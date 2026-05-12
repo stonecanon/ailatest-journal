@@ -15,3 +15,7 @@ node_modules/
 *.gsheet
 *.gdoc
 *.gslides
+
+
+# Build artifacts / intermediate parsed data
+generated/
