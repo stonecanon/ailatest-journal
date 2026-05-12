@@ -1,6 +1,6 @@
 {
-  "source": "WoS Core Collection (SCIE/SSCI/AHCI/ESCI) + JCR 2025 + ESI",
-  "last_updated_source": "April 20, 2026",
+  "source": "WoS Core + JCR 2025 + ESI + 中科院 2025 + 长江大学 + ShowJCR (JCR/FQB/XR/CCF/Warning) + 中国科协",
+  "last_updated_source": "WoS Core 2026-04-20",
   "total": 23185,
   "indices": {
     "ESCI": 9449,
@@ -8,6 +8,13 @@
     "SCIE": 9527,
     "SSCI": 3557
   },
+  "with_if_2024": 21525,
+  "with_cas_zone": 21695,
+  "with_cas_top": 1788,
+  "with_warning": 4,
+  "with_cn_name": 33,
+  "with_ccf": 279,
+  "with_cnkx": 2119,
   "wos_categories": 259,
   "esi_categories": 22
 }

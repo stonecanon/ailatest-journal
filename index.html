@@ -3,83 +3,144 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>AILatest Journal · SCI/SSCI 期刊查询</title>
-<meta name="description" content="Web of Science Core Collection 期刊检索 · SCIE/SSCI/AHCI/ESCI · 23,000+ 本 · 按 ESI 22 大学科分类" />
+<title>AILatest Journal · 期刊检索</title>
+<meta name="description" content="SCI/SSCI/AHCI/ESCI 期刊检索 · JCR IF · 中科院分区 · CCF 推荐 · 中国科协高质量期刊分级 · 国内 CCF-T / 浙大目录" />
 <link rel="preload" href="data/journals.json" as="fetch" crossorigin="anonymous" />
-<link rel="stylesheet" href="css/app.css?v=20260512-01" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="css/app.css?v=20260512-06" />
 </head>
 <body>
 <aside class="sidebar">
-  <h1 class="brand"><a href="./">AILatest<span>Journal</span></a></h1>
-  <div class="side-section">
-    <div class="side-label">索引</div>
-    <div class="index-toggles" id="index-toggles">
-      <label><input type="checkbox" value="SCIE" checked><span class="tag tag-scie">SCIE</span></label>
-      <label><input type="checkbox" value="SSCI" checked><span class="tag tag-ssci">SSCI</span></label>
-      <label><input type="checkbox" value="AHCI" checked><span class="tag tag-ahci">AHCI</span></label>
-      <label><input type="checkbox" value="ESCI" checked><span class="tag tag-esci">ESCI</span></label>
+  <h1 class="brand">
+    <a href="./">AILatest<span>Journal</span></a>
+  </h1>
+  <div class="brand-sub" data-i18n="tagline">学术期刊检索 · 牛皮纸版</div>
+
+  <div class="side-section" data-international>
+    <div class="side-label" data-i18n="indices">索引</div>
+    <div class="chip-row" id="index-toggles">
+      <label class="chip tag-scie"><input type="checkbox" value="SCIE" checked>SCIE</label>
+      <label class="chip tag-ssci"><input type="checkbox" value="SSCI" checked>SSCI</label>
+      <label class="chip tag-ahci"><input type="checkbox" value="AHCI" checked>AHCI</label>
+      <label class="chip tag-esci"><input type="checkbox" value="ESCI" checked>ESCI</label>
     </div>
   </div>
-  <div class="side-section">
-    <div class="side-label">ESI 学科大类</div>
+
+  <div class="side-section" data-international>
+    <div class="side-label" data-i18n="cas_zone">中科院 2025 分区</div>
+    <div class="chip-row" id="zone-toggles">
+      <label class="chip zone-1"><input type="checkbox" value="1"><span data-i18n="z1">1 区</span></label>
+      <label class="chip zone-2"><input type="checkbox" value="2"><span data-i18n="z2">2 区</span></label>
+      <label class="chip zone-3"><input type="checkbox" value="3"><span data-i18n="z3">3 区</span></label>
+      <label class="chip zone-4"><input type="checkbox" value="4"><span data-i18n="z4">4 区</span></label>
+      <label class="chip zone-top"><input type="checkbox" value="top">Top</label>
+    </div>
+  </div>
+
+  <div class="side-section" data-international>
+    <div class="side-label" data-i18n="filters">附加筛选</div>
+    <div class="chip-row" id="feat-toggles">
+      <label class="chip"><input type="checkbox" value="if" data-feat>IF</label>
+      <label class="chip"><input type="checkbox" value="ccf" data-feat>CCF</label>
+      <label class="chip"><input type="checkbox" value="cnkx" data-feat>T1/T2/T3</label>
+      <label class="chip"><input type="checkbox" value="warning" data-feat>预警</label>
+    </div>
+  </div>
+
+  <div class="side-section" data-international>
+    <div class="side-label" data-i18n="esi">ESI 学科大类</div>
     <nav class="nav">
-      <button class="nav-item active" data-cat="__all">全部 <span class="count" id="count-all">—</span></button>
+      <button class="nav-item active" data-cat="__all"><span data-i18n="all">全部</span> <span class="count" id="count-all">—</span></button>
       <div class="nav-group" id="cat-list"></div>
     </nav>
   </div>
+
+  <div class="side-section" data-domestic hidden>
+    <div class="side-label" data-i18n="domestic_sources">国内分级来源</div>
+    <nav class="nav" id="domestic-nav">
+      <button class="nav-item active" data-dom="cnkx"><span data-i18n="src_cnkx">中国科协高质量目录</span></button>
+      <button class="nav-item" data-dom="zju_zju"><span data-i18n="src_zju">浙江大学 2024</span></button>
+      <button class="nav-item" data-dom="zju_city"><span data-i18n="src_zjucity">学校 A 2023</span></button>
+      <button class="nav-item" data-dom="ccft"><span data-i18n="src_ccft">CCF 中文 T 分区</span></button>
+    </nav>
+  </div>
+
   <footer class="aside-foot">
     <a href="https://ailatest.org" target="_blank" rel="noopener">← ailatest.org</a>
   </footer>
 </aside>
 
 <main class="main">
+  <div class="tabs">
+    <button class="tab active" data-tab="int" data-i18n="tab_int">国际 SCI/SSCI</button>
+    <button class="tab" data-tab="dom" data-i18n="tab_dom">国内分级目录</button>
+  </div>
+
   <header class="topbar">
     <div class="search-wrap">
-      <input id="q" type="search" placeholder="搜索：期刊全称 / 缩写 / ISSN（英文）" autocomplete="off" spellcheck="false" />
-      <span class="hint" id="hint">加载中…</span>
+      <input id="q" type="search" placeholder="Search: journal title / abbr / ISSN" autocomplete="off" spellcheck="false" />
+      <span class="hint" id="hint" data-i18n="loading">加载中…</span>
     </div>
+    <button class="lang-toggle" id="lang-toggle" aria-label="切换语言">中 / EN</button>
   </header>
 
-  <section class="hero">
-    <h2>SCI / SSCI 期刊检索</h2>
-    <p>
-      数据源：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI）· 更新至 2026-04-20<br/>
-      合并 <b>JCR 2025</b> 的四索引归属标记与 <b>ESI</b> 22 大学科分类 · 共收录 <b id="total">—</b> 本。<br/>
-      <span class="muted">IF 与中科院分区因数据版权暂不展示。</span>
-    </p>
+  <!-- ─── 国际 tab ─── -->
+  <section class="tab-panel" data-panel="int">
+    <section class="hero">
+      <h2 data-i18n="hero_title_int">SCI / SSCI 国际期刊检索</h2>
+      <p>
+        <span data-i18n="hero_body_int">数据源：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI）· 更新至 2026-04-20。合并 <b>JCR 2025</b> 归属标记、<b>ESI</b> 22 大学科分类、<b>中科院 2025 大类分区</b>、<b>ShowJCR</b> JCR 2024 影响因子 / 小类分区 / 新锐版 / CCF 2026 推荐、<b>中国科协</b> 高质量科技期刊分级目录（T1/T2/T3）与国际期刊预警名单。共收录 <b id="total">—</b> 本。</span><br/>
+        <span class="muted" data-i18n="hero_note">期刊原名保留英文，括注为中文刊名；徽章从左至右：索引 / CAS 分区 / IF 分位 / CCF / T1-T3 / 预警。</span>
+      </p>
+    </section>
+
+    <section class="results">
+      <div class="results-head">
+        <h3 id="results-title" data-i18n="results_all">全部期刊</h3>
+        <span class="results-count" id="results-count">—</span>
+      </div>
+      <div class="table-wrap">
+        <table class="journals">
+          <thead>
+            <tr>
+              <th class="col-name" data-i18n="col_name">期刊 Title</th>
+              <th class="col-abbr" data-i18n="col_abbr">缩写 Abbr</th>
+              <th class="col-issn">ISSN</th>
+              <th class="col-badge" data-i18n="col_badges">索引 / IF / 分区 / 徽章</th>
+              <th class="col-cat" data-i18n="col_cat">ESI / 中科院大类</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+      <div class="pager">
+        <button id="more" hidden data-i18n="load_more">加载更多</button>
+      </div>
+    </section>
   </section>
 
-  <section class="results">
-    <div class="results-head">
-      <h3 id="results-title">全部期刊</h3>
-      <span class="results-count" id="results-count">—</span>
-    </div>
-    <div class="table-wrap">
-      <table class="journals">
-        <thead>
-          <tr>
-            <th class="col-name">期刊名</th>
-            <th class="col-abbr">缩写</th>
-            <th class="col-issn">ISSN / eISSN</th>
-            <th class="col-idx">索引</th>
-            <th class="col-cat">ESI 大类</th>
-          </tr>
-        </thead>
-        <tbody id="tbody"></tbody>
-      </table>
-    </div>
-    <div class="pager">
-      <button id="more" hidden>加载更多</button>
-    </div>
+  <!-- ─── 国内 tab ─── -->
+  <section class="tab-panel" data-panel="dom" hidden>
+    <section class="hero">
+      <h2 data-i18n="hero_title_dom">国内学术期刊分级目录</h2>
+      <p>
+        <span data-i18n="hero_body_dom"><b>中国科协科学技术创新部</b> 2025 年 12 月发布的 <em>高质量科技期刊分级目录总汇</em>，覆盖 40+ 学科领域，T1 / T2 / T3 三级；<b>浙江大学 2024 版</b> 与 <b>学校 A 2023 版</b> 的国内期刊分级；<b>CCF 推荐中文科技期刊 2025</b> T 分区。</span><br/>
+        <span class="muted" data-i18n="hero_note_dom">CSSCI / 北大核心目录为扫描件 PDF，OCR 版稍后补入。</span>
+      </p>
+    </section>
+
+    <div id="dom-content"></div>
   </section>
 
   <footer class="site-foot">
-    <p>Data: Clarivate Web of Science Core Collection · JCR 2025 · ESI. Built for <a href="https://ailatest.org">ailatest.org</a>.</p>
+    <p>Data · Clarivate WoS Core Collection · JCR 2025 · ESI · 中科院文献情报中心分区表 2025 · ShowJCR (GPL-3.0) · 中国科协 2025 · 浙大 2024 · 学校 A 2023. Built for <a href="https://ailatest.org">ailatest.org</a>.</p>
   </footer>
 </main>
 
-<button id="theme-toggle" class="theme-toggle" aria-label="切换主题">🌓</button>
+<button id="theme-toggle" class="theme-toggle" aria-label="切换主题">◐</button>
 
-<script src="js/app.js?v=20260512-01" defer></script>
+<script src="js/app.js?v=20260512-06" defer></script>
 </body>
 </html>
