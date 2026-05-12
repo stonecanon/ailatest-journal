@@ -57,7 +57,7 @@ SHOW_CCFT   = LIST_DIR / 'ShowJCR_CCF-T_2025.csv'
 
 CNKX_JSON    = DATA_DIR / 'cnkx_tiers.json'
 ZJU_JSON     = DATA_DIR / 'zju_tiers.json'
-ZJU_CITY_JSON= DATA_DIR / 'zju_city_tiers.json'
+SCHOOL_A_JSON= DATA_DIR / 'school_a_tiers.json'
 CSSCI_CORE_JSON = ROOT / 'generated' / 'cssci_core.json'
 CSSCI_EXT_JSON  = ROOT / 'generated' / 'cssci_ext.json'
 PKU_CORE_JSON   = ROOT / 'generated' / 'pku_core.json'
@@ -531,7 +531,7 @@ def main():
     domestic = {
         'cnkx': None,
         'zju': None,
-        'zju_city': None,
+        'school_a': None,
         'ccft': [],
         'cssci_core': [],
         'cssci_ext': [],
@@ -541,8 +541,8 @@ def main():
         domestic['cnkx'] = json.loads(CNKX_JSON.read_text(encoding='utf-8'))
     if ZJU_JSON.exists():
         domestic['zju'] = json.loads(ZJU_JSON.read_text(encoding='utf-8'))
-    if ZJU_CITY_JSON.exists():
-        domestic['zju_city'] = json.loads(ZJU_CITY_JSON.read_text(encoding='utf-8'))
+    if SCHOOL_A_JSON.exists():
+        domestic['school_a'] = json.loads(SCHOOL_A_JSON.read_text(encoding='utf-8'))
     if CSSCI_CORE_JSON.exists():
         domestic['cssci_core'] = json.loads(CSSCI_CORE_JSON.read_text(encoding='utf-8'))
     if CSSCI_EXT_JSON.exists():
