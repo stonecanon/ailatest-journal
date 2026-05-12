@@ -16,5 +16,20 @@
   "with_ccf": 279,
   "with_cnkx": 2119,
   "wos_categories": 259,
-  "esi_categories": 22
+  "esi_categories": 22,
+  "oa_enriched": true,
+  "oa_source": "OpenAlex snapshot 2026-05",
+  "oa_stats": {
+    "matched_issns": 39310,
+    "has_homepage": 34142,
+    "has_apc": 14014,
+    "labels": {
+      "subscription_paid_read": 17147,
+      "diamond": 5756,
+      "hybrid": 9544,
+      "gold_apc": 6863
+    },
+    "is_oa": 12619,
+    "in_doaj": 10133
+  }
 }

@@ -87,6 +87,16 @@
   let domestic = null;
   let esiCats = [];
   let meta = null;
+  let oaMap = {};          // compact OpenAlex map: { "ISSN": {hp, l, oa, dj, apc, org, cn, w} }
+
+  function lookupOA(r) {
+    if (!oaMap) return null;
+    const keys = [r.issn, r.eissn].filter(Boolean).map(s => String(s).toUpperCase());
+    for (const k of keys) {
+      if (oaMap[k]) return oaMap[k];
+    }
+    return null;
+  }
 
   let activeTab = 'int';
   let activeCat = '__all';
@@ -913,6 +923,47 @@
          </div>`
       : '';
 
+    // OpenAlex enriched block (homepage / OA / APC)
+    const oa = r.oa || lookupOA(r);
+    const oaHTML = oa ? (() => {
+      const labelMap = {
+        diamond:                 { text: 'Diamond OA · 读投全免费',   cls: 'oa-diamond',  desc: '由机构/基金全额资助，作者读者都不付费。' },
+        gold_apc:                { text: 'Gold OA · 投稿付 APC',       cls: 'oa-gold',     desc: '全刊开放获取，作者支付版面费（APC）。' },
+        hybrid:                  { text: 'Hybrid · 可选 OA',           cls: 'oa-hybrid',   desc: '订阅制刊，可选付 APC 开放单篇。' },
+        subscription_paid_read:  { text: '订阅制 · 读付费',            cls: 'oa-sub',      desc: '读者需订阅，作者投稿通常免费（个别收 page charge）。' },
+        unknown:                 { text: '付费模式未知',               cls: 'oa-unk',      desc: '' },
+      };
+      // Normalize both compact (hp/l/oa/dj/apc/org/w) and verbose shapes
+      const label   = oa.l || oa.label || 'unknown';
+      const L       = labelMap[label] || labelMap.unknown;
+      const homepage= oa.hp || oa.homepage;
+      const apcVal  = oa.apc ?? oa.apc_usd;
+      const isoa    = oa.oa ?? oa.is_oa;
+      const doaj    = oa.dj ?? oa.in_doaj;
+      const org     = oa.org || oa.host_org;
+      const works   = oa.w   || oa.works_count;
+      const apc = (apcVal && apcVal > 0) ? `USD ${apcVal.toLocaleString()}` : null;
+      const doajBadge = doaj ? '<span class="oa-chip oa-doaj">✓ 收录 DOAJ</span>' : '';
+      const isoaBadge = isoa ? '<span class="oa-chip oa-isoa">Open Access</span>' : '';
+      const rows = [];
+      if (homepage) rows.push(['官网', `<a href="${escape(homepage)}" target="_blank" rel="noopener nofollow">${escape(homepage.replace(/^https?:\/\//,'').replace(/\/$/,''))}</a>`]);
+      if (apc) rows.push(['版面费 (APC)', apc]);
+      if (org) rows.push(['出版方 (OpenAlex)', escape(org)]);
+      if (works) rows.push(['已发表论文', works.toLocaleString() + ' 篇']);
+      return `<div class="drawer-section oa-section">
+        <h4>开放获取 / 版面费</h4>
+        <div class="oa-head">
+          <span class="oa-pill ${L.cls}">${L.text}</span>
+          ${doajBadge}${isoaBadge}
+        </div>
+        ${L.desc ? `<div class="oa-desc muted">${L.desc}</div>` : ''}
+        ${rows.length ? `<div class="oa-rows">${rows.map(([k,v]) =>
+          `<div class="meta-row"><div class="meta-k">${k}</div><div class="meta-v">${v}</div></div>`
+        ).join('')}</div>` : ''}
+        <div class="oa-footnote muted">数据来源：OpenAlex snapshot 2026-05。仅供参考，最终以期刊官网为准。</div>
+      </div>`;
+    })() : '';
+
     const on = isFav(r);
     body.innerHTML = `
       <div class="drawer-hero">
@@ -925,6 +976,7 @@
         </div>
       </div>
       ${statsHTML}
+      ${oaHTML}
       ${warnHTML}
       ${metaHTML ? `<div class="meta-block">${metaHTML}</div>` : ''}
       ${casHTML}
@@ -1182,13 +1234,14 @@
     updateFavCount();
     await handleAuthCallback();
     try {
-      const [j, d, m, esi] = await Promise.all([
+      const [j, d, m, esi, oa] = await Promise.all([
         fetch('data/journals.json').then(r => r.json()),
         fetch('data/domestic.json').then(r => r.json()).catch(() => null),
         fetch('data/meta.json').then(r => r.json()).catch(() => null),
         fetch('data/esi_categories.json').then(r => r.json()).catch(() => []),
+        fetch('data/oa.json').then(r => r.json()).catch(() => ({})),
       ]);
-      journals = j; domestic = d; meta = m; esiCats = esi;
+      journals = j; domestic = d; meta = m; esiCats = esi; oaMap = oa || {};
       buildDomIndex(domestic);
       if (meta?.total && $('#total')) $('#total').textContent = meta.total.toLocaleString();
       $('#hint').textContent = lang === 'zh'

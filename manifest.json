@@ -1,0 +1,46 @@
+{
+  "name": "AILatest Journal · 期刊检索",
+  "short_name": "AILatest Journal",
+  "description": "面向中文科研人员的一站式期刊查询工具 · SCI/SSCI/中科院分区/CCF/科协/院校目录",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f5ecd7",
+  "theme_color": "#2b2824",
+  "lang": "zh-CN",
+  "categories": ["education", "productivity", "books"],
+  "icons": [
+    { "src": "icons/icon-72.png",  "sizes": "72x72",   "type": "image/png" },
+    { "src": "icons/icon-96.png",  "sizes": "96x96",   "type": "image/png" },
+    { "src": "icons/icon-128.png", "sizes": "128x128", "type": "image/png" },
+    { "src": "icons/icon-144.png", "sizes": "144x144", "type": "image/png" },
+    { "src": "icons/icon-152.png", "sizes": "152x152", "type": "image/png" },
+    { "src": "icons/icon-180.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-256.png", "sizes": "256x256", "type": "image/png" },
+    { "src": "icons/icon-384.png", "sizes": "384x384", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    {
+      "name": "国际 SCI / SSCI",
+      "short_name": "国际",
+      "url": "/?tab=int",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "国内分级目录",
+      "short_name": "国内",
+      "url": "/?tab=dom",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "我的收藏",
+      "short_name": "收藏",
+      "url": "/?tab=fav",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

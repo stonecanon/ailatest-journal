@@ -561,6 +561,79 @@ table.journals tr:last-child td { border-bottom: 0; }
 }
 
 /* theme toggle */
+/* OpenAlex OA / APC drawer block */
+.oa-section .oa-head { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 6px 0 8px; }
+.oa-pill {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  border: 1px solid transparent;
+}
+.oa-pill.oa-diamond { background: #e8f7ef; color: #1b6a3d; border-color: #b9e3ca; }
+.oa-pill.oa-gold    { background: #fff3d6; color: #7a5100; border-color: #f3d789; }
+.oa-pill.oa-hybrid  { background: #eef2fb; color: #2b4478; border-color: #c9d3ea; }
+.oa-pill.oa-sub     { background: #f2ede3; color: #5a4a2f; border-color: #d9cdb2; }
+.oa-pill.oa-unk     { background: #ececec; color: #555;    border-color: #ccc; }
+.oa-chip {
+  display: inline-block;
+  padding: 3px 8px;
+  font-size: 11px;
+  border-radius: 4px;
+  background: #eef2ec;
+  color: #2b5a3a;
+  border: 1px solid #c8d9c7;
+}
+.oa-chip.oa-isoa { background: #fff3d6; color: #7a5100; border-color: #f3d789; }
+.oa-desc { font-size: 12px; line-height: 1.55; margin: 4px 0 10px; }
+.oa-rows .meta-row { padding: 4px 0; }
+.oa-footnote { font-size: 11px; margin-top: 8px; }
+html[data-theme="dark"] .oa-pill.oa-diamond { background: #14302a; color: #9cdbb5; border-color: #2b5a3a; }
+html[data-theme="dark"] .oa-pill.oa-gold    { background: #3a2d10; color: #f3d789; border-color: #6b532b; }
+html[data-theme="dark"] .oa-pill.oa-hybrid  { background: #1d2640; color: #a5b4d8; border-color: #3f4b6f; }
+html[data-theme="dark"] .oa-pill.oa-sub     { background: #2c2519; color: #d9cdb2; border-color: #554830; }
+html[data-theme="dark"] .oa-chip            { background: #203028; color: #c9dfc8; border-color: #3a5840; }
+html[data-theme="dark"] .oa-chip.oa-isoa    { background: #3a2d10; color: #f3d789; border-color: #6b532b; }
+
+/* compact OA chip shown in table row */
+.row-badges .badge-oa {
+  display: inline-block;
+  padding: 1px 6px;
+  font-size: 10px;
+  border-radius: 3px;
+  margin-left: 4px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.badge-oa.oa-diamond { background: #e8f7ef; color: #1b6a3d; }
+.badge-oa.oa-gold    { background: #fff3d6; color: #7a5100; }
+.badge-oa.oa-hybrid  { background: #eef2fb; color: #2b4478; }
+
+/* PWA install prompt */
+.pwa-install {
+  position: fixed;
+  right: 14px;
+  bottom: 14px;
+  z-index: 200;
+  padding: 10px 14px;
+  border: 1px solid rgba(43,40,36,0.2);
+  border-radius: 999px;
+  background: linear-gradient(180deg, #f5ecd7, #e5d4a8);
+  color: #2b2824;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  cursor: pointer;
+  font-family: inherit;
+}
+.pwa-install:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(0,0,0,0.2); }
+@media (max-width: 720px) {
+  .pwa-install { right: 10px; bottom: 72px; font-size: 12px; padding: 8px 12px; }
+}
+
+#theme-toggle,
 .theme-toggle {
   position: fixed; right: 18px; bottom: 18px;
   width: 40px; height: 40px;
