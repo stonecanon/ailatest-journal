@@ -58,6 +58,9 @@ SHOW_CCFT   = LIST_DIR / 'ShowJCR_CCF-T_2025.csv'
 CNKX_JSON    = DATA_DIR / 'cnkx_tiers.json'
 ZJU_JSON     = DATA_DIR / 'zju_tiers.json'
 ZJU_CITY_JSON= DATA_DIR / 'zju_city_tiers.json'
+CSSCI_CORE_JSON = ROOT / 'generated' / 'cssci_core.json'
+CSSCI_EXT_JSON  = ROOT / 'generated' / 'cssci_ext.json'
+PKU_CORE_JSON   = ROOT / 'generated' / 'pku_core.json'
 
 
 # ───────────────────────── utils ─────────────────────────
@@ -530,6 +533,9 @@ def main():
         'zju': None,
         'zju_city': None,
         'ccft': [],
+        'cssci_core': [],
+        'cssci_ext': [],
+        'pku_core': [],
     }
     if CNKX_JSON.exists():
         domestic['cnkx'] = json.loads(CNKX_JSON.read_text(encoding='utf-8'))
@@ -537,6 +543,12 @@ def main():
         domestic['zju'] = json.loads(ZJU_JSON.read_text(encoding='utf-8'))
     if ZJU_CITY_JSON.exists():
         domestic['zju_city'] = json.loads(ZJU_CITY_JSON.read_text(encoding='utf-8'))
+    if CSSCI_CORE_JSON.exists():
+        domestic['cssci_core'] = json.loads(CSSCI_CORE_JSON.read_text(encoding='utf-8'))
+    if CSSCI_EXT_JSON.exists():
+        domestic['cssci_ext'] = json.loads(CSSCI_EXT_JSON.read_text(encoding='utf-8'))
+    if PKU_CORE_JSON.exists():
+        domestic['pku_core'] = json.loads(PKU_CORE_JSON.read_text(encoding='utf-8'))
     if SHOW_CCFT.exists():
         with open(SHOW_CCFT, 'r', encoding='utf-8-sig', newline='') as f:
             reader = csv.DictReader(f)

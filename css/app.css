@@ -271,14 +271,55 @@ main.main {
   margin-left: 4px;
   letter-spacing: 0.04em;
 }
-.lang-toggle {
+.topbar-actions {
+  display: flex; align-items: center; gap: 8px;
+}
+.lang-toggle,
+.auth-btn,
+.fav-tab {
   font-family: var(--serif); font-size: 13px;
   background: transparent; border: 1px solid var(--rule);
   padding: 6px 12px; border-radius: 2px;
   cursor: pointer; color: var(--ink-soft);
   letter-spacing: 0.04em;
+  white-space: nowrap;
 }
-.lang-toggle:hover { border-color: var(--accent); color: var(--accent); }
+.lang-toggle:hover,
+.auth-btn:hover,
+.fav-tab:hover { border-color: var(--accent); color: var(--accent); }
+.fav-tab {
+  color: var(--accent);
+  border-color: var(--rule);
+}
+.fav-tab #fav-count {
+  display: inline-block;
+  min-width: 18px;
+  padding: 1px 5px;
+  font-family: var(--mono);
+  font-size: 10px;
+  margin-left: 2px;
+  background: var(--accent);
+  color: var(--paper);
+  border-radius: 9px;
+  line-height: 1.2;
+}
+
+/* favorite star button on row */
+.fav-star {
+  background: transparent;
+  border: 0;
+  font-size: 18px;
+  line-height: 1;
+  padding: 2px 6px;
+  color: var(--ink-faint);
+  cursor: pointer;
+  transition: color .12s;
+}
+.fav-star:hover { color: var(--accent); }
+.fav-star.on { color: var(--gold); }
+
+.col-fav { width: 36px; text-align: center; }
+
 
 /* ─────────── Hero ─────────── */
 .hero {

@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="css/app.css?v=20260512-06" />
+<link rel="stylesheet" href="css/app.css?v=20260512-07" />
 </head>
 <body>
 <aside class="sidebar">
@@ -61,6 +61,9 @@
     <div class="side-label" data-i18n="domestic_sources">国内分级来源</div>
     <nav class="nav" id="domestic-nav">
       <button class="nav-item active" data-dom="cnkx"><span data-i18n="src_cnkx">中国科协高质量目录</span></button>
+      <button class="nav-item" data-dom="cssci_core"><span data-i18n="src_cssci_core">CSSCI 来源期刊</span></button>
+      <button class="nav-item" data-dom="cssci_ext"><span data-i18n="src_cssci_ext">CSSCI 扩展版</span></button>
+      <button class="nav-item" data-dom="pku_core"><span data-i18n="src_pku">北大核心 (2023)</span></button>
       <button class="nav-item" data-dom="zju_zju"><span data-i18n="src_zju">浙江大学 2024</span></button>
       <button class="nav-item" data-dom="zju_city"><span data-i18n="src_zjucity">学校 A 2023</span></button>
       <button class="nav-item" data-dom="ccft"><span data-i18n="src_ccft">CCF 中文 T 分区</span></button>
@@ -76,6 +79,7 @@
   <div class="tabs">
     <button class="tab active" data-tab="int" data-i18n="tab_int">国际 SCI/SSCI</button>
     <button class="tab" data-tab="dom" data-i18n="tab_dom">国内分级目录</button>
+    <button class="tab" data-tab="fav" data-i18n="tab_fav">我的收藏</button>
   </div>
 
   <header class="topbar">
@@ -83,7 +87,11 @@
       <input id="q" type="search" placeholder="Search: journal title / abbr / ISSN" autocomplete="off" spellcheck="false" />
       <span class="hint" id="hint" data-i18n="loading">加载中…</span>
     </div>
-    <button class="lang-toggle" id="lang-toggle" aria-label="切换语言">中 / EN</button>
+    <div class="topbar-actions">
+      <button class="fav-tab" id="fav-tab" aria-label="收藏" title="我的收藏">★ <span id="fav-count">0</span></button>
+      <button class="auth-btn" id="auth-btn" aria-label="登录">登录</button>
+      <button class="lang-toggle" id="lang-toggle" aria-label="切换语言">中 / EN</button>
+    </div>
   </header>
 
   <!-- ─── 国际 tab ─── -->
@@ -134,6 +142,17 @@
     <div id="dom-content"></div>
   </section>
 
+  <!-- ─── 收藏 tab ─── -->
+  <section class="tab-panel" data-panel="fav" hidden>
+    <section class="hero">
+      <h2 data-i18n="hero_title_fav">我的收藏</h2>
+      <p>
+        <span data-i18n="hero_body_fav">点击任意期刊右侧的 <b>★</b> 可加入收藏。未登录时保存在本机 localStorage；登录后自动同步到云端，可跨设备访问。</span>
+      </p>
+    </section>
+    <div id="fav-content"></div>
+  </section>
+
   <footer class="site-foot">
     <p>Data · Clarivate WoS Core Collection · JCR 2025 · ESI · 中科院文献情报中心分区表 2025 · ShowJCR (GPL-3.0) · 中国科协 2025 · 浙大 2024 · 学校 A 2023. Built for <a href="https://ailatest.org">ailatest.org</a>.</p>
   </footer>
@@ -141,6 +160,6 @@
 
 <button id="theme-toggle" class="theme-toggle" aria-label="切换主题">◐</button>
 
-<script src="js/app.js?v=20260512-06" defer></script>
+<script src="js/app.js?v=20260512-07" defer></script>
 </body>
 </html>
