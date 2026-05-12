@@ -1,55 +1,85 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Journal · SCI期刊查询 | ailatest</title>
-<meta name="description" content="SCI 期刊快速查询：ESI 22 大类 12,000+ 本期刊，支持按刊名、ISSN、学科检索。">
-<link rel="stylesheet" href="css/journal.css?v=20260512-01">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>AILatest Journal · SCI/SSCI 期刊查询</title>
+<meta name="description" content="Web of Science Core Collection 期刊检索 · SCIE/SSCI/AHCI/ESCI · 23,000+ 本 · 按 ESI 22 大学科分类" />
+<link rel="preload" href="data/journals.json" as="fetch" crossorigin="anonymous" />
+<link rel="stylesheet" href="css/app.css?v=20260512-01" />
 </head>
 <body>
 <aside class="sidebar">
-  <div class="brand">
-    <a href="/" class="brand-name">journal<span class="brand-dot">.</span>ailatest</a>
-    <div class="brand-sub">SCI 期刊查询</div>
+  <h1 class="brand"><a href="./">AILatest<span>Journal</span></a></h1>
+  <div class="side-section">
+    <div class="side-label">索引</div>
+    <div class="index-toggles" id="index-toggles">
+      <label><input type="checkbox" value="SCIE" checked><span class="tag tag-scie">SCIE</span></label>
+      <label><input type="checkbox" value="SSCI" checked><span class="tag tag-ssci">SSCI</span></label>
+      <label><input type="checkbox" value="AHCI" checked><span class="tag tag-ahci">AHCI</span></label>
+      <label><input type="checkbox" value="ESCI" checked><span class="tag tag-esci">ESCI</span></label>
+    </div>
   </div>
-  <nav id="cat-nav" class="cat-nav">
-    <button class="cat-btn active" data-cat="">全部 <span class="cat-count" id="cat-count-all">0</span></button>
-  </nav>
-  <div class="aside-foot">
+  <div class="side-section">
+    <div class="side-label">ESI 学科大类</div>
+    <nav class="nav">
+      <button class="nav-item active" data-cat="__all">全部 <span class="count" id="count-all">—</span></button>
+      <div class="nav-group" id="cat-list"></div>
+    </nav>
+  </div>
+  <footer class="aside-foot">
     <a href="https://ailatest.org" target="_blank" rel="noopener">← ailatest.org</a>
-  </div>
+  </footer>
 </aside>
 
 <main class="main">
   <header class="topbar">
     <div class="search-wrap">
-      <input type="search" id="q" placeholder="搜索刊名 / ISSN / eISSN（英文）" autocomplete="off" spellcheck="false">
-      <span class="search-stats" id="stats">加载中…</span>
+      <input id="q" type="search" placeholder="搜索：期刊全称 / 缩写 / ISSN（英文）" autocomplete="off" spellcheck="false" />
+      <span class="hint" id="hint">加载中…</span>
     </div>
   </header>
 
-  <section class="hero" id="hero">
-    <h1>SCI 期刊查询</h1>
-    <p>覆盖 ESI 22 大类共 <strong id="total">—</strong> 本期刊。数据源：Clarivate ESI 期刊清单。IF 与分区因版权暂未接入，后续提供独立检索入口。</p>
+  <section class="hero">
+    <h2>SCI / SSCI 期刊检索</h2>
+    <p>
+      数据源：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI）· 更新至 2026-04-20<br/>
+      合并 <b>JCR 2025</b> 的四索引归属标记与 <b>ESI</b> 22 大学科分类 · 共收录 <b id="total">—</b> 本。<br/>
+      <span class="muted">IF 与中科院分区因数据版权暂不展示。</span>
+    </p>
   </section>
 
-  <section class="list" id="list"></section>
+  <section class="results">
+    <div class="results-head">
+      <h3 id="results-title">全部期刊</h3>
+      <span class="results-count" id="results-count">—</span>
+    </div>
+    <div class="table-wrap">
+      <table class="journals">
+        <thead>
+          <tr>
+            <th class="col-name">期刊名</th>
+            <th class="col-abbr">缩写</th>
+            <th class="col-issn">ISSN / eISSN</th>
+            <th class="col-idx">索引</th>
+            <th class="col-cat">ESI 大类</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div class="pager">
+      <button id="more" hidden>加载更多</button>
+    </div>
+  </section>
 
-  <nav class="pager" id="pager" hidden>
-    <button id="prev">← 上一页</button>
-    <span id="page-info"></span>
-    <button id="next">下一页 →</button>
-  </nav>
-
-  <footer class="footer">
-    <span>数据：ESI Journal List · 构建 <span id="buildtime">—</span></span>
-    <span>· <a href="https://ailatest.org" target="_blank" rel="noopener">ailatest.org</a></span>
+  <footer class="site-foot">
+    <p>Data: Clarivate Web of Science Core Collection · JCR 2025 · ESI. Built for <a href="https://ailatest.org">ailatest.org</a>.</p>
   </footer>
 </main>
 
-<button id="theme-toggle" class="theme-toggle" title="切换主题">◐</button>
+<button id="theme-toggle" class="theme-toggle" aria-label="切换主题">🌓</button>
 
-<script src="js/journal.js?v=20260512-01"></script>
+<script src="js/app.js?v=20260512-01" defer></script>
 </body>
 </html>

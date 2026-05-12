@@ -1,38 +1,56 @@
-# journal.ailatest.org
+# AILatest Journal
 
-SCI 期刊查询与投稿推荐站点（ailatest 子站）。
+SCI / SSCI / AHCI / ESCI 期刊查询静态站，数据来自 Clarivate Web of Science Core Collection（更新至 2026-04-20）+ JCR 2025 + ESI。
 
-## 现状（MVP）
+> Live: [journal.ailatest.org](https://journal.ailatest.org) · 隶属 [ailatest.org](https://ailatest.org)
 
-- 纯静态页，部署 Cloudflare Pages
-- 数据：ESI 期刊清单 12,278 条 · 22 大类
-- 功能：按刊名 / ISSN / eISSN 搜索 + 按 ESI 分类筛选
-- IF / 中科院分区暂未接入（版权归 Clarivate / 中科院文献情报中心）
+## 数据规模
 
-## 结构
+| 指标 | 数量 |
+|---|---|
+| 总期刊数 | 23,185 |
+| SCIE | 9,527 |
+| SSCI | 3,557 |
+| AHCI | 1,819 |
+| ESCI | 9,449 |
+| ESI 22 大类匹配 | 12,272 |
 
-```
-data/journals.json     # ESI 期刊主表
-data/categories.json   # 22 大类 + 计数
-scripts/build_journals.py  # Excel → JSON
-css/journal.css  js/journal.js  index.html
-```
+## 数据源
 
-## 重建数据
+- `list/Science Citation Index Expanded (SCIE).csv`
+- `list/Social Sciences Citation Index (SSCI).csv`
+- `list/Arts & Humanities Citation Index (AHCI).csv`
+- `list/Emerging Sources Citation Index (ESCI).csv`
+- `list/JCR 2025.csv` — 提供 Title20 缩写 + 四索引旗标
+- `list/ESI全部期刊列表.xlsx` — 12,278 本带 22 大学科大类
+
+## 构建
 
 ```bash
-source ~/.hermes/hermes-agent/venv/bin/activate
-python scripts/build_journals.py
+python3 scripts/build_journals.py
 ```
 
-源文件路径写死在脚本内（`~/.hermes/cache/documents/doc_4f0ce4c8295c_全部期刊列表.xlsx`）。
+产出：
 
-## 部署
+- `data/journals.json` (~7.9 MB, gzip 后约 1.5 MB)
+- `data/esi_categories.json` / `data/wos_categories.json`
+- `data/meta.json`
 
-GitHub: `stonecanon/ailatest-journal` → Cloudflare Pages 自动部署 → CNAME `journal.ailatest.org`。
+## 本地预览
 
-## 路线图
+```bash
+python3 -m http.server 8000
+# 打开 http://localhost:8000
+```
 
-- Phase 1 (当前) 静态 ESI 检索
-- Phase 2 投稿推荐（摘要 embedding → 相似期刊）
-- Phase 3 社区评论（Cloudflare D1）
+## 版权说明
+
+- 期刊元数据来自 Clarivate 公开发布列表，供学术检索参考。
+- **IF（影响因子）与中科院分区因属商业授权数据，当前站点不展示。**
+- 如有收录争议或下架请求，请提 issue。
+
+## 技术栈
+
+- 纯静态 HTML / CSS / 原生 JS，无构建依赖
+- 搜索在前端本地完成（单次 fetch 全量 JSON，之后全内存过滤）
+- 部署：Cloudflare Pages，CNAME → `journal.ailatest.org`

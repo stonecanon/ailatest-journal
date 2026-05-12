@@ -1,0 +1,90 @@
+[
+  {
+    "name": "SOCIAL SCIENCES, GENERAL",
+    "count": 2095
+  },
+  {
+    "name": "CLINICAL MEDICINE",
+    "count": 2084
+  },
+  {
+    "name": "ENGINEERING",
+    "count": 914
+  },
+  {
+    "name": "PLANT & ANIMAL SCIENCE",
+    "count": 807
+  },
+  {
+    "name": "PSYCHIATRY/PSYCHOLOGY",
+    "count": 649
+  },
+  {
+    "name": "ECONOMICS & BUSINESS",
+    "count": 626
+  },
+  {
+    "name": "CHEMISTRY",
+    "count": 529
+  },
+  {
+    "name": "MATHEMATICS",
+    "count": 519
+  },
+  {
+    "name": "GEOSCIENCES",
+    "count": 432
+  },
+  {
+    "name": "BIOLOGY & BIOCHEMISTRY",
+    "count": 420
+  },
+  {
+    "name": "MATERIALS SCIENCE",
+    "count": 419
+  },
+  {
+    "name": "COMPUTER SCIENCE",
+    "count": 407
+  },
+  {
+    "name": "ENVIRONMENT/ECOLOGY",
+    "count": 375
+  },
+  {
+    "name": "AGRICULTURAL SCIENCES",
+    "count": 351
+  },
+  {
+    "name": "NEUROSCIENCE & BEHAVIOR",
+    "count": 345
+  },
+  {
+    "name": "PHYSICS",
+    "count": 312
+  },
+  {
+    "name": "MOLECULAR BIOLOGY & GENETICS",
+    "count": 290
+  },
+  {
+    "name": "PHARMACOLOGY & TOXICOLOGY",
+    "count": 279
+  },
+  {
+    "name": "IMMUNOLOGY",
+    "count": 167
+  },
+  {
+    "name": "MICROBIOLOGY",
+    "count": 128
+  },
+  {
+    "name": "MULTIDISCIPLINARY",
+    "count": 67
+  },
+  {
+    "name": "SPACE SCIENCE",
+    "count": 57
+  }
+]

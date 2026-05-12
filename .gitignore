@@ -1,18 +1,17 @@
-# deps & caches
-node_modules/
-__pycache__/
-*.pyc
+# Keep raw source data (list/) committed so build is reproducible.
+# Exclude editor/system junk only.
+
 .DS_Store
-
-# local-only
-.env
-.vscode/
+*.pyc
+__pycache__/
+.venv/
+venv/
+node_modules/
 .idea/
+.vscode/
+*.swp
 
-# Google Drive quirks
+# Google Drive shortcut placeholders
 *.gsheet
 *.gdoc
 *.gslides
-
-# build artifacts we don't commit
-*.log
