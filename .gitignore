@@ -19,3 +19,7 @@ node_modules/
 
 # Build artifacts / intermediate parsed data
 generated/
+
+# OpenAlex raw cache (21MB, regeneratable via scripts/fetch_openalex.py)
+data/openalex_cache.json
+

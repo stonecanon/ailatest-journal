@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f5ecd7"/>
+      <stop offset="1" stop-color="#e5d4a8"/>
+    </linearGradient>
+    <linearGradient id="ink" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2b2824"/>
+      <stop offset="1" stop-color="#4a3f2d"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="96" fill="url(#paper)"/>
+  <g fill="url(#ink)">
+    <!-- Stylised "J" for Journal as a bookmark ribbon -->
+    <path d="M168 96 h176 c12 0 20 8 20 20 v280 c0 18 -22 24 -34 12 l-74 -74 -74 74 c-12 12 -34 6 -34 -12 V116 c0 -12 8 -20 20 -20 z" opacity="0.15"/>
+    <!-- Letter A (ailatest) serif style -->
+    <path d="M256 140 L156 392 h52 l22 -56 h100 l22 56 h52 L304 140 z M248 296 l32 -84 32 84 z"/>
+  </g>
+  <!-- tiny journal title bar -->
+  <rect x="120" y="412" width="272" height="10" rx="5" fill="#8a6a35" opacity="0.6"/>
+  <rect x="156" y="432" width="200" height="6" rx="3" fill="#8a6a35" opacity="0.4"/>
+</svg>
