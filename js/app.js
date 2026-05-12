@@ -5,7 +5,7 @@
 
   const I18N = {
     zh: {
-      tagline: '学术期刊检索 · 牛皮纸版',
+      tagline: '<b>ailatest · journal</b> — 面向中文科研人员的一站式期刊查询工具，聚合国际 SCI/SSCI 与国内分级目录，支持收藏、解锁院校自编目录、跨设备同步。',
       indices: '索引', cas_zone: '中科院 2025 分区', filters: '附加筛选',
       esi: 'ESI 学科大类', all: '全部',
       z1: '1 区', z2: '2 区', z3: '3 区', z4: '4 区',
@@ -41,7 +41,7 @@
       syncing: '同步中…', synced: '已同步',
     },
     en: {
-      tagline: 'Scholarly Journal Index · Kraft Edition',
+      tagline: '<b>ailatest · journal</b> — One-stop journal index for Chinese researchers. Aggregates international SCI/SSCI indexes with Chinese tiered directories. Favorites, institution-locked catalogs, cross-device sync.',
       indices: 'Indices', cas_zone: 'CAS 2025 Tier', filters: 'Filters',
       esi: 'ESI Categories', all: 'All',
       z1: 'T1', z2: 'T2', z3: 'T3', z4: 'T4',
