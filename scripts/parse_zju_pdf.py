@@ -8,7 +8,7 @@
 
 每条:  序号  刊名(可跨行)  ISSN(或 CN号)  (备注)
 
-输出: data/zju_tiers.json / data/zju_city_tiers.json
+输出: data/zju_tiers.json / data/school_a_tiers.json
      = {'source':str, 'records':[{'name','issn','cn_code','tier','note'}...]}
 """
 from __future__ import annotations
@@ -22,7 +22,7 @@ FILES = [
     (ROOT/'list'/'浙江大学国内学术期刊分级目录指南·2024 版.pdf',
      ROOT/'data'/'zju_tiers.json', '浙江大学国内学术期刊分级目录指南 · 2024'),
     (ROOT/'list'/'学校 A期刊目录（2023 年版）.pdf',
-     ROOT/'data'/'zju_city_tiers.json', '学校 A期刊目录 · 2023'),
+     ROOT/'data'/'school_a_tiers.json', '学校 A期刊目录 · 2023'),
 ]
 
 RE_ISSN = re.compile(r'\d{4}-\d{3}[\dXx]')

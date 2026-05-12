@@ -2,13 +2,13 @@
 """Encrypt 学校自编目录 using AES-GCM with a user-defined unlock code.
 
 用法:
-    python scripts/encrypt_locked.py zju_city school-a-149684
+    python scripts/encrypt_locked.py school_a school-a-149684
 
 效果:
-    - 读取 data/domestic.json 中 zju_city.records
+    - 读取 data/domestic.json 中 school_a.records
     - 用 code 通过 PBKDF2 派生 AES-256 密钥
-    - AES-GCM 加密 → data/locked/zju_city.enc.json
-    - 原 domestic.json 中 zju_city.records 清空（只留 source）
+    - AES-GCM 加密 → data/locked/school_a.enc.json
+    - 原 domestic.json 中 school_a.records 清空（只留 source）
 
 前端用 Web Crypto API 的 PBKDF2 + AES-GCM 解密，参数必须与本脚本一致。
 """
@@ -107,5 +107,5 @@ def encrypt(source_key: str, code: str) -> None:
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
-        sys.exit(f"用法: python {sys.argv[0]} <source_key> <code>\n 例: python {sys.argv[0]} zju_city school-a-149684")
+        sys.exit(f"用法: python {sys.argv[0]} <source_key> <code>\n 例: python {sys.argv[0]} school_a school-a-149684")
     encrypt(sys.argv[1], sys.argv[2])

@@ -115,7 +115,7 @@
   try { favsData = JSON.parse(localStorage.getItem('ailatest.favsData') || '{}'); } catch(_){}
   let user = JSON.parse(localStorage.getItem('ailatest.user') || 'null');
 
-  // unlocked records cache for locked sources: { zju_city: [...records], ... }
+  // unlocked records cache for locked sources: { school_a: [...records], ... }
   const unlockedCache = {};
   try {
     const raw = localStorage.getItem('ailatest.unlocked');
@@ -345,7 +345,7 @@
       cssci: 'CSSCI', cssci_ext: 'CSSCI 扩', pku: '北大核心',
       cnkx_T1: '科协 T1', cnkx_T2: '科协 T2', cnkx_T3: '科协 T3',
       ccft_T1: 'CCF-T1', ccft_T2: 'CCF-T2', ccft_T3: 'CCF-T3',
-      zju: '浙大目录', zju_city: '学校 A',
+      zju: '浙大目录', school_a: '学校 A',
     };
     const cls = tag.replace(/[^a-z0-9]/gi,'-').toLowerCase();
     return `<span class="domsrc-pill ds-${cls}">${map[tag]||tag}</span>`;
@@ -705,13 +705,13 @@
       return;
     }
 
-    if (activeDom === 'zju_city') {
+    if (activeDom === 'school_a') {
       // 高校自编目录着陆页（不展示数据，点击才输码解锁）
-      const src = domestic.zju_city || {};
-      const unlocked = isUnlocked('zju_city');
+      const src = domestic.school_a || {};
+      const unlocked = isUnlocked('school_a');
       if (unlocked) {
         // 已解锁 → 展示数据（保留原逻辑）
-        const list = unlockedCache.zju_city;
+        const list = unlockedCache.school_a;
         const f = list.filter(r => {
           if (!q) return true;
           const hay = (r.name + ' ' + (r.issn||'') + ' ' + (r.cn_code||'')).toLowerCase();
@@ -737,7 +737,7 @@
               const tierBadge = `<span class="tier-pill ${tierClass[r.tier]||'t3'}">${escape(r.tier)}</span>${r.name.includes('*') ? ' <span class="warn-pill" style="background:var(--gold);color:#fff">★</span>' : ''}`;
               return renderDomRow(
                 { ...r, name: r.name.replace(/\*$/,'') },
-                { src: 'zju_city', extraCols: `<td class="muted-cell" style="width:180px">${escape(r.note||'')}</td>` }
+                { src: 'school_a', extraCols: `<td class="muted-cell" style="width:180px">${escape(r.note||'')}</td>` }
               ).replace(
                 /<tr class="j-row clickable" (data-fid=[^>]+)>/,
                 `<tr class="j-row clickable" $1><td style="width:70px">${tierBadge}</td>`
@@ -749,7 +749,7 @@
         html.push('</div>');
         box.innerHTML = html.join('');
         $('#lock-again')?.addEventListener('click', () => {
-          if (confirm('锁回后需要再次输入解锁码。确认？')) { forgetUnlock('zju_city'); renderDomestic(); }
+          if (confirm('锁回后需要再次输入解锁码。确认？')) { forgetUnlock('school_a'); renderDomestic(); }
         });
         return;
       }
@@ -793,7 +793,7 @@
       $('#open-unlock')?.addEventListener('click', () => {
         const slot = $('#unlock-slot');
         slot.hidden = false;
-        slot.innerHTML = lockedPrompt('zju_city', src.source || '高校自编目录 · 期刊分级目录 2023', src.count || 0);
+        slot.innerHTML = lockedPrompt('school_a', src.source || '高校自编目录 · 期刊分级目录 2023', src.count || 0);
         slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
       });
       return;
@@ -1022,7 +1022,7 @@
       const SRC = {
         int: 'SCI / SSCI 国际期刊', cssci: 'CSSCI 来源期刊', cssci_ext: 'CSSCI 扩展版',
         pku: '北大核心', cnkx: '中国科协高质量目录', ccft: 'CCF 推荐中文科技期刊',
-        zju: '浙江大学 2024', zju_city: '高校自编目录 2023',
+        zju: '浙江大学 2024', school_a: '高校自编目录 2023',
       };
       kicker.textContent = SRC[src] || '期刊详情';
     }
@@ -1073,11 +1073,11 @@
       cnkx: '🇨🇳 中国科协高质量目录',
       ccft: '🇨🇳 CCF 推荐中文科技期刊',
       zju: '🇨🇳 浙江大学 2024',
-      zju_city: '🔒 高校自编目录 2023',
+      school_a: '🔒 高校自编目录 2023',
     };
     const bySrc = {};
     for (const r of list) (bySrc[r.__src] = bySrc[r.__src] || []).push(r);
-    const srcOrder = ['int','cssci','cssci_ext','pku','cnkx','ccft','zju','zju_city'];
+    const srcOrder = ['int','cssci','cssci_ext','pku','cnkx','ccft','zju','school_a'];
     const orderedSrcs = srcOrder.filter(s => bySrc[s]).concat(
       Object.keys(bySrc).filter(s => !srcOrder.includes(s))
     );
