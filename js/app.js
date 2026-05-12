@@ -1219,10 +1219,7 @@
       if (user) {
         if (confirm(lang === 'zh' ? '退出登录？' : 'Sign out?')) doLogout();
       } else {
-        // TODO: 账号系统建设中，Worker 未部署前先占位
-        alert(lang === 'zh'
-          ? '登录 / 注册功能正在建设中，敬请期待。\n\n当前收藏数据已保存在本机浏览器，安全稳妥。\n未来登录后可跨设备同步。'
-          : 'Sign-in is under construction. Your favorites are safely stored in this browser and will sync across devices once accounts are ready.');
+        startLogin();
       }
     });
   }
