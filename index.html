@@ -16,7 +16,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="css/app.css?v=20260512-07" />
+<link rel="stylesheet" href="css/app.css?v=20260512-08" />
 </head>
 <body>
 <!-- Google Tag Manager (noscript) -->
@@ -75,9 +75,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <button class="nav-item" data-dom="cssci_core"><span data-i18n="src_cssci_core">CSSCI 来源期刊</span></button>
       <button class="nav-item" data-dom="cssci_ext"><span data-i18n="src_cssci_ext">CSSCI 扩展版</span></button>
       <button class="nav-item" data-dom="pku_core"><span data-i18n="src_pku">北大核心 (2023)</span></button>
-      <button class="nav-item" data-dom="zju_zju"><span data-i18n="src_zju">浙江大学 2024</span></button>
-      <button class="nav-item" data-dom="zju_city"><span data-i18n="src_zjucity">学校 A 2023</span></button>
       <button class="nav-item" data-dom="ccft"><span data-i18n="src_ccft">CCF 中文 T 分区</span></button>
+      <div class="nav-divider"></div>
+      <div class="nav-sub">院校自编目录</div>
+      <button class="nav-item" data-dom="zju_zju"><span data-i18n="src_zju">浙江大学 2024</span></button>
+      <button class="nav-item nav-locked" data-dom="zju_city" title="高校自编目录 · 2023（付费解锁）">
+        <span>🔒 学校 A 2023</span>
+        <span class="count">付费</span>
+      </button>
     </nav>
   </div>
 
@@ -145,7 +150,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <section class="hero">
       <h2 data-i18n="hero_title_dom">国内学术期刊分级目录</h2>
       <p>
-        <span data-i18n="hero_body_dom"><b>中国科协科学技术创新部</b> 2025 年 12 月发布的 <em>高质量科技期刊分级目录总汇</em>，覆盖 40+ 学科领域，T1 / T2 / T3 三级；<b>浙江大学 2024 版</b> 与 <b>学校 A 2023 版</b> 的国内期刊分级；<b>CCF 推荐中文科技期刊 2025</b> T 分区。</span><br/>
+        <span data-i18n="hero_body_dom"><b>中国科协科学技术创新部</b> 2025 年 12 月发布的 <em>高质量科技期刊分级目录总汇</em>，覆盖 40+ 学科领域，T1 / T2 / T3 三级；<b>浙江大学 2024 版</b> 国内期刊分级与 <b>高校自编目录 2023</b>（付费解锁）；<b>CCF 推荐中文科技期刊 2025</b> T 分区。</span><br/>
         <span class="muted" data-i18n="hero_note_dom">CSSCI / 北大核心目录为扫描件 PDF，OCR 版稍后补入。</span>
       </p>
     </section>
@@ -165,12 +170,25 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </section>
 
   <footer class="site-foot">
-    <p>Data · Clarivate WoS Core Collection · JCR 2025 · ESI · 中科院文献情报中心分区表 2025 · ShowJCR (GPL-3.0) · 中国科协 2025 · 浙大 2024 · 学校 A 2023. Built for <a href="https://ailatest.org">ailatest.org</a>.</p>
+    <p><b>ailatest · journal</b> — 面向中文科研人员的一站式期刊查询工具，聚合国际 SCI/SSCI 与国内分级目录，支持收藏、解锁院校自编目录、跨设备同步。数据来源：Clarivate WoS Core Collection · JCR 2025 · ESI · 中科院文献情报中心分区表 2025 · ShowJCR (GPL-3.0) · 中国科协 2025 · 浙江大学 2024 · 高校自编目录 2023。© <a href="https://ailatest.org">ailatest.org</a></p>
   </footer>
 </main>
 
 <button id="theme-toggle" class="theme-toggle" aria-label="切换主题">◐</button>
 
-<script src="js/app.js?v=20260512-07" defer></script>
+<!-- 期刊详情抽屉 -->
+<div id="drawer-scrim" class="drawer-scrim" hidden></div>
+<aside id="j-drawer" class="j-drawer" aria-hidden="true">
+  <header class="drawer-head">
+    <span class="drawer-kicker" id="drawer-kicker">期刊详情</span>
+    <div class="drawer-head-actions">
+      <button id="drawer-fav" class="drawer-fav" title="收藏">☆</button>
+      <button id="drawer-close" class="drawer-close" aria-label="关闭">✕</button>
+    </div>
+  </header>
+  <div id="drawer-body" class="drawer-body"></div>
+</aside>
+
+<script src="js/app.js?v=20260512-08" defer></script>
 </body>
 </html>

@@ -14,7 +14,7 @@ SITE_URL = "https://journal.ailatest.org"
 [[d1_databases]]
 binding = "DB"
 database_name = "ailatest-journal"
-database_id = "REPLACE_WITH_D1_ID"
+database_id = "861dd053-c23a-4363-b62b-2559c06ec3fd"
 
 # Secrets (set with `wrangler secret put`):
 #   GITHUB_CLIENT_SECRET
