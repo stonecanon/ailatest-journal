@@ -20,7 +20,7 @@
       tab_int: '国际 SCI/SSCI', tab_dom: '国内分级目录', tab_fav: '我的收藏',
       loading: '加载中…',
       hero_title_int: 'SCI / SSCI 国际期刊检索',
-      hero_body_int: '数据源：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI）· 更新至 2026-04-20。合并 <b>JCR 2025</b> 归属标记、<b>ESI</b> 22 大学科分类、<b>中科院 2025 大类分区</b>、<b>ShowJCR</b> JCR 2024 影响因子 / 小类分区 / 新锐版 / CCF 2026 推荐、<b>中国科协</b> 高质量科技期刊分级目录（T1/T2/T3）与国际期刊预警名单。共收录 <b id="total">—</b> 本。',
+      hero_body_int: '数据源：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI）· 更新至 2026-04-20，并合并 <b>Ei Compendex</b> 期刊目录（2025-10-10）。合并 <b>JCR 2025</b> 归属标记、<b>ESI</b> 22 大学科分类、<b>中科院 2025 大类分区</b>、<b>ShowJCR</b> JCR 2024 影响因子 / 小类分区 / 新锐版 / CCF 2026 推荐、<b>中国科协</b> 高质量科技期刊分级目录（T1/T2/T3）与国际期刊预警名单。共收录 <b id="total">—</b> 本。',
       hero_note: '期刊原名保留英文，括注为中文刊名；徽章从左至右：索引 / CAS 分区 / IF 分位 / CCF / T1-T3 / 预警。',
       hero_title_fav: '我的收藏',
       hero_body_fav: '点击任意期刊右侧的 <b>★</b> 可加入收藏。未登录时保存在本机 localStorage；登录后自动同步到云端，可跨设备访问。',
@@ -56,7 +56,7 @@
       tab_int: 'Int’l SCI/SSCI', tab_dom: 'Domestic (CN)', tab_fav: 'My Favorites',
       loading: 'Loading…',
       hero_title_int: 'International SCI / SSCI Search',
-      hero_body_int: 'Source: <b>Web of Science Core Collection</b> (SCIE / SSCI / AHCI / ESCI), updated 2026-04-20. Enriched with <b>JCR 2025</b> index flags, <b>ESI</b> 22 subject categories, <b>CAS 2025</b> tiers, <b>ShowJCR</b> JCR 2024 Impact Factors / sub-category tiers / emerging edition / CCF 2026, and <b>CAST</b> tiered directory (T1/T2/T3) plus international warning list. Total: <b id="total">—</b> journals.',
+      hero_body_int: 'Source: <b>Web of Science Core Collection</b> (SCIE / SSCI / AHCI / ESCI), updated 2026-04-20, merged with <b>Ei Compendex</b> source list (2025-10-10). Enriched with <b>JCR 2025</b> index flags, <b>ESI</b> 22 subject categories, <b>CAS 2025</b> tiers, <b>ShowJCR</b> JCR 2024 Impact Factors / sub-category tiers / emerging edition / CCF 2026, and <b>CAST</b> tiered directory (T1/T2/T3) plus international warning list. Total: <b id="total">—</b> journals.',
       hero_note: 'Titles preserved in original (English); Chinese names in subtitle. Badges left-to-right: index / CAS tier / IF quartile / CCF / T1-T3 / warning.',
       hero_title_fav: 'My Favorites',
       hero_body_fav: 'Click the <b>★</b> on any row to bookmark. Saved locally when signed-out; syncs to the cloud when signed-in.',
@@ -100,7 +100,7 @@
 
   let activeTab = 'int';
   let activeCat = '__all';
-  let activeIndices = new Set(['SCIE','SSCI','AHCI','ESCI']);
+  let activeIndices = new Set(['SCIE','SSCI','AHCI','ESCI','EI']);
   let activeZones = new Set();
   let activeFeats = new Set();
   let activeQuery = '';
@@ -887,6 +887,14 @@
          </div>`
       : '';
 
+    // Ei Compendex 主题分类
+    const eiHTML = (Array.isArray(r.ei_subjects) && r.ei_subjects.length)
+      ? `<div class="drawer-section">
+           <h4>Ei Compendex 主题</h4>
+           <div class="cat-chips">${r.ei_subjects.map(c => `<span class="cat-chip">${escape(c)}</span>`).join('')}</div>
+         </div>`
+      : '';
+
     // 中科院完整层级
     const casHTML = (() => {
       const blocks = [];
@@ -981,6 +989,7 @@
       ${metaHTML ? `<div class="meta-block">${metaHTML}</div>` : ''}
       ${casHTML}
       ${wosHTML}
+      ${eiHTML}
       ${cnkxHTML}
       <div class="drawer-section">
         <h4>用户评分 / 投稿经验</h4>

@@ -1,11 +1,12 @@
 {
   "source": "WoS Core + JCR 2025 + ESI + 中科院 2025 + 长江大学 + ShowJCR (JCR/FQB/XR/CCF/Warning) + 中国科协",
   "last_updated_source": "WoS Core 2026-04-20",
-  "total": 23185,
+  "total": 24214,
   "indices": {
     "ESCI": 9449,
     "AHCI": 1819,
     "SCIE": 9527,
+    "EI": 4710,
     "SSCI": 3557
   },
   "with_if_2024": 21525,
@@ -31,5 +32,6 @@
     },
     "is_oa": 12619,
     "in_doaj": 10133
-  }
+  },
+  "last_updated_ei": "2025-10-10"
 }

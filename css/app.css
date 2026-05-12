@@ -19,6 +19,7 @@
   --tag-ssci:       #5b3e1c;
   --tag-ahci:       #5a2b3b;
   --tag-esci:       #3b4f3b;
+  --tag-ei:         #6b4a1f;
 
   --zone-1:         #7a2020;
   --zone-2:         #b4531f;
@@ -175,6 +176,7 @@ main.main {
 .chip.tag-ssci:has(input:checked) { background: var(--tag-ssci); border-color: var(--tag-ssci); }
 .chip.tag-ahci:has(input:checked) { background: var(--tag-ahci); border-color: var(--tag-ahci); }
 .chip.tag-esci:has(input:checked) { background: var(--tag-esci); border-color: var(--tag-esci); }
+.chip.tag-ei:has(input:checked)   { background: var(--tag-ei);   border-color: var(--tag-ei); }
 .chip.zone-1:has(input:checked) { background: var(--zone-1); border-color: var(--zone-1); color: #fff; }
 .chip.zone-2:has(input:checked) { background: var(--zone-2); border-color: var(--zone-2); color: #fff; }
 .chip.zone-3:has(input:checked) { background: var(--zone-3); border-color: var(--zone-3); color: #fff; }
@@ -458,6 +460,7 @@ table.journals tr:last-child td { border-bottom: 0; }
 .badge.b-ssci { color: var(--tag-ssci); border-color: var(--tag-ssci); background: rgba(91,62,28,0.05); }
 .badge.b-ahci { color: var(--tag-ahci); border-color: var(--tag-ahci); background: rgba(90,43,59,0.05); }
 .badge.b-esci { color: var(--tag-esci); border-color: var(--tag-esci); background: rgba(59,79,59,0.05); }
+.badge.b-ei   { color: var(--tag-ei);   border-color: var(--tag-ei);   background: rgba(107,74,31,0.05); }
 
 .zone {
   display: inline-flex; align-items: baseline; gap: 2px;
