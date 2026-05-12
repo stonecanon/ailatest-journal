@@ -51,7 +51,7 @@
       src_cssci_ext: 'CSSCI Extended',
       src_pku: 'PKU Core (2023)',
       src_zju: 'ZJU 2024',
-      src_zjucity: 'ZJU City 2023',
+      src_zjucity: 'School A 2023',
       src_ccft: 'CCF-T (Chinese)',
       tab_int: 'Int’l SCI/SSCI', tab_dom: 'Domestic (CN)', tab_fav: 'My Favorites',
       loading: 'Loading…',
@@ -64,7 +64,7 @@
       col_name: 'Journal Title', col_abbr: 'Abbr', col_badges: 'Index / IF / Tier / Badges',
       col_cat: 'ESI / CAS Major',
       hero_title_dom: 'Domestic Chinese Journal Directories',
-      hero_body_dom: '<b>CAST</b> (中国科协) 2025-12 <em>High-Quality Science & Technology Journal Tiered Directory</em>; <b>CSSCI 2025-2026</b> core & extended; <b>PKU Core (2023)</b>; <b>ZJU 2024</b>; <b>ZJU City 2023</b>; <b>CCF Recommended Chinese Journals 2025</b>.',
+      hero_body_dom: '<b>CAST</b> (中国科协) 2025-12 <em>High-Quality Science & Technology Journal Tiered Directory</em>; <b>CSSCI 2025-2026</b> core & extended; <b>PKU Core (2023)</b>; <b>ZJU 2024</b>; <b>School A 2023</b>; <b>CCF Recommended Chinese Journals 2025</b>.',
       hero_note_dom: 'CSSCI / PKU Core extracted via OCR from scanned PDF; minor typos possible.',
       search_int: 'Search: title / abbr / ISSN / Chinese name',
       search_dom: 'Search: Chinese name / English name / ISSN / CN',
@@ -770,7 +770,7 @@
             </div>
             <div class="locked-actions">
               <button class="big-btn primary" id="open-unlock">我已有解锁码，立即解锁</button>
-              <a class="big-btn ghost" href="mailto:support@ailatest.org?subject=申请学校 A目录解锁码">💬 联系获取解锁码</a>
+              <a class="big-btn ghost" href="mailto:support@ailatest.org?subject=申请学校 A 目录解锁码">💬 联系获取解锁码</a>
             </div>
             <div class="locked-note">
               · 解锁码绑定本浏览器，下次自动识别，无需再输<br/>
