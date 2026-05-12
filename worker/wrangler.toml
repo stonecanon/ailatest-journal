@@ -2,11 +2,13 @@ name = "ailatest-journal-api"
 main = "src/index.js"
 compatibility_date = "2024-11-01"
 
-# Custom domain or worker subdomain
-# routes = [{ pattern = "api.ailatest.org/*", zone_name = "ailatest.org" }]
+# Custom domain
+routes = [
+  { pattern = "api.ailatest.org", custom_domain = true }
+]
 
 [vars]
-GITHUB_CLIENT_ID = ""          # set via: wrangler secret put OR fill here (public)
+GITHUB_CLIENT_ID = "Ov23liKY2We6M23yTMJV"  # public client id
 SITE_URL = "https://journal.ailatest.org"
 
 # D1 database — create with: wrangler d1 create ailatest-journal
