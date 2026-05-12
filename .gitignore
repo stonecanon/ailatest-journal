@@ -1,0 +1,18 @@
+# deps & caches
+node_modules/
+__pycache__/
+*.pyc
+.DS_Store
+
+# local-only
+.env
+.vscode/
+.idea/
+
+# Google Drive quirks
+*.gsheet
+*.gdoc
+*.gslides
+
+# build artifacts we don't commit
+*.log

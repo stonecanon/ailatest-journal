@@ -1,0 +1,234 @@
+:root {
+  --bg: #f7f8fa;
+  --bg-elev: #ffffff;
+  --border: #e4e7ec;
+  --text: #1a1f2e;
+  --text-muted: #6b7280;
+  --accent: #1d4ed8;
+  --accent-hover: #1e40af;
+  --sidebar-bg: #ffffff;
+  --chip-bg: #eef2ff;
+  --chip-text: #3730a3;
+  --shadow: 0 1px 2px rgba(0,0,0,.04);
+}
+[data-theme="dark"] {
+  --bg: #0f1420;
+  --bg-elev: #161c2c;
+  --border: #2a3144;
+  --text: #e8eaf0;
+  --text-muted: #9aa3b5;
+  --accent: #7fb0ff;
+  --accent-hover: #a6c7ff;
+  --sidebar-bg: #121828;
+  --chip-bg: #1e2640;
+  --chip-text: #a6c7ff;
+  --shadow: 0 1px 2px rgba(0,0,0,.3);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14.5px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* Layout */
+.sidebar {
+  position: fixed; left: 0; top: 0; bottom: 0;
+  width: 240px;
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--border);
+  padding: 18px 14px;
+  overflow-y: auto;
+  display: flex; flex-direction: column;
+}
+.main {
+  margin-left: 240px;
+  min-height: 100vh;
+  padding: 0 32px 40px;
+  max-width: 1100px;
+}
+
+/* Brand */
+.brand { margin-bottom: 20px; }
+.brand-name {
+  font-weight: 700; font-size: 17px; color: var(--text);
+  letter-spacing: -.01em;
+}
+.brand-dot { color: var(--accent); }
+.brand-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+/* Category nav */
+.cat-nav { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+.cat-btn {
+  text-align: left;
+  background: transparent;
+  border: none;
+  padding: 7px 10px;
+  border-radius: 6px;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 13px;
+  font-family: inherit;
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 6px;
+  line-height: 1.3;
+}
+.cat-btn:hover { background: var(--chip-bg); }
+.cat-btn.active { background: var(--chip-bg); color: var(--chip-text); font-weight: 600; }
+.cat-count {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.cat-btn.active .cat-count { color: var(--chip-text); }
+
+.aside-foot {
+  padding-top: 12px; margin-top: 10px;
+  border-top: 1px solid var(--border);
+  font-size: 12px; color: var(--text-muted);
+}
+
+/* Top bar */
+.topbar {
+  position: sticky; top: 0; z-index: 10;
+  background: var(--bg);
+  padding: 18px 0 14px;
+  border-bottom: 1px solid var(--border);
+}
+.search-wrap { display: flex; align-items: center; gap: 12px; }
+#q {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-elev);
+  color: var(--text);
+  font-size: 14.5px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color .15s;
+}
+#q:focus { border-color: var(--accent); }
+.search-stats { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+
+/* Hero */
+.hero { padding: 24px 0 8px; }
+.hero h1 { margin: 0 0 6px; font-size: 24px; color: var(--accent); letter-spacing: -.01em; }
+.hero p { margin: 0; color: var(--text-muted); font-size: 13.5px; }
+
+/* List */
+.list {
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 16px 0;
+}
+.item {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  box-shadow: var(--shadow);
+  display: flex; flex-direction: column; gap: 6px;
+}
+.item-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--accent);
+  line-height: 1.4;
+}
+.item-meta {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  font-size: 12px; color: var(--text-muted);
+  align-items: center;
+}
+.chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--chip-bg); color: var(--chip-text);
+  padding: 2px 8px; border-radius: 10px;
+  font-size: 11.5px; font-weight: 500;
+  line-height: 1.6;
+}
+.issn {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  padding: 1px 6px; border-radius: 4px;
+  cursor: pointer;
+  user-select: all;
+}
+.issn:hover { border-color: var(--accent); }
+.issn-label { margin-right: 2px; color: var(--text-muted); }
+
+.empty {
+  text-align: center; padding: 40px 0;
+  color: var(--text-muted);
+}
+
+/* Pager */
+.pager {
+  display: flex; align-items: center; justify-content: center; gap: 16px;
+  padding: 16px 0;
+}
+.pager button {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  padding: 7px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+}
+.pager button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.pager button:disabled { opacity: .4; cursor: not-allowed; }
+#page-info { font-size: 13px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+
+/* Footer */
+.footer {
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text-muted);
+  display: flex; gap: 8px; flex-wrap: wrap;
+}
+
+/* Theme toggle */
+.theme-toggle {
+  position: fixed; right: 18px; bottom: 18px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-elev);
+  color: var(--text);
+  font-size: 18px;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0,0,0,.12);
+  z-index: 100;
+}
+.theme-toggle:hover { border-color: var(--accent); color: var(--accent); }
+
+/* Mobile */
+@media (max-width: 760px) {
+  .sidebar {
+    position: static; width: auto;
+    border-right: none; border-bottom: 1px solid var(--border);
+    padding: 12px;
+  }
+  .cat-nav {
+    flex-direction: row; overflow-x: auto;
+    padding-bottom: 4px;
+  }
+  .cat-btn { flex-shrink: 0; white-space: nowrap; }
+  .aside-foot { display: none; }
+  .main { margin-left: 0; padding: 0 14px 40px; max-width: 100%; }
+  .hero h1 { font-size: 20px; }
+}
+
+[hidden] { display: none !important; }
