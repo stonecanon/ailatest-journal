@@ -788,15 +788,57 @@ html[data-theme="dark"] .oa-chip.oa-isoa    { background: #3a2d10; color: #f3d78
   margin-top: 4px;
 }
 
+/* sidebar drawer toggle (mobile only) */
+.side-toggle {
+  display: none;
+  background: transparent;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  width: 38px; height: 38px;
+  font-size: 18px; line-height: 1;
+  cursor: pointer; color: var(--ink-soft);
+  flex-shrink: 0;
+}
+.side-toggle:hover { border-color: var(--accent); color: var(--accent); }
+.sidebar-scrim {
+  position: fixed; inset: 0;
+  background: rgba(32, 24, 16, 0.42);
+  backdrop-filter: blur(2px);
+  z-index: 80;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+.sidebar-scrim.on { opacity: 1; pointer-events: auto; }
+
 /* responsive */
 @media (max-width: 900px) {
   body { grid-template-columns: 1fr; }
   aside.sidebar {
-    position: static; height: auto;
-    border-right: 0; border-bottom: 1px solid var(--rule);
+    position: fixed; top: 0; left: 0; bottom: 0;
+    width: min(300px, 86vw);
+    height: 100vh;
+    border-right: 1px solid var(--rule);
+    border-bottom: 0;
+    z-index: 90;
+    transform: translateX(-100%);
+    transition: transform 0.25s cubic-bezier(.2,.7,.2,1);
+    overflow-y: auto;
+    box-shadow: 8px 0 32px rgba(60,40,20,.18);
   }
-  main.main { padding: 24px 20px 60px; }
-  .tabs { margin: -8px -20px 20px; padding: 0 20px; }
+  aside.sidebar.open { transform: translateX(0); }
+  main.main {
+    padding: 14px 16px 60px;
+    display: flex; flex-direction: column;
+  }
+  /* 搜索框放最上面：topbar 排 1，tabs 排 2 */
+  main.main .topbar { order: 1; margin-bottom: 12px; }
+  main.main .tabs   { order: 2; margin: 0 -16px 14px; padding: 0 16px; }
+  main.main .tab-panel { order: 3; }
+  main.main .site-foot { order: 4; }
+  .side-toggle { display: inline-flex; align-items: center; justify-content: center; }
+  .topbar { gap: 10px; }
+  .topbar-actions { gap: 6px; }
+  .lang-toggle, .auth-btn, .fav-tab { padding: 5px 8px; font-size: 12px; }
 }
 
 /* ─────────────── 详情抽屉 ─────────────── */
