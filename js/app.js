@@ -502,12 +502,36 @@
     const t = String(ccf).toUpperCase().replace(/[^ABC]/g,'') || 'X';
     return `<span class="ccf-pill ccf-${t}">CCF ${t}</span>`;
   }
-  function badgeTier(tier) {
-    if (!tier) return '';
-    const t = tier.toLowerCase().replace(/[^t123]/g,'');
-    return `<span class="tier-pill ${t}">${tier.toUpperCase()}</span>`;
-  }
-  function badgeWarn() { return `<span class="warn-pill">⚠ Warning</span>`; }
+      function badgeTier(tier) {
+        if (!tier) return '';
+        const raw = String(tier).trim().toUpperCase();
+        // 理工 T1/T2/T3
+        const tm = raw.match(/^T([123])$/);
+        if (tm) return `<span class="tier-pill t${tm[1]}" title="中国科协 T${tm[1]} 级">${raw}</span>`;
+        // 管理 A/B/C/D
+        const am = raw.match(/^([ABCD])$/);
+        if (am) return `<span class="tier-pill ta-${am[1].toLowerCase()}" title="中国科协 ${am[1]} 级（管理类）">${raw}</span>`;
+        return `<span class="tier-pill">${raw}</span>`;
+      }
+      function badgeFlagship(kind) {
+        if (!kind) return '';
+        const map = {
+          nature_main:  ['Nature 正刊', 'flag-nature-main'],
+          science_main: ['Science 正刊','flag-science-main'],
+          cell_main:    ['Cell 正刊',   'flag-cell-main'],
+          nature_sub:   ['Nature 子刊', 'flag-nature-sub'],
+          science_sub:  ['Science 子刊','flag-science-sub'],
+          cell_sub:     ['Cell 子刊',   'flag-cell-sub'],
+        };
+        const m = map[kind];
+        if (!m) return '';
+        return `<span class="flagship-pill ${m[1]}" title="${m[0]}">★ ${m[0]}</span>`;
+      }
+      function badgeXR(z) {
+        if (!z) return '';
+        return `<span class="xr-pill xr-${z}" title="中科院 2026 新锐版分区">新锐 ${z}区</span>`;
+      }
+      function badgeWarn() { return `<span class="warn-pill">⚠ Warning</span>`; }
 
   function starBtn(r, src = 'int') {
     const on = isFav(r);
@@ -594,15 +618,18 @@
   function renderRow(r) {
     const fid = favId(r);
     rowRecordsByFid[fid] = { ...r, __src: 'int' };
-    const nameHtml = `<div class="jname">${escape(r.name)}${r.cn_name ? `<span class="jname-cn">${escape(r.cn_name)}</span>` : ''}</div>`;
+    const flagshipHtml = r.flagship ? `<span class="flagship-star fs-${r.flagship}" title="${r.flagship.replace('_',' ')}">★</span>` : '';
+    const nameHtml = `<div class="jname">${flagshipHtml}${escape(r.name)}${r.cn_name ? `<span class="jname-cn">${escape(r.cn_name)}</span>` : ''}</div>`;
     const abbr = r.abbr20 ? `<span class="jabbr">${escape(r.abbr20)}</span>` : '';
     const issn = r.issn || r.eissn
       ? `<span class="jissn">${r.issn||''}${r.eissn ? ` <span class="eissn">e:${r.eissn}</span>` : ''}</span>`
       : '<span class="muted-cell">—</span>';
     const crossBadges = renderDomCrossBadges(r, 'int');
     const badges = [
+      badgeFlagship(r.flagship),
       ...(r.indices || []).map(badgeIndex),
       badgeCAS(r.cas_zone, r.cas_top),
+      badgeXR(r.cas_xr && r.cas_xr.zone),
       badgeIF(r.if_2024, r.if_quartile),
       badgeCCF(r.ccf),
       ...(r.cnkx ? r.cnkx.slice(0,2).map(c => badgeTier(c.tier)) : []),
@@ -611,7 +638,7 @@
     ].filter(Boolean).join('');
     const cat = [r.esi_category, r.cas_major_cn]
       .filter(Boolean).map(escape).join(' · ') || '<span class="muted-cell">—</span>';
-    return `<tr data-fid="${escape(fid)}" class="j-row clickable" data-src="int">
+    return `<tr data-fid="${escape(fid)}" class="j-row clickable ${r.flagship ? 'row-flagship' : ''}" data-src="int">
       <td class="col-name">${nameHtml}</td>
       <td class="col-abbr">${abbr || '<span class="muted-cell">—</span>'}</td>
       <td class="col-issn">${issn}</td>
@@ -640,21 +667,78 @@
     if (activeFeats.has('if') && r.if_2024 == null) return false;
     if (activeFeats.has('ccf') && !r.ccf) return false;
     if (activeFeats.has('cnkx') && !(r.cnkx && r.cnkx.length)) return false;
+    if (activeFeats.has('xr') && !r.cas_xr) return false;
+    if (activeFeats.has('flagship') && !r.flagship) return false;
     if (activeFeats.has('warning') && !r.warning) return false;
     if (activeCat !== '__all' && r.esi_category !== activeCat) return false;
     if (activeQuery) {
-      const q = activeQuery.toLowerCase();
-      const hay = [
-        r.name, r.abbr20, r.issn, r.eissn, r.cn_name, r.cn_code,
-        r.publisher, r.country
-      ].map(x => (x||'').toString().toLowerCase()).join(' ');
-      if (!hay.includes(q)) return false;
+      return scoreRecord(r, activeQuery) > 0;
     }
     return true;
   }
 
+  // 搜索排序：精确名 > 旗舰刊 > 前缀 > ISSN 精确 > 缩写精确 > 包含
+  function scoreRecord(r, query) {
+    const q = (query||'').trim().toLowerCase();
+    if (!q) return 1;
+    const name = (r.name||'').toLowerCase();
+    const abbr = (r.abbr20||'').toLowerCase();
+    const cn = (r.cn_name||'').toLowerCase();
+    const issn = (r.issn||'').toLowerCase();
+    const eissn = (r.eissn||'').toLowerCase();
+    const publisher = (r.publisher||'').toLowerCase();
+    const country = (r.country||'').toLowerCase();
+
+    // 精确匹配（最高优先级）
+    if (name === q) return 1000;
+    if (issn === q || eissn === q) return 950;
+    if (abbr === q) return 900;
+    if (cn === q) return 880;
+
+    // 前缀匹配（"nature"→"Nature Cities"会命中前缀）
+    if (name.startsWith(q + ' ') || name.startsWith(q + '-') || name.startsWith(q + ':')) {
+      // 旗舰刊子刊更高
+      let s = 800;
+      if (r.flagship && /(_main|_sub)$/.test(r.flagship)) s += 50;
+      // 子刊按字母排（顺序号其实由 sort 决定）
+      return s;
+    }
+    if (cn.startsWith(q)) return 700;
+    if (abbr.startsWith(q)) return 680;
+
+    // 词边界匹配（"cell"在"Cell Reports"中出现在词首）
+    const wordRe = new RegExp('\\b' + q.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&') + '\\b', 'i');
+    if (wordRe.test(r.name||'')) return 500;
+    if (wordRe.test(r.cn_name||'')) return 480;
+
+    // 包含
+    if (name.includes(q)) return 200;
+    if (cn.includes(q)) return 180;
+    if (publisher.includes(q)) return 100;
+    if (country.includes(q)) return 50;
+    return 0;
+  }
+
   function renderInt() {
-    const filtered = journals.filter(matches);
+    let filtered = journals.filter(matches);
+    if (activeQuery) {
+      // 按相关性排序
+      const q = activeQuery;
+      filtered = filtered
+        .map(r => ({ r, s: scoreRecord(r, q) }))
+        .sort((a, b) => {
+          if (b.s !== a.s) return b.s - a.s;
+          // 同分时：旗舰刊在前，再按 IF 倒序，最后按字母
+          const fa = a.r.flagship ? 1 : 0;
+          const fb = b.r.flagship ? 1 : 0;
+          if (fa !== fb) return fb - fa;
+          const ifa = a.r.if_2024 ?? -1;
+          const ifb = b.r.if_2024 ?? -1;
+          if (ifa !== ifb) return ifb - ifa;
+          return (a.r.name||'').localeCompare(b.r.name||'');
+        })
+        .map(x => x.r);
+    }
     $('#results-title').textContent = activeCat === '__all'
       ? t('results_all') : activeCat;
     const visible = filtered.slice(0, shown);
