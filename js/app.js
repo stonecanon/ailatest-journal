@@ -297,6 +297,18 @@
   async function syncFavs() {
     if (!user || !user.token) return;
     try {
+      // 主同步：整组 lists 上云
+      await fetch(`${API_BASE}/lists`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user.token}`,
+        },
+        body: JSON.stringify({
+          lists: favLists.map(l => ({ id: l.id, name: l.name, ids: l.ids })),
+        }),
+      });
+      // 兼容旧端点：扁平 union 推一份，老设备/老前端仍能读
       await fetch(`${API_BASE}/favorites`, {
         method: 'PUT',
         headers: {
@@ -304,24 +316,57 @@
           'Authorization': `Bearer ${user.token}`,
         },
         body: JSON.stringify({ favs: [...favs] }),
-      });
+      }).catch(() => {});
     } catch (e) { console.warn('fav sync failed', e); }
   }
 
   async function pullFavs() {
     if (!user || !user.token) return;
     try {
-      const r = await fetch(`${API_BASE}/favorites`, {
+      // 优先从 /lists 拉云端清单
+      const r = await fetch(`${API_BASE}/lists`, {
         headers: { 'Authorization': `Bearer ${user.token}` },
       });
-      if (!r.ok) return;
-      const d = await r.json();
-      if (Array.isArray(d.favs)) {
-        // 远端 id 合并进 active list，保持本地顺序优先
-        const list = getActiveList();
-        if (list) {
-          d.favs.forEach(x => { if (!list.ids.includes(x)) list.ids.push(x); });
+      if (r.ok) {
+        const d = await r.json();
+        const cloud = Array.isArray(d.lists) ? d.lists : [];
+        if (cloud.length) {
+          // 合并：以 list.id 为键。云端有的覆盖本地（云为权威），本地独有的保留追加。
+          const cloudMap = new Map(cloud.map(l => [String(l.id), {
+            id: String(l.id),
+            name: String(l.name || '未命名'),
+            ids: Array.isArray(l.ids) ? l.ids.map(String) : [],
+          }]));
+          const merged = [];
+          // 先按云端顺序
+          cloud.forEach(c => merged.push(cloudMap.get(String(c.id))));
+          // 本地独有的清单追加到末尾
+          favLists.forEach(local => {
+            if (!cloudMap.has(local.id)) merged.push(local);
+          });
+          favLists = merged;
+          if (!favLists.find(l => l.id === activeListId)) {
+            activeListId = favLists[0] ? favLists[0].id : 'default';
+          }
+          persistFavLists(true); // 把合并结果再推一次，保证云端齐全
+          updateFavCount();
+          return;
         }
+        // 云端为空：把本地推上去
+        if (favLists.length && favLists.some(l => l.ids.length)) {
+          persistFavLists(true);
+        }
+        return;
+      }
+      // 兜底：/lists 不可用时退回老接口
+      const r2 = await fetch(`${API_BASE}/favorites`, {
+        headers: { 'Authorization': `Bearer ${user.token}` },
+      });
+      if (!r2.ok) return;
+      const d2 = await r2.json();
+      if (Array.isArray(d2.favs)) {
+        const list = getActiveList();
+        if (list) d2.favs.forEach(x => { if (!list.ids.includes(x)) list.ids.push(x); });
         persistFavLists();
         updateFavCount();
       }

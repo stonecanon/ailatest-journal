@@ -437,6 +437,56 @@ async function routePutFavs(req, env) {
   return json({ ok: true, count: favs.length });
 }
 
+// ───────── routes: fav_lists (multi-list cloud sync) ─────────
+
+// GET /lists  → { lists: [{id, name, ids:[]}] }
+async function routeGetLists(req, env) {
+  const u = await getUser(req, env);
+  if (!u) return err('unauthorized', 401);
+  const rows = await env.DB.prepare(
+    'SELECT list_id, name, ids_json FROM fav_lists WHERE user_id = ? ORDER BY sort_index ASC, list_id ASC'
+  ).bind(u.id).all();
+  const lists = (rows.results || []).map(r => {
+    let ids = [];
+    try { const a = JSON.parse(r.ids_json); if (Array.isArray(a)) ids = a.filter(x => typeof x === 'string'); } catch (_) {}
+    return { id: r.list_id, name: r.name, ids };
+  });
+  return json({ lists });
+}
+
+// PUT /lists  body { lists: [{id, name, ids:[]}] }  → 整组替换
+async function routePutLists(req, env) {
+  const u = await getUser(req, env);
+  if (!u) return err('unauthorized', 401);
+  const body = await req.json().catch(() => null);
+  if (!body || !Array.isArray(body.lists)) return err('invalid body');
+
+  const clean = [];
+  for (const l of body.lists.slice(0, 50)) {
+    if (!l || typeof l !== 'object') continue;
+    const id = typeof l.id === 'string' ? l.id.trim().slice(0, 64) : '';
+    const name = typeof l.name === 'string' ? l.name.trim().slice(0, 80) : '';
+    if (!id || !name) continue;
+    const ids = Array.isArray(l.ids)
+      ? l.ids.filter(x => typeof x === 'string' && x.length <= 200).slice(0, 5000)
+      : [];
+    clean.push({ id, name, ids });
+  }
+
+  const now = nowSec();
+  const stmts = [
+    env.DB.prepare('DELETE FROM fav_lists WHERE user_id = ?').bind(u.id),
+    ...clean.map((l, i) =>
+      env.DB.prepare(
+        `INSERT INTO fav_lists (user_id, list_id, name, sort_index, ids_json, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`
+      ).bind(u.id, l.id, l.name, i, JSON.stringify(l.ids), now, now)
+    ),
+  ];
+  await env.DB.batch(stmts);
+  return json({ ok: true, count: clean.length });
+}
+
 // ───────── routes: ratings ─────────
 
 // Normalize journal_key: strip whitespace, limit length
@@ -564,6 +614,8 @@ export default {
       if (p === '/me'                  && req.method === 'GET')  return routeMe(req, env);
       if (p === '/favorites'           && req.method === 'GET')  return routeGetFavs(req, env);
       if (p === '/favorites'           && req.method === 'PUT')  return routePutFavs(req, env);
+      if (p === '/lists'               && req.method === 'GET')  return routeGetLists(req, env);
+      if (p === '/lists'               && req.method === 'PUT')  return routePutLists(req, env);
       if (p === '/ratings'              && req.method === 'GET')  return routeGetRatings(req, env);
       if (p === '/ratings'              && req.method === 'PUT')  return routePutRating(req, env);
       if (p === '/ratings'              && req.method === 'DELETE') return routeDeleteRating(req, env);
