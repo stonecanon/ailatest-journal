@@ -792,63 +792,62 @@
     if (activeDom === 'cnkx') {
       const d = domestic.cnkx;
       if (!d) { box.innerHTML = '<div class="empty">中国科协数据缺失</div>'; return; }
-      // 只保留带 tier 的正常记录（过滤 OCR 噪声）
+      // 官方 59 个学科领域顺序
+      const DOMAIN_ORDER = (d.domains && d.domains.length)
+        ? d.domains.map(x => x.name)
+        : Array.from(new Set(d.records.map(r => r.domain).filter(Boolean)));
+
+      // 只保留带 tier 的正常记录
       const cleanRecs = d.records.filter(r => r.tier && r.tier.match(/^T[123]$/));
 
-      // 按 domain_top 大类分组；domain（原细碎学科）作为子标签
-      const TOP_ORDER = [
-        '医学健康','生命科学','地球科学','环境资源','信息技术','电子通信','数学',
-        '工程技术','材料化工','能源矿业','交通运输','建筑照明','农林科学',
-        '管理经济','人文社科','综合交叉','未分类'
-      ];
-      const byTop = {};
+      // 按 domain（59 官方领域）分组
+      const byDomain = {};
       let filtered = 0;
       for (const r of cleanRecs) {
         if (q) {
-          const hay = (r.name + ' ' + (r.issn||'') + ' ' + (r.domain||'') + ' ' + (r.domain_top||'') + ' ' + (r.subdomain||'')).toLowerCase();
+          const hay = (r.name + ' ' + (r.issn||'') + ' ' + (r.domain||'') + ' ' + (r.subdomain||'')).toLowerCase();
           if (!hay.includes(q)) { filtered++; continue; }
         }
-        const top = r.domain_top || '未分类';
-        (byTop[top] = byTop[top] || []).push(r);
+        const dom = r.domain || '未分类';
+        (byDomain[dom] = byDomain[dom] || []).push(r);
       }
-      const tops = TOP_ORDER.filter(t => byTop[t] && byTop[t].length);
-      Object.keys(byTop).forEach(t => { if (!tops.includes(t)) tops.push(t); });
+      const doms = DOMAIN_ORDER.filter(t => byDomain[t] && byDomain[t].length);
+      Object.keys(byDomain).forEach(t => { if (!doms.includes(t)) doms.push(t); });
 
-      const totalShown = Object.values(byTop).reduce((s,a)=>s+a.length, 0);
       const html = [];
       html.push(`<div class="section-block">
         <h3 class="section-title">中国科协高质量科技期刊分级目录 (2025-12)</h3>
-        <div class="section-subtitle">T1 / T2 / T3 三级；${tops.length} 个大类（含 ${cleanRecs.length.toLocaleString()} 条带分级记录）${q?`；已过滤 ${filtered} 条不匹配`:''}</div>`);
-      for (const top of tops) {
-        const recs = byTop[top]; if (!recs || !recs.length) continue;
+        <div class="section-subtitle">T1 / T2 / T3 三级；${DOMAIN_ORDER.length} 个官方学科领域，含 ${cleanRecs.length.toLocaleString()} 条带分级记录${q?`；已过滤 ${filtered} 条不匹配`:''}</div>`);
+      for (const dom of doms) {
+        const recs = byDomain[dom]; if (!recs || !recs.length) continue;
         const t1 = recs.filter(r => r.tier === 'T1');
         const t2 = recs.filter(r => r.tier === 'T2');
         const t3 = recs.filter(r => r.tier === 'T3');
-        // 子学科统计（用原 domain 字段）
+        // 细分学科（subdomain 字段，可能为空）
         const subC = {};
         for (const r of recs) {
-          const k = r.domain || '其他';
-          subC[k] = (subC[k] || 0) + 1;
+          const k = r.subdomain || '';
+          if (k) subC[k] = (subC[k] || 0) + 1;
         }
         const subs = Object.entries(subC).sort((a,b) => b[1]-a[1]);
-        html.push(`<details class="section-block" style="margin-top:18px" ${q?'open':''}>
+        html.push(`<details class="section-block" style="margin-top:14px" ${q?'open':''}>
           <summary>
-            ${escape(top)}
+            ${escape(dom)}
             <span class="muted-cell">(${recs.length})</span>
             <span class="tier-mini t1">T1 ${t1.length}</span>
             <span class="tier-mini t2">T2 ${t2.length}</span>
             <span class="tier-mini t3">T3 ${t3.length}</span>
           </summary>
-          <div class="muted-cell" style="margin:8px 0 4px;font-size:12px;line-height:1.7">
-            ${subs.slice(0, 30).map(([s,c]) => `<span style="display:inline-block;margin-right:10px">${escape(s)} <span style="opacity:.6">(${c})</span></span>`).join('')}
-            ${subs.length > 30 ? `<span style="opacity:.6">… 共 ${subs.length} 个细分学科</span>` : ''}
-          </div>
+          ${subs.length ? `<div class="muted-cell" style="margin:8px 0 4px;font-size:12px;line-height:1.7">
+            ${subs.slice(0, 24).map(([s,c]) => `<span style="display:inline-block;margin-right:10px">${escape(s)} <span style="opacity:.6">(${c})</span></span>`).join('')}
+            ${subs.length > 24 ? `<span style="opacity:.6">… 共 ${subs.length} 个细分</span>` : ''}
+          </div>` : ''}
           <div class="table-wrap" style="margin-top:10px"><table class="journals"><thead><tr>
-            <th style="width:60px">T级</th><th>期刊</th><th style="width:120px">ISSN</th><th style="width:160px">细分学科</th><th>交叉收录</th><th style="width:40px"></th>
+            <th style="width:60px">T级</th><th>期刊</th><th style="width:120px">ISSN</th><th style="width:160px">细分</th><th>交叉收录</th><th style="width:40px"></th>
           </tr></thead><tbody>
           ${[t1,t2,t3].flat().slice(0, 300).map(r => renderDomRow(r, {
             src: 'cnkx', showTier: true, tierValue: r.tier,
-            extraCols: `<td class="muted-cell" style="width:160px">${escape(r.domain || '')}${r.subdomain ? ' · '+escape(r.subdomain) : ''}</td>`,
+            extraCols: `<td class="muted-cell" style="width:160px">${escape(r.subdomain || '—')}</td>`,
           })).join('')}
           ${recs.length > 300 ? `<tr><td colspan="6" class="empty">仅显示前 300 条，剩余 ${recs.length - 300} 条请搜索</td></tr>` : ''}
           </tbody></table></div>
@@ -1186,7 +1185,7 @@
       ? `<div class="drawer-section">
            <h4>中国科协高质量目录</h4>
            <ul class="cas-sub-list">${r.cnkx.map(c =>
-             `<li><b>${escape(c.tier||'')}</b>${c.domain_top ? ' · ' + escape(c.domain_top) : ''}${c.domain ? ' <span class="muted-cell">· '+escape(c.domain)+'</span>' : ''}${c.version ? ` <span class="muted-cell">(${escape(c.version)})</span>` : ''}</li>`
+             `<li><b>${escape(c.tier||'')}</b>${c.domain ? ' · ' + escape(c.domain) : ''}${c.subdomain ? ' <span class="muted-cell">· '+escape(c.subdomain)+'</span>' : ''}${c.version ? ` <span class="muted-cell">(${escape(c.version)})</span>` : ''}</li>`
            ).join('')}</ul>
          </div>`
       : '';
