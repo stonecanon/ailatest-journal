@@ -941,9 +941,13 @@
       ? `<span class="jissn">${r.issn||''}${r.eissn ? ` <span class="eissn">e:${r.eissn}</span>` : ''}</span>`
       : '<span class="muted-cell">—</span>';
     const crossBadges = renderDomCrossBadges(r, 'int');
-    const badges = [
+    // 第一行：索引（SCIE/SSCI/AHCI/ESCI/EI）— 回答"这本被哪些数据库收录"
+    const indexBadges = [
       badgeFlagship(r.flagship),
       ...(r.indices || []).map(badgeIndex),
+    ].filter(Boolean).join('');
+    // 第二行：分区/IF/等级/预警 — 回答"这本的等级和影响力"
+    const rankBadges = [
       badgeCAS(r.cas_zone, r.cas_top),
       badgeXR(r.cas_xr && r.cas_xr.zone),
       badgeIF(r.if_2024, r.if_quartile),
@@ -952,13 +956,17 @@
       r.warning ? badgeWarn() : '',
       crossBadges,
     ].filter(Boolean).join('');
+    const badgeCell = [
+      indexBadges ? `<div class="badges badges-idx">${indexBadges}</div>` : '',
+      rankBadges  ? `<div class="badges badges-rank">${rankBadges}</div>`  : '',
+    ].filter(Boolean).join('') || '<span class="muted-cell">—</span>';
     const cat = [r.esi_category, r.cas_major_cn]
       .filter(Boolean).map(escape).join(' · ') || '<span class="muted-cell">—</span>';
     return `<tr data-fid="${escape(fid)}" class="j-row clickable ${r.flagship ? 'row-flagship' : ''}" data-src="int">
       <td class="col-name">${nameHtml}</td>
       <td class="col-abbr">${abbr || '<span class="muted-cell">—</span>'}</td>
       <td class="col-issn">${issn}</td>
-      <td class="col-badge"><div class="badges">${badges}</div></td>
+      <td class="col-badge col-badge-split">${badgeCell}</td>
       <td class="col-cat">${cat}</td>
       <td class="col-fav">${starBtn(r, 'int')}</td>
     </tr>`;

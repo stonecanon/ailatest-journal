@@ -251,7 +251,7 @@ main.main {
 .search-wrap { flex: 1; position: relative; }
 .search-wrap input {
   width: 100%;
-  background: var(--paper-soft);
+  background: var(--paper-deeper);
   border: 1px solid var(--rule);
   border-radius: 2px;
   padding: 11px 14px;
@@ -446,6 +446,17 @@ table.journals tr:last-child td { border-bottom: 0; }
 
 /* 徽章 */
 .badges { display: flex; flex-wrap: wrap; gap: 4px; }
+/* 国际行：索引栏 + 分区栏 两行分隔 */
+.col-badge-split { min-width: 200px; }
+.col-badge-split .badges { margin: 0; }
+.col-badge-split .badges-idx  { gap: 3px; }
+.col-badge-split .badges-rank {
+  margin-top: 5px;
+  padding-top: 5px;
+  border-top: 1px dashed var(--rule-soft);
+  gap: 4px;
+}
+.col-badge-split .badges-rank:first-child { border-top: 0; margin-top: 0; padding-top: 0; }
 .badge {
   display: inline-flex; align-items: center;
   padding: 2px 7px;
@@ -836,9 +847,33 @@ html[data-theme="dark"] .oa-chip.oa-isoa    { background: #3a2d10; color: #f3d78
   main.main .tab-panel { order: 3; }
   main.main .site-foot { order: 4; }
   .side-toggle { display: inline-flex; align-items: center; justify-content: center; }
-  .topbar { gap: 10px; }
-  .topbar-actions { gap: 6px; }
-  .lang-toggle, .auth-btn, .fav-tab { padding: 5px 8px; font-size: 12px; }
+  /* 手机端 topbar: 两行布局
+     第一行：☰ + 搜索框（搜索框占满）
+     第二行：收藏 / 登录 / 中EN 右对齐 */
+  main.main .topbar {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    grid-template-areas:
+      "toggle search"
+      "actions actions";
+    gap: 8px 10px;
+    align-items: center;
+  }
+  main.main .topbar .side-toggle { grid-area: toggle; width: 38px; height: 38px; }
+  main.main .topbar .search-wrap { grid-area: search; }
+  main.main .topbar-actions {
+    grid-area: actions;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+  .lang-toggle, .auth-btn, .fav-tab {
+    padding: 6px 10px;
+    font-size: 12px;
+    height: 32px;
+    display: inline-flex; align-items: center;
+  }
+  .search-wrap input { padding: 10px 12px; font-size: 14px; }
 }
 
 /* ─────────────── 详情抽屉 ─────────────── */
