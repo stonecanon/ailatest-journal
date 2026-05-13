@@ -108,13 +108,7 @@
   const PAGE = 100;
   let shown = PAGE;
 
-  // favorites: stable id = ISSN || eISSN || norm(name); value = true
-  let favs = new Set(JSON.parse(localStorage.getItem('ailatest.favs') || '[]'));
-  // favsData: 存储完整记录（含国内期刊），key = fav id
-  let favsData = {};
-  try { favsData = JSON.parse(localStorage.getItem('ailatest.favsData') || '{}'); } catch(_){}
-  let user = JSON.parse(localStorage.getItem('ailatest.user') || 'null');
-
+  // favorites & ratings 数据见下方 "favorites (multi-list + drag sort)" 段
   // unlocked records cache for locked sources: { school_a: [...records], ... }
   const unlockedCache = {};
   try {
@@ -157,31 +151,147 @@
     document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
   }
 
-  // ───────── favorites ─────────
+  // ───────── favorites (multi-list + drag sort) ─────────
   function favId(r) {
     return r.issn || r.eissn || r.cn_code || ('t:' + normTitle(r.name || r.cn_name || ''));
   }
   function normTitle(s) {
     return String(s).toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]+/g, '');
   }
-  function isFav(r) { return favs.has(favId(r)); }
+
+  // favLists: [{id, name, ids:[...ordered ids...]}]
+  let favLists = [];
+  let activeListId = null;
+
+  function loadFavLists() {
+    try {
+      const raw = localStorage.getItem('ailatest.favLists');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length) {
+          favLists = parsed.map(l => ({
+            id: String(l.id),
+            name: String(l.name || '未命名'),
+            ids: Array.isArray(l.ids) ? l.ids.map(String) : [],
+          }));
+          activeListId = localStorage.getItem('ailatest.activeListId') || favLists[0].id;
+          if (!favLists.find(l => l.id === activeListId)) activeListId = favLists[0].id;
+          return;
+        }
+      }
+    } catch (_) {}
+    // migrate from old flat favs (ailatest.favs)
+    let legacy = [];
+    try { legacy = JSON.parse(localStorage.getItem('ailatest.favs') || '[]'); } catch(_) {}
+    favLists = [{ id: 'default', name: '默认收藏', ids: [...legacy] }];
+    activeListId = 'default';
+    persistFavLists(false);
+  }
+
+  function persistFavLists(sync = true) {
+    localStorage.setItem('ailatest.favLists', JSON.stringify(favLists));
+    localStorage.setItem('ailatest.activeListId', activeListId);
+    // rebuild flat union for legacy path + backend sync
+    const union = new Set();
+    favLists.forEach(l => l.ids.forEach(id => union.add(id)));
+    favs = union;
+    localStorage.setItem('ailatest.favs', JSON.stringify([...union]));
+    if (sync) syncFavs();
+  }
+
+  function getActiveList() {
+    return favLists.find(l => l.id === activeListId) || favLists[0];
+  }
+  function allFavIds() {
+    const s = new Set();
+    favLists.forEach(l => l.ids.forEach(id => s.add(id)));
+    return s;
+  }
+
+  // favs kept as Set (union) for compatibility with star rendering
+  let favs = new Set();
+  // favsData: 完整记录池（key = fav id）
+  let favsData = {};
+  try { favsData = JSON.parse(localStorage.getItem('ailatest.favsData') || '{}'); } catch(_){}
+  let user = JSON.parse(localStorage.getItem('ailatest.user') || 'null');
+
+  // isFav = 在当前 active list 中
+  function isFav(r) {
+    const id = favId(r);
+    const list = getActiveList();
+    return !!(list && list.ids.includes(id));
+  }
+
   function toggleFav(r, meta = {}) {
     const id = favId(r);
-    if (favs.has(id)) {
-      favs.delete(id);
-      delete favsData[id];
+    const list = getActiveList();
+    if (!list) return;
+    const idx = list.ids.indexOf(id);
+    if (idx >= 0) {
+      list.ids.splice(idx, 1);
+      // 其他 list 都不含它 → 从 favsData 移除
+      if (!favLists.some(l => l.ids.includes(id))) delete favsData[id];
     } else {
-      favs.add(id);
-      // 存完整记录 + 来源标签 (int / cnkx / cssci_core / ...)
+      list.ids.push(id);
       favsData[id] = { ...r, __src: meta.src || 'int', __savedAt: Date.now() };
     }
-    localStorage.setItem('ailatest.favs', JSON.stringify([...favs]));
     localStorage.setItem('ailatest.favsData', JSON.stringify(favsData));
+    persistFavLists();
     updateFavCount();
-    syncFavs();
   }
+
   function updateFavCount() {
-    $('#fav-count').textContent = favs.size;
+    const total = allFavIds().size;
+    const el = $('#fav-count');
+    if (el) el.textContent = total;
+  }
+
+  // list 管理
+  function createList(name) {
+    const id = 'l_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+    favLists.push({ id, name: name || '新清单', ids: [] });
+    activeListId = id;
+    persistFavLists();
+    return id;
+  }
+  function renameList(id, newName) {
+    const l = favLists.find(x => x.id === id);
+    if (l && newName && newName.trim()) { l.name = newName.trim(); persistFavLists(); }
+  }
+  function deleteList(id) {
+    if (favLists.length <= 1) return false; // 不允许删到 0
+    const removed = favLists.find(x => x.id === id);
+    favLists = favLists.filter(x => x.id !== id);
+    if (activeListId === id) activeListId = favLists[0].id;
+    // 清理孤儿 favsData
+    if (removed) {
+      removed.ids.forEach(fid => {
+        if (!favLists.some(l => l.ids.includes(fid))) delete favsData[fid];
+      });
+      localStorage.setItem('ailatest.favsData', JSON.stringify(favsData));
+    }
+    persistFavLists();
+    return true;
+  }
+  function switchList(id) {
+    if (favLists.find(l => l.id === id)) {
+      activeListId = id;
+      localStorage.setItem('ailatest.activeListId', activeListId);
+      // 重绘：主表星号状态依赖 active list
+      if (activeTab === 'fav') renderFav();
+      else if (activeTab === 'int') renderInt();
+      else if (activeTab === 'dom') renderDomestic();
+    }
+  }
+  function reorderActiveList(newOrder) {
+    const list = getActiveList();
+    if (!list) return;
+    // newOrder = array of ids
+    const valid = newOrder.filter(id => list.ids.includes(id));
+    // append any missing (defensive)
+    list.ids.forEach(id => { if (!valid.includes(id)) valid.push(id); });
+    list.ids = valid;
+    persistFavLists();
   }
 
   async function syncFavs() {
@@ -207,12 +317,13 @@
       if (!r.ok) return;
       const d = await r.json();
       if (Array.isArray(d.favs)) {
-        // merge local + remote
-        d.favs.forEach(x => favs.add(x));
-        localStorage.setItem('ailatest.favs', JSON.stringify([...favs]));
+        // 远端 id 合并进 active list，保持本地顺序优先
+        const list = getActiveList();
+        if (list) {
+          d.favs.forEach(x => { if (!list.ids.includes(x)) list.ids.push(x); });
+        }
+        persistFavLists();
         updateFavCount();
-        // push merged back
-        syncFavs();
       }
     } catch (e) { console.warn('fav pull failed', e); }
   }
@@ -1487,59 +1598,113 @@
   // ───────── favorites tab ─────────
   function renderFav() {
     const box = $('#fav-content');
-    // 收藏数据来源：favsData（包含国际 + 国内各源完整记录）
-    // 对于历史只有 favs 无 favsData 的旧用户，尝试从 journals 回填
-    let list = [];
-    for (const id of favs) {
+    const list = getActiveList();
+    if (!list) { box.innerHTML = ''; return; }
+
+    // list 管理栏（全列表切换 + 新建/重命名/删除）
+    const bar = favLists.map(l => `
+      <button class="fav-list-chip ${l.id === activeListId ? 'active' : ''}" data-list="${escape(l.id)}">
+        <span class="lname">${escape(l.name)}</span>
+        <span class="lcount">${l.ids.length}</span>
+      </button>`).join('');
+    const toolbar = `
+      <div class="fav-toolbar">
+        <div class="fav-list-chips">${bar}</div>
+        <div class="fav-list-ops">
+          <button class="btn-mini" id="fav-list-new" title="新建清单">＋ 新建</button>
+          <button class="btn-mini" id="fav-list-rename" title="重命名当前">✎ 重命名</button>
+          <button class="btn-mini btn-danger" id="fav-list-del" title="删除当前" ${favLists.length<=1?'disabled':''}>🗑 删除</button>
+        </div>
+      </div>`;
+
+    // 取当前 list 的有序记录
+    let rows = [];
+    for (const id of list.ids) {
       const rec = favsData[id] || journals.find(r => favId(r) === id);
-      if (rec) list.push({ ...rec, __src: rec.__src || 'int' });
+      if (rec) rows.push({ ...rec, __src: rec.__src || 'int' });
     }
     if (activeQuery) {
       const q = activeQuery.toLowerCase();
-      list = list.filter(r => (
+      rows = rows.filter(r => (
         (r.name||'') + ' ' + (r.cn_name||'') + ' ' + (r.en_name||'') + ' ' +
         (r.issn||'') + ' ' + (r.cn_code||'')
       ).toLowerCase().includes(q));
     }
-    if (!list.length) {
-      box.innerHTML = `<div class="empty" style="padding:40px 0">${t('empty_fav')}</div>`;
+
+    if (!rows.length) {
+      box.innerHTML = toolbar + `<div class="empty" style="padding:40px 0">${t('empty_fav')}</div>`;
+      attachFavBarHandlers();
       return;
     }
-    // 按来源分组
-    const SRC_LABEL = {
-      int: '🌏 国际期刊 (SCI/SSCI)',
-      cssci: '🇨🇳 CSSCI 来源期刊',
-      cssci_ext: '🇨🇳 CSSCI 扩展版',
-      pku: '🇨🇳 北大核心',
-      cnkx: '🇨🇳 中国科协高质量目录',
-      ccft: '🇨🇳 CCF 推荐中文科技期刊',
-      zju: '🇨🇳 浙江大学 2024',
-      school_a: '🔒 高校自编目录 2023',
-    };
-    const bySrc = {};
-    for (const r of list) (bySrc[r.__src] = bySrc[r.__src] || []).push(r);
-    const srcOrder = ['int','cssci','cssci_ext','pku','cnkx','ccft','zju','school_a'];
-    const orderedSrcs = srcOrder.filter(s => bySrc[s]).concat(
-      Object.keys(bySrc).filter(s => !srcOrder.includes(s))
-    );
-    const html = [];
-    for (const s of orderedSrcs) {
-      const recs = bySrc[s];
-      html.push(`<div class="section-block" style="margin-top:18px">
-        <h3 class="section-title">${SRC_LABEL[s] || s} <span class="muted-cell">(${recs.length})</span></h3>
-        <div class="table-wrap" style="margin-top:10px"><table class="journals">
+
+    // 单一有序表格 + 拖动
+    const tbody = rows.map(r => renderFavRow(r)).join('');
+    const hint = activeQuery ? '' : `<div class="fav-drag-hint">按住 <span class="drag-ico">⋮⋮</span> 拖动排序 · 长按手机端同样支持</div>`;
+    box.innerHTML = toolbar + hint + `
+      <div class="table-wrap" style="margin-top:10px">
+        <table class="journals fav-table">
           <thead><tr>
+            <th class="col-drag" style="width:28px"></th>
             <th class="col-name">期刊</th>
             <th style="width:160px">ISSN / CN</th>
             <th>徽章 / 交叉收录</th>
+            <th class="col-src" style="width:90px">来源</th>
             <th style="width:40px"></th>
-          </tr></thead><tbody>
-          ${recs.map(r => renderFavRow(r)).join('')}
-        </tbody></table></div>
-      </div>`);
+          </tr></thead>
+          <tbody id="fav-tbody">${tbody}</tbody>
+        </table>
+      </div>
+      <div class="results-count" style="margin-top:18px">${t('showing')} ${rows.length} ${t('total_items')}</div>`;
+
+    attachFavBarHandlers();
+    // 拖动排序（只在无搜索时启用，搜索时顺序与真实顺序不一致）
+    if (!activeQuery && window.Sortable) {
+      const tb = document.getElementById('fav-tbody');
+      if (tb) {
+        Sortable.create(tb, {
+          handle: '.drag-handle',
+          animation: 150,
+          delay: 200,          // 手机端长按触发
+          delayOnTouchOnly: true,
+          touchStartThreshold: 5,
+          ghostClass: 'fav-ghost',
+          chosenClass: 'fav-chosen',
+          onEnd: () => {
+            const ids = [...tb.querySelectorAll('tr.j-row')].map(tr => tr.dataset.fid);
+            reorderActiveList(ids);
+          },
+        });
+      }
     }
-    html.push(`<div class="results-count" style="margin-top:18px">${t('showing')} ${list.length} ${t('total_items')}</div>`);
-    box.innerHTML = html.join('');
+  }
+
+  function attachFavBarHandlers() {
+    const bar = document.querySelector('.fav-list-chips');
+    if (bar) {
+      bar.querySelectorAll('.fav-list-chip').forEach(btn => {
+        btn.addEventListener('click', () => switchList(btn.dataset.list));
+      });
+    }
+    const newBtn = document.getElementById('fav-list-new');
+    if (newBtn) newBtn.addEventListener('click', () => {
+      const name = prompt('新清单名称：', '新清单');
+      if (name && name.trim()) { createList(name.trim()); renderFav(); }
+    });
+    const renBtn = document.getElementById('fav-list-rename');
+    if (renBtn) renBtn.addEventListener('click', () => {
+      const cur = getActiveList(); if (!cur) return;
+      const name = prompt('重命名清单：', cur.name);
+      if (name && name.trim()) { renameList(cur.id, name.trim()); renderFav(); }
+    });
+    const delBtn = document.getElementById('fav-list-del');
+    if (delBtn) delBtn.addEventListener('click', () => {
+      const cur = getActiveList(); if (!cur) return;
+      if (favLists.length <= 1) { alert('至少保留一个清单'); return; }
+      if (confirm(`删除清单「${cur.name}」？\n清单中的期刊若未在其他清单中也会被移除。`)) {
+        deleteList(cur.id); renderFav();
+        if (activeTab === 'int') renderInt();
+      }
+    });
   }
 
   function renderFavRow(r) {
@@ -1562,10 +1727,17 @@
     const tierBadge = r.tier && /^T[123]$/.test(r.tier) ? badgeTier(r.tier)
                     : r.tier ? `<span class="tier-pill t3">${escape(r.tier)}</span>` : '';
     const crossBadges = renderDomCrossBadges(r, r.__src);
+    const SRC_LABEL = {
+      int: '国际', cssci: 'CSSCI', cssci_core: 'CSSCI', cssci_ext: 'CSSCI扩展',
+      pku: '北大核心', pku_core: '北大核心', cnkx: '科协', ccft: 'CCF-T',
+      zju: '浙大', school_a: '高校目录',
+    };
     return `<tr class="j-row clickable" data-fid="${escape(fid)}" data-src="${escape(r.__src)}">
+      <td class="col-drag"><span class="drag-handle" title="拖动排序">⋮⋮</span></td>
       <td class="col-name"><div class="jname">${escape(name.replace(/\*$/,''))}${cnName}${enName}</div></td>
       <td class="col-issn">${isnCell}</td>
       <td class="col-badge"><div class="badges">${intBadges}${tierBadge}${crossBadges}</div></td>
+      <td class="col-src"><span class="src-tag src-${escape(r.__src)}">${SRC_LABEL[r.__src] || r.__src}</span></td>
       <td class="col-fav">${starBtn(r, r.__src)}</td>
     </tr>`;
   }
@@ -1654,6 +1826,7 @@
     // 行点击 → 详情抽屉
     document.addEventListener('click', (e) => {
       if (e.target.closest('.fav-star')) return;
+      if (e.target.closest('.drag-handle')) return;
       const row = e.target.closest('tr.j-row.clickable'); if (!row) return;
       const fid = row.dataset.fid;
       const rec = rowRecordsByFid[fid] || journals.find(r => favId(r) === fid) || favsData[fid];
@@ -1677,6 +1850,7 @@
 
   // ───────── boot ─────────
   async function boot() {
+    loadFavLists();
     bind();
     applyI18n();
     updateFavCount();
