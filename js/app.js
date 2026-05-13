@@ -283,40 +283,154 @@
   }
 
 
-  // ───────── auth (GitHub OAuth via Worker) ─────────
+  // ───────── auth (email code + GitHub / Google OAuth via Worker) ─────────
   function startLogin() {
-    const state = Math.random().toString(36).slice(2);
-    sessionStorage.setItem('ailatest.oauth_state', state);
-    const redirect = encodeURIComponent(location.origin + location.pathname);
-    window.location.href =
-      `${API_BASE}/auth/github?state=${state}&redirect=${redirect}`;
+    openLoginModal();
   }
+
+  function openLoginModal() {
+    let modal = $('#login-modal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'login-modal';
+      modal.className = 'login-modal';
+      modal.innerHTML = `
+        <div class="login-card" role="dialog" aria-labelledby="login-title">
+          <button class="login-close" aria-label="关闭">×</button>
+          <h3 id="login-title">登录 / 注册</h3>
+          <p class="login-sub">跨设备同步收藏、投稿经验、打分记录</p>
+
+          <form class="login-email" autocomplete="off">
+            <label>邮箱</label>
+            <input type="email" name="email" placeholder="you@example.com" required />
+            <div class="login-code-row" hidden>
+              <label>6 位验证码</label>
+              <input type="text" name="code" inputmode="numeric" pattern="\\d{6}" maxlength="6" placeholder="123456" />
+            </div>
+            <button type="submit" class="login-btn-primary" data-step="request">发送验证码</button>
+            <div class="login-msg" role="status"></div>
+          </form>
+
+          <div class="login-divider"><span>或使用第三方登录</span></div>
+
+          <div class="login-oauth">
+            <button class="login-btn-oauth gh" data-provider="github">
+              <svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+              GitHub
+            </button>
+            <button class="login-btn-oauth gg" data-provider="google">
+              <svg viewBox="0 0 48 48" width="18" height="18" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3c-1.6 4.7-6.1 8-11.3 8a12 12 0 010-24c3 0 5.8 1.1 7.9 3L37.6 9.3A20 20 0 004 24a20 20 0 0040 0c0-1.3-.1-2.6-.4-3.9z"/><path fill="#FF3D00" d="M6.3 14.1l6.6 4.8A12 12 0 0124 16c3 0 5.8 1.1 7.9 3L37.6 9.3A20 20 0 006.3 14.1z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2A12 12 0 0124 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5A20 20 0 0024 44z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.3-2.2 4.2-4.1 5.6l6.2 5.2c-.4.4 6.6-4.8 6.6-14.8 0-1.3-.1-2.6-.4-3.9z"/></svg>
+              Google
+            </button>
+          </div>
+
+          <p class="login-tos">登录即同意 <a href="/terms.html">服务条款</a> 与 <a href="/privacy.html">隐私政策</a></p>
+        </div>
+      `;
+      document.body.appendChild(modal);
+
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeLoginModal();
+      });
+      $('.login-close', modal).addEventListener('click', closeLoginModal);
+
+      // email code flow
+      const form = $('.login-email', modal);
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = $('.login-btn-primary', form);
+        const msg = $('.login-msg', form);
+        const emailEl = form.email;
+        const codeEl  = form.code;
+        const step = btn.dataset.step;
+        msg.textContent = '';
+        btn.disabled = true;
+        try {
+          if (step === 'request') {
+            const r = await fetch(`${API_BASE}/auth/email/request`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email: emailEl.value.trim().toLowerCase() }),
+            });
+            const d = await r.json();
+            if (!r.ok) throw new Error(d.error || '发送失败');
+            $('.login-code-row', form).hidden = false;
+            codeEl.required = true;
+            codeEl.focus();
+            btn.dataset.step = 'verify';
+            btn.textContent = '登录';
+            msg.textContent = '验证码已发送，10 分钟内有效';
+            msg.className = 'login-msg ok';
+          } else {
+            const r = await fetch(`${API_BASE}/auth/email/verify`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                email: emailEl.value.trim().toLowerCase(),
+                code:  codeEl.value.trim(),
+              }),
+            });
+            const d = await r.json();
+            if (!r.ok) throw new Error(d.error || '验证失败');
+            await finishLogin(d.token);
+            closeLoginModal();
+          }
+        } catch (err) {
+          msg.textContent = err.message;
+          msg.className = 'login-msg err';
+        } finally {
+          btn.disabled = false;
+        }
+      });
+
+      // oauth buttons
+      $$('.login-btn-oauth', modal).forEach(btn => {
+        btn.addEventListener('click', () => {
+          const p = btn.dataset.provider;
+          const state = Math.random().toString(36).slice(2);
+          sessionStorage.setItem('ailatest.oauth_state', state);
+          const redirect = encodeURIComponent(location.origin + location.pathname);
+          location.href = `${API_BASE}/auth/${p}?state=${state}&redirect=${redirect}`;
+        });
+      });
+    }
+    modal.classList.add('open');
+    setTimeout(() => $('.login-email input[name=email]', modal)?.focus(), 50);
+  }
+
+  function closeLoginModal() {
+    $('#login-modal')?.classList.remove('open');
+  }
+
+  async function finishLogin(token) {
+    const r = await fetch(`${API_BASE}/me`, {
+      headers: { 'Authorization': `Bearer ${token}` },
+    });
+    if (!r.ok) throw new Error('用户信息获取失败');
+    const me = await r.json();
+    user = { ...me, token };
+    localStorage.setItem('ailatest.user', JSON.stringify(user));
+    await pullFavs();
+    applyI18n();
+  }
+
   function doLogout() {
     user = null;
     localStorage.removeItem('ailatest.user');
     applyI18n();
   }
+
   async function handleAuthCallback() {
     const q = new URLSearchParams(location.search);
     const token = q.get('token');
     if (!token) return;
     try {
-      const r = await fetch(`${API_BASE}/me`, {
-        headers: { 'Authorization': `Bearer ${token}` },
-      });
-      if (r.ok) {
-        const me = await r.json();
-        user = { ...me, token };
-        localStorage.setItem('ailatest.user', JSON.stringify(user));
-        await pullFavs();
-      }
+      await finishLogin(token);
     } catch (e) { console.warn('auth callback failed', e); }
-    // clean URL
     const u = new URL(location.href);
     u.searchParams.delete('token');
     u.searchParams.delete('state');
     history.replaceState({}, '', u.toString());
-    applyI18n();
   }
 
   // ───────── render helpers ─────────
