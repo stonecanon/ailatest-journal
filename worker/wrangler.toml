@@ -2,22 +2,24 @@ name = "ailatest-journal-api"
 main = "src/index.js"
 compatibility_date = "2024-11-01"
 
-# Custom domain
 routes = [
   { pattern = "api.ailatest.org", custom_domain = true }
 ]
 
 [vars]
-GITHUB_CLIENT_ID = "Ov23liKY2We6M23yTMJV"  # public client id
-SITE_URL = "https://journal.ailatest.org"
+GITHUB_CLIENT_ID = "Ov23liKY2We6M23yTMJV"
+GOOGLE_CLIENT_ID = ""                       # set after creating Google OAuth client
+SITE_URL         = "https://journal.ailatest.org"
+MAIL_FROM        = "noreply@ailatest.org"   # must be a Resend-verified sender
 
-# D1 database — create with: wrangler d1 create ailatest-journal
-# Then paste database_id below.
 [[d1_databases]]
 binding = "DB"
 database_name = "ailatest-journal"
 database_id = "861dd053-c23a-4363-b62b-2559c06ec3fd"
 
-# Secrets (set with `wrangler secret put`):
-#   GITHUB_CLIENT_SECRET
-#   JWT_SECRET    (any long random string, e.g. openssl rand -base64 48)
+# Secrets to configure:
+#   wrangler secret put GITHUB_CLIENT_SECRET
+#   wrangler secret put GOOGLE_CLIENT_SECRET
+#   wrangler secret put JWT_SECRET
+#   wrangler secret put RESEND_API_KEY
+#   wrangler secret put CODE_PEPPER

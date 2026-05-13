@@ -1,10 +1,13 @@
--- ailatest-journal D1 schema
+-- ailatest-journal D1 schema (v2 — supports email/github/google)
 CREATE TABLE IF NOT EXISTS users (
   id          INTEGER PRIMARY KEY AUTOINCREMENT,
-  github_id   INTEGER UNIQUE NOT NULL,
-  login       TEXT NOT NULL,
+  email       TEXT UNIQUE,
+  github_id   INTEGER UNIQUE,
+  google_id   TEXT UNIQUE,
+  login       TEXT,
   name        TEXT,
   avatar_url  TEXT,
+  provider    TEXT,                    -- 'email' | 'github' | 'google'
   created_at  INTEGER NOT NULL,
   updated_at  INTEGER NOT NULL
 );
@@ -17,4 +20,16 @@ CREATE TABLE IF NOT EXISTS favorites (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+-- 邮箱一次性验证码
+CREATE TABLE IF NOT EXISTS email_codes (
+  email       TEXT NOT NULL,
+  code_hash   TEXT NOT NULL,           -- sha256(code + pepper)
+  expires_at  INTEGER NOT NULL,
+  attempts    INTEGER DEFAULT 0,
+  created_at  INTEGER NOT NULL,
+  PRIMARY KEY (email)
+);
+
 CREATE INDEX IF NOT EXISTS idx_favorites_user ON favorites(user_id);
+CREATE INDEX IF NOT EXISTS idx_users_email    ON users(email);
+CREATE INDEX IF NOT EXISTS idx_users_google   ON users(google_id);
