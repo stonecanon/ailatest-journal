@@ -508,7 +508,7 @@ table.journals tr:last-child td { border-bottom: 0; }
 
 .tier-pill {
   display: inline-block;
-  padding: 2px 6px;
+  padding: 2px 7px;
   font-family: var(--serif);
   font-size: 11px; font-weight: 700;
   background: var(--deep);
@@ -516,9 +516,84 @@ table.journals tr:last-child td { border-bottom: 0; }
   border-radius: 2px;
   letter-spacing: 0.06em;
 }
-.tier-pill.t1 { background: var(--crimson); }
-.tier-pill.t2 { background: var(--accent); }
-.tier-pill.t3 { background: var(--sage); }
+/* 中国科协 理工 T1/T2/T3 */
+.tier-pill.t1 { background: #8b1a1a; }   /* 深红 */
+.tier-pill.t2 { background: #b47a1e; }   /* 深琥珀 */
+.tier-pill.t3 { background: #4a6741; }   /* 鼠尾草绿 */
+/* 中国科协 管理 A/B/C/D */
+.tier-pill.ta-a { background: #8b1a1a; }
+.tier-pill.ta-b { background: #b47a1e; }
+.tier-pill.ta-c { background: #4a6741; }
+.tier-pill.ta-d { background: #6b5d52; }
+
+/* 中科院新锐版分区 */
+.xr-pill {
+  display: inline-block;
+  padding: 2px 6px;
+  font-family: var(--serif);
+  font-size: 11px; font-weight: 700;
+  border-radius: 2px;
+  color: #fff;
+  letter-spacing: 0.02em;
+}
+.xr-pill.xr-1 { background: #4a3a5f; }  /* 深紫（区别于中科院主分区的深红） */
+.xr-pill.xr-2 { background: #6a5080; }
+.xr-pill.xr-3 { background: #8a7aa0; }
+.xr-pill.xr-4 { background: #a89db8; }
+
+/* Nature / Science / Cell 旗舰徽章 */
+.flagship-pill {
+  display: inline-block;
+  padding: 2px 7px;
+  font-family: var(--serif);
+  font-size: 11px; font-weight: 700;
+  border-radius: 2px;
+  letter-spacing: 0.04em;
+  border: 1px solid transparent;
+}
+.flagship-pill.flag-nature-main,
+.flagship-pill.flag-science-main,
+.flagship-pill.flag-cell-main {
+  background: linear-gradient(135deg, #c9a227 0%, #8b6914 100%);
+  color: #fff;
+  border-color: #6b4e0a;
+}
+.flagship-pill.flag-nature-sub,
+.flagship-pill.flag-science-sub,
+.flagship-pill.flag-cell-sub {
+  background: #fdf8e7;
+  color: #6b4e0a;
+  border-color: #c9a227;
+}
+.flagship-star {
+  color: #c9a227;
+  font-size: 12px;
+  margin-right: 4px;
+}
+.row-flagship {
+  background: linear-gradient(to right, rgba(201,162,39,0.06), transparent 40%);
+}
+
+/* cnkx 大类 summary 上的 T1/T2/T3 计数迷你徽章 */
+.tier-mini {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 7px;
+  font-family: var(--serif);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border-radius: 2px;
+  color: #fff;
+  vertical-align: 1px;
+}
+.tier-mini.t1 { background: #8b1a1a; }
+.tier-mini.t2 { background: #b47a1e; }
+.tier-mini.t3 { background: #4a6741; }
+.tier-mini.ta-a { background: #8b1a1a; }
+.tier-mini.ta-b { background: #b47a1e; }
+.tier-mini.ta-c { background: #4a6741; }
+.tier-mini.ta-d { background: #6b5d52; }
 
 .warn-pill {
   display: inline-block;

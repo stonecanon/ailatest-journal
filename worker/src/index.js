@@ -8,7 +8,7 @@
  *
  * Endpoints:
  *   POST /auth/email/request     { email }                → sends code via Resend
- *   POST /auth/email/verify      { email, code }          → { token }
+ *   POST /auth/email/verify      { email, code }          → { token, user }
  *   GET  /auth/github            ?state=&redirect=         → 302 to GitHub
  *   GET  /auth/github/callback   ?code=&state=             → 302 back with ?token=
  *   GET  /auth/google            ?state=&redirect=         → 302 to Google
@@ -167,6 +167,23 @@ async function upsertEmailUser(env, email) {
   return res.meta.last_row_id;
 }
 
+async function getUserById(env, id) {
+  return env.DB.prepare(
+    'SELECT id, email, github_id, google_id, login, name, avatar_url, provider FROM users WHERE id = ?'
+  ).bind(id).first();
+}
+
+function publicUser(u) {
+  return {
+    id: u.id,
+    email: u.email,
+    login: u.login,
+    name: u.name,
+    avatar_url: u.avatar_url,
+    provider: u.provider,
+  };
+}
+
 // ───────── routes: email ─────────
 async function routeEmailRequest(req, env) {
   const body = await req.json().catch(() => null);
@@ -230,7 +247,9 @@ async function routeEmailVerify(req, env) {
 
   const uid = await upsertEmailUser(env, email);
   const jwt = await signJWT({ uid, email }, env.JWT_SECRET);
-  return json({ token: jwt });
+  const u = await getUserById(env, uid);
+  if (!u) return err('用户创建失败', 500);
+  return json({ token: jwt, user: publicUser(u) });
 }
 
 // ───────── routes: github (existing) ─────────
@@ -387,14 +406,7 @@ async function routeGoogleCallback(req, env) {
 async function routeMe(req, env) {
   const u = await getUser(req, env);
   if (!u) return err('unauthorized', 401);
-  return json({
-    id: u.id,
-    email: u.email,
-    login: u.login,
-    name: u.name,
-    avatar_url: u.avatar_url,
-    provider: u.provider,
-  });
+  return json(publicUser(u));
 }
 
 async function routeGetFavs(req, env) {

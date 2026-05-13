@@ -23,3 +23,6 @@ generated/
 # OpenAlex raw cache (21MB, regeneratable via scripts/fetch_openalex.py)
 data/openalex_cache.json
 
+
+CODEX_REVIEW.md
+.wrangler/
