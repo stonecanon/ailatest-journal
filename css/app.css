@@ -976,6 +976,58 @@ html[data-theme="dark"] .oa-chip.oa-isoa    { background: #3a2d10; color: #f3d78
   line-height: 1.5;
 }
 
+.rating-section { padding: 14px 18px; }
+.rating-summary {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) minmax(0,1.3fr);
+  gap: 18px;
+  align-items: start;
+  padding: 12px 0 4px;
+}
+@media (max-width: 560px) {
+  .rating-summary { grid-template-columns: 1fr; }
+}
+.rating-avg-wrap { text-align: center; padding: 8px 6px; border-right: 1px dashed var(--rule); }
+@media (max-width: 560px) {
+  .rating-avg-wrap { border-right: none; border-bottom: 1px dashed var(--rule); padding-bottom: 14px; }
+}
+.rating-avg {
+  font-size: 32px; font-weight: 600; line-height: 1; margin-bottom: 4px;
+  font-family: var(--font-serif, Georgia, serif); color: var(--ink);
+}
+.rating-avg-stars { font-size: 16px; letter-spacing: 0.06em; margin-bottom: 4px; }
+.rating-avg-stars .star.full  { color: #f5a623; }
+.rating-avg-stars .star.half  { color: #f5a623; opacity: 0.55; }
+.rating-avg-stars .star.empty { color: var(--ink-faint); }
+.rating-count { font-size: 12px; }
+
+.rating-my-wrap { padding: 4px 4px 0; }
+.rating-my-label { font-size: 12px; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.06em; }
+.rating-stars-input {
+  display: inline-flex; gap: 2px; font-size: 26px; line-height: 1;
+  user-select: none; cursor: pointer; padding: 4px 0;
+}
+.rating-stars-input.disabled { cursor: not-allowed; opacity: 0.55; }
+.rating-stars-input .star-input {
+  position: relative; display: inline-block; width: 1em; height: 1em;
+  color: var(--ink-faint);
+}
+.rating-stars-input .star-visual {
+  position: absolute; inset: 0; display: block; pointer-events: none;
+}
+.rating-stars-input .star-input.half  .star-visual {
+  background: linear-gradient(90deg, #f5a623 50%, var(--ink-faint) 50%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.rating-stars-input .star-input.full  .star-visual { color: #f5a623; }
+.rating-stars-input .half-hit {
+  position: absolute; top: 0; bottom: 0; width: 50%; cursor: pointer;
+}
+.rating-stars-input .half-hit.left  { left: 0; }
+.rating-stars-input .half-hit.right { right: 0; }
+.rating-my-hint { font-size: 11.5px; margin-top: 6px; line-height: 1.5; }
+.rating-my-hint a { color: var(--accent, #4a73c0); text-decoration: underline; }
+
 /* 行可点击提示 */
 tr.j-row.clickable { cursor: pointer; transition: background 0.1s; }
 tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }

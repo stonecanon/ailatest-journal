@@ -437,6 +437,114 @@ async function routePutFavs(req, env) {
   return json({ ok: true, count: favs.length });
 }
 
+// ───────── routes: ratings ─────────
+
+// Normalize journal_key: strip whitespace, limit length
+function normalizeJournalKey(k) {
+  if (typeof k !== 'string') return null;
+  const s = k.trim();
+  if (!s || s.length > 200) return null;
+  return s;
+}
+
+// Read-only endpoint — no auth required. GET /ratings?keys=a,b,c (max 200)
+async function routeGetRatings(req, env) {
+  const u = new URL(req.url);
+  const raw = (u.searchParams.get('keys') || '').trim();
+  if (!raw) return json({ ratings: {} });
+  const keys = raw.split(',').map(normalizeJournalKey).filter(Boolean).slice(0, 200);
+  if (!keys.length) return json({ ratings: {} });
+  const placeholders = keys.map(() => '?').join(',');
+  const rows = await env.DB.prepare(
+    `SELECT journal_key, AVG(rating) AS avg_r, COUNT(*) AS n
+       FROM ratings WHERE journal_key IN (${placeholders})
+      GROUP BY journal_key`
+  ).bind(...keys).all();
+
+  // Optional: if Bearer token, also return this user's own ratings for those keys
+  let mine = {};
+  const tok = (req.headers.get('authorization') || '').replace(/^Bearer\s+/i, '');
+  if (tok) {
+    const user = await getUser(req, env).catch(() => null);
+    if (user) {
+      const myRows = await env.DB.prepare(
+        `SELECT journal_key, rating FROM ratings
+          WHERE user_id = ? AND journal_key IN (${placeholders})`
+      ).bind(user.id, ...keys).all();
+      for (const r of (myRows.results || [])) mine[r.journal_key] = r.rating;
+    }
+  }
+
+  const out = {};
+  for (const r of (rows.results || [])) {
+    out[r.journal_key] = {
+      avg: Math.round(r.avg_r * 10) / 10,
+      n: r.n,
+      mine: mine[r.journal_key] ?? null,
+    };
+  }
+  // Ensure keys with no ratings return a stub (so frontend knows)
+  for (const k of keys) {
+    if (!(k in out)) out[k] = { avg: null, n: 0, mine: mine[k] ?? null };
+  }
+  return json({ ratings: out });
+}
+
+// PUT /ratings { journal_key, rating }   (0.5-5.0, step 0.5)
+async function routePutRating(req, env) {
+  const u = await getUser(req, env);
+  if (!u) return err('unauthorized', 401);
+  const body = await req.json().catch(() => null);
+  if (!body) return err('invalid body');
+  const key = normalizeJournalKey(body.journal_key);
+  if (!key) return err('invalid journal_key');
+  const n = Number(body.rating);
+  if (!Number.isFinite(n) || n < 0.5 || n > 5 || (n * 2) % 1 !== 0) {
+    return err('rating must be 0.5 / 1.0 / ... / 5.0');
+  }
+  const now = nowSec();
+  await env.DB.prepare(
+    `INSERT INTO ratings (user_id, journal_key, rating, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?)
+     ON CONFLICT(user_id, journal_key) DO UPDATE SET rating = excluded.rating, updated_at = excluded.updated_at`
+  ).bind(u.id, key, n, now, now).run();
+
+  // return new aggregate
+  const row = await env.DB.prepare(
+    'SELECT AVG(rating) AS avg_r, COUNT(*) AS n FROM ratings WHERE journal_key = ?'
+  ).bind(key).first();
+  return json({
+    ok: true,
+    journal_key: key,
+    mine: n,
+    avg: row && row.avg_r != null ? Math.round(row.avg_r * 10) / 10 : null,
+    n: row ? row.n : 0,
+  });
+}
+
+// DELETE /ratings { journal_key }
+async function routeDeleteRating(req, env) {
+  const u = await getUser(req, env);
+  if (!u) return err('unauthorized', 401);
+  const body = await req.json().catch(() => null);
+  if (!body) return err('invalid body');
+  const key = normalizeJournalKey(body.journal_key);
+  if (!key) return err('invalid journal_key');
+  await env.DB.prepare(
+    'DELETE FROM ratings WHERE user_id = ? AND journal_key = ?'
+  ).bind(u.id, key).run();
+  const row = await env.DB.prepare(
+    'SELECT AVG(rating) AS avg_r, COUNT(*) AS n FROM ratings WHERE journal_key = ?'
+  ).bind(key).first();
+  return json({
+    ok: true,
+    journal_key: key,
+    mine: null,
+    avg: row && row.avg_r != null ? Math.round(row.avg_r * 10) / 10 : null,
+    n: row ? row.n : 0,
+  });
+}
+
 // ───────── dispatcher ─────────
 export default {
   async fetch(req, env) {
@@ -456,6 +564,9 @@ export default {
       if (p === '/me'                  && req.method === 'GET')  return routeMe(req, env);
       if (p === '/favorites'           && req.method === 'GET')  return routeGetFavs(req, env);
       if (p === '/favorites'           && req.method === 'PUT')  return routePutFavs(req, env);
+      if (p === '/ratings'              && req.method === 'GET')  return routeGetRatings(req, env);
+      if (p === '/ratings'              && req.method === 'PUT')  return routePutRating(req, env);
+      if (p === '/ratings'              && req.method === 'DELETE') return routeDeleteRating(req, env);
       return err('not found', 404);
     } catch (e) {
       return err('server error: ' + e.message, 500);

@@ -217,6 +217,166 @@
     } catch (e) { console.warn('fav pull failed', e); }
   }
 
+  // ───────── ratings ─────────
+  async function fetchRating(key) {
+    try {
+      const headers = {};
+      if (user && user.token) headers['Authorization'] = `Bearer ${user.token}`;
+      const r = await fetch(`${API_BASE}/ratings?keys=${encodeURIComponent(key)}`, { headers });
+      if (!r.ok) return null;
+      const d = await r.json();
+      return (d.ratings && d.ratings[key]) || null;
+    } catch (e) { return null; }
+  }
+  async function putRating(key, rating) {
+    if (!user || !user.token) return null;
+    try {
+      const r = await fetch(`${API_BASE}/ratings`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user.token}`,
+        },
+        body: JSON.stringify({ journal_key: key, rating }),
+      });
+      if (!r.ok) return null;
+      return await r.json();
+    } catch (e) { return null; }
+  }
+  async function deleteRating(key) {
+    if (!user || !user.token) return null;
+    try {
+      const r = await fetch(`${API_BASE}/ratings`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user.token}`,
+        },
+        body: JSON.stringify({ journal_key: key }),
+      });
+      if (!r.ok) return null;
+      return await r.json();
+    } catch (e) { return null; }
+  }
+  // half-star renderer: value 0..5 (0.5 step) → ★ ★ ★ ☆ ☆ etc
+  function renderStarsStatic(value) {
+    const v = Math.max(0, Math.min(5, Number(value) || 0));
+    let out = '';
+    for (let i = 1; i <= 5; i++) {
+      if (v >= i)            out += '<span class="star full">★</span>';
+      else if (v >= i - 0.5) out += '<span class="star half">★</span>';
+      else                   out += '<span class="star empty">☆</span>';
+    }
+    return out;
+  }
+  function paintRatingDisplay(data) {
+    const avgEl   = document.getElementById('rating-avg');
+    const starsEl = document.getElementById('rating-avg-stars');
+    const cntEl   = document.getElementById('rating-count');
+    if (!avgEl) return;
+    const avg = (data && data.avg != null) ? data.avg : null;
+    const n   = (data && data.n)   ? data.n   : 0;
+    if (avg != null) {
+      avgEl.textContent = avg.toFixed(1);
+      starsEl.innerHTML = renderStarsStatic(avg);
+      cntEl.textContent = `${n} 人评分`;
+    } else {
+      avgEl.textContent = '—';
+      starsEl.innerHTML = renderStarsStatic(0);
+      cntEl.textContent = '暂无评分';
+    }
+  }
+  function paintRatingInput(key, mine) {
+    const wrap = document.getElementById('rating-input');
+    const hint = document.getElementById('rating-hint');
+    if (!wrap) return;
+    const loggedIn = !!(user && user.token);
+    wrap.classList.toggle('disabled', !loggedIn);
+    wrap.innerHTML = '';
+    // Build 5 star blocks; each has two halves (left=N-0.5, right=N)
+    for (let i = 1; i <= 5; i++) {
+      const block = document.createElement('span');
+      block.className = 'star-input';
+      const left  = document.createElement('span');
+      left.className = 'half-hit left';
+      left.dataset.value = String(i - 0.5);
+      const right = document.createElement('span');
+      right.className = 'half-hit right';
+      right.dataset.value = String(i);
+      const visual = document.createElement('span');
+      visual.className = 'star-visual';
+      visual.textContent = '★';
+      block.appendChild(visual);
+      block.appendChild(left);
+      block.appendChild(right);
+      wrap.appendChild(block);
+    }
+    const apply = (v) => {
+      [...wrap.querySelectorAll('.star-input')].forEach((b, idx) => {
+        const i = idx + 1;
+        b.classList.remove('full', 'half');
+        if (v >= i)            b.classList.add('full');
+        else if (v >= i - 0.5) b.classList.add('half');
+      });
+    };
+    apply(mine || 0);
+    if (loggedIn) {
+      hint.textContent = mine
+        ? `已评 ${mine.toFixed(1)} 星 · 再次点击修改 · 长按清除`
+        : '半星可评 · 点击星左半为 0.5，右半为 1 星';
+      // hover preview
+      wrap.querySelectorAll('.half-hit').forEach(hit => {
+        hit.addEventListener('mouseenter', () => apply(Number(hit.dataset.value)));
+        hit.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          const v = Number(hit.dataset.value);
+          apply(v);
+          hint.textContent = '提交中…';
+          const res = await putRating(key, v);
+          if (res) {
+            paintRatingDisplay({ avg: res.avg, n: res.n });
+            hint.textContent = `已评 ${v.toFixed(1)} 星 · 再次点击修改 · 长按清除`;
+          } else {
+            hint.textContent = '提交失败，请稍后再试';
+          }
+        });
+      });
+      // long-press to clear
+      let pressT = null;
+      wrap.addEventListener('mousedown', () => {
+        pressT = setTimeout(async () => {
+          pressT = null;
+          hint.textContent = '清除中…';
+          const res = await deleteRating(key);
+          if (res) {
+            apply(0);
+            paintRatingDisplay({ avg: res.avg, n: res.n });
+            hint.textContent = '已清除评分 · 可重新打分';
+          } else {
+            hint.textContent = '清除失败';
+          }
+        }, 700);
+      });
+      const cancelPress = () => { if (pressT) { clearTimeout(pressT); pressT = null; } };
+      wrap.addEventListener('mouseup', cancelPress);
+      wrap.addEventListener('mouseleave', () => { cancelPress(); apply(mine || 0); });
+    } else {
+      hint.innerHTML = '<a href="#" id="rating-login-link">登录</a>后可打分（邮箱验证码 / GitHub / Google）';
+      const a = document.getElementById('rating-login-link');
+      if (a) a.addEventListener('click', (e) => { e.preventDefault(); document.getElementById('login-btn')?.click(); });
+    }
+  }
+  async function initRatingWidget(key) {
+    paintRatingDisplay(null);
+    paintRatingInput(key, 0);
+    const data = await fetchRating(key);
+    if (!data) return;
+    paintRatingDisplay({ avg: data.avg, n: data.n });
+    paintRatingInput(key, data.mine || 0);
+  }
+  // expose for renderJournal
+  window.__initRatingWidget = initRatingWidget;
+
   // ───────── locked sources (paid unlock) ─────────
   // 分片加密的学校自编目录 → 用户输码 → Web Crypto 解密 → 记状态免复输
   const LOCK_CONFIG = {
@@ -1121,7 +1281,7 @@
     if (r.if_rank) stats.push(['IF 排名 (2024)', r.if_rank]);
     if (r.cas_zone) stats.push(['中科院 2025 大类', r.cas_zone + '区' + (r.cas_top ? ' · Top' : '')]);
     if (r.cas_zone_2023 && r.cas_zone_2023 !== r.cas_zone) stats.push(['中科院 2023 大类', r.cas_zone_2023 + '区']);
-    if (r.cas_xr && r.cas_xr.zone) stats.push(['中科院新锐版 2026', r.cas_xr.zone + '区']);
+    if (r.cas_xr && r.cas_xr.zone) stats.push(['新锐版 2026', r.cas_xr.zone + '区']);
     if (r.cas_oa === true) stats.push(['开放获取', 'OA ✓']);
     const statsHTML = stats.length ? `<div class="stats-grid">${stats.map(([k,v]) =>
       `<div class="stat"><div class="stat-v">${escape(String(v))}</div><div class="stat-k">${k}</div></div>`
@@ -1178,8 +1338,8 @@
           return `<li>${escape(nm)}${zn ? ` · <b>新锐 ${zn} 区</b>` : ''}</li>`;
         }).join('')}</ul>`);
       }
-      blocks.push(`<div class="muted-cell" style="margin-top:6px;font-size:12px;line-height:1.6">中科院新锐版面向成长期期刊提供独立分区，与主大类分区互为补充。数据源：ShowJCR 中科院新锐版 2026。</div>`);
-      return `<div class="drawer-section"><h4>中科院新锐版分区 · 2026 年度</h4>${blocks.join('')}</div>`;
+      blocks.push(`<div class="muted-cell" style="margin-top:6px;font-size:12px;line-height:1.6">新锐版面向成长期期刊提供独立分区，与主大类分区互为补充。数据源：ShowJCR 新锐版 2026。</div>`);
+      return `<div class="drawer-section"><h4>新锐版分区 · 2026 年度</h4>${blocks.join('')}</div>`;
     })();
 
     // 科协历史分级（科协 2025-12 版，多领域可同时收录）
@@ -1262,14 +1422,24 @@
       ${wosHTML}
       ${eiHTML}
       ${cnkxHTML}
-      <div class="drawer-section">
-        <h4>用户评分 / 投稿经验</h4>
-        <div class="rating-placeholder">
-          <div class="rating-stars">☆ ☆ ☆ ☆ ☆</div>
-          <div class="rating-note">评分与投稿经验分享功能建设中，登录后可打分、留投稿周期、推荐指数。</div>
+      <div class="drawer-section rating-section" data-rating-key="${escape(favId(r))}">
+        <h4>综合推荐评分</h4>
+        <div class="rating-summary">
+          <div class="rating-avg-wrap">
+            <div class="rating-avg" id="rating-avg">—</div>
+            <div class="rating-avg-stars" id="rating-avg-stars"></div>
+            <div class="rating-count muted-cell" id="rating-count">暂无评分</div>
+          </div>
+          <div class="rating-my-wrap">
+            <div class="rating-my-label muted-cell">我的评分</div>
+            <div class="rating-stars-input" id="rating-input" role="radiogroup" aria-label="评分"></div>
+            <div class="rating-my-hint muted-cell" id="rating-hint">登录后可打分 · 半星可评 · 可随时修改</div>
+          </div>
         </div>
       </div>
     `;
+    // init rating widget
+    setTimeout(() => initRatingWidget(favId(r)), 0);
     $('#drawer-fav-big')?.addEventListener('click', () => {
       toggleFav(r, { src });
       openDrawer(r); // 刷新状态

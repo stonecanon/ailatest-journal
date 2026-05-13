@@ -30,6 +30,19 @@ CREATE TABLE IF NOT EXISTS email_codes (
   PRIMARY KEY (email)
 );
 
+-- 期刊评分（综合推荐，0.5-5.0，0.5 步长）
+CREATE TABLE IF NOT EXISTS ratings (
+  user_id      INTEGER NOT NULL,
+  journal_key  TEXT    NOT NULL,
+  rating       REAL    NOT NULL,
+  created_at   INTEGER NOT NULL,
+  updated_at   INTEGER NOT NULL,
+  PRIMARY KEY (user_id, journal_key),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
 CREATE INDEX IF NOT EXISTS idx_favorites_user ON favorites(user_id);
 CREATE INDEX IF NOT EXISTS idx_users_email    ON users(email);
 CREATE INDEX IF NOT EXISTS idx_users_google   ON users(google_id);
+CREATE INDEX IF NOT EXISTS idx_ratings_journal ON ratings(journal_key);
+CREATE INDEX IF NOT EXISTS idx_ratings_user    ON ratings(user_id);
