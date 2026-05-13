@@ -254,7 +254,7 @@ main.main {
   background: var(--paper-deeper);
   border: 1px solid var(--rule);
   border-radius: 2px;
-  padding: 11px 14px;
+  padding: 11px 120px 11px 14px;
   font-family: var(--serif);
   font-size: 15px;
   color: var(--ink);
@@ -270,8 +270,15 @@ main.main {
   font-family: var(--mono);
   font-size: 11px;
   color: var(--ink-faint);
-  margin-left: 4px;
   letter-spacing: 0.04em;
+  position: absolute;
+  right: 12px; top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  background: var(--paper-deeper);
+  padding: 0 6px;
+  max-width: 45%;
+  overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
 }
 .topbar-actions {
   display: flex; align-items: center; gap: 8px;
@@ -873,7 +880,8 @@ html[data-theme="dark"] .oa-chip.oa-isoa    { background: #3a2d10; color: #f3d78
     height: 32px;
     display: inline-flex; align-items: center;
   }
-  .search-wrap input { padding: 10px 12px; font-size: 14px; }
+  .search-wrap input { padding: 10px 100px 10px 12px; font-size: 14px; }
+  .hint { font-size: 10px; max-width: 90px; right: 8px; }
 }
 
 /* ─────────────── 详情抽屉 ─────────────── */
