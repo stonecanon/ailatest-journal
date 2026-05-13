@@ -18,7 +18,8 @@ from pathlib import Path
 
 import pdfplumber
 
-PDF_PATH = Path("/tmp/list-backup/中国科协科学技术创新部高质量科技期刊分级目录总汇.pdf")
+ROOT = Path(__file__).resolve().parent.parent
+PDF_PATH = ROOT / "list" / "中国科协科学技术创新部高质量科技期刊分级目录总汇.pdf"
 OUT_PATH = Path("data/cnkx_records.json")
 
 # --- 正则 ---

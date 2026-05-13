@@ -1122,6 +1122,7 @@
     if (r.if_rank) stats.push(['IF 排名', r.if_rank]);
     if (r.cas_zone) stats.push(['中科院', r.cas_zone + '区' + (r.cas_top ? ' · Top' : '')]);
     if (r.cas_zone_2023 && r.cas_zone_2023 !== r.cas_zone) stats.push(['中科院 2023', r.cas_zone_2023 + '区']);
+    if (r.cas_xr && r.cas_xr.zone) stats.push(['中科院新锐 2026', r.cas_xr.zone + '区']);
     if (r.cas_oa === true) stats.push(['开放获取', 'OA ✓']);
     const statsHTML = stats.length ? `<div class="stats-grid">${stats.map(([k,v]) =>
       `<div class="stat"><div class="stat-v">${escape(String(v))}</div><div class="stat-k">${k}</div></div>`
@@ -1158,8 +1159,26 @@
         }).join('')}</ul>`);
       }
       return blocks.length
-        ? `<div class="drawer-section"><h4>中科院文献情报中心分区</h4>${blocks.join('')}</div>`
+        ? `<div class="drawer-section"><h4>中科院文献情报中心分区（2025 主版）</h4>${blocks.join('')}</div>`
         : '';
+    })();
+
+    // 中科院新锐版 2026
+    const xrHTML = (() => {
+      const xr = r.cas_xr;
+      if (!xr || !xr.zone) return '';
+      const blocks = [];
+      const major = xr.major_cn || xr.major_en || '';
+      blocks.push(`<div class="cas-major">${escape(major)} · <b>${xr.zone}区</b></div>`);
+      if (Array.isArray(xr.subs) && xr.subs.length) {
+        blocks.push(`<ul class="cas-sub-list">${xr.subs.map(s => {
+          const nm = s.cat || s.name || '';
+          const zn = s.zone;
+          return `<li>${escape(nm)}${zn ? ` · <b>${zn}区</b>` : ''}</li>`;
+        }).join('')}</ul>`);
+      }
+      blocks.push(`<div class="muted xr-note">新锐版聚焦近 5 年增长迅速、潜力突出的期刊，分区结果与主版独立计算，可同时参考。</div>`);
+      return `<div class="drawer-section xr-section"><h4>中科院新锐版 2026</h4>${blocks.join('')}</div>`;
     })();
 
     // 科协历史分级（有时有多年数据）
@@ -1237,6 +1256,7 @@
       ${warnHTML}
       ${metaHTML ? `<div class="meta-block">${metaHTML}</div>` : ''}
       ${casHTML}
+      ${xrHTML}
       ${wosHTML}
       ${eiHTML}
       ${cnkxHTML}
