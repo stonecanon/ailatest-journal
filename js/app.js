@@ -1114,14 +1114,14 @@
     if (r.note) meta.push(['备注', r.note]);
     const metaHTML = meta.map(([k,v]) => `<div class="meta-row"><div class="meta-k">${k}</div><div class="meta-v">${escape(v)}</div></div>`).join('');
 
-    // 核心指标数值
+    // 核心指标数值（带年份，避免不知道是哪一版数据）
     const stats = [];
-    if (r.if_2024 != null) stats.push(['IF 2024', r.if_2024]);
-    if (r.if_quartile) stats.push(['JCR 分区', r.if_quartile]);
-    if (r.if_rank) stats.push(['IF 排名', r.if_rank]);
-    if (r.cas_zone) stats.push(['中科院', r.cas_zone + '区' + (r.cas_top ? ' · Top' : '')]);
-    if (r.cas_zone_2023 && r.cas_zone_2023 !== r.cas_zone) stats.push(['中科院 2023', r.cas_zone_2023 + '区']);
-    if (r.cas_xr && r.cas_xr.zone) stats.push(['中科院新锐 2026', r.cas_xr.zone + '区']);
+    if (r.if_2024 != null) stats.push(['影响因子 (JCR 2024)', r.if_2024]);
+    if (r.if_quartile) stats.push(['JCR 分区 (2024)', r.if_quartile]);
+    if (r.if_rank) stats.push(['IF 排名 (2024)', r.if_rank]);
+    if (r.cas_zone) stats.push(['中科院 2025 大类', r.cas_zone + '区' + (r.cas_top ? ' · Top' : '')]);
+    if (r.cas_zone_2023 && r.cas_zone_2023 !== r.cas_zone) stats.push(['中科院 2023 大类', r.cas_zone_2023 + '区']);
+    if (r.cas_xr && r.cas_xr.zone) stats.push(['中科院新锐版 2026', r.cas_xr.zone + '区']);
     if (r.cas_oa === true) stats.push(['开放获取', 'OA ✓']);
     const statsHTML = stats.length ? `<div class="stats-grid">${stats.map(([k,v]) =>
       `<div class="stat"><div class="stat-v">${escape(String(v))}</div><div class="stat-k">${k}</div></div>`
@@ -1144,7 +1144,7 @@
          </div>`
       : '';
 
-    // 中科院完整层级
+    // 中科院完整层级（2025 大类分区）
     const casHTML = (() => {
       const blocks = [];
       if (r.cas_major_cn) {
@@ -1158,35 +1158,38 @@
         }).join('')}</ul>`);
       }
       return blocks.length
-        ? `<div class="drawer-section"><h4>中科院文献情报中心分区（2025 主版）</h4>${blocks.join('')}</div>`
+        ? `<div class="drawer-section"><h4>中科院文献情报中心分区 · 2025 年度</h4>${blocks.join('')}</div>`
         : '';
     })();
 
-    // 中科院新锐版 2026
+    // 中科院新锐版 2026（独立块）
     const xrHTML = (() => {
       const xr = r.cas_xr;
       if (!xr || !xr.zone) return '';
       const blocks = [];
-      const major = xr.major_cn || xr.major_en || '';
-      blocks.push(`<div class="cas-major">${escape(major)} · <b>${xr.zone}区</b></div>`);
+      const majorCn = xr.major_cn || '';
+      const majorEn = xr.major_en || '';
+      const majorText = [majorCn, majorEn].filter(Boolean).join(' · ');
+      blocks.push(`<div class="cas-major">${escape(majorText || '（未标注大类）')} · <b>新锐 ${xr.zone} 区</b></div>`);
       if (Array.isArray(xr.subs) && xr.subs.length) {
         blocks.push(`<ul class="cas-sub-list">${xr.subs.map(s => {
           const nm = s.cat || s.name || '';
           const zn = s.zone;
-          return `<li>${escape(nm)}${zn ? ` · <b>${zn}区</b>` : ''}</li>`;
+          return `<li>${escape(nm)}${zn ? ` · <b>新锐 ${zn} 区</b>` : ''}</li>`;
         }).join('')}</ul>`);
       }
-      blocks.push(`<div class="muted xr-note">新锐版聚焦近 5 年增长迅速、潜力突出的期刊，分区结果与主版独立计算，可同时参考。</div>`);
-      return `<div class="drawer-section xr-section"><h4>中科院新锐版 2026</h4>${blocks.join('')}</div>`;
+      blocks.push(`<div class="muted-cell" style="margin-top:6px;font-size:12px;line-height:1.6">中科院新锐版面向成长期期刊提供独立分区，与主大类分区互为补充。数据源：ShowJCR 中科院新锐版 2026。</div>`);
+      return `<div class="drawer-section"><h4>中科院新锐版分区 · 2026 年度</h4>${blocks.join('')}</div>`;
     })();
 
-    // 科协历史分级（有时有多年数据）
+    // 科协历史分级（科协 2025-12 版，多领域可同时收录）
     const cnkxHTML = (Array.isArray(r.cnkx) && r.cnkx.length)
       ? `<div class="drawer-section">
-           <h4>中国科协高质量目录</h4>
+           <h4>中国科协高质量科技期刊分级目录 · 2025-12 版</h4>
            <ul class="cas-sub-list">${r.cnkx.map(c =>
-             `<li><b>${escape(c.tier||'')}</b>${c.domain ? ' · ' + escape(c.domain) : ''}${c.subdomain ? ' <span class="muted-cell">· '+escape(c.subdomain)+'</span>' : ''}${c.version ? ` <span class="muted-cell">(${escape(c.version)})</span>` : ''}</li>`
+             `<li><b>${escape(c.tier||'')}</b>${c.domain ? ' · ' + escape(c.domain) : ''}${c.subdomain ? ' <span class="muted-cell">· '+escape(c.subdomain)+'</span>' : ''}</li>`
            ).join('')}</ul>
+           <div class="muted-cell" style="margin-top:6px;font-size:12px;line-height:1.6">同一刊在多个学科领域分别评定 T1 / T2 / T3，互不冲突。</div>
          </div>`
       : '';
 
@@ -1381,6 +1384,7 @@
     const intBadges = r.__src === 'int' ? [
       ...(r.indices || []).map(badgeIndex),
       badgeCAS(r.cas_zone, r.cas_top),
+      badgeXR(r.cas_xr && r.cas_xr.zone),
       badgeIF(r.if_2024, r.if_quartile),
       badgeCCF(r.ccf),
       r.warning ? badgeWarn() : '',
