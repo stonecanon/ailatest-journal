@@ -1,10 +1,11 @@
 /* ailatest-journal service worker
    Strategy:
-   - static shell (HTML/CSS/JS/icons): stale-while-revalidate
+   - app shell (HTML/CSS/JS): network-first, cache fallback
+   - icons/manifest: stale-while-revalidate
    - data JSON: network-first, cache fallback (so updates win, offline still works)
    - everything else: network only
 */
-const VERSION = 'v20260513-01';
+const VERSION = 'v20260513-11';
 const SHELL_CACHE = `shell-${VERSION}`;
 const DATA_CACHE = `data-${VERSION}`;
 
@@ -40,6 +41,9 @@ function isShell(url) {
   if (url.pathname === '/' || url.pathname.endsWith('.html')) return true;
   if (url.pathname.startsWith('/css/')) return true;
   if (url.pathname.startsWith('/js/')) return true;
+  return false;
+}
+function isStaticAsset(url) {
   if (url.pathname.startsWith('/icons/')) return true;
   if (url.pathname === '/manifest.json') return true;
   return false;
@@ -67,7 +71,21 @@ self.addEventListener('fetch', (event) => {
   }
 
   if (isShell(url)) {
-    // stale-while-revalidate
+    // network-first for HTML/CSS/JS so a stale app.js cannot keep old auth endpoints alive.
+    event.respondWith(
+      fetch(req).then((resp) => {
+        if (resp && resp.status === 200) {
+          const clone = resp.clone();
+          caches.open(SHELL_CACHE).then((c) => c.put(req, clone)).catch(() => {});
+        }
+        return resp;
+      }).catch(() => caches.match(req).then((r) => r || Response.error()))
+    );
+    return;
+  }
+
+  if (isStaticAsset(url)) {
+    // stale-while-revalidate is fine for icons and the manifest.
     event.respondWith(
       caches.match(req).then((cached) => {
         const network = fetch(req).then((resp) => {
