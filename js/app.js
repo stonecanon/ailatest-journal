@@ -1430,6 +1430,38 @@
     if (r.note) meta.push(['备注', r.note]);
     const metaHTML = meta.map(([k,v]) => `<div class="meta-row"><div class="meta-k">${k}</div><div class="meta-v">${escape(v)}</div></div>`).join('');
 
+    // 解锁源收录状态（高校自编目录 2023，已解锁才显示）
+    const lockedSrcHTML = (() => {
+      const rows = [];
+      const sa = unlockedCache.school_a;
+      if (Array.isArray(sa) && sa.length) {
+        const key = (r.issn || r.eissn || '').toUpperCase();
+        const cn  = (r.cn_code || '').toUpperCase();
+        const nm  = normTitle(r.name || r.cn_name || '');
+        const hit = sa.find(x => {
+          const xi = (x.issn || '').toUpperCase();
+          const xc = (x.cn_code || '').toUpperCase();
+          const xn = normTitle(x.name || '');
+          return (key && xi && xi === key) || (cn && xc && xc === cn) || (nm && xn && xn === nm);
+        });
+        if (hit) {
+          const tierCls = {'一级':'t1','核心':'t2','其他':'t3'}[hit.tier] || 't3';
+          rows.push(`<div class="locked-src-row">
+            <span class="locked-src-name">高校自编目录 · 2023</span>
+            <span class="tier-pill ${tierCls}">${escape(hit.tier || '收录')}</span>
+            ${hit.note ? `<span class="muted-cell">· ${escape(hit.note)}</span>` : ''}
+          </div>`);
+        }
+      }
+      return rows.length
+        ? `<div class="drawer-section">
+             <h4>🔓 已解锁目录收录</h4>
+             ${rows.join('')}
+             <div class="muted-cell" style="margin-top:6px;font-size:12px">加密目录解锁后仅本设备可见。</div>
+           </div>`
+        : '';
+    })();
+
     // 核心指标数值（带年份，避免不知道是哪一版数据）
     const stats = [];
     if (r.if_2024 != null) stats.push(['影响因子 (JCR 2024)', r.if_2024]);
@@ -1578,6 +1610,7 @@
       ${wosHTML}
       ${eiHTML}
       ${cnkxHTML}
+      ${lockedSrcHTML}
       <div class="drawer-section rating-section" data-rating-key="${escape(favId(r))}">
         <h4>综合推荐评分</h4>
         <div class="rating-summary">
@@ -1881,6 +1914,32 @@
     $('#drawer-scrim')?.addEventListener('click', closeDrawer);
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') closeDrawer();
+    });
+
+    // 移动端侧栏抽屉：☰ 开 / 点 scrim 关 / 点 nav-item 自动关
+    const side = document.querySelector('aside.sidebar');
+    const sideScrim = $('#sidebar-scrim');
+    function openSide() {
+      side?.classList.add('open');
+      if (sideScrim) { sideScrim.hidden = false; requestAnimationFrame(() => sideScrim.classList.add('on')); }
+    }
+    function closeSide() {
+      side?.classList.remove('open');
+      if (sideScrim) {
+        sideScrim.classList.remove('on');
+        setTimeout(() => { sideScrim.hidden = true; }, 200);
+      }
+    }
+    $('#side-toggle')?.addEventListener('click', openSide);
+    sideScrim?.addEventListener('click', closeSide);
+    side?.addEventListener('click', (e) => {
+      if (window.matchMedia('(max-width: 900px)').matches &&
+          e.target.closest('.nav-item, .chip, .nav-sub')) {
+        closeSide();
+      }
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeSide();
     });
 
     // auth
