@@ -964,9 +964,9 @@
       .filter(Boolean).map(escape).join(' · ') || '<span class="muted-cell">—</span>';
     return `<tr data-fid="${escape(fid)}" class="j-row clickable ${r.flagship ? 'row-flagship' : ''}" data-src="int">
       <td class="col-name">${nameHtml}</td>
+      <td class="col-badge col-badge-split">${badgeCell}</td>
       <td class="col-abbr">${abbr || '<span class="muted-cell">—</span>'}</td>
       <td class="col-issn">${issn}</td>
-      <td class="col-badge col-badge-split">${badgeCell}</td>
       <td class="col-cat">${cat}</td>
       <td class="col-fav">${starBtn(r, 'int')}</td>
     </tr>`;
@@ -1732,8 +1732,8 @@
           <thead><tr>
             <th class="col-drag" style="width:28px"></th>
             <th class="col-name">期刊</th>
-            <th style="width:160px">ISSN / CN</th>
             <th>徽章 / 交叉收录</th>
+            <th style="width:160px">ISSN / CN</th>
             <th class="col-src" style="width:90px">来源</th>
             <th style="width:40px"></th>
           </tr></thead>
@@ -1821,8 +1821,8 @@
     return `<tr class="j-row clickable" data-fid="${escape(fid)}" data-src="${escape(r.__src)}">
       <td class="col-drag"><span class="drag-handle" title="拖动排序">⋮⋮</span></td>
       <td class="col-name"><div class="jname">${escape(name.replace(/\*$/,''))}${cnName}${enName}</div></td>
-      <td class="col-issn">${isnCell}</td>
       <td class="col-badge"><div class="badges">${intBadges}${tierBadge}${crossBadges}</div></td>
+      <td class="col-issn">${isnCell}</td>
       <td class="col-src"><span class="src-tag src-${escape(r.__src)}">${SRC_LABEL[r.__src] || r.__src}</span></td>
       <td class="col-fav">${starBtn(r, r.__src)}</td>
     </tr>`;
