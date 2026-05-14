@@ -415,13 +415,32 @@
     } catch (e) { return null; }
   }
   // half-star renderer: value 0..5 (0.5 step) → ★ ★ ★ ☆ ☆ etc
+  // half-star renderer: value 0..5 (0.5 step)
+  // 用 SVG 取代 unicode ★，规避不同浏览器把 ★ 渲染成 emoji 字体导致宽度不一致的问题
   function renderStarsStatic(value) {
     const v = Math.max(0, Math.min(5, Number(value) || 0));
+    const path = 'M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8L10 14.9 4.8 17.6l1-5.8L1.6 7.7l5.8-.8L10 1.6z';
     let out = '';
     for (let i = 1; i <= 5; i++) {
-      if (v >= i)            out += '<span class="star full">★</span>';
-      else if (v >= i - 0.5) out += '<span class="star half">★</span>';
-      else                   out += '<span class="star empty">☆</span>';
+      let cls;
+      if (v >= i)            cls = 'full';
+      else if (v >= i - 0.5) cls = 'half';
+      else                   cls = 'empty';
+      if (cls === 'half') {
+        // 用 linearGradient 的 id 唯一化避免冲突
+        const gid = 'half-grad-' + i + '-' + Math.random().toString(36).slice(2, 7);
+        out += '<svg class="star ' + cls + '" viewBox="0 0 20 20" aria-hidden="true">'
+             + '<defs><linearGradient id="' + gid + '" x1="0" x2="1" y1="0" y2="0">'
+             + '<stop offset="50%" class="half-fill"/>'
+             + '<stop offset="50%" class="half-empty"/>'
+             + '</linearGradient></defs>'
+             + '<path d="' + path + '" fill="url(#' + gid + ')"/>'
+             + '</svg>';
+      } else {
+        out += '<svg class="star ' + cls + '" viewBox="0 0 20 20" aria-hidden="true">'
+             + '<path d="' + path + '"/>'
+             + '</svg>';
+      }
     }
     return out;
   }
