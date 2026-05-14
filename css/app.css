@@ -1064,33 +1064,49 @@ html[data-theme="dark"] .oa-chip.oa-isoa    { background: #3a2d10; color: #f3d78
 .rating-section { padding: 14px 18px; }
 .rating-summary {
   display: grid;
-  grid-template-columns: minmax(0,1fr) minmax(0,1.3fr);
-  gap: 18px;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.4fr);
+  column-gap: 28px;
+  row-gap: 16px;
   align-items: start;
   padding: 12px 0 4px;
 }
 @media (max-width: 560px) {
-  .rating-summary { grid-template-columns: 1fr; }
+  .rating-summary { grid-template-columns: 1fr; column-gap: 0; }
 }
-.rating-avg-wrap { text-align: center; padding: 8px 6px; border-right: 1px dashed var(--rule); }
+.rating-avg-wrap {
+  text-align: left;
+  padding: 6px 16px 8px 4px;
+  border-right: 1px solid var(--rule);
+  min-width: 0;
+}
 @media (max-width: 560px) {
-  .rating-avg-wrap { border-right: none; border-bottom: 1px dashed var(--rule); padding-bottom: 14px; }
+  .rating-avg-wrap {
+    text-align: center;
+    border-right: none;
+    border-bottom: 1px solid var(--rule);
+    padding: 4px 0 16px;
+  }
 }
 .rating-avg {
-  font-size: 32px; font-weight: 600; line-height: 1; margin-bottom: 4px;
+  font-size: 30px; font-weight: 600; line-height: 1.05; margin-bottom: 6px;
   font-family: var(--font-serif, Georgia, serif); color: var(--ink);
+  display: inline-flex; align-items: baseline; gap: 6px;
 }
-.rating-avg-stars { font-size: 16px; letter-spacing: 0.06em; margin-bottom: 4px; }
+.rating-avg::after {
+  content: '/ 5'; font-size: 13px; color: var(--ink-faint); font-weight: 400;
+  font-family: inherit;
+}
+.rating-avg-stars { font-size: 15px; letter-spacing: 0.04em; margin-bottom: 4px; line-height: 1; }
 .rating-avg-stars .star.full  { color: #f5a623; }
 .rating-avg-stars .star.half  { color: #f5a623; opacity: 0.55; }
 .rating-avg-stars .star.empty { color: var(--ink-faint); }
 .rating-count { font-size: 12px; }
 
-.rating-my-wrap { padding: 4px 4px 0; }
-.rating-my-label { font-size: 12px; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.06em; }
+.rating-my-wrap { padding: 4px 0 0 4px; min-width: 0; }
+.rating-my-label { font-size: 12px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.06em; }
 .rating-stars-input {
-  display: inline-flex; gap: 2px; font-size: 26px; line-height: 1;
-  user-select: none; cursor: pointer; padding: 4px 0;
+  display: inline-flex; gap: 3px; font-size: 22px; line-height: 1;
+  user-select: none; cursor: pointer; padding: 2px 0 4px;
 }
 .rating-stars-input.disabled { cursor: not-allowed; opacity: 0.55; }
 .rating-stars-input .star-input {

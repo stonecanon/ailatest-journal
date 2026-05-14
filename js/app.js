@@ -922,12 +922,12 @@
     const crossBadges = renderDomCrossBadges({ name, issn: r.issn, cn_code: r.cn_code }, src);
     const tierBadge = showTier && tierValue ? badgeTier(tierValue) : '';
     return `<tr class="j-row clickable" data-fid="${escape(fid)}" data-src="${escape(src)}">
+      <td class="col-fav">${starBtn(r, src)}</td>
       ${showTier ? `<td style="width:60px">${tierBadge}</td>` : ''}
       <td class="jname" style="font-size:13.5px">${escape(name.replace(/\*$/,''))}${enName}</td>
-      <td class="col-issn" style="width:130px">${isnCell}</td>
-      ${extraCols}
       <td class="col-cross"><div class="badges">${extraBadges}${crossBadges}</div></td>
-      <td class="col-fav">${starBtn(r, src)}</td>
+      ${extraCols}
+      <td class="col-issn" style="width:130px">${isnCell}</td>
     </tr>`;
   }
 
@@ -963,12 +963,12 @@
     const cat = [r.esi_category, r.cas_major_cn]
       .filter(Boolean).map(escape).join(' · ') || '<span class="muted-cell">—</span>';
     return `<tr data-fid="${escape(fid)}" class="j-row clickable ${r.flagship ? 'row-flagship' : ''}" data-src="int">
+      <td class="col-fav">${starBtn(r, 'int')}</td>
       <td class="col-name">${nameHtml}</td>
-      <td class="col-abbr">${abbr || '<span class="muted-cell">—</span>'}</td>
-      <td class="col-issn">${issn}</td>
       <td class="col-badge col-badge-split">${badgeCell}</td>
       <td class="col-cat">${cat}</td>
-      <td class="col-fav">${starBtn(r, 'int')}</td>
+      <td class="col-abbr">${abbr || '<span class="muted-cell">—</span>'}</td>
+      <td class="col-issn">${issn}</td>
     </tr>`;
   }
 
@@ -1167,7 +1167,7 @@
             ${subs.length > 24 ? `<span style="opacity:.6">… 共 ${subs.length} 个细分</span>` : ''}
           </div>` : ''}
           <div class="table-wrap" style="margin-top:10px"><table class="journals"><thead><tr>
-            <th style="width:60px">T级</th><th>期刊</th><th style="width:120px">ISSN</th><th style="width:160px">细分</th><th>交叉收录</th><th style="width:40px"></th>
+            <th class="col-fav" style="width:36px"></th><th style="width:60px">T级</th><th>期刊</th><th>交叉收录</th><th style="width:160px">细分</th><th style="width:120px">ISSN</th>
           </tr></thead><tbody>
           ${[t1,t2,t3].flat().slice(0, 300).map(r => renderDomRow(r, {
             src: 'cnkx', showTier: true, tierValue: r.tier,
@@ -1197,7 +1197,7 @@
           <details class="section-block" style="margin-top:14px" ${q?'open':''}>
             <summary>${escape(d)} <span class="muted-cell">(${byDisc[d].length})</span></summary>
             <div class="table-wrap" style="margin-top:10px"><table class="journals"><thead><tr>
-              <th>期刊名称</th><th style="width:130px">ISSN</th><th style="width:160px">学科</th><th>交叉收录</th><th style="width:40px"></th>
+              <th class="col-fav" style="width:36px"></th><th>期刊名称</th><th>交叉收录</th><th style="width:160px">学科</th><th style="width:130px">ISSN</th>
             </tr></thead><tbody>
               ${byDisc[d].map(r => renderDomRow(r, {
                 src: srcKey,
@@ -1217,7 +1217,7 @@
         <h3 class="section-title">北大《中文核心期刊要目总览》(2023 年版)</h3>
         <div class="section-subtitle">共 ${list.length.toLocaleString()} 条；北京大学图书馆；${q ? '已过滤 '+f.length+' 条' : ''}</div>
         <div class="table-wrap" style="margin-top:14px"><table class="journals"><thead><tr>
-          <th>期刊名称</th><th style="width:130px">ISSN</th><th style="width:160px">分类</th><th>交叉收录</th><th style="width:40px"></th>
+          <th class="col-fav" style="width:36px"></th><th>期刊名称</th><th>交叉收录</th><th style="width:160px">分类</th><th style="width:130px">ISSN</th>
         </tr></thead><tbody>
           ${f.slice(0, 2000).map(r => renderDomRow(r, {
             src: 'pku',
@@ -1250,7 +1250,7 @@
         html.push(`<details class="section-block" style="margin-top:14px" ${q?'open':(tier==='一级'?'open':'')}>
           <summary>国内${escape(tier)}学术期刊 <span class="muted-cell">(${recs.length})</span></summary>
           <div class="table-wrap" style="margin-top:10px"><table class="journals"><thead><tr>
-            <th style="width:70px">级别</th><th>期刊</th><th style="width:130px">ISSN / CN</th><th style="width:180px">备注</th><th>交叉收录</th><th style="width:40px"></th>
+            <th class="col-fav" style="width:36px"></th><th style="width:70px">级别</th><th>期刊</th><th>交叉收录</th><th style="width:180px">备注</th><th style="width:130px">ISSN / CN</th>
           </tr></thead><tbody>
           ${recs.slice(0, 1500).map(r => {
             const tierBadge = `<span class="tier-pill ${tierClass[r.tier]||'t3'}">${escape(r.tier)}</span>${r.name.includes('*') ? ' <span class="warn-pill" style="background:var(--gold);color:#fff">★</span>' : ''}`;
@@ -1262,10 +1262,8 @@
                 extraBadges: '',
               }
             ).replace(
-              /<td style="width:60px">[^<]*<\/td>/, ''
-            ).replace(
-              /<tr class="j-row clickable" (data-fid=[^>]+)>/,
-              `<tr class="j-row clickable" $1><td style="width:70px">${tierBadge}</td>`
+              /(<tr class="j-row clickable"[^>]+><td class="col-fav">[^]*?<\/td>)/,
+              `$1<td style="width:70px">${tierBadge}</td>`
             );
           }).join('')}
           ${recs.length > 1500 ? `<tr><td colspan="6" class="empty">仅显示前 1500 条，请在搜索框内精确查找</td></tr>` : ''}
@@ -1303,7 +1301,7 @@
           html.push(`<details class="section-block" style="margin-top:14px" ${q?'open':(tier==='一级'?'open':'')}>
             <summary>国内${escape(tier)}学术期刊 <span class="muted-cell">(${recs.length})</span></summary>
             <div class="table-wrap" style="margin-top:10px"><table class="journals"><thead><tr>
-              <th style="width:70px">级别</th><th>期刊</th><th style="width:130px">ISSN / CN</th><th style="width:180px">备注</th><th>交叉收录</th><th style="width:40px"></th>
+              <th class="col-fav" style="width:36px"></th><th style="width:70px">级别</th><th>期刊</th><th>交叉收录</th><th style="width:180px">备注</th><th style="width:130px">ISSN / CN</th>
             </tr></thead><tbody>
             ${recs.slice(0, 1500).map(r => {
               const tierBadge = `<span class="tier-pill ${tierClass[r.tier]||'t3'}">${escape(r.tier)}</span>${r.name.includes('*') ? ' <span class="warn-pill" style="background:var(--gold);color:#fff">★</span>' : ''}`;
@@ -1311,8 +1309,8 @@
                 { ...r, name: r.name.replace(/\*$/,'') },
                 { src: 'school_a', extraCols: `<td class="muted-cell" style="width:180px">${escape(r.note||'')}</td>` }
               ).replace(
-                /<tr class="j-row clickable" (data-fid=[^>]+)>/,
-                `<tr class="j-row clickable" $1><td style="width:70px">${tierBadge}</td>`
+                /(<tr class="j-row clickable"[^>]+><td class="col-fav">[^]*?<\/td>)/,
+                `$1<td style="width:70px">${tierBadge}</td>`
               );
             }).join('')}
             </tbody></table></div>
@@ -1382,7 +1380,7 @@
         <h3 class="section-title">CCF 推荐中文科技期刊 2025</h3>
         <div class="section-subtitle">共 ${list.length} 条；T1/T2/T3 三级</div>
         <div class="table-wrap" style="margin-top:14px"><table class="journals"><thead><tr>
-          <th style="width:60px">T分区</th><th>期刊</th><th style="width:130px">CN</th><th style="width:180px">主办单位</th><th>交叉收录</th><th style="width:40px"></th>
+          <th class="col-fav" style="width:36px"></th><th style="width:60px">T分区</th><th>期刊</th><th>交叉收录</th><th style="width:180px">主办单位</th><th style="width:130px">CN</th>
         </tr></thead><tbody>
         ${f.map(r => renderDomRow(
           { name: r.cn_name, en_name: r.en_name, issn: r.cn_code, cn_code: r.cn_code, org: r.org, ccf_area: r.ccf_area, tier: r.tier },
@@ -1730,12 +1728,12 @@
       <div class="table-wrap" style="margin-top:10px">
         <table class="journals fav-table">
           <thead><tr>
-            <th class="col-drag" style="width:28px"></th>
+            <th class="col-fav" style="width:36px"></th>
             <th class="col-name">期刊</th>
-            <th style="width:160px">ISSN / CN</th>
             <th>徽章 / 交叉收录</th>
             <th class="col-src" style="width:90px">来源</th>
-            <th style="width:40px"></th>
+            <th style="width:160px">ISSN / CN</th>
+            <th class="col-drag" style="width:28px"></th>
           </tr></thead>
           <tbody id="fav-tbody">${tbody}</tbody>
         </table>
@@ -1819,12 +1817,12 @@
       zju: '浙大', school_a: '高校目录',
     };
     return `<tr class="j-row clickable" data-fid="${escape(fid)}" data-src="${escape(r.__src)}">
-      <td class="col-drag"><span class="drag-handle" title="拖动排序">⋮⋮</span></td>
+      <td class="col-fav">${starBtn(r, r.__src)}</td>
       <td class="col-name"><div class="jname">${escape(name.replace(/\*$/,''))}${cnName}${enName}</div></td>
-      <td class="col-issn">${isnCell}</td>
       <td class="col-badge"><div class="badges">${intBadges}${tierBadge}${crossBadges}</div></td>
       <td class="col-src"><span class="src-tag src-${escape(r.__src)}">${SRC_LABEL[r.__src] || r.__src}</span></td>
-      <td class="col-fav">${starBtn(r, r.__src)}</td>
+      <td class="col-issn">${isnCell}</td>
+      <td class="col-drag"><span class="drag-handle" title="拖动排序">⋮⋮</span></td>
     </tr>`;
   }
 
