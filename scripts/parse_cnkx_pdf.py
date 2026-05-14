@@ -102,8 +102,7 @@ def classify_header(header):
     """返回 col_index 的 role list: ['tier','seq','name','issn','cn','domain', None]."""
     roles = []
     for cell in header:
-        # 表头常被拆行成 "分\n级" / "序\n号"，norm 后变 "分 级"，此处再去空白
-        c = re.sub(r"\s+", "", norm(cell or ""))
+        c = norm(cell or "")
         if re.search(r"(分级|级别)", c) and "学科" not in c:
             roles.append("tier")
         elif re.search(r"序号", c):
