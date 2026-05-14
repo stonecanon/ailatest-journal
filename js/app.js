@@ -20,7 +20,7 @@
       tab_int: '国际 SCI/SSCI', tab_dom: '国内分级目录', tab_fav: '我的收藏',
       loading: '加载中…',
       hero_title_int: 'SCI / SSCI 国际期刊检索',
-      hero_body_int: '数据源：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI）· 更新至 2026-04-20，并合并 <b>Ei Compendex</b> 期刊目录（2025-10-10）。合并 <b>JCR 2025</b> 归属标记、<b>ESI</b> 22 大学科分类、<b>中科院 2025 大类分区</b>、<b>ShowJCR</b> JCR 2024 影响因子 / 小类分区 / 新锐版 / CCF 2026 推荐、<b>中国科协</b> 高质量科技期刊分级目录（T1/T2/T3）与国际期刊预警名单。共收录 <b id="total">—</b> 本。',
+      hero_body_int: '数据源：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI）· 更新至 2026-04-20，并合并 <b>Ei Compendex</b> 期刊目录（2025-10-10）。合并 <b>JCR 2025</b> 归属标记、<b>ESI</b> 22 大学科分类、<b>中科院 2025 大类分区</b>、<b>ShowJCR</b> JCR 2024 影响因子 / 小类分区 / 新锐版 / CCF 2026 推荐与国际期刊预警名单。共收录 <b id="total">—</b> 本。',
       hero_note: '期刊原名保留英文，括注为中文刊名；徽章从左至右：索引 / CAS 分区 / IF 分位 / CCF / T1-T3 / 预警。',
       hero_title_fav: '我的收藏',
       hero_body_fav: '点击任意期刊右侧的 <b>★</b> 可加入收藏。未登录时保存在本机 localStorage；登录后自动同步到云端，可跨设备访问。',
@@ -28,7 +28,7 @@
       col_name: '期刊 Title', col_abbr: '缩写 Abbr', col_badges: '索引 / IF / 分区 / 徽章',
       col_cat: 'ESI / 中科院大类',
       hero_title_dom: '国内学术期刊分级目录',
-      hero_body_dom: '<b>中国科协科学技术创新部</b> 2025 年 12 月发布的 <em>高质量科技期刊分级目录总汇</em>，覆盖 40+ 学科领域，T1 / T2 / T3 三级；<b>CSSCI 来源期刊 (2025-2026)</b> 正刊与扩展版；<b>北大《中文核心期刊要目总览》(2023 年版)</b>；<b>浙江大学 2024 版</b> 与 <b>高校自编目录 2023</b>（付费解锁）；<b>CCF 推荐中文科技期刊 2025</b> T 分区。',
+      hero_body_dom: '<b>CSSCI 来源期刊 (2025-2026)</b> 正刊与扩展版；<b>北大《中文核心期刊要目总览》(2023 年版)</b>；<b>浙江大学 2024 版</b> 与 <b>高校自编目录 2023</b>（付费解锁）；<b>CCF 推荐中文科技期刊 2025</b> T 分区。<span class="muted">（中国科协 T1/T2/T3 目录已暂时下架，数据校验中，稍后恢复。）</span>',
       hero_note_dom: 'CSSCI / 北大核心为扫描 PDF OCR 提取，可能存在个别错字。',
       search_int: '搜索：期刊全称 / 缩写 / ISSN / 中文刊名',
       search_dom: '搜索：中文刊名 / 英文刊名 / ISSN / CN 号',
@@ -64,7 +64,7 @@
       col_name: 'Journal Title', col_abbr: 'Abbr', col_badges: 'Index / IF / Tier / Badges',
       col_cat: 'ESI / CAS Major',
       hero_title_dom: 'Domestic Chinese Journal Directories',
-      hero_body_dom: '<b>CAST</b> (中国科协) 2025-12 <em>High-Quality Science & Technology Journal Tiered Directory</em>; <b>CSSCI 2025-2026</b> core & extended; <b>PKU Core (2023)</b>; <b>ZJU 2024</b>; <b>School A 2023</b>; <b>CCF Recommended Chinese Journals 2025</b>.',
+      hero_body_dom: '<b>CSSCI 2025-2026</b> core & extended; <b>PKU Core (2023)</b>; <b>ZJU 2024</b>; <b>School A 2023</b>; <b>CCF Recommended Chinese Journals 2025</b>. <span class="muted">(CAST tiered directory temporarily disabled — data under review.)</span>',
       hero_note_dom: 'CSSCI / PKU Core extracted via OCR from scanned PDF; minor typos possible.',
       search_int: 'Search: title / abbr / ISSN / Chinese name',
       search_dom: 'Search: Chinese name / English name / ISSN / CN',
@@ -104,7 +104,7 @@
   let activeZones = new Set();
   let activeFeats = new Set();
   let activeQuery = '';
-  let activeDom = 'cnkx';
+  let activeDom = 'cssci_core';   // 中国科协目录已临时下架（数据有误），默认改为 CSSCI
   const PAGE = 100;
   let shown = PAGE;
 
@@ -910,11 +910,14 @@
     (d.pku_core||[]).forEach(r => {
       addDomIndex(r.name, 'name', { source:'pku', label:'北大核心', tag:'', category:r.category });
     });
-    ((d.cnkx && d.cnkx.records)||[]).forEach(r => {
-      if (!r.tier || !/^T[123]$/.test(r.tier)) return;
-      addDomIndex(r.name, 'name', { source:'cnkx', label:'科协 '+r.tier, tag:r.tier, domain:r.domain });
-      if (r.issn) addDomIndex(r.issn, 'issn', { source:'cnkx', label:'科协 '+r.tier, tag:r.tier, domain:r.domain });
-    });
+    // 中国科协目录数据已临时下架（数据有误，每条都带无关学科标签）。
+    // 暂停将其录入 cross-source 索引，避免国际表里出现"科协 T?"徽章。
+    // 数据修正后取消注释即可恢复。
+    // ((d.cnkx && d.cnkx.records)||[]).forEach(r => {
+    //   if (!r.tier || !/^T[123]$/.test(r.tier)) return;
+    //   addDomIndex(r.name, 'name', { source:'cnkx', label:'科协 '+r.tier, tag:r.tier, domain:r.domain });
+    //   if (r.issn) addDomIndex(r.issn, 'issn', { source:'cnkx', label:'科协 '+r.tier, tag:r.tier, domain:r.domain });
+    // });
     (d.ccft||[]).forEach(r => {
       addDomIndex(r.cn_name, 'name', { source:'ccft', label:'CCF-'+r.tier, tag:r.tier, org:r.org });
       if (r.cn_code) addDomIndex(r.cn_code, 'issn', { source:'ccft', label:'CCF-'+r.tier, tag:r.tier });
@@ -973,7 +976,8 @@
       badgeXR(r.cas_xr && r.cas_xr.zone),
       badgeIF(r.if_2024, r.if_quartile),
       badgeCCF(r.ccf),
-      ...(r.cnkx ? r.cnkx.slice(0,2).map(c => badgeTier(c.tier)) : []),
+      // 中国科协 T1/T2/T3 徽章已临时下架（数据有误，每条都显示了无关学科）
+      // ...(r.cnkx ? r.cnkx.slice(0,2).map(c => badgeTier(c.tier)) : []),
       r.warning ? badgeWarn() : '',
       crossBadges,
     ].filter(Boolean).join('');
@@ -1011,7 +1015,7 @@
     }
     if (activeFeats.has('if') && r.if_2024 == null) return false;
     if (activeFeats.has('ccf') && !r.ccf) return false;
-    if (activeFeats.has('cnkx') && !(r.cnkx && r.cnkx.length)) return false;
+    if (activeFeats.has('cnkx')) return false; // 科协目录暂停展示，强制不命中
     if (activeFeats.has('xr') && !r.cas_xr) return false;
     if (activeFeats.has('flagship') && !r.flagship) return false;
     if (activeFeats.has('warning') && !r.warning) return false;
@@ -1559,16 +1563,17 @@
       return `<div class="drawer-section"><h4>新锐版分区 · 2026 年度</h4>${blocks.join('')}</div>`;
     })();
 
-    // 科协历史分级（科协 2025-12 版，多领域可同时收录）
-    const cnkxHTML = (Array.isArray(r.cnkx) && r.cnkx.length)
-      ? `<div class="drawer-section">
-           <h4>中国科协高质量科技期刊分级目录 · 2025-12 版</h4>
-           <ul class="cas-sub-list">${r.cnkx.map(c =>
-             `<li><b>${escape(c.tier||'')}</b>${c.domain ? ' · ' + escape(c.domain) : ''}${c.subdomain ? ' <span class="muted-cell">· '+escape(c.subdomain)+'</span>' : ''}</li>`
-           ).join('')}</ul>
-           <div class="muted-cell" style="margin-top:6px;font-size:12px;line-height:1.6">同一刊在多个学科领域分别评定 T1 / T2 / T3，互不冲突。</div>
-         </div>`
-      : '';
+    // 科协历史分级（已临时下架，数据校验中。保留代码注释，下次拿到干净数据后恢复。）
+    const cnkxHTML = '';
+    // const cnkxHTML = (Array.isArray(r.cnkx) && r.cnkx.length)
+    //   ? `<div class="drawer-section">
+    //        <h4>中国科协高质量科技期刊分级目录 · 2025-12 版</h4>
+    //        <ul class="cas-sub-list">${r.cnkx.map(c =>
+    //          `<li><b>${escape(c.tier||'')}</b>${c.domain ? ' · ' + escape(c.domain) : ''}${c.subdomain ? ' <span class="muted-cell">· '+escape(c.subdomain)+'</span>' : ''}</li>`
+    //        ).join('')}</ul>
+    //        <div class="muted-cell" style="margin-top:6px;font-size:12px;line-height:1.6">同一刊在多个学科领域分别评定 T1 / T2 / T3，互不冲突。</div>
+    //      </div>`
+    //   : '';
 
     // 警示刊
     const warnHTML = r.warning

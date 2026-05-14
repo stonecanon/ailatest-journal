@@ -67,7 +67,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="chip-row" id="feat-toggles">
       <label class="chip"><input type="checkbox" value="if" data-feat>IF</label>
       <label class="chip"><input type="checkbox" value="ccf" data-feat>CCF</label>
-      <label class="chip"><input type="checkbox" value="cnkx" data-feat>T1/T2/T3</label>
+      <label class="chip" hidden style="display:none"><input type="checkbox" value="cnkx" data-feat>T1/T2/T3</label>
       <label class="chip"><input type="checkbox" value="xr" data-feat>新锐分区</label>
       <label class="chip"><input type="checkbox" value="flagship" data-feat>N/S/C</label>
       <label class="chip"><input type="checkbox" value="warning" data-feat>预警</label>
@@ -85,8 +85,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div class="side-section" data-domestic hidden>
     <div class="side-label" data-i18n="domestic_sources">国内分级来源</div>
     <nav class="nav" id="domestic-nav">
-      <button class="nav-item active" data-dom="cnkx"><span data-i18n="src_cnkx">中国科协高质量目录</span></button>
-      <button class="nav-item" data-dom="cssci_core"><span data-i18n="src_cssci_core">CSSCI 来源期刊</span></button>
+      <button class="nav-item" data-dom="cnkx" hidden style="display:none"><span data-i18n="src_cnkx">中国科协高质量目录</span></button>
+      <button class="nav-item active" data-dom="cssci_core"><span data-i18n="src_cssci_core">CSSCI 来源期刊</span></button>
       <button class="nav-item" data-dom="cssci_ext"><span data-i18n="src_cssci_ext">CSSCI 扩展版</span></button>
       <button class="nav-item" data-dom="pku_core"><span data-i18n="src_pku">北大核心 (2023)</span></button>
       <button class="nav-item" data-dom="ccft"><span data-i18n="src_ccft">CCF 中文 T 分区</span></button>
@@ -130,7 +130,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <section class="hero">
       <h2 data-i18n="hero_title_int">SCI / SSCI 国际期刊检索</h2>
       <p>
-        <span data-i18n="hero_body_int">数据源：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI）· 更新至 2026-04-20，并合并 <b>Ei Compendex</b> 期刊目录（2025-10-10）。合并 <b>JCR 2025</b> 归属标记、<b>ESI</b> 22 大学科分类、<b>中科院 2025 大类分区</b>、<b>ShowJCR</b> JCR 2024 影响因子 / 小类分区 / 新锐版 / CCF 2026 推荐、<b>中国科协</b> 高质量科技期刊分级目录（T1/T2/T3）与国际期刊预警名单。共收录 <b id="total">—</b> 本。</span><br/>
+        <span data-i18n="hero_body_int">数据源：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI）· 更新至 2026-04-20，并合并 <b>Ei Compendex</b> 期刊目录（2025-10-10）。合并 <b>JCR 2025</b> 归属标记、<b>ESI</b> 22 大学科分类、<b>中科院 2025 大类分区</b>、<b>ShowJCR</b> JCR 2024 影响因子 / 小类分区 / 新锐版 / CCF 2026 推荐与国际期刊预警名单。共收录 <b id="total">—</b> 本。</span><br/>
         <span class="muted" data-i18n="hero_note">期刊原名保留英文，括注为中文刊名；徽章从左至右：索引 / CAS 分区 / IF 分位 / CCF / T1-T3 / 预警。</span>
       </p>
     </section>
@@ -166,7 +166,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <section class="hero">
       <h2 data-i18n="hero_title_dom">国内学术期刊分级目录</h2>
       <p>
-        <span data-i18n="hero_body_dom"><b>中国科协科学技术创新部</b> 2025 年 12 月发布的 <em>高质量科技期刊分级目录总汇</em>，覆盖 40+ 学科领域，T1 / T2 / T3 三级；<b>浙江大学 2024 版</b> 国内期刊分级与 <b>高校自编目录 2023</b>（付费解锁）；<b>CCF 推荐中文科技期刊 2025</b> T 分区。</span><br/>
+        <span data-i18n="hero_body_dom"><b>CSSCI 来源期刊 (2025-2026)</b> 正刊与扩展版；<b>北大《中文核心期刊要目总览》(2023 年版)</b>；<b>浙江大学 2024 版</b> 国内期刊分级与 <b>高校自编目录 2023</b>（付费解锁）；<b>CCF 推荐中文科技期刊 2025</b> T 分区。<span class="muted">（中国科协 T1/T2/T3 目录已暂时下架，数据校验中，稍后恢复。）</span></span><br/>
         <span class="muted" data-i18n="hero_note_dom">CSSCI / 北大核心目录为扫描件 PDF，OCR 版稍后补入。</span>
       </p>
     </section>
