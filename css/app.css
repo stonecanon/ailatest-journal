@@ -318,35 +318,32 @@ main.main {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 38px;
-  height: 28px;
-  padding: 0 10px;
+  min-width: 64px;
+  height: 30px;
+  padding: 0 14px;
   background: var(--paper-soft);
-  border: 1px solid var(--rule-soft);
-  border-radius: 6px;
-  font-size: 16px;
+  border: 0;
+  border-radius: 999px;
+  font-size: 18px;
   line-height: 1;
   color: var(--ink-faint);
   cursor: pointer;
-  transition: background .12s, color .12s, border-color .12s, transform .08s;
+  transition: background .12s, color .12s, transform .08s;
 }
 .fav-star:hover {
   background: var(--paper-deeper);
-  border-color: var(--rule);
   color: var(--accent);
   transform: translateY(-1px);
 }
 .fav-star.on {
   background: var(--paper-deeper);
-  border-color: var(--gold);
   color: var(--gold);
 }
 .fav-star.on:hover {
-  background: var(--paper-deeper);
   color: var(--accent);
 }
 
-.col-fav { width: 56px; text-align: center; }
+.col-fav { width: 80px; text-align: center; }
 
 /* drawer 大类/小类 标签（区分新锐版双 4 区等情况） */
 .zone-tier {
@@ -1001,6 +998,7 @@ html[data-theme="dark"] .oa-chip.oa-isoa    { background: #3a2d10; color: #f3d78
   margin-top: 10px;
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 14px;
   flex-wrap: wrap;
 }
@@ -1041,26 +1039,35 @@ html[data-theme="dark"] .oa-chip.oa-isoa    { background: #3a2d10; color: #f3d78
 
 .big-btn {
   display: inline-block;
-  padding: 9px 18px;
-  border-radius: 6px;
+  padding: 7px 18px;
+  border-radius: 999px;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 400;
+  letter-spacing: 0.02em;
   cursor: pointer;
   border: 1px solid transparent;
   transition: all 0.12s;
 }
 .big-btn.primary {
-  background: var(--ink, #3a2d1a);
-  color: var(--paper, #f6f0e2);
-  border-color: var(--ink);
+  background: var(--paper-soft);
+  color: var(--ink);
+  border-color: var(--rule-soft);
 }
-.big-btn.primary:hover { opacity: 0.85; }
+.big-btn.primary:hover {
+  background: var(--paper-deeper);
+  border-color: var(--rule);
+  color: var(--accent);
+}
 .big-btn.ghost {
   background: transparent;
-  color: var(--ink);
-  border-color: var(--rule, #d8ccb4);
+  color: var(--ink-faint);
+  border-color: var(--rule-soft);
 }
-.big-btn.ghost:hover { background: rgba(0,0,0,0.04); }
+.big-btn.ghost:hover {
+  background: var(--paper-soft);
+  color: var(--gold);
+  border-color: var(--rule);
+}
 
 .stats-grid {
   display: grid;

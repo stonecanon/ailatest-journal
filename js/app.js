@@ -1608,12 +1608,12 @@
         <div class="drawer-issn">${issn ? 'ISSN ' + escape(issn) : ''}${eissn ? ' · eISSN ' + escape(eissn) : ''}</div>
         <div class="badges drawer-badges">${intBadges}${tierBadge}${crossBadges}</div>
         <div class="drawer-actions">
-          <button class="big-btn ${on?'ghost':'primary'}" id="drawer-fav-big">${on ? '★ 已收藏（点击取消）' : '☆ 加入收藏'}</button>
           <div class="rating-pill" data-rating-key="${escape(favId(r))}" title="综合推荐评分">
             <span class="rating-avg" id="rating-avg">—</span><span class="rating-avg-suffix">/ 5</span>
             <span class="rating-avg-stars" id="rating-avg-stars"></span>
             <span class="rating-count muted-cell" id="rating-count">暂无评分</span>
           </div>
+          <button class="big-btn ${on?'ghost':'primary'}" id="drawer-fav-big">${on ? '★ 已收藏（点击取消）' : '☆ 加入收藏'}</button>
         </div>
       </div>
       ${statsHTML}
