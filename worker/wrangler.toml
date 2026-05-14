@@ -8,7 +8,7 @@ routes = [
 
 [vars]
 GITHUB_CLIENT_ID = "Ov23liKY2We6M23yTMJV"
-GOOGLE_CLIENT_ID = ""                       # set after creating Google OAuth client
+GOOGLE_CLIENT_ID = "393406357932-4sqvlnbm296o5pj68o60i8o8k2ujgfov.apps.googleusercontent.com"
 SITE_URL         = "https://journal.ailatest.org"
 MAIL_FROM        = "noreply@ailatest.org"   # must be a Resend-verified sender
 

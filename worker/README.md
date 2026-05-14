@@ -1,6 +1,6 @@
 # AILatest Journal API (Cloudflare Worker + D1)
 
-GitHub OAuth login + journal favorites, persisted in D1.
+Email code, GitHub OAuth, Google OAuth login + journal favorites, persisted in D1.
 
 ## 部署步骤
 
@@ -9,6 +9,17 @@ GitHub OAuth login + journal favorites, persisted in D1.
    - Homepage URL: `https://journal.ailatest.org`
    - Authorization callback URL: `https://api.ailatest.org/auth/github/callback`
      （或先用 `https://ailatest-journal-api.<you>.workers.dev/auth/github/callback`）
+   - 记下 Client ID / Client Secret
+
+**1b. 创建 Google OAuth Client**
+   - https://console.cloud.google.com/apis/credentials → Create credentials → OAuth client ID
+   - Application type: `Web application`
+   - Authorized JavaScript origins:
+     - `https://journal.ailatest.org`
+     - `https://api.ailatest.org`
+   - Authorized redirect URIs:
+     - `https://api.ailatest.org/auth/google/callback`
+     - 如果临时用 workers.dev 测试，再加：`https://ailatest-journal-api.<you>.workers.dev/auth/google/callback`
    - 记下 Client ID / Client Secret
 
 **2. 创建 D1 数据库**
@@ -22,9 +33,10 @@ GitHub OAuth login + journal favorites, persisted in D1.
 **3. 配置 secrets**
    ```bash
    npx wrangler secret put GITHUB_CLIENT_SECRET
+   npx wrangler secret put GOOGLE_CLIENT_SECRET
    npx wrangler secret put JWT_SECRET   # openssl rand -base64 48
    ```
-   在 `wrangler.toml` 填 `GITHUB_CLIENT_ID`。
+   在 `wrangler.toml` 填 `GITHUB_CLIENT_ID` 和 `GOOGLE_CLIENT_ID`。`GOOGLE_CLIENT_ID` 不是 secret；如果不想写进仓库，也可以在 Cloudflare Dashboard → Workers → `ailatest-journal-api` → Settings → Variables 里添加同名变量。
 
 **4. 部署**
    ```bash
