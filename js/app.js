@@ -963,12 +963,12 @@
     const cat = [r.esi_category, r.cas_major_cn]
       .filter(Boolean).map(escape).join(' · ') || '<span class="muted-cell">—</span>';
     return `<tr data-fid="${escape(fid)}" class="j-row clickable ${r.flagship ? 'row-flagship' : ''}" data-src="int">
+      <td class="col-fav">${starBtn(r, 'int')}</td>
       <td class="col-name">${nameHtml}</td>
-      <td class="col-abbr">${abbr || '<span class="muted-cell">—</span>'}</td>
-      <td class="col-issn">${issn}</td>
       <td class="col-badge col-badge-split">${badgeCell}</td>
       <td class="col-cat">${cat}</td>
-      <td class="col-fav">${starBtn(r, 'int')}</td>
+      <td class="col-abbr">${abbr || '<span class="muted-cell">—</span>'}</td>
+      <td class="col-issn">${issn}</td>
     </tr>`;
   }
 
@@ -1504,13 +1504,13 @@
     const casHTML = (() => {
       const blocks = [];
       if (r.cas_major_cn) {
-        blocks.push(`<div class="cas-major">${escape(r.cas_major_cn)} · <b>${r.cas_major_zone || r.cas_zone || '?'}区</b>${r.cas_top ? ' · Top' : ''}</div>`);
+        blocks.push(`<div class="cas-major"><span class="zone-tier">大类</span> ${escape(r.cas_major_cn)} · <b>${r.cas_major_zone || r.cas_zone || '?'}区</b>${r.cas_top ? ' · Top' : ''}</div>`);
       }
       if (Array.isArray(r.cas_sub_cats) && r.cas_sub_cats.length) {
         blocks.push(`<ul class="cas-sub-list">${r.cas_sub_cats.map(s => {
           const nm = typeof s === 'string' ? s : (s.name || '');
           const zn = typeof s === 'object' ? s.zone : null;
-          return `<li>${escape(nm)}${zn ? ` · <b>${zn}区</b>` : ''}</li>`;
+          return `<li><span class="zone-tier zone-tier-sub">小类</span> ${escape(nm)}${zn ? ` · <b>${zn}区</b>` : ''}</li>`;
         }).join('')}</ul>`);
       }
       return blocks.length
@@ -1526,15 +1526,15 @@
       const majorCn = xr.major_cn || '';
       const majorEn = xr.major_en || '';
       const majorText = [majorCn, majorEn].filter(Boolean).join(' · ');
-      blocks.push(`<div class="cas-major">${escape(majorText || '（未标注大类）')} · <b>新锐 ${xr.zone} 区</b></div>`);
+      blocks.push(`<div class="cas-major"><span class="zone-tier">大类</span> ${escape(majorText || '（未标注大类）')} · <b>新锐 ${xr.zone} 区</b></div>`);
       if (Array.isArray(xr.subs) && xr.subs.length) {
         blocks.push(`<ul class="cas-sub-list">${xr.subs.map(s => {
           const nm = s.cat || s.name || '';
           const zn = s.zone;
-          return `<li>${escape(nm)}${zn ? ` · <b>新锐 ${zn} 区</b>` : ''}</li>`;
+          return `<li><span class="zone-tier zone-tier-sub">小类</span> ${escape(nm)}${zn ? ` · <b>新锐 ${zn} 区</b>` : ''}</li>`;
         }).join('')}</ul>`);
       }
-      blocks.push(`<div class="muted-cell" style="margin-top:6px;font-size:12px;line-height:1.6">新锐版面向成长期期刊提供独立分区，与主大类分区互为补充。数据源：ShowJCR 新锐版 2026。</div>`);
+      blocks.push(`<div class="muted-cell" style="margin-top:6px;font-size:12px;line-height:1.6">新锐版面向成长期期刊提供独立分区，与主大类分区互为补充。"大类"为学科门类层级（如历史学），"小类"为细分学科。数据源：ShowJCR 新锐版 2026。</div>`);
       return `<div class="drawer-section"><h4>新锐版分区 · 2026 年度</h4>${blocks.join('')}</div>`;
     })();
 
