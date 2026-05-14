@@ -435,10 +435,12 @@
     if (avg != null) {
       avgEl.textContent = avg.toFixed(1);
       starsEl.innerHTML = renderStarsStatic(avg);
-      cntEl.textContent = `${n} 人评分`;
+      starsEl.style.display = '';
+      cntEl.textContent = `${n} 人`;
     } else {
       avgEl.textContent = '—';
-      starsEl.innerHTML = renderStarsStatic(0);
+      starsEl.innerHTML = '';
+      starsEl.style.display = 'none';
       cntEl.textContent = '暂无评分';
     }
   }
@@ -1607,6 +1609,11 @@
         <div class="badges drawer-badges">${intBadges}${tierBadge}${crossBadges}</div>
         <div class="drawer-actions">
           <button class="big-btn ${on?'ghost':'primary'}" id="drawer-fav-big">${on ? '★ 已收藏（点击取消）' : '☆ 加入收藏'}</button>
+          <div class="rating-pill" data-rating-key="${escape(favId(r))}" title="综合推荐评分">
+            <span class="rating-avg" id="rating-avg">—</span><span class="rating-avg-suffix">/ 5</span>
+            <span class="rating-avg-stars" id="rating-avg-stars"></span>
+            <span class="rating-count muted-cell" id="rating-count">暂无评分</span>
+          </div>
         </div>
       </div>
       ${statsHTML}
@@ -1620,18 +1627,10 @@
       ${cnkxHTML}
       ${lockedSrcHTML}
       <div class="drawer-section rating-section" data-rating-key="${escape(favId(r))}">
-        <h4>综合推荐评分</h4>
-        <div class="rating-summary">
-          <div class="rating-avg-wrap">
-            <div class="rating-avg" id="rating-avg">—</div>
-            <div class="rating-avg-stars" id="rating-avg-stars"></div>
-            <div class="rating-count muted-cell" id="rating-count">暂无评分</div>
-          </div>
-          <div class="rating-my-wrap">
-            <div class="rating-my-label muted-cell">我的评分</div>
-            <div class="rating-stars-input" id="rating-input" role="radiogroup" aria-label="评分"></div>
-            <div class="rating-my-hint muted-cell" id="rating-hint">登录后可打分 · 半星可评 · 可随时修改</div>
-          </div>
+        <h4>我的评分</h4>
+        <div class="rating-my-wrap">
+          <div class="rating-stars-input" id="rating-input" role="radiogroup" aria-label="评分"></div>
+          <div class="rating-my-hint muted-cell" id="rating-hint">登录后可打分 · 半星可评 · 可随时修改</div>
         </div>
       </div>
     `;
