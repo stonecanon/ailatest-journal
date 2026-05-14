@@ -323,7 +323,16 @@ async function routeAuthCallback(req, env) {
 }
 
 // ───────── routes: google ─────────
+function googleOAuthConfigError(env) {
+  const missing = [];
+  if (!env.GOOGLE_CLIENT_ID) missing.push('GOOGLE_CLIENT_ID');
+  if (!env.GOOGLE_CLIENT_SECRET) missing.push('GOOGLE_CLIENT_SECRET');
+  return missing.length ? `google oauth not configured: missing ${missing.join(', ')}` : '';
+}
+
 async function routeGoogleStart(req, env) {
+  const configError = googleOAuthConfigError(env);
+  if (configError) return err(configError, 503);
   const u = new URL(req.url);
   const state = u.searchParams.get('state') || '';
   const redirect = u.searchParams.get('redirect') || env.SITE_URL;
@@ -341,6 +350,8 @@ async function routeGoogleStart(req, env) {
 }
 
 async function routeGoogleCallback(req, env) {
+  const configError = googleOAuthConfigError(env);
+  if (configError) return err(configError, 503);
   const u = new URL(req.url);
   const code = u.searchParams.get('code');
   const ggState = u.searchParams.get('state');
