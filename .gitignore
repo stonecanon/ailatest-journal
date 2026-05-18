@@ -26,3 +26,6 @@ data/openalex_cache.json
 
 CODEX_REVIEW.md
 .wrangler/
+
+# cnkx 旧数据备份
+data/cnkx_records.json.bak
