@@ -30,9 +30,9 @@
       hero_title_dom: '国内学术期刊分级目录',
       hero_body_dom: '<b>CSSCI 来源期刊 (2025-2026)</b> 正刊与扩展版；<b>北大《中文核心期刊要目总览》(2023 年版)</b>；<b>浙江大学 2024 版</b> 与 <b>高校自编目录 2023</b>（付费解锁）；<b>CCF 推荐中文科技期刊 2025</b> T 分区。<span class="muted">（中国科协 T1/T2/T3 目录已暂时下架，数据校验中，稍后恢复。）</span>',
       hero_note_dom: 'CSSCI / 北大核心为扫描 PDF OCR 提取，可能存在个别错字。',
-      search_int: '搜索：期刊全称 / 缩写 / ISSN / 中文刊名',
+      search_int: '搜索：期刊全称 / 官方缩写 / 社群缩写 / ISSN / 中文刊名',
       search_dom: '搜索：中文刊名 / 英文刊名 / ISSN / CN 号',
-      search_fav: '搜索收藏：期刊 / ISSN',
+      search_fav: '搜索收藏：期刊 / 缩写 / ISSN',
       showing: '显示', of: '条 / 共', total_items: '条',
       empty: '未找到匹配的期刊',
       empty_fav: '还没有收藏。切到「国际 SCI/SSCI」点任意一行右边的 ★ 就能收藏。',
@@ -66,9 +66,9 @@
       hero_title_dom: 'Domestic Chinese Journal Directories',
       hero_body_dom: '<b>CSSCI 2025-2026</b> core & extended; <b>PKU Core (2023)</b>; <b>ZJU 2024</b>; <b>School A 2023</b>; <b>CCF Recommended Chinese Journals 2025</b>. <span class="muted">(CAST tiered directory temporarily disabled — data under review.)</span>',
       hero_note_dom: 'CSSCI / PKU Core extracted via OCR from scanned PDF; minor typos possible.',
-      search_int: 'Search: title / abbr / ISSN / Chinese name',
+      search_int: 'Search: title / abbr / acronym / ISSN / Chinese name',
       search_dom: 'Search: Chinese name / English name / ISSN / CN',
-      search_fav: 'Search favorites: title / ISSN',
+      search_fav: 'Search favorites: title / acronym / ISSN',
       showing: 'Showing', of: 'of', total_items: '',
       empty: 'No journals match.',
       empty_fav: 'No favorites yet. Switch to Int’l SCI/SSCI and click ★ on any row to bookmark.',
@@ -88,6 +88,23 @@
   let esiCats = [];
   let meta = null;
   let oaMap = {};          // compact OpenAlex map: { "ISSN": {hp, l, oa, dj, apc, org, cn, w} }
+  const DEFAULT_JOURNAL_ALIASES = {
+    BE: 'BUILDING AND ENVIRONMENT',
+    'B&E': 'BUILDING AND ENVIRONMENT',
+    JAABE: 'JOURNAL OF ASIAN ARCHITECTURE AND BUILDING ENGINEERING',
+    JBE: 'JOURNAL OF BUILDING ENGINEERING',
+    JBPS: 'JOURNAL OF BUILDING PERFORMANCE SIMULATION',
+    EB: 'ENERGY AND BUILDINGS',
+    'E&B': 'ENERGY AND BUILDINGS',
+    TVST: 'TRANSLATIONAL VISION SCIENCE & TECHNOLOGY',
+  };
+  const ACRONYM_STOP_WORDS = new Set([
+    'a', 'an', 'and', 'at', 'by', 'for', 'from', 'in', 'into', 'of',
+    'on', 'or', 'the', 'to', 'with',
+  ]);
+  let searchMetaCache = new WeakMap();
+  let aliasTargetsByKey = new Map();
+  let aliasDisplayByTitle = new Map();
 
   function lookupOA(r) {
     if (!oaMap) return null;
@@ -104,7 +121,7 @@
   let activeZones = new Set();
   let activeFeats = new Set();
   let activeQuery = '';
-  let activeDom = 'cssci_core';   // 中国科协目录已临时下架（数据有误），默认改为 CSSCI
+  let activeDom = 'cnkx';   // 中国科协 高质量科技期刊分级目录 (2025-12 修订, 11084 条)
   const PAGE = 100;
   let shown = PAGE;
 
@@ -136,6 +153,86 @@
   }
 
   function t(k) { return I18N[lang][k] ?? k; }
+
+  function canonicalTitle(s) {
+    return String(s || '').trim().replace(/\s+/g, ' ').toUpperCase();
+  }
+
+  function normalizeAliasKey(s) {
+    return String(s || '').trim().toUpperCase().replace(/＆/g, '&').replace(/\s+/g, '');
+  }
+
+  function normalizeAcronymQuery(s) {
+    return normalizeAliasKey(s).replace(/[._-]+/g, '');
+  }
+
+  function setJournalAliases(raw) {
+    const source = raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {};
+    const merged = { ...DEFAULT_JOURNAL_ALIASES, ...source };
+    const byKey = new Map();
+    const byTitle = new Map();
+    Object.entries(merged).forEach(([alias, title]) => {
+      const key = normalizeAliasKey(alias);
+      const target = canonicalTitle(title);
+      if (!key || !target) return;
+      byKey.set(key, target);
+      if (!byTitle.has(target)) byTitle.set(target, []);
+      const display = key;
+      if (!byTitle.get(target).includes(display)) byTitle.get(target).push(display);
+    });
+    aliasTargetsByKey = byKey;
+    aliasDisplayByTitle = byTitle;
+    searchMetaCache = new WeakMap();
+  }
+
+  function makeJournalAcronym(r) {
+    const source = r?.name || r?.en_name || '';
+    const words = String(source)
+      .normalize('NFKD')
+      .replace(/&/g, ' and ')
+      .replace(/[’']/g, '')
+      .replace(/[^A-Za-z0-9]+/g, ' ')
+      .trim()
+      .split(/\s+/)
+      .filter(w => w && !ACRONYM_STOP_WORDS.has(w.toLowerCase()));
+    const acronym = words.map(w => w[0]).join('').toUpperCase();
+    return acronym.length >= 2 ? acronym : '';
+  }
+
+  function journalSearchMeta(r) {
+    if (!r || typeof r !== 'object') return { acronym: '', aliases: [], aliasKeys: new Set() };
+    const cached = searchMetaCache.get(r);
+    if (cached) return cached;
+    const title = canonicalTitle(r.name || r.en_name || r.cn_name || '');
+    const acronym = makeJournalAcronym(r);
+    const aliases = [];
+    if (acronym && acronym.length <= 6) aliases.push(acronym);
+    (aliasDisplayByTitle.get(title) || []).forEach(a => {
+      if (!aliases.includes(a)) aliases.push(a);
+    });
+    const aliasKeys = new Set(aliases.map(normalizeAliasKey));
+    const meta = { acronym, aliases, aliasKeys };
+    searchMetaCache.set(r, meta);
+    return meta;
+  }
+
+  function aliasHintHtml(r) {
+    if (!activeQuery) return '';
+    const aliases = journalSearchMeta(r).aliases.slice(0, 5);
+    if (!aliases.length) return '';
+    const title = lang === 'zh' ? '可直接搜索这些缩写' : 'Searchable aliases';
+    return `<span class="jname-aka" title="${title}">aka: ${aliases.map(escape).join(' / ')}</span>`;
+  }
+
+  function aliasTargetForQuery(query) {
+    return aliasTargetsByKey.get(normalizeAliasKey(query));
+  }
+
+  function escapeRegExp(s) {
+    return String(s || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  setJournalAliases(DEFAULT_JOURNAL_ALIASES);
 
   function applyI18n() {
     $$('[data-i18n]').forEach(el => {
@@ -910,14 +1007,12 @@
     (d.pku_core||[]).forEach(r => {
       addDomIndex(r.name, 'name', { source:'pku', label:'北大核心', tag:'', category:r.category });
     });
-    // 中国科协目录数据已临时下架（数据有误，每条都带无关学科标签）。
-    // 暂停将其录入 cross-source 索引，避免国际表里出现"科协 T?"徽章。
-    // 数据修正后取消注释即可恢复。
-    // ((d.cnkx && d.cnkx.records)||[]).forEach(r => {
-    //   if (!r.tier || !/^T[123]$/.test(r.tier)) return;
-    //   addDomIndex(r.name, 'name', { source:'cnkx', label:'科协 '+r.tier, tag:r.tier, domain:r.domain });
-    //   if (r.issn) addDomIndex(r.issn, 'issn', { source:'cnkx', label:'科协 '+r.tier, tag:r.tier, domain:r.domain });
-    // });
+    // 中国科协 高质量科技期刊分级目录 (2025-12 修订, 11084 条)
+    ((d.cnkx && d.cnkx.records)||[]).forEach(r => {
+      if (!r.tier || !/^T[123]$/.test(r.tier)) return;
+      addDomIndex(r.name, 'name', { source:'cnkx', label:'科协 '+r.tier, tag:r.tier, domain:r.domain });
+      if (r.issn) addDomIndex(r.issn, 'issn', { source:'cnkx', label:'科协 '+r.tier, tag:r.tier, domain:r.domain });
+    });
     (d.ccft||[]).forEach(r => {
       addDomIndex(r.cn_name, 'name', { source:'ccft', label:'CCF-'+r.tier, tag:r.tier, org:r.org });
       if (r.cn_code) addDomIndex(r.cn_code, 'issn', { source:'ccft', label:'CCF-'+r.tier, tag:r.tier });
@@ -959,7 +1054,7 @@
     const fid = favId(r);
     rowRecordsByFid[fid] = { ...r, __src: 'int' };
     const flagshipHtml = r.flagship ? `<span class="flagship-star fs-${r.flagship}" title="${r.flagship.replace('_',' ')}">★</span>` : '';
-    const nameHtml = `<div class="jname">${flagshipHtml}${escape(r.name)}${r.cn_name ? `<span class="jname-cn">${escape(r.cn_name)}</span>` : ''}</div>`;
+    const nameHtml = `<div class="jname">${flagshipHtml}${escape(r.name)}${r.cn_name ? `<span class="jname-cn">${escape(r.cn_name)}</span>` : ''}${aliasHintHtml(r)}</div>`;
     const abbr = r.abbr20 ? `<span class="jabbr">${escape(r.abbr20)}</span>` : '';
     const issn = r.issn || r.eissn
       ? `<span class="jissn">${r.issn||''}${r.eissn ? ` <span class="eissn">e:${r.eissn}</span>` : ''}</span>`
@@ -976,8 +1071,8 @@
       badgeXR(r.cas_xr && r.cas_xr.zone),
       badgeIF(r.if_2024, r.if_quartile),
       badgeCCF(r.ccf),
-      // 中国科协 T1/T2/T3 徽章已临时下架（数据有误，每条都显示了无关学科）
-      // ...(r.cnkx ? r.cnkx.slice(0,2).map(c => badgeTier(c.tier)) : []),
+      // 中国科协 T1/T2/T3 徽章 (取该刊所有 cnkx 标签中最高级别)
+      ...(r.cnkx ? r.cnkx.slice(0,2).map(c => badgeTier(c.tier)) : []),
       r.warning ? badgeWarn() : '',
       crossBadges,
     ].filter(Boolean).join('');
@@ -1015,7 +1110,7 @@
     }
     if (activeFeats.has('if') && r.if_2024 == null) return false;
     if (activeFeats.has('ccf') && !r.ccf) return false;
-    if (activeFeats.has('cnkx')) return false; // 科协目录暂停展示，强制不命中
+    if (activeFeats.has('cnkx') && !(Array.isArray(r.cnkx) && r.cnkx.length)) return false;
     if (activeFeats.has('xr') && !r.cas_xr) return false;
     if (activeFeats.has('flagship') && !r.flagship) return false;
     if (activeFeats.has('warning') && !r.warning) return false;
@@ -1026,23 +1121,35 @@
     return true;
   }
 
-  // 搜索排序：精确名 > 旗舰刊 > 前缀 > ISSN 精确 > 缩写精确 > 包含
+  // 搜索排序：精确名 > ISSN > 手动 alias > 自动 acronym > 官方缩写 > 前缀 > 包含
   function scoreRecord(r, query) {
-    const q = (query||'').trim().toLowerCase();
+    const raw = (query||'').trim();
+    const q = raw.toLowerCase();
     if (!q) return 1;
     const name = (r.name||'').toLowerCase();
     const abbr = (r.abbr20||'').toLowerCase();
     const cn = (r.cn_name||'').toLowerCase();
+    const en = (r.en_name||'').toLowerCase();
     const issn = (r.issn||'').toLowerCase();
     const eissn = (r.eissn||'').toLowerCase();
     const publisher = (r.publisher||'').toLowerCase();
     const country = (r.country||'').toLowerCase();
+    const meta = journalSearchMeta(r);
+    const title = canonicalTitle(r.name || r.en_name || r.cn_name || '');
+    const aliasTarget = aliasTargetForQuery(raw);
+    const acronymQuery = normalizeAcronymQuery(raw);
+    const compactIssn = raw.replace(/[^0-9x]/gi, '').toLowerCase();
+    const issnCompact = issn.replace(/[^0-9x]/g, '');
+    const eissnCompact = eissn.replace(/[^0-9x]/g, '');
 
     // 精确匹配（最高优先级）
     if (name === q) return 1000;
-    if (issn === q || eissn === q) return 950;
+    if (issn === q || eissn === q || (compactIssn && (issnCompact === compactIssn || eissnCompact === compactIssn))) return 950;
+    if (aliasTarget && aliasTarget === title) return 940;
+    if (acronymQuery && acronymQuery.length <= 6 && meta.acronym === acronymQuery) return 930;
     if (abbr === q) return 900;
     if (cn === q) return 880;
+    if (en === q) return 860;
 
     // 前缀匹配（"nature"→"Nature Cities"会命中前缀）
     if (name.startsWith(q + ' ') || name.startsWith(q + '-') || name.startsWith(q + ':')) {
@@ -1053,16 +1160,21 @@
       return s;
     }
     if (cn.startsWith(q)) return 700;
+    if (en.startsWith(q)) return 690;
     if (abbr.startsWith(q)) return 680;
+    if (acronymQuery && acronymQuery.length >= 2 && acronymQuery.length <= 6 && meta.acronym.startsWith(acronymQuery)) return 660;
 
     // 词边界匹配（"cell"在"Cell Reports"中出现在词首）
-    const wordRe = new RegExp('\\b' + q.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&') + '\\b', 'i');
+    const wordRe = new RegExp('\\b' + escapeRegExp(q) + '\\b', 'i');
     if (wordRe.test(r.name||'')) return 500;
     if (wordRe.test(r.cn_name||'')) return 480;
+    if (wordRe.test(r.en_name||'')) return 460;
 
     // 包含
     if (name.includes(q)) return 200;
     if (cn.includes(q)) return 180;
+    if (en.includes(q)) return 160;
+    if (acronymQuery && meta.aliasKeys.has(normalizeAliasKey(raw))) return 140;
     if (publisher.includes(q)) return 100;
     if (country.includes(q)) return 50;
     return 0;
@@ -1563,17 +1675,16 @@
       return `<div class="drawer-section"><h4>新锐版分区 · 2026 年度</h4>${blocks.join('')}</div>`;
     })();
 
-    // 科协历史分级（已临时下架，数据校验中。保留代码注释，下次拿到干净数据后恢复。）
-    const cnkxHTML = '';
-    // const cnkxHTML = (Array.isArray(r.cnkx) && r.cnkx.length)
-    //   ? `<div class="drawer-section">
-    //        <h4>中国科协高质量科技期刊分级目录 · 2025-12 版</h4>
-    //        <ul class="cas-sub-list">${r.cnkx.map(c =>
-    //          `<li><b>${escape(c.tier||'')}</b>${c.domain ? ' · ' + escape(c.domain) : ''}${c.subdomain ? ' <span class="muted-cell">· '+escape(c.subdomain)+'</span>' : ''}</li>`
-    //        ).join('')}</ul>
-    //        <div class="muted-cell" style="margin-top:6px;font-size:12px;line-height:1.6">同一刊在多个学科领域分别评定 T1 / T2 / T3，互不冲突。</div>
-    //      </div>`
-    //   : '';
+    // 中国科协高质量科技期刊分级目录 (2025-12 修订)
+    const cnkxHTML = (Array.isArray(r.cnkx) && r.cnkx.length)
+      ? `<div class="drawer-section">
+           <h4>中国科协高质量科技期刊分级目录 · 2025-12 版</h4>
+           <ul class="cas-sub-list">${r.cnkx.map(c =>
+             `<li><b>${escape(c.tier||'')}</b>${c.domain ? ' · ' + escape(c.domain) : ''}${c.subdomain ? ' <span class="muted-cell">· '+escape(c.subdomain)+'</span>' : ''}</li>`
+           ).join('')}</ul>
+           <div class="muted-cell" style="margin-top:6px;font-size:12px;line-height:1.6">同一刊在多个学科领域分别评定 T1 / T2 / T3，互不冲突。</div>
+         </div>`
+      : '';
 
     // 警示刊
     const warnHTML = r.warning
@@ -1734,7 +1845,7 @@
     }
     if (activeQuery) {
       const q = activeQuery.toLowerCase();
-      rows = rows.filter(r => (
+      rows = rows.filter(r => scoreRecord(r, activeQuery) > 0 || (
         (r.name||'') + ' ' + (r.cn_name||'') + ' ' + (r.en_name||'') + ' ' +
         (r.issn||'') + ' ' + (r.cn_code||'')
       ).toLowerCase().includes(q));
@@ -1843,7 +1954,7 @@
     };
     return `<tr class="j-row clickable" data-fid="${escape(fid)}" data-src="${escape(r.__src)}">
       <td class="col-drag"><span class="drag-handle" title="拖动排序">⋮⋮</span></td>
-      <td class="col-name"><div class="jname">${escape(name.replace(/\*$/,''))}${cnName}${enName}</div></td>
+      <td class="col-name"><div class="jname">${escape(name.replace(/\*$/,''))}${cnName}${enName}${aliasHintHtml(r)}</div></td>
       <td class="col-issn">${isnCell}</td>
       <td class="col-badge"><div class="badges">${intBadges}${tierBadge}${crossBadges}</div></td>
       <td class="col-src"><span class="src-tag src-${escape(r.__src)}">${SRC_LABEL[r.__src] || r.__src}</span></td>
@@ -1991,14 +2102,17 @@
     updateFavCount();
     await handleAuthCallback();
     try {
-      const [j, d, m, esi, oa] = await Promise.all([
+      const [j, d, m, esi, oa, aliases] = await Promise.all([
         fetch('data/journals.json').then(r => r.json()),
         fetch('data/domestic.json').then(r => r.json()).catch(() => null),
         fetch('data/meta.json').then(r => r.json()).catch(() => null),
         fetch('data/esi_categories.json').then(r => r.json()).catch(() => []),
         fetch('data/oa.json').then(r => r.json()).catch(() => ({})),
+        fetch('data/journal_aliases.json').then(r => r.json()).catch(() => DEFAULT_JOURNAL_ALIASES),
       ]);
+      setJournalAliases(aliases);
       journals = j; domestic = d; meta = m; esiCats = esi; oaMap = oa || {};
+      journals.forEach(journalSearchMeta);
       buildDomIndex(domestic);
       if (meta?.total && $('#total')) $('#total').textContent = meta.total.toLocaleString();
       $('#hint').textContent = lang === 'zh'

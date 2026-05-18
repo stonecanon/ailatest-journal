@@ -13,10 +13,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <title>AILatest Journal · 期刊检索</title>
 <meta name="description" content="SCI/SSCI/AHCI/ESCI/EI 期刊检索 · JCR IF · 中科院分区 · CCF 推荐 · 中国科协高质量期刊分级 · 国内 CCF-T / 浙大目录" />
 <link rel="preload" href="data/journals.json" as="fetch" crossorigin="anonymous" />
+<link rel="preload" href="data/journal_aliases.json" as="fetch" crossorigin="anonymous" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="css/app.css?v=20260513-22" />
+<link rel="stylesheet" href="css/app.css?v=20260515-01" />
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
 <!-- PWA -->
 <link rel="manifest" href="manifest.json" />
@@ -85,8 +86,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div class="side-section" data-domestic hidden>
     <div class="side-label" data-i18n="domestic_sources">国内分级来源</div>
     <nav class="nav" id="domestic-nav">
-      <button class="nav-item" data-dom="cnkx" hidden style="display:none"><span data-i18n="src_cnkx">中国科协高质量目录</span></button>
-      <button class="nav-item active" data-dom="cssci_core"><span data-i18n="src_cssci_core">CSSCI 来源期刊</span></button>
+      <button class="nav-item active" data-dom="cnkx"><span data-i18n="src_cnkx">中国科协高质量目录</span></button>
+      <button class="nav-item" data-dom="cssci_core"><span data-i18n="src_cssci_core">CSSCI 来源期刊</span></button>
       <button class="nav-item" data-dom="cssci_ext"><span data-i18n="src_cssci_ext">CSSCI 扩展版</span></button>
       <button class="nav-item" data-dom="pku_core"><span data-i18n="src_pku">北大核心 (2023)</span></button>
       <button class="nav-item" data-dom="ccft"><span data-i18n="src_ccft">CCF 中文 T 分区</span></button>
@@ -166,7 +167,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <section class="hero">
       <h2 data-i18n="hero_title_dom">国内学术期刊分级目录</h2>
       <p>
-        <span data-i18n="hero_body_dom"><b>CSSCI 来源期刊 (2025-2026)</b> 正刊与扩展版；<b>北大《中文核心期刊要目总览》(2023 年版)</b>；<b>浙江大学 2024 版</b> 国内期刊分级与 <b>高校自编目录 2023</b>（付费解锁）；<b>CCF 推荐中文科技期刊 2025</b> T 分区。<span class="muted">（中国科协 T1/T2/T3 目录已暂时下架，数据校验中，稍后恢复。）</span></span><br/>
+        <span data-i18n="hero_body_dom"><b>中国科协 高质量科技期刊分级目录 (2025-12 修订)</b> 共 11,084 条 / 59 学科领域；<b>CSSCI 来源期刊 (2025-2026)</b> 正刊与扩展版；<b>北大《中文核心期刊要目总览》(2023 年版)</b>；<b>浙江大学 2024 版</b> 国内期刊分级与 <b>高校自编目录 2023</b>（付费解锁）；<b>CCF 推荐中文科技期刊 2025</b> T 分区。</span><br/>
         <span class="muted" data-i18n="hero_note_dom">CSSCI / 北大核心目录为扫描件 PDF，OCR 版稍后补入。</span>
       </p>
     </section>
@@ -206,7 +207,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </aside>
 
 <button id="pwa-install" class="pwa-install" hidden>📲 安装到主屏</button>
-<script src="js/app.js?v=20260513-22" defer></script>
+<script src="js/app.js?v=20260518-cnkx" defer></script>
 <script>
   // Register service worker (PWA)
   if ('serviceWorker' in navigator) {

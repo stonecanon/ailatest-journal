@@ -15,7 +15,7 @@
   "with_warning": 4,
   "with_cn_name": 33,
   "with_ccf": 279,
-  "with_cnkx": 2119,
+  "with_cnkx": 4876,
   "wos_categories": 259,
   "esi_categories": 22,
   "oa_enriched": true,
@@ -33,5 +33,8 @@
     "is_oa": 12619,
     "in_doaj": 10133
   },
-  "last_updated_ei": "2025-10-10"
+  "last_updated_ei": "2025-10-10",
+  "cnkx_total_records": 11084,
+  "cnkx_source": "中国科协 高质量科技期刊分级目录 (2025-12 修订, 共 11084 条 / 59 学科领域)",
+  "cnkx_last_updated": "2026-05-18"
 }
