@@ -46,6 +46,9 @@
       login: '登录', logout: '登出',
       fav_added: '已收藏', fav_removed: '已移除',
       syncing: '同步中…', synced: '已同步',
+      wos_subjects: 'WoS 细分学科',
+      wos_search_ph: '筛选学科（A-Z）…',
+      wos_clear_title: '清空选择',
     },
     en: {
       tagline: '<b>AILatest Journal</b> — Journal search & submission decision tool for researchers. Aggregates SCI/SSCI, CAS tiers, JCR, ESI, CSSCI, PKU Core, ZJU directory and more. Favorites, ratings, cross-device sync.',
@@ -89,6 +92,9 @@
       login: 'Sign in', logout: 'Sign out',
       fav_added: 'Saved', fav_removed: 'Removed',
       syncing: 'Syncing…', synced: 'Synced',
+      wos_subjects: 'WoS Subjects',
+      wos_search_ph: 'Filter subjects (A-Z)…',
+      wos_clear_title: 'Clear selection',
     },
   };
 
@@ -535,6 +541,63 @@
   let aliasTargetsByKey = new Map();
   let aliasDisplayByTitle = new Map();
 
+
+  // ── Title-case helpers (用户偏好：源数据保留全大写，渲染时 transform) ──
+  const TITLECASE_LOWER = new Set(['of','and','the','in','on','for','to','a','an','with','as','at','by','from','but','or','nor','vs','via','per']);
+  const TITLECASE_KEEP = new Set([
+    'IEEE','ACM','NASA','IUPAC','DNA','RNA','USA','UK','EU','UN','SIAM','AAAS','NATO',
+    'PLOS','ACS','JAMA','BMJ','PNAS','MIT','NIH','NIST','SPIE','OSA','RSC','IOP',
+    'APA','OECD','ISO','UNESCO','WHO','FDA','EPA','EMBL','EMBO','CERN','LHC',
+    'AI','ML','AR','VR','GIS','GPS','IT','HCI','HVAC','LED','OLED','PCB','RFID',
+    'PDF','URL','HTML','CSS','API','SDK','SQL','TCP','UDP','HTTP','HTTPS',
+    'PV','UV','IR','XRD','MRI','CT','EEG','ECG','PCR','RNA','BMC','PLOS','SAGE',
+    '3D','2D','4D'
+  ]);
+  function titleCase(s) {
+    if (!s) return s;
+    const str = String(s);
+    // 仅当原字符串看起来是「全大写英文」时转换；含小写字母则保留原样
+    if (/[a-z]/.test(str)) return str;
+    if (!/[A-Z]/.test(str)) return str;
+    // tokenize: 保留空格/连字符/标点为 token
+    const tokens = str.split(/([^A-Za-z0-9'&]+)/);
+    // 找出所有「单词 token」的索引，便于判断首/尾词
+    const wordIdx = tokens.map((t, i) => /[A-Za-z]/.test(t) ? i : -1).filter(i => i >= 0);
+    const firstWord = wordIdx[0], lastWord = wordIdx[wordIdx.length - 1];
+    return tokens.map((tok, i) => {
+      if (!/[A-Za-z]/.test(tok)) return tok;
+      const upper = tok.toUpperCase();
+      // 缩写白名单：保留全大写
+      if (TITLECASE_KEEP.has(upper)) return upper;
+      // 含数字的词（如 H2O, CO2, 2D, B2B）保留全大写
+      if (/\d/.test(tok)) return upper;
+      // 罗马数字（II, III, IV, IX 等）保留全大写
+      if (/^M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$/.test(upper) && upper.length > 1) return upper;
+      const lower = tok.toLowerCase();
+      // 首尾词强制大写；中间小词保持小写
+      if (i !== firstWord && i !== lastWord && TITLECASE_LOWER.has(lower)) return lower;
+      return lower.charAt(0).toUpperCase() + lower.slice(1);
+    }).join('');
+  }
+
+  // ── 国际期刊 ISSN/eISSN/标题反向索引（供 CAST 等国内源抽屉查国际信息）──
+  const intIndex = { byIssn: Object.create(null), byName: Object.create(null) };
+  function buildIntIndex(arr) {
+    for (const r of arr) {
+      if (r.issn) intIndex.byIssn[String(r.issn).toUpperCase()] = r;
+      if (r.eissn) intIndex.byIssn[String(r.eissn).toUpperCase()] = r;
+      const nk = normTitle(r.name || r.en_name || '');
+      if (nk) intIndex.byName[nk] = r;
+    }
+  }
+  function lookupInt(r) {
+    const issns = [r.issn, r.eissn, r.cn_code].filter(Boolean).map(s => String(s).toUpperCase());
+    for (const i of issns) if (intIndex.byIssn[i]) return intIndex.byIssn[i];
+    const nk = normTitle(r.en_name || r.name || '');
+    if (nk && intIndex.byName[nk]) return intIndex.byName[nk];
+    return null;
+  }
+
   function lookupOA(r) {
     if (!oaMap) return null;
     const keys = [r.issn, r.eissn].filter(Boolean).map(s => String(s).toUpperCase());
@@ -549,6 +612,8 @@
   let activeIndices = new Set(['SCIE','SSCI','AHCI','ESCI','EI']);
   let activeZones = new Set();
   let activeFeats = new Set();
+  let activeWos = new Set();
+  let wosCats = [];   // [{name,count}] sorted A-Z
   let activeQuery = '';
   let activeDom = 'cnkx';   // 中国科协 高质量科技期刊分级目录 (2025-12 修订, 11084 条)
   const PAGE = 100;
@@ -703,6 +768,14 @@
     $$('[data-i18n]').forEach(el => {
       const k = el.dataset.i18n;
       if (I18N[lang][k]) el.innerHTML = I18N[lang][k];
+    });
+    $$('[data-i18n-placeholder]').forEach(el => {
+      const k = el.dataset.i18nPlaceholder;
+      if (I18N[lang][k]) el.placeholder = I18N[lang][k];
+    });
+    $$('[data-i18n-title]').forEach(el => {
+      const k = el.dataset.i18nTitle;
+      if (I18N[lang][k]) el.title = I18N[lang][k];
     });
     const search = activeTab === 'int' ? 'search_int'
                   : activeTab === 'fav' ? 'search_fav'
@@ -1499,7 +1572,7 @@
     const fid = favId(r);
     rowRecordsByFid[fid] = { ...r, __src: src };
     const name = r.name || r.cn_name || '';
-    const enName = r.en_name ? `<span class="jname-cn">${escape(r.en_name)}</span>` : '';
+    const enName = r.en_name ? `<span class="jname-cn">${escape(titleCase(r.en_name))}</span>` : '';
     const isnCell = r.issn || r.cn_code
       ? `<span class="jissn">${escape(r.issn || r.cn_code)}</span>`
       : '<span class="muted-cell">—</span>';
@@ -1507,7 +1580,7 @@
     const tierBadge = showTier && tierValue ? badgeTier(tierValue) : '';
     return `<tr class="j-row clickable" data-fid="${escape(fid)}" data-src="${escape(src)}">
       ${showTier ? `<td style="width:60px">${tierBadge}</td>` : ''}
-      <td class="jname" style="font-size:13.5px">${escape(name.replace(/\*$/,''))}${enName}</td>
+      <td class="jname" style="font-size:13.5px">${escape(titleCase(name.replace(/\*$/,'')))}${enName}</td>
       <td class="col-issn" style="width:130px">${isnCell}</td>
       ${extraCols}
       <td class="col-cross"><div class="badges">${extraBadges}${crossBadges}</div></td>
@@ -1519,7 +1592,7 @@
     const fid = favId(r);
     rowRecordsByFid[fid] = { ...r, __src: 'int' };
     const flagshipHtml = r.flagship ? `<span class="flagship-star fs-${r.flagship}" title="${r.flagship.replace('_',' ')}">★</span>` : '';
-    const nameHtml = `<div class="jname">${flagshipHtml}${escape(r.name)}${r.cn_name ? `<span class="jname-cn">${escape(r.cn_name)}</span>` : ''}${aliasHintHtml(r)}</div>`;
+    const nameHtml = `<div class="jname">${flagshipHtml}${escape(titleCase(r.name))}${r.cn_name ? `<span class="jname-cn">${escape(r.cn_name)}</span>` : ''}${aliasHintHtml(r)}</div>`;
     const abbr = r.abbr20 ? `<span class="jabbr">${escape(r.abbr20)}</span>` : '';
     const issn = r.issn || r.eissn
       ? `<span class="jissn">${r.issn||''}${r.eissn ? ` <span class="eissn">e:${r.eissn}</span>` : ''}</span>`
@@ -1580,6 +1653,12 @@
     if (activeFeats.has('flagship') && !r.flagship) return false;
     if (activeFeats.has('warning') && !r.warning) return false;
     if (activeCat !== '__all' && r.esi_category !== activeCat) return false;
+    if (activeWos.size) {
+      const wc = r.wos_categories || [];
+      let ok = false;
+      for (const c of wc) if (activeWos.has(c)) { ok = true; break; }
+      if (!ok) return false;
+    }
     if (activeQuery) {
       return scoreRecord(r, activeQuery) > 0;
     }
@@ -1703,6 +1782,32 @@
         $$('.nav-item', $('.sidebar')).forEach(n => n.classList.remove('active'));
         b.classList.add('active');
         activeCat = '__all';
+        shown = PAGE;
+        renderInt();
+      });
+    });
+  }
+
+
+  function renderWosList() {
+    const box = $('#wos-list');
+    if (!box || !wosCats.length) return;
+    const search = ($('#wos-search')?.value || '').trim().toLowerCase();
+    const filtered = search
+      ? wosCats.filter(c => c.name.toLowerCase().includes(search))
+      : wosCats;
+    box.innerHTML = filtered.map(c =>
+      `<label class="wos-item${activeWos.has(c.name) ? ' on' : ''}">
+         <input type="checkbox" value="${escape(c.name)}" ${activeWos.has(c.name) ? 'checked' : ''}>
+         <span class="wos-name">${escape(c.name)}</span>
+         <span class="wos-count">${c.count}</span>
+       </label>`
+    ).join('');
+    // bind change
+    box.querySelectorAll('input[type=checkbox]').forEach(cb => {
+      cb.addEventListener('change', () => {
+        if (cb.checked) activeWos.add(cb.value); else activeWos.delete(cb.value);
+        cb.closest('.wos-item').classList.toggle('on', cb.checked);
         shown = PAGE;
         renderInt();
       });
@@ -2004,7 +2109,8 @@
     const drawer = $('#j-drawer'), scrim = $('#drawer-scrim'), body = $('#drawer-body');
     if (!drawer || !body) return;
     const src = r.__src || 'int';
-    const title = r.name || r.cn_name || '';
+    const titleRaw = r.name || r.cn_name || '';
+    const title = titleCase(titleRaw);
     const sub = r.cn_name && r.cn_name !== title ? r.cn_name
               : r.en_name && r.en_name !== title ? r.en_name : '';
     const issn = r.issn || r.cn_code || '';
@@ -2012,13 +2118,16 @@
 
     // （按用户要求：不再外链到 LetPub / SCImago / Scholar / ISSN Portal，一切自己做）
 
-    // 徽章块
-    const intBadges = src === 'int' ? [
-      ...(r.indices || []).map(badgeIndex),
-      badgeCAS(r.cas_zone, r.cas_top),
-      badgeIF(r.if_2024, r.if_quartile),
-      badgeCCF(r.ccf),
-      r.warning ? badgeWarn() : '',
+    // 国际信息 join（非 int 源时按 ISSN/eISSN/标题查 WoS 国际表）
+    const intRec = src === 'int' ? r : lookupInt(r);
+    const ir = intRec || {};
+    // 徽章块（int 源用 r 自身，国内源用 join 到的国际记录）
+    const intBadges = (src === 'int' || intRec) ? [
+      ...((ir.indices) || []).map(badgeIndex),
+      badgeCAS(ir.cas_zone, ir.cas_top),
+      badgeIF(ir.if_2024, ir.if_quartile),
+      badgeCCF(ir.ccf),
+      ir.warning ? badgeWarn() : '',
     ].filter(Boolean).join('') : '';
     const tierBadge = r.tier && /^T[123]$/.test(r.tier) ? badgeTier(r.tier)
                     : r.tier ? `<span class="tier-pill t3">${escape(tn(r.tier, "tier"))}</span>` : '';
@@ -2072,44 +2181,44 @@
         : '';
     })();
 
-    // 核心指标数值（带年份，避免不知道是哪一版数据）
+    // 核心指标数值（带年份，避免不知道是哪一版数据）。优先用 join 到的国际记录 ir
     const stats = [];
-    if (r.if_2024 != null) stats.push([T('影响因子 (JCR 2024)','Impact Factor (JCR 2024)'), r.if_2024]);
-    if (r.if_quartile) stats.push([T('JCR 分区 (2024)','JCR Quartile (2024)'), r.if_quartile]);
-    if (r.if_rank) stats.push([T('IF 排名 (2024)','IF Rank (2024)'), r.if_rank]);
-    if (r.cas_zone) stats.push([T('中科院 2025 大类','CAS 2025 Major'), r.cas_zone + T('区','') + (r.cas_top ? ' · Top' : '')]);
-    if (r.cas_zone_2023 && r.cas_zone_2023 !== r.cas_zone) stats.push([T('中科院 2023 大类','CAS 2023 Major'), r.cas_zone_2023 + T('区','')]);
-    if (r.cas_xr && r.cas_xr.zone) stats.push([T('新锐版 2026','Emerging 2026'), r.cas_xr.zone + T('区','')]);
-    if (r.cas_oa === true) stats.push([T('开放获取','Open Access'), 'OA ✓']);
+    if (ir.if_2024 != null) stats.push([T('影响因子 (JCR 2024)','Impact Factor (JCR 2024)'), ir.if_2024]);
+    if (ir.if_quartile) stats.push([T('JCR 分区 (2024)','JCR Quartile (2024)'), ir.if_quartile]);
+    if (ir.if_rank) stats.push([T('IF 排名 (2024)','IF Rank (2024)'), ir.if_rank]);
+    if (ir.cas_zone) stats.push([T('中科院 2025 大类','CAS 2025 Major'), ir.cas_zone + T('区','') + (ir.cas_top ? ' · Top' : '')]);
+    if (ir.cas_zone_2023 && ir.cas_zone_2023 !== ir.cas_zone) stats.push([T('中科院 2023 大类','CAS 2023 Major'), ir.cas_zone_2023 + T('区','')]);
+    if (ir.cas_xr && ir.cas_xr.zone) stats.push([T('新锐版 2026','Emerging 2026'), ir.cas_xr.zone + T('区','')]);
+    if (ir.cas_oa === true) stats.push([T('开放获取','Open Access'), 'OA ✓']);
     const statsHTML = stats.length ? `<div class="stats-grid">${stats.map(([k,v]) =>
       `<div class="stat"><div class="stat-v">${escape(String(v))}</div><div class="stat-k">${k}</div></div>`
     ).join('')}</div>` : '';
 
     // WoS 学科分类
-    const wosHTML = (Array.isArray(r.wos_categories) && r.wos_categories.length)
+    const wosHTML = (Array.isArray(ir.wos_categories) && ir.wos_categories.length)
       ? `<div class="drawer-section">
            <h4>${T('Web of Science 分类','Web of Science Categories')}</h4>
-           <div class="cat-chips">${r.wos_categories.map(c => `<span class="cat-chip">${escape(c)}</span>`).join('')}</div>
-           ${r.esi_category ? `<div class="esi-row"><span class="esi-label">${T('ESI 高被引学科','ESI Highly-Cited Field')}</span><span class="esi-val">${escape(r.esi_category)}</span></div>` : ''}
+           <div class="cat-chips">${ir.wos_categories.map(c => `<span class="cat-chip">${escape(c)}</span>`).join('')}</div>
+           ${ir.esi_category ? `<div class="esi-row"><span class="esi-label">${T('ESI 高被引学科','ESI Highly-Cited Field')}</span><span class="esi-val">${escape(ir.esi_category)}</span></div>` : ''}
          </div>`
       : '';
 
     // Ei Compendex 主题分类
-    const eiHTML = (Array.isArray(r.ei_subjects) && r.ei_subjects.length)
+    const eiHTML = (Array.isArray(ir.ei_subjects) && ir.ei_subjects.length)
       ? `<div class="drawer-section">
            <h4>${T('Ei Compendex 主题','Ei Compendex Subjects')}</h4>
-           <div class="cat-chips">${r.ei_subjects.map(c => `<span class="cat-chip">${escape(c)}</span>`).join('')}</div>
+           <div class="cat-chips">${ir.ei_subjects.map(c => `<span class="cat-chip">${escape(c)}</span>`).join('')}</div>
          </div>`
       : '';
 
     // 中科院完整层级（2025 大类分区）
     const casHTML = (() => {
       const blocks = [];
-      if (r.cas_major_cn) {
-        blocks.push(`<div class="cas-major"><span class="zone-tier">${T('大类','Major')}</span> ${escape(tn(r.cas_major_cn, 'domain'))} · <b>${r.cas_major_zone || r.cas_zone || '?'}${T('区','')}</b>${r.cas_top ? ' · Top' : ''}</div>`);
+      if (ir.cas_major_cn) {
+        blocks.push(`<div class="cas-major"><span class="zone-tier">${T('大类','Major')}</span> ${escape(tn(ir.cas_major_cn, 'domain'))} · <b>${ir.cas_major_zone || ir.cas_zone || '?'}${T('区','')}</b>${ir.cas_top ? ' · Top' : ''}</div>`);
       }
-      if (Array.isArray(r.cas_sub_cats) && r.cas_sub_cats.length) {
-        blocks.push(`<ul class="cas-sub-list">${r.cas_sub_cats.map(s => {
+      if (Array.isArray(ir.cas_sub_cats) && ir.cas_sub_cats.length) {
+        blocks.push(`<ul class="cas-sub-list">${ir.cas_sub_cats.map(s => {
           const nm = typeof s === 'string' ? s : (s.name || '');
           const zn = typeof s === 'object' ? s.zone : null;
           return `<li><span class="zone-tier zone-tier-sub">${T('小类','Sub')}</span> ${escape(nm)}${zn ? ` · <b>${zn}${T('区','')}</b>` : ''}</li>`;
@@ -2122,7 +2231,7 @@
 
     // 中科院新锐版 2026（独立块）
     const xrHTML = (() => {
-      const xr = r.cas_xr;
+      const xr = ir.cas_xr;
       if (!xr || !xr.zone) return '';
       const blocks = [];
       const majorCn = xr.major_cn || '';
@@ -2152,15 +2261,15 @@
       : '';
 
     // 警示刊
-    const warnHTML = r.warning
+    const warnHTML = ir.warning
       ? `<div class="drawer-section warn-block">
            <h4>⚠ ${T('警示期刊提示','Warning Journal Notice')}</h4>
-           <p>${T('该刊被中科院纳入','This journal is included in the CAS')} ${escape(r.warning_year || T('最新','latest'))} ${T('国际期刊预警名单。投稿前请谨慎评估，留意审稿周期、版面费、学术影响等因素。','International Journal Warning List. Evaluate carefully before submission — review cycle, APC, and academic impact.')}</p>
+           <p>${T('该刊被中科院纳入','This journal is included in the CAS')} ${escape(ir.warning_year || T('最新','latest'))} ${T('国际期刊预警名单。投稿前请谨慎评估，留意审稿周期、版面费、学术影响等因素。','International Journal Warning List. Evaluate carefully before submission — review cycle, APC, and academic impact.')}</p>
          </div>`
       : '';
 
     // OpenAlex enriched block (homepage / OA / APC)
-    const oa = r.oa || lookupOA(r);
+    const oa = ir.oa || lookupOA(ir.issn || ir.eissn ? ir : r);
     const oaHTML = oa ? (() => {
       const labelMap = {
         diamond:                 { text: T('Diamond OA · 读投全免费','Diamond OA · free to read & publish'),   cls: 'oa-diamond',  desc: T('由机构/基金全额资助，作者读者都不付费。','Fully funded by institutions / grants. No fees for authors or readers.') },
@@ -2441,6 +2550,13 @@
       activeFeats = new Set($$('#feat-toggles input:checked').map(i => i.value));
       shown = PAGE; renderInt();
     });
+    $('#wos-search')?.addEventListener('input', () => renderWosList());
+    $('#wos-clear')?.addEventListener('click', () => {
+      activeWos.clear();
+      const inp = $('#wos-search'); if (inp) inp.value = '';
+      renderWosList();
+      shown = PAGE; renderInt();
+    });
     $('#q').addEventListener('input', (e) => {
       activeQuery = e.target.value.trim();
       shown = PAGE;
@@ -2480,6 +2596,7 @@
       lang = lang === 'zh' ? 'en' : 'zh';
       localStorage.setItem('ailatest.lang', lang);
       applyI18n();
+      renderWosList();
       // re-render because categories etc. are dynamic text
       if (activeTab === 'dom') renderDomestic();
       else if (activeTab === 'fav') renderFav();
@@ -2580,11 +2697,17 @@
       journals = j; domestic = d; meta = m; esiCats = esi; oaMap = oa || {};
       journals.forEach(journalSearchMeta);
       buildDomIndex(domestic);
+      buildIntIndex(journals);
+      // 计算 WoS 学科表（按字母 A-Z 排序）
+      const _wc = Object.create(null);
+      for (const r of journals) for (const c of (r.wos_categories||[])) _wc[c] = (_wc[c]||0)+1;
+      wosCats = Object.entries(_wc).map(([name,count])=>({name,count})).sort((a,b)=>a.name.localeCompare(b.name,'en'));
       if (meta?.total && $('#total')) $('#total').textContent = meta.total.toLocaleString();
       $('#hint').textContent = lang === 'zh'
         ? `${T('已加载','Loaded')} ${journals.length.toLocaleString()} ${T('本期刊','journals')}`
         : `${journals.length.toLocaleString()} journals loaded`;
       renderCatList();
+      renderWosList();
       renderInt();
       if (user) await pullFavs();
     } catch (e) {
