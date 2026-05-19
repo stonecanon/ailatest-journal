@@ -353,13 +353,13 @@ main.main {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 64px;
-  height: 30px;
-  padding: 0 14px;
+  min-width: 92px;
+  height: 36px;
+  padding: 0 20px;
   background: var(--paper-soft);
   border: 0;
   border-radius: 999px;
-  font-size: 18px;
+  font-size: 22px;
   line-height: 1;
   color: var(--ink-faint);
   cursor: pointer;
@@ -378,7 +378,7 @@ main.main {
   color: var(--accent);
 }
 
-.col-fav { width: 80px; text-align: center; }
+.col-fav { width: 108px; text-align: center; }
 
 /* drawer 大类/小类 标签（区分新锐版双 4 区等情况） */
 .zone-tier {
