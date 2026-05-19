@@ -5,10 +5,11 @@
 
   const I18N = {
     zh: {
-      tagline: '<b>ailatest · journal</b> — 面向中文科研人员的一站式期刊查询工具，聚合国际 SCI/SSCI 与国内分级目录，支持收藏、解锁院校自编目录、跨设备同步。',
+      tagline: '<b>AILatest Journal</b> — 面向科研人员的期刊检索与投稿决策工具，聚合 SCI/SSCI、中科院分区、JCR、ESI、CSSCI、北大核心、浙大目录等数据，支持收藏、评分与跨设备同步。',
       indices: '索引', cas_zone: '中科院 2025 分区', filters: '附加筛选',
       esi: 'ESI 学科大类', all: '全部',
       z1: '1 区', z2: '2 区', z3: '3 区', z4: '4 区',
+      filter_xinrui: '新锐分区', filter_warning: '预警',
       domestic_sources: '国内分级来源',
       src_cnkx: '中国科协高质量目录',
       src_cssci_core: 'CSSCI 来源期刊',
@@ -17,6 +18,12 @@
       src_zju: '浙江大学 2024',
       src_zjucity: '高校自编目录 2023',
       src_ccft: 'CCF 中文 T 分区',
+      nav_sub_inhouse: '院校自编目录',
+      locked_school_a: '🔒 学校 A · 2023',
+      paid_label: '付费',
+      drawer_kicker: '期刊详情',
+      pwa_install: '📲 安装到主屏',
+      footer_data: '数据来源：Clarivate WoS Core Collection · JCR 2025 · ESI · 中科院文献情报中心分区表 2025 · ShowJCR (GPL-3.0) · 中国科协 2025 · 浙江大学 2024 · 高校自编目录 2023。© <a href="https://journal.ailatest.org">AILatest Journal</a>',
       tab_int: '国际 SCI/SSCI', tab_dom: '国内分级目录', tab_fav: '我的收藏',
       loading: '加载中…',
       hero_title_int: 'SCI / SSCI 国际期刊检索',
@@ -28,7 +35,7 @@
       col_name: '期刊 Title', col_abbr: '缩写 Abbr', col_badges: '索引 / IF / 分区 / 徽章',
       col_cat: 'ESI / 中科院大类',
       hero_title_dom: '国内学术期刊分级目录',
-      hero_body_dom: '<b>CSSCI 来源期刊 (2025-2026)</b> 正刊与扩展版；<b>北大《中文核心期刊要目总览》(2023 年版)</b>；<b>浙江大学 2024 版</b> 与 <b>高校自编目录 2023</b>（付费解锁）；<b>CCF 推荐中文科技期刊 2025</b> T 分区。<span class="muted">（中国科协 T1/T2/T3 目录已暂时下架，数据校验中，稍后恢复。）</span>',
+      hero_body_dom: '<b>中国科协 高质量科技期刊分级目录 (2025-12 修订)</b> 共 11,084 条 / 59 学科领域；<b>CSSCI 来源期刊 (2025-2026)</b> 正刊与扩展版；<b>北大《中文核心期刊要目总览》(2023 年版)</b>；<b>浙江大学 2024 版</b> 与 <b>高校自编目录 2023</b>（付费解锁）；<b>CCF 推荐中文科技期刊 2025</b> T 分区。',
       hero_note_dom: 'CSSCI / 北大核心为扫描 PDF OCR 提取，可能存在个别错字。',
       search_int: '搜索：期刊全称 / 官方缩写 / 社群缩写 / ISSN / 中文刊名',
       search_dom: '搜索：中文刊名 / 英文刊名 / ISSN / CN 号',
@@ -41,10 +48,11 @@
       syncing: '同步中…', synced: '已同步',
     },
     en: {
-      tagline: '<b>ailatest · journal</b> — One-stop journal index for Chinese researchers. Aggregates international SCI/SSCI indexes with Chinese tiered directories. Favorites, institution-locked catalogs, cross-device sync.',
+      tagline: '<b>AILatest Journal</b> — Journal search & submission decision tool for researchers. Aggregates SCI/SSCI, CAS tiers, JCR, ESI, CSSCI, PKU Core, ZJU directory and more. Favorites, ratings, cross-device sync.',
       indices: 'Indices', cas_zone: 'CAS 2025 Tier', filters: 'Filters',
       esi: 'ESI Categories', all: 'All',
       z1: 'T1', z2: 'T2', z3: 'T3', z4: 'T4',
+      filter_xinrui: 'Emerging Tier', filter_warning: 'Warning List',
       domestic_sources: 'Domestic Sources',
       src_cnkx: 'CAST Tiered Directory',
       src_cssci_core: 'CSSCI Core',
@@ -53,6 +61,12 @@
       src_zju: 'ZJU 2024',
       src_zjucity: 'School A 2023',
       src_ccft: 'CCF-T (Chinese)',
+      nav_sub_inhouse: 'In-house School Directories',
+      locked_school_a: '🔒 School A · 2023',
+      paid_label: 'Paid',
+      drawer_kicker: 'Journal Details',
+      pwa_install: '📲 Install to Home',
+      footer_data: 'Sources: Clarivate WoS Core Collection · JCR 2025 · ESI · CAS NSL Tiers 2025 · ShowJCR (GPL-3.0) · CAST 2025 · ZJU 2024 · School A 2023. © <a href="https://journal.ailatest.org">AILatest Journal</a>',
       tab_int: 'Int’l SCI/SSCI', tab_dom: 'Domestic (CN)', tab_fav: 'My Favorites',
       loading: 'Loading…',
       hero_title_int: 'International SCI / SSCI Search',
@@ -64,7 +78,7 @@
       col_name: 'Journal Title', col_abbr: 'Abbr', col_badges: 'Index / IF / Tier / Badges',
       col_cat: 'ESI / CAS Major',
       hero_title_dom: 'Domestic Chinese Journal Directories',
-      hero_body_dom: '<b>CSSCI 2025-2026</b> core & extended; <b>PKU Core (2023)</b>; <b>ZJU 2024</b>; <b>School A 2023</b>; <b>CCF Recommended Chinese Journals 2025</b>. <span class="muted">(CAST tiered directory temporarily disabled — data under review.)</span>',
+      hero_body_dom: '<b>CAST High-Quality Sci-Tech Journal Tiered Directory (Dec 2025)</b> — 11,084 journals across 59 disciplines; <b>CSSCI 2025-2026</b> core & extended; <b>PKU Core (2023)</b>; <b>ZJU 2024</b>; <b>School A 2023</b> (paywalled); <b>CCF Recommended Chinese Journals 2025</b> tiered.',
       hero_note_dom: 'CSSCI / PKU Core extracted via OCR from scanned PDF; minor typos possible.',
       search_int: 'Search: title / abbr / acronym / ISSN / Chinese name',
       search_dom: 'Search: Chinese name / English name / ISSN / CN',
@@ -80,6 +94,7 @@
 
   // ───────── state ─────────
   let lang = localStorage.getItem('ailatest.lang') || 'zh';
+  const T = (zh_, en_) => lang === 'en' ? en_ : zh_;
   let theme = localStorage.getItem('ailatest.theme') || 'light';
   document.documentElement.dataset.theme = theme;
 
@@ -139,7 +154,7 @@
     let data = null;
     try { data = await resp.json(); } catch (_) {}
     if (!resp.ok) {
-      const message = data?.error || `${fallback}（HTTP ${resp.status}）`;
+      const message = data?.error || `${fallback}${T('（HTTP ',' (HTTP ')}${resp.status}${T('）',')')}`;
       throw new Error(message);
     }
     return data || {};
@@ -147,9 +162,45 @@
 
   function fetchFailureMessage(err, stage) {
     if (err instanceof TypeError && /fetch/i.test(err.message || '')) {
-      return `${stage}：网络请求失败，请检查代理/DNS/CORS 后重试`;
+      return `${stage}${T('：网络请求失败，请检查代理/DNS/CORS 后重试',': Network request failed, check proxy/DNS/CORS and retry')}`;
     }
-    return err.message || `${stage}失败`;
+    return err.message || `${stage}${T('失败',' failed')}`;
+  }
+
+  function getAnalyticsId(key, storage) {
+    try {
+      let id = storage.getItem(key);
+      if (!id) {
+        id = (crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`);
+        storage.setItem(key, id);
+      }
+      return id;
+    } catch (_) {
+      return '';
+    }
+  }
+
+  function trackPageview() {
+    const payload = {
+      path: `${location.pathname}${location.search ? '?' + location.search.slice(1, 180) : ''}`,
+      referrer: document.referrer || '',
+      visitor_id: getAnalyticsId('ailatest.analytics.visitor', localStorage),
+      session_id: getAnalyticsId('ailatest.analytics.session', sessionStorage),
+    };
+    const body = JSON.stringify(payload);
+    const url = `${API_BASE}/analytics/pageview`;
+    try {
+      if (navigator.sendBeacon) {
+        const blob = new Blob([body], { type: 'application/json' });
+        if (navigator.sendBeacon(url, blob)) return;
+      }
+    } catch (_) {}
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body,
+      keepalive: true,
+    }).catch(() => {});
   }
 
   function t(k) { return I18N[lang][k] ?? k; }
@@ -268,7 +319,7 @@
         if (Array.isArray(parsed) && parsed.length) {
           favLists = parsed.map(l => ({
             id: String(l.id),
-            name: String(l.name || '未命名'),
+            name: String(l.name || T('未命名','Untitled')),
             ids: Array.isArray(l.ids) ? l.ids.map(String) : [],
           }));
           activeListId = localStorage.getItem('ailatest.activeListId') || favLists[0].id;
@@ -280,7 +331,7 @@
     // migrate from old flat favs (ailatest.favs)
     let legacy = [];
     try { legacy = JSON.parse(localStorage.getItem('ailatest.favs') || '[]'); } catch(_) {}
-    favLists = [{ id: 'default', name: '默认收藏', ids: [...legacy] }];
+    favLists = [{ id: 'default', name: T('默认收藏','My Favorites'), ids: [...legacy] }];
     activeListId = 'default';
     persistFavLists(false);
   }
@@ -346,7 +397,7 @@
   // list 管理
   function createList(name) {
     const id = 'l_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
-    favLists.push({ id, name: name || '新清单', ids: [] });
+    favLists.push({ id, name: name || T('新清单','New list'), ids: [] });
     activeListId = id;
     persistFavLists();
     return id;
@@ -431,7 +482,7 @@
           // 合并：以 list.id 为键。云端有的覆盖本地（云为权威），本地独有的保留追加。
           const cloudMap = new Map(cloud.map(l => [String(l.id), {
             id: String(l.id),
-            name: String(l.name || '未命名'),
+            name: String(l.name || T('未命名','Untitled')),
             ids: Array.isArray(l.ids) ? l.ids.map(String) : [],
           }]));
           const merged = [];
@@ -552,12 +603,12 @@
       avgEl.textContent = avg.toFixed(1);
       starsEl.innerHTML = renderStarsStatic(avg);
       starsEl.style.display = '';
-      cntEl.textContent = `${n} 人`;
+      cntEl.textContent = `${n} ${T('人','reviews')}`;
     } else {
       avgEl.textContent = '—';
       starsEl.innerHTML = '';
       starsEl.style.display = 'none';
-      cntEl.textContent = '暂无评分';
+      cntEl.textContent = T('暂无评分','No ratings yet');
     }
   }
   function paintRatingInput(key, mine) {
@@ -596,8 +647,8 @@
     apply(mine || 0);
     if (loggedIn) {
       hint.textContent = mine
-        ? `已评 ${mine.toFixed(1)} 星 · 再次点击修改 · 长按清除`
-        : '半星可评 · 点击星左半为 0.5，右半为 1 星';
+        ? `${T('已评','Rated')} ${mine.toFixed(1)}${T(' 星 · 再次点击修改 · 长按清除',' stars · click again to change · long-press to clear')}`
+        : T('半星可评 · 点击星左半为 0.5，右半为 1 星','Half-stars supported · left half = 0.5, right half = 1 star');
       // hover preview
       wrap.querySelectorAll('.half-hit').forEach(hit => {
         hit.addEventListener('mouseenter', () => apply(Number(hit.dataset.value)));
@@ -605,13 +656,13 @@
           e.stopPropagation();
           const v = Number(hit.dataset.value);
           apply(v);
-          hint.textContent = '提交中…';
+          hint.textContent = T('提交中…','Submitting…');
           const res = await putRating(key, v);
           if (res) {
             paintRatingDisplay({ avg: res.avg, n: res.n });
-            hint.textContent = `已评 ${v.toFixed(1)} 星 · 再次点击修改 · 长按清除`;
+            hint.textContent = `${T('已评','Rated')} ${v.toFixed(1)}${T(' 星 · 再次点击修改 · 长按清除',' stars · click again to change · long-press to clear')}`;
           } else {
-            hint.textContent = '提交失败，请稍后再试';
+            hint.textContent = T('提交失败，请稍后再试','Submission failed, please retry');
           }
         });
       });
@@ -620,14 +671,14 @@
       wrap.addEventListener('mousedown', () => {
         pressT = setTimeout(async () => {
           pressT = null;
-          hint.textContent = '清除中…';
+          hint.textContent = T('清除中…','Clearing…');
           const res = await deleteRating(key);
           if (res) {
             apply(0);
             paintRatingDisplay({ avg: res.avg, n: res.n });
-            hint.textContent = '已清除评分 · 可重新打分';
+            hint.textContent = T('已清除评分 · 可重新打分','Rating cleared · you can rate again');
           } else {
-            hint.textContent = '清除失败';
+            hint.textContent = T('清除失败','Clear failed');
           }
         }, 700);
       });
@@ -635,7 +686,7 @@
       wrap.addEventListener('mouseup', cancelPress);
       wrap.addEventListener('mouseleave', () => { cancelPress(); apply(mine || 0); });
     } else {
-      hint.innerHTML = '<a href="#" id="rating-login-link">登录</a>后可打分（邮箱验证码 / GitHub / Google）';
+      hint.innerHTML = T('<a href="#" id="rating-login-link">登录</a>后可打分（邮箱验证码 / GitHub / Google）','<a href="#" id="rating-login-link">Sign in</a> to rate (email code / GitHub / Google)');
       const a = document.getElementById('rating-login-link');
       if (a) a.addEventListener('click', (e) => { e.preventDefault(); document.getElementById('login-btn')?.click(); });
     }
@@ -719,15 +770,15 @@
   function lockedPrompt(sourceKey, sourceLabel, recordCount) {
     return `
       <div class="section-block locked-block">
-        <h3 class="section-title">${escape(sourceLabel)} <span class="lock-pill">🔒 付费解锁</span></h3>
-        <div class="section-subtitle">此学校自编目录为付费内容，共 ${recordCount} 条记录。输入解锁码后自动保存在本机浏览器，下次免输。</div>
+        <h3 class="section-title">${escape(sourceLabel)} <span class="lock-pill">🔒 ${T('付费解锁','Paid unlock')}</span></h3>
+        <div class="section-subtitle">${T('此学校自编目录为付费内容，共','This in-house directory is paid content,')} ${recordCount} ${T('条记录。输入解锁码后自动保存在本机浏览器，下次免输。','records. Enter your unlock code; it will be saved on this device for next time.')}</div>
         <form class="unlock-form" data-src="${escape(sourceKey)}">
-          <input class="unlock-input" type="text" autocomplete="off" spellcheck="false" placeholder="解锁码（如 school-a-xxxxxxxx）" />
-          <button type="submit" class="unlock-btn">解锁</button>
+          <input class="unlock-input" type="text" autocomplete="off" spellcheck="false" placeholder="${T('解锁码（如 school-a-xxxxxxxx）','Unlock code (e.g. school-a-xxxxxxxx)')}" />
+          <button type="submit" class="unlock-btn">${T('解锁','Unlock')}</button>
           <div class="unlock-msg" role="status"></div>
         </form>
         <div class="unlock-help">
-          <p>未购买？<a href="mailto:support@ailatest.org?subject=解锁码申请（${escape(sourceKey)}）">联系获取解锁码</a></p>
+          <p>${T('未购买？','Don’t have a code yet?')}<a href="mailto:support@ailatest.org?subject=Unlock code request (${escape(sourceKey)})">${T('联系获取解锁码','Contact us to get a code')}</a></p>
         </div>
       </div>
     `;
@@ -747,22 +798,22 @@
       modal.className = 'login-modal';
       modal.innerHTML = `
         <div class="login-card" role="dialog" aria-labelledby="login-title">
-          <button class="login-close" aria-label="关闭">×</button>
-          <h3 id="login-title">登录 / 注册</h3>
-          <p class="login-sub">跨设备同步收藏、投稿经验、打分记录</p>
+          <button class="login-close" aria-label="${T('关闭','Close')}">×</button>
+          <h3 id="login-title">${T('登录 / 注册','Sign in / Sign up')}</h3>
+          <p class="login-sub">${T('跨设备同步收藏、投稿经验、打分记录','Sync favorites, submission notes and ratings across devices')}</p>
 
           <form class="login-email" autocomplete="off">
-            <label>邮箱</label>
+            <label>${T('邮箱','Email')}</label>
             <input type="email" name="email" placeholder="you@example.com" required />
             <div class="login-code-row" hidden>
-              <label>6 位验证码</label>
+              <label>${T('6 位验证码','6-digit code')}</label>
               <input type="text" name="code" inputmode="numeric" pattern="\\d{6}" maxlength="6" placeholder="123456" />
             </div>
-            <button type="submit" class="login-btn-primary" data-step="request">发送验证码</button>
+            <button type="submit" class="login-btn-primary" data-step="request">${T('发送验证码','Send code')}</button>
             <div class="login-msg" role="status"></div>
           </form>
 
-          <div class="login-divider"><span>或使用第三方登录</span></div>
+          <div class="login-divider"><span>${T('或使用第三方登录','Or sign in with')}</span></div>
 
           <div class="login-oauth">
             <button class="login-btn-oauth gh" data-provider="github">
@@ -775,7 +826,7 @@
             </button>
           </div>
 
-          <p class="login-tos">登录即同意 <a href="/terms.html">服务条款</a> 与 <a href="/privacy.html">隐私政策</a></p>
+          <p class="login-tos">${T('登录即同意','By signing in you agree to the')} <a href="/terms.html">${T('服务条款','Terms')}</a> ${T('与','and')} <a href="/privacy.html">${T('隐私政策','Privacy Policy')}</a></p>
         </div>
       `;
       document.body.appendChild(modal);
@@ -804,7 +855,7 @@
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ email: requestedEmail }),
             });
-            await readJsonResponse(r, '发送验证码失败');
+            await readJsonResponse(r, T('发送验证码失败','Send code failed'));
             form.dataset.email = requestedEmail;
             emailEl.value = requestedEmail;
             emailEl.readOnly = true;
@@ -812,8 +863,8 @@
             codeEl.required = true;
             codeEl.focus();
             btn.dataset.step = 'verify';
-            btn.textContent = '登录';
-            msg.textContent = '验证码已发送，10 分钟内有效';
+            btn.textContent = T('登录','Sign in');
+            msg.textContent = T('验证码已发送，10 分钟内有效','Code sent · valid for 10 minutes');
             msg.className = 'login-msg ok';
           } else {
             const requestedEmail = form.dataset.email || emailEl.value.trim().toLowerCase();
@@ -825,18 +876,18 @@
                 code:  codeEl.value.trim(),
               }),
             });
-            const d = await readJsonResponse(r, '验证码验证失败');
-            if (!d.token) throw new Error('验证码验证失败：未收到登录凭证');
+            const d = await readJsonResponse(r, T('验证码验证失败','Code verification failed'));
+            if (!d.token) throw new Error(T('验证码验证失败：未收到登录凭证','Code verification failed: no token returned'));
             await finishLogin(d.token, d.user);
             closeLoginModal();
           }
         } catch (err) {
-          const stage = step === 'request' ? '发送验证码' : '验证码登录';
+          const stage = step === 'request' ? T('发送验证码','Send code') : T('验证码登录','Code sign-in');
           msg.textContent = fetchFailureMessage(err, stage);
           msg.className = 'login-msg err';
           if (step === 'verify' && /请先请求验证码|验证码已过期/.test(err.message || '')) {
             btn.dataset.step = 'request';
-            btn.textContent = '发送验证码';
+            btn.textContent = T('发送验证码','Send code');
             codeEl.required = false;
             codeEl.value = '';
             $('.login-code-row', form).hidden = true;
@@ -873,7 +924,7 @@
       const r = await fetch(`${API_BASE}/me`, {
         headers: { 'Authorization': `Bearer ${token}` },
       });
-      me = await readJsonResponse(r, '用户信息获取失败');
+      me = await readJsonResponse(r, T('用户信息获取失败','Failed to fetch user info'));
     }
     user = { ...me, token };
     localStorage.setItem('ailatest.user', JSON.stringify(user));
@@ -906,27 +957,27 @@
   }
   function badgeZone(z, top) {
     if (!z) return '';
-    if (top) return `<span class="zone ztop">TOP·${z}区</span>`;
-    return `<span class="zone z${z}">${z}区</span>`;
+    if (top) return `<span class="zone ztop">TOP·${z}${T('区','')}</span>`;
+    return `<span class="zone z${z}">${z}${T('区','')}</span>`;
   }
   function badgeIF(v, q) {
     if (v === undefined || v === null) return '';
     const qq = q ? ` iq-${q}` : '';
     const qtext = q ? ` · ${q}` : '';
-    return `<span class="if-pill${qq}" title="JCR 影响因子 2024 · JCR 分区${q||'—'}">IF ${(+v).toFixed(1)}${qtext}</span>`;
+    return `<span class="if-pill${qq}" title="${T('JCR 影响因子 2024 · JCR 分区','JCR Impact Factor 2024 · JCR Quartile')}${q||'—'}">IF ${(+v).toFixed(1)}${qtext}</span>`;
   }
   function badgeCAS(z, top) {
     if (!z) return '';
-    if (top) return `<span class="zone ztop" title="中科院大类分区 Top">中科·TOP ${z}区</span>`;
-    return `<span class="zone z${z}" title="中科院大类分区">中科 ${z}区</span>`;
+    if (top) return `<span class="zone ztop" title="${T('中科院大类分区 Top','CAS Major Tier · Top')}">${T('中科·TOP','CAS·TOP')} ${z}${T('区','')}</span>`;
+    return `<span class="zone z${z}" title="${T('中科院大类分区','CAS Major Tier')}">${T('中科','CAS')} ${z}${T('区','')}</span>`;
   }
   // 国内来源交叉徽章
   function badgeDomSrc(tag) {
     const map = {
-      cssci: 'CSSCI', cssci_ext: 'CSSCI 扩', pku: '北大核心',
-      cnkx_T1: '科协 T1', cnkx_T2: '科协 T2', cnkx_T3: '科协 T3',
+      cssci: 'CSSCI', cssci_ext: T('CSSCI 扩','CSSCI Ext'), pku: T('北大核心','PKU Core'),
+      cnkx_T1: T('科协 T1','CAST T1'), cnkx_T2: T('科协 T2','CAST T2'), cnkx_T3: T('科协 T3','CAST T3'),
       ccft_T1: 'CCF-T1', ccft_T2: 'CCF-T2', ccft_T3: 'CCF-T3',
-      zju: '浙大目录', school_a: '学校 A',
+      zju: T('浙大目录','ZJU'), school_a: T('学校 A','School A'),
     };
     const cls = tag.replace(/[^a-z0-9]/gi,'-').toLowerCase();
     return `<span class="domsrc-pill ds-${cls}">${map[tag]||tag}</span>`;
@@ -941,21 +992,21 @@
         const raw = String(tier).trim().toUpperCase();
         // 理工 T1/T2/T3
         const tm = raw.match(/^T([123])$/);
-        if (tm) return `<span class="tier-pill t${tm[1]}" title="中国科协 T${tm[1]} 级">${raw}</span>`;
+        if (tm) return `<span class="tier-pill t${tm[1]}" title="${T('中国科协 T','CAST T')}${tm[1]}${T(' 级',' tier')}">${raw}</span>`;
         // 管理 A/B/C/D
         const am = raw.match(/^([ABCD])$/);
-        if (am) return `<span class="tier-pill ta-${am[1].toLowerCase()}" title="中国科协 ${am[1]} 级（管理类）">${raw}</span>`;
+        if (am) return `<span class="tier-pill ta-${am[1].toLowerCase()}" title="${T('中国科协','CAST')} ${am[1]}${T(' 级（管理类）',' (Management)')}">${raw}</span>`;
         return `<span class="tier-pill">${raw}</span>`;
       }
       function badgeFlagship(kind) {
         if (!kind) return '';
         const map = {
-          nature_main:  ['Nature 正刊', 'flag-nature-main'],
-          science_main: ['Science 正刊','flag-science-main'],
-          cell_main:    ['Cell 正刊',   'flag-cell-main'],
-          nature_sub:   ['Nature 子刊', 'flag-nature-sub'],
-          science_sub:  ['Science 子刊','flag-science-sub'],
-          cell_sub:     ['Cell 子刊',   'flag-cell-sub'],
+          nature_main:  [T('Nature 正刊','Nature'),     'flag-nature-main'],
+          science_main: [T('Science 正刊','Science'),    'flag-science-main'],
+          cell_main:    [T('Cell 正刊','Cell'),          'flag-cell-main'],
+          nature_sub:   [T('Nature 子刊','Nature sub'),  'flag-nature-sub'],
+          science_sub:  [T('Science 子刊','Science sub'),'flag-science-sub'],
+          cell_sub:     [T('Cell 子刊','Cell sub'),      'flag-cell-sub'],
         };
         const m = map[kind];
         if (!m) return '';
@@ -963,7 +1014,7 @@
       }
       function badgeXR(z) {
         if (!z) return '';
-        return `<span class="xr-pill xr-${z}" title="中科院 2026 新锐版分区">新锐 ${z}区</span>`;
+        return `<span class="xr-pill xr-${z}" title="${T('中科院 2026 新锐版分区','CAS Emerging Edition 2026')}">${T('新锐','Emerging')} ${z}${T('区','')}</span>`;
       }
       function badgeWarn() { return `<span class="warn-pill">⚠ Warning</span>`; }
 
@@ -1002,24 +1053,24 @@
       addDomIndex(r.name, 'name', { source:'cssci', label:'CSSCI', tag:'', discipline:r.discipline });
     });
     (d.cssci_ext||[]).forEach(r => {
-      addDomIndex(r.name, 'name', { source:'cssci_ext', label:'CSSCI 扩', tag:'', discipline:r.discipline });
+      addDomIndex(r.name, 'name', { source:'cssci_ext', label:T('CSSCI 扩','CSSCI Ext'), tag:'', discipline:r.discipline });
     });
     (d.pku_core||[]).forEach(r => {
-      addDomIndex(r.name, 'name', { source:'pku', label:'北大核心', tag:'', category:r.category });
+      addDomIndex(r.name, 'name', { source:'pku', label:T('北大核心','PKU Core'), tag:'', category:r.category });
     });
     // 中国科协 高质量科技期刊分级目录 (2025-12 修订, 11084 条)
     ((d.cnkx && d.cnkx.records)||[]).forEach(r => {
       if (!r.tier || !/^T[123]$/.test(r.tier)) return;
-      addDomIndex(r.name, 'name', { source:'cnkx', label:'科协 '+r.tier, tag:r.tier, domain:r.domain });
-      if (r.issn) addDomIndex(r.issn, 'issn', { source:'cnkx', label:'科协 '+r.tier, tag:r.tier, domain:r.domain });
+      addDomIndex(r.name, 'name', { source:'cnkx', label:T('科协','CAST')+' '+r.tier, tag:r.tier, domain:r.domain });
+      if (r.issn) addDomIndex(r.issn, 'issn', { source:'cnkx', label:T('科协','CAST')+' '+r.tier, tag:r.tier, domain:r.domain });
     });
     (d.ccft||[]).forEach(r => {
       addDomIndex(r.cn_name, 'name', { source:'ccft', label:'CCF-'+r.tier, tag:r.tier, org:r.org });
       if (r.cn_code) addDomIndex(r.cn_code, 'issn', { source:'ccft', label:'CCF-'+r.tier, tag:r.tier });
     });
     ((d.zju && d.zju.records)||[]).forEach(r => {
-      addDomIndex(r.name.replace(/\*$/,''), 'name', { source:'zju', label:'浙大 '+r.tier, tag:r.tier });
-      if (r.issn) addDomIndex(r.issn, 'issn', { source:'zju', label:'浙大 '+r.tier, tag:r.tier });
+      addDomIndex(r.name.replace(/\*$/,''), 'name', { source:'zju', label:T('浙大','ZJU')+' '+r.tier, tag:r.tier });
+      if (r.issn) addDomIndex(r.issn, 'issn', { source:'zju', label:T('浙大','ZJU')+' '+r.tier, tag:r.tier });
     });
   }
   function renderDomCrossBadges(r, excludeSource) {
@@ -1247,12 +1298,12 @@
   // ───────── domestic tab ─────────
   function renderDomestic() {
     const box = $('#dom-content');
-    if (!domestic) { box.innerHTML = '<div class="empty">无数据</div>'; return; }
+    if (!domestic) { box.innerHTML = `<div class="empty">${T('无数据','No data')}</div>`; return; }
     const q = activeQuery.toLowerCase();
 
     if (activeDom === 'cnkx') {
       const d = domestic.cnkx;
-      if (!d) { box.innerHTML = '<div class="empty">中国科协数据缺失</div>'; return; }
+      if (!d) { box.innerHTML = `<div class="empty">${T('中国科协数据缺失','CAST data missing')}</div>`; return; }
       // 官方 59 个学科领域顺序
       const DOMAIN_ORDER = (d.domains && d.domains.length)
         ? d.domains.map(x => x.name)
@@ -1269,7 +1320,7 @@
           const hay = (r.name + ' ' + (r.issn||'') + ' ' + (r.domain||'') + ' ' + (r.subdomain||'')).toLowerCase();
           if (!hay.includes(q)) { filtered++; continue; }
         }
-        const dom = r.domain || '未分类';
+        const dom = r.domain || T('未分类','Uncategorized');
         (byDomain[dom] = byDomain[dom] || []).push(r);
       }
       const doms = DOMAIN_ORDER.filter(t => byDomain[t] && byDomain[t].length);
@@ -1277,8 +1328,8 @@
 
       const html = [];
       html.push(`<div class="section-block">
-        <h3 class="section-title">中国科协高质量科技期刊分级目录 (2025-12)</h3>
-        <div class="section-subtitle">T1 / T2 / T3 三级；${DOMAIN_ORDER.length} 个官方学科领域，含 ${cleanRecs.length.toLocaleString()} 条带分级记录${q?`；已过滤 ${filtered} 条不匹配`:''}</div>`);
+        <h3 class="section-title">${T('中国科协高质量科技期刊分级目录 (2025-12)','CAST High-Quality Sci-Tech Journal Tiered Directory (Dec 2025)')}</h3>
+        <div class="section-subtitle">${T('T1 / T2 / T3 三级；','T1 / T2 / T3 tiers · ')}${DOMAIN_ORDER.length} ${T('个官方学科领域，含','official disciplines · ')} ${cleanRecs.length.toLocaleString()} ${T('条带分级记录','tiered records')}${q?`${T('；已过滤 ',' · ')}${filtered}${T(' 条不匹配',' filtered out')}`:''}</div>`);
       for (const dom of doms) {
         const recs = byDomain[dom]; if (!recs || !recs.length) continue;
         const t1 = recs.filter(r => r.tier === 'T1');
@@ -1301,16 +1352,16 @@
           </summary>
           ${subs.length ? `<div class="muted-cell" style="margin:8px 0 4px;font-size:12px;line-height:1.7">
             ${subs.slice(0, 24).map(([s,c]) => `<span style="display:inline-block;margin-right:10px">${escape(s)} <span style="opacity:.6">(${c})</span></span>`).join('')}
-            ${subs.length > 24 ? `<span style="opacity:.6">… 共 ${subs.length} 个细分</span>` : ''}
+            ${subs.length > 24 ? `<span style="opacity:.6">… ${T('共','total ')} ${subs.length} ${T('个细分','sub-fields')}</span>` : ''}
           </div>` : ''}
           <div class="table-wrap" style="margin-top:10px"><table class="journals"><thead><tr>
-            <th style="width:60px">T级</th><th>期刊</th><th style="width:120px">ISSN</th><th style="width:160px">细分</th><th>交叉收录</th><th style="width:40px"></th>
+            <th style="width:60px">${T('T级','Tier')}</th><th>${T('期刊','Journal')}</th><th style="width:120px">ISSN</th><th style="width:160px">${T('细分','Sub-field')}</th><th>${T('交叉收录','Also In')}</th><th style="width:40px"></th>
           </tr></thead><tbody>
           ${[t1,t2,t3].flat().slice(0, 300).map(r => renderDomRow(r, {
             src: 'cnkx', showTier: true, tierValue: r.tier,
             extraCols: `<td class="muted-cell" style="width:160px">${escape(r.subdomain || '—')}</td>`,
           })).join('')}
-          ${recs.length > 300 ? `<tr><td colspan="6" class="empty">仅显示前 300 条，剩余 ${recs.length - 300} 条请搜索</td></tr>` : ''}
+          ${recs.length > 300 ? `<tr><td colspan="6" class="empty">${T('仅显示前 300 条，剩余','Showing first 300, remaining')} ${recs.length - 300} ${T('条请搜索','— please refine search')}</td></tr>` : ''}
           </tbody></table></div>
         </details>`);
       }
@@ -1322,19 +1373,19 @@
     if (activeDom === 'cssci_core' || activeDom === 'cssci_ext') {
       const list = activeDom === 'cssci_core' ? (domestic.cssci_core||[]) : (domestic.cssci_ext||[]);
       const srcKey = activeDom === 'cssci_core' ? 'cssci' : 'cssci_ext';
-      const title = activeDom === 'cssci_core' ? 'CSSCI 来源期刊目录 (2025-2026)' : 'CSSCI 扩展版来源期刊目录 (2025-2026)';
+      const title = activeDom === 'cssci_core' ? T('CSSCI 来源期刊目录 (2025-2026)','CSSCI Source Journals (2025-2026)') : T('CSSCI 扩展版来源期刊目录 (2025-2026)','CSSCI Extended Source Journals (2025-2026)');
       const f = list.filter(r => !q || (r.name + ' ' + (r.discipline||'')).toLowerCase().includes(q));
       const byDisc = {};
-      for (const r of f) (byDisc[r.discipline||'未分类'] = byDisc[r.discipline||'未分类'] || []).push(r);
+      for (const r of f) (byDisc[r.discipline||T('未分类','Uncategorized')] = byDisc[r.discipline||T('未分类','Uncategorized')] || []).push(r);
       const discs = Object.keys(byDisc).sort((a,b) => byDisc[b].length - byDisc[a].length);
       box.innerHTML = `<div class="section-block">
         <h3 class="section-title">${title}</h3>
-        <div class="section-subtitle">共 ${list.length.toLocaleString()} 条；南京大学中国社会科学研究评价中心；${q ? '已过滤 '+f.length+' 条' : ''}</div>
+        <div class="section-subtitle">${T('共','Total ')} ${list.length.toLocaleString()} ${T('条','journals')}${T('；南京大学中国社会科学研究评价中心；',' · CSSRE, Nanjing University · ')}${q ? T('已过滤 ','Filtered ')+f.length+T(' 条',' results') : ''}</div>
         ${discs.map(d => `
           <details class="section-block" style="margin-top:14px" ${q?'open':''}>
             <summary>${escape(d)} <span class="muted-cell">(${byDisc[d].length})</span></summary>
             <div class="table-wrap" style="margin-top:10px"><table class="journals"><thead><tr>
-              <th>期刊名称</th><th style="width:130px">ISSN</th><th style="width:160px">学科</th><th>交叉收录</th><th style="width:40px"></th>
+              <th>${T('期刊名称','Journal')}</th><th style="width:130px">ISSN</th><th style="width:160px">${T('学科','Discipline')}</th><th>${T('交叉收录','Also In')}</th><th style="width:40px"></th>
             </tr></thead><tbody>
               ${byDisc[d].map(r => renderDomRow(r, {
                 src: srcKey,
@@ -1351,16 +1402,16 @@
       const list = domestic.pku_core || [];
       const f = list.filter(r => !q || (r.name + ' ' + (r.category||'')).toLowerCase().includes(q));
       box.innerHTML = `<div class="section-block">
-        <h3 class="section-title">北大《中文核心期刊要目总览》(2023 年版)</h3>
-        <div class="section-subtitle">共 ${list.length.toLocaleString()} 条；北京大学图书馆；${q ? '已过滤 '+f.length+' 条' : ''}</div>
+        <h3 class="section-title">${T('北大《中文核心期刊要目总览》(2023 年版)','PKU Chinese Core Journals Overview (2023 ed.)')}</h3>
+        <div class="section-subtitle">${T('共','Total ')} ${list.length.toLocaleString()} ${T('条','journals')}${T('；北京大学图书馆；',' · Peking University Library · ')}${q ? T('已过滤 ','Filtered ')+f.length+T(' 条',' results') : ''}</div>
         <div class="table-wrap" style="margin-top:14px"><table class="journals"><thead><tr>
-          <th>期刊名称</th><th style="width:130px">ISSN</th><th style="width:160px">分类</th><th>交叉收录</th><th style="width:40px"></th>
+          <th>${T('期刊名称','Journal')}</th><th style="width:130px">ISSN</th><th style="width:160px">${T('分类','Category')}</th><th>${T('交叉收录','Also In')}</th><th style="width:40px"></th>
         </tr></thead><tbody>
           ${f.slice(0, 2000).map(r => renderDomRow(r, {
             src: 'pku',
             extraCols: `<td class="muted-cell" style="width:160px">${escape(r.category||'')}</td>`,
           })).join('')}
-          ${f.length > 2000 ? `<tr><td colspan="5" class="empty">仅显示前 2000 条，请在搜索框内精确查找</td></tr>` : ''}
+          ${f.length > 2000 ? `<tr><td colspan="5" class="empty">${T('仅显示前 2000 条，请在搜索框内精确查找','Showing first 2000 — please refine search')}</td></tr>` : ''}
         </tbody></table></div>
       </div>`;
       return;
@@ -1368,7 +1419,7 @@
 
     if (activeDom === 'zju_zju') {
       const src = domestic.zju;
-      if (!src || !src.records) { box.innerHTML = '<div class="empty">数据缺失</div>'; return; }
+      if (!src || !src.records) { box.innerHTML = `<div class="empty">${T('数据缺失','Data missing')}</div>`; return; }
       const list = src.records;
       const f = list.filter(r => {
         if (!q) return true;
@@ -1380,14 +1431,14 @@
       const tierOrder = ['一级', '核心', '其他'];
       const tierClass = {'一级':'t1','核心':'t2','其他':'t3'};
       const html = [`<div class="section-block">
-        <h3 class="section-title">${escape(src.source || '浙江大学 2024 期刊分级')}</h3>
-        <div class="section-subtitle">共 ${list.length.toLocaleString()} 条；带 ★ 为人文社科权威级期刊（一级内）</div>`];
+        <h3 class="section-title">${escape(src.source || T('浙江大学 2024 期刊分级','ZJU 2024 Journal Tiers'))}</h3>
+        <div class="section-subtitle">${T('共','Total ')} ${list.length.toLocaleString()} ${T('条；带 ★ 为人文社科权威级期刊（一级内）',' · ★ marks authoritative humanities & social sciences journals (within Tier 1)')}</div>`];
       for (const tier of tierOrder) {
         const recs = byTier[tier]; if (!recs || !recs.length) continue;
         html.push(`<details class="section-block" style="margin-top:14px" ${q?'open':(tier==='一级'?'open':'')}>
-          <summary>国内${escape(tier)}学术期刊 <span class="muted-cell">(${recs.length})</span></summary>
+          <summary>${T('国内','Domestic ')}${escape(tier)}${T('学术期刊',' Journals')} <span class="muted-cell">(${recs.length})</span></summary>
           <div class="table-wrap" style="margin-top:10px"><table class="journals"><thead><tr>
-            <th style="width:70px">级别</th><th>期刊</th><th style="width:130px">ISSN / CN</th><th style="width:180px">备注</th><th>交叉收录</th><th style="width:40px"></th>
+            <th style="width:70px">${T('级别','Tier')}</th><th>${T('期刊','Journal')}</th><th style="width:130px">ISSN / CN</th><th style="width:180px">${T('备注','Note')}</th><th>${T('交叉收录','Also In')}</th><th style="width:40px"></th>
           </tr></thead><tbody>
           ${recs.slice(0, 1500).map(r => {
             const tierBadge = `<span class="tier-pill ${tierClass[r.tier]||'t3'}">${escape(r.tier)}</span>${r.name.includes('*') ? ' <span class="warn-pill" style="background:var(--gold);color:#fff">★</span>' : ''}`;
@@ -1405,7 +1456,7 @@
               `<tr class="j-row clickable" $1><td style="width:70px">${tierBadge}</td>`
             );
           }).join('')}
-          ${recs.length > 1500 ? `<tr><td colspan="6" class="empty">仅显示前 1500 条，请在搜索框内精确查找</td></tr>` : ''}
+          ${recs.length > 1500 ? `<tr><td colspan="6" class="empty">${T('仅显示前 1500 条，请在搜索框内精确查找','Showing first 1500 — please refine search')}</td></tr>` : ''}
           </tbody></table></div>
         </details>`);
       }
@@ -1431,16 +1482,16 @@
         const tierOrder = ['一级', '核心', '其他'];
         const tierClass = {'一级':'t1','核心':'t2','其他':'t3'};
         const html = [`<div class="section-block">
-          <h3 class="section-title">${escape(src.source || '高校自编目录 · 2023 期刊分级')} <span class="unlocked-pill">✓ 已解锁</span>
-            <button class="tiny-btn" id="lock-again" style="float:right">锁回</button>
+          <h3 class="section-title">${escape(src.source || T('高校自编目录 · 2023 期刊分级','In-house School Directory · 2023 Journal Tiers'))} <span class="unlocked-pill">✓ ${T('已解锁','Unlocked')}</span>
+            <button class="tiny-btn" id="lock-again" style="float:right">${T('锁回','Lock again')}</button>
           </h3>
-          <div class="section-subtitle">共 ${list.length.toLocaleString()} 条；带 ★ 为人文社科权威级期刊</div>`];
+          <div class="section-subtitle">${T('共','Total ')} ${list.length.toLocaleString()} ${T('条；带 ★ 为人文社科权威级期刊',' · ★ marks authoritative humanities & social sciences journals')}</div>`];
         for (const tier of tierOrder) {
           const recs = byTier[tier]; if (!recs || !recs.length) continue;
           html.push(`<details class="section-block" style="margin-top:14px" ${q?'open':(tier==='一级'?'open':'')}>
-            <summary>国内${escape(tier)}学术期刊 <span class="muted-cell">(${recs.length})</span></summary>
+            <summary>${T('国内','Domestic ')}${escape(tier)}${T('学术期刊',' Journals')} <span class="muted-cell">(${recs.length})</span></summary>
             <div class="table-wrap" style="margin-top:10px"><table class="journals"><thead><tr>
-              <th style="width:70px">级别</th><th>期刊</th><th style="width:130px">ISSN / CN</th><th style="width:180px">备注</th><th>交叉收录</th><th style="width:40px"></th>
+              <th style="width:70px">${T('级别','Tier')}</th><th>${T('期刊','Journal')}</th><th style="width:130px">ISSN / CN</th><th style="width:180px">${T('备注','Note')}</th><th>${T('交叉收录','Also In')}</th><th style="width:40px"></th>
             </tr></thead><tbody>
             ${recs.slice(0, 1500).map(r => {
               const tierBadge = `<span class="tier-pill ${tierClass[r.tier]||'t3'}">${escape(r.tier)}</span>${r.name.includes('*') ? ' <span class="warn-pill" style="background:var(--gold);color:#fff">★</span>' : ''}`;
@@ -1458,7 +1509,7 @@
         html.push('</div>');
         box.innerHTML = html.join('');
         $('#lock-again')?.addEventListener('click', () => {
-          if (confirm('锁回后需要再次输入解锁码。确认？')) { forgetUnlock('school_a'); renderDomestic(); }
+          if (confirm(T('锁回后需要再次输入解锁码。确认？','Locking again will require re-entering the unlock code. Continue?'))) { forgetUnlock('school_a'); renderDomestic(); }
         });
         return;
       }
@@ -1466,35 +1517,35 @@
       box.innerHTML = `
         <div class="locked-landing">
           <div class="locked-hero">
-            <div class="locked-badge">🔒 高校自编目录</div>
-            <h2>高校自编目录 · 期刊分级目录 (2023 版)</h2>
-            <p class="locked-sub">学校人事处 / 科研处自编，用于校内职称评审、科研奖励、毕业考核的权威参考目录。共收录 <b>${src.count || '2,390'}</b> 条国内外期刊，分「一级 / 核心 / 其他」三级，含人文社科权威标注。</p>
+            <div class="locked-badge">🔒 ${T('高校自编目录','In-house School Directory')}</div>
+            <h2>${T('高校自编目录 · 期刊分级目录 (2023 版)','In-house School Directory · Journal Tiers (2023 ed.)')}</h2>
+            <p class="locked-sub">${T('学校人事处 / 科研处自编，用于校内职称评审、科研奖励、毕业考核的权威参考目录。共收录','Compiled by the university HR / Research Office for promotion review, research awards, and graduation assessment. Contains')} <b>${src.count || '2,390'}</b> ${T('条国内外期刊，分「一级 / 核心 / 其他」三级，含人文社科权威标注。','domestic and international journals, tiered as Tier 1 / Core / Other, with humanities & social sciences flags.')}</p>
             <div class="locked-specs">
               <div class="spec">
-                <div class="spec-k">收录条数</div>
+                <div class="spec-k">${T('收录条数','Records')}</div>
                 <div class="spec-v">${src.count || '2,390'}</div>
               </div>
               <div class="spec">
-                <div class="spec-k">分级层次</div>
-                <div class="spec-v">一级 / 核心 / 其他</div>
+                <div class="spec-k">${T('分级层次','Tier Levels')}</div>
+                <div class="spec-v">${T('一级 / 核心 / 其他','Tier 1 / Core / Other')}</div>
               </div>
               <div class="spec">
-                <div class="spec-k">版本</div>
-                <div class="spec-v">2023 最新</div>
+                <div class="spec-k">${T('版本','Edition')}</div>
+                <div class="spec-v">${T('2023 最新','2023 latest')}</div>
               </div>
               <div class="spec">
-                <div class="spec-k">解锁方式</div>
-                <div class="spec-v">一码终身</div>
+                <div class="spec-k">${T('解锁方式','Unlock')}</div>
+                <div class="spec-v">${T('一码终身','One-time code')}</div>
               </div>
             </div>
             <div class="locked-actions">
-              <button class="big-btn primary" id="open-unlock">我已有解锁码，立即解锁</button>
-              <a class="big-btn ghost" href="mailto:support@ailatest.org?subject=申请学校 A 目录解锁码">💬 联系获取解锁码</a>
+              <button class="big-btn primary" id="open-unlock">${T('我已有解锁码，立即解锁','I have an unlock code')}</button>
+              <a class="big-btn ghost" href="mailto:support@ailatest.org?subject=Unlock code request - School A">💬 ${T('联系获取解锁码','Contact us to get a code')}</a>
             </div>
             <div class="locked-note">
-              · 解锁码绑定本浏览器，下次自动识别，无需再输<br/>
-              · AES-GCM + PBKDF2 加密存储，传输过程不落明文<br/>
-              · 同站后续新增高校目录（浙大、同济等）将陆续上线
+              · ${T('解锁码绑定本浏览器，下次自动识别，无需再输','Code is bound to this browser; auto-recognized next time')}<br/>
+              · ${T('AES-GCM + PBKDF2 加密存储，传输过程不落明文','AES-GCM + PBKDF2 encrypted storage; no plaintext in transit')}<br/>
+              · ${T('同站后续新增高校目录（浙大、同济等）将陆续上线','More school directories (ZJU, Tongji, etc.) coming soon')}
             </div>
             <div class="unlock-slot" id="unlock-slot" hidden></div>
           </div>
@@ -1502,7 +1553,7 @@
       $('#open-unlock')?.addEventListener('click', () => {
         const slot = $('#unlock-slot');
         slot.hidden = false;
-        slot.innerHTML = lockedPrompt('school_a', src.source || '高校自编目录 · 期刊分级目录 2023', src.count || 0);
+        slot.innerHTML = lockedPrompt('school_a', src.source || T('高校自编目录 · 期刊分级目录 2023','In-house School Directory · Journal Tiers 2023'), src.count || 0);
         slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
       });
       return;
@@ -1516,10 +1567,10 @@
         return hay.includes(q);
       });
       box.innerHTML = `<div class="section-block">
-        <h3 class="section-title">CCF 推荐中文科技期刊 2025</h3>
-        <div class="section-subtitle">共 ${list.length} 条；T1/T2/T3 三级</div>
+        <h3 class="section-title">${T('CCF 推荐中文科技期刊 2025','CCF Recommended Chinese Sci-Tech Journals 2025')}</h3>
+        <div class="section-subtitle">${T('共','Total ')} ${list.length} ${T('条；T1/T2/T3 三级',' · T1/T2/T3 tiers')}</div>
         <div class="table-wrap" style="margin-top:14px"><table class="journals"><thead><tr>
-          <th style="width:60px">T分区</th><th>期刊</th><th style="width:130px">CN</th><th style="width:180px">主办单位</th><th>交叉收录</th><th style="width:40px"></th>
+          <th style="width:60px">${T('T分区','Tier')}</th><th>${T('期刊','Journal')}</th><th style="width:130px">CN</th><th style="width:180px">${T('主办单位','Sponsor')}</th><th>${T('交叉收录','Also In')}</th><th style="width:40px"></th>
         </tr></thead><tbody>
         ${f.map(r => renderDomRow(
           { name: r.cn_name, en_name: r.en_name, issn: r.cn_code, cn_code: r.cn_code, org: r.org, ccf_area: r.ccf_area, tier: r.tier },
@@ -1561,18 +1612,18 @@
 
     // 基础元信息（真实字段）
     const meta = [];
-    if (r.abbr20 && r.abbr20 !== (r.name||'').replace(/\*$/,'')) meta.push(['期刊缩写', r.abbr20]);
-    if (r.publisher) meta.push(['出版商', r.publisher]);
-    if (r.org) meta.push(['主办单位', r.org]);
-    if (r.address) meta.push(['出版地址', r.address]);
-    if (r.country) meta.push(['国家/地区', r.country]);
-    if (r.languages || r.language_cn || r.language) meta.push(['语种', r.languages || r.language_cn || r.language]);
-    if (r.frequency) meta.push(['出版周期', r.frequency]);
-    if (r.discipline) meta.push(['学科', r.discipline]);
-    if (r.category) meta.push(['分类', r.category]);
-    if (r.domain) meta.push(['科协领域', r.domain + (r.subdomain ? ' · ' + r.subdomain : '')]);
-    if (r.ccf_area) meta.push(['CCF 方向', r.ccf_area]);
-    if (r.note) meta.push(['备注', r.note]);
+    if (r.abbr20 && r.abbr20 !== (r.name||'').replace(/\*$/,'')) meta.push([T('期刊缩写','Abbreviation'), r.abbr20]);
+    if (r.publisher) meta.push([T('出版商','Publisher'), r.publisher]);
+    if (r.org) meta.push([T('主办单位','Sponsor'), r.org]);
+    if (r.address) meta.push([T('出版地址','Address'), r.address]);
+    if (r.country) meta.push([T('国家/地区','Country/Region'), r.country]);
+    if (r.languages || r.language_cn || r.language) meta.push([T('语种','Language'), r.languages || r.language_cn || r.language]);
+    if (r.frequency) meta.push([T('出版周期','Frequency'), r.frequency]);
+    if (r.discipline) meta.push([T('学科','Discipline'), r.discipline]);
+    if (r.category) meta.push([T('分类','Category'), r.category]);
+    if (r.domain) meta.push([T('科协领域','CAST Domain'), r.domain + (r.subdomain ? ' · ' + r.subdomain : '')]);
+    if (r.ccf_area) meta.push([T('CCF 方向','CCF Area'), r.ccf_area]);
+    if (r.note) meta.push([T('备注','Note'), r.note]);
     const metaHTML = meta.map(([k,v]) => `<div class="meta-row"><div class="meta-k">${k}</div><div class="meta-v">${escape(v)}</div></div>`).join('');
 
     // 解锁源收录状态（高校自编目录 2023，已解锁才显示）
@@ -1592,30 +1643,30 @@
         if (hit) {
           const tierCls = {'一级':'t1','核心':'t2','其他':'t3'}[hit.tier] || 't3';
           rows.push(`<div class="locked-src-row">
-            <span class="locked-src-name">高校自编目录 · 2023</span>
-            <span class="tier-pill ${tierCls}">${escape(hit.tier || '收录')}</span>
+            <span class="locked-src-name">${T('高校自编目录 · 2023','In-house School Directory · 2023')}</span>
+            <span class="tier-pill ${tierCls}">${escape(hit.tier || T('收录','Listed'))}</span>
             ${hit.note ? `<span class="muted-cell">· ${escape(hit.note)}</span>` : ''}
           </div>`);
         }
       }
       return rows.length
         ? `<div class="drawer-section">
-             <h4>🔓 已解锁目录收录</h4>
+             <h4>🔓 ${T('已解锁目录收录','Unlocked Directory Listings')}</h4>
              ${rows.join('')}
-             <div class="muted-cell" style="margin-top:6px;font-size:12px">加密目录解锁后仅本设备可见。</div>
+             <div class="muted-cell" style="margin-top:6px;font-size:12px">${T('加密目录解锁后仅本设备可见。','Unlocked encrypted directories are visible only on this device.')}</div>
            </div>`
         : '';
     })();
 
     // 核心指标数值（带年份，避免不知道是哪一版数据）
     const stats = [];
-    if (r.if_2024 != null) stats.push(['影响因子 (JCR 2024)', r.if_2024]);
-    if (r.if_quartile) stats.push(['JCR 分区 (2024)', r.if_quartile]);
-    if (r.if_rank) stats.push(['IF 排名 (2024)', r.if_rank]);
-    if (r.cas_zone) stats.push(['中科院 2025 大类', r.cas_zone + '区' + (r.cas_top ? ' · Top' : '')]);
-    if (r.cas_zone_2023 && r.cas_zone_2023 !== r.cas_zone) stats.push(['中科院 2023 大类', r.cas_zone_2023 + '区']);
-    if (r.cas_xr && r.cas_xr.zone) stats.push(['新锐版 2026', r.cas_xr.zone + '区']);
-    if (r.cas_oa === true) stats.push(['开放获取', 'OA ✓']);
+    if (r.if_2024 != null) stats.push([T('影响因子 (JCR 2024)','Impact Factor (JCR 2024)'), r.if_2024]);
+    if (r.if_quartile) stats.push([T('JCR 分区 (2024)','JCR Quartile (2024)'), r.if_quartile]);
+    if (r.if_rank) stats.push([T('IF 排名 (2024)','IF Rank (2024)'), r.if_rank]);
+    if (r.cas_zone) stats.push([T('中科院 2025 大类','CAS 2025 Major'), r.cas_zone + T('区','') + (r.cas_top ? ' · Top' : '')]);
+    if (r.cas_zone_2023 && r.cas_zone_2023 !== r.cas_zone) stats.push([T('中科院 2023 大类','CAS 2023 Major'), r.cas_zone_2023 + T('区','')]);
+    if (r.cas_xr && r.cas_xr.zone) stats.push([T('新锐版 2026','Emerging 2026'), r.cas_xr.zone + T('区','')]);
+    if (r.cas_oa === true) stats.push([T('开放获取','Open Access'), 'OA ✓']);
     const statsHTML = stats.length ? `<div class="stats-grid">${stats.map(([k,v]) =>
       `<div class="stat"><div class="stat-v">${escape(String(v))}</div><div class="stat-k">${k}</div></div>`
     ).join('')}</div>` : '';
@@ -1623,16 +1674,16 @@
     // WoS 学科分类
     const wosHTML = (Array.isArray(r.wos_categories) && r.wos_categories.length)
       ? `<div class="drawer-section">
-           <h4>Web of Science 分类</h4>
+           <h4>${T('Web of Science 分类','Web of Science Categories')}</h4>
            <div class="cat-chips">${r.wos_categories.map(c => `<span class="cat-chip">${escape(c)}</span>`).join('')}</div>
-           ${r.esi_category ? `<div class="esi-row"><span class="esi-label">ESI 高被引学科</span><span class="esi-val">${escape(r.esi_category)}</span></div>` : ''}
+           ${r.esi_category ? `<div class="esi-row"><span class="esi-label">${T('ESI 高被引学科','ESI Highly-Cited Field')}</span><span class="esi-val">${escape(r.esi_category)}</span></div>` : ''}
          </div>`
       : '';
 
     // Ei Compendex 主题分类
     const eiHTML = (Array.isArray(r.ei_subjects) && r.ei_subjects.length)
       ? `<div class="drawer-section">
-           <h4>Ei Compendex 主题</h4>
+           <h4>${T('Ei Compendex 主题','Ei Compendex Subjects')}</h4>
            <div class="cat-chips">${r.ei_subjects.map(c => `<span class="cat-chip">${escape(c)}</span>`).join('')}</div>
          </div>`
       : '';
@@ -1641,17 +1692,17 @@
     const casHTML = (() => {
       const blocks = [];
       if (r.cas_major_cn) {
-        blocks.push(`<div class="cas-major"><span class="zone-tier">大类</span> ${escape(r.cas_major_cn)} · <b>${r.cas_major_zone || r.cas_zone || '?'}区</b>${r.cas_top ? ' · Top' : ''}</div>`);
+        blocks.push(`<div class="cas-major"><span class="zone-tier">${T('大类','Major')}</span> ${escape(r.cas_major_cn)} · <b>${r.cas_major_zone || r.cas_zone || '?'}${T('区','')}</b>${r.cas_top ? ' · Top' : ''}</div>`);
       }
       if (Array.isArray(r.cas_sub_cats) && r.cas_sub_cats.length) {
         blocks.push(`<ul class="cas-sub-list">${r.cas_sub_cats.map(s => {
           const nm = typeof s === 'string' ? s : (s.name || '');
           const zn = typeof s === 'object' ? s.zone : null;
-          return `<li><span class="zone-tier zone-tier-sub">小类</span> ${escape(nm)}${zn ? ` · <b>${zn}区</b>` : ''}</li>`;
+          return `<li><span class="zone-tier zone-tier-sub">${T('小类','Sub')}</span> ${escape(nm)}${zn ? ` · <b>${zn}${T('区','')}</b>` : ''}</li>`;
         }).join('')}</ul>`);
       }
       return blocks.length
-        ? `<div class="drawer-section"><h4>中科院文献情报中心分区 · 2025 年度</h4>${blocks.join('')}</div>`
+        ? `<div class="drawer-section"><h4>${T('中科院文献情报中心分区 · 2025 年度','CAS NSL Tiers · 2025')}</h4>${blocks.join('')}</div>`
         : '';
     })();
 
@@ -1663,34 +1714,34 @@
       const majorCn = xr.major_cn || '';
       const majorEn = xr.major_en || '';
       const majorText = [majorCn, majorEn].filter(Boolean).join(' · ');
-      blocks.push(`<div class="cas-major"><span class="zone-tier">大类</span> ${escape(majorText || '（未标注大类）')} · <b>新锐 ${xr.zone} 区</b></div>`);
+      blocks.push(`<div class="cas-major"><span class="zone-tier">${T('大类','Major')}</span> ${escape(majorText || T('（未标注大类）','(no major)'))} · <b>${T('新锐','Emerging')} ${xr.zone} ${T('区','')}</b></div>`);
       if (Array.isArray(xr.subs) && xr.subs.length) {
         blocks.push(`<ul class="cas-sub-list">${xr.subs.map(s => {
           const nm = s.cat || s.name || '';
           const zn = s.zone;
-          return `<li><span class="zone-tier zone-tier-sub">小类</span> ${escape(nm)}${zn ? ` · <b>新锐 ${zn} 区</b>` : ''}</li>`;
+          return `<li><span class="zone-tier zone-tier-sub">${T('小类','Sub')}</span> ${escape(nm)}${zn ? ` · <b>${T('新锐','Emerging')} ${zn} ${T('区','')}</b>` : ''}</li>`;
         }).join('')}</ul>`);
       }
-      blocks.push(`<div class="muted-cell" style="margin-top:6px;font-size:12px;line-height:1.6">新锐版面向成长期期刊提供独立分区，与主大类分区互为补充。"大类"为学科门类层级（如历史学），"小类"为细分学科。数据源：ShowJCR 新锐版 2026。</div>`);
-      return `<div class="drawer-section"><h4>新锐版分区 · 2026 年度</h4>${blocks.join('')}</div>`;
+      blocks.push(`<div class="muted-cell" style="margin-top:6px;font-size:12px;line-height:1.6">${T('新锐版面向成长期期刊提供独立分区，与主大类分区互为补充。"大类"为学科门类层级（如历史学），"小类"为细分学科。数据源：ShowJCR 新锐版 2026。','The Emerging Edition provides independent tiers for growing journals, complementing the main major-category tiers. "Major" is the discipline group (e.g. History); "Sub" is the sub-field. Source: ShowJCR Emerging 2026.')}</div>`);
+      return `<div class="drawer-section"><h4>${T('新锐版分区 · 2026 年度','Emerging Tiers · 2026')}</h4>${blocks.join('')}</div>`;
     })();
 
     // 中国科协高质量科技期刊分级目录 (2025-12 修订)
     const cnkxHTML = (Array.isArray(r.cnkx) && r.cnkx.length)
       ? `<div class="drawer-section">
-           <h4>中国科协高质量科技期刊分级目录 · 2025-12 版</h4>
+           <h4>${T('中国科协高质量科技期刊分级目录 · 2025-12 版','CAST High-Quality Sci-Tech Journal Tiered Directory · Dec 2025')}</h4>
            <ul class="cas-sub-list">${r.cnkx.map(c =>
              `<li><b>${escape(c.tier||'')}</b>${c.domain ? ' · ' + escape(c.domain) : ''}${c.subdomain ? ' <span class="muted-cell">· '+escape(c.subdomain)+'</span>' : ''}</li>`
            ).join('')}</ul>
-           <div class="muted-cell" style="margin-top:6px;font-size:12px;line-height:1.6">同一刊在多个学科领域分别评定 T1 / T2 / T3，互不冲突。</div>
+           <div class="muted-cell" style="margin-top:6px;font-size:12px;line-height:1.6">${T('同一刊在多个学科领域分别评定 T1 / T2 / T3，互不冲突。','A journal can be tiered T1/T2/T3 separately in multiple disciplines without conflict.')}</div>
          </div>`
       : '';
 
     // 警示刊
     const warnHTML = r.warning
       ? `<div class="drawer-section warn-block">
-           <h4>⚠ 警示期刊提示</h4>
-           <p>该刊被中科院纳入 ${escape(r.warning_year || '最新')} 国际期刊预警名单。投稿前请谨慎评估，留意审稿周期、版面费、学术影响等因素。</p>
+           <h4>⚠ ${T('警示期刊提示','Warning Journal Notice')}</h4>
+           <p>${T('该刊被中科院纳入','This journal is included in the CAS')} ${escape(r.warning_year || T('最新','latest'))} ${T('国际期刊预警名单。投稿前请谨慎评估，留意审稿周期、版面费、学术影响等因素。','International Journal Warning List. Evaluate carefully before submission — review cycle, APC, and academic impact.')}</p>
          </div>`
       : '';
 
@@ -1698,11 +1749,11 @@
     const oa = r.oa || lookupOA(r);
     const oaHTML = oa ? (() => {
       const labelMap = {
-        diamond:                 { text: 'Diamond OA · 读投全免费',   cls: 'oa-diamond',  desc: '由机构/基金全额资助，作者读者都不付费。' },
-        gold_apc:                { text: 'Gold OA · 投稿付 APC',       cls: 'oa-gold',     desc: '全刊开放获取，作者支付版面费（APC）。' },
-        hybrid:                  { text: 'Hybrid · 可选 OA',           cls: 'oa-hybrid',   desc: '订阅制刊，可选付 APC 开放单篇。' },
-        subscription_paid_read:  { text: '订阅制 · 读付费',            cls: 'oa-sub',      desc: '读者需订阅，作者投稿通常免费（个别收 page charge）。' },
-        unknown:                 { text: '付费模式未知',               cls: 'oa-unk',      desc: '' },
+        diamond:                 { text: T('Diamond OA · 读投全免费','Diamond OA · free to read & publish'),   cls: 'oa-diamond',  desc: T('由机构/基金全额资助，作者读者都不付费。','Fully funded by institutions / grants. No fees for authors or readers.') },
+        gold_apc:                { text: T('Gold OA · 投稿付 APC','Gold OA · APC paid by author'),       cls: 'oa-gold',     desc: T('全刊开放获取，作者支付版面费（APC）。','Fully open-access; author pays the APC.') },
+        hybrid:                  { text: T('Hybrid · 可选 OA','Hybrid · optional OA'),           cls: 'oa-hybrid',   desc: T('订阅制刊，可选付 APC 开放单篇。','Subscription journal; optional APC to open individual articles.') },
+        subscription_paid_read:  { text: T('订阅制 · 读付费','Subscription · paid read'),            cls: 'oa-sub',      desc: T('读者需订阅，作者投稿通常免费（个别收 page charge）。','Readers subscribe; authors usually free (some charge page fees).') },
+        unknown:                 { text: T('付费模式未知','OA model unknown'),               cls: 'oa-unk',      desc: '' },
       };
       // Normalize both compact (hp/l/oa/dj/apc/org/w) and verbose shapes
       const label   = oa.l || oa.label || 'unknown';
@@ -1714,15 +1765,15 @@
       const org     = oa.org || oa.host_org;
       const works   = oa.w   || oa.works_count;
       const apc = (apcVal && apcVal > 0) ? `USD ${apcVal.toLocaleString()}` : null;
-      const doajBadge = doaj ? '<span class="oa-chip oa-doaj">✓ 收录 DOAJ</span>' : '';
+      const doajBadge = doaj ? `<span class="oa-chip oa-doaj">✓ ${T('收录 DOAJ','In DOAJ')}</span>` : '';
       const isoaBadge = isoa ? '<span class="oa-chip oa-isoa">Open Access</span>' : '';
       const rows = [];
-      if (homepage) rows.push(['官网', `<a href="${escape(homepage)}" target="_blank" rel="noopener nofollow">${escape(homepage.replace(/^https?:\/\//,'').replace(/\/$/,''))}</a>`]);
-      if (apc) rows.push(['版面费 (APC)', apc]);
-      if (org) rows.push(['出版方 (OpenAlex)', escape(org)]);
-      if (works) rows.push(['已发表论文', works.toLocaleString() + ' 篇']);
+      if (homepage) rows.push([T('官网','Website'), `<a href="${escape(homepage)}" target="_blank" rel="noopener nofollow">${escape(homepage.replace(/^https?:\/\//,'').replace(/\/$/,''))}</a>`]);
+      if (apc) rows.push([T('版面费 (APC)','APC'), apc]);
+      if (org) rows.push([T('出版方 (OpenAlex)','Publisher (OpenAlex)'), escape(org)]);
+      if (works) rows.push([T('已发表论文','Published works'), works.toLocaleString() + T(' 篇','')]);
       return `<div class="drawer-section oa-section">
-        <h4>开放获取 / 版面费</h4>
+        <h4>${T('开放获取 / 版面费','Open Access / APC')}</h4>
         <div class="oa-head">
           <span class="oa-pill ${L.cls}">${L.text}</span>
           ${doajBadge}${isoaBadge}
@@ -1731,7 +1782,7 @@
         ${rows.length ? `<div class="oa-rows">${rows.map(([k,v]) =>
           `<div class="meta-row"><div class="meta-k">${k}</div><div class="meta-v">${v}</div></div>`
         ).join('')}</div>` : ''}
-        <div class="oa-footnote muted">数据来源：OpenAlex snapshot 2026-05。仅供参考，最终以期刊官网为准。</div>
+        <div class="oa-footnote muted">${T('数据来源：OpenAlex snapshot 2026-05。仅供参考，最终以期刊官网为准。','Source: OpenAlex snapshot 2026-05. For reference only — confirm on the journal website.')}</div>
       </div>`;
     })() : '';
 
@@ -1743,12 +1794,12 @@
         <div class="drawer-issn">${issn ? 'ISSN ' + escape(issn) : ''}${eissn ? ' · eISSN ' + escape(eissn) : ''}</div>
         <div class="badges drawer-badges">${intBadges}${tierBadge}${crossBadges}</div>
         <div class="drawer-actions">
-          <div class="rating-pill" data-rating-key="${escape(favId(r))}" title="综合推荐评分">
+          <div class="rating-pill" data-rating-key="${escape(favId(r))}" title="${T('综合推荐评分','Overall rating')}">
             <span class="rating-avg" id="rating-avg">—</span><span class="rating-avg-suffix">/ 5</span>
             <span class="rating-avg-stars" id="rating-avg-stars"></span>
-            <span class="rating-count muted-cell" id="rating-count">暂无评分</span>
+            <span class="rating-count muted-cell" id="rating-count">${T('暂无评分','No ratings yet')}</span>
           </div>
-          <button class="big-btn ${on?'ghost':'primary'}" id="drawer-fav-big">${on ? '★ 已收藏（点击取消）' : '☆ 加入收藏'}</button>
+          <button class="big-btn ${on?'ghost':'primary'}" id="drawer-fav-big">${on ? T('★ 已收藏（点击取消）','★ Favorited (click to remove)') : T('☆ 加入收藏','☆ Add to favorites')}</button>
         </div>
       </div>
       ${statsHTML}
@@ -1762,10 +1813,10 @@
       ${cnkxHTML}
       ${lockedSrcHTML}
       <div class="drawer-section rating-section" data-rating-key="${escape(favId(r))}">
-        <h4>我的评分</h4>
+        <h4>${T('我的评分','My Rating')}</h4>
         <div class="rating-my-wrap">
-          <div class="rating-stars-input" id="rating-input" role="radiogroup" aria-label="评分"></div>
-          <div class="rating-my-hint muted-cell" id="rating-hint">登录后可打分 · 半星可评 · 可随时修改</div>
+          <div class="rating-stars-input" id="rating-input" role="radiogroup" aria-label="${T('评分','Rating')}"></div>
+          <div class="rating-my-hint muted-cell" id="rating-hint">${T('登录后可打分 · 半星可评 · 可随时修改','Sign in to rate · half-stars supported · editable anytime')}</div>
         </div>
       </div>
     `;
@@ -1792,11 +1843,11 @@
     const kicker = $('#drawer-kicker');
     if (kicker) {
       const SRC = {
-        int: 'SCI / SSCI 国际期刊', cssci: 'CSSCI 来源期刊', cssci_ext: 'CSSCI 扩展版',
-        pku: '北大核心', cnkx: '中国科协高质量目录', ccft: 'CCF 推荐中文科技期刊',
-        zju: '浙江大学 2024', school_a: '高校自编目录 2023',
+        int: T('SCI / SSCI 国际期刊','International SCI / SSCI'), cssci: T('CSSCI 来源期刊','CSSCI Source Journals'), cssci_ext: T('CSSCI 扩展版','CSSCI Extended'),
+        pku: T('北大核心','PKU Core'), cnkx: T('中国科协高质量目录','CAST Tiered Directory'), ccft: T('CCF 推荐中文科技期刊','CCF Recommended Chinese Journals'),
+        zju: T('浙江大学 2024','ZJU 2024'), school_a: T('高校自编目录 2023','In-house School Directory 2023'),
       };
-      kicker.textContent = SRC[src] || '期刊详情';
+      kicker.textContent = SRC[src] || T('期刊详情','Journal Details');
     }
 
     drawer.classList.add('open');
@@ -1831,9 +1882,9 @@
       <div class="fav-toolbar">
         <div class="fav-list-chips">${bar}</div>
         <div class="fav-list-ops">
-          <button class="btn-mini" id="fav-list-new" title="新建清单">＋ 新建</button>
-          <button class="btn-mini" id="fav-list-rename" title="重命名当前">✎ 重命名</button>
-          <button class="btn-mini btn-danger" id="fav-list-del" title="删除当前" ${favLists.length<=1?'disabled':''}>🗑 删除</button>
+          <button class="btn-mini" id="fav-list-new" title="${T('新建清单','New list')}">＋ ${T('新建','New')}</button>
+          <button class="btn-mini" id="fav-list-rename" title="${T('重命名当前','Rename current')}">✎ ${T('重命名','Rename')}</button>
+          <button class="btn-mini btn-danger" id="fav-list-del" title="${T('删除当前','Delete current')}" ${favLists.length<=1?'disabled':''}>🗑 ${T('删除','Delete')}</button>
         </div>
       </div>`;
 
@@ -1859,16 +1910,16 @@
 
     // 单一有序表格 + 拖动
     const tbody = rows.map(r => renderFavRow(r)).join('');
-    const hint = activeQuery ? '' : `<div class="fav-drag-hint">按住 <span class="drag-ico">⋮⋮</span> 拖动排序 · 长按手机端同样支持</div>`;
+    const hint = activeQuery ? '' : `<div class="fav-drag-hint">${T('按住','Hold')} <span class="drag-ico">⋮⋮</span> ${T('拖动排序 · 长按手机端同样支持','to drag-reorder · long-press on mobile')}</div>`;
     box.innerHTML = toolbar + hint + `
       <div class="table-wrap" style="margin-top:10px">
         <table class="journals fav-table">
           <thead><tr>
             <th class="col-drag" style="width:28px"></th>
-            <th class="col-name">期刊</th>
+            <th class="col-name">${T('期刊','Journal')}</th>
             <th style="width:160px">ISSN / CN</th>
-            <th>徽章 / 交叉收录</th>
-            <th class="col-src" style="width:90px">来源</th>
+            <th>${T('徽章 / 交叉收录','Badges / Also In')}</th>
+            <th class="col-src" style="width:90px">${T('来源','Source')}</th>
             <th style="width:40px"></th>
           </tr></thead>
           <tbody id="fav-tbody">${tbody}</tbody>
@@ -1907,20 +1958,20 @@
     }
     const newBtn = document.getElementById('fav-list-new');
     if (newBtn) newBtn.addEventListener('click', () => {
-      const name = prompt('新清单名称：', '新清单');
+      const name = prompt(T('新清单名称：','New list name:'), T('新清单','New list'));
       if (name && name.trim()) { createList(name.trim()); renderFav(); }
     });
     const renBtn = document.getElementById('fav-list-rename');
     if (renBtn) renBtn.addEventListener('click', () => {
       const cur = getActiveList(); if (!cur) return;
-      const name = prompt('重命名清单：', cur.name);
+      const name = prompt(T('重命名清单：','Rename list:'), cur.name);
       if (name && name.trim()) { renameList(cur.id, name.trim()); renderFav(); }
     });
     const delBtn = document.getElementById('fav-list-del');
     if (delBtn) delBtn.addEventListener('click', () => {
       const cur = getActiveList(); if (!cur) return;
-      if (favLists.length <= 1) { alert('至少保留一个清单'); return; }
-      if (confirm(`删除清单「${cur.name}」？\n清单中的期刊若未在其他清单中也会被移除。`)) {
+      if (favLists.length <= 1) { alert(T('至少保留一个清单','Keep at least one list')); return; }
+      if (confirm(T(`删除清单「${cur.name}」？\n清单中的期刊若未在其他清单中也会被移除。`,`Delete list "${cur.name}"?\nJournals not in other lists will also be removed.`))) {
         deleteList(cur.id); renderFav();
         if (activeTab === 'int') renderInt();
       }
@@ -1948,12 +1999,12 @@
                     : r.tier ? `<span class="tier-pill t3">${escape(r.tier)}</span>` : '';
     const crossBadges = renderDomCrossBadges(r, r.__src);
     const SRC_LABEL = {
-      int: '国际', cssci: 'CSSCI', cssci_core: 'CSSCI', cssci_ext: 'CSSCI扩展',
-      pku: '北大核心', pku_core: '北大核心', cnkx: '科协', ccft: 'CCF-T',
-      zju: '浙大', school_a: '高校目录',
+      int: T('国际','Int’l'), cssci: 'CSSCI', cssci_core: 'CSSCI', cssci_ext: T('CSSCI扩展','CSSCI Ext'),
+      pku: T('北大核心','PKU Core'), pku_core: T('北大核心','PKU Core'), cnkx: T('科协','CAST'), ccft: 'CCF-T',
+      zju: T('浙大','ZJU'), school_a: T('高校目录','In-house'),
     };
     return `<tr class="j-row clickable" data-fid="${escape(fid)}" data-src="${escape(r.__src)}">
-      <td class="col-drag"><span class="drag-handle" title="拖动排序">⋮⋮</span></td>
+      <td class="col-drag"><span class="drag-handle" title="${T('拖动排序','Drag to reorder')}">⋮⋮</span></td>
       <td class="col-name"><div class="jname">${escape(name.replace(/\*$/,''))}${cnName}${enName}${aliasHintHtml(r)}</div></td>
       <td class="col-issn">${isnCell}</td>
       <td class="col-badge"><div class="badges">${intBadges}${tierBadge}${crossBadges}</div></td>
@@ -2087,7 +2138,7 @@
     // auth
     $('#auth-btn').addEventListener('click', () => {
       if (user) {
-        if (confirm(lang === 'zh' ? '退出登录？' : 'Sign out?')) doLogout();
+        if (confirm(T('退出登录？','Sign out?'))) doLogout();
       } else {
         startLogin();
       }
@@ -2096,6 +2147,7 @@
 
   // ───────── boot ─────────
   async function boot() {
+    trackPageview();
     loadFavLists();
     bind();
     applyI18n();
@@ -2116,7 +2168,7 @@
       buildDomIndex(domestic);
       if (meta?.total && $('#total')) $('#total').textContent = meta.total.toLocaleString();
       $('#hint').textContent = lang === 'zh'
-        ? `已加载 ${journals.length.toLocaleString()} 本期刊`
+        ? `${T('已加载','Loaded')} ${journals.length.toLocaleString()} ${T('本期刊','journals')}`
         : `${journals.length.toLocaleString()} journals loaded`;
       renderCatList();
       renderInt();

@@ -10,8 +10,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
 })(window,document,'script','dataLayer','GTM-NBNXL7FB');</script>
 <!-- End Google Tag Manager -->
-<title>AILatest Journal · 期刊检索</title>
-<meta name="description" content="SCI/SSCI/AHCI/ESCI/EI 期刊检索 · JCR IF · 中科院分区 · CCF 推荐 · 中国科协高质量期刊分级 · 国内 CCF-T / 浙大目录" />
+<title>AILatest Journal</title>
+<meta name="description" content="AILatest Journal — Journal search & submission decision tool. SCI/SSCI/AHCI/ESCI/EI · JCR IF · CAS Tiers · CCF · CAST Tiered Directory · CSSCI · PKU Core · ZJU." />
 <link rel="preload" href="data/journals.json" as="fetch" crossorigin="anonymous" />
 <link rel="preload" href="data/journal_aliases.json" as="fetch" crossorigin="anonymous" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -39,7 +39,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <h1 class="brand">
     <a href="./">AILatest<span>Journal</span></a>
   </h1>
-  <div class="brand-sub" data-i18n="tagline"><b>ailatest · journal</b> — 面向中文科研人员的一站式期刊查询工具，聚合国际 SCI/SSCI 与国内分级目录，支持收藏、解锁院校自编目录、跨设备同步。</div>
+  <div class="brand-sub" data-i18n="tagline"><b>AILatest Journal</b> — 面向科研人员的期刊检索与投稿决策工具，聚合 SCI/SSCI、中科院分区、JCR、ESI、CSSCI、北大核心、浙大目录等数据，支持收藏、评分与跨设备同步。</div>
 
   <div class="side-section" data-international>
     <div class="side-label" data-i18n="indices">索引</div>
@@ -69,9 +69,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <label class="chip"><input type="checkbox" value="if" data-feat>IF</label>
       <label class="chip"><input type="checkbox" value="ccf" data-feat>CCF</label>
       <label class="chip" hidden style="display:none"><input type="checkbox" value="cnkx" data-feat>T1/T2/T3</label>
-      <label class="chip"><input type="checkbox" value="xr" data-feat>新锐分区</label>
+      <label class="chip"><input type="checkbox" value="xr" data-feat><span data-i18n="filter_xinrui">新锐分区</span></label>
       <label class="chip"><input type="checkbox" value="flagship" data-feat>N/S/C</label>
-      <label class="chip"><input type="checkbox" value="warning" data-feat>预警</label>
+      <label class="chip"><input type="checkbox" value="warning" data-feat><span data-i18n="filter_warning">预警</span></label>
     </div>
   </div>
 
@@ -92,11 +92,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <button class="nav-item" data-dom="pku_core"><span data-i18n="src_pku">北大核心 (2023)</span></button>
       <button class="nav-item" data-dom="ccft"><span data-i18n="src_ccft">CCF 中文 T 分区</span></button>
       <div class="nav-divider"></div>
-      <div class="nav-sub">院校自编目录</div>
+      <div class="nav-sub" data-i18n="nav_sub_inhouse">院校自编目录</div>
       <button class="nav-item" data-dom="zju_zju"><span data-i18n="src_zju">浙江大学 2024</span></button>
-      <button class="nav-item nav-locked" data-dom="school_a" title="高校自编目录（付费解锁）">
-        <span>🔒 学校 A · 2023</span>
-        <span class="count">付费</span>
+      <button class="nav-item nav-locked" data-dom="school_a" title="In-house School Directory (paid unlock) / 高校自编目录（付费解锁）">
+        <span data-i18n="locked_school_a">🔒 学校 A · 2023</span>
+        <span class="count" data-i18n="paid_label">付费</span>
       </button>
     </nav>
   </div>
@@ -114,19 +114,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 
   <header class="topbar">
-    <button class="side-toggle" id="side-toggle" aria-label="打开筛选侧栏">☰</button>
+    <button class="side-toggle" id="side-toggle" aria-label="Toggle filters / 打开筛选侧栏">☰</button>
     <div class="search-wrap">
       <input id="q" type="search" placeholder="Search: journal title / abbr / ISSN" autocomplete="off" spellcheck="false" />
-      <span class="hint" id="hint">加载中…</span>
+      <span class="hint" id="hint" data-i18n="loading">加载中…</span>
     </div>
     <div class="topbar-actions">
-      <button class="fav-tab" id="fav-tab" aria-label="收藏" title="我的收藏">★ <span id="fav-count">0</span></button>
-      <button class="auth-btn" id="auth-btn" aria-label="登录">登录</button>
-      <button class="lang-toggle" id="lang-toggle" aria-label="切换语言">中 / EN</button>
+      <button class="fav-tab" id="fav-tab" aria-label="Favorites" title="My Favorites / 我的收藏">★ <span id="fav-count">0</span></button>
+      <button class="auth-btn" id="auth-btn" aria-label="Sign in" data-i18n="login">登录</button>
+      <button class="lang-toggle" id="lang-toggle" aria-label="Switch language">中 / EN</button>
     </div>
   </header>
 
-  <!-- ─── 国际 tab ─── -->
+  <!-- ─── International tab ─── -->
   <section class="tab-panel" data-panel="int">
     <section class="hero">
       <h2 data-i18n="hero_title_int">SCI / SSCI 国际期刊检索</h2>
@@ -145,7 +145,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <table class="journals">
           <thead>
             <tr>
-              <th class="col-fav" aria-label="收藏"></th>
+              <th class="col-fav" aria-label="Favorite"></th>
               <th class="col-name" data-i18n="col_name">期刊 Title</th>
               <th class="col-badge" data-i18n="col_badges">索引 / IF / 分区 / 徽章</th>
               <th class="col-cat" data-i18n="col_cat">ESI / 中科院大类</th>
@@ -162,7 +162,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </section>
   </section>
 
-  <!-- ─── 国内 tab ─── -->
+  <!-- ─── Domestic tab ─── -->
   <section class="tab-panel" data-panel="dom" hidden>
     <section class="hero">
       <h2 data-i18n="hero_title_dom">国内学术期刊分级目录</h2>
@@ -175,7 +175,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div id="dom-content"></div>
   </section>
 
-  <!-- ─── 收藏 tab ─── -->
+  <!-- ─── Favorites tab ─── -->
   <section class="tab-panel" data-panel="fav" hidden>
     <section class="hero">
       <h2 data-i18n="hero_title_fav">我的收藏</h2>
@@ -187,26 +187,26 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </section>
 
   <footer class="site-foot">
-    <p>数据来源：Clarivate WoS Core Collection · JCR 2025 · ESI · 中科院文献情报中心分区表 2025 · ShowJCR (GPL-3.0) · 中国科协 2025 · 浙江大学 2024 · 高校自编目录 2023。© <a href="https://journal.ailatest.org">journal.ailatest.org</a></p>
+    <p data-i18n="footer_data">数据来源：Clarivate WoS Core Collection · JCR 2025 · ESI · 中科院文献情报中心分区表 2025 · ShowJCR (GPL-3.0) · 中国科协 2025 · 浙江大学 2024 · 高校自编目录 2023。© <a href="https://journal.ailatest.org">AILatest Journal</a></p>
   </footer>
 </main>
 
-<button id="theme-toggle" class="theme-toggle" aria-label="切换主题">◐</button>
+<button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">◐</button>
 
-<!-- 期刊详情抽屉 -->
+<!-- Journal detail drawer -->
 <div id="drawer-scrim" class="drawer-scrim" hidden></div>
 <aside id="j-drawer" class="j-drawer" aria-hidden="true">
   <header class="drawer-head">
-    <span class="drawer-kicker" id="drawer-kicker">期刊详情</span>
+    <span class="drawer-kicker" id="drawer-kicker" data-i18n="drawer_kicker">期刊详情</span>
     <div class="drawer-head-actions">
-      <button id="drawer-fav" class="drawer-fav" title="收藏">☆</button>
-      <button id="drawer-close" class="drawer-close" aria-label="关闭">✕</button>
+      <button id="drawer-fav" class="drawer-fav" title="Favorite / 收藏">☆</button>
+      <button id="drawer-close" class="drawer-close" aria-label="Close">✕</button>
     </div>
   </header>
   <div id="drawer-body" class="drawer-body"></div>
 </aside>
 
-<button id="pwa-install" class="pwa-install" hidden>📲 安装到主屏</button>
+<button id="pwa-install" class="pwa-install" hidden data-i18n="pwa_install">📲 安装到主屏</button>
 <script src="js/app.js?v=20260518-cnkx" defer></script>
 <script>
   // Register service worker (PWA)
