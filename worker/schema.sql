@@ -54,9 +54,35 @@ CREATE TABLE IF NOT EXISTS fav_lists (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS login_events (
+  id        INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id   INTEGER NOT NULL,
+  provider  TEXT,
+  day       TEXT NOT NULL,
+  event_at  INTEGER NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS page_events (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  day         TEXT NOT NULL,
+  event_at    INTEGER NOT NULL,
+  path        TEXT,
+  referrer    TEXT,
+  session_id  TEXT,
+  visitor_id  TEXT,
+  country     TEXT,
+  colo        TEXT
+);
+
 CREATE INDEX IF NOT EXISTS idx_fav_lists_user ON fav_lists(user_id);
 CREATE INDEX IF NOT EXISTS idx_favorites_user ON favorites(user_id);
 CREATE INDEX IF NOT EXISTS idx_users_email    ON users(email);
 CREATE INDEX IF NOT EXISTS idx_users_google   ON users(google_id);
 CREATE INDEX IF NOT EXISTS idx_ratings_journal ON ratings(journal_key);
 CREATE INDEX IF NOT EXISTS idx_ratings_user    ON ratings(user_id);
+CREATE INDEX IF NOT EXISTS idx_login_events_day ON login_events(day);
+CREATE INDEX IF NOT EXISTS idx_login_events_user_day ON login_events(user_id, day);
+CREATE INDEX IF NOT EXISTS idx_page_events_day ON page_events(day);
+CREATE INDEX IF NOT EXISTS idx_page_events_session_day ON page_events(session_id, day);
+CREATE INDEX IF NOT EXISTS idx_page_events_visitor_day ON page_events(visitor_id, day);
