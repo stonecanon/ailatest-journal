@@ -1,7 +1,7 @@
 {
   "name": "AILatest Journal · 期刊检索",
   "short_name": "AILatest Journal",
-  "description": "面向中文科研人员的一站式期刊查询工具 · SCI/SSCI/中科院分区/CCF/科协/院校目录",
+  "description": "面向科研人员的一站式期刊查询工具 · SCI/SSCI/中科院分区/CCF/科协/院校目录",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
