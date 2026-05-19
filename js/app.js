@@ -1789,13 +1789,111 @@
   }
 
 
+  // WoS 细分学科常用中文别名 → 英文关键词（供搜索时跨语言匹配）
+  const WOS_ZH_ALIAS = {
+    '建筑': 'architecture',
+    '城市': 'urban',
+    '规划': 'planning',
+    '土木': 'civil',
+    '结构': 'construction',
+    '环境': 'environment',
+    '生态': 'ecology',
+    '能源': 'energy',
+    '可持续': 'green sustain',
+    '交通': 'transportation',
+    '水': 'water',
+    '地理': 'geography',
+    '地质': 'geology',
+    '地球': 'earth',
+    '海洋': 'oceanography marine',
+    '气象': 'meteorology',
+    '气候': 'climate',
+    '材料': 'materials',
+    '化学': 'chemistry',
+    '物理': 'physics',
+    '数学': 'mathematics',
+    '统计': 'statistics',
+    '计算机': 'computer',
+    '人工智能': 'artificial intelligence',
+    '信息': 'information',
+    '软件': 'software',
+    '电子': 'electronic',
+    '电气': 'electrical',
+    '通信': 'telecommunications',
+    '自动化': 'automation control',
+    '机械': 'mechanical engineering',
+    '工程': 'engineering',
+    '工业': 'industrial',
+    '制造': 'manufacturing',
+    '航空': 'aerospace',
+    '生物': 'biology biological',
+    '生化': 'biochemistry',
+    '生态学': 'ecology',
+    '医学': 'medicine medical',
+    '临床': 'clinical',
+    '外科': 'surgery',
+    '内科': 'medicine general internal',
+    '神经': 'neuro neurology',
+    '心血管': 'cardiac cardiovascular',
+    '肿瘤': 'oncology',
+    '免疫': 'immunology',
+    '药理': 'pharmacology',
+    '药学': 'pharmacy',
+    '护理': 'nursing',
+    '公共卫生': 'public health',
+    '心理': 'psychology psychiatry',
+    '社会': 'social sociology',
+    '经济': 'economics',
+    '管理': 'management',
+    '商业': 'business',
+    '金融': 'finance',
+    '教育': 'education',
+    '法学': 'law',
+    '法律': 'law',
+    '历史': 'history',
+    '哲学': 'philosophy',
+    '语言': 'linguistics language',
+    '文学': 'literature',
+    '艺术': 'art',
+    '考古': 'archaeology',
+    '人类学': 'anthropology',
+    '政治': 'political',
+    '传播': 'communication',
+    '体育': 'sport',
+    '食品': 'food',
+    '农业': 'agricultur',
+    '园艺': 'horticulture',
+    '林业': 'forestry',
+    '动物': 'animal zoology',
+    '植物': 'plant botany',
+    '微生物': 'microbiology',
+  };
+
+  function expandWosQuery(raw) {
+    const q = (raw || '').trim().toLowerCase();
+    if (!q) return [];
+    // 英文直接走原样；中文走映射；混合就两路都收
+    const expanded = new Set();
+    expanded.add(q);
+    Object.keys(WOS_ZH_ALIAS).forEach(zh => {
+      if (q.includes(zh)) {
+        WOS_ZH_ALIAS[zh].split(/\s+/).forEach(en => en && expanded.add(en));
+      }
+    });
+    return [...expanded];
+  }
+
   function renderWosList() {
     const box = $('#wos-list');
     if (!box || !wosCats.length) return;
-    const search = ($('#wos-search')?.value || '').trim().toLowerCase();
-    const filtered = search
-      ? wosCats.filter(c => c.name.toLowerCase().includes(search))
-      : wosCats;
+    const raw = ($('#wos-search')?.value || '').trim().toLowerCase();
+    const tokens = expandWosQuery(raw);
+    const filtered = !tokens.length
+      ? wosCats
+      : wosCats.filter(c => {
+          const name = c.name.toLowerCase();
+          return tokens.some(t => name.includes(t));
+        });
     box.innerHTML = filtered.map(c =>
       `<label class="wos-item${activeWos.has(c.name) ? ' on' : ''}">
          <input type="checkbox" value="${escape(c.name)}" ${activeWos.has(c.name) ? 'checked' : ''}>
