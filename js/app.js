@@ -2360,12 +2360,34 @@
       : '';
 
     // 警示刊
-    const warnHTML = ir.warning
-      ? `<div class="drawer-section warn-block">
+    const warnHTML = (() => {
+      const w = ir.warning;
+      if (!w) return '';
+      // 兼容旧值（true / 字符串）
+      if (typeof w !== 'object') {
+        return `<div class="drawer-section warn-block">
            <h4>⚠ ${T('警示期刊提示','Warning Journal Notice')}</h4>
-           <p>${T('该刊被中科院纳入','This journal is included in the CAS')} ${escape(ir.warning_year || T('最新','latest'))} ${T('国际期刊预警名单。投稿前请谨慎评估，留意审稿周期、版面费、学术影响等因素。','International Journal Warning List. Evaluate carefully before submission — review cycle, APC, and academic impact.')}</p>
-         </div>`
-      : '';
+           <p>${T('该刊被中科院纳入国际期刊预警名单。投稿前请谨慎评估，留意审稿周期、版面费、学术影响等因素。','This journal is included in the CAS International Journal Warning List. Evaluate carefully before submission — review cycle, APC, and academic impact.')}</p>
+         </div>`;
+      }
+      const rows = [];
+      if (w.year)    rows.push([T('发布年份','Year'),   escape(String(w.year))]);
+      if (w.level)   rows.push([T('预警级别','Level'),  escape(w.level)]);
+      if (w.reason)  rows.push([T('预警原因','Reason'), escape(w.reason)]);
+      if (w.subject) rows.push([T('学科','Subject'),    escape(w.subject)]);
+      const meta = rows.length
+        ? `<div class="oa-rows">${rows.map(([k,v]) =>
+            `<div class="meta-row"><div class="meta-k">${k}</div><div class="meta-v">${v}</div></div>`
+          ).join('')}</div>`
+        : '';
+      const src = w.source ? `<div class="muted-cell" style="margin-top:8px;font-size:12px;line-height:1.6">${T('数据来源：','Source: ')}${escape(w.source)}</div>` : '';
+      return `<div class="drawer-section warn-block">
+           <h4>⚠ ${T('警示期刊提示','Warning Journal Notice')}</h4>
+           <p>${T('该刊被中科院纳入','This journal is included in the CAS')} ${escape(String(w.year || T('最新','latest')))} ${T('年国际期刊预警名单。投稿前请谨慎评估。','International Journal Warning List. Evaluate carefully before submission.')}</p>
+           ${meta}
+           ${src}
+         </div>`;
+    })();
 
     // OpenAlex enriched block (homepage / OA / APC)
     const oa = ir.oa || lookupOA(ir.issn || ir.eissn ? ir : r);
@@ -2427,7 +2449,7 @@
       if (issnKey || eissnKey) {
         return `<div class="drawer-section">
           <h4>${T('审稿周期','Review Cycle')}</h4>
-          <div class="muted-cell" style="font-size:13px;line-height:1.7">${T('暂无可信公开数据。','No reliable public data.')}<br>${T('该出版商未在 CrossRef 公开 received / accepted 字段（已知缺数：Elsevier / MDPI / SAGE / Oxford / IEEE / Cambridge / Frontiers / Emerald 等）。建议通过期刊官网 "Journal Insights" 或 ScienceDirect 文章页面查阅。','This publisher does not expose received / accepted dates on CrossRef (known: Elsevier / MDPI / SAGE / Oxford / IEEE / Cambridge / Frontiers / Emerald). Check the journal website "Journal Insights" or article header pages instead.')}</div>
+          <div class="muted-cell" style="font-size:13px;line-height:1.7">${T('暂无可信公开数据。','No reliable public data.')}</div>
         </div>`;
       }
       return '';
