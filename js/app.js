@@ -523,6 +523,7 @@
   let esiCats = [];
   let meta = null;
   let oaMap = {};          // compact OpenAlex map: { "ISSN": {hp, l, oa, dj, apc, org, cn, w} }
+  let reviewCycles = {};   // { ISSN: {median_days, sample_size, source, year_window, updated} }
   const DEFAULT_JOURNAL_ALIASES = {
     BE: 'BUILDING AND ENVIRONMENT',
     'B&E': 'BUILDING AND ENVIRONMENT',
@@ -2407,6 +2408,31 @@
       </div>`;
     })() : '';
 
+    // 审稿周期（CrossRef received → accepted 中位数）
+    const cycleHTML = (() => {
+      const issnKey = (r.issn || '').trim();
+      const eissnKey = (r.eissn || '').trim();
+      const rec = reviewCycles[issnKey] || reviewCycles[eissnKey];
+      if (rec && rec.median_days) {
+        return `<div class="drawer-section">
+          <h4>${T('审稿周期','Review Cycle')}</h4>
+          <div class="stats-grid">
+            <div class="stat"><div class="stat-v">${rec.median_days}</div><div class="stat-k">${T('投稿到接收 · 中位天数','Submission → Acceptance · median days')}</div></div>
+            <div class="stat"><div class="stat-v">${rec.sample_size}</div><div class="stat-k">${T('样本数 · 2024 年起','Sample size · since 2024')}</div></div>
+          </div>
+          <div class="muted-cell" style="margin-top:8px;font-size:12px;line-height:1.6">${T('数据源：','Source: ')}${escape(rec.source)} · ${T('窗口','Window')} ${escape(rec.year_window)} · ${T('更新','Updated')} ${escape(rec.updated)}<br>${T('计算方式：作者投稿（received）到编辑接收（accepted）的天数中位数。仅 Wiley / T&F / Springer / Lippincott 等出版商在 CrossRef 公开此字段；Elsevier / MDPI / SAGE / Oxford / IEEE / Cambridge / Frontiers 等出版商不公开，故部分期刊显示"暂无可信公开数据"。','Median days from received to accepted. Only Wiley / T&F / Springer / Lippincott publish this on CrossRef; Elsevier / MDPI / SAGE / Oxford / IEEE / Cambridge / Frontiers do not, so some journals show "no reliable public data".')}</div>
+        </div>`;
+      }
+      // 国际刊（有 ISSN）但没数据 → 明示"暂无"
+      if (issnKey || eissnKey) {
+        return `<div class="drawer-section">
+          <h4>${T('审稿周期','Review Cycle')}</h4>
+          <div class="muted-cell" style="font-size:13px;line-height:1.7">${T('暂无可信公开数据。','No reliable public data.')}<br>${T('该出版商未在 CrossRef 公开 received / accepted 字段（已知缺数：Elsevier / MDPI / SAGE / Oxford / IEEE / Cambridge / Frontiers / Emerald 等）。建议通过期刊官网 "Journal Insights" 或 ScienceDirect 文章页面查阅。','This publisher does not expose received / accepted dates on CrossRef (known: Elsevier / MDPI / SAGE / Oxford / IEEE / Cambridge / Frontiers / Emerald). Check the journal website "Journal Insights" or article header pages instead.')}</div>
+        </div>`;
+      }
+      return '';
+    })();
+
     const on = isFav(r);
     body.innerHTML = `
       <div class="drawer-hero">
@@ -2424,6 +2450,7 @@
         </div>
       </div>
       ${statsHTML}
+      ${cycleHTML}
       ${oaHTML}
       ${warnHTML}
       ${metaHTML ? `<div class="meta-block">${metaHTML}</div>` : ''}
@@ -2783,16 +2810,17 @@
     updateFavCount();
     await handleAuthCallback();
     try {
-      const [j, d, m, esi, oa, aliases] = await Promise.all([
+      const [j, d, m, esi, oa, aliases, rc] = await Promise.all([
         fetch('data/journals.json').then(r => r.json()),
         fetch('data/domestic.json').then(r => r.json()).catch(() => null),
         fetch('data/meta.json').then(r => r.json()).catch(() => null),
         fetch('data/esi_categories.json').then(r => r.json()).catch(() => []),
         fetch('data/oa.json').then(r => r.json()).catch(() => ({})),
         fetch('data/journal_aliases.json').then(r => r.json()).catch(() => DEFAULT_JOURNAL_ALIASES),
+        fetch('data/review_cycles.json').then(r => r.json()).catch(() => ({})),
       ]);
       setJournalAliases(aliases);
-      journals = j; domestic = d; meta = m; esiCats = esi; oaMap = oa || {};
+      journals = j; domestic = d; meta = m; esiCats = esi; oaMap = oa || {}; reviewCycles = rc || {};
       journals.forEach(journalSearchMeta);
       buildDomIndex(domestic);
       buildIntIndex(journals);
