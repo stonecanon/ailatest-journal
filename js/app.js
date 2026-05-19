@@ -95,6 +95,420 @@
   // ───────── state ─────────
   let lang = localStorage.getItem('ailatest.lang') || 'zh';
   const T = (zh_, en_) => lang === 'en' ? en_ : zh_;
+  // ── Domestic field-value translations (CAST domains, CSSCI/PKU disciplines, ZJU tiers) ──
+  const DOM_I18N = {
+    domain: {
+        "中医药":"Traditional Chinese Medicine",
+        "中国优秀科普期刊":"Outstanding Popular Science Journals",
+        "临床医学":"Clinical Medicine",
+        "仪器仪表":"Instruments & Instrumentation",
+        "仿真科学与技术":"Simulation Science & Technology",
+        "体育":"Sports Science",
+        "信息通信":"Information & Communication",
+        "光学工程和光学":"Optical Engineering & Optics",
+        "公路运输":"Highway Transportation",
+        "兵器科学与技术":"Weaponry Science & Technology",
+        "农业工程":"Agricultural Engineering",
+        "冶金工程技术与金属材料":"Metallurgical Engineering & Metallic Materials",
+        "化工":"Chemical Engineering",
+        "口腔医学":"Stomatology",
+        "图像图形":"Image & Graphics",
+        "图学":"Graphics Science",
+        "土壤学":"Soil Science",
+        "地球物理":"Geophysics",
+        "地球科学":"Earth Sciences",
+        "地理资源":"Geography & Resources",
+        "声学":"Acoustics",
+        "安全科学":"Safety Science",
+        "岩土力学与工程地质":"Geotechnical Mechanics & Engineering Geology",
+        "建筑科学":"Architectural Science",
+        "技术经济":"Technology Economics",
+        "护理学":"Nursing",
+        "指挥与控制":"Command & Control",
+        "振动工程":"Vibration Engineering",
+        "数学":"Mathematics",
+        "无机非金属材料":"Inorganic Non-metallic Materials",
+        "有色金属":"Non-ferrous Metals",
+        "机械工程":"Mechanical Engineering",
+        "材料-综合":"Materials Science (General)",
+        "材料失效与保护":"Materials Failure & Protection",
+        "核":"Nuclear Science",
+        "植物科学":"Plant Science",
+        "汽车工程":"Automotive Engineering",
+        "煤炭":"Coal Industry",
+        "照明":"Illumination",
+        "环境科学":"Environmental Science",
+        "生态学":"Ecology",
+        "生物医学工程":"Biomedical Engineering",
+        "电子及信息技术":"Electronics & Information Technology",
+        "电气工程":"Electrical Engineering",
+        "石油天然气工业":"Petroleum & Natural Gas Industry",
+        "管理科学":"Management Science",
+        "纺织":"Textiles",
+        "细胞生物学":"Cell Biology",
+        "能源电力":"Energy & Power",
+        "自动化学科":"Automation",
+        "航海":"Navigation",
+        "航空航天":"Aerospace",
+        "舰船科学":"Naval Architecture",
+        "药学":"Pharmacy",
+        "计算":"Computing",
+        "遥感科学与技术":"Remote Sensing Science & Technology",
+        "铁路运输":"Railway Transportation",
+        "预防医学与卫生学":"Preventive Medicine & Hygiene",
+        "食品科学与工程":"Food Science & Engineering",
+        "未分类":"Uncategorized",
+        "管理学":"Management",
+        "材料科学":"Materials Science",
+        "工程技术":"Engineering & Technology",
+        "生物学":"Biology",
+        "医学":"Medicine",
+        "计算机科学":"Computer Science",
+        "数学（综合）":"Mathematics (General)",
+        "化学":"Chemistry",
+        "物理与天体物理":"Physics & Astrophysics",
+        "环境科学与生态学":"Environmental Science & Ecology",
+        "农林科学":"Agriculture & Forestry",
+        "经济学":"Economics",
+        "心理学":"Psychology",
+        "法学":"Law",
+        "教育学":"Education",
+        "社会学":"Sociology",
+        "新闻传播与图书情报":"Journalism & Library Science",
+        "历史学":"History",
+        "文学":"Literature",
+        "艺术学":"Arts",
+        "哲学":"Philosophy",
+        "人文科学（综合）":"Humanities (General)",
+        "综合性期刊":"Multidisciplinary",
+    },
+    sub: {
+        "临床医学与内科学综合":"Clinical Medicine & Internal Medicine",
+        "儿科学":"Pediatrics",
+        "内分泌学":"Endocrinology",
+        "医学影像学":"Medical Imaging",
+        "呼吸病学":"Respiratory Medicine",
+        "外科学综合":"Surgery (General)",
+        "妇产科学":"Obstetrics & Gynecology",
+        "心血管病学":"Cardiovascular Medicine",
+        "感染性疾病与传染病学":"Infectious Diseases",
+        "整形外科学综合":"Plastic Surgery",
+        "检验医学":"Laboratory Medicine",
+        "消化病学":"Gastroenterology",
+        "烧伤外科学":"Burn Surgery",
+        "病理学":"Pathology",
+        "皮肤病与性病学":"Dermatology & Venereology",
+        "眼科学":"Ophthalmology",
+        "神经病学":"Neurology",
+        "精神病学":"Psychiatry",
+        "耳鼻咽喉科学科":"Otorhinolaryngology",
+        "肾脏病学":"Nephrology",
+        "肿瘤学":"Oncology",
+        "血液病学":"Hematology",
+        "风湿病学":"Rheumatology",
+        "中医药":"Traditional Chinese Medicine",
+        "交叉推荐类期刊":"Interdisciplinary Recommended",
+        "交叉领域推荐期刊目录":"Interdisciplinary Recommended",
+        "综述类期刊推荐目录":"Review Journals Recommended",
+        "农业基础科学":"Agricultural Basic Sciences",
+        "农业工程综合":"Agricultural Engineering (General)",
+        "农业建筑环境与能源工程":"Agricultural Building, Environment & Energy",
+        "农业机械化及其自动化":"Agricultural Mechanization & Automation",
+        "农业水利工程":"Agricultural Water Conservancy",
+        "农业电气化":"Agricultural Electrification",
+        "农业科学综合":"Agricultural Sciences (General)",
+        "土地整治工程":"Land Consolidation",
+        "智慧农业":"Smart Agriculture",
+        "涉农业工程大学学报":"Agricultural Engineering University Journals",
+        "生物质科学与工程":"Biomass Science & Engineering",
+        "冶金工程技术领域":"Metallurgical Engineering",
+        "金属材料（金属学与金属工艺）":"Metallic Materials",
+        "信息传感":"Information Sensing",
+        "图像信息处理、计算机图像处理":"Image Processing & Computer Vision",
+        "图像信息处理、计算机图像处理与图形学、模式识别与机器视觉":"Image/Graphics & Pattern Recognition / Machine Vision",
+        "生物医学影像处理":"Biomedical Image Processing",
+        "遥感科学与技术":"Remote Sensing Science & Technology",
+        "固体地球物理学":"Solid Earth Geophysics",
+        "水界物理学":"Hydrosphere Physics",
+        "空间物理学":"Space Physics",
+        "古生物学":"Paleontology",
+        "地球物理学":"Geophysics",
+        "地球物理学、地震":"Geophysics & Seismology",
+        "地球物理学、岩石、矿物":"Geophysics, Rocks & Minerals",
+        "地球物理学、石油天然气工业":"Geophysics & Petroleum/Gas",
+        "地质学":"Geology",
+        "地质学、古生物学":"Geology & Paleontology",
+        "地质学、地球物理学":"Geology & Geophysics",
+        "地质学、煤炭、矿物、岩石、矿床学":"Geology, Coal, Minerals, Rocks & Ore Deposits",
+        "地质学、石油":"Geology & Petroleum",
+        "地质学、矿山工程技术":"Geology & Mining Engineering",
+        "地质学、矿山工程技术、地球物理学":"Geology, Mining & Geophysics",
+        "地质学、矿物、岩石、矿床学":"Geology, Minerals, Rocks & Ore Deposits",
+        "地质学、矿物、岩石、矿床学、地球物理学":"Geology, Minerals, Rocks, Ore Deposits & Geophysics",
+        "地震、地球物理学":"Seismology & Geophysics",
+        "地震学":"Seismology",
+        "地震学、地球物理学":"Seismology & Geophysics",
+        "大气科学":"Atmospheric Sciences",
+        "天文学":"Astronomy",
+        "海洋科学、水文学":"Marine Science & Hydrology",
+        "海洋科学、水文学、气象学":"Marine Science, Hydrology & Meteorology",
+        "海洋科学、水文学、矿物、岩石、矿床学":"Marine Science, Hydrology, Minerals & Ore Deposits",
+        "石油天然气工业":"Petroleum & Natural Gas",
+        "石油天然气工业、地球物理学":"Petroleum/Gas & Geophysics",
+        "矿山工程技术":"Mining Engineering",
+        "矿山工程技术、岩石矿物":"Mining Engineering, Rocks & Minerals",
+        "矿山工程技术、矿物、岩石、矿床学":"Mining, Minerals, Rocks & Ore Deposits",
+        "矿物、岩石、矿床":"Minerals, Rocks & Ore Deposits",
+        "矿物、岩石、矿床学":"Minerals, Rocks & Ore Deposits",
+        "矿物、岩石、矿床学、地球物理学":"Minerals, Rocks, Ore Deposits & Geophysics",
+        "人文地理学领域":"Human Geography",
+        "信息地理学领域":"Geographic Information",
+        "地球科学数据出版领域":"Earth Science Data Publishing",
+        "自然地理学领域":"Physical Geography",
+        "自然资源领域":"Natural Resources",
+        "应用数学":"Applied Mathematics",
+        "数学类":"Mathematics (General)",
+        "概率统计":"Probability & Statistics",
+        "概率统计类":"Probability & Statistics",
+        "跨学科应用数学":"Interdisciplinary Applied Math",
+        "人工晶体类":"Artificial Crystals",
+        "低维无机非金属材料类":"Low-dim Inorganic Non-metallic Materials",
+        "无机非晶态材料类":"Inorganic Amorphous Materials",
+        "无机非金属材料其他学科类":"Inorganic Non-metallic Materials (Other)",
+        "无机非金属材料学科综合类期刊":"Inorganic Non-metallic Materials (General)",
+        "水泥基材料类":"Cement-based Materials",
+        "特种功能无机非金属材料类":"Functional Inorganic Non-metallic Materials",
+        "能源材料类":"Energy Materials",
+        "陶瓷材料类期刊":"Ceramic Materials",
+        "机械制造及其智能化":"Mechanical Manufacturing & Intelligence",
+        "机械工程前沿交叉领域":"Mechanical Engineering Frontiers",
+        "机械工程综合":"Mechanical Engineering (General)",
+        "机械测试与传感":"Mechanical Testing & Sensing",
+        "机械系统设计、集成与控制":"Mechanical Systems Design & Control",
+        "机械表面与界面":"Mechanical Surfaces & Interfaces",
+        "机械运行维护与管理":"Mechanical Operation & Maintenance",
+        "机械驱动与传动":"Mechanical Drive & Transmission",
+        "材料腐蚀与失效":"Materials Corrosion & Failure",
+        "材料表面与界面":"Materials Surfaces & Interfaces",
+        "涂料学":"Coatings",
+        "电化学":"Electrochemistry",
+        "生物医学工程":"Biomedical Engineering",
+        "电子技术、通信技术学科":"Electronic & Communication Technology",
+        "计算机技术":"Computer Technology",
+        "上游":"Upstream",
+        "下游":"Downstream",
+        "综合":"General",
+        "一般管理":"General Management",
+        "一般经济":"General Economics",
+        "交通运输管理":"Transportation Management",
+        "产业经济与发展经济":"Industrial & Development Economics",
+        "人力资源管理":"Human Resource Management",
+        "会计":"Accounting",
+        "信息管理":"Information Management",
+        "公共政策与公共管理":"Public Policy & Management",
+        "农业经济":"Agricultural Economics",
+        "创业与中小企业管理":"Entrepreneurship & SME Management",
+        "劳动与人口经济":"Labor & Population Economics",
+        "区域研究与区域经济":"Regional Studies & Economics",
+        "卫生管理与经济":"Health Management & Economics",
+        "国际商务国际事务":"International Business & Affairs",
+        "图书情报管理":"Library & Information Management",
+        "宏观经济与国际经济":"Macroeconomics & International Economics",
+        "工程项目管理":"Engineering Project Management",
+        "心理学":"Psychology",
+        "战略管理":"Strategic Management",
+        "教育管理":"Education Management",
+        "旅游管理":"Tourism Management",
+        "理论经济与实验经济":"Theoretical & Experimental Economics",
+        "科技创新管理":"S&T Innovation Management",
+        "组织管理":"Organizational Management",
+        "经济史与管理史":"Economic & Management History",
+        "营销":"Marketing",
+        "计量经济与统计":"Econometrics & Statistics",
+        "资源环境管理":"Resource & Environmental Management",
+        "运筹与管理":"Operations Research & Management",
+        "运营管理":"Operations Management",
+        "金融":"Finance",
+        "风险与安全管理":"Risk & Safety Management",
+        "电力系统及其自动化":"Power Systems & Automation",
+        "电工理论与装备":"Electrical Theory & Equipment",
+        "能源与发电技术":"Energy & Power Generation",
+        "能源与电力综合":"Energy & Power (General)",
+        "仿真科学与工程":"Simulation Science & Engineering",
+        "企业信息化":"Enterprise Informatization",
+        "导航、制导与控制":"Navigation, Guidance & Control",
+        "控制理论与控制工程":"Control Theory & Engineering",
+        "智能感知与自主控制":"Intelligent Sensing & Autonomous Control",
+        "机器人与无人系统":"Robotics & Unmanned Systems",
+        "检测技术与自动化装置":"Detection & Automation",
+        "模式识别与智能系统":"Pattern Recognition & Intelligent Systems",
+        "生物信息学":"Bioinformatics",
+        "系统工程":"Systems Engineering",
+        "综合交叉":"Interdisciplinary",
+        "自动化与控制系统、仿真科学与工程":"Automation & Control, Simulation Science",
+    },
+    cssci: {
+        "体育学":"Sports Science",
+        "历史学":"History",
+        "哲学":"Philosophy",
+        "宗教学":"Religious Studies",
+        "心理学":"Psychology",
+        "政治学":"Political Science",
+        "教育学":"Education",
+        "新闻学与传播学":"Journalism & Communication",
+        "民族学与文化学":"Ethnology & Culturology",
+        "法学":"Law",
+        "社会学":"Sociology",
+        "管理学":"Management",
+        "经济学":"Economics",
+        "统计学":"Statistics",
+        "考古学":"Archaeology",
+        "艺术学":"Arts",
+        "语言学":"Linguistics",
+        "马克思主义理论":"Marxist Theory",
+        "高校学报":"University Journals",
+    },
+    pku: {
+        "世界经济":"World Economy",
+        "中国医学":"Chinese Medicine",
+        "中国政治":"Chinese Politics",
+        "临床医学":"Clinical Medicine",
+        "人口学":"Demography",
+        "人才学":"Talent Studies",
+        "会计":"Accounting",
+        "体育":"Sports",
+        "儿科":"Pediatrics",
+        "公路":"Highways",
+        "其他化工":"Other Chemical Engineering",
+        "内科学":"Internal Medicine",
+        "农业基础科学":"Agricultural Basic Sciences",
+        "农业工程":"Agricultural Engineering",
+        "农业经济":"Agricultural Economics",
+        "冶金工业":"Metallurgical Industry",
+        "出版":"Publishing",
+        "初等中等教育":"Primary & Secondary Education",
+        "制冷工程":"Refrigeration Engineering",
+        "力学":"Mechanics",
+        "动物学":"Zoology",
+        "化学":"Chemistry",
+        "化工":"Chemical Engineering",
+        "医学理论与教育普及":"Medical Theory & Popularization",
+        "博物馆":"Museums",
+        "历史":"History",
+        "原子能":"Atomic Energy",
+        "口腔":"Stomatology",
+        "哲学":"Philosophy",
+        "国际政治":"International Politics",
+        "地球物理":"Geophysics",
+        "地理":"Geography",
+        "地质":"Geology",
+        "基础医学":"Basic Medicine",
+        "声学工程":"Acoustic Engineering",
+        "外国语言":"Foreign Languages",
+        "外科":"Surgery",
+        "外语":"Foreign Languages",
+        "天文学":"Astronomy",
+        "妇科":"Gynecology",
+        "学前教育":"Pre-school Education",
+        "安全科学":"Safety Science",
+        "宗教":"Religion",
+        "审计":"Auditing",
+        "属切割金属粘接":"Metal Cutting & Bonding",
+        "工业经济":"Industrial Economics",
+        "工程材料":"Engineering Materials",
+        "广播电视":"Broadcasting & Television",
+        "建筑":"Architecture",
+        "心理学":"Psychology",
+        "戏剧":"Drama",
+        "政治":"Politics",
+        "教师教育":"Teacher Education",
+        "数学":"Mathematics",
+        "数民族语言":"Minority Languages",
+        "文学":"Literature",
+        "文学作品":"Literary Works",
+        "新闻学":"Journalism",
+        "旅游":"Tourism",
+        "无机化工工业":"Inorganic Chemical Industry",
+        "有机化工":"Organic Chemical Engineering",
+        "木材加工家具":"Wood Processing & Furniture",
+        "林业":"Forestry",
+        "档案学":"Archival Studies",
+        "植物保护":"Plant Protection",
+        "植物学":"Botany",
+        "武器工业":"Weapons Industry",
+        "民族学":"Ethnology",
+        "气象":"Meteorology",
+        "水利":"Water Conservancy",
+        "水路":"Waterway Transport",
+        "法律":"Law",
+        "测绘学":"Surveying & Mapping",
+        "济管理":"Economics & Management",
+        "海洋学":"Oceanography",
+        "烟草":"Tobacco",
+        "煤矿":"Coal Mining",
+        "物理":"Physics",
+        "物理学":"Physics",
+        "特种医学":"Special Medicine",
+        "环境科学":"Environmental Science",
+        "生物":"Biology",
+        "生物科学":"Biological Sciences",
+        "电化教育":"Educational Technology",
+        "电工技术":"Electrical Engineering",
+        "畜牧动物医学":"Animal Husbandry & Veterinary",
+        "皮肤病学与性病学":"Dermatology & Venereology",
+        "皮革":"Leather",
+        "真空技术":"Vacuum Technology",
+        "眼科":"Ophthalmology",
+        "石油天然气":"Petroleum & Gas",
+        "矿业工程":"Mining Engineering",
+        "社会学":"Sociology",
+        "神经病学与精神病学":"Neurology & Psychiatry",
+        "科学研究":"Scientific Research",
+        "管理学":"Management",
+        "纺织染整工业":"Textile & Dyeing Industry",
+        "绘画雕塑工艺美术":"Painting, Sculpture & Decorative Arts",
+        "统计学":"Statistics",
+        "综合农业科学":"General Agriculture",
+        "综合医学":"General Medicine",
+        "综合性经济科学":"General Economic Sciences",
+        "综合理工农医类":"General STEM",
+        "网络安全保密":"Cybersecurity",
+        "考古":"Archaeology",
+        "耳鼻咽喉":"ENT",
+        "职业教育":"Vocational Education",
+        "肿瘤学":"Oncology",
+        "能源与动力工程":"Energy & Power Engineering",
+        "自然科学总论":"General Natural Sciences",
+        "航空航天":"Aerospace",
+        "艺术":"Arts",
+        "药学":"Pharmacy",
+        "计算机技术与自动化":"Computer Technology & Automation",
+        "计量学":"Metrology",
+        "语文":"Chinese Language",
+        "贸易经济":"Trade Economics",
+        "轻工综合":"Light Industry (General)",
+        "运输综合":"Transportation (General)",
+        "通用技术与设备":"General Technology & Equipment",
+        "造纸":"Paper Making",
+        "配工艺":"Allocation Technology",
+        "铁路":"Railway",
+        "音乐":"Music",
+        "食品工业":"Food Industry",
+        "高等教育":"Higher Education",
+    },
+    tier: {
+        "一级":"Tier 1",
+        "核心":"Core",
+        "其他":"Other",
+    },
+  };
+  // tn(value, type) — translate a domestic data field value, falling back to original
+  const tn = (val, type) => {
+    if (lang !== 'en' || !val) return val;
+    const m = DOM_I18N[type];
+    return (m && m[val]) || val;
+  };
+
   let theme = localStorage.getItem('ailatest.theme') || 'light';
   document.documentElement.dataset.theme = theme;
 
@@ -1131,7 +1545,7 @@
       indexBadges ? `<div class="badges badges-idx">${indexBadges}</div>` : '',
       rankBadges  ? `<div class="badges badges-rank">${rankBadges}</div>`  : '',
     ].filter(Boolean).join('') || '<span class="muted-cell">—</span>';
-    const cat = [r.esi_category, r.cas_major_cn]
+    const cat = [r.esi_category, lang==='en' ? tn(r.cas_major_cn, 'domain') : r.cas_major_cn]
       .filter(Boolean).map(escape).join(' · ') || '<span class="muted-cell">—</span>';
     return `<tr data-fid="${escape(fid)}" class="j-row clickable ${r.flagship ? 'row-flagship' : ''}" data-src="int">
       <td class="col-fav">${starBtn(r, 'int')}</td>
@@ -1344,14 +1758,14 @@
         const subs = Object.entries(subC).sort((a,b) => b[1]-a[1]);
         html.push(`<details class="section-block" style="margin-top:14px" ${q?'open':''}>
           <summary>
-            ${escape(dom)}
+            ${escape(tn(dom, "domain"))}
             <span class="muted-cell">(${recs.length})</span>
             <span class="tier-mini t1">T1 ${t1.length}</span>
             <span class="tier-mini t2">T2 ${t2.length}</span>
             <span class="tier-mini t3">T3 ${t3.length}</span>
           </summary>
           ${subs.length ? `<div class="muted-cell" style="margin:8px 0 4px;font-size:12px;line-height:1.7">
-            ${subs.slice(0, 24).map(([s,c]) => `<span style="display:inline-block;margin-right:10px">${escape(s)} <span style="opacity:.6">(${c})</span></span>`).join('')}
+            ${subs.slice(0, 24).map(([s,c]) => `<span style="display:inline-block;margin-right:10px">${escape(tn(s, "sub"))} <span style="opacity:.6">(${c})</span></span>`).join('')}
             ${subs.length > 24 ? `<span style="opacity:.6">… ${T('共','total ')} ${subs.length} ${T('个细分','sub-fields')}</span>` : ''}
           </div>` : ''}
           <div class="table-wrap" style="margin-top:10px"><table class="journals"><thead><tr>
@@ -1359,7 +1773,7 @@
           </tr></thead><tbody>
           ${[t1,t2,t3].flat().slice(0, 300).map(r => renderDomRow(r, {
             src: 'cnkx', showTier: true, tierValue: r.tier,
-            extraCols: `<td class="muted-cell" style="width:160px">${escape(r.subdomain || '—')}</td>`,
+            extraCols: `<td class="muted-cell" style="width:160px">${escape(r.subdomain ? tn(r.subdomain, "sub") : '—')}</td>`,
           })).join('')}
           ${recs.length > 300 ? `<tr><td colspan="6" class="empty">${T('仅显示前 300 条，剩余','Showing first 300, remaining')} ${recs.length - 300} ${T('条请搜索','— please refine search')}</td></tr>` : ''}
           </tbody></table></div>
@@ -1383,13 +1797,13 @@
         <div class="section-subtitle">${T('共','Total ')} ${list.length.toLocaleString()} ${T('条','journals')}${T('；南京大学中国社会科学研究评价中心；',' · CSSRE, Nanjing University · ')}${q ? T('已过滤 ','Filtered ')+f.length+T(' 条',' results') : ''}</div>
         ${discs.map(d => `
           <details class="section-block" style="margin-top:14px" ${q?'open':''}>
-            <summary>${escape(d)} <span class="muted-cell">(${byDisc[d].length})</span></summary>
+            <summary>${escape(tn(d, "cssci"))} <span class="muted-cell">(${byDisc[d].length})</span></summary>
             <div class="table-wrap" style="margin-top:10px"><table class="journals"><thead><tr>
               <th>${T('期刊名称','Journal')}</th><th style="width:130px">ISSN</th><th style="width:160px">${T('学科','Discipline')}</th><th>${T('交叉收录','Also In')}</th><th style="width:40px"></th>
             </tr></thead><tbody>
               ${byDisc[d].map(r => renderDomRow(r, {
                 src: srcKey,
-                extraCols: `<td class="muted-cell" style="width:160px">${escape(r.discipline||'')}</td>`,
+                extraCols: `<td class="muted-cell" style="width:160px">${escape(tn(r.discipline||'', "cssci"))}</td>`,
               })).join('')}
             </tbody></table></div>
           </details>
@@ -1409,7 +1823,7 @@
         </tr></thead><tbody>
           ${f.slice(0, 2000).map(r => renderDomRow(r, {
             src: 'pku',
-            extraCols: `<td class="muted-cell" style="width:160px">${escape(r.category||'')}</td>`,
+            extraCols: `<td class="muted-cell" style="width:160px">${escape(tn(r.category||'', "pku"))}</td>`,
           })).join('')}
           ${f.length > 2000 ? `<tr><td colspan="5" class="empty">${T('仅显示前 2000 条，请在搜索框内精确查找','Showing first 2000 — please refine search')}</td></tr>` : ''}
         </tbody></table></div>
@@ -1431,17 +1845,17 @@
       const tierOrder = ['一级', '核心', '其他'];
       const tierClass = {'一级':'t1','核心':'t2','其他':'t3'};
       const html = [`<div class="section-block">
-        <h3 class="section-title">${escape(src.source || T('浙江大学 2024 期刊分级','ZJU 2024 Journal Tiers'))}</h3>
+        <h3 class="section-title">${escape(lang==='en' ? T('浙江大学 2024 期刊分级','ZJU 2024 Journal Tiers') : (src.source || '浙江大学 2024 期刊分级'))}</h3>
         <div class="section-subtitle">${T('共','Total ')} ${list.length.toLocaleString()} ${T('条；带 ★ 为人文社科权威级期刊（一级内）',' · ★ marks authoritative humanities & social sciences journals (within Tier 1)')}</div>`];
       for (const tier of tierOrder) {
         const recs = byTier[tier]; if (!recs || !recs.length) continue;
         html.push(`<details class="section-block" style="margin-top:14px" ${q?'open':(tier==='一级'?'open':'')}>
-          <summary>${T('国内','Domestic ')}${escape(tier)}${T('学术期刊',' Journals')} <span class="muted-cell">(${recs.length})</span></summary>
+          <summary>${T('国内','Domestic ')}${escape(tn(tier, "tier"))}${T('学术期刊',' Journals')} <span class="muted-cell">(${recs.length})</span></summary>
           <div class="table-wrap" style="margin-top:10px"><table class="journals"><thead><tr>
             <th style="width:70px">${T('级别','Tier')}</th><th>${T('期刊','Journal')}</th><th style="width:130px">ISSN / CN</th><th style="width:180px">${T('备注','Note')}</th><th>${T('交叉收录','Also In')}</th><th style="width:40px"></th>
           </tr></thead><tbody>
           ${recs.slice(0, 1500).map(r => {
-            const tierBadge = `<span class="tier-pill ${tierClass[r.tier]||'t3'}">${escape(r.tier)}</span>${r.name.includes('*') ? ' <span class="warn-pill" style="background:var(--gold);color:#fff">★</span>' : ''}`;
+            const tierBadge = `<span class="tier-pill ${tierClass[r.tier]||'t3'}">${escape(tn(r.tier, "tier"))}</span>${r.name.includes('*') ? ' <span class="warn-pill" style="background:var(--gold);color:#fff">★</span>' : ''}`;
             return renderDomRow(
               { ...r, name: r.name.replace(/\*$/,'') },
               {
@@ -1482,19 +1896,19 @@
         const tierOrder = ['一级', '核心', '其他'];
         const tierClass = {'一级':'t1','核心':'t2','其他':'t3'};
         const html = [`<div class="section-block">
-          <h3 class="section-title">${escape(src.source || T('高校自编目录 · 2023 期刊分级','In-house School Directory · 2023 Journal Tiers'))} <span class="unlocked-pill">✓ ${T('已解锁','Unlocked')}</span>
+          <h3 class="section-title">${escape(lang==='en' ? T('高校自编目录 · 2023 期刊分级','In-house School Directory · 2023 Journal Tiers') : (src.source || '高校自编目录 · 2023 期刊分级'))} <span class="unlocked-pill">✓ ${T('已解锁','Unlocked')}</span>
             <button class="tiny-btn" id="lock-again" style="float:right">${T('锁回','Lock again')}</button>
           </h3>
           <div class="section-subtitle">${T('共','Total ')} ${list.length.toLocaleString()} ${T('条；带 ★ 为人文社科权威级期刊',' · ★ marks authoritative humanities & social sciences journals')}</div>`];
         for (const tier of tierOrder) {
           const recs = byTier[tier]; if (!recs || !recs.length) continue;
           html.push(`<details class="section-block" style="margin-top:14px" ${q?'open':(tier==='一级'?'open':'')}>
-            <summary>${T('国内','Domestic ')}${escape(tier)}${T('学术期刊',' Journals')} <span class="muted-cell">(${recs.length})</span></summary>
+            <summary>${T('国内','Domestic ')}${escape(tn(tier, "tier"))}${T('学术期刊',' Journals')} <span class="muted-cell">(${recs.length})</span></summary>
             <div class="table-wrap" style="margin-top:10px"><table class="journals"><thead><tr>
               <th style="width:70px">${T('级别','Tier')}</th><th>${T('期刊','Journal')}</th><th style="width:130px">ISSN / CN</th><th style="width:180px">${T('备注','Note')}</th><th>${T('交叉收录','Also In')}</th><th style="width:40px"></th>
             </tr></thead><tbody>
             ${recs.slice(0, 1500).map(r => {
-              const tierBadge = `<span class="tier-pill ${tierClass[r.tier]||'t3'}">${escape(r.tier)}</span>${r.name.includes('*') ? ' <span class="warn-pill" style="background:var(--gold);color:#fff">★</span>' : ''}`;
+              const tierBadge = `<span class="tier-pill ${tierClass[r.tier]||'t3'}">${escape(tn(r.tier, "tier"))}</span>${r.name.includes('*') ? ' <span class="warn-pill" style="background:var(--gold);color:#fff">★</span>' : ''}`;
               return renderDomRow(
                 { ...r, name: r.name.replace(/\*$/,'') },
                 { src: 'school_a', extraCols: `<td class="muted-cell" style="width:180px">${escape(r.note||'')}</td>` }
@@ -1607,7 +2021,7 @@
       r.warning ? badgeWarn() : '',
     ].filter(Boolean).join('') : '';
     const tierBadge = r.tier && /^T[123]$/.test(r.tier) ? badgeTier(r.tier)
-                    : r.tier ? `<span class="tier-pill t3">${escape(r.tier)}</span>` : '';
+                    : r.tier ? `<span class="tier-pill t3">${escape(tn(r.tier, "tier"))}</span>` : '';
     const crossBadges = renderDomCrossBadges(r, src);
 
     // 基础元信息（真实字段）
@@ -1619,9 +2033,9 @@
     if (r.country) meta.push([T('国家/地区','Country/Region'), r.country]);
     if (r.languages || r.language_cn || r.language) meta.push([T('语种','Language'), r.languages || r.language_cn || r.language]);
     if (r.frequency) meta.push([T('出版周期','Frequency'), r.frequency]);
-    if (r.discipline) meta.push([T('学科','Discipline'), r.discipline]);
-    if (r.category) meta.push([T('分类','Category'), r.category]);
-    if (r.domain) meta.push([T('科协领域','CAST Domain'), r.domain + (r.subdomain ? ' · ' + r.subdomain : '')]);
+    if (r.discipline) meta.push([T('学科','Discipline'), tn(r.discipline, 'cssci')]);
+    if (r.category) meta.push([T('分类','Category'), tn(r.category, 'pku')]);
+    if (r.domain) meta.push([T('科协领域','CAST Domain'), tn(r.domain, 'domain') + (r.subdomain ? ' · ' + tn(r.subdomain, 'sub') : '')]);
     if (r.ccf_area) meta.push([T('CCF 方向','CCF Area'), r.ccf_area]);
     if (r.note) meta.push([T('备注','Note'), r.note]);
     const metaHTML = meta.map(([k,v]) => `<div class="meta-row"><div class="meta-k">${k}</div><div class="meta-v">${escape(v)}</div></div>`).join('');
@@ -1692,7 +2106,7 @@
     const casHTML = (() => {
       const blocks = [];
       if (r.cas_major_cn) {
-        blocks.push(`<div class="cas-major"><span class="zone-tier">${T('大类','Major')}</span> ${escape(r.cas_major_cn)} · <b>${r.cas_major_zone || r.cas_zone || '?'}${T('区','')}</b>${r.cas_top ? ' · Top' : ''}</div>`);
+        blocks.push(`<div class="cas-major"><span class="zone-tier">${T('大类','Major')}</span> ${escape(tn(r.cas_major_cn, 'domain'))} · <b>${r.cas_major_zone || r.cas_zone || '?'}${T('区','')}</b>${r.cas_top ? ' · Top' : ''}</div>`);
       }
       if (Array.isArray(r.cas_sub_cats) && r.cas_sub_cats.length) {
         blocks.push(`<ul class="cas-sub-list">${r.cas_sub_cats.map(s => {
@@ -1996,7 +2410,7 @@
       r.warning ? badgeWarn() : '',
     ].filter(Boolean).join('') : '';
     const tierBadge = r.tier && /^T[123]$/.test(r.tier) ? badgeTier(r.tier)
-                    : r.tier ? `<span class="tier-pill t3">${escape(r.tier)}</span>` : '';
+                    : r.tier ? `<span class="tier-pill t3">${escape(tn(r.tier, "tier"))}</span>` : '';
     const crossBadges = renderDomCrossBadges(r, r.__src);
     const SRC_LABEL = {
       int: T('国际','Int’l'), cssci: 'CSSCI', cssci_core: 'CSSCI', cssci_ext: T('CSSCI扩展','CSSCI Ext'),
