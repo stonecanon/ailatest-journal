@@ -1759,34 +1759,24 @@
     more.hidden = filtered.length <= shown;
   }
 
-  // ───────── category nav ─────────
+  // ───────── category nav (ESI sidebar removed; only "全部" reset button remains) ─────────
   function renderCatList() {
-    const box = $('#cat-list');
-    if (!esiCats.length) { box.innerHTML = ''; return; }
-    box.innerHTML = esiCats.map(c =>
-      `<button class="nav-item" data-cat="${escape(c.name)}">
-        <span>${escape(c.name)}</span>
-        <span class="count">${c.count}</span>
-      </button>`
-    ).join('');
-    $('#count-all').textContent = journals.length.toLocaleString();
-    box.addEventListener('click', (e) => {
-      const b = e.target.closest('.nav-item'); if (!b) return;
-      $$('.nav-item', $('.sidebar')).forEach(n => n.classList.remove('active'));
-      b.classList.add('active');
-      activeCat = b.dataset.cat;
-      shown = PAGE;
-      renderInt();
-    });
-    $$('.nav > .nav-item[data-cat="__all"]').forEach(b => {
-      b.addEventListener('click', () => {
-        $$('.nav-item', $('.sidebar')).forEach(n => n.classList.remove('active'));
-        b.classList.add('active');
+    const total = $('#count-all');
+    if (total) total.textContent = journals.length.toLocaleString();
+    const allBtn = $('#wos-all-btn');
+    if (allBtn && !allBtn.__bound) {
+      allBtn.__bound = true;
+      allBtn.addEventListener('click', () => {
+        activeWos.clear();
+        $$('.wos-item').forEach(el => el.classList.remove('on'));
+        $$('#wos-list input[type=checkbox]').forEach(cb => cb.checked = false);
+        const inp = $('#wos-search'); if (inp) inp.value = '';
+        renderWosList();
         activeCat = '__all';
         shown = PAGE;
         renderInt();
       });
-    });
+    }
   }
 
 
@@ -1913,11 +1903,145 @@
     });
   }
 
+  // ───────── domestic unified search (query 时聚合所有库) ─────────
+  function renderDomesticUnified(box, q) {
+    const sections = [];
+    const matchTxt = (...parts) => parts.filter(Boolean).join(' ').toLowerCase().includes(q);
+
+    // 1) 中国科协 (CAST)
+    if (domestic.cnkx && domestic.cnkx.records) {
+      const recs = domestic.cnkx.records.filter(r =>
+        r.tier && /^T[123]$/.test(r.tier) &&
+        matchTxt(r.name, r.issn, r.domain, r.subdomain)
+      );
+      if (recs.length) {
+        sections.push({
+          title: T('中国科协高质量目录','CAST Tiered Directory'),
+          count: recs.length,
+          html: `<div class="table-wrap"><table class="journals"><thead><tr>
+            <th style="width:60px">${T('T级','Tier')}</th><th>${T('期刊','Journal')}</th><th style="width:120px">ISSN</th><th style="width:160px">${T('学科 / 细分','Domain / Sub')}</th><th>${T('交叉收录','Also In')}</th><th style="width:40px"></th>
+          </tr></thead><tbody>
+          ${recs.slice(0, 200).map(r => renderDomRow(r, {
+            src: 'cnkx', showTier: true, tierValue: r.tier,
+            extraCols: `<td class="muted-cell" style="width:160px">${escape(tn(r.domain || '', 'domain'))}${r.subdomain ? ' · '+escape(tn(r.subdomain,'sub')) : ''}</td>`,
+          })).join('')}
+          ${recs.length > 200 ? `<tr><td colspan="6" class="empty">${T('仅显示前 200 条','First 200 only')}</td></tr>` : ''}
+          </tbody></table></div>`
+        });
+      }
+    }
+
+    // 2) CSSCI core / ext
+    for (const [key, label] of [['cssci_core', T('CSSCI 来源期刊','CSSCI Source')], ['cssci_ext', T('CSSCI 扩展版','CSSCI Extended')]]) {
+      const list = (domestic[key] || []).filter(r => matchTxt(r.name, r.discipline));
+      if (list.length) {
+        const srcKey = key === 'cssci_core' ? 'cssci' : 'cssci_ext';
+        sections.push({
+          title: label,
+          count: list.length,
+          html: `<div class="table-wrap"><table class="journals"><thead><tr>
+            <th>${T('期刊名称','Journal')}</th><th style="width:130px">ISSN</th><th style="width:160px">${T('学科','Discipline')}</th><th>${T('交叉收录','Also In')}</th><th style="width:40px"></th>
+          </tr></thead><tbody>
+          ${list.slice(0, 200).map(r => renderDomRow(r, {
+            src: srcKey,
+            extraCols: `<td class="muted-cell" style="width:160px">${escape(tn(r.discipline||'', 'cssci'))}</td>`,
+          })).join('')}
+          ${list.length > 200 ? `<tr><td colspan="5" class="empty">${T('仅显示前 200 条','First 200 only')}</td></tr>` : ''}
+          </tbody></table></div>`
+        });
+      }
+    }
+
+    // 3) 北大核心
+    if (domestic.pku_core) {
+      const list = domestic.pku_core.filter(r => matchTxt(r.name, r.category));
+      if (list.length) {
+        sections.push({
+          title: T('北大核心 (2023)','PKU Core (2023)'),
+          count: list.length,
+          html: `<div class="table-wrap"><table class="journals"><thead><tr>
+            <th>${T('期刊名称','Journal')}</th><th style="width:130px">ISSN</th><th style="width:160px">${T('分类','Category')}</th><th>${T('交叉收录','Also In')}</th><th style="width:40px"></th>
+          </tr></thead><tbody>
+          ${list.slice(0, 200).map(r => renderDomRow(r, {
+            src: 'pku',
+            extraCols: `<td class="muted-cell" style="width:160px">${escape(tn(r.category||'', 'pku'))}</td>`,
+          })).join('')}
+          ${list.length > 200 ? `<tr><td colspan="5" class="empty">${T('仅显示前 200 条','First 200 only')}</td></tr>` : ''}
+          </tbody></table></div>`
+        });
+      }
+    }
+
+    // 4) 浙大目录
+    if (domestic.zju && domestic.zju.records) {
+      const list = domestic.zju.records.filter(r => matchTxt(r.name, r.issn, r.cn_code));
+      if (list.length) {
+        const tierClass = {'一级':'t1','核心':'t2','其他':'t3'};
+        sections.push({
+          title: T('浙江大学 2024 期刊分级','ZJU 2024 Journal Tiers'),
+          count: list.length,
+          html: `<div class="table-wrap"><table class="journals"><thead><tr>
+            <th style="width:70px">${T('级别','Tier')}</th><th>${T('期刊','Journal')}</th><th style="width:130px">ISSN / CN</th><th style="width:180px">${T('备注','Note')}</th><th>${T('交叉收录','Also In')}</th><th style="width:40px"></th>
+          </tr></thead><tbody>
+          ${list.slice(0, 200).map(r => {
+            const tierBadge = `<span class="tier-pill ${tierClass[r.tier]||'t3'}">${escape(tn(r.tier, 'tier'))}</span>${(r.name||'').includes('*') ? ' <span class="warn-pill" style="background:var(--gold);color:#fff">★</span>' : ''}`;
+            return renderDomRow(
+              { ...r, name: (r.name||'').replace(/\*$/,'') },
+              { src: 'zju', extraCols: `<td class="muted-cell" style="width:180px">${escape(r.note||'')}</td>` }
+            ).replace(
+              /<tr class="j-row clickable" (data-fid=[^>]+)>/,
+              `<tr class="j-row clickable" $1><td style="width:70px">${tierBadge}</td>`
+            );
+          }).join('')}
+          ${list.length > 200 ? `<tr><td colspan="6" class="empty">${T('仅显示前 200 条','First 200 only')}</td></tr>` : ''}
+          </tbody></table></div>`
+        });
+      }
+    }
+
+    // 5) CCF 中文
+    if (domestic.ccft) {
+      const list = domestic.ccft.filter(r => matchTxt(r.cn_name, r.en_name, r.cn_code, r.org));
+      if (list.length) {
+        sections.push({
+          title: T('CCF 推荐中文 2025','CCF Chinese 2025'),
+          count: list.length,
+          html: `<div class="table-wrap"><table class="journals"><thead><tr>
+            <th style="width:60px">${T('T分区','Tier')}</th><th>${T('期刊','Journal')}</th><th style="width:130px">CN</th><th style="width:180px">${T('主办单位','Sponsor')}</th><th>${T('交叉收录','Also In')}</th><th style="width:40px"></th>
+          </tr></thead><tbody>
+          ${list.slice(0, 200).map(r => renderDomRow(
+            { name: r.cn_name, en_name: r.en_name, issn: r.cn_code, cn_code: r.cn_code, org: r.org, ccf_area: r.ccf_area, tier: r.tier },
+            { src: 'ccft', showTier: true, tierValue: r.tier, extraCols: `<td class="muted-cell" style="width:180px">${escape(r.org||'')}</td>` }
+          )).join('')}
+          ${list.length > 200 ? `<tr><td colspan="6" class="empty">${T('仅显示前 200 条','First 200 only')}</td></tr>` : ''}
+          </tbody></table></div>`
+        });
+      }
+    }
+
+    const total = sections.reduce((s, x) => s + x.count, 0);
+    if (!sections.length) {
+      box.innerHTML = `<div class="section-block"><div class="empty">${T('未找到与"','No matches for "')}${escape(activeQuery)}${T('"匹配的中文期刊。','".')}</div></div>`;
+      return;
+    }
+    box.innerHTML = `<div class="section-block">
+      <h3 class="section-title">${T('中文期刊统一搜索','Chinese Journals · Unified Search')} <span class="muted-cell">(${total})</span></h3>
+      <div class="section-subtitle">${T('已跨库聚合：科协 / CSSCI / 北大核心 / 浙大 / CCF。清空搜索框可返回单库浏览。','Aggregated across CAST / CSSCI / PKU / ZJU / CCF. Clear the search box to return to per-source view.')}</div>
+      ${sections.map(s => `<details class="section-block" style="margin-top:14px" open>
+        <summary>${escape(s.title)} <span class="muted-cell">(${s.count})</span></summary>
+        <div style="margin-top:10px">${s.html}</div>
+      </details>`).join('')}
+    </div>`;
+  }
+
   // ───────── domestic tab ─────────
   function renderDomestic() {
     const box = $('#dom-content');
     if (!domestic) { box.innerHTML = `<div class="empty">${T('无数据','No data')}</div>`; return; }
     const q = activeQuery.toLowerCase();
+
+    // ===== 统一搜索：只要有搜索词就跨库聚合，忽略当前库选择 =====
+    if (q) return renderDomesticUnified(box, q);
 
     if (activeDom === 'cnkx') {
       const d = domestic.cnkx;

@@ -16,6 +16,7 @@
  *   GET  /me                     (Bearer)                  → user profile
  *   GET  /favorites              (Bearer)                  → favorite ids
  *   PUT  /favorites              (Bearer) { favs: [...] }
+ *   POST /analytics/pageview      { path, referrer, session_id, visitor_id }
  *
  * Required secrets:
  *   JWT_SECRET              long random
@@ -94,6 +95,14 @@ async function verifyJWT(token, secret) {
 
 function nowSec() { return Math.floor(Date.now() / 1000); }
 
+function dayFromSec(sec) {
+  return new Date(sec * 1000).toISOString().slice(0, 10);
+}
+
+function cleanText(value, max = 200) {
+  return typeof value === 'string' ? value.trim().slice(0, max) : '';
+}
+
 function isEmail(s) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s || '');
 }
@@ -165,6 +174,40 @@ async function upsertEmailUser(env, email) {
      VALUES (?, ?, ?, 'email', ?, ?)`
   ).bind(email, email.split('@')[0], email.split('@')[0], now, now).run();
   return res.meta.last_row_id;
+}
+
+async function recordLoginEvent(env, userId, provider) {
+  const now = nowSec();
+  await env.DB.prepare(
+    'INSERT INTO login_events (user_id, provider, day, event_at) VALUES (?, ?, ?, ?)'
+  ).bind(userId, provider || '', dayFromSec(now), now).run();
+}
+
+async function routePageview(req, env) {
+  const body = await req.json().catch(() => null);
+  const now = nowSec();
+  const path = cleanText(body?.path || '/', 240) || '/';
+  const referrer = cleanText(body?.referrer || '', 300);
+  const sessionId = cleanText(body?.session_id || '', 80);
+  const visitorId = cleanText(body?.visitor_id || '', 80);
+  const cf = req.cf || {};
+
+  await env.DB.prepare(
+    `INSERT INTO page_events
+       (day, event_at, path, referrer, session_id, visitor_id, country, colo)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+  ).bind(
+    dayFromSec(now),
+    now,
+    path,
+    referrer,
+    sessionId,
+    visitorId,
+    cleanText(cf.country || '', 16),
+    cleanText(cf.colo || '', 16),
+  ).run();
+
+  return json({ ok: true });
 }
 
 async function getUserById(env, id) {
@@ -246,6 +289,7 @@ async function routeEmailVerify(req, env) {
   await env.DB.prepare('DELETE FROM email_codes WHERE email = ?').bind(email).run();
 
   const uid = await upsertEmailUser(env, email);
+  await recordLoginEvent(env, uid, 'email');
   const jwt = await signJWT({ uid, email }, env.JWT_SECRET);
   const u = await getUserById(env, uid);
   if (!u) return err('用户创建失败', 500);
@@ -316,6 +360,7 @@ async function routeAuthCallback(req, env) {
     uid = res.meta.last_row_id;
   }
 
+  await recordLoginEvent(env, uid, 'github');
   const jwt = await signJWT({ uid, login: gh.login }, env.JWT_SECRET);
   const r = new URL(redirect);
   r.searchParams.set('token', jwt);
@@ -407,6 +452,7 @@ async function routeGoogleCallback(req, env) {
     uid = res.meta.last_row_id;
   }
 
+  await recordLoginEvent(env, uid, 'google');
   const jwt = await signJWT({ uid, email }, env.JWT_SECRET);
   const r = new URL(redirect);
   r.searchParams.set('token', jwt);
@@ -622,6 +668,7 @@ export default {
       if (p === '/auth/github/callback'&& req.method === 'GET')  return routeAuthCallback(req, env);
       if (p === '/auth/google'         && req.method === 'GET')  return routeGoogleStart(req, env);
       if (p === '/auth/google/callback'&& req.method === 'GET')  return routeGoogleCallback(req, env);
+      if (p === '/analytics/pageview' && req.method === 'POST')  return routePageview(req, env);
       if (p === '/me'                  && req.method === 'GET')  return routeMe(req, env);
       if (p === '/favorites'           && req.method === 'GET')  return routeGetFavs(req, env);
       if (p === '/favorites'           && req.method === 'PUT')  return routePutFavs(req, env);

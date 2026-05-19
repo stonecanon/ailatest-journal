@@ -199,6 +199,8 @@ main.main {
   border: 1px solid var(--rule-soft); border-radius: 4px;
   background: var(--paper);
 }
+.wos-list-tall { max-height: calc(100vh - 360px); min-height: 420px; }
+.wos-actions { display: flex; justify-content: flex-end; margin-bottom: 6px; }
 .wos-list::-webkit-scrollbar { width: 6px; }
 .wos-list::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 3px; }
 .wos-item {

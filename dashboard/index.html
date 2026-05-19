@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AILatest Journal 本地运营看板</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div>
+        <h1>AILatest Journal 运营看板</h1>
+        <p class="subtitle">注册、登录、访问、收藏、评分与内容互动的本地可视化汇总。</p>
+      </div>
+      <div class="meta">
+        <div><span class="pill" id="source">remote D1</span></div>
+        <div>生成时间：<span id="generated-at">-</span></div>
+      </div>
+    </header>
+
+    <section class="grid kpis" aria-label="关键指标"></section>
+
+    <section class="grid main-grid">
+      <article class="card panel">
+        <h2>注册与登录趋势</h2>
+        <div class="chart" id="signup-login-chart"></div>
+      </article>
+      <article class="card panel">
+        <h2>注册来源</h2>
+        <div class="bar-list" id="provider-bars"></div>
+      </article>
+      <article class="card panel">
+        <h2>访问趋势</h2>
+        <div class="chart" id="traffic-chart"></div>
+      </article>
+      <article class="card panel">
+        <h2>登录来源</h2>
+        <div class="bar-list" id="login-provider-bars"></div>
+      </article>
+    </section>
+
+    <section class="grid tables">
+      <article class="card panel">
+        <h2>热门访问路径</h2>
+        <div class="bar-list" id="top-paths"></div>
+      </article>
+      <article class="card panel">
+        <h2>访问地区</h2>
+        <div class="bar-list" id="traffic-countries"></div>
+      </article>
+      <article class="card panel">
+        <h2>收藏最多的期刊</h2>
+        <div id="top-favorites"></div>
+      </article>
+      <article class="card panel">
+        <h2>评分最多的期刊</h2>
+        <div id="top-rated"></div>
+      </article>
+      <article class="card panel">
+        <h2>最近注册用户</h2>
+        <div id="recent-users"></div>
+      </article>
+      <article class="card panel">
+        <h2>口径说明</h2>
+        <ul class="note-list" id="notes"></ul>
+      </article>
+    </section>
+  </main>
+
+  <script src="dashboard.js"></script>
+</body>
+</html>

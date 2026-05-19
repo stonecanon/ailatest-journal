@@ -1,0 +1,292 @@
+{
+  "generated_at": "2026-05-19T13:54:28.145Z",
+  "source": "remote D1",
+  "notes": [
+    "注册量来自 users.created_at，当前是最可靠口径。",
+    "每日登录人数来自 login_events；部署 0005 migration 和新版 Worker 后开始累积。",
+    "埋点上线前，active_users_proxy 使用 users.updated_at 作为粗略活跃代理，不等同真实登录。",
+    "浏览量来自 page_events；前端埋点上线后开始累积 PV、UV、session、路径和国家/地区。"
+  ],
+  "tables": [
+    "_cf_KV",
+    "d1_migrations",
+    "email_codes",
+    "fav_lists",
+    "favorites",
+    "login_events",
+    "page_events",
+    "ratings",
+    "sqlite_sequence",
+    "users"
+  ],
+  "kpis": {
+    "total_users": 5,
+    "users_with_email": 4,
+    "email_users": 3,
+    "github_users": 1,
+    "google_users": 1,
+    "first_signup_at": 1778628305,
+    "latest_signup_at": 1779188365,
+    "favorite_rows": 22,
+    "users_with_favorites": 3,
+    "avg_favorites_per_active_user": 7.33,
+    "rating_rows": 18,
+    "users_with_ratings": 3,
+    "rated_journals": 14,
+    "avg_rating": 4.44,
+    "lists": 4,
+    "users_with_lists": 4,
+    "total_pageviews": 0,
+    "total_visitors": 0,
+    "total_login_events": 0
+  },
+  "series": {
+    "providerMix": [
+      {
+        "provider": "email",
+        "users": 3
+      },
+      {
+        "provider": "google",
+        "users": 1
+      },
+      {
+        "provider": "github",
+        "users": 1
+      }
+    ],
+    "registrationsByDay": [
+      {
+        "day": "2026-05-12",
+        "signups": 1
+      },
+      {
+        "day": "2026-05-13",
+        "signups": 2
+      },
+      {
+        "day": "2026-05-14",
+        "signups": 1
+      },
+      {
+        "day": "2026-05-19",
+        "signups": 1
+      }
+    ],
+    "activeProxyByDay": [
+      {
+        "day": "2026-05-13",
+        "active_users_proxy": 2
+      },
+      {
+        "day": "2026-05-14",
+        "active_users_proxy": 1
+      },
+      {
+        "day": "2026-05-15",
+        "active_users_proxy": 1
+      },
+      {
+        "day": "2026-05-19",
+        "active_users_proxy": 1
+      }
+    ],
+    "loginEventsByDay": [],
+    "loginProviderMix": [],
+    "pageviewsByDay": []
+  },
+  "tables_data": {
+    "topFavorites": [
+      {
+        "journal_key": "0028-0836",
+        "favorites": 3,
+        "label": "NATURE"
+      },
+      {
+        "journal_key": "1346-7581",
+        "favorites": 3,
+        "label": "JOURNAL OF ASIAN ARCHITECTURE AND BUILDING ENGINEERING"
+      },
+      {
+        "journal_key": "2045-2322",
+        "favorites": 3,
+        "label": "SCIENTIFIC REPORTS"
+      },
+      {
+        "journal_key": "2075-5309",
+        "favorites": 3,
+        "label": "BUILDINGS"
+      },
+      {
+        "journal_key": "2352-7102",
+        "favorites": 3,
+        "label": "JOURNAL OF BUILDING ENGINEERING"
+      },
+      {
+        "journal_key": "2662-9992",
+        "favorites": 2,
+        "label": "HUMANITIES & SOCIAL SCIENCES COMMUNICATIONS"
+      },
+      {
+        "journal_key": "0009-7322",
+        "favorites": 1,
+        "label": "CIRCULATION"
+      },
+      {
+        "journal_key": "0378-7788",
+        "favorites": 1,
+        "label": "ENERGY AND BUILDINGS"
+      },
+      {
+        "journal_key": "2053-1583",
+        "favorites": 1,
+        "label": "2D MATERIALS"
+      },
+      {
+        "journal_key": "2571-6255",
+        "favorites": 1,
+        "label": "FIRE-SWITZERLAND"
+      },
+      {
+        "journal_key": "t:circulation",
+        "favorites": 1,
+        "label": "t:circulation"
+      }
+    ],
+    "topRated": [
+      {
+        "journal_key": "0028-0836",
+        "ratings": 2,
+        "avg_rating": 5,
+        "label": "NATURE"
+      },
+      {
+        "journal_key": "2662-9992",
+        "ratings": 2,
+        "avg_rating": 5,
+        "label": "HUMANITIES & SOCIAL SCIENCES COMMUNICATIONS"
+      },
+      {
+        "journal_key": "1346-7581",
+        "ratings": 2,
+        "avg_rating": 4.75,
+        "label": "JOURNAL OF ASIAN ARCHITECTURE AND BUILDING ENGINEERING"
+      },
+      {
+        "journal_key": "2352-7102",
+        "ratings": 2,
+        "avg_rating": 4.5,
+        "label": "JOURNAL OF BUILDING ENGINEERING"
+      },
+      {
+        "journal_key": "0378-7788",
+        "ratings": 1,
+        "avg_rating": 5,
+        "label": "ENERGY AND BUILDINGS"
+      },
+      {
+        "journal_key": "2662-1355",
+        "ratings": 1,
+        "avg_rating": 5,
+        "label": "NATURE FOOD"
+      },
+      {
+        "journal_key": "1474-1776",
+        "ratings": 1,
+        "avg_rating": 4.5,
+        "label": "NATURE REVIEWS DRUG DISCOVERY"
+      },
+      {
+        "journal_key": "2045-2322",
+        "ratings": 1,
+        "avg_rating": 4.5,
+        "label": "SCIENTIFIC REPORTS"
+      },
+      {
+        "journal_key": "2053-1583",
+        "ratings": 1,
+        "avg_rating": 4,
+        "label": "2D MATERIALS"
+      },
+      {
+        "journal_key": "2571-6255",
+        "ratings": 1,
+        "avg_rating": 4,
+        "label": "FIRE-SWITZERLAND"
+      },
+      {
+        "journal_key": "t:安徽大学学报哲学社会科学版",
+        "ratings": 1,
+        "avg_rating": 4,
+        "label": "t:安徽大学学报哲学社会科学版"
+      },
+      {
+        "journal_key": "1550-7416",
+        "ratings": 1,
+        "avg_rating": 3.5,
+        "label": "AAPS JOURNAL"
+      },
+      {
+        "journal_key": "2075-5309",
+        "ratings": 1,
+        "avg_rating": 3.5,
+        "label": "BUILDINGS"
+      },
+      {
+        "journal_key": "2649-664X",
+        "ratings": 1,
+        "avg_rating": 3.5,
+        "label": "20 ET 21-REVUE D HISTOIRE"
+      }
+    ],
+    "topPaths": [],
+    "trafficCountries": [],
+    "recentUsers": [
+      {
+        "id": 5,
+        "provider": "email",
+        "email": "lu***@gmail.com",
+        "login": "luli2359594",
+        "name": "luli2359594",
+        "created_at": 1779188365,
+        "updated_at": 1779188365
+      },
+      {
+        "id": 4,
+        "provider": "google",
+        "email": "ji***@gmail.com",
+        "login": "stonecanon",
+        "name": "H&S一心菌 (石头小石头)",
+        "created_at": 1778766419,
+        "updated_at": 1778821092
+      },
+      {
+        "id": 3,
+        "provider": "email",
+        "email": "wz***@163.com",
+        "login": "wzy1318599914",
+        "name": "wzy1318599914",
+        "created_at": 1778657204,
+        "updated_at": 1778657276
+      },
+      {
+        "id": 2,
+        "provider": "email",
+        "email": "ar***@163.com",
+        "login": "arc_wjt",
+        "name": "arc_wjt",
+        "created_at": 1778656798,
+        "updated_at": 1778675798
+      },
+      {
+        "id": 1,
+        "provider": "github",
+        "email": "",
+        "login": "stonecanon",
+        "name": "stonecanon",
+        "created_at": 1778628305,
+        "updated_at": 1778797047
+      }
+    ]
+  }
+}
