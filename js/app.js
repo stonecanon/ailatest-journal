@@ -610,7 +610,6 @@
 
   let activeTab = 'int';
   let activeCat = '__all';
-  let catMode = (localStorage.getItem('ailatest.catMode') === 'esi') ? 'esi' : 'cas';
   let activeIndices = new Set(['SCIE','SSCI','AHCI','ESCI','EI']);
   let activeZones = new Set();
   let activeFeats = new Set();
@@ -1683,15 +1682,16 @@
       indexBadges ? `<div class="badges badges-idx">${indexBadges}</div>` : '',
       rankBadges  ? `<div class="badges badges-rank">${rankBadges}</div>`  : '',
     ].filter(Boolean).join('') || '<span class="muted-cell">—</span>';
-    const catVal = catMode === 'esi'
-      ? (r.esi_category || '')
-      : (lang === 'en' ? tn(r.cas_major_cn || '', 'domain') : (r.cas_major_cn || ''));
-    const cat = catVal ? escape(catVal) : '<span class="muted-cell">—</span>';
+    const casVal = lang === 'en' ? tn(r.cas_major_cn || '', 'domain') : (r.cas_major_cn || '');
+    const esiVal = r.esi_category || '';
+    const casCell = casVal ? escape(casVal) : '<span class="muted-cell">—</span>';
+    const esiCell = esiVal ? escape(esiVal) : '<span class="muted-cell">—</span>';
     return `<tr data-fid="${escape(fid)}" class="j-row clickable ${r.flagship ? 'row-flagship' : ''}" data-src="int">
       <td class="col-fav">${starBtn(r, 'int')}</td>
       <td class="col-name">${nameHtml}</td>
       <td class="col-badge col-badge-split">${badgeCell}</td>
-      <td class="col-cat">${cat}</td>
+      <td class="col-cas">${casCell}</td>
+      <td class="col-esi">${esiCell}</td>
       <td class="col-abbr">${abbr || '<span class="muted-cell">—</span>'}</td>
       <td class="col-issn">${issn}</td>
     </tr>`;
@@ -1844,17 +1844,7 @@
         renderInt();
       });
     }
-    // 大类列下拉切换：CAS / ESI
-    const catSel = $('#cat-col-mode');
-    if (catSel && !catSel.__bound) {
-      catSel.__bound = true;
-      catSel.value = catMode;
-      catSel.addEventListener('change', () => {
-        catMode = catSel.value === 'esi' ? 'esi' : 'cas';
-        try { localStorage.setItem('ailatest.catMode', catMode); } catch(_){}
-        renderInt();
-      });
-    }
+    // 大类列下拉切换：CAS / ESI（v30 移除：现已拆为独立两列）
   }
 
 

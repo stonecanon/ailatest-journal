@@ -419,6 +419,9 @@ main.main {
 }
 
 .col-fav { width: 64px; text-align: center; padding-left: 4px; padding-right: 4px; }
+.col-cas, .col-esi { font-size: 12.5px; line-height: 1.4; max-width: 160px; }
+.col-cas { color: var(--ink); }
+.col-esi { color: var(--ink-soft); font-family: var(--sans); font-size: 12px; }
 
 /* drawer 大类/小类 标签（区分新锐版双 4 区等情况） */
 .zone-tier {
