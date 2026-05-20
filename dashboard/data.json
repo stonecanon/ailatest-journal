@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-20T12:18:29.222Z",
+  "generated_at": "2026-05-20T12:48:28.468Z",
   "source": "remote D1",
   "notes": [
     "注册量来自 users.created_at，当前是最可靠口径。",
@@ -36,14 +36,14 @@
     "favorite_rows": 23,
     "users_with_favorites": 3,
     "avg_favorites_per_active_user": 7.67,
-    "rating_rows": 19,
-    "users_with_ratings": 3,
+    "rating_rows": 20,
+    "users_with_ratings": 4,
     "rated_journals": 15,
-    "avg_rating": 4.37,
+    "avg_rating": 4.4,
     "lists": 4,
     "users_with_lists": 4,
-    "total_pageviews": 135,
-    "total_visitors": 31,
+    "total_pageviews": 147,
+    "total_visitors": 33,
     "total_login_events": 1
   },
   "series": {
@@ -118,9 +118,9 @@
     "pageviewsByDay": [
       {
         "day": "2026-05-20",
-        "pageviews": 135,
-        "sessions": 60,
-        "visitors": 31
+        "pageviews": 147,
+        "sessions": 67,
+        "visitors": 33
       }
     ]
   },
@@ -212,6 +212,12 @@
         "label": "JOURNAL OF ASIAN ARCHITECTURE AND BUILDING ENGINEERING"
       },
       {
+        "journal_key": "2053-1583",
+        "ratings": 2,
+        "avg_rating": 4.5,
+        "label": "2D MATERIALS"
+      },
+      {
         "journal_key": "2352-7102",
         "ratings": 2,
         "avg_rating": 4.5,
@@ -240,12 +246,6 @@
         "ratings": 1,
         "avg_rating": 4.5,
         "label": "SCIENTIFIC REPORTS"
-      },
-      {
-        "journal_key": "2053-1583",
-        "ratings": 1,
-        "avg_rating": 4,
-        "label": "2D MATERIALS"
       },
       {
         "journal_key": "2571-6255",
@@ -287,8 +287,8 @@
     "topPaths": [
       {
         "path": "/",
-        "pageviews": 107,
-        "visitors": 24
+        "pageviews": 119,
+        "visitors": 27
       },
       {
         "path": "/s/3P9gQfdK",
@@ -369,13 +369,13 @@
     "trafficCountries": [
       {
         "country": "JP",
-        "pageviews": 92,
+        "pageviews": 98,
         "visitors": 12
       },
       {
         "country": "US",
-        "pageviews": 26,
-        "visitors": 12
+        "pageviews": 32,
+        "visitors": 14
       },
       {
         "country": "SG",

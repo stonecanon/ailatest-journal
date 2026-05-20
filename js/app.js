@@ -2791,12 +2791,12 @@
         </div>
       </div>
       ${statsHTML}
+      ${casHTML}
+      ${xrHTML}
       ${cycleHTML}
       ${oaHTML}
       ${warnHTML}
       ${metaHTML ? `<div class="meta-block">${metaHTML}</div>` : ''}
-      ${casHTML}
-      ${xrHTML}
       ${wosHTML}
       ${scopusHTML}
       ${eiHTML}
@@ -3208,12 +3208,14 @@
     modal.innerHTML = `
       <div class="share-card share-modal-card jcard-modal">
         <div class="share-modal-body">
-          <div class="share-modal-eyebrow">AILATEST · ${T('期刊名片','Journal Card')}</div>
-          <div class="jcard" id="jcard-canvas">
-            <div class="jcard-head">
+          <div class="jcard-header">
+            <div class="jcard-header-left">
               <div class="jcard-brand">AILatest <em>Journal</em></div>
-              <div class="jcard-brand-url">journal.ailatest.org</div>
+              <div class="jcard-eyebrow">${T('期刊名片','Journal Card')}</div>
             </div>
+            <div class="jcard-brand-url">journal.ailatest.org</div>
+          </div>
+          <div class="jcard" id="jcard-canvas">
             <div class="jcard-title">${escape(title)}</div>
             ${cn ? `<div class="jcard-sub">${escape(cn)}</div>` : ''}
             <div class="jcard-issn">${issn ? 'ISSN ' + escape(issn) : ''}${eissn ? ' · eISSN ' + escape(eissn) : ''}</div>
