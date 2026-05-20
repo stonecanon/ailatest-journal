@@ -2589,17 +2589,22 @@
         : '';
     })();
 
-    // 核心指标数值（带年份，避免不知道是哪一版数据）。优先用 join 到的国际记录 ir
+    // 核心指标数值 — 只放真正的"数值"，分区/Q 用徽章呈现，避免重复
+    // 重复信息已删：JCR Q（→ badges）、CAS 大类区（→ casHTML）、Emerging 2026 区（→ xrHTML）
     const stats = [];
-    if (ir.if_2024 != null) stats.push([T('影响因子 (JCR 2024)','Impact Factor (JCR 2024)'), ir.if_2024]);
-    if (ir.if_quartile) stats.push([T('JCR 分区 (2024)','JCR Quartile (2024)'), ir.if_quartile]);
-    if (ir.if_rank) stats.push([T('IF 排名 (2024)','IF Rank (2024)'), ir.if_rank]);
-    if (ir.cas_zone) stats.push([T('中科院 2025 大类','CAS 2025 Major'), ir.cas_zone + T('区','') + (ir.cas_top ? ' · Top' : '')]);
-    if (ir.cas_zone_2023 && ir.cas_zone_2023 !== ir.cas_zone) stats.push([T('中科院 2023 大类','CAS 2023 Major'), ir.cas_zone_2023 + T('区','')]);
-    if (ir.cas_xr && ir.cas_xr.zone) stats.push([T('新锐版 2026','Emerging 2026'), ir.cas_xr.zone + T('区','')]);
-    if (ir.cas_oa === true) stats.push([T('开放获取','Open Access'), 'OA ✓']);
-    const statsHTML = stats.length ? `<div class="stats-grid">${stats.map(([k,v]) =>
-      `<div class="stat"><div class="stat-v">${escape(String(v))}</div><div class="stat-k">${k}</div></div>`
+    if (ir.if_2024 != null) stats.push([T('影响因子','Impact Factor'), ir.if_2024, T('JCR 2024','JCR 2024')]);
+    if (ir.if_rank) stats.push([T('IF 排名','IF Rank'), ir.if_rank, T('2024','2024')]);
+    // 审稿周期合并到 stats 区
+    {
+      const issnKey = (r.issn || '').trim();
+      const eissnKey = (r.eissn || '').trim();
+      const rec = reviewCycles[issnKey] || reviewCycles[eissnKey];
+      if (rec && rec.median_days) {
+        stats.push([T('审稿天数','Review Days'), rec.median_days, T('投稿→接收 中位','Sub→Accept median')]);
+      }
+    }
+    const statsHTML = stats.length ? `<div class="stats-grid">${stats.map(([k,v,sub]) =>
+      `<div class="stat"><div class="stat-v">${escape(String(v))}</div><div class="stat-k">${k}</div>${sub?`<div class="stat-sub">${sub}</div>`:''}</div>`
     ).join('')}</div>` : '';
 
     // WoS 学科分类
@@ -2638,42 +2643,33 @@
          </div>`
       : '';
 
-    // 中科院完整层级（2025 大类分区）
+    // 中科院完整层级（2025 大类分区）— 仅显示小类列表，大类区已在徽章中展示，避免重复
     const casHTML = (() => {
-      const blocks = [];
-      if (ir.cas_major_cn) {
-        blocks.push(`<div class="cas-major"><span class="zone-tier">${T('大类','Major')}</span> ${escape(tn(ir.cas_major_cn, 'domain'))} · <b>${ir.cas_major_zone || ir.cas_zone || '?'}${T('区','')}</b>${ir.cas_top ? ' · Top' : ''}</div>`);
-      }
-      if (Array.isArray(ir.cas_sub_cats) && ir.cas_sub_cats.length) {
-        blocks.push(`<ul class="cas-sub-list">${ir.cas_sub_cats.map(s => {
-          const nm = typeof s === 'string' ? s : (s.name || '');
-          const zn = typeof s === 'object' ? s.zone : null;
-          return `<li><span class="zone-tier zone-tier-sub">${T('小类','Sub')}</span> ${escape(nm)}${zn ? ` · <b>${zn}${T('区','')}</b>` : ''}</li>`;
-        }).join('')}</ul>`);
-      }
-      return blocks.length
-        ? `<div class="drawer-section"><h4>${T('中科院文献情报中心分区 · 2025 年度','CAS NSL Tiers · 2025')}</h4>${blocks.join('')}</div>`
-        : '';
+      if (!Array.isArray(ir.cas_sub_cats) || !ir.cas_sub_cats.length) return '';
+      const items = ir.cas_sub_cats.map(s => {
+        const nm = typeof s === 'string' ? s : (s.name || '');
+        const zn = typeof s === 'object' ? s.zone : null;
+        return `<li>${escape(nm)}${zn ? ` · <b>${zn}${T('区','')}</b>` : ''}</li>`;
+      }).join('');
+      return `<div class="drawer-section">
+        <h4>${T('中科院 2025 · 小类','CAS 2025 · Sub-fields')}</h4>
+        <ul class="cas-sub-list">${items}</ul>
+      </div>`;
     })();
 
-    // 中科院新锐版 2026（独立块）
+    // 中科院新锐版 2026（独立块）— 仅显示小类列表，大类区已在徽章
     const xrHTML = (() => {
       const xr = ir.cas_xr;
-      if (!xr || !xr.zone) return '';
-      const blocks = [];
-      const majorCn = xr.major_cn || '';
-      const majorEn = xr.major_en || '';
-      const majorText = [majorCn, majorEn].filter(Boolean).join(' · ');
-      blocks.push(`<div class="cas-major"><span class="zone-tier">${T('大类','Major')}</span> ${escape(majorText || T('（未标注大类）','(no major)'))} · <b>${T('新锐','Emerging')} ${xr.zone} ${T('区','')}</b></div>`);
-      if (Array.isArray(xr.sub) && xr.sub.length) {
-        blocks.push(`<ul class="cas-sub-list">${xr.sub.map(s => {
-          const nm = s.cat || s.name || '';
-          const zn = s.zone;
-          return `<li><span class="zone-tier zone-tier-sub">${T('小类','Sub')}</span> ${escape(nm)}${zn ? ` · <b>${T('新锐','Emerging')} ${zn} ${T('区','')}</b>` : ''}</li>`;
-        }).join('')}</ul>`);
-      }
-      blocks.push(`<div class="muted-cell" style="margin-top:6px;font-size:12px;line-height:1.6">${T('数据源：ShowJCR 新锐版 2026','Source: ShowJCR Emerging 2026')}</div>`);
-      return `<div class="drawer-section"><h4>${T('新锐版分区 · 2026 年度','Emerging Tiers · 2026')}</h4>${blocks.join('')}</div>`;
+      if (!xr || !Array.isArray(xr.sub) || !xr.sub.length) return '';
+      const items = xr.sub.map(s => {
+        const nm = s.cat || s.name || '';
+        const zn = s.zone;
+        return `<li>${escape(nm)}${zn ? ` · <b>${T('新锐','Emerging')} ${zn} ${T('区','')}</b>` : ''}</li>`;
+      }).join('');
+      return `<div class="drawer-section">
+        <h4>${T('新锐版 2026 · 小类','Emerging 2026 · Sub-fields')}</h4>
+        <ul class="cas-sub-list">${items}</ul>
+      </div>`;
     })();
 
     // 中国科协高质量科技期刊分级目录 (2025-12 修订)
@@ -2758,30 +2754,8 @@
       </div>`;
     })() : '';
 
-    // 审稿周期（CrossRef received → accepted 中位数）
-    const cycleHTML = (() => {
-      const issnKey = (r.issn || '').trim();
-      const eissnKey = (r.eissn || '').trim();
-      const rec = reviewCycles[issnKey] || reviewCycles[eissnKey];
-      if (rec && rec.median_days) {
-        return `<div class="drawer-section">
-          <h4>${T('审稿周期','Review Cycle')}</h4>
-          <div class="stats-grid">
-            <div class="stat"><div class="stat-v">${rec.median_days}</div><div class="stat-k">${T('投稿到接收 · 中位天数','Submission → Acceptance · median days')}</div></div>
-            <div class="stat"><div class="stat-v">${rec.sample_size}</div><div class="stat-k">${T('样本数 · 2024 年起','Sample size · since 2024')}</div></div>
-          </div>
-          <div class="muted-cell" style="margin-top:8px;font-size:12px;line-height:1.6">${T('数据源：','Source: ')}${escape(rec.source)} · ${T('窗口','Window')} ${escape(rec.year_window)} · ${T('更新','Updated')} ${escape(rec.updated)}</div>
-        </div>`;
-      }
-      // 国际刊（有 ISSN）但没数据 → 明示"暂无"
-      if (issnKey || eissnKey) {
-        return `<div class="drawer-section">
-          <h4>${T('审稿周期','Review Cycle')}</h4>
-          <div class="muted-cell" style="font-size:13px;line-height:1.7">${T('暂无可信公开数据。','No reliable public data.')}</div>
-        </div>`;
-      }
-      return '';
-    })();
+    // 审稿周期已合并入 stats，此处保留空块以兼容（不输出）
+    const cycleHTML = '';
 
     const on = isFav(r);
     body.innerHTML = `
