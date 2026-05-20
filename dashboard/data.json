@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-20T02:36:54.217Z",
+  "generated_at": "2026-05-20T08:46:06.550Z",
   "source": "remote D1",
   "notes": [
     "注册量来自 users.created_at，当前是最可靠口径。",
@@ -13,20 +13,22 @@
     "email_codes",
     "fav_lists",
     "favorites",
+    "journal_views",
     "login_events",
     "page_events",
     "ratings",
+    "shares",
     "sqlite_sequence",
     "users"
   ],
   "kpis": {
-    "total_users": 5,
-    "users_with_email": 4,
+    "total_users": 6,
+    "users_with_email": 5,
     "email_users": 3,
     "github_users": 1,
-    "google_users": 1,
+    "google_users": 2,
     "first_signup_at": 1778628305,
-    "latest_signup_at": 1779188365,
+    "latest_signup_at": 1779258177,
     "favorite_rows": 22,
     "users_with_favorites": 3,
     "avg_favorites_per_active_user": 7.33,
@@ -34,11 +36,11 @@
     "users_with_ratings": 3,
     "rated_journals": 15,
     "avg_rating": 4.37,
-    "lists": 4,
+    "lists": 5,
     "users_with_lists": 4,
-    "total_pageviews": 0,
-    "total_visitors": 0,
-    "total_login_events": 0
+    "total_pageviews": 47,
+    "total_visitors": 19,
+    "total_login_events": 1
   },
   "series": {
     "providerMix": [
@@ -48,7 +50,7 @@
       },
       {
         "provider": "google",
-        "users": 1
+        "users": 2
       },
       {
         "provider": "github",
@@ -71,6 +73,10 @@
       {
         "day": "2026-05-19",
         "signups": 1
+      },
+      {
+        "day": "2026-05-20",
+        "signups": 1
       }
     ],
     "activeProxyByDay": [
@@ -83,17 +89,36 @@
         "active_users_proxy": 1
       },
       {
-        "day": "2026-05-15",
+        "day": "2026-05-19",
         "active_users_proxy": 1
       },
       {
-        "day": "2026-05-19",
-        "active_users_proxy": 1
+        "day": "2026-05-20",
+        "active_users_proxy": 2
       }
     ],
-    "loginEventsByDay": [],
-    "loginProviderMix": [],
-    "pageviewsByDay": []
+    "loginEventsByDay": [
+      {
+        "day": "2026-05-20",
+        "login_events": 1,
+        "login_users": 1
+      }
+    ],
+    "loginProviderMix": [
+      {
+        "provider": "google",
+        "login_events": 1,
+        "login_users": 1
+      }
+    ],
+    "pageviewsByDay": [
+      {
+        "day": "2026-05-20",
+        "pageviews": 47,
+        "sessions": 27,
+        "visitors": 19
+      }
+    ]
   },
   "tables_data": {
     "topFavorites": [
@@ -250,9 +275,65 @@
         "label": "ENERGIES"
       }
     ],
-    "topPaths": [],
-    "trafficCountries": [],
+    "topPaths": [
+      {
+        "path": "/",
+        "pageviews": 39,
+        "visitors": 15
+      },
+      {
+        "path": "/%E4%B8%80%E7%AB%99%E5%BC%8F%E7%A7%91%E7%A0%94%E6%9C%9F%E5%88%8A%E6%9F%A5",
+        "pageviews": 3,
+        "visitors": 2
+      },
+      {
+        "path": "/?q=nature&_t=1",
+        "pageviews": 2,
+        "visitors": 1
+      },
+      {
+        "path": "/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3NzkyNjQzMDIsImV4cCI6MTc4MTg1NjMwMiwidWlkIjo0LCJlbWFpbCI6ImppYW50YW93ZW5nQGdtYWlsLmNvbSJ9.3lWgyjEot0ZyjQxa9i_TwcdasKXk8kkze3E",
+        "pageviews": 1,
+        "visitors": 1
+      },
+      {
+        "path": "/?q=nature",
+        "pageviews": 1,
+        "visitors": 1
+      },
+      {
+        "path": "/%E4%B8%80%E7%AB%99%E5%BC%8F%E7%A7%91%E7%A0%94%E6%9C%9F%E5%88%8A%E6%9F%A5%E8%AF%A2%E5%B9%B3%E5%8F%B0",
+        "pageviews": 1,
+        "visitors": 1
+      }
+    ],
+    "trafficCountries": [
+      {
+        "country": "JP",
+        "pageviews": 24,
+        "visitors": 7
+      },
+      {
+        "country": "US",
+        "pageviews": 20,
+        "visitors": 10
+      },
+      {
+        "country": "HK",
+        "pageviews": 3,
+        "visitors": 2
+      }
+    ],
     "recentUsers": [
+      {
+        "id": 6,
+        "provider": "google",
+        "email": "be***@gmail.com",
+        "login": "beacontorta",
+        "name": "Wu Adrain",
+        "created_at": 1779258177,
+        "updated_at": 1779258177
+      },
       {
         "id": 5,
         "provider": "email",
@@ -269,7 +350,7 @@
         "login": "stonecanon",
         "name": "H&S一心菌 (石头小石头)",
         "created_at": 1778766419,
-        "updated_at": 1778821092
+        "updated_at": 1779264302
       },
       {
         "id": 3,
