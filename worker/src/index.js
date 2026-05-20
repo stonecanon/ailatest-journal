@@ -652,6 +652,194 @@ async function routeDeleteRating(req, env) {
   });
 }
 
+// ───────── routes: shares (一键分享收藏夹) ─────────
+
+const SHARE_ID_ALPHA = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+function genShareId() {
+  const buf = new Uint8Array(8);
+  crypto.getRandomValues(buf);
+  let out = '';
+  for (const b of buf) out += SHARE_ID_ALPHA[b % 62];
+  return out;
+}
+
+function ownerDisplayName(u) {
+  return cleanText(u.name || u.login || (u.email ? u.email.split('@')[0] : 'user'), 60) || 'user';
+}
+
+// POST /share  body { name, ids:[], expires_days? }  → { id, url }
+async function routeCreateShare(req, env) {
+  const u = await getUser(req, env);
+  if (!u) return err('unauthorized', 401);
+  const body = await req.json().catch(() => null);
+  if (!body) return err('invalid body');
+  const name = cleanText(body.name || '', 80);
+  if (!name) return err('name required');
+  const idsRaw = Array.isArray(body.ids) ? body.ids : [];
+  const ids = idsRaw
+    .filter(x => typeof x === 'string' && x.length > 0 && x.length <= 200)
+    .slice(0, 5000);
+  if (!ids.length) return err('ids empty');
+
+  const days = Number(body.expires_days);
+  const now = nowSec();
+  let expiresAt = null;
+  if (Number.isFinite(days) && days > 0 && days <= 3650) {
+    expiresAt = now + Math.floor(days) * 86400;
+  } else if (body.expires_days === null || body.expires_days === 0) {
+    expiresAt = null;  // 永久
+  } else {
+    expiresAt = now + 90 * 86400;  // 默认 90 天
+  }
+
+  // 重试 5 次防主键冲突
+  for (let i = 0; i < 5; i++) {
+    const id = genShareId();
+    try {
+      await env.DB.prepare(
+        `INSERT INTO shares (id, owner_uid, owner_name, name, items_json, view_count, import_count, created_at, expires_at)
+         VALUES (?, ?, ?, ?, ?, 0, 0, ?, ?)`
+      ).bind(id, u.id, ownerDisplayName(u), name, JSON.stringify(ids), now, expiresAt).run();
+      return json({
+        ok: true,
+        id,
+        url: `${env.SITE_URL || 'https://journal.ailatest.org'}/s/${id}`,
+        expires_at: expiresAt,
+        count: ids.length,
+      });
+    } catch (e) {
+      if (i === 4) return err('share id collision', 500);
+    }
+  }
+}
+
+// GET /share/:id  → { name, owner_name, ids:[], view_count, expires_at, expired }
+async function routeGetShare(req, env, id) {
+  const row = await env.DB.prepare(
+    'SELECT owner_uid, owner_name, name, items_json, view_count, expires_at, created_at FROM shares WHERE id = ?'
+  ).bind(id).first();
+  if (!row) return err('not found', 404);
+
+  const expired = row.expires_at && row.expires_at < nowSec();
+  let ids = [];
+  try { const a = JSON.parse(row.items_json); if (Array.isArray(a)) ids = a; } catch (_) {}
+
+  // 浏览数 +1（不阻塞响应）
+  if (!expired) {
+    await env.DB.prepare('UPDATE shares SET view_count = view_count + 1 WHERE id = ?')
+      .bind(id).run().catch(() => {});
+  }
+
+  return json({
+    id,
+    name: row.name,
+    owner_name: row.owner_name || 'user',
+    ids,
+    count: ids.length,
+    view_count: (row.view_count || 0) + (expired ? 0 : 1),
+    created_at: row.created_at,
+    expires_at: row.expires_at,
+    expired: !!expired,
+  });
+}
+
+// POST /share/:id/import  (auth) → 把分享的 ids 导入为新的收藏夹
+async function routeImportShare(req, env, id) {
+  const u = await getUser(req, env);
+  if (!u) return err('unauthorized', 401);
+  const row = await env.DB.prepare(
+    'SELECT owner_name, name, items_json, expires_at FROM shares WHERE id = ?'
+  ).bind(id).first();
+  if (!row) return err('not found', 404);
+  if (row.expires_at && row.expires_at < nowSec()) return err('expired', 410);
+
+  let ids = [];
+  try { const a = JSON.parse(row.items_json); if (Array.isArray(a)) ids = a.filter(x => typeof x === 'string'); } catch (_) {}
+  if (!ids.length) return err('share empty', 400);
+
+  const now = nowSec();
+  const newListId = `s_${id}_${now.toString(36)}`;
+  const newName = `@${row.owner_name || 'user'} 分享的 ${row.name}`.slice(0, 80);
+
+  // 取当前最大 sort_index
+  const maxRow = await env.DB.prepare(
+    'SELECT COALESCE(MAX(sort_index), -1) AS m FROM fav_lists WHERE user_id = ?'
+  ).bind(u.id).first();
+  const sortIndex = (maxRow?.m ?? -1) + 1;
+
+  await env.DB.prepare(
+    `INSERT INTO fav_lists (user_id, list_id, name, sort_index, ids_json, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`
+  ).bind(u.id, newListId, newName, sortIndex, JSON.stringify(ids), now, now).run();
+
+  await env.DB.prepare('UPDATE shares SET import_count = import_count + 1 WHERE id = ?')
+    .bind(id).run().catch(() => {});
+
+  return json({ ok: true, list_id: newListId, name: newName, count: ids.length });
+}
+
+// GET /shares/mine  → 当前用户创建的分享列表
+async function routeMyShares(req, env) {
+  const u = await getUser(req, env);
+  if (!u) return err('unauthorized', 401);
+  const rows = await env.DB.prepare(
+    `SELECT id, name, view_count, import_count, created_at, expires_at,
+            (SELECT json_array_length(items_json)) AS n
+       FROM shares WHERE owner_uid = ? ORDER BY created_at DESC LIMIT 100`
+  ).bind(u.id).all();
+  return json({ shares: rows.results || [] });
+}
+
+// DELETE /share/:id  (auth, owner only)
+async function routeDeleteShare(req, env, id) {
+  const u = await getUser(req, env);
+  if (!u) return err('unauthorized', 401);
+  const row = await env.DB.prepare('SELECT owner_uid FROM shares WHERE id = ?').bind(id).first();
+  if (!row) return err('not found', 404);
+  if (row.owner_uid !== u.id) return err('forbidden', 403);
+  await env.DB.prepare('DELETE FROM shares WHERE id = ?').bind(id).run();
+  return json({ ok: true });
+}
+
+// ───────── routes: journal_views (期刊浏览计数) ─────────
+
+// POST /journal-view  body { journal_key }   (无需登录)
+async function routeJournalView(req, env) {
+  const body = await req.json().catch(() => null);
+  const key = normalizeJournalKey(body?.journal_key);
+  if (!key) return err('invalid journal_key');
+  const now = nowSec();
+  await env.DB.prepare(
+    `INSERT INTO journal_views (journal_key, count, updated_at)
+     VALUES (?, 1, ?)
+     ON CONFLICT(journal_key) DO UPDATE SET
+       count = count + 1,
+       updated_at = excluded.updated_at`
+  ).bind(key, now).run();
+  const row = await env.DB.prepare(
+    'SELECT count FROM journal_views WHERE journal_key = ?'
+  ).bind(key).first();
+  return json({ ok: true, journal_key: key, count: row ? row.count : 1 });
+}
+
+// GET /journal-views?keys=k1,k2,...   (批量，最多 500)
+async function routeGetJournalViews(req, env) {
+  const u = new URL(req.url);
+  const raw = (u.searchParams.get('keys') || '').trim();
+  if (!raw) return json({ views: {} });
+  const keys = raw.split(',').map(normalizeJournalKey).filter(Boolean).slice(0, 500);
+  if (!keys.length) return json({ views: {} });
+  const placeholders = keys.map(() => '?').join(',');
+  const rows = await env.DB.prepare(
+    `SELECT journal_key, count FROM journal_views WHERE journal_key IN (${placeholders})`
+  ).bind(...keys).all();
+  const out = {};
+  for (const r of (rows.results || [])) out[r.journal_key] = r.count;
+  for (const k of keys) if (!(k in out)) out[k] = 0;
+  return json({ views: out });
+}
+
 // ───────── dispatcher ─────────
 export default {
   async fetch(req, env) {
@@ -677,6 +865,20 @@ export default {
       if (p === '/ratings'              && req.method === 'GET')  return routeGetRatings(req, env);
       if (p === '/ratings'              && req.method === 'PUT')  return routePutRating(req, env);
       if (p === '/ratings'              && req.method === 'DELETE') return routeDeleteRating(req, env);
+
+      // shares (一键分享收藏夹)
+      if (p === '/share'                 && req.method === 'POST')   return routeCreateShare(req, env);
+      if (p === '/shares/mine'           && req.method === 'GET')    return routeMyShares(req, env);
+      const mShare = p.match(/^\/share\/([0-9a-zA-Z]{8})$/);
+      if (mShare && req.method === 'GET')                            return routeGetShare(req, env, mShare[1]);
+      if (mShare && req.method === 'DELETE')                         return routeDeleteShare(req, env, mShare[1]);
+      const mImport = p.match(/^\/share\/([0-9a-zA-Z]{8})\/import$/);
+      if (mImport && req.method === 'POST')                          return routeImportShare(req, env, mImport[1]);
+
+      // journal views (浏览计数)
+      if (p === '/journal-view'          && req.method === 'POST')   return routeJournalView(req, env);
+      if (p === '/journal-views'         && req.method === 'GET')    return routeGetJournalViews(req, env);
+
       return err('not found', 404);
     } catch (e) {
       return err('server error: ' + e.message, 500);
