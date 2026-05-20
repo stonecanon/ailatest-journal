@@ -677,11 +677,11 @@ table.journals tr:last-child td { border-bottom: 0; }
 }
 /* 索引徽章统一中性奶米色，仅作信息标签 */
 .share-modal-list .share-idx { background: #ebe2c5; color: #5a4a20; }
-/* JCR 分区 navy 单色（共用 zone 变量） */
-.share-modal-list .jcr-q1 { background: var(--zone-1); color: #ffffff; }
-.share-modal-list .jcr-q2 { background: var(--zone-2); color: #ffffff; }
-.share-modal-list .jcr-q3 { background: var(--zone-3); color: #1f3a5f; }
-.share-modal-list .jcr-q4 { background: var(--zone-4); color: #1f3a5f; }
+/* JCR 分区 burgundy 单色（与中科院 navy / 新锐 teal 区分） */
+.share-modal-list .jcr-q1 { background: #7a2030; color: #fff; }
+.share-modal-list .jcr-q2 { background: #a04a5a; color: #fff; }
+.share-modal-list .jcr-q3 { background: #c89099; color: #5a1820; }
+.share-modal-list .jcr-q4 { background: #ead0d4; color: #5a1820; }
 .share-modal-more { font-size: 12px; color: #8a7a4a; text-align: center; margin: -4px 0 12px; }
 .share-foot-link {
   background: none; border: 0; padding: 6px 12px; cursor: pointer;
@@ -772,10 +772,10 @@ table.journals tr:last-child td { border-bottom: 0; }
 .share-idx.idx-ahci,
 .share-idx.idx-esci,
 .share-idx.idx-ei   { background: #ebe2c5; color: #5a4a20; }
-.share-idx.jcr-q1   { background: var(--zone-1); color: #ffffff; }
-.share-idx.jcr-q2   { background: var(--zone-2); color: #ffffff; }
-.share-idx.jcr-q3   { background: var(--zone-3); color: #1f3a5f; }
-.share-idx.jcr-q4   { background: var(--zone-4); color: #1f3a5f; }
+.share-idx.jcr-q1   { background: #7a2030; color: #fff; }
+.share-idx.jcr-q2   { background: #a04a5a; color: #fff; }
+.share-idx.jcr-q3   { background: #c89099; color: #5a1820; }
+.share-idx.jcr-q4   { background: #ead0d4; color: #5a1820; }
 @media (max-width: 480px) {
   .share-list-row { flex-wrap: wrap; gap: 6px 10px; }
   .share-row-tags { max-width: 100%; justify-content: flex-start; padding-left: 38px; }
@@ -889,10 +889,10 @@ body.share-mode main.main { max-width: 760px; margin: 0 auto; padding: 28px 20px
   border-radius: 2px;
   color: #fff;
 }
-.zone.z1 { background: var(--zone-1); }
-.zone.z2 { background: var(--zone-2); }
-.zone.z3 { background: var(--zone-3); color: #1f3a5f; }
-.zone.z4 { background: var(--zone-4); color: #1f3a5f; }
+.zone.z1 { background: #1f3a5f; color: #fff; }
+.zone.z2 { background: #4f6f9b; color: #fff; }
+.zone.z3 { background: #9eb1cb; color: #1f3a5f; }
+.zone.z4 { background: #d3dbe6; color: #1f3a5f; }
 .zone.ztop { background: var(--zone-top); font-size: 10.5px; letter-spacing: 0.06em; }
 .zone sup { font-size: 8px; font-weight: 400; opacity: 0.8; }
 
@@ -906,10 +906,10 @@ body.share-mode main.main { max-width: 760px; margin: 0 auto; padding: 28px 20px
   border-radius: 2px;
   letter-spacing: 0.02em;
 }
-.if-pill.iq-Q1 { background: var(--zone-1); }
-.if-pill.iq-Q2 { background: var(--zone-2); }
-.if-pill.iq-Q3 { background: var(--zone-3); color: #1f3a5f; }
-.if-pill.iq-Q4 { background: var(--zone-4); color: #1f3a5f; }
+.if-pill.iq-Q1 { background: #7a2030; color: #fff; }
+.if-pill.iq-Q2 { background: #a04a5a; color: #fff; }
+.if-pill.iq-Q3 { background: #c89099; color: #5a1820; }
+.if-pill.iq-Q4 { background: #ead0d4; color: #5a1820; }
 
 .ccf-pill {
   display: inline-block;
@@ -945,7 +945,7 @@ body.share-mode main.main { max-width: 760px; margin: 0 auto; padding: 28px 20px
 .tier-pill.ta-c { background: #4a6741; }
 .tier-pill.ta-d { background: #6b5d52; }
 
-/* 中科院新锐版分区（与主分区/JCR 同 navy 单色系） */
+/* 中科院新锐版分区（teal 单色，由深到浅） */
 .xr-pill {
   display: inline-block;
   padding: 2px 6px;
@@ -955,10 +955,10 @@ body.share-mode main.main { max-width: 760px; margin: 0 auto; padding: 28px 20px
   color: #fff;
   letter-spacing: 0.02em;
 }
-.xr-pill.xr-1 { background: var(--zone-1); }
-.xr-pill.xr-2 { background: var(--zone-2); }
-.xr-pill.xr-3 { background: var(--zone-3); color: #1f3a5f; }
-.xr-pill.xr-4 { background: var(--zone-4); color: #1f3a5f; }
+.xr-pill.xr-1 { background: #1f5f5a; color: #fff; }
+.xr-pill.xr-2 { background: #4f9b95; color: #fff; }
+.xr-pill.xr-3 { background: #9ec9c5; color: #1f5f5a; }
+.xr-pill.xr-4 { background: #d3e6e3; color: #1f5f5a; }
 
 /* Nature / Science / Cell 旗舰徽章 */
 .flagship-pill {
