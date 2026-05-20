@@ -2658,7 +2658,7 @@
           return `<li><span class="zone-tier zone-tier-sub">${T('小类','Sub')}</span> ${escape(nm)}${zn ? ` · <b>${T('新锐','Emerging')} ${zn} ${T('区','')}</b>` : ''}</li>`;
         }).join('')}</ul>`);
       }
-      blocks.push(`<div class="muted-cell" style="margin-top:6px;font-size:12px;line-height:1.6">${T('新锐版面向成长期期刊提供独立分区，与主大类分区互为补充。"大类"为学科门类层级（如历史学），"小类"为细分学科。数据源：ShowJCR 新锐版 2026。','The Emerging Edition provides independent tiers for growing journals, complementing the main major-category tiers. "Major" is the discipline group (e.g. History); "Sub" is the sub-field. Source: ShowJCR Emerging 2026.')}</div>`);
+      blocks.push(`<div class="muted-cell" style="margin-top:6px;font-size:12px;line-height:1.6">${T('数据源：ShowJCR 新锐版 2026','Source: ShowJCR Emerging 2026')}</div>`);
       return `<div class="drawer-section"><h4>${T('新锐版分区 · 2026 年度','Emerging Tiers · 2026')}</h4>${blocks.join('')}</div>`;
     })();
 
@@ -3186,11 +3186,11 @@
     const stats = [];
     if (ir.if_2024 != null) stats.push([T('影响因子','Impact Factor'), ir.if_2024 + ' <small>JCR 2024</small>']);
     if (ir.if_rank) stats.push([T('IF 排名','IF Rank'), ir.if_rank]);
-    if (ir.cas_major_cn) stats.push([T('中科院大类','CAS Major'), escape(ir.cas_major_cn)]);
-    if (ir.esi_category) stats.push([T('ESI 高被引','ESI'), escape(ir.esi_category)]);
     const statsHtml = stats.length ? `<div class="jcard-stats">${stats.map(([k,v]) => `<div class="jcard-stat"><div class="jcard-stat-v">${v}</div><div class="jcard-stat-k">${k}</div></div>`).join('')}</div>` : '';
 
     const meta = [];
+    if (ir.cas_major_cn) meta.push([T('中科院大类','CAS Major'), ir.cas_major_cn]);
+    if (ir.esi_category) meta.push([T('ESI 高被引','ESI Category'), ir.esi_category]);
     if (r.publisher) meta.push([T('出版商','Publisher'), r.publisher]);
     if (r.country) meta.push([T('国家/地区','Country'), r.country]);
     if (r.frequency) meta.push([T('刊期','Frequency'), r.frequency]);
@@ -3209,11 +3209,8 @@
       <div class="share-card share-modal-card jcard-modal">
         <div class="share-modal-body">
           <div class="jcard-header">
-            <div class="jcard-header-left">
-              <div class="jcard-brand">AILatest <em>Journal</em></div>
-              <div class="jcard-eyebrow">${T('期刊名片','Journal Card')}</div>
-            </div>
-            <div class="jcard-brand-url">journal.ailatest.org</div>
+            <div class="jcard-eyebrow">${T('期刊名片','Journal Card')}</div>
+            <div class="jcard-brand"><em>Journal</em></div>
           </div>
           <div class="jcard" id="jcard-canvas">
             <div class="jcard-title">${escape(title)}</div>
