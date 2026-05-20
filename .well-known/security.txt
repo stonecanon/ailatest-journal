@@ -1,0 +1,4 @@
+Contact: mailto:ailatest@security-contact.local
+Expires: 2027-05-20T00:00:00Z
+Preferred-Languages: zh, en
+Canonical: https://journal.ailatest.org/.well-known/security.txt
