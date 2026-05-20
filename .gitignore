@@ -29,3 +29,6 @@ CODEX_REVIEW.md
 
 # cnkx 旧数据备份
 data/cnkx_records.json.bak
+
+# Pre-merge backups
+data/journals.json.bak_*

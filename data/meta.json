@@ -1,40 +1,29 @@
 {
   "source": "WoS Core + JCR 2025 + ESI + 中科院 2025 + 长江大学 + ShowJCR (JCR/FQB/XR/CCF/Warning) + 中国科协",
-  "last_updated_source": "WoS Core 2026-04-20",
-  "total": 24214,
+  "last_updated_source": "WoS Core 2026-05-18 + Scopus Mar. 2026",
+  "total": 23219,
   "indices": {
-    "ESCI": 9449,
+    "ESCI": 9477,
     "AHCI": 1819,
-    "SCIE": 9527,
-    "EI": 4710,
-    "SSCI": 3557
+    "SCIE": 9533,
+    "SSCI": 3558
   },
   "with_if_2024": 21525,
   "with_cas_zone": 21695,
   "with_cas_top": 1788,
   "with_warning": 4,
   "with_cn_name": 33,
-  "with_ccf": 279,
-  "with_cnkx": 4876,
+  "with_ccf": 281,
+  "with_cnkx": 0,
   "wos_categories": 259,
   "esi_categories": 22,
-  "oa_enriched": true,
-  "oa_source": "OpenAlex snapshot 2026-05",
-  "oa_stats": {
-    "matched_issns": 39310,
-    "has_homepage": 34142,
-    "has_apc": 14014,
-    "labels": {
-      "subscription_paid_read": 17147,
-      "diamond": 5756,
-      "hybrid": 9544,
-      "gold_apc": 6863
-    },
-    "is_oa": 12619,
-    "in_doaj": 10133
+  "with_scopus": 20995,
+  "scopus_active": 20416,
+  "asjc_top_levels": {
+    "Social Sciences": 8640,
+    "Physical Sciences": 7121,
+    "Life Sciences": 4278,
+    "Health Sciences": 5890
   },
-  "last_updated_ei": "2025-10-10",
-  "cnkx_total_records": 11084,
-  "cnkx_source": "中国科协 高质量科技期刊分级目录 (2025-12 修订, 共 11084 条 / 59 学科领域)",
-  "cnkx_last_updated": "2026-05-18"
+  "scopus_source": "Elsevier Scopus Source Title List Mar. 2026 (ext_list_Mar_2026.xlsx)"
 }

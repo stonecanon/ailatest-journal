@@ -1,7 +1,7 @@
 [
   {
     "name": "Education & Educational Research",
-    "count": 758
+    "count": 756
   },
   {
     "name": "Economics",
@@ -9,7 +9,7 @@
   },
   {
     "name": "History",
-    "count": 556
+    "count": 555
   },
   {
     "name": "Mathematics",
@@ -25,7 +25,7 @@
   },
   {
     "name": "Public, Environmental & Occupational Health",
-    "count": 438
+    "count": 439
   },
   {
     "name": "Humanities, Multidisciplinary",
@@ -33,7 +33,7 @@
   },
   {
     "name": "Environmental Sciences",
-    "count": 399
+    "count": 400
   },
   {
     "name": "Management",
@@ -41,7 +41,7 @@
   },
   {
     "name": "Engineering, Electrical & Electronic",
-    "count": 373
+    "count": 372
   },
   {
     "name": "Pharmacology & Pharmacy",
@@ -60,12 +60,12 @@
     "count": 339
   },
   {
-    "name": "Political Science",
-    "count": 337
+    "name": "Oncology",
+    "count": 339
   },
   {
-    "name": "Oncology",
-    "count": 336
+    "name": "Political Science",
+    "count": 338
   },
   {
     "name": "Neurosciences",
@@ -73,11 +73,11 @@
   },
   {
     "name": "Biochemistry & Molecular Biology",
-    "count": 329
+    "count": 327
   },
   {
     "name": "Surgery",
-    "count": 321
+    "count": 322
   },
   {
     "name": "Philosophy",
@@ -97,7 +97,7 @@
   },
   {
     "name": "Psychiatry",
-    "count": 294
+    "count": 296
   },
   {
     "name": "Plant Sciences",
@@ -105,14 +105,14 @@
   },
   {
     "name": "Social Sciences, Interdisciplinary",
-    "count": 274
-  },
-  {
-    "name": "Language & Linguistics",
-    "count": 268
+    "count": 276
   },
   {
     "name": "Computer Science, Information Systems",
+    "count": 269
+  },
+  {
+    "name": "Language & Linguistics",
     "count": 268
   },
   {
@@ -133,7 +133,7 @@
   },
   {
     "name": "Communication",
-    "count": 232
+    "count": 233
   },
   {
     "name": "Sociology",
@@ -145,18 +145,18 @@
   },
   {
     "name": "Computer Science, Artificial Intelligence",
-    "count": 213
+    "count": 215
   },
   {
     "name": "Literature",
     "count": 210
   },
   {
-    "name": "Ecology",
+    "name": "Psychology, Multidisciplinary",
     "count": 208
   },
   {
-    "name": "Psychology, Multidisciplinary",
+    "name": "Ecology",
     "count": 207
   },
   {
@@ -169,10 +169,14 @@
   },
   {
     "name": "Endocrinology & Metabolism",
-    "count": 196
+    "count": 197
   },
   {
     "name": "Nursing",
+    "count": 197
+  },
+  {
+    "name": "Engineering, Civil",
     "count": 196
   },
   {
@@ -180,15 +184,11 @@
     "count": 196
   },
   {
-    "name": "Engineering, Civil",
-    "count": 195
+    "name": "Medicine, Research & Experimental",
+    "count": 194
   },
   {
     "name": "Genetics & Heredity",
-    "count": 195
-  },
-  {
-    "name": "Medicine, Research & Experimental",
     "count": 194
   },
   {
@@ -204,16 +204,20 @@
     "count": 190
   },
   {
+    "name": "Computer Science, Interdisciplinary Applications",
+    "count": 188
+  },
+  {
     "name": "Area Studies",
     "count": 188
   },
   {
-    "name": "Computer Science, Interdisciplinary Applications",
+    "name": "Food Science & Technology",
     "count": 187
   },
   {
-    "name": "Food Science & Technology",
-    "count": 187
+    "name": "Engineering, Multidisciplinary",
+    "count": 186
   },
   {
     "name": "Engineering, Mechanical",
@@ -224,12 +228,8 @@
     "count": 184
   },
   {
-    "name": "Engineering, Multidisciplinary",
-    "count": 184
-  },
-  {
     "name": "Zoology",
-    "count": 183
+    "count": 184
   },
   {
     "name": "Immunology",
@@ -241,7 +241,7 @@
   },
   {
     "name": "International Relations",
-    "count": 175
+    "count": 176
   },
   {
     "name": "Veterinary Sciences",
@@ -257,7 +257,7 @@
   },
   {
     "name": "Statistics & Probability",
-    "count": 171
+    "count": 172
   },
   {
     "name": "Geography",
@@ -269,11 +269,15 @@
   },
   {
     "name": "Environmental Studies",
-    "count": 167
+    "count": 168
   },
   {
     "name": "Dentistry, Oral Surgery & Medicine",
     "count": 166
+  },
+  {
+    "name": "Gastroenterology & Hepatology",
+    "count": 157
   },
   {
     "name": "Psychology, Clinical",
@@ -284,16 +288,16 @@
     "count": 157
   },
   {
-    "name": "Gastroenterology & Hepatology",
-    "count": 155
-  },
-  {
     "name": "Information Science & Library Science",
-    "count": 149
+    "count": 150
   },
   {
     "name": "Nanoscience & Nanotechnology",
     "count": 148
+  },
+  {
+    "name": "Computer Science, Theory & Methods",
+    "count": 147
   },
   {
     "name": "Archaeology",
@@ -302,10 +306,6 @@
   {
     "name": "Orthopedics",
     "count": 147
-  },
-  {
-    "name": "Computer Science, Theory & Methods",
-    "count": 146
   },
   {
     "name": "Obstetrics & Gynecology",
@@ -320,11 +320,11 @@
     "count": 142
   },
   {
-    "name": "Sport Sciences",
-    "count": 138
+    "name": "Mathematics, Interdisciplinary Applications",
+    "count": 137
   },
   {
-    "name": "Mathematics, Interdisciplinary Applications",
+    "name": "Sport Sciences",
     "count": 137
   },
   {
@@ -337,7 +337,7 @@
   },
   {
     "name": "Agronomy",
-    "count": 134
+    "count": 133
   },
   {
     "name": "Urology & Nephrology",
@@ -369,7 +369,7 @@
   },
   {
     "name": "Literature, Romance",
-    "count": 121
+    "count": 122
   },
   {
     "name": "Nutrition & Dietetics",
@@ -388,11 +388,11 @@
     "count": 113
   },
   {
-    "name": "History & Philosophy Of Science",
-    "count": 113
+    "name": "Chemistry, Analytical",
+    "count": 112
   },
   {
-    "name": "Chemistry, Analytical",
+    "name": "History & Philosophy Of Science",
     "count": 112
   },
   {
@@ -408,11 +408,11 @@
     "count": 109
   },
   {
-    "name": "Biology",
-    "count": 108
+    "name": "Respiratory System",
+    "count": 109
   },
   {
-    "name": "Respiratory System",
+    "name": "Biology",
     "count": 108
   },
   {
@@ -424,12 +424,12 @@
     "count": 107
   },
   {
-    "name": "Geochemistry & Geophysics",
+    "name": "Construction & Building Technology",
     "count": 105
   },
   {
-    "name": "Construction & Building Technology",
-    "count": 104
+    "name": "Geochemistry & Geophysics",
+    "count": 105
   },
   {
     "name": "Hematology",
@@ -497,7 +497,7 @@
   },
   {
     "name": "Engineering, Environmental",
-    "count": 89
+    "count": 90
   },
   {
     "name": "Agriculture, Dairy & Animal Science",
@@ -533,7 +533,7 @@
   },
   {
     "name": "Instruments & Instrumentation",
-    "count": 81
+    "count": 82
   },
   {
     "name": "Transportation Science & Technology",
@@ -564,6 +564,10 @@
     "count": 77
   },
   {
+    "name": "Anesthesiology",
+    "count": 73
+  },
+  {
     "name": "Health Policy & Services",
     "count": 73
   },
@@ -580,10 +584,6 @@
     "count": 72
   },
   {
-    "name": "Anesthesiology",
-    "count": 72
-  },
-  {
     "name": "Chemistry, Medicinal",
     "count": 72
   },
@@ -596,19 +596,19 @@
     "count": 71
   },
   {
+    "name": "Cultural Studies",
+    "count": 71
+  },
+  {
     "name": "Engineering, Industrial",
     "count": 70
   },
   {
-    "name": "Cultural Studies",
+    "name": "Psychology, Experimental",
     "count": 70
   },
   {
     "name": "Engineering, Geological",
-    "count": 69
-  },
-  {
-    "name": "Psychology, Experimental",
     "count": 69
   },
   {
@@ -641,7 +641,7 @@
   },
   {
     "name": "Literary Theory & Criticism",
-    "count": 65
+    "count": 64
   },
   {
     "name": "Film, Radio, Television",
@@ -656,19 +656,19 @@
     "count": 63
   },
   {
+    "name": "Fisheries",
+    "count": 63
+  },
+  {
     "name": "Family Studies",
     "count": 63
   },
   {
-    "name": "Fisheries",
+    "name": "Physics, Mathematical",
     "count": 62
   },
   {
     "name": "Computer Science, Hardware & Architecture",
-    "count": 61
-  },
-  {
-    "name": "Physics, Mathematical",
     "count": 61
   },
   {
@@ -712,12 +712,12 @@
     "count": 56
   },
   {
-    "name": "Regional & Urban Planning",
+    "name": "Medical Informatics",
     "count": 56
   },
   {
-    "name": "Medical Informatics",
-    "count": 55
+    "name": "Regional & Urban Planning",
+    "count": 56
   },
   {
     "name": "Industrial Relations & Labor",
@@ -784,10 +784,6 @@
     "count": 44
   },
   {
-    "name": "History Of Social Sciences",
-    "count": 44
-  },
-  {
     "name": "Physics, Fluids & Plasmas",
     "count": 43
   },
@@ -797,6 +793,10 @@
   },
   {
     "name": "Nuclear Science & Technology",
+    "count": 43
+  },
+  {
+    "name": "History Of Social Sciences",
     "count": 43
   },
   {
@@ -812,20 +812,24 @@
     "count": 40
   },
   {
-    "name": "Imaging Science & Photographic Technology",
-    "count": 39
-  },
-  {
     "name": "Developmental Biology",
     "count": 39
   },
   {
+    "name": "Imaging Science & Photographic Technology",
+    "count": 38
+  },
+  {
     "name": "Physics, Atomic, Molecular & Chemical",
-    "count": 39
+    "count": 38
   },
   {
     "name": "Materials Science, Characterization, Testing",
     "count": 37
+  },
+  {
+    "name": "Computer Science, Cybernetics",
+    "count": 35
   },
   {
     "name": "Mining & Mineral Processing",
@@ -842,10 +846,6 @@
   {
     "name": "Social Sciences, Mathematical Methods",
     "count": 35
-  },
-  {
-    "name": "Computer Science, Cybernetics",
-    "count": 34
   },
   {
     "name": "Medical Laboratory Technology",
@@ -1013,7 +1013,7 @@
   },
   {
     "name": "Psychology, Biological",
-    "count": 6
+    "count": 5
   },
   {
     "name": "Clinical Medicine",
