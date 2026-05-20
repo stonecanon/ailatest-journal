@@ -586,6 +586,12 @@ table.journals tr:last-child td { border-bottom: 0; }
 .badge.b-ahci { color: var(--tag-ahci); border-color: var(--tag-ahci); background: rgba(90,43,59,0.05); }
 .badge.b-esci { color: var(--tag-esci); border-color: var(--tag-esci); background: rgba(59,79,59,0.05); }
 .badge.b-ei   { color: var(--tag-ei);   border-color: var(--tag-ei);   background: rgba(107,74,31,0.05); }
+.badge.b-scopus { color: #b8341a; border-color: #b8341a; background: rgba(184,52,26,0.05); }
+.cat-chip.asjc-life     { background: #e7f5ee; color: #1f6a3d; border-color: #b6dec5; }
+.cat-chip.asjc-health   { background: #fdeaea; color: #a23b3b; border-color: #f1c2c2; }
+.cat-chip.asjc-physical { background: #e7eefa; color: #25437f; border-color: #c2d3ed; }
+.cat-chip.asjc-social   { background: #fbf1e3; color: #7a5a1a; border-color: #ead9b0; }
+.cat-chip.asjc-multidisciplinary { background: #f1ecfa; color: #5b3a91; border-color: #d6c8ee; }
 
 .zone {
   display: inline-flex; align-items: baseline; gap: 2px;

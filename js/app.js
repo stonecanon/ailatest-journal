@@ -1443,6 +1443,21 @@
   function badgeIndex(idx) {
     return `<span class="badge b-${idx.toLowerCase()}">${idx}</span>`;
   }
+  function badgeScopus(sc) {
+    if (!sc || sc.active === false) return '';
+    return `<span class="badge b-scopus" title="${T('Scopus 收录 (Source List Mar.2026)','Indexed by Scopus (Source List Mar.2026)')}">Scopus</span>`;
+  }
+  const ASJC_TOP_CN = {
+    'Life Sciences': '生命科学',
+    'Health Sciences': '健康科学',
+    'Physical Sciences': '物理科学',
+    'Social Sciences': '社会科学',
+    'Multidisciplinary': '多学科',
+  };
+  function asjcTopChip(name) {
+    const cls = name.split(' ')[0].toLowerCase();
+    return `<span class="cat-chip asjc-${cls}">${T(ASJC_TOP_CN[name]||name, name)}</span>`;
+  }
   function badgeZone(z, top) {
     if (!z) return '';
     if (top) return `<span class="zone ztop">TOP·${z}${T('区','')}</span>`;
@@ -1603,6 +1618,7 @@
     const indexBadges = [
       badgeFlagship(r.flagship),
       ...(r.indices || []).map(badgeIndex),
+      badgeScopus(r.scopus),
     ].filter(Boolean).join('');
     // 第二行：分区/IF/等级/预警 — 回答"这本的等级和影响力"
     const rankBadges = [
@@ -2347,6 +2363,7 @@
     // 徽章块（int 源用 r 自身，国内源用 join 到的国际记录）
     const intBadges = (src === 'int' || intRec) ? [
       ...((ir.indices) || []).map(badgeIndex),
+      badgeScopus(ir.scopus),
       badgeCAS(ir.cas_zone, ir.cas_top),
       badgeIF(ir.if_2024, ir.if_quartile),
       badgeCCF(ir.ccf),
@@ -2423,6 +2440,25 @@
            <h4>${T('Web of Science 分类','Web of Science Categories')}</h4>
            <div class="cat-chips">${ir.wos_categories.map(c => `<span class="cat-chip">${escape(c)}</span>`).join('')}</div>
            ${ir.esi_category ? `<div class="esi-row"><span class="esi-label">${T('ESI 高被引学科','ESI Highly-Cited Field')}</span><span class="esi-val">${escape(ir.esi_category)}</span></div>` : ''}
+         </div>`
+      : '';
+
+    // Scopus ASJC 顶层学科（来自 Scopus Source List Mar.2026）
+    const scopusTopList = (() => {
+      const sc = ir.scopus;
+      if (!sc) return [];
+      const tops = Array.isArray(sc.asjc_top) ? [...sc.asjc_top] : [];
+      // ASJC 1000 = Multidisciplinary 是独立顶级，源表里 asjc_top 为空，前端兜底
+      if (!tops.length && Array.isArray(sc.asjc) && sc.asjc.includes('1000')) {
+        tops.push('Multidisciplinary');
+      }
+      return tops;
+    })();
+    const scopusHTML = (ir.scopus && (scopusTopList.length || ir.scopus.id))
+      ? `<div class="drawer-section">
+           <h4>${T('Scopus 学科分类','Scopus Subject Area')}</h4>
+           ${scopusTopList.length ? `<div class="cat-chips">${scopusTopList.map(asjcTopChip).join('')}</div>` : ''}
+           ${ir.scopus.id ? `<div class="muted-cell" style="margin-top:6px;font-size:12px">Scopus ID: ${escape(ir.scopus.id)}${ir.scopus.active === false ? ` · ${T('已停止收录','no longer indexed')}` : ''}</div>` : ''}
          </div>`
       : '';
 
@@ -2603,6 +2639,7 @@
       ${casHTML}
       ${xrHTML}
       ${wosHTML}
+      ${scopusHTML}
       ${eiHTML}
       ${cnkxHTML}
       ${lockedSrcHTML}
@@ -2783,6 +2820,7 @@
       : '<span class="muted-cell">—</span>';
     const intBadges = r.__src === 'int' ? [
       ...(r.indices || []).map(badgeIndex),
+      badgeScopus(r.scopus),
       badgeCAS(r.cas_zone, r.cas_top),
       badgeXR(r.cas_xr && r.cas_xr.zone),
       badgeIF(r.if_2024, r.if_quartile),
