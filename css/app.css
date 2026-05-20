@@ -1,8 +1,8 @@
 /* AILatest Journal · 牛皮纸学术风 (Claude-inspired kraft/paper palette) */
 :root {
-  --paper:          #f5f1ea;   /* Claude 牛皮纸底色 */
-  --paper-soft:     #eee8dc;
-  --paper-deeper:   #e5dece;
+  --paper:          #fbf6e8;   /* 奶油米白 (与分享卡一致) */
+  --paper-soft:     #f5eedb;
+  --paper-deeper:   #ede4c9;
   --ink:            #2b2a27;
   --ink-soft:       #4a463f;
   --ink-faint:      #6b6559;
@@ -650,7 +650,6 @@ table.journals tr:last-child td { border-bottom: 0; }
 }
 .share-btn:hover { background: #fff; box-shadow: 0 4px 12px -4px rgba(60,40,20,0.18); transform: translateY(-1px); }
 .share-btn.primary {
-  grid-column: 1 / -1;
   background: linear-gradient(180deg, #2a4a72 0%, #1f3a5f 100%);
   color: #fff; border-color: #1f3a5f;
   box-shadow: 0 4px 14px -4px rgba(31,58,95,0.5);
@@ -690,8 +689,6 @@ table.journals tr:last-child td { border-bottom: 0; }
 .share-foot-link:hover { color: #1f3a5f; }
 @media (max-width: 480px) {
   .share-modal-body { padding: 24px 20px 18px; }
-  .share-modal-card .share-actions { grid-template-columns: 1fr; }
-  .share-btn.primary { grid-column: auto; }
 }
 
 /* share landing page */
