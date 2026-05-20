@@ -1543,7 +1543,8 @@
     if (!rating) return '';
     const label = String(rating).trim().toUpperCase().replace('A STAR', 'A*').replace('A-STAR', 'A*');
     const cls = label === 'A*' ? 'a-star' : label.toLowerCase().replace(/[^a-c]/g, '');
-    return `<span class="abdc-pill abdc-${cls}" title="${T('ABDC Journal Quality List 2022','ABDC Journal Quality List 2022')}">ABDC ${escape(label)}</span>`;
+    const source = (abdc && abdc.source) || 'ABDC Journal Quality List';
+    return `<span class="abdc-pill abdc-${cls}" title="${escape(source)}">ABDC ${escape(label)}</span>`;
   }
       function badgeTier(tier) {
         if (!tier) return '';

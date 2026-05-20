@@ -4,14 +4,19 @@
 
 ## ABDC Journal Quality List
 
-状态：已接入为可选数据源；当前目录中尚未放入 ABDC 原始文件。
+状态：已接入为可选数据源；当前使用官方 2025 版 Excel。
 
 推荐放入的官方文件名：
 
-- `ABDC-JQL-2022-v3-100523.xlsx`
+- `ABDC-JQL-2025-v1-260326.xlsx`
 
 也会自动识别这些常见命名：
 
+- `ABDC Journal Quality List 2025.xlsx`
+- `ABDC_Journal_Quality_List_2025.xlsx`
+- `ABDC-JQL-2025.csv`
+- `ABDC Journal Quality List 2025.csv`
+- `ABDC-JQL-2022-v3-100523.xlsx`
 - `ABDC Journal Quality List 2022.xlsx`
 - `ABDC_Journal_Quality_List_2022.xlsx`
 - `ABDC-JQL-2022.csv`
@@ -19,7 +24,7 @@
 
 来源说明：
 
-- 数据源：ABDC Journal Quality List 2022。
+- 数据源：ABDC Journal Quality List 2025。
 - 评级字段：`A*`、`A`、`B`、`C`。
 - 用途：经管类期刊质量等级展示，合并到国际期刊主表字段 `abdc`。
 - 匹配优先级：`ISSN` > `ISSN Online / eISSN` > 期刊标题。
@@ -31,7 +36,7 @@
 - `ISSN`
 - `ISSN Online`
 - `FoR`
-- `2022 rating`
+- `2025 rating`
 
 备注：
 

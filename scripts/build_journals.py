@@ -55,6 +55,11 @@ SHOW_XR     = LIST_DIR / 'ShowJCR_中科院新锐版_2026.csv'
 SHOW_CCF    = LIST_DIR / 'ShowJCR_CCF推荐_2026.csv'
 SHOW_CCFT   = LIST_DIR / 'ShowJCR_CCF-T_2025.csv'
 ABDC_CANDIDATES = [
+    LIST_DIR / 'ABDC-JQL-2025-v1-260326.xlsx',
+    LIST_DIR / 'ABDC Journal Quality List 2025.xlsx',
+    LIST_DIR / 'ABDC_Journal_Quality_List_2025.xlsx',
+    LIST_DIR / 'ABDC-JQL-2025.csv',
+    LIST_DIR / 'ABDC Journal Quality List 2025.csv',
     LIST_DIR / 'ABDC-JQL-2022-v3-100523.xlsx',
     LIST_DIR / 'ABDC Journal Quality List 2022.xlsx',
     LIST_DIR / 'ABDC_Journal_Quality_List_2022.xlsx',
@@ -505,25 +510,26 @@ def parse_showjcr_ccf(path, by_title, by_issn):
     return hits
 
 
-# ───────────────────────── ABDC Journal Quality List 2022 ─────────────────────────
+# ───────────────────────── ABDC Journal Quality List ─────────────────────────
 
 def parse_abdc(path, by_title, by_issn):
     """ABDC Journal Quality List: A*, A, B, C.
 
     Expected official/common headers:
-      Journal Title | Publisher | ISSN | ISSN Online | Year Inception | FoR | 2022 rating
+      Journal Title | Publisher | ISSN | ISSN Online | Year Inception | FoR | <year> rating
     The parser is deliberately tolerant because downloaded workbooks sometimes vary
     in spacing/casing.
     """
     if not path: return 0
+    source_year = '2025' if '2025' in path.name else '2022' if '2022' in path.name else ''
 
     def apply_row(row):
         title = str(pick_col(row, ['Journal Title', 'Title', 'Journal', 'Journal title']) or '').strip()
         if not title:
             return 0
         issn = clean_issn(pick_col(row, ['ISSN', 'Print ISSN', 'ISSN Print']))
-        eissn = clean_issn(pick_col(row, ['ISSN Online', 'Online ISSN', 'eISSN', 'EISSN', 'ISSN_Online']))
-        rating = str(pick_col(row, ['2022 rating', 'Rating', 'ABDC Rating', 'ABDC 2022', 'Rank']) or '').strip().upper()
+        eissn = clean_issn(pick_col(row, ['ISSN Online', 'ISSNOnline', 'Online ISSN', 'eISSN', 'EISSN', 'ISSN_Online']))
+        rating = str(pick_col(row, ['2025 rating', '2022 rating', 'Rating', 'ABDC Rating', 'ABDC 2025', 'ABDC 2022', 'Rank']) or '').strip().upper()
         rating = rating.replace('A STAR', 'A*').replace('A-STAR', 'A*').replace('A* ', 'A*')
         if rating not in {'A*', 'A', 'B', 'C'}:
             return 0
@@ -536,7 +542,7 @@ def parse_abdc(path, by_title, by_issn):
         rec['abdc'] = {
             'rating': rating,
             'field': field,
-            'source': 'ABDC Journal Quality List 2022',
+            'source': f'ABDC Journal Quality List {source_year}'.strip(),
         }
         if publisher and not rec.get('publisher'):
             rec['publisher'] = publisher
@@ -563,6 +569,11 @@ def parse_abdc(path, by_title, by_issn):
             break
     if not headers:
         return 0
+    for h in headers:
+        m = re.search(r'\b(20\d{2})\s+rating\b', h, re.I)
+        if m:
+            source_year = m.group(1)
+            break
     for raw in rows:
         row = {headers[i]: raw[i] if i < len(raw) else '' for i in range(len(headers))}
         hits += apply_row(row)
@@ -750,7 +761,7 @@ def main():
 
     # meta
     meta = {
-        'source': 'WoS Core + JCR 2025 + ESI + 中科院 2025 + 长江大学 + ShowJCR (JCR/FQB/XR/CCF/Warning) + ABDC 2022 optional + 中国科协',
+        'source': 'WoS Core + JCR 2025 + ESI + 中科院 2025 + 长江大学 + ShowJCR (JCR/FQB/XR/CCF/Warning) + ABDC optional + 中国科协',
         'last_updated_source': 'WoS Core 2026-04-20',
         'total': len(journals),
         'indices': dict(idx_c),
