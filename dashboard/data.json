@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-20T12:13:28.118Z",
+  "generated_at": "2026-05-20T12:18:29.222Z",
   "source": "remote D1",
   "notes": [
     "注册量来自 users.created_at，当前是最可靠口径。",
@@ -42,7 +42,7 @@
     "avg_rating": 4.37,
     "lists": 4,
     "users_with_lists": 4,
-    "total_pageviews": 132,
+    "total_pageviews": 135,
     "total_visitors": 31,
     "total_login_events": 1
   },
@@ -118,7 +118,7 @@
     "pageviewsByDay": [
       {
         "day": "2026-05-20",
-        "pageviews": 132,
+        "pageviews": 135,
         "sessions": 60,
         "visitors": 31
       }
@@ -287,7 +287,7 @@
     "topPaths": [
       {
         "path": "/",
-        "pageviews": 104,
+        "pageviews": 107,
         "visitors": 24
       },
       {
@@ -369,7 +369,7 @@
     "trafficCountries": [
       {
         "country": "JP",
-        "pageviews": 89,
+        "pageviews": 92,
         "visitors": 12
       },
       {
