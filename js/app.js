@@ -3210,7 +3210,7 @@
         <div class="share-modal-body">
           <div class="jcard-header">
             <div class="jcard-eyebrow">${T('期刊名片','Journal Card')}</div>
-            <div class="jcard-brand"><em>Journal</em></div>
+            <div class="jcard-brand"><em>journal</em>.ailatest</div>
           </div>
           <div class="jcard" id="jcard-canvas">
             <div class="jcard-title">${escape(title)}</div>
