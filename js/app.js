@@ -1668,6 +1668,7 @@
     if (activeFeats.has('cnkx') && !(Array.isArray(r.cnkx) && r.cnkx.length)) return false;
     if (activeFeats.has('xr') && !r.cas_xr) return false;
     if (activeFeats.has('flagship') && !r.flagship) return false;
+    if (activeFeats.has('scopus') && !(r.scopus && r.scopus.active)) return false;
     if (activeFeats.has('warning') && !r.warning) return false;
     if (activeCat !== '__all' && r.esi_category !== activeCat) return false;
     if (activeWos.size) {
