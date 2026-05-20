@@ -1,8 +1,8 @@
 /* AILatest Journal · 牛皮纸学术风 (Claude-inspired kraft/paper palette) */
 :root {
   --paper:          #faf6e8;   /* 与分享卡 jcard 底色一致 */
-  --paper-soft:     #f3ecd2;
-  --paper-deeper:   #e9dfb8;
+  --paper-soft:     #f5efdb;   /* 比 paper 略深一档（侧栏/卡片） */
+  --paper-deeper:   #ece4c5;   /* 再略深一档（强调块） */
   --ink:            #2b2a27;
   --ink-soft:       #4a463f;
   --ink-faint:      #6b6559;
@@ -73,14 +73,24 @@ html, body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* 纸张纹理：subtle noise + 纤维感 */
+/* 纸张纹理：参考分享卡的浅白→米色渐变 + 微高光 + 纤维感 */
+html, body {
+  background-color: #faf6e8;
+}
 body {
   background-image:
-    linear-gradient(180deg, #fffdf6 0%, var(--paper) 320px),
-    radial-gradient(circle at 20% 20%, rgba(180,83,31,0.025) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(31,44,76,0.025) 0%, transparent 50%),
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.2 0 0 0 0 0.18 0 0 0 0 0.14 0 0 0 0.025 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
-  background-attachment: fixed;
+    /* 顶部 ~22% 高度的浅白高光 (与 jcard 渐变同源 #fffdf6 → #faf6e8) */
+    linear-gradient(180deg, #fffdf6 0%, #fcf8ec 12%, #faf6e8 28%, #faf6e8 100%),
+    /* 左上角斜向高光 */
+    radial-gradient(ellipse 1200px 600px at 30% -10%, rgba(255,253,240,0.55) 0%, transparent 65%),
+    /* 暖色/冷色对角微染 */
+    radial-gradient(circle at 18% 22%, rgba(180,83,31,0.018) 0%, transparent 55%),
+    radial-gradient(circle at 82% 78%, rgba(31,44,76,0.018) 0%, transparent 55%),
+    /* 极淡纤维噪点 */
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.2 0 0 0 0 0.18 0 0 0 0 0.14 0 0 0 0.018 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  background-attachment: fixed, fixed, fixed, fixed, fixed;
+  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, repeat;
+  background-size: cover, cover, cover, cover, 180px 180px;
 }
 
 a { color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; transition: border-color .15s; }
@@ -383,13 +393,13 @@ main.main {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 92px;
-  height: 36px;
-  padding: 0 20px;
+  min-width: 36px;
+  height: 30px;
+  padding: 0 10px;
   background: var(--paper-soft);
   border: 0;
   border-radius: 999px;
-  font-size: 22px;
+  font-size: 18px;
   line-height: 1;
   color: var(--ink-faint);
   cursor: pointer;
@@ -408,7 +418,7 @@ main.main {
   color: var(--accent);
 }
 
-.col-fav { width: 108px; text-align: center; }
+.col-fav { width: 64px; text-align: center; padding-left: 4px; padding-right: 4px; }
 
 /* drawer 大类/小类 标签（区分新锐版双 4 区等情况） */
 .zone-tier {
@@ -1830,22 +1840,22 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   border-radius: 6px;
 }
 .fav-list-chips {
-  display: flex; flex-wrap: wrap; gap: 6px; flex: 1 1 auto;
+  display: flex; flex-wrap: wrap; gap: 8px; flex: 1 1 auto;
 }
 .fav-list-chip {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 5px 10px; border-radius: 14px; cursor: pointer;
-  background: #fff; border: 1px solid var(--ink-border, #c9bb95);
-  color: var(--ink, #3a2e1f); font-size: 13px; font-family: inherit;
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 16px; border-radius: 18px; cursor: pointer;
+  background: #f3ead0; border: 1px solid #b39e6a;
+  color: var(--ink, #3a2e1f); font-size: 14px; font-weight: 500; font-family: inherit;
   transition: all 0.15s;
 }
-.fav-list-chip:hover { border-color: #8b6914; background: #faf4e6; }
+.fav-list-chip:hover { border-color: #6e5618; background: #ebe0b8; }
 .fav-list-chip.active {
   background: var(--ink, #3a2e1f); color: #f5ecd6; border-color: var(--ink, #3a2e1f);
 }
 .fav-list-chip .lcount {
-  font-size: 11px; opacity: 0.8;
-  padding: 1px 6px; border-radius: 9px;
+  font-size: 12px; opacity: 0.85;
+  padding: 1px 7px; border-radius: 9px;
   background: rgba(0,0,0,0.08);
 }
 .fav-list-chip.active .lcount { background: rgba(255,255,255,0.18); }
@@ -1939,26 +1949,20 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 /* ───────── 单本期刊分享名片（jcard） ───────── */
 .jcard-modal { max-width: 520px; }
 .jcard-header {
-  display: flex; justify-content: space-between; align-items: flex-end;
-  padding: 0 2px 10px; margin-bottom: 4px;
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: 0 4px 8px; margin-bottom: 4px;
   border-bottom: 1px solid rgba(180, 150, 80, 0.3);
 }
-.jcard-header-left { display: flex; flex-direction: column; gap: 2px; }
-.jcard-header .jcard-brand {
-  font-family: var(--serif);
-  font-size: 17px; font-weight: 700; color: #5a4a20;
-  letter-spacing: 0.02em; line-height: 1.15;
-}
-.jcard-header .jcard-brand em {
-  color: #8b6f2a; font-style: italic; font-weight: 600;
-}
 .jcard-header .jcard-eyebrow {
-  font-size: 10.5px; letter-spacing: 1.6px; text-transform: uppercase;
+  font-size: 11px; letter-spacing: 1.6px; text-transform: uppercase;
   color: #8a7a4a; font-weight: 600;
 }
-.jcard-header .jcard-brand-url {
-  font-size: 11.5px; color: #8a7a4a; font-family: var(--mono);
-  letter-spacing: 0.02em;
+.jcard-header .jcard-brand {
+  font-family: var(--serif);
+  font-size: 16px; color: #8b6f2a; line-height: 1.1;
+}
+.jcard-header .jcard-brand em {
+  font-style: italic; font-weight: 600; letter-spacing: 0.02em;
 }
 .jcard {
   background: linear-gradient(180deg, #fffdf6 0%, #faf6e8 100%);
