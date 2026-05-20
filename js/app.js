@@ -1463,7 +1463,16 @@
         body: JSON.stringify({ journal_key: key }),
       });
       const d = await r.json().catch(() => null);
-      if (d && typeof d.count === 'number') viewsCache[key] = d.count;
+      if (d && typeof d.count === 'number') {
+        viewsCache[key] = d.count;
+        // 回填抽屉中显示的浏览数
+        const el = document.getElementById('drawer-views');
+        if (el && el.dataset.fid === key) {
+          const n = d.count;
+          const txt = n >= 1000 ? (n/1000).toFixed(1) + 'k' : String(n);
+          el.textContent = (lang === 'en' ? '👁 ' : '👁 ') + txt + (lang === 'en' ? ' views' : ' 次浏览');
+        }
+      }
     } catch (_) {}
   }
   async function fetchJournalViews(keys) {
@@ -1647,7 +1656,6 @@
       badgeFlagship(r.flagship),
       ...(r.indices || []).map(badgeIndex),
       badgeScopus(r.scopus),
-      badgeView(favId(r)),
     ].filter(Boolean).join('');
     // 第二行：分区/IF/等级/预警 — 回答"这本的等级和影响力"
     const rankBadges = [
@@ -1799,17 +1807,6 @@
       tbody.innerHTML = `<tr><td colspan="6" class="empty">${t('empty')}</td></tr>`;
     } else {
       tbody.innerHTML = visible.map(renderRow).join('');
-      // 异步拉取浏览量并刷新可见行的 👁 徽章
-      const keys = visible.map(r => favId(r)).filter(Boolean);
-      fetchJournalViews(keys).then(() => {
-        for (const k of keys) {
-          if (!viewsCache[k]) continue;
-          const tr = tbody.querySelector(`tr.j-row[data-fid="${CSS.escape(k)}"]`);
-          if (!tr || tr.querySelector('.badge.b-view')) continue;
-          const idxBadgeRow = tr.querySelector('.badges-idx');
-          if (idxBadgeRow) idxBadgeRow.insertAdjacentHTML('beforeend', badgeView(k));
-        }
-      });
     }
     $('#results-count').textContent = `${t('showing')} ${visible.length} ${t('of')} ${filtered.length.toLocaleString()} ${t('total_items')}`;
     const more = $('#more');
@@ -2450,7 +2447,46 @@
 
   // ───────── 详情抽屉 ─────────
   let drawerOpen = false;
-  function openDrawer(r) {
+  let _currentDrawerRec = null;
+  // 跨源按 favId 检索任意期刊记录（用于 #j/<id> 深链）
+  function findRecByFid(id) {
+    if (!id) return null;
+    if (Array.isArray(journals)) {
+      for (const r of journals) {
+        if (favId(r) === id) {
+          const rr = Object.assign({}, r);
+          if (!rr.__src) rr.__src = 'int';
+          return rr;
+        }
+      }
+    }
+    if (domestic) {
+      const groups = [
+        ['cssci', domestic.cssci_core || []],
+        ['cssci_ext', domestic.cssci_ext || []],
+        ['pku', domestic.pku_core || []],
+        ['cnkx', (domestic.cnkx && domestic.cnkx.records) || []],
+        ['zju', (domestic.zju && domestic.zju.records) || []],
+      ];
+      for (const [src, arr] of groups) {
+        for (const r of arr) {
+          if (favId(r) === id) return Object.assign({}, r, { __src: src });
+        }
+      }
+    }
+    return null;
+  }
+  function applyHashRoute() {
+    const m = (location.hash || '').match(/^#j\/(.+)$/);
+    if (!m) { if (drawerOpen) closeDrawer(true); return; }
+    let id;
+    try { id = decodeURIComponent(m[1]); } catch (_) { id = m[1]; }
+    if (_currentDrawerRec && favId(_currentDrawerRec) === id) return;
+    const r = findRecByFid(id);
+    if (r) openDrawer(r, { fromHash: true });
+  }
+  function openDrawer(r, opts) {
+    _currentDrawerRec = r;
     const drawer = $('#j-drawer'), scrim = $('#drawer-scrim'), body = $('#drawer-body');
     if (!drawer || !body) return;
     // 上报浏览（无需登录），结果回填进 cache
@@ -2741,6 +2777,7 @@
             <span class="muted-cell" style="font-size:12px">${T('保存到：','Save to:')}</span>
             <select id="drawer-fav-list-select">${favLists.map(l => `<option value="${escape(l.id)}" ${l.id===activeListId?'selected':''}>${escape(l.name)} (${l.ids.length})</option>`).join('')}</select>
           </div>` : ''}
+          <div class="drawer-views muted-cell" id="drawer-views" data-fid="${escape(favId(r))}" style="font-size:12px;opacity:0.7;margin-left:auto"></div>
         </div>
       </div>
       ${statsHTML}
@@ -2816,16 +2853,30 @@
     scrim?.classList.add('on');
     scrim && (scrim.hidden = false);
     drawerOpen = true;
+    // 同步 URL hash（仅当非来自 hash 路由时），便于分享
+    if (!opts || !opts.fromHash) {
+      const id = favId(r);
+      const newHash = '#j/' + encodeURIComponent(id);
+      if (location.hash !== newHash) {
+        try { history.replaceState(null, '', newHash); } catch (_) { location.hash = newHash; }
+      }
+    }
     document.body.style.overflow = 'hidden';
   }
-  function closeDrawer() {
+  function closeDrawer(skipHashClear) {
     if (!drawerOpen) return;
     $('#j-drawer')?.classList.remove('open');
     const scrim = $('#drawer-scrim');
     scrim?.classList.remove('on');
     if (scrim) scrim.hidden = true;
     drawerOpen = false;
+    _currentDrawerRec = null;
     document.body.style.overflow = '';
+    // 清掉 #j/<id> hash（避免回到列表后浏览器仍显示旧 hash）
+    if (!skipHashClear && /^#j\//.test(location.hash || '')) {
+      try { history.replaceState(null, '', location.pathname + location.search); }
+      catch (_) { location.hash = ''; }
+    }
   }
 
   // ───────── favorites tab ─────────
@@ -3279,8 +3330,34 @@
       const rec = rowRecordsByFid[fid] || journals.find(r => favId(r) === fid) || favsData[fid];
       if (rec) openDrawer(rec);
     });
-    $('#drawer-close')?.addEventListener('click', closeDrawer);
-    $('#drawer-scrim')?.addEventListener('click', closeDrawer);
+    $('#drawer-close')?.addEventListener('click', () => closeDrawer());
+    $('#drawer-scrim')?.addEventListener('click', () => closeDrawer());
+    // 复制当前期刊的分享链接
+    $('#drawer-share')?.addEventListener('click', async () => {
+      if (!_currentDrawerRec) return;
+      const id = favId(_currentDrawerRec);
+      const url = `${location.origin}${location.pathname}#j/${encodeURIComponent(id)}`;
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(url);
+        } else {
+          const ta = document.createElement('textarea');
+          ta.value = url; ta.style.position = 'fixed'; ta.style.opacity = '0';
+          document.body.appendChild(ta); ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+        }
+        const btn = $('#drawer-share');
+        if (btn) {
+          const old = btn.textContent;
+          btn.textContent = '✓';
+          btn.title = T('已复制','Copied');
+          setTimeout(() => { btn.textContent = old; btn.title = T('复制链接 / Copy link','Copy link'); }, 1400);
+        }
+      } catch (_) {
+        prompt(T('复制此链接：','Copy this link:'), url);
+      }
+    });
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') closeDrawer();
     });
@@ -3357,6 +3434,9 @@
       renderCatList();
       renderWosList();
       renderInt();
+      // 启用 #j/<id> 深链
+      window.addEventListener('hashchange', applyHashRoute);
+      applyHashRoute();
       if (user) await pullFavs();
     } catch (e) {
       $('#hint').textContent = 'Load failed: ' + e.message;
