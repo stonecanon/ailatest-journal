@@ -1,11 +1,14 @@
 {
-  "generated_at": "2026-05-20T08:46:06.550Z",
+  "generated_at": "2026-05-20T12:03:29.806Z",
   "source": "remote D1",
   "notes": [
     "注册量来自 users.created_at，当前是最可靠口径。",
     "每日登录人数来自 login_events；部署 0005 migration 和新版 Worker 后开始累积。",
     "埋点上线前，active_users_proxy 使用 users.updated_at 作为粗略活跃代理，不等同真实登录。",
-    "浏览量来自 page_events；前端埋点上线后开始累积 PV、UV、session、路径和国家/地区。"
+    "PV 是页面浏览量：同一人刷新或打开多个页面会重复计数。",
+    "UV 是独立访客：按浏览器本地 visitor_id 去重，同一人换设备或清缓存会被算作新访客。",
+    "Sessions 是访问人次：按浏览器会话 session_id 去重，更接近“来了多少次”。",
+    "浏览量来自 page_events；前端埋点上线后开始累积 PV、UV、Sessions、路径和国家/地区。"
   ],
   "tables": [
     "_cf_KV",
@@ -29,17 +32,17 @@
     "google_users": 2,
     "first_signup_at": 1778628305,
     "latest_signup_at": 1779258177,
-    "favorite_rows": 22,
+    "favorite_rows": 23,
     "users_with_favorites": 3,
-    "avg_favorites_per_active_user": 7.33,
+    "avg_favorites_per_active_user": 7.67,
     "rating_rows": 19,
     "users_with_ratings": 3,
     "rated_journals": 15,
     "avg_rating": 4.37,
-    "lists": 5,
+    "lists": 4,
     "users_with_lists": 4,
-    "total_pageviews": 47,
-    "total_visitors": 19,
+    "total_pageviews": 129,
+    "total_visitors": 31,
     "total_login_events": 1
   },
   "series": {
@@ -114,9 +117,9 @@
     "pageviewsByDay": [
       {
         "day": "2026-05-20",
-        "pageviews": 47,
-        "sessions": 27,
-        "visitors": 19
+        "pageviews": 129,
+        "sessions": 59,
+        "visitors": 31
       }
     ]
   },
@@ -176,6 +179,11 @@
         "journal_key": "2571-6255",
         "favorites": 1,
         "label": "FIRE-SWITZERLAND"
+      },
+      {
+        "journal_key": "t:3ctic",
+        "favorites": 1,
+        "label": "t:3ctic"
       },
       {
         "journal_key": "t:circulation",
@@ -278,13 +286,28 @@
     "topPaths": [
       {
         "path": "/",
-        "pageviews": 39,
-        "visitors": 15
+        "pageviews": 101,
+        "visitors": 24
+      },
+      {
+        "path": "/s/3P9gQfdK",
+        "pageviews": 6,
+        "visitors": 4
       },
       {
         "path": "/%E4%B8%80%E7%AB%99%E5%BC%8F%E7%A7%91%E7%A0%94%E6%9C%9F%E5%88%8A%E6%9F%A5",
-        "pageviews": 3,
+        "pageviews": 5,
         "visitors": 2
+      },
+      {
+        "path": "/s/1vZeToFQ",
+        "pageviews": 3,
+        "visitors": 1
+      },
+      {
+        "path": "/s/H2uiCp5y",
+        "pageviews": 2,
+        "visitors": 1
       },
       {
         "path": "/?q=nature&_t=1",
@@ -292,7 +315,42 @@
         "visitors": 1
       },
       {
-        "path": "/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3NzkyNjQzMDIsImV4cCI6MTc4MTg1NjMwMiwidWlkIjo0LCJlbWFpbCI6ImppYW50YW93ZW5nQGdtYWlsLmNvbSJ9.3lWgyjEot0ZyjQxa9i_TwcdasKXk8kkze3E",
+        "path": "/s/vmXylHMj",
+        "pageviews": 1,
+        "visitors": 1
+      },
+      {
+        "path": "/s/pX8snWAe?cb=1",
+        "pageviews": 1,
+        "visitors": 1
+      },
+      {
+        "path": "/s/pX8snWAe",
+        "pageviews": 1,
+        "visitors": 1
+      },
+      {
+        "path": "/s/lcxMj4P7",
+        "pageviews": 1,
+        "visitors": 1
+      },
+      {
+        "path": "/s/iV61yNZz",
+        "pageviews": 1,
+        "visitors": 1
+      },
+      {
+        "path": "/s/bWxwNCJt",
+        "pageviews": 1,
+        "visitors": 1
+      },
+      {
+        "path": "/s/1WLw5rKn",
+        "pageviews": 1,
+        "visitors": 1
+      },
+      {
+        "path": "/?token=[redacted]",
         "pageviews": 1,
         "visitors": 1
       },
@@ -310,18 +368,28 @@
     "trafficCountries": [
       {
         "country": "JP",
-        "pageviews": 24,
-        "visitors": 7
+        "pageviews": 86,
+        "visitors": 12
       },
       {
         "country": "US",
-        "pageviews": 20,
-        "visitors": 10
+        "pageviews": 26,
+        "visitors": 12
+      },
+      {
+        "country": "SG",
+        "pageviews": 12,
+        "visitors": 4
       },
       {
         "country": "HK",
         "pageviews": 3,
         "visitors": 2
+      },
+      {
+        "country": "NL",
+        "pageviews": 2,
+        "visitors": 1
       }
     ],
     "recentUsers": [

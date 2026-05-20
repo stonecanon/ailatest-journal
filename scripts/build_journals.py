@@ -364,9 +364,18 @@ def parse_showjcr_xr(path, by_title, by_issn):
         col_issn    = 'ISSN' if 'ISSN' in fieldnames else find('ISSN')
         col_eissn   = 'EISSN' if 'EISSN' in fieldnames else find('EISSN')
         col_cat_cn  = None
+        col_cat_en  = None
+        col_cat2_cn = None
+        col_cat2_en = None
         for fn in fieldnames:
-            if '大类' in fn and '中文' in fn and '2' not in fn:
-                col_cat_cn = fn; break
+            if '大类' in fn and '中文' in fn and '2' not in fn and not col_cat_cn:
+                col_cat_cn = fn
+            elif '大类' in fn and '英文' in fn and '2' not in fn and not col_cat_en:
+                col_cat_en = fn
+            elif '大类2' in fn and '中文' in fn and not col_cat2_cn:
+                col_cat2_cn = fn
+            elif '大类2' in fn and '英文' in fn and not col_cat2_en:
+                col_cat2_en = fn
 
         # 新锐版分区列
         col_zone1   = '大类新锐分区' if '大类新锐分区' in fieldnames else None
@@ -413,6 +422,19 @@ def parse_showjcr_xr(path, by_title, by_issn):
             if z2:
                 xr['zone2'] = z2
                 if col_top2: xr['top2'] = norm_top(row.get(col_top2))
+            # 把大类挂到 xr 上，前端展示用
+            if col_cat_cn:
+                v = (row.get(col_cat_cn) or '').strip()
+                if v: xr['major_cn'] = v.split()[0] if v else ''
+            if col_cat_en:
+                v = (row.get(col_cat_en) or '').strip()
+                if v: xr['major_en'] = v
+            if col_cat2_cn:
+                v = (row.get(col_cat2_cn) or '').strip()
+                if v: xr['major2_cn'] = v.split()[0] if v else ''
+            if col_cat2_en:
+                v = (row.get(col_cat2_en) or '').strip()
+                if v: xr['major2_en'] = v
             subs = []
             for cn_col, zn_col in sub_cols:
                 name = (row.get(cn_col) or '').strip()

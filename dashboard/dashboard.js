@@ -22,22 +22,42 @@ function el(tag, attrs = {}, children = []) {
 }
 
 function kpi(label, value, detail) {
-  return el('div', { class: 'card kpi' }, [
+  return el('div', { class: 'kpi' }, [
     el('div', { class: 'label', text: label }),
     el('div', { class: 'value', text: value }),
     el('div', { class: 'detail', text: detail || '' }),
   ]);
 }
 
-function renderKpis(data) {
+function sumRows(rows, key) {
+  return (rows || []).reduce((sum, row) => sum + Number(row[key] || 0), 0);
+}
+
+function latestTrafficRow(data) {
+  const rows = [...(data.series.pageviewsByDay || [])].sort((a, b) => b.day.localeCompare(a.day));
+  return rows[0] || {};
+}
+
+function renderTrafficKpis(data) {
   const k = data.kpis;
-  document.querySelector('.kpis').append(
+  const latest = latestTrafficRow(data);
+  const sessions = sumRows(data.series.pageviewsByDay, 'sessions');
+  document.querySelector('.traffic-kpis').append(
+    kpi('最近一天 PV', n(latest.pageviews), latest.day ? `${latest.day} 页面浏览量` : '暂无访问记录'),
+    kpi('最近一天 UV', n(latest.visitors), '同一浏览器访客去重'),
+    kpi('最近一天访问人次', n(latest.sessions), '同一浏览器会话去重'),
+    kpi('累计 PV / UV', `${n(k.total_pageviews)} / ${n(k.total_visitors)}`, `累计访问人次 ${n(sessions)}`),
+  );
+}
+
+function renderSecondaryKpis(data) {
+  const k = data.kpis;
+  document.querySelector('.secondary-kpis').append(
     kpi('总注册用户', n(k.total_users), `最早 ${fromUnix(k.first_signup_at)} · 最新 ${fromUnix(k.latest_signup_at)}`),
     kpi('邮箱用户', n(k.email_users), `有邮箱记录 ${n(k.users_with_email)}`),
     kpi('GitHub / Google', `${n(k.github_users)} / ${n(k.google_users)}`, 'OAuth 注册来源'),
     kpi('收藏行为', n(k.favorite_rows), `${n(k.users_with_favorites)} 人使用收藏`),
     kpi('评分行为', n(k.rating_rows), `${n(k.rated_journals)} 本期刊被评分`),
-    kpi('PV / UV', `${n(k.total_pageviews)} / ${n(k.total_visitors)}`, '埋点上线后开始累积'),
   );
 }
 
@@ -129,7 +149,8 @@ async function main() {
   const data = await fetch('data.json', { cache: 'no-store' }).then(r => r.json());
   document.querySelector('#generated-at').textContent = dateFmt.format(new Date(data.generated_at));
   document.querySelector('#source').textContent = data.source;
-  renderKpis(data);
+  renderTrafficKpis(data);
+  renderSecondaryKpis(data);
 
   const registrationRows = data.series.registrationsByDay || [];
   const loginRows = data.series.loginEventsByDay || [];
@@ -166,6 +187,25 @@ async function main() {
     { title: '来源', key: 'provider' },
     { title: '用户', render: row => row.name || row.login || row.email || '-' },
     { title: '注册日', render: row => fromUnix(row.created_at) },
+  ]);
+  const dailyTraffic = mergeSeries(
+    [data.series.pageviewsByDay || [], registrationRows, loginRows],
+    ['pageviews', 'signups', 'login_users'],
+  ).map(row => {
+    const traffic = (data.series.pageviewsByDay || []).find(item => item.day === row.day) || {};
+    return {
+      ...row,
+      visitors: Number(traffic.visitors || 0),
+      sessions: Number(traffic.sessions || 0),
+    };
+  }).sort((a, b) => b.day.localeCompare(a.day));
+  table('#daily-traffic', dailyTraffic, [
+    { title: '日期', key: 'day' },
+    { title: 'PV 页面浏览量', render: row => n(row.pageviews) },
+    { title: 'UV 独立访客', render: row => n(row.visitors) },
+    { title: '访问人次 Sessions', render: row => n(row.sessions) },
+    { title: '注册', render: row => n(row.signups) },
+    { title: '登录用户', render: row => n(row.login_users) },
   ]);
 
   const notes = document.querySelector('#notes');

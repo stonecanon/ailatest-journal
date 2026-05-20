@@ -216,7 +216,10 @@ const payload = {
     '注册量来自 users.created_at，当前是最可靠口径。',
     '每日登录人数来自 login_events；部署 0005 migration 和新版 Worker 后开始累积。',
     '埋点上线前，active_users_proxy 使用 users.updated_at 作为粗略活跃代理，不等同真实登录。',
-    '浏览量来自 page_events；前端埋点上线后开始累积 PV、UV、session、路径和国家/地区。',
+    'PV 是页面浏览量：同一人刷新或打开多个页面会重复计数。',
+    'UV 是独立访客：按浏览器本地 visitor_id 去重，同一人换设备或清缓存会被算作新访客。',
+    'Sessions 是访问人次：按浏览器会话 session_id 去重，更接近“来了多少次”。',
+    '浏览量来自 page_events；前端埋点上线后开始累积 PV、UV、Sessions、路径和国家/地区。',
   ],
   tables: [...tables],
   kpis: {

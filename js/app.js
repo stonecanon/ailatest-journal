@@ -661,8 +661,18 @@
   }
 
   function trackPageview() {
+    try {
+      if (new URLSearchParams(location.search).has('noanalytics')) {
+        localStorage.setItem('ailatest.analytics.ignore', '1');
+      }
+      if (localStorage.getItem('ailatest.analytics.ignore') === '1') return;
+    } catch (_) {}
+    const trackedUrl = new URL(location.href);
+    trackedUrl.searchParams.delete('token');
+    trackedUrl.searchParams.delete('state');
+    trackedUrl.searchParams.delete('code');
     const payload = {
-      path: `${location.pathname}${location.search ? '?' + location.search.slice(1, 180) : ''}`,
+      path: `${trackedUrl.pathname}${trackedUrl.search ? trackedUrl.search.slice(0, 180) : ''}`,
       referrer: document.referrer || '',
       visitor_id: getAnalyticsId('ailatest.analytics.visitor', localStorage),
       session_id: getAnalyticsId('ailatest.analytics.session', sessionStorage),
@@ -2641,8 +2651,8 @@
       const majorEn = xr.major_en || '';
       const majorText = [majorCn, majorEn].filter(Boolean).join(' · ');
       blocks.push(`<div class="cas-major"><span class="zone-tier">${T('大类','Major')}</span> ${escape(majorText || T('（未标注大类）','(no major)'))} · <b>${T('新锐','Emerging')} ${xr.zone} ${T('区','')}</b></div>`);
-      if (Array.isArray(xr.subs) && xr.subs.length) {
-        blocks.push(`<ul class="cas-sub-list">${xr.subs.map(s => {
+      if (Array.isArray(xr.sub) && xr.sub.length) {
+        blocks.push(`<ul class="cas-sub-list">${xr.sub.map(s => {
           const nm = s.cat || s.name || '';
           const zn = s.zone;
           return `<li><span class="zone-tier zone-tier-sub">${T('小类','Sub')}</span> ${escape(nm)}${zn ? ` · <b>${T('新锐','Emerging')} ${zn} ${T('区','')}</b>` : ''}</li>`;
@@ -3139,6 +3149,129 @@
     if (openBtn && opts.url) openBtn.addEventListener('click', () => window.open(opts.url, '_blank'));
   }
 
+  // ───────── 单本期刊分享弹窗（含卡片预览 + 下载图片 + 复制链接） ─────────
+  function showJournalShareModal(r) {
+    const id = favId(r);
+    const url = `${location.origin}${location.pathname}#j/${encodeURIComponent(id)}`;
+    const ir = r.__src === 'int' ? r : (lookupInt(r) || r);
+    const title = titleCase((r.name || r.cn_name || '').replace(/\*$/,''));
+    const cn = r.cn_name && r.cn_name !== title ? r.cn_name : '';
+    const issn = r.issn || r.cn_code || '';
+    const eissn = r.eissn || '';
+
+    // 收录索引
+    const idxList = (ir.indices || []).slice();
+    const idxRank = { SCIE:1, SSCI:2, AHCI:3, ESCI:4, EI:5 };
+    idxList.sort((a,b) => (idxRank[a]||9) - (idxRank[b]||9));
+    const idxHtml = idxList.map(i => `<span class="jcard-idx idx-${i.toLowerCase()}">${i}</span>`).join('');
+
+    // 三类分区徽章（导出图片用 inline style，避免 html2canvas 错过 var()）
+    const zoneStyles = {
+      navy: ['#1f3a5f', '#4f6f9b', '#9eb1cb', '#d3dbe6'],
+      burg: ['#7a2030', '#a04a5a', '#c89099', '#ead0d4'],
+      teal: ['#1f5f5a', '#4f9b95', '#9ec9c5', '#d3e6e3'],
+    };
+    const fgFor = (palette, n) => (n >= 3 ? (palette === 'navy' ? '#1f3a5f' : palette === 'burg' ? '#5a1820' : '#1f5f5a') : '#fff');
+    const zoneTag = (palette, n, label) => {
+      const bg = zoneStyles[palette][n - 1];
+      return `<span class="jcard-zone" style="background:${bg};color:${fgFor(palette,n)}">${label}</span>`;
+    };
+    const zonesHtml = [
+      ir.cas_zone ? zoneTag('navy', parseInt(ir.cas_zone), `${T('中科院','CAS')} ${ir.cas_zone}${T('区','')}${ir.cas_top ? ' Top' : ''}`) : '',
+      ir.if_quartile && /^Q[1-4]$/i.test(ir.if_quartile) ? zoneTag('burg', parseInt(ir.if_quartile.slice(1)), `JCR ${ir.if_quartile.toUpperCase()}`) : '',
+      (ir.cas_xr && ir.cas_xr.zone) ? zoneTag('teal', parseInt(ir.cas_xr.zone), `${T('新锐','Emerging')} ${ir.cas_xr.zone}${T('区','')}`) : '',
+    ].filter(Boolean).join('');
+
+    // 关键指标 + 元信息
+    const stats = [];
+    if (ir.if_2024 != null) stats.push([T('影响因子','Impact Factor'), ir.if_2024 + ' <small>JCR 2024</small>']);
+    if (ir.if_rank) stats.push([T('IF 排名','IF Rank'), ir.if_rank]);
+    if (ir.cas_major_cn) stats.push([T('中科院大类','CAS Major'), escape(ir.cas_major_cn)]);
+    if (ir.esi_category) stats.push([T('ESI 高被引','ESI'), escape(ir.esi_category)]);
+    const statsHtml = stats.length ? `<div class="jcard-stats">${stats.map(([k,v]) => `<div class="jcard-stat"><div class="jcard-stat-v">${v}</div><div class="jcard-stat-k">${k}</div></div>`).join('')}</div>` : '';
+
+    const meta = [];
+    if (r.publisher) meta.push([T('出版商','Publisher'), r.publisher]);
+    if (r.country) meta.push([T('国家/地区','Country'), r.country]);
+    if (r.frequency) meta.push([T('刊期','Frequency'), r.frequency]);
+    if (ir.cas_xr && ir.cas_xr.major_cn) meta.push([T('新锐版大类','Emerging Major'), ir.cas_xr.major_cn]);
+    const metaHtml = meta.length ? `<div class="jcard-meta">${meta.map(([k,v]) => `<div class="jcard-meta-row"><span class="jcard-meta-k">${k}</span><span class="jcard-meta-v">${escape(v)}</span></div>`).join('')}</div>` : '';
+
+    let modal = document.getElementById('share-modal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'share-modal'; modal.className = 'share-modal';
+      document.body.appendChild(modal);
+      modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('open'); });
+    }
+
+    modal.innerHTML = `
+      <div class="share-card share-modal-card jcard-modal">
+        <div class="share-modal-body">
+          <div class="share-modal-eyebrow">AILATEST · ${T('期刊名片','Journal Card')}</div>
+          <div class="jcard" id="jcard-canvas">
+            <div class="jcard-head">
+              <div class="jcard-brand">AILatest <em>Journal</em></div>
+              <div class="jcard-brand-url">journal.ailatest.org</div>
+            </div>
+            <div class="jcard-title">${escape(title)}</div>
+            ${cn ? `<div class="jcard-sub">${escape(cn)}</div>` : ''}
+            <div class="jcard-issn">${issn ? 'ISSN ' + escape(issn) : ''}${eissn ? ' · eISSN ' + escape(eissn) : ''}</div>
+            ${idxHtml ? `<div class="jcard-row">${idxHtml}</div>` : ''}
+            ${zonesHtml ? `<div class="jcard-row">${zonesHtml}</div>` : ''}
+            ${statsHtml}
+            ${metaHtml}
+            <div class="jcard-foot">
+              <div class="jcard-foot-text">${T('扫码或访问 ','Scan or visit ')}<b>${escape(location.host)}</b>${T(' 查看完整信息','for full details')}</div>
+            </div>
+          </div>
+          <div class="share-modal-url">
+            <input id="jcard-url-input" type="text" readonly value="${escape(url)}">
+          </div>
+          <div class="share-actions">
+            <button id="jcard-copy-btn" class="share-btn primary">🔗 ${T('复制链接','Copy link')}</button>
+            <button id="jcard-img-btn" class="share-btn">🖼 ${T('保存为图片','Save as image')}</button>
+          </div>
+          <div class="share-modal-foot"><button id="share-close-btn" class="share-foot-link">${T('关闭','Close')}</button></div>
+        </div>
+      </div>`;
+    modal.classList.add('open');
+
+    document.getElementById('share-close-btn').addEventListener('click', () => modal.classList.remove('open'));
+
+    document.getElementById('jcard-copy-btn').addEventListener('click', async () => {
+      const ok = await copyToClipboard(url);
+      flashBtn(document.getElementById('jcard-copy-btn'), ok ? T('已复制 ✓','Copied ✓') : T('请手动复制','Copy manually'));
+    });
+
+    document.getElementById('jcard-img-btn').addEventListener('click', async () => {
+      const btn = document.getElementById('jcard-img-btn');
+      const old = btn.innerHTML;
+      btn.disabled = true; btn.innerHTML = `<span class="spinner"></span> ${T('生成中…','Rendering…')}`;
+      try {
+        if (!window.html2canvas) {
+          await new Promise((res, rej) => {
+            const s = document.createElement('script');
+            s.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+            s.onload = res; s.onerror = () => rej(new Error('html2canvas load failed'));
+            document.head.appendChild(s);
+          });
+        }
+        const node = document.getElementById('jcard-canvas');
+        const canvas = await window.html2canvas(node, { backgroundColor: '#fffdf6', scale: 2, useCORS: true, logging: false });
+        const a = document.createElement('a');
+        a.href = canvas.toDataURL('image/png');
+        a.download = `journal-${id}.png`;
+        document.body.appendChild(a); a.click(); a.remove();
+        btn.innerHTML = old; btn.disabled = false;
+        flashBtn(btn, T('已保存 ✓','Saved ✓'));
+      } catch (e) {
+        btn.innerHTML = old; btn.disabled = false;
+        alert(T('生成图片失败：','Image render failed: ') + (e.message || e));
+      }
+    });
+  }
+
   // ───────── share landing (/s/<id>) ─────────
   async function copyToClipboard(text) {
     try {
@@ -3532,33 +3665,10 @@
     });
     $('#drawer-close')?.addEventListener('click', () => closeDrawer());
     $('#drawer-scrim')?.addEventListener('click', () => closeDrawer());
-    // 复制当前期刊的分享链接
-    $('#drawer-share')?.addEventListener('click', async () => {
+    // 复制当前期刊的分享链接 + 生成卡片图片
+    $('#drawer-share')?.addEventListener('click', () => {
       if (!_currentDrawerRec) return;
-      const id = favId(_currentDrawerRec);
-      const url = `${location.origin}${location.pathname}#j/${encodeURIComponent(id)}`;
-      try {
-        if (navigator.clipboard && window.isSecureContext) {
-          await navigator.clipboard.writeText(url);
-        } else {
-          const ta = document.createElement('textarea');
-          ta.value = url; ta.style.position = 'fixed'; ta.style.opacity = '0';
-          document.body.appendChild(ta); ta.select();
-          document.execCommand('copy');
-          document.body.removeChild(ta);
-        }
-        const btn = $('#drawer-share');
-        if (btn) {
-          btn.classList.add('copied');
-          btn.title = T('已复制','Copied');
-          setTimeout(() => {
-            btn.classList.remove('copied');
-            btn.title = T('复制链接 / Copy link','Copy link');
-          }, 1400);
-        }
-      } catch (_) {
-        prompt(T('复制此链接：','Copy this link:'), url);
-      }
+      showJournalShareModal(_currentDrawerRec);
     });
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') closeDrawer();
