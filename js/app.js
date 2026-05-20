@@ -2774,7 +2774,10 @@
       <div class="drawer-hero">
         <div class="drawer-title">${escape(title.replace(/\*$/,''))}</div>
         ${sub ? `<div class="drawer-sub">${escape(sub)}</div>` : ''}
-        <div class="drawer-issn">${issn ? 'ISSN ' + escape(issn) : ''}${eissn ? ' · eISSN ' + escape(eissn) : ''}</div>
+        <div class="drawer-issn">
+          ${issn ? 'ISSN ' + escape(issn) : ''}${eissn ? ' · eISSN ' + escape(eissn) : ''}
+          <span class="drawer-views" id="drawer-views" data-fid="${escape(favId(r))}"></span>
+        </div>
         <div class="badges drawer-badges">${intBadges}${tierBadge}${crossBadges}</div>
         <div class="drawer-actions">
           <div class="rating-pill" data-rating-key="${escape(favId(r))}" title="${T('综合推荐评分','Overall rating')}">
@@ -2787,7 +2790,6 @@
             <span class="muted-cell" style="font-size:12px">${T('保存到：','Save to:')}</span>
             <select id="drawer-fav-list-select">${favLists.map(l => `<option value="${escape(l.id)}" ${l.id===activeListId?'selected':''}>${escape(l.name)} (${l.ids.length})</option>`).join('')}</select>
           </div>` : ''}
-          <div class="drawer-views muted-cell" id="drawer-views" data-fid="${escape(favId(r))}" style="font-size:12px;opacity:0.7;margin-left:auto"></div>
         </div>
       </div>
       ${statsHTML}
@@ -3195,6 +3197,34 @@
     if (r.country) meta.push([T('国家/地区','Country'), r.country]);
     if (r.frequency) meta.push([T('刊期','Frequency'), r.frequency]);
     if (ir.cas_xr && ir.cas_xr.major_cn) meta.push([T('新锐版大类','Emerging Major'), ir.cas_xr.major_cn]);
+
+    // 审稿周期（CrossRef 投稿→接收 中位天数）— 有数据才显示
+    const cycRec = reviewCycles[(r.issn||'').trim()] || reviewCycles[(r.eissn||'').trim()];
+    if (cycRec && cycRec.median_days) {
+      meta.push([
+        T('审稿周期','Review Cycle'),
+        `${T('中位 ','median ')}${cycRec.median_days}${T(' 天 · ','d · ')}${T('样本 ','n=')}${cycRec.sample_size}`
+      ]);
+    }
+
+    // OA / 订阅模式 + APC
+    const oaRec = ir.oa || lookupOA(ir.issn || ir.eissn ? ir : r);
+    if (oaRec) {
+      const labelMapShort = {
+        diamond: T('Diamond · 读投全免费','Diamond · free both ways'),
+        gold_apc: T('Gold OA · 投稿付 APC','Gold OA · author pays APC'),
+        hybrid: T('Hybrid · 可选 OA','Hybrid · optional OA'),
+        subscription_paid_read: T('订阅制 · 读付费','Subscription · paid read'),
+        unknown: T('未知','Unknown'),
+      };
+      const lab = oaRec.l || oaRec.label || 'unknown';
+      const apcVal = oaRec.apc ?? oaRec.apc_usd;
+      const doaj = oaRec.dj ?? oaRec.in_doaj;
+      let oaText = labelMapShort[lab] || labelMapShort.unknown;
+      if (apcVal && apcVal > 0) oaText += ` · APC USD ${apcVal.toLocaleString()}`;
+      if (doaj) oaText += T(' · 收录 DOAJ',' · in DOAJ');
+      meta.push([T('开放获取','Open Access'), oaText]);
+    }
     const metaHtml = meta.length ? `<div class="jcard-meta">${meta.map(([k,v]) => `<div class="jcard-meta-row"><span class="jcard-meta-k">${k}</span><span class="jcard-meta-v">${escape(v)}</span></div>`).join('')}</div>` : '';
 
     let modal = document.getElementById('share-modal');
