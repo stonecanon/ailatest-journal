@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-19T13:54:28.145Z",
+  "generated_at": "2026-05-20T02:36:54.217Z",
   "source": "remote D1",
   "notes": [
     "注册量来自 users.created_at，当前是最可靠口径。",
@@ -30,10 +30,10 @@
     "favorite_rows": 22,
     "users_with_favorites": 3,
     "avg_favorites_per_active_user": 7.33,
-    "rating_rows": 18,
+    "rating_rows": 19,
     "users_with_ratings": 3,
-    "rated_journals": 14,
-    "avg_rating": 4.44,
+    "rated_journals": 15,
+    "avg_rating": 4.37,
     "lists": 4,
     "users_with_lists": 4,
     "total_pageviews": 0,
@@ -113,14 +113,14 @@
         "label": "SCIENTIFIC REPORTS"
       },
       {
-        "journal_key": "2075-5309",
-        "favorites": 3,
-        "label": "BUILDINGS"
-      },
-      {
         "journal_key": "2352-7102",
         "favorites": 3,
         "label": "JOURNAL OF BUILDING ENGINEERING"
+      },
+      {
+        "journal_key": "2075-5309",
+        "favorites": 2,
+        "label": "BUILDINGS"
       },
       {
         "journal_key": "2662-9992",
@@ -136,6 +136,11 @@
         "journal_key": "0378-7788",
         "favorites": 1,
         "label": "ENERGY AND BUILDINGS"
+      },
+      {
+        "journal_key": "1996-1073",
+        "favorites": 1,
+        "label": "ENERGIES"
       },
       {
         "journal_key": "2053-1583",
@@ -237,6 +242,12 @@
         "ratings": 1,
         "avg_rating": 3.5,
         "label": "20 ET 21-REVUE D HISTOIRE"
+      },
+      {
+        "journal_key": "1996-1073",
+        "ratings": 1,
+        "avg_rating": 3,
+        "label": "ENERGIES"
       }
     ],
     "topPaths": [],
