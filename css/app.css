@@ -727,6 +727,33 @@ table.journals tr:last-child td { border-bottom: 0; }
   background: rgba(180,150,100,0.10);
   padding: 2px 8px; border-radius: 4px;
 }
+.share-row-tags {
+  flex: 0 0 auto;
+  display: inline-flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end;
+  max-width: 50%;
+}
+.share-idx {
+  display: inline-block;
+  font-size: 10.5px; line-height: 1.4;
+  font-weight: 700; letter-spacing: 0.04em;
+  padding: 2px 7px; border-radius: 4px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+}
+.share-idx.idx-scie { background: #c0392b; }
+.share-idx.idx-ssci { background: #6e408a; }
+.share-idx.idx-ahci { background: #aa6c2c; }
+.share-idx.idx-esci { background: #5a8a8a; }
+.share-idx.idx-ei   { background: #2a4a72; }
+.share-idx.jcr-q1   { background: var(--zone-1); }
+.share-idx.jcr-q2   { background: var(--zone-2); }
+.share-idx.jcr-q3   { background: var(--zone-3); }
+.share-idx.jcr-q4   { background: var(--zone-4); }
+@media (max-width: 480px) {
+  .share-list-row { flex-wrap: wrap; gap: 6px 10px; }
+  .share-row-tags { max-width: 100%; justify-content: flex-start; padding-left: 38px; }
+}
 .share-foot {
   display: flex; justify-content: space-between; align-items: baseline;
   padding-top: 14px; margin-top: 8px;
