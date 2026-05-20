@@ -2759,6 +2759,7 @@
         <div class="fav-list-ops">
           <button class="btn-mini" id="fav-list-new" title="${T('新建清单','New list')}">＋ ${T('新建','New')}</button>
           <button class="btn-mini" id="fav-list-rename" title="${T('重命名当前','Rename current')}">✎ ${T('重命名','Rename')}</button>
+          <button class="btn-mini" id="fav-list-share" title="${T('生成分享短链','Generate share link')}">🔗 ${T('分享','Share')}</button>
           <button class="btn-mini btn-danger" id="fav-list-del" title="${T('删除当前','Delete current')}" ${favLists.length<=1?'disabled':''}>🗑 ${T('删除','Delete')}</button>
         </div>
       </div>`;
@@ -2851,6 +2852,149 @@
         if (activeTab === 'int') renderInt();
       }
     });
+    const shareBtn = document.getElementById('fav-list-share');
+    if (shareBtn) shareBtn.addEventListener('click', () => openShareDialog());
+  }
+
+  // ───────── share lists ─────────
+  async function openShareDialog() {
+    if (!user || !user.token) {
+      alert(T('请先登录后分享清单','Please sign in to share a list'));
+      return;
+    }
+    const cur = getActiveList();
+    if (!cur || !cur.ids.length) {
+      alert(T('当前清单为空，加几本期刊再分享～','Add some journals first, then share'));
+      return;
+    }
+    // 把 ids 反查为 ISSN（导入端按 ISSN 查找；用 cn_code 兜底中文期刊）
+    const items = [];
+    for (const id of cur.ids) {
+      const rec = favsData[id] || journals.find(r => favId(r) === id);
+      if (!rec) continue;
+      items.push({
+        issn: rec.issn || rec.eissn || '',
+        cn_code: rec.cn_code || '',
+        name: rec.name || rec.cn_name || '',
+      });
+    }
+    showShareModal({ loading: true });
+    try {
+      const r = await fetch(`${API_BASE}/share`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${user.token}` },
+        body: JSON.stringify({ name: cur.name, items, ttl_days: 90 }),
+      });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const d = await r.json();
+      const shareUrl = `${location.origin}/s/${d.id}`;
+      showShareModal({ url: shareUrl, expiresAt: d.expires_at, listName: cur.name, count: items.length });
+    } catch (e) {
+      showShareModal({ error: String(e.message || e) });
+    }
+  }
+
+  function showShareModal(opts) {
+    let modal = document.getElementById('share-modal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'share-modal';
+      modal.className = 'share-modal';
+      document.body.appendChild(modal);
+      modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('open'); });
+    }
+    let body;
+    if (opts.loading) {
+      body = `<div style="padding:20px 0;text-align:center;color:#666">${T('生成中…','Generating…')}</div>`;
+    } else if (opts.error) {
+      body = `<div style="color:#a23b3b;padding:12px 0">${T('生成失败：','Failed: ')}${escape(opts.error)}</div>`;
+    } else {
+      const exp = opts.expiresAt ? new Date(opts.expiresAt * 1000).toLocaleDateString() : '';
+      const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(opts.url)}`;
+      body = `
+        <h3>🔗 ${T('分享清单','Share list')}「${escape(opts.listName)}」</h3>
+        <div class="share-meta">${opts.count} ${T('本期刊','journals')}${exp ? ' · ' + T('有效期至 ', 'expires ') + exp : ''}</div>
+        <div class="share-url">
+          <input id="share-url-input" type="text" readonly value="${escape(opts.url)}">
+          <button id="share-copy-btn">${T('复制','Copy')}</button>
+        </div>
+        <div class="share-qr"><img src="${escape(qrSrc)}" alt="QR"></div>
+        <div class="share-actions">
+          <button id="share-close-btn">${T('关闭','Close')}</button>
+        </div>`;
+    }
+    modal.innerHTML = `<div class="share-card">${body}</div>`;
+    modal.classList.add('open');
+    const closeBtn = document.getElementById('share-close-btn');
+    if (closeBtn) closeBtn.addEventListener('click', () => modal.classList.remove('open'));
+    const copyBtn = document.getElementById('share-copy-btn');
+    if (copyBtn) copyBtn.addEventListener('click', async () => {
+      const inp = document.getElementById('share-url-input');
+      try {
+        await navigator.clipboard.writeText(inp.value);
+        copyBtn.textContent = T('已复制 ✓','Copied ✓');
+        setTimeout(() => { copyBtn.textContent = T('复制','Copy'); }, 1500);
+      } catch (e) {
+        inp.select(); document.execCommand('copy');
+      }
+    });
+  }
+
+  // ───────── share landing (/s/<id>) ─────────
+  async function maybeRenderShareLanding() {
+    const m = location.pathname.match(/^\/s\/([A-Za-z0-9_-]{4,32})\/?$/);
+    if (!m) return false;
+    const shareId = m[1];
+    const main = document.querySelector('main') || document.body;
+    main.innerHTML = `<div class="share-landing"><div class="empty">${T('加载分享中…','Loading shared list…')}</div></div>`;
+    try {
+      const r = await fetch(`${API_BASE}/share/${shareId}`);
+      if (!r.ok) {
+        main.innerHTML = `<div class="share-landing"><h2>${T('分享不存在或已过期','Share not found or expired')}</h2><p><a href="/">${T('返回首页','Back home')}</a></p></div>`;
+        return true;
+      }
+      const d = await r.json();
+      const items = (d.items || []).map((it, i) =>
+        `<div class="share-list-row">${i+1}. ${escape(it.name || it.issn || it.cn_code || '—')}${it.issn ? ` <span style="color:#999">[${escape(it.issn)}]</span>` : ''}</div>`
+      ).join('') || `<div class="empty">${T('（空清单）','(empty list)')}</div>`;
+      const exp = d.expires_at ? new Date(d.expires_at * 1000).toLocaleDateString() : '';
+      main.innerHTML = `
+        <div class="share-landing">
+          <h2>📚 ${escape(d.name || T('期刊清单','Journal list'))}</h2>
+          <div class="share-by">${T('共','')} ${(d.items||[]).length} ${T('本期刊','journals')}${exp ? ' · ' + T('有效期至 ','expires ') + exp : ''} · ${d.view_count||0} ${T('次查看','views')}</div>
+          ${items}
+          <div class="share-import-bar">
+            <button id="share-import-btn">${T('导入到我的收藏','Import to my favorites')}</button>
+            <a href="/" style="color:#666">${T('或回到主站浏览','or back to the main site')}</a>
+          </div>
+        </div>`;
+      document.getElementById('share-import-btn').addEventListener('click', async () => {
+        if (!user || !user.token) {
+          alert(T('请先登录后导入清单','Sign in first, then import'));
+          location.href = '/?login=1&redirect=' + encodeURIComponent(location.pathname);
+          return;
+        }
+        const btn = document.getElementById('share-import-btn');
+        btn.disabled = true; btn.textContent = T('导入中…','Importing…');
+        try {
+          const rr = await fetch(`${API_BASE}/share/${shareId}/import`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${user.token}` },
+          });
+          if (!rr.ok) throw new Error(`HTTP ${rr.status}`);
+          const dd = await rr.json();
+          alert(T(`已导入 ${dd.imported || 0} 本期刊到清单「${dd.list_name || ''}」`, `Imported ${dd.imported || 0} journals into "${dd.list_name || ''}"`));
+          location.href = '/#fav';
+        } catch (e) {
+          btn.disabled = false; btn.textContent = T('导入到我的收藏','Import to my favorites');
+          alert(T('导入失败：','Import failed: ') + (e.message || e));
+        }
+      });
+      return true;
+    } catch (e) {
+      main.innerHTML = `<div class="share-landing"><h2>${T('加载失败','Load failed')}</h2><p>${escape(String(e.message||e))}</p></div>`;
+      return true;
+    }
   }
 
   function renderFavRow(r) {
@@ -3037,6 +3181,8 @@
     applyI18n();
     updateFavCount();
     await handleAuthCallback();
+    // 分享着陆页：/s/<id> 直接接管 main，不走主流程
+    if (await maybeRenderShareLanding()) return;
     try {
       const [j, d, m, esi, oa, aliases, rc] = await Promise.all([
         fetch('data/journals.json').then(r => r.json()),
