@@ -3079,33 +3079,151 @@
   }
 
   // ───────── share landing (/s/<id>) ─────────
+  async function copyToClipboard(text) {
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+    } catch (_) {}
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed'; ta.style.opacity = '0'; ta.style.left = '-9999px';
+      document.body.appendChild(ta); ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      return true;
+    } catch (_) { return false; }
+  }
+  function flashBtn(id, label) {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    const old = btn.innerHTML;
+    btn.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> ${label}`;
+    btn.classList.add('btn-ok');
+    setTimeout(() => { btn.innerHTML = old; btn.classList.remove('btn-ok'); }, 1400);
+  }
+
   async function maybeRenderShareLanding() {
     const m = location.pathname.match(/^\/s\/([A-Za-z0-9_-]{4,32})\/?$/);
     if (!m) return false;
     const shareId = m[1];
+    // 进入 share 模式：单列布局、隐藏侧边栏，避免半空侧栏的渲染感
+    document.body.classList.add('share-mode');
     const main = document.querySelector('main') || document.body;
-    main.innerHTML = `<div class="share-landing"><div class="empty">${T('加载分享中…','Loading shared list…')}</div></div>`;
+    const brandHead = `
+      <div class="share-brand">
+        <a href="/" class="share-brand-link">
+          <span class="share-brand-title">AILatest <em>Journal</em></span>
+          <span class="share-brand-sub">期刊检索 · 收藏分享</span>
+        </a>
+      </div>`;
+    main.innerHTML = `${brandHead}<div class="share-landing"><div class="empty">${T('加载分享中…','Loading shared list…')}</div></div>`;
     try {
       const r = await fetch(`${API_BASE}/share/${shareId}`);
       if (!r.ok) {
-        main.innerHTML = `<div class="share-landing"><h2>${T('分享不存在或已过期','Share not found or expired')}</h2><p><a href="/">${T('返回首页','Back home')}</a></p></div>`;
+        main.innerHTML = `${brandHead}<div class="share-landing"><h2>${T('分享不存在或已过期','Share not found or expired')}</h2><p><a href="/">${T('返回首页','Back home')}</a></p></div>`;
         return true;
       }
       const d = await r.json();
-      const items = (d.items || []).map((it, i) =>
-        `<div class="share-list-row">${i+1}. ${escape(it.name || it.issn || it.cn_code || '—')}${it.issn ? ` <span style="color:#999">[${escape(it.issn)}]</span>` : ''}</div>`
-      ).join('') || `<div class="empty">${T('（空清单）','(empty list)')}</div>`;
+      const items = (d.items || []).map((it, i) => {
+        const title = escape(it.name || it.cn_name || it.issn || it.cn_code || '—');
+        const sub = it.cn_name && it.cn_name !== (it.name || '') ? `<span class="share-row-cn">${escape(it.cn_name)}</span>` : '';
+        const code = it.issn ? `<span class="share-row-code">${escape(it.issn)}</span>`
+                   : it.cn_code ? `<span class="share-row-code">${escape(it.cn_code)}</span>` : '';
+        return `<div class="share-list-row"><span class="share-row-idx">${String(i+1).padStart(2,'0')}</span><span class="share-row-name">${title}${sub}</span>${code}</div>`;
+      }).join('') || `<div class="empty">${T('（空清单）','(empty list)')}</div>`;
       const exp = d.expires_at ? new Date(d.expires_at * 1000).toLocaleDateString() : '';
+      const cnt = (d.items||[]).length;
+      const inviteDefault = T(
+        `我整理了一份期刊清单「${d.name||'我的期刊'}」，共 ${cnt} 本，推荐给你看看 👇`,
+        `I curated a journal list "${d.name||'My journals'}" with ${cnt} entries — take a look 👇`
+      );
       main.innerHTML = `
-        <div class="share-landing">
-          <h2>📚 ${escape(d.name || T('期刊清单','Journal list'))}</h2>
-          <div class="share-by">${T('共','')} ${(d.items||[]).length} ${T('本期刊','journals')}${exp ? ' · ' + T('有效期至 ','expires ') + exp : ''} · ${d.view_count||0} ${T('次查看','views')}</div>
-          ${items}
-          <div class="share-import-bar">
-            <button id="share-import-btn">${T('导入到我的收藏','Import to my favorites')}</button>
-            <a href="/" style="color:#666">${T('或回到主站浏览','or back to the main site')}</a>
+        ${brandHead}
+        <div class="share-landing" id="share-card">
+          <div class="share-ribbon">📚 ${T('期刊清单分享','Journal list')}</div>
+          <h2 class="share-title">${escape(d.name || T('期刊清单','Journal list'))}</h2>
+          <div class="share-meta">
+            <span class="share-meta-item"><strong>${cnt}</strong> ${T('本期刊','journals')}</span>
+            ${exp ? `<span class="share-meta-item">${T('有效期至','expires')} ${exp}</span>` : ''}
+            <span class="share-meta-item">${d.view_count||0} ${T('次查看','views')}</span>
           </div>
-        </div>`;
+          <div class="share-list">${items}</div>
+          <div class="share-foot">
+            <span class="share-foot-brand">AILatest <em>Journal</em></span>
+            <span class="share-foot-url">journal.ailatest.org</span>
+          </div>
+        </div>
+
+        <div class="share-invite">
+          <label class="share-invite-label">${T('邀请文案（可编辑后复制）','Invite message (edit & copy)')}</label>
+          <textarea id="share-invite-text" rows="3">${escape(inviteDefault)}\n\n${location.href}</textarea>
+        </div>
+
+        <div class="share-actions">
+          <button id="share-copy-link" class="btn-primary">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+            ${T('复制链接','Copy link')}
+          </button>
+          <button id="share-copy-text" class="btn-soft">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            ${T('复制邀请','Copy invite')}
+          </button>
+          <button id="share-download-img" class="btn-soft">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            ${T('保存为图片','Save as image')}
+          </button>
+          <button id="share-import-btn" class="btn-soft">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            ${T('导入到收藏','Import')}
+          </button>
+        </div>
+        <div class="share-foot-link"><a href="/" class="share-back">${T('← 回到主站浏览','← back to main site')}</a></div>`;
+      // 复制链接
+      document.getElementById('share-copy-link').addEventListener('click', async () => {
+        await copyToClipboard(location.href);
+        flashBtn('share-copy-link', T('已复制','Copied'));
+      });
+      // 复制邀请文案
+      document.getElementById('share-copy-text').addEventListener('click', async () => {
+        const t = document.getElementById('share-invite-text').value;
+        await copyToClipboard(t);
+        flashBtn('share-copy-text', T('已复制','Copied'));
+      });
+      // 保存为图片
+      document.getElementById('share-download-img').addEventListener('click', async () => {
+        const btn = document.getElementById('share-download-img');
+        const old = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = `<span class="spinner"></span> ${T('生成中…','Rendering…')}`;
+        try {
+          if (!window.html2canvas) {
+            await new Promise((res, rej) => {
+              const s = document.createElement('script');
+              s.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+              s.onload = res; s.onerror = () => rej(new Error('html2canvas load failed'));
+              document.head.appendChild(s);
+            });
+          }
+          const card = document.getElementById('share-card');
+          const canvas = await window.html2canvas(card, {
+            backgroundColor: '#fffdf6', scale: 2, useCORS: true, logging: false,
+          });
+          const url = canvas.toDataURL('image/png');
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `journal-list-${shareId}.png`;
+          document.body.appendChild(a); a.click(); a.remove();
+          btn.innerHTML = old; btn.disabled = false;
+          flashBtn('share-download-img', T('已保存','Saved'));
+        } catch (e) {
+          btn.innerHTML = old; btn.disabled = false;
+          alert(T('生成图片失败：','Image render failed: ') + (e.message || e));
+        }
+      });
+      // 导入
       document.getElementById('share-import-btn').addEventListener('click', async () => {
         if (!user || !user.token) {
           alert(T('请先登录后导入清单','Sign in first, then import'));
@@ -3113,7 +3231,8 @@
           return;
         }
         const btn = document.getElementById('share-import-btn');
-        btn.disabled = true; btn.textContent = T('导入中…','Importing…');
+        const old = btn.innerHTML;
+        btn.disabled = true; btn.innerHTML = `<span class="spinner"></span> ${T('导入中…','Importing…')}`;
         try {
           const rr = await fetch(`${API_BASE}/share/${shareId}/import`, {
             method: 'POST',
@@ -3124,7 +3243,7 @@
           alert(T(`已导入 ${dd.imported || 0} 本期刊到清单「${dd.list_name || ''}」`, `Imported ${dd.imported || 0} journals into "${dd.list_name || ''}"`));
           location.href = '/#fav';
         } catch (e) {
-          btn.disabled = false; btn.textContent = T('导入到我的收藏','Import to my favorites');
+          btn.disabled = false; btn.innerHTML = old;
           alert(T('导入失败：','Import failed: ') + (e.message || e));
         }
       });
@@ -3349,10 +3468,12 @@
         }
         const btn = $('#drawer-share');
         if (btn) {
-          const old = btn.textContent;
-          btn.textContent = '✓';
+          btn.classList.add('copied');
           btn.title = T('已复制','Copied');
-          setTimeout(() => { btn.textContent = old; btn.title = T('复制链接 / Copy link','Copy link'); }, 1400);
+          setTimeout(() => {
+            btn.classList.remove('copied');
+            btn.title = T('复制链接 / Copy link','Copy link');
+          }, 1400);
         }
       } catch (_) {
         prompt(T('复制此链接：','Copy this link:'), url);
