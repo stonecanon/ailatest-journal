@@ -1,8 +1,8 @@
 /* AILatest Journal · 牛皮纸学术风 (Claude-inspired kraft/paper palette) */
 :root {
-  --paper:          #faf6e8;   /* 与分享卡 jcard 底色一致 */
-  --paper-soft:     #f9f3dd;   /* 比 paper 略深一档（侧栏/卡片）— v26 拉亮 */
-  --paper-deeper:   #f1e8c7;   /* 再略深一档（强调块）— v26 拉亮 */
+  --paper:          #fdfbf3;   /* 与 body 同色，抽屉无缝融入 v28 */
+  --paper-soft:     #faf6e6;   /* 极淡卡片底色 v28 */
+  --paper-deeper:   #f3e9d0;   /* 强调块 v28 */
   --ink:            #2b2a27;
   --ink-soft:       #4a463f;
   --ink-faint:      #6b6559;

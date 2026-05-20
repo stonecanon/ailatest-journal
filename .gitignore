@@ -32,5 +32,3 @@ data/cnkx_records.json.bak
 
 # Pre-merge backups
 data/journals.json.bak_*
-
-.dashboard-server.*
