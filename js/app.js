@@ -27,7 +27,7 @@
       tab_int: '国际 SCI/SSCI', tab_dom: '国内分级目录', tab_fav: '我的收藏',
       loading: '加载中…',
       hero_title_int: 'SCI / SSCI 国际期刊检索',
-      hero_body_int: '数据源：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI）· 更新至 2026-04-20，并合并 <b>Ei Compendex</b> 期刊目录（2025-10-10）。合并 <b>JCR 2025</b> 归属标记、<b>ESI</b> 22 大学科分类、<b>中科院 2025 大类分区</b>、<b>ShowJCR</b> JCR 2024 影响因子 / 小类分区 / 新锐版 / CCF 2026 推荐与国际期刊预警名单。共收录 <b id="total">—</b> 本。',
+      hero_body_int: '数据源：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI）· 更新至 2026-05-18，并合并 <b>Ei Compendex</b> 期刊目录（2025-10-10）。合并 <b>JCR 2025</b> 归属标记、<b>ESI</b> 22 大学科分类、<b>中科院 2025 大类分区</b>、<b>ShowJCR</b> JCR 2024 影响因子 / 小类分区 / 新锐版 / CCF 2026 推荐与国际期刊预警名单。共收录 <b id="total">—</b> 本。',
       hero_note: '期刊原名保留英文，括注为中文刊名；徽章从左至右：索引 / CAS 分区 / IF 分位 / CCF / T1-T3 / 预警。',
       hero_title_fav: '我的收藏',
       hero_body_fav: '点击任意期刊右侧的 <b>★</b> 可加入收藏。未登录时保存在本机 localStorage；登录后自动同步到云端，可跨设备访问。',
@@ -73,7 +73,7 @@
       tab_int: 'Int’l SCI/SSCI', tab_dom: 'Domestic (CN)', tab_fav: 'My Favorites',
       loading: 'Loading…',
       hero_title_int: 'International SCI / SSCI Search',
-      hero_body_int: 'Source: <b>Web of Science Core Collection</b> (SCIE / SSCI / AHCI / ESCI), updated 2026-04-20, merged with <b>Ei Compendex</b> source list (2025-10-10). Enriched with <b>JCR 2025</b> index flags, <b>ESI</b> 22 subject categories, <b>CAS 2025</b> tiers, <b>ShowJCR</b> JCR 2024 Impact Factors / sub-category tiers / emerging edition / CCF 2026, and <b>CAST</b> tiered directory (T1/T2/T3) plus international warning list. Total: <b id="total">—</b> journals.',
+      hero_body_int: 'Source: <b>Web of Science Core Collection</b> (SCIE / SSCI / AHCI / ESCI), updated 2026-05-18, merged with <b>Ei Compendex</b> source list (2025-10-10). Enriched with <b>JCR 2025</b> index flags, <b>ESI</b> 22 subject categories, <b>CAS 2025</b> tiers, <b>ShowJCR</b> JCR 2024 Impact Factors / sub-category tiers / emerging edition / CCF 2026, and <b>China Association for Science and Technology (CAST)</b> High-Quality Sci-Tech Journal Tiered Directory (T1/T2/T3) plus international warning list. Total: <b id="total">—</b> journals.',
       hero_note: 'Titles preserved in original (English); Chinese names in subtitle. Badges left-to-right: index / CAS tier / IF quartile / CCF / T1-T3 / warning.',
       hero_title_fav: 'My Favorites',
       hero_body_fav: 'Click the <b>★</b> on any row to bookmark. Saved locally when signed-out; syncs to the cloud when signed-in.',
@@ -81,7 +81,7 @@
       col_name: 'Journal Title', col_abbr: 'Abbr', col_badges: 'Index / IF / Tier / Badges',
       col_cat: 'ESI / CAS Major',
       hero_title_dom: 'Domestic Chinese Journal Directories',
-      hero_body_dom: '<b>CAST High-Quality Sci-Tech Journal Tiered Directory (Dec 2025)</b> — 11,084 journals across 59 disciplines; <b>CSSCI 2025-2026</b> core & extended; <b>PKU Core (2023)</b>; <b>ZJU 2024</b>; <b>School A 2023</b> (paywalled); <b>CCF Recommended Chinese Journals 2025</b> tiered.',
+      hero_body_dom: '<b>China Association for Science and Technology (CAST) High-Quality Sci-Tech Journal Tiered Directory (Dec 2025)</b> — 11,084 journals across 59 disciplines; <b>CSSCI 2025-2026</b> core & extended; <b>PKU Core (2023)</b>; <b>ZJU 2024</b>; <b>School A 2023</b> (paywalled); <b>CCF Recommended Chinese Journals 2025</b> tiered.',
       hero_note_dom: 'CSSCI / PKU Core extracted via OCR from scanned PDF; minor typos possible.',
       search_int: 'Search: title / abbr / acronym / ISSN / Chinese name',
       search_dom: 'Search: Chinese name / English name / ISSN / CN',
@@ -1450,8 +1450,7 @@
   // 期刊浏览量缓存（journal_key → count）
   const viewsCache = {};
   function badgeView(key) {
-    const n = viewsCache[key];
-    if (!n || n < 1) return '';
+    const n = viewsCache[key] || 0;
     const display = n >= 1000 ? (n / 1000).toFixed(1) + 'k' : String(n);
     return `<span class="badge b-view" title="${T('累计浏览次数','Total views')}">👁 ${display}</span>`;
   }
@@ -2384,6 +2383,71 @@
     }
   }
 
+
+  // ───────── 相关期刊推荐 (Top 3) ─────────
+  function getRelatedJournals(r, limit = 3) {
+    if (!journals.length) return [];
+    const selfId = favId(r);
+    const selfIF = parseFloat(r.if_2024) || 0;
+    const selfCats = Array.isArray(r.wos_categories) ? r.wos_categories : [];
+    const selfCAS = r.cas_zone || '';
+    const selfJCR = r.if_quartile || '';
+    const selfPub = (r.publisher || '').toLowerCase();
+    const selfESI = r.esi_category || '';
+
+    const scored = [];
+    for (const j of journals) {
+      const jid = favId(j);
+      if (jid === selfId) continue;
+      const jCats = Array.isArray(j.wos_categories) ? j.wos_categories : [];
+      // Jaccard similarity on WoS categories (weight 0.5)
+      let catScore = 0;
+      if (selfCats.length && jCats.length) {
+        const inter = selfCats.filter(c => jCats.includes(c)).length;
+        const union = new Set([...selfCats, ...jCats]).size;
+        catScore = union > 0 ? inter / union : 0;
+      }
+      // IF proximity (weight 0.25)
+      const jIF = parseFloat(j.if_2024) || 0;
+      let ifScore = 0;
+      if (selfIF > 0 && jIF > 0) {
+        ifScore = 1 / (1 + Math.abs(Math.log(selfIF) - Math.log(jIF)));
+      }
+      // CAS zone match (weight 0.15)
+      let zoneScore = 0;
+      if (selfCAS && j.cas_zone === selfCAS) zoneScore += 0.5;
+      if (selfJCR && j.if_quartile === selfJCR) zoneScore += 0.5;
+      // Same publisher (weight 0.1)
+      const pubScore = (selfPub && (j.publisher || '').toLowerCase() === selfPub) ? 1 : 0;
+      // ESI bonus
+      const esiBonus = (selfESI && j.esi_category === selfESI) ? 0.1 : 0;
+
+      const total = catScore * 0.5 + ifScore * 0.25 + zoneScore * 0.15 + pubScore * 0.1 + esiBonus;
+      if (total > 0.05) scored.push({ j, score: total });
+    }
+    scored.sort((a, b) => b.score - a.score);
+    return scored.slice(0, limit).map(s => s.j);
+  }
+
+  function renderRelatedHTML(r) {
+    const related = getRelatedJournals(r, 3);
+    if (!related.length) return '';
+    const cards = related.map(j => {
+      const name = titleCase(j.name || j.cn_name || '');
+      const ifVal = j.if_2024 != null ? `IF ${j.if_2024}` : '';
+      const cas = j.cas_zone ? `${T('中科院','CAS')} ${j.cas_zone}${T('区','')}` : '';
+      const badges = [ifVal, cas].filter(Boolean).join(' · ');
+      return `<div class="related-card" data-fid="${escape(favId(j))}" style="cursor:pointer">
+        <div class="related-name">${escape(name)}</div>
+        <div class="related-meta muted-cell">${badges}</div>
+      </div>`;
+    }).join('');
+    return `<div class="drawer-section related-section">
+      <h4>${T('相关期刊推荐','Related Journals')}</h4>
+      <div class="related-grid">${cards}</div>
+    </div>`;
+  }
+
   // ───────── 详情抽屉 ─────────
   let drawerOpen = false;
   function openDrawer(r) {
@@ -2673,6 +2737,10 @@
             <span class="rating-count muted-cell" id="rating-count">${T('暂无评分','No ratings yet')}</span>
           </div>
           <button class="big-btn ${on?'ghost':'primary'}" id="drawer-fav-big">${on ? T('★ 已收藏（点击取消）','★ Favorited (click to remove)') : T('☆ 加入收藏','☆ Add to favorites')}</button>
+          ${favLists.length > 1 ? `<div class="drawer-fav-select">
+            <span class="muted-cell" style="font-size:12px">${T('保存到：','Save to:')}</span>
+            <select id="drawer-fav-list-select">${favLists.map(l => `<option value="${escape(l.id)}" ${l.id===activeListId?'selected':''}>${escape(l.name)} (${l.ids.length})</option>`).join('')}</select>
+          </div>` : ''}
         </div>
       </div>
       ${statsHTML}
@@ -2687,6 +2755,7 @@
       ${eiHTML}
       ${cnkxHTML}
       ${lockedSrcHTML}
+      ${renderRelatedHTML(r)}
       <div class="drawer-section rating-section" data-rating-key="${escape(favId(r))}">
         <h4>${T('我的评分','My Rating')}</h4>
         <div class="rating-my-wrap">
@@ -2697,7 +2766,25 @@
     `;
     // init rating widget
     setTimeout(() => initRatingWidget(favId(r)), 0);
+    // related journal cards → click to open that journal's drawer
+    body.querySelectorAll('.related-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const fid = card.dataset.fid;
+        const rec = journals.find(j => favId(j) === fid) || favsData[fid];
+        if (rec) openDrawer(rec);
+      });
+    });
+    // drawer list selector: switch active list before toggling
+    const drawerListSel = document.getElementById('drawer-fav-list-select');
+    if (drawerListSel) {
+      drawerListSel.addEventListener('change', () => {
+        switchList(drawerListSel.value);
+        openDrawer(r); // refresh drawer state
+      });
+    }
     $('#drawer-fav-big')?.addEventListener('click', () => {
+      // If user selected a different list in dropdown, switch first
+      if (drawerListSel && drawerListSel.value !== activeListId) switchList(drawerListSel.value);
       toggleFav(r, { src });
       openDrawer(r); // 刷新状态
       document.querySelectorAll(`.fav-star[data-fav="${favId(r)}"]`).forEach(btn => {
@@ -3106,20 +3193,81 @@
     });
 
     // favorite star delegation (国际 + 国内全覆盖)
+    let activePicker = null;
+    function closeFavPicker() {
+      if (activePicker) { activePicker.remove(); activePicker = null; }
+    }
     document.addEventListener('click', (e) => {
+      // Close picker if clicking outside
+      if (activePicker && !e.target.closest('.fav-picker') && !e.target.closest('.fav-star')) {
+        closeFavPicker();
+      }
       const btn = e.target.closest('.fav-star'); if (!btn) return;
       e.stopPropagation();
       const fid = btn.dataset.fav;
       const src = btn.dataset.favSrc || 'int';
-      // 优先从 rowRecordsByFid 取完整记录；再回退到 journals[] / favsData
       const rec = rowRecordsByFid[fid]
         || journals.find(r => favId(r) === fid)
         || favsData[fid];
       if (!rec) return;
-      toggleFav(rec, { src });
-      btn.classList.toggle('on');
-      btn.textContent = btn.classList.contains('on') ? '★' : '☆';
-      if (activeTab === 'fav') renderFav();
+
+      // If already favorited OR only 1 list → direct toggle (old behavior)
+      const alreadyFav = allFavIds().has(fid);
+      if (alreadyFav || favLists.length <= 1) {
+        toggleFav(rec, { src });
+        btn.classList.toggle('on');
+        btn.textContent = btn.classList.contains('on') ? '★' : '☆';
+        if (activeTab === 'fav') renderFav();
+        return;
+      }
+      // Multiple lists & not yet favorited → show picker popover
+      closeFavPicker();
+      const picker = document.createElement('div');
+      picker.className = 'fav-picker';
+      picker.innerHTML = favLists.map(l => {
+        const has = l.ids.includes(fid);
+        return `<div class="fav-picker-item ${has?'active':''}" data-list-id="${escape(l.id)}">
+          <span class="check">${has ? '✓' : ''}</span>
+          <span>${escape(l.name)} (${l.ids.length})</span>
+        </div>`;
+      }).join('') + `<div class="fav-picker-new">＋ ${T('新建清单','New list')}</div>`;
+      // Position near the button
+      const rect = btn.getBoundingClientRect();
+      picker.style.position = 'fixed';
+      picker.style.top = (rect.bottom + 4) + 'px';
+      picker.style.left = Math.min(rect.left, window.innerWidth - 220) + 'px';
+      document.body.appendChild(picker);
+      activePicker = picker;
+      // Picker item click
+      picker.querySelectorAll('.fav-picker-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const listId = item.dataset.listId;
+          const prevActive = activeListId;
+          activeListId = listId;
+          toggleFav(rec, { src });
+          activeListId = prevActive; // restore
+          closeFavPicker();
+          btn.classList.add('on');
+          btn.textContent = '★';
+          if (activeTab === 'fav') renderFav();
+        });
+      });
+      picker.querySelector('.fav-picker-new')?.addEventListener('click', () => {
+        const name = prompt(T('新清单名称：','New list name:'), T('新清单','New list'));
+        if (name && name.trim()) {
+          const newId = createList(name.trim());
+          const prevActive = activeListId;
+          activeListId = newId;
+          toggleFav(rec, { src });
+          activeListId = prevActive;
+          closeFavPicker();
+          btn.classList.add('on');
+          btn.textContent = '★';
+          if (activeTab === 'fav') renderFav();
+        } else {
+          closeFavPicker();
+        }
+      });
     });
 
     // 行点击 → 详情抽屉

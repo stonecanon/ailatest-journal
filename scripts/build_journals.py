@@ -56,6 +56,8 @@ SHOW_CCF    = LIST_DIR / 'ShowJCR_CCF推荐_2026.csv'
 SHOW_CCFT   = LIST_DIR / 'ShowJCR_CCF-T_2025.csv'
 
 CNKX_JSON    = DATA_DIR / 'cnkx_tiers.json'
+CNKX_RECORDS = DATA_DIR / 'cnkx_records.json'
+CNKX_DOMAINS = DATA_DIR / 'cnkx_domains_59.json'
 ZJU_JSON     = DATA_DIR / 'zju_tiers.json'
 SCHOOL_A_JSON= DATA_DIR / 'school_a_tiers.json'
 CSSCI_CORE_JSON = ROOT / 'generated' / 'cssci_core.json'
@@ -537,8 +539,11 @@ def main():
         'cssci_ext': [],
         'pku_core': [],
     }
-    if CNKX_JSON.exists():
-        domestic['cnkx'] = json.loads(CNKX_JSON.read_text(encoding='utf-8'))
+    if CNKX_RECORDS.exists():
+        cnkx_records = json.loads(CNKX_RECORDS.read_text(encoding='utf-8'))
+        cnkx_by_issn = json.loads(CNKX_JSON.read_text(encoding='utf-8')) if CNKX_JSON.exists() else {}
+        cnkx_domains = json.loads(CNKX_DOMAINS.read_text(encoding='utf-8')).get('domains', []) if CNKX_DOMAINS.exists() else []
+        domestic['cnkx'] = {'records': cnkx_records, 'by_issn': cnkx_by_issn, 'domains': cnkx_domains}
     if ZJU_JSON.exists():
         domestic['zju'] = json.loads(ZJU_JSON.read_text(encoding='utf-8'))
     if SCHOOL_A_JSON.exists():
