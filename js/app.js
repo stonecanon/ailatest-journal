@@ -3047,7 +3047,17 @@
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       const d = await r.json();
       const shareUrl = `${location.origin}/s/${d.id}`;
-      showShareModal({ url: shareUrl, expiresAt: d.expires_at, listName: cur.name, count: items.length });
+      // 用本地 favsData 富化每行（索引/JCR），不必再请求 journals.json
+      const richItems = cur.ids.map(id => {
+        const rec = favsData[id] || journals.find(r => favId(r) === id) || {};
+        return {
+          name: rec.name || rec.cn_name || '—',
+          cn_name: rec.cn_name && rec.cn_name !== rec.name ? rec.cn_name : '',
+          indices: rec.indices || [],
+          if_quartile: rec.if_quartile || '',
+        };
+      });
+      showShareModal({ url: shareUrl, expiresAt: d.expires_at, listName: cur.name, count: items.length, items: richItems });
     } catch (e) {
       showShareModal({ error: String(e.message || e) });
     }
@@ -3073,6 +3083,22 @@
         `我整理了一份期刊清单「${opts.listName}」，共 ${opts.count} 本，点开一键查分区/影响因子/收稿周期：\n${opts.url}`,
         `I curated a journal list "${opts.listName}" (${opts.count} journals) — quartile, IF, review cycles, all in one click:\n${opts.url}`
       );
+      // 期刊预览列表（最多 30 本）
+      const items = opts.items || [];
+      const previewMax = 30;
+      const shown = items.slice(0, previewMax);
+      const idxRank = { SCIE: 1, SSCI: 2, AHCI: 3, ESCI: 4, EI: 5 };
+      const renderRow = (it) => {
+        const idxList = (it.indices || []).slice().sort((a, b) => (idxRank[a] || 9) - (idxRank[b] || 9));
+        const idxHtml = idxList.map(i => `<span class="share-idx idx-${i.toLowerCase()}">${escape(i)}</span>`).join('');
+        const q = (it.if_quartile || '').toUpperCase();
+        const jcrHtml = /^Q[1-4]$/.test(q) ? `<span class="share-jcr jcr-${q.toLowerCase()}">JCR ${q}</span>` : '';
+        const cn = it.cn_name ? `<span class="share-row-cn">${escape(it.cn_name)}</span>` : '';
+        return `<li class="share-row"><span class="share-row-name">${escape(it.name || '—')}</span>${cn}<span class="share-row-tags">${idxHtml}${jcrHtml}</span></li>`;
+      };
+      const listHtml = shown.length
+        ? `<ul class="share-modal-list">${shown.map(renderRow).join('')}</ul>${items.length > previewMax ? `<div class="share-modal-more">${T(`还有 ${items.length - previewMax} 本，打开链接查看完整清单`, `+${items.length - previewMax} more — open the link to see all`)}</div>` : ''}`
+        : '';
       body = `
         <div class="share-modal-body">
           <div class="share-modal-head">
@@ -3080,6 +3106,7 @@
             <h3 class="share-modal-title">「${escape(opts.listName)}」</h3>
             <div class="share-modal-meta">${T('共','')} <strong>${opts.count}</strong> ${T('本期刊','journals')}${exp ? ' · ' + T('有效期至 ', 'expires ') + exp : ''}</div>
           </div>
+          ${listHtml}
           <div class="share-modal-url">
             <input id="share-url-input" type="text" readonly value="${escape(opts.url)}">
           </div>
