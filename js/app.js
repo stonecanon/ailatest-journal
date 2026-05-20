@@ -24,13 +24,17 @@
       drawer_kicker: '期刊详情',
       pwa_install: '📲 安装到主屏',
       footer_data: '数据来源：Clarivate WoS Core Collection · JCR 2025 · ESI · 中科院文献情报中心分区表 2025 · ShowJCR (GPL-3.0) · 中国科协 2025 · 浙江大学 2024 · 高校自编目录 2023。© <a href="https://journal.ailatest.org">AILatest Journal</a>',
-      tab_int: '国际 SCI/SSCI', tab_dom: '国内分级目录', tab_fav: '我的收藏',
+      tab_int: '国际', tab_dom: '中国', tab_fav: '我的收藏', tab_pick: '帮我选刊',
       loading: '加载中…',
       hero_title_int: 'SCI / SSCI 国际期刊检索',
-      hero_body_int: '数据源：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI）· 更新至 2026-05-18，并合并 <b>Ei Compendex</b> 期刊目录（2025-10-10）。合并 <b>JCR 2025</b> 归属标记、<b>ESI</b> 22 大学科分类、<b>中科院 2025 大类分区</b>、<b>ShowJCR</b> JCR 2024 影响因子 / 小类分区 / 新锐版 / CCF 2026 推荐与国际期刊预警名单。共收录 <b id="total">—</b> 本。',
-      hero_note: '徽章语义：<b>SCIE/SSCI/AHCI/ESCI/EI</b> 索引收录 · <b>中科院</b> 中科院 2025 大类分区（1-4 区，TOP 标志） · <b>JCR Q</b> Quartile（Q1-Q4） · <b>新锐</b> 中科院 2026 新锐版分区 · <b>CCF</b> 中国计算机学会 2026 推荐（A/B/C） · <b>ABDC</b> 澳洲经管期刊分级（A*/A/B/C） · <b>ABS</b> 英国 Chartered ABS Academic Journal Guide 2024（4*/4/3/2/1，仅经管商科） · <b>T1/T2/T3</b> 中国科协 2025 高质量期刊分级 · <b>⚠ Warning</b> 国际期刊预警名单。<b>IF</b> 单独成列，按 JCR 2024 影响因子展示。',
+      hero_body_int: '数据源：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI）· 更新至 2026-05-18，并合并 <b>EI Compendex</b> 期刊目录（2025-10-10）。合并 <b>JCR 2025</b> 归属标记、<b>ESI</b> 22 大学科分类、<b>中科院 2025 大类分区</b>、<b>ShowJCR</b> JCR 2025 发布版 · 2024 指标（IF / 小类分区 / 排名）、新锐版、CCF 2026 推荐与国际期刊预警名单。共收录 <b id="total">—</b> 本。',
+      hero_note: '徽章语义：<b>SCIE/SSCI/AHCI/ESCI/EI</b> 索引收录 · <b>中科院</b> 中科院 2025 大类分区（1-4 区，TOP 标志） · <b>JCR Q</b> Quartile（Q1-Q4） · <b>新锐</b> 中科院 2026 新锐版分区 · <b>CCF</b> 中国计算机学会 2026 推荐（A/B/C） · <b>ABDC</b> 澳洲经管期刊分级（A*/A/B/C） · <b>ABS</b> 英国 Chartered ABS Academic Journal Guide 2024（4*/4/3/2/1，仅经管商科） · <b>T1/T2/T3</b> 中国科协 2025 高质量期刊分级 · <b>⚠ Warning</b> 国际期刊预警名单。<b>IF</b> 单独成列，按 JCR 2025 发布版 · 2024 指标展示，可升序/降序排序。',
       hero_title_fav: '我的收藏',
       hero_body_fav: '点击任意期刊右侧的 <b>★</b> 可加入收藏。未登录时保存在本机 localStorage；登录后自动同步到云端，可跨设备访问。',
+      hero_title_pick: '帮我选刊',
+      hero_body_pick: '敬请期待。这里将根据你的研究主题、影响因子区间、审稿周期、版面费、收录索引等条件，为你推荐合适的目标期刊。未来在更新。',
+      pick_coming_title: '敬请期待',
+      pick_coming_desc: '未来在更新',
       results_all: '全部期刊', load_more: '加载更多',
       col_name: '期刊 Title', col_abbr: '缩写 Abbr', col_badges: '索引 / IF / 分区 / 徽章',
       col_cat: 'ESI / 中科院大类',
@@ -70,13 +74,17 @@
       drawer_kicker: 'Journal Details',
       pwa_install: '📲 Install to Home',
       footer_data: 'Sources: Clarivate WoS Core Collection · JCR 2025 · ESI · CAS NSL Tiers 2025 · ShowJCR (GPL-3.0) · CAST 2025 · ZJU 2024 · School A 2023. © <a href="https://journal.ailatest.org">AILatest Journal</a>',
-      tab_int: 'Int’l SCI/SSCI', tab_dom: 'Domestic (CN)', tab_fav: 'My Favorites',
+      tab_int: 'International', tab_dom: 'China', tab_fav: 'My Favorites', tab_pick: 'Pick for me',
       loading: 'Loading…',
       hero_title_int: 'International SCI / SSCI Search',
-      hero_body_int: 'Source: <b>Web of Science Core Collection</b> (SCIE / SSCI / AHCI / ESCI), updated 2026-05-18, merged with <b>Ei Compendex</b> source list (2025-10-10). Enriched with <b>JCR 2025</b> index flags, <b>ESI</b> 22 subject categories, <b>CAS 2025</b> tiers, <b>ShowJCR</b> JCR 2024 Impact Factors / sub-category tiers / emerging edition / CCF 2026, and <b>China Association for Science and Technology (CAST)</b> High-Quality Sci-Tech Journal Tiered Directory (T1/T2/T3) plus international warning list. Total: <b id="total">—</b> journals.',
-      hero_note: 'Badge legend: <b>SCIE/SSCI/AHCI/ESCI/EI</b> indices · <b>CAS</b> CAS 2025 major tier (1-4, TOP) · <b>JCR Q</b> Quartile · <b>Emerging</b> CAS 2026 Emerging Edition · <b>IF</b> JCR 2024 Impact Factor · <b>CCF</b> CCF 2026 (A/B/C) · <b>ABDC</b> Australian Business (A*/A/B/C) · <b>T1/T2/T3</b> CAST 2025 · <b>⚠ Warning</b> Int’l journal warning list.',
+      hero_body_int: 'Source: <b>Web of Science Core Collection</b> (SCIE / SSCI / AHCI / ESCI), updated 2026-05-18, merged with <b>EI Compendex</b> source list (2025-10-10). Enriched with <b>JCR 2025</b> index flags, <b>ESI</b> 22 subject categories, <b>CAS 2025</b> tiers, <b>ShowJCR</b> JCR 2025 release · 2024 metrics (IF / category quartiles / ranks), emerging edition, CCF 2026, and <b>China Association for Science and Technology (CAST)</b> High-Quality Sci-Tech Journal Tiered Directory (T1/T2/T3) plus international warning list. Total: <b id="total">—</b> journals.',
+      hero_note: 'Badge legend: <b>SCIE/SSCI/AHCI/ESCI/EI</b> indices · <b>CAS</b> CAS 2025 major tier (1-4, TOP) · <b>JCR Q</b> Quartile · <b>Emerging</b> CAS 2026 Emerging Edition · <b>IF</b> JCR 2025 release · 2024 metric, sortable ascending/descending · <b>CCF</b> CCF 2026 (A/B/C) · <b>ABDC</b> Australian Business (A*/A/B/C) · <b>T1/T2/T3</b> CAST 2025 · <b>⚠ Warning</b> Int’l journal warning list.',
       hero_title_fav: 'My Favorites',
       hero_body_fav: 'Click the <b>★</b> on any row to bookmark. Saved locally when signed-out; syncs to the cloud when signed-in.',
+      hero_title_pick: 'Pick for me',
+      hero_body_pick: 'Coming soon. This module will recommend target journals based on your topic, IF range, review cycle, APC, and index requirements. Future update in progress.',
+      pick_coming_title: 'Coming soon',
+      pick_coming_desc: 'Future update in progress',
       results_all: 'All Journals', load_more: 'Load more',
       col_name: 'Journal Title', col_abbr: 'Abbr', col_badges: 'Index / IF / Tier / Badges',
       col_cat: 'ESI / CAS Major',
@@ -98,9 +106,66 @@
     },
   };
 
+
+
+  // 8-language UI layer. Journal titles / ISSN / ranking values remain source-language data.
+  I18N['zh-CN'] = I18N.zh;
+  I18N['zh-TW'] = {
+    ...I18N.zh,
+    tagline: '<b>AILatest Journal</b> — 面向科研人員的期刊檢索與投稿決策工具，聚合 SCI/SSCI、中科院分區、JCR、ESI、CSSCI、北大核心、浙大目錄等資料，支援收藏、評分與跨裝置同步。',
+    indices: '索引', cas_zone: '中科院 2025 分區', filters: '附加篩選', all: '全部',
+    filter_xinrui: '新銳分區', filter_warning: '預警', domestic_sources: '中國分級來源',
+    src_cnkx: '中國科協高品質目錄', src_cssci_core: 'CSSCI 來源期刊', src_cssci_ext: 'CSSCI 擴展版', src_pku: '北大核心 (2023)', src_zju: '浙江大學 2024', src_ccft: 'CCF 中文 T 分區', nav_sub_inhouse: '院校自編目錄', paid_label: '付費', drawer_kicker: '期刊詳情',
+    tab_int: '國際', tab_dom: '中國', tab_fav: '我的收藏', tab_pick: '幫我選刊', loading: '載入中…',
+    hero_title_int: 'SCI / SSCI 國際期刊檢索',
+    hero_body_int: '資料來源：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI）· 更新至 2026-05-18，並合併 <b>EI Compendex</b> 期刊目錄（2025-10-10）。合併 <b>JCR 2025</b> 歸屬標記、<b>ESI</b> 22 大學科分類、<b>中科院 2025 大類分區</b>、<b>ShowJCR</b> JCR 2025 發布版 · 2024 指標（IF / 小類分區 / 排名）、新銳版、CCF 2026 推薦與國際期刊預警名單。共收錄 <b id="total">—</b> 本。',
+    hero_note: '徽章語義：<b>SCIE/SSCI/AHCI/ESCI/EI</b> 索引收錄 · <b>中科院</b> 2025 大類分區 · <b>JCR Q</b> Quartile · <b>新銳</b> 2026 新銳版分區 · <b>CCF</b> 2026 推薦 · <b>ABDC</b> 澳洲經管期刊分級 · <b>ABS</b> AJG 2024 · <b>T1/T2/T3</b> 中國科協 2025 · <b>⚠ Warning</b> 國際期刊預警。<b>IF</b> 按 JCR 2025 發布版 · 2024 指標展示，可升序/降序排序。',
+    hero_title_dom: '中國學術期刊分級目錄', hero_title_fav: '我的收藏', hero_title_pick: '幫我選刊',
+    hero_body_fav: '點擊任一期刊右側的 <b>★</b> 可加入收藏。未登入時保存在本機 localStorage；登入後自動同步到雲端。',
+    hero_body_pick: '敬請期待。這裡將根據你的研究主題、影響因子區間、審稿週期、版面費、收錄索引等條件推薦目標期刊。未來更新。',
+    pick_coming_title: '敬請期待', pick_coming_desc: '未來更新', results_all: '全部期刊', load_more: '載入更多',
+    col_name: '期刊 Title', col_abbr: '縮寫 Abbr', col_badges: '索引 / IF / 分區 / 徽章', search_int: '搜尋：期刊全稱 / 官方縮寫 / ISSN / 中文刊名', search_dom: '搜尋：中文刊名 / 英文刊名 / ISSN / CN 號', search_fav: '搜尋收藏：期刊 / 縮寫 / ISSN', showing: '顯示', of: '條 / 共', total_items: '條', empty: '未找到匹配的期刊', login: '登入', logout: '登出', fav_added: '已收藏', fav_removed: '已移除', syncing: '同步中…', synced: '已同步', wos_subjects: 'WoS 細分學科', wos_search_ph: '篩選學科（A-Z）…', wos_clear_title: '清空選擇'
+  };
+  Object.assign(I18N, {
+    ja: {
+      ...I18N.en,
+      tagline: '<b>AILatest Journal</b> — 研究者向けのジャーナル検索・投稿判断ツール。SCI/SSCI、CAS区分、JCR、ESI、CSSCI、PKU Core、ZJU などを統合。',
+      indices: '索引', cas_zone: 'CAS 2025 区分', filters: 'フィルター', all: 'すべて', filter_xinrui: 'Emerging 区分', filter_warning: '警告リスト', domestic_sources: '中国国内ソース',
+      tab_int: '国際', tab_dom: '中国', tab_fav: 'お気に入り', tab_pick: '投稿先を選ぶ', loading: '読み込み中…',
+      hero_title_int: 'SCI / SSCI 国際ジャーナル検索',
+      hero_body_int: 'データソース：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI、2026-05-18更新）に <b>EI Compendex</b>（2025-10-10）を統合。<b>JCR 2025</b> 索引、<b>ESI</b> 22分野、<b>CAS 2025</b> 区分、<b>ShowJCR</b> JCR 2025リリース・2024指標（IF / 区分 / ランク）、Emerging、CCF 2026、警告リストを収録。合計 <b id="total">—</b> 誌。',
+      hero_note: '<b>IF</b> は JCR 2025リリース・2024指標として表示され、昇順/降順で並べ替えできます。',
+      hero_title_dom: '中国学術ジャーナル区分', hero_title_fav: 'お気に入り', hero_title_pick: '投稿先を選ぶ', hero_body_fav: '<b>★</b> でお気に入りに追加できます。', hero_body_pick: '近日公開。研究テーマ、IF範囲、査読期間、APC、索引条件から投稿候補を推薦します。', pick_coming_title: '近日公開', pick_coming_desc: '今後更新予定', results_all: 'すべてのジャーナル', load_more: 'さらに読み込む', col_name: 'ジャーナル Title', col_abbr: '略称 Abbr', col_badges: '索引 / IF / 区分 / バッジ', search_int: '検索：タイトル / 略称 / ISSN / 中国語名', search_dom: '検索：中国語名 / 英語名 / ISSN / CN', search_fav: 'お気に入りを検索', showing: '表示', of: '/', total_items: '件', empty: '一致するジャーナルがありません', login: 'ログイン', logout: 'ログアウト', wos_subjects: 'WoS 分野', wos_search_ph: '分野を絞り込み（A-Z）…'
+    },
+    ko: {
+      ...I18N.en,
+      tagline: '<b>AILatest Journal</b> — 연구자를 위한 저널 검색 및 투고 의사결정 도구입니다.', indices: '색인', cas_zone: 'CAS 2025 등급', filters: '필터', all: '전체', filter_xinrui: '신예 등급', filter_warning: '경고 목록', domestic_sources: '중국 국내 목록', tab_int: '국제', tab_dom: '중국', tab_fav: '즐겨찾기', tab_pick: '저널 추천', loading: '불러오는 중…',
+      hero_title_int: 'SCI / SSCI 국제 저널 검색', hero_body_int: '데이터: <b>Web of Science Core Collection</b>(2026-05-18) 및 <b>EI Compendex</b>(2025-10-10). <b>JCR 2025</b> 색인, <b>ESI</b>, <b>CAS 2025</b>, <b>ShowJCR</b> JCR 2025 릴리스 · 2024 지표(IF/분야/순위), CCF 2026, 경고 목록을 통합했습니다. 총 <b id="total">—</b> 종.', hero_note: '<b>IF</b>는 JCR 2025 릴리스 · 2024 지표이며 오름차순/내림차순 정렬이 가능합니다.', hero_title_dom: '중국 학술지 등급 목록', hero_title_fav: '즐겨찾기', hero_title_pick: '저널 추천', hero_body_pick: '곧 제공됩니다. 연구 주제, IF 범위, 심사 기간, APC, 색인 조건으로 추천합니다.', pick_coming_title: '준비 중', pick_coming_desc: '향후 업데이트', results_all: '전체 저널', load_more: '더 보기', col_name: '저널 Title', col_abbr: '약어 Abbr', col_badges: '색인 / IF / 등급 / 배지', search_int: '검색: 제목 / 약어 / ISSN / 중국어명', search_dom: '검색: 중국어명 / 영어명 / ISSN / CN', search_fav: '즐겨찾기 검색', showing: '표시', of: '/', total_items: '개', empty: '일치하는 저널이 없습니다', login: '로그인', logout: '로그아웃', wos_subjects: 'WoS 세부분야', wos_search_ph: '분야 필터(A-Z)…'
+    },
+    es: {
+      ...I18N.en,
+      tagline: '<b>AILatest Journal</b> — buscador de revistas y herramienta de decisión para investigadores.', indices: 'Índices', cas_zone: 'CAS 2025', filters: 'Filtros', all: 'Todo', filter_xinrui: 'Emergente', filter_warning: 'Advertencia', domestic_sources: 'Fuentes de China', tab_int: 'Internacional', tab_dom: 'China', tab_fav: 'Favoritos', tab_pick: 'Ayúdame a elegir', loading: 'Cargando…', hero_title_int: 'Búsqueda internacional SCI / SSCI', hero_body_int: 'Fuente: <b>Web of Science Core Collection</b> (actualizado 2026-05-18) con <b>EI Compendex</b> (2025-10-10). Integra <b>JCR 2025</b>, <b>ESI</b>, <b>CAS 2025</b> y <b>ShowJCR</b> versión JCR 2025 · métricas 2024 (IF / cuartiles / rangos), CCF 2026 y listas de advertencia. Total: <b id="total">—</b> revistas.', hero_note: 'El <b>IF</b> corresponde a JCR 2025 publicado · métricas 2024 y se puede ordenar ascendente/descendente.', hero_title_dom: 'Directorios de revistas chinas', hero_title_fav: 'Favoritos', hero_title_pick: 'Ayúdame a elegir', hero_body_pick: 'Próximamente. Recomendará revistas según tema, rango de IF, revisión, APC e índices.', pick_coming_title: 'Próximamente', pick_coming_desc: 'Actualización futura', results_all: 'Todas las revistas', load_more: 'Cargar más', col_name: 'Revista Title', col_abbr: 'Abrev. Abbr', col_badges: 'Índice / IF / nivel / etiquetas', search_int: 'Buscar: título / abreviatura / ISSN / nombre chino', search_dom: 'Buscar: nombre chino / inglés / ISSN / CN', search_fav: 'Buscar favoritos', showing: 'Mostrando', of: 'de', total_items: '', empty: 'No hay coincidencias', login: 'Iniciar sesión', logout: 'Salir', wos_subjects: 'Materias WoS', wos_search_ph: 'Filtrar materias (A-Z)…'
+    },
+    pt: {
+      ...I18N.en,
+      tagline: '<b>AILatest Journal</b> — ferramenta de busca de periódicos e decisão de submissão para pesquisadores.', indices: 'Índices', cas_zone: 'CAS 2025', filters: 'Filtros', all: 'Tudo', filter_xinrui: 'Emergente', filter_warning: 'Alerta', domestic_sources: 'Fontes chinesas', tab_int: 'Internacional', tab_dom: 'China', tab_fav: 'Favoritos', tab_pick: 'Escolher periódico', loading: 'Carregando…', hero_title_int: 'Busca internacional SCI / SSCI', hero_body_int: 'Fonte: <b>Web of Science Core Collection</b> (2026-05-18) com <b>EI Compendex</b> (2025-10-10). Integra <b>JCR 2025</b>, <b>ESI</b>, <b>CAS 2025</b> e <b>ShowJCR</b> versão JCR 2025 · métricas 2024 (IF / quartis / rankings), CCF 2026 e listas de alerta. Total: <b id="total">—</b> periódicos.', hero_note: '<b>IF</b> é JCR 2025 publicado · métricas 2024, com ordenação crescente/decrescente.', hero_title_dom: 'Diretórios chineses', hero_title_fav: 'Favoritos', hero_title_pick: 'Escolher periódico', hero_body_pick: 'Em breve. Recomendará periódicos por tema, faixa de IF, revisão, APC e índices.', pick_coming_title: 'Em breve', pick_coming_desc: 'Atualização futura', results_all: 'Todos os periódicos', load_more: 'Carregar mais', col_name: 'Periódico Title', col_abbr: 'Abrev. Abbr', col_badges: 'Índice / IF / nível / etiquetas', search_int: 'Buscar: título / abreviação / ISSN / nome chinês', search_dom: 'Buscar: nome chinês / inglês / ISSN / CN', search_fav: 'Buscar favoritos', showing: 'Mostrando', of: 'de', total_items: '', empty: 'Nenhum resultado', login: 'Entrar', logout: 'Sair', wos_subjects: 'Assuntos WoS', wos_search_ph: 'Filtrar assuntos (A-Z)…'
+    },
+    fr: {
+      ...I18N.en,
+      tagline: '<b>AILatest Journal</b> — outil de recherche de revues et d’aide au choix de soumission pour les chercheurs.', indices: 'Index', cas_zone: 'CAS 2025', filters: 'Filtres', all: 'Tout', filter_xinrui: 'Émergent', filter_warning: 'Alerte', domestic_sources: 'Sources chinoises', tab_int: 'International', tab_dom: 'Chine', tab_fav: 'Favoris', tab_pick: 'M’aider à choisir', loading: 'Chargement…', hero_title_int: 'Recherche internationale SCI / SSCI', hero_body_int: 'Source : <b>Web of Science Core Collection</b> (2026-05-18) avec <b>EI Compendex</b> (2025-10-10). Intègre <b>JCR 2025</b>, <b>ESI</b>, <b>CAS 2025</b> et <b>ShowJCR</b> version JCR 2025 · métriques 2024 (IF / quartiles / rangs), CCF 2026 et listes d’alerte. Total : <b id="total">—</b> revues.', hero_note: '<b>IF</b> correspond à la version JCR 2025 · métriques 2024, triable en ordre croissant/décroissant.', hero_title_dom: 'Répertoires chinois', hero_title_fav: 'Favoris', hero_title_pick: 'M’aider à choisir', hero_body_pick: 'Bientôt disponible. Recommandations selon thème, IF, délai de revue, APC et index.', pick_coming_title: 'Bientôt disponible', pick_coming_desc: 'Mise à jour future', results_all: 'Toutes les revues', load_more: 'Charger plus', col_name: 'Revue Title', col_abbr: 'Abrév. Abbr', col_badges: 'Index / IF / niveau / badges', search_int: 'Chercher : titre / abréviation / ISSN / nom chinois', search_dom: 'Chercher : nom chinois / anglais / ISSN / CN', search_fav: 'Chercher favoris', showing: 'Affichage', of: 'sur', total_items: '', empty: 'Aucun résultat', login: 'Connexion', logout: 'Déconnexion', wos_subjects: 'Sujets WoS', wos_search_ph: 'Filtrer les sujets (A-Z)…'
+    }
+  });
+  const LANG_ORDER = ['zh-CN', 'zh-TW', 'ja', 'ko', 'en', 'es', 'pt', 'fr'];
+  const LANG_META = {
+    'zh-CN': { label: '简', html: 'zh-CN' }, 'zh-TW': { label: '繁', html: 'zh-TW' },
+    ja: { label: '日', html: 'ja' }, ko: { label: '한', html: 'ko' }, en: { label: 'EN', html: 'en' },
+    es: { label: 'ES', html: 'es' }, pt: { label: 'PT', html: 'pt' }, fr: { label: 'FR', html: 'fr' }
+  };
+  const normalizeLang = (code) => code === 'zh' ? 'zh-CN' : (I18N[code] ? code : 'zh-CN');
+
   // ───────── state ─────────
-  let lang = localStorage.getItem('ailatest.lang') || 'zh';
-  const T = (zh_, en_) => lang === 'en' ? en_ : zh_;
+  let lang = normalizeLang(localStorage.getItem('ailatest.lang') || 'zh-CN');
+  const T = (zh_, en_) => lang === 'zh-CN' || lang === 'zh-TW' ? zh_ : en_;
   // ── Domestic field-value translations (CAST domains, CSSCI/PKU disciplines, ZJU tiers) ──
   const DOM_I18N = {
     domain: {
@@ -620,6 +685,8 @@
   let activeDom = 'cnkx';   // 中国科协 高质量科技期刊分级目录 (2025-12 修订, 11084 条)
   const PAGE = 100;
   let shown = PAGE;
+  let intIfSort = null; // null | 'desc' | 'asc'
+  let favIfSort = null; // null | 'desc' | 'asc'
 
   // favorites & ratings 数据见下方 "favorites (multi-list + drag sort)" 段
   // unlocked records cache for locked sources: { school_a: [...records], ... }
@@ -694,7 +761,7 @@
     }).catch(() => {});
   }
 
-  function t(k) { return I18N[lang][k] ?? k; }
+  function t(k) { return (I18N[lang] && I18N[lang][k]) ?? I18N.en[k] ?? I18N['zh-CN'][k] ?? k; }
 
   function canonicalTitle(s) {
     return String(s || '').trim().replace(/\s+/g, ' ').toUpperCase();
@@ -762,7 +829,7 @@
     if (!activeQuery) return '';
     const aliases = journalSearchMeta(r).aliases.slice(0, 5);
     if (!aliases.length) return '';
-    const title = lang === 'zh' ? '可直接搜索这些缩写' : 'Searchable aliases';
+    const title = (lang === 'zh-CN' || lang === 'zh-TW') ? '可直接搜索这些缩写' : 'Searchable aliases';
     return `<span class="jname-aka" title="${title}">aka: ${aliases.map(escape).join(' / ')}</span>`;
   }
 
@@ -779,23 +846,23 @@
   function applyI18n() {
     $$('[data-i18n]').forEach(el => {
       const k = el.dataset.i18n;
-      if (I18N[lang][k]) el.innerHTML = I18N[lang][k];
+      const v = t(k); if (v) el.innerHTML = v;
     });
     $$('[data-i18n-placeholder]').forEach(el => {
       const k = el.dataset.i18nPlaceholder;
-      if (I18N[lang][k]) el.placeholder = I18N[lang][k];
+      const v = t(k); if (v) el.placeholder = v;
     });
     $$('[data-i18n-title]').forEach(el => {
       const k = el.dataset.i18nTitle;
-      if (I18N[lang][k]) el.title = I18N[lang][k];
+      const v = t(k); if (v) el.title = v;
     });
     const search = activeTab === 'int' ? 'search_int'
                   : activeTab === 'fav' ? 'search_fav'
                   : 'search_dom';
     $('#q').placeholder = t(search);
-    $('#lang-toggle').textContent = lang === 'zh' ? '中文 · EN' : 'EN · 中文';
+    $('#lang-toggle').textContent = LANG_ORDER.map(code => LANG_META[code].label).join(' · ');
     $('#auth-btn').textContent = user ? (user.name || user.login || t('logout')) : t('login');
-    document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+    document.documentElement.lang = LANG_META[lang]?.html || 'zh-CN';
   }
 
   // ───────── favorites (multi-list + drag sort) ─────────
@@ -1556,9 +1623,9 @@
     const label = String(rating).trim().replace('★', '*');
     const valid = ['4*', '4', '3', '2', '1'];
     if (!valid.includes(label)) return '';
-    const cls = label === '4*' ? 'g4s' : 'g' + label;
+    const cls = label === '4*' ? 'abs-g4s' : 'abs-g' + label;
     const source = (abs && abs.source) || 'Chartered ABS AJG 2024';
-    return `<span class="abs-pill abs-${cls}" title="${escape(source)}">ABS ${escape(label)}</span>`;
+    return `<span class="zone ${cls}" title="${escape(source)}">ABS ${escape(label)}</span>`;
   }
       function badgeTier(tier) {
         if (!tier) return '';
@@ -1707,7 +1774,7 @@
       indexBadges ? `<div class="badges badges-idx">${indexBadges}</div>` : '',
       rankBadges  ? `<div class="badges badges-rank">${rankBadges}</div>`  : '',
     ].filter(Boolean).join('') || '<span class="muted-cell">—</span>';
-    const casVal = lang === 'en' ? tn(r.cas_major_cn || '', 'domain') : (r.cas_major_cn || '');
+    const casVal = (lang === 'zh-CN' || lang === 'zh-TW') ? (r.cas_major_cn || '') : tn(r.cas_major_cn || '', 'domain');
     const esiVal = r.esi_category || '';
     const casCell = casVal ? escape(casVal) : '<span class="muted-cell">—</span>';
     const esiCell = esiVal ? escape(esiVal) : '<span class="muted-cell">—</span>';
@@ -1748,6 +1815,8 @@
     if (activeFeats.has('flagship') && !r.flagship) return false;
     if (activeFeats.has('scopus') && !(r.scopus && r.scopus.active)) return false;
     if (activeFeats.has('warning') && !r.warning) return false;
+    if (activeFeats.has('abdc') && !(r.abdc && r.abdc.rating)) return false;
+    if (activeFeats.has('abs')  && !(r.abs  && r.abs.rating))  return false;
     if (activeCat !== '__all' && r.esi_category !== activeCat) return false;
     if (activeCasMajor !== '__all' && (r.cas_major_cn || '') !== activeCasMajor) return false;
     if (activeWos.size) {
@@ -1821,6 +1890,21 @@
     return 0;
   }
 
+  function sortByIF(rows, dir) {
+    if (!dir) return rows;
+    const sign = dir === 'asc' ? 1 : -1;
+    return [...rows].sort((a, b) => {
+      const hasA = Number.isFinite(+a.if_2024);
+      const hasB = Number.isFinite(+b.if_2024);
+      // 缺失 IF 永远放末尾；升序时从最低 IF 开始，不让“—”顶到前面。
+      if (hasA !== hasB) return hasA ? -1 : 1;
+      const av = hasA ? +a.if_2024 : 0;
+      const bv = hasB ? +b.if_2024 : 0;
+      if (av !== bv) return sign * (av - bv);
+      return (a.name || a.en_name || '').localeCompare(b.name || b.en_name || '');
+    });
+  }
+
   function renderInt() {
     let filtered = journals.filter(matches);
     if (activeQuery) {
@@ -1841,6 +1925,11 @@
         })
         .map(x => x.r);
     }
+    filtered = sortByIF(filtered, intIfSort);
+    document.querySelector('th.col-if[data-if-sort="int"]')?.classList.toggle('sort-desc', intIfSort === 'desc');
+    document.querySelector('th.col-if[data-if-sort="int"]')?.classList.toggle('sort-asc', intIfSort === 'asc');
+    const intArrow = document.querySelector('th.col-if[data-if-sort="int"] .sort-arrow');
+    if (intArrow) intArrow.textContent = intIfSort === 'asc' ? '▲' : '▼';
     $('#results-title').textContent = activeCat === '__all'
       ? t('results_all') : activeCat;
     const visible = filtered.slice(0, shown);
@@ -2580,6 +2669,7 @@
     const ir = intRec || {};
     // 徽章块（int 源用 r 自身，国内源用 join 到的国际记录）— 合并为单行 flex-wrap
     const allDrawerBadges = (src === 'int' || intRec) ? [
+      badgeFlagship(ir.flagship),
       ...((ir.indices) || []).map(badgeIndex),
       badgeScopus(ir.scopus),
       badgeJCR(ir.if_quartile),
@@ -2646,7 +2736,7 @@
     // 核心指标数值 — 只放真正的"数值"，分区/Q 用徽章呈现，避免重复
     // 重复信息已删：JCR Q（→ badges）、CAS 大类区（→ casHTML）、Emerging 2026 区（→ xrHTML）
     const stats = [];
-    if (ir.if_2024 != null) stats.push([T('影响因子 / IF','Impact Factor'), ir.if_2024, T('JCR 2024','JCR 2024')]);
+    if (ir.if_2024 != null) stats.push([T('影响因子 / IF','Impact Factor'), ir.if_2024, T('JCR 2025发布 · 2024指标','JCR 2025 rel. · 2024 metric')]);
     if (ir.if_rank) stats.push([T('IF 排名','IF Rank'), ir.if_rank, T('2024','2024')]);
     // 审稿周期合并到 stats 区
     {
@@ -2735,7 +2825,7 @@
         return `<li>${escape(nm)}${zn ? ` · <b>${zn}${T('区','')}</b>` : ''}</li>`;
       }).join('') : '';
       return `<div class="drawer-section">
-        <h4>${T('中科院新锐版 2026','CAS Emerging 2026')}</h4>
+        <h4>${T('新锐版 2026','Emerging 2026')}</h4>
         ${majorLine}
         ${hasSub ? `<div class="cat-sub-label">${T('小类','Sub-fields')}</div><ul class="cas-sub-list">${items}</ul>` : ''}
       </div>`;
@@ -2852,13 +2942,13 @@
       ${statsHTML}
       ${casHTML}
       ${xrHTML}
+      ${wosHTML}
+      ${scopusHTML}
+      ${eiHTML}
       ${cycleHTML}
       ${oaHTML}
       ${warnHTML}
       ${metaHTML ? `<div class="meta-block">${metaHTML}</div>` : ''}
-      ${wosHTML}
-      ${scopusHTML}
-      ${eiHTML}
       ${cnkxHTML}
       ${lockedSrcHTML}
       <div class="drawer-section rating-section" data-rating-key="${escape(favId(r))}">
@@ -3005,6 +3095,7 @@
         (r.issn||'') + ' ' + (r.cn_code||'')
       ).toLowerCase().includes(q));
     }
+    rows = sortByIF(rows, favIfSort);
 
     if (!rows.length) {
       box.innerHTML = toolbar + `<div class="empty" style="padding:40px 0">${t('empty_fav')}</div>`;
@@ -3023,7 +3114,7 @@
             <th class="col-fav" aria-label="Favorite"></th>
             <th class="col-name">${T('期刊 Title','Journal Title')}</th>
             <th class="col-badge">${T('索引 / 分区 / 徽章','Indices / Tier / Badges')}</th>
-            <th class="col-if">IF</th>
+            <th class="col-if sortable ${favIfSort === 'desc' ? 'sort-desc' : favIfSort === 'asc' ? 'sort-asc' : ''}" data-if-sort="fav">IF <span class="sort-arrow">${favIfSort === 'asc' ? '▲' : '▼'}</span></th>
             <th class="col-cas">${T('中科院大类','CAS Major')}</th>
             <th class="col-esi">ESI Subject</th>
             <th class="col-abbr">${T('缩写 Abbr','Abbr')}</th>
@@ -3226,7 +3317,11 @@
     const idxList = (ir.indices || []).slice();
     const idxRank = { SCIE:1, SSCI:2, AHCI:3, ESCI:4, EI:5 };
     idxList.sort((a,b) => (idxRank[a]||9) - (idxRank[b]||9));
-    const idxHtml = idxList.map(i => `<span class="jcard-idx idx-${i.toLowerCase()}">${i}</span>`).join('');
+    const idxHtml = [
+      badgeFlagship(ir.flagship),
+      ...idxList.map(i => `<span class="jcard-idx idx-${i.toLowerCase()}">${i}</span>`),
+      ir.scopus && ir.scopus.active !== false ? `<span class="jcard-idx idx-scopus">Scopus</span>` : '',
+    ].filter(Boolean).join('');
 
     // 三类分区徽章（导出图片用 inline style，避免 html2canvas 错过 var()）
     const zoneStyles = {
@@ -3243,11 +3338,16 @@
       ir.if_quartile && /^Q[1-4]$/i.test(ir.if_quartile) ? zoneTag('burg', parseInt(ir.if_quartile.slice(1)), `JCR ${ir.if_quartile.toUpperCase()}`) : '',
       ir.cas_zone ? zoneTag('navy', parseInt(ir.cas_zone), `${T('中科院','CAS')} ${ir.cas_zone}${T('区','')}${ir.cas_top ? ' Top' : ''}`) : '',
       (ir.cas_xr && ir.cas_xr.zone) ? zoneTag('teal', parseInt(ir.cas_xr.zone), `${T('新锐','Emerging')} ${ir.cas_xr.zone}${T('区','')}`) : '',
+      badgeCCF(ir.ccf),
+      badgeABDC(ir.abdc),
+      badgeABS(ir.abs),
+      ...(ir.cnkx ? ir.cnkx.slice(0,2).map(c => badgeTier(c.tier)) : []),
+      ir.warning ? badgeWarn() : '',
     ].filter(Boolean).join('');
 
     // 关键指标 + 元信息
     const stats = [];
-    if (ir.if_2024 != null) stats.push([T('影响因子','Impact Factor'), ir.if_2024 + ' <small>JCR 2024</small>']);
+    if (ir.if_2024 != null) stats.push([T('影响因子','Impact Factor'), ir.if_2024 + ' <small>JCR 2025发布 · 2024指标</small>']);
     if (ir.if_rank) stats.push([T('IF 排名','IF Rank'), ir.if_rank]);
     const statsHtml = stats.length ? `<div class="jcard-stats">${stats.map(([k,v]) => `<div class="jcard-stat"><div class="jcard-stat-v">${v}</div><div class="jcard-stat-k">${k}</div></div>`).join('')}</div>` : '';
 
@@ -3300,21 +3400,24 @@
     modal.innerHTML = `
       <div class="share-card share-modal-card jcard-modal">
         <div class="share-modal-body">
-          <div class="jcard-header">
-            <div class="jcard-eyebrow">${T('期刊名片','Journal Card')}</div>
-            <div class="jcard-brand"><em>journal</em>.ailatest</div>
-          </div>
-          <div class="jcard" id="jcard-canvas">
-            <div class="jcard-title">${escape(title)}</div>
-            ${cn ? `<div class="jcard-sub">${escape(cn)}</div>` : ''}
-            <div class="jcard-issn">${issn ? 'ISSN ' + escape(issn) : ''}${eissn ? ' · eISSN ' + escape(eissn) : ''}</div>
-            ${idxHtml ? `<div class="jcard-row">${idxHtml}</div>` : ''}
-            ${zonesHtml ? `<div class="jcard-row">${zonesHtml}</div>` : ''}
-            ${statsHtml}
-            ${metaHtml}
-            <div class="jcard-foot">
-              <div class="jcard-foot-text">${T('扫码或访问 ','Scan or visit ')}<b>${escape(location.host)}</b>${T(' 查看完整信息','for full details')}</div>
+          <div class="jcard-export" id="jcard-canvas">
+            <div class="jcard-header">
+              <div class="jcard-eyebrow">${T('期刊名片','Journal Card')}</div>
+              <div class="jcard-brand"><em>journal</em>.ailatest</div>
             </div>
+            <div class="jcard">
+              <div class="jcard-title">${escape(title)}</div>
+              ${cn ? `<div class="jcard-sub">${escape(cn)}</div>` : ''}
+              <div class="jcard-issn">${issn ? 'ISSN ' + escape(issn) : ''}${eissn ? ' · eISSN ' + escape(eissn) : ''}</div>
+              ${idxHtml ? `<div class="jcard-row">${idxHtml}</div>` : ''}
+              ${zonesHtml ? `<div class="jcard-row">${zonesHtml}</div>` : ''}
+              ${statsHtml}
+              ${metaHtml}
+              <div class="jcard-foot">
+                <div class="jcard-foot-text">${T('扫码或访问 ','Scan or visit ')}<b>${escape(location.host)}</b>${T(' 查看完整信息','for full details')}</div>
+              </div>
+            </div>
+            <div class="jcard-site-url">https://journal.ailatest.org</div>
           </div>
           <div class="share-modal-url">
             <input id="jcard-url-input" type="text" readonly value="${escape(url)}">
@@ -3594,7 +3697,7 @@
       indexBadges ? `<div class="badges badges-idx">${indexBadges}</div>` : '',
       (rankBadges || otherBadges) ? `<div class="badges badges-rank">${rankBadges}${otherBadges}</div>` : '',
     ].filter(Boolean).join('') || '<span class="muted-cell">—</span>';
-    const casVal = lang === 'en' ? tn(r.cas_major_cn || '', 'domain') : (r.cas_major_cn || '');
+    const casVal = (lang === 'zh-CN' || lang === 'zh-TW') ? (r.cas_major_cn || '') : tn(r.cas_major_cn || '', 'domain');
     const esiVal = r.esi_category || '';
     const casCell = casVal ? escape(casVal) : '<span class="muted-cell">—</span>';
     const esiCell = esiVal ? escape(esiVal) : '<span class="muted-cell">—</span>';
@@ -3645,9 +3748,24 @@
       shown = PAGE;
       activeTab === 'int' ? renderInt()
         : activeTab === 'fav' ? renderFav()
-        : renderDomestic();
+        : activeTab === 'dom' ? renderDomestic()
+        : null;
     });
     $('#more').addEventListener('click', () => { shown += PAGE; renderInt(); });
+
+    document.addEventListener('click', (e) => {
+      const th = e.target.closest('th.col-if[data-if-sort]');
+      if (!th) return;
+      const target = th.dataset.ifSort;
+      if (target === 'int') {
+        intIfSort = intIfSort === 'desc' ? 'asc' : 'desc';
+        shown = PAGE;
+        renderInt();
+      } else if (target === 'fav') {
+        favIfSort = favIfSort === 'desc' ? 'asc' : 'desc';
+        renderFav();
+      }
+    });
 
     $$('.tab').forEach(b => b.addEventListener('click', () => {
       $$('.tab').forEach(x => x.classList.remove('active'));
@@ -3659,7 +3777,7 @@
       applyI18n(); // refresh placeholder
       if (activeTab === 'dom') renderDomestic();
       else if (activeTab === 'fav') renderFav();
-      else renderInt();
+      else if (activeTab === 'int') renderInt();
     }));
 
     $('#fav-tab').addEventListener('click', () => {
@@ -3676,14 +3794,14 @@
     });
 
     $('#lang-toggle').addEventListener('click', () => {
-      lang = lang === 'zh' ? 'en' : 'zh';
+      lang = LANG_ORDER[(LANG_ORDER.indexOf(lang) + 1) % LANG_ORDER.length];
       localStorage.setItem('ailatest.lang', lang);
       applyI18n();
       renderWosList();
       // re-render because categories etc. are dynamic text
       if (activeTab === 'dom') renderDomestic();
       else if (activeTab === 'fav') renderFav();
-      else renderInt();
+      else if (activeTab === 'int') renderInt();
     });
     $('#theme-toggle').addEventListener('click', () => {
       theme = theme === 'light' ? 'dark' : 'light';

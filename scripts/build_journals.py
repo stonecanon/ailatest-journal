@@ -73,6 +73,8 @@ ABS_CANDIDATES = [
     LIST_DIR / 'AJG_2024.xlsx',
     LIST_DIR / 'AJG2024.csv',
 ]
+SCOPUS_FILE  = LIST_DIR / 'scopus ext_list_Mar_2026.xlsx'
+EI_FILE      = LIST_DIR / 'CPXSourceList_102025.xlsx'
 
 CNKX_JSON    = DATA_DIR / 'cnkx_tiers.json'
 CNKX_RECORDS = DATA_DIR / 'cnkx_records.json'
@@ -519,7 +521,7 @@ def parse_showjcr_ccf(path, by_title, by_issn):
 
 # ───────────────────────── ABDC Journal Quality List ─────────────────────────
 
-def parse_abdc(path, by_title, by_issn):
+def parse_abdc(path, by_title, by_issn, store=None):
     """ABDC Journal Quality List: A*, A, B, C.
 
     Expected official/common headers:
@@ -542,10 +544,25 @@ def parse_abdc(path, by_title, by_issn):
             return 0
         nt = norm_title(title)
         rec = (issn and by_issn.get(issn)) or (eissn and by_issn.get(eissn)) or by_title.get(nt)
-        if rec is None:
-            return 0
         field = str(pick_col(row, ['FoR', 'FOR', 'Field of Research', 'Field', 'FoR code']) or '').strip()
         publisher = str(pick_col(row, ['Publisher']) or '').strip()
+        if rec is None:
+            if store is None:
+                return 0
+            key = 'abdc:' + (issn or eissn or nt)
+            rec = store.get(key)
+            if rec is None:
+                rec = {
+                    'name': title, 'issn': issn, 'eissn': eissn,
+                    'publisher': publisher, 'address': '', 'languages': '',
+                    'wos_categories': [], 'esi_category': '',
+                    'abbr20': '', 'country': '', 'indices': [],
+                    'abdc_only': True,
+                }
+                store[key] = rec
+                by_title.setdefault(nt, rec)
+                for k in (issn, eissn):
+                    if k: by_issn.setdefault(k, rec)
         rec['abdc'] = {
             'rating': rating,
             'field': field,
@@ -589,7 +606,7 @@ def parse_abdc(path, by_title, by_issn):
 
 # ───────────────────────── ABS / AJG Academic Journal Guide ─────────────────────────
 
-def parse_abs(path, by_title, by_issn):
+def parse_abs(path, by_title, by_issn, store=None):
     """Chartered ABS Academic Journal Guide (AJG): 4*, 4, 3, 2, 1.
 
     Source: https://charteredabs.org/academic-journal-guide/academic-journal-guide-2024
@@ -630,6 +647,7 @@ def parse_abs(path, by_title, by_issn):
         return 0
 
     hits = 0
+    standalone = 0
     for raw in rows_iter:
         def cell(i):
             if i < 0 or i >= len(raw): return ''
@@ -649,15 +667,213 @@ def parse_abs(path, by_title, by_issn):
                 continue
         nt = norm_title(title)
         rec = by_title.get(nt)
-        if rec is None:
-            continue
-        rec['abs'] = {
+        abs_payload = {
             'rating': rating,
             'field': cell(i_field),
             'source': f'Chartered ABS AJG {source_year}',
         }
-        hits += 1
-    return hits
+        if rec is not None:
+            rec['abs'] = abs_payload
+            hits += 1
+        elif store is not None:
+            # ABS-only record (not in WoS Core) — usually management/IB titles
+            key = 'abs:' + nt
+            if key in store:
+                store[key]['abs'] = abs_payload
+            else:
+                store[key] = {
+                    'name': title, 'issn': '', 'eissn': '',
+                    'wos_categories': [], 'esi_category': '',
+                    'abbr20': '', 'country': '', 'indices': [],
+                    'abs': abs_payload,
+                    'abs_only': True,
+                }
+            by_title[nt] = store[key]
+            standalone += 1
+    if standalone:
+        print(f'  ABS standalone (not in WoS): +{standalone}')
+    return hits + standalone
+
+
+# ───────────────────────── Scopus Source List ─────────────────────────
+
+def parse_scopus(path, by_title, by_issn, store=None):
+    """Scopus Source List (Mar. 2026).
+
+    Match priority: ISSN > EISSN > normalized title. Journal-only rows are used.
+    Active matched rows get a visible Scopus badge; inactive rows keep metadata for drawer notes.
+    Active journal rows not found in WoS are added as Scopus-only records so the list source is not lost.
+    """
+    if not path.exists() or not openpyxl:
+        return 0, 0, 0
+    wb = openpyxl.load_workbook(path, read_only=True, data_only=True)
+    ws = wb['Scopus Sources Mar. 2026'] if 'Scopus Sources Mar. 2026' in wb.sheetnames else wb.active
+    rows = ws.iter_rows(values_only=True)
+    headers = [str(v).strip() if v is not None else '' for v in next(rows)]
+    col = {h: i for i, h in enumerate(headers) if h}
+
+    def cell(raw, name):
+        i = col.get(name)
+        if i is None or i >= len(raw): return ''
+        v = raw[i]
+        return '' if v is None else str(v).strip()
+
+    top_cols = []
+    for label, token in [
+        ('Life Sciences', 'Life Sciences'),
+        ('Social Sciences', 'Social Sciences'),
+        ('Physical Sciences', 'Physical Sciences'),
+        ('Health Sciences', 'Health Sciences'),
+    ]:
+        for h, i in col.items():
+            if 'Top level' in h and token in h:
+                top_cols.append((label, i)); break
+
+    matched = standalone = inactive = 0
+    for raw in rows:
+        title = cell(raw, 'Source Title')
+        if not title: continue
+        if cell(raw, 'Source Type').lower() != 'journal':
+            continue
+        issn = clean_issn(cell(raw, 'ISSN'))
+        eissn = clean_issn(cell(raw, 'EISSN'))
+        nt = norm_title(title)
+        status = cell(raw, 'Active or Inactive')
+        active = status.lower() != 'inactive'
+        asjc = [s.strip() for s in re.split(r'[;,]+', cell(raw, 'All Science Journal Classification Codes (ASJC)')) if s and s.strip()]
+        asjc_top = []
+        for label, i in top_cols:
+            v = raw[i] if i < len(raw) else None
+            if v not in (None, '') and label not in asjc_top:
+                asjc_top.append(label)
+        payload = {
+            'id': cell(raw, 'Sourcerecord ID'),
+            'active': active,
+            'coverage': cell(raw, 'Coverage'),
+            'asjc': asjc,
+            'asjc_top': asjc_top,
+            'source': 'Scopus Source List Mar. 2026',
+        }
+        rec = (issn and by_issn.get(issn)) or (eissn and by_issn.get(eissn)) or by_title.get(nt)
+        if rec is not None:
+            rec['scopus'] = payload
+            if not rec.get('publisher') and cell(raw, 'Publisher'):
+                rec['publisher'] = cell(raw, 'Publisher')
+            matched += 1
+            if not active: inactive += 1
+        elif store is not None and active:
+            key = 'scopus:' + (issn or eissn or nt)
+            rec = store.get(key)
+            if rec is None:
+                rec = {
+                    'name': title, 'issn': issn, 'eissn': eissn,
+                    'publisher': cell(raw, 'Publisher'), 'address': '', 'languages': cell(raw, 'Article Language in Source (Three-Letter ISO Language Codes)'),
+                    'wos_categories': [], 'esi_category': '',
+                    'abbr20': '', 'country': '', 'indices': [],
+                    'scopus_only': True,
+                }
+                store[key] = rec
+                by_title.setdefault(nt, rec)
+                for k in (issn, eissn):
+                    if k: by_issn.setdefault(k, rec)
+            rec['scopus'] = payload
+            standalone += 1
+    return matched, standalone, inactive
+
+
+# ───────────────────────── EI Compendex Source List ─────────────────────────
+
+def parse_ei_compendex(path, by_title, by_issn, store=None):
+    """EI/Compendex Source List (Oct. 2025) journal rows + Chinese journals sheet."""
+    if not path.exists() or not openpyxl:
+        return 0, 0, 0
+    wb = openpyxl.load_workbook(path, read_only=True, data_only=True)
+    matched = standalone = chinese_hits = 0
+
+    def apply(title, issn, eissn, publisher='', country='', language='', subjects=None, status='', cn_name=''):
+        nonlocal matched, standalone, chinese_hits
+        if not title: return
+        issn = clean_issn(issn); eissn = clean_issn(eissn)
+        nt = norm_title(title)
+        subjects = [s for s in (subjects or []) if s and str(s).strip() not in {'-', '—'}]
+        subjects = [str(s).strip() for s in subjects]
+        rec = (issn and by_issn.get(issn)) or (eissn and by_issn.get(eissn)) or by_title.get(nt)
+        if rec is None and store is not None:
+            key = 'ei:' + (issn or eissn or nt)
+            rec = store.get(key)
+            if rec is None:
+                rec = {
+                    'name': title, 'issn': issn, 'eissn': eissn,
+                    'publisher': publisher or '', 'address': '', 'languages': language or '',
+                    'wos_categories': [], 'esi_category': '',
+                    'abbr20': '', 'country': country or '', 'indices': [],
+                    'ei_only': True,
+                }
+                store[key] = rec
+                by_title.setdefault(nt, rec)
+                for k in (issn, eissn):
+                    if k: by_issn.setdefault(k, rec)
+            standalone += 1
+        elif rec is not None:
+            matched += 1
+        if rec is None:
+            return
+        if 'EI' not in rec.setdefault('indices', []):
+            rec['indices'].append('EI')
+        if subjects:
+            cur = rec.setdefault('ei_subjects', [])
+            for s in subjects:
+                if s not in cur: cur.append(s)
+        if publisher and not rec.get('publisher'): rec['publisher'] = publisher
+        if country and not rec.get('country'): rec['country'] = country
+        if language and not rec.get('languages'): rec['languages'] = language
+        if status: rec['ei_status'] = status
+        if cn_name:
+            rec['cn_name'] = cn_name
+            chinese_hits += 1
+
+    if 'SERIALS' in wb.sheetnames:
+        ws = wb['SERIALS']
+        for raw in ws.iter_rows(min_row=3, values_only=True):
+            if not raw or not raw[0]: continue
+            stype = str(raw[1] or '').strip().lower() if len(raw) > 1 else ''
+            if stype != 'journal': continue
+            apply(raw[0], raw[2] if len(raw)>2 else '', raw[3] if len(raw)>3 else '',
+                  publisher=str(raw[4] or '').strip() if len(raw)>4 else '',
+                  country=str(raw[5] or '').strip() if len(raw)>5 else '',
+                  language=str(raw[6] or '').strip() if len(raw)>6 else '',
+                  subjects=list(raw[7:15]) if len(raw)>7 else [],
+                  status='Compendex Source List Oct. 2025')
+
+    if 'CHINESE JRS on SERIALS LIST' in wb.sheetnames:
+        ws = wb['CHINESE JRS on SERIALS LIST']
+        for raw in ws.iter_rows(min_row=3, values_only=True):
+            if not raw or not raw[4]: continue
+            apply(raw[4], raw[0] if len(raw)>0 else '', raw[1] if len(raw)>1 else '',
+                  language=str(raw[5] or '').strip() if len(raw)>5 else '',
+                  status=str(raw[6] or '').strip() if len(raw)>6 else '',
+                  cn_name=str(raw[2] or '').strip() if len(raw)>2 else '')
+    return matched, standalone, chinese_hits
+
+
+# ───────────────────────── flagship Nature / Science / Cell ─────────────────────────
+
+def infer_flagship(title, publisher=''):
+    n = norm_title(title)
+    pub = (publisher or '').upper()
+    if n == 'NATURE': return 'nature_main'
+    if n == 'SCIENCE': return 'science_main'
+    if n == 'CELL': return 'cell_main'
+    t = (title or '').strip().upper()
+    if t.startswith('NATURE ') or t.startswith('NATURE-') or t.startswith('NATURE REVIEWS'):
+        return 'nature_sub'
+    if t in {'SCIENCE ADVANCES', 'SCIENCE ROBOTICS', 'SCIENCE IMMUNOLOGY', 'SCIENCE SIGNALING', 'SCIENCE TRANSLATIONAL MEDICINE'}:
+        return 'science_sub'
+    if t.startswith('CELL ') or t.startswith('CELL REPORTS') or t in {'CELL GENOMICS', 'CELL METABOLISM', 'CELL STEM CELL', 'CELL SYSTEMS', 'CELL HOST & MICROBE'}:
+        return 'cell_sub'
+    if 'NATURE PORTFOLIO' in pub and t.startswith('NATURE'):
+        return 'nature_sub'
+    return ''
 
 
 # ───────────────────────── 中国科协 — merge 回主库 (按 ISSN) ─────────────────────────
@@ -738,10 +954,20 @@ def main():
     h = parse_showjcr_ccf(SHOW_CCF, by_title, by_issn)
     print(f'  CCF matched: {h}')
 
+    print('== Scopus Source List Mar. 2026 ==')
+    h, s, inactive = parse_scopus(SCOPUS_FILE, by_title, by_issn, store=store)
+    print(f'  Scopus matched: {h}  standalone active: +{s}  inactive matched: {inactive}')
+    by_issn, by_title = rebuild_lookups()
+
+    print('== EI Compendex Source List ==')
+    h, s, zh = parse_ei_compendex(EI_FILE, by_title, by_issn, store=store)
+    print(f'  EI matched: {h}  standalone: +{s}  Chinese-title merged: {zh}')
+    by_issn, by_title = rebuild_lookups()
+
     print('== ABDC Journal Quality List ==')
     abdc_file = first_existing(ABDC_CANDIDATES)
     if abdc_file:
-        h = parse_abdc(abdc_file, by_title, by_issn)
+        h = parse_abdc(abdc_file, by_title, by_issn, store=store)
         print(f'  ABDC matched: {h} ({abdc_file.name})')
     else:
         h = 0
@@ -750,7 +976,7 @@ def main():
     print('== ABS / AJG Academic Journal Guide ==')
     abs_file = first_existing(ABS_CANDIDATES)
     if abs_file:
-        h = parse_abs(abs_file, by_title, by_issn)
+        h = parse_abs(abs_file, by_title, by_issn, store=store)
         print(f'  ABS matched: {h} ({abs_file.name})')
     else:
         print('  ABS skipped: file not found')
@@ -760,6 +986,10 @@ def main():
     print(f'  CNKX merged: {h}')
 
     # ────── finalize ──────
+    for rec in store.values():
+        flag = infer_flagship(rec.get('name') or '', rec.get('publisher') or '')
+        if flag:
+            rec['flagship'] = flag
     journals = list(store.values())
     journals.sort(key=lambda r: r['name'])
 
@@ -768,7 +998,7 @@ def main():
     for r in journals:
         for i in r['indices']: idx_c[i] += 1
     cas_c = Counter(); cas_top = 0
-    if_count = 0; warning_count = 0; cn_name_count = 0; ccf_count = 0; abdc_count = 0; abs_count = 0; cnkx_count = 0
+    if_count = 0; warning_count = 0; cn_name_count = 0; ccf_count = 0; abdc_count = 0; abs_count = 0; cnkx_count = 0; scopus_count = 0; ei_count = 0
     for r in journals:
         z = r.get('cas_zone')
         if z: cas_c[z] += 1
@@ -780,12 +1010,14 @@ def main():
         if r.get('abdc'): abdc_count += 1
         if r.get('abs'): abs_count += 1
         if r.get('cnkx'): cnkx_count += 1
+        if r.get('scopus') and r.get('scopus', {}).get('active') is not False: scopus_count += 1
+        if 'EI' in r.get('indices', []): ei_count += 1
 
     print('== Stats ==')
     print(f'  total: {len(journals)}')
     print(f'  indices: {dict(idx_c)}')
     print(f'  CAS zones: {dict(cas_c)} Top={cas_top}')
-    print(f'  IF: {if_count}  warning: {warning_count}  中文刊名: {cn_name_count}  CCF: {ccf_count}  ABDC: {abdc_count}  ABS: {abs_count}  CNKX: {cnkx_count}')
+    print(f'  IF: {if_count}  warning: {warning_count}  中文刊名: {cn_name_count}  CCF: {ccf_count}  ABDC: {abdc_count}  ABS: {abs_count}  CNKX: {cnkx_count}  Scopus: {scopus_count}  EI: {ei_count}')
 
     # main write
     with open(DATA_DIR / 'journals.json', 'w', encoding='utf-8') as f:
@@ -850,7 +1082,7 @@ def main():
 
     # meta
     meta = {
-        'source': 'WoS Core + JCR 2025 + ESI + 中科院 2025 + 长江大学 + ShowJCR (JCR/FQB/XR/CCF/Warning) + ABDC optional + 中国科协',
+        'source': 'WoS Core + JCR 2025 + ESI + 中科院 2025 + 长江大学 + ShowJCR (JCR/FQB/XR/CCF/Warning) + Scopus Mar. 2026 + EI Compendex Oct. 2025 + ABDC optional + ABS AJG + 中国科协',
         'last_updated_source': 'WoS Core 2026-04-20',
         'total': len(journals),
         'indices': dict(idx_c),
@@ -863,6 +1095,8 @@ def main():
         'with_abdc': abdc_count,
         'with_abs': abs_count,
         'with_cnkx': cnkx_count,
+        'with_scopus': scopus_count,
+        'with_ei': ei_count,
         'wos_categories': len(wos_c),
         'esi_categories': len(esi_c),
     }

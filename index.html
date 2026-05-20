@@ -17,7 +17,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="/css/app.css?v=20260520-34" />
+<link rel="stylesheet" href="/css/app.css?v=20260520-35" />
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json" />
@@ -73,6 +73,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <label class="chip"><input type="checkbox" value="flagship" data-feat>N/S/C</label>
       <label class="chip"><input type="checkbox" value="scopus" data-feat>Scopus</label>
       <label class="chip"><input type="checkbox" value="warning" data-feat><span data-i18n="filter_warning">预警</span></label>
+      <label class="chip"><input type="checkbox" value="abdc" data-feat>ABDC</label>
+      <label class="chip"><input type="checkbox" value="abs" data-feat>ABS</label>
     </div>
   </div>
 
@@ -113,9 +115,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <main class="main">
   <div class="tabs">
-    <button class="tab active" data-tab="int" data-i18n="tab_int">国际 SCI/SSCI</button>
-    <button class="tab" data-tab="dom" data-i18n="tab_dom">国内分级目录</button>
+    <button class="tab active" data-tab="int" data-i18n="tab_int">国际</button>
+    <button class="tab" data-tab="dom" data-i18n="tab_dom">中国</button>
     <button class="tab" data-tab="fav" data-i18n="tab_fav">我的收藏</button>
+    <button class="tab" data-tab="pick" data-i18n="tab_pick">帮我选刊</button>
   </div>
 
   <header class="topbar">
@@ -136,8 +139,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <section class="hero">
       <h2 data-i18n="hero_title_int">SCI / SSCI 国际期刊检索</h2>
       <p>
-        <span data-i18n="hero_body_int">数据源：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI）· 更新至 2026-05-18，并合并 <b>Ei Compendex</b> 期刊目录（2025-10-10）。合并 <b>JCR 2025</b> 归属标记、<b>ESI</b> 22 大学科分类、<b>中科院 2025 大类分区</b>、<b>ShowJCR</b> JCR 2024 影响因子 / 小类分区 / 新锐版 / CCF 2026 推荐与国际期刊预警名单。共收录 <b id="total">—</b> 本。</span><br/>
-        <span class="muted" data-i18n="hero_note">徽章语义：<b>SCIE/SSCI/AHCI/ESCI/EI</b> 索引收录 · <b>中科院</b> 中科院 2025 大类分区（1-4 区，TOP 标志） · <b>JCR Q</b> Quartile（Q1-Q4） · <b>新锐</b> 中科院 2026 新锐版分区 · <b>CCF</b> 中国计算机学会 2026 推荐（A/B/C） · <b>ABDC</b> 澳洲经管期刊分级（A*/A/B/C） · <b>ABS</b> 英国 Chartered ABS Academic Journal Guide 2024（4*/4/3/2/1，仅经管商科） · <b>T1/T2/T3</b> 中国科协 2025 高质量期刊分级 · <b>⚠ Warning</b> 国际期刊预警名单。<b>IF</b> 单独成列，按 JCR 2024 影响因子展示。</span>
+        <span data-i18n="hero_body_int">数据源：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI）· 更新至 2026-05-18，并合并 <b>EI Compendex</b> 期刊目录（2025-10-10）。合并 <b>JCR 2025</b> 归属标记、<b>ESI</b> 22 大学科分类、<b>中科院 2025 大类分区</b>、<b>ShowJCR</b> JCR 2025 发布版 · 2024 指标（IF / 小类分区 / 排名）、新锐版、CCF 2026 推荐与国际期刊预警名单。共收录 <b id="total">—</b> 本。</span><br/>
+        <span class="muted" data-i18n="hero_note">徽章语义：<b>SCIE/SSCI/AHCI/ESCI/EI</b> 索引收录 · <b>中科院</b> 中科院 2025 大类分区（1-4 区，TOP 标志） · <b>JCR Q</b> Quartile（Q1-Q4） · <b>新锐</b> 中科院 2026 新锐版分区 · <b>CCF</b> 中国计算机学会 2026 推荐（A/B/C） · <b>ABDC</b> 澳洲经管期刊分级（A*/A/B/C） · <b>ABS</b> 英国 Chartered ABS Academic Journal Guide 2024（4*/4/3/2/1，仅经管商科） · <b>T1/T2/T3</b> 中国科协 2025 高质量期刊分级 · <b>⚠ Warning</b> 国际期刊预警名单。<b>IF</b> 单独成列，按 JCR 2025 发布版 · 2024 指标展示，可升序/降序排序。</span>
       </p>
     </section>
 
@@ -153,7 +156,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               <th class="col-fav" aria-label="Favorite"></th>
               <th class="col-name" data-i18n="col_name">期刊 Title</th>
               <th class="col-badge" data-i18n="col_badges">索引 / 分区 / 徽章</th>
-              <th class="col-if">IF</th>
+              <th class="col-if sortable" data-if-sort="int" title="按 IF 排序">IF <span class="sort-arrow">▼</span></th>
               <th class="col-cas">
                 <select id="cas-col-filter" class="th-select" aria-label="筛选中科院大类">
                   <option value="__all">中科院大类</option>
@@ -201,6 +204,21 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div id="fav-content"></div>
   </section>
 
+  <!-- ─── Pick-for-me tab ─── -->
+  <section class="tab-panel" data-panel="pick" hidden>
+    <section class="hero">
+      <h2 data-i18n="hero_title_pick">帮我选刊</h2>
+      <p>
+        <span data-i18n="hero_body_pick">敬请期待。这里将根据你的研究主题、影响因子区间、审稿周期、版面费、收录索引等条件，为你推荐合适的目标期刊。未来在更新。</span>
+      </p>
+    </section>
+    <div class="pick-coming">
+      <div class="pick-coming-icon">⏳</div>
+      <div class="pick-coming-title" data-i18n="pick_coming_title">敬请期待</div>
+      <div class="pick-coming-desc" data-i18n="pick_coming_desc">未来在更新</div>
+    </div>
+  </section>
+
   <footer class="site-foot">
     <p data-i18n="footer_data">数据来源：Clarivate WoS Core Collection · JCR 2025 · ESI · 中科院文献情报中心分区表 2025 · ShowJCR (GPL-3.0) · 中国科协 2025 · 浙江大学 2024 · 高校自编目录 2023。© <a href="https://journal.ailatest.org">AILatest Journal</a></p>
   </footer>
@@ -229,7 +247,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </aside>
 
 <button id="pwa-install" class="pwa-install" hidden data-i18n="pwa_install">📲 安装到主屏</button>
-<script src="/js/app.js?v=20260520-34" defer></script>
+<script src="/js/app.js?v=20260520-35" defer></script>
 <script>
   // Register service worker (PWA)
   if ('serviceWorker' in navigator) {
