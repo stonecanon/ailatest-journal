@@ -2815,8 +2815,29 @@
     const drawerListSel = document.getElementById('drawer-fav-list-select');
     if (drawerListSel) {
       drawerListSel.addEventListener('change', () => {
-        switchList(drawerListSel.value);
+        const targetId = drawerListSel.value;
+        const target = favLists.find(l => l.id === targetId);
+        if (!target) return;
+        const fid = favId(r);
+        // 切到目标清单作为当前 active
+        switchList(targetId);
+        // 不在目标清单则自动加入（"换/保存到"语义）
+        if (!target.ids.includes(fid)) {
+          target.ids.push(fid);
+          favsData[fid] = { ...r, __src: src || 'int', __savedAt: Date.now() };
+          localStorage.setItem('ailatest.favsData', JSON.stringify(favsData));
+          persistFavLists();
+          updateFavCount();
+          if (typeof syncFavs === 'function') syncFavs();
+        }
         openDrawer(r); // refresh drawer state
+        // 同步主表星号
+        document.querySelectorAll(`.fav-star[data-fav="${fid}"]`).forEach(btn => {
+          const now = isFav(r);
+          btn.classList.toggle('on', now);
+          btn.textContent = now ? '★' : '☆';
+        });
+        if (activeTab === 'fav') renderFav();
       });
     }
     $('#drawer-fav-big')?.addEventListener('click', () => {
@@ -3043,39 +3064,54 @@
     }
     let body;
     if (opts.loading) {
-      body = `<div style="padding:20px 0;text-align:center;color:#666">${T('生成中…','Generating…')}</div>`;
+      body = `<div class="share-modal-body" style="padding:32px 0;text-align:center;color:#666">${T('生成中…','Generating…')}</div>`;
     } else if (opts.error) {
-      body = `<div style="color:#a23b3b;padding:12px 0">${T('生成失败：','Failed: ')}${escape(opts.error)}</div>`;
+      body = `<div class="share-modal-body"><div style="color:#a23b3b;padding:16px 0">${T('生成失败：','Failed: ')}${escape(opts.error)}</div><div class="share-actions"><button id="share-close-btn" class="share-btn">${T('关闭','Close')}</button></div></div>`;
     } else {
       const exp = opts.expiresAt ? new Date(opts.expiresAt * 1000).toLocaleDateString() : '';
-      const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(opts.url)}`;
+      const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(opts.url)}&margin=0&color=1f3a5f`;
+      const inviteText = T(
+        `我整理了一份期刊清单「${opts.listName}」，共 ${opts.count} 本，点开一键查分区/影响因子/收稿周期：\n${opts.url}`,
+        `I curated a journal list "${opts.listName}" (${opts.count} journals) — quartile, IF, review cycles, all in one click:\n${opts.url}`
+      );
       body = `
-        <h3>🔗 ${T('分享清单','Share list')}「${escape(opts.listName)}」</h3>
-        <div class="share-meta">${opts.count} ${T('本期刊','journals')}${exp ? ' · ' + T('有效期至 ', 'expires ') + exp : ''}</div>
-        <div class="share-url">
-          <input id="share-url-input" type="text" readonly value="${escape(opts.url)}">
-          <button id="share-copy-btn">${T('复制','Copy')}</button>
-        </div>
-        <div class="share-qr"><img src="${escape(qrSrc)}" alt="QR"></div>
-        <div class="share-actions">
-          <button id="share-close-btn">${T('关闭','Close')}</button>
+        <div class="share-modal-body">
+          <div class="share-modal-head">
+            <div class="share-modal-eyebrow">AILATEST · ${T('期刊清单分享','Journal list share')}</div>
+            <h3 class="share-modal-title">「${escape(opts.listName)}」</h3>
+            <div class="share-modal-meta">${opts.count} ${T('本期刊','journals')}${exp ? ' · ' + T('有效期至 ', 'expires ') + exp : ''}</div>
+          </div>
+          <div class="share-modal-qr"><img src="${escape(qrSrc)}" alt="QR"></div>
+          <div class="share-modal-url">
+            <input id="share-url-input" type="text" readonly value="${escape(opts.url)}">
+          </div>
+          <div class="share-actions">
+            <button id="share-copy-btn" class="share-btn primary">🔗 ${T('复制链接','Copy link')}</button>
+            <button id="share-copy-invite-btn" class="share-btn">📝 ${T('复制邀请文案','Copy invite')}</button>
+            <button id="share-open-btn" class="share-btn ghost">↗ ${T('打开预览','Open preview')}</button>
+          </div>
+          <textarea id="share-invite-text" style="position:absolute;left:-9999px;top:-9999px" readonly>${escape(inviteText)}</textarea>
+          <div class="share-modal-foot"><button id="share-close-btn" class="share-foot-link">${T('关闭','Close')}</button></div>
         </div>`;
     }
-    modal.innerHTML = `<div class="share-card">${body}</div>`;
+    modal.innerHTML = `<div class="share-card share-modal-card">${body}</div>`;
     modal.classList.add('open');
     const closeBtn = document.getElementById('share-close-btn');
     if (closeBtn) closeBtn.addEventListener('click', () => modal.classList.remove('open'));
     const copyBtn = document.getElementById('share-copy-btn');
     if (copyBtn) copyBtn.addEventListener('click', async () => {
       const inp = document.getElementById('share-url-input');
-      try {
-        await navigator.clipboard.writeText(inp.value);
-        copyBtn.textContent = T('已复制 ✓','Copied ✓');
-        setTimeout(() => { copyBtn.textContent = T('复制','Copy'); }, 1500);
-      } catch (e) {
-        inp.select(); document.execCommand('copy');
-      }
+      const ok = await copyToClipboard(inp.value);
+      flashBtn(copyBtn, ok ? T('已复制 ✓','Copied ✓') : T('请手动复制','Copy manually'));
     });
+    const inviteBtn = document.getElementById('share-copy-invite-btn');
+    if (inviteBtn) inviteBtn.addEventListener('click', async () => {
+      const ta = document.getElementById('share-invite-text');
+      const ok = await copyToClipboard(ta.value);
+      flashBtn(inviteBtn, ok ? T('已复制 ✓','Copied ✓') : T('请手动复制','Copy manually'));
+    });
+    const openBtn = document.getElementById('share-open-btn');
+    if (openBtn && opts.url) openBtn.addEventListener('click', () => window.open(opts.url, '_blank'));
   }
 
   // ───────── share landing (/s/<id>) ─────────
