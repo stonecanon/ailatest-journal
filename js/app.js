@@ -28,7 +28,7 @@
       loading: '加载中…',
       hero_title_int: 'SCI / SSCI 国际期刊检索',
       hero_body_int: '数据源：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI）· 更新至 2026-05-18，并合并 <b>Ei Compendex</b> 期刊目录（2025-10-10）。合并 <b>JCR 2025</b> 归属标记、<b>ESI</b> 22 大学科分类、<b>中科院 2025 大类分区</b>、<b>ShowJCR</b> JCR 2024 影响因子 / 小类分区 / 新锐版 / CCF 2026 推荐与国际期刊预警名单。共收录 <b id="total">—</b> 本。',
-      hero_note: '徽章语义：<b>SCIE/SSCI/AHCI/ESCI/EI</b> 索引收录 · <b>中科</b> 中科院 2025 大类分区（1-4 区，TOP 标志） · <b>JCR Q</b> Quartile（Q1-Q4） · <b>新锐</b> 中科院 2026 新锐版分区 · <b>IF</b> JCR 2024 影响因子 · <b>CCF</b> 中国计算机学会 2026 推荐（A/B/C） · <b>ABDC</b> 澳洲经管期刊分级（A*/A/B/C） · <b>T1/T2/T3</b> 中国科协 2025 高质量期刊分级 · <b>⚠ Warning</b> 国际期刊预警名单。',
+      hero_note: '徽章语义：<b>SCIE/SSCI/AHCI/ESCI/EI</b> 索引收录 · <b>中科院</b> 中科院 2025 大类分区（1-4 区，TOP 标志） · <b>JCR Q</b> Quartile（Q1-Q4） · <b>新锐</b> 中科院 2026 新锐版分区 · <b>CCF</b> 中国计算机学会 2026 推荐（A/B/C） · <b>ABDC</b> 澳洲经管期刊分级（A*/A/B/C） · <b>ABS</b> 英国 Chartered ABS Academic Journal Guide 2024（4*/4/3/2/1，仅经管商科） · <b>T1/T2/T3</b> 中国科协 2025 高质量期刊分级 · <b>⚠ Warning</b> 国际期刊预警名单。<b>IF</b> 单独成列，按 JCR 2024 影响因子展示。',
       hero_title_fav: '我的收藏',
       hero_body_fav: '点击任意期刊右侧的 <b>★</b> 可加入收藏。未登录时保存在本机 localStorage；登录后自动同步到云端，可跨设备访问。',
       results_all: '全部期刊', load_more: '加载更多',
@@ -1523,8 +1523,8 @@
   }
   function badgeCAS(z, top) {
     if (!z) return '';
-    if (top) return `<span class="zone ztop" title="${T('中科院大类分区 Top','CAS Major Tier · Top')}">${T('中科·TOP','CAS·TOP')} ${z}${T('区','')}</span>`;
-    return `<span class="zone z${z}" title="${T('中科院大类分区','CAS Major Tier')}">${T('中科','CAS')} ${z}${T('区','')}</span>`;
+    if (top) return `<span class="zone ztop" title="${T('中科院大类分区 Top','CAS Major Tier · Top')}">${T('中科院·TOP','CAS·TOP')} ${z}${T('区','')}</span>`;
+    return `<span class="zone z${z}" title="${T('中科院大类分区','CAS Major Tier')}">${T('中科院','CAS')} ${z}${T('区','')}</span>`;
   }
   // 国内来源交叉徽章
   function badgeDomSrc(tag) {
@@ -1549,6 +1549,16 @@
     const cls = label === 'A*' ? 'a-star' : label.toLowerCase().replace(/[^a-c]/g, '');
     const source = (abdc && abdc.source) || 'ABDC Journal Quality List';
     return `<span class="abdc-pill abdc-${cls}" title="${escape(source)}">ABDC ${escape(label)}</span>`;
+  }
+  function badgeABS(abs) {
+    const rating = typeof abs === 'string' ? abs : (abs && abs.rating);
+    if (!rating) return '';
+    const label = String(rating).trim().replace('★', '*');
+    const valid = ['4*', '4', '3', '2', '1'];
+    if (!valid.includes(label)) return '';
+    const cls = label === '4*' ? 'g4s' : 'g' + label;
+    const source = (abs && abs.source) || 'Chartered ABS AJG 2024';
+    return `<span class="abs-pill abs-${cls}" title="${escape(source)}">ABS ${escape(label)}</span>`;
   }
       function badgeTier(tier) {
         if (!tier) return '';
@@ -1680,14 +1690,14 @@
       ...(r.indices || []).map(badgeIndex),
       badgeScopus(r.scopus),
     ].filter(Boolean).join('');
-    // 第二行：分区/IF/等级/预警 — 回答"这本的等级和影响力"
+    // 第二行：分区/等级/预警 — 回答"这本的等级和影响力"（IF 已移到独立列）
     const rankBadges = [
       badgeCAS(r.cas_zone, r.cas_top),
       badgeJCR(r.if_quartile),
       badgeXR(r.cas_xr && r.cas_xr.zone),
-      badgeIF(r.if_2024),
       badgeCCF(r.ccf),
       badgeABDC(r.abdc),
+      badgeABS(r.abs),
       // 中国科协 T1/T2/T3 徽章 (取该刊所有 cnkx 标签中最高级别)
       ...(r.cnkx ? r.cnkx.slice(0,2).map(c => badgeTier(c.tier)) : []),
       r.warning ? badgeWarn() : '',
@@ -1701,10 +1711,13 @@
     const esiVal = r.esi_category || '';
     const casCell = casVal ? escape(casVal) : '<span class="muted-cell">—</span>';
     const esiCell = esiVal ? escape(esiVal) : '<span class="muted-cell">—</span>';
+    const ifVal = (r.if_2024 != null) ? (+r.if_2024).toFixed(1) : '';
+    const ifCell = ifVal ? `<span class="if-cell">${ifVal}</span>` : '<span class="muted-cell">—</span>';
     return `<tr data-fid="${escape(fid)}" class="j-row clickable ${r.flagship ? 'row-flagship' : ''}" data-src="int">
       <td class="col-fav">${starBtn(r, 'int')}</td>
       <td class="col-name">${nameHtml}</td>
       <td class="col-badge col-badge-split">${badgeCell}</td>
+      <td class="col-if">${ifCell}</td>
       <td class="col-cas">${casCell}</td>
       <td class="col-esi">${esiCell}</td>
       <td class="col-abbr">${abbr || '<span class="muted-cell">—</span>'}</td>
@@ -2565,23 +2578,18 @@
     // 国际信息 join（非 int 源时按 ISSN/eISSN/标题查 WoS 国际表）
     const intRec = src === 'int' ? r : lookupInt(r);
     const ir = intRec || {};
-    // 徽章块（int 源用 r 自身，国内源用 join 到的国际记录）— 分两行：索引 / 分区
-    const idxRow = (src === 'int' || intRec) ? [
+    // 徽章块（int 源用 r 自身，国内源用 join 到的国际记录）— 合并为单行 flex-wrap
+    const allDrawerBadges = (src === 'int' || intRec) ? [
       ...((ir.indices) || []).map(badgeIndex),
       badgeScopus(ir.scopus),
-    ].filter(Boolean).join('') : '';
-    const tierRow = (src === 'int' || intRec) ? [
       badgeJCR(ir.if_quartile),
       badgeCAS(ir.cas_zone, ir.cas_top),
       badgeXR(ir.cas_xr && ir.cas_xr.zone),
-    ].filter(Boolean).join('') : '';
-    const extraRow = (src === 'int' || intRec) ? [
-      badgeIF(ir.if_2024),
       badgeCCF(ir.ccf),
       badgeABDC(ir.abdc),
+      badgeABS(ir.abs),
       ir.warning ? badgeWarn() : '',
     ].filter(Boolean).join('') : '';
-    const intBadges = idxRow + tierRow + extraRow; // legacy var kept for back-compat refs
     const tierBadge = r.tier && /^T[123]$/.test(r.tier) ? badgeTier(r.tier)
                     : r.tier ? `<span class="tier-pill t3">${escape(tn(r.tier, "tier"))}</span>` : '';
     const crossBadges = renderDomCrossBadges(r, src);
@@ -2638,7 +2646,7 @@
     // 核心指标数值 — 只放真正的"数值"，分区/Q 用徽章呈现，避免重复
     // 重复信息已删：JCR Q（→ badges）、CAS 大类区（→ casHTML）、Emerging 2026 区（→ xrHTML）
     const stats = [];
-    if (ir.if_2024 != null) stats.push([T('影响因子','Impact Factor'), ir.if_2024, T('JCR 2024','JCR 2024')]);
+    if (ir.if_2024 != null) stats.push([T('影响因子 / IF','Impact Factor'), ir.if_2024, T('JCR 2024','JCR 2024')]);
     if (ir.if_rank) stats.push([T('IF 排名','IF Rank'), ir.if_rank, T('2024','2024')]);
     // 审稿周期合并到 stats 区
     {
@@ -2827,9 +2835,7 @@
           ${issn ? 'ISSN ' + escape(issn) : ''}${eissn ? ' · eISSN ' + escape(eissn) : ''}
           <span class="drawer-views" id="drawer-views" data-fid="${escape(favId(r))}"></span>
         </div>
-        ${idxRow ? `<div class="badges drawer-badges-row">${idxRow}</div>` : ''}
-        ${tierRow ? `<div class="badges drawer-badges-row">${tierRow}</div>` : ''}
-        ${(extraRow || tierBadge || crossBadges) ? `<div class="badges drawer-badges-row drawer-badges-extra">${extraRow}${tierBadge}${crossBadges}</div>` : ''}
+        ${allDrawerBadges || tierBadge || crossBadges ? `<div class="badges drawer-badges-row">${allDrawerBadges}${tierBadge}${crossBadges}</div>` : ''}
         <div class="drawer-actions">
           <div class="rating-pill" data-rating-key="${escape(favId(r))}" title="${T('综合推荐评分','Overall rating')}">
             <span class="rating-avg" id="rating-avg">—</span><span class="rating-avg-suffix">/ 5</span>
@@ -3016,7 +3022,8 @@
             <th class="col-drag" style="width:28px"></th>
             <th class="col-fav" aria-label="Favorite"></th>
             <th class="col-name">${T('期刊 Title','Journal Title')}</th>
-            <th class="col-badge">${T('索引 / IF / 分区 / 徽章','Indices / IF / Tier / Badges')}</th>
+            <th class="col-badge">${T('索引 / 分区 / 徽章','Indices / Tier / Badges')}</th>
+            <th class="col-if">IF</th>
             <th class="col-cas">${T('中科院大类','CAS Major')}</th>
             <th class="col-esi">ESI Subject</th>
             <th class="col-abbr">${T('缩写 Abbr','Abbr')}</th>
@@ -3568,14 +3575,14 @@
       ...((r.indices) || []).map(badgeIndex),
       badgeScopus(r.scopus),
     ].filter(Boolean).join('') : '';
-    // 分区/IF/等级行
+    // 分区/等级行（IF 已移到独立列）
     const rankBadges = r.__src === 'int' ? [
       badgeCAS(r.cas_zone, r.cas_top),
       badgeJCR(r.if_quartile),
       badgeXR(r.cas_xr && r.cas_xr.zone),
-      badgeIF(r.if_2024),
       badgeCCF(r.ccf),
       badgeABDC(r.abdc),
+      badgeABS(r.abs),
       ...(r.cnkx ? r.cnkx.slice(0,2).map(c => badgeTier(c.tier)) : []),
       r.warning ? badgeWarn() : '',
     ].filter(Boolean).join('') : '';
@@ -3596,11 +3603,14 @@
       pku: T('北大核心','PKU Core'), pku_core: T('北大核心','PKU Core'), cnkx: T('科协','CAST'), ccft: 'CCF-T',
       zju: T('浙大','ZJU'), school_a: T('高校目录','In-house'),
     };
+    const ifVal = (r.if_2024 != null) ? (+r.if_2024).toFixed(1) : '';
+    const ifCell = ifVal ? `<span class="if-cell">${ifVal}</span>` : '<span class="muted-cell">—</span>';
     return `<tr class="j-row clickable" data-fid="${escape(fid)}" data-src="${escape(r.__src)}">
       <td class="col-drag"><span class="drag-handle" title="${T('拖动排序','Drag to reorder')}">⋮⋮</span></td>
       <td class="col-fav">${starBtn(r, r.__src)}</td>
       <td class="col-name">${nameHtml}</td>
       <td class="col-badge col-badge-split">${badgeCell}</td>
+      <td class="col-if">${ifCell}</td>
       <td class="col-cas">${casCell}</td>
       <td class="col-esi">${esiCell}</td>
       <td class="col-abbr">${abbr || '<span class="muted-cell">—</span>'}</td>

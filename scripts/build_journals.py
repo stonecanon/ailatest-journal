@@ -66,6 +66,13 @@ ABDC_CANDIDATES = [
     LIST_DIR / 'ABDC-JQL-2022.csv',
     LIST_DIR / 'ABDC Journal Quality List 2022.csv',
 ]
+ABS_CANDIDATES = [
+    LIST_DIR / 'Academic Journal Guide 2024期刊目录.xlsx',
+    LIST_DIR / 'Academic Journal Guide 2024.xlsx',
+    LIST_DIR / 'AJG2024.xlsx',
+    LIST_DIR / 'AJG_2024.xlsx',
+    LIST_DIR / 'AJG2024.csv',
+]
 
 CNKX_JSON    = DATA_DIR / 'cnkx_tiers.json'
 CNKX_RECORDS = DATA_DIR / 'cnkx_records.json'
@@ -580,6 +587,79 @@ def parse_abdc(path, by_title, by_issn):
     return hits
 
 
+# ───────────────────────── ABS / AJG Academic Journal Guide ─────────────────────────
+
+def parse_abs(path, by_title, by_issn):
+    """Chartered ABS Academic Journal Guide (AJG): 4*, 4, 3, 2, 1.
+
+    Source: https://charteredabs.org/academic-journal-guide/academic-journal-guide-2024
+    Expected columns: ID | Field | Title (or Ttitle) | AJG_2024
+    Match strategy: title-only (the source xlsx ships no ISSN).
+    """
+    if not path or not openpyxl: return 0
+    source_year = '2024'
+    m = re.search(r'(20\d{2})', path.name)
+    if m: source_year = m.group(1)
+
+    valid = {'4*', '4', '3', '2', '1'}
+    wb = openpyxl.load_workbook(path, read_only=True, data_only=True)
+    ws = wb.active
+
+    headers = None
+    rows_iter = ws.iter_rows(values_only=True)
+    for raw in rows_iter:
+        vals = [str(v).strip() if v is not None else '' for v in raw]
+        joined = ' '.join(vals).lower()
+        if ('title' in joined or 'ttitle' in joined) and ('ajg' in joined or 'rating' in joined or 'rank' in joined):
+            headers = vals
+            break
+    if not headers:
+        return 0
+
+    def find_idx(keys):
+        keys = [k.lower() for k in keys]
+        for i, h in enumerate(headers):
+            hl = h.strip().lower()
+            if hl in keys: return i
+        return -1
+
+    i_title = find_idx(['title', 'ttitle', 'journal title', 'journal'])
+    i_field = find_idx(['field', 'subject', 'area'])
+    i_rate  = find_idx(['ajg_2024', 'ajg 2024', 'ajg2024', 'rating', 'rank', '2024 rating'])
+    if i_title < 0 or i_rate < 0:
+        return 0
+
+    hits = 0
+    for raw in rows_iter:
+        def cell(i):
+            if i < 0 or i >= len(raw): return ''
+            v = raw[i]
+            return '' if v is None else str(v).strip()
+        title = cell(i_title)
+        if not title: continue
+        rating = cell(i_rate).replace('★', '*').replace('（', '').replace('）', '').strip()
+        if rating not in valid:
+            try:
+                f = float(rating)
+                if f.is_integer():
+                    rating = str(int(f))
+            except Exception:
+                pass
+            if rating not in valid:
+                continue
+        nt = norm_title(title)
+        rec = by_title.get(nt)
+        if rec is None:
+            continue
+        rec['abs'] = {
+            'rating': rating,
+            'field': cell(i_field),
+            'source': f'Chartered ABS AJG {source_year}',
+        }
+        hits += 1
+    return hits
+
+
 # ───────────────────────── 中国科协 — merge 回主库 (按 ISSN) ─────────────────────────
 
 def merge_cnkx_to_main(by_issn, by_title):
@@ -667,6 +747,14 @@ def main():
         h = 0
         print('  ABDC skipped: file not found')
 
+    print('== ABS / AJG Academic Journal Guide ==')
+    abs_file = first_existing(ABS_CANDIDATES)
+    if abs_file:
+        h = parse_abs(abs_file, by_title, by_issn)
+        print(f'  ABS matched: {h} ({abs_file.name})')
+    else:
+        print('  ABS skipped: file not found')
+
     print('== 中国科协 merge ==')
     h = merge_cnkx_to_main(by_issn, by_title)
     print(f'  CNKX merged: {h}')
@@ -680,7 +768,7 @@ def main():
     for r in journals:
         for i in r['indices']: idx_c[i] += 1
     cas_c = Counter(); cas_top = 0
-    if_count = 0; warning_count = 0; cn_name_count = 0; ccf_count = 0; abdc_count = 0; cnkx_count = 0
+    if_count = 0; warning_count = 0; cn_name_count = 0; ccf_count = 0; abdc_count = 0; abs_count = 0; cnkx_count = 0
     for r in journals:
         z = r.get('cas_zone')
         if z: cas_c[z] += 1
@@ -690,13 +778,14 @@ def main():
         if r.get('cn_name'): cn_name_count += 1
         if r.get('ccf'): ccf_count += 1
         if r.get('abdc'): abdc_count += 1
+        if r.get('abs'): abs_count += 1
         if r.get('cnkx'): cnkx_count += 1
 
     print('== Stats ==')
     print(f'  total: {len(journals)}')
     print(f'  indices: {dict(idx_c)}')
     print(f'  CAS zones: {dict(cas_c)} Top={cas_top}')
-    print(f'  IF: {if_count}  warning: {warning_count}  中文刊名: {cn_name_count}  CCF: {ccf_count}  ABDC: {abdc_count}  CNKX: {cnkx_count}')
+    print(f'  IF: {if_count}  warning: {warning_count}  中文刊名: {cn_name_count}  CCF: {ccf_count}  ABDC: {abdc_count}  ABS: {abs_count}  CNKX: {cnkx_count}')
 
     # main write
     with open(DATA_DIR / 'journals.json', 'w', encoding='utf-8') as f:
@@ -772,6 +861,7 @@ def main():
         'with_cn_name': cn_name_count,
         'with_ccf': ccf_count,
         'with_abdc': abdc_count,
+        'with_abs': abs_count,
         'with_cnkx': cnkx_count,
         'wos_categories': len(wos_c),
         'esi_categories': len(esi_c),

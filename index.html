@@ -17,7 +17,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="/css/app.css?v=20260520-33" />
+<link rel="stylesheet" href="/css/app.css?v=20260520-34" />
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json" />
@@ -137,7 +137,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <h2 data-i18n="hero_title_int">SCI / SSCI 国际期刊检索</h2>
       <p>
         <span data-i18n="hero_body_int">数据源：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI）· 更新至 2026-05-18，并合并 <b>Ei Compendex</b> 期刊目录（2025-10-10）。合并 <b>JCR 2025</b> 归属标记、<b>ESI</b> 22 大学科分类、<b>中科院 2025 大类分区</b>、<b>ShowJCR</b> JCR 2024 影响因子 / 小类分区 / 新锐版 / CCF 2026 推荐与国际期刊预警名单。共收录 <b id="total">—</b> 本。</span><br/>
-        <span class="muted" data-i18n="hero_note">徽章语义：<b>SCIE/SSCI/AHCI/ESCI/EI</b> 索引收录 · <b>中科</b> 中科院 2025 大类分区（1-4 区，TOP 标志） · <b>JCR Q</b> Quartile（Q1-Q4） · <b>新锐</b> 中科院 2026 新锐版分区 · <b>IF</b> JCR 2024 影响因子 · <b>CCF</b> 中国计算机学会 2026 推荐（A/B/C） · <b>ABDC</b> 澳洲经管期刊分级（A*/A/B/C） · <b>T1/T2/T3</b> 中国科协 2025 高质量期刊分级 · <b>⚠ Warning</b> 国际期刊预警名单。</span>
+        <span class="muted" data-i18n="hero_note">徽章语义：<b>SCIE/SSCI/AHCI/ESCI/EI</b> 索引收录 · <b>中科院</b> 中科院 2025 大类分区（1-4 区，TOP 标志） · <b>JCR Q</b> Quartile（Q1-Q4） · <b>新锐</b> 中科院 2026 新锐版分区 · <b>CCF</b> 中国计算机学会 2026 推荐（A/B/C） · <b>ABDC</b> 澳洲经管期刊分级（A*/A/B/C） · <b>ABS</b> 英国 Chartered ABS Academic Journal Guide 2024（4*/4/3/2/1，仅经管商科） · <b>T1/T2/T3</b> 中国科协 2025 高质量期刊分级 · <b>⚠ Warning</b> 国际期刊预警名单。<b>IF</b> 单独成列，按 JCR 2024 影响因子展示。</span>
       </p>
     </section>
 
@@ -152,7 +152,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <tr>
               <th class="col-fav" aria-label="Favorite"></th>
               <th class="col-name" data-i18n="col_name">期刊 Title</th>
-              <th class="col-badge" data-i18n="col_badges">索引 / IF / 分区 / 徽章</th>
+              <th class="col-badge" data-i18n="col_badges">索引 / 分区 / 徽章</th>
+              <th class="col-if">IF</th>
               <th class="col-cas">
                 <select id="cas-col-filter" class="th-select" aria-label="筛选中科院大类">
                   <option value="__all">中科院大类</option>
@@ -228,7 +229,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </aside>
 
 <button id="pwa-install" class="pwa-install" hidden data-i18n="pwa_install">📲 安装到主屏</button>
-<script src="/js/app.js?v=20260520-33" defer></script>
+<script src="/js/app.js?v=20260520-34" defer></script>
 <script>
   // Register service worker (PWA)
   if ('serviceWorker' in navigator) {
