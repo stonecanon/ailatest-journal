@@ -668,7 +668,7 @@ function ownerDisplayName(u) {
   return cleanText(u.name || u.login || (u.email ? u.email.split('@')[0] : 'user'), 60) || 'user';
 }
 
-// POST /share  body { name, ids:[], expires_days? }  → { id, url }
+// POST /share  body { name, items:[{issn?,cn_code?,name?}], expires_days? | ttl_days? }  → { id, url }
 async function routeCreateShare(req, env) {
   const u = await getUser(req, env);
   if (!u) return err('unauthorized', 401);
@@ -676,13 +676,27 @@ async function routeCreateShare(req, env) {
   if (!body) return err('invalid body');
   const name = cleanText(body.name || '', 80);
   if (!name) return err('name required');
-  const idsRaw = Array.isArray(body.ids) ? body.ids : [];
-  const ids = idsRaw
-    .filter(x => typeof x === 'string' && x.length > 0 && x.length <= 200)
-    .slice(0, 5000);
-  if (!ids.length) return err('ids empty');
 
-  const days = Number(body.expires_days);
+  // 兼容两种格式：items: [{issn, cn_code, name}] (新) | ids: [string] (旧)
+  let items = [];
+  if (Array.isArray(body.items)) {
+    items = body.items
+      .map(it => ({
+        issn: cleanText(it?.issn || '', 32),
+        cn_code: cleanText(it?.cn_code || '', 32),
+        name: cleanText(it?.name || '', 200),
+      }))
+      .filter(it => it.issn || it.cn_code || it.name)
+      .slice(0, 5000);
+  } else if (Array.isArray(body.ids)) {
+    items = body.ids
+      .filter(x => typeof x === 'string' && x.length > 0 && x.length <= 200)
+      .slice(0, 5000)
+      .map(s => ({ issn: '', cn_code: '', name: s }));
+  }
+  if (!items.length) return err('items empty');
+
+  const days = Number(body.expires_days ?? body.ttl_days);
   const now = nowSec();
   let expiresAt = null;
   if (Number.isFinite(days) && days > 0 && days <= 3650) {
@@ -700,13 +714,13 @@ async function routeCreateShare(req, env) {
       await env.DB.prepare(
         `INSERT INTO shares (id, owner_uid, owner_name, name, items_json, view_count, import_count, created_at, expires_at)
          VALUES (?, ?, ?, ?, ?, 0, 0, ?, ?)`
-      ).bind(id, u.id, ownerDisplayName(u), name, JSON.stringify(ids), now, expiresAt).run();
+      ).bind(id, u.id, ownerDisplayName(u), name, JSON.stringify(items), now, expiresAt).run();
       return json({
         ok: true,
         id,
         url: `${env.SITE_URL || 'https://journal.ailatest.org'}/s/${id}`,
         expires_at: expiresAt,
-        count: ids.length,
+        count: items.length,
       });
     } catch (e) {
       if (i === 4) return err('share id collision', 500);
@@ -714,7 +728,7 @@ async function routeCreateShare(req, env) {
   }
 }
 
-// GET /share/:id  → { name, owner_name, ids:[], view_count, expires_at, expired }
+// GET /share/:id  → { name, owner_name, items:[], view_count, expires_at, expired }
 async function routeGetShare(req, env, id) {
   const row = await env.DB.prepare(
     'SELECT owner_uid, owner_name, name, items_json, view_count, expires_at, created_at FROM shares WHERE id = ?'
@@ -722,8 +736,21 @@ async function routeGetShare(req, env, id) {
   if (!row) return err('not found', 404);
 
   const expired = row.expires_at && row.expires_at < nowSec();
-  let ids = [];
-  try { const a = JSON.parse(row.items_json); if (Array.isArray(a)) ids = a; } catch (_) {}
+  // 兼容旧格式（字符串 ids 数组）和新格式（{issn, cn_code, name} 对象数组）
+  let items = [];
+  try {
+    const a = JSON.parse(row.items_json);
+    if (Array.isArray(a)) {
+      items = a.map(x => {
+        if (typeof x === 'string') return { issn: '', cn_code: '', name: x };
+        return {
+          issn: x?.issn || '',
+          cn_code: x?.cn_code || '',
+          name: x?.name || '',
+        };
+      });
+    }
+  } catch (_) {}
 
   // 浏览数 +1（不阻塞响应）
   if (!expired) {
@@ -735,8 +762,8 @@ async function routeGetShare(req, env, id) {
     id,
     name: row.name,
     owner_name: row.owner_name || 'user',
-    ids,
-    count: ids.length,
+    items,
+    count: items.length,
     view_count: (row.view_count || 0) + (expired ? 0 : 1),
     created_at: row.created_at,
     expires_at: row.expires_at,
@@ -754,8 +781,24 @@ async function routeImportShare(req, env, id) {
   if (!row) return err('not found', 404);
   if (row.expires_at && row.expires_at < nowSec()) return err('expired', 410);
 
+  // 兼容旧 ids 数组 / 新 items 对象数组；统一抽出 favId 字符串
   let ids = [];
-  try { const a = JSON.parse(row.items_json); if (Array.isArray(a)) ids = a.filter(x => typeof x === 'string'); } catch (_) {}
+  try {
+    const a = JSON.parse(row.items_json);
+    if (Array.isArray(a)) {
+      ids = a.map(x => {
+        if (typeof x === 'string') return x;
+        // 富对象按 favId 优先级：issn → cn_code → t:normTitle(name)
+        if (x?.issn) return String(x.issn);
+        if (x?.cn_code) return String(x.cn_code);
+        if (x?.name) {
+          const norm = String(x.name).toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]+/g, '');
+          return norm ? 't:' + norm : '';
+        }
+        return '';
+      }).filter(s => typeof s === 'string' && s.length > 0);
+    }
+  } catch (_) {}
   if (!ids.length) return err('share empty', 400);
 
   const now = nowSec();
