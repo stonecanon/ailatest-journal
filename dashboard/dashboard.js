@@ -43,10 +43,10 @@ function renderTrafficKpis(data) {
   const latest = latestTrafficRow(data);
   const sessions = sumRows(data.series.pageviewsByDay, 'sessions');
   document.querySelector('.traffic-kpis').append(
-    kpi('最近一天 PV', n(latest.pageviews), latest.day ? `${latest.day} 页面浏览量` : '暂无访问记录'),
-    kpi('最近一天 UV', n(latest.visitors), '同一浏览器访客去重'),
+    kpi('最近一天页面浏览量', n(latest.pageviews), latest.day ? `${latest.day} 页面被打开的次数` : '暂无访问记录'),
+    kpi('最近一天独立访客数', n(latest.visitors), '同一浏览器访客去重'),
     kpi('最近一天访问人次', n(latest.sessions), '同一浏览器会话去重'),
-    kpi('累计 PV / UV', `${n(k.total_pageviews)} / ${n(k.total_visitors)}`, `累计访问人次 ${n(sessions)}`),
+    kpi('累计浏览量 / 访客数', `${n(k.total_pageviews)} / ${n(k.total_visitors)}`, `累计访问人次 ${n(sessions)}`),
   );
 }
 
@@ -129,6 +129,20 @@ function barList(target, rows, labelKey, valueKey, color = '#256f5a') {
   }
 }
 
+function regionName(code) {
+  const map = {
+    CN: '中国大陆',
+    HK: '中国香港',
+    MO: '中国澳门',
+    TW: '中国台湾',
+    JP: '日本',
+    US: '美国',
+    SG: '新加坡',
+    NL: '荷兰',
+  };
+  return map[code] || code || '未知地区';
+}
+
 function table(target, rows, columns) {
   const host = document.querySelector(target);
   if (!rows.length) {
@@ -163,15 +177,19 @@ async function main() {
   ], { label: '注册与登录趋势' });
 
   lineChart('#traffic-chart', data.series.pageviewsByDay || [], [
-    { key: 'pageviews', name: 'PV', color: '#0b7285' },
-    { key: 'visitors', name: 'UV', color: '#b0443d' },
-    { key: 'sessions', name: 'Sessions', color: '#a46a13' },
+    { key: 'pageviews', name: '页面浏览量', color: '#0b7285' },
+    { key: 'visitors', name: '独立访客数', color: '#b0443d' },
+    { key: 'sessions', name: '访问人次', color: '#a46a13' },
   ], { label: '访问趋势' });
 
   barList('#provider-bars', data.series.providerMix || [], 'provider', 'users', '#256f5a');
   barList('#login-provider-bars', data.series.loginProviderMix || [], 'provider', 'login_events', '#345995');
   barList('#top-paths', data.tables_data.topPaths || [], 'path', 'pageviews', '#0b7285');
-  barList('#traffic-countries', data.tables_data.trafficCountries || [], 'country', 'pageviews', '#a46a13');
+  const trafficCountries = (data.tables_data.trafficCountries || []).map(row => ({
+    ...row,
+    country_label: regionName(row.country),
+  }));
+  barList('#traffic-countries', trafficCountries, 'country_label', 'pageviews', '#a46a13');
 
   table('#top-favorites', data.tables_data.topFavorites || [], [
     { title: '期刊', render: row => row.label || row.journal_key },
@@ -201,9 +219,9 @@ async function main() {
   }).sort((a, b) => b.day.localeCompare(a.day));
   table('#daily-traffic', dailyTraffic, [
     { title: '日期', key: 'day' },
-    { title: 'PV 页面浏览量', render: row => n(row.pageviews) },
-    { title: 'UV 独立访客', render: row => n(row.visitors) },
-    { title: '访问人次 Sessions', render: row => n(row.sessions) },
+    { title: '页面浏览量', render: row => n(row.pageviews) },
+    { title: '独立访客数', render: row => n(row.visitors) },
+    { title: '访问人次', render: row => n(row.sessions) },
     { title: '注册', render: row => n(row.signups) },
     { title: '登录用户', render: row => n(row.login_users) },
   ]);
