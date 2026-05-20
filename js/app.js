@@ -2802,7 +2802,6 @@
       ${eiHTML}
       ${cnkxHTML}
       ${lockedSrcHTML}
-      ${renderRelatedHTML(r)}
       <div class="drawer-section rating-section" data-rating-key="${escape(favId(r))}">
         <h4>${T('我的评分','My Rating')}</h4>
         <div class="rating-my-wrap">
@@ -2810,6 +2809,7 @@
           <div class="rating-my-hint muted-cell" id="rating-hint">${T('登录后可打分 · 半星可评 · 可随时修改','Sign in to rate · half-stars supported · editable anytime')}</div>
         </div>
       </div>
+      ${renderRelatedHTML(r)}
     `;
     // init rating widget
     setTimeout(() => initRatingWidget(favId(r)), 0);
@@ -3177,8 +3177,8 @@
       return `<span class="jcard-zone" style="background:${bg};color:${fgFor(palette,n)}">${label}</span>`;
     };
     const zonesHtml = [
-      ir.cas_zone ? zoneTag('navy', parseInt(ir.cas_zone), `${T('中科院','CAS')} ${ir.cas_zone}${T('区','')}${ir.cas_top ? ' Top' : ''}`) : '',
       ir.if_quartile && /^Q[1-4]$/i.test(ir.if_quartile) ? zoneTag('burg', parseInt(ir.if_quartile.slice(1)), `JCR ${ir.if_quartile.toUpperCase()}`) : '',
+      ir.cas_zone ? zoneTag('navy', parseInt(ir.cas_zone), `${T('中科院','CAS')} ${ir.cas_zone}${T('区','')}${ir.cas_top ? ' Top' : ''}`) : '',
       (ir.cas_xr && ir.cas_xr.zone) ? zoneTag('teal', parseInt(ir.cas_xr.zone), `${T('新锐','Emerging')} ${ir.cas_xr.zone}${T('区','')}`) : '',
     ].filter(Boolean).join('');
 

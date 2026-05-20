@@ -315,13 +315,22 @@ def parse_showjcr_fqb(path, by_title, by_issn):
 
             subs = []
             for i in range(1, 7):
-                v = (row.get(f'小类{i}') or '').strip()
-                if not v: continue
-                m = re.match(r'^(.+?)\s+(\d)\s*区?\s*$', v)
-                if m:
-                    subs.append({'name': m.group(1).strip(), 'zone': int(m.group(2))})
-                else:
-                    subs.append({'name': v, 'zone': None})
+                nm = (row.get(f'小类{i}') or '').strip()
+                if not nm: continue
+                zn_raw = (row.get(f'小类{i}分区') or '').strip()
+                zn = None
+                if zn_raw:
+                    mz = re.search(r'\d', zn_raw)
+                    if mz:
+                        try: zn = int(mz.group(0))
+                        except ValueError: pass
+                # legacy fallback: name + zone packed in one cell
+                if zn is None:
+                    m = re.match(r'^(.+?)\s+(\d)\s*区?\s*$', nm)
+                    if m:
+                        nm = m.group(1).strip()
+                        zn = int(m.group(2))
+                subs.append({'name': nm, 'zone': zn})
             if subs: rec['cas_sub_cats'] = subs
             hits += 1
     return hits
