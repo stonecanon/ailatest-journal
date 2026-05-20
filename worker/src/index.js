@@ -183,6 +183,14 @@ async function recordLoginEvent(env, userId, provider) {
   ).bind(userId, provider || '', dayFromSec(now), now).run();
 }
 
+async function safeRecordLoginEvent(env, userId, provider) {
+  try {
+    await recordLoginEvent(env, userId, provider);
+  } catch (e) {
+    console.warn('login event skipped:', e?.message || e);
+  }
+}
+
 async function routePageview(req, env) {
   const body = await req.json().catch(() => null);
   const now = nowSec();
@@ -289,7 +297,7 @@ async function routeEmailVerify(req, env) {
   await env.DB.prepare('DELETE FROM email_codes WHERE email = ?').bind(email).run();
 
   const uid = await upsertEmailUser(env, email);
-  await recordLoginEvent(env, uid, 'email');
+  await safeRecordLoginEvent(env, uid, 'email');
   const jwt = await signJWT({ uid, email }, env.JWT_SECRET);
   const u = await getUserById(env, uid);
   if (!u) return err('用户创建失败', 500);
@@ -360,7 +368,7 @@ async function routeAuthCallback(req, env) {
     uid = res.meta.last_row_id;
   }
 
-  await recordLoginEvent(env, uid, 'github');
+  await safeRecordLoginEvent(env, uid, 'github');
   const jwt = await signJWT({ uid, login: gh.login }, env.JWT_SECRET);
   const r = new URL(redirect);
   r.searchParams.set('token', jwt);
@@ -395,68 +403,94 @@ async function routeGoogleStart(req, env) {
 }
 
 async function routeGoogleCallback(req, env) {
-  const configError = googleOAuthConfigError(env);
-  if (configError) return err(configError, 503);
-  const u = new URL(req.url);
-  const code = u.searchParams.get('code');
-  const ggState = u.searchParams.get('state');
-  if (!code || !ggState) return err('missing code/state');
-  let redirect = env.SITE_URL;
-  try { redirect = JSON.parse(atob(ggState)).r || redirect; } catch {}
-  const callback = `${u.origin}/auth/google/callback`;
+  try {
+    const configError = googleOAuthConfigError(env);
+    if (configError) return err(configError, 503);
+    const u = new URL(req.url);
+    const code = u.searchParams.get('code');
+    const ggState = u.searchParams.get('state');
+    if (!code || !ggState) return err('missing code/state');
+    let redirect = env.SITE_URL;
+    try { redirect = JSON.parse(atob(ggState)).r || redirect; } catch {}
+    const callback = `${u.origin}/auth/google/callback`;
 
-  const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({
-      code,
-      client_id: env.GOOGLE_CLIENT_ID,
-      client_secret: env.GOOGLE_CLIENT_SECRET,
-      redirect_uri: callback,
-      grant_type: 'authorization_code',
-    }),
-  });
-  const tokenData = await tokenRes.json();
-  if (!tokenData.access_token) return err('google oauth exchange failed', 401);
+    const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        code,
+        client_id: env.GOOGLE_CLIENT_ID,
+        client_secret: env.GOOGLE_CLIENT_SECRET,
+        redirect_uri: callback,
+        grant_type: 'authorization_code',
+      }),
+    });
+    const tokenData = await tokenRes.json().catch(() => ({}));
+    if (!tokenRes.ok || !tokenData.access_token) {
+      console.warn('google token exchange failed:', tokenRes.status, tokenData.error || '');
+      return err('google oauth exchange failed', 401);
+    }
 
-  const userRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-    headers: { 'Authorization': `Bearer ${tokenData.access_token}` },
-  });
-  const gg = await userRes.json();
-  if (!gg.sub) return err('google user fetch failed', 401);
+    const userRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { 'Authorization': `Bearer ${tokenData.access_token}` },
+    });
+    const gg = await userRes.json().catch(() => ({}));
+    if (!userRes.ok || !gg.sub) {
+      console.warn('google user fetch failed:', userRes.status);
+      return err('google user fetch failed', 401);
+    }
 
-  const email = (gg.email || '').toLowerCase();
-  const now = nowSec();
+    const email = (gg.email || '').toLowerCase();
+    const now = nowSec();
 
-  // match by google_id → then by email
-  let existing = await env.DB.prepare(
-    'SELECT id FROM users WHERE google_id = ?'
-  ).bind(gg.sub).first();
-  if (!existing && email) {
-    existing = await env.DB.prepare(
-      'SELECT id FROM users WHERE email = ?'
-    ).bind(email).first();
+    // match by google_id → then by email
+    let existing = await env.DB.prepare(
+      'SELECT id FROM users WHERE google_id = ?'
+    ).bind(gg.sub).first();
+    if (!existing && email) {
+      existing = await env.DB.prepare(
+        'SELECT id FROM users WHERE email = ?'
+      ).bind(email).first();
+    }
+
+    let uid;
+    if (existing) {
+      uid = existing.id;
+      await env.DB.prepare(
+        `UPDATE users
+            SET google_id=?,
+                email=COALESCE(email, ?),
+                login=COALESCE(login, ?),
+                name=COALESCE(NULLIF(?, ''), name),
+                avatar_url=COALESCE(NULLIF(?, ''), avatar_url),
+                updated_at=?
+          WHERE id=?`
+      ).bind(
+        gg.sub,
+        email || null,
+        email ? email.split('@')[0] : gg.sub,
+        gg.name || '',
+        gg.picture || '',
+        now,
+        uid,
+      ).run();
+    } else {
+      const res = await env.DB.prepare(
+        `INSERT INTO users (google_id, email, login, name, avatar_url, provider, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, 'google', ?, ?)`
+      ).bind(gg.sub, email || null, email ? email.split('@')[0] : gg.sub, gg.name || '', gg.picture || '', now, now).run();
+      uid = res.meta.last_row_id;
+    }
+
+    await safeRecordLoginEvent(env, uid, 'google');
+    const jwt = await signJWT({ uid, email }, env.JWT_SECRET);
+    const r = new URL(redirect);
+    r.searchParams.set('token', jwt);
+    return Response.redirect(r.toString(), 302);
+  } catch (e) {
+    console.error('google callback error:', e?.stack || e?.message || e);
+    return err('google callback failed', 500);
   }
-
-  let uid;
-  if (existing) {
-    uid = existing.id;
-    await env.DB.prepare(
-      `UPDATE users SET google_id=?, email=COALESCE(email, ?), name=?, avatar_url=?, updated_at=? WHERE id=?`
-    ).bind(gg.sub, email, gg.name || '', gg.picture || '', now, uid).run();
-  } else {
-    const res = await env.DB.prepare(
-      `INSERT INTO users (google_id, email, login, name, avatar_url, provider, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, 'google', ?, ?)`
-    ).bind(gg.sub, email, email.split('@')[0] || gg.sub, gg.name || '', gg.picture || '', now, now).run();
-    uid = res.meta.last_row_id;
-  }
-
-  await recordLoginEvent(env, uid, 'google');
-  const jwt = await signJWT({ uid, email }, env.JWT_SECRET);
-  const r = new URL(redirect);
-  r.searchParams.set('token', jwt);
-  return Response.redirect(r.toString(), 302);
 }
 
 // ───────── routes: me + favorites ─────────

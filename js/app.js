@@ -609,7 +609,8 @@
   }
 
   let activeTab = 'int';
-  let activeCat = '__all';
+  let activeCat = '__all';   // ESI subject filter (legacy name)
+  let activeCasMajor = '__all'; // CAS 大类 filter
   let activeIndices = new Set(['SCIE','SSCI','AHCI','ESCI','EI']);
   let activeZones = new Set();
   let activeFeats = new Set();
@@ -1721,6 +1722,7 @@
     if (activeFeats.has('scopus') && !(r.scopus && r.scopus.active)) return false;
     if (activeFeats.has('warning') && !r.warning) return false;
     if (activeCat !== '__all' && r.esi_category !== activeCat) return false;
+    if (activeCasMajor !== '__all' && (r.cas_major_cn || '') !== activeCasMajor) return false;
     if (activeWos.size) {
       const wc = r.wos_categories || [];
       let ok = false;
@@ -1845,6 +1847,37 @@
       });
     }
     // 大类列下拉切换：CAS / ESI（v30 移除：现已拆为独立两列）
+    // v31: 表头两个下拉填充 distinct 学科 + 触发筛选
+    const casSel = $('#cas-col-filter');
+    if (casSel && !casSel.__bound) {
+      casSel.__bound = true;
+      const casSet = new Set();
+      journals.forEach(j => { if (j.cas_major_cn) casSet.add(j.cas_major_cn); });
+      const casList = [...casSet].sort((a,b) => a.localeCompare(b, 'zh'));
+      casSel.innerHTML = `<option value="__all">中科院大类</option>` +
+        casList.map(v => `<option value="${escape(v)}">${escape(v)}</option>`).join('');
+      casSel.value = activeCasMajor;
+      casSel.addEventListener('change', () => {
+        activeCasMajor = casSel.value;
+        shown = PAGE;
+        renderInt();
+      });
+    }
+    const esiSel = $('#esi-col-filter');
+    if (esiSel && !esiSel.__bound) {
+      esiSel.__bound = true;
+      const esiSet = new Set();
+      journals.forEach(j => { if (j.esi_category) esiSet.add(j.esi_category); });
+      const esiList = [...esiSet].sort();
+      esiSel.innerHTML = `<option value="__all">ESI Subject</option>` +
+        esiList.map(v => `<option value="${escape(v)}">${escape(v)}</option>`).join('');
+      esiSel.value = activeCat;
+      esiSel.addEventListener('change', () => {
+        activeCat = esiSel.value;
+        shown = PAGE;
+        renderInt();
+      });
+    }
   }
 
 
