@@ -1447,6 +1447,35 @@
     if (!sc || sc.active === false) return '';
     return `<span class="badge b-scopus" title="${T('Scopus 收录 (Source List Mar.2026)','Indexed by Scopus (Source List Mar.2026)')}">Scopus</span>`;
   }
+  // 期刊浏览量缓存（journal_key → count）
+  const viewsCache = {};
+  function badgeView(key) {
+    const n = viewsCache[key];
+    if (!n || n < 1) return '';
+    const display = n >= 1000 ? (n / 1000).toFixed(1) + 'k' : String(n);
+    return `<span class="badge b-view" title="${T('累计浏览次数','Total views')}">👁 ${display}</span>`;
+  }
+  async function reportJournalView(key) {
+    if (!key) return;
+    try {
+      const r = await fetch(`${API_BASE}/journal-view`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ journal_key: key }),
+      });
+      const d = await r.json().catch(() => null);
+      if (d && typeof d.count === 'number') viewsCache[key] = d.count;
+    } catch (_) {}
+  }
+  async function fetchJournalViews(keys) {
+    const want = [...new Set(keys.filter(k => k && !(k in viewsCache)))].slice(0, 500);
+    if (!want.length) return;
+    try {
+      const r = await fetch(`${API_BASE}/journal-views?keys=${encodeURIComponent(want.join(','))}`);
+      const d = await r.json().catch(() => null);
+      if (d && d.views) for (const k in d.views) viewsCache[k] = d.views[k];
+    } catch (_) {}
+  }
   const ASJC_TOP_CN = {
     'Life Sciences': '生命科学',
     'Health Sciences': '健康科学',
@@ -1619,6 +1648,7 @@
       badgeFlagship(r.flagship),
       ...(r.indices || []).map(badgeIndex),
       badgeScopus(r.scopus),
+      badgeView(favId(r)),
     ].filter(Boolean).join('');
     // 第二行：分区/IF/等级/预警 — 回答"这本的等级和影响力"
     const rankBadges = [
@@ -1770,6 +1800,17 @@
       tbody.innerHTML = `<tr><td colspan="6" class="empty">${t('empty')}</td></tr>`;
     } else {
       tbody.innerHTML = visible.map(renderRow).join('');
+      // 异步拉取浏览量并刷新可见行的 👁 徽章
+      const keys = visible.map(r => favId(r)).filter(Boolean);
+      fetchJournalViews(keys).then(() => {
+        for (const k of keys) {
+          if (!viewsCache[k]) continue;
+          const tr = tbody.querySelector(`tr.j-row[data-fid="${CSS.escape(k)}"]`);
+          if (!tr || tr.querySelector('.badge.b-view')) continue;
+          const idxBadgeRow = tr.querySelector('.badges-idx');
+          if (idxBadgeRow) idxBadgeRow.insertAdjacentHTML('beforeend', badgeView(k));
+        }
+      });
     }
     $('#results-count').textContent = `${t('showing')} ${visible.length} ${t('of')} ${filtered.length.toLocaleString()} ${t('total_items')}`;
     const more = $('#more');
@@ -2348,6 +2389,8 @@
   function openDrawer(r) {
     const drawer = $('#j-drawer'), scrim = $('#drawer-scrim'), body = $('#drawer-body');
     if (!drawer || !body) return;
+    // 上报浏览（无需登录），结果回填进 cache
+    reportJournalView(favId(r));
     const src = r.__src || 'int';
     const titleRaw = r.name || r.cn_name || '';
     const title = titleCase(titleRaw);
