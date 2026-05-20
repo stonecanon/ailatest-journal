@@ -1519,13 +1519,18 @@ td.empty,
 }
 .meta-v { color: var(--ink); }
 
-.drawer-section { margin: 16px 0; }
+.drawer-section {
+  margin: 0;
+  padding: 14px 0 12px;
+  border-top: 1px dashed var(--rule-soft);
+}
+.drawer-section:first-of-type { border-top: 0; padding-top: 4px; }
 .drawer-section h4 {
   font-family: var(--mono);
   font-size: 10.5px; letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--ink-faint);
-  margin: 0 0 8px;
+  margin: 0 0 10px;
   font-weight: 500;
 }
 
@@ -1758,10 +1763,10 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .cas-sub-list li b { color: #a1522a; }
 
 .warn-block {
-  background: rgba(200, 60, 30, 0.05);
-  border: 1px solid rgba(200, 60, 30, 0.2);
-  border-radius: 8px;
-  padding: 14px 18px;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
 }
 .warn-block h4 { color: #c23a18 !important; margin-bottom: 6px !important; }
 .warn-block p {
@@ -1946,8 +1951,8 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 }
 /* Related journals recommendation */
 .related-grid { display: flex; flex-direction: column; gap: 8px; }
-.related-section { background: #f7f4ec; border-left: 3px solid #c9b988; padding: 14px 16px 16px; border-radius: 6px; }
-[data-theme="dark"] .related-section { background: #2a2820; border-left-color: #6e5e3f; }
+.related-section { background: transparent; border-left: 0; padding: 0; border-radius: 0; }
+[data-theme="dark"] .related-section { background: transparent; border-left: 0; }
 .related-card { padding: 10px 14px; background: #fffaf0; border: 1px solid #e6dfc8; border-radius: 8px; transition: background .15s, box-shadow .15s; cursor: pointer; }
 .related-card:hover { background: #fff7e0; box-shadow: 0 2px 8px rgba(120, 95, 30, 0.12); }
 [data-theme="dark"] .related-card { background: #322f25; border-color: #4a4332; color: #e8e2d0; }
