@@ -2746,7 +2746,7 @@
             <div class="stat"><div class="stat-v">${rec.median_days}</div><div class="stat-k">${T('投稿到接收 · 中位天数','Submission → Acceptance · median days')}</div></div>
             <div class="stat"><div class="stat-v">${rec.sample_size}</div><div class="stat-k">${T('样本数 · 2024 年起','Sample size · since 2024')}</div></div>
           </div>
-          <div class="muted-cell" style="margin-top:8px;font-size:12px;line-height:1.6">${T('数据源：','Source: ')}${escape(rec.source)} · ${T('窗口','Window')} ${escape(rec.year_window)} · ${T('更新','Updated')} ${escape(rec.updated)}<br>${T('计算方式：作者投稿（received）到编辑接收（accepted）的天数中位数。仅 Wiley / T&F / Springer / Lippincott 等出版商在 CrossRef 公开此字段；Elsevier / MDPI / SAGE / Oxford / IEEE / Cambridge / Frontiers 等出版商不公开，故部分期刊显示"暂无可信公开数据"。','Median days from received to accepted. Only Wiley / T&F / Springer / Lippincott publish this on CrossRef; Elsevier / MDPI / SAGE / Oxford / IEEE / Cambridge / Frontiers do not, so some journals show "no reliable public data".')}</div>
+          <div class="muted-cell" style="margin-top:8px;font-size:12px;line-height:1.6">${T('数据源：','Source: ')}${escape(rec.source)} · ${T('窗口','Window')} ${escape(rec.year_window)} · ${T('更新','Updated')} ${escape(rec.updated)}</div>
         </div>`;
       }
       // 国际刊（有 ISSN）但没数据 → 明示"暂无"
@@ -3161,12 +3161,32 @@
         return true;
       }
       const d = await r.json();
+      // 加载期刊主库以反查索引/JCR
+      let lookup = {};
+      try {
+        const jr = await fetch('/data/journals.json');
+        if (jr.ok) {
+          const arr = await jr.json();
+          for (const j of arr) {
+            const k1 = (j.issn||'').replace(/-/g,'').toUpperCase();
+            const k2 = (j.eissn||'').replace(/-/g,'').toUpperCase();
+            if (k1) lookup[k1] = j;
+            if (k2 && !lookup[k2]) lookup[k2] = j;
+          }
+        }
+      } catch(_) {}
+      const norm = s => (s||'').replace(/-/g,'').toUpperCase();
+      const idxColor = { SCIE:'scie', SSCI:'ssci', AHCI:'ahci', ESCI:'esci', EI:'ei' };
       const items = (d.items || []).map((it, i) => {
         const title = escape(it.name || it.cn_name || it.issn || it.cn_code || '—');
         const sub = it.cn_name && it.cn_name !== (it.name || '') ? `<span class="share-row-cn">${escape(it.cn_name)}</span>` : '';
-        const code = it.issn ? `<span class="share-row-code">${escape(it.issn)}</span>`
-                   : it.cn_code ? `<span class="share-row-code">${escape(it.cn_code)}</span>` : '';
-        return `<div class="share-list-row"><span class="share-row-idx">${String(i+1).padStart(2,'0')}</span><span class="share-row-name">${title}${sub}</span>${code}</div>`;
+        // 反查丰富数据
+        const j = lookup[norm(it.issn)] || lookup[norm(it.eissn)] || {};
+        const inds = (j.indices || []).filter(x => idxColor[x]);
+        const idxBadges = inds.map(x => `<span class="share-idx idx-${idxColor[x]}">${x}</span>`).join('');
+        const jcrQ = j.if_quartile ? `<span class="share-idx jcr-${j.if_quartile.toLowerCase()}">JCR ${j.if_quartile}</span>` : '';
+        const meta = (idxBadges + jcrQ) ? `<span class="share-row-tags">${idxBadges}${jcrQ}</span>` : '';
+        return `<div class="share-list-row"><span class="share-row-idx">${String(i+1).padStart(2,'0')}</span><span class="share-row-name">${title}${sub}</span>${meta}</div>`;
       }).join('') || `<div class="empty">${T('（空清单）','(empty list)')}</div>`;
       const exp = d.expires_at ? new Date(d.expires_at * 1000).toLocaleDateString() : '';
       const cnt = (d.items||[]).length;
