@@ -335,6 +335,20 @@ def parse_showjcr_xr(path, by_title, by_issn):
        大类(英文/中文) 1..2 含新锐分区, Top, 小类1..6(英文/中文/新锐分区)"""
     if not path.exists(): return 0
     hits = 0
+
+    def norm_zone(v):
+        """'2 区' → '2', '—' → '', None/'' → ''"""
+        if not v: return ''
+        s = str(v).strip().replace(' ', '')
+        if not s or s in ('—', '-', '－'): return ''
+        m = re.match(r'^([1-4])', s)
+        return m.group(1) if m else ''
+
+    def norm_top(v):
+        if not v: return False
+        s = str(v).strip()
+        return s in ('是', 'Y', 'YES', 'TRUE', '1', 'Top', 'TOP')
+
     with open(path, 'r', encoding='utf-8-sig', newline='') as f:
         reader = csv.DictReader(f)
         fieldnames = reader.fieldnames or []
@@ -351,8 +365,21 @@ def parse_showjcr_xr(path, by_title, by_issn):
         col_eissn   = 'EISSN' if 'EISSN' in fieldnames else find('EISSN')
         col_cat_cn  = None
         for fn in fieldnames:
-            if '大类' in fn and '中文' in fn:
+            if '大类' in fn and '中文' in fn and '2' not in fn:
                 col_cat_cn = fn; break
+
+        # 新锐版分区列
+        col_zone1   = '大类新锐分区' if '大类新锐分区' in fieldnames else None
+        col_top1    = 'Top' if 'Top' in fieldnames else None
+        col_zone2   = '大类2新锐分区' if '大类2新锐分区' in fieldnames else None
+        col_top2    = '大类2Top' if '大类2Top' in fieldnames else None
+        # 小类 1-6 (中文名 + 分区)
+        sub_cols = []
+        for n in range(1, 7):
+            cn = f'小类{n}中文名'
+            zn = f'小类{n}新锐分区'
+            if cn in fieldnames and zn in fieldnames:
+                sub_cols.append((cn, zn))
 
         for row in reader:
             title = (row.get('Journal') or row.get('刊名') or '').strip()
@@ -375,6 +402,28 @@ def parse_showjcr_xr(path, by_title, by_issn):
             if col_cat_cn and not rec.get('cas_major_cn'):
                 v = (row.get(col_cat_cn) or '').strip()
                 if v: rec['cas_major_cn'] = v.split()[0] if v else ''
+
+            # 新锐分区 → cas_xr
+            xr = {}
+            z1 = norm_zone(row.get(col_zone1)) if col_zone1 else ''
+            if z1:
+                xr['zone'] = z1
+                if col_top1: xr['top'] = norm_top(row.get(col_top1))
+            z2 = norm_zone(row.get(col_zone2)) if col_zone2 else ''
+            if z2:
+                xr['zone2'] = z2
+                if col_top2: xr['top2'] = norm_top(row.get(col_top2))
+            subs = []
+            for cn_col, zn_col in sub_cols:
+                name = (row.get(cn_col) or '').strip()
+                z = norm_zone(row.get(zn_col))
+                if name and z:
+                    subs.append({'name': name, 'zone': z})
+            if subs:
+                xr['sub'] = subs
+            if xr:
+                rec['cas_xr'] = xr
+
             hits += 1
     return hits
 
