@@ -3069,7 +3069,6 @@
       body = `<div class="share-modal-body"><div style="color:#a23b3b;padding:16px 0">${T('生成失败：','Failed: ')}${escape(opts.error)}</div><div class="share-actions"><button id="share-close-btn" class="share-btn">${T('关闭','Close')}</button></div></div>`;
     } else {
       const exp = opts.expiresAt ? new Date(opts.expiresAt * 1000).toLocaleDateString() : '';
-      const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(opts.url)}&margin=0&color=1f3a5f`;
       const inviteText = T(
         `我整理了一份期刊清单「${opts.listName}」，共 ${opts.count} 本，点开一键查分区/影响因子/收稿周期：\n${opts.url}`,
         `I curated a journal list "${opts.listName}" (${opts.count} journals) — quartile, IF, review cycles, all in one click:\n${opts.url}`
@@ -3079,9 +3078,8 @@
           <div class="share-modal-head">
             <div class="share-modal-eyebrow">AILATEST · ${T('期刊清单分享','Journal list share')}</div>
             <h3 class="share-modal-title">「${escape(opts.listName)}」</h3>
-            <div class="share-modal-meta">${opts.count} ${T('本期刊','journals')}${exp ? ' · ' + T('有效期至 ', 'expires ') + exp : ''}</div>
+            <div class="share-modal-meta">${T('共','')} <strong>${opts.count}</strong> ${T('本期刊','journals')}${exp ? ' · ' + T('有效期至 ', 'expires ') + exp : ''}</div>
           </div>
-          <div class="share-modal-qr"><img src="${escape(qrSrc)}" alt="QR"></div>
           <div class="share-modal-url">
             <input id="share-url-input" type="text" readonly value="${escape(opts.url)}">
           </div>
