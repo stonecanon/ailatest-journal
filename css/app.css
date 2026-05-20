@@ -677,6 +677,7 @@ table.journals tr:last-child td { border-bottom: 0; }
 
 .share-invite {
   max-width: 720px; margin: 22px auto 0;
+  padding: 0 32px; box-sizing: border-box;
 }
 .share-invite-label {
   display: block; font-size: 12px; color: #8a7456;
@@ -696,6 +697,7 @@ table.journals tr:last-child td { border-bottom: 0; }
 
 .share-actions {
   max-width: 720px; margin: 18px auto 0;
+  padding: 0 32px; box-sizing: border-box;
   display: flex; flex-wrap: wrap; gap: 10px;
 }
 .share-actions button {
@@ -731,6 +733,7 @@ table.journals tr:last-child td { border-bottom: 0; }
 
 .share-foot-link {
   max-width: 720px; margin: 18px auto 0;
+  padding: 0 32px; box-sizing: border-box;
   text-align: center; font-size: 13px;
 }
 .share-back { color: #8a7456; }
@@ -739,6 +742,7 @@ table.journals tr:last-child td { border-bottom: 0; }
 @media (max-width: 600px) {
   .share-landing { padding: 24px 18px 20px; border-radius: 10px; }
   .share-title { font-size: 22px; }
+  .share-invite, .share-actions, .share-foot-link { padding: 0 18px; }
   .share-actions button { flex: 1 1 calc(50% - 5px); justify-content: center; }
 }
 
