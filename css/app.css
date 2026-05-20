@@ -1906,12 +1906,98 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 }
 /* Related journals recommendation */
 .related-grid { display: flex; flex-direction: column; gap: 8px; }
-.related-card { padding: 10px 14px; border: 1px solid #e2e2e2; border-radius: 8px; transition: background .15s, box-shadow .15s; cursor: pointer; }
-.related-card:hover { background: #f4f8ff; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.related-section { background: #f7f4ec; border-left: 3px solid #c9b988; padding: 14px 16px 16px; border-radius: 6px; }
+[data-theme="dark"] .related-section { background: #2a2820; border-left-color: #6e5e3f; }
+.related-card { padding: 10px 14px; background: #fffaf0; border: 1px solid #e6dfc8; border-radius: 8px; transition: background .15s, box-shadow .15s; cursor: pointer; }
+.related-card:hover { background: #fff7e0; box-shadow: 0 2px 8px rgba(120, 95, 30, 0.12); }
+[data-theme="dark"] .related-card { background: #322f25; border-color: #4a4332; color: #e8e2d0; }
+[data-theme="dark"] .related-card:hover { background: #3a3528; }
+
+/* 跨源徽章（在抽屉里显示「科协 T2」「CSSCI 来源」「北大核心」等跨源收录标签） */
+.domsrc-pill {
+  display: inline-flex; align-items: center;
+  padding: 2px 8px;
+  font-size: 11.5px; font-weight: 600;
+  border-radius: 3px;
+  letter-spacing: 0.02em;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+.domsrc-pill.ds-cnkx     { background: #f3ede0; color: #6b5a2a; border-color: #d8c89a; }
+.domsrc-pill.ds-cssci    { background: #ece3d9; color: #5a4030; border-color: #c8b9a8; }
+.domsrc-pill.ds-cssci_ext{ background: #f3ece2; color: #7a5a40; border-color: #d6c4ab; }
+.domsrc-pill.ds-pku      { background: #ece5dd; color: #6b3a2a; border-color: #c8a797; }
+.domsrc-pill.ds-zju      { background: #e3ece0; color: #355a3a; border-color: #a8c8a3; }
+.domsrc-pill.ds-school_a { background: #e8e8e8; color: #555; border-color: #c8c8c8; }
+.domsrc-pill.ds-ccf      { background: #e3eaec; color: #2a4a55; border-color: #a3c0c8; }
+[data-theme="dark"] .domsrc-pill.ds-cnkx     { background: #4a3f2a; color: #e8d8a8; border-color: #6b5a2a; }
+[data-theme="dark"] .domsrc-pill.ds-cssci    { background: #4a3a30; color: #e8c8a0; border-color: #6b4a3a; }
+[data-theme="dark"] .domsrc-pill.ds-cssci_ext{ background: #4a3f30; color: #e8c8a8; border-color: #6b5a40; }
+[data-theme="dark"] .domsrc-pill.ds-pku      { background: #4a3528; color: #e8b298; border-color: #6b4a35; }
+[data-theme="dark"] .domsrc-pill.ds-zju      { background: #2f4a32; color: #c0e8a3; border-color: #486b48; }
+[data-theme="dark"] .domsrc-pill.ds-school_a { background: #3a3a3a; color: #d8d8d8; border-color: #5a5a5a; }
+[data-theme="dark"] .domsrc-pill.ds-ccf      { background: #2a4045; color: #a8d8e0; border-color: #486b75; }
+
+/* ───────── 单本期刊分享名片（jcard） ───────── */
+.jcard-modal { max-width: 520px; }
+.jcard {
+  background: linear-gradient(180deg, #fffdf6 0%, #faf6e8 100%);
+  border: 1px solid #e6dcb8;
+  border-radius: 8px;
+  padding: 20px 22px 18px;
+  margin: 12px 0 14px;
+  font-family: var(--serif);
+  color: #2a2a2a;
+}
+.jcard-head {
+  display: flex; justify-content: space-between; align-items: baseline;
+  border-bottom: 1px solid rgba(180, 150, 80, 0.25);
+  padding-bottom: 8px; margin-bottom: 10px;
+}
+.jcard-brand { font-size: 13.5px; font-weight: 700; color: #5a4a20; letter-spacing: 0.04em; }
+.jcard-brand em { color: #8b6f2a; font-style: italic; font-weight: 600; }
+.jcard-brand-url { font-size: 11px; color: #8a7a4a; font-family: var(--mono); }
+.jcard-title { font-size: 19px; font-weight: 700; line-height: 1.32; color: #1a1a1a; margin-bottom: 3px; word-break: break-word; }
+.jcard-sub { font-size: 14px; color: #555; margin-bottom: 6px; }
+.jcard-issn { font-size: 12px; color: #7a6a3a; font-family: var(--mono); margin-bottom: 12px; letter-spacing: 0.02em; }
+.jcard-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.jcard-idx {
+  display: inline-block; padding: 2px 8px; border-radius: 3px;
+  background: #ebe2c5; color: #5a4a20;
+  font-size: 11.5px; font-weight: 700; letter-spacing: 0.04em; font-family: var(--mono);
+}
+.jcard-zone {
+  display: inline-block; padding: 3px 9px; border-radius: 3px;
+  font-size: 12px; font-weight: 700; letter-spacing: 0.02em;
+}
+.jcard-stats {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px;
+  margin: 10px 0;
+  padding: 10px 0; border-top: 1px dashed rgba(180, 150, 80, 0.3); border-bottom: 1px dashed rgba(180, 150, 80, 0.3);
+}
+.jcard-stat { text-align: center; }
+.jcard-stat-v { font-size: 16px; font-weight: 700; color: #1f3a5f; line-height: 1.2; }
+.jcard-stat-v small { font-size: 10.5px; color: #888; font-weight: 500; }
+.jcard-stat-k { font-size: 11px; color: #6a6a6a; margin-top: 2px; }
+.jcard-meta { margin-top: 6px; }
+.jcard-meta-row { display: flex; gap: 8px; font-size: 12.5px; line-height: 1.7; }
+.jcard-meta-k { color: #8a7a4a; min-width: 70px; flex-shrink: 0; }
+.jcard-meta-v { color: #2a2a2a; flex: 1; }
+.jcard-foot {
+  margin-top: 12px; padding-top: 8px; border-top: 1px solid rgba(180, 150, 80, 0.25);
+  font-size: 11.5px; color: #8a7a4a; text-align: center;
+}
+[data-theme="dark"] .jcard {
+  background: linear-gradient(180deg, #2a2820 0%, #322f25 100%);
+  border-color: #5a4f30; color: #e8e2d0;
+}
+[data-theme="dark"] .jcard-title { color: #f4ecc8; }
+[data-theme="dark"] .jcard-sub { color: #c8c0a8; }
+[data-theme="dark"] .jcard-stat-v { color: #8bb8e8; }
+[data-theme="dark"] .jcard-meta-v { color: #e8e2d0; }
 .related-name { font-size: 13.5px; font-weight: 500; color: #1f3a5f; }
 .related-meta { font-size: 12px; margin-top: 3px; }
-[data-theme="dark"] .related-card { border-color: #3a3a3a; }
-[data-theme="dark"] .related-card:hover { background: #2a3040; }
+[data-theme="dark"] .related-card { border-color: #4a4332; }
 [data-theme="dark"] .related-name { color: #8bb8e8; }
 
 /* Fav list picker popover (A+B) */

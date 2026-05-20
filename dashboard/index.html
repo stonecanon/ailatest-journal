@@ -10,8 +10,8 @@
   <main class="shell">
     <header class="topbar">
       <div>
-        <h1>AILatest Journal 运营看板</h1>
-        <p class="subtitle">注册、登录、访问、收藏、评分与内容互动的本地可视化汇总。</p>
+        <h1>AILatest Journal 流量看板</h1>
+        <p class="subtitle">优先查看每日浏览量、独立访客和访问人次；注册、登录与互动数据作为辅助参考。</p>
       </div>
       <div class="meta">
         <div><span class="pill" id="source">remote D1</span></div>
@@ -19,28 +19,37 @@
       </div>
     </header>
 
-    <section class="grid kpis" aria-label="关键指标"></section>
+    <section class="traffic-summary" aria-label="访问概览">
+      <div class="summary-copy">
+        <div class="eyebrow">Traffic Overview</div>
+        <h2>逐日访问是主指标</h2>
+        <p>PV 看页面被打开多少次，UV 看不同访客，Sessions 更接近“来了多少趟”。</p>
+      </div>
+      <div class="grid traffic-kpis"></div>
+    </section>
 
-    <section class="grid main-grid">
-      <article class="card panel">
-        <h2>注册与登录趋势</h2>
-        <div class="chart" id="signup-login-chart"></div>
-      </article>
-      <article class="card panel">
-        <h2>注册来源</h2>
-        <div class="bar-list" id="provider-bars"></div>
-      </article>
-      <article class="card panel">
-        <h2>访问趋势</h2>
+    <section class="grid traffic-grid">
+      <article class="card panel panel-large">
+        <div class="panel-head">
+          <div>
+            <h2>逐日浏览趋势</h2>
+            <p>页面浏览量、独立访客与访问人次</p>
+          </div>
+        </div>
         <div class="chart" id="traffic-chart"></div>
       </article>
       <article class="card panel">
-        <h2>登录来源</h2>
-        <div class="bar-list" id="login-provider-bars"></div>
+        <div class="panel-head">
+          <div>
+            <h2>每日访问明细</h2>
+            <p>按天对比 PV、UV、Sessions</p>
+          </div>
+        </div>
+        <div id="daily-traffic"></div>
       </article>
     </section>
 
-    <section class="grid tables">
+    <section class="grid traffic-breakdown">
       <article class="card panel">
         <h2>热门访问路径</h2>
         <div class="bar-list" id="top-paths"></div>
@@ -48,6 +57,28 @@
       <article class="card panel">
         <h2>访问地区</h2>
         <div class="bar-list" id="traffic-countries"></div>
+      </article>
+    </section>
+
+    <section class="section-label">
+      <h2>用户与互动</h2>
+      <p>这些指标用于判断访问后的注册、登录和内容互动情况，不放在首屏主视线里。</p>
+    </section>
+
+    <section class="grid secondary-kpis" aria-label="用户与互动指标"></section>
+
+    <section class="grid secondary-grid">
+      <article class="card panel">
+        <h2>注册与登录趋势</h2>
+        <div class="chart chart-compact" id="signup-login-chart"></div>
+      </article>
+      <article class="card panel">
+        <h2>注册来源</h2>
+        <div class="bar-list" id="provider-bars"></div>
+      </article>
+      <article class="card panel">
+        <h2>登录来源</h2>
+        <div class="bar-list" id="login-provider-bars"></div>
       </article>
       <article class="card panel">
         <h2>收藏最多的期刊</h2>
