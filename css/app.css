@@ -419,9 +419,11 @@ main.main {
 }
 
 .col-fav { width: 64px; text-align: center; padding-left: 4px; padding-right: 4px; }
-.col-cas, .col-esi { font-size: 12.5px; line-height: 1.4; max-width: 160px; }
+.col-cas, .col-esi { font-size: 12.5px; line-height: 1.4; width: 150px; max-width: 150px; overflow: hidden; }
 .col-cas { color: var(--ink); }
 .col-esi { color: var(--ink-soft); font-family: var(--sans); font-size: 12px; }
+.col-esi .th-select, .col-cas .th-select { max-width: 100%; box-sizing: border-box; text-overflow: ellipsis; overflow: hidden; }
+.col-esi td, .col-cas td { white-space: normal; word-break: break-word; }
 
 /* drawer 大类/小类 标签（区分新锐版双 4 区等情况） */
 .zone-tier {
@@ -935,6 +937,22 @@ body.share-mode main.main { max-width: 760px; margin: 0 auto; padding: 28px 20px
 .ccf-pill.ccf-A { background: var(--crimson); }
 .ccf-pill.ccf-B { background: var(--accent); }
 .ccf-pill.ccf-C { background: var(--sage); }
+
+.abdc-pill {
+  display: inline-block;
+  padding: 2px 6px;
+  font-family: var(--serif);
+  font-size: 11px; font-weight: 700;
+  background: #e8eef7;
+  color: #2f4c7f;
+  border: 1px solid #c8d6ea;
+  border-radius: 2px;
+  letter-spacing: 0.04em;
+}
+.abdc-pill.abdc-a-star { background: #21385f; border-color: #21385f; color: #fff; }
+.abdc-pill.abdc-a { background: #476fa6; border-color: #476fa6; color: #fff; }
+.abdc-pill.abdc-b { background: #dce8f6; color: #294969; }
+.abdc-pill.abdc-c { background: #eef2f5; color: #52606a; }
 
 .tier-pill {
   display: inline-block;
@@ -2072,4 +2090,3 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .drawer-fav-select { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
 .drawer-fav-select select { padding: 5px 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 12.5px; background: #f8f8f8; }
 [data-theme="dark"] .drawer-fav-select select { background: #333; border-color: #555; color: #ddd; }
-

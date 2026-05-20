@@ -54,6 +54,13 @@ SHOW_FQB    = LIST_DIR / 'ShowJCR_中科院分区_2025.csv'
 SHOW_XR     = LIST_DIR / 'ShowJCR_中科院新锐版_2026.csv'
 SHOW_CCF    = LIST_DIR / 'ShowJCR_CCF推荐_2026.csv'
 SHOW_CCFT   = LIST_DIR / 'ShowJCR_CCF-T_2025.csv'
+ABDC_CANDIDATES = [
+    LIST_DIR / 'ABDC-JQL-2022-v3-100523.xlsx',
+    LIST_DIR / 'ABDC Journal Quality List 2022.xlsx',
+    LIST_DIR / 'ABDC_Journal_Quality_List_2022.xlsx',
+    LIST_DIR / 'ABDC-JQL-2022.csv',
+    LIST_DIR / 'ABDC Journal Quality List 2022.csv',
+]
 
 CNKX_JSON    = DATA_DIR / 'cnkx_tiers.json'
 CNKX_RECORDS = DATA_DIR / 'cnkx_records.json'
@@ -86,6 +93,23 @@ def split_issn_pair(s):
     issns = [clean_issn(p) for p in parts if clean_issn(p)]
     return (issns[0] if issns else '',
             issns[1] if len(issns) > 1 else '')
+
+def first_existing(paths):
+    for p in paths:
+        if p.exists():
+            return p
+    return None
+
+def pick_col(row, names):
+    for name in names:
+        if name in row and row[name] not in (None, ''):
+            return row[name]
+    lowered = {str(k).strip().lower(): k for k in row.keys()}
+    for name in names:
+        k = lowered.get(name.lower())
+        if k is not None and row.get(k) not in (None, ''):
+            return row.get(k)
+    return ''
 
 
 # ───────────────────────── WoS Core ─────────────────────────
@@ -481,6 +505,70 @@ def parse_showjcr_ccf(path, by_title, by_issn):
     return hits
 
 
+# ───────────────────────── ABDC Journal Quality List 2022 ─────────────────────────
+
+def parse_abdc(path, by_title, by_issn):
+    """ABDC Journal Quality List: A*, A, B, C.
+
+    Expected official/common headers:
+      Journal Title | Publisher | ISSN | ISSN Online | Year Inception | FoR | 2022 rating
+    The parser is deliberately tolerant because downloaded workbooks sometimes vary
+    in spacing/casing.
+    """
+    if not path: return 0
+
+    def apply_row(row):
+        title = str(pick_col(row, ['Journal Title', 'Title', 'Journal', 'Journal title']) or '').strip()
+        if not title:
+            return 0
+        issn = clean_issn(pick_col(row, ['ISSN', 'Print ISSN', 'ISSN Print']))
+        eissn = clean_issn(pick_col(row, ['ISSN Online', 'Online ISSN', 'eISSN', 'EISSN', 'ISSN_Online']))
+        rating = str(pick_col(row, ['2022 rating', 'Rating', 'ABDC Rating', 'ABDC 2022', 'Rank']) or '').strip().upper()
+        rating = rating.replace('A STAR', 'A*').replace('A-STAR', 'A*').replace('A* ', 'A*')
+        if rating not in {'A*', 'A', 'B', 'C'}:
+            return 0
+        nt = norm_title(title)
+        rec = (issn and by_issn.get(issn)) or (eissn and by_issn.get(eissn)) or by_title.get(nt)
+        if rec is None:
+            return 0
+        field = str(pick_col(row, ['FoR', 'FOR', 'Field of Research', 'Field', 'FoR code']) or '').strip()
+        publisher = str(pick_col(row, ['Publisher']) or '').strip()
+        rec['abdc'] = {
+            'rating': rating,
+            'field': field,
+            'source': 'ABDC Journal Quality List 2022',
+        }
+        if publisher and not rec.get('publisher'):
+            rec['publisher'] = publisher
+        return 1
+
+    hits = 0
+    if path.suffix.lower() == '.csv':
+        with open(path, 'r', encoding='utf-8-sig', newline='') as f:
+            for row in csv.DictReader(f):
+                hits += apply_row(row)
+        return hits
+
+    if not openpyxl:
+        return 0
+    wb = openpyxl.load_workbook(path, read_only=True, data_only=True)
+    ws = wb.active
+    rows = ws.iter_rows(values_only=True)
+    headers = None
+    for raw in rows:
+        vals = [str(v).strip() if v is not None else '' for v in raw]
+        joined = ' '.join(vals).lower()
+        if 'journal' in joined and ('rating' in joined or 'issn' in joined):
+            headers = vals
+            break
+    if not headers:
+        return 0
+    for raw in rows:
+        row = {headers[i]: raw[i] if i < len(raw) else '' for i in range(len(headers))}
+        hits += apply_row(row)
+    return hits
+
+
 # ───────────────────────── 中国科协 — merge 回主库 (按 ISSN) ─────────────────────────
 
 def merge_cnkx_to_main(by_issn, by_title):
@@ -559,6 +647,15 @@ def main():
     h = parse_showjcr_ccf(SHOW_CCF, by_title, by_issn)
     print(f'  CCF matched: {h}')
 
+    print('== ABDC Journal Quality List ==')
+    abdc_file = first_existing(ABDC_CANDIDATES)
+    if abdc_file:
+        h = parse_abdc(abdc_file, by_title, by_issn)
+        print(f'  ABDC matched: {h} ({abdc_file.name})')
+    else:
+        h = 0
+        print('  ABDC skipped: file not found')
+
     print('== 中国科协 merge ==')
     h = merge_cnkx_to_main(by_issn, by_title)
     print(f'  CNKX merged: {h}')
@@ -572,7 +669,7 @@ def main():
     for r in journals:
         for i in r['indices']: idx_c[i] += 1
     cas_c = Counter(); cas_top = 0
-    if_count = 0; warning_count = 0; cn_name_count = 0; ccf_count = 0; cnkx_count = 0
+    if_count = 0; warning_count = 0; cn_name_count = 0; ccf_count = 0; abdc_count = 0; cnkx_count = 0
     for r in journals:
         z = r.get('cas_zone')
         if z: cas_c[z] += 1
@@ -581,13 +678,14 @@ def main():
         if r.get('warning'): warning_count += 1
         if r.get('cn_name'): cn_name_count += 1
         if r.get('ccf'): ccf_count += 1
+        if r.get('abdc'): abdc_count += 1
         if r.get('cnkx'): cnkx_count += 1
 
     print('== Stats ==')
     print(f'  total: {len(journals)}')
     print(f'  indices: {dict(idx_c)}')
     print(f'  CAS zones: {dict(cas_c)} Top={cas_top}')
-    print(f'  IF: {if_count}  warning: {warning_count}  中文刊名: {cn_name_count}  CCF: {ccf_count}  CNKX: {cnkx_count}')
+    print(f'  IF: {if_count}  warning: {warning_count}  中文刊名: {cn_name_count}  CCF: {ccf_count}  ABDC: {abdc_count}  CNKX: {cnkx_count}')
 
     # main write
     with open(DATA_DIR / 'journals.json', 'w', encoding='utf-8') as f:
@@ -652,7 +750,7 @@ def main():
 
     # meta
     meta = {
-        'source': 'WoS Core + JCR 2025 + ESI + 中科院 2025 + 长江大学 + ShowJCR (JCR/FQB/XR/CCF/Warning) + 中国科协',
+        'source': 'WoS Core + JCR 2025 + ESI + 中科院 2025 + 长江大学 + ShowJCR (JCR/FQB/XR/CCF/Warning) + ABDC 2022 optional + 中国科协',
         'last_updated_source': 'WoS Core 2026-04-20',
         'total': len(journals),
         'indices': dict(idx_c),
@@ -662,6 +760,7 @@ def main():
         'with_warning': warning_count,
         'with_cn_name': cn_name_count,
         'with_ccf': ccf_count,
+        'with_abdc': abdc_count,
         'with_cnkx': cnkx_count,
         'wos_categories': len(wos_c),
         'esi_categories': len(esi_c),

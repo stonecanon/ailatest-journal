@@ -1538,6 +1538,13 @@
     const t = String(ccf).toUpperCase().replace(/[^ABC]/g,'') || 'X';
     return `<span class="ccf-pill ccf-${t}">CCF ${t}</span>`;
   }
+  function badgeABDC(abdc) {
+    const rating = typeof abdc === 'string' ? abdc : (abdc && abdc.rating);
+    if (!rating) return '';
+    const label = String(rating).trim().toUpperCase().replace('A STAR', 'A*').replace('A-STAR', 'A*');
+    const cls = label === 'A*' ? 'a-star' : label.toLowerCase().replace(/[^a-c]/g, '');
+    return `<span class="abdc-pill abdc-${cls}" title="${T('ABDC Journal Quality List 2022','ABDC Journal Quality List 2022')}">ABDC ${escape(label)}</span>`;
+  }
       function badgeTier(tier) {
         if (!tier) return '';
         const raw = String(tier).trim().toUpperCase();
@@ -1674,6 +1681,7 @@
       badgeXR(r.cas_xr && r.cas_xr.zone),
       badgeIF(r.if_2024, r.if_quartile),
       badgeCCF(r.ccf),
+      badgeABDC(r.abdc),
       // 中国科协 T1/T2/T3 徽章 (取该刊所有 cnkx 标签中最高级别)
       ...(r.cnkx ? r.cnkx.slice(0,2).map(c => badgeTier(c.tier)) : []),
       r.warning ? badgeWarn() : '',
@@ -2558,6 +2566,7 @@
       badgeCAS(ir.cas_zone, ir.cas_top),
       badgeIF(ir.if_2024, ir.if_quartile),
       badgeCCF(ir.ccf),
+      badgeABDC(ir.abdc),
       ir.warning ? badgeWarn() : '',
     ].filter(Boolean).join('') : '';
     const tierBadge = r.tier && /^T[123]$/.test(r.tier) ? badgeTier(r.tier)
@@ -2577,6 +2586,7 @@
     if (r.category) meta.push([T('分类','Category'), tn(r.category, 'pku')]);
     if (r.domain) meta.push([T('科协领域','CAST Domain'), tn(r.domain, 'domain') + (r.subdomain ? ' · ' + tn(r.subdomain, 'sub') : '')]);
     if (r.ccf_area) meta.push([T('CCF 方向','CCF Area'), r.ccf_area]);
+    if (ir.abdc && ir.abdc.rating) meta.push([T('ABDC 等级','ABDC Rating'), ir.abdc.rating + (ir.abdc.field ? ' · ' + ir.abdc.field : '')]);
     if (r.note) meta.push([T('备注','Note'), r.note]);
     const metaHTML = meta.map(([k,v]) => `<div class="meta-row"><div class="meta-k">${k}</div><div class="meta-v">${escape(v)}</div></div>`).join('');
 
@@ -3204,6 +3214,7 @@
     const meta = [];
     if (ir.cas_major_cn) meta.push([T('中科院大类','CAS Major'), ir.cas_major_cn]);
     if (ir.esi_category) meta.push([T('ESI 高被引','ESI Category'), ir.esi_category]);
+    if (ir.abdc && ir.abdc.rating) meta.push([T('ABDC 等级','ABDC Rating'), ir.abdc.rating + (ir.abdc.field ? ' · ' + ir.abdc.field : '')]);
     if (r.publisher) meta.push([T('出版商','Publisher'), r.publisher]);
     if (r.country) meta.push([T('国家/地区','Country'), r.country]);
     if (r.frequency) meta.push([T('刊期','Frequency'), r.frequency]);
@@ -3524,6 +3535,7 @@
       badgeXR(r.cas_xr && r.cas_xr.zone),
       badgeIF(r.if_2024, r.if_quartile),
       badgeCCF(r.ccf),
+      badgeABDC(r.abdc),
       r.warning ? badgeWarn() : '',
     ].filter(Boolean).join('') : '';
     const tierBadge = r.tier && /^T[123]$/.test(r.tier) ? badgeTier(r.tier)

@@ -1,5 +1,5 @@
 {
-  "source": "WoS Core + JCR 2025 + ESI + 中科院 2025 + 长江大学 + ShowJCR (JCR/FQB/XR/CCF/Warning) + 中国科协",
+  "source": "WoS Core + JCR 2025 + ESI + 中科院 2025 + 长江大学 + ShowJCR (JCR/FQB/XR/CCF/Warning) + ABDC 2022 optional + 中国科协",
   "last_updated_source": "WoS Core 2026-04-20",
   "total": 23185,
   "indices": {
@@ -14,6 +14,7 @@
   "with_warning": 4,
   "with_cn_name": 33,
   "with_ccf": 279,
+  "with_abdc": 0,
   "with_cnkx": 0,
   "wos_categories": 259,
   "esi_categories": 22
