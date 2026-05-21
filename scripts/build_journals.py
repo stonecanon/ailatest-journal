@@ -77,6 +77,7 @@ ABS_CANDIDATES = [
 ]
 SCOPUS_FILE  = LIST_DIR / 'scopus ext_list_Mar_2026.xlsx'
 EI_FILE      = LIST_DIR / 'CPXSourceList_102025.xlsx'
+OAJ_FILE     = LIST_DIR / 'oaj_journals.json'
 
 CNKX_JSON    = DATA_DIR / 'cnkx_tiers.json'
 CNKX_RECORDS = DATA_DIR / 'cnkx_records.json'
@@ -897,6 +898,49 @@ def merge_cnkx_to_main(by_issn, by_title):
     return hits
 
 
+# ───────────────────────── OAJ 全球开放获取期刊索引 ─────────────────────────
+
+def parse_oaj(path, by_title, by_issn, store=None):
+    """读取 OAJ 开放获取期刊索引 JSON，匹配到现有记录或新增."""
+    if not path.exists():
+        return 0, 0
+    with open(path, 'r', encoding='utf-8') as f:
+        oaj_list = json.load(f)
+    matched = standalone = 0
+    for item in oaj_list:
+        title = item.get('title') or ''
+        issn = clean_issn(item.get('issn'))
+        eissn = clean_issn(item.get('eissn'))
+        nt = norm_title(title)
+        payload = {
+            'partition': item.get('partition'),   # e.g. "1区"
+            'position': item.get('positioning'),   # e.g. "Frontier Science Journal"
+            'oa_type': item.get('oa_type'),        # e.g. "Gold OA"
+        }
+        rec = (issn and by_issn.get(issn)) or (eissn and by_issn.get(eissn)) or by_title.get(nt)
+        if rec is not None:
+            rec['oaj'] = payload
+            matched += 1
+        elif store is not None:
+            key = 'oaj:' + (issn or eissn or nt)
+            rec = store.get(key)
+            if rec is None:
+                rec = {
+                    'name': title, 'issn': issn, 'eissn': eissn,
+                    'publisher': item.get('publisher', ''),
+                    'country': item.get('country', ''),
+                    'abbr20': '', 'indices': [], 'wos_categories': [], 'esi_category': '',
+                    'oaj_only': True,
+                }
+                store[key] = rec
+                by_title.setdefault(nt, rec)
+                for k in (issn, eissn):
+                    if k: by_issn.setdefault(k, rec)
+            rec['oaj'] = payload
+            standalone += 1
+    return matched, standalone
+
+
 # ───────────────────────── main ─────────────────────────
 
 def main():
@@ -987,6 +1031,11 @@ def main():
     h = merge_cnkx_to_main(by_issn, by_title)
     print(f'  CNKX merged: {h}')
 
+    print('== OAJ 全球开放获取期刊索引 ==')
+    h, s = parse_oaj(OAJ_FILE, by_title, by_issn, store=store)
+    print(f'  OAJ matched: {h}  OAJ-only: +{s}')
+    by_issn, by_title = rebuild_lookups()
+
     # ────── finalize ──────
     for rec in store.values():
         flag = infer_flagship(rec.get('name') or '', rec.get('publisher') or '')
@@ -1000,7 +1049,7 @@ def main():
     for r in journals:
         for i in r['indices']: idx_c[i] += 1
     cas_c = Counter(); cas_top = 0
-    if_count = 0; warning_count = 0; cn_name_count = 0; ccf_count = 0; abdc_count = 0; abs_count = 0; cnkx_count = 0; scopus_count = 0; ei_count = 0
+    if_count = 0; warning_count = 0; cn_name_count = 0; ccf_count = 0; abdc_count = 0; abs_count = 0; cnkx_count = 0; scopus_count = 0; ei_count = 0; oaj_count = 0
     for r in journals:
         z = r.get('cas_zone')
         if z: cas_c[z] += 1
@@ -1014,12 +1063,13 @@ def main():
         if r.get('cnkx'): cnkx_count += 1
         if r.get('scopus') and r.get('scopus', {}).get('active') is not False: scopus_count += 1
         if 'EI' in r.get('indices', []): ei_count += 1
+        if r.get('oaj'): oaj_count += 1
 
     print('== Stats ==')
     print(f'  total: {len(journals)}')
     print(f'  indices: {dict(idx_c)}')
     print(f'  CAS zones: {dict(cas_c)} Top={cas_top}')
-    print(f'  IF: {if_count}  warning: {warning_count}  中文刊名: {cn_name_count}  CCF: {ccf_count}  ABDC: {abdc_count}  ABS: {abs_count}  CNKX: {cnkx_count}  Scopus: {scopus_count}  EI: {ei_count}')
+    print(f'  IF: {if_count}  warning: {warning_count}  中文刊名: {cn_name_count}  CCF: {ccf_count}  ABDC: {abdc_count}  ABS: {abs_count}  CNKX: {cnkx_count}  Scopus: {scopus_count}  EI: {ei_count}  OAJ: {oaj_count}')
 
     # Strip large non-essential fields to stay under CF Pages 25 MB limit
     for r in journals:
@@ -1097,7 +1147,7 @@ def main():
 
     # meta
     meta = {
-        'source': 'WoS Core + JCR 2025 + ESI + 中科院 2025 + 长江大学 + ShowJCR (JCR/FQB/XR/CCF/Warning) + Scopus Mar. 2026 + EI Compendex Oct. 2025 + ABDC optional + ABS AJG + 中国科协',
+        'source': 'WoS Core + JCR 2025 + ESI + 中科院 2025 + 长江大学 + ShowJCR (JCR/FQB/XR/CCF/Warning) + Scopus Mar. 2026 + EI Compendex Oct. 2025 + ABDC optional + ABS AJG + 中国科协 + OAJ 2025',
         'last_updated_source': 'WoS Core 2026-04-20',
         'total': len(journals),
         'indices': dict(idx_c),
@@ -1109,6 +1159,7 @@ def main():
         'with_ccf': ccf_count,
         'with_abdc': abdc_count,
         'with_abs': abs_count,
+        'with_oaj': oaj_count,
         'with_cnkx': cnkx_count,
         'with_scopus': scopus_count,
         'with_ei': ei_count,
