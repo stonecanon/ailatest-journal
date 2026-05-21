@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-21T23:33:29.066Z",
+  "generated_at": "2026-05-21T23:38:28.586Z",
   "source": "remote D1",
   "notes": [
     "注册量来自 users.created_at，当前是最可靠口径。",
@@ -44,8 +44,8 @@
     "avg_rating": 4.43,
     "lists": 7,
     "users_with_lists": 6,
-    "total_pageviews": 449,
-    "total_visitors": 110,
+    "total_pageviews": 454,
+    "total_visitors": 111,
     "total_login_events": 8
   },
   "series": {
@@ -145,9 +145,9 @@
       },
       {
         "day": "2026-05-21",
-        "pageviews": 191,
-        "sessions": 84,
-        "visitors": 61
+        "pageviews": 196,
+        "sessions": 85,
+        "visitors": 62
       }
     ]
   },
@@ -346,8 +346,8 @@
     "topPaths": [
       {
         "path": "/",
-        "pageviews": 354,
-        "visitors": 67
+        "pageviews": 358,
+        "visitors": 68
       },
       {
         "path": "/?ref=producthunt",
@@ -448,9 +448,9 @@
     "trafficCountries": [
       {
         "country": "JP",
-        "pageviews": 323,
-        "visitors": 39,
-        "sessions": 92,
+        "pageviews": 328,
+        "visitors": 40,
+        "sessions": 93,
         "colos": "NRT",
         "client_timezones": ",Asia/Shanghai",
         "client_languages": ",en-US,zh-CN,en"
