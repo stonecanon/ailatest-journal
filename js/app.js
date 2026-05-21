@@ -3762,18 +3762,79 @@
       renderDomestic();
     });
 
-    $('#lang-toggle').addEventListener('click', () => {
-      lang = LANG_ORDER[(LANG_ORDER.indexOf(lang) + 1) % LANG_ORDER.length];
-      localStorage.setItem('ailatest.lang', lang);
-      localizeDefaultFavListName();
-      persistFavLists(false);
-      applyI18n();
-      renderWosList();
-      // re-render because categories etc. are dynamic text
-      if (activeTab === 'dom') renderDomestic();
-      else if (activeTab === 'fav') renderFav();
-      else if (activeTab === 'int') renderInt();
-    });
+    // ─── 语言切换下拉菜单 ───
+    (function initLangDropdown() {
+      const btn = $('#lang-toggle');
+      const wrap = btn.closest('.lang-toggle-wrap');
+      let dropdown;
+
+      function buildDropdown() {
+        dropdown = document.createElement('div');
+        dropdown.className = 'lang-dropdown';
+        LANG_ORDER.forEach(code => {
+          const opt = document.createElement('button');
+          opt.dataset.lang = code;
+          const meta = LANG_META[code];
+          opt.innerHTML = meta.label;
+          if (code === lang) opt.classList.add('active');
+          opt.addEventListener('click', (e) => {
+            e.stopPropagation();
+            lang = code;
+            localStorage.setItem('ailatest.lang', lang);
+            localizeDefaultFavListName();
+            persistFavLists(false);
+            applyI18n();
+            renderWosList();
+            if (activeTab === 'dom') renderDomestic();
+            else if (activeTab === 'fav') renderFav();
+            else if (activeTab === 'int') renderInt();
+            closeDropdown();
+          });
+          dropdown.appendChild(opt);
+        });
+        wrap.appendChild(dropdown);
+      }
+
+      function openDropdown() {
+        if (!dropdown) buildDropdown();
+        dropdown.classList.add('open');
+        // update active state
+        dropdown.querySelectorAll('button').forEach(b => {
+          b.classList.toggle('active', b.dataset.lang === lang);
+        });
+      }
+
+      function closeDropdown() {
+        if (dropdown) dropdown.classList.remove('open');
+      }
+
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (dropdown && dropdown.classList.contains('open')) {
+          closeDropdown();
+        } else {
+          openDropdown();
+        }
+      });
+
+      document.addEventListener('click', (e) => {
+        if (dropdown && dropdown.classList.contains('open') && !wrap.contains(e.target)) {
+          closeDropdown();
+        }
+      });
+
+      // update button text when lang changes
+      const origSetText = btn.textContent;
+      const origApply = applyI18n;
+      applyI18n = function() {
+        origApply.call(this);
+        const meta = LANG_META[lang];
+        btn.textContent = meta ? meta.label : lang;
+      };
+      // trigger initial label
+      const meta = LANG_META[lang];
+      if (meta) btn.textContent = meta.label;
+    })();
     $('#theme-toggle').addEventListener('click', () => {
       theme = theme === 'light' ? 'dark' : 'light';
       document.documentElement.dataset.theme = theme;

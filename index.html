@@ -17,7 +17,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="/css/app.css?v=20260521-37" />
+<link rel="stylesheet" href="/css/app.css?v=20260521-39" />
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json" />
@@ -130,7 +130,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="topbar-actions">
       <button class="fav-tab" id="fav-tab" aria-label="Favorites" title="My Favorites / 我的收藏">★ <span id="fav-count">0</span></button>
       <button class="auth-btn" id="auth-btn" aria-label="Sign in" data-i18n="login">登录</button>
-      <button class="lang-toggle" id="lang-toggle" aria-label="Switch language">中 / EN</button>
+      <div class="lang-toggle-wrap">
+        <button class="lang-toggle" id="lang-toggle" aria-label="Switch language">中 / EN</button>
+      </div>
     </div>
   </header>
 
@@ -247,7 +249,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </aside>
 
 <button id="pwa-install" class="pwa-install" hidden data-i18n="pwa_install">📲 安装到主屏</button>
-<script src="/js/app.js?v=20260520-35" defer></script>
+<script src="/js/app.js?v=20260521-39" defer></script>
 <script>
   // Register service worker (PWA)
   if ('serviceWorker' in navigator) {
