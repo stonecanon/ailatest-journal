@@ -21,8 +21,18 @@
   });
 
   // ---------- Data load ----------
+  async function _fetchJSON(url) {
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    if (url.endsWith('.gz')) {
+      const ds = new DecompressionStream('gzip');
+      const stream = resp.body.pipeThrough(ds);
+      return await new Response(stream).json();
+    }
+    return await resp.json();
+  }
   Promise.all([
-    fetch("data/journals.json").then((r) => r.json()),
+    _fetchJSON("data/journals.json.gz"),
     fetch("data/categories.json").then((r) => r.json()),
   ])
     .then(([journals, cats]) => {
