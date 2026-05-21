@@ -899,10 +899,11 @@ body.share-mode main.main { max-width: 760px; margin: 0 auto; padding: 28px 20px
 .cat-chip.asjc-multidisciplinary { background: #5b3a91; color: #fff; border-color: #5b3a91; }
 
 .zone {
-  display: inline-flex; align-items: baseline; gap: 2px;
-  padding: 2px 6px;
-  font-family: var(--serif);
-  font-size: 11.5px; font-weight: 700;
+  display: inline-flex; align-items: center;
+  padding: 2px 7px;
+  font-family: var(--sans);
+  font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.04em;
   border-radius: 2px;
   border: 0;
   color: #fff;
