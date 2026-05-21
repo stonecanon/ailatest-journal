@@ -2199,8 +2199,15 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   padding: 10px 0; border-top: 1px dashed rgba(180, 150, 80, 0.3); border-bottom: 1px dashed rgba(180, 150, 80, 0.3);
 }
 .jcard-stat { text-align: center; }
+.jcard-stat:first-child {
+  background: rgba(31, 58, 95, 0.05);
+  border-radius: 8px;
+  padding: 6px 4px;
+}
 .jcard-stat-v { font-size: 16px; font-weight: 700; color: #1f3a5f; line-height: 1.2; }
 .jcard-stat-v small { font-size: 10.5px; color: #888; font-weight: 500; }
+.jcard-if-val { font-size: 20px; font-weight: 700; color: #1f3a5f; line-height: 1.3; }
+.jcard-if-info { font-size: 10.5px; color: #888; font-weight: 500; margin-top: 3px; }
 .jcard-stat-k { font-size: 11px; color: #6a6a6a; margin-top: 2px; }
 .jcard-meta { margin-top: 6px; }
 .jcard-meta-row { display: flex; gap: 8px; font-size: 12.5px; line-height: 1.7; }
