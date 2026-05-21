@@ -72,7 +72,9 @@ CREATE TABLE IF NOT EXISTS page_events (
   session_id  TEXT,
   visitor_id  TEXT,
   country     TEXT,
-  colo        TEXT
+  colo        TEXT,
+  client_timezone TEXT,
+  client_language TEXT
 );
 
 CREATE INDEX IF NOT EXISTS idx_fav_lists_user ON fav_lists(user_id);

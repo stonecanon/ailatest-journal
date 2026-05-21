@@ -194,7 +194,14 @@ const [
     LIMIT 20
   `),
   maybeQuery(hasTable, 'page_events', `
-    SELECT COALESCE(country, 'unknown') AS country, COUNT(*) AS pageviews, COUNT(DISTINCT visitor_id) AS visitors
+    SELECT
+      COALESCE(country, 'unknown') AS country,
+      COUNT(*) AS pageviews,
+      COUNT(DISTINCT visitor_id) AS visitors,
+      COUNT(DISTINCT session_id) AS sessions,
+      GROUP_CONCAT(DISTINCT colo) AS colos,
+      GROUP_CONCAT(DISTINCT client_timezone) AS client_timezones,
+      GROUP_CONCAT(DISTINCT client_language) AS client_languages
     FROM page_events
     GROUP BY COALESCE(country, 'unknown')
     ORDER BY pageviews DESC
@@ -219,8 +226,10 @@ const payload = {
     '页面浏览量：同一人刷新或打开多个页面会重复计数。',
     '独立访客数：按浏览器本地匿名访客标识去重，同一人换设备或清缓存会被算作新访客。',
     '访问人次：按浏览器会话去重，更接近“来了多少趟”。',
-    '浏览量来自访问事件表；前端埋点上线后开始累积页面浏览量、独立访客数、访问人次、路径和国家/地区。',
-    '站内埋点地区只统计成功运行网页脚本并上报的访问；Cloudflare 后台的地区流量包含所有静态资源、接口、机器人和历史请求，数值会大很多。',
+    '浏览量来自访问事件表；前端埋点上线后开始累积页面浏览量、独立访客数、访问人次、路径和访问网络出口地区。',
+    '访问网络出口地区来自 Cloudflare 对请求 IP 的国家/地区识别，更接近 VPN、代理或运营商出口位置，不等同真实所在地。',
+    '新版埋点会额外记录浏览器时区和语言，可辅助判断中国用户，例如 Asia/Shanghai 或 zh-CN。',
+    'Cloudflare 后台的地区流量包含所有静态资源、接口、机器人和历史请求；站内埋点只统计成功运行网页脚本并上报的访问。',
   ],
   tables: [...tables],
   kpis: {

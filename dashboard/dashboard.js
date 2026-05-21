@@ -119,7 +119,10 @@ function barList(target, rows, labelKey, valueKey, color = '#256f5a') {
     const value = Number(row[valueKey] || 0);
     const label = row[labelKey] || 'unknown';
     const item = el('div', { class: 'bar-row' }, [
-      el('div', { class: 'bar-label', title: label, text: label }),
+      el('div', { class: 'bar-label', title: label }, [
+        el('span', { text: label }),
+        ...(row.detail ? [el('small', { text: row.detail })] : []),
+      ]),
       el('div', { class: 'bar-track' }, [
         el('span', { class: 'bar-fill', style: `width:${Math.max(4, value / max * 100)}%;background:${color}` }),
       ]),
@@ -139,8 +142,22 @@ function regionName(code) {
     US: '美国',
     SG: '新加坡',
     NL: '荷兰',
+    GB: '英国',
+    IN: '印度',
+    ZA: '南非',
+    NG: '尼日利亚',
+    DE: '德国',
   };
   return map[code] || code || '未知地区';
+}
+
+function shortList(value, limit = 2) {
+  return String(value || '')
+    .split(',')
+    .map(item => item.trim())
+    .filter(Boolean)
+    .slice(0, limit)
+    .join(' / ');
 }
 
 function table(target, rows, columns) {
@@ -187,7 +204,14 @@ async function main() {
   barList('#top-paths', data.tables_data.topPaths || [], 'path', 'pageviews', '#0b7285');
   const trafficCountries = (data.tables_data.trafficCountries || []).map(row => ({
     ...row,
-    country_label: regionName(row.country),
+    country_label: `${regionName(row.country)}${row.country ? ` (${row.country})` : ''}`,
+    detail: [
+      `独立访客 ${n(row.visitors)}`,
+      `访问人次 ${n(row.sessions)}`,
+      row.colos ? `机房 ${shortList(row.colos, 3)}` : '',
+      row.client_timezones ? `时区 ${shortList(row.client_timezones)}` : '',
+      row.client_languages ? `语言 ${shortList(row.client_languages)}` : '',
+    ].filter(Boolean).join(' · '),
   }));
   barList('#traffic-countries', trafficCountries, 'country_label', 'pageviews', '#a46a13');
 
