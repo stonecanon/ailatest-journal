@@ -21,8 +21,10 @@ Match priority: ISSN > eISSN > normalized title.
 """
 from __future__ import annotations
 import csv
+import gzip
 import json
 import re
+import shutil
 import sys
 from collections import Counter, defaultdict
 from pathlib import Path
@@ -1027,6 +1029,14 @@ def main():
     # main write
     with open(DATA_DIR / 'journals.json', 'w', encoding='utf-8') as f:
         json.dump(journals, f, ensure_ascii=False, separators=(',', ':'))
+
+    # gzip for production (CF Pages 25MB per-file limit)
+    import gzip
+    with open(DATA_DIR / 'journals.json', 'rb') as fin:
+        with gzip.open(DATA_DIR / 'journals.json.gz', 'wb', compresslevel=9) as fout:
+            shutil.copyfileobj(fin, fout)
+    gz_size = (DATA_DIR / 'journals.json.gz').stat().st_size
+    print(f'  journals.json.gz: {gz_size/1024/1024:.2f} MB')
 
     # wos_categories
     wos_c = Counter()

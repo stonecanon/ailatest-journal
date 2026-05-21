@@ -2,6 +2,16 @@
 (() => {
   const $ = (s, r=document) => r.querySelector(s);
   const $$ = (s, r=document) => [...r.querySelectorAll(s)];
+  const fetchJSON = async (url) => {
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    if (url.endsWith('.gz')) {
+      const ds = new DecompressionStream('gzip');
+      const stream = resp.body.pipeThrough(ds);
+      return await new Response(stream).json();
+    }
+    return await resp.json();
+  };
 
   const I18N = {
     zh: {
@@ -1682,8 +1692,8 @@
   function renderRankBadges(r) {
     if (!r) return '';
     return [
-      badgeCAS(r.cas_zone, r.cas_top),
       badgeJCR(r.if_quartile),
+      badgeCAS(r.cas_zone, r.cas_top),
       badgeXR(r.cas_xr && r.cas_xr.zone),
       badgeCCF(r.ccf),
       badgeABDC(r.abdc),
@@ -3504,15 +3514,12 @@
       // 加载期刊主库以反查索引/JCR
       let lookup = {};
       try {
-        const jr = await fetch('/data/journals.json');
-        if (jr.ok) {
-          const arr = await jr.json();
-          for (const j of arr) {
-            const k1 = (j.issn||'').replace(/-/g,'').toUpperCase();
-            const k2 = (j.eissn||'').replace(/-/g,'').toUpperCase();
-            if (k1) lookup[k1] = j;
-            if (k2 && !lookup[k2]) lookup[k2] = j;
-          }
+        const arr = await fetchJSON('/data/journals.json.gz').catch(() => []);
+        for (const j of arr) {
+          const k1 = (j.issn||'').replace(/-/g,'').toUpperCase();
+          const k2 = (j.eissn||'').replace(/-/g,'').toUpperCase();
+          if (k1) lookup[k1] = j;
+          if (k2 && !lookup[k2]) lookup[k2] = j;
         }
       } catch(_) {}
       const norm = s => (s||'').replace(/-/g,'').toUpperCase();
@@ -3987,7 +3994,7 @@
     if (await maybeRenderShareLanding()) return;
     try {
       const [j, d, m, esi, oa, aliases, rc] = await Promise.all([
-        fetch('data/journals.json').then(r => r.json()),
+        fetchJSON('data/journals.json.gz'),
         fetch('data/domestic.json').then(r => r.json()).catch(() => null),
         fetch('data/meta.json').then(r => r.json()).catch(() => null),
         fetch('data/esi_categories.json').then(r => r.json()).catch(() => []),
