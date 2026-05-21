@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-21T15:13:30.062Z",
+  "generated_at": "2026-05-21T15:28:29.446Z",
   "source": "remote D1",
   "notes": [
     "注册量来自 users.created_at，当前是最可靠口径。",
@@ -42,8 +42,8 @@
     "avg_rating": 4.43,
     "lists": 7,
     "users_with_lists": 6,
-    "total_pageviews": 402,
-    "total_visitors": 89,
+    "total_pageviews": 406,
+    "total_visitors": 91,
     "total_login_events": 7
   },
   "series": {
@@ -143,9 +143,9 @@
       },
       {
         "day": "2026-05-21",
-        "pageviews": 144,
-        "sessions": 58,
-        "visitors": 40
+        "pageviews": 148,
+        "sessions": 60,
+        "visitors": 42
       }
     ]
   },
@@ -339,8 +339,8 @@
       },
       {
         "path": "/?ref=producthunt",
-        "pageviews": 21,
-        "visitors": 10
+        "pageviews": 23,
+        "visitors": 11
       },
       {
         "path": "/%E4%B8%80%E7%AB%99%E5%BC%8F%E7%A7%91%E7%A0%94%E6%9C%9F%E5%88%8A%E6%9F%A5%E8%AF%A2%E5%B9%B3%E5%8F%B0",
@@ -374,6 +374,11 @@
       },
       {
         "path": "/?verify=9d9976a",
+        "pageviews": 2,
+        "visitors": 1
+      },
+      {
+        "path": "/?t=v44verify",
         "pageviews": 2,
         "visitors": 1
       },
@@ -426,18 +431,13 @@
         "path": "/s/lcxMj4P7",
         "pageviews": 1,
         "visitors": 1
-      },
-      {
-        "path": "/s/iV61yNZz",
-        "pageviews": 1,
-        "visitors": 1
       }
     ],
     "trafficCountries": [
       {
         "country": "JP",
-        "pageviews": 292,
-        "visitors": 33
+        "pageviews": 294,
+        "visitors": 34
       },
       {
         "country": "US",
@@ -455,6 +455,11 @@
         "visitors": 7
       },
       {
+        "country": "GB",
+        "pageviews": 5,
+        "visitors": 2
+      },
+      {
         "country": "IN",
         "pageviews": 4,
         "visitors": 1
@@ -463,11 +468,6 @@
         "country": "HK",
         "pageviews": 3,
         "visitors": 2
-      },
-      {
-        "country": "GB",
-        "pageviews": 3,
-        "visitors": 1
       },
       {
         "country": "ZA",
