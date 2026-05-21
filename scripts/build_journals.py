@@ -1019,6 +1019,11 @@ def main():
     print(f'  CAS zones: {dict(cas_c)} Top={cas_top}')
     print(f'  IF: {if_count}  warning: {warning_count}  中文刊名: {cn_name_count}  CCF: {ccf_count}  ABDC: {abdc_count}  ABS: {abs_count}  CNKX: {cnkx_count}  Scopus: {scopus_count}  EI: {ei_count}')
 
+    # Strip large non-essential fields to stay under CF Pages 25 MB limit
+    for r in journals:
+        r.pop('address', None)
+        r.pop('languages', None)
+
     # main write
     with open(DATA_DIR / 'journals.json', 'w', encoding='utf-8') as f:
         json.dump(journals, f, ensure_ascii=False, separators=(',', ':'))
