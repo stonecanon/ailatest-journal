@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-20T12:48:28.468Z",
+  "generated_at": "2026-05-21T14:33:28.854Z",
   "source": "remote D1",
   "notes": [
     "注册量来自 users.created_at，当前是最可靠口径。",
@@ -26,35 +26,35 @@
     "users"
   ],
   "kpis": {
-    "total_users": 6,
-    "users_with_email": 5,
-    "email_users": 3,
+    "total_users": 9,
+    "users_with_email": 8,
+    "email_users": 5,
     "github_users": 1,
-    "google_users": 2,
+    "google_users": 3,
     "first_signup_at": 1778628305,
-    "latest_signup_at": 1779258177,
-    "favorite_rows": 23,
-    "users_with_favorites": 3,
-    "avg_favorites_per_active_user": 7.67,
-    "rating_rows": 20,
-    "users_with_ratings": 4,
-    "rated_journals": 15,
-    "avg_rating": 4.4,
-    "lists": 4,
-    "users_with_lists": 4,
-    "total_pageviews": 147,
-    "total_visitors": 33,
-    "total_login_events": 1
+    "latest_signup_at": 1779351336,
+    "favorite_rows": 25,
+    "users_with_favorites": 5,
+    "avg_favorites_per_active_user": 5,
+    "rating_rows": 22,
+    "users_with_ratings": 5,
+    "rated_journals": 17,
+    "avg_rating": 4.43,
+    "lists": 7,
+    "users_with_lists": 6,
+    "total_pageviews": 387,
+    "total_visitors": 87,
+    "total_login_events": 7
   },
   "series": {
     "providerMix": [
       {
         "provider": "email",
-        "users": 3
+        "users": 5
       },
       {
         "provider": "google",
-        "users": 2
+        "users": 3
       },
       {
         "provider": "github",
@@ -80,7 +80,11 @@
       },
       {
         "day": "2026-05-20",
-        "signups": 1
+        "signups": 2
+      },
+      {
+        "day": "2026-05-21",
+        "signups": 2
       }
     ],
     "activeProxyByDay": [
@@ -89,28 +93,43 @@
         "active_users_proxy": 2
       },
       {
-        "day": "2026-05-14",
-        "active_users_proxy": 1
-      },
-      {
         "day": "2026-05-19",
         "active_users_proxy": 1
       },
       {
         "day": "2026-05-20",
+        "active_users_proxy": 4
+      },
+      {
+        "day": "2026-05-21",
         "active_users_proxy": 2
       }
     ],
     "loginEventsByDay": [
       {
         "day": "2026-05-20",
-        "login_events": 1,
-        "login_users": 1
+        "login_events": 5,
+        "login_users": 3
+      },
+      {
+        "day": "2026-05-21",
+        "login_events": 2,
+        "login_users": 2
       }
     ],
     "loginProviderMix": [
       {
         "provider": "google",
+        "login_events": 4,
+        "login_users": 2
+      },
+      {
+        "provider": "email",
+        "login_events": 2,
+        "login_users": 2
+      },
+      {
+        "provider": "github",
         "login_events": 1,
         "login_users": 1
       }
@@ -118,9 +137,15 @@
     "pageviewsByDay": [
       {
         "day": "2026-05-20",
-        "pageviews": 147,
-        "sessions": 67,
-        "visitors": 33
+        "pageviews": 258,
+        "sessions": 94,
+        "visitors": 49
+      },
+      {
+        "day": "2026-05-21",
+        "pageviews": 129,
+        "sessions": 55,
+        "visitors": 38
       }
     ]
   },
@@ -157,6 +182,11 @@
         "label": "HUMANITIES & SOCIAL SCIENCES COMMUNICATIONS"
       },
       {
+        "journal_key": "0001-4966",
+        "favorites": 1,
+        "label": "JOURNAL OF THE ACOUSTICAL SOCIETY OF AMERICA"
+      },
+      {
         "journal_key": "0009-7322",
         "favorites": 1,
         "label": "CIRCULATION"
@@ -165,6 +195,16 @@
         "journal_key": "0378-7788",
         "favorites": 1,
         "label": "ENERGY AND BUILDINGS"
+      },
+      {
+        "journal_key": "0944-7113",
+        "favorites": 1,
+        "label": "PHYTOMEDICINE"
+      },
+      {
+        "journal_key": "1740-1526",
+        "favorites": 1,
+        "label": "NATURE REVIEWS MICROBIOLOGY"
       },
       {
         "journal_key": "1996-1073",
@@ -180,11 +220,6 @@
         "journal_key": "2571-6255",
         "favorites": 1,
         "label": "FIRE-SWITZERLAND"
-      },
-      {
-        "journal_key": "t:3ctic",
-        "favorites": 1,
-        "label": "t:3ctic"
       },
       {
         "journal_key": "t:circulation",
@@ -224,6 +259,12 @@
         "label": "JOURNAL OF BUILDING ENGINEERING"
       },
       {
+        "journal_key": "0001-4966",
+        "ratings": 1,
+        "avg_rating": 5,
+        "label": "JOURNAL OF THE ACOUSTICAL SOCIETY OF AMERICA"
+      },
+      {
         "journal_key": "0378-7788",
         "ratings": 1,
         "avg_rating": 5,
@@ -240,6 +281,12 @@
         "ratings": 1,
         "avg_rating": 4.5,
         "label": "NATURE REVIEWS DRUG DISCOVERY"
+      },
+      {
+        "journal_key": "1740-1526",
+        "ratings": 1,
+        "avg_rating": 4.5,
+        "label": "NATURE REVIEWS MICROBIOLOGY"
       },
       {
         "journal_key": "2045-2322",
@@ -287,8 +334,18 @@
     "topPaths": [
       {
         "path": "/",
-        "pageviews": 119,
-        "visitors": 27
+        "pageviews": 315,
+        "visitors": 59
+      },
+      {
+        "path": "/?ref=producthunt",
+        "pageviews": 21,
+        "visitors": 10
+      },
+      {
+        "path": "/%E4%B8%80%E7%AB%99%E5%BC%8F%E7%A7%91%E7%A0%94%E6%9C%9F%E5%88%8A%E6%9F%A5%E8%AF%A2%E5%B9%B3%E5%8F%B0",
+        "pageviews": 10,
+        "visitors": 6
       },
       {
         "path": "/s/3P9gQfdK",
@@ -311,12 +368,47 @@
         "visitors": 1
       },
       {
+        "path": "/?verify=9d9976a-2",
+        "pageviews": 2,
+        "visitors": 1
+      },
+      {
+        "path": "/?verify=9d9976a",
+        "pageviews": 2,
+        "visitors": 1
+      },
+      {
+        "path": "/?t=v42verify",
+        "pageviews": 2,
+        "visitors": 1
+      },
+      {
+        "path": "/?t=v41check",
+        "pageviews": 2,
+        "visitors": 1
+      },
+      {
+        "path": "/?t=prod",
+        "pageviews": 2,
+        "visitors": 1
+      },
+      {
         "path": "/?q=nature&_t=1",
         "pageviews": 2,
         "visitors": 1
       },
       {
+        "path": "/s/xXZ1zTGM",
+        "pageviews": 1,
+        "visitors": 1
+      },
+      {
         "path": "/s/vmXylHMj",
+        "pageviews": 1,
+        "visitors": 1
+      },
+      {
+        "path": "/s/s4dpHOD0",
         "pageviews": 1,
         "visitors": 1
       },
@@ -339,48 +431,33 @@
         "path": "/s/iV61yNZz",
         "pageviews": 1,
         "visitors": 1
-      },
-      {
-        "path": "/s/bWxwNCJt",
-        "pageviews": 1,
-        "visitors": 1
-      },
-      {
-        "path": "/s/1WLw5rKn",
-        "pageviews": 1,
-        "visitors": 1
-      },
-      {
-        "path": "/?token=[redacted]",
-        "pageviews": 1,
-        "visitors": 1
-      },
-      {
-        "path": "/?q=nature",
-        "pageviews": 1,
-        "visitors": 1
-      },
-      {
-        "path": "/%E4%B8%80%E7%AB%99%E5%BC%8F%E7%A7%91%E7%A0%94%E6%9C%9F%E5%88%8A%E6%9F%A5%E8%AF%A2%E5%B9%B3%E5%8F%B0",
-        "pageviews": 1,
-        "visitors": 1
       }
     ],
     "trafficCountries": [
       {
         "country": "JP",
-        "pageviews": 98,
-        "visitors": 12
+        "pageviews": 277,
+        "visitors": 31
       },
       {
         "country": "US",
-        "pageviews": 32,
-        "visitors": 14
+        "pageviews": 51,
+        "visitors": 26
+      },
+      {
+        "country": "NL",
+        "pageviews": 22,
+        "visitors": 11
       },
       {
         "country": "SG",
-        "pageviews": 12,
-        "visitors": 4
+        "pageviews": 20,
+        "visitors": 7
+      },
+      {
+        "country": "IN",
+        "pageviews": 4,
+        "visitors": 1
       },
       {
         "country": "HK",
@@ -388,12 +465,59 @@
         "visitors": 2
       },
       {
-        "country": "NL",
+        "country": "GB",
+        "pageviews": 3,
+        "visitors": 1
+      },
+      {
+        "country": "ZA",
         "pageviews": 2,
+        "visitors": 1
+      },
+      {
+        "country": "TW",
+        "pageviews": 2,
+        "visitors": 1
+      },
+      {
+        "country": "NG",
+        "pageviews": 2,
+        "visitors": 1
+      },
+      {
+        "country": "DE",
+        "pageviews": 1,
         "visitors": 1
       }
     ],
     "recentUsers": [
+      {
+        "id": 9,
+        "provider": "email",
+        "email": "hk***@163.com",
+        "login": "hkzeng2021",
+        "name": "hkzeng2021",
+        "created_at": 1779351336,
+        "updated_at": 1779351336
+      },
+      {
+        "id": 8,
+        "provider": "google",
+        "email": "ch***@gmail.com",
+        "login": "chen5188119",
+        "name": "zhian chen",
+        "created_at": 1779350638,
+        "updated_at": 1779350638
+      },
+      {
+        "id": 7,
+        "provider": "email",
+        "email": "28***@qq.com",
+        "login": "2844347195",
+        "name": "2844347195",
+        "created_at": 1779294026,
+        "updated_at": 1779294026
+      },
       {
         "id": 6,
         "provider": "google",
@@ -419,7 +543,7 @@
         "login": "stonecanon",
         "name": "H&S一心菌 (石头小石头)",
         "created_at": 1778766419,
-        "updated_at": 1779264302
+        "updated_at": 1779287054
       },
       {
         "id": 3,
@@ -446,7 +570,7 @@
         "login": "stonecanon",
         "name": "stonecanon",
         "created_at": 1778628305,
-        "updated_at": 1778797047
+        "updated_at": 1779287027
       }
     ]
   }
