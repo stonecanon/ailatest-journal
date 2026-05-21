@@ -2774,7 +2774,7 @@
     // 核心指标数值 — 只放真正的"数值"，分区/Q 用徽章呈现，避免重复
     // 重复信息已删：JCR Q（→ badges）、CAS 大类区（→ casHTML）、Emerging 2026 区（→ xrHTML）
     const stats = [];
-    if (ir.if_2024 != null) stats.push([T('影响因子 / IF','Impact Factor'), ir.if_2024, T('JCR 2025发布 · 2024指标','JCR 2025 rel. · 2024 metric')]);
+    if (ir.if_2024 != null) stats.push([T('影响因子 / IF','Impact Factor'), ir.if_2024]);
     if (ir.if_rank) stats.push([T('IF 排名','IF Rank'), ir.if_rank, T('2024','2024')]);
     // 审稿周期合并到 stats 区
     {
@@ -2785,9 +2785,10 @@
         stats.push([T('审稿天数','Review Days'), rec.median_days, T('投稿→接收 中位','Sub→Accept median')]);
       }
     }
+    const ifNote = ir.if_2024 != null ? T('JCR 2025发布 · 2024指标','JCR 2025 rel. · 2024 metric') : '';
     const statsHTML = stats.length ? `<div class="stats-grid">${stats.map(([k,v,sub]) =>
       `<div class="stat"><div class="stat-v">${escape(String(v))}</div><div class="stat-k">${k}</div>${sub?`<div class="stat-sub">${sub}</div>`:''}</div>`
-    ).join('')}</div>` : '';
+    ).join('')}</div>${ifNote ? `<div class="stats-sub">${ifNote}</div>` : ''}` : '';
 
     // WoS 学科分类
     const wosHTML = (Array.isArray(ir.wos_categories) && ir.wos_categories.length)
@@ -3370,9 +3371,10 @@
 
     // 关键指标 + 元信息
     const stats = [];
-    if (ir.if_2024 != null) stats.push([T('影响因子','Impact Factor'), ir.if_2024, T('JCR 2025发布 · 2024指标','JCR 2025 · 2024 IF')]);
+    if (ir.if_2024 != null) stats.push([T('影响因子','Impact Factor'), ir.if_2024]);
     if (ir.if_rank) stats.push([T('IF 排名','IF Rank'), ir.if_rank]);
-    const statsHtml = stats.length ? `<div class="jcard-stats">${stats.map(([k,v,sub]) => `<div class="jcard-stat"><div class="jcard-stat-v">${v}</div><div class="jcard-stat-k">${k}</div>${sub?`<div class="jcard-stat-sub">${sub}</div>`:''}</div>`).join('')}</div>` : '';
+    const ifNote = ir.if_2024 != null ? T('JCR 2025发布 · 2024指标','JCR 2025 · 2024 IF') : '';
+    const statsHtml = stats.length ? `<div class="jcard-stats">${stats.map(([k,v,sub]) => `<div class="jcard-stat"><div class="jcard-stat-v">${v}</div><div class="jcard-stat-k">${k}</div>${sub?`<div class="jcard-stat-sub">${sub}</div>`:''}</div>`).join('')}</div>${ifNote ? `<div class="jcard-stats-sub">${ifNote}</div>` : ''}` : '';
 
     const meta = [];
     if (ir.cas_major_cn) meta.push([T('中科院大类','CAS Major'), ir.cas_major_cn]);

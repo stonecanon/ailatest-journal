@@ -1584,6 +1584,18 @@ td.empty,
   text-transform: none;
 }
 
+.stats-sub {
+  text-align: center;
+  font-family: var(--serif);
+  font-size: 10px;
+  color: var(--ink-faint);
+  letter-spacing: 0.02em;
+  margin-top: -6px;
+  margin-bottom: 8px;
+  opacity: 0.65;
+  font-style: italic;
+}
+
 /* drawer 分区分块（中科院 2025 / 新锐 2026）大类标题 */
 .cat-major-line {
   display: flex;
@@ -2202,6 +2214,15 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .jcard-stat-v { font-size: 17px; font-weight: 600; color: #2b2a27; line-height: 1.3; }
 .jcard-stat-v small { font-size: 10.5px; color: #888; font-weight: 500; }
 .jcard-stat-sub { font-size: 10px; color: #6b6559; margin-top: 3px; }
+.jcard-stats-sub {
+  text-align: center;
+  font-size: 10px;
+  color: #6b6559;
+  font-style: italic;
+  margin-top: -8px;
+  margin-bottom: 8px;
+  opacity: 0.75;
+}
 .jcard-stat-k { font-size: 11px; color: #6b6559; margin-top: 2px; }
 .jcard-meta { margin-top: 6px; }
 .jcard-meta-row { display: flex; gap: 8px; font-size: 12.5px; line-height: 1.7; }
