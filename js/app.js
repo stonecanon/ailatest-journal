@@ -2775,7 +2775,7 @@
     // 重复信息已删：JCR Q（→ badges）、CAS 大类区（→ casHTML）、Emerging 2026 区（→ xrHTML）
     const stats = [];
     if (ir.if_2024 != null) stats.push([T('影响因子 / IF','Impact Factor'), ir.if_2024]);
-    if (ir.if_rank) stats.push([T('IF 排名','IF Rank'), ir.if_rank, T('2024','2024')]);
+    if (ir.if_rank) stats.push([T('IF 排名','IF Rank'), ir.if_rank]);
     // 审稿周期合并到 stats 区
     {
       const issnKey = (r.issn || '').trim();
