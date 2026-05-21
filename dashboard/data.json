@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-21T22:43:40.203Z",
+  "generated_at": "2026-05-21T23:08:28.756Z",
   "source": "remote D1",
   "notes": [
     "注册量来自 users.created_at，当前是最可靠口径。",
@@ -28,13 +28,13 @@
     "users"
   ],
   "kpis": {
-    "total_users": 9,
+    "total_users": 10,
     "users_with_email": 8,
     "email_users": 5,
-    "github_users": 1,
+    "github_users": 2,
     "google_users": 3,
     "first_signup_at": 1778628305,
-    "latest_signup_at": 1779351336,
+    "latest_signup_at": 1779404069,
     "favorite_rows": 27,
     "users_with_favorites": 5,
     "avg_favorites_per_active_user": 5.4,
@@ -44,9 +44,9 @@
     "avg_rating": 4.43,
     "lists": 7,
     "users_with_lists": 6,
-    "total_pageviews": 430,
-    "total_visitors": 100,
-    "total_login_events": 7
+    "total_pageviews": 435,
+    "total_visitors": 104,
+    "total_login_events": 8
   },
   "series": {
     "providerMix": [
@@ -60,7 +60,7 @@
       },
       {
         "provider": "github",
-        "users": 1
+        "users": 2
       }
     ],
     "registrationsByDay": [
@@ -86,7 +86,7 @@
       },
       {
         "day": "2026-05-21",
-        "signups": 2
+        "signups": 3
       }
     ],
     "activeProxyByDay": [
@@ -104,7 +104,7 @@
       },
       {
         "day": "2026-05-21",
-        "active_users_proxy": 2
+        "active_users_proxy": 3
       }
     ],
     "loginEventsByDay": [
@@ -115,8 +115,8 @@
       },
       {
         "day": "2026-05-21",
-        "login_events": 2,
-        "login_users": 2
+        "login_events": 3,
+        "login_users": 3
       }
     ],
     "loginProviderMix": [
@@ -126,14 +126,14 @@
         "login_users": 2
       },
       {
-        "provider": "email",
+        "provider": "github",
         "login_events": 2,
         "login_users": 2
       },
       {
-        "provider": "github",
-        "login_events": 1,
-        "login_users": 1
+        "provider": "email",
+        "login_events": 2,
+        "login_users": 2
       }
     ],
     "pageviewsByDay": [
@@ -145,9 +145,9 @@
       },
       {
         "day": "2026-05-21",
-        "pageviews": 172,
-        "sessions": 73,
-        "visitors": 51
+        "pageviews": 177,
+        "sessions": 77,
+        "visitors": 55
       }
     ]
   },
@@ -346,13 +346,13 @@
     "topPaths": [
       {
         "path": "/",
-        "pageviews": 342,
+        "pageviews": 343,
         "visitors": 63
       },
       {
         "path": "/?ref=producthunt",
-        "pageviews": 30,
-        "visitors": 18
+        "pageviews": 34,
+        "visitors": 22
       },
       {
         "path": "/%E4%B8%80%E7%AB%99%E5%BC%8F%E7%A7%91%E7%A0%94%E6%9C%9F%E5%88%8A%E6%9F%A5%E8%AF%A2%E5%B9%B3%E5%8F%B0",
@@ -448,21 +448,21 @@
     "trafficCountries": [
       {
         "country": "JP",
-        "pageviews": 309,
+        "pageviews": 310,
         "visitors": 35,
         "sessions": 86,
         "colos": "NRT",
-        "client_timezones": null,
-        "client_languages": null
+        "client_timezones": "",
+        "client_languages": ""
       },
       {
         "country": "US",
-        "pageviews": 55,
-        "visitors": 29,
-        "sessions": 39,
-        "colos": "LAX,SEA,IAD,SJC,ORD,ATL",
-        "client_timezones": null,
-        "client_languages": null
+        "pageviews": 58,
+        "visitors": 32,
+        "sessions": 42,
+        "colos": "LAX,SEA,IAD,SJC,ORD,ATL,DFW",
+        "client_timezones": "Etc/Unknown,UTC,America/Chicago",
+        "client_languages": "en-US"
       },
       {
         "country": "SG",
@@ -537,6 +537,15 @@
         "client_languages": null
       },
       {
+        "country": "NZ",
+        "pageviews": 1,
+        "visitors": 1,
+        "sessions": 1,
+        "colos": "AKL",
+        "client_timezones": "UTC",
+        "client_languages": "en-US"
+      },
+      {
         "country": "DE",
         "pageviews": 1,
         "visitors": 1,
@@ -547,6 +556,15 @@
       }
     ],
     "recentUsers": [
+      {
+        "id": 10,
+        "provider": "github",
+        "email": "",
+        "login": "Hi1993Ryan",
+        "name": "Hi1993Ryan",
+        "created_at": 1779404069,
+        "updated_at": 1779404069
+      },
       {
         "id": 9,
         "provider": "email",
