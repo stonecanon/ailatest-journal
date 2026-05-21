@@ -1617,7 +1617,7 @@
   }
   function badgeCAS(z, top) {
     if (!z) return '';
-    if (top) return `<span class="zone ztop" title="${T('中科院大类分区 Top','CAS Major Tier · Top')}">${T('中科院·TOP','CAS·TOP')} ${z}${T('区','')}</span>`;
+    if (top) return `<span class="zone ztop" title="${T('中科院大类分区 Top','CAS Major Tier · Top')}">${T('中科院','CAS')} ${z}${T('区','')}·TOP</span>`;
     return `<span class="zone z${z}" title="${T('中科院大类分区','CAS Major Tier')}">${T('中科院','CAS')} ${z}${T('区','')}</span>`;
   }
   // 国内来源交叉徽章

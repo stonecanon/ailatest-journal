@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-21T15:28:29.446Z",
+  "generated_at": "2026-05-21T15:43:29.126Z",
   "source": "remote D1",
   "notes": [
     "注册量来自 users.created_at，当前是最可靠口径。",
@@ -33,16 +33,16 @@
     "google_users": 3,
     "first_signup_at": 1778628305,
     "latest_signup_at": 1779351336,
-    "favorite_rows": 25,
+    "favorite_rows": 26,
     "users_with_favorites": 5,
-    "avg_favorites_per_active_user": 5,
+    "avg_favorites_per_active_user": 5.2,
     "rating_rows": 22,
     "users_with_ratings": 5,
     "rated_journals": 17,
     "avg_rating": 4.43,
     "lists": 7,
     "users_with_lists": 6,
-    "total_pageviews": 406,
+    "total_pageviews": 411,
     "total_visitors": 91,
     "total_login_events": 7
   },
@@ -143,8 +143,8 @@
       },
       {
         "day": "2026-05-21",
-        "pageviews": 148,
-        "sessions": 60,
+        "pageviews": 153,
+        "sessions": 61,
         "visitors": 42
       }
     ]
@@ -215,6 +215,11 @@
         "journal_key": "2053-1583",
         "favorites": 1,
         "label": "2D MATERIALS"
+      },
+      {
+        "journal_key": "2374-7943",
+        "favorites": 1,
+        "label": "ACS CENTRAL SCIENCE"
       },
       {
         "journal_key": "2571-6255",
@@ -334,7 +339,7 @@
     "topPaths": [
       {
         "path": "/",
-        "pageviews": 327,
+        "pageviews": 332,
         "visitors": 61
       },
       {
@@ -436,7 +441,7 @@
     "trafficCountries": [
       {
         "country": "JP",
-        "pageviews": 294,
+        "pageviews": 299,
         "visitors": 34
       },
       {
