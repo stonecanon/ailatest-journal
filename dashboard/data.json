@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-21T23:28:28.407Z",
+  "generated_at": "2026-05-21T23:33:29.066Z",
   "source": "remote D1",
   "notes": [
     "注册量来自 users.created_at，当前是最可靠口径。",
@@ -44,8 +44,8 @@
     "avg_rating": 4.43,
     "lists": 7,
     "users_with_lists": 6,
-    "total_pageviews": 446,
-    "total_visitors": 108,
+    "total_pageviews": 449,
+    "total_visitors": 110,
     "total_login_events": 8
   },
   "series": {
@@ -145,9 +145,9 @@
       },
       {
         "day": "2026-05-21",
-        "pageviews": 188,
-        "sessions": 82,
-        "visitors": 59
+        "pageviews": 191,
+        "sessions": 84,
+        "visitors": 61
       }
     ]
   },
@@ -346,8 +346,8 @@
     "topPaths": [
       {
         "path": "/",
-        "pageviews": 351,
-        "visitors": 65
+        "pageviews": 354,
+        "visitors": 67
       },
       {
         "path": "/?ref=producthunt",
@@ -448,21 +448,21 @@
     "trafficCountries": [
       {
         "country": "JP",
-        "pageviews": 321,
-        "visitors": 38,
-        "sessions": 91,
+        "pageviews": 323,
+        "visitors": 39,
+        "sessions": 92,
         "colos": "NRT",
         "client_timezones": ",Asia/Shanghai",
         "client_languages": ",en-US,zh-CN,en"
       },
       {
         "country": "US",
-        "pageviews": 58,
-        "visitors": 32,
-        "sessions": 42,
+        "pageviews": 59,
+        "visitors": 33,
+        "sessions": 43,
         "colos": "LAX,SEA,IAD,SJC,ORD,ATL,DFW",
-        "client_timezones": "Etc/Unknown,UTC,America/Chicago",
-        "client_languages": "en-US"
+        "client_timezones": "Etc/Unknown,UTC,America/Chicago,Asia/Shanghai",
+        "client_languages": "en-US,zh-CN"
       },
       {
         "country": "SG",

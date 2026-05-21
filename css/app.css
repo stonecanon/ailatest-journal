@@ -2199,10 +2199,10 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   padding: 10px 0; border-top: 1px dashed rgba(180, 150, 80, 0.3); border-bottom: 1px dashed rgba(180, 150, 80, 0.3);
 }
 .jcard-stat { text-align: center; }
-.jcard-stat-v { font-size: 17px; font-weight: 600; color: #1f3a5f; line-height: 1.3; }
+.jcard-stat-v { font-size: 17px; font-weight: 600; color: #2b2a27; line-height: 1.3; }
 .jcard-stat-v small { font-size: 10.5px; color: #888; font-weight: 500; }
-.jcard-stat-sub { font-size: 10px; color: #888; margin-top: 3px; }
-.jcard-stat-k { font-size: 11px; color: #6a6a6a; margin-top: 2px; }
+.jcard-stat-sub { font-size: 10px; color: #6b6559; margin-top: 3px; }
+.jcard-stat-k { font-size: 11px; color: #6b6559; margin-top: 2px; }
 .jcard-meta { margin-top: 6px; }
 .jcard-meta-row { display: flex; gap: 8px; font-size: 12.5px; line-height: 1.7; }
 .jcard-meta-k { color: #8a7a4a; min-width: 70px; flex-shrink: 0; }
