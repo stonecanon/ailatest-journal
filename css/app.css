@@ -2210,14 +2210,6 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   margin-top: 12px; padding-top: 8px; border-top: 1px solid rgba(180, 150, 80, 0.25);
   font-size: 11.5px; color: #8a7a4a; text-align: center;
 }
-.jcard-site-url {
-  margin-top: 8px;
-  text-align: center;
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.04em;
-  color: #8a6f2a;
-}
 [data-theme="dark"] .jcard-export {
   background: #fffdf6;
   border-color: #d8c487;

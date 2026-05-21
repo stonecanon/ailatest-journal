@@ -3440,7 +3440,6 @@
                 <div class="jcard-foot-text">${T('扫码或访问 ','Scan or visit ')}<b>${escape(location.host)}</b>${T(' 查看完整信息','for full details')}</div>
               </div>
             </div>
-            <div class="jcard-site-url">https://journal.ailatest.org</div>
           </div>
           <div class="share-modal-url">
             <input id="jcard-url-input" type="text" readonly value="${escape(url)}">
