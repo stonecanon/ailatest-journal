@@ -371,6 +371,37 @@ main.main {
 .lang-toggle:hover,
 .auth-btn:hover,
 .fav-tab:hover { border-color: var(--accent); color: var(--accent); }
+
+/* 语言切换下拉菜单 */
+.lang-toggle-wrap { position: relative; display: inline-block; }
+.lang-dropdown {
+  position: absolute; top: calc(100% + 4px); right: 0; z-index: 100;
+  min-width: 130px;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  display: none;
+  flex-direction: column;
+  padding: 4px;
+}
+.lang-dropdown.open { display: flex; }
+.lang-dropdown button {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 10px;
+  border: 0; border-radius: 3px;
+  background: transparent;
+  font-family: var(--sans); font-size: 13px;
+  color: var(--ink-soft);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.lang-dropdown button:hover { background: var(--paper-deeper); }
+.lang-dropdown button.active { color: var(--accent); font-weight: 700; background: var(--paper-soft); }
+.lang-dropdown button .lang-code { font-size: 11px; opacity: 0.6; font-family: var(--sans); min-width: 24px; text-align: center; }
+@media (max-width: 720px) {
+  .lang-dropdown { right: auto; left: 0; }
+}
 .fav-tab {
   color: var(--accent);
   border-color: var(--rule);
@@ -923,12 +954,12 @@ body.share-mode main.main { max-width: 760px; margin: 0 auto; padding: 28px 20px
 .if-pill {
   display: inline-block;
   padding: 2px 7px;
-  font-family: var(--mono);
-  font-size: 11.5px; font-weight: 700;
+  font-family: var(--sans);
+  font-size: 10.5px; font-weight: 700;
   background: var(--gold);
   color: #fff;
   border-radius: 2px;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.04em;
 }
 .if-pill.iq-Q1 { background: #7a2030; color: #fff; }
 .if-pill.iq-Q2 { background: #a04a5a; color: #fff; }
@@ -938,13 +969,13 @@ body.share-mode main.main { max-width: 760px; margin: 0 auto; padding: 28px 20px
 .ccf-pill {
   display: inline-block;
   padding: 2px 6px;
-  font-family: var(--serif);
-  font-size: 11px; font-weight: 700;
+  font-family: var(--sans);
+  font-size: 10.5px; font-weight: 700;
   background: var(--deep);
   color: #fff;
   border-radius: 2px;
   border: 0;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
 }
 .ccf-pill.ccf-A { background: var(--crimson); }
 .ccf-pill.ccf-B { background: var(--accent); }
@@ -953,8 +984,8 @@ body.share-mode main.main { max-width: 760px; margin: 0 auto; padding: 28px 20px
 .abdc-pill {
   display: inline-block;
   padding: 2px 6px;
-  font-family: var(--serif);
-  font-size: 11px; font-weight: 700;
+  font-family: var(--sans);
+  font-size: 10.5px; font-weight: 700;
   background: #6b7f9f;
   color: #fff;
   border: 0;
@@ -976,12 +1007,12 @@ body.share-mode main.main { max-width: 760px; margin: 0 auto; padding: 28px 20px
 .tier-pill {
   display: inline-block;
   padding: 2px 7px;
-  font-family: var(--serif);
-  font-size: 11px; font-weight: 700;
+  font-family: var(--sans);
+  font-size: 10.5px; font-weight: 700;
   background: var(--deep);
   color: #fff;
   border-radius: 2px;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
   border: none;
 }
 /* 中国科协 理工 T1/T2/T3 — 边框=填充色 */
@@ -998,12 +1029,12 @@ body.share-mode main.main { max-width: 760px; margin: 0 auto; padding: 28px 20px
 .xr-pill {
   display: inline-block;
   padding: 2px 6px;
-  font-family: var(--serif);
-  font-size: 11px; font-weight: 700;
+  font-family: var(--sans);
+  font-size: 10.5px; font-weight: 700;
   border-radius: 2px;
   border: 0;
   color: #fff;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.04em;
 }
 .xr-pill.xr-1 { background: #1f5f5a; color: #fff; }
 .xr-pill.xr-2 { background: #4f9b95; color: #fff; }
@@ -1014,8 +1045,8 @@ body.share-mode main.main { max-width: 760px; margin: 0 auto; padding: 28px 20px
 .flagship-pill {
   display: inline-block;
   padding: 2px 7px;
-  font-family: var(--serif);
-  font-size: 11px; font-weight: 700;
+  font-family: var(--sans);
+  font-size: 10.5px; font-weight: 700;
   border-radius: 2px;
   letter-spacing: 0.04em;
   border: 0;
@@ -1046,8 +1077,8 @@ body.share-mode main.main { max-width: 760px; margin: 0 auto; padding: 28px 20px
   display: inline-block;
   margin-left: 6px;
   padding: 1px 7px;
-  font-family: var(--serif);
-  font-size: 11px;
+  font-family: var(--sans);
+  font-size: 10.5px;
   font-weight: 700;
   letter-spacing: 0.04em;
   border-radius: 2px;
@@ -2051,10 +2082,10 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 /* 跨源徽章（在抽屉里显示「科协 T2」「CSSCI 来源」「北大核心」等跨源收录标签） */
 .domsrc-pill {
   display: inline-flex; align-items: center;
-  padding: 2px 8px;
-  font-size: 11.5px; font-weight: 600;
-  border-radius: 3px;
-  letter-spacing: 0.02em;
+  padding: 2px 7px;
+  font-size: 10.5px; font-weight: 700;
+  border-radius: 2px;
+  letter-spacing: 0.04em;
   border: 0;
   white-space: nowrap;
 }
