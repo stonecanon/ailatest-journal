@@ -3475,7 +3475,7 @@
           });
         }
         const node = document.getElementById('jcard-canvas');
-        const canvas = await window.html2canvas(node, { backgroundColor: '#fffdf6', scale: 2, useCORS: true, logging: false });
+        const canvas = await window.html2canvas(node, { backgroundColor: '#fffdf6', scale: 3, useCORS: true, logging: false });
         const a = document.createElement('a');
         a.href = canvas.toDataURL('image/png');
         a.download = `journal-${id}.png`;
