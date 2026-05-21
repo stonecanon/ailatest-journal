@@ -1838,7 +1838,11 @@
 
   // ───────── filtering ─────────
   function matches(r) {
-    if (activeIndices.size && !(r.indices || []).some(i => activeIndices.has(i))) return false;
+    if (activeIndices.size && !(r.indices || []).some(i => activeIndices.has(i))) {
+      // When OAJ is checked, OAJ journals bypass the index filter
+      // (allows pure-OAJ journals without WoS/EI indices to show)
+      if (!(activeFeats.has('oaj') && r.oaj)) return false;
+    }
     if (activeZones.size) {
       const zones = new Set();
       if (r.cas_zone) zones.add(String(r.cas_zone));
