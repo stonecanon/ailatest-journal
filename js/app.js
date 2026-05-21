@@ -876,6 +876,17 @@
   // favLists: [{id, name, ids:[...ordered ids...]}]
   let favLists = [];
   let activeListId = null;
+  const DEFAULT_FAV_LIST_NAMES = ['默认收藏', 'My Favorites'];
+  function defaultFavListName() { return T('默认收藏', 'My Favorites'); }
+  function isDefaultFavListName(name) { return DEFAULT_FAV_LIST_NAMES.includes(String(name || '').trim()); }
+  function favListDisplayName(list) {
+    if (list && list.id === 'default' && isDefaultFavListName(list.name)) return defaultFavListName();
+    return String((list && list.name) || T('未命名','Untitled'));
+  }
+  function localizeDefaultFavListName() {
+    const l = favLists.find(x => x.id === 'default');
+    if (l && isDefaultFavListName(l.name)) l.name = defaultFavListName();
+  }
 
   function loadFavLists() {
     try {
@@ -897,12 +908,13 @@
     // migrate from old flat favs (ailatest.favs)
     let legacy = [];
     try { legacy = JSON.parse(localStorage.getItem('ailatest.favs') || '[]'); } catch(_) {}
-    favLists = [{ id: 'default', name: T('默认收藏','My Favorites'), ids: [...legacy] }];
+    favLists = [{ id: 'default', name: defaultFavListName(), ids: [...legacy] }];
     activeListId = 'default';
     persistFavLists(false);
   }
 
   function persistFavLists(sync = true) {
+    localizeDefaultFavListName();
     localStorage.setItem('ailatest.favLists', JSON.stringify(favLists));
     localStorage.setItem('ailatest.activeListId', activeListId);
     // rebuild flat union for legacy path + backend sync
@@ -1658,6 +1670,35 @@
       }
       function badgeWarn() { return `<span class="warn-pill">⚠ Warning</span>`; }
 
+  // 统一标签组合：主页 / 收藏页 / 抽屉 / 分享卡片共用同一批 badge 函数与 CSS 类。
+  function renderIndexBadges(r) {
+    if (!r) return '';
+    return [
+      badgeFlagship(r.flagship),
+      ...((r.indices) || []).map(badgeIndex),
+      badgeScopus(r.scopus),
+    ].filter(Boolean).join('');
+  }
+  function renderRankBadges(r) {
+    if (!r) return '';
+    return [
+      badgeCAS(r.cas_zone, r.cas_top),
+      badgeJCR(r.if_quartile),
+      badgeXR(r.cas_xr && r.cas_xr.zone),
+      badgeCCF(r.ccf),
+      badgeABDC(r.abdc),
+      badgeABS(r.abs),
+      ...(r.cnkx ? r.cnkx.slice(0,2).map(c => badgeTier(c.tier)) : []),
+      r.warning ? badgeWarn() : '',
+    ].filter(Boolean).join('');
+  }
+  function renderBadgeCell(indexBadges, rankBadges) {
+    return [
+      indexBadges ? `<div class="badges badges-idx">${indexBadges}</div>` : '',
+      rankBadges  ? `<div class="badges badges-rank">${rankBadges}</div>`  : '',
+    ].filter(Boolean).join('') || '<span class="muted-cell">—</span>';
+  }
+
   function starBtn(r, src = 'int') {
     const on = isFav(r);
     return `<button class="fav-star ${on?'on':''}" data-fav="${escape(favId(r))}" data-fav-src="${escape(src)}" aria-label="toggle favorite" title="${on?t('fav_removed'):t('fav_added')}">${on?'★':'☆'}</button>`;
@@ -1752,28 +1793,10 @@
       : '<span class="muted-cell">—</span>';
     const crossBadges = renderDomCrossBadges(r, 'int');
     // 第一行：索引（SCIE/SSCI/AHCI/ESCI/EI）— 回答"这本被哪些数据库收录"
-    const indexBadges = [
-      badgeFlagship(r.flagship),
-      ...(r.indices || []).map(badgeIndex),
-      badgeScopus(r.scopus),
-    ].filter(Boolean).join('');
+    const indexBadges = renderIndexBadges(r);
     // 第二行：分区/等级/预警 — 回答"这本的等级和影响力"（IF 已移到独立列）
-    const rankBadges = [
-      badgeCAS(r.cas_zone, r.cas_top),
-      badgeJCR(r.if_quartile),
-      badgeXR(r.cas_xr && r.cas_xr.zone),
-      badgeCCF(r.ccf),
-      badgeABDC(r.abdc),
-      badgeABS(r.abs),
-      // 中国科协 T1/T2/T3 徽章 (取该刊所有 cnkx 标签中最高级别)
-      ...(r.cnkx ? r.cnkx.slice(0,2).map(c => badgeTier(c.tier)) : []),
-      r.warning ? badgeWarn() : '',
-      crossBadges,
-    ].filter(Boolean).join('');
-    const badgeCell = [
-      indexBadges ? `<div class="badges badges-idx">${indexBadges}</div>` : '',
-      rankBadges  ? `<div class="badges badges-rank">${rankBadges}</div>`  : '',
-    ].filter(Boolean).join('') || '<span class="muted-cell">—</span>';
+    const rankBadges = [renderRankBadges(r), crossBadges].filter(Boolean).join('');
+    const badgeCell = renderBadgeCell(indexBadges, rankBadges);
     const casVal = (lang === 'zh-CN' || lang === 'zh-TW') ? (r.cas_major_cn || '') : tn(r.cas_major_cn || '', 'domain');
     const esiVal = r.esi_category || '';
     const casCell = casVal ? escape(casVal) : '<span class="muted-cell">—</span>';
@@ -2669,16 +2692,8 @@
     const ir = intRec || {};
     // 徽章块（int 源用 r 自身，国内源用 join 到的国际记录）— 合并为单行 flex-wrap
     const allDrawerBadges = (src === 'int' || intRec) ? [
-      badgeFlagship(ir.flagship),
-      ...((ir.indices) || []).map(badgeIndex),
-      badgeScopus(ir.scopus),
-      badgeJCR(ir.if_quartile),
-      badgeCAS(ir.cas_zone, ir.cas_top),
-      badgeXR(ir.cas_xr && ir.cas_xr.zone),
-      badgeCCF(ir.ccf),
-      badgeABDC(ir.abdc),
-      badgeABS(ir.abs),
-      ir.warning ? badgeWarn() : '',
+      renderIndexBadges(ir),
+      renderRankBadges(ir),
     ].filter(Boolean).join('') : '';
     const tierBadge = r.tier && /^T[123]$/.test(r.tier) ? badgeTier(r.tier)
                     : r.tier ? `<span class="tier-pill t3">${escape(tn(r.tier, "tier"))}</span>` : '';
@@ -2935,7 +2950,7 @@
           <button class="big-btn ${on?'ghost':'primary'}" id="drawer-fav-big">${on ? T('★ 已收藏（点击取消）','★ Favorited (click to remove)') : T('☆ 加入收藏','☆ Add to favorites')}</button>
           ${favLists.length > 1 ? `<div class="drawer-fav-select">
             <span class="muted-cell" style="font-size:12px">${T('保存到：','Save to:')}</span>
-            <select id="drawer-fav-list-select">${favLists.map(l => `<option value="${escape(l.id)}" ${l.id===activeListId?'selected':''}>${escape(l.name)} (${l.ids.length})</option>`).join('')}</select>
+            <select id="drawer-fav-list-select">${favLists.map(l => `<option value="${escape(l.id)}" ${l.id===activeListId?'selected':''}>${escape(favListDisplayName(l))} (${l.ids.length})</option>`).join('')}</select>
           </div>` : ''}
         </div>
       </div>
@@ -3068,7 +3083,7 @@
     // list 管理栏（全列表切换 + 新建/重命名/删除）
     const bar = favLists.map(l => `
       <button class="fav-list-chip ${l.id === activeListId ? 'active' : ''}" data-list="${escape(l.id)}">
-        <span class="lname">${escape(l.name)}</span>
+        <span class="lname">${escape(favListDisplayName(l))}</span>
         <span class="lcount">${l.ids.length}</span>
       </button>`).join('');
     const toolbar = `
@@ -3163,14 +3178,14 @@
     const renBtn = document.getElementById('fav-list-rename');
     if (renBtn) renBtn.addEventListener('click', () => {
       const cur = getActiveList(); if (!cur) return;
-      const name = prompt(T('重命名清单：','Rename list:'), cur.name);
+      const name = prompt(T('重命名清单：','Rename list:'), favListDisplayName(cur));
       if (name && name.trim()) { renameList(cur.id, name.trim()); renderFav(); }
     });
     const delBtn = document.getElementById('fav-list-del');
     if (delBtn) delBtn.addEventListener('click', () => {
       const cur = getActiveList(); if (!cur) return;
       if (favLists.length <= 1) { alert(T('至少保留一个清单','Keep at least one list')); return; }
-      if (confirm(T(`删除清单「${cur.name}」？\n清单中的期刊若未在其他清单中也会被移除。`,`Delete list "${cur.name}"?\nJournals not in other lists will also be removed.`))) {
+      if (confirm(T(`删除清单「${favListDisplayName(cur)}」？\n清单中的期刊若未在其他清单中也会被移除。`,`Delete list "${favListDisplayName(cur)}"?\nJournals not in other lists will also be removed.`))) {
         deleteList(cur.id); renderFav();
         if (activeTab === 'int') renderInt();
       }
@@ -3206,7 +3221,7 @@
       const r = await fetch(`${API_BASE}/share`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${user.token}` },
-        body: JSON.stringify({ name: cur.name, items, ttl_days: 90 }),
+        body: JSON.stringify({ name: favListDisplayName(cur), items, ttl_days: 90 }),
       });
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       const d = await r.json();
@@ -3217,11 +3232,10 @@
         return {
           name: rec.name || rec.cn_name || '—',
           cn_name: rec.cn_name && rec.cn_name !== rec.name ? rec.cn_name : '',
-          indices: rec.indices || [],
-          if_quartile: rec.if_quartile || '',
+          badge_html: [renderIndexBadges(rec), renderRankBadges(rec)].filter(Boolean).join(''),
         };
       });
-      showShareModal({ url: shareUrl, expiresAt: d.expires_at, listName: cur.name, count: items.length, items: richItems });
+      showShareModal({ url: shareUrl, expiresAt: d.expires_at, listName: favListDisplayName(cur), count: items.length, items: richItems });
     } catch (e) {
       showShareModal({ error: String(e.message || e) });
     }
@@ -3251,14 +3265,10 @@
       const items = opts.items || [];
       const previewMax = 30;
       const shown = items.slice(0, previewMax);
-      const idxRank = { SCIE: 1, SSCI: 2, AHCI: 3, ESCI: 4, EI: 5 };
       const renderRow = (it) => {
-        const idxList = (it.indices || []).slice().sort((a, b) => (idxRank[a] || 9) - (idxRank[b] || 9));
-        const idxHtml = idxList.map(i => `<span class="share-idx idx-${i.toLowerCase()}">${escape(i)}</span>`).join('');
-        const q = (it.if_quartile || '').toUpperCase();
-        const jcrHtml = /^Q[1-4]$/.test(q) ? `<span class="share-jcr jcr-${q.toLowerCase()}">JCR ${q}</span>` : '';
+        const badgeHtml = it.badge_html || '';
         const cn = it.cn_name ? `<span class="share-row-cn">${escape(it.cn_name)}</span>` : '';
-        return `<li class="share-row"><span class="share-row-name">${escape(it.name || '—')}</span>${cn}<span class="share-row-tags">${idxHtml}${jcrHtml}</span></li>`;
+        return `<li class="share-row"><span class="share-row-name">${escape(it.name || '—')}</span>${cn}<span class="share-row-tags badges">${badgeHtml}</span></li>`;
       };
       const listHtml = shown.length
         ? `<ul class="share-modal-list">${shown.map(renderRow).join('')}</ul>${items.length > previewMax ? `<div class="share-modal-more">${T(`还有 ${items.length - previewMax} 本，打开链接查看完整清单`, `+${items.length - previewMax} more — open the link to see all`)}</div>` : ''}`
@@ -3317,33 +3327,9 @@
     const idxList = (ir.indices || []).slice();
     const idxRank = { SCIE:1, SSCI:2, AHCI:3, ESCI:4, EI:5 };
     idxList.sort((a,b) => (idxRank[a]||9) - (idxRank[b]||9));
-    const idxHtml = [
-      badgeFlagship(ir.flagship),
-      ...idxList.map(i => `<span class="jcard-idx idx-${i.toLowerCase()}">${i}</span>`),
-      ir.scopus && ir.scopus.active !== false ? `<span class="jcard-idx idx-scopus">Scopus</span>` : '',
-    ].filter(Boolean).join('');
+    const idxHtml = renderIndexBadges(ir);
 
-    // 三类分区徽章（导出图片用 inline style，避免 html2canvas 错过 var()）
-    const zoneStyles = {
-      navy: ['#1f3a5f', '#4f6f9b', '#9eb1cb', '#d3dbe6'],
-      burg: ['#7a2030', '#a04a5a', '#c89099', '#ead0d4'],
-      teal: ['#1f5f5a', '#4f9b95', '#9ec9c5', '#d3e6e3'],
-    };
-    const fgFor = (palette, n) => (n >= 3 ? (palette === 'navy' ? '#1f3a5f' : palette === 'burg' ? '#5a1820' : '#1f5f5a') : '#fff');
-    const zoneTag = (palette, n, label) => {
-      const bg = zoneStyles[palette][n - 1];
-      return `<span class="jcard-zone" style="background:${bg};color:${fgFor(palette,n)}">${label}</span>`;
-    };
-    const zonesHtml = [
-      ir.if_quartile && /^Q[1-4]$/i.test(ir.if_quartile) ? zoneTag('burg', parseInt(ir.if_quartile.slice(1)), `JCR ${ir.if_quartile.toUpperCase()}`) : '',
-      ir.cas_zone ? zoneTag('navy', parseInt(ir.cas_zone), `${T('中科院','CAS')} ${ir.cas_zone}${T('区','')}${ir.cas_top ? ' Top' : ''}`) : '',
-      (ir.cas_xr && ir.cas_xr.zone) ? zoneTag('teal', parseInt(ir.cas_xr.zone), `${T('新锐','Emerging')} ${ir.cas_xr.zone}${T('区','')}`) : '',
-      badgeCCF(ir.ccf),
-      badgeABDC(ir.abdc),
-      badgeABS(ir.abs),
-      ...(ir.cnkx ? ir.cnkx.slice(0,2).map(c => badgeTier(c.tier)) : []),
-      ir.warning ? badgeWarn() : '',
-    ].filter(Boolean).join('');
+    const zonesHtml = renderRankBadges(ir);
 
     // 关键指标 + 元信息
     const stats = [];
@@ -3485,7 +3471,7 @@
     } catch (_) { return false; }
   }
   function flashBtn(id, label) {
-    const btn = document.getElementById(id);
+    const btn = (typeof id === 'string') ? document.getElementById(id) : id;
     if (!btn) return;
     const old = btn.innerHTML;
     btn.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> ${label}`;
@@ -3536,10 +3522,9 @@
         const sub = it.cn_name && it.cn_name !== (it.name || '') ? `<span class="share-row-cn">${escape(it.cn_name)}</span>` : '';
         // 反查丰富数据
         const j = lookup[norm(it.issn)] || lookup[norm(it.eissn)] || {};
-        const inds = (j.indices || []).filter(x => idxColor[x]);
-        const idxBadges = inds.map(x => `<span class="share-idx idx-${idxColor[x]}">${x}</span>`).join('');
-        const jcrQ = j.if_quartile ? `<span class="share-idx jcr-${j.if_quartile.toLowerCase()}">JCR ${j.if_quartile}</span>` : '';
-        const meta = (idxBadges + jcrQ) ? `<span class="share-row-tags">${idxBadges}${jcrQ}</span>` : '';
+        const meta = (j && (j.indices || j.if_quartile || j.cas_zone || j.scopus))
+          ? `<span class="share-row-tags badges">${[renderIndexBadges(j), renderRankBadges(j)].filter(Boolean).join('')}</span>`
+          : '';
         return `<div class="share-list-row"><span class="share-row-idx">${String(i+1).padStart(2,'0')}</span><span class="share-row-name">${title}${sub}</span>${meta}</div>`;
       }).join('') || `<div class="empty">${T('（空清单）','(empty list)')}</div>`;
       const exp = d.expires_at ? new Date(d.expires_at * 1000).toLocaleDateString() : '';
@@ -3673,30 +3658,14 @@
       ? `<span class="jissn">${escape(r.issn || r.cn_code || '')}${r.eissn ? ` <span class="eissn">e:${r.eissn}</span>` : ''}</span>`
       : '<span class="muted-cell">—</span>';
     // 索引行
-    const indexBadges = r.__src === 'int' ? [
-      badgeFlagship(r.flagship),
-      ...((r.indices) || []).map(badgeIndex),
-      badgeScopus(r.scopus),
-    ].filter(Boolean).join('') : '';
+    const indexBadges = r.__src === 'int' ? renderIndexBadges(r) : '';
     // 分区/等级行（IF 已移到独立列）
-    const rankBadges = r.__src === 'int' ? [
-      badgeCAS(r.cas_zone, r.cas_top),
-      badgeJCR(r.if_quartile),
-      badgeXR(r.cas_xr && r.cas_xr.zone),
-      badgeCCF(r.ccf),
-      badgeABDC(r.abdc),
-      badgeABS(r.abs),
-      ...(r.cnkx ? r.cnkx.slice(0,2).map(c => badgeTier(c.tier)) : []),
-      r.warning ? badgeWarn() : '',
-    ].filter(Boolean).join('') : '';
+    const rankBadges = r.__src === 'int' ? renderRankBadges(r) : '';
     const tierBadge = r.tier && /^T[123]$/.test(r.tier) ? badgeTier(r.tier)
                     : r.tier ? `<span class="tier-pill t3">${escape(tn(r.tier, "tier"))}</span>` : '';
     const crossBadges = renderDomCrossBadges(r, r.__src);
     const otherBadges = [tierBadge, crossBadges].filter(Boolean).join('');
-    const badgeCell = [
-      indexBadges ? `<div class="badges badges-idx">${indexBadges}</div>` : '',
-      (rankBadges || otherBadges) ? `<div class="badges badges-rank">${rankBadges}${otherBadges}</div>` : '',
-    ].filter(Boolean).join('') || '<span class="muted-cell">—</span>';
+    const badgeCell = renderBadgeCell(indexBadges, [rankBadges, otherBadges].filter(Boolean).join(''));
     const casVal = (lang === 'zh-CN' || lang === 'zh-TW') ? (r.cas_major_cn || '') : tn(r.cas_major_cn || '', 'domain');
     const esiVal = r.esi_category || '';
     const casCell = casVal ? escape(casVal) : '<span class="muted-cell">—</span>';
@@ -3796,6 +3765,8 @@
     $('#lang-toggle').addEventListener('click', () => {
       lang = LANG_ORDER[(LANG_ORDER.indexOf(lang) + 1) % LANG_ORDER.length];
       localStorage.setItem('ailatest.lang', lang);
+      localizeDefaultFavListName();
+      persistFavLists(false);
       applyI18n();
       renderWosList();
       // re-render because categories etc. are dynamic text
@@ -3845,7 +3816,7 @@
         const has = l.ids.includes(fid);
         return `<div class="fav-picker-item ${has?'active':''}" data-list-id="${escape(l.id)}">
           <span class="check">${has ? '✓' : ''}</span>
-          <span>${escape(l.name)} (${l.ids.length})</span>
+          <span>${escape(favListDisplayName(l))} (${l.ids.length})</span>
         </div>`;
       }).join('') + `<div class="fav-picker-new">＋ ${T('新建清单','New list')}</div>`;
       // Position near the button
