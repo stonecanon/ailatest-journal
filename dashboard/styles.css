@@ -212,10 +212,15 @@ h1 .title-tail {
 }
 
 .panel-head p,
-.section-label p {
+.section-label p,
+.panel-note {
   margin: 4px 0 0;
   color: var(--muted);
   font-size: 13px;
+}
+
+.panel-note {
+  margin-bottom: 14px;
 }
 
 .traffic-grid {
@@ -254,15 +259,28 @@ h1 .title-tail {
 
 .bar-row {
   display: grid;
-  grid-template-columns: minmax(120px, 1fr) 3fr 68px;
+  grid-template-columns: minmax(160px, 1.35fr) 3fr 68px;
   gap: 10px;
   align-items: center;
 }
 
 .bar-label {
+  display: grid;
+  gap: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bar-label span,
+.bar-label small {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.bar-label small {
+  color: var(--muted);
+  font-size: 11px;
 }
 
 .bar-track {

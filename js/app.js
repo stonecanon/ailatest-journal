@@ -754,6 +754,8 @@
       referrer: document.referrer || '',
       visitor_id: getAnalyticsId('ailatest.analytics.visitor', localStorage),
       session_id: getAnalyticsId('ailatest.analytics.session', sessionStorage),
+      client_timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || '',
+      client_language: navigator.language || '',
     };
     const body = JSON.stringify(payload);
     const url = `${API_BASE}/analytics/pageview`;

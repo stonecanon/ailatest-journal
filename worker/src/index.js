@@ -16,7 +16,7 @@
  *   GET  /me                     (Bearer)                  → user profile
  *   GET  /favorites              (Bearer)                  → favorite ids
  *   PUT  /favorites              (Bearer) { favs: [...] }
- *   POST /analytics/pageview      { path, referrer, session_id, visitor_id }
+ *   POST /analytics/pageview      { path, referrer, session_id, visitor_id, client_timezone, client_language }
  *
  * Required secrets:
  *   JWT_SECRET              long random
@@ -198,12 +198,14 @@ async function routePageview(req, env) {
   const referrer = cleanText(body?.referrer || '', 300);
   const sessionId = cleanText(body?.session_id || '', 80);
   const visitorId = cleanText(body?.visitor_id || '', 80);
+  const clientTimezone = cleanText(body?.client_timezone || '', 80);
+  const clientLanguage = cleanText(body?.client_language || '', 80);
   const cf = req.cf || {};
 
   await env.DB.prepare(
     `INSERT INTO page_events
-       (day, event_at, path, referrer, session_id, visitor_id, country, colo)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+       (day, event_at, path, referrer, session_id, visitor_id, country, colo, client_timezone, client_language)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
   ).bind(
     dayFromSec(now),
     now,
@@ -213,6 +215,8 @@ async function routePageview(req, env) {
     visitorId,
     cleanText(cf.country || '', 16),
     cleanText(cf.colo || '', 16),
+    clientTimezone,
+    clientLanguage,
   ).run();
 
   return json({ ok: true });
