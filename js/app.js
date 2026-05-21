@@ -1547,6 +1547,11 @@
     if (!sc || sc.active === false) return '';
     return `<span class="badge b-scopus" title="${T('Scopus 收录 (Source List Mar.2026)','Indexed by Scopus (Source List Mar.2026)')}">Scopus</span>`;
   }
+  function badgeOAJ(oaj) {
+    if (!oaj) return '';
+    const tip = oaj.partition ? `OAJ ${oaj.partition}` : 'OAJ 收录';
+    return `<span class="badge b-oaj" title="${T('OAJ 全球开放获取期刊索引','Open Access Journal Index')}${oaj.partition ? ' · ' + oaj.partition : ''}${oaj.position ? ' · ' + escape(oaj.position) : ''}">OAJ</span>`;
+  }
   // 期刊浏览量缓存（journal_key → count）
   const viewsCache = {};
   function badgeView(key) {
@@ -1687,6 +1692,7 @@
       badgeFlagship(r.flagship),
       ...((r.indices) || []).map(badgeIndex),
       badgeScopus(r.scopus),
+      badgeOAJ(r.oaj),
     ].filter(Boolean).join('');
   }
   function renderRankBadges(r) {
@@ -1847,6 +1853,7 @@
     if (activeFeats.has('xr') && !r.cas_xr) return false;
     if (activeFeats.has('flagship') && !r.flagship) return false;
     if (activeFeats.has('scopus') && !(r.scopus && r.scopus.active)) return false;
+    if (activeFeats.has('oaj') && !r.oaj) return false;
     if (activeFeats.has('warning') && !r.warning) return false;
     if (activeFeats.has('abdc') && !(r.abdc && r.abdc.rating)) return false;
     if (activeFeats.has('abs')  && !(r.abs  && r.abs.rating))  return false;
@@ -2938,6 +2945,19 @@
       </div>`;
     })() : '';
 
+    // OAJ 全球开放获取期刊索引
+    const oajHTML = ir.oaj ? `<div class="drawer-section">
+      <h4>${T('OAJ 全球开放获取期刊索引','OAJ — Open Access Journal Index')}</h4>
+      <div class="muted-cell" style="font-size:12px">
+        ${ir.oaj.partition ? `${T('OAJ 分区','OAJ Tier')}: ${escape(ir.oaj.partition)}` : ''}
+        ${ir.oaj.partition && ir.oaj.position ? ' · ' : ''}
+        ${ir.oaj.position ? escape(ir.oaj.position) : ''}
+      </div>
+      <div class="muted-cell" style="font-size:11px;margin-top:4px">
+        ${T('由中国科学院文献情报中心与中国教育图书进出口有限公司共建，数据更新周期3个月。','Developed by CAS. Updated quarterly.')}
+      </div>
+    </div>` : '';
+
     // 审稿周期已合并入 stats，此处保留空块以兼容（不输出）
     const cycleHTML = '';
 
@@ -2970,6 +2990,7 @@
       ${wosHTML}
       ${scopusHTML}
       ${eiHTML}
+      ${oajHTML}
       ${cycleHTML}
       ${oaHTML}
       ${warnHTML}
