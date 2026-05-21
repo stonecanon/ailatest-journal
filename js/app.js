@@ -3370,9 +3370,9 @@
 
     // 关键指标 + 元信息
     const stats = [];
-    if (ir.if_2024 != null) stats.push([T('影响因子','Impact Factor'), `<div class="jcard-if-val">${ir.if_2024}</div><div class="jcard-if-info">${T('JCR 2025发布 · 2024指标','JCR 2025 · 2024 IF')}</div>`]);
+    if (ir.if_2024 != null) stats.push([T('影响因子','Impact Factor'), ir.if_2024, T('JCR 2025发布 · 2024指标','JCR 2025 · 2024 IF')]);
     if (ir.if_rank) stats.push([T('IF 排名','IF Rank'), ir.if_rank]);
-    const statsHtml = stats.length ? `<div class="jcard-stats">${stats.map(([k,v]) => `<div class="jcard-stat"><div class="jcard-stat-v">${v}</div><div class="jcard-stat-k">${k}</div></div>`).join('')}</div>` : '';
+    const statsHtml = stats.length ? `<div class="jcard-stats">${stats.map(([k,v,sub]) => `<div class="jcard-stat"><div class="jcard-stat-v">${v}</div><div class="jcard-stat-k">${k}</div>${sub?`<div class="jcard-stat-sub">${sub}</div>`:''}</div>`).join('')}</div>` : '';
 
     const meta = [];
     if (ir.cas_major_cn) meta.push([T('中科院大类','CAS Major'), ir.cas_major_cn]);
