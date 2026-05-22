@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-21T23:48:28.798Z",
+  "generated_at": "2026-05-22T15:33:31.294Z",
   "source": "remote D1",
   "notes": [
     "注册量来自 users.created_at，当前是最可靠口径。",
@@ -28,13 +28,13 @@
     "users"
   ],
   "kpis": {
-    "total_users": 10,
-    "users_with_email": 8,
-    "email_users": 5,
-    "github_users": 2,
+    "total_users": 12,
+    "users_with_email": 9,
+    "email_users": 6,
+    "github_users": 3,
     "google_users": 3,
     "first_signup_at": 1778628305,
-    "latest_signup_at": 1779404069,
+    "latest_signup_at": 1779440996,
     "favorite_rows": 27,
     "users_with_favorites": 5,
     "avg_favorites_per_active_user": 5.4,
@@ -42,17 +42,17 @@
     "users_with_ratings": 5,
     "rated_journals": 17,
     "avg_rating": 4.43,
-    "lists": 7,
+    "lists": 6,
     "users_with_lists": 6,
-    "total_pageviews": 455,
-    "total_visitors": 111,
-    "total_login_events": 8
+    "total_pageviews": 504,
+    "total_visitors": 141,
+    "total_login_events": 10
   },
   "series": {
     "providerMix": [
       {
         "provider": "email",
-        "users": 5
+        "users": 6
       },
       {
         "provider": "google",
@@ -60,7 +60,7 @@
       },
       {
         "provider": "github",
-        "users": 2
+        "users": 3
       }
     ],
     "registrationsByDay": [
@@ -87,6 +87,10 @@
       {
         "day": "2026-05-21",
         "signups": 3
+      },
+      {
+        "day": "2026-05-22",
+        "signups": 2
       }
     ],
     "activeProxyByDay": [
@@ -105,6 +109,10 @@
       {
         "day": "2026-05-21",
         "active_users_proxy": 3
+      },
+      {
+        "day": "2026-05-22",
+        "active_users_proxy": 2
       }
     ],
     "loginEventsByDay": [
@@ -117,6 +125,11 @@
         "day": "2026-05-21",
         "login_events": 3,
         "login_users": 3
+      },
+      {
+        "day": "2026-05-22",
+        "login_events": 2,
+        "login_users": 2
       }
     ],
     "loginProviderMix": [
@@ -127,13 +140,13 @@
       },
       {
         "provider": "github",
-        "login_events": 2,
-        "login_users": 2
+        "login_events": 3,
+        "login_users": 3
       },
       {
         "provider": "email",
-        "login_events": 2,
-        "login_users": 2
+        "login_events": 3,
+        "login_users": 3
       }
     ],
     "pageviewsByDay": [
@@ -145,9 +158,15 @@
       },
       {
         "day": "2026-05-21",
-        "pageviews": 197,
-        "sessions": 85,
-        "visitors": 62
+        "pageviews": 199,
+        "sessions": 86,
+        "visitors": 63
+      },
+      {
+        "day": "2026-05-22",
+        "pageviews": 47,
+        "sessions": 37,
+        "visitors": 29
       }
     ]
   },
@@ -194,6 +213,11 @@
         "label": "CIRCULATION"
       },
       {
+        "journal_key": "0360-1323",
+        "favorites": 1,
+        "label": "BUILDING AND ENVIRONMENT"
+      },
+      {
         "journal_key": "0378-7788",
         "favorites": 1,
         "label": "ENERGY AND BUILDINGS"
@@ -217,11 +241,6 @@
         "journal_key": "2053-1583",
         "favorites": 1,
         "label": "2D MATERIALS"
-      },
-      {
-        "journal_key": "2365-6271",
-        "favorites": 1,
-        "label": "3D PRINTING IN MEDICINE"
       },
       {
         "journal_key": "2374-7943",
@@ -346,13 +365,13 @@
     "topPaths": [
       {
         "path": "/",
-        "pageviews": 359,
-        "visitors": 68
+        "pageviews": 398,
+        "visitors": 86
       },
       {
         "path": "/?ref=producthunt",
-        "pageviews": 34,
-        "visitors": 22
+        "pageviews": 42,
+        "visitors": 30
       },
       {
         "path": "/%E4%B8%80%E7%AB%99%E5%BC%8F%E7%A7%91%E7%A0%94%E6%9C%9F%E5%88%8A%E6%9F%A5%E8%AF%A2%E5%B9%B3%E5%8F%B0",
@@ -440,7 +459,7 @@
         "visitors": 1
       },
       {
-        "path": "/s/lcxMj4P7",
+        "path": "/s/p2Hbx7ip",
         "pageviews": 1,
         "visitors": 1
       }
@@ -448,39 +467,48 @@
     "trafficCountries": [
       {
         "country": "JP",
-        "pageviews": 329,
-        "visitors": 40,
-        "sessions": 93,
+        "pageviews": 348,
+        "visitors": 43,
+        "sessions": 102,
         "colos": "NRT",
         "client_timezones": ",Asia/Shanghai",
         "client_languages": ",en-US,zh-CN,en"
       },
       {
         "country": "US",
-        "pageviews": 59,
-        "visitors": 33,
-        "sessions": 43,
-        "colos": "LAX,SEA,IAD,SJC,ORD,ATL,DFW",
-        "client_timezones": "Etc/Unknown,UTC,America/Chicago,Asia/Shanghai",
-        "client_languages": "en-US,zh-CN"
+        "pageviews": 76,
+        "visitors": 47,
+        "sessions": 59,
+        "colos": "LAX,SEA,IAD,SJC,ORD,ATL,DFW,EWR,PDX",
+        "client_timezones": "Etc/Unknown,UTC,America/Chicago,Asia/Shanghai,America/Los_Angeles",
+        "client_languages": "en-US,zh-CN,en-US@posix"
       },
       {
         "country": "SG",
-        "pageviews": 22,
-        "visitors": 9,
-        "sessions": 13,
+        "pageviews": 26,
+        "visitors": 13,
+        "sessions": 17,
         "colos": "SIN",
-        "client_timezones": null,
-        "client_languages": null
+        "client_timezones": "Asia/Calcutta,Asia/Shanghai",
+        "client_languages": "en-US,zh-CN"
       },
       {
         "country": "NL",
-        "pageviews": 22,
-        "visitors": 11,
-        "sessions": 14,
+        "pageviews": 25,
+        "visitors": 14,
+        "sessions": 17,
         "colos": "AMS",
-        "client_timezones": null,
-        "client_languages": null
+        "client_timezones": "Asia/Shanghai",
+        "client_languages": "en-US,zh-CN"
+      },
+      {
+        "country": "HK",
+        "pageviews": 7,
+        "visitors": 5,
+        "sessions": 6,
+        "colos": "HKG",
+        "client_timezones": "Asia/Shanghai",
+        "client_languages": "zh-CN"
       },
       {
         "country": "GB",
@@ -501,13 +529,13 @@
         "client_languages": null
       },
       {
-        "country": "HK",
+        "country": "DE",
         "pageviews": 4,
-        "visitors": 3,
-        "sessions": 3,
-        "colos": "HKG",
-        "client_timezones": null,
-        "client_languages": null
+        "visitors": 4,
+        "sessions": 4,
+        "colos": "DUS,FRA",
+        "client_timezones": "America/New_York",
+        "client_languages": "en-US"
       },
       {
         "country": "ZA",
@@ -544,18 +572,27 @@
         "colos": "AKL",
         "client_timezones": "UTC",
         "client_languages": "en-US"
-      },
-      {
-        "country": "DE",
-        "pageviews": 1,
-        "visitors": 1,
-        "sessions": 1,
-        "colos": "DUS",
-        "client_timezones": null,
-        "client_languages": null
       }
     ],
     "recentUsers": [
+      {
+        "id": 12,
+        "provider": "email",
+        "email": "li***@lib.pku.edu.cn",
+        "login": "liud",
+        "name": "liud",
+        "created_at": 1779440996,
+        "updated_at": 1779440996
+      },
+      {
+        "id": 11,
+        "provider": "github",
+        "email": "",
+        "login": "thomasghc",
+        "name": "thomasghc",
+        "created_at": 1779428180,
+        "updated_at": 1779428180
+      },
       {
         "id": 10,
         "provider": "github",
