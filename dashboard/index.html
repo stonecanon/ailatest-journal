@@ -11,7 +11,7 @@
     <header class="topbar">
       <div>
         <h1><span class="brand-word">AILatest</span> <em>Journal</em> <span class="title-tail">流量看板</span></h1>
-        <p class="subtitle">优先查看每日浏览量、独立访客和访问人次；注册、登录与互动数据作为辅助参考。</p>
+        <p class="subtitle">每日浏览、访客、会话和互动数据集中在一个运营工作台里。</p>
       </div>
       <div class="meta">
         <div><span class="pill" id="source">remote D1</span></div>
@@ -19,85 +19,116 @@
       </div>
     </header>
 
-    <section class="traffic-summary" aria-label="访问概览">
-      <div class="summary-copy">
-        <div class="eyebrow">访问概览</div>
-        <h2>逐日访问是主指标</h2>
-        <p>页面浏览量看页面被打开多少次，独立访客数看大概多少个不同的人来过，访问人次更接近“来了多少趟”。</p>
+    <div class="app-frame" aria-label="运营看板应用界面">
+      <aside class="rail" aria-label="看板导航">
+        <div class="rail-logo">A</div>
+        <nav>
+          <span class="rail-item active" title="Overview">⌘</span>
+          <span class="rail-item" title="Traffic">◇</span>
+          <span class="rail-item" title="Users">◌</span>
+          <span class="rail-item" title="Reports">▥</span>
+          <span class="rail-item" title="Notes">?</span>
+        </nav>
+        <span class="rail-exit" title="Export">↗</span>
+      </aside>
+
+      <div class="workspace">
+        <section class="workspace-head">
+          <div>
+            <span class="eyebrow">Overview</span>
+            <h2>Portfolio</h2>
+          </div>
+          <div class="head-actions" aria-hidden="true">
+            <span>⌕</span>
+            <span>◐</span>
+            <span class="avatar">Z</span>
+          </div>
+        </section>
+
+        <section class="traffic-summary" aria-label="访问概览">
+          <div class="summary-copy">
+            <div class="summary-metric">
+              <span>Portfolio balance</span>
+              <strong id="hero-pageviews">-</strong>
+            </div>
+            <p>逐日访问是主指标。页面浏览量看页面被打开多少次，独立访客数看大概多少个不同的人来过，访问人次更接近“来了多少趟”。</p>
+            <div class="mini-line" aria-hidden="true"></div>
+          </div>
+          <div class="grid traffic-kpis"></div>
+        </section>
+
+        <section class="grid traffic-grid">
+          <article class="card panel panel-large">
+            <div class="panel-head">
+              <div>
+                <h2>逐日浏览趋势</h2>
+                <p>页面浏览量、独立访客与访问人次</p>
+              </div>
+            </div>
+            <div class="chart" id="traffic-chart"></div>
+          </article>
+          <article class="card panel">
+            <div class="panel-head">
+              <div>
+                <h2>每日访问明细</h2>
+                <p>按天对比页面浏览量、独立访客数和访问人次</p>
+              </div>
+            </div>
+            <div id="daily-traffic"></div>
+          </article>
+        </section>
+
+        <section class="grid traffic-breakdown">
+          <article class="card panel">
+            <h2>热门访问路径</h2>
+            <div class="bar-list" id="top-paths"></div>
+          </article>
+          <article class="card panel panel-dark">
+            <h2>访问网络出口地区</h2>
+            <p class="panel-note">由 Cloudflare 按请求 IP 判断，可能是 VPN、代理或运营商出口，不等于真实所在地。</p>
+            <div class="bar-list" id="traffic-countries"></div>
+          </article>
+        </section>
+
+        <section class="section-label">
+          <h2>用户与互动</h2>
+          <p>注册、登录和内容互动用于判断访问后的行为质量。</p>
+        </section>
+
+        <section class="grid secondary-kpis" aria-label="用户与互动指标"></section>
+
+        <section class="grid secondary-grid">
+          <article class="card panel">
+            <h2>注册与登录趋势</h2>
+            <div class="chart chart-compact" id="signup-login-chart"></div>
+          </article>
+          <article class="card panel">
+            <h2>注册来源</h2>
+            <div class="bar-list" id="provider-bars"></div>
+          </article>
+          <article class="card panel">
+            <h2>登录来源</h2>
+            <div class="bar-list" id="login-provider-bars"></div>
+          </article>
+          <article class="card panel">
+            <h2>收藏最多的期刊</h2>
+            <div id="top-favorites"></div>
+          </article>
+          <article class="card panel">
+            <h2>评分最多的期刊</h2>
+            <div id="top-rated"></div>
+          </article>
+          <article class="card panel">
+            <h2>最近注册用户</h2>
+            <div id="recent-users"></div>
+          </article>
+          <article class="card panel">
+            <h2>口径说明</h2>
+            <ul class="note-list" id="notes"></ul>
+          </article>
+        </section>
       </div>
-      <div class="grid traffic-kpis"></div>
-    </section>
-
-    <section class="grid traffic-grid">
-      <article class="card panel panel-large">
-        <div class="panel-head">
-          <div>
-            <h2>逐日浏览趋势</h2>
-            <p>页面浏览量、独立访客与访问人次</p>
-          </div>
-        </div>
-        <div class="chart" id="traffic-chart"></div>
-      </article>
-      <article class="card panel">
-        <div class="panel-head">
-          <div>
-            <h2>每日访问明细</h2>
-            <p>按天对比页面浏览量、独立访客数和访问人次</p>
-          </div>
-        </div>
-        <div id="daily-traffic"></div>
-      </article>
-    </section>
-
-    <section class="grid traffic-breakdown">
-      <article class="card panel">
-        <h2>热门访问路径</h2>
-        <div class="bar-list" id="top-paths"></div>
-      </article>
-      <article class="card panel">
-        <h2>访问网络出口地区</h2>
-        <p class="panel-note">由 Cloudflare 按请求 IP 判断，可能是 VPN、代理或运营商出口，不等于真实所在地。</p>
-        <div class="bar-list" id="traffic-countries"></div>
-      </article>
-    </section>
-
-    <section class="section-label">
-      <h2>用户与互动</h2>
-      <p>这些指标用于判断访问后的注册、登录和内容互动情况，不放在首屏主视线里。</p>
-    </section>
-
-    <section class="grid secondary-kpis" aria-label="用户与互动指标"></section>
-
-    <section class="grid secondary-grid">
-      <article class="card panel">
-        <h2>注册与登录趋势</h2>
-        <div class="chart chart-compact" id="signup-login-chart"></div>
-      </article>
-      <article class="card panel">
-        <h2>注册来源</h2>
-        <div class="bar-list" id="provider-bars"></div>
-      </article>
-      <article class="card panel">
-        <h2>登录来源</h2>
-        <div class="bar-list" id="login-provider-bars"></div>
-      </article>
-      <article class="card panel">
-        <h2>收藏最多的期刊</h2>
-        <div id="top-favorites"></div>
-      </article>
-      <article class="card panel">
-        <h2>评分最多的期刊</h2>
-        <div id="top-rated"></div>
-      </article>
-      <article class="card panel">
-        <h2>最近注册用户</h2>
-        <div id="recent-users"></div>
-      </article>
-      <article class="card panel">
-        <h2>口径说明</h2>
-        <ul class="note-list" id="notes"></ul>
-      </article>
-    </section>
+    </div>
   </main>
 
   <script src="dashboard.js"></script>
