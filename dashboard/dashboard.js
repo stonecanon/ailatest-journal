@@ -21,8 +21,8 @@ function el(tag, attrs = {}, children = []) {
   return node;
 }
 
-function kpi(label, value, detail) {
-  return el('div', { class: 'kpi' }, [
+function kpi(label, value, detail, icon = '•') {
+  return el('div', { class: 'kpi', 'data-icon': icon }, [
     el('div', { class: 'label', text: label }),
     el('div', { class: 'value', text: value }),
     el('div', { class: 'detail', text: detail || '' }),
@@ -42,22 +42,23 @@ function renderTrafficKpis(data) {
   const k = data.kpis;
   const latest = latestTrafficRow(data);
   const sessions = sumRows(data.series.pageviewsByDay, 'sessions');
+  document.querySelector('#hero-pageviews').textContent = n(k.total_pageviews);
   document.querySelector('.traffic-kpis').append(
-    kpi('最近一天页面浏览量', n(latest.pageviews), latest.day ? `${latest.day} 页面被打开的次数` : '暂无访问记录'),
-    kpi('最近一天独立访客数', n(latest.visitors), '同一浏览器访客去重'),
-    kpi('最近一天访问人次', n(latest.sessions), '同一浏览器会话去重'),
-    kpi('累计浏览量 / 访客数', `${n(k.total_pageviews)} / ${n(k.total_visitors)}`, `累计访问人次 ${n(sessions)}`),
+    kpi('最近一天页面浏览量', n(latest.pageviews), latest.day ? `${latest.day} 页面被打开的次数` : '暂无访问记录', 'PV'),
+    kpi('最近一天独立访客数', n(latest.visitors), '同一浏览器访客去重', 'UV'),
+    kpi('最近一天访问人次', n(latest.sessions), '同一浏览器会话去重', 'S'),
+    kpi('累计浏览量 / 访客数', `${n(k.total_pageviews)} / ${n(k.total_visitors)}`, `累计访问人次 ${n(sessions)}`, 'Σ'),
   );
 }
 
 function renderSecondaryKpis(data) {
   const k = data.kpis;
   document.querySelector('.secondary-kpis').append(
-    kpi('总注册用户', n(k.total_users), `最早 ${fromUnix(k.first_signup_at)} · 最新 ${fromUnix(k.latest_signup_at)}`),
-    kpi('邮箱用户', n(k.email_users), `有邮箱记录 ${n(k.users_with_email)}`),
-    kpi('GitHub / Google', `${n(k.github_users)} / ${n(k.google_users)}`, 'OAuth 注册来源'),
-    kpi('收藏行为', n(k.favorite_rows), `${n(k.users_with_favorites)} 人使用收藏`),
-    kpi('评分行为', n(k.rating_rows), `${n(k.rated_journals)} 本期刊被评分`),
+    kpi('总注册用户', n(k.total_users), `最早 ${fromUnix(k.first_signup_at)} · 最新 ${fromUnix(k.latest_signup_at)}`, 'U'),
+    kpi('邮箱用户', n(k.email_users), `有邮箱记录 ${n(k.users_with_email)}`, '@'),
+    kpi('GitHub / Google', `${n(k.github_users)} / ${n(k.google_users)}`, 'OAuth 注册来源', 'G'),
+    kpi('收藏行为', n(k.favorite_rows), `${n(k.users_with_favorites)} 人使用收藏`, '☆'),
+    kpi('评分行为', n(k.rating_rows), `${n(k.rated_journals)} 本期刊被评分`, '★'),
   );
 }
 

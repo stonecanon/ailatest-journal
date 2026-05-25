@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-22T15:53:30.037Z",
+  "generated_at": "2026-05-25T02:18:30.848Z",
   "source": "remote D1",
   "notes": [
     "注册量来自 users.created_at，当前是最可靠口径。",
@@ -44,8 +44,8 @@
     "avg_rating": 4.43,
     "lists": 6,
     "users_with_lists": 6,
-    "total_pageviews": 509,
-    "total_visitors": 143,
+    "total_pageviews": 554,
+    "total_visitors": 168,
     "total_login_events": 10
   },
   "series": {
@@ -164,9 +164,27 @@
       },
       {
         "day": "2026-05-22",
-        "pageviews": 52,
-        "sessions": 40,
-        "visitors": 31
+        "pageviews": 62,
+        "sessions": 48,
+        "visitors": 37
+      },
+      {
+        "day": "2026-05-23",
+        "pageviews": 8,
+        "sessions": 6,
+        "visitors": 4
+      },
+      {
+        "day": "2026-05-24",
+        "pageviews": 16,
+        "sessions": 13,
+        "visitors": 10
+      },
+      {
+        "day": "2026-05-25",
+        "pageviews": 11,
+        "sessions": 7,
+        "visitors": 5
       }
     ]
   },
@@ -365,13 +383,13 @@
     "topPaths": [
       {
         "path": "/",
-        "pageviews": 402,
-        "visitors": 88
+        "pageviews": 445,
+        "visitors": 105
       },
       {
         "path": "/?ref=producthunt",
-        "pageviews": 42,
-        "visitors": 30
+        "pageviews": 43,
+        "visitors": 31
       },
       {
         "path": "/%E4%B8%80%E7%AB%99%E5%BC%8F%E7%A7%91%E7%A0%94%E6%9C%9F%E5%88%8A%E6%9F%A5%E8%AF%A2%E5%B9%B3%E5%8F%B0",
@@ -467,45 +485,45 @@
     "trafficCountries": [
       {
         "country": "JP",
-        "pageviews": 351,
-        "visitors": 44,
-        "sessions": 103,
+        "pageviews": 369,
+        "visitors": 50,
+        "sessions": 116,
         "colos": "NRT",
-        "client_timezones": ",Asia/Shanghai",
-        "client_languages": ",en-US,zh-CN,en"
+        "client_timezones": ",Asia/Shanghai,Asia/Seoul,Asia/Tokyo,Asia/Taipei",
+        "client_languages": ",en-US,zh-CN,en,ko-KR"
       },
       {
         "country": "US",
-        "pageviews": 76,
-        "visitors": 47,
-        "sessions": 59,
+        "pageviews": 87,
+        "visitors": 55,
+        "sessions": 67,
         "colos": "LAX,SEA,IAD,SJC,ORD,ATL,DFW,EWR,PDX",
-        "client_timezones": "Etc/Unknown,UTC,America/Chicago,Asia/Shanghai,America/Los_Angeles",
-        "client_languages": "en-US,zh-CN,en-US@posix"
-      },
-      {
-        "country": "SG",
-        "pageviews": 26,
-        "visitors": 13,
-        "sessions": 17,
-        "colos": "SIN",
-        "client_timezones": "Asia/Calcutta,Asia/Shanghai",
-        "client_languages": "en-US,zh-CN"
+        "client_timezones": "Etc/Unknown,UTC,America/Chicago,Asia/Shanghai,America/Los_Angeles,",
+        "client_languages": "en-US,zh-CN,en-US@posix,"
       },
       {
         "country": "NL",
-        "pageviews": 25,
-        "visitors": 14,
-        "sessions": 17,
+        "pageviews": 29,
+        "visitors": 17,
+        "sessions": 20,
         "colos": "AMS",
         "client_timezones": "Asia/Shanghai",
         "client_languages": "en-US,zh-CN"
       },
       {
+        "country": "SG",
+        "pageviews": 27,
+        "visitors": 13,
+        "sessions": 18,
+        "colos": "SIN",
+        "client_timezones": "Asia/Calcutta,Asia/Shanghai",
+        "client_languages": "en-US,zh-CN"
+      },
+      {
         "country": "HK",
-        "pageviews": 9,
-        "visitors": 6,
-        "sessions": 8,
+        "pageviews": 14,
+        "visitors": 8,
+        "sessions": 13,
         "colos": "HKG",
         "client_timezones": "Asia/Shanghai",
         "client_languages": "zh-CN"
@@ -520,6 +538,24 @@
         "client_languages": null
       },
       {
+        "country": "DE",
+        "pageviews": 7,
+        "visitors": 6,
+        "sessions": 6,
+        "colos": "DUS,FRA",
+        "client_timezones": "America/New_York,Asia/Shanghai,UTC",
+        "client_languages": "en-US"
+      },
+      {
+        "country": "TW",
+        "pageviews": 5,
+        "visitors": 2,
+        "sessions": 3,
+        "colos": "TPE",
+        "client_timezones": "Asia/Shanghai",
+        "client_languages": "zh-CN"
+      },
+      {
         "country": "IN",
         "pageviews": 4,
         "visitors": 1,
@@ -529,29 +565,11 @@
         "client_languages": null
       },
       {
-        "country": "DE",
-        "pageviews": 4,
-        "visitors": 4,
-        "sessions": 4,
-        "colos": "DUS,FRA",
-        "client_timezones": "America/New_York",
-        "client_languages": "en-US"
-      },
-      {
         "country": "ZA",
         "pageviews": 2,
         "visitors": 1,
         "sessions": 1,
         "colos": "DUR",
-        "client_timezones": null,
-        "client_languages": null
-      },
-      {
-        "country": "TW",
-        "pageviews": 2,
-        "visitors": 1,
-        "sessions": 1,
-        "colos": "TPE",
         "client_timezones": null,
         "client_languages": null
       },
