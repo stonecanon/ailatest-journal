@@ -639,6 +639,7 @@ table.journals tr:last-child td { border-bottom: 0; }
 .badge.b-ei   { background: var(--tag-ei); }
 .badge.b-scopus { background: #b8341a; }
 .badge.b-oaj { background: #147a6b; }
+.badge.b-doaj { background: #4b7f21; }
 .badge.b-view { color: #6b5d52; background: #e9dfc8; font-variant-numeric: tabular-nums; opacity: 0.9; }
 
 /* share dialog */

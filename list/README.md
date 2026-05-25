@@ -47,6 +47,7 @@
 ## 已有主要文件
 
 - `oaj_journals.xlsx` / `oaj_journals.csv` / `oaj_journals.json`：从 OAJ 官网 `https://www.oaj.com.cn/simplesearch?field=1` 提取的 773 种开放获取期刊列表。可用 `python3 scripts/fetch_oaj_journals.py` 重新抓取。
+- `doaj_journals.csv`：DOAJ 官方公开 Journal CSV，来源 `https://doaj.org/csv`。用于标记 DOAJ 收录、许可证、APC、同行评议与 DOAJ 学科。
 - `Science Citation Index Expanded (SCIE).csv`
 - `Social Sciences Citation Index (SSCI).csv`
 - `Arts & Humanities Citation Index (AHCI).csv`
