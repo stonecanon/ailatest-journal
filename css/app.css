@@ -376,7 +376,7 @@ main.main {
 .lang-toggle-wrap { position: relative; display: inline-block; }
 .lang-dropdown {
   position: absolute; top: calc(100% + 4px); right: 0; z-index: 100;
-  min-width: 130px;
+  min-width: 150px;
   background: var(--paper);
   border: 1px solid var(--rule);
   border-radius: 4px;
