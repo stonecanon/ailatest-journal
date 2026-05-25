@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-25T02:18:30.848Z",
+  "generated_at": "2026-05-25T05:08:31.890Z",
   "source": "remote D1",
   "notes": [
     "注册量来自 users.created_at，当前是最可靠口径。",
@@ -44,8 +44,8 @@
     "avg_rating": 4.43,
     "lists": 6,
     "users_with_lists": 6,
-    "total_pageviews": 554,
-    "total_visitors": 168,
+    "total_pageviews": 571,
+    "total_visitors": 172,
     "total_login_events": 10
   },
   "series": {
@@ -182,9 +182,9 @@
       },
       {
         "day": "2026-05-25",
-        "pageviews": 11,
-        "sessions": 7,
-        "visitors": 5
+        "pageviews": 28,
+        "sessions": 14,
+        "visitors": 9
       }
     ]
   },
@@ -383,8 +383,8 @@
     "topPaths": [
       {
         "path": "/",
-        "pageviews": 445,
-        "visitors": 105
+        "pageviews": 458,
+        "visitors": 107
       },
       {
         "path": "/?ref=producthunt",
@@ -452,6 +452,16 @@
         "visitors": 1
       },
       {
+        "path": "/?q=nature",
+        "pageviews": 2,
+        "visitors": 2
+      },
+      {
+        "path": "/?force=1",
+        "pageviews": 2,
+        "visitors": 2
+      },
+      {
         "path": "/s/xXZ1zTGM",
         "pageviews": 1,
         "visitors": 1
@@ -470,24 +480,14 @@
         "path": "/s/pX8snWAe?cb=1",
         "pageviews": 1,
         "visitors": 1
-      },
-      {
-        "path": "/s/pX8snWAe",
-        "pageviews": 1,
-        "visitors": 1
-      },
-      {
-        "path": "/s/p2Hbx7ip",
-        "pageviews": 1,
-        "visitors": 1
       }
     ],
     "trafficCountries": [
       {
         "country": "JP",
-        "pageviews": 369,
-        "visitors": 50,
-        "sessions": 116,
+        "pageviews": 385,
+        "visitors": 53,
+        "sessions": 122,
         "colos": "NRT",
         "client_timezones": ",Asia/Shanghai,Asia/Seoul,Asia/Tokyo,Asia/Taipei",
         "client_languages": ",en-US,zh-CN,en,ko-KR"
@@ -521,9 +521,9 @@
       },
       {
         "country": "HK",
-        "pageviews": 14,
-        "visitors": 8,
-        "sessions": 13,
+        "pageviews": 15,
+        "visitors": 9,
+        "sessions": 14,
         "colos": "HKG",
         "client_timezones": "Asia/Shanghai",
         "client_languages": "zh-CN"

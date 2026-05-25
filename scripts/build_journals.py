@@ -882,10 +882,10 @@ def infer_flagship(title, publisher=''):
 # ───────────────────────── 中国科协 — merge 回主库 (按 ISSN) ─────────────────────────
 
 def merge_cnkx_to_main(by_issn, by_title):
-    if not CNKX_JSON.exists(): return 0
-    data = json.loads(CNKX_JSON.read_text(encoding='utf-8'))
+    if not CNKX_RECORDS.exists(): return 0
+    data = json.loads(CNKX_RECORDS.read_text(encoding='utf-8'))
     hits = 0
-    for r in data.get('records', []):
+    for r in data:
         issn = r.get('issn')
         nt = norm_title(r.get('name') or '')
         rec = (issn and by_issn.get(issn)) or by_title.get(nt)
