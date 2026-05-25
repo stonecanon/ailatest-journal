@@ -1555,6 +1555,11 @@
     const tip = oaj.partition ? `OAJ ${oaj.partition}` : 'OAJ 收录';
     return `<span class="badge b-oaj" title="${T('OAJ 全球开放获取期刊索引','Open Access Journal Index')}${oaj.partition ? ' · ' + oaj.partition : ''}${oaj.position ? ' · ' + escape(oaj.position) : ''}">OAJ</span>`;
   }
+  function badgeDOAJ(doaj) {
+    if (!doaj) return '';
+    const license = doaj.lic || doaj.license || '';
+    return `<span class="badge b-doaj" title="${T('DOAJ 开放获取期刊目录','Directory of Open Access Journals')}${license ? ' · ' + escape(license) : ''}">DOAJ</span>`;
+  }
   // 期刊浏览量缓存（journal_key → count）
   const viewsCache = {};
   function badgeView(key) {
@@ -1696,6 +1701,7 @@
       ...((r.indices) || []).map(badgeIndex),
       badgeScopus(r.scopus),
       badgeOAJ(r.oaj),
+      badgeDOAJ(r.doaj),
     ].filter(Boolean).join('');
   }
   function renderRankBadges(r) {
@@ -1842,9 +1848,9 @@
   // ───────── filtering ─────────
   function matches(r) {
     if (activeIndices.size && !(r.indices || []).some(i => activeIndices.has(i))) {
-      // When OAJ is checked, OAJ journals bypass the index filter
-      // (allows pure-OAJ journals without WoS/EI indices to show)
-      if (!(activeFeats.has('oaj') && r.oaj)) return false;
+      // When OAJ / DOAJ is checked, OA directory journals bypass the index filter
+      // (allows pure OA directory journals without WoS/EI indices to show)
+      if (!((activeFeats.has('oaj') && r.oaj) || (activeFeats.has('doaj') && r.doaj))) return false;
     }
     if (activeZones.size) {
       const zones = new Set();
@@ -1861,6 +1867,7 @@
     if (activeFeats.has('flagship') && !r.flagship) return false;
     if (activeFeats.has('scopus') && !(r.scopus && r.scopus.active)) return false;
     if (activeFeats.has('oaj') && !r.oaj) return false;
+    if (activeFeats.has('doaj') && !r.doaj) return false;
     if (activeFeats.has('warning') && !r.warning) return false;
     if (activeFeats.has('abdc') && !(r.abdc && r.abdc.rating)) return false;
     if (activeFeats.has('abs')  && !(r.abs  && r.abs.rating))  return false;
@@ -2966,6 +2973,17 @@
       </div>
     </div>` : '';
 
+    const doajHTML = ir.doaj ? `<div class="drawer-section">
+      <h4>${T('DOAJ 开放获取期刊目录','DOAJ — Directory of Open Access Journals')}</h4>
+      <div class="meta-row"><div class="meta-k">${T('许可证','License')}</div><div class="meta-v">${escape(ir.doaj.lic || ir.doaj.license || '—')}</div></div>
+      <div class="meta-row"><div class="meta-k">APC</div><div class="meta-v">${escape(ir.doaj.apc || '—')}${(ir.doaj.fee || ir.doaj.apc_amount) ? ` · ${escape(ir.doaj.fee || ir.doaj.apc_amount)}` : ''}</div></div>
+      <div class="meta-row"><div class="meta-k">${T('同行评议','Peer review')}</div><div class="meta-v">${escape(ir.doaj.review || ir.doaj.review_process || '—')}</div></div>
+      ${ir.doaj.du || ir.doaj.doaj_url ? `<div class="meta-row"><div class="meta-k">DOAJ</div><div class="meta-v"><a href="${escape(ir.doaj.du || ir.doaj.doaj_url)}" target="_blank" rel="noopener">${T('打开目录页','Open directory page')}</a></div></div>` : ''}
+      <div class="muted-cell" style="font-size:11px;margin-top:4px">
+        ${T('数据来源：DOAJ Journal CSV。免费 CSV 可能较完整数据滞后。','Source: DOAJ Journal CSV. The free CSV may lag the full data dump.')}
+      </div>
+    </div>` : '';
+
     // 审稿周期已合并入 stats，此处保留空块以兼容（不输出）
     const cycleHTML = '';
 
@@ -2999,6 +3017,7 @@
       ${scopusHTML}
       ${eiHTML}
       ${oajHTML}
+      ${doajHTML}
       ${cycleHTML}
       ${oaHTML}
       ${warnHTML}

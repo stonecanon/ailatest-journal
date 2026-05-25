@@ -78,6 +78,7 @@ ABS_CANDIDATES = [
 SCOPUS_FILE  = LIST_DIR / 'scopus ext_list_Mar_2026.xlsx'
 EI_FILE      = LIST_DIR / 'CPXSourceList_102025.xlsx'
 OAJ_FILE     = LIST_DIR / 'oaj_journals.json'
+DOAJ_FILE    = LIST_DIR / 'doaj_journals.csv'
 
 CNKX_JSON    = DATA_DIR / 'cnkx_tiers.json'
 CNKX_RECORDS = DATA_DIR / 'cnkx_records.json'
@@ -941,6 +942,63 @@ def parse_oaj(path, by_title, by_issn, store=None):
     return matched, standalone
 
 
+# ───────────────────────── DOAJ Directory of Open Access Journals ─────────────────────────
+
+def parse_doaj(path, by_title, by_issn, store=None):
+    """DOAJ Journal CSV.
+
+    Official public CSV: https://doaj.org/csv
+    Match priority: print ISSN > online ISSN > normalized title. DOAJ-only journals
+    are added because many fully open-access journals are outside WoS/EI/Scopus.
+    """
+    if not path.exists():
+        return 0, 0
+    matched = standalone = 0
+    with open(path, 'r', encoding='utf-8-sig', newline='') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            title = (row.get('Journal title') or '').strip()
+            if not title:
+                continue
+            issn = clean_issn(row.get('Journal ISSN (print version)'))
+            eissn = clean_issn(row.get('Journal EISSN (online version)'))
+            nt = norm_title(title)
+            payload = {
+                'u': (row.get('Journal URL') or '').strip(),
+                'du': (row.get('URL in DOAJ') or '').strip(),
+                'lic': (row.get('Journal license') or '').strip(),
+                'apc': (row.get('APC') or '').strip(),
+                'fee': (row.get('APC amount') or '').strip(),
+                'review': (row.get('Review process') or '').strip(),
+            }
+            rec = (issn and by_issn.get(issn)) or (eissn and by_issn.get(eissn)) or by_title.get(nt)
+            if rec is not None:
+                rec['doaj'] = payload
+                if not rec.get('publisher') and row.get('Publisher'):
+                    rec['publisher'] = row.get('Publisher', '').strip()
+                if not rec.get('country') and row.get('Country of publisher'):
+                    rec['country'] = row.get('Country of publisher', '').strip()
+                matched += 1
+            elif store is not None:
+                key = 'doaj:' + (issn or eissn or nt)
+                rec = store.get(key)
+                if rec is None:
+                    rec = {
+                        'name': title, 'issn': issn, 'eissn': eissn,
+                        'publisher': (row.get('Publisher') or '').strip(),
+                        'country': (row.get('Country of publisher') or '').strip(),
+                        'abbr20': '', 'indices': [], 'wos_categories': [], 'esi_category': '',
+                        'doaj_only': True,
+                    }
+                    store[key] = rec
+                    by_title.setdefault(nt, rec)
+                    for k in (issn, eissn):
+                        if k: by_issn.setdefault(k, rec)
+                rec['doaj'] = payload
+                standalone += 1
+    return matched, standalone
+
+
 # ───────────────────────── main ─────────────────────────
 
 def main():
@@ -1036,6 +1094,11 @@ def main():
     print(f'  OAJ matched: {h}  OAJ-only: +{s}')
     by_issn, by_title = rebuild_lookups()
 
+    print('== DOAJ Directory of Open Access Journals ==')
+    h, s = parse_doaj(DOAJ_FILE, by_title, by_issn, store=store)
+    print(f'  DOAJ matched: {h}  DOAJ-only: +{s}')
+    by_issn, by_title = rebuild_lookups()
+
     # ────── finalize ──────
     for rec in store.values():
         flag = infer_flagship(rec.get('name') or '', rec.get('publisher') or '')
@@ -1049,7 +1112,7 @@ def main():
     for r in journals:
         for i in r['indices']: idx_c[i] += 1
     cas_c = Counter(); cas_top = 0
-    if_count = 0; warning_count = 0; cn_name_count = 0; ccf_count = 0; abdc_count = 0; abs_count = 0; cnkx_count = 0; scopus_count = 0; ei_count = 0; oaj_count = 0
+    if_count = 0; warning_count = 0; cn_name_count = 0; ccf_count = 0; abdc_count = 0; abs_count = 0; cnkx_count = 0; scopus_count = 0; ei_count = 0; oaj_count = 0; doaj_count = 0
     for r in journals:
         z = r.get('cas_zone')
         if z: cas_c[z] += 1
@@ -1064,12 +1127,13 @@ def main():
         if r.get('scopus') and r.get('scopus', {}).get('active') is not False: scopus_count += 1
         if 'EI' in r.get('indices', []): ei_count += 1
         if r.get('oaj'): oaj_count += 1
+        if r.get('doaj'): doaj_count += 1
 
     print('== Stats ==')
     print(f'  total: {len(journals)}')
     print(f'  indices: {dict(idx_c)}')
     print(f'  CAS zones: {dict(cas_c)} Top={cas_top}')
-    print(f'  IF: {if_count}  warning: {warning_count}  中文刊名: {cn_name_count}  CCF: {ccf_count}  ABDC: {abdc_count}  ABS: {abs_count}  CNKX: {cnkx_count}  Scopus: {scopus_count}  EI: {ei_count}  OAJ: {oaj_count}')
+    print(f'  IF: {if_count}  warning: {warning_count}  中文刊名: {cn_name_count}  CCF: {ccf_count}  ABDC: {abdc_count}  ABS: {abs_count}  CNKX: {cnkx_count}  Scopus: {scopus_count}  EI: {ei_count}  OAJ: {oaj_count}  DOAJ: {doaj_count}')
 
     # Strip large non-essential fields to stay under CF Pages 25 MB limit
     for r in journals:
@@ -1147,7 +1211,7 @@ def main():
 
     # meta
     meta = {
-        'source': 'WoS Core + JCR 2025 + ESI + 中科院 2025 + 长江大学 + ShowJCR (JCR/FQB/XR/CCF/Warning) + Scopus Mar. 2026 + EI Compendex Oct. 2025 + ABDC optional + ABS AJG + 中国科协 + OAJ 2025',
+        'source': 'WoS Core + JCR 2025 + ESI + 中科院 2025 + 长江大学 + ShowJCR (JCR/FQB/XR/CCF/Warning) + Scopus Mar. 2026 + EI Compendex Oct. 2025 + ABDC optional + ABS AJG + 中国科协 + OAJ 2025 + DOAJ Journal CSV',
         'last_updated_source': 'WoS Core 2026-04-20',
         'total': len(journals),
         'indices': dict(idx_c),
@@ -1160,6 +1224,7 @@ def main():
         'with_abdc': abdc_count,
         'with_abs': abs_count,
         'with_oaj': oaj_count,
+        'with_doaj': doaj_count,
         'with_cnkx': cnkx_count,
         'with_scopus': scopus_count,
         'with_ei': ei_count,
