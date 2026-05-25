@@ -2162,7 +2162,8 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .jcard-row .tier-pill,
 .jcard-row .xr-pill,
 .jcard-row .warn-pill,
-.jcard-row .flagship-pill { font-size: 11px; }
+.jcard-row .flagship-pill,
+.jcard-row .domsrc-pill { font-size: 11px; }
 .share-row-tags.badges,
 .share-list-row .share-row-tags.badges { display: inline-flex; flex-wrap: wrap; gap: 4px; margin-left: 8px; vertical-align: middle; }
 .share-row-tags .badge,
@@ -2172,7 +2173,8 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .share-row-tags .tier-pill,
 .share-row-tags .xr-pill,
 .share-row-tags .warn-pill,
-.share-row-tags .flagship-pill { font-size: 10px; padding: 1px 5px; }
+.share-row-tags .flagship-pill,
+.share-row-tags .domsrc-pill { font-size: 10px; padding: 1px 5px; }
 .jcard-idx {
   display: inline-block; padding: 2px 8px; border-radius: 3px;
   background: #6b5d52; color: #fff;
