@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-25T05:08:31.890Z",
+  "generated_at": "2026-05-25T11:13:32.121Z",
   "source": "remote D1",
   "notes": [
     "注册量来自 users.created_at，当前是最可靠口径。",
@@ -35,18 +35,18 @@
     "google_users": 3,
     "first_signup_at": 1778628305,
     "latest_signup_at": 1779440996,
-    "favorite_rows": 27,
+    "favorite_rows": 28,
     "users_with_favorites": 5,
-    "avg_favorites_per_active_user": 5.4,
+    "avg_favorites_per_active_user": 5.6,
     "rating_rows": 22,
     "users_with_ratings": 5,
     "rated_journals": 17,
     "avg_rating": 4.43,
     "lists": 6,
     "users_with_lists": 6,
-    "total_pageviews": 571,
-    "total_visitors": 172,
-    "total_login_events": 10
+    "total_pageviews": 591,
+    "total_visitors": 180,
+    "total_login_events": 11
   },
   "series": {
     "providerMix": [
@@ -104,7 +104,7 @@
       },
       {
         "day": "2026-05-20",
-        "active_users_proxy": 4
+        "active_users_proxy": 3
       },
       {
         "day": "2026-05-21",
@@ -113,6 +113,10 @@
       {
         "day": "2026-05-22",
         "active_users_proxy": 2
+      },
+      {
+        "day": "2026-05-25",
+        "active_users_proxy": 1
       }
     ],
     "loginEventsByDay": [
@@ -130,12 +134,17 @@
         "day": "2026-05-22",
         "login_events": 2,
         "login_users": 2
+      },
+      {
+        "day": "2026-05-25",
+        "login_events": 1,
+        "login_users": 1
       }
     ],
     "loginProviderMix": [
       {
         "provider": "google",
-        "login_events": 4,
+        "login_events": 5,
         "login_users": 2
       },
       {
@@ -182,9 +191,9 @@
       },
       {
         "day": "2026-05-25",
-        "pageviews": 28,
-        "sessions": 14,
-        "visitors": 9
+        "pageviews": 48,
+        "sessions": 28,
+        "visitors": 17
       }
     ]
   },
@@ -211,6 +220,11 @@
         "label": "JOURNAL OF BUILDING ENGINEERING"
       },
       {
+        "journal_key": "0360-1323",
+        "favorites": 2,
+        "label": "BUILDING AND ENVIRONMENT"
+      },
+      {
         "journal_key": "2075-5309",
         "favorites": 2,
         "label": "BUILDINGS"
@@ -229,11 +243,6 @@
         "journal_key": "0009-7322",
         "favorites": 1,
         "label": "CIRCULATION"
-      },
-      {
-        "journal_key": "0360-1323",
-        "favorites": 1,
-        "label": "BUILDING AND ENVIRONMENT"
       },
       {
         "journal_key": "0378-7788",
@@ -383,8 +392,8 @@
     "topPaths": [
       {
         "path": "/",
-        "pageviews": 458,
-        "visitors": 107
+        "pageviews": 475,
+        "visitors": 111
       },
       {
         "path": "/?ref=producthunt",
@@ -399,6 +408,11 @@
       {
         "path": "/s/3P9gQfdK",
         "pageviews": 6,
+        "visitors": 4
+      },
+      {
+        "path": "/?q=nature",
+        "pageviews": 5,
         "visitors": 4
       },
       {
@@ -452,11 +466,6 @@
         "visitors": 1
       },
       {
-        "path": "/?q=nature",
-        "pageviews": 2,
-        "visitors": 2
-      },
-      {
         "path": "/?force=1",
         "pageviews": 2,
         "visitors": 2
@@ -485,9 +494,9 @@
     "trafficCountries": [
       {
         "country": "JP",
-        "pageviews": 385,
-        "visitors": 53,
-        "sessions": 122,
+        "pageviews": 398,
+        "visitors": 56,
+        "sessions": 132,
         "colos": "NRT",
         "client_timezones": ",Asia/Shanghai,Asia/Seoul,Asia/Tokyo,Asia/Taipei",
         "client_languages": ",en-US,zh-CN,en,ko-KR"
@@ -521,12 +530,21 @@
       },
       {
         "country": "HK",
-        "pageviews": 15,
-        "visitors": 9,
-        "sessions": 14,
+        "pageviews": 18,
+        "visitors": 10,
+        "sessions": 15,
         "colos": "HKG",
-        "client_timezones": "Asia/Shanghai",
-        "client_languages": "zh-CN"
+        "client_timezones": "Asia/Shanghai,",
+        "client_languages": "zh-CN,,en-US"
+      },
+      {
+        "country": "DE",
+        "pageviews": 11,
+        "visitors": 9,
+        "sessions": 9,
+        "colos": "DUS,FRA",
+        "client_timezones": "America/New_York,Asia/Shanghai,UTC,Europe/Berlin",
+        "client_languages": "en-US,zh-CN"
       },
       {
         "country": "GB",
@@ -536,15 +554,6 @@
         "colos": "LHR",
         "client_timezones": null,
         "client_languages": null
-      },
-      {
-        "country": "DE",
-        "pageviews": 7,
-        "visitors": 6,
-        "sessions": 6,
-        "colos": "DUS,FRA",
-        "client_timezones": "America/New_York,Asia/Shanghai,UTC",
-        "client_languages": "en-US"
       },
       {
         "country": "TW",
@@ -672,7 +681,7 @@
         "login": "stonecanon",
         "name": "H&S一心菌 (石头小石头)",
         "created_at": 1778766419,
-        "updated_at": 1779287054
+        "updated_at": 1779706069
       },
       {
         "id": 3,

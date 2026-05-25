@@ -179,61 +179,62 @@
   // ── Domestic field-value translations (CAST domains, CSSCI/PKU disciplines, ZJU tiers) ──
   const DOM_I18N = {
     domain: {
-        "中医药":"Traditional Chinese Medicine",
+        "中医药领域":"Traditional Chinese Medicine",
         "中国优秀科普期刊":"Outstanding Popular Science Journals",
         "临床医学":"Clinical Medicine",
+        "临床医学领域":"Clinical Medicine (Fields)",
         "仪器仪表":"Instruments & Instrumentation",
         "仿真科学与技术":"Simulation Science & Technology",
         "体育":"Sports Science",
         "信息通信":"Information & Communication",
-        "光学工程和光学":"Optical Engineering & Optics",
+        "光学":"Optics",
         "公路运输":"Highway Transportation",
         "兵器科学与技术":"Weaponry Science & Technology",
         "农业工程":"Agricultural Engineering",
         "冶金工程技术与金属材料":"Metallurgical Engineering & Metallic Materials",
-        "化工":"Chemical Engineering",
+        "化工领域":"Chemical Engineering",
         "口腔医学":"Stomatology",
         "图像图形":"Image & Graphics",
-        "图学":"Graphics Science",
+        "图学领域":"Graphics Science",
         "土壤学":"Soil Science",
         "地球物理":"Geophysics",
-        "地球科学":"Earth Sciences",
-        "地理资源":"Geography & Resources",
+        "地球科学领域":"Earth Sciences",
+        "地理资源领域":"Geography & Resources",
         "声学":"Acoustics",
         "安全科学":"Safety Science",
-        "岩土力学与工程地质":"Geotechnical Mechanics & Engineering Geology",
-        "建筑科学":"Architectural Science",
+        "岩土力学":"Geotechnical Mechanics",
+        "建筑领域":"Architectural Science",
         "技术经济":"Technology Economics",
-        "护理学":"Nursing",
+        "护理领域":"Nursing",
         "指挥与控制":"Command & Control",
         "振动工程":"Vibration Engineering",
         "数学":"Mathematics",
         "无机非金属材料":"Inorganic Non-metallic Materials",
-        "有色金属":"Non-ferrous Metals",
-        "机械工程":"Mechanical Engineering",
+        "有色金属领域":"Non-ferrous Metals",
+        "机械领域":"Mechanical Engineering",
         "材料-综合":"Materials Science (General)",
-        "材料失效与保护":"Materials Failure & Protection",
-        "核":"Nuclear Science",
-        "植物科学":"Plant Science",
+        "材料失效与保护领域":"Materials Failure & Protection",
+        "核领域":"Nuclear Science",
+        "植物科学领域":"Plant Science",
         "汽车工程":"Automotive Engineering",
-        "煤炭":"Coal Industry",
-        "照明":"Illumination",
+        "煤炭领域":"Coal Industry",
+        "照明领域":"Illumination",
         "环境科学":"Environmental Science",
         "生态学":"Ecology",
         "生物医学工程":"Biomedical Engineering",
         "电子及信息技术":"Electronics & Information Technology",
         "电气工程":"Electrical Engineering",
-        "石油天然气工业":"Petroleum & Natural Gas Industry",
-        "管理科学":"Management Science",
+        "石油、天然气工业":"Petroleum & Natural Gas Industry",
+        "管理学":"Management Science",
         "纺织":"Textiles",
-        "细胞生物学":"Cell Biology",
-        "能源电力":"Energy & Power",
-        "自动化学科":"Automation",
+        "细胞生物学领域":"Cell Biology",
+        "能源电力领域":"Energy & Power",
+        "自动化学科领域":"Automation",
+        "航天航空领域":"Aerospace",
         "航海":"Navigation",
-        "航空航天":"Aerospace",
         "舰船科学":"Naval Architecture",
         "药学":"Pharmacy",
-        "计算":"Computing",
+        "计算领域":"Computing",
         "遥感科学与技术":"Remote Sensing Science & Technology",
         "铁路运输":"Railway Transportation",
         "预防医学与卫生学":"Preventive Medicine & Hygiene",
@@ -1706,7 +1707,7 @@
       badgeCCF(r.ccf),
       badgeABDC(r.abdc),
       badgeABS(r.abs),
-      ...(r.cnkx ? r.cnkx.slice(0,2).map(c => badgeTier(c.tier)) : []),
+        // cnkx tier badges removed — now handled by renderDomCrossBadges via domIndex
       r.warning ? badgeWarn() : '',
     ].filter(Boolean).join('');
   }
@@ -3270,7 +3271,7 @@
         return {
           name: rec.name || rec.cn_name || '—',
           cn_name: rec.cn_name && rec.cn_name !== rec.name ? rec.cn_name : '',
-          badge_html: [renderIndexBadges(rec), renderRankBadges(rec)].filter(Boolean).join(''),
+          badge_html: [renderIndexBadges(rec), renderRankBadges(rec), renderDomCrossBadges(rec)].filter(Boolean).join(''),
         };
       });
       showShareModal({ url: shareUrl, expiresAt: d.expires_at, listName: favListDisplayName(cur), count: items.length, items: richItems });
@@ -3367,7 +3368,7 @@
     idxList.sort((a,b) => (idxRank[a]||9) - (idxRank[b]||9));
     const idxHtml = renderIndexBadges(ir);
 
-    const zonesHtml = renderRankBadges(ir);
+    const zonesHtml = [renderRankBadges(ir), renderDomCrossBadges(ir)].filter(Boolean).join('');
 
     // 关键指标 + 元信息
     const stats = [];
