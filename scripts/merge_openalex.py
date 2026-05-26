@@ -77,6 +77,13 @@ def main():
             "w": rec.get("works_count") or None,
             "t": rec.get("type") or None,
         }
+        # Extract top topic subfield names (max 8, sorted by count desc)
+        topics = rec.get("topics") or []
+        if topics:
+            sorted_topics = sorted(topics, key=lambda x: x.get("count", 0), reverse=True)
+            names = [st.get("display_name", "") for st in sorted_topics[:8] if st.get("display_name")]
+            if names:
+                row["tp"] = names
         # drop empty values to shrink file
         row = {k: v for k, v in row.items() if v not in (None, 0)}
         # but re-attach label always

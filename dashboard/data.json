@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-26T10:53:40.782Z",
+  "generated_at": "2026-05-26T13:43:41.693Z",
   "source": "remote D1",
   "notes": [
     "注册量来自 users.created_at，当前是最可靠口径。",
@@ -28,13 +28,13 @@
     "users"
   ],
   "kpis": {
-    "total_users": 12,
+    "total_users": 13,
     "users_with_email": 9,
     "email_users": 6,
-    "github_users": 3,
+    "github_users": 4,
     "google_users": 3,
     "first_signup_at": 1778628305,
-    "latest_signup_at": 1779440996,
+    "latest_signup_at": 1779794141,
     "favorite_rows": 28,
     "users_with_favorites": 5,
     "avg_favorites_per_active_user": 5.6,
@@ -44,9 +44,9 @@
     "avg_rating": 4.43,
     "lists": 6,
     "users_with_lists": 6,
-    "total_pageviews": 630,
-    "total_visitors": 198,
-    "total_login_events": 13
+    "total_pageviews": 643,
+    "total_visitors": 204,
+    "total_login_events": 14
   },
   "series": {
     "providerMix": [
@@ -55,11 +55,11 @@
         "users": 6
       },
       {
-        "provider": "google",
-        "users": 3
+        "provider": "github",
+        "users": 4
       },
       {
-        "provider": "github",
+        "provider": "google",
         "users": 3
       }
     ],
@@ -91,6 +91,10 @@
       {
         "day": "2026-05-22",
         "signups": 2
+      },
+      {
+        "day": "2026-05-26",
+        "signups": 1
       }
     ],
     "activeProxyByDay": [
@@ -117,6 +121,10 @@
       {
         "day": "2026-05-25",
         "active_users_proxy": 1
+      },
+      {
+        "day": "2026-05-26",
+        "active_users_proxy": 1
       }
     ],
     "loginEventsByDay": [
@@ -139,6 +147,11 @@
         "day": "2026-05-25",
         "login_events": 3,
         "login_users": 1
+      },
+      {
+        "day": "2026-05-26",
+        "login_events": 1,
+        "login_users": 1
       }
     ],
     "loginProviderMix": [
@@ -149,8 +162,8 @@
       },
       {
         "provider": "github",
-        "login_events": 3,
-        "login_users": 3
+        "login_events": 4,
+        "login_users": 4
       },
       {
         "provider": "email",
@@ -197,9 +210,9 @@
       },
       {
         "day": "2026-05-26",
-        "pageviews": 20,
-        "sessions": 20,
-        "visitors": 15
+        "pageviews": 33,
+        "sessions": 28,
+        "visitors": 21
       }
     ]
   },
@@ -398,8 +411,8 @@
     "topPaths": [
       {
         "path": "/",
-        "pageviews": 514,
-        "visitors": 124
+        "pageviews": 525,
+        "visitors": 128
       },
       {
         "path": "/?ref=producthunt",
@@ -500,18 +513,18 @@
     "trafficCountries": [
       {
         "country": "JP",
-        "pageviews": 420,
-        "visitors": 57,
-        "sessions": 142,
+        "pageviews": 429,
+        "visitors": 58,
+        "sessions": 146,
         "colos": "NRT",
         "client_timezones": ",Asia/Shanghai,Asia/Seoul,Asia/Tokyo,Asia/Taipei",
         "client_languages": ",en-US,zh-CN,en,ko-KR"
       },
       {
         "country": "US",
-        "pageviews": 97,
-        "visitors": 62,
-        "sessions": 77,
+        "pageviews": 98,
+        "visitors": 63,
+        "sessions": 78,
         "colos": "LAX,SEA,IAD,SJC,ORD,ATL,DFW,EWR,PDX",
         "client_timezones": "Etc/Unknown,UTC,America/Chicago,Asia/Shanghai,America/Los_Angeles,",
         "client_languages": "en-US,zh-CN,en-US@posix,"
@@ -527,18 +540,18 @@
       },
       {
         "country": "SG",
-        "pageviews": 28,
-        "visitors": 14,
-        "sessions": 19,
+        "pageviews": 29,
+        "visitors": 15,
+        "sessions": 20,
         "colos": "SIN",
         "client_timezones": "Asia/Calcutta,Asia/Shanghai,Etc/GMT-8",
         "client_languages": "en-US,zh-CN"
       },
       {
         "country": "HK",
-        "pageviews": 20,
-        "visitors": 11,
-        "sessions": 17,
+        "pageviews": 22,
+        "visitors": 13,
+        "sessions": 19,
         "colos": "HKG",
         "client_timezones": "Asia/Shanghai,",
         "client_languages": "zh-CN,,en-US"
@@ -608,6 +621,15 @@
       }
     ],
     "recentUsers": [
+      {
+        "id": 13,
+        "provider": "github",
+        "email": "",
+        "login": "qingc188",
+        "name": "Tianyu Zhou",
+        "created_at": 1779794141,
+        "updated_at": 1779794141
+      },
       {
         "id": 12,
         "provider": "email",

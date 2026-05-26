@@ -32,6 +32,7 @@ SELECT = ",".join([
     "homepage_url", "is_oa", "is_in_doaj",
     "apc_usd", "apc_prices", "type", "country_code",
     "host_organization_name", "works_count",
+    "topics",
 ])
 
 
@@ -103,8 +104,15 @@ def main():
     fetched = set(cache.get("fetched_issns", []))
     by_issn = cache.setdefault("by_issn", {})
 
+    # Re-fetch records that are missing 'topics' (schema upgrade)
+    missing_topics = set()
+    for k, v in by_issn.items():
+        if "topics" not in v:
+            fetched.discard(k)
+            missing_topics.add(k)
+
     todo = [i for i in all_issns if i not in fetched]
-    print(f"Already cached: {len(fetched)}; remaining: {len(todo)}")
+    print(f"Already cached: {len(fetched)}; missing topics: {len(missing_topics)}; remaining: {len(todo)}")
 
     t0 = time.time()
     saved_count = 0
@@ -145,6 +153,7 @@ def main():
                 "country": r.get("country_code"),
                 "host_org": r.get("host_organization_name"),
                 "works_count": r.get("works_count"),
+                "topics": r.get("topics", []),
             }
             for issn in issns:
                 by_issn[issn.upper()] = record
