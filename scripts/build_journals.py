@@ -75,7 +75,7 @@ ABS_CANDIDATES = [
     LIST_DIR / 'AJG_2024.xlsx',
     LIST_DIR / 'AJG2024.csv',
 ]
-SCOPUS_FILE  = LIST_DIR / 'scopus ext_list_Mar_2026.xlsx'
+SCOPUS_FILE  = LIST_DIR / 'scopus_source_list.xlsx'
 EI_FILE      = LIST_DIR / 'CPXSourceList_102025.xlsx'
 OAJ_FILE     = LIST_DIR / 'oaj_journals.json'
 DOAJ_FILE    = LIST_DIR / 'doaj_journals.csv'
@@ -711,7 +711,9 @@ def parse_scopus(path, by_title, by_issn, store=None):
     if not path.exists() or not openpyxl:
         return 0, 0, 0
     wb = openpyxl.load_workbook(path, read_only=True, data_only=True)
-    ws = wb['Scopus Sources Mar. 2026'] if 'Scopus Sources Mar. 2026' in wb.sheetnames else wb.active
+    # auto-detect sheet containing "Scopus Sources"
+    sheet_name = next((s for s in wb.sheetnames if 'Scopus Sources' in s), None)
+    ws = wb[sheet_name] if sheet_name else wb.active
     rows = ws.iter_rows(values_only=True)
     headers = [str(v).strip() if v is not None else '' for v in next(rows)]
     col = {h: i for i, h in enumerate(headers) if h}
@@ -756,7 +758,7 @@ def parse_scopus(path, by_title, by_issn, store=None):
             'coverage': cell(raw, 'Coverage'),
             'asjc': asjc,
             'asjc_top': asjc_top,
-            'source': 'Scopus Source List Mar. 2026',
+            'source': 'Scopus Source List (auto-updated)',
         }
         rec = (issn and by_issn.get(issn)) or (eissn and by_issn.get(eissn)) or by_title.get(nt)
         if rec is not None:
@@ -1058,7 +1060,7 @@ def main():
     h = parse_showjcr_ccf(SHOW_CCF, by_title, by_issn)
     print(f'  CCF matched: {h}')
 
-    print('== Scopus Source List Mar. 2026 ==')
+    print('== Scopus Source List ==')
     h, s, inactive = parse_scopus(SCOPUS_FILE, by_title, by_issn, store=store)
     print(f'  Scopus matched: {h}  standalone active: +{s}  inactive matched: {inactive}')
     by_issn, by_title = rebuild_lookups()
@@ -1211,7 +1213,7 @@ def main():
 
     # meta
     meta = {
-        'source': 'WoS Core + JCR 2025 + ESI + 中科院 2025 + 长江大学 + ShowJCR (JCR/FQB/XR/CCF/Warning) + Scopus Mar. 2026 + EI Compendex Oct. 2025 + ABDC optional + ABS AJG + 中国科协 + OAJ 2025 + DOAJ Journal CSV',
+        'source': 'WoS Core + JCR 2025 + ESI + 中科院 2025 + 长江大学 + ShowJCR (JCR/FQB/XR/CCF/Warning) + Scopus (auto-updated) + EI Compendex Oct. 2025 + ABDC optional + ABS AJG + 中国科协 + OAJ 2025 + DOAJ Journal CSV',
         'last_updated_source': 'WoS Core 2026-04-20',
         'total': len(journals),
         'indices': dict(idx_c),
