@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-26T14:33:41.873Z",
+  "generated_at": "2026-05-26T23:04:03.854Z",
   "source": "remote D1",
   "notes": [
     "注册量来自 users.created_at，当前是最可靠口径。",
@@ -28,35 +28,35 @@
     "users"
   ],
   "kpis": {
-    "total_users": 13,
-    "users_with_email": 9,
-    "email_users": 6,
-    "github_users": 4,
+    "total_users": 15,
+    "users_with_email": 10,
+    "email_users": 7,
+    "github_users": 5,
     "google_users": 3,
     "first_signup_at": 1778628305,
-    "latest_signup_at": 1779794141,
-    "favorite_rows": 28,
-    "users_with_favorites": 5,
-    "avg_favorites_per_active_user": 5.6,
+    "latest_signup_at": 1779811726,
+    "favorite_rows": 30,
+    "users_with_favorites": 6,
+    "avg_favorites_per_active_user": 5,
     "rating_rows": 22,
     "users_with_ratings": 5,
     "rated_journals": 17,
     "avg_rating": 4.43,
-    "lists": 6,
-    "users_with_lists": 6,
-    "total_pageviews": 653,
-    "total_visitors": 206,
-    "total_login_events": 14
+    "lists": 7,
+    "users_with_lists": 7,
+    "total_pageviews": 661,
+    "total_visitors": 209,
+    "total_login_events": 17
   },
   "series": {
     "providerMix": [
       {
         "provider": "email",
-        "users": 6
+        "users": 7
       },
       {
         "provider": "github",
-        "users": 4
+        "users": 5
       },
       {
         "provider": "google",
@@ -94,7 +94,7 @@
       },
       {
         "day": "2026-05-26",
-        "signups": 1
+        "signups": 3
       }
     ],
     "activeProxyByDay": [
@@ -124,7 +124,7 @@
       },
       {
         "day": "2026-05-26",
-        "active_users_proxy": 1
+        "active_users_proxy": 3
       }
     ],
     "loginEventsByDay": [
@@ -150,8 +150,8 @@
       },
       {
         "day": "2026-05-26",
-        "login_events": 1,
-        "login_users": 1
+        "login_events": 4,
+        "login_users": 3
       }
     ],
     "loginProviderMix": [
@@ -162,13 +162,13 @@
       },
       {
         "provider": "github",
-        "login_events": 4,
-        "login_users": 4
+        "login_events": 5,
+        "login_users": 5
       },
       {
         "provider": "email",
-        "login_events": 3,
-        "login_users": 3
+        "login_events": 5,
+        "login_users": 4
       }
     ],
     "pageviewsByDay": [
@@ -210,9 +210,9 @@
       },
       {
         "day": "2026-05-26",
-        "pageviews": 43,
-        "sessions": 31,
-        "visitors": 23
+        "pageviews": 51,
+        "sessions": 37,
+        "visitors": 26
       }
     ]
   },
@@ -259,6 +259,11 @@
         "label": "JOURNAL OF THE ACOUSTICAL SOCIETY OF AMERICA"
       },
       {
+        "journal_key": "0031-9155",
+        "favorites": 1,
+        "label": "PHYSICS IN MEDICINE AND BIOLOGY"
+      },
+      {
         "journal_key": "0378-7788",
         "favorites": 1,
         "label": "ENERGY AND BUILDINGS"
@@ -297,6 +302,11 @@
         "journal_key": "2571-6255",
         "favorites": 1,
         "label": "FIRE-SWITZERLAND"
+      },
+      {
+        "journal_key": "2573-0436",
+        "favorites": 1,
+        "label": "IEEE TRANSACTIONS ON COMPUTATIONAL IMAGING"
       },
       {
         "journal_key": "t:circulation",
@@ -411,8 +421,8 @@
     "topPaths": [
       {
         "path": "/",
-        "pageviews": 534,
-        "visitors": 130
+        "pageviews": 542,
+        "visitors": 132
       },
       {
         "path": "/?ref=producthunt",
@@ -513,27 +523,27 @@
     "trafficCountries": [
       {
         "country": "JP",
-        "pageviews": 438,
-        "visitors": 59,
-        "sessions": 148,
+        "pageviews": 444,
+        "visitors": 60,
+        "sessions": 152,
         "colos": "NRT",
         "client_timezones": ",Asia/Shanghai,Asia/Seoul,Asia/Tokyo,Asia/Taipei",
         "client_languages": ",en-US,zh-CN,en,ko-KR"
       },
       {
         "country": "US",
-        "pageviews": 98,
-        "visitors": 63,
-        "sessions": 78,
+        "pageviews": 99,
+        "visitors": 64,
+        "sessions": 79,
         "colos": "LAX,SEA,IAD,SJC,ORD,ATL,DFW,EWR,PDX",
-        "client_timezones": "Etc/Unknown,UTC,America/Chicago,Asia/Shanghai,America/Los_Angeles,",
+        "client_timezones": "Etc/Unknown,UTC,America/Chicago,Asia/Shanghai,America/Los_Angeles,,Asia/Hong_Kong",
         "client_languages": "en-US,zh-CN,en-US@posix,"
       },
       {
         "country": "NL",
-        "pageviews": 31,
-        "visitors": 19,
-        "sessions": 22,
+        "pageviews": 32,
+        "visitors": 20,
+        "sessions": 23,
         "colos": "AMS",
         "client_timezones": "Asia/Shanghai",
         "client_languages": "en-US,zh-CN,en"
@@ -630,6 +640,24 @@
       }
     ],
     "recentUsers": [
+      {
+        "id": 15,
+        "provider": "email",
+        "email": "10***@qq.com",
+        "login": "1012238555",
+        "name": "1012238555",
+        "created_at": 1779811726,
+        "updated_at": 1779812013
+      },
+      {
+        "id": 14,
+        "provider": "github",
+        "email": "",
+        "login": "ShuoLi0311",
+        "name": "Shuo Li",
+        "created_at": 1779806119,
+        "updated_at": 1779806119
+      },
       {
         "id": 13,
         "provider": "github",

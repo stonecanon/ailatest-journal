@@ -1691,7 +1691,21 @@
         if (!z) return '';
         return `<span class="xr-pill xr-${z}" title="${T('中科院 2026 新锐版分区','CAS Emerging Edition 2026')}">${T('新锐','Emerging')} ${z}${T('区','')}</span>`;
       }
-      function badgeWarn() { return `<span class="warn-pill">⚠ Warning</span>`; }
+      function badgeWarn(w, isCard) {
+        if (!w) return '';
+        // Rich warning object with year/level
+        if (typeof w === 'object') {
+          const arr = Array.isArray(w) ? w : [w];
+          const latest = arr.reduce((a,b) => (!a || (b.year && b.year > (a.year||0))) ? b : a, null);
+          const yearStr = latest && latest.year ? `${latest.year}` : '';
+          const levelStr = latest && latest.level ? latest.level : '';
+          const label = yearStr ? `${yearStr}${levelStr ? '/'+levelStr : ''}` : (levelStr || '');
+          if (isCard && label) {
+            return `<span class="warn-pill">⚠ ${escape(label)}</span>`;
+          }
+        }
+        return `<span class="warn-pill">⚠ Warning</span>`;
+      }
 
   // 统一标签组合：主页 / 收藏页 / 抽屉 / 分享卡片共用同一批 badge 函数与 CSS 类。
   function renderIndexBadges(r) {
@@ -1714,7 +1728,7 @@
       badgeABDC(r.abdc),
       badgeABS(r.abs),
         // cnkx tier badges removed — now handled by renderDomCrossBadges via domIndex
-      r.warning ? badgeWarn() : '',
+      r.warning ? badgeWarn(r.warning, true) : '',
     ].filter(Boolean).join('');
   }
   function renderBadgeCell(indexBadges, rankBadges) {

@@ -51,7 +51,6 @@ ESI_FILE    = LIST_DIR / 'ESI全部期刊列表.xlsx'
 CAS_FILE    = LIST_DIR / '2025中科院分区表完整版（附2023vs2025对比版）.xlsx'
 CJU_FILE    = LIST_DIR / '中国科学院2025年期刊大类划分（仅供参考用）第二来源-长江大学.xlsx'
 
-SHOW_WARN   = LIST_DIR / 'ShowJCR_国际期刊预警_2025.csv'
 SHOW_JCR    = LIST_DIR / 'ShowJCR_JCR_2024.csv'
 SHOW_FQB    = LIST_DIR / 'ShowJCR_中科院分区_2025.csv'
 SHOW_XR     = LIST_DIR / 'ShowJCR_中科院新锐版_2026.csv'
@@ -294,6 +293,71 @@ def parse_warning(path, by_title, by_issn):
             if rec is None: continue
             rec['warning'] = reason or True
             hits += 1
+    return hits
+
+
+WARNING_XLSX = LIST_DIR / '国际期刊预警名单_2020-2025.xlsx'
+def parse_warning_xlsx(path, by_title, by_issn):
+    """Parse the comprehensive CAS warning list xlsx (2020-2025).
+    '全部名单' sheet columns: 序号, 年份, 学科, 期刊, ISSN/EISSN, 预警级别, 预警原因, 发布信息, 页面链接
+    Stores warning as object {year, level, reason, subject} — supports multiple years.
+    """
+    if not path.exists():
+        print(f'  WARNING: {path} not found')
+        return 0
+    try:
+        import openpyxl
+    except ImportError:
+        print('  WARNING: openpyxl not available, skipping warning xlsx')
+        return 0
+    wb = openpyxl.load_workbook(path, read_only=True, data_only=True)
+    if '全部名单' not in wb.sheetnames:
+        print(f'  WARNING: no "全部名单" sheet in {path}')
+        return 0
+    ws = wb['全部名单']
+    rows = list(ws.iter_rows(values_only=True))
+    if not rows:
+        return 0
+    headers = rows[0]
+    # find column indices
+    try:
+        idx_year   = headers.index('年份')
+        idx_subj   = headers.index('学科')
+        idx_jrnl   = headers.index('期刊')
+        idx_issn   = headers.index('ISSN/EISSN')
+        idx_level  = headers.index('预警级别')
+        idx_reason = headers.index('预警原因')
+    except ValueError as e:
+        print(f'  WARNING: column mismatch in "全部名单": {e}')
+        return 0
+    hits = 0
+    for row in rows[1:]:
+        if not row or not row[idx_jrnl]:
+            continue
+        title = str(row[idx_jrnl]).strip()
+        issn  = str(row[idx_issn]).strip() if row[idx_issn] else ''
+        year  = int(row[idx_year]) if row[idx_year] else None
+        level = str(row[idx_level]).strip() if row[idx_level] else None
+        subject = str(row[idx_subj]).strip() if row[idx_subj] else None
+        reason = str(row[idx_reason]).strip() if row[idx_reason] else None
+        if not title:
+            continue
+        nt = norm_title(title)
+        rec = by_title.get(nt)
+        if rec is None and issn and issn != '-':
+            rec = by_issn.get(issn)
+        if rec is None:
+            continue
+        wobj = {'year': year, 'level': level, 'reason': reason, 'subject': subject}
+        existing = rec.get('warning')
+        if isinstance(existing, list):
+            existing.append(wobj)
+        elif isinstance(existing, dict):
+            rec['warning'] = [existing, wobj]
+        else:
+            rec['warning'] = wobj
+        hits += 1
+    wb.close()
     return hits
 
 
@@ -1041,8 +1105,8 @@ def main():
     h = parse_changjiang(CJU_FILE, by_issn, by_title)
     print(f'  Changjiang matched: {h}')
 
-    print('== ShowJCR 预警名单 ==')
-    h = parse_warning(SHOW_WARN, by_title, by_issn)
+    print('== 中科院预警名单 2020-2025 ==')
+    h = parse_warning_xlsx(LIST_DIR / '国际期刊预警名单_2020-2025.xlsx', by_title, by_issn)
     print(f'  warning matched: {h}')
 
     print('== ShowJCR JCR 2024 IF ==')
