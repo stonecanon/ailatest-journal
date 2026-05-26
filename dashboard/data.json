@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-25T11:13:32.121Z",
+  "generated_at": "2026-05-26T10:53:40.782Z",
   "source": "remote D1",
   "notes": [
     "注册量来自 users.created_at，当前是最可靠口径。",
@@ -44,9 +44,9 @@
     "avg_rating": 4.43,
     "lists": 6,
     "users_with_lists": 6,
-    "total_pageviews": 591,
-    "total_visitors": 180,
-    "total_login_events": 11
+    "total_pageviews": 630,
+    "total_visitors": 198,
+    "total_login_events": 13
   },
   "series": {
     "providerMix": [
@@ -137,14 +137,14 @@
       },
       {
         "day": "2026-05-25",
-        "login_events": 1,
+        "login_events": 3,
         "login_users": 1
       }
     ],
     "loginProviderMix": [
       {
         "provider": "google",
-        "login_events": 5,
+        "login_events": 7,
         "login_users": 2
       },
       {
@@ -191,9 +191,15 @@
       },
       {
         "day": "2026-05-25",
-        "pageviews": 48,
-        "sessions": 28,
-        "visitors": 17
+        "pageviews": 67,
+        "sessions": 36,
+        "visitors": 20
+      },
+      {
+        "day": "2026-05-26",
+        "pageviews": 20,
+        "sessions": 20,
+        "visitors": 15
       }
     ]
   },
@@ -240,11 +246,6 @@
         "label": "JOURNAL OF THE ACOUSTICAL SOCIETY OF AMERICA"
       },
       {
-        "journal_key": "0009-7322",
-        "favorites": 1,
-        "label": "CIRCULATION"
-      },
-      {
         "journal_key": "0378-7788",
         "favorites": 1,
         "label": "ENERGY AND BUILDINGS"
@@ -253,6 +254,11 @@
         "journal_key": "0944-7113",
         "favorites": 1,
         "label": "PHYTOMEDICINE"
+      },
+      {
+        "journal_key": "1110-0168",
+        "favorites": 1,
+        "label": "ALEXANDRIA ENGINEERING JOURNAL"
       },
       {
         "journal_key": "1740-1526",
@@ -392,8 +398,8 @@
     "topPaths": [
       {
         "path": "/",
-        "pageviews": 475,
-        "visitors": 111
+        "pageviews": 514,
+        "visitors": 124
       },
       {
         "path": "/?ref=producthunt",
@@ -494,45 +500,45 @@
     "trafficCountries": [
       {
         "country": "JP",
-        "pageviews": 398,
-        "visitors": 56,
-        "sessions": 132,
+        "pageviews": 420,
+        "visitors": 57,
+        "sessions": 142,
         "colos": "NRT",
         "client_timezones": ",Asia/Shanghai,Asia/Seoul,Asia/Tokyo,Asia/Taipei",
         "client_languages": ",en-US,zh-CN,en,ko-KR"
       },
       {
         "country": "US",
-        "pageviews": 87,
-        "visitors": 55,
-        "sessions": 67,
+        "pageviews": 97,
+        "visitors": 62,
+        "sessions": 77,
         "colos": "LAX,SEA,IAD,SJC,ORD,ATL,DFW,EWR,PDX",
         "client_timezones": "Etc/Unknown,UTC,America/Chicago,Asia/Shanghai,America/Los_Angeles,",
         "client_languages": "en-US,zh-CN,en-US@posix,"
       },
       {
         "country": "NL",
-        "pageviews": 29,
-        "visitors": 17,
-        "sessions": 20,
+        "pageviews": 31,
+        "visitors": 19,
+        "sessions": 22,
         "colos": "AMS",
         "client_timezones": "Asia/Shanghai",
-        "client_languages": "en-US,zh-CN"
+        "client_languages": "en-US,zh-CN,en"
       },
       {
         "country": "SG",
-        "pageviews": 27,
-        "visitors": 13,
-        "sessions": 18,
+        "pageviews": 28,
+        "visitors": 14,
+        "sessions": 19,
         "colos": "SIN",
-        "client_timezones": "Asia/Calcutta,Asia/Shanghai",
+        "client_timezones": "Asia/Calcutta,Asia/Shanghai,Etc/GMT-8",
         "client_languages": "en-US,zh-CN"
       },
       {
         "country": "HK",
-        "pageviews": 18,
-        "visitors": 10,
-        "sessions": 15,
+        "pageviews": 20,
+        "visitors": 11,
+        "sessions": 17,
         "colos": "HKG",
         "client_timezones": "Asia/Shanghai,",
         "client_languages": "zh-CN,,en-US"
@@ -547,6 +553,15 @@
         "client_languages": "en-US,zh-CN"
       },
       {
+        "country": "TW",
+        "pageviews": 7,
+        "visitors": 3,
+        "sessions": 5,
+        "colos": "TPE",
+        "client_timezones": "Asia/Shanghai",
+        "client_languages": "zh-CN"
+      },
+      {
         "country": "GB",
         "pageviews": 7,
         "visitors": 4,
@@ -554,15 +569,6 @@
         "colos": "LHR",
         "client_timezones": null,
         "client_languages": null
-      },
-      {
-        "country": "TW",
-        "pageviews": 5,
-        "visitors": 2,
-        "sessions": 3,
-        "colos": "TPE",
-        "client_timezones": "Asia/Shanghai",
-        "client_languages": "zh-CN"
       },
       {
         "country": "IN",
@@ -681,7 +687,7 @@
         "login": "stonecanon",
         "name": "H&S一心菌 (石头小石头)",
         "created_at": 1778766419,
-        "updated_at": 1779706069
+        "updated_at": 1779719500
       },
       {
         "id": 3,
