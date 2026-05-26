@@ -12,7 +12,7 @@
   "with_if_2024": 21525,
   "with_cas_zone": 21695,
   "with_cas_top": 1788,
-  "with_warning": 4,
+  "with_warning": 105,
   "with_cn_name": 374,
   "with_ccf": 279,
   "with_abdc": 2651,
@@ -31,10 +31,10 @@
     "has_homepage": 53337,
     "has_apc": 17261,
     "labels": {
-      "diamond": 23058,
-      "hybrid": 9960,
       "gold_apc": 11978,
-      "subscription_paid_read": 22906
+      "subscription_paid_read": 22906,
+      "hybrid": 9960,
+      "diamond": 23058
     },
     "is_oa": 35036,
     "in_doaj": 30206
