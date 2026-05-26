@@ -545,7 +545,7 @@ td {
 @media (max-width: 760px) {
   body {
     background:
-      linear-gradient(180deg, #424d4e 0, #515b5c 190px, var(--paper) 191px);
+      linear-gradient(180deg, #424d4e 0, #515b5c 255px, var(--paper) 256px);
   }
 
   .shell {
@@ -553,9 +553,14 @@ td {
     padding-top: 16px;
   }
 
+  h1 {
+    font-size: 30px;
+    line-height: 1.08;
+  }
+
   .topbar {
     display: block;
-    padding-bottom: 16px;
+    padding-bottom: 18px;
   }
 
   .meta {
