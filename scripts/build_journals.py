@@ -25,6 +25,7 @@ import gzip
 import json
 import re
 import shutil
+import subprocess
 import sys
 from collections import Counter, defaultdict
 from pathlib import Path
@@ -1238,6 +1239,18 @@ def main():
 
     size = (DATA_DIR / 'journals.json').stat().st_size
     print(f'  journals.json: {size/1024/1024:.2f} MB')
+
+    print('== OpenAlex Merge (oa.json) ==')
+    merge_script = ROOT / 'scripts' / 'merge_openalex.py'
+    if merge_script.exists() and (DATA_DIR / 'openalex_cache.json').exists():
+        r = subprocess.run(
+            [sys.executable, str(merge_script)],
+            cwd=ROOT, capture_output=True, text=True, timeout=120)
+        print(r.stdout)
+        if r.returncode != 0:
+            print(f'  WARN: merge_openalex.py exited {r.returncode}: {r.stderr.strip()}')
+    else:
+        print('  skip: merge_openalex.py or openalex_cache.json not found')
     return 0
 
 
