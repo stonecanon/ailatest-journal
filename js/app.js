@@ -4112,10 +4112,22 @@
           catch(e) { oaMap = {}; }
         }
 
-        // Step 1: Search papers on OpenAlex
-        const url = OA_API + `/works?filter=title_and_abstract.search:${encodeURIComponent(query)}&per_page=50&sort=relevance_score:desc&select=id,title,publication_date,authorships,primary_location,relevance_score`;
+        // Step 1: Search papers on OpenAlex — trim query to fit API limits
+        // OpenAlex title_and_abstract.search has ~250 char max; extract key terms from long texts
+        let searchQuery = query;
+        if (query.length > 250) {
+          // Try to extract key terms: first 200 chars (title region), then trim to last sentence boundary
+          searchQuery = query.slice(0, 200);
+          const lastBreak = Math.max(searchQuery.lastIndexOf('。'), searchQuery.lastIndexOf('. '), searchQuery.lastIndexOf(';'));
+          if (lastBreak > 50) searchQuery = searchQuery.slice(0, lastBreak);
+          status.textContent = T('正在分析匹配中…（摘要较长，已自动提取关键内容）','Analyzing… (long input auto-trimmed to key content)');
+        }
+        const url = OA_API + `/works?filter=title_and_abstract.search:${encodeURIComponent(searchQuery)}&per_page=50&sort=relevance_score:desc&select=id,title,publication_date,authorships,primary_location,relevance_score`;
         const resp = await fetch(url, { headers: { 'Accept': 'application/json' } });
-        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        if (!resp.ok) {
+          if (resp.status === 400) throw new Error(T('查询内容过长或格式有误，建议精简至标题+3-5个关键词','Query too long or malformed. Try title + 3-5 keywords only.'));
+          throw new Error(`HTTP ${resp.status}`);
+        }
         const data = await resp.json();
         const works = data.results || [];
         if (!works.length) {
