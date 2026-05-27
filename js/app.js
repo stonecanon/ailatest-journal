@@ -4636,7 +4636,7 @@
             ${(function(){
               const r2 = e.journalRec;
               let txt = '📅 ' + T('审稿周期','Review cycle') + ': ';
-              // Prefer CrossRef (measured in days), fall back to DOAJ (weeks), then average
+              // Prefer CrossRef (measured in days), fall back to DOAJ (weeks)
               const cr = r2?.crossref;
               if (cr && cr.median_days > 0) {
                 const months = (cr.median_days / 30.44).toFixed(1);
@@ -4646,7 +4646,7 @@
                 if (weeks > 0) {
                   txt += (weeks / 4.33).toFixed(1) + T(' 个月 (投稿→出版,DOAJ)',' months (submission→pub.,DOAJ)');
                 } else {
-                  txt += T('≈3.5 个月 (DOAJ 中位数)','≈3.5 months (DOAJ median)');
+                  txt += 'N/A';
                 }
               }
               return '<div class="pick-cycle">' + txt + '</div>';
