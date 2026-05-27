@@ -4170,18 +4170,19 @@
         // Deduplicate preserving insertion order
         const uniqueWords = allWords.filter((w, i) => allWords.indexOf(w) === i);
 
-        // Take as many English keywords as fit within URL budget
-        let engQuery = '';
-        for (const w of uniqueWords) {
-          const test = engQuery ? engQuery + ' ' + w : w;
-          if (encodeURIComponent(test).length > MAX_URL) break;
-          engQuery = test;
-        }
+        // OpenAlex title_and_abstract.search uses AND logic — too many terms = 0 results
+        // Empirical max: 5 terms works well, 6+ often fails on diverse paper sets
+        const MAX_KEYWORDS = 5;
 
-        // Priority 1: explicit keywords (if present)
+        // Take top MAX_KEYWORDS English terms
+        let engQuery = uniqueWords.slice(0, MAX_KEYWORDS).join(' ');
+
+        // Priority 1: explicit keywords (if present) — limit to MAX_KEYWORDS
         let searchQuery = '';
         if (explicitKeywords.length) {
-          for (const kw of explicitKeywords) {
+          for (let i = 0; i < Math.min(explicitKeywords.length, MAX_KEYWORDS); i++) {
+            const kw = explicitKeywords[i].trim();
+            if (!kw) continue;
             const test = searchQuery ? searchQuery + ' ' + kw : kw;
             if (encodeURIComponent(test).length > MAX_URL) break;
             searchQuery = test;
@@ -4191,8 +4192,10 @@
         // Priority 2: English keywords from title+body (fill remaining budget)
         let remaining = MAX_URL - (searchQuery ? encodeURIComponent(searchQuery).length + 1 : 0);
         if (remaining > 10) {
+          const existingCount = searchQuery ? searchQuery.split(' ').length : 0;
           const pool = engQuery.split(' ').filter(w => !searchQuery.toLowerCase().includes(w.toLowerCase()));
-          for (const w of pool) {
+          for (let i = 0; i < Math.min(pool.length, MAX_KEYWORDS); i++) {
+            const w = pool[i];
             const test = searchQuery ? searchQuery + ' ' + w : w;
             const encLen = encodeURIComponent(test).length;
             if (encLen > MAX_URL) break;
