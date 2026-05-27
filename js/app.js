@@ -49,6 +49,7 @@
       pick_filter_if: '限 IF >',
       pick_filter_zone: '中科院分区',
       pick_filter_scopus: '仅 Scopus 收录',
+      pick_filter_compre: '排除综合性期刊',
       pick_free_used: '已用 {n}/5 次',
       pick_free_exhausted: '今日免费次数已用完，明天再来吧！',
       results_all: '全部期刊', load_more: '加载更多',
@@ -105,6 +106,7 @@
       pick_filter_if: 'IF >',
       pick_filter_zone: 'CAS Zone',
       pick_filter_scopus: 'Scopus only',
+      pick_filter_compre: 'Exclude Multidisciplinary',
       pick_free_used: '{n}/5 used today',
       pick_free_exhausted: 'Daily limit reached. Come back tomorrow!',
       results_all: 'All Journals', load_more: 'Load more',
@@ -4140,29 +4142,48 @@
           }
         }
 
-        // Step 3: Build ranked results
+        // Step 3: Build ranked results with differentiated scoring
         const entries = [...journalMap.entries()].map(([issn, j]) => {
           // Base score: average relevance of papers from this journal
           const avgScore = j.scores.reduce((a,b)=>a+b,0) / j.scores.length;
-          // Bonus: more papers = higher confidence
-          const countBonus = Math.log2(j.count + 1) * 0.05;
-          // Bonus: topic overlap with query keywords
+          // Score differentiation: wider spread using polynomial
+          // Core relevance: 0.4 weight, squared to spread thin vs strong
+          const relevanceScore = Math.pow(avgScore, 0.7) * 0.4;
+          // Count bonus: more papers = more confidence (log scale, capped)
+          // 1 paper → 0.1, 5 papers → 0.26, 20+ papers → 0.4
+          const countBonus = Math.min(0.4, Math.log2(j.count + 1) * 0.07);
+          // Topic overlap bonus
           let topicBonus = 0;
           if (oaMap && oaMap[issn]) {
             const qLower = query.toLowerCase();
+            const keywords = qLower.split(/\s+/).filter(w => w.length > 3);
             const topics = oaMap[issn].tp || [];
-            const match = topics.filter(t => t.toLowerCase().includes(qLower) || qLower.split(/\s+/).some(w => w.length>3 && t.toLowerCase().includes(w)));
-            topicBonus = match.length * 0.08;
+            // Exact match of full query in a topic
+            const fullMatch = topics.filter(t => t.toLowerCase().includes(qLower)).length;
+            // Keyword partial matches
+            const kwMatch = keywords.length > 0
+              ? topics.filter(t => keywords.some(w => t.toLowerCase().includes(w))).length
+              : 0;
+            topicBonus = Math.min(0.25, (fullMatch * 0.12 + kwMatch * 0.04));
           }
-          const totalScore = Math.min(1, avgScore + countBonus + topicBonus);
-
-          // Look up in our journal data
+          // IF bonus (good journals get a small boost)
           const journalRec = journals.find(r => r.issn === issn || r.eissn === issn);
           const ifVal = journalRec?.if_2024;
+          const ifBonus = ifVal != null && ifVal > 0 ? Math.min(0.12, Math.log2(ifVal + 1) * 0.025) : 0;
+
+          const totalScore = Math.min(0.99, relevanceScore + countBonus + topicBonus + ifBonus);
           const zoneVal = journalRec?.cas_zone;
+          const topVal = journalRec?.cas_top;
+          const qVal = journalRec?.jcr_q;
+          const scopusVal = journalRec?.scopus;
+          const eiVal = journalRec?.ei;
+          const indices = journalRec?.indices || [];
+          const wosCats = journalRec?.wos_categories || [];
 
           return {
-            issn, journalRec, if: ifVal, zone: zoneVal,
+            issn, journalRec, if: ifVal, zone: zoneVal, top: topVal,
+            jcr_q: qVal, scopus: scopusVal, ei: eiVal,
+            indices, wos_categories: wosCats,
             count: j.count, papers: j.papers.slice(0,5),
             topics: [...j.topics].slice(0,6),
             score: totalScore,
@@ -4181,6 +4202,13 @@
         }
         if (document.getElementById('pick-filter-scopus')?.checked) {
           filtered = filtered.filter(e => e.journalRec?.scopus);
+        }
+        // Comprehensive journal filter (use wos_categories)
+        if (document.getElementById('pick-filter-comprehensive')?.checked) {
+          filtered = filtered.filter(e => {
+            const cats = e.wos_categories || [];
+            return !cats.some(c => /multidisciplinary/i.test(c));
+          });
         }
         // Topic filter (always on if checkbox checked, acts as minimum signal filter)
         if (document.getElementById('pick-filter-topics')?.checked) {
@@ -4205,9 +4233,31 @@
           const paperList = e.papers.map(p => `<span class="pick-paper" title="${escape(p.title)}">${escape((p.title||'').slice(0,60))}${(p.title||'').length>60?'…':''} (${escape(p.year||'')})</span>`).join('');
           const topics = e.topics.map(t => `<span class="pick-topic">${escape(t)}</span>`).join('');
 
+          // Build badges
+          let badgesHtml = '';
+          if (e.journalRec) {
+            const r = e.journalRec;
+            // Index badges (SCIE/SSCI/AHCI/ESCI)
+            const idxBadges = (e.indices||[]).map(idx => badgeIndex(idx)).join('');
+            // Scopus
+            const scBadge = badgeScopus(r.scopus);
+            // EI
+            const eiBdg = r.ei ? `<span class="badge b-ei">EI</span>` : '';
+            // CAS zone
+            const zoneBdg = badgeZone(e.zone, e.top);
+            // JCR Q
+            const jcrBdg = badgeJCR(e.jcr_q);
+            // IF
+            const ifBdg = badgeIF(e.if);
+            // CCF
+            const ccfTxt = r.ccf_2026_type ? `<span class="badge b-ccf">CCF ${r.ccf_2026_type}</span>` : '';
+            badgesHtml = [idxBadges, scBadge, eiBdg, zoneBdg, jcrBdg, ifBdg, ccfTxt].filter(Boolean).join('');
+          }
+
           return `<div class="pick-card" data-issn="${escape(issnStr)}">
             <h3><a href="#j/${escape(e.journalRec ? favId(e.journalRec) : issnStr)}">${escape(name)}</a></h3>
             <div class="pick-meta">${issnStr}${ifStr ? ' · ' + ifStr : ''}${zoneStr ? ' · ' + zoneStr : ''} · ${e.count} ${T('篇论文','papers')}</div>
+            ${badgesHtml ? `<div class="pick-badges">${badgesHtml}</div>` : ''}
             <div class="pick-score">
               <span>${T('推荐指数','Score')}: ${scorePct}%</span>
               <span class="bar"><span class="bar-fill" style="width:${scorePct}%"></span></span>
