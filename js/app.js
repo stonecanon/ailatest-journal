@@ -3581,13 +3581,18 @@
     if (r.frequency) meta.push([T('刊期','Frequency'), r.frequency]);
     if (ir.cas_xr && ir.cas_xr.major_cn) meta.push([T('新锐版大类','Emerging Major'), ir.cas_xr.major_cn]);
 
-    // 审稿周期（CrossRef 投稿→接收 中位天数）— 有数据才显示
+    // 审稿周期 — 支持两个数据源
     const cycRec = reviewCycles[(r.issn||'').trim()] || reviewCycles[(r.eissn||'').trim()];
-    if (cycRec && cycRec.median_days) {
-      meta.push([
-        T('审稿周期','Review Cycle'),
-        `${T('中位 ','median ')}${cycRec.median_days}${T(' 天 · ','d · ')}${T('样本 ','n=')}${cycRec.sample_size}`
-      ]);
+    if (cycRec) {
+      let txt = '';
+      if (cycRec.avg_months) {
+        txt = `${cycRec.avg_months}${T(' 个月 (投稿→出版，DOAJ)',' months (submission→pub.)')}`;
+      } else if (cycRec.median_days) {
+        txt = `${T('中位 ','median ')}${cycRec.median_days}${T(' 天 (收稿→录用，n=',' days (received→accepted, n=')}${cycRec.sample_size})`;
+      }
+      if (txt) {
+        meta.push([T('审稿周期','Review Cycle'), txt]);
+      }
     }
 
     // OA / 订阅模式 + APC
@@ -4636,8 +4641,16 @@
             ${(function(){
               const rcKey = e.journalRec ? (e.journalRec.issn || e.journalRec.eissn || issnStr) : issnStr;
               const cycle = reviewCycles[rcKey];
-              if (!cycle || !cycle.median_days) return '';
-              return '<div class="pick-cycle">📅 ' + T('审稿周期','Review cycle') + ': ' + T('中位数 ','median ') + cycle.median_days + T(' 天 (n=',' days (n=') + cycle.sample_size + ')</div>';
+              if (!cycle) return '';
+              let txt = '📅 ' + T('审稿周期','Review cycle') + ': ';
+              if (cycle.avg_months) {
+                txt += cycle.avg_months + T(' 个月',' months') + T(' (投稿→出版)',' (submission→pub.)');
+              } else if (cycle.median_days) {
+                txt += T('中位数 ','median ') + cycle.median_days + T(' 天 (n=',' days (n=') + cycle.sample_size + ')');
+              } else {
+                return '';
+              }
+              return '<div class="pick-cycle">' + txt + '</div>';
             })()}
             ${paperList ? `<div class="pick-papers">${paperList}</div>` : ''}
           </div>`;
