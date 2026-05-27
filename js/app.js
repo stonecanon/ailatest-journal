@@ -4435,13 +4435,16 @@
         }).join('');
 
         // Click to open journal drawer (only if we have our data)
-        results.querySelectorAll('.pick-card').forEach(card => {
-          card.addEventListener('click', () => {
-            const issn = card.dataset.issn;
-            const rec = journals.find(r => r.issn === issn || r.eissn === issn);
-            if (rec) openDrawer(rec);
+        const pickEl = document.getElementById('pick-results');
+        if (pickEl) {
+          pickEl.querySelectorAll('.pick-card').forEach(card => {
+            card.addEventListener('click', () => {
+              const issn = card.dataset.issn;
+              const rec = journals.find(r => r.issn === issn || r.eissn === issn);
+              if (rec) openDrawer(rec);
+            });
           });
-        });
+        }
 
         status.textContent = `${T('已检索','Searched')} ${allWorks.length} ${T('篇论文','papers')}，${T('分布在','in')} ${journalMap.size} ${T('个期刊','journals')}，${T('推荐','recommended')} ${filtered.length} ${T('个','')}`;
         // Increment daily counter (only for non-unlocked users)
