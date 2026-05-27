@@ -2111,6 +2111,7 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .domsrc-pill.ds-zju      { background: #1f5f5a; color: #fff; }
 .domsrc-pill.ds-school_a { background: #4a6b2a; color: #fff; }
 .domsrc-pill.ds-ccf      { background: #7a2030; color: #fff; }
+.domsrc-pill.ds-cnki_major { background: #2a6b8a; color: #fff; }
 [data-theme="dark"] .domsrc-pill.ds-cnkx,
 [data-theme="dark"] .domsrc-pill.ds-cssci,
 [data-theme="dark"] .domsrc-pill.ds-cssci_ext,
@@ -2206,8 +2207,9 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .pick-num, .pick-select { padding:4px 8px; border:1px solid var(--border); border-radius:4px; background:var(--bg); color:var(--fg); font-size:13px }
 .pick-actions { display:flex; align-items:center; gap:12px; margin-top:16px }
 .pick-status { font-size:13px }
-.pick-results { display:flex; flex-direction:column; gap:12px }
-.pick-card { background:var(--bg2); border-radius:10px; padding:16px 20px; cursor:pointer; transition:box-shadow .15s,background .15s; border-left:4px solid var(--border); border-bottom:1px solid var(--border); position:relative }
+.pick-results { display:flex; flex-direction:column; gap:0 }
+.pick-card { background:var(--bg2); border-radius:10px 10px 0 0; padding:16px 20px; cursor:pointer; transition:box-shadow .15s,background .15s; border-left:4px solid var(--border); border-bottom:2px solid var(--border); position:relative }
+.pick-card:last-child { border-radius:0 0 10px 10px; border-bottom:2px solid transparent }
 .pick-card .pick-stripe { display:none }
 .pick-card:hover { background:var(--hover-bg,var(--bg)); box-shadow:0 2px 12px rgba(0,0,0,.1) }
 .pick-card h3 { margin:0 0 4px; font-size:15px; line-height:1.4 }
