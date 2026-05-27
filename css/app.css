@@ -2252,6 +2252,19 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .pick-card .pick-paper:hover { background:var(--hover-bg,#e8f0fe); text-decoration:underline }
 .pick-no-results { text-align:center; padding:60px 20px; color:var(--muted) }
 
+/* Search history */
+.pick-history { margin-bottom:16px; background:var(--bg2); border-radius:10px; padding:12px 16px }
+.pick-history-head { display:flex; align-items:center; justify-content:space-between; font-size:13px; font-weight:600; color:var(--muted); margin-bottom:8px }
+.pick-history-head .clear-btn { background:none; border:none; color:var(--muted); font-size:12px; cursor:pointer; padding:2px 6px; border-radius:4px }
+.pick-history-head .clear-btn:hover { background:var(--hover-bg,var(--border)); color:var(--fg) }
+.pick-history-list { display:flex; flex-direction:column; gap:2px }
+.pick-history-item { display:flex; align-items:center; justify-content:space-between; padding:6px 10px; border-radius:6px; cursor:pointer; font-size:13px }
+.pick-history-item:hover { background:var(--hover-bg,var(--border)) }
+.pick-history-text { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--fg) }
+.pick-history-time { font-size:11px; color:var(--muted); margin-left:12px; white-space:nowrap }
+[data-theme="dark"] .pick-history { background:#28282c }
+[data-theme="dark"] .pick-history-item:hover { background:#35353a }
+
 /* Sortable IF column header */
 .journals th.col-if.sortable { cursor: pointer; user-select: none; white-space: nowrap; }
 .journals th.col-if.sortable:hover { color: var(--accent, #1f3a5f); }
