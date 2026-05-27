@@ -368,20 +368,23 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </aside>
 
 <button id="pwa-install" class="pwa-install" hidden data-i18n="pwa_install">📲 安装到主屏</button>
+<script>
+// Build version for cache busting data files
+const __BUILD_VER = 'v20260527-39';
+// Service Worker 清理 — 必须在 app.js 加载前运行
+(function() {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistration().then(existing => {
+      if (existing) {
+        caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k))));
+        existing.unregister();
+      }
+    });
+  }
+})();
+</script>
 <script src="/js/app.js?v=20260527-39" defer></script>
 <script>
-  // Unregister any existing Service Worker — WeChat browser has broken SW support
-  // that causes stale JS to be served despite network-first strategy.
-  (async () => {
-    if ('serviceWorker' in navigator) {
-      const existing = await navigator.serviceWorker.getRegistration().catch(() => null);
-      if (existing) {
-        const keys = await caches.keys();
-        await Promise.all(keys.map(k => caches.delete(k)));
-        await existing.unregister();
-      }
-    }
-  })();
   // Custom install prompt
   let __pwaPrompt = null;
   window.addEventListener('beforeinstallprompt', (e) => {

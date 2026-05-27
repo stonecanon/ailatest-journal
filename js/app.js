@@ -2856,7 +2856,7 @@
     if (!drawer || !body) return;
     // 懒加载 OpenAlex 数据（首次打开抽屉时加载）
     if (!oaMap) {
-      try { oaMap = await fetchJSON('data/oa.json.gz'); }
+      try { oaMap = await fetchJSON('data/oa.json.gz?v=' + (typeof __BUILD_VER !== 'undefined' ? __BUILD_VER : Date.now())); }
       catch(e) { oaMap = {}; }
     }
     // 上报浏览（无需登录），结果回填进 cache
@@ -3738,7 +3738,7 @@
       // 加载期刊主库以反查索引/JCR
       let lookup = {};
       try {
-        const arr = await fetchJSON('/data/journals.json.gz').catch(() => []);
+        const arr = await fetchJSON('/data/journals.json.gz?v=' + (typeof __BUILD_VER !== 'undefined' ? __BUILD_VER : Date.now())).catch(() => []);
         for (const j of arr) {
           const k1 = (j.issn||'').replace(/-/g,'').toUpperCase();
           const k2 = (j.eissn||'').replace(/-/g,'').toUpperCase();
@@ -4285,7 +4285,7 @@
       try {
         // Lazy-load oaMap for topic matching (only if pick tool is first to need it)
         if (!oaMap) {
-          try { oaMap = await fetchJSON('data/oa.json.gz'); }
+          try { oaMap = await fetchJSON('data/oa.json.gz?v=' + (typeof __BUILD_VER !== 'undefined' ? __BUILD_VER : Date.now())); }
           catch(e) { oaMap = {}; }
         }
 
@@ -4757,11 +4757,11 @@
     if (await maybeRenderShareLanding()) return;
     try {
       const [j, d, m, esi, aliases] = await Promise.all([
-        fetchJSON('data/journals.json.gz'),
-        fetch('data/domestic.json').then(r => r.json()).catch(() => null),
-        fetch('data/meta.json').then(r => r.json()).catch(() => null),
-        fetch('data/esi_categories.json').then(r => r.json()).catch(() => []),
-        fetch('data/journal_aliases.json').then(r => r.json()).catch(() => DEFAULT_JOURNAL_ALIASES),
+        fetchJSON('data/journals.json.gz' + (typeof __BUILD_VER !== 'undefined' ? '?v=' + __BUILD_VER : '')),
+        fetch('data/domestic.json' + (typeof __BUILD_VER !== 'undefined' ? '?v=' + __BUILD_VER : '')).then(r => r.json()).catch(() => null),
+        fetch('data/meta.json' + (typeof __BUILD_VER !== 'undefined' ? '?v=' + __BUILD_VER : '')).then(r => r.json()).catch(() => null),
+        fetch('data/esi_categories.json' + (typeof __BUILD_VER !== 'undefined' ? '?v=' + __BUILD_VER : '')).then(r => r.json()).catch(() => []),
+        fetch('data/journal_aliases.json' + (typeof __BUILD_VER !== 'undefined' ? '?v=' + __BUILD_VER : '')).then(r => r.json()).catch(() => DEFAULT_JOURNAL_ALIASES),
       ]);
       setJournalAliases(aliases);
       journals = j; domestic = d; meta = m; esiCats = esi; oaMap = null;
