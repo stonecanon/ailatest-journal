@@ -4088,11 +4088,7 @@
       if (!query) { status.textContent = T('请输入内容','Please enter a query'); return; }
 
       // ── Daily usage limit (localStorage) ──
-      // Bypass for owner: set localStorage.ailatest_unlocked = '1'
-      // URL parameter ?unlock=1 also auto-sets it
-      if (window.location.search.includes('unlock=1')) {
-        localStorage.setItem('ailatest_unlocked', '1');
-      }
+      // Bypass for owner: set localStorage.ailatest_unlocked = '1' (via ?unlock=1 URL)
       const isUnlocked = localStorage.getItem('ailatest_unlocked') === '1';
       if (!isUnlocked) {
         const today = new Date().toISOString().slice(0,10);
@@ -4469,6 +4465,10 @@
 
   // ───────── boot ─────────
   async function boot() {
+    // ── Owner unlock: ?unlock=1 auto-sets localStorage bypass ──
+    if (window.location.search.includes('unlock=1')) {
+      try { localStorage.setItem('ailatest_unlocked', '1'); } catch {}
+    }
     trackPageview();
     loadFavLists();
     bind();
