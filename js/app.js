@@ -4395,14 +4395,16 @@
             : '#8e9aaf';
 
           return `<div class="pick-card" style="border-left-color:${scoreColor}" data-issn="${escape(issnStr)}">
-            <h3><a href="#j/${escape(e.journalRec ? favId(e.journalRec) : issnStr)}">${escape(name)}</a></h3>
-            <div class="pick-meta">${issnStr}${ifStr ? ' · ' + ifStr : ''}${zoneStr ? ' · ' + zoneStr : ''} · ${e.count} ${T('篇论文','papers')}</div>
-            ${badgesHtml ? `<div class="pick-badges">${badgesHtml}</div>` : ''}
-            <div class="pick-score">
-              <span>${T('推荐指数','Score')}: ${scorePct}%</span>
-              <span class="bar"><span class="bar-fill" style="width:${scorePct}%"></span></span>
+            <div class="pick-head">
+              <span class="pick-count">${e.count}<small> ${T('篇论文','papers')}</small></span>
+              <div class="pick-head-right">
+                <span class="pick-score-bar"><span class="bar"><span class="bar-fill" style="width:${scorePct}%"></span></span></span>
+                <span class="pick-score-pct">${scorePct}%</span>
+              </div>
             </div>
-            ${topics ? `<div class="pick-topics">${topics}</div>` : ''}
+            <h3><a href="#j/${escape(e.journalRec ? favId(e.journalRec) : issnStr)}">${escape(name)}</a></h3>
+            <div class="pick-meta">${issnStr}${ifStr ? ' · ' + ifStr : ''}${zoneStr ? ' · ' + zoneStr : ''}</div>
+            ${badgesHtml ? `<div class="pick-badges">${badgesHtml}</div>` : ''}
             ${paperList ? `<div class="pick-papers">${paperList}</div>` : ''}
           </div>`;
         }).join('');
