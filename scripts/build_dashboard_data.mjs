@@ -181,7 +181,10 @@ const [
       day,
       COUNT(*) AS pageviews,
       COUNT(DISTINCT session_id) AS sessions,
-      COUNT(DISTINCT visitor_id) AS visitors
+      COUNT(DISTINCT visitor_id) AS visitors,
+      SUM(CASE WHEN client_timezone='Asia/Shanghai' OR client_language LIKE 'zh%' THEN 1 ELSE 0 END) AS cn_hint_events,
+      COUNT(DISTINCT CASE WHEN client_timezone='Asia/Shanghai' OR client_language LIKE 'zh%' THEN visitor_id END) AS cn_hint_visitors,
+      COUNT(DISTINCT CASE WHEN client_timezone='Asia/Shanghai' OR client_language LIKE 'zh%' THEN session_id END) AS cn_hint_sessions
     FROM page_events
     GROUP BY day
     ORDER BY day
@@ -199,6 +202,9 @@ const [
       COUNT(*) AS pageviews,
       COUNT(DISTINCT visitor_id) AS visitors,
       COUNT(DISTINCT session_id) AS sessions,
+      SUM(CASE WHEN client_timezone='Asia/Shanghai' OR client_language LIKE 'zh%' THEN 1 ELSE 0 END) AS cn_hint_events,
+      COUNT(DISTINCT CASE WHEN client_timezone='Asia/Shanghai' OR client_language LIKE 'zh%' THEN visitor_id END) AS cn_hint_visitors,
+      COUNT(DISTINCT CASE WHEN client_timezone='Asia/Shanghai' OR client_language LIKE 'zh%' THEN session_id END) AS cn_hint_sessions,
       GROUP_CONCAT(DISTINCT colo) AS colos,
       GROUP_CONCAT(DISTINCT client_timezone) AS client_timezones,
       GROUP_CONCAT(DISTINCT client_language) AS client_languages
@@ -229,6 +235,7 @@ const payload = {
     '浏览量来自访问事件表；前端埋点上线后开始累积页面浏览量、独立访客数、访问人次、路径和访问网络出口地区。',
     '访问网络出口地区来自 Cloudflare 对请求 IP 的国家/地区识别，更接近 VPN、代理或运营商出口位置，不等同真实所在地。',
     '新版埋点会额外记录浏览器时区和语言，可辅助判断中国用户，例如 Asia/Shanghai 或 zh-CN。',
+    '疑似中国访问按浏览器时区 Asia/Shanghai 或语言 zh-* 粗略判断，可用于弥补 VPN、代理和 Pages 中转导致的 IP 出口偏差。',
     'Cloudflare 后台的地区流量包含所有静态资源、接口、机器人和历史请求；站内埋点只统计成功运行网页脚本并上报的访问。',
   ],
   tables: [...tables],
@@ -251,6 +258,9 @@ const payload = {
     users_with_lists: scalar(listSummary[0], 'users_with_lists'),
     total_pageviews: pageviewsByDay.reduce((sum, row) => sum + Number(row.pageviews || 0), 0),
     total_visitors: pageviewsByDay.reduce((sum, row) => sum + Number(row.visitors || 0), 0),
+    total_cn_hint_events: pageviewsByDay.reduce((sum, row) => sum + Number(row.cn_hint_events || 0), 0),
+    total_cn_hint_visitors: pageviewsByDay.reduce((sum, row) => sum + Number(row.cn_hint_visitors || 0), 0),
+    total_cn_hint_sessions: pageviewsByDay.reduce((sum, row) => sum + Number(row.cn_hint_sessions || 0), 0),
     total_login_events: loginEventsByDay.reduce((sum, row) => sum + Number(row.login_events || 0), 0),
   },
   series: {
