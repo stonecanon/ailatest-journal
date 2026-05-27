@@ -38,6 +38,8 @@
       loading: '加载中…',
       hero_title_int: 'SCI / SSCI 国际期刊检索',
       hero_body_int: '数据源：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI）· 更新至 2026-05-18，并合并 <b>EI Compendex</b> 期刊目录（2025-10-10）。合并 <b>JCR 2025</b> 归属标记、<b>ESI</b> 22 大学科分类、<b>中科院 2025 大类分区</b>、<b>ShowJCR</b> JCR 2025 发布版 · 2024 指标（IF / 小类分区 / 排名）、新锐版、CCF 2026 推荐与国际期刊预警名单。共收录 <b id="total">—</b> 本。',
+      src_cnkx: '中国科协高质量目录',
+      src_cnki_major: 'CNKI 主要期刊',
       hero_note: '徽章语义：<b>SCIE/SSCI/AHCI/ESCI/EI</b> 索引收录 · <b>中科院</b> 中科院 2025 大类分区（1-4 区，TOP 标志） · <b>JCR Q</b> Quartile（Q1-Q4） · <b>新锐</b> 中科院 2026 新锐版分区 · <b>CCF</b> 中国计算机学会 2026 推荐（A/B/C） · <b>ABDC</b> 澳洲经管期刊分级（A*/A/B/C） · <b>ABS</b> 英国 Chartered ABS Academic Journal Guide 2024（4*/4/3/2/1，仅经管商科） · <b>T1/T2/T3</b> 中国科协 2025 高质量期刊分级 · <b>⚠ Warning</b> 国际期刊预警名单。',
       hero_title_fav: '我的收藏',
       hero_body_fav: '点击任意期刊右侧的 <b>★</b> 可加入收藏。未登录时保存在本机 localStorage；登录后自动同步到云端，可跨设备访问。',
@@ -77,6 +79,7 @@
       filter_xinrui: 'Emerging Tier', filter_warning: 'Warning List',
       domestic_sources: 'Domestic Sources',
       src_cnkx: 'CAST Tiered Directory',
+      src_cnki_major: 'CNKI Major',
       src_cssci_core: 'CSSCI Core',
       src_cssci_ext: 'CSSCI Extended',
       src_pku: 'PKU Core (2023)',
@@ -1803,6 +1806,11 @@
       addDomIndex(r.name.replace(/\*$/,''), 'name', { source:'zju', label:T('浙大','ZJU')+' '+r.tier, tag:r.tier });
       if (r.issn) addDomIndex(r.issn, 'issn', { source:'zju', label:T('浙大','ZJU')+' '+r.tier, tag:r.tier });
     });
+    // CNKI Major Journals (全量中文期刊主目录)
+    ((d.cnki_major && d.cnki_major.records)||[]).forEach(r => {
+      addDomIndex(r.name, 'name', { source:'cnki_major', label:T('CNKI 主要','CNKI Major'), tag:'', domain:r.major_categories.join(', ') });
+      if (r.issn) addDomIndex(r.issn, 'issn', { source:'cnki_major', label:T('CNKI 主要','CNKI Major'), tag:'', domain:r.major_categories.join(', ') });
+    });
   }
   function renderDomCrossBadges(r, excludeSource) {
     const hits = lookupDom(r).filter(h => h.source !== excludeSource);
@@ -2315,6 +2323,28 @@
       }
     }
 
+    // 6) CNKI Major Journals (全量中文期刊主目录)
+    if (domestic.cnki_major && domestic.cnki_major.records) {
+      const list = domestic.cnki_major.records.filter(r =>
+        matchTxt(r.name, r.issn, r.cn_code, r.sponsor, ...(r.major_categories||[]))
+      );
+      if (list.length) {
+        sections.push({
+          title: T('CNKI 主要期刊','CNKI Major Journals'),
+          count: list.length,
+          html: `<div class="table-wrap"><table class="journals"><thead><tr>
+            <th>${T('期刊名称','Journal')}</th><th style="width:130px">ISSN</th><th style="width:140px">CN</th><th style="width:180px">${T('主办单位','Sponsor')}</th><th style="width:160px">${T('学科分类','Categories')}</th><th>${T('交叉收录','Also In')}</th><th style="width:40px"></th>
+          </tr></thead><tbody>
+          ${list.slice(0, 200).map(r => renderDomRow(r, {
+            src: 'cnki_major',
+            extraCols: `<td class="muted-cell" style="width:140px">${escape(r.cn_code||'—')}</td><td class="muted-cell" style="width:180px">${escape(r.sponsor||'')}</td><td class="muted-cell" style="width:160px">${escape(r.major_categories.join(' | '))}</td>`,
+          })).join('')}
+          ${list.length > 200 ? `<tr><td colspan="7" class="empty">${T('仅显示前 200 条','First 200 only')}</td></tr>` : ''}
+          </tbody></table></div>`
+        });
+      }
+    }
+
     const total = sections.reduce((s, x) => s + x.count, 0);
     if (!sections.length) {
       box.innerHTML = `<div class="section-block"><div class="empty">${T('未找到与"','No matches for "')}${escape(activeQuery)}${T('"匹配的中文期刊。','".')}</div></div>`;
@@ -2322,7 +2352,7 @@
     }
     box.innerHTML = `<div class="section-block">
       <h3 class="section-title">${T('中文期刊统一搜索','Chinese Journals · Unified Search')} <span class="muted-cell">(${total})</span></h3>
-      <div class="section-subtitle">${T('已跨库聚合：科协 / CSSCI / 北大核心 / 浙大 / CCF。清空搜索框可返回单库浏览。','Aggregated across CAST / CSSCI / PKU / ZJU / CCF. Clear the search box to return to per-source view.')}</div>
+      <div class="section-subtitle">${T('已跨库聚合：科协 / CSSCI / 北大核心 / 浙大 / CCF / CNKI。清空搜索框可返回单库浏览。','Aggregated across CAST / CSSCI / PKU / ZJU / CCF / CNKI. Clear the search box to return to per-source view.')}</div>
       ${sections.map(s => `<details class="section-block" style="margin-top:14px" open>
         <summary>${escape(s.title)} <span class="muted-cell">(${s.count})</span></summary>
         <div style="margin-top:10px">${s.html}</div>
@@ -4210,7 +4240,8 @@
         // Run all queries concurrently via Promise.all
         status.textContent = T('正在搜索相关论文…','Searching related papers…');
         const SEARCH_FIELDS = 'id,title,publication_date,primary_location,relevance_score';
-        const DATE_FILTER = '&filter=from_publication_date:2021-01-01';
+        const FIVE_YEARS_AGO = new Date(Date.now() - 5*365*24*60*60*1000).toISOString().slice(0,10);
+        const DATE_FILTER = `&filter=from_publication_date:${FIVE_YEARS_AGO}`;
         const queryBatches = await Promise.all(queries.slice(0, 3).map(async (q) => {
           const url = OA_API + `/works?search=${encodeURIComponent(q.slice(0,120))}&per_page=30&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
           try {

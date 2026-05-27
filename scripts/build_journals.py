@@ -88,6 +88,8 @@ SCHOOL_A_JSON= DATA_DIR / 'school_a_tiers.json'
 CSSCI_CORE_JSON = ROOT / 'generated' / 'cssci_core.json'
 CSSCI_EXT_JSON  = ROOT / 'generated' / 'cssci_ext.json'
 PKU_CORE_JSON   = ROOT / 'generated' / 'pku_core.json'
+CNKI_MAJOR_FILE = LIST_DIR / 'cnki_major_journals.csv'
+CNKI_MAJOR_JSON = DATA_DIR / 'cnki_major_journals.json'
 
 
 # ───────────────────────── utils ─────────────────────────
@@ -1244,6 +1246,7 @@ def main():
         'cssci_core': [],
         'cssci_ext': [],
         'pku_core': [],
+        'cnki_major': None,  # full list of CNKI major journals (ISSN + title)
     }
     if CNKX_RECORDS.exists():
         cnkx_records = json.loads(CNKX_RECORDS.read_text(encoding='utf-8'))
@@ -1273,6 +1276,46 @@ def main():
                     'ccf_area': (row.get('CCF推荐类别') or '').strip(),
                     'tier': (row.get('T分区') or '').strip(),
                 })
+    # ────── CNKI Major Journals (全量中文期刊主目录) ──────
+    cnki_major_records = []
+    cnki_major_by_issn = {}
+    if CNKI_MAJOR_FILE.exists():
+        with open(CNKI_MAJOR_FILE, 'r', encoding='utf-8-sig', newline='') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                title = (row.get('title') or '').strip()
+                if not title: continue
+                issn = clean_issn(row.get('issn') or '')
+                cn = (row.get('cn') or '').strip()
+                sponsor = (row.get('sponsor') or '').strip()
+                compound_if = (row.get('compound_if') or '').strip()
+                comprehensive_if = (row.get('comprehensive_if') or '').strip()
+                tags = (row.get('tags') or '').strip()
+                categories = (row.get('major_categories') or '').strip()
+                rec = {
+                    'name': title,
+                    'issn': issn,
+                    'cn_code': cn,
+                    'sponsor': sponsor,
+                    'compound_if': compound_if,
+                    'comprehensive_if': comprehensive_if,
+                    'tags': tags,
+                    'major_categories': [c.strip() for c in categories.split('|') if c.strip()],
+                }
+                cnki_major_records.append(rec)
+                if issn:
+                    cnki_major_by_issn.setdefault(issn, []).append(rec)
+        domestic['cnki_major'] = {'records': cnki_major_records, 'by_issn': cnki_major_by_issn}
+        print(f'  CNKI Major: {len(cnki_major_records)} records, {len(cnki_major_by_issn)} with ISSN')
+        # Also tag international journals that appear in CNKI Major
+        cnki_tagged = 0
+        for r in journals:
+            for issn_key in (r.get('issn',''), r.get('eissn','')):
+                if issn_key and issn_key in cnki_major_by_issn:
+                    r['cnki_major'] = True
+                    cnki_tagged += 1
+                    break
+        print(f'  CNKI Major tagged on international journals: {cnki_tagged}')
     with open(DATA_DIR / 'domestic.json', 'w', encoding='utf-8') as f:
         json.dump(domestic, f, ensure_ascii=False)
 
