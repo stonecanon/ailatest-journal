@@ -702,6 +702,7 @@
   let activeCasMajor = '__all'; // CAS 大类 filter
   let activeIndices = new Set(['SCIE','SSCI','AHCI','ESCI','EI']);
   let activeZones = new Set();
+  let activeJcr = new Set();
   let activeFeats = new Set();
   let activeWos = new Set();
   let wosCats = [];   // [{name,count}] sorted A-Z
@@ -1889,6 +1890,10 @@
       for (const z of activeZones) if (zones.has(z)) { ok = true; break; }
       if (!ok) return false;
     }
+    if (activeJcr.size) {
+      const jcr = (r.if_quartile || '').toUpperCase();
+      if (!jcr || !activeJcr.has(jcr)) return false;
+    }
     if (activeFeats.has('if') && r.if_2024 == null) return false;
     if (activeFeats.has('ccf') && !r.ccf) return false;
     if (activeFeats.has('cnkx') && !(Array.isArray(r.cnkx) && r.cnkx.length)) return false;
@@ -2752,6 +2757,7 @@
   // ───────── 详情抽屉 ─────────
   let drawerOpen = false;
   let _currentDrawerRec = null;
+  let _drawerStack = []; // for back-navigation through related journals
   // 跨源按 favId 检索任意期刊记录（用于 #j/<id> 深链）
   function findRecByFid(id) {
     if (!id) return null;
@@ -3141,7 +3147,10 @@
       card.addEventListener('click', () => {
         const fid = card.dataset.fid;
         const rec = journals.find(j => favId(j) === fid) || favsData[fid];
-        if (rec) openDrawer(rec);
+        if (rec) {
+          if (_currentDrawerRec) _drawerStack.push(_currentDrawerRec);
+          openDrawer(rec);
+        }
       });
     });
     // drawer list selector: switch active list before toggling
@@ -3857,9 +3866,15 @@
       activeZones = new Set($$('#zone-toggles input:checked').map(i => i.value));
       shown = PAGE; renderInt();
     });
-    $('#feat-toggles').addEventListener('change', () => {
-      activeFeats = new Set($$('#feat-toggles input:checked').map(i => i.value));
+    $('#jcr-toggles').addEventListener('change', () => {
+      activeJcr = new Set($$('#jcr-toggles input:checked').map(i => i.value));
       shown = PAGE; renderInt();
+    });
+    document.querySelectorAll('.feat-row').forEach(row => {
+      row.addEventListener('change', () => {
+        activeFeats = new Set([...document.querySelectorAll('.feat-row input:checked')].map(i => i.value));
+        shown = PAGE; renderInt();
+      });
     });
     $('#wos-search')?.addEventListener('input', () => renderWosList());
     $('#wos-clear')?.addEventListener('click', () => {
@@ -4086,6 +4101,10 @@
       if (rec) openDrawer(rec);
     });
     $('#drawer-close')?.addEventListener('click', () => closeDrawer());
+    $('#drawer-back')?.addEventListener('click', () => {
+      const prev = _drawerStack.pop();
+      if (prev) openDrawer(prev);
+    });
     $('#drawer-scrim')?.addEventListener('click', () => closeDrawer());
     // 复制当前期刊的分享链接 + 生成卡片图片
     $('#drawer-share')?.addEventListener('click', () => {
