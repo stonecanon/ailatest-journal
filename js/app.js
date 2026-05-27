@@ -2935,12 +2935,18 @@
     const stats = [];
     if (ir.if_2024 != null) stats.push([T('影响因子 / IF','Impact Factor'), ir.if_2024]);
     if (ir.if_rank) stats.push([T('IF 排名','IF Rank'), ir.if_rank]);
-    // 审稿周期 — 从嵌入的 DOAJ review_weeks 读取
+    // 审稿周期 — CrossRef 优先，DOAJ 次之
     {
-      const weeks = parseFloat(r.doaj?.review_weeks || ir.doaj?.review_weeks);
-      if (weeks > 0) {
-        const m = (weeks / 4.33).toFixed(1);
-        stats.push([T('审稿周期','Review Cycle'), m + T(' 个月',' months'), T('投稿→出版 (DOAJ)','Submission→pub. (DOAJ)')]);
+      const cr = r.crossref || ir.crossref;
+      if (cr && cr.median_days > 0) {
+        const m = (cr.median_days / 30.44).toFixed(1);
+        stats.push([T('审稿周期','Review Cycle'), m + T(' 个月',' months'), T('收稿→录用 (Crossref, ','Submission→acceptance (') + (cr.sample_size || '?') + T('篇)',' samples)')]);
+      } else {
+        const weeks = parseFloat(r.doaj?.review_weeks || ir.doaj?.review_weeks);
+        if (weeks > 0) {
+          const m = (weeks / 4.33).toFixed(1);
+          stats.push([T('审稿周期','Review Cycle'), m + T(' 个月',' months'), T('投稿→出版 (DOAJ)','Submission→pub. (DOAJ)')]);
+        }
       }
     }
     const ifNote = ir.if_2024 != null ? T('JCR 2025发布 · 2024指标','JCR 2025 rel. · 2024 metric') : '';
@@ -3579,11 +3585,16 @@
     if (r.frequency) meta.push([T('刊期','Frequency'), r.frequency]);
     if (ir.cas_xr && ir.cas_xr.major_cn) meta.push([T('新锐版大类','Emerging Major'), ir.cas_xr.major_cn]);
 
-    // 审稿周期 — 从嵌入的 DOAJ review_weeks 读取
+    // 审稿周期 — CrossRef 优先，DOAJ 次之
     let cycTxt = '';
-    const weeks = parseFloat(r.doaj?.review_weeks || ir.doaj?.review_weeks);
-    if (weeks > 0) {
-      cycTxt = `${(weeks / 4.33).toFixed(1)}${T(' 个月 (投稿→出版，DOAJ)',' months (submission→pub.)')}`;
+    const cr = r.crossref || ir.crossref;
+    if (cr && cr.median_days > 0) {
+      cycTxt = `${(cr.median_days / 30.44).toFixed(1)}${T(' 个月 (收稿→录用，Crossref)',' months (submission→acceptance)')}`;
+    } else {
+      const weeks = parseFloat(r.doaj?.review_weeks || ir.doaj?.review_weeks);
+      if (weeks > 0) {
+        cycTxt = `${(weeks / 4.33).toFixed(1)}${T(' 个月 (投稿→出版，DOAJ)',' months (submission→pub.)')}`;
+      }
     }
     if (cycTxt) {
       meta.push([T('审稿周期','Review Cycle'), cycTxt]);
