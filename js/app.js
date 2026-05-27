@@ -1806,11 +1806,7 @@
       addDomIndex(r.name.replace(/\*$/,''), 'name', { source:'zju', label:T('浙大','ZJU')+' '+r.tier, tag:r.tier });
       if (r.issn) addDomIndex(r.issn, 'issn', { source:'zju', label:T('浙大','ZJU')+' '+r.tier, tag:r.tier });
     });
-    // CNKI Major Journals (全量中文期刊主目录)
-    ((d.cnki_major && d.cnki_major.records)||[]).forEach(r => {
-      addDomIndex(r.name, 'name', { source:'cnki_major', label:T('中文目录','Chinese Dir.'), tag:'', domain:r.major_categories.join(', ') });
-      if (r.issn) addDomIndex(r.issn, 'issn', { source:'cnki_major', label:T('中文目录','Chinese Dir.'), tag:'', domain:r.major_categories.join(', ') });
-    });
+    // Note: cnki_major（中文期刊目录）是基础库，不参与交叉收录徽章
   }
   function renderDomCrossBadges(r, excludeSource) {
     const hits = lookupDom(r).filter(h => h.source !== excludeSource);
@@ -1831,12 +1827,12 @@
     const crossBadges = renderDomCrossBadges({ name, issn: r.issn, cn_code: r.cn_code }, src);
     const tierBadge = showTier && tierValue ? badgeTier(tierValue) : '';
     return `<tr class="j-row clickable" data-fid="${escape(fid)}" data-src="${escape(src)}">
+      <td class="col-fav" style="width:36px">${starBtn(r, src)}</td>
       ${showTier ? `<td style="width:60px">${tierBadge}</td>` : ''}
       <td class="jname" style="font-size:13.5px">${escape(titleCase(name.replace(/\*$/,'')))}${enName}</td>
+      <td class="col-cross"><div class="badges">${extraBadges}${crossBadges}</div></td>
       <td class="col-issn" style="width:130px">${isnCell}</td>
       ${extraCols}
-      <td class="col-cross"><div class="badges">${extraBadges}${crossBadges}</div></td>
-      <td class="col-fav">${starBtn(r, src)}</td>
     </tr>`;
   }
 
@@ -2223,7 +2219,7 @@
           title: T('中国科协高质量目录','CAST Tiered Directory'),
           count: recs.length,
           html: `<div class="table-wrap"><table class="journals"><thead><tr>
-            <th style="width:60px">${T('T级','Tier')}</th><th>${T('期刊','Journal')}</th><th style="width:120px">ISSN</th><th style="width:160px">${T('学科 / 细分','Domain / Sub')}</th><th>${T('交叉收录','Also In')}</th><th style="width:40px"></th>
+            <th style="width:36px" aria-label="Favorite"></th><th style="width:60px">${T('T级','Tier')}</th><th>${T('期刊','Journal')}</th><th>${T('交叉收录','Also In')}</th><th style="width:120px">ISSN</th><th style="width:160px">${T('学科 / 细分','Domain / Sub')}</th>
           </tr></thead><tbody>
           ${recs.slice(0, 200).map(r => renderDomRow(r, {
             src: 'cnkx', showTier: true, tierValue: r.tier,
@@ -2244,7 +2240,7 @@
           title: label,
           count: list.length,
           html: `<div class="table-wrap"><table class="journals"><thead><tr>
-            <th>${T('期刊名称','Journal')}</th><th style="width:130px">ISSN</th><th style="width:160px">${T('学科','Discipline')}</th><th>${T('交叉收录','Also In')}</th><th style="width:40px"></th>
+            <th style="width:36px" aria-label="Favorite"></th><th>${T('期刊名称','Journal')}</th><th>${T('交叉收录','Also In')}</th><th style="width:130px">ISSN</th><th style="width:160px">${T('学科','Discipline')}</th>
           </tr></thead><tbody>
           ${list.slice(0, 200).map(r => renderDomRow(r, {
             src: srcKey,
@@ -2264,7 +2260,7 @@
           title: T('北大核心 (2023)','PKU Core (2023)'),
           count: list.length,
           html: `<div class="table-wrap"><table class="journals"><thead><tr>
-            <th>${T('期刊名称','Journal')}</th><th style="width:130px">ISSN</th><th style="width:160px">${T('分类','Category')}</th><th>${T('交叉收录','Also In')}</th><th style="width:40px"></th>
+            <th style="width:36px" aria-label="Favorite"></th><th>${T('期刊名称','Journal')}</th><th>${T('交叉收录','Also In')}</th><th style="width:130px">ISSN</th><th style="width:160px">${T('分类','Category')}</th>
           </tr></thead><tbody>
           ${list.slice(0, 200).map(r => renderDomRow(r, {
             src: 'pku',
@@ -2285,7 +2281,7 @@
           title: T('浙江大学 2024 期刊分级','ZJU 2024 Journal Tiers'),
           count: list.length,
           html: `<div class="table-wrap"><table class="journals"><thead><tr>
-            <th style="width:70px">${T('级别','Tier')}</th><th>${T('期刊','Journal')}</th><th style="width:130px">ISSN / CN</th><th style="width:180px">${T('备注','Note')}</th><th>${T('交叉收录','Also In')}</th><th style="width:40px"></th>
+            <th style="width:36px" aria-label="Favorite"></th><th style="width:70px">${T('级别','Tier')}</th><th>${T('期刊','Journal')}</th><th>${T('交叉收录','Also In')}</th><th style="width:130px">ISSN / CN</th><th style="width:180px">${T('备注','Note')}</th>
           </tr></thead><tbody>
           ${list.slice(0, 200).map(r => {
             const tierBadge = `<span class="tier-pill ${tierClass[r.tier]||'t3'}">${escape(tn(r.tier, 'tier'))}</span>${(r.name||'').includes('*') ? ' <span class="warn-pill" style="background:var(--gold);color:#fff">★</span>' : ''}`;
@@ -2293,8 +2289,8 @@
               { ...r, name: (r.name||'').replace(/\*$/,'') },
               { src: 'zju', extraCols: `<td class="muted-cell" style="width:180px">${escape(r.note||'')}</td>` }
             ).replace(
-              /<tr class="j-row clickable" (data-fid=[^>]+)>/,
-              `<tr class="j-row clickable" $1><td style="width:70px">${tierBadge}</td>`
+              /(<td class="col-fav"[^>]*>.*?<\/td>)/,
+              `$1<td style="width:70px">${tierBadge}</td>`
             );
           }).join('')}
           ${list.length > 200 ? `<tr><td colspan="6" class="empty">${T('仅显示前 200 条','First 200 only')}</td></tr>` : ''}
@@ -2311,7 +2307,7 @@
           title: T('CCF 推荐中文 2025','CCF Chinese 2025'),
           count: list.length,
           html: `<div class="table-wrap"><table class="journals"><thead><tr>
-            <th style="width:60px">${T('T分区','Tier')}</th><th>${T('期刊','Journal')}</th><th style="width:130px">CN</th><th style="width:180px">${T('主办单位','Sponsor')}</th><th>${T('交叉收录','Also In')}</th><th style="width:40px"></th>
+            <th style="width:36px" aria-label="Favorite"></th><th style="width:60px">${T('T分区','Tier')}</th><th>${T('期刊','Journal')}</th><th>${T('交叉收录','Also In')}</th><th style="width:130px">CN</th><th style="width:180px">${T('主办单位','Sponsor')}</th>
           </tr></thead><tbody>
           ${list.slice(0, 200).map(r => renderDomRow(
             { name: r.cn_name, en_name: r.en_name, issn: r.cn_code, cn_code: r.cn_code, org: r.org, ccf_area: r.ccf_area, tier: r.tier },
@@ -2333,7 +2329,7 @@
           title: T('中文期刊目录','Chinese Journal Directory'),
           count: list.length,
           html: `<div class="table-wrap"><table class="journals"><thead><tr>
-            <th>${T('期刊名称','Journal')}</th><th style="width:130px">ISSN</th><th style="width:140px">CN</th><th style="width:180px">${T('主办单位','Sponsor')}</th><th style="width:160px">${T('学科分类','Categories')}</th><th>${T('交叉收录','Also In')}</th><th style="width:40px"></th>
+            <th style="width:36px" aria-label="Favorite"></th><th>${T('期刊名称','Journal')}</th><th>${T('交叉收录','Also In')}</th><th style="width:130px">ISSN</th><th style="width:140px">CN</th><th style="width:180px">${T('主办单位','Sponsor')}</th><th style="width:160px">${T('学科分类','Categories')}</th>
           </tr></thead><tbody>
           ${list.slice(0, 200).map(r => renderDomRow(r, {
             src: 'cnki_major',
@@ -2423,7 +2419,7 @@
             ${subs.length > 24 ? `<span style="opacity:.6">… ${T('共','total ')} ${subs.length} ${T('个细分','sub-fields')}</span>` : ''}
           </div>` : ''}
           <div class="table-wrap" style="margin-top:10px"><table class="journals"><thead><tr>
-            <th style="width:60px">${T('T级','Tier')}</th><th>${T('期刊','Journal')}</th><th style="width:120px">ISSN</th><th style="width:160px">${T('细分','Sub-field')}</th><th>${T('交叉收录','Also In')}</th><th style="width:40px"></th>
+            <th style="width:36px" aria-label="Favorite"></th><th style="width:60px">${T('T级','Tier')}</th><th>${T('期刊','Journal')}</th><th>${T('交叉收录','Also In')}</th><th style="width:120px">ISSN</th><th style="width:160px">${T('细分','Sub-field')}</th>
           </tr></thead><tbody>
           ${[t1,t2,t3].flat().slice(0, 300).map(r => renderDomRow(r, {
             src: 'cnkx', showTier: true, tierValue: r.tier,
@@ -2453,7 +2449,7 @@
           <details class="section-block" style="margin-top:14px" ${q?'open':''}>
             <summary>${escape(tn(d, "cssci"))} <span class="muted-cell">(${byDisc[d].length})</span></summary>
             <div class="table-wrap" style="margin-top:10px"><table class="journals"><thead><tr>
-              <th>${T('期刊名称','Journal')}</th><th style="width:130px">ISSN</th><th style="width:160px">${T('学科','Discipline')}</th><th>${T('交叉收录','Also In')}</th><th style="width:40px"></th>
+              <th style="width:36px" aria-label="Favorite"></th><th>${T('期刊名称','Journal')}</th><th>${T('交叉收录','Also In')}</th><th style="width:130px">ISSN</th><th style="width:160px">${T('学科','Discipline')}</th>
             </tr></thead><tbody>
               ${byDisc[d].map(r => renderDomRow(r, {
                 src: srcKey,
@@ -2473,7 +2469,7 @@
         <h3 class="section-title">${T('北大《中文核心期刊要目总览》(2023 年版)','PKU Chinese Core Journals Overview (2023 ed.)')}</h3>
         <div class="section-subtitle">${T('共','Total ')} ${list.length.toLocaleString()} ${T('条','journals')}${T('；北京大学图书馆；',' · Peking University Library · ')}${q ? T('已过滤 ','Filtered ')+f.length+T(' 条',' results') : ''}</div>
         <div class="table-wrap" style="margin-top:14px"><table class="journals"><thead><tr>
-          <th>${T('期刊名称','Journal')}</th><th style="width:130px">ISSN</th><th style="width:160px">${T('分类','Category')}</th><th>${T('交叉收录','Also In')}</th><th style="width:40px"></th>
+          <th style="width:36px" aria-label="Favorite"></th><th>${T('期刊名称','Journal')}</th><th>${T('交叉收录','Also In')}</th><th style="width:130px">ISSN</th><th style="width:160px">${T('分类','Category')}</th>
         </tr></thead><tbody>
           ${f.slice(0, 2000).map(r => renderDomRow(r, {
             src: 'pku',
@@ -2507,7 +2503,7 @@
           <details class="section-block" style="margin-top:14px" ${q?'open':''}>
             <summary>${escape(c)} <span class="muted-cell">(${byCat[c].length})</span></summary>
             <div class="table-wrap" style="margin-top:10px"><table class="journals"><thead><tr>
-              <th>${T('期刊名称','Journal')}</th><th style="width:130px">ISSN</th><th style="width:140px">CN</th><th style="width:180px">${T('主办单位','Sponsor')}</th><th>${T('交叉收录','Also In')}</th><th style="width:40px"></th>
+              <th style="width:36px" aria-label="Favorite"></th><th>${T('期刊名称','Journal')}</th><th>${T('交叉收录','Also In')}</th><th style="width:130px">ISSN</th><th style="width:140px">CN</th><th style="width:180px">${T('主办单位','Sponsor')}</th>
             </tr></thead><tbody>
               ${byCat[c].slice(0, 300).map(r => renderDomRow(r, {
                 src: 'cnki_major',
