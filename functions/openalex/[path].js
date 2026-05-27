@@ -11,8 +11,9 @@ export async function onRequest(context) {
   // Extract the path after /openalex/
   const path = url.pathname.replace(/^\/openalex\//, '') || '';
 
-  // Build the upstream URL — pass through query params
-  const upstreamUrl = `https://api.openalex.org/${path}${url.search}`;
+  // Build the upstream URL — pass through query params, add mailto for polite pool
+  const sep = url.search ? '&' : '?';
+  const upstreamUrl = `https://api.openalex.org/${path}${url.search}${sep}mailto=support@ailatest.org`;
 
   // Forward headers (Accept for JSON response)
   const headers = {
