@@ -4163,7 +4163,7 @@
         }
 
         // Q2: Title-derived keywords (core topic of the paper)
-        const titleLower = (titleTerms[0]||'').toLowerCase().replace(/[^a-z\s]/g, '');
+        const titleLower = (titleTerms[0]||'').toLowerCase().replace(/[^a-z\s-]/g, '').replace(/-/g, ' ');
         const titleKws = titleLower.split(/\s+/).filter(w => w.length > 3 && !stopWords.has(w));
         if (titleKws.length >= 3) {
           const q = titleKws.slice(0, 6).join(' ');
