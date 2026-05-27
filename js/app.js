@@ -4087,6 +4087,29 @@
       const query = input.value.trim();
       if (!query) { status.textContent = T('请输入内容','Please enter a query'); return; }
 
+      // ── Daily usage limit (localStorage) ──
+      // Bypass for owner: set localStorage.ailatest_unlocked = '1'
+      // URL parameter ?unlock=1 also auto-sets it
+      if (window.location.search.includes('unlock=1')) {
+        localStorage.setItem('ailatest_unlocked', '1');
+      }
+      const isUnlocked = localStorage.getItem('ailatest_unlocked') === '1';
+      if (!isUnlocked) {
+        const today = new Date().toISOString().slice(0,10);
+        const limitKey = 'ailatest.pick.count';
+        let dailyData;
+        try { dailyData = JSON.parse(localStorage.getItem(limitKey) || '{}'); } catch(e) { dailyData = {}; }
+        if (dailyData.date !== today) { dailyData = { date: today, count: 0 }; }
+        if (dailyData.count >= 5) {
+          status.textContent = T('今日免费次数已用完，购买解锁无限使用 → support@ailatest.org','Daily limit reached. Purchase unlimited → support@ailatest.org');
+          results.innerHTML = `<div class="pick-no-results" style="padding:40px 20px">
+            <p>${T('免费用户每天限 5 次搜索','Free: 5 searches/day')}</p>
+            <p>${T('联系 support@ailatest.org 购买解锁无限使用','Contact support@ailatest.org to unlock unlimited use')}</p>
+          </div>`;
+          return;
+        }
+      }
+
       status.textContent = T('正在搜索相关论文…','Searching related papers…');
       results.innerHTML = '';
 
@@ -4189,7 +4212,7 @@
         // Run all queries concurrently via Promise.all
         status.textContent = T('正在搜索相关论文…','Searching related papers…');
         const SEARCH_FIELDS = 'id,title,publication_date,primary_location,relevance_score';
-        const results = await Promise.all(queries.slice(0, 3).map(async (q) => {
+        const queryBatches = await Promise.all(queries.slice(0, 3).map(async (q) => {
           const url = OA_API + `/works?search=${encodeURIComponent(q.slice(0,120))}&per_page=30&sort=relevance_score:desc&select=${SEARCH_FIELDS}`;
           try {
             const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
@@ -4202,7 +4225,7 @@
         // Deduplicate by work ID
         const seenIds = new Set();
         const allWorks = [];
-        for (const batch of results) {
+        for (const batch of queryBatches) {
           for (const w of batch) {
             if (w.id && !seenIds.has(w.id)) {
               seenIds.add(w.id);
@@ -4421,14 +4444,16 @@
         });
 
         status.textContent = `${T('已检索','Searched')} ${allWorks.length} ${T('篇论文','papers')}，${T('分布在','in')} ${journalMap.size} ${T('个期刊','journals')}，${T('推荐','recommended')} ${filtered.length} ${T('个','')}`;
-        // Increment daily counter (no limit)
-        const today = new Date().toISOString().slice(0,10);
-        const limitKey = 'ailatest.pick.count';
-        let dailyData;
-        try { dailyData = JSON.parse(localStorage.getItem(limitKey) || '{"date":"","count":0}'); } catch(e) { dailyData = {date:'',count:0}; }
-        if (dailyData.date !== today) { dailyData = { date: today, count: 0 }; }
-        dailyData.count++;
-        localStorage.setItem(limitKey, JSON.stringify(dailyData));
+        // Increment daily counter (only for non-unlocked users)
+        if (!isUnlocked) {
+          const today = new Date().toISOString().slice(0,10);
+          const limitKey = 'ailatest.pick.count';
+          let dailyData;
+          try { dailyData = JSON.parse(localStorage.getItem(limitKey) || '{"date":"","count":0}'); } catch(e) { dailyData = {date:'',count:0}; }
+          if (dailyData.date !== today) { dailyData = { date: today, count: 0 }; }
+          dailyData.count++;
+          localStorage.setItem(limitKey, JSON.stringify(dailyData));
+        }
       } catch (e) {
         status.textContent = T('检索失败：','Search failed: ') + e.message;
         console.error(e);
