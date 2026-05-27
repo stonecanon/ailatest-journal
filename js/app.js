@@ -52,6 +52,7 @@
       pick_filter_zone: '中科院分区',
       pick_filter_scopus: '仅 Scopus 收录',
       pick_filter_compre: '排除综合性期刊',
+      pick_history: '搜索历史', pick_history_clear: '清空',
       results_all: '全部期刊', load_more: '加载更多',
       col_name: '期刊 Title', col_abbr: '缩写 Abbr', col_badges: '索引 / 分区',
       col_cat: 'ESI / 中科院大类',
@@ -108,6 +109,7 @@
       pick_filter_zone: 'CAS Zone',
       pick_filter_scopus: 'Scopus only',
       pick_filter_compre: 'Exclude multidisciplinary',
+      pick_history: 'Search History', pick_history_clear: 'Clear',
       results_all: 'All journals', load_more: 'Load more',
       col_name: 'Journal Title', col_abbr: 'Abbr', col_badges: 'Index / Tier',
       col_cat: 'ESI / CAS Major',
@@ -4627,6 +4629,8 @@
           dailyData.count++;
           localStorage.setItem(limitKey, JSON.stringify(dailyData));
         }
+        // ── Save to search history ──
+        savePickHistory(query);
       } catch (e) {
         status.textContent = T('检索失败：','Search failed: ') + e.message;
         console.error(e);
@@ -4635,6 +4639,63 @@
 
     btn.addEventListener('click', doSearch);
     input.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.ctrlKey) doSearch(); });
+
+    // ── Search history ──
+    const HISTORY_KEY = 'ailatest.pick.history';
+    const MAX_HISTORY = 20;
+
+    function getPickHistory() {
+      try {
+        const raw = localStorage.getItem(HISTORY_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch { return []; }
+    }
+
+    function savePickHistory(query) {
+      let history = getPickHistory();
+      history = history.filter(h => h.query !== query);
+      history.unshift({ query, time: Date.now() });
+      if (history.length > MAX_HISTORY) history.length = MAX_HISTORY;
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+      renderPickHistory();
+    }
+
+    function renderPickHistory() {
+      const history = getPickHistory();
+      const container = document.getElementById('pick-history');
+      const list = document.getElementById('pick-history-list');
+      if (!container || !list) return;
+      if (!history.length) {
+        container.style.display = 'none';
+        return;
+      }
+      container.style.display = '';
+      list.innerHTML = history.map(h => {
+        const q = escape(h.query);
+        const preview = h.query.length > 40 ? h.query.slice(0, 40) + '…' : h.query;
+        const timeStr = h.time ? new Date(h.time).toLocaleString(lang === 'zh' ? 'zh-CN' : 'en-US', {
+          month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+        }) : '';
+        return `<div class="pick-history-item" data-query="${q}">
+          <span class="pick-history-text">${escape(preview)}</span>
+          <span class="pick-history-time">${timeStr}</span>
+        </div>`;
+      }).join('');
+
+      list.querySelectorAll('.pick-history-item').forEach(item => {
+        item.addEventListener('click', () => {
+          input.value = item.dataset.query;
+          doSearch();
+        });
+      });
+    }
+
+    document.getElementById('pick-history-clear')?.addEventListener('click', () => {
+      localStorage.removeItem(HISTORY_KEY);
+      renderPickHistory();
+    });
+
+    renderPickHistory();
   }
 
   // ───────── boot ─────────
