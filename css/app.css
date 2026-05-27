@@ -2212,12 +2212,12 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .pick-card:last-child { border-radius:0 0 10px 10px; border-bottom:2px solid transparent }
 .pick-card .pick-stripe { display:none }
 .pick-card:hover { background:var(--hover-bg,var(--bg)); box-shadow:0 2px 12px rgba(0,0,0,.1) }
-.pick-card h3 { margin:0 0 4px; font-size:15px; line-height:1.4 }
+.pick-card h3 { margin:0 0 4px; font-size:17px; line-height:1.4; font-weight:700 }
 .pick-card h3 a { color:var(--fg); text-decoration:none }
 .pick-card h3 a:hover { color:var(--accent) }
 .pick-card .pick-meta { font-size:12px; color:var(--muted); display:flex; flex-wrap:wrap; gap:4px 16px; margin:2px 0 6px }
-.pick-card .pick-head { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:4px }
-.pick-card .pick-count { font-size:28px; font-weight:800; color:var(--accent,#1f3a5f); line-height:1 }
+.pick-card .pick-head { display:flex; align-items:center; justify-content:flex-end; gap:10px; margin-bottom:4px }
+.pick-card .pick-count { font-size:20px; font-weight:700; color:var(--accent,#1f3a5f); line-height:1 }
 .pick-card .pick-count small { font-size:13px; font-weight:400; color:var(--muted); margin-left:2px }
 .pick-card .pick-head-right { display:flex; align-items:center; gap:8px }
 .pick-card .pick-score-bar .bar { display:inline-block; width:80px; height:8px; border-radius:4px; background:var(--border); overflow:hidden; vertical-align:middle }
