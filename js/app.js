@@ -4403,7 +4403,6 @@
               </div>
             </div>
             <h3><a href="#j/${escape(e.journalRec ? favId(e.journalRec) : issnStr)}">${escape(name)}</a></h3>
-            <div class="pick-meta">${issnStr}${ifStr ? ' · ' + ifStr : ''}${zoneStr ? ' · ' + zoneStr : ''}</div>
             ${badgesHtml ? `<div class="pick-badges">${badgesHtml}</div>` : ''}
             ${paperList ? `<div class="pick-papers">${paperList}</div>` : ''}
           </div>`;
