@@ -4243,7 +4243,7 @@
 
   // ───────── pick-for-me (journal recommendation) ─────────
   let _pickInit = false;
-  const OA_API = 'https://api.openalex.org';
+  const OA_API = '/openalex';
 
   function initPickTool() {
     if (_pickInit) return;
