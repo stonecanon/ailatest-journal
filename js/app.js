@@ -4636,10 +4636,8 @@
             ${(function(){
               const rcKey = e.journalRec ? (e.journalRec.issn || e.journalRec.eissn || issnStr) : issnStr;
               const cycle = reviewCycles[rcKey];
-              const cycleStr = cycle
-                ? T('中位数 ','median ') + cycle.median_days + T(' 天 (n=',' days (n=') + cycle.sample_size + ')'
-                : 'N/A';
-              return '<div class="pick-cycle">📅 ' + T('审稿周期','Review cycle') + ': ' + T('期刊平均','Journal avg') + ' ' + cycleStr + ' | ' + T('近100篇','Recent 100') + ' N/A | ' + T('相关论文','Related papers') + ' N/A</div>';
+              if (!cycle || !cycle.median_days) return '';
+              return '<div class="pick-cycle">📅 ' + T('审稿周期','Review cycle') + ': ' + T('中位数 ','median ') + cycle.median_days + T(' 天 (n=',' days (n=') + cycle.sample_size + ')</div>';
             })()}
             ${paperList ? `<div class="pick-papers">${paperList}</div>` : ''}
           </div>`;
