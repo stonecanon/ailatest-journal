@@ -4228,7 +4228,16 @@
         const data = await resp.json();
         const works = data.results || [];
         if (!works.length) {
-          status.textContent = T('未找到相关论文，请尝试其他关键词','No papers found, try different keywords');
+          // Check if Chinese-only input — OpenAlex doesn't handle Chinese well
+          const hasCnOnly = [...query].filter(c => c >= '\u4e00' && c <= '\u9fff').length > 0
+            && uniqueWords.filter(w => w.length > 4).length < 2
+            && !explicitKeywords.length;
+          if (hasCnOnly) {
+            status.textContent = T('未找到相关论文。OpenAlex 对中文搜索效果不佳，建议在摘要后添加英文 Keywords: 行（如 Keywords: indoor occupancy, sensor）',
+              'No papers found. OpenAlex has limited Chinese support. Try adding an English "Keywords:" line (e.g., Keywords: indoor occupancy, sensor).');
+          } else {
+            status.textContent = T('未找到相关论文，请尝试其他关键词','No papers found, try different keywords');
+          }
           return;
         }
 
