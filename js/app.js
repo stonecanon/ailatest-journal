@@ -613,7 +613,6 @@
   let domestic = null;
   let esiCats = [];
   let meta = null;
-  let journalPages = {};
   let oaMap = {};          // compact OpenAlex map: { "ISSN": {hp, l, oa, dj, apc, org, cn, w} }
   let reviewCycles = {};   // { ISSN: {median_days, sample_size, source, year_window, updated} }
   const DEFAULT_JOURNAL_ALIASES = {
@@ -905,25 +904,6 @@
   }
   function normTitle(s) {
     return String(s).toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]+/g, '');
-  }
-  function journalPagePath(rOrId) {
-    if (!rOrId) return '';
-    if (typeof rOrId === 'string') return journalPages[rOrId] || '';
-    return journalPages[favId(rOrId)]
-      || journalPages[rOrId.issn || '']
-      || journalPages[rOrId.eissn || '']
-      || journalPages['t:' + normTitle(rOrId.name || rOrId.cn_name || '')]
-      || '';
-  }
-  function openJournalPage(r) {
-    const path = journalPagePath(r);
-    if (path) {
-      window.location.href = path;
-      return true;
-    }
-    const q = encodeURIComponent(r.name || r.cn_name || r.en_name || '');
-    if (q) window.location.href = `/?q=${q}`;
-    return false;
   }
 
   // favLists: [{id, name, ids:[...ordered ids...]}]
@@ -2810,7 +2790,7 @@
     </div>`;
   }
 
-  // ───────── 期刊详情页 / legacy drawer fallback ─────────
+  // ───────── 详情抽屉 ─────────
   let drawerOpen = false;
   let _currentDrawerRec = null;
   let _drawerStack = []; // for back-navigation through related journals
@@ -2866,14 +2846,9 @@
     if (!m) { if (drawerOpen) closeDrawer(true); return; }
     let id;
     try { id = decodeURIComponent(m[1]); } catch (_) { id = m[1]; }
-    const path = journalPagePath(id);
-    if (path) {
-      location.replace(path);
-      return;
-    }
     if (_currentDrawerRec && favId(_currentDrawerRec) === id) return;
     const r = findRecByFid(id);
-    if (r) openJournalPage(r);
+    if (r) openDrawer(r, { fromHash: true });
   }
   async function openDrawer(r, opts) {
     _currentDrawerRec = r;
@@ -4213,14 +4188,14 @@
       });
     });
 
-    // 行点击 → 完整期刊页
+    // 行点击 → 详情抽屉
     document.addEventListener('click', (e) => {
       if (e.target.closest('.fav-star')) return;
       if (e.target.closest('.drag-handle')) return;
       const row = e.target.closest('tr.j-row.clickable'); if (!row) return;
       const fid = row.dataset.fid;
       const rec = rowRecordsByFid[fid] || journals.find(r => favId(r) === fid) || favsData[fid];
-      if (rec) openJournalPage(rec);
+      if (rec) openDrawer(rec);
     });
     $('#drawer-close')?.addEventListener('click', () => closeDrawer());
     $('#drawer-back')?.addEventListener('click', () => {
@@ -4653,11 +4628,10 @@
           const cardZoneClass = e.zone ? ` zone-${e.zone}` : '';
           const zoneStripStyle = zoneColor ? `style="background:${zoneColor}"` : '';
 
-          const pageHref = e.journalRec ? journalPagePath(e.journalRec) : '';
           return `<div class="pick-card${cardZoneClass}" data-issn="${escape(issnStr)}">
             ${zoneColor ? `<div class="pick-zone-strip" ${zoneStripStyle}></div>` : ''}
             ${zoneTagsHtml ? `<div class="pick-zone-tags">${zoneTagsHtml}</div>` : ''}
-            <h3><a href="${escape(pageHref || '#')}">${escape(name)}</a></h3>
+            <h3><a href="#j/${escape(e.journalRec ? favId(e.journalRec) : issnStr)}">${escape(name)}</a></h3>
             <div class="pick-head">
               <span class="pick-count">${e.count}<small> ${T('篇论文','papers')}</small></span>
               <div class="pick-head-right">
@@ -4685,14 +4659,14 @@
           </div>`;
         }).join('');
 
-        // Click to open the full journal page (only if we have our data)
+        // Click to open journal drawer (only if we have our data)
         const pickEl = document.getElementById('pick-results');
         if (pickEl) {
           pickEl.querySelectorAll('.pick-card').forEach(card => {
             card.addEventListener('click', () => {
               const issn = card.dataset.issn;
               const rec = journals.find(r => r.issn === issn || r.eissn === issn);
-              if (rec) openJournalPage(rec);
+              if (rec) openDrawer(rec);
             });
           });
         }
@@ -4793,17 +4767,16 @@
     // 分享着陆页：/s/<id> 直接接管 main，不走主流程
     if (await maybeRenderShareLanding()) return;
     try {
-      const [j, d, m, esi, aliases, rc, pages] = await Promise.all([
+      const [j, d, m, esi, aliases, rc] = await Promise.all([
         fetchJSON('data/journals.json.gz'),
         fetch('data/domestic.json').then(r => r.json()).catch(() => null),
         fetch('data/meta.json').then(r => r.json()).catch(() => null),
         fetch('data/esi_categories.json').then(r => r.json()).catch(() => []),
         fetch('data/journal_aliases.json').then(r => r.json()).catch(() => DEFAULT_JOURNAL_ALIASES),
         fetch('data/review_cycles.json').then(r => r.json()).catch(() => ({})),
-        fetch('data/journal_pages.json').then(r => r.json()).catch(() => ({})),
       ]);
       setJournalAliases(aliases);
-      journals = j; domestic = d; meta = m; esiCats = esi; oaMap = null; reviewCycles = rc || {}; journalPages = pages || {};
+      journals = j; domestic = d; meta = m; esiCats = esi; oaMap = null; reviewCycles = rc || {};
       journals.forEach(journalSearchMeta);
       buildDomIndex(domestic);
       buildIntIndex(journals);
