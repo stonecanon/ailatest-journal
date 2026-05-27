@@ -4387,25 +4387,22 @@
         // Run all queries concurrently via Promise.all
         status.textContent = T('正在搜索相关论文…','Searching related papers…');
         const SEARCH_FIELDS = 'id,title,publication_date,primary_location,relevance_score';
-        const FIVE_YEARS_AGO = new Date(Date.now() - 5*365*24*60*60*1000).toISOString().slice(0,10);
-        const DATE_FILTER = `&filter=from_publication_date:${FIVE_YEARS_AGO}`;
         const queryBatches = await Promise.all(queries.slice(0, 3).map(async (q) => {
-          const qs = `search=${encodeURIComponent(q.slice(0,120))}&per_page=30&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
-          const directUrl = `https://api.openalex.org/works?${qs}`;
-          const proxyUrl = `/openalex?${qs}`;
-          // Try direct first; if it fails (CORS/DNS/network), fall back to CF proxy
+          const url = `https://api.openalex.org/works?search=${encodeURIComponent(q.slice(0,120))}&per_page=30&select=${SEARCH_FIELDS}`;
           try {
-            const r = await fetch(directUrl, { headers: { 'Accept': 'application/json' } });
-            if (r.ok) { const d = await r.json(); return d.results || []; }
-          } catch {}
-          try {
-            const r = await fetch(proxyUrl, { headers: { 'Accept': 'application/json' } });
-            if (r.ok) { const d = await r.json(); return d.results || []; }
-          } catch {}
-          return [];
+            const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
+            if (!r.ok) {
+              const text = await r.text().catch(() => '');
+              console.error('OpenAlex API error:', r.status, text.slice(0,200));
+              return [];
+            }
+            const d = await r.json();
+            return d.results || [];
+          } catch (e) {
+            console.error('OpenAlex fetch error:', e?.message || e);
+            return [];
+          }
         }));
-
-        // Deduplicate by work ID
         const seenIds = new Set();
         const allWorks = [];
         for (const batch of queryBatches) {
@@ -4420,13 +4417,16 @@
         // If too few results, try a broader backup query
         if (allWorks.length < 8) {
           const backup = uniqueWords.slice(0, 5).join(' ');
-          const qs = `search=${encodeURIComponent(backup)}&per_page=30&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
-          const directUrl = `https://api.openalex.org/works?${qs}`;
-          const proxyUrl = `/openalex?${qs}`;
+          const url = `https://api.openalex.org/works?search=${encodeURIComponent(backup)}&per_page=30&select=${SEARCH_FIELDS}`;
           try {
-            const r = await fetch(directUrl, { headers: { 'Accept': 'application/json' } });
-            if (r.ok) { const d = await r.json(); for (const w of (d.results||[])) { if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); } } }
-          } catch { try { const r = await fetch(proxyUrl, { headers: { 'Accept': 'application/json' } }); if (r.ok) { const d = await r.json(); for (const w of (d.results||[])) { if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); } } } } catch {} }
+            const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
+            if (r.ok) {
+              const d = await r.json();
+              for (const w of (d.results || [])) {
+                if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); }
+              }
+            }
+          } catch (e) { console.error('OpenAlex backup fetch error:', e?.message || e); }
         }
 
         // Chinese fallback: if still nothing and has Chinese, try short Chinese title
@@ -4434,13 +4434,11 @@
           const chn = titleTerms[0].replace(/[a-zA-Z0-9\s]/g, '').replace(/[，。、；：！？（）【】《》""''\s]/g, '');
           if (chn) {
             const cnQuery = chn.slice(0, 12);
-            const qs = `search=${encodeURIComponent(cnQuery)}&per_page=20&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
-            const directUrl = `https://api.openalex.org/works?${qs}`;
-            const proxyUrl = `/openalex?${qs}`;
+            const url = `https://api.openalex.org/works?search=${encodeURIComponent(cnQuery)}&per_page=20&select=${SEARCH_FIELDS}`;
             try {
-              const r = await fetch(directUrl, { headers: { 'Accept': 'application/json' } });
+              const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
               if (r.ok) { const d = await r.json(); for (const w of (d.results||[])) { if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); } } }
-            } catch { try { const r = await fetch(proxyUrl, { headers: { 'Accept': 'application/json' } }); if (r.ok) { const d = await r.json(); for (const w of (d.results||[])) { if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); } } } } catch {} }
+            } catch (e) { console.error('OpenAlex CN fetch error:', e?.message || e); }
           }
         }
 
