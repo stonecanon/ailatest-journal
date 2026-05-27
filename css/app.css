@@ -1408,7 +1408,7 @@ td.empty,
   text-transform: uppercase;
 }
 .drawer-head-actions { display: flex; gap: 6px; }
-.drawer-fav, .drawer-close, .drawer-share {
+.drawer-back, .drawer-fav, .drawer-close, .drawer-share {
   background: transparent; border: 0;
   font-size: 20px; line-height: 1;
   width: 34px; height: 34px;
