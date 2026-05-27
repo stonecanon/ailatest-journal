@@ -4124,14 +4124,14 @@
         }
 
         // Step 2: Aggregate by journal ISSN
-        const journalMap = new Map(); // ISSN → {count, papers[], topics[], scores[]}
+        const journalMap = new Map(); // ISSN → {count, papers[], topics[], scores[], srcName}
         const topicSet = new Set();
         for (const w of works) {
           const src = w.primary_location?.source;
           if (!src) continue;
           const issn = (src.issn_l || '').toUpperCase();
           if (!issn) continue;
-          if (!journalMap.has(issn)) journalMap.set(issn, { count: 0, papers: [], scores: [], topics: new Set() });
+          if (!journalMap.has(issn)) journalMap.set(issn, { count: 0, papers: [], scores: [], topics: new Set(), srcName: src.display_name || '' });
           const j = journalMap.get(issn);
           j.count++;
           j.papers.push({ title: w.title, year: (w.publication_date||'').slice(0,4), id: w.id });
@@ -4186,7 +4186,7 @@
             indices, wos_categories: wosCats,
             count: j.count, papers: j.papers.slice(0,5),
             topics: [...j.topics].slice(0,6),
-            score: totalScore,
+            score: totalScore, srcName: j.srcName,
           };
         });
 
@@ -4228,7 +4228,7 @@
           const scorePct = Math.round(e.score * 100);
           const ifStr = e.if != null ? `IF ${e.if}` : '';
           const zoneStr = e.zone ? `CAS ${e.zone}区` : '';
-          const name = e.journalRec?.name || e.issn;
+          const name = e.journalRec?.name || e.srcName || e.issn;
           const issnStr = e.issn;
           const paperList = e.papers.map(p => `<span class="pick-paper" title="${escape(p.title)}">${escape((p.title||'').slice(0,60))}${(p.title||'').length>60?'…':''} (${escape(p.year||'')})</span>`).join('');
           const topics = e.topics.map(t => `<span class="pick-topic">${escape(t)}</span>`).join('');
@@ -4267,7 +4267,7 @@
           </div>`;
         }).join('');
 
-        // Click to open journal drawer
+        // Click to open journal drawer (only if we have our data)
         results.querySelectorAll('.pick-card').forEach(card => {
           card.addEventListener('click', () => {
             const issn = card.dataset.issn;
