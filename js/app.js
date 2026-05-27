@@ -4387,7 +4387,7 @@
         // Step 5: Render
         if (!filtered.length) {
           results.innerHTML = `<div class="pick-no-results">${T('没有符合筛选条件的期刊推荐','No journals match your filters')}</div>`;
-          status.textContent = `${T('已检索','Searched')} ${allWorks.length} ${T('篇论文','papers')}，${T('分布在','in')} ${journalMap.size} ${T('个期刊','journals')}`;
+          status.textContent = `${T('已发表','Published')} ${allWorks.length} ${T('篇相关论文','related papers')}，${T('分布在','in')} ${journalMap.size} ${T('个期刊','journals')}`;
           return;
         }
 
@@ -4429,6 +4429,7 @@
             : '#8e9aaf';
 
           return `<div class="pick-card" style="border-left-color:${scoreColor}" data-issn="${escape(issnStr)}">
+            <h3><a href="#j/${escape(e.journalRec ? favId(e.journalRec) : issnStr)}">${escape(name)}</a></h3>
             <div class="pick-head">
               <span class="pick-count">${e.count}<small> ${T('篇论文','papers')}</small></span>
               <div class="pick-head-right">
@@ -4436,7 +4437,6 @@
                 <span class="pick-score-pct">${scorePct}%</span>
               </div>
             </div>
-            <h3><a href="#j/${escape(e.journalRec ? favId(e.journalRec) : issnStr)}">${escape(name)}</a></h3>
             ${badgesHtml ? `<div class="pick-badges">${badgesHtml}</div>` : ''}
             ${paperList ? `<div class="pick-papers">${paperList}</div>` : ''}
           </div>`;
@@ -4454,7 +4454,7 @@
           });
         }
 
-        status.textContent = `${T('已检索','Searched')} ${allWorks.length} ${T('篇论文','papers')}，${T('分布在','in')} ${journalMap.size} ${T('个期刊','journals')}，${T('推荐','recommended')} ${filtered.length} ${T('个','')}`;
+        status.textContent = `${T('已发表','Published')} ${allWorks.length} ${T('篇相关论文','related papers')}，${T('分布在','in')} ${journalMap.size} ${T('个期刊','journals')}，${T('推荐','recommended')} ${filtered.length} ${T('个','')}`;
         // Increment daily counter (only for non-unlocked users)
         if (!isUnlocked) {
           const today = new Date().toISOString().slice(0,10);
