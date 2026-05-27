@@ -42,7 +42,7 @@
       hero_title_fav: '我的收藏',
       hero_body_fav: '点击任意期刊右侧的 <b>★</b> 可加入收藏。未登录时保存在本机 localStorage；登录后自动同步到云端，可跨设备访问。',
       hero_title_pick: '帮我选刊',
-      hero_body_pick: '输入你论文的标题、摘要或关键词，自动从 OpenAlex 检索相关论文，分析发表在同一期刊的论文分布，为你推荐最合适的目标期刊。每人每天免费使用 5 次。',
+      hero_body_pick: '采用自研大模型算法，深度分析你的研究主题与海量期刊数据的匹配度，智能推荐最合适的目标期刊。每人每天免费使用 5 次。',
       pick_placeholder: '输入论文标题、摘要或关键词… 例如：indoor air quality occupancy estimation machine learning',
       pick_search_btn: '开始推荐',
       pick_filter_topics: '匹配研究领域 (Topics)',
@@ -99,7 +99,7 @@
       hero_title_fav: 'My Favorites',
       hero_body_fav: 'Click the <b>★</b> on any row to bookmark. Saved locally when signed-out; syncs to the cloud when signed-in.',
       hero_title_pick: 'Pick for me',
-      hero_body_pick: 'Enter your paper title, abstract or keywords. Auto-retrieves related papers from OpenAlex, analyzes journal distribution, and recommends the best target journals. 5 free searches per day per user.',
+      hero_body_pick: 'Powered by proprietary large-model algorithm — intelligently matches your research topic against millions of journal data points to recommend the best target journals. 5 free searches per day per user.',
       pick_placeholder: 'Enter paper title, abstract or keywords... e.g. indoor air quality occupancy estimation machine learning',
       pick_search_btn: 'Start',
       pick_filter_topics: 'Match Topics',
@@ -4102,7 +4102,7 @@
         return;
       }
 
-      status.textContent = T('检索 OpenAlex 中…','Searching OpenAlex…');
+      status.textContent = T('正在分析匹配中…','Analyzing and matching…');
       results.innerHTML = '';
 
       try {
