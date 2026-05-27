@@ -902,7 +902,7 @@
     if (l && isDefaultFavListName(l.name)) l.name = defaultFavListName();
   }
 
-  const STORAGE_PREFIX = SITE_MODE === 'all' ? 'ailatest.' : 'ailatest.' + SITE_MODE + '.';
+  const STORAGE_PREFIX = 'ailatest.';
   function loadFavLists() {
     try {
       const raw = localStorage.getItem(STORAGE_PREFIX + 'favLists');
