@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Build data/review_cycles.json from CrossRef (rate-limit-safe, resume).
+"""Build data/review_cycles.json from CrossRef (fixed assertion date parsing).
 
-Queries each journal's works for received→accepted date pairs (2024+).
-2 workers, 1s gap between requests. On 429 → wait 5 min, retry up to 10x.
-Checkpoints every 500.
+Queries journal works for received→accepted date pairs via assertion fields.
+Most journals store these as natural-language strings ("31 October 2023").
 """
 import json, urllib.request, urllib.error, ssl, statistics, time
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -19,72 +18,85 @@ UA = "AILatest-Journal/1.0 (mailto:43259074+stonecanon@users.noreply.github.com)
 TODAY = date.today().isoformat()
 MIN_PAIRS = 4
 ROWS = 50
-WORKERS = 2
-
-# Rate-limit state (shared across workers)
-_last_req_time = [0.0]
+WORKERS = 3
 
 
-def parse_dp(d):
-    try:
-        dp = d.get("date-parts", [[]])[0]
-        if len(dp) >= 3:
-            return date(int(dp[0]), int(dp[1]), int(dp[2]))
-    except Exception:
+def parse_date(val):
+    """Parse a date from various formats:
+       - {"date-parts": [[2024, 3, 9]]}  (CrossRef standard)
+       - "31 October 2023"  (assertion string)
+       - "2023-10-31"      (ISO)
+    """
+    if val is None:
         return None
+    if isinstance(val, dict):
+        try:
+            dp = val.get("date-parts", [[]])[0]
+            if len(dp) >= 3:
+                return date(int(dp[0]), int(dp[1]), int(dp[2]))
+        except Exception:
+            pass
+        return None
+    if isinstance(val, str):
+        val = val.strip()
+        # Try ISO first (YYYY-MM-DD)
+        try:
+            return date.fromisoformat(val[:10])
+        except: pass
+        # Try "31 October 2023"
+        for fmt in ("%d %B %Y", "%d %b %Y", "%B %d, %Y", "%b %d, %Y",
+                    "%d-%m-%Y", "%m/%d/%Y", "%Y/%m/%d"):
+            try:
+                return datetime.strptime(val, fmt).date()
+            except: pass
     return None
 
 
 def fetch_one(issn):
-    global _last_req_time
-    ctx = ssl.create_default_context()
     url = f"https://api.crossref.org/journals/{issn}/works?rows={ROWS}&filter=from-pub-date:2024-01-01"
-
-    for attempt in range(10):
-        # Rate-limit: at least 1s between requests
-        now = time.time()
-        gap = 1.0 - (now - _last_req_time[0])
-        if gap > 0:
-            time.sleep(gap)
-        _last_req_time[0] = time.time()
-
-        try:
-            req = urllib.request.Request(url, headers={"User-Agent": UA})
-            with urllib.request.urlopen(req, timeout=10, context=ctx) as r:
-                items = json.loads(r.read())["message"]["items"]
-        except urllib.error.HTTPError as e:
-            if e.code == 429:
-                wait = min(300 * (attempt + 1), 1800)
-                print(f"  429 on {issn}, wait {wait}s (attempt {attempt+1})", flush=True)
-                time.sleep(wait)
-                # Re-create SSL context (new connection)
-                ctx = ssl.create_default_context()
-                continue
-            return issn, None, 0
-        except Exception:
-            return issn, None, 0
-        break
-    else:
-        return issn, None, 0  # All retries exhausted
+    ctx = ssl.create_default_context()
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": UA})
+        with urllib.request.urlopen(req, timeout=10, context=ctx) as r:
+            items = json.loads(r.read())["message"]["items"]
+    except Exception:
+        return issn, None, 0
 
     days = []
     for it in items:
-        rd = parse_dp(it.get("received")) if "received" in it else None
-        ad = parse_dp(it.get("accepted")) if "accepted" in it else None
+        # Top-level received/accepted (rare)
+        rd = parse_date(it.get("received"))
+        ad = parse_date(it.get("accepted"))
+        # Assertion fallback (common: "31 October 2023" style)
         if not (rd and ad):
             for a in it.get("assertion", []) or []:
-                n = (a.get("name") or "").lower()
-                v = (a.get("value") or "")[:10]
-                if n == "received" and not rd:
-                    try: rd = date.fromisoformat(v)
-                    except: pass
-                elif n == "accepted" and not ad:
-                    try: ad = date.fromisoformat(v)
-                    except: pass
+                n = (a.get("name") or "").lower().replace(" ", "_")
+                v = (a.get("value") or "").strip()
+                if n in ("received", "date_received") and not rd:
+                    rd = parse_date(v)
+                elif n in ("accepted", "date_accepted") and not ad:
+                    ad = parse_date(v)
+                elif n in ("submission_date", "submitted", "date_submitted") and not rd:
+                    rd = parse_date(v)
+                elif n in ("acceptance_date", "date_accepted") and not ad:
+                    ad = parse_date(v)
         if rd and ad:
             d = (ad - rd).days
             if 0 < d < 1500:
                 days.append(d)
+
+    # Also try "published-print" date parts from the work itself
+    if len(days) < MIN_PAIRS:
+        for it in items:
+            pp = it.get("published-print") or it.get("published-online") or it.get("published")
+            rd2 = parse_date(it.get("received"))
+            if pp and rd2:
+                ppd = parse_date(pp)
+                if ppd and rd2:
+                    d = (ppd - rd2).days
+                    if 0 < d < 1500:
+                        days.append(d)
+
     med = int(statistics.median(days)) if days else None
     return issn, med, len(days)
 
@@ -107,8 +119,8 @@ def main():
             pass
 
     pending = [i for i in targets if i not in out]
-    print(f"Pending: {len(pending)} (have: {len(out)} good)", flush=True)
-    print(f"Workers: {WORKERS} | Min pairs: {MIN_PAIRS}", flush=True)
+    print(f"Pending: {len(pending)} (have: {len(out)})", flush=True)
+    print(f"Workers: {WORKERS} | Rows: {ROWS} | Min pairs: {MIN_PAIRS}", flush=True)
 
     t0 = time.time()
     done = kept = nf = 0
@@ -121,7 +133,7 @@ def main():
             if med and pairs >= MIN_PAIRS:
                 out[issn] = {
                     "median_days": med, "sample_size": pairs,
-                    "source": "CrossRef", "year_window": "2024+", "updated": TODAY,
+                    "source": "CrossRef (assertion)", "year_window": "2024+", "updated": TODAY,
                 }
                 kept += 1
             else:
