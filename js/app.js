@@ -4387,8 +4387,10 @@
         // Run all queries concurrently via Promise.all
         status.textContent = T('正在搜索相关论文…','Searching related papers…');
         const SEARCH_FIELDS = 'id,title,publication_date,primary_location,relevance_score';
+        const FIVE_YEARS_AGO = new Date(Date.now() - 5*365*24*60*60*1000).toISOString().slice(0,10);
+        const DATE_FILTER = `&filter=from_publication_date:${FIVE_YEARS_AGO}`;
         const queryBatches = await Promise.all(queries.slice(0, 3).map(async (q) => {
-          const url = `https://api.openalex.org/works?search=${encodeURIComponent(q.slice(0,120))}&per_page=30&select=${SEARCH_FIELDS}`;
+          const url = `https://api.openalex.org/works?search=${encodeURIComponent(q.slice(0,120))}&per_page=30&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
           try {
             const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
             if (!r.ok) {
@@ -4417,7 +4419,7 @@
         // If too few results, try a broader backup query
         if (allWorks.length < 8) {
           const backup = uniqueWords.slice(0, 5).join(' ');
-          const url = `https://api.openalex.org/works?search=${encodeURIComponent(backup)}&per_page=30&select=${SEARCH_FIELDS}`;
+          const url = `https://api.openalex.org/works?search=${encodeURIComponent(backup)}&per_page=30&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
           try {
             const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
             if (r.ok) {
@@ -4434,7 +4436,7 @@
           const chn = titleTerms[0].replace(/[a-zA-Z0-9\s]/g, '').replace(/[，。、；：！？（）【】《》""''\s]/g, '');
           if (chn) {
             const cnQuery = chn.slice(0, 12);
-            const url = `https://api.openalex.org/works?search=${encodeURIComponent(cnQuery)}&per_page=20&select=${SEARCH_FIELDS}`;
+            const url = `https://api.openalex.org/works?search=${encodeURIComponent(cnQuery)}&per_page=20&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
             try {
               const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
               if (r.ok) { const d = await r.json(); for (const w of (d.results||[])) { if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); } } }
@@ -4634,11 +4636,18 @@
             ${(function(){
               const r2 = e.journalRec;
               let txt = '📅 ' + T('审稿周期','Review cycle') + ': ';
-              const weeks = parseFloat(r2?.doaj?.review_weeks);
-              if (weeks > 0) {
-                txt += (weeks / 4.33).toFixed(1) + T(' 个月 (投稿→出版,DOAJ)',' months (submission→pub.)');
+              // Prefer CrossRef (measured in days), fall back to DOAJ (weeks), then average
+              const cr = r2?.crossref;
+              if (cr && cr.median_days > 0) {
+                const months = (cr.median_days / 30.44).toFixed(1);
+                txt += months + T(' 个月 (收稿→录用,Crossref,',' months (submission→acceptance, ') + (cr.sample_size || '?') + T('篇样本)',' samples)');
               } else {
-                txt += T('≈4.0 个月 (DOAJ 平均)','≈4.0 months (DOAJ avg)');
+                const weeks = parseFloat(r2?.doaj?.review_weeks);
+                if (weeks > 0) {
+                  txt += (weeks / 4.33).toFixed(1) + T(' 个月 (投稿→出版,DOAJ)',' months (submission→pub.)');
+                } else {
+                  txt += T('≈4.0 个月 (DOAJ 平均)','≈4.0 months (DOAJ avg)');
+                }
               }
               return '<div class="pick-cycle">' + txt + '</div>';
             })()}
