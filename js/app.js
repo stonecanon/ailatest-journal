@@ -4088,8 +4088,10 @@
       if (!query) { status.textContent = T('请输入内容','Please enter a query'); return; }
 
       // ── Daily usage limit (localStorage) ──
-      // Bypass for owner: set localStorage.ailatest_unlocked = '1' (via ?unlock=1 URL)
-      const isUnlocked = localStorage.getItem('ailatest_unlocked') === '1';
+      // Bypass: owner email hardcoded
+      const OWNER_EMAIL = 'jiantaoweng@gmail.com';
+      const isUnlocked = localStorage.getItem('ailatest_unlocked') === '1'
+        || (user && (user.email === OWNER_EMAIL || user.login === OWNER_EMAIL || user.name === OWNER_EMAIL));
       if (!isUnlocked) {
         const today = new Date().toISOString().slice(0,10);
         const limitKey = 'ailatest.pick.count';
@@ -4443,8 +4445,9 @@
 
   // ───────── boot ─────────
   async function boot() {
-    // ── Owner unlock: ?unlock=1 auto-sets localStorage bypass ──
-    if (window.location.search.includes('unlock=1')) {
+    // ── Owner unlock: specific URL param sets localStorage bypass ──
+    const OWNER_EMAIL = 'jiantaoweng@gmail.com';
+    if (window.location.search.includes(OWNER_EMAIL)) {
       try { localStorage.setItem('ailatest_unlocked', '1'); } catch {}
     }
     trackPageview();
