@@ -2475,13 +2475,15 @@
         return true;
       });
 
-      // 生成学科分类芯片 HTML
-      const catChips = CAT_ORDER.map(c => {
-        const count = all.filter(r => (r.major_categories||[]).includes(c)).length;
-        const active = activeCat === c;
-        return `<button class="cat-chip-dom ${active ? 'active' : ''}" data-cat="${escape(c)}" style="cursor:pointer;display:inline-block;padding:4px 10px;font-size:11.5px;border:1px solid var(--rule);border-radius:12px;background:${active ? 'var(--accent)' : 'var(--paper)'};color:${active ? '#fff' : 'var(--ink-soft)'};transition:all .12s">${escape(c)} <span style="opacity:.65;font-size:10px">(${count.toLocaleString()})</span></button>`;
-      }).join('');
-      const catRow = `<div class="cat-chips-dom" style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0">${catChips}</div>`;
+      // 生成学科分类下拉
+      const catOptions = [
+        `<option value="__all">${T('全部分类','All Categories')}</option>`,
+        ...CAT_ORDER.map(c => {
+          const count = all.filter(r => (r.major_categories||[]).includes(c)).length;
+          return `<option value="${escape(c)}"${activeCat === c ? ' selected' : ''}>${escape(c)} (${count.toLocaleString()})</option>`;
+        })
+      ].join('');
+      const catRow = `<div style="margin:8px 0"><select id="cnki-cat-select" style="width:100%;max-width:360px;padding:6px 10px;font-size:13px;border:1px solid var(--rule);border-radius:2px;background:var(--paper);color:var(--ink);font-family:inherit">${catOptions}</select></div>`;
 
       // 按刊名字母排序
       filtered.sort((a, b) => (a.name||'').localeCompare(b.name||'', 'zh'));
@@ -2519,7 +2521,7 @@
 
       box.innerHTML = `<div class="section-block">
         <h3 class="section-title">${T('中文期刊目录','Chinese Journal Directory')}</h3>
-        <div class="section-subtitle">${T('共收录','Total ')} ${all.length.toLocaleString()} ${T('种中文期刊',' Chinese journals')}${activeCat !== '__all' ? T(' · 分类: ',' · Category: ')+escape(activeCat) : ''}${q ? T(' · 搜索: ',' · Search: ')+escape(q) : ''}</div>
+        <div class="section-subtitle">${T('共收录','Total ')} ${all.length.toLocaleString()} ${T('种中文期刊',' Chinese journals')}${q ? T(' · 搜索: ',' · Search: ')+escape(q) : ''}</div>
         ${catRow}
         <div class="table-wrap"><table class="journals"><thead><tr>
           <th style="width:36px" aria-label="Favorite"></th>
@@ -2535,15 +2537,15 @@
         ${total > (window.__cnkiShown || 100) ? `<div class="pager"><button id="cnki-more" class="more-btn" style="margin-top:12px;padding:8px 20px;border:1px solid var(--rule);background:var(--paper);color:var(--ink-soft);border-radius:2px;cursor:pointer">${T('加载更多','Load more')} (${total - (window.__cnkiShown||100)} ${T('条剩余','remaining')})</button></div>` : ''}
       </div>`;
 
-      // 绑定分类芯片点击
-      box.querySelectorAll('.cat-chip-dom').forEach(el => {
-        el.addEventListener('click', () => {
-          const cat = el.dataset.cat;
-          window.__cnkiCat = cat === window.__cnkiCat ? '__all' : cat;
+      // 绑定分类下拉
+      const catSelect = document.getElementById('cnki-cat-select');
+      if (catSelect) {
+        catSelect.addEventListener('change', () => {
+          window.__cnkiCat = catSelect.value;
           window.__cnkiShown = 100;
           renderDomestic();
         });
-      });
+      }
 
       // 绑定加载更多
       const moreBtn = $('#cnki-more');
