@@ -727,7 +727,7 @@
     if (raw) Object.assign(unlockedCache, JSON.parse(raw));
   } catch (_) {}
   const API_BASE = (window.AILATEST_API_BASE
-    || (location.hostname === 'localhost' ? 'http://localhost:8787' : `${location.origin}/api`));
+    || (location.hostname === 'localhost' ? 'http://localhost:8787' : 'https://api.ailatest.org'));
 
   async function readJsonResponse(resp, fallback) {
     let data = null;
@@ -2822,7 +2822,26 @@
     return null;
   }
   function applyHashRoute() {
-    const m = (location.hash || '').match(/^#j\/(.+)$/);
+    const hash = location.hash || '';
+    // #search?q=<query> → switch to pick tab and fill search
+    const searchMatch = hash.match(/^#search\?q=(.+)$/);
+    if (searchMatch) {
+      try {
+        const q = decodeURIComponent(searchMatch[1]);
+        const pickEl = document.querySelector('[data-tab="pick"]');
+        const pickInput = $('#pick-input');
+        if (pickEl && pickInput) {
+          pickEl.click();
+          pickInput.value = q;
+          setTimeout(() => {
+            const btn = $('#pick-search-btn');
+            if (btn) btn.click();
+          }, 800);
+        }
+      } catch (_) {}
+      return;
+    }
+    const m = hash.match(/^#j\/(.+)$/);
     if (!m) { if (drawerOpen) closeDrawer(true); return; }
     let id;
     try { id = decodeURIComponent(m[1]); } catch (_) { id = m[1]; }
