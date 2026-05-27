@@ -713,7 +713,7 @@
   let wosCats = [];   // [{name,count}] sorted A-Z
   let activeQuery = '';
   let activeDom = 'cnki_major';   // 中文期刊目录
-  let activeDomBadges = new Set(['cssci', 'pku']);
+  let activeDomBadges = new Set(); // 默认不勾选 = 显示全部；勾选 = 只看有该徽章的
   const PAGE = 100;
   let shown = PAGE;
   let intIfSort = null; // null | 'desc' | 'asc'
@@ -2487,17 +2487,18 @@
           const cats = r.major_categories || [];
           if (!cats.includes(activeCat)) return false;
         }
-        // 徽章过滤（CSSCI/北大核心/CCF）
-        if (activeDomBadges.size < 4) { // 有任意徽章被取消勾选时
+        // 徽章过滤（CSSCI/北大核心/CCF）— include mode: 勾选 = 只看有该徽章的
+        if (activeDomBadges.size > 0) { // 有任意徽章被勾选时
           const hits = lookupDom(r);
           const hasCssci = hits.some(h => h.source === 'cssci');
           const hasCssciExt = hits.some(h => h.source === 'cssci_ext');
           const hasPku = hits.some(h => h.source === 'pku');
           const hasCcf = hits.some(h => h.source === 'ccft');
-          if (!activeDomBadges.has('cssci') && hasCssci) return false;
-          if (!activeDomBadges.has('cssci_ext') && hasCssciExt) return false;
-          if (!activeDomBadges.has('pku') && hasPku) return false;
-          if (!activeDomBadges.has('ccft') && hasCcf) return false;
+          // AND logic: 勾选的徽章，期刊必须全部拥有
+          if (activeDomBadges.has('cssci') && !hasCssci) return false;
+          if (activeDomBadges.has('cssci_ext') && !hasCssciExt) return false;
+          if (activeDomBadges.has('pku') && !hasPku) return false;
+          if (activeDomBadges.has('ccft') && !hasCcf) return false;
         }
         return true;
       });
