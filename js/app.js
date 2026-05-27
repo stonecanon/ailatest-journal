@@ -4160,7 +4160,7 @@
           chnTerms = [chnChars.slice(0, 20)];
         }
 
-        // Build final search query
+        // Build final search query — OpenAlex filter limit is ~168 URL-encoded chars
         const searchParts = [
           ...titleTerms,
           ...explicitKeywords.slice(0, 3),
@@ -4168,7 +4168,11 @@
           ...chnTerms,
         ].filter(Boolean);
 
-        const searchQuery = searchParts.join(' ').slice(0, 120);
+        let searchQuery = searchParts.join(' ').slice(0, 120);
+        // Reduce further if URL-encoding would exceed OpenAlex's ~168 char filter limit
+        while (encodeURIComponent(searchQuery).length > 155 && searchQuery.length > 30) {
+          searchQuery = searchQuery.slice(0, -10).trim();
+        }
         if (query.length > 50) {
           status.textContent = T('正在分析匹配中…（已提取关键词）','Analyzing… (keywords extracted)');
         }
