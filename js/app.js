@@ -4392,7 +4392,7 @@
         const queryBatches = await Promise.all(queries.slice(0, 3).map(async (q) => {
           const qs = `search=${encodeURIComponent(q.slice(0,120))}&per_page=30&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
           const directUrl = `https://api.openalex.org/works?${qs}`;
-          const proxyUrl = `https://api.ailatest.org/openalex?${qs}`;
+          const proxyUrl = `/openalex?${qs}`;
           // Try direct first; if it fails (CORS/DNS/network), fall back to CF proxy
           try {
             const r = await fetch(directUrl, { headers: { 'Accept': 'application/json' } });
@@ -4422,7 +4422,7 @@
           const backup = uniqueWords.slice(0, 5).join(' ');
           const qs = `search=${encodeURIComponent(backup)}&per_page=30&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
           const directUrl = `https://api.openalex.org/works?${qs}`;
-          const proxyUrl = `https://api.ailatest.org/openalex?${qs}`;
+          const proxyUrl = `/openalex?${qs}`;
           try {
             const r = await fetch(directUrl, { headers: { 'Accept': 'application/json' } });
             if (r.ok) { const d = await r.json(); for (const w of (d.results||[])) { if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); } } }
@@ -4436,7 +4436,7 @@
             const cnQuery = chn.slice(0, 12);
             const qs = `search=${encodeURIComponent(cnQuery)}&per_page=20&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
             const directUrl = `https://api.openalex.org/works?${qs}`;
-            const proxyUrl = `https://api.ailatest.org/openalex?${qs}`;
+            const proxyUrl = `/openalex?${qs}`;
             try {
               const r = await fetch(directUrl, { headers: { 'Accept': 'application/json' } });
               if (r.ok) { const d = await r.json(); for (const w of (d.results||[])) { if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); } } }
