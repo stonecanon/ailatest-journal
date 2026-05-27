@@ -4192,7 +4192,6 @@
         // Priority 2: English keywords from title+body (fill remaining budget)
         let remaining = MAX_URL - (searchQuery ? encodeURIComponent(searchQuery).length + 1 : 0);
         if (remaining > 10) {
-          const existingCount = searchQuery ? searchQuery.split(' ').length : 0;
           const pool = engQuery.split(' ').filter(w => !searchQuery.toLowerCase().includes(w.toLowerCase()));
           for (let i = 0; i < Math.min(pool.length, MAX_KEYWORDS); i++) {
             const w = pool[i];
