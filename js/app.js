@@ -3831,6 +3831,7 @@
       if (activeTab === 'dom') renderDomestic();
       else if (activeTab === 'fav') renderFav();
       else if (activeTab === 'int') renderInt();
+      else if (activeTab === 'pick') initPickTool();
     }));
 
     $('#fav-tab').addEventListener('click', () => {
@@ -4057,6 +4058,154 @@
         startLogin();
       }
     });
+  }
+
+  // ───────── pick-for-me (journal recommendation) ─────────
+  let _pickInit = false;
+  const OA_API = 'https://api.openalex.org';
+
+  function initPickTool() {
+    if (_pickInit) return;
+    _pickInit = true;
+
+    const btn = $('#pick-search-btn');
+    const input = $('#pick-input');
+    const results = $('#pick-results');
+    const status = $('#pick-status');
+
+    async function doSearch() {
+      const query = input.value.trim();
+      if (!query) { status.textContent = T('请输入内容','Please enter a query'); return; }
+
+      status.textContent = T('检索 OpenAlex 中…','Searching OpenAlex…');
+      results.innerHTML = '';
+
+      try {
+        // Step 1: Search papers on OpenAlex
+        const url = OA_API + `/works?filter=title_and_abstract.search:${encodeURIComponent(query)}&per_page=50&sort=relevance_score:desc&select=id,title,publication_date,authorships,primary_location,relevance_score`;
+        const resp = await fetch(url, { headers: { 'Accept': 'application/json' } });
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const data = await resp.json();
+        const works = data.results || [];
+        if (!works.length) {
+          status.textContent = T('未找到相关论文，请尝试其他关键词','No papers found, try different keywords');
+          return;
+        }
+
+        // Step 2: Aggregate by journal ISSN
+        const journalMap = new Map(); // ISSN → {count, papers[], topics[], scores[]}
+        const topicSet = new Set();
+        for (const w of works) {
+          const src = w.primary_location?.source;
+          if (!src) continue;
+          const issn = (src.issn_l || '').toUpperCase();
+          if (!issn) continue;
+          if (!journalMap.has(issn)) journalMap.set(issn, { count: 0, papers: [], scores: [], topics: new Set() });
+          const j = journalMap.get(issn);
+          j.count++;
+          j.papers.push({ title: w.title, year: (w.publication_date||'').slice(0,4), id: w.id });
+          j.scores.push(w.relevance_score || 0);
+          // Collect topics from oaMap if available
+          if (oaMap && oaMap[issn]) {
+            (oaMap[issn].tp || []).forEach(t => { j.topics.add(t); topicSet.add(t); });
+          }
+        }
+
+        // Step 3: Build ranked results
+        const entries = [...journalMap.entries()].map(([issn, j]) => {
+          // Base score: average relevance of papers from this journal
+          const avgScore = j.scores.reduce((a,b)=>a+b,0) / j.scores.length;
+          // Bonus: more papers = higher confidence
+          const countBonus = Math.log2(j.count + 1) * 0.05;
+          // Bonus: topic overlap with query keywords
+          let topicBonus = 0;
+          if (oaMap && oaMap[issn]) {
+            const qLower = query.toLowerCase();
+            const topics = oaMap[issn].tp || [];
+            const match = topics.filter(t => t.toLowerCase().includes(qLower) || qLower.split(/\s+/).some(w => w.length>3 && t.toLowerCase().includes(w)));
+            topicBonus = match.length * 0.08;
+          }
+          const totalScore = Math.min(1, avgScore + countBonus + topicBonus);
+
+          // Look up in our journal data
+          const journalRec = journals.find(r => r.issn === issn || r.eissn === issn);
+          const ifVal = journalRec?.if_2024;
+          const zoneVal = journalRec?.cas_zone;
+
+          return {
+            issn, journalRec, if: ifVal, zone: zoneVal,
+            count: j.count, papers: j.papers.slice(0,5),
+            topics: [...j.topics].slice(0,6),
+            score: totalScore,
+          };
+        });
+
+        // Step 4: Filter and sort
+        let filtered = entries;
+        const ifMin = parseFloat(document.getElementById('pick-if-min')?.value || '0');
+        if (document.getElementById('pick-filter-if')?.checked && ifMin > 0) {
+          filtered = filtered.filter(e => e.if != null && e.if >= ifMin);
+        }
+        const zoneVal = document.getElementById('pick-zone')?.value || 'all';
+        if (zoneVal !== 'all') {
+          filtered = filtered.filter(e => e.zone != null && String(e.zone) === zoneVal);
+        }
+        if (document.getElementById('pick-filter-scopus')?.checked) {
+          filtered = filtered.filter(e => e.journalRec?.scopus);
+        }
+        // Topic filter (always on if checkbox checked, acts as minimum signal filter)
+        if (document.getElementById('pick-filter-topics')?.checked) {
+          filtered = filtered.filter(e => e.score > 0.05);
+        }
+        filtered.sort((a, b) => b.score - a.score);
+        filtered = filtered.slice(0, 30);
+
+        // Step 5: Render
+        if (!filtered.length) {
+          results.innerHTML = `<div class="pick-no-results">${T('没有符合筛选条件的期刊推荐','No journals match your filters')}</div>`;
+          status.textContent = `${T('已检索','Searched')} ${works.length} ${T('篇论文','papers')}，${T('分布在','in')} ${journalMap.size} ${T('个期刊','journals')}`;
+          return;
+        }
+
+        results.innerHTML = filtered.map(e => {
+          const scorePct = Math.round(e.score * 100);
+          const ifStr = e.if != null ? `IF ${e.if}` : '';
+          const zoneStr = e.zone ? `CAS ${e.zone}区` : '';
+          const name = e.journalRec?.name || e.issn;
+          const issnStr = e.issn;
+          const paperList = e.papers.map(p => `<span class="pick-paper" title="${escape(p.title)}">${escape((p.title||'').slice(0,60))}${(p.title||'').length>60?'…':''} (${escape(p.year||'')})</span>`).join('');
+          const topics = e.topics.map(t => `<span class="pick-topic">${escape(t)}</span>`).join('');
+
+          return `<div class="pick-card" data-issn="${escape(issnStr)}">
+            <h3><a href="#j/${escape(e.journalRec ? favId(e.journalRec) : issnStr)}">${escape(name)}</a></h3>
+            <div class="pick-meta">${issnStr}${ifStr ? ' · ' + ifStr : ''}${zoneStr ? ' · ' + zoneStr : ''} · ${e.count} ${T('篇论文','papers')}</div>
+            <div class="pick-score">
+              <span>${T('推荐指数','Score')}: ${scorePct}%</span>
+              <span class="bar"><span class="bar-fill" style="width:${scorePct}%"></span></span>
+            </div>
+            ${topics ? `<div class="pick-topics">${topics}</div>` : ''}
+            ${paperList ? `<div class="pick-papers">${paperList}</div>` : ''}
+          </div>`;
+        }).join('');
+
+        // Click to open journal drawer
+        results.querySelectorAll('.pick-card').forEach(card => {
+          card.addEventListener('click', () => {
+            const issn = card.dataset.issn;
+            const rec = journals.find(r => r.issn === issn || r.eissn === issn);
+            if (rec) openDrawer(rec);
+          });
+        });
+
+        status.textContent = `${T('已检索','Searched')} ${works.length} ${T('篇论文','papers')}，${T('分布在','in')} ${journalMap.size} ${T('个期刊','journals')}，${T('推荐','recommended')} ${filtered.length} ${T('个','')}`;
+      } catch (e) {
+        status.textContent = T('检索失败：','Search failed: ') + e.message;
+        console.error(e);
+      }
+    }
+
+    btn.addEventListener('click', doSearch);
+    input.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.ctrlKey) doSearch(); });
   }
 
   // ───────── boot ─────────
