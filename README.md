@@ -53,7 +53,12 @@
 ## 🎯 Pick for Me — AI Journal Recommendation
 
 <div align="center">
-  <a href="https://journal.ailatest.org"><img src="screenshots/pick-tool.png" alt="Pick for Me tool" width="800"></a>
+  <table>
+    <tr>
+      <td><a href="https://journal.ailatest.org"><img src="screenshots/pick-tool.png" alt="Pick for Me tool" width="390"></a></td>
+      <td><a href="https://journal.ailatest.org"><img src="screenshots/pick-results.png" alt="Pick results" width="390"></a></td>
+    </tr>
+  </table>
 </div>
 
 输入论文标题或摘要，系统自动:
