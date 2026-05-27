@@ -4166,7 +4166,7 @@
         const titleLower = (titleTerms[0]||'').toLowerCase().replace(/[^a-z\s-]/g, '').replace(/-/g, ' ');
         const titleKws = titleLower.split(/\s+/).filter(w => w.length > 3 && !stopWords.has(w));
         if (titleKws.length >= 3) {
-          const q = titleKws.slice(0, 6).join(' ');
+          const q = titleKws.slice(0, 10).join(' ');
           if (encodeURIComponent(q).length < MAX_URL && !queries.some(x => x.toLowerCase().includes(q.slice(0,15)))) {
             queries.push(q);
           }
