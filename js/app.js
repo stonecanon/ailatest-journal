@@ -3933,7 +3933,7 @@
       activeTab = b.dataset.tab;
       $$('.tab-panel').forEach(p => p.hidden = p.dataset.panel !== activeTab);
       $$('[data-international]').forEach(el => el.hidden = activeTab !== 'int');
-      $('[data-domestic]').hidden = activeTab !== 'dom';
+      $$('[data-domestic]').forEach(el => el.hidden = activeTab !== 'dom');
       applyI18n(); // refresh placeholder
       if (activeTab === 'dom') renderDomestic();
       else if (activeTab === 'fav') renderFav();
