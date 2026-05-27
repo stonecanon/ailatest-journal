@@ -2271,7 +2271,8 @@
               ...hits.filter(h => h.source === 'cssci_ext').map(() => `<span class="domsrc-pill ds-cssci-ext">${T('CSSCI 扩','CSSCI Ext')}</span>`),
               ...hits.filter(h => h.source === 'pku').map(() => `<span class="domsrc-pill ds-pku">${T('北大核心','PKU Core')}</span>`),
               ...hits.filter(h => h.source === 'ccft').map(h => `<span class="domsrc-pill ds-ccft">CCF-${h.tag||'T'}</span>`),
-              ...hits.filter(h => h.source === 'zju').map(() => `<span class="domsrc-pill ds-zju">${T('浙大','ZJU')}</span>`),
+              ...hits.filter(h => h.source === 'zju').map(h => `<span class="domsrc-pill ds-zju">${escape(h.label)}</span>`),
+              ...hits.filter(h => h.source === 'school_a').map(h => `<span class="domsrc-pill ds-school-a">${escape(h.label)}</span>`),
               ...hits.filter(h => h.source.startsWith('cnkx')).map(h => `<span class="domsrc-pill ds-cnkx">${escape(h.label)}</span>`),
             ].filter(Boolean).join('');
             return `<tr class="j-row clickable" data-fid="${escape(favId(r))}" data-src="cnki_major">
@@ -2523,8 +2524,8 @@
           ...hits.filter(h => h.source === 'cssci_ext').map(() => `<span class="domsrc-pill ds-cssci-ext">${T('CSSCI 扩','CSSCI Ext')}</span>`),
           ...hits.filter(h => h.source === 'pku').map(() => `<span class="domsrc-pill ds-pku">${T('北大核心','PKU Core')}</span>`),
           ...hits.filter(h => h.source === 'ccft').map(h => `<span class="domsrc-pill ds-ccft" title="${escape(h.org||'')}">CCF-${h.tag||'T'}</span>`),
-          ...hits.filter(h => h.source === 'zju').map(() => `<span class="domsrc-pill ds-zju">${T('浙大','ZJU')}</span>`),
-          ...hits.filter(h => h.source === 'school_a').map(() => `<span class="domsrc-pill ds-school-a">${T('学校 A','School A')}</span>`),
+          ...hits.filter(h => h.source === 'zju').map(h => `<span class="domsrc-pill ds-zju">${escape(h.label)}</span>`),
+          ...hits.filter(h => h.source === 'school_a').map(h => `<span class="domsrc-pill ds-school-a">${escape(h.label)}</span>`),
           ...hits.filter(h => h.source.startsWith('cnkx')).map(h => `<span class="domsrc-pill ds-cnkx">${escape(h.label)}</span>`),
         ].filter(Boolean).join('');
         const name = r.name || '';
