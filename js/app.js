@@ -3301,7 +3301,18 @@
     // 取当前 list 的有序记录
     let rows = [];
     for (const id of list.ids) {
-      const rec = favsData[id] || journals.find(r => favId(r) === id);
+      // 优先使用实时数据，收藏时保存的旧数据可能过时（如刊名大小写变化）
+      let rec = journals.find(r => favId(r) === id);
+      if (!rec && domestic) {
+        // 搜索国内源
+        const src = favsData[id]?.__src || 'cnki_major';
+        const domRecs = [
+          ...(domestic.cnkx?.records || []).map(r => ({ ...r, __src: 'cnkx' })),
+          ...(domestic.cnki_major?.records || []).map(r => ({ ...r, __src: 'cnki_major' })),
+        ];
+        rec = domRecs.find(r => favId(r) === id);
+      }
+      if (!rec) rec = favsData[id]; // 最终 fallback
       if (rec) rows.push({ ...rec, __src: rec.__src || 'int' });
     }
     if (activeQuery) {
@@ -4655,6 +4666,28 @@
       journals.forEach(journalSearchMeta);
       buildDomIndex(domestic);
       buildIntIndex(journals);
+      // Refresh stale favsData with live international journal data
+      (function refreshFavsData() {
+        let dirty = false;
+        for (const id of Object.keys(favsData)) {
+          const live = journals.find(r => favId(r) === id);
+          if (live && favsData[id]) {
+            const oldName = favsData[id].name || '';
+            const newName = live.name || '';
+            if (oldName !== newName) {
+              favsData[id] = { ...favsData[id], name: newName, cn_name: live.cn_name,
+                en_name: live.en_name, abbr20: live.abbr20, if_2024: live.if_2024,
+                cas_zone: live.cas_zone, cas_top: live.cas_top, indices: live.indices,
+                flagship: live.flagship, esi_category: live.esi_category,
+                if_quartile: live.if_quartile, publisher: live.publisher, ccf: live.ccf,
+                scopus: live.scopus, warning: live.warning,
+              };
+              dirty = true;
+            }
+          }
+        }
+        if (dirty) localStorage.setItem(STORAGE_PREFIX + 'favsData', JSON.stringify(favsData));
+      })();
       // 计算 WoS 学科表（按字母 A-Z 排序）
       const _wc = Object.create(null);
       for (const r of journals) for (const c of (r.wos_categories||[])) _wc[c] = (_wc[c]||0)+1;
