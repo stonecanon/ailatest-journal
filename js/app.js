@@ -2359,9 +2359,6 @@
   function renderDomestic() {
     const box = $('#dom-content');
     if (!domestic) { box.innerHTML = `<div class="empty">${T('无数据','No data')}</div>`; return; }
-    // Show/hide badge filter section
-    const badgeSec = $('#domestic-badge-section');
-    if (badgeSec) badgeSec.hidden = activeDom !== 'cnki_major';
     const q = activeQuery.toLowerCase();
 
     // ===== 统一搜索：只要有搜索词就跨库聚合，忽略当前库选择 =====
@@ -3952,8 +3949,6 @@
         $$('[data-domestic] .nav-item').forEach(n => n.classList.remove('active'));
         btn.classList.add('active');
         activeDom = btn.dataset.dom;
-        const badgeSec = $('#domestic-badge-section');
-        if (badgeSec) badgeSec.hidden = activeDom !== 'cnki_major';
         renderDomestic();
       });
     });
@@ -3965,7 +3960,7 @@
       const val = cb.value;
       if (cb.checked) activeDomBadges.add(val);
       else activeDomBadges.delete(val);
-      if (activeDom === 'cnki_major') renderDomestic();
+      renderDomestic();
     });
 
     // ─── 语言切换下拉菜单 ───
