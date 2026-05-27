@@ -4126,9 +4126,9 @@
             const trimmed = line.trim();
 
             // Detect keywords line (English/Chinese markers)
-            if (/^keywords?:/i.test(trimmed) || /^关键词[：:]/.test(trimmed) || /^关键词[：:]/.test(trimmed)) {
+            if (/^keywords?:/i.test(trimmed) || /^关键词[：:]/.test(trimmed) || /^關鍵詞[：:]/.test(trimmed)) {
               // Extract individual keywords (split by comma/semicolon/slash/space)
-              const kwStr = trimmed.replace(/^keywords?:/i, '').replace(/^关键词[：:]/, '').replace(/^关键词[：:]/, '').trim();
+              const kwStr = trimmed.replace(/^keywords?:/i, '').replace(/^关键词[：:]/, '').replace(/^關鍵詞[：:]/, '').trim();
               explicitKeywords = kwStr.split(/[,;，；、\/]/).map(s => s.trim()).filter(s => s.length > 2);
               continue;
             }
