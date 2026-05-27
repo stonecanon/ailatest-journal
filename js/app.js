@@ -1,6 +1,6 @@
 /* AILatest Journal — front-end app (i18n + tabs + favorites + auth) */
 (() => {
-  const SITE_MODE = location.pathname.startsWith('/cn') ? 'cn' : 'intl';
+  const SITE_MODE = location.pathname.startsWith('/cn') ? 'cn' : location.pathname.startsWith('/intl') ? 'intl' : 'all';
   const $ = (s, r=document) => r.querySelector(s);
   const $$ = (s, r=document) => [...r.querySelectorAll(s)];
   const fetchJSON = async (url) => {
@@ -902,7 +902,7 @@
     if (l && isDefaultFavListName(l.name)) l.name = defaultFavListName();
   }
 
-  const STORAGE_PREFIX = 'ailatest.' + SITE_MODE + '.';
+  const STORAGE_PREFIX = SITE_MODE === 'all' ? 'ailatest.' : 'ailatest.' + SITE_MODE + '.';
   function loadFavLists() {
     try {
       const raw = localStorage.getItem(STORAGE_PREFIX + 'favLists');
@@ -4094,7 +4094,7 @@
         : `${journals.length.toLocaleString()} journals loaded`;
       renderCatList();
       renderWosList();
-      // 子路径模式：隐藏不相关 UI
+      // 子路径模式：隐藏不相关 UI（仅 /intl/ 或 /cn/ 时生效）
       if (SITE_MODE === 'cn') {
         // cn 模式：隐藏国际侧栏、选项卡
         $$('[data-international]').forEach(el => el.style.display = 'none');
@@ -4107,7 +4107,7 @@
         // 添加切换到国际的链接
         const hero = document.querySelector('[data-panel="dom"] .hero p');
         if (hero) hero.innerHTML += '<br><a href="/intl/" style="font-size:13px">← 切换到国际期刊</a>';
-      } else {
+      } else if (SITE_MODE === 'intl') {
         // intl 模式：隐藏国内侧栏
         $$('[data-domestic]').forEach(el => el.style.display = 'none');
         const domTab = document.querySelector('.tab[data-tab="dom"]');
