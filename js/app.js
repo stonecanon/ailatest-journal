@@ -4113,72 +4113,63 @@
         }
 
         // Step 1: Extract keywords from input, then search OpenAlex
-        let searchQuery = query;
-        if (query.length > 200) {
-          // ── Smart keyword extraction ──
-          // Strategy: split input into sections, extract key terms intelligently
-          const lines = query.split('\n').filter(l => l.trim());
-          let titleTerms = [];
-          let abstractTerms = [];
-          let explicitKeywords = [];
+        const lines = query.split('\n').filter(l => l.trim());
+        let titleTerms = [];
+        let abstractTerms = [];
+        let explicitKeywords = [];
 
-          for (const line of lines) {
-            const trimmed = line.trim();
+        for (const line of lines) {
+          const trimmed = line.trim();
 
-            // Detect keywords line (English/Chinese markers)
-            if (/^keywords?:/i.test(trimmed) || /^关键词[：:]/.test(trimmed) || /^關鍵詞[：:]/.test(trimmed)) {
-              // Extract individual keywords (split by comma/semicolon/slash/space)
-              const kwStr = trimmed.replace(/^keywords?:/i, '').replace(/^关键词[：:]/, '').replace(/^關鍵詞[：:]/, '').trim();
-              explicitKeywords = kwStr.split(/[,;，；、\/]/).map(s => s.trim()).filter(s => s.length > 2);
-              continue;
-            }
+          // Detect keywords line (English/Chinese markers)
+          if (/^keywords?:/i.test(trimmed) || /^关键词[：:]/.test(trimmed) || /^關鍵詞[：:]/.test(trimmed)) {
+            const kwStr = trimmed.replace(/^keywords?:/i, '').replace(/^关键词[：:]/, '').replace(/^關鍵詞[：:]/, '').trim();
+            explicitKeywords = kwStr.split(/[,;，；、\/]/).map(s => s.trim()).filter(s => s.length > 2);
+            continue;
           }
+        }
 
-          // Title = first non-empty line (keep concise)
-          const firstLine = lines.find(l => !/^keywords?:/i.test(l) && !/^关键词[：:]/.test(l));
-          if (firstLine) {
-            // Take first ~80 chars of title; remove trailing punctuation
-            let t = firstLine.replace(/[.。！!?？,，;；]+$/, '').trim();
-            if (t.length > 80) {
-              // Keep the most distinctive part: first 60 chars + last phrase
-              const firstPart = t.slice(0, 60);
-              const lastSpace = firstPart.lastIndexOf(' ');
-              t = (lastSpace > 20 ? firstPart.slice(0, lastSpace) : firstPart).replace(/[,;，；]+$/, '');
-            }
-            titleTerms = [t];
+        // Title = first non-empty line (keep concise)
+        const firstLine = lines.find(l => !/^keywords?:/i.test(l) && !/^关键词[：:]/.test(l));
+        if (firstLine) {
+          let t = firstLine.replace(/[.。！!?？,，;；]+$/, '').trim();
+          if (t.length > 80) {
+            const firstPart = t.slice(0, 60);
+            const lastSpace = firstPart.lastIndexOf(' ');
+            t = (lastSpace > 20 ? firstPart.slice(0, lastSpace) : firstPart).replace(/[,;，；]+$/, '');
           }
+          titleTerms = [t];
+        }
 
-          // From abstract body, extract meaningful words (English) or phrases (Chinese)
-          const bodyText = lines.slice(1).filter(l => !/^keywords?:/i.test(l) && !/^关键词[：:]/.test(l)).join(' ');
+        // From abstract body, extract meaningful words (English) or phrases (Chinese)
+        const bodyText = lines.slice(1).filter(l => !/^keywords?:/i.test(l) && !/^关键词[：:]/.test(l)).join(' ');
 
-          // Extract English words (skip short/stop words)
-          const engWords = bodyText.toLowerCase()
-            .replace(/[^a-z0-9\s-]/g, ' ')
-            .split(/\s+/)
-            .filter(w => w.length > 4 && !/^(this|that|with|from|which|were|have|been|than|into|also|their|about|study|show|were|used|using|based|results|method|model|data|paper|these|between|while|where|after|before|other|there|analysis|approach|process|system|study|research)$/i.test(w))
-            .filter((w, i, a) => a.indexOf(w) === i); // unique
+        // Extract English words (skip short/stop words)
+        const engWords = bodyText.toLowerCase()
+          .replace(/[^a-z0-9\s-]/g, ' ')
+          .split(/\s+/)
+          .filter(w => w.length > 4 && !/^(this|that|with|from|which|were|have|been|than|into|also|their|about|study|show|were|used|using|based|results|method|model|data|paper|these|between|while|where|after|before|other|there|analysis|approach|process|system|study|research)$/i.test(w))
+          .filter((w, i, a) => a.indexOf(w) === i);
 
-          // Keep top distinctive words (max 6)
-          const topEng = engWords.slice(0, 6);
+        const topEng = engWords.slice(0, 6);
 
-          // For Chinese, extract key 2-char+ segments
-          const chnChars = bodyText.replace(/[a-zA-Z0-9\s]/g, '').replace(/[，。、；：！？（）【】《》""''\s]/g, '');
-          let chnTerms = [];
-          if (chnChars.length > 0) {
-            // Take the first ~30 meaningful Chinese chars
-            chnTerms = [chnChars.slice(0, 30)];
-          }
+        // Chinese segments
+        const chnChars = bodyText.replace(/[a-zA-Z0-9\s]/g, '').replace(/[，。、；：！？（）【】《》""''\s]/g, '');
+        let chnTerms = [];
+        if (chnChars.length > 0) {
+          chnTerms = [chnChars.slice(0, 30)];
+        }
 
-          // Build final search query
-          const allParts = [
-            ...titleTerms,
-            ...explicitKeywords.slice(0, 5),
-            ...topEng,
-            ...chnTerms,
-          ].filter(Boolean);
+        // Build final search query
+        const searchParts = [
+          ...titleTerms,
+          ...explicitKeywords.slice(0, 5),
+          ...topEng,
+          ...chnTerms,
+        ].filter(Boolean);
 
-          searchQuery = allParts.join(' ').slice(0, 250);
-
+        const searchQuery = searchParts.join(' ').slice(0, 250);
+        if (query.length > 100) {
           status.textContent = T('正在分析匹配中…（已提取关键词）','Analyzing… (keywords extracted)');
         }
         const url = OA_API + `/works?filter=title_and_abstract.search:${encodeURIComponent(searchQuery)}&per_page=50&sort=relevance_score:desc&select=id,title,publication_date,authorships,primary_location,relevance_score`;
