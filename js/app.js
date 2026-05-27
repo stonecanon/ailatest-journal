@@ -4260,7 +4260,7 @@
         fetch('data/review_cycles.json').then(r => r.json()).catch(() => ({})),
       ]);
       setJournalAliases(aliases);
-      journals = j; domestic = d; meta = m; esiCats = esi; oaMap = null; reviewCycles = rc || {};`
+      journals = j; domestic = d; meta = m; esiCats = esi; oaMap = null; reviewCycles = rc || {};
       journals.forEach(journalSearchMeta);
       buildDomIndex(domestic);
       buildIntIndex(journals);
