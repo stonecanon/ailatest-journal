@@ -16,7 +16,7 @@ export async function onRequest({ request }) {
     });
   }
 
-  const apiUrl = `https://api.openalex.org/works?${qs}&mailto=jiantaoweng@gmail.com`;
+  const apiUrl = `https://api.openalex.org/works?${qs}`;
 
   try {
     const resp = await fetch(apiUrl, {
