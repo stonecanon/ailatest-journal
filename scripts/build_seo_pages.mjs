@@ -171,7 +171,6 @@ function pageShell({ title, desc, canonical, children, directory = false, jsonLd
       <nav class="seo-nav">
         <a href="/">返回主页查询</a>
         <a href="/journals/">浏览期刊内容页</a>
-        <a href="/dashboard/">访问数据看板</a>
       </nav>
     </aside>
     <main class="seo-main">
