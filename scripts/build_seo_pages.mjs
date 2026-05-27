@@ -108,17 +108,80 @@ function pageDescription(r) {
   return `${title} journal profile with indexing, impact factor, JCR quartile, CAS zone, publisher, ISSN, DOAJ and related submission metrics. ${bits.join(' · ')}`.slice(0, 300);
 }
 
+function badgeClass(value) {
+  const key = text(value).toLowerCase();
+  if (['scie', 'ssci', 'ahci', 'esci', 'ei', 'scopus', 'doaj', 'oaj'].includes(key)) return `badge b-${key}`;
+  return 'soft-pill';
+}
+
 function badges(r) {
-  const items = [
-    ...arr(r.indices),
-    r.if_quartile ? `JCR ${r.if_quartile}` : '',
-    r.cas_zone ? `CAS ${r.cas_zone}${r.cas_top ? ' TOP' : ''}` : '',
-    r.ccf ? `CCF ${r.ccf}` : '',
-    r.abdc?.rating ? `ABDC ${r.abdc.rating}` : '',
-    r.abs?.rating ? `ABS ${r.abs.rating}` : '',
-    r.doaj ? 'DOAJ' : '',
-  ].filter(Boolean);
-  return items.map(item => `<span>${esc(item)}</span>`).join('');
+  const indexBadges = arr(r.indices).map(item => `<span class="${badgeClass(item)}">${esc(item)}</span>`);
+  const rankBadges = compact([
+    r.if_quartile ? `<span class="zone jcr-${esc(String(r.if_quartile).toLowerCase())}">JCR ${esc(r.if_quartile)}</span>` : '',
+    r.cas_zone ? `<span class="zone z${esc(r.cas_zone)}">CAS ${esc(r.cas_zone)}${r.cas_top ? ' TOP' : ''}</span>` : '',
+    r.ccf ? `<span class="soft-pill">CCF ${esc(r.ccf)}</span>` : '',
+    r.abdc?.rating ? `<span class="soft-pill">ABDC ${esc(r.abdc.rating)}</span>` : '',
+    r.abs?.rating ? `<span class="soft-pill">ABS ${esc(r.abs.rating)}</span>` : '',
+    r.doaj ? '<span class="badge b-doaj">DOAJ</span>' : '',
+    r.oaj ? '<span class="badge b-oaj">OAJ</span>' : '',
+  ]);
+  return [...indexBadges, ...rankBadges].join('');
+}
+
+function statCards(r) {
+  const stats = [
+    ['影响因子 / IF', r.if_2024],
+    ['JCR 分区', r.if_quartile],
+    ['中科院分区', r.cas_zone ? `${r.cas_zone} 区${r.cas_top ? ' · TOP' : ''}` : ''],
+    ['ABDC', r.abdc?.rating],
+    ['ABS AJG', r.abs?.rating],
+    ['IF 排名', r.if_rank],
+  ].filter(([, value]) => text(value));
+  return stats.map(([key, value]) => `<div class="stat"><div class="stat-v">${esc(value)}</div><div class="stat-k">${esc(key)}</div></div>`).join('');
+}
+
+function metaBlock(rows) {
+  return rows.map(([key, value]) => `<div class="meta-row"><div class="meta-k">${esc(key)}</div><div class="meta-v">${esc(value)}</div></div>`).join('');
+}
+
+function pageShell({ title, desc, canonical, children, directory = false, jsonLd = '' }) {
+  return `<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>${esc(title)}</title>
+  <meta name="description" content="${esc(desc)}" />
+  <link rel="canonical" href="${canonical}" />
+  <meta property="og:type" content="${directory ? 'website' : 'article'}" />
+  <meta property="og:title" content="${esc(title)}" />
+  <meta property="og:description" content="${esc(desc)}" />
+  <meta property="og:url" content="${canonical}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/seo.css" />
+  ${jsonLd ? `<script type="application/ld+json">${jsonLd}</script>` : ''}
+</head>
+<body>
+  <div class="seo-shell">
+    <aside class="seo-sidebar">
+      <div class="brand"><a href="/">AILatest<span>Journal</span></a></div>
+      <p class="brand-sub">面向科研人员的期刊检索与投稿决策工具。完整期刊页用于检索收录、分区、影响因子、开放获取与投稿前核查。</p>
+      <nav class="seo-nav">
+        <a href="/">返回主页查询</a>
+        <a href="/journals/">浏览期刊内容页</a>
+        <a href="/dashboard/">访问数据看板</a>
+      </nav>
+    </aside>
+    <main class="seo-main">
+      ${children}
+      <p class="footnote">Data compiled by AILatest Journal from public journal directories and ranking lists. Last generated ${today}.</p>
+    </main>
+  </div>
+</body>
+</html>
+`;
 }
 
 function htmlFor(r, slug) {
@@ -148,64 +211,48 @@ function htmlFor(r, slug) {
     return value === '' || value == null ? undefined : value;
   });
   const desc = pageDescription(r);
+  const metaRows = rows.filter(([key]) => !['JCR Impact Factor 2024', 'JCR Quartile', 'JCR Rank', 'CAS 2025 Zone'].includes(key));
+  const subjects = categories.length
+    ? `<div class="cat-chips">${categories.map(c => `<span class="cat-chip">${esc(c)}</span>`).join('')}</div>`
+    : '<p class="meta-v">Subject category data is not available for this journal yet.</p>';
 
-  return `<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>${esc(title)} | Journal metrics, indexing and ranking</title>
-  <meta name="description" content="${esc(desc)}" />
-  <link rel="canonical" href="${url}" />
-  <meta property="og:type" content="article" />
-  <meta property="og:title" content="${esc(title)} | AILatest Journal" />
-  <meta property="og:description" content="${esc(desc)}" />
-  <meta property="og:url" content="${url}" />
-  <link rel="stylesheet" href="/css/seo.css" />
-  <script type="application/ld+json">${cleanedJsonLd}</script>
-</head>
-<body>
-  <main class="page">
-    <nav class="crumb"><a href="/">AILatest Journal</a><span>/</span><a href="/journals/">Journal pages</a></nav>
-    <header class="hero">
-      <p class="eyebrow">Journal Profile</p>
-      <h1>${esc(title)}</h1>
-      <p class="summary">${esc(desc)}</p>
-      <div class="badges">${badges(r)}</div>
-    </header>
+  const children = `
+      <nav class="crumb"><a href="/">AILatest Journal</a><span>/</span><a href="/journals/">期刊内容页</a><span>/</span><span>${esc(title)}</span></nav>
+      <header class="page-hero">
+        <p class="eyebrow">Journal Profile</p>
+        <h1>${esc(title)}</h1>
+        <p class="summary">${esc(desc)}</p>
+        ${issns(r).length ? `<div class="issn-line">ISSN ${esc(issns(r).join(' · eISSN '))}</div>` : ''}
+        <div class="badges">${badges(r)}</div>
+        <div class="actions">
+          <a class="big-btn primary" href="/?q=${encodeURIComponent(title)}">返回主页查询这本期刊</a>
+          <a class="big-btn" href="/journals/">浏览更多期刊页</a>
+        </div>
+      </header>
 
-    <section class="grid">
-      <article class="card">
-        <h2>Core Metrics</h2>
-        <table>
-          <tbody>
-            ${rows.map(([key, value]) => `<tr><th>${esc(key)}</th><td>${esc(value)}</td></tr>`).join('\n            ')}
-          </tbody>
-        </table>
-      </article>
-      <aside class="card side">
-        <h2>Use this page for</h2>
-        <ul>
-          <li>Checking whether the journal is indexed in SCI, SSCI, AHCI, ESCI, EI, Scopus or DOAJ.</li>
-          <li>Comparing JCR Impact Factor, JCR quartile and CAS zone signals.</li>
-          <li>Finding ISSN, publisher and subject category information before submission.</li>
-        </ul>
-        <a class="button" href="/?q=${encodeURIComponent(title)}">Open in journal finder</a>
-      </aside>
-    </section>
+      <div class="content-grid">
+        <article>
+          ${statCards(r) ? `<section class="panel"><h2>Core Metrics</h2><div class="stats-grid">${statCards(r)}</div></section>` : ''}
+          <section class="panel"><h2>Journal Information</h2><div class="meta-block">${metaBlock(metaRows)}</div></section>
+          <section class="panel"><h2>Subject Areas</h2>${subjects}</section>
+        </article>
+        <aside class="side-panel">
+          <h3>Use This Page For</h3>
+          <ul>
+            <li>核查 SCI、SSCI、AHCI、ESCI、EI、Scopus、DOAJ 等收录信号。</li>
+            <li>快速比较影响因子、JCR 分区、中科院分区、ABDC、ABS 等指标。</li>
+            <li>从 Google 直接进入单本期刊档案，再回到主页做筛选与收藏。</li>
+          </ul>
+        </aside>
+      </div>`;
 
-    <section class="card">
-      <h2>Subject Areas</h2>
-      <p>${categories.length ? esc(categories.join(' · ')) : 'Subject category data is not available for this journal yet.'}</p>
-    </section>
-
-    <footer>
-      <p>Data compiled by AILatest Journal from public journal directories and ranking lists. Last generated ${today}.</p>
-    </footer>
-  </main>
-</body>
-</html>
-`;
+  return pageShell({
+    title: `${title} | AILatest Journal 期刊详情`,
+    desc,
+    canonical: url,
+    children,
+    jsonLd: cleanedJsonLd,
+  });
 }
 
 function sitemapUrl(loc, priority = '0.7') {
@@ -213,40 +260,31 @@ function sitemapUrl(loc, priority = '0.7') {
 }
 
 function directoryHtml(pages, totalPages) {
-  return `<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Journal Directory | AILatest Journal</title>
-  <meta name="description" content="Browse AILatest Journal profile pages for journal indexing, impact factor, JCR quartile, CAS zone, ABDC, ABS and DOAJ information." />
-  <link rel="canonical" href="${site}/journals/" />
-  <meta property="og:type" content="website" />
-  <meta property="og:title" content="Journal Directory | AILatest Journal" />
-  <meta property="og:description" content="Static journal profile pages for search engines and researchers." />
-  <meta property="og:url" content="${site}/journals/" />
-  <link rel="stylesheet" href="/css/seo.css" />
-</head>
-<body>
-  <main class="page">
-    <nav class="crumb"><a href="/">AILatest Journal</a><span>/</span><span>Journal pages</span></nav>
-    <header class="hero">
-      <p class="eyebrow">Journal Directory</p>
-      <h1>Searchable Journal Pages</h1>
-      <p class="summary">Browse journal profile pages generated from AILatest Journal data. Each page can be indexed by search engines and links back to the interactive journal finder.</p>
-      <div class="badges"><span>${totalPages} generated pages</span><span>Top ${pages.length} listed here</span><span>Updated ${today}</span></div>
-    </header>
+  const desc = 'Browse AILatest Journal profile pages for journal indexing, impact factor, JCR quartile, CAS zone, ABDC, ABS and DOAJ information.';
+  const children = `
+      <nav class="crumb"><a href="/">AILatest Journal</a><span>/</span><span>期刊内容页</span></nav>
+      <header class="page-hero">
+        <p class="eyebrow">Journal Directory</p>
+        <h1>完整期刊内容页</h1>
+        <p class="summary">这里是从数据库生成的独立期刊页面。每个页面都有自己的 URL，可被搜索引擎抓取，也能把用户带回主页继续筛选、收藏和比较。</p>
+        <div class="badges"><span class="soft-pill">${totalPages} generated pages</span><span class="soft-pill">Top ${pages.length} listed here</span><span class="soft-pill">Updated ${today}</span></div>
+        <div class="actions"><a class="big-btn primary" href="/">返回主页查询</a></div>
+      </header>
 
-    <section class="directory-list">
-      ${pages.map(page => `<article>
+      <section class="directory-list">
+        ${pages.map(page => `<article>
         <a href="${page.path}">${esc(page.title)}</a>
         <p>${esc(page.description)}</p>
-      </article>`).join('\n      ')}
-    </section>
-  </main>
-</body>
-</html>
-`;
+      </article>`).join('\n        ')}
+      </section>`;
+
+  return pageShell({
+    title: 'Journal Directory | AILatest Journal',
+    desc,
+    canonical: `${site}/journals/`,
+    children,
+    directory: true,
+  });
 }
 
 const journals = JSON.parse(await readFile(dataFile, 'utf8'));
