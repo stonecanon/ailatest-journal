@@ -4434,12 +4434,24 @@
 
         // Step 3: Build ranked results — multi-factor scoring
         const maxCount = Math.max(...[...journalMap.values()].map(j => j.count), 1);
+
+        // Compute topic frequency across journals (for topic match scoring)
+        const topicJournalCount = {};
+        for (const [, j] of journalMap) {
+          for (const t of j.topics) {
+            topicJournalCount[t] = (topicJournalCount[t] || 0) + 1;
+          }
+        }
+        const maxTopicFreq = Math.max(...Object.values(topicJournalCount), 1);
+
         const entries = [...journalMap.entries()].map(([issn, j]) => {
           const countRatio = j.count / maxCount;
           const kwMatchRatio = j.count > 0 ? j.kwMatch / j.count : 0;
-          const avgRelevance = j.scores.length > 0 ? j.scores.reduce((a,b) => a+b, 0) / j.scores.length : 0;
+          const topicMatch = j.topics.size > 0
+            ? [...j.topics].reduce((sum, t) => sum + (topicJournalCount[t] || 0), 0) / (j.topics.size * maxTopicFreq)
+            : 0;
 
-          const totalScore = countRatio * 0.60 + kwMatchRatio * 0.30 + avgRelevance * 0.10;
+          const totalScore = countRatio * 0.60 + kwMatchRatio * 0.30 + topicMatch * 0.10;
 
           const journalRec = journals.find(r => r.issn === issn || r.eissn === issn);
           const zoneVal = journalRec?.cas_zone;
