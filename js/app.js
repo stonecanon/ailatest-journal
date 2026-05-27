@@ -39,7 +39,7 @@
       hero_title_int: 'SCI / SSCI 国际期刊检索',
       hero_body_int: '数据源：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI）· 更新至 2026-05-18，并合并 <b>EI Compendex</b> 期刊目录（2025-10-10）。合并 <b>JCR 2025</b> 归属标记、<b>ESI</b> 22 大学科分类、<b>中科院 2025 大类分区</b>、<b>ShowJCR</b> JCR 2025 发布版 · 2024 指标（IF / 小类分区 / 排名）、新锐版、CCF 2026 推荐与国际期刊预警名单。共收录 <b id="total">—</b> 本。',
       src_cnkx: '中国科协高质量目录',
-      src_cnki_major: 'CNKI 主要期刊',
+      src_cnki_major: '中文期刊目录',
       hero_note: '徽章语义：<b>SCIE/SSCI/AHCI/ESCI/EI</b> 索引收录 · <b>中科院</b> 中科院 2025 大类分区（1-4 区，TOP 标志） · <b>JCR Q</b> Quartile（Q1-Q4） · <b>新锐</b> 中科院 2026 新锐版分区 · <b>CCF</b> 中国计算机学会 2026 推荐（A/B/C） · <b>ABDC</b> 澳洲经管期刊分级（A*/A/B/C） · <b>ABS</b> 英国 Chartered ABS Academic Journal Guide 2024（4*/4/3/2/1，仅经管商科） · <b>T1/T2/T3</b> 中国科协 2025 高质量期刊分级 · <b>⚠ Warning</b> 国际期刊预警名单。',
       hero_title_fav: '我的收藏',
       hero_body_fav: '点击任意期刊右侧的 <b>★</b> 可加入收藏。未登录时保存在本机 localStorage；登录后自动同步到云端，可跨设备访问。',
@@ -79,7 +79,7 @@
       filter_xinrui: 'Emerging Tier', filter_warning: 'Warning List',
       domestic_sources: 'Domestic Sources',
       src_cnkx: 'CAST Tiered Directory',
-      src_cnki_major: 'CNKI Major',
+      src_cnki_major: 'Chinese Journal Directory',
       src_cssci_core: 'CSSCI Core',
       src_cssci_ext: 'CSSCI Extended',
       src_pku: 'PKU Core (2023)',
@@ -1808,8 +1808,8 @@
     });
     // CNKI Major Journals (全量中文期刊主目录)
     ((d.cnki_major && d.cnki_major.records)||[]).forEach(r => {
-      addDomIndex(r.name, 'name', { source:'cnki_major', label:T('CNKI 主要','CNKI Major'), tag:'', domain:r.major_categories.join(', ') });
-      if (r.issn) addDomIndex(r.issn, 'issn', { source:'cnki_major', label:T('CNKI 主要','CNKI Major'), tag:'', domain:r.major_categories.join(', ') });
+      addDomIndex(r.name, 'name', { source:'cnki_major', label:T('中文目录','Chinese Dir.'), tag:'', domain:r.major_categories.join(', ') });
+      if (r.issn) addDomIndex(r.issn, 'issn', { source:'cnki_major', label:T('中文目录','Chinese Dir.'), tag:'', domain:r.major_categories.join(', ') });
     });
   }
   function renderDomCrossBadges(r, excludeSource) {
@@ -2330,7 +2330,7 @@
       );
       if (list.length) {
         sections.push({
-          title: T('CNKI 主要期刊','CNKI Major Journals'),
+          title: T('中文期刊目录','Chinese Journal Directory'),
           count: list.length,
           html: `<div class="table-wrap"><table class="journals"><thead><tr>
             <th>${T('期刊名称','Journal')}</th><th style="width:130px">ISSN</th><th style="width:140px">CN</th><th style="width:180px">${T('主办单位','Sponsor')}</th><th style="width:160px">${T('学科分类','Categories')}</th><th>${T('交叉收录','Also In')}</th><th style="width:40px"></th>
@@ -2352,7 +2352,7 @@
     }
     box.innerHTML = `<div class="section-block">
       <h3 class="section-title">${T('中文期刊统一搜索','Chinese Journals · Unified Search')} <span class="muted-cell">(${total})</span></h3>
-      <div class="section-subtitle">${T('已跨库聚合：科协 / CSSCI / 北大核心 / 浙大 / CCF / CNKI。清空搜索框可返回单库浏览。','Aggregated across CAST / CSSCI / PKU / ZJU / CCF / CNKI. Clear the search box to return to per-source view.')}</div>
+      <div class="section-subtitle">${T('已跨库聚合：科协 / CSSCI / 北大核心 / 浙大 / CCF / 中文期刊目录。清空搜索框可返回单库浏览。','Aggregated across CAST / CSSCI / PKU / ZJU / CCF / Chinese Journal Directory. Clear the search box to return to per-source view.')}</div>
       ${sections.map(s => `<details class="section-block" style="margin-top:14px" open>
         <summary>${escape(s.title)} <span class="muted-cell">(${s.count})</span></summary>
         <div style="margin-top:10px">${s.html}</div>
@@ -2481,6 +2481,42 @@
           })).join('')}
           ${f.length > 2000 ? `<tr><td colspan="5" class="empty">${T('仅显示前 2000 条，请在搜索框内精确查找','Showing first 2000 — please refine search')}</td></tr>` : ''}
         </tbody></table></div>
+      </div>`;
+      return;
+    }
+
+    if (activeDom === 'cnki_major') {
+      const d = domestic.cnki_major;
+      if (!d) { box.innerHTML = `<div class="empty">${T('目录数据缺失','Data missing')}</div>`; return; }
+      const list = d.records || [];
+      const f = list.filter(r => {
+        if (!q) return true;
+        const hay = (r.name + ' ' + (r.issn||'') + ' ' + (r.cn_code||'') + ' ' + (r.sponsor||'') + ' ' + (r.major_categories||[]).join(' ')).toLowerCase();
+        return hay.includes(q);
+      });
+      const byCat = {};
+      for (const r of f) {
+        const cats = (r.major_categories && r.major_categories.length) ? r.major_categories : [T('未分类','Uncategorized')];
+        for (const c of cats) (byCat[c] = byCat[c] || []).push(r);
+      }
+      const catOrder = Object.keys(byCat).sort((a,b) => byCat[b].length - byCat[a].length);
+      box.innerHTML = `<div class="section-block">
+        <h3 class="section-title">${T('中文期刊目录','Chinese Journal Directory')}</h3>
+        <div class="section-subtitle">${T('共收录','Total ')} ${list.length.toLocaleString()} ${T('种中文期刊，覆盖',' Chinese journals covering ')} ${catOrder.length} ${T('大学科分类',' major categories')}${q ? T('；已过滤 ',' · filtered ')+f.length+T(' 条','') : ''}</div>
+        ${catOrder.map(c => `
+          <details class="section-block" style="margin-top:14px" ${q?'open':''}>
+            <summary>${escape(c)} <span class="muted-cell">(${byCat[c].length})</span></summary>
+            <div class="table-wrap" style="margin-top:10px"><table class="journals"><thead><tr>
+              <th>${T('期刊名称','Journal')}</th><th style="width:130px">ISSN</th><th style="width:140px">CN</th><th style="width:180px">${T('主办单位','Sponsor')}</th><th>${T('交叉收录','Also In')}</th><th style="width:40px"></th>
+            </tr></thead><tbody>
+              ${byCat[c].slice(0, 300).map(r => renderDomRow(r, {
+                src: 'cnki_major',
+                extraCols: `<td class="muted-cell" style="width:140px">${escape(r.cn_code||'—')}</td><td class="muted-cell" style="width:180px">${escape(r.sponsor||'')}</td>`,
+              })).join('')}
+              ${byCat[c].length > 300 ? `<tr><td colspan="6" class="empty">${T('仅显示前 300 条，请搜索','Showing first 300 — please refine search')}</td></tr>` : ''}
+            </tbody></table></div>
+          </details>
+        `).join('')}
       </div>`;
       return;
     }
