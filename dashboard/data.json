@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-26T23:04:03.854Z",
+  "generated_at": "2026-05-27T08:27:03.405Z",
   "source": "remote D1",
   "notes": [
     "注册量来自 users.created_at，当前是最可靠口径。",
@@ -35,18 +35,18 @@
     "google_users": 3,
     "first_signup_at": 1778628305,
     "latest_signup_at": 1779811726,
-    "favorite_rows": 30,
+    "favorite_rows": 31,
     "users_with_favorites": 6,
-    "avg_favorites_per_active_user": 5,
+    "avg_favorites_per_active_user": 5.17,
     "rating_rows": 22,
     "users_with_ratings": 5,
     "rated_journals": 17,
     "avg_rating": 4.43,
     "lists": 7,
     "users_with_lists": 7,
-    "total_pageviews": 661,
-    "total_visitors": 209,
-    "total_login_events": 17
+    "total_pageviews": 773,
+    "total_visitors": 221,
+    "total_login_events": 19
   },
   "series": {
     "providerMix": [
@@ -108,7 +108,7 @@
       },
       {
         "day": "2026-05-20",
-        "active_users_proxy": 3
+        "active_users_proxy": 2
       },
       {
         "day": "2026-05-21",
@@ -119,12 +119,12 @@
         "active_users_proxy": 2
       },
       {
-        "day": "2026-05-25",
-        "active_users_proxy": 1
-      },
-      {
         "day": "2026-05-26",
         "active_users_proxy": 3
+      },
+      {
+        "day": "2026-05-27",
+        "active_users_proxy": 2
       }
     ],
     "loginEventsByDay": [
@@ -152,17 +152,22 @@
         "day": "2026-05-26",
         "login_events": 4,
         "login_users": 3
+      },
+      {
+        "day": "2026-05-27",
+        "login_events": 2,
+        "login_users": 2
       }
     ],
     "loginProviderMix": [
       {
         "provider": "google",
-        "login_events": 7,
+        "login_events": 8,
         "login_users": 2
       },
       {
         "provider": "github",
-        "login_events": 5,
+        "login_events": 6,
         "login_users": 5
       },
       {
@@ -210,9 +215,15 @@
       },
       {
         "day": "2026-05-26",
-        "pageviews": 51,
-        "sessions": 37,
+        "pageviews": 55,
+        "sessions": 40,
         "visitors": 26
+      },
+      {
+        "day": "2026-05-27",
+        "pageviews": 108,
+        "sessions": 29,
+        "visitors": 12
       }
     ]
   },
@@ -312,6 +323,11 @@
         "journal_key": "t:circulation",
         "favorites": 1,
         "label": "t:circulation"
+      },
+      {
+        "journal_key": "t:九一八研究",
+        "favorites": 1,
+        "label": "t:九一八研究"
       }
     ],
     "topRated": [
@@ -421,8 +437,8 @@
     "topPaths": [
       {
         "path": "/",
-        "pageviews": 542,
-        "visitors": 132
+        "pageviews": 645,
+        "visitors": 138
       },
       {
         "path": "/?ref=producthunt",
@@ -436,8 +452,8 @@
       },
       {
         "path": "/s/3P9gQfdK",
-        "pageviews": 6,
-        "visitors": 4
+        "pageviews": 8,
+        "visitors": 6
       },
       {
         "path": "/?q=nature",
@@ -456,6 +472,11 @@
       },
       {
         "path": "/s/H2uiCp5y",
+        "pageviews": 2,
+        "visitors": 1
+      },
+      {
+        "path": "/s/03byCMGP",
         "pageviews": 2,
         "visitors": 1
       },
@@ -500,6 +521,11 @@
         "visitors": 2
       },
       {
+        "path": "/s/zcqYju0Q",
+        "pageviews": 1,
+        "visitors": 1
+      },
+      {
         "path": "/s/xXZ1zTGM",
         "pageviews": 1,
         "visitors": 1
@@ -508,35 +534,25 @@
         "path": "/s/vmXylHMj",
         "pageviews": 1,
         "visitors": 1
-      },
-      {
-        "path": "/s/s4dpHOD0",
-        "pageviews": 1,
-        "visitors": 1
-      },
-      {
-        "path": "/s/pX8snWAe?cb=1",
-        "pageviews": 1,
-        "visitors": 1
       }
     ],
     "trafficCountries": [
       {
         "country": "JP",
-        "pageviews": 444,
-        "visitors": 60,
-        "sessions": 152,
+        "pageviews": 546,
+        "visitors": 61,
+        "sessions": 175,
         "colos": "NRT",
         "client_timezones": ",Asia/Shanghai,Asia/Seoul,Asia/Tokyo,Asia/Taipei",
         "client_languages": ",en-US,zh-CN,en,ko-KR"
       },
       {
         "country": "US",
-        "pageviews": 99,
-        "visitors": 64,
-        "sessions": 79,
+        "pageviews": 107,
+        "visitors": 70,
+        "sessions": 86,
         "colos": "LAX,SEA,IAD,SJC,ORD,ATL,DFW,EWR,PDX",
-        "client_timezones": "Etc/Unknown,UTC,America/Chicago,Asia/Shanghai,America/Los_Angeles,,Asia/Hong_Kong",
+        "client_timezones": "Etc/Unknown,UTC,America/Chicago,Asia/Shanghai,America/Los_Angeles,,Asia/Hong_Kong,Etc/GMT-8",
         "client_languages": "en-US,zh-CN,en-US@posix,"
       },
       {
@@ -559,11 +575,11 @@
       },
       {
         "country": "HK",
-        "pageviews": 22,
-        "visitors": 13,
-        "sessions": 19,
+        "pageviews": 24,
+        "visitors": 15,
+        "sessions": 21,
         "colos": "HKG",
-        "client_timezones": "Asia/Shanghai,",
+        "client_timezones": "Asia/Shanghai,,Etc/GMT-8",
         "client_languages": "zh-CN,,en-US"
       },
       {
@@ -743,10 +759,10 @@
         "id": 4,
         "provider": "google",
         "email": "ji***@gmail.com",
-        "login": "stonecanon",
+        "login": "jiantaoweng",
         "name": "H&S一心菌 (石头小石头)",
         "created_at": 1778766419,
-        "updated_at": 1779719500
+        "updated_at": 1779864557
       },
       {
         "id": 3,
@@ -773,7 +789,7 @@
         "login": "stonecanon",
         "name": "stonecanon",
         "created_at": 1778628305,
-        "updated_at": 1779287027
+        "updated_at": 1779864405
       }
     ]
   }
