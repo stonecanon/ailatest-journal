@@ -198,6 +198,7 @@ async function main() {
     { key: 'pageviews', name: '页面浏览量', color: '#0b7285' },
     { key: 'visitors', name: '独立访客数', color: '#b0443d' },
     { key: 'sessions', name: '访问人次', color: '#a46a13' },
+    { key: 'cn_hint_events', name: '疑似中国访问', color: '#6f4bb2' },
   ], { label: '访问趋势' });
 
   barList('#provider-bars', data.series.providerMix || [], 'provider', 'users', '#256f5a');
@@ -209,6 +210,7 @@ async function main() {
     detail: [
       `独立访客 ${n(row.visitors)}`,
       `访问人次 ${n(row.sessions)}`,
+      Number(row.cn_hint_events || 0) ? `疑似中国 ${n(row.cn_hint_events)} 次 / ${n(row.cn_hint_visitors)} 人` : '',
       row.colos ? `机房 ${shortList(row.colos, 3)}` : '',
       row.client_timezones ? `时区 ${shortList(row.client_timezones)}` : '',
       row.client_languages ? `语言 ${shortList(row.client_languages)}` : '',
@@ -240,6 +242,9 @@ async function main() {
       ...row,
       visitors: Number(traffic.visitors || 0),
       sessions: Number(traffic.sessions || 0),
+      cn_hint_events: Number(traffic.cn_hint_events || 0),
+      cn_hint_visitors: Number(traffic.cn_hint_visitors || 0),
+      cn_hint_sessions: Number(traffic.cn_hint_sessions || 0),
     };
   }).sort((a, b) => b.day.localeCompare(a.day));
   table('#daily-traffic', dailyTraffic, [
@@ -247,6 +252,7 @@ async function main() {
     { title: '页面浏览量', render: row => n(row.pageviews) },
     { title: '独立访客数', render: row => n(row.visitors) },
     { title: '访问人次', render: row => n(row.sessions) },
+    { title: '疑似中国访问', render: row => `${n(row.cn_hint_events)} / ${n(row.cn_hint_visitors)}人` },
     { title: '注册', render: row => n(row.signups) },
     { title: '登录用户', render: row => n(row.login_users) },
   ]);
