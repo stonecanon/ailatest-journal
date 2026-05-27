@@ -88,7 +88,7 @@ SCHOOL_A_JSON= DATA_DIR / 'school_a_tiers.json'
 CSSCI_CORE_JSON = ROOT / 'generated' / 'cssci_core.json'
 CSSCI_EXT_JSON  = ROOT / 'generated' / 'cssci_ext.json'
 PKU_CORE_JSON   = ROOT / 'generated' / 'pku_core.json'
-CNKI_MAJOR_FILE = LIST_DIR / 'cnki_major_journals.csv'
+CNKI_MAJOR_FILE = LIST_DIR / 'cnki_leaf_journals.csv'
 CNKI_MAJOR_JSON = DATA_DIR / 'cnki_major_journals.json'
 
 
