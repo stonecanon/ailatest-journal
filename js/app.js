@@ -2941,7 +2941,8 @@
       const eissnKey = (r.eissn || '').trim();
       const rec = reviewCycles[issnKey] || reviewCycles[eissnKey];
       if (rec && rec.median_days) {
-        stats.push([T('审稿天数','Review Days'), rec.median_days, T('投稿→接收 中位','Sub→Accept median')]);
+        const mo = (rec.median_days / 30.44).toFixed(1);
+        stats.push([T('审稿周期','Review Cycle'), mo + T(' 个月',' months'), T('收稿→录用 中位','Received→Accepted median')]);
       }
     }
     const ifNote = ir.if_2024 != null ? T('JCR 2025发布 · 2024指标','JCR 2025 rel. · 2024 metric') : '';
@@ -3588,7 +3589,8 @@
       if (cycRec.avg_months) {
         txt = `${cycRec.avg_months}${T(' 个月 (投稿→出版，DOAJ)',' months (submission→pub.)')}`;
       } else if (cycRec.median_days) {
-        txt = `${T('中位 ','median ')}${cycRec.median_days}${T(' 天 (收稿→录用，n=',' days (received→accepted, n=')}${cycRec.sample_size})`;
+        const m = (cycRec.median_days / 30.44).toFixed(1);
+        txt = `${T('中位 ','median ')}${m}${T(' 个月 (收稿→录用，n=',' months (received→accepted, n=')}${cycRec.sample_size})`;
       }
       if (txt) {
         meta.push([T('审稿周期','Review Cycle'), txt]);
@@ -4646,7 +4648,8 @@
               if (cycle.avg_months) {
                 txt += cycle.avg_months + T(' 个月',' months') + T(' (投稿→出版)',' (submission→pub.)');
               } else if (cycle.median_days) {
-                txt += T('中位数 ','median ') + cycle.median_days + T(' 天 (n=',' days (n=') + cycle.sample_size + ')');
+                const m2 = (cycle.median_days / 30.44).toFixed(1);
+                txt += T('中位数 ','median ') + m2 + T(' 个月 (n=',' months (n=') + cycle.sample_size + ')';
               } else {
                 return '';
               }
