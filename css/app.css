@@ -2198,6 +2198,8 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 [data-theme="dark"] .pick-input:focus { background:#353540; }
 [data-theme="dark"] .pick-card .pick-paper { color:#7ab8f5; background:#2e2e32 }
 [data-theme="dark"] .pick-card .pick-paper:hover { background:#3a3a44 }
+[data-theme="dark"] .pick-card .pick-count { color:#8bb8e8 }
+[data-theme="dark"] .pick-card .pick-score-pct { color:#ddd }
 .pick-options { display:flex; flex-wrap:wrap; gap:12px 24px; margin-top:12px }
 .pick-option-group { display:flex; flex-wrap:wrap; gap:8px 16px; align-items:center }
 .pick-opt { display:inline-flex; align-items:center; gap:4px; font-size:13px; cursor:pointer }
@@ -2212,10 +2214,13 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .pick-card h3 a { color:var(--fg); text-decoration:none }
 .pick-card h3 a:hover { color:var(--accent) }
 .pick-card .pick-meta { font-size:12px; color:var(--muted); display:flex; flex-wrap:wrap; gap:4px 16px; margin:2px 0 6px }
-.pick-card .pick-score { display:inline-flex; align-items:center; gap:4px; font-size:13px; font-weight:600 }
-.pick-card .pick-score .bar { display:inline-block; width:60px; height:6px; border-radius:3px; background:var(--border); overflow:hidden; vertical-align:middle }
-.pick-card .pick-score .bar-fill { height:100%; border-radius:3px; background:var(--accent); transition:width .3s }
-.pick-card .pick-topics { display:flex; flex-wrap:wrap; gap:4px; margin-top:6px }
+.pick-card .pick-head { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:4px }
+.pick-card .pick-count { font-size:28px; font-weight:800; color:var(--accent,#1f3a5f); line-height:1 }
+.pick-card .pick-count small { font-size:13px; font-weight:400; color:var(--muted); margin-left:2px }
+.pick-card .pick-head-right { display:flex; align-items:center; gap:8px }
+.pick-card .pick-score-bar .bar { display:inline-block; width:80px; height:8px; border-radius:4px; background:var(--border); overflow:hidden; vertical-align:middle }
+.pick-card .pick-score-bar .bar-fill { height:100%; border-radius:4px; background:var(--accent); transition:width .3s }
+.pick-card .pick-score-pct { font-size:15px; font-weight:700; color:var(--fg) }
 .pick-card .pick-badges { display:flex; flex-wrap:wrap; gap:4px 6px; margin:4px 0 }
 .pick-card .pick-badges .badge,
 .pick-card .pick-badges .zone,
