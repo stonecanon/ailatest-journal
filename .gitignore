@@ -31,6 +31,9 @@ data/oa.json
 CODEX_REVIEW.md
 .wrangler/
 
+# Local server / dashboard artifacts (contain local paths / personal info)
+.dashboard-server.*
+
 # cnkx 旧数据备份
 data/cnkx_records.json.bak
 
