@@ -36,6 +36,14 @@ function slugify(value, fallback) {
   return slug || fallback;
 }
 
+function normTitle(value) {
+  return text(value).toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]+/g, '');
+}
+
+function pageId(r) {
+  return text(r.issn || r.eissn || r.cn_code) || `t:${normTitle(r.name || r.cn_name || r.title || '')}`;
+}
+
 function compact(values) {
   return values.map(text).filter(Boolean);
 }
@@ -299,6 +307,7 @@ await mkdir(indexDir, { recursive: true });
 
 const used = new Map();
 const pages = [];
+const pageMap = {};
 for (let i = 0; i < selected.length; i += 1) {
   const r = selected[i];
   const title = titleOf(r);
@@ -316,9 +325,15 @@ for (let i = 0; i < selected.length; i += 1) {
     title,
     description: pageDescription(r),
   });
+  const id = pageId(r);
+  if (id && !pageMap[id]) pageMap[id] = `/journal/${slug}/`;
+  for (const altId of compact([r.issn, r.eissn])) {
+    if (!pageMap[altId]) pageMap[altId] = `/journal/${slug}/`;
+  }
 }
 
 await writeFile(join(indexDir, 'index.html'), directoryHtml(pages.slice(0, 500), pages.length), 'utf8');
+await writeFile(join(root, 'data', 'journal_pages.json'), `${JSON.stringify(pageMap, null, 2)}\n`, 'utf8');
 
 await writeFile(join(root, 'sitemap-main.xml'), `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
