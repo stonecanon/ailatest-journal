@@ -8,7 +8,7 @@
 // ── Module-level caches (shared across requests to the same isolate) ──
 let journalsCache = null;    // parsed journal array
 let oaCache = null;          // parsed oa.json map
-let rcCache = null;          // parsed review_cycles.json map
+// review_cycle read from embedded doaj.review_weeks in journals.json.gz
 let versionCache = null;     // version string from index.html
 let versionCacheTime = 0;
 
@@ -62,13 +62,6 @@ async function getOA() {
   return oaCache;
 }
 
-async function getReviewCycles() {
-  if (rcCache) return rcCache;
-  const url = new URL('/data/review_cycles.json', 'https://journal.ailatest.org').href;
-  rcCache = await loadData(url);
-  return rcCache;
-}
-
 // ── Rendering ──
 
 function renderZoneTag(zone) {
@@ -80,14 +73,11 @@ function renderZoneTag(zone) {
   return `<span class="badge" style="background:${colors[idx]}">${labels[idx]}</span>`;
 }
 
-function renderCycleHTML(rc) {
-  if (!rc) return '';
-  if (rc.avg_months) {
-    return `${escape(String(rc.avg_months))} months (submission→pub.)`;
-  }
-  if (rc.median_days) {
-    const m = (rc.median_days / 30.44).toFixed(1);
-    return `median ${m} months (received→accepted, n=${rc.sample_size})`;
+function renderCycleHTML(journal) {
+  if (!journal) return '';
+  const weeks = parseFloat(journal.doaj?.review_weeks);
+  if (weeks > 0) {
+    return `${(weeks / 4.33).toFixed(1)} months (submission→pub.)`;
   }
   return '';
 }
@@ -97,7 +87,7 @@ function renderTopics(topics) {
   return topics.map(t => `<span class="topic-tag">${escape(t)}</span>`).join('');
 }
 
-function renderJournalPage(journal, oaData, rcData, baseUrl) {
+function renderJournalPage(journal, oaData, baseUrl) {
   const issn = journal.eissn || journal.issn || '';
   const lang = 'en';
   const title = journal.name || journal.title || '';
@@ -109,10 +99,8 @@ function renderJournalPage(journal, oaData, rcData, baseUrl) {
   if (journal.if_2024) descParts.push(`IF: ${journal.if_2024}`);
   if (journal.if_quartile) descParts.push(`${journal.if_quartile}`);
   if (journal.cas_zone || journal.cas_zone === 0) descParts.push(`CAS Zone ${journal.cas_zone_2023 || journal.cas_zone}`);
-  if (rcData && (rcData.avg_months || rcData.median_days)) {
-    const cycle = rcData.avg_months ? `${rcData.avg_months} month review cycle` : `${(rcData.median_days / 30.44).toFixed(1)} month median review cycle`;
-    descParts.push(cycle);
-  }
+  const reviewCycle = renderCycleHTML(journal);
+  if (reviewCycle) descParts.push(reviewCycle);
   if (journal.publisher) descParts.push(`Published by ${journal.publisher}`);
   const description = descParts.join(' | ');
 
@@ -120,7 +108,6 @@ function renderJournalPage(journal, oaData, rcData, baseUrl) {
   const indices = Array.isArray(journal.indices) ? journal.indices.join(', ') : journal.indices || '';
   const categories = Array.isArray(journal.wos_categories) ? journal.wos_categories.join(', ') : '';
   const oaTopics = Array.isArray(oaData?.tp) ? oaData.tp.slice(0, 6) : [];
-  const reviewCycle = renderCycleHTML(rcData);
   const zone2023 = journal.cas_zone_2023 ?? journal.cas_zone;
 
   // Structured data (JSON-LD)
@@ -319,10 +306,9 @@ export async function onRequest(context) {
   }
 
   try {
-    const [journals, oa, rc] = await Promise.all([
+    const [journals, oa] = await Promise.all([
       getJournals(),
       getOA(),
-      getReviewCycles(),
     ]);
 
     // Find journal by ISSN or EISSN
@@ -335,10 +321,9 @@ export async function onRequest(context) {
     }
 
     const oaData = oa[issn] || null;
-    const rcData = rc[issn] || null;
     const baseUrl = 'https://journal.ailatest.org';
 
-    const html = renderJournalPage(journal, oaData, rcData, baseUrl);
+    const html = renderJournalPage(journal, oaData, baseUrl);
 
     return new Response(html, {
       status: 200,

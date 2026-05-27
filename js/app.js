@@ -614,7 +614,7 @@
   let esiCats = [];
   let meta = null;
   let oaMap = {};          // compact OpenAlex map: { "ISSN": {hp, l, oa, dj, apc, org, cn, w} }
-  let reviewCycles = {};   // { ISSN: {median_days, sample_size, source, year_window, updated} }
+  // review_cycles now read from embedded doaj.review_weeks in journals.json.gz
   const DEFAULT_JOURNAL_ALIASES = {
     BE: 'BUILDING AND ENVIRONMENT',
     'B&E': 'BUILDING AND ENVIRONMENT',
@@ -2935,25 +2935,12 @@
     const stats = [];
     if (ir.if_2024 != null) stats.push([T('影响因子 / IF','Impact Factor'), ir.if_2024]);
     if (ir.if_rank) stats.push([T('IF 排名','IF Rank'), ir.if_rank]);
-    // 审稿周期合并到 stats 区
+    // 审稿周期 — 从嵌入的 DOAJ review_weeks 读取
     {
-      const issnKey = (r.issn || '').trim();
-      const eissnKey = (r.eissn || '').trim();
-      const rec = reviewCycles[issnKey] || reviewCycles[eissnKey];
-      if (rec && (rec.median_days || rec.avg_months)) {
-        const val = rec.avg_months || (rec.median_days / 30.44).toFixed(1);
-        const unit = T(' 个月',' months');
-        const sub = rec.avg_months
-          ? T('投稿→出版 (DOAJ)','Submission→pub. (DOAJ)')
-          : T('收稿→录用 中位','Received→Accepted median');
-        stats.push([T('审稿周期','Review Cycle'), String(val) + unit, sub]);
-      } else {
-        // Fallback: read from embedded doaj.review_weeks
-        const weeks = parseFloat(r.doaj?.review_weeks || ir.doaj?.review_weeks);
-        if (weeks > 0) {
-          const m = (weeks / 4.33).toFixed(1);
-          stats.push([T('审稿周期','Review Cycle'), m + T(' 个月',' months'), T('投稿→出版 (DOAJ)','Submission→pub. (DOAJ)')]);
-        }
+      const weeks = parseFloat(r.doaj?.review_weeks || ir.doaj?.review_weeks);
+      if (weeks > 0) {
+        const m = (weeks / 4.33).toFixed(1);
+        stats.push([T('审稿周期','Review Cycle'), m + T(' 个月',' months'), T('投稿→出版 (DOAJ)','Submission→pub. (DOAJ)')]);
       }
     }
     const ifNote = ir.if_2024 != null ? T('JCR 2025发布 · 2024指标','JCR 2025 rel. · 2024 metric') : '';
@@ -3592,20 +3579,11 @@
     if (r.frequency) meta.push([T('刊期','Frequency'), r.frequency]);
     if (ir.cas_xr && ir.cas_xr.major_cn) meta.push([T('新锐版大类','Emerging Major'), ir.cas_xr.major_cn]);
 
-    // 审稿周期 — 支持两个数据源
-    const cycRec = reviewCycles[(r.issn||'').trim()] || reviewCycles[(r.eissn||'').trim()];
+    // 审稿周期 — 从嵌入的 DOAJ review_weeks 读取
     let cycTxt = '';
-    if (cycRec && cycRec.avg_months) {
-      cycTxt = `${cycRec.avg_months}${T(' 个月 (投稿→出版，DOAJ)',' months (submission→pub.)')}`;
-    } else if (cycRec && cycRec.median_days) {
-      const m = (cycRec.median_days / 30.44).toFixed(1);
-      cycTxt = `${T('中位 ','median ')}${m}${T(' 个月 (收稿→录用，n=',' months (received→accepted, n=')}${cycRec.sample_size})`;
-    } else {
-      // Fallback: embedded DOAJ data
-      const weeks = parseFloat(r.doaj?.review_weeks || ir.doaj?.review_weeks);
-      if (weeks > 0) {
-        cycTxt = `${(weeks / 4.33).toFixed(1)}${T(' 个月 (投稿→出版，DOAJ)',' months (submission→pub.)')}`;
-      }
+    const weeks = parseFloat(r.doaj?.review_weeks || ir.doaj?.review_weeks);
+    if (weeks > 0) {
+      cycTxt = `${(weeks / 4.33).toFixed(1)}${T(' 个月 (投稿→出版，DOAJ)',' months (submission→pub.)')}`;
     }
     if (cycTxt) {
       meta.push([T('审稿周期','Review Cycle'), cycTxt]);
@@ -4788,16 +4766,15 @@
     // 分享着陆页：/s/<id> 直接接管 main，不走主流程
     if (await maybeRenderShareLanding()) return;
     try {
-      const [j, d, m, esi, aliases, rc] = await Promise.all([
+      const [j, d, m, esi, aliases] = await Promise.all([
         fetchJSON('data/journals.json.gz'),
         fetch('data/domestic.json').then(r => r.json()).catch(() => null),
         fetch('data/meta.json').then(r => r.json()).catch(() => null),
         fetch('data/esi_categories.json').then(r => r.json()).catch(() => []),
         fetch('data/journal_aliases.json').then(r => r.json()).catch(() => DEFAULT_JOURNAL_ALIASES),
-        fetch('data/review_cycles.json').then(r => r.json()).catch(() => ({})),
       ]);
       setJournalAliases(aliases);
-      journals = j; domestic = d; meta = m; esiCats = esi; oaMap = null; reviewCycles = rc || {};
+      journals = j; domestic = d; meta = m; esiCats = esi; oaMap = null;
       journals.forEach(journalSearchMeta);
       buildDomIndex(domestic);
       buildIntIndex(journals);
