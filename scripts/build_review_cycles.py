@@ -162,9 +162,9 @@ def main():
 
     # --- CrossRef phase (API calls for remaining) ---
     cr_targets = [i for i in targets if i not in out]
-    pending = []  # CrossRef disabled — run separately with --crossref flag
+    pending = [i for i in cr_targets if i not in out]
     # (CrossRef API code continues below...)
-    print(f"CrossRef targets: {len(cr_targets)} (remaining after DOAJ, SKIPPED)", flush=True)
+    print(f"CrossRef targets: {len(cr_targets)} (remaining after DOAJ)", flush=True)
 
     t0 = time.time()
     done = kept = nf = 0

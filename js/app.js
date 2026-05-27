@@ -2942,11 +2942,18 @@
       const rec = reviewCycles[issnKey] || reviewCycles[eissnKey];
       if (rec && (rec.median_days || rec.avg_months)) {
         const val = rec.avg_months || (rec.median_days / 30.44).toFixed(1);
-        const unit = rec.avg_months ? T(' 个月',' months') : T(' 个月',' months');
+        const unit = T(' 个月',' months');
         const sub = rec.avg_months
           ? T('投稿→出版 (DOAJ)','Submission→pub. (DOAJ)')
           : T('收稿→录用 中位','Received→Accepted median');
         stats.push([T('审稿周期','Review Cycle'), String(val) + unit, sub]);
+      } else {
+        // Fallback: read from embedded doaj.review_weeks
+        const weeks = parseFloat(r.doaj?.review_weeks || ir.doaj?.review_weeks);
+        if (weeks > 0) {
+          const m = (weeks / 4.33).toFixed(1);
+          stats.push([T('审稿周期','Review Cycle'), m + T(' 个月',' months'), T('投稿→出版 (DOAJ)','Submission→pub. (DOAJ)')]);
+        }
       }
     }
     const ifNote = ir.if_2024 != null ? T('JCR 2025发布 · 2024指标','JCR 2025 rel. · 2024 metric') : '';
@@ -3593,6 +3600,12 @@
     } else if (cycRec && cycRec.median_days) {
       const m = (cycRec.median_days / 30.44).toFixed(1);
       cycTxt = `${T('中位 ','median ')}${m}${T(' 个月 (收稿→录用，n=',' months (received→accepted, n=')}${cycRec.sample_size})`;
+    } else {
+      // Fallback: embedded DOAJ data
+      const weeks = parseFloat(r.doaj?.review_weeks || ir.doaj?.review_weeks);
+      if (weeks > 0) {
+        cycTxt = `${(weeks / 4.33).toFixed(1)}${T(' 个月 (投稿→出版，DOAJ)',' months (submission→pub.)')}`;
+      }
     }
     if (cycTxt) {
       meta.push([T('审稿周期','Review Cycle'), cycTxt]);
@@ -4652,7 +4665,14 @@
                 const m2 = (cycle.median_days / 30.44).toFixed(1);
                 txt += T('中位数 ','median ') + m2 + T(' 个月 (n=',' months (n=') + cycle.sample_size + ')';
               } else {
-                txt += T('≈4.0 个月 (DOAJ 平均)','≈4.0 months (DOAJ avg)');
+                // Fallback: embedded DOAJ data
+                const r2 = e.journalRec;
+                const weeks = parseFloat(r2?.doaj?.review_weeks);
+                if (weeks > 0) {
+                  txt += (weeks / 4.33).toFixed(1) + T(' 个月 (投稿→出版,DOAJ)',' months (submission→pub.)');
+                } else {
+                  txt += T('≈4.0 个月 (DOAJ 平均)','≈4.0 months (DOAJ avg)');
+                }
               }
               return '<div class="pick-cycle">' + txt + '</div>';
             })()}

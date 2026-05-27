@@ -1039,6 +1039,7 @@ def parse_doaj(path, by_title, by_issn, store=None):
                 'apc': (row.get('APC') or '').strip(),
                 'fee': (row.get('APC amount') or '').strip(),
                 'review': (row.get('Review process') or '').strip(),
+                'review_weeks': (row.get('Average number of weeks between article submission and publication') or '').strip(),
             }
             rec = (issn and by_issn.get(issn)) or (eissn and by_issn.get(eissn)) or by_title.get(nt)
             if rec is not None:
