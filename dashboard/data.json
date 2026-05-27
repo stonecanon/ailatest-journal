@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-27T08:40:28.080Z",
+  "generated_at": "2026-05-27T10:10:23.880Z",
   "source": "remote D1",
   "notes": [
     "注册量来自 users.created_at，当前是最可靠口径。",
@@ -45,11 +45,11 @@
     "avg_rating": 4.43,
     "lists": 7,
     "users_with_lists": 7,
-    "total_pageviews": 773,
-    "total_visitors": 221,
-    "total_cn_hint_events": 312,
-    "total_cn_hint_visitors": 95,
-    "total_cn_hint_sessions": 160,
+    "total_pageviews": 774,
+    "total_visitors": 222,
+    "total_cn_hint_events": 313,
+    "total_cn_hint_visitors": 96,
+    "total_cn_hint_sessions": 161,
     "total_login_events": 19
   },
   "series": {
@@ -246,12 +246,12 @@
       },
       {
         "day": "2026-05-27",
-        "pageviews": 108,
-        "sessions": 29,
-        "visitors": 12,
-        "cn_hint_events": 105,
-        "cn_hint_visitors": 9,
-        "cn_hint_sessions": 26
+        "pageviews": 109,
+        "sessions": 30,
+        "visitors": 13,
+        "cn_hint_events": 106,
+        "cn_hint_visitors": 10,
+        "cn_hint_sessions": 27
       }
     ]
   },
@@ -465,8 +465,8 @@
     "topPaths": [
       {
         "path": "/",
-        "pageviews": 645,
-        "visitors": 138
+        "pageviews": 646,
+        "visitors": 139
       },
       {
         "path": "/?ref=producthunt",
@@ -718,6 +718,18 @@
         "cn_hint_visitors": 1,
         "cn_hint_sessions": 1,
         "colos": "ICN",
+        "client_timezones": "Asia/Shanghai",
+        "client_languages": "zh-CN"
+      },
+      {
+        "country": "CN",
+        "pageviews": 1,
+        "visitors": 1,
+        "sessions": 1,
+        "cn_hint_events": 1,
+        "cn_hint_visitors": 1,
+        "cn_hint_sessions": 1,
+        "colos": "LAX",
         "client_timezones": "Asia/Shanghai",
         "client_languages": "zh-CN"
       }
