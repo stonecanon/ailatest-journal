@@ -4104,6 +4104,12 @@
       results.innerHTML = '';
 
       try {
+        // Lazy-load oaMap for topic matching (only if pick tool is first to need it)
+        if (!oaMap) {
+          try { oaMap = await fetchJSON('data/oa.json.gz'); }
+          catch(e) { oaMap = {}; }
+        }
+
         // Step 1: Search papers on OpenAlex
         const url = OA_API + `/works?filter=title_and_abstract.search:${encodeURIComponent(query)}&per_page=50&sort=relevance_score:desc&select=id,title,publication_date,authorships,primary_location,relevance_score`;
         const resp = await fetch(url, { headers: { 'Accept': 'application/json' } });
@@ -4245,17 +4251,16 @@
     // 分享着陆页：/s/<id> 直接接管 main，不走主流程
     if (await maybeRenderShareLanding()) return;
     try {
-      const [j, d, m, esi, aliases, rc, oa] = await Promise.all([
+      const [j, d, m, esi, aliases, rc] = await Promise.all([
         fetchJSON('data/journals.json.gz'),
         fetch('data/domestic.json').then(r => r.json()).catch(() => null),
         fetch('data/meta.json').then(r => r.json()).catch(() => null),
         fetch('data/esi_categories.json').then(r => r.json()).catch(() => []),
         fetch('data/journal_aliases.json').then(r => r.json()).catch(() => DEFAULT_JOURNAL_ALIASES),
         fetch('data/review_cycles.json').then(r => r.json()).catch(() => ({})),
-        fetch('data/oa.json').then(r => r.json()).catch(() => null),
       ]);
       setJournalAliases(aliases);
-      journals = j; domestic = d; meta = m; esiCats = esi; oaMap = oa; reviewCycles = rc || {};`
+      journals = j; domestic = d; meta = m; esiCats = esi; oaMap = null; reviewCycles = rc || {};`
       journals.forEach(journalSearchMeta);
       buildDomIndex(domestic);
       buildIntIndex(journals);
