@@ -2475,15 +2475,11 @@
         return true;
       });
 
-      // 生成学科分类下拉
-      const catOptions = [
-        `<option value="__all">${T('全部分类','All Categories')}</option>`,
-        ...CAT_ORDER.map(c => {
-          const count = all.filter(r => (r.major_categories||[]).includes(c)).length;
-          return `<option value="${escape(c)}"${activeCat === c ? ' selected' : ''}>${escape(c)} (${count.toLocaleString()})</option>`;
-        })
-      ].join('');
-      const catRow = `<div style="margin:8px 0"><select id="cnki-cat-select" style="width:100%;max-width:360px;padding:6px 10px;font-size:13px;border:1px solid var(--rule);border-radius:2px;background:var(--paper);color:var(--ink);font-family:inherit">${catOptions}</select></div>`;
+      // 生成学科分类下拉选项
+      const catOptions = CAT_ORDER.map(c => {
+        const count = all.filter(r => (r.major_categories||[]).includes(c)).length;
+        return `<option value="${escape(c)}"${activeCat === c ? ' selected' : ''}>${escape(c)}</option>`;
+      }).join('');
 
       // 按刊名字母排序
       filtered.sort((a, b) => (a.name||'').localeCompare(b.name||'', 'zh'));
@@ -2509,27 +2505,27 @@
         ].filter(Boolean).join('');
         const name = r.name || '';
         const isnCell = r.issn ? `<span class="jissn">${escape(r.issn)}</span>` : (r.cn_code ? `<span class="jissn">${escape(r.cn_code)}</span>` : '<span class="muted-cell">—</span>');
+        const catCell = (r.major_categories||[]).length ? r.major_categories.map(c => `<span class="cat-inline">${escape(c)}</span>`).join('') : '<span class="muted-cell">—</span>';
         return `<tr class="j-row clickable" data-fid="${escape(fid)}" data-src="cnki_major">
           <td class="col-fav" style="width:36px">${starBtn(r, 'cnki_major')}</td>
           <td class="jname" style="font-size:13.5px">${escape(name)}</td>
           <td class="col-cross"><div class="badges">${badges || '<span class="muted-cell">—</span>'}</div></td>
+          <td class="muted-cell" style="width:160px">${catCell}</td>
           <td style="width:130px">${isnCell}</td>
           <td class="muted-cell" style="width:120px">${escape(r.cn_code||'—')}</td>
-          <td class="muted-cell" style="width:160px">${escape((r.major_categories||[]).join(' · '))}</td>
         </tr>`;
       }).join('');
 
       box.innerHTML = `<div class="section-block">
         <h3 class="section-title">${T('中文期刊目录','Chinese Journal Directory')}</h3>
         <div class="section-subtitle">${T('共收录','Total ')} ${all.length.toLocaleString()} ${T('种中文期刊',' Chinese journals')}${q ? T(' · 搜索: ',' · Search: ')+escape(q) : ''}</div>
-        ${catRow}
         <div class="table-wrap"><table class="journals"><thead><tr>
           <th style="width:36px" aria-label="Favorite"></th>
           <th>${T('期刊名称','Journal')}</th>
           <th>${T('收录索引','Indices')}</th>
+          <th style="width:160px;padding:0"><select id="cnki-cat-select" class="th-select" style="width:100%;padding:4px 2px;background:transparent;border:0;border-bottom:1px solid var(--rule-soft);color:var(--ink);font:inherit;font-size:12px;font-weight:600;cursor:pointer"><option value="__all">${T('全部分类','All Categories')}</option>${catOptions}</select></th>
           <th style="width:130px">ISSN</th>
           <th style="width:120px">CN</th>
-          <th style="width:160px">${T('学科分类','Category')}</th>
         </tr></thead><tbody>
           ${rows}
           ${total === 0 ? `<tr><td colspan="6" class="empty">${T('未找到匹配的期刊','No matching journals found')}</td></tr>` : ''}

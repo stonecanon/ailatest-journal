@@ -1853,6 +1853,18 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
+/* 中文期刊目录 - 学科分类内联标签 */
+.cat-inline {
+  display: inline-block;
+  padding: 1px 6px;
+  margin: 1px 2px;
+  font-size: 11px;
+  background: var(--bg2);
+  border: 1px solid var(--rule-soft);
+  border-radius: 2px;
+  color: var(--ink-soft);
+}
+
 /* 详情抽屉 - 新增样式 */
 .cat-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
 .cat-chip {
