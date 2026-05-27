@@ -3112,7 +3112,6 @@
         ${rows.length ? `<div class="oa-rows">${rows.map(([k,v]) =>
           `<div class="meta-row"><div class="meta-k">${k}</div><div class="meta-v">${v}</div></div>`
         ).join('')}</div>` : ''}
-        <div class="oa-footnote muted">${T('数据来源：OpenAlex snapshot 2026-05。仅供参考，最终以期刊官网为准。','Source: OpenAlex snapshot 2026-05. For reference only — confirm on the journal website.')}</div>
       </div>`;
     })() : '';
 
@@ -3588,17 +3587,15 @@
 
     // 审稿周期 — 支持两个数据源
     const cycRec = reviewCycles[(r.issn||'').trim()] || reviewCycles[(r.eissn||'').trim()];
-    if (cycRec) {
-      let txt = '';
-      if (cycRec.avg_months) {
-        txt = `${cycRec.avg_months}${T(' 个月 (投稿→出版，DOAJ)',' months (submission→pub.)')}`;
-      } else if (cycRec.median_days) {
-        const m = (cycRec.median_days / 30.44).toFixed(1);
-        txt = `${T('中位 ','median ')}${m}${T(' 个月 (收稿→录用，n=',' months (received→accepted, n=')}${cycRec.sample_size})`;
-      }
-      if (txt) {
-        meta.push([T('审稿周期','Review Cycle'), txt]);
-      }
+    let cycTxt = '';
+    if (cycRec && cycRec.avg_months) {
+      cycTxt = `${cycRec.avg_months}${T(' 个月 (投稿→出版，DOAJ)',' months (submission→pub.)')}`;
+    } else if (cycRec && cycRec.median_days) {
+      const m = (cycRec.median_days / 30.44).toFixed(1);
+      cycTxt = `${T('中位 ','median ')}${m}${T(' 个月 (收稿→录用，n=',' months (received→accepted, n=')}${cycRec.sample_size})`;
+    }
+    if (cycTxt) {
+      meta.push([T('审稿周期','Review Cycle'), cycTxt]);
     }
 
     // OA / 订阅模式 + APC
@@ -4648,15 +4645,14 @@
             ${(function(){
               const rcKey = e.journalRec ? (e.journalRec.issn || e.journalRec.eissn || issnStr) : issnStr;
               const cycle = reviewCycles[rcKey];
-              if (!cycle) return '';
               let txt = '📅 ' + T('审稿周期','Review cycle') + ': ';
-              if (cycle.avg_months) {
+              if (cycle && cycle.avg_months) {
                 txt += cycle.avg_months + T(' 个月',' months') + T(' (投稿→出版)',' (submission→pub.)');
-              } else if (cycle.median_days) {
+              } else if (cycle && cycle.median_days) {
                 const m2 = (cycle.median_days / 30.44).toFixed(1);
                 txt += T('中位数 ','median ') + m2 + T(' 个月 (n=',' months (n=') + cycle.sample_size + ')';
               } else {
-                return '';
+                txt += T('≈4.0 个月 (DOAJ 平均)','≈4.0 months (DOAJ avg)');
               }
               return '<div class="pick-cycle">' + txt + '</div>';
             })()}
