@@ -75,6 +75,10 @@ function renderZoneTag(zone) {
 
 function renderCycleHTML(journal) {
   if (!journal) return '';
+  const cr = journal.crossref;
+  if (cr && cr.median_days > 0) {
+    return `${(cr.median_days / 30.44).toFixed(1)} months (submission→acceptance)`;
+  }
   const weeks = parseFloat(journal.doaj?.review_weeks);
   if (weeks > 0) {
     return `${(weeks / 4.33).toFixed(1)} months (submission→pub.)`;
