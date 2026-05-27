@@ -4151,25 +4151,25 @@
           .filter(w => w.length > 4 && !/^(this|that|with|from|which|were|have|been|than|into|also|their|about|study|show|were|used|using|based|results|method|model|data|paper|these|between|while|where|after|before|other|there|analysis|approach|process|system|study|research)$/i.test(w))
           .filter((w, i, a) => a.indexOf(w) === i);
 
-        const topEng = engWords.slice(0, 6);
+        const topEng = engWords.slice(0, 3);
 
         // Chinese segments
         const chnChars = bodyText.replace(/[a-zA-Z0-9\s]/g, '').replace(/[，。、；：！？（）【】《》""''\s]/g, '');
         let chnTerms = [];
         if (chnChars.length > 0) {
-          chnTerms = [chnChars.slice(0, 30)];
+          chnTerms = [chnChars.slice(0, 20)];
         }
 
         // Build final search query
         const searchParts = [
           ...titleTerms,
-          ...explicitKeywords.slice(0, 5),
+          ...explicitKeywords.slice(0, 3),
           ...topEng,
           ...chnTerms,
         ].filter(Boolean);
 
-        const searchQuery = searchParts.join(' ').slice(0, 250);
-        if (query.length > 100) {
+        const searchQuery = searchParts.join(' ').slice(0, 120);
+        if (query.length > 50) {
           status.textContent = T('正在分析匹配中…（已提取关键词）','Analyzing… (keywords extracted)');
         }
         const url = OA_API + `/works?filter=title_and_abstract.search:${encodeURIComponent(searchQuery)}&per_page=50&sort=relevance_score:desc&select=id,title,publication_date,authorships,primary_location,relevance_score`;
