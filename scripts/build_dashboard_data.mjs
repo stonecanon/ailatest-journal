@@ -90,6 +90,7 @@ const [
   listSummary,
   loginEventsByDay,
   loginProviderMix,
+  latestPageview,
   pageviewsByDay,
   topPaths,
   trafficCountries,
@@ -177,6 +178,10 @@ const [
     ORDER BY login_events DESC
   `),
   maybeQuery(hasTable, 'page_events', `
+    SELECT MAX(event_at) AS latest_pageview_at
+    FROM page_events
+  `),
+  maybeQuery(hasTable, 'page_events', `
     SELECT
       day,
       COUNT(*) AS pageviews,
@@ -262,6 +267,7 @@ const payload = {
     total_cn_hint_visitors: pageviewsByDay.reduce((sum, row) => sum + Number(row.cn_hint_visitors || 0), 0),
     total_cn_hint_sessions: pageviewsByDay.reduce((sum, row) => sum + Number(row.cn_hint_sessions || 0), 0),
     total_login_events: loginEventsByDay.reduce((sum, row) => sum + Number(row.login_events || 0), 0),
+    latest_pageview_at: scalar(latestPageview[0], 'latest_pageview_at', null),
   },
   series: {
     providerMix,
