@@ -4144,34 +4144,36 @@
 
         // Step 3: Build ranked results with differentiated scoring
         const entries = [...journalMap.entries()].map(([issn, j]) => {
-          // Base score: average relevance of papers from this journal
-          const avgScore = j.scores.reduce((a,b)=>a+b,0) / j.scores.length;
-          // Score differentiation: wider spread using polynomial
-          // Core relevance: 0.4 weight, squared to spread thin vs strong
-          const relevanceScore = Math.pow(avgScore, 0.7) * 0.4;
-          // Count bonus: more papers = more confidence (log scale, capped)
-          // 1 paper → 0.1, 5 papers → 0.26, 20+ papers → 0.4
-          const countBonus = Math.min(0.4, Math.log2(j.count + 1) * 0.07);
-          // Topic overlap bonus
+          // ── Primary score: paper count (this is the main differentiator) ──
+          //   1 paper → ~12%     3 papers → ~38%     5 → ~55%
+          //   8 papers → ~73%   10+ papers → ~82%   20+ → ~92%
+          const maxCount = 50; // max papers retrieved
+          const countRatio = j.count / maxCount;
+          const countScore = Math.pow(countRatio, 0.45) * 0.92;
+
+          // ── Quality adjustment: average relevance (±8%) ──
+          const avgRel = j.scores.reduce((a,b)=>a+b,0) / j.scores.length;
+          const qualityAdj = (avgRel - 0.6) * 0.2;
+
+          // ── Topic overlap bonus (capped at 8%) ──
           let topicBonus = 0;
           if (oaMap && oaMap[issn]) {
             const qLower = query.toLowerCase();
             const keywords = qLower.split(/\s+/).filter(w => w.length > 3);
             const topics = oaMap[issn].tp || [];
-            // Exact match of full query in a topic
             const fullMatch = topics.filter(t => t.toLowerCase().includes(qLower)).length;
-            // Keyword partial matches
             const kwMatch = keywords.length > 0
               ? topics.filter(t => keywords.some(w => t.toLowerCase().includes(w))).length
               : 0;
-            topicBonus = Math.min(0.25, (fullMatch * 0.12 + kwMatch * 0.04));
+            topicBonus = Math.min(0.08, (fullMatch * 0.04 + kwMatch * 0.015));
           }
-          // IF bonus (good journals get a small boost)
+
+          // ── IF bonus (capped at 5%) ──
           const journalRec = journals.find(r => r.issn === issn || r.eissn === issn);
           const ifVal = journalRec?.if_2024;
-          const ifBonus = ifVal != null && ifVal > 0 ? Math.min(0.12, Math.log2(ifVal + 1) * 0.025) : 0;
+          const ifBonus = ifVal != null && ifVal > 0 ? Math.min(0.05, Math.log2(ifVal + 1) * 0.012) : 0;
 
-          const totalScore = Math.min(0.99, relevanceScore + countBonus + topicBonus + ifBonus);
+          const totalScore = Math.max(0.03, Math.min(0.97, countScore + qualityAdj + topicBonus + ifBonus));
           const zoneVal = journalRec?.cas_zone;
           const topVal = journalRec?.cas_top;
           const qVal = journalRec?.jcr_q;
@@ -4254,7 +4256,14 @@
             badgesHtml = [idxBadges, scBadge, eiBdg, zoneBdg, jcrBdg, ifBdg, ccfTxt].filter(Boolean).join('');
           }
 
-          return `<div class="pick-card" data-issn="${escape(issnStr)}">
+          // Compute score color for left stripe: gray → blue → amber → green
+          const scoreColor = scorePct < 20 ? '#8e9aaf'
+            : scorePct < 40 ? '#5a8fc9'
+            : scorePct < 60 ? '#d4a017'
+            : scorePct < 80 ? '#3a9d5e'
+            : '#1f8b4c';
+
+          return `<div class="pick-card" style="border-left-color:${scoreColor}" data-issn="${escape(issnStr)}">
             <h3><a href="#j/${escape(e.journalRec ? favId(e.journalRec) : issnStr)}">${escape(name)}</a></h3>
             <div class="pick-meta">${issnStr}${ifStr ? ' · ' + ifStr : ''}${zoneStr ? ' · ' + zoneStr : ''} · ${e.count} ${T('篇论文','papers')}</div>
             ${badgesHtml ? `<div class="pick-badges">${badgesHtml}</div>` : ''}
