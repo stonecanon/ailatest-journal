@@ -4243,7 +4243,8 @@
 
   // ───────── pick-for-me (journal recommendation) ─────────
   let _pickInit = false;
-  const OA_API = '/openalex';
+  const OA_API = 'https://api.openalex.org';
+  const OA_PROXY = '/openalex';
 
   function initPickTool() {
     if (_pickInit) return;
@@ -4389,14 +4390,26 @@
         const SEARCH_FIELDS = 'id,title,publication_date,primary_location,relevance_score';
         const FIVE_YEARS_AGO = new Date(Date.now() - 5*365*24*60*60*1000).toISOString().slice(0,10);
         const DATE_FILTER = `&filter=from_publication_date:${FIVE_YEARS_AGO}`;
-        const queryBatches = await Promise.all(queries.slice(0, 3).map(async (q) => {
-          const url = OA_API + `/works?search=${encodeURIComponent(q.slice(0,120))}&per_page=30&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
+        const apiFetch = async (path) => {
+          const url = OA_API + path;
           try {
             const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
-            if (!r.ok) return [];
-            const d = await r.json();
-            return d.results || [];
-          } catch { return []; }
+            if (r.ok) return r;
+          } catch {}
+          // Fallback: try proxy (for regions where OpenAlex is blocked)
+          const proxyUrl = OA_PROXY + path;
+          try {
+            const r = await fetch(proxyUrl, { headers: { 'Accept': 'application/json' } });
+            if (r.ok) return r;
+          } catch {}
+          return null;
+        };
+        const queryBatches = await Promise.all(queries.slice(0, 3).map(async (q) => {
+          const path = `/works?search=${encodeURIComponent(q.slice(0,120))}&per_page=30&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
+          const r = await apiFetch(path);
+          if (!r) return [];
+          const d = await r.json();
+          return d.results || [];
         }));
 
         // Deduplicate by work ID
@@ -4414,16 +4427,14 @@
         // If too few results, try a broader backup query
         if (allWorks.length < 8) {
           const backup = uniqueWords.slice(0, 5).join(' ');
-          try {
-            const url = OA_API + `/works?search=${encodeURIComponent(backup)}&per_page=30&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
-            const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
-            if (r.ok) {
-              const d = await r.json();
-              for (const w of (d.results || [])) {
-                if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); }
-              }
+          const bp = `/works?search=${encodeURIComponent(backup)}&per_page=30&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
+          const r = await apiFetch(bp);
+          if (r && r.ok) {
+            const d = await r.json();
+            for (const w of (d.results || [])) {
+              if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); }
             }
-          } catch {}
+          }
         }
 
         // Chinese fallback: if still nothing and has Chinese, try short Chinese title
@@ -4431,16 +4442,14 @@
           const chn = titleTerms[0].replace(/[a-zA-Z0-9\s]/g, '').replace(/[，。、；：！？（）【】《》""''\s]/g, '');
           if (chn) {
             const cnQuery = chn.slice(0, 12); // 12 Chinese chars ≈ 108 URL chars
-            try {
-              const url = OA_API + `/works?search=${encodeURIComponent(cnQuery)}&per_page=20&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
-              const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
-              if (r.ok) {
-                const d = await r.json();
-                for (const w of (d.results || [])) {
-                  if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); }
-                }
+            const cp = `/works?search=${encodeURIComponent(cnQuery)}&per_page=20&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
+            const r = await apiFetch(cp);
+            if (r && r.ok) {
+              const d = await r.json();
+              for (const w of (d.results || [])) {
+                if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); }
               }
-            } catch {}
+            }
           }
         }
 
