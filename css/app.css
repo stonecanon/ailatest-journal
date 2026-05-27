@@ -2203,7 +2203,8 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .pick-actions { display:flex; align-items:center; gap:12px; margin-top:16px }
 .pick-status { font-size:13px }
 .pick-results { display:flex; flex-direction:column; gap:12px }
-.pick-card { background:var(--bg2); border-radius:10px; padding:16px 20px; cursor:pointer; transition:box-shadow .15s }
+.pick-card { background:var(--bg2); border-radius:10px; padding:16px 20px; cursor:pointer; transition:box-shadow .15s; border-left:4px solid var(--border); position:relative }
+.pick-card .pick-stripe { display:none }
 .pick-card:hover { box-shadow:0 2px 12px rgba(0,0,0,.1) }
 .pick-card h3 { margin:0 0 4px; font-size:15px; line-height:1.4 }
 .pick-card h3 a { color:var(--fg); text-decoration:none }
