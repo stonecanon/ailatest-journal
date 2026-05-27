@@ -1853,6 +1853,25 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   .meta-row { grid-template-columns: 90px 1fr; gap: 10px; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
 }
+@media (max-width: 600px) {
+  .pick-card { padding:12px 14px }
+  .pick-card h3 { font-size:15px }
+  .pick-card .pick-count { font-size:16px }
+  .pick-card .pick-count small { font-size:11px }
+  .pick-card .pick-score-bar .bar { width:50px; height:6px }
+  .pick-card .pick-score-pct { font-size:12px }
+  .pick-card .pick-badges .badge,
+  .pick-card .pick-badges .zone,
+  .pick-card .pick-badges .if-pill { font-size:9.5px; padding:1px 5px }
+  .pick-card .pick-cycle { font-size:10px }
+  .pick-card .pick-papers { font-size:11px }
+  .pick-input-wrap { padding:14px }
+  .pick-input { font-size:13px; padding:10px 12px }
+  .pick-options { gap:8px 12px; margin-top:8px }
+  .pick-opt { font-size:12px }
+  .pick-select, .pick-num { padding:2px 6px; font-size:12px }
+  .pick-history { padding:10px 12px }
+}
 
 /* 中文期刊目录 - 学科分类内联标签 */
 .cat-inline {
@@ -2234,7 +2253,7 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .pick-card h3 a { color:var(--fg); text-decoration:none }
 .pick-card h3 a:hover { color:var(--accent) }
 .pick-card .pick-meta { font-size:12px; color:var(--muted); display:flex; flex-wrap:wrap; gap:4px 16px; margin:2px 0 6px }
-.pick-card .pick-head { display:flex; align-items:center; justify-content:flex-end; gap:10px; margin-bottom:4px }
+.pick-card .pick-head { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:4px }
 .pick-card .pick-count { font-size:20px; font-weight:700; color:var(--accent,#1f3a5f); line-height:1 }
 .pick-card .pick-count small { font-size:13px; font-weight:400; color:var(--muted); margin-left:2px }
 .pick-card .pick-head-right { display:flex; align-items:center; gap:8px }
