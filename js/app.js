@@ -4576,8 +4576,10 @@
           const paperList = e.papers.map(p => `<a class="pick-paper" href="${escape(p.url)}" target="_blank" rel="noopener" title="${escape(p.title)}">${escape((p.title||'').slice(0,55))}${(p.title||'').length>55?'…':''} (${escape(p.year||'')})</a>`).join('');
           const topics = e.topics.map(t => `<span class="pick-topic">${escape(t)}</span>`).join('');
 
-          // Build badges
+          // Build badges — zone/JCR go in zone-tags above title
           let badgesHtml = '';
+          let zoneTagsHtml = '';
+          let zoneColor = '';
           if (e.journalRec) {
             const r = e.journalRec;
             // Index badges (SCIE/SSCI/AHCI/ESCI)
@@ -4586,30 +4588,47 @@
             const scBadge = badgeScopus(r.scopus);
             // EI
             const eiBdg = r.ei ? `<span class="badge b-ei">EI</span>` : '';
-            // CAS zone
-            const zoneBdg = badgeZone(e.zone, e.top);
-            // JCR Q
-            const jcrBdg = badgeJCR(e.jcr_q);
             // IF
             const ifBdg = badgeIF(e.if);
             // CCF
             const ccfTxt = r.ccf_2026_type ? `<span class="badge b-ccf">CCF ${r.ccf_2026_type}</span>` : '';
-            badgesHtml = [idxBadges, scBadge, eiBdg, zoneBdg, jcrBdg, ifBdg, ccfTxt].filter(Boolean).join('');
+            badgesHtml = [idxBadges, scBadge, eiBdg, ifBdg, ccfTxt].filter(Boolean).join('');
+            // Prominent zone/JCR tags at top of card
+            const zTag = e.zone
+              ? `<span class="zone z${e.zone}">${e.top ? 'TOP·' : ''}${e.zone}${T('区','')}</span>`
+              : '';
+            const jcrTag = e.jcr_q
+              ? `<span class="zone jcr-${e.jcr_q.toLowerCase()}">JCR ${e.jcr_q}</span>`
+              : '';
+            zoneTagsHtml = [zTag, jcrTag].filter(Boolean).join('');
+            // Zone strip color
+            zoneColor = e.zone === '1' || e.zone === 1 ? '#1f3a5f'
+              : e.zone === '2' || e.zone === 2 ? '#4f6f9b'
+              : e.zone === '3' || e.zone === 3 ? '#9eb1cb'
+              : e.zone === '4' || e.zone === 4 ? '#d3dbe6'
+              : e.jcr_q === 'Q1' ? '#7a2030'
+              : e.jcr_q === 'Q2' ? '#a04a5a'
+              : '';
           }
 
-          // Compute score color for left stripe: proportional to paper count
-          const scoreColor = scorePct >= 80 ? '#1a8b3c'
+          // Compute score color for the score bar
+          const barColor = scorePct >= 80 ? '#1a8b3c'
             : scorePct >= 60 ? '#2d9d5e'
             : scorePct >= 40 ? '#d4a017'
             : scorePct >= 20 ? '#5a8fc9'
             : '#8e9aaf';
 
-          return `<div class="pick-card" style="border-left-color:${scoreColor}" data-issn="${escape(issnStr)}">
+          const cardZoneClass = e.zone ? ` zone-${e.zone}` : '';
+          const zoneStripStyle = zoneColor ? `style="background:${zoneColor}"` : '';
+
+          return `<div class="pick-card${cardZoneClass}" data-issn="${escape(issnStr)}">
+            ${zoneColor ? `<div class="pick-zone-strip" ${zoneStripStyle}></div>` : ''}
+            ${zoneTagsHtml ? `<div class="pick-zone-tags">${zoneTagsHtml}</div>` : ''}
             <h3><a href="#j/${escape(e.journalRec ? favId(e.journalRec) : issnStr)}">${escape(name)}</a></h3>
             <div class="pick-head">
               <span class="pick-count">${e.count}<small> ${T('篇论文','papers')}</small></span>
               <div class="pick-head-right">
-                <span class="pick-score-bar"><span class="bar"><span class="bar-fill" style="width:${scorePct}%"></span></span></span>
+                <span class="pick-score-bar"><span class="bar"><span class="bar-fill" style="width:${scorePct}%;background:${barColor}"></span></span></span>
                 <span class="pick-score-pct">${scorePct}%</span>
               </div>
             </div>
