@@ -2192,8 +2192,10 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 /* Pick-for-me tool */
 .pick-tool { max-width:800px; margin:0 auto; padding:0 16px 40px }
 .pick-input-wrap { background:var(--bg2); border-radius:12px; padding:20px; margin-bottom:24px }
-.pick-input { width:100%; padding:12px 16px; border:1px solid var(--border); border-radius:8px; background:var(--bg); color:var(--fg); font-size:14px; line-height:1.6; resize:vertical; font-family:var(--sans); box-sizing:border-box }
-.pick-input:focus { outline:none; border-color:var(--accent) }
+.pick-input { width:100%; padding:12px 16px; border:1px solid var(--border); border-radius:8px; background:#f5f6f8; color:var(--fg); font-size:14px; line-height:1.6; resize:vertical; font-family:var(--sans); box-sizing:border-box }
+[data-theme="dark"] .pick-input { background:#2e2e32; }
+.pick-input:focus { outline:none; border-color:var(--accent); background:#ebedf0 }
+[data-theme="dark"] .pick-input:focus { background:#353540; }
 .pick-options { display:flex; flex-wrap:wrap; gap:12px 24px; margin-top:12px }
 .pick-option-group { display:flex; flex-wrap:wrap; gap:8px 16px; align-items:center }
 .pick-opt { display:inline-flex; align-items:center; gap:4px; font-size:13px; cursor:pointer }
@@ -2211,6 +2213,10 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .pick-card .pick-score .bar { display:inline-block; width:60px; height:6px; border-radius:3px; background:var(--border); overflow:hidden; vertical-align:middle }
 .pick-card .pick-score .bar-fill { height:100%; border-radius:3px; background:var(--accent); transition:width .3s }
 .pick-card .pick-topics { display:flex; flex-wrap:wrap; gap:4px; margin-top:6px }
+.pick-card .pick-badges { display:flex; flex-wrap:wrap; gap:4px 6px; margin:4px 0 }
+.pick-card .pick-badges .badge,
+.pick-card .pick-badges .zone,
+.pick-card .pick-badges .if-pill { font-size:11px; padding:1px 7px; border-radius:8px; line-height:1.5 }
 .pick-card .pick-topic { font-size:11px; padding:2px 8px; border-radius:10px; background:var(--accent-bg,var(--border)); color:var(--muted) }
 .pick-card .pick-papers { font-size:12px; color:var(--muted); margin-top:6px; display:flex; flex-wrap:wrap; gap:4px }
 .pick-card .pick-paper { padding:2px 6px; border-radius:4px; background:var(--bg); font-size:11px; color:var(--muted); max-width:300px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
