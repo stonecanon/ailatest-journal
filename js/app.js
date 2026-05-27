@@ -4315,6 +4315,12 @@
           queries.push(uniqueWords.slice(0, 6).join(' '));
         }
 
+        // Collect all search keyword tokens for title matching
+        const searchKeywords = new Set();
+        [...explicitKeywords, ...titleKws, ...bodyKws, ...uniqueWords].forEach(k => {
+          k.toLowerCase().split(/[\s-]+/).filter(w => w.length > 2).forEach(w => searchKeywords.add(w));
+        });
+
         // Run all queries concurrently via Promise.all
         status.textContent = T('正在搜索相关论文…','Searching related papers…');
         const SEARCH_FIELDS = 'id,title,publication_date,primary_location,relevance_score';
@@ -4393,12 +4399,22 @@
           if (!src) continue;
           const issn = (src.issn_l || '').toUpperCase();
           if (!issn) continue;
-          if (!journalMap.has(issn)) journalMap.set(issn, { count: 0, papers: [], scores: [], topics: new Set(), srcName: src.display_name || '' });
+          if (!journalMap.has(issn)) journalMap.set(issn, { count: 0, papers: [], scores: [], topics: new Set(), srcName: src.display_name || '', kwMatch: 0, recentCount: 0 });
           const j = journalMap.get(issn);
           j.count++;
+          const titleLower = (w.title || '').toLowerCase();
+          const year = (w.publication_date||'').slice(0,4);
+          // Keyword match: does paper title contain any search keyword?
+          let hasKw = false;
+          for (const kw of searchKeywords) {
+            if (titleLower.includes(kw)) { hasKw = true; break; }
+          }
+          if (hasKw) j.kwMatch++;
+          // Recency: papers from last 2 years
+          if (year >= String(new Date().getFullYear() - 1)) j.recentCount++;
           j.papers.push({
             title: w.title,
-            year: (w.publication_date||'').slice(0,4),
+            year: year,
             id: w.id,
             url: w.id // OpenAlex full URL, e.g. https://openalex.org/W12345
           });
@@ -4408,13 +4424,20 @@
           }
         }
 
-        // Step 3: Build ranked results — score = proportional to paper count
+        // Step 3: Build ranked results — multi-factor scoring
         const maxCount = Math.max(...[...journalMap.values()].map(j => j.count), 1);
         const entries = [...journalMap.entries()].map(([issn, j]) => {
-          const totalScore = j.count / maxCount; // 0~1, top journal = 100%
+          const countRatio = j.count / maxCount;
+          const kwMatchRatio = j.count > 0 ? j.kwMatch / j.count : 0;
+          const avgRelevance = j.scores.length > 0 ? j.scores.reduce((a,b) => a+b, 0) / j.scores.length : 0;
+          const recency = j.count > 0 ? j.recentCount / j.count : 0;
 
           const journalRec = journals.find(r => r.issn === issn || r.eissn === issn);
           const ifVal = journalRec?.if_2024;
+          const ifBonus = ifVal > 0 ? Math.min(ifVal / 30, 1) : 0;
+
+          const totalScore = countRatio * 0.30 + kwMatchRatio * 0.25 + avgRelevance * 0.20 + recency * 0.15 + ifBonus * 0.10;
+
           const zoneVal = journalRec?.cas_zone;
           const topVal = journalRec?.cas_top;
           const qVal = journalRec?.jcr_q;
