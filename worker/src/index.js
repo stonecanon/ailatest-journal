@@ -964,15 +964,14 @@ export default {
       if (p === '/openalex' && req.method === 'GET') {
         const target = u.searchParams.get('url') || '';
         if (target) {
-          const apiUrl = target + (target.includes('?') ? '&' : '?') + 'mailto=jiantaoweng@gmail.com';
-          const r = await fetch(apiUrl, { headers: { 'Accept': 'application/json' } });
+          const r = await fetch(target, { headers: { 'Accept': 'application/json' } });
           const body = await r.text();
           return new Response(body, { status: r.status, headers: { 'Content-Type': 'application/json', ...CORS } });
         }
         // If no url param, treat searchParams as direct query string to pass through
         const qs = u.search.slice(1); // remove leading ?
         if (qs) {
-          const apiUrl = `https://api.openalex.org/works?${qs}&mailto=jiantaoweng@gmail.com`;
+          const apiUrl = `https://api.openalex.org/works?${qs}`;
           const r = await fetch(apiUrl, { headers: { 'Accept': 'application/json' } });
           const body = await r.text();
           return new Response(body, { status: r.status, headers: { 'Content-Type': 'application/json', ...CORS } });
