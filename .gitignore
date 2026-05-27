@@ -23,6 +23,10 @@ generated/
 # OpenAlex raw cache (21MB, regeneratable via scripts/fetch_openalex.py)
 data/openalex_cache.json
 
+# oa.json is too large for CF Pages 25MB limit; track .gz only
+data/oa.json
+!data/oa.json.gz
+
 
 CODEX_REVIEW.md
 .wrangler/

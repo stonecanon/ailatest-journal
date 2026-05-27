@@ -1313,6 +1313,15 @@ def main():
         print(r.stdout)
         if r.returncode != 0:
             print(f'  WARN: merge_openalex.py exited {r.returncode}: {r.stderr.strip()}')
+        # gzip oa.json for CF Pages 25MB per-file limit
+        oa_path = DATA_DIR / 'oa.json'
+        if oa_path.exists():
+            oa_size = oa_path.stat().st_size
+            with open(oa_path, 'rb') as fin:
+                with gzip.open(DATA_DIR / 'oa.json.gz', 'wb', compresslevel=9) as fout:
+                    shutil.copyfileobj(fin, fout)
+            gz_size = (DATA_DIR / 'oa.json.gz').stat().st_size
+            print(f'  oa.json: {oa_size/1024/1024:.1f} MB → oa.json.gz: {gz_size/1024/1024:.1f} MB')
     else:
         print('  skip: merge_openalex.py or openalex_cache.json not found')
     return 0
