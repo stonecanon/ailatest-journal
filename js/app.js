@@ -4644,9 +4644,9 @@
               } else {
                 const weeks = parseFloat(r2?.doaj?.review_weeks);
                 if (weeks > 0) {
-                  txt += (weeks / 4.33).toFixed(1) + T(' 个月 (投稿→出版,DOAJ)',' months (submission→pub.)');
+                  txt += (weeks / 4.33).toFixed(1) + T(' 个月 (投稿→出版,DOAJ)',' months (submission→pub.,DOAJ)');
                 } else {
-                  txt += T('≈4.0 个月 (DOAJ 平均)','≈4.0 months (DOAJ avg)');
+                  txt += T('≈3.5 个月 (DOAJ 中位数)','≈3.5 months (DOAJ median)');
                 }
               }
               return '<div class="pick-cycle">' + txt + '</div>';
