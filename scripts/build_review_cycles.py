@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Build data/review_cycles.json from CrossRef (fixed assertion date parsing).
+"""Build data/review_cycles.json from CrossRef (assertion dates) + DOAJ (weeks).
 
-Queries journal works for received→accepted date pairs via assertion fields.
-Most journals store these as natural-language strings ("31 October 2023").
+Queries CrossRef journal works for received→accepted date pairs via assertion fields.
+Also reads DOAJ CSV for 'Average number of weeks between article submission and publication'.
+DOAJ data uses that field directly (no CrossRef API call needed).
 """
-import json, urllib.request, urllib.error, ssl, statistics, time
+import csv, json, urllib.request, urllib.error, ssl, statistics, time
 from datetime import date, datetime
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -13,6 +14,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "data" / "journals.json"
 OUT = ROOT / "data" / "review_cycles.json"
+DOAJ_CSV = ROOT / "list" / "doaj_journals.csv"
 
 UA = "AILatest-Journal/1.0 (mailto:43259074+stonecanon@users.noreply.github.com)"
 TODAY = date.today().isoformat()
@@ -101,6 +103,31 @@ def fetch_one(issn):
     return issn, med, len(days)
 
 
+def load_doaj():
+    """Read DOAJ CSV and return {issn_or_eissn: avg_months}."""
+    doaj = {}
+    try:
+        with open(DOAJ_CSV, 'r', encoding='utf-8') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                w = row.get('Average number of weeks between article submission and publication', '').strip()
+                if not w:
+                    continue
+                try:
+                    weeks = float(w)
+                except ValueError:
+                    continue
+                avg_months = round(weeks / 4.33, 1)  # weeks → months
+                # Register under both print ISSN and EISSN if available
+                for col in ('Journal ISSN (print version)', 'Journal EISSN (online version)'):
+                    issn = row.get(col, '').strip()
+                    if issn:
+                        doaj[issn] = avg_months
+    except FileNotFoundError:
+        print(f"WARNING: DOAJ CSV not found at {DOAJ_CSV}", flush=True)
+    return doaj
+
+
 def main():
     journals = json.loads(SRC.read_text())
     seen = set()
@@ -118,8 +145,26 @@ def main():
         except Exception:
             pass
 
-    pending = [i for i in targets if i not in out]
-    print(f"Pending: {len(pending)} (have: {len(out)})", flush=True)
+    # --- DOAJ phase (no API calls) ---
+    doaj_data = load_doaj()
+    doaj_hit = 0
+    for issn in targets:
+        if issn in doaj_data:
+            out[issn] = {
+                "avg_months": doaj_data[issn],
+                "source": "DOAJ",
+                "updated": TODAY,
+            }
+            doaj_hit += 1
+    print(f"DOAJ: {doaj_hit}/{len(targets)} journals matched ({doaj_hit/len(targets)*100:.1f}%)", flush=True)
+    OUT.write_text(json.dumps(out, ensure_ascii=False, sort_keys=True))
+    print(f"  → saved to {OUT}", flush=True)
+
+    # --- CrossRef phase (API calls for remaining) ---
+    cr_targets = [i for i in targets if i not in out]
+    pending = [i for i in cr_targets if i not in out]
+    # (CrossRef API code continues below...)
+    print(f"CrossRef targets: {len(cr_targets)} (remaining after DOAJ)", flush=True)
     print(f"Workers: {WORKERS} | Rows: {ROWS} | Min pairs: {MIN_PAIRS}", flush=True)
 
     t0 = time.time()
@@ -150,8 +195,12 @@ def main():
     OUT.write_text(json.dumps(out, ensure_ascii=False, sort_keys=True))
     elapsed = time.time() - t0
     rate = done / elapsed if elapsed else 0
+    doaj_count = len([v for v in out.values() if v.get('source') == 'DOAJ'])
+    cr_count = len(out) - doaj_count
     print(f"\nDONE in {elapsed:.0f}s ({rate:.2f}/s)", flush=True)
-    print(f"  Kept: {kept}  No data: {nf}  Total: {len(out)} → {OUT}", flush=True)
+    print(f"  DOAJ:      {doaj_count:>6}", flush=True)
+    print(f"  CrossRef:  {cr_count:>6}  (kept {kept}, no-data {nf})", flush=True)
+    print(f"  Total:     {len(out):>6}  → {OUT}", flush=True)
 
 
 if __name__ == "__main__":
