@@ -56,10 +56,10 @@
       col_name: '期刊 Title', col_abbr: '缩写 Abbr', col_badges: '索引 / 分区',
       col_cat: 'ESI / 中科院大类',
       hero_title_dom: '国内学术期刊分级目录',
-      hero_body_dom: '<b>中国科协 高质量科技期刊分级目录 (2025-12 修订)</b> 共 11,084 条 / 59 学科领域；<b>CSSCI 来源期刊 (2025-2026)</b> 正刊与扩展版；<b>北大《中文核心期刊要目总览》(2023 年版)</b>；<b>浙江大学 2024 版</b> 与 <b>高校自编目录 2023</b>（付费解锁）；<b>CCF 推荐中文科技期刊 2025</b> T 分区。',
+      hero_body_dom: '<b>中国科协 高质量科技期刊分级目录 (2025-12 修订)</b> 共 11,084 条 / 59 学科领域；<b>中文期刊目录</b> 共 7,755 条 / 10 大学科分类，CSSCI / 北大核心 / CCF 中文以徽章形式叠加；<b>浙江大学 2024 版</b> 与 <b>高校自编目录 2023</b>（付费解锁）。',
       hero_note_dom: 'CSSCI / 北大核心为扫描 PDF OCR 提取，可能存在个别错字。',
       search_int: '搜索：期刊全称 / 官方缩写 / 社群缩写 / ISSN / 中文刊名',
-      search_dom: '搜索：中文刊名 / 英文刊名 / ISSN / CN 号',
+      search_dom: '搜索：刊名 / ISSN / CN 号（跨库搜索）',
       search_fav: '搜索收藏：期刊 / 缩写 / ISSN',
       showing: '显示', of: '条 / 共', total_items: '条',
       empty: '未找到匹配的期刊',
@@ -112,10 +112,10 @@
       col_name: 'Journal Title', col_abbr: 'Abbr', col_badges: 'Index / Tier',
       col_cat: 'ESI / CAS Major',
       hero_title_dom: 'Domestic Chinese Journal Directories',
-      hero_body_dom: '<b>China Association for Science and Technology (CAST) High-Quality Sci-Tech Journal Tiered Directory (Dec 2025)</b> — 11,084 journals across 59 disciplines; <b>CSSCI 2025-2026</b> core & extended; <b>PKU Core (2023)</b>; <b>ZJU 2024</b>; <b>School A 2023</b> (paywalled); <b>CCF Recommended Chinese Journals 2025</b> tiered.',
+      hero_body_dom: '<b>China Association for Science and Technology (CAST) High-Quality Sci-Tech Journal Tiered Directory (Dec 2025)</b> — 11,084 journals across 59 disciplines; <b>Chinese Journal Directory</b> — 7,755 journals across 10 subject categories, with CSSCI / PKU Core / CCF Chinese badges; <b>ZJU 2024</b>; <b>School A 2023</b> (paywalled).',
       hero_note_dom: 'CSSCI / PKU Core extracted via OCR from scanned PDF; minor typos possible.',
       search_int: 'Search: title / abbr / acronym / ISSN / Chinese name',
-      search_dom: 'Search: Chinese name / English name / ISSN / CN',
+      search_dom: 'Search: title / ISSN / CN (cross-source)',
       search_fav: 'Search favorites: title / acronym / ISSN',
       showing: 'Showing', of: 'of', total_items: '',
       empty: 'No journals match.',
@@ -711,6 +711,7 @@
   let wosCats = [];   // [{name,count}] sorted A-Z
   let activeQuery = '';
   let activeDom = 'cnkx';   // 中国科协 高质量科技期刊分级目录 (2025-12 修订, 11084 条)
+  let activeDomBadges = new Set(['cssci', 'pku']);
   const PAGE = 100;
   let shown = PAGE;
   let intIfSort = null; // null | 'desc' | 'asc'
@@ -2251,48 +2252,44 @@
       }
     }
 
-    // 2) CSSCI core / ext
-    for (const [key, label] of [['cssci_core', T('CSSCI 来源期刊','CSSCI Source')], ['cssci_ext', T('CSSCI 扩展版','CSSCI Extended')]]) {
-      const list = (domestic[key] || []).filter(r => matchTxt(r.name, r.discipline));
+    // 2) 中文期刊目录 (CNKI Major)
+    if (domestic.cnki_major && domestic.cnki_major.records) {
+      const list = domestic.cnki_major.records.filter(r =>
+        matchTxt(r.name, r.issn, r.cn_code, r.sponsor, ...(r.major_categories||[]))
+      );
       if (list.length) {
-        const srcKey = key === 'cssci_core' ? 'cssci' : 'cssci_ext';
         sections.push({
-          title: label,
+          title: T('中文期刊目录','Chinese Journal Directory'),
           count: list.length,
           html: `<div class="table-wrap"><table class="journals"><thead><tr>
-            <th style="width:36px" aria-label="Favorite"></th><th>${T('期刊名称','Journal')}</th><th>${T('交叉收录','Also In')}</th><th style="width:130px">ISSN</th><th style="width:160px">${T('学科','Discipline')}</th>
+            <th style="width:36px" aria-label="Favorite"></th><th>${T('期刊名称','Journal')}</th><th>${T('收录索引','Indices')}</th><th style="width:130px">ISSN</th><th style="width:120px">CN</th><th style="width:160px">${T('学科分类','Category')}</th>
           </tr></thead><tbody>
-          ${list.slice(0, 200).map(r => renderDomRow(r, {
-            src: srcKey,
-            extraCols: `<td class="muted-cell" style="width:160px">${escape(tn(r.discipline||'', 'cssci'))}</td>`,
-          })).join('')}
-          ${list.length > 200 ? `<tr><td colspan="5" class="empty">${T('仅显示前 200 条','First 200 only')}</td></tr>` : ''}
+          ${list.slice(0, 200).map(r => {
+            const hits = lookupDom(r);
+            const badges = [
+              ...hits.filter(h => h.source === 'cssci').map(() => `<span class="domsrc-pill ds-cssci">CSSCI</span>`),
+              ...hits.filter(h => h.source === 'cssci_ext').map(() => `<span class="domsrc-pill ds-cssci-ext">${T('CSSCI 扩','CSSCI Ext')}</span>`),
+              ...hits.filter(h => h.source === 'pku').map(() => `<span class="domsrc-pill ds-pku">${T('北大核心','PKU Core')}</span>`),
+              ...hits.filter(h => h.source === 'ccft').map(h => `<span class="domsrc-pill ds-ccft">CCF-${h.tag||'T'}</span>`),
+              ...hits.filter(h => h.source === 'zju').map(() => `<span class="domsrc-pill ds-zju">${T('浙大','ZJU')}</span>`),
+              ...hits.filter(h => h.source.startsWith('cnkx')).map(h => `<span class="domsrc-pill ds-cnkx">${escape(h.label)}</span>`),
+            ].filter(Boolean).join('');
+            return `<tr class="j-row clickable" data-fid="${escape(favId(r))}" data-src="cnki_major">
+              <td style="width:36px">${starBtn(r, 'cnki_major')}</td>
+              <td class="jname" style="font-size:13.5px">${escape(r.name||'')}</td>
+              <td class="col-cross"><div class="badges">${badges || '<span class="muted-cell">—</span>'}</div></td>
+              <td class="muted-cell" style="width:130px">${escape(r.issn||'—')}</td>
+              <td class="muted-cell" style="width:120px">${escape(r.cn_code||'—')}</td>
+              <td class="muted-cell" style="width:160px">${escape((r.major_categories||[]).join(' · '))}</td>
+            </tr>`;
+          }).join('')}
+          ${list.length > 200 ? `<tr><td colspan="6" class="empty">${T('仅显示前 200 条','First 200 only')}</td></tr>` : ''}
           </tbody></table></div>`
         });
       }
     }
 
-    // 3) 北大核心
-    if (domestic.pku_core) {
-      const list = domestic.pku_core.filter(r => matchTxt(r.name, r.category));
-      if (list.length) {
-        sections.push({
-          title: T('北大核心 (2023)','PKU Core (2023)'),
-          count: list.length,
-          html: `<div class="table-wrap"><table class="journals"><thead><tr>
-            <th style="width:36px" aria-label="Favorite"></th><th>${T('期刊名称','Journal')}</th><th>${T('交叉收录','Also In')}</th><th style="width:130px">ISSN</th><th style="width:160px">${T('分类','Category')}</th>
-          </tr></thead><tbody>
-          ${list.slice(0, 200).map(r => renderDomRow(r, {
-            src: 'pku',
-            extraCols: `<td class="muted-cell" style="width:160px">${escape(tn(r.category||'', 'pku'))}</td>`,
-          })).join('')}
-          ${list.length > 200 ? `<tr><td colspan="5" class="empty">${T('仅显示前 200 条','First 200 only')}</td></tr>` : ''}
-          </tbody></table></div>`
-        });
-      }
-    }
-
-    // 4) 浙大目录
+    // 3) 浙大目录
     if (domestic.zju && domestic.zju.records) {
       const list = domestic.zju.records.filter(r => matchTxt(r.name, r.issn, r.cn_code));
       if (list.length) {
@@ -2319,43 +2316,25 @@
       }
     }
 
-    // 5) CCF 中文
-    if (domestic.ccft) {
-      const list = domestic.ccft.filter(r => matchTxt(r.cn_name, r.en_name, r.cn_code, r.org));
-      if (list.length) {
+    // 4) 学校A（已解锁）
+    if (domestic.school_a && isUnlocked('school_a')) {
+      const list = unlockedCache.school_a || [];
+      const f = list.filter(r => matchTxt(r.name, r.issn, r.cn_code));
+      if (f.length) {
+        const tierClass = {'一级':'t1','核心':'t2','其他':'t3'};
         sections.push({
-          title: T('CCF 推荐中文 2025','CCF Chinese 2025'),
-          count: list.length,
+          title: T('高校自编目录 · 2023','School A · 2023'),
+          count: f.length,
           html: `<div class="table-wrap"><table class="journals"><thead><tr>
-            <th style="width:36px" aria-label="Favorite"></th><th style="width:60px">${T('T分区','Tier')}</th><th>${T('期刊','Journal')}</th><th>${T('交叉收录','Also In')}</th><th style="width:130px">CN</th><th style="width:180px">${T('主办单位','Sponsor')}</th>
+            <th style="width:36px" aria-label="Favorite"></th><th style="width:70px">${T('级别','Tier')}</th><th>${T('期刊','Journal')}</th><th>${T('交叉收录','Also In')}</th><th style="width:130px">ISSN / CN</th>
           </tr></thead><tbody>
-          ${list.slice(0, 200).map(r => renderDomRow(
-            { name: r.cn_name, en_name: r.en_name, issn: r.cn_code, cn_code: r.cn_code, org: r.org, ccf_area: r.ccf_area, tier: r.tier },
-            { src: 'ccft', showTier: true, tierValue: r.tier, extraCols: `<td class="muted-cell" style="width:180px">${escape(r.org||'')}</td>` }
-          )).join('')}
-          ${list.length > 200 ? `<tr><td colspan="6" class="empty">${T('仅显示前 200 条','First 200 only')}</td></tr>` : ''}
-          </tbody></table></div>`
-        });
-      }
-    }
-
-    // 6) CNKI Major Journals (全量中文期刊主目录)
-    if (domestic.cnki_major && domestic.cnki_major.records) {
-      const list = domestic.cnki_major.records.filter(r =>
-        matchTxt(r.name, r.issn, r.cn_code, r.sponsor, ...(r.major_categories||[]))
-      );
-      if (list.length) {
-        sections.push({
-          title: T('中文期刊目录','Chinese Journal Directory'),
-          count: list.length,
-          html: `<div class="table-wrap"><table class="journals"><thead><tr>
-            <th style="width:36px" aria-label="Favorite"></th><th>${T('期刊名称','Journal')}</th><th>${T('交叉收录','Also In')}</th><th style="width:130px">ISSN</th><th style="width:140px">CN</th><th style="width:180px">${T('主办单位','Sponsor')}</th><th style="width:160px">${T('学科分类','Categories')}</th>
-          </tr></thead><tbody>
-          ${list.slice(0, 200).map(r => renderDomRow(r, {
-            src: 'cnki_major',
-            extraCols: `<td class="muted-cell" style="width:140px">${escape(r.cn_code||'—')}</td><td class="muted-cell" style="width:180px">${escape(r.sponsor||'')}</td><td class="muted-cell" style="width:160px">${escape(r.major_categories.join(' | '))}</td>`,
-          })).join('')}
-          ${list.length > 200 ? `<tr><td colspan="7" class="empty">${T('仅显示前 200 条','First 200 only')}</td></tr>` : ''}
+          ${f.slice(0, 200).map(r => {
+            const tierBadge = `<span class="tier-pill ${tierClass[r.tier]||'t3'}">${escape(tn(r.tier, 'tier'))}</span>`;
+            return renderDomRow(
+              { ...r, name: (r.name||'').replace(/\*$/,'') },
+              { src: 'school_a', extraCols: '' }
+            ).replace(/<tr class="j-row clickable" /, `<tr class="j-row clickable" ><td style="width:70px">${tierBadge}</td>`);
+          }).join('')}
           </tbody></table></div>`
         });
       }
@@ -2368,7 +2347,7 @@
     }
     box.innerHTML = `<div class="section-block">
       <h3 class="section-title">${T('中文期刊统一搜索','Chinese Journals · Unified Search')} <span class="muted-cell">(${total})</span></h3>
-      <div class="section-subtitle">${T('已跨库聚合：科协 / CSSCI / 北大核心 / 浙大 / CCF / 中文期刊目录。清空搜索框可返回单库浏览。','Aggregated across CAST / CSSCI / PKU / ZJU / CCF / Chinese Journal Directory. Clear the search box to return to per-source view.')}</div>
+      <div class="section-subtitle">${T('已跨库聚合：科协 / 中文期刊目录 / 浙大 / 学校 A。CSSCI、北大核心、CCF 中文以徽章形式展示。清空搜索框可返回单库浏览。','Aggregated across CAST / Chinese Journal Directory / ZJU / School A. CSSCI, PKU Core, CCF Chinese shown as badges. Clear the search box to return to per-source view.')}</div>
       ${sections.map(s => `<details class="section-block" style="margin-top:14px" open>
         <summary>${escape(s.title)} <span class="muted-cell">(${s.count})</span></summary>
         <div style="margin-top:10px">${s.html}</div>
@@ -2380,6 +2359,9 @@
   function renderDomestic() {
     const box = $('#dom-content');
     if (!domestic) { box.innerHTML = `<div class="empty">${T('无数据','No data')}</div>`; return; }
+    // Show/hide badge filter section
+    const badgeSec = $('#domestic-badge-section');
+    if (badgeSec) badgeSec.hidden = activeDom !== 'cnki_major';
     const q = activeQuery.toLowerCase();
 
     // ===== 统一搜索：只要有搜索词就跨库聚合，忽略当前库选择 =====
@@ -2454,86 +2436,123 @@
       return;
     }
 
-    if (activeDom === 'cssci_core' || activeDom === 'cssci_ext') {
-      const list = activeDom === 'cssci_core' ? (domestic.cssci_core||[]) : (domestic.cssci_ext||[]);
-      const srcKey = activeDom === 'cssci_core' ? 'cssci' : 'cssci_ext';
-      const title = activeDom === 'cssci_core' ? T('CSSCI 来源期刊目录 (2025-2026)','CSSCI Source Journals (2025-2026)') : T('CSSCI 扩展版来源期刊目录 (2025-2026)','CSSCI Extended Source Journals (2025-2026)');
-      const f = list.filter(r => !q || (r.name + ' ' + (r.discipline||'')).toLowerCase().includes(q));
-      const byDisc = {};
-      for (const r of f) (byDisc[r.discipline||T('未分类','Uncategorized')] = byDisc[r.discipline||T('未分类','Uncategorized')] || []).push(r);
-      const discs = Object.keys(byDisc).sort((a,b) => byDisc[b].length - byDisc[a].length);
-      box.innerHTML = `<div class="section-block">
-        <h3 class="section-title">${title}</h3>
-        <div class="section-subtitle">${T('共','Total ')} ${list.length.toLocaleString()} ${T('条','journals')}${T('；南京大学中国社会科学研究评价中心；',' · CSSRE, Nanjing University · ')}${q ? T('已过滤 ','Filtered ')+f.length+T(' 条',' results') : ''}</div>
-        ${discs.map(d => `
-          <details class="section-block" style="margin-top:14px" ${q?'open':''}>
-            <summary>${escape(tn(d, "cssci"))} <span class="muted-cell">(${byDisc[d].length})</span></summary>
-            <div class="table-wrap" style="margin-top:10px"><table class="journals"><thead><tr>
-              <th style="width:36px" aria-label="Favorite"></th><th>${T('期刊名称','Journal')}</th><th>${T('交叉收录','Also In')}</th><th style="width:130px">ISSN</th><th style="width:160px">${T('学科','Discipline')}</th>
-            </tr></thead><tbody>
-              ${byDisc[d].map(r => renderDomRow(r, {
-                src: srcKey,
-                extraCols: `<td class="muted-cell" style="width:160px">${escape(tn(r.discipline||'', "cssci"))}</td>`,
-              })).join('')}
-            </tbody></table></div>
-          </details>
-        `).join('')}
-      </div>`;
-      return;
-    }
-
-    if (activeDom === 'pku_core') {
-      const list = domestic.pku_core || [];
-      const f = list.filter(r => !q || (r.name + ' ' + (r.category||'')).toLowerCase().includes(q));
-      box.innerHTML = `<div class="section-block">
-        <h3 class="section-title">${T('北大《中文核心期刊要目总览》(2023 年版)','PKU Chinese Core Journals Overview (2023 ed.)')}</h3>
-        <div class="section-subtitle">${T('共','Total ')} ${list.length.toLocaleString()} ${T('条','journals')}${T('；北京大学图书馆；',' · Peking University Library · ')}${q ? T('已过滤 ','Filtered ')+f.length+T(' 条',' results') : ''}</div>
-        <div class="table-wrap" style="margin-top:14px"><table class="journals"><thead><tr>
-          <th style="width:36px" aria-label="Favorite"></th><th>${T('期刊名称','Journal')}</th><th>${T('交叉收录','Also In')}</th><th style="width:130px">ISSN</th><th style="width:160px">${T('分类','Category')}</th>
-        </tr></thead><tbody>
-          ${f.slice(0, 2000).map(r => renderDomRow(r, {
-            src: 'pku',
-            extraCols: `<td class="muted-cell" style="width:160px">${escape(tn(r.category||'', "pku"))}</td>`,
-          })).join('')}
-          ${f.length > 2000 ? `<tr><td colspan="5" class="empty">${T('仅显示前 2000 条，请在搜索框内精确查找','Showing first 2000 — please refine search')}</td></tr>` : ''}
-        </tbody></table></div>
-      </div>`;
-      return;
-    }
-
     if (activeDom === 'cnki_major') {
       const d = domestic.cnki_major;
       if (!d) { box.innerHTML = `<div class="empty">${T('目录数据缺失','Data missing')}</div>`; return; }
-      const list = d.records || [];
-      const f = list.filter(r => {
-        if (!q) return true;
-        const hay = (r.name + ' ' + (r.issn||'') + ' ' + (r.cn_code||'') + ' ' + (r.sponsor||'') + ' ' + (r.major_categories||[]).join(' ')).toLowerCase();
-        return hay.includes(q);
+      const all = d.records || [];
+      // 10 大学科分类
+      const CAT_ORDER = ['基础科学','工程科技I','工程科技II','信息科技','农业科技','医药卫生科技','哲学与人文科学','社会科学I','社会科学II','经济与管理科学'];
+      let activeCat = '__all';
+      // 从URL hash或存储取当前选中分类（默认全部）
+      // 使用内存变量跟踪
+      if (!window.__cnkiCat) window.__cnkiCat = '__all';
+      activeCat = window.__cnkiCat;
+
+      // 筛选逻辑
+      let filtered = all.filter(r => {
+        // 搜索过滤
+        if (q) {
+          const hay = (r.name + ' ' + (r.issn||'') + ' ' + (r.cn_code||'') + ' ' + (r.sponsor||'') + ' ' + (r.major_categories||[]).join(' ')).toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+        // 学科分类过滤
+        if (activeCat !== '__all') {
+          const cats = r.major_categories || [];
+          if (!cats.includes(activeCat)) return false;
+        }
+        // 徽章过滤（CSSCI/北大核心/CCF）
+        if (activeDomBadges.size < 4) { // 有任意徽章被取消勾选时
+          const hits = lookupDom(r);
+          const hasCssci = hits.some(h => h.source === 'cssci');
+          const hasCssciExt = hits.some(h => h.source === 'cssci_ext');
+          const hasPku = hits.some(h => h.source === 'pku');
+          const hasCcf = hits.some(h => h.source === 'ccft');
+          if (!activeDomBadges.has('cssci') && hasCssci) return false;
+          if (!activeDomBadges.has('cssci_ext') && hasCssciExt) return false;
+          if (!activeDomBadges.has('pku') && hasPku) return false;
+          if (!activeDomBadges.has('ccft') && hasCcf) return false;
+        }
+        return true;
       });
-      const byCat = {};
-      for (const r of f) {
-        const cats = (r.major_categories && r.major_categories.length) ? r.major_categories : [T('未分类','Uncategorized')];
-        for (const c of cats) (byCat[c] = byCat[c] || []).push(r);
-      }
-      const catOrder = Object.keys(byCat).sort((a,b) => byCat[b].length - byCat[a].length);
+
+      // 生成学科分类芯片 HTML
+      const catChips = CAT_ORDER.map(c => {
+        const count = all.filter(r => (r.major_categories||[]).includes(c)).length;
+        const active = activeCat === c;
+        return `<button class="cat-chip-dom ${active ? 'active' : ''}" data-cat="${escape(c)}" style="cursor:pointer;display:inline-block;padding:4px 10px;font-size:11.5px;border:1px solid var(--rule);border-radius:12px;background:${active ? 'var(--accent)' : 'var(--paper)'};color:${active ? '#fff' : 'var(--ink-soft)'};transition:all .12s">${escape(c)} <span style="opacity:.65;font-size:10px">(${count.toLocaleString()})</span></button>`;
+      }).join('');
+      const catRow = `<div class="cat-chips-dom" style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0">${catChips}</div>`;
+
+      // 按刊名字母排序
+      filtered.sort((a, b) => (a.name||'').localeCompare(b.name||'', 'zh'));
+
+      // 分页
+      const visible = filtered.slice(0, window.__cnkiShown || 100);
+      const total = filtered.length;
+
+      // 渲染行
+      const rows = visible.map(r => {
+        const fid = favId(r);
+        rowRecordsByFid[fid] = { ...r, __src: 'cnki_major' };
+        // 查询交叉收录徽章（CSSCI/北大核心/CCF）
+        const hits = lookupDom(r);
+        const badges = [
+          ...hits.filter(h => h.source === 'cssci').map(() => `<span class="domsrc-pill ds-cssci">CSSCI</span>`),
+          ...hits.filter(h => h.source === 'cssci_ext').map(() => `<span class="domsrc-pill ds-cssci-ext">${T('CSSCI 扩','CSSCI Ext')}</span>`),
+          ...hits.filter(h => h.source === 'pku').map(() => `<span class="domsrc-pill ds-pku">${T('北大核心','PKU Core')}</span>`),
+          ...hits.filter(h => h.source === 'ccft').map(h => `<span class="domsrc-pill ds-ccft" title="${escape(h.org||'')}">CCF-${h.tag||'T'}</span>`),
+          ...hits.filter(h => h.source === 'zju').map(() => `<span class="domsrc-pill ds-zju">${T('浙大','ZJU')}</span>`),
+          ...hits.filter(h => h.source === 'school_a').map(() => `<span class="domsrc-pill ds-school-a">${T('学校 A','School A')}</span>`),
+          ...hits.filter(h => h.source.startsWith('cnkx')).map(h => `<span class="domsrc-pill ds-cnkx">${escape(h.label)}</span>`),
+        ].filter(Boolean).join('');
+        const name = r.name || '';
+        const isnCell = r.issn ? `<span class="jissn">${escape(r.issn)}</span>` : (r.cn_code ? `<span class="jissn">${escape(r.cn_code)}</span>` : '<span class="muted-cell">—</span>');
+        return `<tr class="j-row clickable" data-fid="${escape(fid)}" data-src="cnki_major">
+          <td class="col-fav" style="width:36px">${starBtn(r, 'cnki_major')}</td>
+          <td class="jname" style="font-size:13.5px">${escape(name)}</td>
+          <td class="col-cross"><div class="badges">${badges || '<span class="muted-cell">—</span>'}</div></td>
+          <td style="width:130px">${isnCell}</td>
+          <td class="muted-cell" style="width:120px">${escape(r.cn_code||'—')}</td>
+          <td class="muted-cell" style="width:160px">${escape((r.major_categories||[]).join(' · '))}</td>
+        </tr>`;
+      }).join('');
+
       box.innerHTML = `<div class="section-block">
         <h3 class="section-title">${T('中文期刊目录','Chinese Journal Directory')}</h3>
-        <div class="section-subtitle">${T('共收录','Total ')} ${list.length.toLocaleString()} ${T('种中文期刊，覆盖',' Chinese journals covering ')} ${catOrder.length} ${T('大学科分类',' major categories')}${q ? T('；已过滤 ',' · filtered ')+f.length+T(' 条','') : ''}</div>
-        ${catOrder.map(c => `
-          <details class="section-block" style="margin-top:14px" ${q?'open':''}>
-            <summary>${escape(c)} <span class="muted-cell">(${byCat[c].length})</span></summary>
-            <div class="table-wrap" style="margin-top:10px"><table class="journals"><thead><tr>
-              <th style="width:36px" aria-label="Favorite"></th><th>${T('期刊名称','Journal')}</th><th>${T('交叉收录','Also In')}</th><th style="width:130px">ISSN</th><th style="width:140px">CN</th><th style="width:180px">${T('主办单位','Sponsor')}</th>
-            </tr></thead><tbody>
-              ${byCat[c].slice(0, 300).map(r => renderDomRow(r, {
-                src: 'cnki_major',
-                extraCols: `<td class="muted-cell" style="width:140px">${escape(r.cn_code||'—')}</td><td class="muted-cell" style="width:180px">${escape(r.sponsor||'')}</td>`,
-              })).join('')}
-              ${byCat[c].length > 300 ? `<tr><td colspan="6" class="empty">${T('仅显示前 300 条，请搜索','Showing first 300 — please refine search')}</td></tr>` : ''}
-            </tbody></table></div>
-          </details>
-        `).join('')}
+        <div class="section-subtitle">${T('共收录','Total ')} ${all.length.toLocaleString()} ${T('种中文期刊',' Chinese journals')}${activeCat !== '__all' ? T(' · 分类: ',' · Category: ')+escape(activeCat) : ''}${q ? T(' · 搜索: ',' · Search: ')+escape(q) : ''}</div>
+        ${catRow}
+        <div class="table-wrap"><table class="journals"><thead><tr>
+          <th style="width:36px" aria-label="Favorite"></th>
+          <th>${T('期刊名称','Journal')}</th>
+          <th>${T('收录索引','Indices')}</th>
+          <th style="width:130px">ISSN</th>
+          <th style="width:120px">CN</th>
+          <th style="width:160px">${T('学科分类','Category')}</th>
+        </tr></thead><tbody>
+          ${rows}
+          ${total === 0 ? `<tr><td colspan="6" class="empty">${T('未找到匹配的期刊','No matching journals found')}</td></tr>` : ''}
+        </tbody></table></div>
+        ${total > (window.__cnkiShown || 100) ? `<div class="pager"><button id="cnki-more" class="more-btn" style="margin-top:12px;padding:8px 20px;border:1px solid var(--rule);background:var(--paper);color:var(--ink-soft);border-radius:2px;cursor:pointer">${T('加载更多','Load more')} (${total - (window.__cnkiShown||100)} ${T('条剩余','remaining')})</button></div>` : ''}
       </div>`;
+
+      // 绑定分类芯片点击
+      box.querySelectorAll('.cat-chip-dom').forEach(el => {
+        el.addEventListener('click', () => {
+          const cat = el.dataset.cat;
+          window.__cnkiCat = cat === window.__cnkiCat ? '__all' : cat;
+          window.__cnkiShown = 100;
+          renderDomestic();
+        });
+      });
+
+      // 绑定加载更多
+      const moreBtn = $('#cnki-more');
+      if (moreBtn) {
+        moreBtn.addEventListener('click', () => {
+          window.__cnkiShown = (window.__cnkiShown || 100) + 100;
+          renderDomestic();
+        });
+      }
       return;
     }
 
@@ -2677,30 +2696,6 @@
         slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
       });
       return;
-    }
-
-    if (activeDom === 'ccft') {
-      const list = domestic.ccft || [];
-      const f = list.filter(r => {
-        if (!q) return true;
-        const hay = (r.cn_name + ' ' + (r.en_name||'') + ' ' + (r.cn_code||'') + ' ' + (r.org||'')).toLowerCase();
-        return hay.includes(q);
-      });
-      box.innerHTML = `<div class="section-block">
-        <h3 class="section-title">${T('CCF 推荐中文科技期刊 2025','CCF Recommended Chinese Sci-Tech Journals 2025')}</h3>
-        <div class="section-subtitle">${T('共','Total ')} ${list.length} ${T('条；T1/T2/T3 三级',' · T1/T2/T3 tiers')}</div>
-        <div class="table-wrap" style="margin-top:14px"><table class="journals"><thead><tr>
-          <th style="width:60px">${T('T分区','Tier')}</th><th>${T('期刊','Journal')}</th><th style="width:130px">CN</th><th style="width:180px">${T('主办单位','Sponsor')}</th><th>${T('交叉收录','Also In')}</th><th style="width:40px"></th>
-        </tr></thead><tbody>
-        ${f.map(r => renderDomRow(
-          { name: r.cn_name, en_name: r.en_name, issn: r.cn_code, cn_code: r.cn_code, org: r.org, ccf_area: r.ccf_area, tier: r.tier },
-          {
-            src: 'ccft', showTier: true, tierValue: r.tier,
-            extraCols: `<td class="muted-cell" style="width:180px">${escape(r.org||'')}</td>`,
-          }
-        )).join('')}
-        </tbody></table></div>
-      </div>`;
     }
   }
 
@@ -3958,7 +3953,20 @@
       $$('#domestic-nav .nav-item').forEach(n => n.classList.remove('active'));
       b.classList.add('active');
       activeDom = b.dataset.dom;
+      // 显示/隐藏 CSSCI/PKU/CCF 筛选（仅 cnki_major 展示徽章筛选）
+      const badgeSec = $('#domestic-badge-section');
+      if (badgeSec) badgeSec.hidden = activeDom !== 'cnki_major';
       renderDomestic();
+    });
+
+    // ─── 国内徽章筛选（CSSCI/北大核心/CCF）───
+    $('#domestic-badge-toggles')?.addEventListener('change', (e) => {
+      const cb = e.target.closest('input[type=checkbox]');
+      if (!cb) return;
+      const val = cb.value;
+      if (cb.checked) activeDomBadges.add(val);
+      else activeDomBadges.delete(val);
+      if (activeDom === 'cnki_major') renderDomestic();
     });
 
     // ─── 语言切换下拉菜单 ───

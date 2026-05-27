@@ -257,6 +257,11 @@ main.main {
 .chip.zone-3:has(input:checked) { background: var(--zone-3); border-color: var(--zone-3); color: #fff; }
 .chip.zone-4:has(input:checked) { background: var(--zone-4); border-color: var(--zone-4); color: #fff; }
 .chip.zone-top:has(input:checked) { background: var(--zone-top); border-color: var(--zone-top); color: #fff; }
+/* domestic source chips */
+.chip.ds-chip-cssci:has(input:checked) { background: #b33c6e; border-color: #b33c6e; }
+.chip.ds-chip-cssci-ext:has(input:checked) { background: #b33c6e; border-color: #b33c6e; opacity: 0.75; }
+.chip.ds-chip-pku:has(input:checked) { background: #c7442d; border-color: #c7442d; }
+.chip.ds-chip-ccft:has(input:checked) { background: #2e6a8a; border-color: #2e6a8a; }
 
 /* cat 列表：书页目录感 */
 .nav { display: flex; flex-direction: column; gap: 1px; }

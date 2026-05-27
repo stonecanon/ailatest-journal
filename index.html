@@ -17,7 +17,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="/css/app.css?v=20260527-11" />
+<link rel="stylesheet" href="/css/app.css?v=20260527-12" />
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json" />
@@ -134,10 +134,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="side-label" data-i18n="domestic_sources">国内分级来源</div>
     <nav class="nav" id="domestic-nav">
       <button class="nav-item active" data-dom="cnkx"><span data-i18n="src_cnkx">中国科协高质量目录</span></button>
-      <button class="nav-item" data-dom="cssci_core"><span data-i18n="src_cssci_core">CSSCI 来源期刊</span></button>
-      <button class="nav-item" data-dom="cssci_ext"><span data-i18n="src_cssci_ext">CSSCI 扩展版</span></button>
-      <button class="nav-item" data-dom="pku_core"><span data-i18n="src_pku">北大核心 (2023)</span></button>
-      <button class="nav-item" data-dom="ccft"><span data-i18n="src_ccft">CCF 中文 T 分区</span></button>
       <button class="nav-item" data-dom="cnki_major"><span data-i18n="src_cnki_major">中文期刊目录</span></button>
       <div class="nav-divider"></div>
       <div class="nav-sub" data-i18n="nav_sub_inhouse">院校自编目录</div>
@@ -147,6 +143,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <span class="count" data-i18n="paid_label">付费</span>
       </button>
     </nav>
+  </div>
+
+  <div class="side-section" data-domestic hidden id="domestic-badge-section">
+    <div class="side-label">CSSCI / 北大核心 / CCF</div>
+    <div class="chip-row" id="domestic-badge-toggles">
+      <label class="chip ds-chip-cssci"><input type="checkbox" value="cssci" checked>CSSCI</label>
+      <label class="chip ds-chip-cssci-ext"><input type="checkbox" value="cssci_ext">CSSCI 扩</label>
+      <label class="chip ds-chip-pku"><input type="checkbox" value="pku" checked>北大核心</label>
+      <label class="chip ds-chip-ccft"><input type="checkbox" value="ccft">CCF 中文</label>
+    </div>
   </div>
 
   <footer class="aside-foot">
@@ -315,7 +321,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </aside>
 
 <button id="pwa-install" class="pwa-install" hidden data-i18n="pwa_install">📲 安装到主屏</button>
-<script src="/js/app.js?v=20260527-11" defer></script>
+<script src="/js/app.js?v=20260527-12" defer></script>
 <script>
   // Unregister any existing Service Worker — WeChat browser has broken SW support
   // that causes stale JS to be served despite network-first strategy.
