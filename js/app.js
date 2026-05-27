@@ -42,9 +42,15 @@
       hero_title_fav: '我的收藏',
       hero_body_fav: '点击任意期刊右侧的 <b>★</b> 可加入收藏。未登录时保存在本机 localStorage；登录后自动同步到云端，可跨设备访问。',
       hero_title_pick: '帮我选刊',
-      hero_body_pick: '敬请期待。这里将根据你的研究主题、影响因子区间、审稿周期、版面费、收录索引等条件，为你推荐合适的目标期刊。未来在更新。',
-      pick_coming_title: '敬请期待',
-      pick_coming_desc: '未来在更新',
+      hero_body_pick: '输入你论文的标题、摘要或关键词，自动从 OpenAlex 检索相关论文，分析发表在同一期刊的论文分布，为你推荐最合适的目标期刊。每人每天免费使用 5 次。',
+      pick_placeholder: '输入论文标题、摘要或关键词… 例如：indoor air quality occupancy estimation machine learning',
+      pick_search_btn: '开始推荐',
+      pick_filter_topics: '匹配研究领域 (Topics)',
+      pick_filter_if: '限 IF >',
+      pick_filter_zone: '中科院分区',
+      pick_filter_scopus: '仅 Scopus 收录',
+      pick_free_used: '已用 {n}/5 次',
+      pick_free_exhausted: '今日免费次数已用完，明天再来吧！',
       results_all: '全部期刊', load_more: '加载更多',
       col_name: '期刊 Title', col_abbr: '缩写 Abbr', col_badges: '索引 / 分区',
       col_cat: 'ESI / 中科院大类',
@@ -92,9 +98,15 @@
       hero_title_fav: 'My Favorites',
       hero_body_fav: 'Click the <b>★</b> on any row to bookmark. Saved locally when signed-out; syncs to the cloud when signed-in.',
       hero_title_pick: 'Pick for me',
-      hero_body_pick: 'Coming soon. This module will recommend target journals based on your topic, IF range, review cycle, APC, and index requirements. Future update in progress.',
-      pick_coming_title: 'Coming soon',
-      pick_coming_desc: 'Future update in progress',
+      hero_body_pick: 'Enter your paper title, abstract or keywords. Auto-retrieves related papers from OpenAlex, analyzes journal distribution, and recommends the best target journals. 5 free searches per day per user.',
+      pick_placeholder: 'Enter paper title, abstract or keywords... e.g. indoor air quality occupancy estimation machine learning',
+      pick_search_btn: 'Start',
+      pick_filter_topics: 'Match Topics',
+      pick_filter_if: 'IF >',
+      pick_filter_zone: 'CAS Zone',
+      pick_filter_scopus: 'Scopus only',
+      pick_free_used: '{n}/5 used today',
+      pick_free_exhausted: 'Daily limit reached. Come back tomorrow!',
       results_all: 'All Journals', load_more: 'Load more',
       col_name: 'Journal Title', col_abbr: 'Abbr', col_badges: 'Index / Tier',
       col_cat: 'ESI / CAS Major',
@@ -4077,6 +4089,17 @@
       const query = input.value.trim();
       if (!query) { status.textContent = T('请输入内容','Please enter a query'); return; }
 
+      // ── Daily usage limit (localStorage) ──
+      const today = new Date().toISOString().slice(0,10); // YYYY-MM-DD
+      const limitKey = 'ailatest.pick.count';
+      let dailyData;
+      try { dailyData = JSON.parse(localStorage.getItem(limitKey) || '{}'); } catch(e) { dailyData = {}; }
+      if (dailyData.date !== today) { dailyData = { date: today, count: 0 }; }
+      if (dailyData.count >= 5) {
+        status.textContent = T('今日免费次数已用完，明天再来吧！','Daily limit reached. Come back tomorrow!');
+        return;
+      }
+
       status.textContent = T('检索 OpenAlex 中…','Searching OpenAlex…');
       results.innerHTML = '';
 
@@ -4197,7 +4220,10 @@
           });
         });
 
-        status.textContent = `${T('已检索','Searched')} ${works.length} ${T('篇论文','papers')}，${T('分布在','in')} ${journalMap.size} ${T('个期刊','journals')}，${T('推荐','recommended')} ${filtered.length} ${T('个','')}`;
+        status.textContent = `${T('已检索','Searched')} ${works.length} ${T('篇论文','papers')}，${T('分布在','in')} ${journalMap.size} ${T('个期刊','journals')}，${T('推荐','recommended')} ${filtered.length} ${T('个','')} · ${T('已用 {n}/5 次','{n}/5 used today').replace('{n}', dailyData.count+1)}`;
+        // Increment daily counter
+        dailyData.count++;
+        localStorage.setItem(limitKey, JSON.stringify(dailyData));
       } catch (e) {
         status.textContent = T('检索失败：','Search failed: ') + e.message;
         console.error(e);
@@ -4219,16 +4245,17 @@
     // 分享着陆页：/s/<id> 直接接管 main，不走主流程
     if (await maybeRenderShareLanding()) return;
     try {
-      const [j, d, m, esi, aliases, rc] = await Promise.all([
+      const [j, d, m, esi, aliases, rc, oa] = await Promise.all([
         fetchJSON('data/journals.json.gz'),
         fetch('data/domestic.json').then(r => r.json()).catch(() => null),
         fetch('data/meta.json').then(r => r.json()).catch(() => null),
         fetch('data/esi_categories.json').then(r => r.json()).catch(() => []),
         fetch('data/journal_aliases.json').then(r => r.json()).catch(() => DEFAULT_JOURNAL_ALIASES),
         fetch('data/review_cycles.json').then(r => r.json()).catch(() => ({})),
+        fetch('data/oa.json').then(r => r.json()).catch(() => null),
       ]);
       setJournalAliases(aliases);
-      journals = j; domestic = d; meta = m; esiCats = esi; oaMap = null; reviewCycles = rc || {};
+      journals = j; domestic = d; meta = m; esiCats = esi; oaMap = oa; reviewCycles = rc || {};`
       journals.forEach(journalSearchMeta);
       buildDomIndex(domestic);
       buildIntIndex(journals);
