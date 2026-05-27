@@ -4153,26 +4153,69 @@
 
         const topEng = engWords.slice(0, 3);
 
-        // Chinese segments
+        // Chinese segments — URL-encodes to 9× raw length, so keep very short
         const chnChars = bodyText.replace(/[a-zA-Z0-9\s]/g, '').replace(/[，。、；：！？（）【】《》""''\s]/g, '');
         let chnTerms = [];
         if (chnChars.length > 0) {
-          chnTerms = [chnChars.slice(0, 20)];
+          chnTerms = [chnChars.slice(0, 8)];  // 8 Chinese chars → ~72 URL chars
         }
 
-        // Build final search query — OpenAlex filter limit is ~168 URL-encoded chars
-        const searchParts = [
-          ...titleTerms,
-          ...explicitKeywords.slice(0, 3),
-          ...topEng,
-          ...chnTerms,
-        ].filter(Boolean);
+        // ── Smart query assembly with URL-encoding budget ──
+        // OpenAlex filter limit: ~168 URL-encoded chars
+        const MAX_URL = 155;
+        // Priority order: explicit keywords > title > English body words > Chinese body chars
+        const candidates = [
+          { type: 'kw', text: explicitKeywords.slice(0, 3).join(' '), raw: true },
+          { type: 'title', text: titleTerms[0] || '', raw: true },
+          { type: 'eng', text: topEng.join(' '), raw: true },
+          { type: 'chn', text: chnTerms[0] || '', raw: false },
+        ].filter(c => c.text);
 
-        let searchQuery = searchParts.join(' ').slice(0, 120);
-        // Reduce further if URL-encoding would exceed OpenAlex's ~168 char filter limit
-        while (encodeURIComponent(searchQuery).length > 155 && searchQuery.length > 30) {
-          searchQuery = searchQuery.slice(0, -10).trim();
+        // Helper: estimate URL-encoded length (Chinese=9, ASCII=1, other~variable)
+        function urlLenEst(s) {
+          let len = 0;
+          for (const ch of s) {
+            if (ch >= '\u4e00' && ch <= '\u9fff') len += 9;
+            else if (/[a-zA-Z0-9\s\-_]/.test(ch)) len += 1;
+            else len += 3; // approximate for other chars
+          }
+          return len;
         }
+
+        // Build query within budget: add candidates in priority order, then length-cap each
+        let searchQuery = '';
+        for (const c of candidates) {
+          const space = searchQuery ? 1 : 0; // space separator
+          // Estimate remaining budget
+          const remaining = MAX_URL - urlLenEst(searchQuery);
+          if (remaining <= 1) break;
+          let txt = c.text;
+          if (c.type === 'chn') {
+            // Chinese chars: each takes 9 URL chars, trim to fit remaining budget
+            const maxChn = Math.max(1, Math.floor((remaining - space) / 9));
+            txt = txt.slice(0, maxChn);
+          } else {
+            // ASCII text: trim to fit remaining budget (worst-case all chars=1 each)
+            const maxAscii = Math.max(1, remaining - space);
+            if (txt.length > maxAscii) {
+              // Try to cut at word boundary
+              txt = txt.slice(0, maxAscii - 10);
+              const lastSpace = txt.lastIndexOf(' ');
+              if (lastSpace > 5) txt = txt.slice(0, lastSpace);
+            }
+          }
+          if (!txt) continue;
+          searchQuery = (searchQuery ? searchQuery + ' ' : '') + txt;
+        }
+
+        // Safety net: final URL-encoded length check
+        if (encodeURIComponent(searchQuery).length > MAX_URL) {
+          searchQuery = searchQuery.slice(0, Math.floor(searchQuery.length * 0.7));
+          while (encodeURIComponent(searchQuery).length > MAX_URL && searchQuery.length > 5) {
+            searchQuery = searchQuery.slice(0, -1).trim();
+          }
+        }
+
         if (query.length > 50) {
           status.textContent = T('正在分析匹配中…（已提取关键词）','Analyzing… (keywords extracted)');
         }
