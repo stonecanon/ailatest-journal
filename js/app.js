@@ -4439,7 +4439,7 @@
           const kwMatchRatio = j.count > 0 ? j.kwMatch / j.count : 0;
           const avgRelevance = j.scores.length > 0 ? j.scores.reduce((a,b) => a+b, 0) / j.scores.length : 0;
 
-          const totalScore = countRatio * 0.50 + kwMatchRatio * 0.25 + avgRelevance * 0.25;
+          const totalScore = countRatio * 0.60 + kwMatchRatio * 0.30 + avgRelevance * 0.10;
 
           const journalRec = journals.find(r => r.issn === issn || r.eissn === issn);
           const zoneVal = journalRec?.cas_zone;
