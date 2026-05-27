@@ -1693,7 +1693,7 @@ td.empty,
 }
 .journals thead .th-select:hover { color: var(--accent); border-bottom-color: var(--accent); }
 .journals thead .th-select:focus { outline: none; border-bottom-color: var(--accent); }
-#cnki-cat-select { width: 100%; }
+#cnki-cat-select, #cnkx-domain-select, #cnkx-sub-select { width: 100%; }
 .rating-placeholder {
   padding: 20px 18px;
   border: 1px dashed var(--rule);

@@ -2367,69 +2367,96 @@
     if (activeDom === 'cnkx') {
       const d = domestic.cnkx;
       if (!d) { box.innerHTML = `<div class="empty">${T('中国科协数据缺失','CAST data missing')}</div>`; return; }
-      // 官方 59 个学科领域顺序
-      const DOMAIN_ORDER = (d.domains && d.domains.length)
+      const all = (d.records || []).filter(r => r.tier && /^T[123]$/.test(r.tier));
+      // 官方学科领域
+      const domainList = (d.domains && d.domains.length)
         ? d.domains.map(x => x.name)
-        : Array.from(new Set(d.records.map(r => r.domain).filter(Boolean)));
+        : [...new Set(all.map(r => r.domain).filter(Boolean))];
 
-      // 只保留带 tier 的正常记录
-      const cleanRecs = d.records.filter(r => r.tier && r.tier.match(/^T[123]$/));
+      // 细分学科列表
+      const subdomainSet = new Set();
+      all.forEach(r => { if (r.subdomain) subdomainSet.add(r.subdomain); });
+      const subdomainList = [...subdomainSet].sort((a,b) => a.localeCompare(b, 'zh'));
 
-      // 按 domain（59 官方领域）分组
-      const byDomain = {};
-      let filtered = 0;
-      for (const r of cleanRecs) {
+      // 筛选状态
+      if (!window.__cnkxDomain) window.__cnkxDomain = '__all';
+      if (!window.__cnkxSub) window.__cnkxSub = '__all';
+      if (!window.__cnkxShown) window.__cnkxShown = 100;
+
+      // 筛选
+      let filtered = all.filter(r => {
         if (q) {
           const hay = (r.name + ' ' + (r.issn||'') + ' ' + (r.domain||'') + ' ' + (r.subdomain||'')).toLowerCase();
-          if (!hay.includes(q)) { filtered++; continue; }
+          if (!hay.includes(q)) return false;
         }
-        const dom = r.domain || T('未分类','Uncategorized');
-        (byDomain[dom] = byDomain[dom] || []).push(r);
-      }
-      const doms = DOMAIN_ORDER.filter(t => byDomain[t] && byDomain[t].length);
-      Object.keys(byDomain).forEach(t => { if (!doms.includes(t)) doms.push(t); });
+        if (window.__cnkxDomain !== '__all' && r.domain !== window.__cnkxDomain) return false;
+        if (window.__cnkxSub !== '__all' && r.subdomain !== window.__cnkxSub) return false;
+        return true;
+      });
 
-      const html = [];
-      html.push(`<div class="section-block">
+      // 按刊名排序
+      filtered.sort((a, b) => (a.name||'').localeCompare(b.name||'', 'zh'));
+
+      // 分页
+      const visible = filtered.slice(0, window.__cnkxShown);
+      const total = filtered.length;
+
+      // 下拉选项
+      const domainOpts = domainList.map(d =>
+        `<option value="${escape(d)}"${window.__cnkxDomain === d ? ' selected' : ''}>${escape(tn(d, 'domain'))}</option>`
+      ).join('');
+      const subOpts = subdomainList.map(s =>
+        `<option value="${escape(s)}"${window.__cnkxSub === s ? ' selected' : ''}>${escape(tn(s, 'sub'))}</option>`
+      ).join('');
+
+      // 行渲染
+      const rows = visible.map(r => {
+        const fid = favId(r);
+        rowRecordsByFid[fid] = { ...r, __src: 'cnkx' };
+        const hits = lookupDom(r);
+        const badges = [
+          ...hits.filter(h => h.source.startsWith('cnkx')).map(h => `<span class="domsrc-pill ds-cnkx">${escape(h.label)}</span>`),
+          ...hits.filter(h => h.source === 'cssci').map(() => `<span class="domsrc-pill ds-cssci">CSSCI</span>`),
+          ...hits.filter(h => h.source === 'pku').map(() => `<span class="domsrc-pill ds-pku">${T('北大核心','PKU Core')}</span>`),
+          ...hits.filter(h => h.source === 'ccft').map(h => `<span class="domsrc-pill ds-ccft">CCF-${h.tag||'T'}</span>`),
+        ].filter(Boolean).join('');
+        const subVal = r.subdomain ? tn(r.subdomain, 'sub') : '—';
+        return `<tr class="j-row clickable" data-fid="${escape(fid)}" data-src="cnkx">
+          <td class="col-fav" style="width:36px">${starBtn(r, 'cnkx')}</td>
+          <td style="width:60px">${badgeTier(r.tier)}</td>
+          <td class="jname" style="font-size:13.5px">${escape(r.name||'')}</td>
+          <td class="col-cross"><div class="badges">${badges || '<span class="muted-cell">—</span>'}</div></td>
+          <td class="muted-cell" style="width:160px">${escape(tn(r.domain||'', 'domain'))}</td>
+          <td class="muted-cell" style="width:160px">${escape(subVal)}</td>
+          <td style="width:130px"><span class="jissn">${escape(r.issn||'—')}</span></td>
+        </tr>`;
+      }).join('');
+
+      box.innerHTML = `<div class="section-block">
         <h3 class="section-title">${T('中国科协高质量科技期刊分级目录 (2025-12)','CAST High-Quality Sci-Tech Journal Tiered Directory (Dec 2025)')}</h3>
-        <div class="section-subtitle">${T('T1 / T2 / T3 三级；','T1 / T2 / T3 tiers · ')}${DOMAIN_ORDER.length} ${T('个官方学科领域，含','official disciplines · ')} ${cleanRecs.length.toLocaleString()} ${T('条带分级记录','tiered records')}${q?`${T('；已过滤 ',' · ')}${filtered}${T(' 条不匹配',' filtered out')}`:''}</div>`);
-      for (const dom of doms) {
-        const recs = byDomain[dom]; if (!recs || !recs.length) continue;
-        const t1 = recs.filter(r => r.tier === 'T1');
-        const t2 = recs.filter(r => r.tier === 'T2');
-        const t3 = recs.filter(r => r.tier === 'T3');
-        // 细分学科（subdomain 字段，可能为空）
-        const subC = {};
-        for (const r of recs) {
-          const k = r.subdomain || '';
-          if (k) subC[k] = (subC[k] || 0) + 1;
-        }
-        const subs = Object.entries(subC).sort((a,b) => b[1]-a[1]);
-        html.push(`<details class="section-block" style="margin-top:14px" ${q?'open':''}>
-          <summary>
-            ${escape(tn(dom, "domain"))}
-            <span class="muted-cell">(${recs.length})</span>
-            <span class="tier-mini t1">T1 ${t1.length}</span>
-            <span class="tier-mini t2">T2 ${t2.length}</span>
-            <span class="tier-mini t3">T3 ${t3.length}</span>
-          </summary>
-          ${subs.length ? `<div class="muted-cell" style="margin:8px 0 4px;font-size:12px;line-height:1.7">
-            ${subs.slice(0, 24).map(([s,c]) => `<span style="display:inline-block;margin-right:10px">${escape(tn(s, "sub"))} <span style="opacity:.6">(${c})</span></span>`).join('')}
-            ${subs.length > 24 ? `<span style="opacity:.6">… ${T('共','total ')} ${subs.length} ${T('个细分','sub-fields')}</span>` : ''}
-          </div>` : ''}
-          <div class="table-wrap" style="margin-top:10px"><table class="journals"><thead><tr>
-            <th style="width:36px" aria-label="Favorite"></th><th style="width:60px">${T('T级','Tier')}</th><th>${T('期刊','Journal')}</th><th>${T('交叉收录','Also In')}</th><th style="width:120px">ISSN</th><th style="width:160px">${T('细分','Sub-field')}</th>
-          </tr></thead><tbody>
-          ${[t1,t2,t3].flat().slice(0, 300).map(r => renderDomRow(r, {
-            src: 'cnkx', showTier: true, tierValue: r.tier,
-            extraCols: `<td class="muted-cell" style="width:160px">${escape(r.subdomain ? tn(r.subdomain, "sub") : '—')}</td>`,
-          })).join('')}
-          ${recs.length > 300 ? `<tr><td colspan="6" class="empty">${T('仅显示前 300 条，剩余','Showing first 300, remaining')} ${recs.length - 300} ${T('条请搜索','— please refine search')}</td></tr>` : ''}
-          </tbody></table></div>
-        </details>`);
-      }
-      html.push('</div>');
-      box.innerHTML = html.join('');
+        <div class="section-subtitle">${T('T1 / T2 / T3 三级；','T1 / T2 / T3 tiers · ')}${domainList.length} ${T('个官方学科领域','official disciplines')} · ${all.length.toLocaleString()} ${T('条带分级记录','tiered records')}${q ? T(' · 搜索: ',' · Search: ')+escape(q) : ''}</div>
+        <div class="table-wrap"><table class="journals"><thead><tr>
+          <th style="width:36px" aria-label="Favorite"></th>
+          <th style="width:60px">${T('T级','Tier')}</th>
+          <th>${T('期刊全称','Journal')}</th>
+          <th>${T('交叉收录','Also In')}</th>
+          <th style="width:160px;padding:0 4px"><select id="cnkx-domain-select" class="th-select"><option value="__all">${T('学科领域','Domain')}</option>${domainOpts}</select></th>
+          <th style="width:160px;padding:0 4px"><select id="cnkx-sub-select" class="th-select"><option value="__all">${T('细分学科','Sub-field')}</option>${subOpts}</select></th>
+          <th style="width:130px">ISSN</th>
+        </tr></thead><tbody>
+          ${rows}
+          ${total === 0 ? `<tr><td colspan="7" class="empty">${T('未找到匹配的期刊','No matching journals found')}</td></tr>` : ''}
+        </tbody></table></div>
+        ${total > window.__cnkxShown ? `<div class="pager"><button id="cnkx-more" class="more-btn" style="margin-top:12px;padding:8px 20px;border:1px solid var(--rule);background:var(--paper);color:var(--ink-soft);border-radius:2px;cursor:pointer">${T('加载更多','Load more')} (${total - window.__cnkxShown} ${T('条剩余','remaining')})</button></div>` : ''}
+      </div>`;
+
+      // 绑定筛选下拉
+      const domSel = document.getElementById('cnkx-domain-select');
+      if (domSel) domSel.addEventListener('change', () => { window.__cnkxDomain = domSel.value; window.__cnkxShown = 100; renderDomestic(); });
+      const subSel = document.getElementById('cnkx-sub-select');
+      if (subSel) subSel.addEventListener('change', () => { window.__cnkxSub = subSel.value; window.__cnkxShown = 100; renderDomestic(); });
+      const moreBtn = document.getElementById('cnkx-more');
+      if (moreBtn) moreBtn.addEventListener('click', () => { window.__cnkxShown += 100; renderDomestic(); });
       return;
     }
 
