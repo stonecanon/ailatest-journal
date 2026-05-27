@@ -4390,13 +4390,19 @@
         const FIVE_YEARS_AGO = new Date(Date.now() - 5*365*24*60*60*1000).toISOString().slice(0,10);
         const DATE_FILTER = `&filter=from_publication_date:${FIVE_YEARS_AGO}`;
         const queryBatches = await Promise.all(queries.slice(0, 3).map(async (q) => {
-          const url = `https://api.openalex.org/works?search=${encodeURIComponent(q.slice(0,120))}&per_page=30&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
+          const qs = `search=${encodeURIComponent(q.slice(0,120))}&per_page=30&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
+          const directUrl = `https://api.openalex.org/works?${qs}`;
+          const proxyUrl = `/openalex?${qs}`;
+          // Try direct first; if it fails (CORS/DNS/network), fall back to CF proxy
           try {
-            const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
-            if (!r.ok) return [];
-            const d = await r.json();
-            return d.results || [];
-          } catch { return []; }
+            const r = await fetch(directUrl, { headers: { 'Accept': 'application/json' } });
+            if (r.ok) { const d = await r.json(); return d.results || []; }
+          } catch {}
+          try {
+            const r = await fetch(proxyUrl, { headers: { 'Accept': 'application/json' } });
+            if (r.ok) { const d = await r.json(); return d.results || []; }
+          } catch {}
+          return [];
         }));
 
         // Deduplicate by work ID
@@ -4414,33 +4420,27 @@
         // If too few results, try a broader backup query
         if (allWorks.length < 8) {
           const backup = uniqueWords.slice(0, 5).join(' ');
+          const qs = `search=${encodeURIComponent(backup)}&per_page=30&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
+          const directUrl = `https://api.openalex.org/works?${qs}`;
+          const proxyUrl = `/openalex?${qs}`;
           try {
-            const url = `https://api.openalex.org/works?search=${encodeURIComponent(backup)}&per_page=30&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
-            const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
-            if (r.ok) {
-              const d = await r.json();
-              for (const w of (d.results || [])) {
-                if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); }
-              }
-            }
-          } catch {}
+            const r = await fetch(directUrl, { headers: { 'Accept': 'application/json' } });
+            if (r.ok) { const d = await r.json(); for (const w of (d.results||[])) { if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); } } }
+          } catch { try { const r = await fetch(proxyUrl, { headers: { 'Accept': 'application/json' } }); if (r.ok) { const d = await r.json(); for (const w of (d.results||[])) { if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); } } } } catch {} }
         }
 
         // Chinese fallback: if still nothing and has Chinese, try short Chinese title
         if (allWorks.length < 3 && titleTerms[0]) {
           const chn = titleTerms[0].replace(/[a-zA-Z0-9\s]/g, '').replace(/[，。、；：！？（）【】《》""''\s]/g, '');
           if (chn) {
-            const cnQuery = chn.slice(0, 12); // 12 Chinese chars ≈ 108 URL chars
+            const cnQuery = chn.slice(0, 12);
+            const qs = `search=${encodeURIComponent(cnQuery)}&per_page=20&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
+            const directUrl = `https://api.openalex.org/works?${qs}`;
+            const proxyUrl = `/openalex?${qs}`;
             try {
-              const url = `https://api.openalex.org/works?search=${encodeURIComponent(cnQuery)}&per_page=20&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
-              const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
-              if (r.ok) {
-                const d = await r.json();
-                for (const w of (d.results || [])) {
-                  if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); }
-                }
-              }
-            } catch {}
+              const r = await fetch(directUrl, { headers: { 'Accept': 'application/json' } });
+              if (r.ok) { const d = await r.json(); for (const w of (d.results||[])) { if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); } } }
+            } catch { try { const r = await fetch(proxyUrl, { headers: { 'Accept': 'application/json' } }); if (r.ok) { const d = await r.json(); for (const w of (d.results||[])) { if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); } } } } catch {} }
           }
         }
 
