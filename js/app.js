@@ -4296,38 +4296,13 @@
           }
         }
 
-        // Step 3: Build ranked results with differentiated scoring
+        // Step 3: Build ranked results — score = proportional to paper count
+        const maxCount = Math.max(...[...journalMap.values()].map(j => j.count), 1);
         const entries = [...journalMap.entries()].map(([issn, j]) => {
-          // ── Primary score: paper count (this is the main differentiator) ──
-          //   1 paper → ~12%     3 papers → ~38%     5 → ~55%
-          //   8 papers → ~73%   10+ papers → ~82%   20+ → ~92%
-          const maxCount = 50; // max papers retrieved
-          const countRatio = j.count / maxCount;
-          const countScore = Math.pow(countRatio, 0.45) * 0.92;
+          const totalScore = j.count / maxCount; // 0~1, top journal = 100%
 
-          // ── Quality adjustment: average relevance (±8%) ──
-          const avgRel = j.scores.reduce((a,b)=>a+b,0) / j.scores.length;
-          const qualityAdj = (avgRel - 0.6) * 0.2;
-
-          // ── Topic overlap bonus (capped at 8%) ──
-          let topicBonus = 0;
-          if (oaMap && oaMap[issn]) {
-            const qLower = query.toLowerCase();
-            const keywords = qLower.split(/\s+/).filter(w => w.length > 3);
-            const topics = oaMap[issn].tp || [];
-            const fullMatch = topics.filter(t => t.toLowerCase().includes(qLower)).length;
-            const kwMatch = keywords.length > 0
-              ? topics.filter(t => keywords.some(w => t.toLowerCase().includes(w))).length
-              : 0;
-            topicBonus = Math.min(0.08, (fullMatch * 0.04 + kwMatch * 0.015));
-          }
-
-          // ── IF bonus (capped at 5%) ──
           const journalRec = journals.find(r => r.issn === issn || r.eissn === issn);
           const ifVal = journalRec?.if_2024;
-          const ifBonus = ifVal != null && ifVal > 0 ? Math.min(0.05, Math.log2(ifVal + 1) * 0.012) : 0;
-
-          const totalScore = Math.max(0.03, Math.min(0.97, countScore + qualityAdj + topicBonus + ifBonus));
           const zoneVal = journalRec?.cas_zone;
           const topVal = journalRec?.cas_top;
           const qVal = journalRec?.jcr_q;
@@ -4348,6 +4323,8 @@
 
         // Step 4: Filter and sort
         let filtered = entries;
+        // Exclude single-paper journals (noise from broad queries)
+        filtered = filtered.filter(e => e.count >= 2);
         const ifMin = parseFloat(document.getElementById('pick-if-min')?.value || '0');
         if (document.getElementById('pick-filter-if')?.checked && ifMin > 0) {
           filtered = filtered.filter(e => e.if != null && e.if >= ifMin);
@@ -4368,7 +4345,7 @@
         }
         // Topic filter (always on if checkbox checked, acts as minimum signal filter)
         if (document.getElementById('pick-filter-topics')?.checked) {
-          filtered = filtered.filter(e => e.score > 0.05);
+          filtered = filtered.filter(e => e.score > 0.1);
         }
         filtered.sort((a, b) => b.score - a.score);
         filtered = filtered.slice(0, 30);
@@ -4410,12 +4387,12 @@
             badgesHtml = [idxBadges, scBadge, eiBdg, zoneBdg, jcrBdg, ifBdg, ccfTxt].filter(Boolean).join('');
           }
 
-          // Compute score color for left stripe: gray → blue → amber → green
-          const scoreColor = scorePct < 20 ? '#8e9aaf'
-            : scorePct < 40 ? '#5a8fc9'
-            : scorePct < 60 ? '#d4a017'
-            : scorePct < 80 ? '#3a9d5e'
-            : '#1f8b4c';
+          // Compute score color for left stripe: proportional to paper count
+          const scoreColor = scorePct >= 80 ? '#1a8b3c'
+            : scorePct >= 60 ? '#2d9d5e'
+            : scorePct >= 40 ? '#d4a017'
+            : scorePct >= 20 ? '#5a8fc9'
+            : '#8e9aaf';
 
           return `<div class="pick-card" style="border-left-color:${scoreColor}" data-issn="${escape(issnStr)}">
             <h3><a href="#j/${escape(e.journalRec ? favId(e.journalRec) : issnStr)}">${escape(name)}</a></h3>
