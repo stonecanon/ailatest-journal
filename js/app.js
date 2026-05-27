@@ -5,7 +5,7 @@
   const fetchJSON = async (url) => {
     const resp = await fetch(url);
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-    if (url.endsWith('.gz')) {
+    if (url.split('?')[0].endsWith('.gz')) {
       const ds = new DecompressionStream('gzip');
       const stream = resp.body.pipeThrough(ds);
       return await new Response(stream).json();
