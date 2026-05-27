@@ -2523,7 +2523,7 @@
           <th style="width:36px" aria-label="Favorite"></th>
           <th>${T('期刊名称','Journal')}</th>
           <th>${T('收录索引','Indices')}</th>
-          <th style="width:160px;padding:0"><select id="cnki-cat-select" class="th-select" style="width:100%;padding:4px 2px;background:transparent;border:0;border-bottom:1px solid var(--rule-soft);color:var(--ink);font:inherit;font-size:12px;font-weight:600;cursor:pointer"><option value="__all">${T('全部分类','All Categories')}</option>${catOptions}</select></th>
+          <th style="width:160px;padding:0 4px"><select id="cnki-cat-select" class="th-select" style="width:100%;padding:1px 18px 1px 0"><option value="__all">${T('学科分类','Category')}</option>${catOptions}</select></th>
           <th style="width:130px">ISSN</th>
           <th style="width:120px">CN</th>
         </tr></thead><tbody>
