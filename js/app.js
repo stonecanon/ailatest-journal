@@ -4489,6 +4489,10 @@
         filtered.sort((a, b) => b.score - a.score);
         filtered = filtered.slice(0, 30);
 
+        // Normalize: top journal = 100%
+        const maxScore = filtered.length > 0 ? filtered[0].score : 1;
+        filtered.forEach(e => e.score = maxScore > 0 ? e.score / maxScore : 0);
+
         // Step 5: Render
         if (!filtered.length) {
           results.innerHTML = `<div class="pick-no-results">${T('没有符合筛选条件的期刊推荐','No journals match your filters')}</div>`;
