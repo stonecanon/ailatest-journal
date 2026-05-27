@@ -4177,41 +4177,31 @@
           for (const ch of s) {
             if (ch >= '\u4e00' && ch <= '\u9fff') len += 9;
             else if (/[a-zA-Z0-9\s\-_]/.test(ch)) len += 1;
-            else len += 3; // approximate for other chars
+            else len += 3;
           }
-          return len;
+          return len + (s.match(/\s/g)||[]).length; // spaces inside the query
         }
 
-        // Build query within budget: add candidates in priority order, then length-cap each
+        // Build query within budget: add candidates in priority order, then trim each to fit
         let searchQuery = '';
         for (const c of candidates) {
-          const space = searchQuery ? 1 : 0; // space separator
-          // Estimate remaining budget
-          const remaining = MAX_URL - urlLenEst(searchQuery);
-          if (remaining <= 1) break;
+          const totalSoFar = searchQuery ? urlLenEst(searchQuery) + 1 : 0; // +1 for space separator
+          const remaining = MAX_URL - totalSoFar;
+          if (remaining <= 0) break;
+
           let txt = c.text;
-          if (c.type === 'chn') {
-            // Chinese chars: each takes 9 URL chars, trim to fit remaining budget
-            const maxChn = Math.max(1, Math.floor((remaining - space) / 9));
-            txt = txt.slice(0, maxChn);
-          } else {
-            // ASCII text: trim to fit remaining budget (worst-case all chars=1 each)
-            const maxAscii = Math.max(1, remaining - space);
-            if (txt.length > maxAscii) {
-              // Try to cut at word boundary
-              txt = txt.slice(0, maxAscii - 10);
-              const lastSpace = txt.lastIndexOf(' ');
-              if (lastSpace > 5) txt = txt.slice(0, lastSpace);
-            }
+          // Trim progressively until it fits remaining URL budget
+          while (urlLenEst(txt) > remaining && txt.length > 1) {
+            txt = txt.slice(0, -1);
           }
+          txt = txt.trim();
           if (!txt) continue;
           searchQuery = (searchQuery ? searchQuery + ' ' : '') + txt;
         }
 
         // Safety net: final URL-encoded length check
         if (encodeURIComponent(searchQuery).length > MAX_URL) {
-          searchQuery = searchQuery.slice(0, Math.floor(searchQuery.length * 0.7));
-          while (encodeURIComponent(searchQuery).length > MAX_URL && searchQuery.length > 5) {
+          while (encodeURIComponent(searchQuery).length > MAX_URL && searchQuery.length > 3) {
             searchQuery = searchQuery.slice(0, -1).trim();
           }
         }
