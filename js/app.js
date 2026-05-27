@@ -2940,9 +2940,13 @@
       const issnKey = (r.issn || '').trim();
       const eissnKey = (r.eissn || '').trim();
       const rec = reviewCycles[issnKey] || reviewCycles[eissnKey];
-      if (rec && rec.median_days) {
-        const mo = (rec.median_days / 30.44).toFixed(1);
-        stats.push([T('审稿周期','Review Cycle'), mo + T(' 个月',' months'), T('收稿→录用 中位','Received→Accepted median')]);
+      if (rec && (rec.median_days || rec.avg_months)) {
+        const val = rec.avg_months || (rec.median_days / 30.44).toFixed(1);
+        const unit = rec.avg_months ? T(' 个月',' months') : T(' 个月',' months');
+        const sub = rec.avg_months
+          ? T('投稿→出版 (DOAJ)','Submission→pub. (DOAJ)')
+          : T('收稿→录用 中位','Received→Accepted median');
+        stats.push([T('审稿周期','Review Cycle'), String(val) + unit, sub]);
       }
     }
     const ifNote = ir.if_2024 != null ? T('JCR 2025发布 · 2024指标','JCR 2025 rel. · 2024 metric') : '';
