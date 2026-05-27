@@ -17,7 +17,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="/css/app.css?v=20260527-19" />
+<link rel="stylesheet" href="/css/app.css?v=20260527-20" />
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json" />
@@ -133,15 +133,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div class="side-section" data-domestic hidden>
     <div class="side-label" data-i18n="domestic_sources">国内分级来源</div>
     <nav class="nav" id="domestic-nav">
-      <button class="nav-item active" data-dom="cnkx"><span data-i18n="src_cnkx">中国科协高质量目录</span></button>
-      <button class="nav-item" data-dom="cnki_major"><span data-i18n="src_cnki_major">中文期刊目录</span></button>
-      <div class="nav-divider"></div>
-      <div class="nav-sub" data-i18n="nav_sub_inhouse">院校自编目录</div>
-      <button class="nav-item" data-dom="zju_zju"><span data-i18n="src_zju">浙江大学 2024</span></button>
-      <button class="nav-item nav-locked" data-dom="school_a" title="In-house School Directory (paid unlock) / 高校自编目录（付费解锁）">
-        <span data-i18n="locked_school_a">🔒 学校 A · 2023</span>
-        <span class="count" data-i18n="paid_label">付费</span>
-      </button>
+      <button class="nav-item active" data-dom="cnki_major"><span data-i18n="src_cnki_major">中文期刊目录</span></button>
     </nav>
   </div>
 
@@ -153,6 +145,21 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <label class="chip ds-chip-pku"><input type="checkbox" value="pku" checked>北大核心</label>
       <label class="chip ds-chip-ccft"><input type="checkbox" value="ccft">CCF 中文</label>
     </div>
+  </div>
+
+  <div class="side-section" data-domestic hidden>
+    <nav class="nav">
+      <button class="nav-item" data-dom="cnkx"><span data-i18n="src_cnkx">中国科协高质量目录</span></button>
+    </nav>
+    <div class="nav-divider" style="margin:8px 0"></div>
+    <div class="nav-sub" data-i18n="nav_sub_inhouse">院校自编目录</div>
+    <nav class="nav">
+      <button class="nav-item" data-dom="zju_zju"><span data-i18n="src_zju">浙江大学 2024</span></button>
+      <button class="nav-item nav-locked" data-dom="school_a" title="In-house School Directory (paid unlock) / 高校自编目录（付费解锁）">
+        <span data-i18n="locked_school_a">🔒 学校 A · 2023</span>
+        <span class="count" data-i18n="paid_label">付费</span>
+      </button>
+    </nav>
   </div>
 
   <footer class="aside-foot">
@@ -321,7 +328,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </aside>
 
 <button id="pwa-install" class="pwa-install" hidden data-i18n="pwa_install">📲 安装到主屏</button>
-<script src="/js/app.js?v=20260527-19" defer></script>
+<script src="/js/app.js?v=20260527-20" defer></script>
 <script>
   // Unregister any existing Service Worker — WeChat browser has broken SW support
   // that causes stale JS to be served despite network-first strategy.

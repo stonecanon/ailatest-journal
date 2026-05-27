@@ -710,7 +710,7 @@
   let activeWos = new Set();
   let wosCats = [];   // [{name,count}] sorted A-Z
   let activeQuery = '';
-  let activeDom = 'cnkx';   // 中国科协 高质量科技期刊分级目录 (2025-12 修订, 11084 条)
+  let activeDom = 'cnki_major';   // 中文期刊目录
   let activeDomBadges = new Set(['cssci', 'pku']);
   const PAGE = 100;
   let shown = PAGE;
@@ -2523,7 +2523,7 @@
           <th style="width:36px" aria-label="Favorite"></th>
           <th>${T('期刊名称','Journal')}</th>
           <th>${T('收录索引','Indices')}</th>
-          <th style="width:160px;padding:0 4px"><select id="cnki-cat-select" class="th-select" style="width:100%;padding:1px 18px 1px 0"><option value="__all">${T('学科分类','Category')}</option>${catOptions}</select></th>
+          <th style="width:160px;padding:0 4px"><select id="cnki-cat-select" class="th-select"><option value="__all">${T('学科分类','Category')}</option>${catOptions}</select></th>
           <th style="width:130px">ISSN</th>
           <th style="width:120px">CN</th>
         </tr></thead><tbody>
@@ -3946,15 +3946,16 @@
       if (favTab) favTab.click();
     });
 
-    $('#domestic-nav').addEventListener('click', (e) => {
-      const b = e.target.closest('.nav-item'); if (!b) return;
-      $$('#domestic-nav .nav-item').forEach(n => n.classList.remove('active'));
-      b.classList.add('active');
-      activeDom = b.dataset.dom;
-      // 显示/隐藏 CSSCI/PKU/CCF 筛选（仅 cnki_major 展示徽章筛选）
-      const badgeSec = $('#domestic-badge-section');
-      if (badgeSec) badgeSec.hidden = activeDom !== 'cnki_major';
-      renderDomestic();
+    // ─── 国内导航 ───
+    document.querySelectorAll('[data-domestic] .nav-item').forEach(btn => {
+      btn.addEventListener('click', () => {
+        $$('[data-domestic] .nav-item').forEach(n => n.classList.remove('active'));
+        btn.classList.add('active');
+        activeDom = btn.dataset.dom;
+        const badgeSec = $('#domestic-badge-section');
+        if (badgeSec) badgeSec.hidden = activeDom !== 'cnki_major';
+        renderDomestic();
+      });
     });
 
     // ─── 国内徽章筛选（CSSCI/北大核心/CCF）───
