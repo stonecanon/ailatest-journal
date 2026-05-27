@@ -3085,17 +3085,17 @@
       const label   = oa.l || oa.label || 'unknown';
       const L       = labelMap[label] || labelMap.unknown;
       const homepage= oa.hp || oa.homepage;
-      const apcVal  = oa.apc ?? oa.apc_usd;
       const isoa    = oa.oa ?? oa.is_oa;
       const doaj    = oa.dj ?? oa.in_doaj;
       const org     = oa.org || oa.host_org;
       const works   = oa.w   || oa.works_count;
-      const apc = (apcVal && apcVal > 0) ? `USD ${apcVal.toLocaleString()}` : null;
-      const doajBadge = doaj ? `<span class="oa-chip oa-doaj">✓ ${T('收录 DOAJ','In DOAJ')}</span>` : '';
+      const doajFee = ir.doaj?.fee || ir.doaj?.apc_amount || '';
+      const apcText = (ir.doaj?.apc === 'Yes' && doajFee) ? doajFee : (ir.doaj?.apc === 'Yes' ? T('有 APC','Has APC') : '');
+      const doajBadge = doaj ? `<span class="oa-chip oa-doaj">&check; ${T('收录 DOAJ','In DOAJ')}</span>` : '';
       const isoaBadge = isoa ? '<span class="oa-chip oa-isoa">Open Access</span>' : '';
       const rows = [];
       if (homepage) rows.push([T('官网','Website'), `<a href="${escape(homepage)}" target="_blank" rel="noopener nofollow">${escape(homepage.replace(/^https?:\/\//,'').replace(/\/$/,''))}</a>`]);
-      if (apc) rows.push([T('版面费 (APC)','APC'), apc]);
+      if (apcText) rows.push([T('版面费 (APC)','APC'), escape(apcText)]);
       if (org) rows.push([T('出版方 (OpenAlex)','Publisher (OpenAlex)'), escape(org)]);
       if (works) rows.push([T('已发表论文','Published works'), works.toLocaleString() + T(' 篇','')]);
       return `<div class="drawer-section oa-section">
@@ -3608,10 +3608,11 @@
         unknown: T('未知','Unknown'),
       };
       const lab = oaRec.l || oaRec.label || 'unknown';
-      const apcVal = oaRec.apc ?? oaRec.apc_usd;
       const doaj = oaRec.dj ?? oaRec.in_doaj;
       let oaText = labelMapShort[lab] || labelMapShort.unknown;
-      if (apcVal && apcVal > 0) oaText += ` · APC USD ${apcVal.toLocaleString()}`;
+      const doajFee = ir.doaj?.fee || ir.doaj?.apc_amount || '';
+      if (ir.doaj?.apc === 'Yes' && doajFee) oaText += ` · APC ${doajFee}`;
+      else if (ir.doaj?.apc === 'Yes') oaText += T(' · 有 APC',' · has APC');
       if (doaj) oaText += T(' · 收录 DOAJ',' · in DOAJ');
       meta.push([T('开放获取','Open Access'), oaText]);
     }
