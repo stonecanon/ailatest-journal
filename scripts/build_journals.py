@@ -1210,6 +1210,23 @@ def main():
         r.pop('address', None)
         r.pop('languages', None)
 
+    # ────── Merge review_cycles (CrossRef) ──────
+    RC_FILE = DATA_DIR / 'review_cycles.json'
+    if RC_FILE.exists():
+        with open(RC_FILE, 'r') as f:
+            rc = json.load(f)  # {issn: {median_days, sample_size, source, ...}}
+        rc_hits = 0
+        for r in journals:
+            issn = r.get('issn', '') or ''
+            eissn = r.get('eissn', '') or ''
+            rcd = rc.get(issn) or rc.get(eissn)
+            if rcd:
+                r['crossref'] = rcd
+                rc_hits += 1
+        print(f'  CrossRef review_cycles: {rc_hits} journals matched ({len(rc)} total in file)')
+    else:
+        print(f'  WARNING: {RC_FILE} not found, skipping CrossRef merge')
+
     # main write
     with open(DATA_DIR / 'journals.json', 'w', encoding='utf-8') as f:
         json.dump(journals, f, ensure_ascii=False, separators=(',', ':'))
