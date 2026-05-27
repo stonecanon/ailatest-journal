@@ -4438,14 +4438,10 @@
           const countRatio = j.count / maxCount;
           const kwMatchRatio = j.count > 0 ? j.kwMatch / j.count : 0;
           const avgRelevance = j.scores.length > 0 ? j.scores.reduce((a,b) => a+b, 0) / j.scores.length : 0;
-          const recency = j.count > 0 ? j.recentCount / j.count : 0;
+
+          const totalScore = countRatio * 0.50 + kwMatchRatio * 0.25 + avgRelevance * 0.25;
 
           const journalRec = journals.find(r => r.issn === issn || r.eissn === issn);
-          const ifVal = journalRec?.if_2024;
-          const ifBonus = ifVal > 0 ? Math.min(ifVal / 30, 1) : 0;
-
-          const totalScore = countRatio * 0.30 + kwMatchRatio * 0.25 + avgRelevance * 0.20 + recency * 0.15 + ifBonus * 0.10;
-
           const zoneVal = journalRec?.cas_zone;
           const topVal = journalRec?.cas_top;
           const qVal = journalRec?.jcr_q;
@@ -4455,7 +4451,7 @@
           const wosCats = journalRec?.wos_categories || [];
 
           return {
-            issn, journalRec, if: ifVal, zone: zoneVal, top: topVal,
+            issn, journalRec, zone: zoneVal, top: topVal,
             jcr_q: qVal, scopus: scopusVal, ei: eiVal,
             indices, wos_categories: wosCats,
             count: j.count, papers: j.papers.slice(0,5),
