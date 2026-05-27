@@ -4141,68 +4141,76 @@
           titleTerms = [t];
         }
 
-        // From abstract body, extract meaningful words (English) or phrases (Chinese)
+        // ── Extract search terms from title + body ──
+        // OpenAlex's title_and_abstract.search works best with short keyword combinations
+        // (5-10 technical terms, not full titles). ASCII terms cost 1 URL-char each.
+
         const bodyText = lines.slice(1).filter(l => !/^keywords?:/i.test(l) && !/^关键词[：:]/.test(l)).join(' ');
-
-        // Extract English words (skip short/stop words)
-        const engWords = bodyText.toLowerCase()
-          .replace(/[^a-z0-9\s-]/g, ' ')
-          .split(/\s+/)
-          .filter(w => w.length > 4 && !/^(this|that|with|from|which|were|have|been|than|into|also|their|about|study|show|were|used|using|based|results|method|model|data|paper|these|between|while|where|after|before|other|there|analysis|approach|process|system|study|research)$/i.test(w))
-          .filter((w, i, a) => a.indexOf(w) === i);
-
-        const topEng = engWords.slice(0, 3);
-
-        // Chinese segments — URL-encodes to 9× raw length, so keep very short
-        const chnChars = bodyText.replace(/[a-zA-Z0-9\s]/g, '').replace(/[，。、；：！？（）【】《》""''\s]/g, '');
-        let chnTerms = [];
-        if (chnChars.length > 0) {
-          chnTerms = [chnChars.slice(0, 8)];  // 8 Chinese chars → ~72 URL chars
-        }
-
-        // ── Smart query assembly with URL-encoding budget ──
-        // OpenAlex filter limit: ~168 URL-encoded chars
         const MAX_URL = 155;
-        // Priority order: explicit keywords > title > English body words > Chinese body chars
-        const candidates = [
-          { type: 'kw', text: explicitKeywords.slice(0, 3).join(' '), raw: true },
-          { type: 'title', text: titleTerms[0] || '', raw: true },
-          { type: 'eng', text: topEng.join(' '), raw: true },
-          { type: 'chn', text: chnTerms[0] || '', raw: false },
-        ].filter(c => c.text);
 
-        // Helper: estimate URL-encoded length (Chinese=9, ASCII=1, other~variable)
-        function urlLenEst(s) {
-          let len = 0;
-          for (const ch of s) {
-            if (ch >= '\u4e00' && ch <= '\u9fff') len += 9;
-            else if (/[a-zA-Z0-9\s\-_]/.test(ch)) len += 1;
-            else len += 3;
-          }
-          return len + (s.match(/\s/g)||[]).length; // spaces inside the query
+        // Stop words — expanded list
+        const stopWords = new Set(('this that with from which were have been than into also their about '+
+          'study show were used using based results method model data paper these between while where '+
+          'after before other there analysis approach process system research above during well such '+
+          'each both more most some than very just also although however therefore because without '+
+          'within across among through before after below under over upon could should would may might '+
+          'shall can will does did has had been being made make made made using used based related '+
+          'significant different important various multiple including following providing performing '+
+          'proposes presents demonstrates investigates examines explores develops describes reports '+
+          'shows found test tests testing methods models datasets dataset experiments experimental '+
+          'proposed presented demonstrated investigated examined explored developed described reported '+
+          'tested showed found approach techniques algorithm algorithms features feature accuracy '+
+          'performance evaluation values value results analysis prediction predictions').split(' '));
+
+        // Collect all English words (length > 3) from title + body
+        const allText = [(titleTerms[0]||''), bodyText].join(' ').toLowerCase();
+        const allWords = allText.replace(/[^a-z0-9\s-]/g, ' ')
+          .split(/\s+/)
+          .filter(w => w.length > 3 && !stopWords.has(w) && !/^\d+$/.test(w) && !w.startsWith('http'));
+        // Deduplicate preserving insertion order
+        const uniqueWords = allWords.filter((w, i) => allWords.indexOf(w) === i);
+
+        // Take as many English keywords as fit within URL budget
+        let engQuery = '';
+        for (const w of uniqueWords) {
+          const test = engQuery ? engQuery + ' ' + w : w;
+          if (encodeURIComponent(test).length > MAX_URL) break;
+          engQuery = test;
         }
 
-        // Build query within budget: add candidates in priority order, then trim each to fit
+        // Priority 1: explicit keywords (if present)
         let searchQuery = '';
-        for (const c of candidates) {
-          const totalSoFar = searchQuery ? urlLenEst(searchQuery) + 1 : 0; // +1 for space separator
-          const remaining = MAX_URL - totalSoFar;
-          if (remaining <= 0) break;
-
-          let txt = c.text;
-          // Trim progressively until it fits remaining URL budget
-          while (urlLenEst(txt) > remaining && txt.length > 1) {
-            txt = txt.slice(0, -1);
+        if (explicitKeywords.length) {
+          for (const kw of explicitKeywords) {
+            const test = searchQuery ? searchQuery + ' ' + kw : kw;
+            if (encodeURIComponent(test).length > MAX_URL) break;
+            searchQuery = test;
           }
-          txt = txt.trim();
-          if (!txt) continue;
-          searchQuery = (searchQuery ? searchQuery + ' ' : '') + txt;
         }
 
-        // Safety net: final URL-encoded length check
-        if (encodeURIComponent(searchQuery).length > MAX_URL) {
-          while (encodeURIComponent(searchQuery).length > MAX_URL && searchQuery.length > 3) {
-            searchQuery = searchQuery.slice(0, -1).trim();
+        // Priority 2: English keywords from title+body (fill remaining budget)
+        let remaining = MAX_URL - (searchQuery ? encodeURIComponent(searchQuery).length + 1 : 0);
+        if (remaining > 10) {
+          const pool = engQuery.split(' ').filter(w => !searchQuery.toLowerCase().includes(w.toLowerCase()));
+          for (const w of pool) {
+            const test = searchQuery ? searchQuery + ' ' + w : w;
+            const encLen = encodeURIComponent(test).length;
+            if (encLen > MAX_URL) break;
+            searchQuery = test;
+            remaining = MAX_URL - encLen - 1;
+            if (remaining < 3) break;
+          }
+        }
+
+        // Priority 3 (last resort): Chinese title chars — only if nothing found yet
+        if (!searchQuery && titleTerms[0]) {
+          const chnChars = titleTerms[0].replace(/[a-zA-Z0-9\s]/g, '').replace(/[，。、；：！？（）【】《》""''\s]/g, '');
+          if (chnChars) {
+            for (let i = 1; i <= chnChars.length; i++) {
+              const slice = chnChars.slice(0, i);
+              if (encodeURIComponent(slice).length > MAX_URL) break;
+              searchQuery = slice;
+            }
           }
         }
 
