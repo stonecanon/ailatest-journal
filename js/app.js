@@ -1,5 +1,6 @@
 /* AILatest Journal — front-end app (i18n + tabs + favorites + auth) */
 (() => {
+  const SITE_MODE = location.pathname.startsWith('/cn') ? 'cn' : 'intl';
   const $ = (s, r=document) => r.querySelector(s);
   const $$ = (s, r=document) => [...r.querySelectorAll(s)];
   const fetchJSON = async (url) => {
@@ -684,7 +685,7 @@
     return null;
   }
 
-  let activeTab = 'int';
+  let activeTab = SITE_MODE === 'cn' ? 'dom' : 'int';
   let activeCat = '__all';   // ESI subject filter (legacy name)
   let activeCasMajor = '__all'; // CAS 大类 filter
   let activeIndices = new Set(['SCIE','SSCI','AHCI','ESCI','EI']);
@@ -901,9 +902,10 @@
     if (l && isDefaultFavListName(l.name)) l.name = defaultFavListName();
   }
 
+  const STORAGE_PREFIX = 'ailatest.' + SITE_MODE + '.';
   function loadFavLists() {
     try {
-      const raw = localStorage.getItem('ailatest.favLists');
+      const raw = localStorage.getItem(STORAGE_PREFIX + 'favLists');
       if (raw) {
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed) && parsed.length) {
@@ -912,7 +914,7 @@
             name: String(l.name || T('未命名','Untitled')),
             ids: Array.isArray(l.ids) ? l.ids.map(String) : [],
           }));
-          activeListId = localStorage.getItem('ailatest.activeListId') || favLists[0].id;
+          activeListId = localStorage.getItem(STORAGE_PREFIX + 'activeListId') || favLists[0].id;
           if (!favLists.find(l => l.id === activeListId)) activeListId = favLists[0].id;
           return;
         }
@@ -928,13 +930,13 @@
 
   function persistFavLists(sync = true) {
     localizeDefaultFavListName();
-    localStorage.setItem('ailatest.favLists', JSON.stringify(favLists));
-    localStorage.setItem('ailatest.activeListId', activeListId);
+    localStorage.setItem(STORAGE_PREFIX + 'favLists', JSON.stringify(favLists));
+    localStorage.setItem(STORAGE_PREFIX + 'activeListId', activeListId);
     // rebuild flat union for legacy path + backend sync
     const union = new Set();
     favLists.forEach(l => l.ids.forEach(id => union.add(id)));
     favs = union;
-    localStorage.setItem('ailatest.favs', JSON.stringify([...union]));
+    localStorage.setItem(STORAGE_PREFIX + 'favs', JSON.stringify([...union]));
     if (sync) syncFavs();
   }
 
@@ -951,7 +953,7 @@
   let favs = new Set();
   // favsData: 完整记录池（key = fav id）
   let favsData = {};
-  try { favsData = JSON.parse(localStorage.getItem('ailatest.favsData') || '{}'); } catch(_){}
+  try { favsData = JSON.parse(localStorage.getItem(STORAGE_PREFIX + 'favsData') || '{}'); } catch(_){}
   let user = JSON.parse(localStorage.getItem('ailatest.user') || 'null');
 
   // isFav = 在当前 active list 中
@@ -974,7 +976,7 @@
       list.ids.push(id);
       favsData[id] = { ...r, __src: meta.src || 'int', __savedAt: Date.now() };
     }
-    localStorage.setItem('ailatest.favsData', JSON.stringify(favsData));
+    localStorage.setItem(STORAGE_PREFIX + 'favsData', JSON.stringify(favsData));
     persistFavLists();
     updateFavCount();
   }
@@ -1007,7 +1009,7 @@
       removed.ids.forEach(fid => {
         if (!favLists.some(l => l.ids.includes(fid))) delete favsData[fid];
       });
-      localStorage.setItem('ailatest.favsData', JSON.stringify(favsData));
+      localStorage.setItem(STORAGE_PREFIX + 'favsData', JSON.stringify(favsData));
     }
     persistFavLists();
     return true;
@@ -2716,10 +2718,15 @@
     const r = findRecByFid(id);
     if (r) openDrawer(r, { fromHash: true });
   }
-  function openDrawer(r, opts) {
+  async function openDrawer(r, opts) {
     _currentDrawerRec = r;
     const drawer = $('#j-drawer'), scrim = $('#drawer-scrim'), body = $('#drawer-body');
     if (!drawer || !body) return;
+    // 懒加载 OpenAlex 数据（首次打开抽屉时加载）
+    if (!oaMap) {
+      try { oaMap = await fetchJSON('data/oa.json.gz'); }
+      catch(e) { oaMap = {}; }
+    }
     // 上报浏览（无需登录），结果回填进 cache
     reportJournalView(favId(r));
     const src = r.__src || 'int';
@@ -3080,7 +3087,7 @@
         if (!target.ids.includes(fid)) {
           target.ids.push(fid);
           favsData[fid] = { ...r, __src: src || 'int', __savedAt: Date.now() };
-          localStorage.setItem('ailatest.favsData', JSON.stringify(favsData));
+          localStorage.setItem(STORAGE_PREFIX + 'favsData', JSON.stringify(favsData));
           persistFavLists();
           updateFavCount();
           if (typeof syncFavs === 'function') syncFavs();
@@ -4064,17 +4071,16 @@
     // 分享着陆页：/s/<id> 直接接管 main，不走主流程
     if (await maybeRenderShareLanding()) return;
     try {
-      const [j, d, m, esi, oa, aliases, rc] = await Promise.all([
+      const [j, d, m, esi, aliases, rc] = await Promise.all([
         fetchJSON('data/journals.json.gz'),
         fetch('data/domestic.json').then(r => r.json()).catch(() => null),
         fetch('data/meta.json').then(r => r.json()).catch(() => null),
         fetch('data/esi_categories.json').then(r => r.json()).catch(() => []),
-        fetchJSON('data/oa.json.gz'),
         fetch('data/journal_aliases.json').then(r => r.json()).catch(() => DEFAULT_JOURNAL_ALIASES),
         fetch('data/review_cycles.json').then(r => r.json()).catch(() => ({})),
       ]);
       setJournalAliases(aliases);
-      journals = j; domestic = d; meta = m; esiCats = esi; oaMap = oa || {}; reviewCycles = rc || {};
+      journals = j; domestic = d; meta = m; esiCats = esi; oaMap = null; reviewCycles = rc || {};
       journals.forEach(journalSearchMeta);
       buildDomIndex(domestic);
       buildIntIndex(journals);
@@ -4088,6 +4094,28 @@
         : `${journals.length.toLocaleString()} journals loaded`;
       renderCatList();
       renderWosList();
+      // 子路径模式：隐藏不相关 UI
+      if (SITE_MODE === 'cn') {
+        // cn 模式：隐藏国际侧栏、选项卡
+        $$('[data-international]').forEach(el => el.style.display = 'none');
+        const intTab = document.querySelector('.tab[data-tab="int"]');
+        if (intTab) intTab.style.display = 'none';
+        const pickTab = document.querySelector('.tab[data-tab="pick"]');
+        if (pickTab) pickTab.style.display = 'none';
+        const favTab = document.querySelector('.tab[data-tab="fav"]');
+        if (favTab) favTab.style.display = 'none';
+        // 添加切换到国际的链接
+        const hero = document.querySelector('[data-panel="dom"] .hero p');
+        if (hero) hero.innerHTML += '<br><a href="/intl/" style="font-size:13px">← 切换到国际期刊</a>';
+      } else {
+        // intl 模式：隐藏国内侧栏
+        $$('[data-domestic]').forEach(el => el.style.display = 'none');
+        const domTab = document.querySelector('.tab[data-tab="dom"]');
+        if (domTab) domTab.style.display = 'none';
+        // 添加切换到中国的链接
+        const hero = document.querySelector('[data-panel="int"] .hero p');
+        if (hero) hero.innerHTML += '<br><a href="/cn/" style="font-size:13px">中国期刊 →</a>';
+      }
       renderInt();
       // 启用 #j/<id> 深链
       window.addEventListener('hashchange', applyHashRoute);

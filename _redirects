@@ -1,1 +1,4 @@
-/s/* /index.html 200
+# Sub-path SPA routing: /intl/* and /cn/* serve index.html
+# 200 = rewrite (keep URL in browser, serve root index.html)
+/intl/* /index.html 200
+/cn/* /index.html 200
