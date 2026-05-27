@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-27T13:40:25.149Z",
+  "generated_at": "2026-05-27T14:06:40.940Z",
   "source": "remote D1",
   "notes": [
     "注册量来自 users.created_at，当前是最可靠口径。",
@@ -36,9 +36,9 @@
     "google_users": 3,
     "first_signup_at": 1778628305,
     "latest_signup_at": 1779811726,
-    "favorite_rows": 31,
+    "favorite_rows": 30,
     "users_with_favorites": 6,
-    "avg_favorites_per_active_user": 5.17,
+    "avg_favorites_per_active_user": 5,
     "rating_rows": 22,
     "users_with_ratings": 5,
     "rated_journals": 17,
@@ -50,7 +50,8 @@
     "total_cn_hint_events": 313,
     "total_cn_hint_visitors": 96,
     "total_cn_hint_sessions": 161,
-    "total_login_events": 19
+    "total_login_events": 19,
+    "latest_pageview_at": 1779883728
   },
   "series": {
     "providerMix": [
@@ -351,11 +352,6 @@
         "journal_key": "t:circulation",
         "favorites": 1,
         "label": "t:circulation"
-      },
-      {
-        "journal_key": "t:九一八研究",
-        "favorites": 1,
-        "label": "t:九一八研究"
       }
     ],
     "topRated": [

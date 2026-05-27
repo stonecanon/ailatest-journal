@@ -10,6 +10,10 @@ function fromUnix(sec) {
   return sec ? new Date(sec * 1000).toLocaleDateString('zh-CN') : '暂无';
 }
 
+function fromUnixDateTime(sec) {
+  return sec ? dateFmt.format(new Date(sec * 1000)) : '暂无';
+}
+
 function el(tag, attrs = {}, children = []) {
   const node = document.createElement(tag);
   for (const [key, value] of Object.entries(attrs)) {
@@ -48,6 +52,7 @@ function renderTrafficKpis(data) {
     kpi('最近一天独立访客数', n(latest.visitors), '同一浏览器访客去重', 'UV'),
     kpi('最近一天访问人次', n(latest.sessions), '同一浏览器会话去重', 'S'),
     kpi('累计浏览量 / 访客数', `${n(k.total_pageviews)} / ${n(k.total_visitors)}`, `累计访问人次 ${n(sessions)}`, 'Σ'),
+    kpi('最后一次浏览上报', fromUnixDateTime(k.latest_pageview_at), '远程 D1 page_events 最新记录', '↻'),
   );
 }
 
@@ -177,9 +182,31 @@ function table(target, rows, columns) {
   host.innerHTML = html;
 }
 
-async function main() {
-  const data = await fetch('data.json', { cache: 'no-store' }).then(r => r.json());
+function clearDynamicContent() {
+  [
+    '.traffic-kpis',
+    '.secondary-kpis',
+    '#signup-login-chart',
+    '#traffic-chart',
+    '#provider-bars',
+    '#login-provider-bars',
+    '#top-paths',
+    '#traffic-countries',
+    '#top-favorites',
+    '#top-rated',
+    '#recent-users',
+    '#daily-traffic',
+    '#notes',
+  ].forEach(selector => {
+    const node = document.querySelector(selector);
+    if (node) node.innerHTML = '';
+  });
+}
+
+function renderDashboard(data) {
+  clearDynamicContent();
   document.querySelector('#generated-at').textContent = dateFmt.format(new Date(data.generated_at));
+  document.querySelector('#latest-pageview-at').textContent = fromUnixDateTime(data.kpis.latest_pageview_at);
   document.querySelector('#source').textContent = data.source;
   renderTrafficKpis(data);
   renderSecondaryKpis(data);
@@ -260,6 +287,34 @@ async function main() {
   const notes = document.querySelector('#notes');
   notes.innerHTML = '';
   for (const note of data.notes || []) notes.append(el('li', { text: note }));
+}
+
+async function loadDashboardData() {
+  const data = await fetch(`data.json?ts=${Date.now()}`, { cache: 'no-store' }).then(r => r.json());
+  renderDashboard(data);
+}
+
+async function refreshFromServer(button) {
+  if (button) {
+    button.disabled = true;
+    button.textContent = '刷新中...';
+  }
+  try {
+    await fetch('refresh', { cache: 'no-store' }).catch(() => null);
+    await loadDashboardData();
+  } finally {
+    if (button) {
+      button.disabled = false;
+      button.textContent = '刷新数据';
+    }
+  }
+}
+
+async function main() {
+  await loadDashboardData();
+  const button = document.querySelector('#refresh-now');
+  button?.addEventListener('click', () => refreshFromServer(button));
+  setInterval(loadDashboardData, 60 * 1000);
 }
 
 main().catch(err => {
