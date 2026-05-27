@@ -4069,7 +4069,7 @@
         fetch('data/domestic.json').then(r => r.json()).catch(() => null),
         fetch('data/meta.json').then(r => r.json()).catch(() => null),
         fetch('data/esi_categories.json').then(r => r.json()).catch(() => []),
-        fetch('data/oa.json').then(r => r.json()).catch(() => ({})),
+        fetchJSON('data/oa.json.gz'),
         fetch('data/journal_aliases.json').then(r => r.json()).catch(() => DEFAULT_JOURNAL_ALIASES),
         fetch('data/review_cycles.json').then(r => r.json()).catch(() => ({})),
       ]);
