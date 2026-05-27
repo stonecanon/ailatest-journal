@@ -4141,14 +4141,13 @@
           titleTerms = [t];
         }
 
-        // ── Extract search terms from title + body ──
-        // OpenAlex's title_and_abstract.search works best with short keyword combinations
-        // (5-10 technical terms, not full titles). ASCII terms cost 1 URL-char each.
+        // ── Multi-query search with OpenAlex 'search' (relevance) param ──
+        // OpenAlex 'search' uses BM25 matching (not strict AND), so 5-8 keywords work fine.
+        // We run 2-3 complementary queries, deduplicate papers, then aggregate by journal.
 
         const bodyText = lines.slice(1).filter(l => !/^keywords?:/i.test(l) && !/^关键词[：:]/.test(l)).join(' ');
         const MAX_URL = 155;
 
-        // Stop words — expanded list
         const stopWords = new Set(('this that with from which were have been than into also their about '+
           'study show were used using based results method model data paper these between while where '+
           'after before other there analysis approach process system research above during well such '+
@@ -4167,84 +4166,113 @@
         const allWords = allText.replace(/[^a-z0-9\s-]/g, ' ')
           .split(/\s+/)
           .filter(w => w.length > 3 && !stopWords.has(w) && !/^\d+$/.test(w) && !w.startsWith('http'));
-        // Deduplicate preserving insertion order
         const uniqueWords = allWords.filter((w, i) => allWords.indexOf(w) === i);
 
-        // OpenAlex title_and_abstract.search uses AND logic — too many terms = 0 results
-        // Empirical max: 5 terms works well, 6+ often fails on diverse paper sets
-        const MAX_KEYWORDS = 5;
+        // Build 2-3 diverse queries from different keyword subsets
+        const queries = [];
 
-        // Take top MAX_KEYWORDS English terms
-        let engQuery = uniqueWords.slice(0, MAX_KEYWORDS).join(' ');
-
-        // Priority 1: explicit keywords (if present) — limit to MAX_KEYWORDS
-        let searchQuery = '';
+        // Q1: Explicit keywords (if present) — these are the most reliable signal
         if (explicitKeywords.length) {
-          for (let i = 0; i < Math.min(explicitKeywords.length, MAX_KEYWORDS); i++) {
-            const kw = explicitKeywords[i].trim();
-            if (!kw) continue;
-            const test = searchQuery ? searchQuery + ' ' + kw : kw;
-            if (encodeURIComponent(test).length > MAX_URL) break;
-            searchQuery = test;
+          const q = explicitKeywords.slice(0, 4).join(' ');
+          if (encodeURIComponent(q).length < MAX_URL) queries.push(q);
+        }
+
+        // Q2: Title-derived keywords (core topic of the paper)
+        const titleLower = (titleTerms[0]||'').toLowerCase().replace(/[^a-z\s]/g, '');
+        const titleKws = titleLower.split(/\s+/).filter(w => w.length > 3 && !stopWords.has(w));
+        if (titleKws.length >= 3) {
+          const q = titleKws.slice(0, 6).join(' ');
+          if (encodeURIComponent(q).length < MAX_URL && !queries.some(x => x.toLowerCase().includes(q.slice(0,15)))) {
+            queries.push(q);
           }
         }
 
-        // Priority 2: English keywords from title+body (fill remaining budget)
-        let remaining = MAX_URL - (searchQuery ? encodeURIComponent(searchQuery).length + 1 : 0);
-        if (remaining > 10) {
-          const pool = engQuery.split(' ').filter(w => !searchQuery.toLowerCase().includes(w.toLowerCase()));
-          for (let i = 0; i < Math.min(pool.length, MAX_KEYWORDS); i++) {
-            const w = pool[i];
-            const test = searchQuery ? searchQuery + ' ' + w : w;
-            const encLen = encodeURIComponent(test).length;
-            if (encLen > MAX_URL) break;
-            searchQuery = test;
-            remaining = MAX_URL - encLen - 1;
-            if (remaining < 3) break;
-          }
+        // Q3: Body-derived technical terms (methods, algorithms, sensors, etc.)
+        // Pick words that are ≥5 chars (more specific), not already covered by Q1/Q2
+        const covered = queries.join(' ').toLowerCase();
+        const bodyKws = uniqueWords.filter(w => w.length >= 4 && !covered.includes(w)).slice(0, 6);
+        if (bodyKws.length >= 3) {
+          const q = bodyKws.join(' ');
+          if (encodeURIComponent(q).length < MAX_URL) queries.push(q);
         }
 
-        // Priority 3 (last resort): Chinese title chars — only if nothing found yet
-        if (!searchQuery && titleTerms[0]) {
-          const chnChars = titleTerms[0].replace(/[a-zA-Z0-9\s]/g, '').replace(/[，。、；：！？（）【】《》""''\s]/g, '');
-          if (chnChars) {
-            for (let i = 1; i <= chnChars.length; i++) {
-              const slice = chnChars.slice(0, i);
-              if (encodeURIComponent(slice).length > MAX_URL) break;
-              searchQuery = slice;
+        // Fallback: if no queries built, just use first 5 unique words
+        if (!queries.length) {
+          queries.push(uniqueWords.slice(0, 6).join(' '));
+        }
+
+        // Run all queries concurrently via Promise.all
+        status.textContent = T('正在搜索相关论文…','Searching related papers…');
+        const SEARCH_FIELDS = 'id,title,publication_date,primary_location,relevance_score';
+        const results = await Promise.all(queries.slice(0, 3).map(async (q) => {
+          const url = OA_API + `/works?search=${encodeURIComponent(q.slice(0,120))}&per_page=30&sort=relevance_score:desc&select=${SEARCH_FIELDS}`;
+          try {
+            const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
+            if (!r.ok) return [];
+            const d = await r.json();
+            return d.results || [];
+          } catch { return []; }
+        }));
+
+        // Deduplicate by work ID
+        const seenIds = new Set();
+        const allWorks = [];
+        for (const batch of results) {
+          for (const w of batch) {
+            if (w.id && !seenIds.has(w.id)) {
+              seenIds.add(w.id);
+              allWorks.push(w);
             }
           }
         }
 
-        if (query.length > 50) {
-          status.textContent = T('正在分析匹配中…（已提取关键词）','Analyzing… (keywords extracted)');
+        // If too few results, try a broader backup query
+        if (allWorks.length < 8) {
+          const backup = uniqueWords.slice(0, 5).join(' ');
+          try {
+            const url = OA_API + `/works?search=${encodeURIComponent(backup)}&per_page=30&sort=relevance_score:desc&select=${SEARCH_FIELDS}`;
+            const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
+            if (r.ok) {
+              const d = await r.json();
+              for (const w of (d.results || [])) {
+                if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); }
+              }
+            }
+          } catch {}
         }
-        const url = OA_API + `/works?filter=title_and_abstract.search:${encodeURIComponent(searchQuery)}&per_page=50&sort=relevance_score:desc&select=id,title,publication_date,authorships,primary_location,relevance_score`;
-        const resp = await fetch(url, { headers: { 'Accept': 'application/json' } });
-        if (!resp.ok) {
-          if (resp.status === 400) throw new Error(T('查询内容过长或格式有误，建议精简至标题+3-5个关键词','Query too long or malformed. Try title + 3-5 keywords only.'));
-          throw new Error(`HTTP ${resp.status}`);
-        }
-        const data = await resp.json();
-        const works = data.results || [];
-        if (!works.length) {
-          // Check if Chinese-only input — OpenAlex doesn't handle Chinese well
-          const hasCnOnly = [...query].filter(c => c >= '\u4e00' && c <= '\u9fff').length > 0
-            && uniqueWords.filter(w => w.length > 4).length < 2
-            && !explicitKeywords.length;
-          if (hasCnOnly) {
-            status.textContent = T('未找到相关论文。OpenAlex 对中文搜索效果不佳，建议在摘要后添加英文 Keywords: 行（如 Keywords: indoor occupancy, sensor）',
-              'No papers found. OpenAlex has limited Chinese support. Try adding an English "Keywords:" line (e.g., Keywords: indoor occupancy, sensor).');
-          } else {
-            status.textContent = T('未找到相关论文，请尝试其他关键词','No papers found, try different keywords');
+
+        // Chinese fallback: if still nothing and has Chinese, try short Chinese title
+        if (allWorks.length < 3 && titleTerms[0]) {
+          const chn = titleTerms[0].replace(/[a-zA-Z0-9\s]/g, '').replace(/[，。、；：！？（）【】《》""''\s]/g, '');
+          if (chn) {
+            const cnQuery = chn.slice(0, 12); // 12 Chinese chars ≈ 108 URL chars
+            try {
+              const url = OA_API + `/works?search=${encodeURIComponent(cnQuery)}&per_page=20&sort=relevance_score:desc&select=${SEARCH_FIELDS}`;
+              const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
+              if (r.ok) {
+                const d = await r.json();
+                for (const w of (d.results || [])) {
+                  if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); }
+                }
+              }
+            } catch {}
           }
+        }
+
+        const hasCnOnly = [...query].filter(c => c >= '\u4e00' && c <= '\u9fff').length > 0
+          && uniqueWords.filter(w => w.length > 4).length < 2 && !explicitKeywords.length;
+        if (!allWorks.length) {
+          status.textContent = hasCnOnly
+            ? T('未找到相关论文。OpenAlex 对中文搜索效果不佳，建议在摘要后添加英文 Keywords: 行（如 Keywords: indoor occupancy, sensor）',
+              'No papers found. OpenAlex has limited Chinese support. Try adding an English "Keywords:" line.')
+            : T('未找到相关论文，请尝试其他关键词','No papers found, try different keywords');
           return;
         }
 
         // Step 2: Aggregate by journal ISSN
-        const journalMap = new Map(); // ISSN → {count, papers[], topics[], scores[], srcName}
+        const journalMap = new Map();
         const topicSet = new Set();
-        for (const w of works) {
+        for (const w of allWorks) {
           const src = w.primary_location?.source;
           if (!src) continue;
           const issn = (src.issn_l || '').toUpperCase();
@@ -4252,9 +4280,13 @@
           if (!journalMap.has(issn)) journalMap.set(issn, { count: 0, papers: [], scores: [], topics: new Set(), srcName: src.display_name || '' });
           const j = journalMap.get(issn);
           j.count++;
-          j.papers.push({ title: w.title, year: (w.publication_date||'').slice(0,4), id: w.id });
+          j.papers.push({
+            title: w.title,
+            year: (w.publication_date||'').slice(0,4),
+            id: w.id,
+            url: w.id // OpenAlex full URL, e.g. https://openalex.org/W12345
+          });
           j.scores.push(w.relevance_score || 0);
-          // Collect topics from oaMap if available
           if (oaMap && oaMap[issn]) {
             (oaMap[issn].tp || []).forEach(t => { j.topics.add(t); topicSet.add(t); });
           }
@@ -4340,7 +4372,7 @@
         // Step 5: Render
         if (!filtered.length) {
           results.innerHTML = `<div class="pick-no-results">${T('没有符合筛选条件的期刊推荐','No journals match your filters')}</div>`;
-          status.textContent = `${T('已检索','Searched')} ${works.length} ${T('篇论文','papers')}，${T('分布在','in')} ${journalMap.size} ${T('个期刊','journals')}`;
+          status.textContent = `${T('已检索','Searched')} ${allWorks.length} ${T('篇论文','papers')}，${T('分布在','in')} ${journalMap.size} ${T('个期刊','journals')}`;
           return;
         }
 
@@ -4350,7 +4382,7 @@
           const zoneStr = e.zone ? `CAS ${e.zone}区` : '';
           const name = e.journalRec?.name || e.srcName || e.issn;
           const issnStr = e.issn;
-          const paperList = e.papers.map(p => `<span class="pick-paper" title="${escape(p.title)}">${escape((p.title||'').slice(0,60))}${(p.title||'').length>60?'…':''} (${escape(p.year||'')})</span>`).join('');
+          const paperList = e.papers.map(p => `<a class="pick-paper" href="${escape(p.url)}" target="_blank" rel="noopener" title="${escape(p.title)}">${escape((p.title||'').slice(0,55))}${(p.title||'').length>55?'…':''} (${escape(p.year||'')})</a>`).join('');
           const topics = e.topics.map(t => `<span class="pick-topic">${escape(t)}</span>`).join('');
 
           // Build badges
@@ -4403,7 +4435,7 @@
           });
         });
 
-        status.textContent = `${T('已检索','Searched')} ${works.length} ${T('篇论文','papers')}，${T('分布在','in')} ${journalMap.size} ${T('个期刊','journals')}，${T('推荐','recommended')} ${filtered.length} ${T('个','')} · ${T('已用 {n}/5 次','{n}/5 used today').replace('{n}', dailyData.count+1)}`;
+        status.textContent = `${T('已检索','Searched')} ${allWorks.length} ${T('篇论文','papers')}，${T('分布在','in')} ${journalMap.size} ${T('个期刊','journals')}，${T('推荐','recommended')} ${filtered.length} ${T('个','')} · ${T('已用 {n}/5 次','{n}/5 used today').replace('{n}', dailyData.count+1)}`;
         // Increment daily counter
         dailyData.count++;
         localStorage.setItem(limitKey, JSON.stringify(dailyData));
