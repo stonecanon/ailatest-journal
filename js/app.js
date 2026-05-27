@@ -4210,8 +4210,9 @@
         // Run all queries concurrently via Promise.all
         status.textContent = T('正在搜索相关论文…','Searching related papers…');
         const SEARCH_FIELDS = 'id,title,publication_date,primary_location,relevance_score';
+        const DATE_FILTER = '&filter=from_publication_date:2021-01-01';
         const queryBatches = await Promise.all(queries.slice(0, 3).map(async (q) => {
-          const url = OA_API + `/works?search=${encodeURIComponent(q.slice(0,120))}&per_page=30&sort=relevance_score:desc&select=${SEARCH_FIELDS}`;
+          const url = OA_API + `/works?search=${encodeURIComponent(q.slice(0,120))}&per_page=30&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
           try {
             const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
             if (!r.ok) return [];
@@ -4236,7 +4237,7 @@
         if (allWorks.length < 8) {
           const backup = uniqueWords.slice(0, 5).join(' ');
           try {
-            const url = OA_API + `/works?search=${encodeURIComponent(backup)}&per_page=30&sort=relevance_score:desc&select=${SEARCH_FIELDS}`;
+            const url = OA_API + `/works?search=${encodeURIComponent(backup)}&per_page=30&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
             const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
             if (r.ok) {
               const d = await r.json();
@@ -4253,7 +4254,7 @@
           if (chn) {
             const cnQuery = chn.slice(0, 12); // 12 Chinese chars ≈ 108 URL chars
             try {
-              const url = OA_API + `/works?search=${encodeURIComponent(cnQuery)}&per_page=20&sort=relevance_score:desc&select=${SEARCH_FIELDS}`;
+              const url = OA_API + `/works?search=${encodeURIComponent(cnQuery)}&per_page=20&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
               const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
               if (r.ok) {
                 const d = await r.json();
