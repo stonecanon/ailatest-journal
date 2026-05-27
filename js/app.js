@@ -50,8 +50,6 @@
       pick_filter_zone: '中科院分区',
       pick_filter_scopus: '仅 Scopus 收录',
       pick_filter_compre: '排除综合性期刊',
-      pick_free_used: '已用 {n}/5 次',
-      pick_free_exhausted: '今日免费次数已用完，明天再来吧！',
       results_all: '全部期刊', load_more: '加载更多',
       col_name: '期刊 Title', col_abbr: '缩写 Abbr', col_badges: '索引 / 分区',
       col_cat: 'ESI / 中科院大类',
@@ -106,10 +104,8 @@
       pick_filter_if: 'IF >',
       pick_filter_zone: 'CAS Zone',
       pick_filter_scopus: 'Scopus only',
-      pick_filter_compre: 'Exclude Multidisciplinary',
-      pick_free_used: '{n}/5 used today',
-      pick_free_exhausted: 'Daily limit reached. Come back tomorrow!',
-      results_all: 'All Journals', load_more: 'Load more',
+      pick_filter_compre: 'Exclude multidisciplinary',
+      results_all: 'All journals', load_more: 'Load more',
       col_name: 'Journal Title', col_abbr: 'Abbr', col_badges: 'Index / Tier',
       col_cat: 'ESI / CAS Major',
       hero_title_dom: 'Domestic Chinese Journal Directories',
@@ -4091,18 +4087,7 @@
       const query = input.value.trim();
       if (!query) { status.textContent = T('请输入内容','Please enter a query'); return; }
 
-      // ── Daily usage limit (localStorage) ──
-      const today = new Date().toISOString().slice(0,10); // YYYY-MM-DD
-      const limitKey = 'ailatest.pick.count';
-      let dailyData;
-      try { dailyData = JSON.parse(localStorage.getItem(limitKey) || '{}'); } catch(e) { dailyData = {}; }
-      if (dailyData.date !== today) { dailyData = { date: today, count: 0 }; }
-      if (dailyData.count >= 5) {
-        status.textContent = T('今日免费次数已用完，明天再来吧！','Daily limit reached. Come back tomorrow!');
-        return;
-      }
-
-      status.textContent = T('正在分析匹配中…','Analyzing and matching…');
+      status.textContent = T('正在搜索相关论文…','Searching related papers…');
       results.innerHTML = '';
 
       try {
@@ -4435,8 +4420,13 @@
           });
         });
 
-        status.textContent = `${T('已检索','Searched')} ${allWorks.length} ${T('篇论文','papers')}，${T('分布在','in')} ${journalMap.size} ${T('个期刊','journals')}，${T('推荐','recommended')} ${filtered.length} ${T('个','')} · ${T('已用 {n}/5 次','{n}/5 used today').replace('{n}', dailyData.count+1)}`;
-        // Increment daily counter
+        status.textContent = `${T('已检索','Searched')} ${allWorks.length} ${T('篇论文','papers')}，${T('分布在','in')} ${journalMap.size} ${T('个期刊','journals')}，${T('推荐','recommended')} ${filtered.length} ${T('个','')}`;
+        // Increment daily counter (no limit)
+        const today = new Date().toISOString().slice(0,10);
+        const limitKey = 'ailatest.pick.count';
+        let dailyData;
+        try { dailyData = JSON.parse(localStorage.getItem(limitKey) || '{"date":"","count":0}'); } catch(e) { dailyData = {date:'',count:0}; }
+        if (dailyData.date !== today) { dailyData = { date: today, count: 0 }; }
         dailyData.count++;
         localStorage.setItem(limitKey, JSON.stringify(dailyData));
       } catch (e) {
