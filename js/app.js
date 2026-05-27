@@ -703,6 +703,9 @@
   let activeIndices = new Set(['SCIE','SSCI','AHCI','ESCI','EI']);
   let activeZones = new Set();
   let activeJcr = new Set();
+  let activeXr = new Set();
+  let activeAbdc = new Set();
+  let activeAbs = new Set();
   let activeFeats = new Set();
   let activeWos = new Set();
   let wosCats = [];   // [{name,count}] sorted A-Z
@@ -1893,6 +1896,18 @@
     if (activeJcr.size) {
       const jcr = (r.if_quartile || '').toUpperCase();
       if (!jcr || !activeJcr.has(jcr)) return false;
+    }
+    if (activeXr.size) {
+      const xr = r.cas_xr != null ? String(r.cas_xr) : '';
+      if (!xr || !activeXr.has(xr)) return false;
+    }
+    if (activeAbdc.size) {
+      const abdc = r.abdc && r.abdc.rating ? r.abdc.rating : '';
+      if (!abdc || !activeAbdc.has(abdc)) return false;
+    }
+    if (activeAbs.size) {
+      const abs = r.abs && r.abs.rating ? r.abs.rating : '';
+      if (!abs || !activeAbs.has(abs)) return false;
     }
     if (activeFeats.has('if') && r.if_2024 == null) return false;
     if (activeFeats.has('ccf') && !r.ccf) return false;
@@ -3868,6 +3883,18 @@
     });
     $('#jcr-toggles').addEventListener('change', () => {
       activeJcr = new Set($$('#jcr-toggles input:checked').map(i => i.value));
+      shown = PAGE; renderInt();
+    });
+    $('#xr-toggles').addEventListener('change', () => {
+      activeXr = new Set($$('#xr-toggles input:checked').map(i => i.value));
+      shown = PAGE; renderInt();
+    });
+    $('#abdc-toggles').addEventListener('change', () => {
+      activeAbdc = new Set($$('#abdc-toggles input:checked').map(i => i.value));
+      shown = PAGE; renderInt();
+    });
+    $('#abs-toggles').addEventListener('change', () => {
+      activeAbs = new Set($$('#abs-toggles input:checked').map(i => i.value));
       shown = PAGE; renderInt();
     });
     document.querySelectorAll('.feat-row').forEach(row => {
