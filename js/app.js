@@ -4634,23 +4634,13 @@
             </div>
             ${badgesHtml ? `<div class="pick-badges">${badgesHtml}</div>` : ''}
             ${(function(){
-              const rcKey = e.journalRec ? (e.journalRec.issn || e.journalRec.eissn || issnStr) : issnStr;
-              const cycle = reviewCycles[rcKey];
+              const r2 = e.journalRec;
               let txt = '📅 ' + T('审稿周期','Review cycle') + ': ';
-              if (cycle && cycle.avg_months) {
-                txt += cycle.avg_months + T(' 个月',' months') + T(' (投稿→出版)',' (submission→pub.)');
-              } else if (cycle && cycle.median_days) {
-                const m2 = (cycle.median_days / 30.44).toFixed(1);
-                txt += T('中位数 ','median ') + m2 + T(' 个月 (n=',' months (n=') + cycle.sample_size + ')';
+              const weeks = parseFloat(r2?.doaj?.review_weeks);
+              if (weeks > 0) {
+                txt += (weeks / 4.33).toFixed(1) + T(' 个月 (投稿→出版,DOAJ)',' months (submission→pub.)');
               } else {
-                // Fallback: embedded DOAJ data
-                const r2 = e.journalRec;
-                const weeks = parseFloat(r2?.doaj?.review_weeks);
-                if (weeks > 0) {
-                  txt += (weeks / 4.33).toFixed(1) + T(' 个月 (投稿→出版,DOAJ)',' months (submission→pub.)');
-                } else {
-                  txt += T('≈4.0 个月 (DOAJ 平均)','≈4.0 months (DOAJ avg)');
-                }
+                txt += T('≈4.0 个月 (DOAJ 平均)','≈4.0 months (DOAJ avg)');
               }
               return '<div class="pick-cycle">' + txt + '</div>';
             })()}
