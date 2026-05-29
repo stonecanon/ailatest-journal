@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-27T22:40:23.858Z",
+  "generated_at": "2026-05-29T14:32:34.681Z",
   "source": "remote D1",
   "notes": [
     "注册量来自 users.created_at，当前是最可靠口径。",
@@ -23,9 +23,11 @@
     "journal_views",
     "login_events",
     "page_events",
+    "pick_usage",
     "ratings",
     "shares",
     "sqlite_sequence",
+    "user_quotas",
     "users"
   ],
   "kpis": {
@@ -36,22 +38,22 @@
     "google_users": 3,
     "first_signup_at": 1778628305,
     "latest_signup_at": 1779811726,
-    "favorite_rows": 30,
+    "favorite_rows": 36,
     "users_with_favorites": 6,
-    "avg_favorites_per_active_user": 5,
-    "rating_rows": 22,
+    "avg_favorites_per_active_user": 6,
+    "rating_rows": 23,
     "users_with_ratings": 5,
-    "rated_journals": 17,
-    "avg_rating": 4.43,
+    "rated_journals": 18,
+    "avg_rating": 4.46,
     "lists": 7,
     "users_with_lists": 7,
-    "total_pageviews": 775,
-    "total_visitors": 223,
-    "total_cn_hint_events": 313,
-    "total_cn_hint_visitors": 96,
-    "total_cn_hint_sessions": 161,
+    "total_pageviews": 933,
+    "total_visitors": 255,
+    "total_cn_hint_events": 467,
+    "total_cn_hint_visitors": 124,
+    "total_cn_hint_sessions": 229,
     "total_login_events": 19,
-    "latest_pageview_at": 1779883728
+    "latest_pageview_at": 1780054473
   },
   "series": {
     "providerMix": [
@@ -253,6 +255,24 @@
         "cn_hint_events": 106,
         "cn_hint_visitors": 10,
         "cn_hint_sessions": 27
+      },
+      {
+        "day": "2026-05-28",
+        "pageviews": 18,
+        "sessions": 18,
+        "visitors": 15,
+        "cn_hint_events": 14,
+        "cn_hint_visitors": 11,
+        "cn_hint_sessions": 14
+      },
+      {
+        "day": "2026-05-29",
+        "pageviews": 140,
+        "sessions": 54,
+        "visitors": 17,
+        "cn_hint_events": 140,
+        "cn_hint_visitors": 17,
+        "cn_hint_sessions": 54
       }
     ]
   },
@@ -304,6 +324,11 @@
         "label": "PHYSICS IN MEDICINE AND BIOLOGY"
       },
       {
+        "journal_key": "0143-6244",
+        "favorites": 1,
+        "label": "BUILDING SERVICES ENGINEERING RESEARCH & TECHNOLOGY"
+      },
+      {
         "journal_key": "0378-7788",
         "favorites": 1,
         "label": "ENERGY AND BUILDINGS"
@@ -312,6 +337,11 @@
         "journal_key": "0944-7113",
         "favorites": 1,
         "label": "PHYTOMEDICINE"
+      },
+      {
+        "journal_key": "0961-3218",
+        "favorites": 1,
+        "label": "BUILDING RESEARCH AND INFORMATION"
       },
       {
         "journal_key": "1110-0168",
@@ -324,9 +354,19 @@
         "label": "NATURE REVIEWS MICROBIOLOGY"
       },
       {
+        "journal_key": "1940-1493",
+        "favorites": 1,
+        "label": "JOURNAL OF BUILDING PERFORMANCE SIMULATION"
+      },
+      {
         "journal_key": "1996-1073",
         "favorites": 1,
         "label": "ENERGIES"
+      },
+      {
+        "journal_key": "2052-4463",
+        "favorites": 1,
+        "label": "SCIENTIFIC DATA"
       },
       {
         "journal_key": "2053-1583",
@@ -334,24 +374,9 @@
         "label": "2D MATERIALS"
       },
       {
-        "journal_key": "2374-7943",
+        "journal_key": "2210-6707",
         "favorites": 1,
-        "label": "ACS CENTRAL SCIENCE"
-      },
-      {
-        "journal_key": "2571-6255",
-        "favorites": 1,
-        "label": "FIRE-SWITZERLAND"
-      },
-      {
-        "journal_key": "2573-0436",
-        "favorites": 1,
-        "label": "IEEE TRANSACTIONS ON COMPUTATIONAL IMAGING"
-      },
-      {
-        "journal_key": "t:circulation",
-        "favorites": 1,
-        "label": "t:circulation"
+        "label": "SUSTAINABLE CITIES AND SOCIETY"
       }
     ],
     "topRated": [
@@ -396,6 +421,12 @@
         "ratings": 1,
         "avg_rating": 5,
         "label": "ENERGY AND BUILDINGS"
+      },
+      {
+        "journal_key": "2210-6707",
+        "ratings": 1,
+        "avg_rating": 5,
+        "label": "SUSTAINABLE CITIES AND SOCIETY"
       },
       {
         "journal_key": "2662-1355",
@@ -461,13 +492,13 @@
     "topPaths": [
       {
         "path": "/",
-        "pageviews": 647,
-        "visitors": 140
+        "pageviews": 799,
+        "visitors": 157
       },
       {
         "path": "/?ref=producthunt",
-        "pageviews": 43,
-        "visitors": 31
+        "pageviews": 44,
+        "visitors": 32
       },
       {
         "path": "/%E4%B8%80%E7%AB%99%E5%BC%8F%E7%A7%91%E7%A0%94%E6%9C%9F%E5%88%8A%E6%9F%A5%E8%AF%A2%E5%B9%B3%E5%8F%B0",
@@ -490,13 +521,13 @@
         "visitors": 2
       },
       {
-        "path": "/s/1vZeToFQ",
+        "path": "/s/H2uiCp5y",
         "pageviews": 3,
-        "visitors": 1
+        "visitors": 2
       },
       {
-        "path": "/s/H2uiCp5y",
-        "pageviews": 2,
+        "path": "/s/1vZeToFQ",
+        "pageviews": 3,
         "visitors": 1
       },
       {
@@ -563,21 +594,21 @@
     "trafficCountries": [
       {
         "country": "JP",
-        "pageviews": 546,
-        "visitors": 61,
-        "sessions": 175,
-        "cn_hint_events": 235,
-        "cn_hint_visitors": 29,
-        "cn_hint_sessions": 91,
+        "pageviews": 678,
+        "visitors": 68,
+        "sessions": 222,
+        "cn_hint_events": 367,
+        "cn_hint_visitors": 37,
+        "cn_hint_sessions": 138,
         "colos": "NRT",
         "client_timezones": ",Asia/Shanghai,Asia/Seoul,Asia/Tokyo,Asia/Taipei",
         "client_languages": ",en-US,zh-CN,en,ko-KR"
       },
       {
         "country": "US",
-        "pageviews": 107,
-        "visitors": 70,
-        "sessions": 86,
+        "pageviews": 108,
+        "visitors": 71,
+        "sessions": 87,
         "cn_hint_events": 31,
         "cn_hint_visitors": 22,
         "cn_hint_sessions": 27,
@@ -622,6 +653,18 @@
         "client_languages": "zh-CN,,en-US"
       },
       {
+        "country": "CN",
+        "pageviews": 20,
+        "visitors": 12,
+        "sessions": 18,
+        "cn_hint_events": 19,
+        "cn_hint_visitors": 11,
+        "cn_hint_sessions": 17,
+        "colos": "LAX,AMS,SEA,HKG,SJC",
+        "client_timezones": "Asia/Shanghai,",
+        "client_languages": "zh-CN,,en-US"
+      },
+      {
         "country": "DE",
         "pageviews": 11,
         "visitors": 9,
@@ -632,6 +675,18 @@
         "colos": "DUS,FRA",
         "client_timezones": "America/New_York,Asia/Shanghai,UTC,Europe/Berlin",
         "client_languages": "en-US,zh-CN"
+      },
+      {
+        "country": "GB",
+        "pageviews": 8,
+        "visitors": 5,
+        "sessions": 6,
+        "cn_hint_events": 0,
+        "cn_hint_visitors": 0,
+        "cn_hint_sessions": 0,
+        "colos": "LHR,MAN",
+        "client_timezones": "Europe/London",
+        "client_languages": "en-GB"
       },
       {
         "country": "TW",
@@ -646,28 +701,28 @@
         "client_languages": "zh-CN"
       },
       {
-        "country": "GB",
-        "pageviews": 7,
-        "visitors": 4,
-        "sessions": 5,
+        "country": "IN",
+        "pageviews": 5,
+        "visitors": 2,
+        "sessions": 2,
         "cn_hint_events": 0,
         "cn_hint_visitors": 0,
         "cn_hint_sessions": 0,
-        "colos": "LHR",
-        "client_timezones": null,
-        "client_languages": null
+        "colos": "BOM,AMS",
+        "client_timezones": "Asia/Calcutta",
+        "client_languages": "en-GB"
       },
       {
-        "country": "IN",
+        "country": "KR",
         "pageviews": 4,
-        "visitors": 1,
-        "sessions": 1,
-        "cn_hint_events": 0,
-        "cn_hint_visitors": 0,
-        "cn_hint_sessions": 0,
-        "colos": "BOM",
-        "client_timezones": null,
-        "client_languages": null
+        "visitors": 2,
+        "sessions": 4,
+        "cn_hint_events": 4,
+        "cn_hint_visitors": 2,
+        "cn_hint_sessions": 4,
+        "colos": "ICN,HKG",
+        "client_timezones": "Asia/Shanghai,Asia/Seoul",
+        "client_languages": "zh-CN"
       },
       {
         "country": "ZA",
@@ -706,26 +761,14 @@
         "client_languages": "en-US"
       },
       {
-        "country": "KR",
+        "country": "EE",
         "pageviews": 1,
         "visitors": 1,
         "sessions": 1,
         "cn_hint_events": 1,
         "cn_hint_visitors": 1,
         "cn_hint_sessions": 1,
-        "colos": "ICN",
-        "client_timezones": "Asia/Shanghai",
-        "client_languages": "zh-CN"
-      },
-      {
-        "country": "CN",
-        "pageviews": 1,
-        "visitors": 1,
-        "sessions": 1,
-        "cn_hint_events": 1,
-        "cn_hint_visitors": 1,
-        "cn_hint_sessions": 1,
-        "colos": "LAX",
+        "colos": "TLL",
         "client_timezones": "Asia/Shanghai",
         "client_languages": "zh-CN"
       }

@@ -1516,6 +1516,7 @@ td.empty,
   }
   .search-wrap input { padding: 10px 100px 10px 12px; font-size: 14px; }
   .hint { font-size: 10px; max-width: 90px; right: 8px; }
+  .col-name { min-width: 160px; width: 28%; }
 }
 
 @media (max-width: 480px) {
