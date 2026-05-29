@@ -369,6 +369,8 @@ def parse_showjcr_if(path, by_title, by_issn):
     """表头: Journal, ISSN, eISSN, Category, IF(2024), IF Quartile(2024), IF Rank(2024)"""
     if not path.exists(): return 0
     hits = 0
+    # Clean JCR category suffix like (SCIE)/(SSCI)/(AHCI)/(ESCI)
+    _cat_pat = re.compile(r'\s*\((?:SCIE|SSCI|AHCI|ESCI)\)\s*')
     with open(path, 'r', encoding='utf-8-sig', newline='') as f:
         reader = csv.DictReader(f)
         for row in reader:
@@ -387,6 +389,15 @@ def parse_showjcr_if(path, by_title, by_issn):
             if q: rec['if_quartile'] = q
             rk = (row.get('IF Rank(2024)') or '').strip()
             if rk: rec['if_rank'] = rk
+            # Save JCR category (may contain multiple categories separated by semicolons)
+            cat_raw = (row.get('Category') or '').strip()
+            if cat_raw:
+                # Clean index suffix from each category
+                cats = [_cat_pat.sub('', c).strip() for c in re.split(r'[;；]', cat_raw) if c.strip()]
+                if cats:
+                    rec['jcr_cat'] = cats[0]  # primary category
+                    if len(cats) > 1:
+                        rec['jcr_cats'] = cats  # all categories
             hits += 1
     return hits
 

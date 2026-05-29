@@ -1667,6 +1667,20 @@ td.empty,
   letter-spacing: 0.04em;
   font-weight: 500;
 }
+.cat-major-zone.jcr-q1 { color: #7a2030; font-weight: 700; }
+.cat-major-zone.jcr-q2 { color: #a04a5a; font-weight: 600; }
+.cat-major-zone.jcr-q3 { color: #906a7a; }
+.cat-major-zone.jcr-q4 { color: #7a6a7a; }
+.cat-major-rank {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-faint);
+  margin-left: auto;
+}
+[data-theme="dark"] .cat-major-zone.jcr-q1 { color: #c05060; }
+[data-theme="dark"] .cat-major-zone.jcr-q2 { color: #d08090; }
+[data-theme="dark"] .cat-major-zone.jcr-q3 { color: #908090; }
+[data-theme="dark"] .cat-major-zone.jcr-q4 { color: #606070; }
 .cat-sub-label {
   font-family: var(--mono);
   font-size: 10.5px;

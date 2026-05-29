@@ -2962,6 +2962,29 @@
       `<div class="stat"><div class="stat-v">${escape(String(v))}</div><div class="stat-k">${k}</div>${sub?`<div class="stat-sub">${sub}</div>`:''}</div>`
     ).join('')}</div>${ifNote ? `<div class="stats-sub">${ifNote}</div>` : ''}` : '';
 
+    // JCR 分区详情 — 大类(primary category) + 小类(all categories)
+    const jcrHTML = (() => {
+      const q = ir.if_quartile;
+      const rk = ir.if_rank;
+      const cat = ir.jcr_cat;
+      const cats = ir.jcr_cats;
+      if (!q && !rk && !cat && !cats) return '';
+      const primaryLine = cat ? `<div class="cat-major-line">
+        <span class="cat-major-name">${escape(cat)}</span>
+        ${q ? `<span class="cat-major-zone jcr-q${q.toLowerCase()}">JCR ${q}</span>` : ''}
+        ${rk ? `<span class="cat-major-rank">${escape(rk)}</span>` : ''}
+      </div>` : '';
+      // All JCR categories (including primary, shown as chips)
+      const allCats = cats && cats.length ? cats : (cat ? [cat] : []);
+      const chips = allCats.length ? `<div class="cat-chips">${allCats.map(c => `<span class="cat-chip">${escape(c)}</span>`).join('')}</div>` : '';
+      if (!primaryLine && !chips) return '';
+      return `<div class="drawer-section">
+        <h4>${T('JCR 2025 类别分区','JCR 2025 · Category Quartiles')}</h4>
+        ${primaryLine}
+        ${chips ? `<div class="cat-sub-label">${T('JCR 学科类别','JCR Subject Categories')}</div>${chips}` : ''}
+      </div>`;
+    })();
+
     // WoS 学科分类
     const wosHTML = (Array.isArray(ir.wos_categories) && ir.wos_categories.length)
       ? `<div class="drawer-section">
@@ -3192,6 +3215,7 @@
         </div>
       </div>
       ${statsHTML}
+      ${jcrHTML}
       ${casHTML}
       ${xrHTML}
       ${wosHTML}
