@@ -4279,7 +4279,7 @@
     return flags[issn] || flags[eissn] || flags[name] || '';
   }
   let _pickInit = false;
-  const OA_API = 'https://api.openalex.org';
+  const OA_API = '/api/openalex';
 
   function initPickTool() {
     if (_pickInit) return;
@@ -4426,7 +4426,7 @@
         const FIVE_YEARS_AGO = new Date(Date.now() - 5*365*24*60*60*1000).toISOString().slice(0,10);
         const DATE_FILTER = `&filter=from_publication_date:${FIVE_YEARS_AGO}`;
         const queryBatches = await Promise.all(queries.slice(0, 4).map(async (q) => {
-          const url = `https://api.openalex.org/works?search=${encodeURIComponent(q.slice(0,120))}&per_page=200&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
+          const url = `${OA_API}/works?search=${encodeURIComponent(q.slice(0,120))}&per_page=200&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
           try {
             const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
             if (!r.ok) {
@@ -4455,7 +4455,7 @@
         // If too few results, try a broader backup query
         if (allWorks.length < 8) {
           const backup = uniqueWords.slice(0, 8).join(' ');
-          const url = `https://api.openalex.org/works?search=${encodeURIComponent(backup)}&per_page=200&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
+          const url = `${OA_API}/works?search=${encodeURIComponent(backup)}&per_page=200&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
           try {
             const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
             if (r.ok) {
@@ -4472,7 +4472,7 @@
           const chn = titleTerms[0].replace(/[a-zA-Z0-9\s]/g, '').replace(/[，。、；：！？（）【】《》""''\s]/g, '');
           if (chn) {
             const cnQuery = chn.slice(0, 12);
-            const url = `https://api.openalex.org/works?search=${encodeURIComponent(cnQuery)}&per_page=200&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
+            const url = `${OA_API}/works?search=${encodeURIComponent(cnQuery)}&per_page=200&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
             try {
               const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
               if (r.ok) { const d = await r.json(); for (const w of (d.results||[])) { if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); } } }
@@ -4743,7 +4743,7 @@
     }
 
     btn.addEventListener('click', doSearch);
-    input.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.ctrlKey) doSearch(); });
+    input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); doSearch(); } });
 
     // ── Search history ──
     const HISTORY_KEY = 'ailatest.pick.history';
