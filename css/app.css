@@ -1488,8 +1488,8 @@ td.empty,
   .mobile-nav-brand { display: none !important; }
   main.main .topbar     { order: 2; margin-bottom: 14px; }
   main.main .tab    { flex: 1 1 0; min-width: 0; padding: 10px 4px 8px; }
-  main.main .tab .tab-icon { font-size: 20px; }
-  main.main .tab .tab-label { font-size: 12px; letter-spacing: 0.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  main.main .tab .tab-icon { font-size: 16px; }
+  main.main .tab .tab-label { font-size: 14px; letter-spacing: 0.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   main.main .tab-panel { order: 3; }
   main.main .site-foot { order: 5; }
   .topbar {
