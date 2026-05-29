@@ -1465,6 +1465,24 @@ td.empty,
 }
 
 @media (max-width: 480px) {
+  main.main .tabs {
+    flex-wrap: wrap;
+    overflow-x: visible;
+    row-gap: 8px;
+    padding-bottom: 6px;
+  }
+  main.main .tabs .topbar-actions {
+    order: -1;
+    flex: 0 0 100%;
+    width: 100%;
+    margin-left: 0;
+    padding-left: 0;
+    justify-content: flex-end;
+  }
+  main.main .tab {
+    flex: 1 1 0;
+    min-width: 0;
+  }
   .topbar-actions {
     justify-content: flex-end;
   }
