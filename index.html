@@ -38,7 +38,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- End Google Tag Manager -->
 <link rel="preload" href="/data/journals.json.gz" as="fetch" crossorigin="anonymous" />
 <link rel="preload" href="/data/journal_aliases.json" as="fetch" crossorigin="anonymous" />
-<link rel="stylesheet" href="/css/app.css?v=20260529-21" />
+<link rel="stylesheet" href="/css/app.css?v=20260529-23" />
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json" />
@@ -102,6 +102,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <input id="q" type="search" placeholder="Search: journal title / abbr / ISSN" autocomplete="off" spellcheck="false" />
       <span class="hint" id="hint" data-i18n="loading">加载中…</span>
     </div>
+    <div class="topbar-actions">
+      <button class="auth-btn" id="auth-btn" aria-label="Sign in" data-i18n="login">登录</button>
+      <div class="lang-toggle-wrap">
+        <button class="lang-toggle" id="lang-toggle" aria-label="Switch language">中文</button>
+      </div>
+    </div>
   </header>
 
   <div class="tabs">
@@ -110,7 +116,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <span class="tab-label" data-i18n="tab_int">国际</span>
     </a>
     <a class="tab" data-tab="dom" href="/china">
-      <span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19V7l8-4 8 4v12"/><path d="M8 19V9h8v10"/><path d="M10 12h4"/><path d="M10 15h4"/></svg></span>
+      <span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 16c4-2 6-8 10-8s6 6 10 8"/><path d="M2 16v4h20v-4"/><rect x="4" y="10" width="3" height="6"/><rect x="10" y="10" width="3" height="6"/><rect x="17" y="10" width="3" height="6"/><rect x="10.5" y="12" width="2" height="4" rx="1"/></svg></span>
       <span class="tab-label" data-i18n="tab_dom">中国</span>
     </a>
     <a class="tab" data-tab="fav" href="/favorites">
@@ -122,12 +128,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <span class="tab-label" data-i18n="tab_pick">选刊</span>
     </a>
     <a class="mobile-nav-brand" href="/" aria-label="AILatest Journal"><em>Journal</em><span>.ailatest</span></a>
-    <div class="topbar-actions">
-      <button class="auth-btn" id="auth-btn" aria-label="Sign in" data-i18n="login">登录</button>
-      <div class="lang-toggle-wrap">
-        <button class="lang-toggle" id="lang-toggle" aria-label="Switch language">中文</button>
-      </div>
-    </div>
   </div>
 
   <!-- ─── International tab ─── -->

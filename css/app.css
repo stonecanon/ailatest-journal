@@ -1484,28 +1484,29 @@ td.empty,
     max-width: 100%;
     display: flex; flex-direction: column;
   }
-  main.main .tabs       { order: 1; margin: 0 -16px 12px; padding: 0 16px; overflow-x: auto; gap: 2px; }
+  main.main .tabs       { order: 1; margin: 0 -16px 12px; padding: 0 16px; overflow-x: hidden; gap: 0; }
+  .mobile-nav-brand { display: none !important; }
   main.main .topbar     { order: 2; margin-bottom: 14px; }
-  main.main .tab    { min-width: 76px; padding: 10px 14px 8px; }
-  main.main .tab .tab-icon { font-size: 18px; }
-  main.main .tab .tab-label { font-size: 14px; letter-spacing: 0.04em; }
+  main.main .tab    { flex: 1 1 0; min-width: 0; padding: 10px 4px 8px; }
+  main.main .tab .tab-icon { font-size: 20px; }
+  main.main .tab .tab-label { font-size: 15px; letter-spacing: 0.04em; }
   main.main .tab-panel { order: 3; }
   main.main .site-foot { order: 5; }
   .topbar {
     flex-wrap: wrap;
     gap: 8px 10px;
   }
+  .topbar .topbar-actions {
+    order: 0;
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
   .search-wrap {
     flex: 0 0 100%;
     width: 100%;
     order: 1;
-  }
-  .tabs .topbar-actions {
-    flex: 0 0 auto;
-    width: auto;
-    margin-left: auto;
-    padding-left: 12px;
-    justify-content: flex-end;
   }
   .lang-toggle, .auth-btn {
     padding: 6px 10px;

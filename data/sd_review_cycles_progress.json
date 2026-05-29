@@ -1,0 +1,25 @@
+{
+  "started": "2026-05-28T00:05:34.955Z",
+  "last_update": "2026-05-28T01:19:15.180Z",
+  "completed": [
+    "1383-5866",
+    "2590-3330",
+    "2210-6707",
+    "0888-3270",
+    "1365-1609",
+    "0950-0618",
+    "1574-0137",
+    "1672-5107"
+  ],
+  "stopped": true,
+  "current_journal": {
+    "name": "PETROLEUM SCIENCE",
+    "issn": "1672-5107",
+    "eissn": "1995-8226",
+    "publisher": "KEAI PUBLISHING LTD",
+    "field": "Engineering"
+  },
+  "current_article_index": 1,
+  "stop_reason": "captcha",
+  "current_doi": "10.1016/j.petsci.2026.05.008"
+}
