@@ -2686,9 +2686,9 @@
         const name = r.name || '';
         const isnCell = r.issn ? `<span class="jissn">${escape(r.issn)}</span>` : (r.cn_code ? `<span class="jissn">${escape(r.cn_code)}</span>` : '<span class="muted-cell">—</span>');
         const catCell = (r.major_categories||[]).length ? r.major_categories.map(c => `<span class="cat-inline">${escape(c)}</span>`).join('') : '<span class="muted-cell">—</span>';
-        return `<tr class="j-row clickable" data-fid="${escape(fid)}" data-src="cnki_major">
+        return `<tr class="j-row clickable cnki-row" data-fid="${escape(fid)}" data-src="cnki_major">
           <td class="col-fav" style="width:36px">${starBtn(r, 'cnki_major')}</td>
-          <td class="jname" style="font-size:13.5px">${escape(name)}</td>
+          <td class="jname cnki-name">${escape(name)}</td>
           <td class="col-cross"><div class="badges">${badges || '<span class="muted-cell">—</span>'}</div></td>
           <td class="muted-cell" style="width:160px">${catCell}</td>
           <td style="width:130px">${isnCell}</td>
@@ -2701,7 +2701,7 @@
           T('中文期刊目录','Chinese Journal Directory'),
           `${T('共收录','Total ')} ${all.length.toLocaleString()} ${T('种中文期刊',' Chinese journals')}${q ? T(' · 搜索: ',' · Search: ')+escape(q) : ''}`,
         )}
-        <div class="table-wrap"><table class="journals"><thead><tr>
+        <div class="table-wrap cnki-table-wrap"><table class="journals cnki-table"><thead><tr>
           <th style="width:36px" aria-label="Favorite"></th>
           <th>${T('期刊名称','Journal')}</th>
           <th style="min-width:180px;padding:0 4px"><select id="cnki-index-select" class="th-select"><option value="__all">${T('收录索引','Indices')}</option>${indexOptions}</select></th>
