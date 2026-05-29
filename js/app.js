@@ -4264,48 +4264,11 @@
     const results = $('#pick-results');
     const status = $('#pick-status');
     const quotaEl = $('#pick-quota');
-
-    // ── Show daily quota ──
-    (function updateQuota() {
-      const OWNER_EMAIL = 'jiantaoweng@gmail.com';
-      const isOwner = localStorage.getItem('ailatest_unlocked') === '1'
-        || (user && (user.email === OWNER_EMAIL || user.login === OWNER_EMAIL || user.name === OWNER_EMAIL));
-      if (isOwner) {
-        quotaEl.textContent = T('无限次使用（已解锁）','Unlimited (unlocked)');
-        return;
-      }
-      const today = new Date().toISOString().slice(0,10);
-      let dailyData;
-      try { dailyData = JSON.parse(localStorage.getItem('ailatest.pick.count') || '{}'); } catch(e) { dailyData = {}; }
-      const used = dailyData.date === today ? dailyData.count : 0;
-      const remaining = Math.max(0, 5 - used);
-      quotaEl.textContent = T(`每日 ${remaining} / 5 次剩余`,`${remaining} / 5 searches remaining`);
-    })();
+    quotaEl.textContent = T('基于 OpenAlex 开放学术数据实时检索','Powered by OpenAlex open scholarly data');
 
     async function doSearch() {
       const query = input.value.trim();
       if (!query) { status.textContent = T('请输入内容','Please enter a query'); return; }
-
-      // ── Daily usage limit (localStorage) ──
-      // Bypass: owner email hardcoded
-      const OWNER_EMAIL = 'jiantaoweng@gmail.com';
-      const isUnlocked = localStorage.getItem('ailatest_unlocked') === '1'
-        || (user && (user.email === OWNER_EMAIL || user.login === OWNER_EMAIL || user.name === OWNER_EMAIL));
-      if (!isUnlocked) {
-        const today = new Date().toISOString().slice(0,10);
-        const limitKey = 'ailatest.pick.count';
-        let dailyData;
-        try { dailyData = JSON.parse(localStorage.getItem(limitKey) || '{}'); } catch(e) { dailyData = {}; }
-        if (dailyData.date !== today) { dailyData = { date: today, count: 0 }; }
-        if (dailyData.count >= 5) {
-          status.textContent = T('今日免费次数已用完，购买解锁无限使用 → support@ailatest.org','Daily limit reached. Purchase unlimited → support@ailatest.org');
-          results.innerHTML = `<div class="pick-no-results" style="padding:40px 20px">
-            <p>${T('免费用户每天限 5 次搜索','Free: 5 searches/day')}</p>
-            <p>${T('联系 support@ailatest.org 购买解锁无限使用','Contact support@ailatest.org to unlock unlimited use')}</p>
-          </div>`;
-          return;
-        }
-      }
 
       status.textContent = T('正在搜索相关论文…','Searching related papers…');
       results.innerHTML = '';
@@ -4716,17 +4679,6 @@
         }
 
         status.textContent = `${T('已发表','Published')} ${allWorks.length} ${T('篇相关论文','related papers')}，${T('分布在','in')} ${journalMap.size} ${T('个期刊','journals')}，${T('推荐','recommended')} ${filtered.length} ${T('个','')}`;
-        // Increment daily counter (only for non-unlocked users)
-        if (!isUnlocked) {
-          const today = new Date().toISOString().slice(0,10);
-          const limitKey = 'ailatest.pick.count';
-          let dailyData;
-          try { dailyData = JSON.parse(localStorage.getItem(limitKey) || '{"date":"","count":0}'); } catch(e) { dailyData = {date:'',count:0}; }
-          if (dailyData.date !== today) { dailyData = { date: today, count: 0 }; }
-          dailyData.count++;
-          localStorage.setItem(limitKey, JSON.stringify(dailyData));
-          quotaEl.textContent = T(`每日 ${Math.max(0,5-dailyData.count)} / 5 次剩余`,`${Math.max(0,5-dailyData.count)} / 5 searches remaining`);
-        }
         // ── Save to search history ──
         savePickHistory(query);
       } catch (e) {
