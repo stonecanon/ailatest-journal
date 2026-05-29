@@ -1856,17 +1856,11 @@
     // 第一行：索引（SCIE/SSCI/AHCI/ESCI/EI）— 回答"这本被哪些数据库收录"
     const indexBadges = renderIndexBadges(r);
     // 第二行：分区/等级/预警 — 回答"这本的等级和影响力"（IF 已移到独立列）
-    // Additional badges: publisher warning labels
-    const _pub = (r.publisher || '').toLowerCase();
-    let _pubBadge = '';
-    if (_pub.includes('mdpi')) _pubBadge = '<span class="badge b-mdpi">MDPI</span>';
-    else if (_pub.includes('frontiers')) _pubBadge = '<span class="badge b-frontiers">Frontiers</span>';
-    else if (_pub.includes('hindawi')) _pubBadge = '<span class="badge b-hindawi">Hindawi</span>';
     // Multidisciplinary badge
     const _cats = r.wos_categories || [];
     const _isMulti = _cats.some(c => /multidisciplinary/i.test(c));
     const _multiBadge = _isMulti ? '<span class="badge b-multi">综合</span>' : '';
-    const rankBadges = [renderRankBadges(r), crossBadges, _pubBadge, _multiBadge].filter(Boolean).join('');
+    const rankBadges = [renderRankBadges(r), crossBadges, _multiBadge].filter(Boolean).join('');
     const badgeCell = renderBadgeCell(indexBadges, rankBadges);
     const casVal = (lang === 'zh-CN' || lang === 'zh-TW') ? (r.cas_major_cn || '') : tn(r.cas_major_cn || '', 'domain');
     const esiVal = r.esi_category || '';
@@ -2888,10 +2882,6 @@
     const drawerIndexBadges = (src === 'int' || intRec) ? renderIndexBadges(ir) : '';
     let drawerRankBadges = (src === 'int' || intRec) ? renderRankBadges(ir) : '';
     if (src === 'int' || intRec) {
-      const _pub2 = (ir.publisher || '').toLowerCase();
-      if (_pub2.includes('mdpi')) drawerRankBadges += '<span class="badge b-mdpi">MDPI</span>';
-      else if (_pub2.includes('frontiers')) drawerRankBadges += '<span class="badge b-frontiers">Frontiers</span>';
-      else if (_pub2.includes('hindawi')) drawerRankBadges += '<span class="badge b-hindawi">Hindawi</span>';
       const _cats2 = ir.wos_categories || [];
       if (_cats2.some(c => /multidisciplinary/i.test(c))) drawerRankBadges += '<span class="badge b-multi">综合</span>';
     }
@@ -4644,7 +4634,7 @@
             const cats = e.wos_categories || [];
             const isMulti = cats.some(c => /multidisciplinary/i.test(c));
             const multiBadge = isMulti ? '<span class="badge b-multi">综合</span>' : '';
-            badgesHtml = [idxBadges, scBadge, eiBdg, ifBdg, ccfTxt, pubBadge, warnBadge, multiBadge].filter(Boolean).join('');
+            badgesHtml = [idxBadges, scBadge, eiBdg, ifBdg, ccfTxt, warnBadge, multiBadge].filter(Boolean).join('');
             // Prominent zone/JCR tags at top of card
             const zTag = e.zone
               ? `<span class="zone z${e.zone}">${e.top ? 'TOP·' : ''}${e.zone}${T('区','')}</span>`
@@ -4686,6 +4676,7 @@
               </div>
             </div>
             ${badgesHtml ? `<div class="pick-badges">${badgesHtml}</div>` : ''}
+            ${pubBadge ? `<div class="pick-publisher-badge">${pubBadge}${T('出版社','ublisher')}</div>` : ''}
             ${(function(){
               const r2 = e.journalRec;
               let txt = '📅 ' + T('审稿周期','Review cycle') + ': ';
