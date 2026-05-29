@@ -3055,12 +3055,12 @@
 
     // 警示刊
     const warnHTML = (() => {
-      // Manual high-risk journal overrides for drawer
-      const _irName = (ir.name || '').toUpperCase();
-      if (_irName === 'ECOLOGICAL INDICATORS') {
+      // On Hold from manual list
+      const _holdLabel = ir.issn ? getOnHoldLabel(ir) : '';
+      if (_holdLabel) {
         return `<div class="drawer-section warn-block">
            <h4>⚠ ${T('高风险警示','High-Risk Warning')}</h4>
-           <p>${T('该刊被标记为高风险期刊。投稿前请谨慎评估。','This journal has been flagged as high-risk. Evaluate carefully before submission.')}</p>
+           <p>${T('该刊被标记为：','This journal has been flagged as: ')}${escape(_holdLabel)}${T('。投稿前请谨慎评估。',' Evaluate carefully before submission.')}</p>
          </div>`;
       }
       const w = ir.warning;
@@ -4269,6 +4269,15 @@
   }
 
   // ───────── pick-for-me (journal recommendation) ─────────
+  const _holdMap = () => window.__holdMap || {};
+  function getOnHoldLabel(journalRec) {
+    if (!journalRec) return '';
+    const hm = _holdMap();
+    const issn = journalRec.issn || '';
+    const eissn = journalRec.eissn || '';
+    const name = (journalRec.name || '').toUpperCase();
+    return hm[issn] || hm[eissn] || hm[name] || '';
+  }
   let _pickInit = false;
   const OA_API = 'https://api.openalex.org';
 
@@ -4638,10 +4647,10 @@
                 warnBadge = '<span class="badge b-warn">⚠ Warning</span>';
               }
             }
-            // Manual high-risk journal overrides (not in CAS warning list but known risky)
-            const _nameUpper = (r.name || '').toUpperCase();
-            if (_nameUpper === 'ECOLOGICAL INDICATORS') {
-              warnBadge = '<span class="badge b-warn b-warn-high">⚠ 高风险</span>';
+            // On Hold label from manual list (SCI on hold, high-risk, etc.)
+            const _holdLabel = getOnHoldLabel(r);
+            if (_holdLabel) {
+              warnBadge = `<span class="badge b-warn b-warn-high">⚠ ${escape(_holdLabel)}</span>`;
             }
             // Multidisciplinary badge
             const cats = e.wos_categories || [];
@@ -4821,15 +4830,17 @@
     // 分享着陆页：/s/<id> 直接接管 main，不走主流程
     if (await maybeRenderShareLanding()) return;
     try {
-      const [j, d, m, esi, aliases] = await Promise.all([
+      const [j, d, m, esi, aliases, holdMap] = await Promise.all([
         fetchJSON('data/journals.json.gz' + (typeof __BUILD_VER !== 'undefined' ? '?v=' + __BUILD_VER : '')),
         fetch('data/domestic.json' + (typeof __BUILD_VER !== 'undefined' ? '?v=' + __BUILD_VER : '')).then(r => r.json()).catch(() => null),
         fetch('data/meta.json' + (typeof __BUILD_VER !== 'undefined' ? '?v=' + __BUILD_VER : '')).then(r => r.json()).catch(() => null),
         fetch('data/esi_categories.json' + (typeof __BUILD_VER !== 'undefined' ? '?v=' + __BUILD_VER : '')).then(r => r.json()).catch(() => []),
         fetch('data/journal_aliases.json' + (typeof __BUILD_VER !== 'undefined' ? '?v=' + __BUILD_VER : '')).then(r => r.json()).catch(() => DEFAULT_JOURNAL_ALIASES),
+        fetchJSON('data/manual_hold_journals.json?v=' + (typeof __BUILD_VER !== 'undefined' ? __BUILD_VER : Date.now())).catch(() => ({})),
       ]);
       setJournalAliases(aliases);
       journals = j; domestic = d; meta = m; esiCats = esi; oaMap = null;
+      window.__holdMap = holdMap;
       journals.forEach(journalSearchMeta);
       buildDomIndex(domestic);
       buildIntIndex(journals);
