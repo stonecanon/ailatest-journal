@@ -17,7 +17,7 @@ export async function onRequest({ request }) {
   }
 
   const targetParams = new URLSearchParams(qs);
-  if (!targetParams.has('mailto')) targetParams.set('mailto', 'support@ailatest.org');
+  if (!targetParams.has('mailto')) targetParams.set('mailto', 'jiantaoweng@gmail.com');
   const apiUrl = `https://api.openalex.org/works?${targetParams.toString()}`;
   const cache = caches.default;
   const cacheKey = new Request(apiUrl, request);

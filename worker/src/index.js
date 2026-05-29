@@ -1072,7 +1072,9 @@ export default {
         // If no url param, treat searchParams as direct query string to pass through
         const qs = u.search.slice(1); // remove leading ?
         if (qs) {
-          const apiUrl = `https://api.openalex.org/works?${qs}`;
+          const targetParams = new URLSearchParams(qs);
+          if (!targetParams.has('mailto')) targetParams.set('mailto', 'jiantaoweng@gmail.com');
+          const apiUrl = `https://api.openalex.org/works?${targetParams.toString()}`;
           const r = await fetch(apiUrl, { headers: { 'Accept': 'application/json' } });
           const body = await r.text();
           return new Response(body, { status: r.status, headers: { 'Content-Type': 'application/json', ...CORS } });
