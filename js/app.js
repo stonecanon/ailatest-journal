@@ -3055,6 +3055,14 @@
 
     // 警示刊
     const warnHTML = (() => {
+      // Manual high-risk journal overrides for drawer
+      const _irName = (ir.name || '').toUpperCase();
+      if (_irName === 'ECOLOGICAL INDICATORS') {
+        return `<div class="drawer-section warn-block">
+           <h4>⚠ ${T('高风险警示','High-Risk Warning')}</h4>
+           <p>${T('该刊被标记为高风险期刊。投稿前请谨慎评估。','This journal has been flagged as high-risk. Evaluate carefully before submission.')}</p>
+         </div>`;
+      }
       const w = ir.warning;
       if (!w) return '';
       // 兼容旧值（true / 字符串）
@@ -4599,6 +4607,7 @@
           let badgesHtml = '';
           let zoneTagsHtml = '';
           let zoneColor = '';
+          let pubBadge = '';
           if (e.journalRec) {
             const r = e.journalRec;
             // Index badges (SCIE/SSCI/AHCI/ESCI)
@@ -4613,7 +4622,6 @@
             const ccfTxt = r.ccf_2026_type ? `<span class="badge b-ccf">CCF ${r.ccf_2026_type}</span>` : '';
             // Publisher badges (MDPI/Frontiers/Hindawi)
             const pubLower = (r.publisher || '').toLowerCase();
-            let pubBadge = '';
             if (pubLower.includes('mdpi')) pubBadge = '<span class="badge b-mdpi">MDPI</span>';
             else if (pubLower.includes('frontiers')) pubBadge = '<span class="badge b-frontiers">Frontiers</span>';
             else if (pubLower.includes('hindawi')) pubBadge = '<span class="badge b-hindawi">Hindawi</span>';
@@ -4629,6 +4637,11 @@
               } else {
                 warnBadge = '<span class="badge b-warn">⚠ Warning</span>';
               }
+            }
+            // Manual high-risk journal overrides (not in CAS warning list but known risky)
+            const _nameUpper = (r.name || '').toUpperCase();
+            if (_nameUpper === 'ECOLOGICAL INDICATORS') {
+              warnBadge = '<span class="badge b-warn b-warn-high">⚠ 高风险</span>';
             }
             // Multidisciplinary badge
             const cats = e.wos_categories || [];
@@ -4653,7 +4666,7 @@
               : '';
           }
 
-          // Compute score color for the score bar
+          // Compute score color for the score bar and strip
           const barColor = scorePct >= 80 ? '#1a8b3c'
             : scorePct >= 60 ? '#2d9d5e'
             : scorePct >= 40 ? '#d4a017'
@@ -4661,11 +4674,12 @@
             : '#8e9aaf';
 
           const cardZoneClass = e.zone ? ` zone-${e.zone}` : '';
-          const zoneStripStyle = zoneColor ? `style="background:${zoneColor}"` : '';
+          // Use score-based strip color (consistent), only show for journals with zone data
+          const zoneStripColor = e.zone ? barColor : '';
 
           const hl = scorePct >= 60 ? " pick-card-highlight" : scorePct >= 40 ? " pick-card-mid" : "";
           return `<div class="pick-card${cardZoneClass}${hl}" data-issn="${escape(issnStr)}">
-            ${zoneColor ? `<div class="pick-zone-strip" ${zoneStripStyle}></div>` : ''}
+            ${zoneStripColor ? `<div class="pick-zone-strip" style="background:${zoneStripColor}"></div>` : ''}
             ${zoneTagsHtml ? `<div class="pick-zone-tags">${zoneTagsHtml}</div>` : ''}
             <h3><a href="#j/${escape(e.journalRec ? favId(e.journalRec) : issnStr)}">${escape(name)}</a></h3>
             <div class="pick-head">
