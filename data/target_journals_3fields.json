@@ -1,0 +1,989 @@
+[
+  {
+    "name": "ENVIRONMENTAL SCIENCE & TECHNOLOGY",
+    "issn": "0013-936X",
+    "eissn": "1520-5851",
+    "publisher": "AMER CHEMICAL SOC",
+    "field": "Environment Science and Ecology"
+  },
+  {
+    "name": "ANNUAL REVIEW OF CHEMICAL AND BIOMOLECULAR ENGINEERING",
+    "issn": "1947-5438",
+    "eissn": "1947-5446",
+    "publisher": "ANNUAL REVIEWS",
+    "field": "Engineering"
+  },
+  {
+    "name": "SEPARATION AND PURIFICATION TECHNOLOGY",
+    "issn": "1383-5866",
+    "eissn": "1873-3794",
+    "publisher": "ELSEVIER",
+    "field": "Engineering"
+  },
+  {
+    "name": "CHINESE JOURNAL OF CHEMICAL ENGINEERING",
+    "issn": "1004-9541",
+    "eissn": "2210-321X",
+    "publisher": "CHEMICAL INDUSTRY PRESS CO LTD",
+    "field": "Engineering"
+  },
+  {
+    "name": "ONE EARTH",
+    "issn": "2590-3330",
+    "eissn": "2590-3322",
+    "publisher": "CELL PRESS",
+    "field": "Environment Science and Ecology"
+  },
+  {
+    "name": "SUSTAINABLE CITIES AND SOCIETY",
+    "issn": "2210-6707",
+    "eissn": "2210-6715",
+    "publisher": "ELSEVIER",
+    "field": "Engineering"
+  },
+  {
+    "name": "MECHANICAL SYSTEMS AND SIGNAL PROCESSING",
+    "issn": "0888-3270",
+    "eissn": "1096-1216",
+    "publisher": "ACADEMIC PRESS LTD- ELSEVIER SCIENCE LTD",
+    "field": "Engineering"
+  },
+  {
+    "name": "INTERNATIONAL JOURNAL OF ROCK MECHANICS AND MINING SCIENCES",
+    "issn": "1365-1609",
+    "eissn": "1873-4545",
+    "publisher": "PERGAMON-ELSEVIER SCIENCE LTD",
+    "field": "Engineering"
+  },
+  {
+    "name": "CONSTRUCTION AND BUILDING MATERIALS",
+    "issn": "0950-0618",
+    "eissn": "1879-0526",
+    "publisher": "ELSEVIER SCI LTD",
+    "field": "Engineering"
+  },
+  {
+    "name": "FACTA UNIVERSITATIS-SERIES MECHANICAL ENGINEERING",
+    "issn": "0354-2025",
+    "eissn": "2335-0164",
+    "publisher": "UNIV NIS",
+    "field": "Engineering"
+  },
+  {
+    "name": "ISME JOURNAL",
+    "issn": "1751-7362",
+    "eissn": "1751-7370",
+    "publisher": "OXFORD UNIV PRESS",
+    "field": "Environment Science and Ecology"
+  },
+  {
+    "name": "COMPUTER SCIENCE REVIEW",
+    "issn": "1574-0137",
+    "eissn": "1876-7745",
+    "publisher": "ELSEVIER",
+    "field": "Computer Science"
+  },
+  {
+    "name": "PETROLEUM SCIENCE",
+    "issn": "1672-5107",
+    "eissn": "1995-8226",
+    "publisher": "KEAI PUBLISHING LTD",
+    "field": "Engineering"
+  },
+  {
+    "name": "RENEWABLE & SUSTAINABLE ENERGY REVIEWS",
+    "issn": "1364-0321",
+    "eissn": "1879-0690",
+    "publisher": "PERGAMON-ELSEVIER SCIENCE LTD",
+    "field": "Engineering"
+  },
+  {
+    "name": "IEEE-CAA JOURNAL OF AUTOMATICA SINICA",
+    "issn": "2329-9266",
+    "eissn": "2329-9274",
+    "publisher": "IEEE",
+    "field": "Computer Science"
+  },
+  {
+    "name": "IEEE TRANSACTIONS ON INFORMATION FORENSICS AND SECURITY",
+    "issn": "1556-6013",
+    "eissn": "1556-6021",
+    "publisher": "IEEE",
+    "field": "Computer Science"
+  },
+  {
+    "name": "IEEE TRANSACTIONS ON INDUSTRIAL ELECTRONICS",
+    "issn": "0278-0046",
+    "eissn": "1557-9948",
+    "publisher": "IEEE",
+    "field": "Engineering"
+  },
+  {
+    "name": "INTERNATIONAL JOURNAL OF PRODUCTION ECONOMICS",
+    "issn": "0925-5273",
+    "eissn": "1873-7579",
+    "publisher": "ELSEVIER",
+    "field": "Engineering"
+  },
+  {
+    "name": "COMPUTERS IN INDUSTRY",
+    "issn": "0166-3615",
+    "eissn": "1872-6194",
+    "publisher": "ELSEVIER",
+    "field": "Computer Science"
+  },
+  {
+    "name": "ENVIRONMENTAL HEALTH PERSPECTIVES",
+    "issn": "0091-6765",
+    "eissn": "1552-9924",
+    "publisher": "US DEPT HEALTH HUMAN SCIENCES PUBLIC HEALTH SCIENCE",
+    "field": "Environment Science and Ecology"
+  },
+  {
+    "name": "ECOLOGICAL INFORMATICS",
+    "issn": "1574-9541",
+    "eissn": "1878-0512",
+    "publisher": "ELSEVIER",
+    "field": "Environment Science and Ecology"
+  },
+  {
+    "name": "IEEE JOURNAL ON SELECTED AREAS IN COMMUNICATIONS",
+    "issn": "0733-8716",
+    "eissn": "1558-0008",
+    "publisher": "IEEE",
+    "field": "Computer Science"
+  },
+  {
+    "name": "UNDERGROUND SPACE",
+    "issn": "2096-2754",
+    "eissn": "2467-9674",
+    "publisher": "KEAI PUBLISHING LTD",
+    "field": "Engineering"
+  },
+  {
+    "name": "JOURNAL OF MANUFACTURING PROCESSES",
+    "issn": "1526-6125",
+    "eissn": "2212-4616",
+    "publisher": "ELSEVIER SCI LTD",
+    "field": "Engineering"
+  },
+  {
+    "name": "IEEE TRANSACTIONS ON FUZZY SYSTEMS",
+    "issn": "1063-6706",
+    "eissn": "1941-0034",
+    "publisher": "IEEE",
+    "field": "Computer Science"
+  },
+  {
+    "name": "ARTIFICIAL INTELLIGENCE REVIEW",
+    "issn": "0269-2821",
+    "eissn": "1573-7462",
+    "publisher": "SPRINGER",
+    "field": "Computer Science"
+  },
+  {
+    "name": "URBAN FORESTRY & URBAN GREENING",
+    "issn": "1618-8667",
+    "eissn": "1610-8167",
+    "publisher": "ELSEVIER GMBH",
+    "field": "Environment Science and Ecology"
+  },
+  {
+    "name": "JOURNAL OF HAZARDOUS MATERIALS",
+    "issn": "0304-3894",
+    "eissn": "1873-3336",
+    "publisher": "ELSEVIER",
+    "field": "Environment Science and Ecology"
+  },
+  {
+    "name": "ANNUAL REVIEWS IN CONTROL",
+    "issn": "1367-5788",
+    "eissn": "1872-9088",
+    "publisher": "PERGAMON-ELSEVIER SCIENCE LTD",
+    "field": "Computer Science"
+  },
+  {
+    "name": "PATTERN RECOGNITION",
+    "issn": "0031-3203",
+    "eissn": "1873-5142",
+    "publisher": "ELSEVIER SCI LTD",
+    "field": "Computer Science"
+  },
+  {
+    "name": "IEEE TRANSACTIONS ON IMAGE PROCESSING",
+    "issn": "1057-7149",
+    "eissn": "1941-0042",
+    "publisher": "IEEE",
+    "field": "Computer Science"
+  },
+  {
+    "name": "TRANSPORT POLICY",
+    "issn": "0967-070X",
+    "eissn": "1879-310X",
+    "publisher": "ELSEVIER SCI LTD",
+    "field": "Engineering"
+  },
+  {
+    "name": "IEEE TRANSACTIONS ON INTELLIGENT TRANSPORTATION SYSTEMS",
+    "issn": "1524-9050",
+    "eissn": "1558-0016",
+    "publisher": "IEEE",
+    "field": "Computer Science"
+  },
+  {
+    "name": "TRANSPORTATION RESEARCH PART A-POLICY AND PRACTICE",
+    "issn": "0965-8564",
+    "eissn": "1879-2375",
+    "publisher": "PERGAMON-ELSEVIER SCIENCE LTD",
+    "field": "Engineering"
+  },
+  {
+    "name": "COMPUTER METHODS IN APPLIED MECHANICS AND ENGINEERING",
+    "issn": "0045-7825",
+    "eissn": "1879-2138",
+    "publisher": "ELSEVIER SCIENCE SA",
+    "field": "Engineering"
+  },
+  {
+    "name": "INFORMATION SCIENCES",
+    "issn": "0020-0255",
+    "eissn": "1872-6291",
+    "publisher": "ELSEVIER SCIENCE INC",
+    "field": "Computer Science"
+  },
+  {
+    "name": "IEEE TRANSACTIONS ON PATTERN ANALYSIS AND MACHINE INTELLIGENCE",
+    "issn": "0162-8828",
+    "eissn": "1939-3539",
+    "publisher": "IEEE COMPUTER SOC",
+    "field": "Computer Science"
+  },
+  {
+    "name": "ANNUAL REVIEW OF ENVIRONMENT AND RESOURCES",
+    "issn": "1543-5938",
+    "eissn": "1545-2050",
+    "publisher": "ANNUAL REVIEWS",
+    "field": "Environment Science and Ecology"
+  },
+  {
+    "name": "DEFENCE TECHNOLOGY",
+    "issn": "2096-3459",
+    "eissn": "2214-9147",
+    "publisher": "KEAI PUBLISHING LTD",
+    "field": "Engineering"
+  },
+  {
+    "name": "CRITICAL REVIEWS IN ENVIRONMENTAL SCIENCE AND TECHNOLOGY",
+    "issn": "1064-3389",
+    "eissn": "1547-6537",
+    "publisher": "TAYLOR & FRANCIS INC",
+    "field": "Environment Science and Ecology"
+  },
+  {
+    "name": "COMPUTERS & INDUSTRIAL ENGINEERING",
+    "issn": "0360-8352",
+    "eissn": "1879-0550",
+    "publisher": "PERGAMON-ELSEVIER SCIENCE LTD",
+    "field": "Engineering"
+  },
+  {
+    "name": "IEEE TRANSACTIONS ON SYSTEMS MAN CYBERNETICS-SYSTEMS",
+    "issn": "2168-2216",
+    "eissn": "2168-2232",
+    "publisher": "IEEE",
+    "field": "Computer Science"
+  },
+  {
+    "name": "IEEE TRANSACTIONS ON TRANSPORTATION ELECTRIFICATION",
+    "issn": "2332-7782",
+    "eissn": "2332-7782",
+    "publisher": "IEEE",
+    "field": "Engineering"
+  },
+  {
+    "name": "IEEE TRANSACTIONS ON MULTIMEDIA",
+    "issn": "1520-9210",
+    "eissn": "1941-0077",
+    "publisher": "IEEE",
+    "field": "Computer Science"
+  },
+  {
+    "name": "PROTECTION AND CONTROL OF MODERN POWER SYSTEMS",
+    "issn": "2367-2617",
+    "eissn": "2367-0983",
+    "publisher": "POWER SYSTEM PROTECTION & CONTROL PRESS",
+    "field": "Engineering"
+  },
+  {
+    "name": "BIORESOURCE TECHNOLOGY",
+    "issn": "0960-8524",
+    "eissn": "1873-2976",
+    "publisher": "ELSEVIER SCI LTD",
+    "field": "Environment Science and Ecology"
+  },
+  {
+    "name": "TRANSPORTATION RESEARCH PART B-METHODOLOGICAL",
+    "issn": "0191-2615",
+    "eissn": "1879-2367",
+    "publisher": "PERGAMON-ELSEVIER SCIENCE LTD",
+    "field": "Engineering"
+  },
+  {
+    "name": "IEEE TRANSACTIONS ON ROBOTICS",
+    "issn": "1552-3098",
+    "eissn": "1941-0468",
+    "publisher": "IEEE",
+    "field": "Computer Science"
+  },
+  {
+    "name": "ECOLOGICAL INDICATORS",
+    "issn": "1470-160X",
+    "eissn": "1872-7034",
+    "publisher": "ELSEVIER",
+    "field": "Environment Science and Ecology"
+  },
+  {
+    "name": "SWARM AND EVOLUTIONARY COMPUTATION",
+    "issn": "2210-6502",
+    "eissn": "2210-6510",
+    "publisher": "ELSEVIER",
+    "field": "Computer Science"
+  },
+  {
+    "name": "STRUCTURAL SAFETY",
+    "issn": "0167-4730",
+    "eissn": "1879-3355",
+    "publisher": "ELSEVIER",
+    "field": "Engineering"
+  },
+  {
+    "name": "JOURNAL OF CLEANER PRODUCTION",
+    "issn": "0959-6526",
+    "eissn": "1879-1786",
+    "publisher": "ELSEVIER SCI LTD",
+    "field": "Environment Science and Ecology"
+  },
+  {
+    "name": "INFORMS JOURNAL ON COMPUTING",
+    "issn": "1091-9856",
+    "eissn": "1526-5528",
+    "publisher": "INFORMS",
+    "field": "Computer Science"
+  },
+  {
+    "name": "EXPERT SYSTEMS WITH APPLICATIONS",
+    "issn": "0957-4174",
+    "eissn": "1873-6793",
+    "publisher": "PERGAMON-ELSEVIER SCIENCE LTD",
+    "field": "Computer Science"
+  },
+  {
+    "name": "TRAVEL BEHAVIOUR AND SOCIETY",
+    "issn": "2214-367X",
+    "eissn": "2214-3688",
+    "publisher": "ELSEVIER",
+    "field": "Engineering"
+  },
+  {
+    "name": "PROGRESS IN ELECTROMAGNETICS RESEARCH-PIER",
+    "issn": "1070-4698",
+    "eissn": "1559-8985",
+    "publisher": "EMW PUBLISHING",
+    "field": "Engineering"
+  },
+  {
+    "name": "TRANSPORTATION RESEARCH PART C-EMERGING TECHNOLOGIES",
+    "issn": "0968-090X",
+    "eissn": "1879-2359",
+    "publisher": "PERGAMON-ELSEVIER SCIENCE LTD",
+    "field": "Engineering"
+  },
+  {
+    "name": "IEEE JOURNAL OF SELECTED TOPICS IN SIGNAL PROCESSING",
+    "issn": "1932-4553",
+    "eissn": "1941-0484",
+    "publisher": "IEEE",
+    "field": "Computer Science"
+  },
+  {
+    "name": "FRONTIERS IN ECOLOGY AND THE ENVIRONMENT",
+    "issn": "1540-9295",
+    "eissn": "1540-9309",
+    "publisher": "WILEY",
+    "field": "Environment Science and Ecology"
+  },
+  {
+    "name": "PETROLEUM EXPLORATION AND DEVELOPMENT",
+    "issn": "2096-4803",
+    "eissn": "1876-3804",
+    "publisher": "KEAI PUBLISHING LTD",
+    "field": "Engineering"
+  },
+  {
+    "name": "ENGINEERING APPLICATIONS OF ARTIFICIAL INTELLIGENCE",
+    "issn": "0952-1976",
+    "eissn": "1873-6769",
+    "publisher": "PERGAMON-ELSEVIER SCIENCE LTD",
+    "field": "Computer Science"
+  },
+  {
+    "name": "IEEE TRANSACTIONS ON CIRCUITS AND SYSTEMS FOR VIDEO TECHNOLOGY",
+    "issn": "1051-8215",
+    "eissn": "1558-2205",
+    "publisher": "IEEE",
+    "field": "Computer Science"
+  },
+  {
+    "name": "GREEN ENERGY AND INTELLIGENT TRANSPORTATION",
+    "issn": "2097-2512",
+    "eissn": "2773-1537",
+    "publisher": "ELSEVIER",
+    "field": "Engineering"
+  },
+  {
+    "name": "MECHANISM AND MACHINE THEORY",
+    "issn": "0094-114X",
+    "eissn": "1873-3999",
+    "publisher": "PERGAMON-ELSEVIER SCIENCE LTD",
+    "field": "Engineering"
+  },
+  {
+    "name": "CHEMICAL ENGINEERING SCIENCE",
+    "issn": "0009-2509",
+    "eissn": "1873-4405",
+    "publisher": "PERGAMON-ELSEVIER SCIENCE LTD",
+    "field": "Engineering"
+  },
+  {
+    "name": "APPLIED ENERGY",
+    "issn": "0306-2619",
+    "eissn": "1872-9118",
+    "publisher": "ELSEVIER SCI LTD",
+    "field": "Engineering"
+  },
+  {
+    "name": "INTERNATIONAL JOURNAL OF MACHINE TOOLS & MANUFACTURE",
+    "issn": "0890-6955",
+    "eissn": "1879-2170",
+    "publisher": "ELSEVIER SCI LTD",
+    "field": "Engineering"
+  },
+  {
+    "name": "APPLIED MECHANICS REVIEWS",
+    "issn": "0003-6900",
+    "eissn": "2379-0407",
+    "publisher": "ASME",
+    "field": "Engineering"
+  },
+  {
+    "name": "INTERNATIONAL JOURNAL OF MECHANICAL SCIENCES",
+    "issn": "0020-7403",
+    "eissn": "1879-2162",
+    "publisher": "PERGAMON-ELSEVIER SCIENCE LTD",
+    "field": "Engineering"
+  },
+  {
+    "name": "GREEN ENERGY & ENVIRONMENT",
+    "issn": "2096-2797",
+    "eissn": "2468-0257",
+    "publisher": "KEAI PUBLISHING LTD",
+    "field": "Engineering"
+  },
+  {
+    "name": "IEEE TRANSACTIONS ON COMMUNICATIONS",
+    "issn": "0090-6778",
+    "eissn": "1558-0857",
+    "publisher": "IEEE",
+    "field": "Computer Science"
+  },
+  {
+    "name": "SUSTAINABLE PRODUCTION AND CONSUMPTION",
+    "issn": "2352-5509",
+    "eissn": "2352-5509",
+    "publisher": "ELSEVIER",
+    "field": "Environment Science and Ecology"
+  },
+  {
+    "name": "ROBOTICS AND COMPUTER-INTEGRATED MANUFACTURING",
+    "issn": "0736-5845",
+    "eissn": "1879-2537",
+    "publisher": "PERGAMON-ELSEVIER SCIENCE LTD",
+    "field": "Computer Science"
+  },
+  {
+    "name": "JOURNAL OF MANUFACTURING SYSTEMS",
+    "issn": "0278-6125",
+    "eissn": "1878-6642",
+    "publisher": "ELSEVIER SCI LTD",
+    "field": "Engineering"
+  },
+  {
+    "name": "PROGRESS IN ENERGY AND COMBUSTION SCIENCE",
+    "issn": "0360-1285",
+    "eissn": "1873-216X",
+    "publisher": "PERGAMON-ELSEVIER SCIENCE LTD",
+    "field": "Engineering"
+  },
+  {
+    "name": "ENGINEERING GEOLOGY",
+    "issn": "0013-7952",
+    "eissn": "1872-6917",
+    "publisher": "ELSEVIER",
+    "field": "Engineering"
+  },
+  {
+    "name": "IEEE TRANSACTIONS ON AFFECTIVE COMPUTING",
+    "issn": "1949-3045",
+    "eissn": "1949-3045",
+    "publisher": "IEEE",
+    "field": "Computer Science"
+  },
+  {
+    "name": "CEMENT AND CONCRETE RESEARCH",
+    "issn": "0008-8846",
+    "eissn": "1873-3948",
+    "publisher": "PERGAMON-ELSEVIER SCIENCE LTD",
+    "field": "Engineering"
+  },
+  {
+    "name": "ENERGY CONVERSION AND MANAGEMENT",
+    "issn": "0196-8904",
+    "eissn": "1879-2227",
+    "publisher": "PERGAMON-ELSEVIER SCIENCE LTD",
+    "field": "Engineering"
+  },
+  {
+    "name": "INFORMATION PROCESSING & MANAGEMENT",
+    "issn": "0306-4573",
+    "eissn": "1873-5371",
+    "publisher": "ELSEVIER SCI LTD",
+    "field": "Computer Science"
+  },
+  {
+    "name": "ENERGY",
+    "issn": "0360-5442",
+    "eissn": "1873-6785",
+    "publisher": "PERGAMON-ELSEVIER SCIENCE LTD",
+    "field": "Engineering"
+  },
+  {
+    "name": "ECOSYSTEM SERVICES",
+    "issn": "2212-0416",
+    "eissn": "2212-0416",
+    "publisher": "ELSEVIER",
+    "field": "Environment Science and Ecology"
+  },
+  {
+    "name": "ENVIRONMENT INTERNATIONAL",
+    "issn": "0160-4120",
+    "eissn": "1873-6750",
+    "publisher": "PERGAMON-ELSEVIER SCIENCE LTD",
+    "field": "Environment Science and Ecology"
+  },
+  {
+    "name": "PROCEEDINGS OF THE IEEE",
+    "issn": "0018-9219",
+    "eissn": "1558-2256",
+    "publisher": "IEEE",
+    "field": "Computer Science"
+  },
+  {
+    "name": "IEEE INTERNET OF THINGS JOURNAL",
+    "issn": "2327-4662",
+    "eissn": "2327-4662",
+    "publisher": "IEEE",
+    "field": "Computer Science"
+  },
+  {
+    "name": "COMPOSITE STRUCTURES",
+    "issn": "0263-8223",
+    "eissn": "1879-1085",
+    "publisher": "ELSEVIER SCI LTD",
+    "field": "Engineering"
+  },
+  {
+    "name": "THIN-WALLED STRUCTURES",
+    "issn": "0263-8231",
+    "eissn": "1879-3223",
+    "publisher": "ELSEVIER SCI LTD",
+    "field": "Engineering"
+  },
+  {
+    "name": "JOURNAL OF MATERIALS PROCESSING TECHNOLOGY",
+    "issn": "0924-0136",
+    "eissn": "1873-4774",
+    "publisher": "ELSEVIER SCIENCE SA",
+    "field": "Engineering"
+  },
+  {
+    "name": "IEEE TRANSACTIONS ON WIRELESS COMMUNICATIONS",
+    "issn": "1536-1276",
+    "eissn": "1558-2248",
+    "publisher": "IEEE",
+    "field": "Computer Science"
+  },
+  {
+    "name": "LANDSCAPE AND URBAN PLANNING",
+    "issn": "0169-2046",
+    "eissn": "1872-6062",
+    "publisher": "ELSEVIER",
+    "field": "Environment Science and Ecology"
+  },
+  {
+    "name": "JOURNAL OF MEMBRANE SCIENCE",
+    "issn": "0376-7388",
+    "eissn": "1873-3123",
+    "publisher": "ELSEVIER",
+    "field": "Engineering"
+  },
+  {
+    "name": "TRIBOLOGY INTERNATIONAL",
+    "issn": "0301-679X",
+    "eissn": "1879-2464",
+    "publisher": "ELSEVIER SCI LTD",
+    "field": "Engineering"
+  },
+  {
+    "name": "ENVIRONMENTAL SCIENCE AND ECOTECHNOLOGY",
+    "issn": "2666-4984",
+    "eissn": "2666-4984",
+    "publisher": "ELSEVIER",
+    "field": "Environment Science and Ecology"
+  },
+  {
+    "name": "IEEE-ASME TRANSACTIONS ON MECHATRONICS",
+    "issn": "1083-4435",
+    "eissn": "1941-014X",
+    "publisher": "IEEE",
+    "field": "Engineering"
+  },
+  {
+    "name": "ACCIDENT ANALYSIS AND PREVENTION",
+    "issn": "0001-4575",
+    "eissn": "1879-2057",
+    "publisher": "PERGAMON-ELSEVIER SCIENCE LTD",
+    "field": "Engineering"
+  },
+  {
+    "name": "DESALINATION",
+    "issn": "0011-9164",
+    "eissn": "1873-4464",
+    "publisher": "ELSEVIER",
+    "field": "Engineering"
+  },
+  {
+    "name": "INDUSTRIAL & ENGINEERING CHEMISTRY RESEARCH",
+    "issn": "0888-5885",
+    "eissn": "1520-5045",
+    "publisher": "AMER CHEMICAL SOC",
+    "field": "Engineering"
+  },
+  {
+    "name": "ADVANCED ENGINEERING INFORMATICS",
+    "issn": "1474-0346",
+    "eissn": "1873-5320",
+    "publisher": "ELSEVIER SCI LTD",
+    "field": "Engineering"
+  },
+  {
+    "name": "PROGRESS IN AEROSPACE SCIENCES",
+    "issn": "0376-0421",
+    "eissn": "1873-1724",
+    "publisher": "PERGAMON-ELSEVIER SCIENCE LTD",
+    "field": "Engineering"
+  },
+  {
+    "name": "ENGINEERING",
+    "issn": "2095-8099",
+    "eissn": "2096-0026",
+    "publisher": "ELSEVIER",
+    "field": "Engineering"
+  },
+  {
+    "name": "TRANSPORTATION RESEARCH PART D-TRANSPORT AND ENVIRONMENT",
+    "issn": "1361-9209",
+    "eissn": "1879-2340",
+    "publisher": "PERGAMON-ELSEVIER SCIENCE LTD",
+    "field": "Engineering"
+  },
+  {
+    "name": "CEMENT & CONCRETE COMPOSITES",
+    "issn": "0958-9465",
+    "eissn": "1873-393X",
+    "publisher": "ELSEVIER SCI LTD",
+    "field": "Engineering"
+  },
+  {
+    "name": "IEEE TRANSACTIONS ON CONSUMER ELECTRONICS",
+    "issn": "0098-3063",
+    "eissn": "1558-4127",
+    "publisher": "IEEE",
+    "field": "Computer Science"
+  },
+  {
+    "name": "IEEE TRANSACTIONS ON SMART GRID",
+    "issn": "1949-3053",
+    "eissn": "1949-3061",
+    "publisher": "IEEE",
+    "field": "Engineering"
+  },
+  {
+    "name": "WATER RESEARCH",
+    "issn": "0043-1354",
+    "eissn": "1879-2448",
+    "publisher": "PERGAMON-ELSEVIER SCIENCE LTD",
+    "field": "Environment Science and Ecology"
+  },
+  {
+    "name": "JOURNAL OF INDUSTRIAL INFORMATION INTEGRATION",
+    "issn": "2467-964X",
+    "eissn": "2452-414X",
+    "publisher": "ELSEVIER",
+    "field": "Computer Science"
+  },
+  {
+    "name": "RENEWABLE ENERGY",
+    "issn": "0960-1481",
+    "eissn": "1879-0682",
+    "publisher": "PERGAMON-ELSEVIER SCIENCE LTD",
+    "field": "Engineering"
+  },
+  {
+    "name": "IEEE TRANSACTIONS ON SUSTAINABLE ENERGY",
+    "issn": "1949-3029",
+    "eissn": "1949-3037",
+    "publisher": "IEEE",
+    "field": "Engineering"
+  },
+  {
+    "name": "GLOBAL ENVIRONMENTAL CHANGE-HUMAN AND POLICY DIMENSIONS",
+    "issn": "0959-3780",
+    "eissn": "1872-9495",
+    "publisher": "ELSEVIER SCI LTD",
+    "field": "Environment Science and Ecology"
+  },
+  {
+    "name": "IEEE TRANSACTIONS ON POWER SYSTEMS",
+    "issn": "0885-8950",
+    "eissn": "1558-0679",
+    "publisher": "IEEE",
+    "field": "Engineering"
+  },
+  {
+    "name": "GEOTEXTILES AND GEOMEMBRANES",
+    "issn": "0266-1144",
+    "eissn": "1879-3584",
+    "publisher": "ELSEVIER SCI LTD",
+    "field": "Engineering"
+  },
+  {
+    "name": "IEEE TRANSACTIONS ON CYBERNETICS",
+    "issn": "2168-2267",
+    "eissn": "2168-2275",
+    "publisher": "IEEE",
+    "field": "Computer Science"
+  },
+  {
+    "name": "IEEE TRANSACTIONS ON EVOLUTIONARY COMPUTATION",
+    "issn": "1089-778X",
+    "eissn": "1941-0026",
+    "publisher": "IEEE",
+    "field": "Computer Science"
+  },
+  {
+    "name": "INTERNATIONAL JOURNAL OF MINING SCIENCE AND TECHNOLOGY",
+    "issn": "2095-2686",
+    "eissn": "2212-6066",
+    "publisher": "ELSEVIER",
+    "field": "Engineering"
+  },
+  {
+    "name": "COMPUTERS AND GEOTECHNICS",
+    "issn": "0266-352X",
+    "eissn": "1873-7633",
+    "publisher": "ELSEVIER SCI LTD",
+    "field": "Engineering"
+  },
+  {
+    "name": "JOURNAL OF ROCK MECHANICS AND GEOTECHNICAL ENGINEERING",
+    "issn": "1674-7755",
+    "eissn": "2589-0417",
+    "publisher": "ELSEVIER",
+    "field": "Engineering"
+  },
+  {
+    "name": "RESOURCES CONSERVATION AND RECYCLING",
+    "issn": "0921-3449",
+    "eissn": "1879-0658",
+    "publisher": "ELSEVIER",
+    "field": "Environment Science and Ecology"
+  },
+  {
+    "name": "AUTOMATION IN CONSTRUCTION",
+    "issn": "0926-5805",
+    "eissn": "1872-7891",
+    "publisher": "ELSEVIER",
+    "field": "Engineering"
+  },
+  {
+    "name": "JOURNAL OF TRANSPORT GEOGRAPHY",
+    "issn": "0966-6923",
+    "eissn": "1873-1236",
+    "publisher": "ELSEVIER SCI LTD",
+    "field": "Engineering"
+  },
+  {
+    "name": "RELIABILITY ENGINEERING & SYSTEM SAFETY",
+    "issn": "0951-8320",
+    "eissn": "1879-0836",
+    "publisher": "ELSEVIER SCI LTD",
+    "field": "Engineering"
+  },
+  {
+    "name": "COMPUTER-AIDED CIVIL AND INFRASTRUCTURE ENGINEERING",
+    "issn": "1093-9687",
+    "eissn": "1467-8667",
+    "publisher": "ELSEVIER SCIENCE INC",
+    "field": "Engineering"
+  },
+  {
+    "name": "ANNUAL REVIEW OF FLUID MECHANICS",
+    "issn": "0066-4189",
+    "eissn": "1545-4479",
+    "publisher": "ANNUAL REVIEWS",
+    "field": "Engineering"
+  },
+  {
+    "name": "ANALYTIC METHODS IN ACCIDENT RESEARCH",
+    "issn": "2213-6657",
+    "eissn": "2213-6665",
+    "publisher": "ELSEVIER",
+    "field": "Engineering"
+  },
+  {
+    "name": "ENGINEERING STRUCTURES",
+    "issn": "0141-0296",
+    "eissn": "1873-7323",
+    "publisher": "ELSEVIER SCI LTD",
+    "field": "Engineering"
+  },
+  {
+    "name": "KNOWLEDGE-BASED SYSTEMS",
+    "issn": "0950-7051",
+    "eissn": "1872-7409",
+    "publisher": "ELSEVIER",
+    "field": "Computer Science"
+  },
+  {
+    "name": "TUNNELLING AND UNDERGROUND SPACE TECHNOLOGY",
+    "issn": "0886-7798",
+    "eissn": "1878-4364",
+    "publisher": "PERGAMON-ELSEVIER SCIENCE LTD",
+    "field": "Engineering"
+  },
+  {
+    "name": "BIOCHAR",
+    "issn": "2524-7972",
+    "eissn": "2524-7867",
+    "publisher": "SPRINGER SINGAPORE PTE LTD",
+    "field": "Environment Science and Ecology"
+  },
+  {
+    "name": "CHINESE JOURNAL OF AERONAUTICS",
+    "issn": "1000-9361",
+    "eissn": "2588-9230",
+    "publisher": "ELSEVIER SCIENCE INC",
+    "field": "Engineering"
+  },
+  {
+    "name": "JOURNAL OF OCEAN ENGINEERING AND SCIENCE",
+    "issn": "2468-0133",
+    "eissn": "2468-0133",
+    "publisher": "ELSEVIER",
+    "field": "Engineering"
+  },
+  {
+    "name": "INFORMATION FUSION",
+    "issn": "1566-2535",
+    "eissn": "1872-6305",
+    "publisher": "ELSEVIER",
+    "field": "Computer Science"
+  },
+  {
+    "name": "IEEE TRANSACTIONS ON INDUSTRIAL INFORMATICS",
+    "issn": "1551-3203",
+    "eissn": "1941-0050",
+    "publisher": "IEEE",
+    "field": "Computer Science"
+  },
+  {
+    "name": "IEEE WIRELESS COMMUNICATIONS",
+    "issn": "1536-1284",
+    "eissn": "1558-0687",
+    "publisher": "IEEE",
+    "field": "Computer Science"
+  },
+  {
+    "name": "INTERNATIONAL JOURNAL OF NEURAL SYSTEMS",
+    "issn": "0129-0657",
+    "eissn": "1793-6462",
+    "publisher": "WORLD SCIENTIFIC PUBL CO PTE LTD",
+    "field": "Computer Science"
+  },
+  {
+    "name": "TRANSPORTATION RESEARCH PART E-LOGISTICS AND TRANSPORTATION REVIEW",
+    "issn": "1366-5545",
+    "eissn": "1878-5794",
+    "publisher": "PERGAMON-ELSEVIER SCIENCE LTD",
+    "field": "Engineering"
+  },
+  {
+    "name": "DESIGN STUDIES",
+    "issn": "0142-694X",
+    "eissn": "1872-6909",
+    "publisher": "ELSEVIER SCI LTD",
+    "field": "Engineering"
+  },
+  {
+    "name": "CURRENT OPINION IN ENVIRONMENTAL SUSTAINABILITY",
+    "issn": "1877-3435",
+    "eissn": "1877-3443",
+    "publisher": "ELSEVIER SCI LTD",
+    "field": "Environment Science and Ecology"
+  },
+  {
+    "name": "ADDITIVE MANUFACTURING",
+    "issn": "2214-8604",
+    "eissn": "2214-7810",
+    "publisher": "ELSEVIER",
+    "field": "Engineering"
+  },
+  {
+    "name": "BUILDING AND ENVIRONMENT",
+    "issn": "0360-1323",
+    "eissn": "1873-684X",
+    "publisher": "PERGAMON-ELSEVIER SCIENCE LTD",
+    "field": "Engineering"
+  },
+  {
+    "name": "COMMUNICATIONS IN TRANSPORTATION RESEARCH",
+    "issn": "2772-4247",
+    "eissn": "2772-4247",
+    "publisher": "TSINGHUA UNIV PRESS",
+    "field": "Engineering"
+  },
+  {
+    "name": "IEEE TRANSACTIONS ON POWER ELECTRONICS",
+    "issn": "0885-8993",
+    "eissn": "1941-0107",
+    "publisher": "IEEE",
+    "field": "Engineering"
+  },
+  {
+    "name": "PROGRESS IN SURFACE SCIENCE",
+    "issn": "0079-6816",
+    "eissn": "1878-4240",
+    "publisher": "PERGAMON-ELSEVIER SCIENCE LTD",
+    "field": "Engineering"
+  }
+]

@@ -1,0 +1,97 @@
+{
+  "1383-5866": {
+    "name": "SEPARATION AND PURIFICATION TECHNOLOGY",
+    "issn": "1383-5866",
+    "eissn": "1873-3794",
+    "source": "Elsevier/ScienceDirect (Chrome CDP)",
+    "n": 0,
+    "attempts": 0,
+    "error": "crossref_failed",
+    "updated": "2026-05-28"
+  },
+  "2590-3330": {
+    "name": "ONE EARTH",
+    "issn": "2590-3330",
+    "eissn": "2590-3322",
+    "source": "Elsevier/ScienceDirect (Chrome CDP)",
+    "n": 0,
+    "attempts": 0,
+    "error": "crossref_failed",
+    "updated": "2026-05-28"
+  },
+  "2210-6707": {
+    "name": "SUSTAINABLE CITIES AND SOCIETY",
+    "issn": "2210-6707",
+    "eissn": "2210-6715",
+    "source": "Elsevier/ScienceDirect (Chrome CDP)",
+    "n": 0,
+    "attempts": 0,
+    "error": "crossref_failed",
+    "updated": "2026-05-28"
+  },
+  "0888-3270": {
+    "name": "MECHANICAL SYSTEMS AND SIGNAL PROCESSING",
+    "issn": "0888-3270",
+    "eissn": "1096-1216",
+    "source": "Elsevier/ScienceDirect (Chrome CDP)",
+    "n": 0,
+    "attempts": 0,
+    "error": "crossref_failed",
+    "updated": "2026-05-28"
+  },
+  "1365-1609": {
+    "name": "INTERNATIONAL JOURNAL OF ROCK MECHANICS AND MINING SCIENCES",
+    "issn": "1365-1609",
+    "eissn": "1873-4545",
+    "source": "Elsevier/ScienceDirect (Chrome CDP)",
+    "n": 0,
+    "attempts": 0,
+    "error": "crossref_failed",
+    "updated": "2026-05-28"
+  },
+  "0950-0618": {
+    "name": "CONSTRUCTION AND BUILDING MATERIALS",
+    "issn": "0950-0618",
+    "eissn": "1879-0526",
+    "source": "Elsevier/ScienceDirect (Chrome CDP)",
+    "n": 0,
+    "attempts": 0,
+    "error": "crossref_failed",
+    "updated": "2026-05-28"
+  },
+  "1574-0137": {
+    "name": "COMPUTER SCIENCE REVIEW",
+    "issn": "1574-0137",
+    "eissn": "1876-7745",
+    "source": "Elsevier/ScienceDirect (Chrome CDP)",
+    "n": 0,
+    "attempts": 0,
+    "error": "crossref_failed",
+    "updated": "2026-05-28"
+  },
+  "1672-5107": {
+    "name": "PETROLEUM SCIENCE",
+    "issn": "1672-5107",
+    "eissn": "1995-8226",
+    "source": "Elsevier/ScienceDirect (Chrome CDP)",
+    "n": 0,
+    "attempts": 1,
+    "error": "no_dates_found",
+    "updated": "2026-05-28",
+    "articles": [
+      {
+        "doi": "10.1016/j.petsci.2026.04.050",
+        "title": "Investigating the impact of well data and seismic resolution on porosity prediction using Bayesian deep learning - ScienceDirect",
+        "url": "https://www.sciencedirect.com/science/article/pii/S199582262600258X?via%3Dihub",
+        "received": "",
+        "revised": "",
+        "accepted": "",
+        "available_online": "2026/05/04",
+        "version_of_record": "2026/05/04",
+        "published": "2026/05/04",
+        "days": null,
+        "error": ""
+      }
+    ]
+  }
+}

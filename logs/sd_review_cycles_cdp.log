@@ -1,0 +1,58 @@
+[2026-05-28T00:04:01.616Z] Targets: 141; ScienceDirect-like: 93; output: G:\我的云端硬盘\AI 工作区\00_每日更新\ailatest-journal\data\sd_review_cycles_sciencedirect.json
+[2026-05-28T00:04:01.625Z] Delay per article: 60-120s; max articles/journal: 30
+[2026-05-28T00:04:01.685Z] [1/93] journal SEPARATION AND PURIFICATION TECHNOLOGY (1383-5866)
+[2026-05-28T00:04:03.200Z]   [1/30] 10.1016/j.seppur.2026.138313
+[2026-05-28T00:04:10.222Z]     result: no date; saved 0/1
+[2026-05-28T00:04:10.227Z]     sleeping 82s
+[2026-05-28T00:05:34.957Z] Targets: 141; ScienceDirect-like: 93; output: G:\我的云端硬盘\AI 工作区\00_每日更新\ailatest-journal\data\sd_review_cycles_sciencedirect.json
+[2026-05-28T00:05:34.963Z] Delay per article: 60-120s; max articles/journal: 30
+[2026-05-28T00:05:35.020Z] [1/93] journal SEPARATION AND PURIFICATION TECHNOLOGY (1383-5866)
+[2026-05-28T00:05:36.720Z]   [1/30] 10.1016/j.seppur.2026.138313
+[2026-05-28T00:05:43.544Z]     result: no date; saved 0/1
+[2026-05-28T00:05:43.550Z]     sleeping 81s
+[2026-05-28T00:07:04.525Z]   [2/30] 10.1016/j.seppur.2026.138473
+[2026-05-28T00:52:04.112Z] Targets: 141; ScienceDirect-like: 93; output: G:\我的云端硬盘\AI 工作区\00_每日更新\ailatest-journal\data\sd_review_cycles_sciencedirect.json
+[2026-05-28T00:52:04.116Z] Delay per article: 60-120s; max articles/journal: 30
+[2026-05-28T00:52:04.177Z] [1/93] journal SEPARATION AND PURIFICATION TECHNOLOGY (1383-5866)
+[2026-05-28T00:52:14.883Z]   CrossRef failed: fetch failed
+[2026-05-28T00:52:25.619Z]   CrossRef eISSN failed: fetch failed
+[2026-05-28T00:52:25.643Z] [2/93] journal ONE EARTH (2590-3330)
+[2026-05-28T00:52:36.385Z]   CrossRef failed: fetch failed
+[2026-05-28T00:52:38.372Z]   [1/30] 10.1016/j.oneear.2026.101710
+[2026-05-28T00:53:23.191Z] Targets: 141; ScienceDirect-like: 93; output: G:\我的云端硬盘\AI 工作区\00_每日更新\ailatest-journal\data\sd_review_cycles_sciencedirect.json
+[2026-05-28T00:53:23.195Z] Delay per article: 60-120s; max articles/journal: 30
+[2026-05-28T00:53:39.470Z] [1/93] journal SEPARATION AND PURIFICATION TECHNOLOGY (1383-5866)
+[2026-05-28T00:53:50.215Z]   CrossRef failed: fetch failed
+[2026-05-28T00:54:00.947Z]   CrossRef eISSN failed: fetch failed
+[2026-05-28T00:54:01.010Z]   CrossRef unavailable; pausing 180s before next journal
+[2026-05-28T00:57:01.031Z] [2/93] journal ONE EARTH (2590-3330)
+[2026-05-28T00:57:11.796Z]   CrossRef failed: fetch failed
+[2026-05-28T00:57:22.521Z]   CrossRef eISSN failed: fetch failed
+[2026-05-28T00:57:22.555Z]   CrossRef unavailable; pausing 180s before next journal
+[2026-05-28T01:00:22.577Z] [3/93] journal SUSTAINABLE CITIES AND SOCIETY (2210-6707)
+[2026-05-28T01:00:33.305Z]   CrossRef failed: fetch failed
+[2026-05-28T01:00:44.032Z]   CrossRef eISSN failed: fetch failed
+[2026-05-28T01:00:44.069Z]   CrossRef unavailable; pausing 180s before next journal
+[2026-05-28T01:03:44.096Z] [4/93] journal MECHANICAL SYSTEMS AND SIGNAL PROCESSING (0888-3270)
+[2026-05-28T01:03:54.770Z]   CrossRef failed: fetch failed
+[2026-05-28T01:04:05.479Z]   CrossRef eISSN failed: fetch failed
+[2026-05-28T01:04:05.512Z]   CrossRef unavailable; pausing 180s before next journal
+[2026-05-28T01:07:05.536Z] [5/93] journal INTERNATIONAL JOURNAL OF ROCK MECHANICS AND MINING SCIENCES (1365-1609)
+[2026-05-28T01:07:16.282Z]   CrossRef failed: fetch failed
+[2026-05-28T01:07:27.007Z]   CrossRef eISSN failed: fetch failed
+[2026-05-28T01:07:27.042Z]   CrossRef unavailable; pausing 180s before next journal
+[2026-05-28T01:10:27.069Z] [6/93] journal CONSTRUCTION AND BUILDING MATERIALS (0950-0618)
+[2026-05-28T01:10:37.811Z]   CrossRef failed: fetch failed
+[2026-05-28T01:10:48.546Z]   CrossRef eISSN failed: fetch failed
+[2026-05-28T01:10:48.581Z]   CrossRef unavailable; pausing 180s before next journal
+[2026-05-28T01:13:48.601Z] [7/93] journal COMPUTER SCIENCE REVIEW (1574-0137)
+[2026-05-28T01:13:59.332Z]   CrossRef failed: fetch failed
+[2026-05-28T01:14:10.060Z]   CrossRef eISSN failed: fetch failed
+[2026-05-28T01:14:10.095Z]   CrossRef unavailable; pausing 180s before next journal
+[2026-05-28T01:17:10.114Z] [8/93] journal PETROLEUM SCIENCE (1672-5107)
+[2026-05-28T01:17:20.864Z]   CrossRef failed: fetch failed
+[2026-05-28T01:17:23.169Z]   [1/30] 10.1016/j.petsci.2026.04.050
+[2026-05-28T01:17:30.429Z]     result: no date; saved 0/1
+[2026-05-28T01:17:30.433Z]     sleeping 98s
+[2026-05-28T01:19:08.220Z]   [2/30] 10.1016/j.petsci.2026.05.008
+[2026-05-28T01:19:15.176Z]   STOP: ScienceDirect showed captcha/robot page. Saving and exiting.
