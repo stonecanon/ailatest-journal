@@ -206,10 +206,26 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <main class="main">
   <div class="tabs">
-    <button class="tab active" data-tab="int" data-i18n="tab_int">国际</button>
-    <button class="tab" data-tab="dom" data-i18n="tab_dom">中国</button>
-    <button class="tab" data-tab="fav" data-i18n="tab_fav">我的收藏</button>
-    <button class="tab" data-tab="pick" data-i18n="tab_pick">帮我选刊</button>
+    <button class="tab active" data-tab="int">
+      <span class="tab-icon">🌍</span>
+      <span class="tab-label" data-i18n="tab_int">国际</span>
+      <span class="tab-desc">SCI / SSCI 检索</span>
+    </button>
+    <button class="tab" data-tab="dom">
+      <span class="tab-icon">🇨🇳</span>
+      <span class="tab-label" data-i18n="tab_dom">中国</span>
+      <span class="tab-desc">国内分级目录</span>
+    </button>
+    <button class="tab" data-tab="fav">
+      <span class="tab-icon">⭐</span>
+      <span class="tab-label" data-i18n="tab_fav">我的收藏</span>
+      <span class="tab-desc">跨设备同步</span>
+    </button>
+    <button class="tab" data-tab="pick">
+      <span class="tab-icon">🤖</span>
+      <span class="tab-label" data-i18n="tab_pick">帮我选刊</span>
+      <span class="tab-desc">AI 智能推荐</span>
+    </button>
   </div>
 
   <header class="topbar">
@@ -283,6 +299,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </p>
     </section>
 
+    <nav class="subnav" data-i18n-static>
+      <button class="subnav-btn active" data-sub="all">全部</button>
+      <button class="subnav-btn" data-sub="cnkx">中国科协</button>
+      <button class="subnav-btn" data-sub="cssci">CSSCI</button>
+      <button class="subnav-btn" data-sub="pku">北大核心</button>
+      <button class="subnav-btn" data-sub="zju">浙江大学</button>
+    </nav>
+
     <div id="dom-content"></div>
   </section>
 
@@ -294,6 +318,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <span data-i18n="hero_body_fav">点击任意期刊右侧的 <b>★</b> 可加入收藏。未登录时保存在本机 localStorage；登录后自动同步到云端，可跨设备访问。</span>
       </p>
     </section>
+    <nav class="subnav" data-i18n-static id="fav-subnav">
+      <button class="subnav-btn active" data-sub="all">全部收藏</button>
+    </nav>
     <div id="fav-content"></div>
   </section>
 
@@ -305,6 +332,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <span data-i18n="hero_body_pick">采用自研大模型算法，深度分析你的研究主题与海量期刊数据的匹配度，智能推荐最合适的目标期刊。每人每天免费使用 5 次。</span>
       </p>
     </section>
+    <nav class="subnav" data-i18n-static>
+      <button class="subnav-btn active" data-sub="recommend">智能推荐</button>
+      <button class="subnav-btn" data-sub="history">搜索历史</button>
+    </nav>
     <div class="pick-tool">
       <div class="pick-input-wrap">
         <textarea id="pick-input" class="pick-input" rows="4" placeholder="输入论文标题、摘要或关键词… 例如：indoor air quality occupancy estimation machine learning" data-i18n-placeholder="pick_placeholder"></textarea>
@@ -387,7 +418,7 @@ const __BUILD_VER = 'v20260528-15';
   }
 })();
 </script>
-<script src="/js/app.js?v=v20260529-07" defer></script>
+<script src="/js/app.js?v=v20260529-08" defer></script>
 <script>
   // Custom install prompt
   let __pwaPrompt = null;
