@@ -38,7 +38,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- End Google Tag Manager -->
 <link rel="preload" href="/data/journals.json.gz" as="fetch" crossorigin="anonymous" />
 <link rel="preload" href="/data/journal_aliases.json" as="fetch" crossorigin="anonymous" />
-<link rel="stylesheet" href="/css/app.css?v=20260529-19" />
+<link rel="stylesheet" href="/css/app.css?v=20260529-20" />
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json" />
@@ -106,19 +106,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
   <div class="tabs">
     <a class="tab active" data-tab="int" href="/international">
-      <span class="tab-icon">🌍</span>
+      <span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.4 2.5 3.6 5.5 3.6 9s-1.2 6.5-3.6 9"/><path d="M12 3c-2.4 2.5-3.6 5.5-3.6 9s1.2 6.5 3.6 9"/></svg></span>
       <span class="tab-label" data-i18n="tab_int">国际</span>
     </a>
     <a class="tab" data-tab="dom" href="/china">
-      <span class="tab-icon">🇨🇳</span>
+      <span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19V7l8-4 8 4v12"/><path d="M8 19V9h8v10"/><path d="M10 12h4"/><path d="M10 15h4"/></svg></span>
       <span class="tab-label" data-i18n="tab_dom">中国</span>
     </a>
     <a class="tab" data-tab="fav" href="/favorites">
-      <span class="tab-icon">⭐</span>
+      <span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3.7l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3.7z"/></svg></span>
       <span class="tab-label" data-i18n="tab_fav">收藏</span>
     </a>
     <a class="tab" data-tab="pick" href="/pick">
-      <span class="tab-icon">🤖</span>
+      <span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 19l3.2-1 7.8-7.8a2.1 2.1 0 0 0-3-3L5.2 15 4 20z"/><path d="M12.5 7.5l4 4"/><path d="M18 4l1 2 2 1-2 1-1 2-1-2-2-1 2-1z"/></svg></span>
       <span class="tab-label" data-i18n="tab_pick">选刊</span>
     </a>
     <a class="mobile-nav-brand" href="/" aria-label="AILatest Journal"><em>journal</em>.ailatest</a>
@@ -441,7 +441,7 @@ const __BUILD_VER = 'v20260529-09';
   }
 })();
 </script>
-<script src="/js/app.js?v=v20260529-19" defer></script>
+<script src="/js/app.js?v=v20260529-20" defer></script>
 <script>
   // Custom install prompt
   let __pwaPrompt = null;
