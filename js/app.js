@@ -3415,7 +3415,7 @@
     // 渲染头部收藏按钮状态
     const hdrFav = $('#drawer-fav');
     if (hdrFav) {
-      hdrFav.textContent = on ? '★' : '☆';
+      hdrFav.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.7l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3.7z"/></svg>';
       hdrFav.classList.toggle('on', on);
       hdrFav.onclick = () => $('#drawer-fav-big')?.click();
     }
