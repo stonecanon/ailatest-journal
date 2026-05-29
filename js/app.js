@@ -4264,7 +4264,7 @@
     const results = $('#pick-results');
     const status = $('#pick-status');
     const quotaEl = $('#pick-quota');
-    quotaEl.textContent = T('基于 OpenAlex 开放学术数据实时检索','Powered by OpenAlex open scholarly data');
+    quotaEl.textContent = T('由 OpenAlex 开放学术数据驱动 · 填 API Key 获更多额度','Powered by OpenAlex · add API key for more credits');
 
     async function doSearch() {
       const query = input.value.trim();
@@ -4377,14 +4377,19 @@
         const SEARCH_FIELDS = 'id,title,publication_date,primary_location,relevance_score';
         const FIVE_YEARS_AGO = new Date(Date.now() - 5*365*24*60*60*1000).toISOString().slice(0,10);
         let openAlexErrorStatus = null;
+        let openAlexErrorBody = null;
         async function fetchOpenAlexResults(params) {
           if (!(params instanceof URLSearchParams)) params = new URLSearchParams(params);
           if (!params.has('mailto')) params.set('mailto', 'jiantaoweng@gmail.com');
+          // Pass user's API key if provided
+          const apiKey = $('#pick-apikey')?.value?.trim();
+          if (apiKey && !params.has('api_key')) params.set('api_key', apiKey);
           const url = openAlexWorksUrl(params);
           try {
             const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
             if (!r.ok) {
               openAlexErrorStatus = r.status;
+              try { openAlexErrorBody = await r.json(); } catch(e) {}
               return [];
             }
             const d = await r.json();
@@ -4459,10 +4464,17 @@
           && uniqueWords.filter(w => w.length > 4).length < 2 && !explicitKeywords.length;
         if (!allWorks.length) {
           if (openAlexErrorStatus) {
-            status.textContent = T(
-              `OpenAlex 搜索接口暂时不可用（${openAlexErrorStatus}），请稍后重试`,
-              `OpenAlex search is temporarily unavailable (${openAlexErrorStatus}), please try again later`
-            );
+            // Show budget info if OpenAlex returned it
+            const budgetMsg = openAlexErrorBody?.dailyRemainingUsd !== undefined
+              ? T(
+                  `OpenAlex 今日额度已用完，每日 UTC 0 点重置。填 API Key 可增加额度`,
+                  `OpenAlex daily budget exhausted, resets at UTC midnight. Add an API key for more credits`
+                )
+              : T(
+                  `OpenAlex 搜索接口暂时不可用（${openAlexErrorStatus}），请稍后重试`,
+                  `OpenAlex search is temporarily unavailable (${openAlexErrorStatus}), please try again later`
+                );
+            status.textContent = budgetMsg;
             return;
           }
           status.textContent = hasCnOnly
