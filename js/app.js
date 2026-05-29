@@ -4019,12 +4019,49 @@
       $$('.tab-panel').forEach(p => p.hidden = p.dataset.panel !== activeTab);
       $$('[data-international]').forEach(el => el.hidden = activeTab !== 'int');
       $$('[data-domestic]').forEach(el => el.hidden = activeTab !== 'dom');
+      // Update hash for direct linking
+      try { history.replaceState(null, '', '#' + activeTab); } catch (_) {}
       applyI18n(); // refresh placeholder
       if (activeTab === 'dom') renderDomestic();
       else if (activeTab === 'fav') renderFav();
       else if (activeTab === 'int') renderInt();
       else if (activeTab === 'pick') initPickTool();
     }));
+
+    // Tab routing from hash
+    const initTabFromHash = () => {
+      const hash = location.hash.replace(/^#/, '');
+      if (['int','dom','fav','pick'].includes(hash)) {
+        const tab = $$('.tab').find(t => t.dataset.tab === hash);
+        if (tab) tab.click();
+      }
+    };
+    window.addEventListener('hashchange', initTabFromHash);
+
+    // ─── Sub-navigation ───
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('.subnav-btn');
+      if (!btn) return;
+      const subnav = btn.closest('.subnav');
+      if (!subnav) return;
+      subnav.querySelectorAll('.subnav-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      // For domestic subnav: trigger filter
+      const panel = subnav.closest('.tab-panel');
+      if (panel && panel.dataset.panel === 'dom') {
+        const dom = btn.dataset.sub;
+        // Toggle sidebar domestic source chips
+        const badgeToggles = document.getElementById('domestic-badge-toggles');
+        if (badgeToggles) {
+          $$('input[type="checkbox"]', badgeToggles).forEach(cb => cb.checked = false);
+          if (dom !== 'all') {
+            const target = badgeToggles.querySelector(`input[value="${dom}"]`);
+            if (target) target.checked = true;
+          }
+          badgeToggles.dispatchEvent(new Event('change'));
+        }
+      }
+    });
 
     $('#fav-tab').addEventListener('click', () => {
       const favTab = $$('.tab').find(t => t.dataset.tab === 'fav');
@@ -4897,6 +4934,8 @@
       $('#hint').textContent = 'Load failed: ' + e.message;
       console.error(e);
     }
+    // Initialize tab from hash (after bind sets up click listeners)
+    if (typeof initTabFromHash === 'function') initTabFromHash();
   }
 
   boot();
