@@ -1857,11 +1857,7 @@
     // 第一行：索引（SCIE/SSCI/AHCI/ESCI/EI）— 回答"这本被哪些数据库收录"
     const indexBadges = renderIndexBadges(r);
     // 第二行：分区/等级/预警 — 回答"这本的等级和影响力"（IF 已移到独立列）
-    // Multidisciplinary badge
-    const _cats = r.wos_categories || [];
-    const _isMulti = _cats.some(c => /multidisciplinary/i.test(c));
-    const _multiBadge = _isMulti ? '<span class="badge b-multi">综合</span>' : '';
-    const rankBadges = [renderRankBadges(r), crossBadges, _multiBadge].filter(Boolean).join('');
+    const rankBadges = [renderRankBadges(r), crossBadges].filter(Boolean).join('');
     const badgeCell = renderBadgeCell(indexBadges, rankBadges);
     const casVal = (lang === 'zh-CN' || lang === 'zh-TW') ? (r.cas_major_cn || '') : tn(r.cas_major_cn || '', 'domain');
     const esiVal = r.esi_category || '';
@@ -2889,10 +2885,6 @@
     // 徽章块 — 分两行：索引收录 / 分区等级
     const drawerIndexBadges = (src === 'int' || intRec) ? renderIndexBadges(ir) : '';
     let drawerRankBadges = (src === 'int' || intRec) ? renderRankBadges(ir) : '';
-    if (src === 'int' || intRec) {
-      const _cats2 = ir.wos_categories || [];
-      if (_cats2.some(c => /multidisciplinary/i.test(c))) drawerRankBadges += '<span class="badge b-multi">综合</span>';
-    }
     const tierBadge = r.tier && /^T[123]$/.test(r.tier) ? badgeTier(r.tier)
                     : r.tier ? `<span class="tier-pill t3">${escape(tn(r.tier, "tier"))}</span>` : '';
     const crossBadges = renderDomCrossBadges(r, src);
