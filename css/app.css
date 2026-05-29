@@ -488,28 +488,28 @@ main.main {
   color: var(--accent);
 }
 
-.col-fav { width: 64px; text-align: center; padding-left: 4px; padding-right: 4px; }
+.col-fav { width: 44px; text-align: center; padding-left: 4px; padding-right: 4px; }
 .col-name {
-  width: 36%;
-  min-width: 360px;
+  width: 30%;
+  min-width: 240px;
 }
-.col-cas, .col-esi, .col-wos { font-size: 12.5px; line-height: 1.4; width: 140px; max-width: 140px; overflow: hidden; }
+.col-cas, .col-esi, .col-wos { font-size: 12px; line-height: 1.4; width: 110px; max-width: 110px; overflow: hidden; }
 .col-cas { color: var(--ink); }
-.col-esi, .col-wos { color: var(--ink-soft); font-family: var(--sans); font-size: 12px; }
+.col-esi, .col-wos { color: var(--ink-soft); font-family: var(--sans); }
 .col-esi .th-select, .col-cas .th-select, .col-wos .th-select { max-width: 100%; box-sizing: border-box; text-overflow: ellipsis; overflow: hidden; }
 td.col-esi, td.col-cas, td.col-wos { white-space: normal; word-break: break-word; }
 .col-if {
-  width: 64px;
-  max-width: 64px;
+  width: 56px;
+  max-width: 56px;
   text-align: right;
-  padding-right: 14px;
+  padding-right: 8px;
   font-family: var(--sans);
   font-feature-settings: 'tnum';
   font-variant-numeric: tabular-nums;
   letter-spacing: 0;
 }
-.col-if .if-cell { font-size: 13.5px; font-weight: 680; color: var(--ink-soft); }
-th.col-if { text-align: right; padding-right: 14px; }
+.col-if .if-cell { font-size: 13px; font-weight: 680; color: var(--ink-soft); }
+th.col-if { text-align: right; padding-right: 8px; }
 
 /* drawer 大类/小类 标签（区分新锐版双 4 区等情况） */
 .zone-tier {
@@ -608,17 +608,17 @@ table.journals th {
   font-family: var(--sans);
   font-weight: 700;
   text-align: left;
-  font-size: 11.5px;
+  font-size: 11px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--ink-faint);
-  padding: 10px 12px;
+  padding: 8px 8px;
   background: var(--paper);
   border-bottom: 1px solid var(--rule-soft);
   white-space: nowrap;
 }
 table.journals td {
-  padding: 11px 12px;
+  padding: 8px 8px;
   border-bottom: 1px solid var(--rule-soft);
   vertical-align: top;
 }
@@ -667,7 +667,7 @@ table.journals tr:last-child td { border-bottom: 0; }
 /* 徽章 */
 .badges { display: flex; flex-wrap: wrap; gap: 4px; }
 /* 国际行：索引栏 + 分区栏 两行分隔 */
-.col-badge-split { min-width: 218px; width: 218px; }
+.col-badge-split { min-width: 160px; width: 160px; }
 .col-badge-split .badges { margin: 0; }
 .col-badge-split .badges-idx  { gap: 3px; }
 .col-badge-split .badges-rank {
@@ -1467,8 +1467,13 @@ td.empty,
   }
   .search-wrap input { padding: 10px 100px 10px 12px; font-size: 14px; }
   .hint { font-size: 10px; max-width: 90px; right: 8px; }
-  .col-name { min-width: 160px; width: 28%; }
+  .col-name { min-width: 130px; width: 26%; }
   .jname { font-size: 13px !important; }
+  table.journals th, table.journals td { padding: 6px 5px; }
+  .col-cas, .col-esi, .col-wos { width: 90px; max-width: 90px; font-size: 11px; }
+  .col-badge-split { min-width: 130px; width: 130px; }
+  .col-fav { width: 36px; }
+  .col-if { width: 44px; max-width: 44px; padding-right: 4px; }
 }
 
 @media (max-width: 480px) {
