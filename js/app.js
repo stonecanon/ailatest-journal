@@ -1831,9 +1831,6 @@
     rowRecordsByFid[fid] = { ...r, __src: src };
     const name = r.name || r.cn_name || '';
     const enName = r.en_name ? `<span class="jname-cn">${escape(titleCase(r.en_name))}</span>` : '';
-    const isnCell = r.issn || r.cn_code
-      ? `<span class="jissn">${escape(r.issn || r.cn_code)}</span>`
-      : '<span class="muted-cell">—</span>';
     const crossBadges = renderDomCrossBadges({ name, issn: r.issn, cn_code: r.cn_code }, src);
     const tierBadge = showTier && tierValue ? badgeTier(tierValue) : '';
     return `<tr class="j-row clickable" data-fid="${escape(fid)}" data-src="${escape(src)}">
@@ -1841,7 +1838,6 @@
       ${showTier ? `<td style="width:60px">${tierBadge}</td>` : ''}
       <td class="jname" style="font-size:13.5px">${escape(titleCase(name.replace(/\*$/,'')))}${enName}</td>
       <td class="col-cross"><div class="badges">${extraBadges}${crossBadges}</div></td>
-      <td class="col-issn" style="width:130px">${isnCell}</td>
       ${extraCols}
     </tr>`;
   }
@@ -1851,10 +1847,6 @@
     rowRecordsByFid[fid] = { ...r, __src: 'int' };
     const flagshipHtml = r.flagship ? `<span class="flagship-star fs-${r.flagship}" title="${r.flagship.replace('_',' ')}">★</span>` : '';
     const nameHtml = `<div class="jname">${flagshipHtml}${escape(titleCase(r.name))}${r.cn_name ? `<span class="jname-cn">${escape(r.cn_name)}</span>` : ''}${aliasHintHtml(r)}</div>`;
-    const abbr = r.abbr20 ? `<span class="jabbr">${escape(r.abbr20)}</span>` : '';
-    const issn = r.issn || r.eissn
-      ? `<span class="jissn">${r.issn||''}${r.eissn ? ` <span class="eissn">e:${r.eissn}</span>` : ''}</span>`
-      : '<span class="muted-cell">—</span>';
     const crossBadges = renderDomCrossBadges(r, 'int');
     // 第一行：索引（SCIE/SSCI/AHCI/ESCI/EI）— 回答"这本被哪些数据库收录"
     const indexBadges = renderIndexBadges(r);
@@ -1874,8 +1866,6 @@
       <td class="col-if">${ifCell}</td>
       <td class="col-cas">${casCell}</td>
       <td class="col-esi">${esiCell}</td>
-      <td class="col-abbr">${abbr || '<span class="muted-cell">—</span>'}</td>
-      <td class="col-issn">${issn}</td>
     </tr>`;
   }
 
@@ -3367,8 +3357,6 @@
             <th class="col-if sortable ${favIfSort === 'desc' ? 'sort-desc' : favIfSort === 'asc' ? 'sort-asc' : ''}" data-if-sort="fav">IF <span class="sort-arrow">${favIfSort === 'asc' ? '▲' : '▼'}</span></th>
             <th class="col-cas">${T('中科院大类','CAS Major')}</th>
             <th class="col-esi">ESI Subject</th>
-            <th class="col-abbr">${T('缩写 Abbr','Abbr')}</th>
-            <th class="col-issn">ISSN</th>
             <th class="col-src" style="width:90px">${T('来源','Source')}</th>
           </tr></thead>
           <tbody id="fav-tbody">${tbody}</tbody>
@@ -3887,10 +3875,6 @@
     const rawName = r.name || r.cn_name || '';
     const flagshipHtml = r.flagship ? `<span class="flagship-star fs-${r.flagship}" title="${r.flagship.replace('_',' ')}">★</span>` : '';
     const nameHtml = `<div class="jname">${flagshipHtml}${escape(titleCase(rawName.replace(/\*$/,'')))}${r.cn_name && r.cn_name !== rawName ? `<span class="jname-cn">${escape(r.cn_name)}</span>` : ''}${r.en_name && r.en_name !== rawName ? `<span class="jname-cn">${escape(titleCase(r.en_name))}</span>` : ''}${aliasHintHtml(r)}</div>`;
-    const abbr = r.abbr20 ? `<span class="jabbr">${escape(r.abbr20)}</span>` : '';
-    const issn = (r.issn || r.eissn || r.cn_code)
-      ? `<span class="jissn">${escape(r.issn || r.cn_code || '')}${r.eissn ? ` <span class="eissn">e:${r.eissn}</span>` : ''}</span>`
-      : '<span class="muted-cell">—</span>';
     // 索引行
     const indexBadges = r.__src === 'int' ? renderIndexBadges(r) : '';
     // 分区/等级行（IF 已移到独立列）
@@ -3919,8 +3903,6 @@
       <td class="col-if">${ifCell}</td>
       <td class="col-cas">${casCell}</td>
       <td class="col-esi">${esiCell}</td>
-      <td class="col-abbr">${abbr || '<span class="muted-cell">—</span>'}</td>
-      <td class="col-issn">${issn}</td>
       <td class="col-src"><span class="src-tag src-${escape(r.__src)}">${SRC_LABEL[r.__src] || r.__src}</span></td>
     </tr>`;
   }

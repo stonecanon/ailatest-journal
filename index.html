@@ -79,6 +79,21 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <div id="sidebar-scrim" class="sidebar-scrim" hidden></div>
 
 <main class="main">
+  <header class="topbar">
+    <button class="side-toggle" id="side-toggle" aria-label="Toggle filters / 打开筛选侧栏">☰</button>
+    <div class="search-wrap">
+      <input id="q" type="search" placeholder="Search: journal title / abbr / ISSN" autocomplete="off" spellcheck="false" />
+      <span class="hint" id="hint" data-i18n="loading">加载中…</span>
+    </div>
+    <div class="topbar-actions">
+      <button class="fav-tab" id="fav-tab" aria-label="Favorites" title="My Favorites / 我的收藏">★ <span id="fav-count">0</span></button>
+      <button class="auth-btn" id="auth-btn" aria-label="Sign in" data-i18n="login">登录</button>
+      <div class="lang-toggle-wrap">
+        <button class="lang-toggle" id="lang-toggle" aria-label="Switch language">中 / EN</button>
+      </div>
+    </div>
+  </header>
+
   <div class="tabs">
     <button class="tab active" data-tab="int">
       <span class="tab-icon">🌍</span>
@@ -123,8 +138,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                   <option value="__all">ESI Subject</option>
                 </select>
               </th>
-              <th class="col-abbr" data-i18n="col_abbr">缩写 Abbr</th>
-              <th class="col-issn">ISSN</th>
             </tr>
           </thead>
           <tbody id="tbody"></tbody>
@@ -186,21 +199,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div id="pick-results" class="pick-results"></div>
     </div>
   </section>
-
-  <header class="topbar">
-    <button class="side-toggle" id="side-toggle" aria-label="Toggle filters / 打开筛选侧栏">☰</button>
-    <div class="search-wrap">
-      <input id="q" type="search" placeholder="Search: journal title / abbr / ISSN" autocomplete="off" spellcheck="false" />
-      <span class="hint" id="hint" data-i18n="loading">加载中…</span>
-    </div>
-    <div class="topbar-actions">
-      <button class="fav-tab" id="fav-tab" aria-label="Favorites" title="My Favorites / 我的收藏">★ <span id="fav-count">0</span></button>
-      <button class="auth-btn" id="auth-btn" aria-label="Sign in" data-i18n="login">登录</button>
-      <div class="lang-toggle-wrap">
-        <button class="lang-toggle" id="lang-toggle" aria-label="Switch language">中 / EN</button>
-      </div>
-    </div>
-  </header>
 
   <section class="sidebar" id="sidebar">
     <h1 class="brand">
