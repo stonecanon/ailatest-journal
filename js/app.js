@@ -609,9 +609,6 @@
     return (m && m[val]) || val;
   };
 
-  let theme = localStorage.getItem('ailatest.theme') || 'light';
-  document.documentElement.dataset.theme = theme;
-
   let journals = [];
   let domestic = null;
   let esiCats = [];
@@ -4281,13 +4278,7 @@
       const meta = LANG_META[lang];
       if (meta) btn.textContent = meta.label;
     })();
-    $('#theme-toggle').addEventListener('click', () => {
-      theme = theme === 'light' ? 'dark' : 'light';
-      document.documentElement.dataset.theme = theme;
-      localStorage.setItem('ailatest.theme', theme);
-    });
-
-    // favorite star delegation (国际 + 国内全覆盖)
+  // ──── favorite star delegation (国际 + 国内全覆盖) ────
     let activePicker = null;
     function closeFavPicker() {
       if (activePicker) { activePicker.remove(); activePicker = null; }
