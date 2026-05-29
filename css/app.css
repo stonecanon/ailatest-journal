@@ -319,7 +319,7 @@ main.main {
 .tab:hover { color: var(--accent); background: rgba(180,83,31,.04); }
 .tab.active {
   color: var(--ink);
-  border-bottom-color: var(--accent);
+  border-bottom-color: var(--ink-faint);
 }
 .tab .tab-icon {
   display: inline-flex;
@@ -531,12 +531,12 @@ th.col-if { text-align: right; padding-right: 14px; }
 
 /* ─────────── Hero ─────────── */
 .hero {
-  background: var(--paper-soft);
-  border: 1px solid var(--rule);
-  border-left: 3px solid var(--accent);
+  background: linear-gradient(135deg, #fffdfa 0%, #faf6e9 100%);
+  border: 1px solid var(--rule-soft);
+  border-left: 1px solid var(--rule-soft);
   padding: 12px 20px 14px;
   margin-bottom: 16px;
-  border-radius: 0;
+  border-radius: 6px;
   position: relative;
 }
 .hero::before {
@@ -550,15 +550,15 @@ th.col-if { text-align: right; padding-right: 14px; }
 .hero > * { position: relative; z-index: 1; }
 .hero h2 {
   font-family: var(--sans);
-  font-size: 20px; font-weight: 750;
+  font-size: 18px; font-weight: 700;
   margin: 0 0 6px;
   color: var(--ink);
   letter-spacing: 0.01em;
 }
 .hero h2::after {
   content: ""; display: block;
-  width: 28px; height: 1px;
-  background: var(--accent);
+  width: 24px; height: 1px;
+  background: var(--ink-faint);
   margin-top: 5px;
 }
 .hero p {
@@ -574,13 +574,13 @@ th.col-if { text-align: right; padding-right: 14px; }
 .results-head {
   display: flex; align-items: baseline; gap: 12px;
   margin-bottom: 14px;
-  padding: 0 0 10px 12px;
-  border-bottom: 1px solid var(--rule);
-  border-left: 3px solid var(--accent);
+  padding: 0 0 10px 8px;
+  border-bottom: 1px solid var(--rule-soft);
+  border-left: 2px solid var(--ink-faint);
 }
 .results-head h3 {
   font-family: var(--sans);
-  font-size: 21px; font-weight: 800;
+  font-size: 18px; font-weight: 700;
   margin: 0;
   letter-spacing: 0;
 }
@@ -593,8 +593,9 @@ th.col-if { text-align: right; padding-right: 14px; }
 
 .table-wrap {
   overflow-x: auto;
-  background: var(--paper-soft);
-  border: 1px solid var(--rule);
+  background: var(--paper);
+  border: 1px solid var(--rule-soft);
+  border-radius: 6px;
 }
 
 table.journals {
@@ -604,15 +605,15 @@ table.journals {
 }
 table.journals th {
   font-family: var(--sans);
-  font-weight: 750;
+  font-weight: 700;
   text-align: left;
-  font-size: 12px;
-  letter-spacing: 0.02em;
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--ink-faint);
   padding: 10px 12px;
-  background: var(--paper-deeper);
-  border-bottom: 1px solid var(--rule);
+  background: var(--paper);
+  border-bottom: 1px solid var(--rule-soft);
   white-space: nowrap;
 }
 table.journals td {
