@@ -4441,7 +4441,7 @@
         const SEARCH_FIELDS = 'id,title,publication_date,primary_location,relevance_score';
         const FIVE_YEARS_AGO = new Date(Date.now() - 5*365*24*60*60*1000).toISOString().slice(0,10);
         const DATE_FILTER = `&filter=from_publication_date:${FIVE_YEARS_AGO}`;
-        const queryBatches = await Promise.all(queries.slice(0, 4).map(async (q) => {
+        const queryBatches = await Promise.all(queries.slice(0, 2).map(async (q) => {
           const searchQ = q.slice(0,120);
           const r = await openAlexFetch(`works?search=${encodeURIComponent(searchQ)}&per_page=200&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`);
           if (!r.ok) {
