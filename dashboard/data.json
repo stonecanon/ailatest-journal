@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-29T15:42:35.061Z",
+  "generated_at": "2026-05-29T21:12:33.645Z",
   "source": "remote D1",
   "notes": [
     "注册量来自 users.created_at，当前是最可靠口径。",
@@ -31,35 +31,35 @@
     "users"
   ],
   "kpis": {
-    "total_users": 15,
-    "users_with_email": 10,
-    "email_users": 7,
+    "total_users": 16,
+    "users_with_email": 11,
+    "email_users": 8,
     "github_users": 5,
     "google_users": 3,
     "first_signup_at": 1778628305,
-    "latest_signup_at": 1779811726,
-    "favorite_rows": 37,
+    "latest_signup_at": 1780072333,
+    "favorite_rows": 38,
     "users_with_favorites": 6,
-    "avg_favorites_per_active_user": 6.17,
+    "avg_favorites_per_active_user": 6.33,
     "rating_rows": 23,
     "users_with_ratings": 5,
     "rated_journals": 18,
     "avg_rating": 4.46,
-    "lists": 7,
-    "users_with_lists": 7,
+    "lists": 9,
+    "users_with_lists": 8,
     "total_pageviews": 933,
     "total_visitors": 255,
     "total_cn_hint_events": 467,
     "total_cn_hint_visitors": 124,
     "total_cn_hint_sessions": 229,
-    "total_login_events": 19,
+    "total_login_events": 22,
     "latest_pageview_at": 1780054473
   },
   "series": {
     "providerMix": [
       {
         "provider": "email",
-        "users": 7
+        "users": 8
       },
       {
         "provider": "github",
@@ -102,6 +102,10 @@
       {
         "day": "2026-05-26",
         "signups": 3
+      },
+      {
+        "day": "2026-05-29",
+        "signups": 1
       }
     ],
     "activeProxyByDay": [
@@ -131,6 +135,10 @@
       },
       {
         "day": "2026-05-27",
+        "active_users_proxy": 1
+      },
+      {
+        "day": "2026-05-29",
         "active_users_proxy": 2
       }
     ],
@@ -164,12 +172,17 @@
         "day": "2026-05-27",
         "login_events": 2,
         "login_users": 2
+      },
+      {
+        "day": "2026-05-29",
+        "login_events": 3,
+        "login_users": 2
       }
     ],
     "loginProviderMix": [
       {
         "provider": "google",
-        "login_events": 8,
+        "login_events": 10,
         "login_users": 2
       },
       {
@@ -179,8 +192,8 @@
       },
       {
         "provider": "email",
-        "login_events": 5,
-        "login_users": 4
+        "login_events": 6,
+        "login_users": 5
       }
     ],
     "pageviewsByDay": [
@@ -775,6 +788,15 @@
     ],
     "recentUsers": [
       {
+        "id": 16,
+        "provider": "email",
+        "email": "lz***@163.com",
+        "login": "lzr991218",
+        "name": "lzr991218",
+        "created_at": 1780072333,
+        "updated_at": 1780072333
+      },
+      {
         "id": 15,
         "provider": "email",
         "email": "10***@qq.com",
@@ -880,7 +902,7 @@
         "login": "jiantaoweng",
         "name": "H&S一心菌 (石头小石头)",
         "created_at": 1778766419,
-        "updated_at": 1779864557
+        "updated_at": 1780088723
       },
       {
         "id": 3,
