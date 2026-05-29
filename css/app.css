@@ -572,15 +572,16 @@ th.col-if { text-align: right; padding-right: 14px; }
 
 /* ─────────── Results ─────────── */
 .results-head {
-  display: flex; align-items: baseline; gap: 12px;
+  display: flex; align-items: center; gap: 12px;
   margin-bottom: 14px;
-  padding: 0 0 10px 8px;
-  border-bottom: 1px solid var(--rule-soft);
-  border-left: 2px solid var(--ink-faint);
+  padding: 10px 14px;
+  background: #f5ecd6;
+  border: 1px solid #d4c9a8;
+  border-radius: 6px;
 }
 .results-head h3 {
   font-family: var(--sans);
-  font-size: 18px; font-weight: 700;
+  font-size: 15px; font-weight: 700;
   margin: 0;
   letter-spacing: 0;
 }
@@ -1351,7 +1352,7 @@ td.empty,
 .section-block { margin-bottom: 34px; }
 .section-title {
   font-family: var(--sans);
-  font-size: 18px; font-weight: 800;
+  font-size: 15px; font-weight: 700;
   margin: 0 0 4px;
   letter-spacing: 0.02em;
 }
@@ -2067,18 +2068,22 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 /* 中文期刊目录 - 学科分类内联标签 */
 .dom-section-head {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  gap: 18px;
+  gap: 12px;
   margin-bottom: 14px;
+  padding: 10px 14px;
+  background: #f5ecd6;
+  border: 1px solid #d4c9a8;
+  border-radius: 6px;
 }
 .dom-section-copy {
   min-width: 0;
 }
 .dom-section-head .section-title {
   margin-bottom: 4px;
-  font-size: 21px;
-  font-weight: 800;
+  font-size: 15px;
+  font-weight: 700;
 }
 .dom-source-tabs {
   display: flex;
