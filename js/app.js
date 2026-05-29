@@ -35,7 +35,7 @@
       pwa_install: '📲 安装到主屏',
       footer_data: '数据来源：Clarivate WoS Core Collection · JCR 2025 · ESI · 中科院文献情报中心分区表 2025 · ShowJCR (GPL-3.0) · 中国科协 2025 · 浙江大学 2024 · 高校自编目录 2023。© <a href="https://journal.ailatest.org">AILatest Journal</a>',
       footer_badges: '徽章语义：<b>SCIE/SSCI/AHCI/ESCI/EI</b> 收录 · <b>中科院</b> 大类分区（1-4 区，TOP） · <b>JCR Q</b> Quartile · <b>新锐</b> 中科院 2026 新锐版 · <b>CCF</b> 2026 推荐（A/B/C） · <b>ABDC</b> 澳洲分级（A*/A/B/C） · <b>ABS</b> 2024（4*/4/3/2/1） · <b>T1/T2/T3</b> 中国科协 2025 · <b>⚠ 预警</b> 国际期刊预警名单 · <b>IF</b> 按 JCR 2025 发布版展示',
-      tab_int: '国际', tab_dom: '中国', tab_fav: '我的收藏', tab_pick: '帮我选刊',
+      tab_int: '国际', tab_dom: '中国', tab_fav: '收藏', tab_pick: '选刊',
       loading: '加载中…',
       hero_title_int: 'SCI / SSCI 国际期刊检索',
       hero_body_int: '資料來源：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI）· 更新至 2026-05-18，並合併 <b>EI Compendex</b> 期刊目錄（2025-10-10）。',
@@ -95,7 +95,7 @@
       pwa_install: '📲 Install to Home',
       footer_data: 'Sources: Clarivate WoS Core Collection · JCR 2025 · ESI · CAS NSL Tiers 2025 · ShowJCR (GPL-3.0) · CAST 2025 · ZJU 2024 · School A 2023. © <a href="https://journal.ailatest.org">AILatest Journal</a>',
       footer_badges: 'Badge legend: <b>SCIE/SSCI/AHCI/ESCI/EI</b> indices · <b>CAS</b> major tier (1-4, TOP) · <b>JCR Q</b> Quartile · <b>Emerging</b> CAS 2026 · <b>CCF</b> 2026 (A/B/C) · <b>ABDC</b> (A*/A/B/C) · <b>ABS</b> 2024 (4*/4/3/2/1) · <b>T1/T2/T3</b> CAST 2025 · <b>⚠ Warning</b> warning list · <b>IF</b> per JCR 2025',
-      tab_int: 'International', tab_dom: 'China', tab_fav: 'My Favorites', tab_pick: 'Pick for me',
+      tab_int: 'International', tab_dom: 'China', tab_fav: 'Favorites', tab_pick: 'Journal Finder',
       loading: 'Loading…',
       hero_title_int: 'International SCI / SSCI Search',
       hero_body_int: 'Source: <b>Web of Science Core Collection</b> (SCIE / SSCI / AHCI / ESCI), updated 2026-05-18, merged with <b>EI Compendex</b> source list (2025-10-10).',
@@ -144,7 +144,7 @@
     filter_xinrui: '新銳分區', filter_warning: '預警', domestic_sources: '中國分級來源',
     src_cnkx: '中國科協高品質目錄', src_cssci_core: 'CSSCI 來源期刊', src_cssci_ext: 'CSSCI 擴展版', src_pku: '北大核心 (2023)', src_zju: '浙江大學 2024', src_ccft: 'CCF 中文 T 分區', nav_sub_inhouse: '院校自編目錄', paid_label: '付費', drawer_kicker: '期刊詳情',
     footer_badges: '徽章語義：<b>SCIE/SSCI/AHCI/ESCI/EI</b> 收錄 · <b>中科院</b> 大類分區（1-4 區，TOP） · <b>JCR Q</b> Quartile · <b>新銳</b> 2026 新銳版 · <b>CCF</b> 2026 推薦（A/B/C） · <b>ABDC</b> 澳洲分級（A*/A/B/C） · <b>ABS</b> 2024（4*/4/3/2/1） · <b>T1/T2/T3</b> 中國科協 2025 · <b>⚠ 預警</b> 國際期刊預警名單 · <b>IF</b> 依 JCR 2025 發布版展示',
-    tab_int: '國際', tab_dom: '中國', tab_fav: '我的收藏', tab_pick: '幫我選刊', loading: '載入中…',
+    tab_int: '國際', tab_dom: '中國', tab_fav: '收藏', tab_pick: '選刊', loading: '載入中…',
     hero_title_int: 'SCI / SSCI 國際期刊檢索',
     hero_body_int: '資料來源：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI）· 更新至 2026-05-18，並合併 <b>EI Compendex</b> 期刊目錄（2025-10-10）。',
     hero_note: '徽章語義：<b>SCIE/SSCI/AHCI/ESCI/EI</b> 索引收錄 · <b>中科院</b> 2025 大類分區（1-4 區，TOP 標誌） · <b>JCR Q</b> Quartile（Q1-Q4） · <b>新銳</b> 2026 新銳版分區 · <b>CCF</b> 中國計算機學會 2026 推薦（A/B/C） · <b>ABDC</b> 澳洲經管期刊分級（A*/A/B/C） · <b>ABS</b> 英國 Chartered ABS Academic Journal Guide 2024（4*/4/3/2/1，僅經管商科） · <b>T1/T2/T3</b> 中國科協 2025 高質量期刊分級 · <b>⚠ Warning</b> 國際期刊預警名單。',
@@ -185,7 +185,7 @@
   });
   const LANG_ORDER = ['zh-CN', 'zh-TW', 'ja', 'ko', 'en', 'es', 'pt', 'fr'];
   const LANG_META = {
-    'zh-CN': { label: '简体中文', html: 'zh-CN' }, 'zh-TW': { label: '繁體中文', html: 'zh-TW' },
+    'zh-CN': { label: '中文', html: 'zh-CN' }, 'zh-TW': { label: '繁中', html: 'zh-TW' },
     ja: { label: '日本語', html: 'ja' }, ko: { label: '한국어', html: 'ko' }, en: { label: 'English', html: 'en' },
     es: { label: 'Español', html: 'es' }, pt: { label: 'Português', html: 'pt' }, fr: { label: 'Français', html: 'fr' }
   };
@@ -703,6 +703,45 @@
   }
 
   let activeTab = 'int';
+  const TAB_PATHS = { int: '/international', dom: '/china', fav: '/favorites', pick: '/pick' };
+  const PATH_TABS = { '/international': 'int', '/journals': 'int', '/china': 'dom', '/favorites': 'fav', '/pick': 'pick' };
+  const TAB_SEO = {
+    int: {
+      title: 'International Journal Search | SCI SSCI JCR IF CAS Tiers - AILatest Journal',
+      desc: 'Search international journals by SCI, SSCI, AHCI, ESCI, EI, JCR impact factor, CAS tiers, Web of Science subjects, Scopus, DOAJ and warning lists.'
+    },
+    dom: {
+      title: '中国期刊目录查询 | CSSCI 北大核心 中国科协 - AILatest Journal',
+      desc: '查询中文期刊目录、中国科协高质量期刊、CSSCI、北大核心、CCF 中文推荐、浙江大学目录等中国期刊分级数据。'
+    },
+    fav: {
+      title: '期刊收藏清单 | Journal Favorites - AILatest Journal',
+      desc: '保存、同步、排序并分享你的目标期刊清单，支持跨设备收藏和期刊清单分享。'
+    },
+    pick: {
+      title: '选刊推荐工具 | Journal Finder for Paper Title and Keywords - AILatest Journal',
+      desc: '输入论文题目、摘要或关键词，智能匹配研究主题、SCI/SSCI/EI 收录、JCR 分区、中科院分区、Scopus 与影响因子，推荐适合投稿的目标期刊。'
+    }
+  };
+  function tabFromPath(pathname = location.pathname) {
+    const clean = pathname.replace(/\/+$/, '') || '/';
+    return PATH_TABS[clean] || 'int';
+  }
+  function updatePageSeo(tab = activeTab) {
+    const seo = TAB_SEO[tab] || TAB_SEO.int;
+    document.title = seo.title;
+    const canonicalPath = (tab === 'int' && (location.pathname === '/' || location.pathname === '')) ? '/' : (TAB_PATHS[tab] || '/');
+    const desc = document.querySelector('meta[name="description"]');
+    if (desc) desc.setAttribute('content', seo.desc);
+    const canonical = document.querySelector('link[rel="canonical"]');
+    if (canonical) canonical.setAttribute('href', 'https://journal.ailatest.org' + canonicalPath);
+    const ogUrl = document.querySelector('meta[property="og:url"]');
+    if (ogUrl) ogUrl.setAttribute('content', 'https://journal.ailatest.org' + canonicalPath);
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    if (ogTitle) ogTitle.setAttribute('content', seo.title);
+    const ogDesc = document.querySelector('meta[property="og:description"]');
+    if (ogDesc) ogDesc.setAttribute('content', seo.desc);
+  }
   let activeCat = '__all';   // ESI subject filter (legacy name)
   let activeCasMajor = '__all'; // CAS 大类 filter
   let activeIdxFilter = '__all'; // 索引快捷筛选
@@ -1711,7 +1750,7 @@
         };
         const m = map[kind];
         if (!m) return '';
-        return `<span class="flagship-pill ${m[1]}" title="${m[0]}">★ ${m[0]}</span>`;
+        return `<span class="flagship-pill ${m[1]}" title="${m[0]}">${m[0]}</span>`;
       }
       function badgeXR(xr) {
         if (!xr) return '';
@@ -1852,8 +1891,7 @@
   function renderRow(r) {
     const fid = favId(r);
     rowRecordsByFid[fid] = { ...r, __src: 'int' };
-    const flagshipHtml = r.flagship ? `<span class="flagship-star fs-${r.flagship}" title="${r.flagship.replace('_',' ')}">★</span>` : '';
-    const nameHtml = `<div class="jname">${flagshipHtml}${escape(titleCase(r.name))}${r.cn_name ? `<span class="jname-cn">${escape(r.cn_name)}</span>` : ''}${aliasHintHtml(r)}</div>`;
+    const nameHtml = `<div class="jname ${r.flagship ? 'jname-flagship' : ''}">${escape(titleCase(r.name))}${r.cn_name ? `<span class="jname-cn">${escape(r.cn_name)}</span>` : ''}${aliasHintHtml(r)}</div>`;
     const crossBadges = renderDomCrossBadges(r, 'int');
     // 第一行：索引（SCIE/SSCI/AHCI/ESCI/EI）— 回答"这本被哪些数据库收录"
     const indexBadges = renderIndexBadges(r);
@@ -2570,10 +2608,12 @@
       // 从URL hash或存储取当前选中分类（默认全部）
       // 使用内存变量跟踪
       if (!window.__cnkiCat) window.__cnkiCat = '__all';
+      if (!window.__cnkiIndex) window.__cnkiIndex = '__all';
       activeCat = window.__cnkiCat;
 
       // 筛选逻辑
       let filtered = all.filter(r => {
+        const hits = lookupDom(r);
         // 搜索过滤
         if (q) {
           const hay = (r.name + ' ' + (r.issn||'') + ' ' + (r.cn_code||'') + ' ' + (r.sponsor||'') + ' ' + (r.major_categories||[]).join(' ')).toLowerCase();
@@ -2584,9 +2624,16 @@
           const cats = r.major_categories || [];
           if (!cats.includes(activeCat)) return false;
         }
+        if (window.__cnkiIndex !== '__all') {
+          const hasIndex = hits.some(h => {
+            if (window.__cnkiIndex === 'cnkx') return h.source && h.source.startsWith('cnkx');
+            if (window.__cnkiIndex === 'zju') return h.source === 'zju';
+            return h.source === window.__cnkiIndex;
+          });
+          if (!hasIndex) return false;
+        }
         // 徽章过滤（CSSCI/北大核心/CCF）— include mode: 勾选 = 只看有该徽章的
         if (activeDomBadges.size > 0) { // 有任意徽章被勾选时
-          const hits = lookupDom(r);
           const hasCssci = hits.some(h => h.source === 'cssci');
           const hasCssciExt = hits.some(h => h.source === 'cssci_ext');
           const hasPku = hits.some(h => h.source === 'pku');
@@ -2605,6 +2652,14 @@
         const count = all.filter(r => (r.major_categories||[]).includes(c)).length;
         return `<option value="${escape(c)}"${activeCat === c ? ' selected' : ''}>${escape(c)}</option>`;
       }).join('');
+      const indexOptions = [
+        ['cssci', 'CSSCI'],
+        ['cssci_ext', T('CSSCI 扩展','CSSCI Ext')],
+        ['pku', T('北大核心','PKU Core')],
+        ['ccft', T('CCF 中文','CCF Chinese')],
+        ['cnkx', T('中国科协','CAST')],
+        ['zju', T('浙江大学','ZJU')],
+      ].map(([value, label]) => `<option value="${escape(value)}"${window.__cnkiIndex === value ? ' selected' : ''}>${escape(label)}</option>`).join('');
 
       // 按刊名字母排序
       filtered.sort((a, b) => (a.name||'').localeCompare(b.name||'', 'zh'));
@@ -2649,7 +2704,7 @@
         <div class="table-wrap"><table class="journals"><thead><tr>
           <th style="width:36px" aria-label="Favorite"></th>
           <th>${T('期刊名称','Journal')}</th>
-          <th>${T('收录索引','Indices')}</th>
+          <th style="min-width:180px;padding:0 4px"><select id="cnki-index-select" class="th-select"><option value="__all">${T('收录索引','Indices')}</option>${indexOptions}</select></th>
           <th style="width:160px;padding:0 4px"><select id="cnki-cat-select" class="th-select"><option value="__all">${T('学科分类','Category')}</option>${catOptions}</select></th>
           <th style="width:130px">ISSN</th>
           <th style="width:120px">CN</th>
@@ -2661,6 +2716,14 @@
       </div>`;
 
       // 绑定分类下拉
+      const indexSelect = document.getElementById('cnki-index-select');
+      if (indexSelect) {
+        indexSelect.addEventListener('change', () => {
+          window.__cnkiIndex = indexSelect.value;
+          window.__cnkiShown = 100;
+          renderDomestic();
+        });
+      }
       const catSelect = document.getElementById('cnki-cat-select');
       if (catSelect) {
         catSelect.addEventListener('change', () => {
@@ -3853,10 +3916,15 @@
         const sub = it.cn_name && it.cn_name !== (it.name || '') ? `<span class="share-row-cn">${escape(it.cn_name)}</span>` : '';
         // 反查丰富数据
         const j = lookup[norm(it.issn)] || lookup[norm(it.eissn)] || {};
-        const meta = (j && (j.indices || j.if_quartile || j.cas_zone || j.scopus))
-          ? `<span class="share-row-tags badges">${renderIndexBadges(j)}</span><span class="share-row-tags badges">${[renderRankBadges(j)].filter(Boolean).join('')}</span>`
+        const indexBadges = renderIndexBadges(j);
+        const rankBadges = [renderRankBadges(j), renderDomCrossBadges(j, 'int')].filter(Boolean).join('');
+        const meta = (indexBadges || rankBadges)
+          ? `<div class="share-row-badges">
+              ${indexBadges ? `<div class="share-row-badge-line"><span class="share-row-badge-label">${T('收录','Indexed')}</span><span class="share-row-tags badges">${indexBadges}</span></div>` : ''}
+              ${rankBadges ? `<div class="share-row-badge-line"><span class="share-row-badge-label">${T('分区','Rank')}</span><span class="share-row-tags badges">${rankBadges}</span></div>` : ''}
+            </div>`
           : '';
-        return `<div class="share-list-row"><span class="share-row-idx">${String(i+1).padStart(2,'0')}</span><span class="share-row-name">${title}${sub}</span>${meta}</div>`;
+        return `<div class="share-list-row"><span class="share-row-idx">${String(i+1).padStart(2,'0')}</span><div class="share-row-main"><div class="share-row-name">${title}${sub}</div>${meta}</div></div>`;
       }).join('') || `<div class="empty">${T('（空清单）','(empty list)')}</div>`;
       const exp = d.expires_at ? new Date(d.expires_at * 1000).toLocaleDateString() : '';
       const cnt = (d.items||[]).length;
@@ -3982,8 +4050,7 @@
     const fid = favId(r);
     rowRecordsByFid[fid] = r;
     const rawName = r.name || r.cn_name || '';
-    const flagshipHtml = r.flagship ? `<span class="flagship-star fs-${r.flagship}" title="${r.flagship.replace('_',' ')}">★</span>` : '';
-    const nameHtml = `<div class="jname">${flagshipHtml}${escape(titleCase(rawName.replace(/\*$/,'')))}${r.cn_name && r.cn_name !== rawName ? `<span class="jname-cn">${escape(r.cn_name)}</span>` : ''}${r.en_name && r.en_name !== rawName ? `<span class="jname-cn">${escape(titleCase(r.en_name))}</span>` : ''}${aliasHintHtml(r)}</div>`;
+    const nameHtml = `<div class="jname ${r.flagship ? 'jname-flagship' : ''}">${escape(titleCase(rawName.replace(/\*$/,'')))}${r.cn_name && r.cn_name !== rawName ? `<span class="jname-cn">${escape(r.cn_name)}</span>` : ''}${r.en_name && r.en_name !== rawName ? `<span class="jname-cn">${escape(titleCase(r.en_name))}</span>` : ''}${aliasHintHtml(r)}</div>`;
     // 索引行
     const indexBadges = r.__src === 'int' ? renderIndexBadges(r) : '';
     // 分区/等级行（IF 已移到独立列）
@@ -4079,22 +4146,36 @@
       }
     });
 
-    $$('.tab').forEach(b => b.addEventListener('click', () => {
-      $$('.tab').forEach(x => x.classList.remove('active'));
-      b.classList.add('active');
-      activeTab = b.dataset.tab;
+    function activateTab(tab, opts = {}) {
+      if (!TAB_PATHS[tab]) tab = 'int';
+      $$('[data-tab]').forEach(x => x.classList.toggle('active', x.dataset.tab === tab));
+      activeTab = tab;
       $$('.tab-panel').forEach(p => p.hidden = p.dataset.panel !== activeTab);
       $$('[data-international]').forEach(el => el.hidden = activeTab !== 'int');
       $$('[data-domestic]').forEach(el => el.hidden = activeTab !== 'dom');
-      // 选刊 tab 不需要搜索框
+      // 选刊 tab 不需要全站搜索框；登录和语言入口在标签栏右侧保留。
       const topbar = $('.topbar');
       if (topbar) topbar.hidden = activeTab === 'pick';
+      if (!opts.skipPath) {
+        const nextPath = TAB_PATHS[activeTab] || '/';
+        if (location.pathname !== nextPath) {
+          try { history.pushState({ tab: activeTab }, '', nextPath + location.search + location.hash); }
+          catch (_) {}
+        }
+      }
+      updatePageSeo(activeTab);
       applyI18n(); // refresh placeholder
       if (activeTab === 'dom') renderDomestic();
       else if (activeTab === 'fav') renderFav();
       else if (activeTab === 'int') renderInt();
       else if (activeTab === 'pick') initPickTool();
+    }
+    window.__activateJournalTab = activateTab;
+    $$('.tab[data-tab]').forEach(b => b.addEventListener('click', (e) => {
+      e.preventDefault();
+      activateTab(b.dataset.tab);
     }));
+    window.addEventListener('popstate', () => activateTab(tabFromPath(), { skipPath: true }));
 
     // ─── 国内导航 ───
     $('#dom-content')?.addEventListener('click', (e) => {
@@ -4920,7 +5001,8 @@
         : `${journals.length.toLocaleString()} journals loaded`;
       renderCatList();
       renderWosList();
-      renderInt();
+      if (window.__activateJournalTab) window.__activateJournalTab(tabFromPath(), { skipPath: true });
+      else renderInt();
       // 启用 #j/<id> 深链
       window.addEventListener('hashchange', applyHashRoute);
       applyHashRoute();
