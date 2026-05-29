@@ -650,6 +650,7 @@ table.journals tr:last-child td { border-bottom: 0; }
 .badge.b-frontiers { background: #1a6b3c; color: #fff; }
 .badge.b-hindawi  { background: #c4551a; color: #fff; }
 .badge.b-warn     { background: #cc3333; color: #fff; }
+.badge.b-warn-high { background: #ff2222; color: #fff; font-weight:900; border:1px solid #ff6666; box-shadow:0 0 6px rgba(255,0,0,.4); }
 .badge.b-multi    { background: #6b5a8a; color: #fff; }
 
 /* share dialog */
