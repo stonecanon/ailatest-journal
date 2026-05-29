@@ -4637,25 +4637,34 @@
         }
 
         // Step 3: Build ranked results — multi-factor scoring
+        // Primary signal: direct keyword-to-topic match (oaMap tp) — 60%
+        // Secondary: keyword match in paper titles — 25%
+        // Tertiary: paper count (volume signal) — 15%
         const maxCount = Math.max(...[...journalMap.values()].map(j => j.count), 1);
 
-        // Compute topic frequency across journals (for topic match scoring)
-        const topicJournalCount = {};
-        for (const [, j] of journalMap) {
-          for (const t of j.topics) {
-            topicJournalCount[t] = (topicJournalCount[t] || 0) + 1;
-          }
-        }
-        const maxTopicFreq = Math.max(...Object.values(topicJournalCount), 1);
+        // Build normalized keyword tokens for topic matching
+        const topicTokens = [...searchKeywords].filter(w => w.length > 3);
 
         const entries = [...journalMap.entries()].map(([issn, j]) => {
           const countRatio = j.count / maxCount;
           const kwMatchRatio = j.count > 0 ? j.kwMatch / j.count : 0;
-          const topicMatch = j.topics.size > 0
-            ? [...j.topics].reduce((sum, t) => sum + (topicJournalCount[t] || 0), 0) / (j.topics.size * maxTopicFreq)
-            : 0;
 
-          const totalScore = countRatio * 0.60 + kwMatchRatio * 0.30 + topicMatch * 0.10;
+          // Direct topic match: score how well journal's oaMap topics match the search keywords
+          let topicScore = 0;
+          const oaEntry = oaMap && oaMap[issn];
+          if (oaEntry && Array.isArray(oaEntry.tp) && oaEntry.tp.length > 0 && topicTokens.length > 0) {
+            let totalMatches = 0;
+            for (const topicName of oaEntry.tp) {
+              const lower = topicName.toLowerCase();
+              for (const tok of topicTokens) {
+                if (lower.includes(tok)) totalMatches++;
+              }
+            }
+            // Normalize: matches per topic, capped at 1.0
+            topicScore = Math.min(1, totalMatches / (oaEntry.tp.length * Math.min(topicTokens.length, 3)));
+          }
+
+          const totalScore = topicScore * 0.60 + kwMatchRatio * 0.25 + countRatio * 0.15;
 
           const journalRec = journals.find(r => r.issn === issn || r.eissn === issn);
           const zoneVal = journalRec?.cas_zone;
