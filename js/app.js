@@ -4208,32 +4208,11 @@
       if (e.key === 'Escape') closeDrawer();
     });
 
-    // 移动端侧栏抽屉：☰ 开 / 点 scrim 关 / 点 nav-item 自动关
-    const side = document.querySelector('aside.sidebar');
+    // 侧栏筛选 — 现在始终在内容下方显示（桌面/移动端皆然）
+    $('#side-toggle')?.style.setProperty('display', 'none');
     const sideScrim = $('#sidebar-scrim');
-    function openSide() {
-      side?.classList.add('open');
-      if (sideScrim) { sideScrim.hidden = false; requestAnimationFrame(() => sideScrim.classList.add('on')); }
-    }
-    function closeSide() {
-      side?.classList.remove('open');
-      if (sideScrim) {
-        sideScrim.classList.remove('on');
-        setTimeout(() => { sideScrim.hidden = true; }, 200);
-      }
-    }
-    $('#side-toggle')?.addEventListener('click', openSide);
-    sideScrim?.addEventListener('click', closeSide);
-    side?.addEventListener('click', (e) => {
-      if (window.matchMedia('(max-width: 900px)').matches &&
-          e.target.closest('.nav-item, .chip, .nav-sub')) {
-        closeSide();
-      }
-    });
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeSide();
-    });
-
+    if (sideScrim) sideScrim.hidden = true;
+  
     // auth
     $('#auth-btn').addEventListener('click', () => {
       if (user) {
