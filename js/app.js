@@ -4346,8 +4346,8 @@
         const firstLine = lines.find(l => !/^keywords?:/i.test(l) && !/^关键词[：:]/.test(l));
         if (firstLine) {
           let t = firstLine.replace(/[.。！!?？,，;；]+$/, '').trim();
-          if (t.length > 80) {
-            const firstPart = t.slice(0, 60);
+          if (t.length > 150) {
+            const firstPart = t.slice(0, 120);
             const lastSpace = firstPart.lastIndexOf(' ');
             t = (lastSpace > 20 ? firstPart.slice(0, lastSpace) : firstPart).replace(/[,;，；]+$/, '');
           }
@@ -4359,7 +4359,7 @@
         // We run 2-3 complementary queries, deduplicate papers, then aggregate by journal.
 
         const bodyText = lines.slice(1).filter(l => !/^keywords?:/i.test(l) && !/^关键词[：:]/.test(l)).join(' ');
-        const MAX_URL = 155;
+        const MAX_URL = 2000;
 
         const stopWords = new Set(('this that with from which were have been than into also their about '+
           'study show were used using based results method model data paper these between while where '+
@@ -4386,15 +4386,15 @@
 
         // Q1: Explicit keywords (if present) — these are the most reliable signal
         if (explicitKeywords.length) {
-          const q = explicitKeywords.slice(0, 4).join(' ');
+          const q = explicitKeywords.slice(0, 8).join(' ');
           if (encodeURIComponent(q).length < MAX_URL) queries.push(q);
         }
 
         // Q2: Title-derived keywords (core topic of the paper)
         const titleLower = (titleTerms[0]||'').toLowerCase().replace(/[^a-z\s-]/g, '').replace(/-/g, ' ');
         const titleKws = titleLower.split(/\s+/).filter(w => w.length > 3 && !stopWords.has(w));
-        if (titleKws.length >= 3) {
-          const q = titleKws.slice(0, 10).join(' ');
+        if (titleKws.length >= 2) {
+          const q = titleKws.slice(0, 15).join(' ');
           if (encodeURIComponent(q).length < MAX_URL && !queries.some(x => x.toLowerCase().includes(q.slice(0,15)))) {
             queries.push(q);
           }
@@ -4403,7 +4403,7 @@
         // Q3: Body-derived technical terms (methods, algorithms, sensors, etc.)
         // Pick words that are ≥5 chars (more specific), not already covered by Q1/Q2
         const covered = queries.join(' ').toLowerCase();
-        const bodyKws = uniqueWords.filter(w => w.length >= 4 && !covered.includes(w)).slice(0, 6);
+        const bodyKws = uniqueWords.filter(w => w.length >= 4 && !covered.includes(w)).slice(0, 10);
         if (bodyKws.length >= 3) {
           const q = bodyKws.join(' ');
           if (encodeURIComponent(q).length < MAX_URL) queries.push(q);
@@ -4425,8 +4425,8 @@
         const SEARCH_FIELDS = 'id,title,publication_date,primary_location,relevance_score';
         const FIVE_YEARS_AGO = new Date(Date.now() - 5*365*24*60*60*1000).toISOString().slice(0,10);
         const DATE_FILTER = `&filter=from_publication_date:${FIVE_YEARS_AGO}`;
-        const queryBatches = await Promise.all(queries.slice(0, 3).map(async (q) => {
-          const url = `https://api.openalex.org/works?search=${encodeURIComponent(q.slice(0,120))}&per_page=30&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
+        const queryBatches = await Promise.all(queries.slice(0, 4).map(async (q) => {
+          const url = `https://api.openalex.org/works?search=${encodeURIComponent(q.slice(0,120))}&per_page=200&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
           try {
             const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
             if (!r.ok) {
@@ -4454,8 +4454,8 @@
 
         // If too few results, try a broader backup query
         if (allWorks.length < 8) {
-          const backup = uniqueWords.slice(0, 5).join(' ');
-          const url = `https://api.openalex.org/works?search=${encodeURIComponent(backup)}&per_page=30&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
+          const backup = uniqueWords.slice(0, 8).join(' ');
+          const url = `https://api.openalex.org/works?search=${encodeURIComponent(backup)}&per_page=200&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
           try {
             const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
             if (r.ok) {
@@ -4472,7 +4472,7 @@
           const chn = titleTerms[0].replace(/[a-zA-Z0-9\s]/g, '').replace(/[，。、；：！？（）【】《》""''\s]/g, '');
           if (chn) {
             const cnQuery = chn.slice(0, 12);
-            const url = `https://api.openalex.org/works?search=${encodeURIComponent(cnQuery)}&per_page=20&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
+            const url = `https://api.openalex.org/works?search=${encodeURIComponent(cnQuery)}&per_page=200&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
             try {
               const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
               if (r.ok) { const d = await r.json(); for (const w of (d.results||[])) { if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); } } }
