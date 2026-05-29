@@ -99,41 +99,22 @@ a:hover { border-bottom-color: var(--accent); }
 /* ─────────── Layout ─────────── */
 body {
   display: block;
-  max-width: 1000px;
+  max-width: 1120px;
   margin: 0 auto;
 }
 
 #sidebar {
-  position: sticky;
-  top: 0;
-  width: 220px;
-  height: 100vh;
-  background: var(--paper-soft);
-  border-right: 1px solid var(--rule);
-  padding: 20px 14px 24px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  font-size: 12px;
-  box-sizing: border-box;
+  display: none !important;
 }
-/* desktop: sidebar in left column via grid */
+
+/* Sidebar filters are kept in the DOM for existing JS bindings, but are
+   intentionally hidden while the no-sidebar layout is restored. */
 @media (min-width: 901px) {
   main.main {
-    max-width: 1240px;
-    display: grid;
-    grid-template-columns: 220px 1fr;
+    display: block;
+    max-width: 1120px;
   }
-  #sidebar {
-    grid-column: 1;
-    grid-row: 1 / -1;
-    width: 220px;
-    position: sticky;
-    top: 0;
-    align-self: start;
-  }
-  #sidebar.open { transform: none; }
   main.main > *:not(#sidebar) {
-    grid-column: 2;
     min-width: 0;
   }
 }
@@ -152,10 +133,9 @@ body {
 #sidebar .chip { font-size: 10px; padding: 2px 6px; }
 
 main.main {
-  flex: 1;
   min-width: 0;
   padding: 14px 20px 60px;
-  max-width: 1000px;
+  max-width: 1120px;
 }
 
 /* ─────────── Brand ─────────── */
@@ -1381,24 +1361,11 @@ td.empty,
 /* responsive */
 @media (max-width: 900px) {
   #sidebar {
-    position: fixed;
-    top: 0; left: 0;
-    width: 280px;
-    max-width: 85vw;
-    height: 100vh;
-    background: var(--paper);
-    border-right: 1px solid var(--rule);
-    box-shadow: 4px 0 20px rgba(43,42,39,.12);
-    z-index: 90;
-    transform: translateX(-100%);
-    transition: transform 0.25s ease;
-    padding: 20px 16px 24px;
-    overflow-y: auto;
+    display: none !important;
   }
   #sidebar.open { transform: none; }
-  .side-toggle { display: inline-flex; }
+  .side-toggle { display: none !important; }
   main.main {
-    flex: none;
     padding: 14px 16px 60px;
     max-width: 100%;
     display: flex; flex-direction: column;
