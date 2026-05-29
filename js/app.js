@@ -1936,6 +1936,14 @@
       if (activeExtraFilter === 'oaj' && !r.oaj) return false;
       if (activeExtraFilter === 'doaj' && !r.doaj) return false;
       if (activeExtraFilter === 'warning' && !r.warning) return false;
+      if (activeExtraFilter.startsWith('abdc:')) {
+        const want = activeExtraFilter.slice(5);
+        if (!r.abdc || r.abdc.rating !== want) return false;
+      }
+      if (activeExtraFilter.startsWith('abs:')) {
+        const want = activeExtraFilter.slice(4);
+        if (!r.abs || r.abs.rating !== want) return false;
+      }
     }
     if (activeWos.size) {
       const wc = r.wos_categories || [];

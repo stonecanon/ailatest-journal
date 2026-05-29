@@ -152,6 +152,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                   <option value="oaj">OAJ</option>
                   <option value="doaj">DOAJ</option>
                   <option value="warning">预警</option>
+                  <option value="abdc:A*">ABDC A*</option>
+                  <option value="abdc:A">ABDC A</option>
+                  <option value="abdc:B">ABDC B</option>
+                  <option value="abdc:C">ABDC C</option>
+                  <option value="abs:4*">ABS 4*</option>
+                  <option value="abs:4">ABS 4</option>
+                  <option value="abs:3">ABS 3</option>
+                  <option value="abs:2">ABS 2</option>
+                  <option value="abs:1">ABS 1</option>
                 </select>
               </th>
               <th class="col-if sortable" data-if-sort="int" title="按 IF 排序">IF <span class="sort-arrow">▼</span></th>
@@ -386,7 +395,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <button id="pwa-install" class="pwa-install" hidden data-i18n="pwa_install">📲 安装到主屏</button>
 <script>
 // Build version for cache busting data files
-const __BUILD_VER = 'v20260528-15';
+const __BUILD_VER = 'v20260529-09';
 // Service Worker 清理 — 必须在 app.js 加载前运行
 (function() {
   if ('serviceWorker' in navigator) {
@@ -399,7 +408,7 @@ const __BUILD_VER = 'v20260528-15';
   }
 })();
 </script>
-<script src="/js/app.js?v=v20260529-08" defer></script>
+<script src="/js/app.js?v=v20260529-09" defer></script>
 <script>
   // Custom install prompt
   let __pwaPrompt = null;
