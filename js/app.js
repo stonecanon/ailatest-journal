@@ -1862,8 +1862,13 @@
     const badgeCell = renderBadgeCell(indexBadges, rankBadges);
     const casVal = (lang === 'zh-CN' || lang === 'zh-TW') ? (r.cas_major_cn || '') : tn(r.cas_major_cn || '', 'domain');
     const esiVal = r.esi_category || '';
+    const wosVals = Array.isArray(r.wos_categories) ? r.wos_categories.filter(Boolean) : [];
+    const wosShown = wosVals.slice(0, 2).join(' / ');
     const casCell = casVal ? escape(casVal) : '<span class="muted-cell">—</span>';
     const esiCell = esiVal ? escape(esiVal) : '<span class="muted-cell">—</span>';
+    const wosCell = wosVals.length
+      ? `<span title="${escape(wosVals.join(' / '))}">${escape(wosShown)}${wosVals.length > 2 ? ` <span class="muted-cell">+${wosVals.length - 2}</span>` : ''}</span>`
+      : '<span class="muted-cell">—</span>';
     const ifVal = (r.if_2024 != null) ? (+r.if_2024).toFixed(1) : '';
     const ifCell = ifVal ? `<span class="if-cell">${ifVal}</span>` : '<span class="muted-cell">—</span>';
     return `<tr data-fid="${escape(fid)}" class="j-row clickable ${r.flagship ? 'row-flagship' : ''}" data-src="int">
@@ -1872,6 +1877,7 @@
       <td class="col-badge col-badge-split">${badgeCell}</td>
       <td class="col-if">${ifCell}</td>
       <td class="col-cas">${casCell}</td>
+      <td class="col-wos">${wosCell}</td>
       <td class="col-esi">${esiCell}</td>
     </tr>`;
   }
@@ -2070,7 +2076,7 @@
     const visible = filtered.slice(0, shown);
     const tbody = $('#tbody');
     if (!visible.length) {
-      tbody.innerHTML = `<tr><td colspan="6" class="empty">${t('empty')}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="7" class="empty">${t('empty')}</td></tr>`;
     } else {
       tbody.innerHTML = visible.map(renderRow).join('');
     }
@@ -2090,6 +2096,7 @@
         activeWos.clear();
         $$('.wos-item').forEach(el => el.classList.remove('on'));
         $$('#wos-list input[type=checkbox]').forEach(cb => cb.checked = false);
+        const wosSel = $('#wos-col-filter'); if (wosSel) wosSel.value = '__all';
         const inp = $('#wos-search'); if (inp) inp.value = '';
         renderWosList();
         activeCat = '__all';
@@ -2129,6 +2136,27 @@
         renderInt();
       });
     }
+    const wosSel = $('#wos-col-filter');
+    if (wosSel && !wosSel.__bound) {
+      wosSel.__bound = true;
+      const wosSet = new Set();
+      journals.forEach(j => (j.wos_categories || []).forEach(c => { if (c) wosSet.add(c); }));
+      const wosList = [...wosSet].sort((a,b) => a.localeCompare(b, 'en'));
+      wosSel.innerHTML = `<option value="__all">WoS Subject</option>` +
+        wosList.map(v => `<option value="${escape(v)}">${escape(v)}</option>`).join('');
+      wosSel.addEventListener('change', () => {
+        activeWos.clear();
+        if (wosSel.value !== '__all') activeWos.add(wosSel.value);
+        $$('#wos-list input[type=checkbox]').forEach(cb => { cb.checked = activeWos.has(cb.value); });
+        $$('.wos-item').forEach(el => {
+          const v = el.querySelector('input')?.value;
+          el.classList.toggle('on', !!v && activeWos.has(v));
+        });
+        shown = PAGE;
+        renderInt();
+      });
+    }
+    if (wosSel) wosSel.value = activeWos.size === 1 ? [...activeWos][0] : '__all';
     // 题头快捷筛选：索引、分区、附加
     ['idx-col-filter','tier-col-filter','extra-col-filter'].forEach(id => {
       const sel = $(`#${id}`);
@@ -2262,6 +2290,8 @@
       cb.addEventListener('change', () => {
         if (cb.checked) activeWos.add(cb.value); else activeWos.delete(cb.value);
         cb.closest('.wos-item').classList.toggle('on', cb.checked);
+        const wosSel = $('#wos-col-filter');
+        if (wosSel) wosSel.value = activeWos.size === 1 ? [...activeWos][0] : '__all';
         shown = PAGE;
         renderInt();
       });
@@ -2445,7 +2475,7 @@
       // 细分学科列表
       const subdomainSet = new Set();
       all.forEach(r => { if (r.subdomain) subdomainSet.add(r.subdomain); });
-      const subdomainList = [...subdomainSet].sort((a,b) => a.localeCompare(b, 'zh'));
+      const subdomainList = [...subdomainSet];
 
       // 筛选状态
       if (!window.__cnkxDomain) window.__cnkxDomain = '__all';
@@ -2463,8 +2493,7 @@
         return true;
       });
 
-      // 按刊名排序
-      filtered.sort((a, b) => (a.name||'').localeCompare(b.name||'', 'zh'));
+      // 保留中国科协原始目录顺序：学科领域 / 细分学科 / T级 / 来源表内顺序。
 
       // 分页
       const visible = filtered.slice(0, window.__cnkxShown);
