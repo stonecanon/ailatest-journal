@@ -327,6 +327,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <label class="pick-opt"><input type="checkbox" id="pick-filter-comprehensive"> <span data-i18n="pick_filter_compre">排除综合性期刊</span></label>
           </div>
         </div>
+        <div class="pick-apikey-row">
+          <input type="text" id="pick-apikey" placeholder="OpenAlex API Key（可选，填了解除额度限制）" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:4px;background:var(--bg);color:var(--ink);font-size:12px;box-sizing:border-box">
+        </div>
         <div class="pick-actions">
           <button id="pick-search-btn" class="big-btn primary" data-i18n="pick_search_btn">开始推荐</button>
           <span id="pick-status" class="pick-status muted-cell"></span>
@@ -384,7 +387,7 @@ const __BUILD_VER = 'v20260528-15';
   }
 })();
 </script>
-<script src="/js/app.js?v=v20260529-06" defer></script>
+<script src="/js/app.js?v=v20260529-07" defer></script>
 <script>
   // Custom install prompt
   let __pwaPrompt = null;

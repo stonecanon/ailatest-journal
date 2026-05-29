@@ -4281,9 +4281,14 @@
   let _pickInit = false;
   /**
    * Fetch from OpenAlex directly. Returns { ok, data, errorMsg }.
+   * Includes API key from localStorage if available.
    */
   async function openAlexFetch(urlPath) {
-    const url = `https://api.openalex.org/${urlPath}`;
+    const apiKey = localStorage.getItem('ailatest_oa_key') || '';
+    const sep = urlPath.includes('?') ? '&' : '?';
+    const url = apiKey
+      ? `https://api.openalex.org/${urlPath}${sep}api_key=${encodeURIComponent(apiKey)}`
+      : `https://api.openalex.org/${urlPath}`;
     try {
       const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
       if (!r.ok) {
@@ -4305,6 +4310,17 @@
     const input = $('#pick-input');
     const results = $('#pick-results');
     const status = $('#pick-status');
+
+    // Restore OpenAlex API key from localStorage
+    const apiKeyInput = $('#pick-apikey');
+    if (apiKeyInput) {
+      const saved = localStorage.getItem('ailatest_oa_key') || '';
+      if (saved) apiKeyInput.value = saved;
+      apiKeyInput.addEventListener('blur', () => {
+        const val = apiKeyInput.value.trim();
+        localStorage.setItem('ailatest_oa_key', val);
+      });
+    }
 
     async function doSearch() {
       const query = input.value.trim();
