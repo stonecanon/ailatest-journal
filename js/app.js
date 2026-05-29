@@ -4384,7 +4384,7 @@
         }
       }
 
-      status.textContent = T('正在搜索相关论文…','Searching related papers…');
+      status.textContent = T('正在匹配期刊主题…','Matching journal topics…');
       results.innerHTML = '';
 
       try {
@@ -4489,122 +4489,98 @@
           k.toLowerCase().split(/[\s-]+/).filter(w => w.length > 2).forEach(w => searchKeywords.add(w));
         });
 
-        // Run all queries concurrently via Promise.all
-        status.textContent = T('正在搜索相关论文…','Searching related papers…');
-        const SEARCH_FIELDS = 'id,title,publication_date,primary_location,relevance_score';
-        const FIVE_YEARS_AGO = new Date(Date.now() - 5*365*24*60*60*1000).toISOString().slice(0,10);
-        const DATE_FILTER = `&filter=from_publication_date:${FIVE_YEARS_AGO}`;
-        const queryBatches = await Promise.all(queries.slice(0, 2).map(async (q) => {
-          const searchQ = q.slice(0,120);
-          const r = await openAlexFetch(`works?search=${encodeURIComponent(searchQ)}&per_page=200&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`);
-          if (!r.ok) {
-            console.error('OpenAlex query failed:', r.errorMsg);
-            status.textContent = T('搜索失败：','Search failed: ') + r.errorMsg;
-            return [];
-          }
-          return r.data;
-        }));
-        const seenIds = new Set();
-        const allWorks = [];
-        for (const batch of queryBatches) {
-          for (const w of batch) {
-            if (w.id && !seenIds.has(w.id)) {
-              seenIds.add(w.id);
-              allWorks.push(w);
-            }
-          }
-        }
+        // ── Local topic matching against oa.json ──
+        // Match user keywords against journal topic names (tp field).
+        // No API calls — instant, zero cost.
 
-        // If too few results, try a broader backup query
-        if (allWorks.length < 8) {
-          const backup = uniqueWords.slice(0, 8).join(' ');
-          const r = await openAlexFetch(`works?search=${encodeURIComponent(backup)}&per_page=200&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`);
-          if (r.ok) {
-            for (const w of (r.data || [])) {
-              if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); }
-            }
-          }
-        }
+        status.textContent = T('正在匹配期刊主题…','Matching journal topics…');
 
-        // Chinese fallback: if still nothing and has Chinese, try short Chinese title
-        if (allWorks.length < 3 && titleTerms[0]) {
-          const chn = titleTerms[0].replace(/[a-zA-Z0-9\s]/g, '').replace(/[，。、；：！？（）【】《》""''\s]/g, '');
-          if (chn) {
-            const cnQuery = chn.slice(0, 12);
-            const r = await openAlexFetch(`works?search=${encodeURIComponent(cnQuery)}&per_page=200&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`);
-            if (r.ok) {
-              for (const w of (r.data || [])) {
-                if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); }
-              }
-            }
-          }
-        }
+        // Collect all keyword tokens (lowercase, deduplicated)
+        const searchTokens = new Set();
+        [...explicitKeywords, ...titleKws, ...bodyKws, ...uniqueWords].forEach(k => {
+          k.toLowerCase().split(/[\s-]+/).filter(w => w.length > 2).forEach(w => searchTokens.add(w.trim()));
+        });
+        const tokens = [...searchTokens];
+        const hasCnInput = [...query].filter(c => c >= '\u4e00' && c <= '\u9fff').length > 0;
 
-        const hasCnOnly = [...query].filter(c => c >= '\u4e00' && c <= '\u9fff').length > 0
-          && uniqueWords.filter(w => w.length > 4).length < 2 && !explicitKeywords.length;
-        if (!allWorks.length) {
-          status.textContent = hasCnOnly
-            ? T('未找到相关论文。OpenAlex 对中文搜索效果不佳，建议在摘要后添加英文 Keywords: 行（如 Keywords: indoor occupancy, sensor）',
-              'No papers found. OpenAlex has limited Chinese support. Try adding an English "Keywords:" line.')
-            : T('未找到相关论文，请尝试其他关键词','No papers found, try different keywords');
+        if (!tokens.length && !hasCnInput) {
+          status.textContent = T('请输入更多关键词','Please enter more keywords');
           return;
         }
 
-        // Step 2: Aggregate by journal ISSN
-        const journalMap = new Map();
+        // Score every journal by topic match
+        const scoredMap = new Map(); // issn -> { count, topics, score, ... }
         const topicSet = new Set();
-        for (const w of allWorks) {
-          const src = w.primary_location?.source;
-          if (!src) continue;
-          const issn = (src.issn_l || '').toUpperCase();
-          if (!issn) continue;
-          if (!journalMap.has(issn)) journalMap.set(issn, { count: 0, papers: [], scores: [], topics: new Set(), srcName: src.display_name || '', kwMatch: 0, recentCount: 0 });
-          const j = journalMap.get(issn);
-          j.count++;
-          const titleLower = (w.title || '').toLowerCase();
-          const year = (w.publication_date||'').slice(0,4);
-          // Keyword match: does paper title contain any search keyword?
-          let hasKw = false;
-          for (const kw of searchKeywords) {
-            if (titleLower.includes(kw)) { hasKw = true; break; }
+        let scoredAny = false;
+
+        for (const [issn, oa] of Object.entries(oaMap || {})) {
+          const tp = oa.tp || [];
+          if (!tp.length) continue;
+          if (!journals.some(r => r.issn === issn || r.eissn === issn)) continue; // only score journals in our DB
+
+          // Compute topic keyword match
+          let matchCount = 0;
+          const matchedTopics = [];
+          for (const topicName of tp) {
+            const lower = topicName.toLowerCase();
+            let topicMatch = 0;
+            for (const tok of tokens) {
+              if (lower.includes(tok)) topicMatch++;
+            }
+            if (topicMatch > 0) {
+              matchCount += topicMatch;
+              matchedTopics.push(topicName);
+              topicSet.add(topicName);
+            }
           }
-          if (hasKw) j.kwMatch++;
-          // Recency: papers from last 2 years
-          if (year >= String(new Date().getFullYear() - 1)) j.recentCount++;
-          j.papers.push({
-            title: w.title,
-            year: year,
-            id: w.id,
-            url: w.id // OpenAlex full URL, e.g. https://openalex.org/W12345
-          });
-          j.scores.push(w.relevance_score || 0);
-          if (oaMap && oaMap[issn]) {
-            (oaMap[issn].tp || []).forEach(t => { j.topics.add(t); topicSet.add(t); });
+
+          // Chinese keyword matching: try matching Chinese query against topic names
+          let cnMatch = 0;
+          if (hasCnInput) {
+            const cnTokens = query.replace(/[a-zA-Z0-9\s,;.?!]/g, ' ').split(/\s+/).filter(w => w.length > 1);
+            for (const topicName of tp) {
+              for (const cn of cnTokens) {
+                if (topicName.toLowerCase().includes(cn.toLowerCase())) cnMatch++;
+              }
+            }
+          }
+
+          if (matchCount > 0 || cnMatch > 0) {
+            scoredAny = true;
+            const journalRec = journals.find(r => r.issn === issn || r.eissn === issn);
+            // Combine English + Chinese match score
+            const ws = oa.w || 0;
+            const topicRatio = Math.min(1, (matchCount + cnMatch) / tokens.length * 2);
+            // Works count as a weak signal (log scale, normalized to 0-0.5)
+            const worksBonus = Math.min(0.5, Math.log10(ws + 1) / 8);
+            // Score: main factor is topic overlap
+            const score = topicRatio * 0.70 + (matchCount > 0 ? Math.min(matchCount / tp.length, 1) * 0.20 : 0) + worksBonus * 0.10;
+
+            scoredMap.set(issn, {
+              count: matchCount + cnMatch,
+              topics: matchedTopics.slice(0, 6),
+              score,
+              srcName: oa.hp || '',
+              journalRec,
+              ws,
+            });
           }
         }
 
-        // Step 3: Build ranked results — multi-factor scoring
-        const maxCount = Math.max(...[...journalMap.values()].map(j => j.count), 1);
-
-        // Compute topic frequency across journals (for topic match scoring)
-        const topicJournalCount = {};
-        for (const [, j] of journalMap) {
-          for (const t of j.topics) {
-            topicJournalCount[t] = (topicJournalCount[t] || 0) + 1;
-          }
+        if (!scoredAny) {
+          status.textContent = hasCnInput
+            ? T('未匹配到相关期刊。建议添加英文关键词行（Keywords: occupancy, sensor, indoor）更好匹配主题',
+              'No matching journals found. Try adding an English "Keywords:" line for better topic matching.')
+            : T('未匹配到相关期刊，请尝试其他关键词','No matching journals found, try different keywords');
+          return;
         }
-        const maxTopicFreq = Math.max(...Object.values(topicJournalCount), 1);
 
-        const entries = [...journalMap.entries()].map(([issn, j]) => {
-          const countRatio = j.count / maxCount;
-          const kwMatchRatio = j.count > 0 ? j.kwMatch / j.count : 0;
-          const topicMatch = j.topics.size > 0
-            ? [...j.topics].reduce((sum, t) => sum + (topicJournalCount[t] || 0), 0) / (j.topics.size * maxTopicFreq)
-            : 0;
+        // Step 3: Build ranked entries
+        const topScore = Math.max(...[...scoredMap.values()].map(j => j.score), 0.001);
 
-          const totalScore = countRatio * 0.60 + kwMatchRatio * 0.30 + topicMatch * 0.10;
-
-          const journalRec = journals.find(r => r.issn === issn || r.eissn === issn);
+        const entries = [...scoredMap.entries()].map(([issn, j]) => {
+          const score = j.score / topScore;
+          const journalRec = j.journalRec;
           const zoneVal = journalRec?.cas_zone;
           const topVal = journalRec?.cas_top;
           const qVal = journalRec?.jcr_q;
@@ -4612,14 +4588,18 @@
           const eiVal = journalRec?.ei;
           const indices = journalRec?.indices || [];
           const wosCats = journalRec?.wos_categories || [];
+          const ifVal = journalRec?.if;
 
           return {
-            issn, journalRec, zone: zoneVal, top: topVal,
+            issn, journalRec,
+            if: ifVal,
+            zone: zoneVal, top: topVal,
             jcr_q: qVal, scopus: scopusVal, ei: eiVal,
             indices, wos_categories: wosCats,
-            count: j.count, papers: j.papers.slice(0,5),
-            topics: [...j.topics].slice(0,6),
-            score: totalScore, srcName: j.srcName,
+            count: j.count, papers: [],
+            topics: j.topics,
+            score,
+            srcName: j.srcName || (journalRec?.name || ''),
           };
         });
 
@@ -4659,7 +4639,7 @@
         // Step 5: Render
         if (!filtered.length) {
           results.innerHTML = `<div class="pick-no-results">${T('没有符合筛选条件的期刊推荐','No journals match your filters')}</div>`;
-          status.textContent = `${T('已发表','Published')} ${allWorks.length} ${T('篇相关论文','related papers')}，${T('分布在','in')} ${journalMap.size} ${T('个期刊','journals')}`;
+          status.textContent = `${T('已匹配','Matched')} ${entries.length} ${T('个期刊','journals')}`;
           return;
         }
 
@@ -4742,7 +4722,7 @@
             <h3><a href="#j/${escape(e.journalRec ? favId(e.journalRec) : issnStr)}">${escape(name)}</a></h3>
             ${pubBadge || multiBadge ? `<div class="pick-name-tags">${pubBadge}${multiBadge}</div>` : ''}
             <div class="pick-head">
-              <span class="pick-count">${e.count}<small> ${T('篇论文','papers')}</small></span>
+              <span class="pick-count">${e.count}<small> ${T('关键词匹配','matches')}</small></span>
               <div class="pick-head-right">
                 <span class="pick-score-bar"><span class="bar"><span class="bar-fill" style="width:${scorePct}%;background:${barColor}"></span></span></span>
                 <span class="pick-score-pct">${scorePct}%</span>
@@ -4783,7 +4763,7 @@
           });
         }
 
-        status.textContent = `${T('已发表','Published')} ${allWorks.length} ${T('篇相关论文','related papers')}，${T('分布在','in')} ${journalMap.size} ${T('个期刊','journals')}，${T('推荐','recommended')} ${filtered.length} ${T('个','')}`;
+        status.textContent = `${T('已匹配','Matched')} ${filtered.length}/${entries.length} ${T('个期刊','journals')}`;
         // Increment daily counter (only for non-unlocked users)
         if (!isUnlocked) {
           const today = new Date().toISOString().slice(0,10);
