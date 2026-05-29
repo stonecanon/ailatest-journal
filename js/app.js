@@ -4456,31 +4456,14 @@
         const bodyText = lines.slice(1).filter(l => !/^keywords?:/i.test(l) && !/^关键词[：:]/.test(l)).join(' ');
         const MAX_URL = 2000;
 
-        const stopWords = new Set(('about above after against also although among another any are around because before '+
+        const stopWords = new Set((
+          'about above after against also although among another any are around because before '+
           'being below between both but can could does each else even ever every few for from further get got had has have '+
           'here how however into just least less let like likely may might more most much must need neither never next nor '+
           'not now often once only onto other our own per quite rather really same shall should show shown shows side since '+
           'some still such than that the their them then there these they this those through thus till to toward towards under '+
-          'upon very via was way were what when where which while who why will with within without would yet '+
-          'study show were used using based results method model data paper these between while where '+
-          'after before other there analysis approach process system research '+
-          'each both more most some very just also although however therefore because without '+
-          'within across among through before after below under over upon could should would may might '+
-          'shall can will does did has had been being made make made made using used based related '+
-          'significant different important various multiple including following providing performing '+
-          'proposes presents demonstrates investigates examines explores develops describes reports '+
-          'shows found test tests testing methods models datasets dataset experiments experimental '+
-          'proposed presented demonstrated investigated examined explored developed described reported '+
-          'tested showed found approach techniques algorithm algorithms features feature accuracy '+
-          'performance evaluation values value results analysis prediction predictions '+
-          'review survey summary overview concept current recent future trends challenge issues progress '+
-          'direction perspective insight update advance comprehensive systematic '+
-          'compare comparison combined combination experimental theoretical numerical computational '+
-          'validation verification optimization simulation monitoring detection recognition '+
-          'application implementation integration framework scheme scenario '+
-          'effect impact influence role contribution factor property characteristic '+
-          'behavior behaviour measurement assessment quantification characterization '+
-          'improvement enhancement modification development solution strategy').split(' '));
+          'upon very via was way were what when where which while who why will with within without would yet'
+        ).split(' '));
 
         // Collect all English words (length > 3) from title + body
         const allText = [(titleTerms[0]||''), bodyText].join(' ').toLowerCase();
