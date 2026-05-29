@@ -1083,7 +1083,7 @@ body.share-mode main.main { max-width: 760px; margin: 0 auto; padding: 28px 20px
 .xr-pill.xr-2 { background: #4f9b95; color: #fff; }
 .xr-pill.xr-3 { background: #9ec9c5; color: #1f5f5a; }
 .xr-pill.xr-4 { background: #d3e6e3; color: #1f5f5a; }
-.xr-pill.xr-top { background: var(--zone-top); color: #fff; font-weight: 600; }
+.xr-pill.xr-top { background: #0f766e; color: #fff; font-weight: 700; }
 
 /* 新锐分区 TOP 侧边栏标签 */
 .chip.xr-top:has(input:checked) { background: var(--zone-top); border-color: var(--zone-top); color: #fff; }
@@ -1913,6 +1913,66 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 }
 
 /* 中文期刊目录 - 学科分类内联标签 */
+.dom-section-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 14px;
+}
+.dom-section-copy {
+  min-width: 0;
+}
+.dom-section-head .section-title {
+  margin-bottom: 4px;
+}
+.dom-source-tabs {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  flex-wrap: wrap;
+  flex: 0 0 auto;
+  max-width: 520px;
+}
+.dom-source-tab {
+  border: 1px solid var(--rule);
+  background: var(--paper);
+  color: var(--ink-soft);
+  border-radius: 2px;
+  padding: 6px 10px;
+  font-family: var(--serif);
+  font-size: 12.5px;
+  line-height: 1.2;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color .15s, color .15s, background .15s;
+}
+.dom-source-tab:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.dom-source-tab.active {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper);
+}
+@media (max-width: 720px) {
+  .dom-section-head {
+    display: block;
+  }
+  .dom-source-tabs {
+    justify-content: flex-start;
+    max-width: none;
+    margin-top: 10px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 4px;
+  }
+  .dom-source-tab {
+    flex: 0 0 auto;
+  }
+}
 .cat-inline {
   display: inline-block;
   padding: 1px 6px;
@@ -2268,9 +2328,9 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 /* Pick-for-me coming-soon */
 /* Pick-for-me tool */
 .pick-tool { max-width:800px; margin:0 auto; padding:0 16px 40px; display:flex; flex-direction:column; }
-.pick-results { order:1; }
+.pick-input-wrap { order:1; }
 .pick-history { order:2; }
-.pick-input-wrap { order:3; }
+.pick-results { order:3; }
 /* Input area — distinctive color block section */
 .pick-input-wrap {
   background:linear-gradient(135deg, #eef3fb 0%, #f0f4fa 50%, #f5f2ec 100%);
