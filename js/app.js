@@ -1708,8 +1708,9 @@
         if (!m) return '';
         return `<span class="flagship-pill ${m[1]}" title="${m[0]}">★ ${m[0]}</span>`;
       }
-      function badgeXR(z) {
+      function badgeXR(z, top) {
         if (!z) return '';
+        if (top) return `<span class="xr-pill xr-top" title="${T('中科院 2026 新锐版分区 · TOP','CAS Emerging Edition 2026 · TOP')}">${T('新锐','Emerging')} ${z}${T('区','')}·TOP</span>`;
         return `<span class="xr-pill xr-${z}" title="${T('中科院 2026 新锐版分区','CAS Emerging Edition 2026')}">${T('新锐','Emerging')} ${z}${T('区','')}</span>`;
       }
       function badgeWarn(w, isCard) {
@@ -1744,7 +1745,7 @@
     return [
       badgeJCR(r.if_quartile),
       badgeCAS(r.cas_zone, r.cas_top),
-      badgeXR(r.cas_xr && r.cas_xr.zone),
+      badgeXR(r.cas_xr && r.cas_xr.zone, r.cas_xr && r.cas_xr.top),
       badgeCCF(r.ccf),
       badgeABDC(r.abdc),
       badgeABS(r.abs),
@@ -3028,7 +3029,7 @@
       if (!hasMajor && !hasSub) return '';
       const majorLine = hasMajor ? `<div class="cat-major-line">
         ${xr.major_cn ? `<span class="cat-major-name">${escape(xr.major_cn)}</span>` : ''}
-        ${xr.zone ? `<span class="cat-major-zone">${xr.zone}${T('区','')}</span>` : ''}
+        ${xr.zone ? `<span class="cat-major-zone">${xr.zone}${T('区','')}${xr.top ? '·TOP' : ''}</span>` : ''}
       </div>` : '';
       const items = hasSub ? xr.sub.map(s => {
         const nm = s.cat || s.name || '';
