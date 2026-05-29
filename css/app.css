@@ -579,7 +579,7 @@ th.col-if { text-align: right; padding-right: 8px; }
   border: 1px solid #d4c9a8;
   border-radius: 6px;
 }
-.results-head h3 {
+.results-head h1 {
   font-family: var(--sans);
   font-size: 15px; font-weight: 700;
   margin: 0;

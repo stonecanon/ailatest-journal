@@ -1423,7 +1423,7 @@
   function lockedPrompt(sourceKey, sourceLabel, recordCount) {
     return `
       <div class="section-block locked-block">
-        <h3 class="section-title">${escape(sourceLabel)} <span class="lock-pill">🔒 ${T('付费解锁','Paid unlock')}</span></h3>
+        <h1 class="section-title">${escape(sourceLabel)} <span class="lock-pill">🔒 ${T('付费解锁','Paid unlock')}</span></h3>
         <div class="section-subtitle">${T('此学校自编目录为付费内容，共','This in-house directory is paid content,')} ${recordCount} ${T('条记录。输入解锁码后自动保存在本机浏览器，下次免输。','records. Enter your unlock code; it will be saved on this device for next time.')}</div>
         <form class="unlock-form" data-src="${escape(sourceKey)}">
           <input class="unlock-input" type="text" autocomplete="off" spellcheck="false" placeholder="${T('解锁码（如 school-a-xxxxxxxx）','Unlock code (e.g. school-a-xxxxxxxx)')}" />
@@ -2348,7 +2348,7 @@
   function domSectionHeader(title, subtitle = '') {
     return `<div class="dom-section-head">
       <div class="dom-section-copy">
-        <h3 class="section-title">${title}</h3>
+        <h1 class="section-title">${title}</h3>
         ${subtitle ? `<div class="section-subtitle">${subtitle}</div>` : ''}
       </div>
       ${domSourceTabsHTML()}
