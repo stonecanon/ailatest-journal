@@ -2347,21 +2347,10 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   font-size: 12px; color: var(--ink-mid, #8a7456);
   margin: 8px 2px 0; padding: 0 2px;
 }
-.fav-drag-hint .drag-ico {
-  font-weight: bold; color: var(--ink, #3a2e1f);
-  padding: 0 3px; letter-spacing: -2px;
+.fav-table .col-name {
+  cursor: grab; user-select: none; touch-action: none;
 }
-
-.fav-table .col-drag { text-align: center; }
-.drag-handle {
-  display: inline-block; width: 20px; line-height: 1;
-  color: var(--ink-mid, #8a7456); cursor: grab;
-  font-weight: bold; letter-spacing: -2px;
-  user-select: none; touch-action: none;
-  padding: 4px 2px;
-}
-.drag-handle:active { cursor: grabbing; color: var(--ink, #3a2e1f); }
-.drag-handle:hover { color: var(--ink, #3a2e1f); }
+.fav-table .col-name:active { cursor: grabbing; }
 
 .fav-ghost { opacity: 0.3; background: var(--paper-2, #f5ecd6); }
 .fav-chosen { background: #faf4e6 !important; }
