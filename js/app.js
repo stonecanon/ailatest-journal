@@ -4481,7 +4481,7 @@
 
         // Q1: Explicit keywords (if present) — these are the most reliable signal
         if (explicitKeywords.length) {
-          const q = explicitKeywords.slice(0, 5).join(' ');
+          const q = explicitKeywords.slice(0, 6).join(' ');
           if (encodeURIComponent(q).length < MAX_URL) queries.push(q);
         }
 
@@ -4489,7 +4489,7 @@
         const titleLower = (titleTerms[0]||'').toLowerCase().replace(/[^a-z\s-]/g, '').replace(/-/g, ' ');
         const titleKws = titleLower.split(/\s+/).filter(w => w.length > 3 && !stopWords.has(w));
         if (titleKws.length >= 2) {
-          const q = titleKws.slice(0, 8).join(' ');
+          const q = titleKws.slice(0, 12).join(' ');
           if (encodeURIComponent(q).length < MAX_URL && !queries.some(x => x.toLowerCase().includes(q.slice(0,15)))) {
             queries.push(q);
           }
@@ -4498,7 +4498,7 @@
         // Q3: Body-derived technical terms (methods, algorithms, sensors, etc.)
         // Pick words that are ≥5 chars (more specific), not already covered by Q1/Q2
         const covered = queries.join(' ').toLowerCase();
-        const bodyKws = uniqueWords.filter(w => w.length >= 4 && !covered.includes(w)).slice(0, 5);
+        const bodyKws = uniqueWords.filter(w => w.length >= 4 && !covered.includes(w)).slice(0, 8);
         if (bodyKws.length >= 3) {
           const q = bodyKws.join(' ');
           if (encodeURIComponent(q).length < MAX_URL) queries.push(q);
@@ -4541,8 +4541,32 @@
           }
         }
 
-        // No backup query — primary queries are sufficient with per_page=80
-        // No Chinese fallback — OpenAlex Chinese search is unreliable
+        // Backup: if very few results, try a broader query with fewer keywords
+        if (allWorks.length < 3) {
+          const backup = uniqueWords.slice(0, 6).join(' ');
+          if (backup) {
+            const r = await openAlexFetch(`works?search=${encodeURIComponent(backup)}&per_page=50&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`);
+            if (r.ok) {
+              for (const w of (r.data || [])) {
+                if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); }
+              }
+            }
+          }
+        }
+
+        // Chinese fallback: if only Chinese input, try short Chinese title
+        if (allWorks.length < 3 && titleTerms[0]) {
+          const chn = titleTerms[0].replace(/[a-zA-Z0-9\s]/g, '').replace(/[，。、；：！？（）【】《》""''\s]/g, '');
+          if (chn) {
+            const cnQuery = chn.slice(0, 8);
+            const r = await openAlexFetch(`works?search=${encodeURIComponent(cnQuery)}&per_page=50&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`);
+            if (r.ok) {
+              for (const w of (r.data || [])) {
+                if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); }
+              }
+            }
+          }
+        }
 
         const hasCnOnly = [...query].filter(c => c >= '\u4e00' && c <= '\u9fff').length > 0
           && uniqueWords.filter(w => w.length > 4).length < 2 && !explicitKeywords.length;
