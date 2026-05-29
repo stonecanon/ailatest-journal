@@ -4659,7 +4659,7 @@
         // Step 4: Filter and sort
         let filtered = entries;
         // Exclude single-paper journals (noise from broad queries)
-        filtered = filtered.filter(e => e.count >= 2);
+        filtered = filtered.filter(e => e.count >= 1);
         const ifMin = parseFloat(document.getElementById('pick-if-min')?.value || '0');
         if (document.getElementById('pick-filter-if')?.checked && ifMin > 0) {
           filtered = filtered.filter(e => e.if != null && e.if >= ifMin);
