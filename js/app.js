@@ -4248,14 +4248,8 @@
     : `${location.origin}/openalex`;
 
   function openAlexWorksUrl(params) {
-    const searchParams = params instanceof URLSearchParams
-      ? new URLSearchParams(params)
-      : new URLSearchParams(String(params || ''));
-    const email = String(user?.email || '').trim().toLowerCase();
-    if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && !searchParams.has('mailto')) {
-      searchParams.set('mailto', email);
-    }
-    return `${OPENALEX_WORKS_ENDPOINT}?${searchParams.toString()}`;
+    const qs = params instanceof URLSearchParams ? params.toString() : String(params || '');
+    return `${OPENALEX_WORKS_ENDPOINT}?${qs}`;
   }
 
   function initPickTool() {
@@ -4271,43 +4265,25 @@
       const query = input.value.trim();
       if (!query) { status.textContent = T('请输入内容','Please enter a query'); return; }
 
-      if (!user || !user.token) {
-        status.textContent = T('请先登录/注册后使用推荐期刊功能', 'Please sign in or create an account to use journal recommendations');
-        results.innerHTML = `<div class="pick-no-results" style="padding:40px 20px">
-          <p>${T('推荐期刊需要登录账号，每个账号拥有独立使用额度。','Journal recommendations require an account. Each account has its own quota.')}</p>
-          <button class="btn primary" id="pick-login-btn" type="button">${T('登录 / 注册','Sign in / Sign up')}</button>
-        </div>`;
-        document.getElementById('pick-login-btn')?.addEventListener('click', startLogin);
-        return;
-      }
-
-      let quotaInfo = null;
-      try {
-        const quotaResp = await fetch(`${API_BASE}/pick/quota/consume`, {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${user.token}` },
-        });
-        quotaInfo = await readJsonResponse(quotaResp, T('额度检查失败','Quota check failed'));
-      } catch (err) {
-        const msg = err.message || '';
-        if (/login required|unauthorized|401/i.test(msg)) {
-          status.textContent = T('登录已过期，请重新登录后使用推荐期刊功能','Your session has expired. Please sign in again to use journal recommendations');
+      // ── Daily usage limit (localStorage) ──
+      // Bypass: owner email hardcoded
+      const OWNER_EMAIL = 'jiantaoweng@gmail.com';
+      const isUnlocked = localStorage.getItem('ailatest_unlocked') === '1'
+        || (user && (user.email === OWNER_EMAIL || user.login === OWNER_EMAIL || user.name === OWNER_EMAIL));
+      if (!isUnlocked) {
+        const today = new Date().toISOString().slice(0,10);
+        const limitKey = 'ailatest.pick.count';
+        let dailyData;
+        try { dailyData = JSON.parse(localStorage.getItem(limitKey) || '{}'); } catch(e) { dailyData = {}; }
+        if (dailyData.date !== today) { dailyData = { date: today, count: 0 }; }
+        if (dailyData.count >= 5) {
+          status.textContent = T('今日免费次数已用完，购买解锁无限使用 → support@ailatest.org','Daily limit reached. Purchase unlimited → support@ailatest.org');
           results.innerHTML = `<div class="pick-no-results" style="padding:40px 20px">
-            <button class="btn primary" id="pick-login-btn" type="button">${T('重新登录','Sign in again')}</button>
-          </div>`;
-          document.getElementById('pick-login-btn')?.addEventListener('click', startLogin);
-          return;
-        }
-        if (/quota exceeded|429/i.test(msg)) {
-          status.textContent = T('今日免费推荐次数已用完，可升级后继续使用','Daily free recommendation quota used up. Upgrade to continue');
-          results.innerHTML = `<div class="pick-no-results" style="padding:40px 20px">
-            <p>${T('免费账号每天 5 次；付费账号可配置更高月额度。','Free accounts get 5 searches per day. Paid accounts can receive a higher monthly quota.')}</p>
-            <p>${T('联系 support@ailatest.org 升级额度','Contact support@ailatest.org to upgrade your quota')}</p>
+            <p>${T('免费用户每天限 5 次搜索','Free: 5 searches/day')}</p>
+            <p>${T('联系 support@ailatest.org 购买解锁无限使用','Contact support@ailatest.org to unlock unlimited use')}</p>
           </div>`;
           return;
         }
-        status.textContent = fetchFailureMessage(err, T('额度检查','Quota check'));
-        return;
       }
 
       status.textContent = T('正在搜索相关论文…','Searching related papers…');
@@ -4316,7 +4292,7 @@
       try {
         // Lazy-load oaMap for topic matching (only if pick tool is first to need it)
         if (!oaMap) {
-          try { oaMap = await fetchJSON('data/oa.json.gz?v=' + (typeof __BUILD_VER !== 'undefined' ? __BUILD_VER : Date.now())); }
+          try { oaMap = await fetchJSON('data/oa.json.gz'); }
           catch(e) { oaMap = {}; }
         }
 
@@ -4340,13 +4316,7 @@
         // Title = first non-empty line (keep concise)
         const firstLine = lines.find(l => !/^keywords?:/i.test(l) && !/^关键词[：:]/.test(l));
         if (firstLine) {
-          let t = firstLine.replace(/[.。！!?？,，;；]+$/, '').trim();
-          if (t.length > 80) {
-            const firstPart = t.slice(0, 60);
-            const lastSpace = firstPart.lastIndexOf(' ');
-            t = (lastSpace > 20 ? firstPart.slice(0, lastSpace) : firstPart).replace(/[,;，；]+$/, '');
-          }
-          titleTerms = [t];
+          titleTerms = [firstLine.replace(/[.。！!?？,，;；]+$/, '').trim().slice(0, 200)];
         }
 
         // ── Multi-query search with OpenAlex 'search' (relevance) param ──
@@ -4362,6 +4332,9 @@
           'each both more most some than very just also although however therefore because without '+
           'within across among through before after below under over upon could should would may might '+
           'shall can will does did has had been being made make made made using used based related '+
+          'review reviews nature '+
+          'five summer cross scenario scenarios invasive '+
+          'cross-scenario non-invasive explainable '+
           'significant different important various multiple including following providing performing '+
           'proposes presents demonstrates investigates examines explores develops describes reports '+
           'shows found test tests testing methods models datasets dataset experiments experimental '+
@@ -4419,40 +4392,36 @@
         status.textContent = T('正在搜索相关论文…','Searching related papers…');
         const SEARCH_FIELDS = 'id,title,publication_date,primary_location,relevance_score';
         const FIVE_YEARS_AGO = new Date(Date.now() - 5*365*24*60*60*1000).toISOString().slice(0,10);
-        const PICK_SEARCH_PAGE_SIZE = 60;
-        const PICK_BACKUP_PAGE_SIZE = 60;
-        const PICK_CN_PAGE_SIZE = 40;
-        const PICK_MAX_JOURNALS = 60;
-        const PICK_PAPERS_PER_JOURNAL = 8;
         let openAlexErrorStatus = null;
-        const rememberOpenAlexError = (statusCode) => {
-          if (statusCode === 429 || !openAlexErrorStatus) openAlexErrorStatus = statusCode;
-        };
-        const queryBatches = await Promise.all(queries.slice(0, 3).map(async (q) => {
-          const params = new URLSearchParams({
-            search: q.slice(0, 120),
-            per_page: String(PICK_SEARCH_PAGE_SIZE),
-            sort: 'relevance_score:desc',
-            select: SEARCH_FIELDS,
-          });
-          params.set('filter', `from_publication_date:${FIVE_YEARS_AGO}`);
+        async function fetchOpenAlexResults(params) {
+          if (!(params instanceof URLSearchParams)) params = new URLSearchParams(params);
+          if (!params.has('mailto')) params.set('mailto', 'jiantaoweng@gmail.com');
           const url = openAlexWorksUrl(params);
           try {
             const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
             if (!r.ok) {
-              rememberOpenAlexError(r.status);
-              const text = await r.text().catch(() => '');
-              console.error('OpenAlex API error:', r.status, text.slice(0,200));
+              openAlexErrorStatus = r.status;
               return [];
             }
             const d = await r.json();
             return d.results || [];
-          } catch (e) {
-            rememberOpenAlexError('network');
-            console.error('OpenAlex fetch error:', e?.message || e);
+          } catch (err) {
+            openAlexErrorStatus = 'network';
             return [];
           }
+        }
+        const queryBatches = await Promise.all(queries.slice(0, 3).map(async (q) => {
+          const params = new URLSearchParams({
+            search: q.slice(0, 120),
+            per_page: '30',
+            sort: 'relevance_score:desc',
+            select: SEARCH_FIELDS,
+          });
+          params.set('filter', `from_publication_date:${FIVE_YEARS_AGO}`);
+          return fetchOpenAlexResults(params);
         }));
+
+        // Deduplicate by work ID
         const seenIds = new Set();
         const allWorks = [];
         for (const batch of queryBatches) {
@@ -4465,47 +4434,40 @@
         }
 
         // If too few results, try a broader backup query
-        if (allWorks.length < 16) {
+        if (allWorks.length < 8) {
           const backup = uniqueWords.slice(0, 5).join(' ');
-          const params = new URLSearchParams({
-            search: backup,
-            per_page: String(PICK_BACKUP_PAGE_SIZE),
-            sort: 'relevance_score:desc',
-            select: SEARCH_FIELDS,
-          });
-          params.set('filter', `from_publication_date:${FIVE_YEARS_AGO}`);
-          const url = openAlexWorksUrl(params);
           try {
-            const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
-            if (r.ok) {
-              const d = await r.json();
-              for (const w of (d.results || [])) {
-                if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); }
-              }
-            } else {
-              rememberOpenAlexError(r.status);
-            }
-          } catch (e) { rememberOpenAlexError('network'); console.error('OpenAlex backup fetch error:', e?.message || e); }
-        }
-
-        // Chinese fallback: if still nothing and has Chinese, try short Chinese title
-        if (allWorks.length < 6 && titleTerms[0]) {
-          const chn = titleTerms[0].replace(/[a-zA-Z0-9\s]/g, '').replace(/[，。、；：！？（）【】《》""''\s]/g, '');
-          if (chn) {
-            const cnQuery = chn.slice(0, 12);
             const params = new URLSearchParams({
-              search: cnQuery,
-              per_page: String(PICK_CN_PAGE_SIZE),
+              search: backup,
+              per_page: '30',
               sort: 'relevance_score:desc',
               select: SEARCH_FIELDS,
             });
             params.set('filter', `from_publication_date:${FIVE_YEARS_AGO}`);
-            const url = openAlexWorksUrl(params);
+            const results = await fetchOpenAlexResults(params);
+            for (const w of results) {
+              if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); }
+            }
+          } catch {}
+        }
+
+        if (allWorks.length < 3 && titleTerms[0]) {
+          const chn = titleTerms[0].replace(/[a-zA-Z0-9\s]/g, '').replace(/[，。、；：！？（）【】《》""''\s]/g, '');
+          if (chn) {
+            const cnQuery = chn.slice(0, 12);
             try {
-              const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
-              if (r.ok) { const d = await r.json(); for (const w of (d.results||[])) { if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); } } }
-              else { rememberOpenAlexError(r.status); }
-            } catch (e) { rememberOpenAlexError('network'); console.error('OpenAlex CN fetch error:', e?.message || e); }
+              const params = new URLSearchParams({
+                search: cnQuery,
+                per_page: '20',
+                sort: 'relevance_score:desc',
+                select: SEARCH_FIELDS,
+              });
+              params.set('filter', `from_publication_date:${FIVE_YEARS_AGO}`);
+              const results = await fetchOpenAlexResults(params);
+              for (const w of results) {
+                if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); }
+              }
+            } catch {}
           }
         }
 
@@ -4514,8 +4476,8 @@
         if (!allWorks.length) {
           if (openAlexErrorStatus) {
             status.textContent = T(
-              `OpenAlex 暂时不可用（${openAlexErrorStatus}），请稍后再试`,
-              `OpenAlex is temporarily unavailable (${openAlexErrorStatus}), please try again later`
+              `OpenAlex 搜索接口暂时不可用（${openAlexErrorStatus}），请稍后重试`,
+              `OpenAlex search is temporarily unavailable (${openAlexErrorStatus}), please try again later`
             );
             return;
           }
@@ -4593,7 +4555,7 @@
             issn, journalRec, zone: zoneVal, top: topVal,
             jcr_q: qVal, scopus: scopusVal, ei: eiVal,
             indices, wos_categories: wosCats,
-            count: j.count, papers: j.papers.slice(0, PICK_PAPERS_PER_JOURNAL),
+            count: j.count, papers: j.papers.slice(0,5),
             topics: [...j.topics].slice(0,6),
             score: totalScore, srcName: j.srcName,
           };
@@ -4626,7 +4588,7 @@
           filtered = filtered.filter(e => e.score > 0.1);
         }
         filtered.sort((a, b) => b.score - a.score);
-        filtered = filtered.slice(0, PICK_MAX_JOURNALS);
+        filtered = filtered.slice(0, 30);
 
         // Normalize: top journal = 100%
         const maxScore = filtered.length > 0 ? filtered[0].score : 1;
@@ -4708,18 +4670,11 @@
             ${(function(){
               const r2 = e.journalRec;
               let txt = '📅 ' + T('审稿周期','Review cycle') + ': ';
-              // Prefer CrossRef (measured in days), fall back to DOAJ (weeks)
-              const cr = r2?.crossref;
-              if (cr && cr.median_days > 0) {
-                const months = (cr.median_days / 30.44).toFixed(1);
-                txt += months + T(' 个月 (收稿→录用,Crossref,',' months (submission→acceptance, ') + (cr.sample_size || '?') + T('篇样本)',' samples)');
+              const weeks = parseFloat(r2?.doaj?.review_weeks);
+              if (weeks > 0) {
+                txt += (weeks / 4.33).toFixed(1) + T(' 个月 (投稿→出版,DOAJ)',' months (submission→pub.)');
               } else {
-                const weeks = parseFloat(r2?.doaj?.review_weeks);
-                if (weeks > 0) {
-                  txt += (weeks / 4.33).toFixed(1) + T(' 个月 (投稿→出版,DOAJ)',' months (submission→pub.,DOAJ)');
-                } else {
-                  txt += 'N/A';
-                }
+                txt += T('≈4.0 个月 (DOAJ 平均)','≈4.0 months (DOAJ avg)');
               }
               return '<div class="pick-cycle">' + txt + '</div>';
             })()}
@@ -4739,10 +4694,17 @@
           });
         }
 
-        const quotaText = quotaInfo && quotaInfo.remaining != null
-          ? T(`，剩余额度 ${quotaInfo.remaining}/${quotaInfo.limit}`, `, quota left ${quotaInfo.remaining}/${quotaInfo.limit}`)
-          : '';
-        status.textContent = `${T('已发表','Published')} ${allWorks.length} ${T('篇相关论文','related papers')}，${T('分布在','in')} ${journalMap.size} ${T('个期刊','journals')}，${T('推荐','recommended')} ${filtered.length} ${T('个','')}${quotaText}`;
+        status.textContent = `${T('已发表','Published')} ${allWorks.length} ${T('篇相关论文','related papers')}，${T('分布在','in')} ${journalMap.size} ${T('个期刊','journals')}，${T('推荐','recommended')} ${filtered.length} ${T('个','')}`;
+        // Increment daily counter (only for non-unlocked users)
+        if (!isUnlocked) {
+          const today = new Date().toISOString().slice(0,10);
+          const limitKey = 'ailatest.pick.count';
+          let dailyData;
+          try { dailyData = JSON.parse(localStorage.getItem(limitKey) || '{"date":"","count":0}'); } catch(e) { dailyData = {date:'',count:0}; }
+          if (dailyData.date !== today) { dailyData = { date: today, count: 0 }; }
+          dailyData.count++;
+          localStorage.setItem(limitKey, JSON.stringify(dailyData));
+        }
         // ── Save to search history ──
         savePickHistory(query);
       } catch (e) {
