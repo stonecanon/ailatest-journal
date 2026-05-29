@@ -4285,7 +4285,7 @@
       try {
         // Lazy-load oaMap for topic matching (only if pick tool is first to need it)
         if (!oaMap) {
-          try { oaMap = await fetchJSON('data/oa.json.gz'); }
+          try { oaMap = await fetchJSON('data/oa.json.gz?v=' + (typeof __BUILD_VER !== 'undefined' ? __BUILD_VER : Date.now())); }
           catch(e) { oaMap = {}; }
         }
 
@@ -4309,7 +4309,13 @@
         // Title = first non-empty line (keep concise)
         const firstLine = lines.find(l => !/^keywords?:/i.test(l) && !/^关键词[：:]/.test(l));
         if (firstLine) {
-          titleTerms = [firstLine.replace(/[.。！!?？,，;；]+$/, '').trim().slice(0, 200)];
+          let t = firstLine.replace(/[.。！!?？,，;；]+$/, '').trim();
+          if (t.length > 80) {
+            const firstPart = t.slice(0, 60);
+            const lastSpace = firstPart.lastIndexOf(' ');
+            t = (lastSpace > 20 ? firstPart.slice(0, lastSpace) : firstPart).replace(/[,;，；]+$/, '');
+          }
+          titleTerms = [t];
         }
 
         // ── Multi-query search with OpenAlex 'search' (relevance) param ──
@@ -4325,9 +4331,6 @@
           'each both more most some than very just also although however therefore because without '+
           'within across among through before after below under over upon could should would may might '+
           'shall can will does did has had been being made make made made using used based related '+
-          'review reviews nature '+
-          'five summer cross scenario scenarios invasive '+
-          'cross-scenario non-invasive explainable '+
           'significant different important various multiple including following providing performing '+
           'proposes presents demonstrates investigates examines explores develops describes reports '+
           'shows found test tests testing methods models datasets dataset experiments experimental '+
@@ -4387,16 +4390,21 @@
         const FIVE_YEARS_AGO = new Date(Date.now() - 5*365*24*60*60*1000).toISOString().slice(0,10);
         const DATE_FILTER = `&filter=from_publication_date:${FIVE_YEARS_AGO}`;
         const queryBatches = await Promise.all(queries.slice(0, 3).map(async (q) => {
-          const url = 'https://api.openalex.org/works?search=' + encodeURIComponent(q.slice(0,120)) + '&per_page=30&sort=relevance_score:desc&select=' + SEARCH_FIELDS + DATE_FILTER;
+          const url = `https://api.openalex.org/works?search=${encodeURIComponent(q.slice(0,120))}&per_page=30&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
           try {
             const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
-            if (!r.ok) return [];
+            if (!r.ok) {
+              const text = await r.text().catch(() => '');
+              console.error('OpenAlex API error:', r.status, text.slice(0,200));
+              return [];
+            }
             const d = await r.json();
             return d.results || [];
-          } catch { return []; }
+          } catch (e) {
+            console.error('OpenAlex fetch error:', e?.message || e);
+            return [];
+          }
         }));
-
-        // Deduplicate by work ID
         const seenIds = new Set();
         const allWorks = [];
         for (const batch of queryBatches) {
@@ -4411,8 +4419,8 @@
         // If too few results, try a broader backup query
         if (allWorks.length < 8) {
           const backup = uniqueWords.slice(0, 5).join(' ');
+          const url = `https://api.openalex.org/works?search=${encodeURIComponent(backup)}&per_page=30&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
           try {
-            const url = 'https://api.openalex.org/works?search=' + encodeURIComponent(backup) + '&per_page=30&sort=relevance_score:desc&select=' + SEARCH_FIELDS + DATE_FILTER;
             const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
             if (r.ok) {
               const d = await r.json();
@@ -4420,23 +4428,19 @@
                 if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); }
               }
             }
-          } catch {}
+          } catch (e) { console.error('OpenAlex backup fetch error:', e?.message || e); }
         }
 
+        // Chinese fallback: if still nothing and has Chinese, try short Chinese title
         if (allWorks.length < 3 && titleTerms[0]) {
           const chn = titleTerms[0].replace(/[a-zA-Z0-9\s]/g, '').replace(/[，。、；：！？（）【】《》""''\s]/g, '');
           if (chn) {
             const cnQuery = chn.slice(0, 12);
+            const url = `https://api.openalex.org/works?search=${encodeURIComponent(cnQuery)}&per_page=20&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
             try {
-              const url = 'https://api.openalex.org/works?search=' + encodeURIComponent(cnQuery) + '&per_page=20&sort=relevance_score:desc&select=' + SEARCH_FIELDS + DATE_FILTER;
               const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
-              if (r.ok) {
-                const d = await r.json();
-                for (const w of (d.results || [])) {
-                  if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); }
-                }
-              }
-            } catch {}
+              if (r.ok) { const d = await r.json(); for (const w of (d.results||[])) { if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); } } }
+            } catch (e) { console.error('OpenAlex CN fetch error:', e?.message || e); }
           }
         }
 
@@ -4632,11 +4636,18 @@
             ${(function(){
               const r2 = e.journalRec;
               let txt = '📅 ' + T('审稿周期','Review cycle') + ': ';
-              const weeks = parseFloat(r2?.doaj?.review_weeks);
-              if (weeks > 0) {
-                txt += (weeks / 4.33).toFixed(1) + T(' 个月 (投稿→出版,DOAJ)',' months (submission→pub.)');
+              // Prefer CrossRef (measured in days), fall back to DOAJ (weeks)
+              const cr = r2?.crossref;
+              if (cr && cr.median_days > 0) {
+                const months = (cr.median_days / 30.44).toFixed(1);
+                txt += months + T(' 个月 (收稿→录用,Crossref,',' months (submission→acceptance, ') + (cr.sample_size || '?') + T('篇样本)',' samples)');
               } else {
-                txt += T('≈4.0 个月 (DOAJ 平均)','≈4.0 months (DOAJ avg)');
+                const weeks = parseFloat(r2?.doaj?.review_weeks);
+                if (weeks > 0) {
+                  txt += (weeks / 4.33).toFixed(1) + T(' 个月 (投稿→出版,DOAJ)',' months (submission→pub.,DOAJ)');
+                } else {
+                  txt += 'N/A';
+                }
               }
               return '<div class="pick-cycle">' + txt + '</div>';
             })()}
