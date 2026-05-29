@@ -2316,14 +2316,15 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .pick-num, .pick-select { padding:4px 8px; border:1px solid var(--border); border-radius:4px; background:var(--bg); color:var(--fg); font-size:13px }
 .pick-actions { display:flex; align-items:center; gap:12px; margin-top:16px }
 .pick-status { font-size:13px }
-.pick-results { display:flex; flex-direction:column; gap:0; border:1px solid var(--border); border-radius:10px; overflow:hidden; background:var(--bg2); }
+.pick-results { display:flex; flex-direction:column; }
 .pick-card {
   position:relative; overflow:hidden;
-  background:var(--bg2); border-radius:0; padding:18px 20px 16px;
+  background:var(--bg2); border-radius:8px; padding:18px 20px 16px;
   cursor:pointer; transition:box-shadow .2s,background .2s;
-  border-bottom:1px solid var(--border);
+  margin-bottom:10px;
+  border:1px solid var(--border);
 }
-.pick-card:last-child { border-bottom:none }
+.pick-card:last-child { margin-bottom:0 }
 /* Journal name tags — MDPI/Frontiers/Hindawi/综合 — lighter, after journal name */
 .pick-name-tags { display:flex; align-items:center; gap:5px; margin-bottom:4px; flex-wrap:wrap }
 .pick-name-tags .badge { font-size:10px; padding:1px 6px; font-weight:600; border-radius:3px; letter-spacing:0.03em }
