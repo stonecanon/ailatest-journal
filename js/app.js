@@ -4297,26 +4297,28 @@
         || favsData[fid];
       if (!rec) return;
 
-      // If already favorited OR only 1 list → direct toggle (old behavior)
-      const alreadyFav = allFavIds().has(fid);
-      if (alreadyFav || favLists.length <= 1) {
+      // Only 1 list → direct toggle (old behavior)
+      if (favLists.length <= 1) {
         toggleFav(rec, { src });
         btn.classList.toggle('on');
         btn.textContent = btn.classList.contains('on') ? '★' : '☆';
         if (activeTab === 'fav') renderFav();
         return;
       }
-      // Multiple lists & not yet favorited → show picker popover
+      // Multiple lists → show picker popover (toggle per list, stays open)
       closeFavPicker();
       const picker = document.createElement('div');
       picker.className = 'fav-picker';
-      picker.innerHTML = favLists.map(l => {
-        const has = l.ids.includes(fid);
-        return `<div class="fav-picker-item ${has?'active':''}" data-list-id="${escape(l.id)}">
-          <span class="check">${has ? '✓' : ''}</span>
-          <span>${escape(favListDisplayName(l))} (${l.ids.length})</span>
-        </div>`;
-      }).join('') + `<div class="fav-picker-new">＋ ${T('新建清单','New list')}</div>`;
+      function renderPickerItems() {
+        return favLists.map(l => {
+          const has = l.ids.includes(fid);
+          return `<div class="fav-picker-item ${has?'active':''}" data-list-id="${escape(l.id)}">
+            <span class="check">${has ? '✓' : ''}</span>
+            <span>${escape(favListDisplayName(l))} (${l.ids.length})</span>
+          </div>`;
+        }).join('');
+      }
+      picker.innerHTML = renderPickerItems() + `<div class="fav-picker-new">＋ ${T('新建清单','New list')}</div>`;
       // Position near the button
       const rect = btn.getBoundingClientRect();
       picker.style.position = 'fixed';
@@ -4324,34 +4326,66 @@
       picker.style.left = Math.min(rect.left, window.innerWidth - 220) + 'px';
       document.body.appendChild(picker);
       activePicker = picker;
-      // Picker item click
+      // Picker item click → toggle that specific list
       picker.querySelectorAll('.fav-picker-item').forEach(item => {
         item.addEventListener('click', () => {
           const listId = item.dataset.listId;
-          const prevActive = activeListId;
-          activeListId = listId;
-          toggleFav(rec, { src });
-          activeListId = prevActive; // restore
-          closeFavPicker();
-          btn.classList.add('on');
-          btn.textContent = '★';
+          const list = favLists.find(l => l.id === listId);
+          if (!list) return;
+          const idx = list.ids.indexOf(fid);
+          if (idx >= 0) {
+            list.ids.splice(idx, 1);
+            if (!favLists.some(l => l.ids.includes(fid))) delete favsData[fid];
+          } else {
+            list.ids.push(fid);
+            favsData[fid] = { ...rec, __src: src, __savedAt: Date.now() };
+          }
+          localStorage.setItem(STORAGE_PREFIX + 'favsData', JSON.stringify(favsData));
+          // rebuild flat union for star
+          const union = new Set();
+          favLists.forEach(l => l.ids.forEach(id => union.add(id)));
+          favs = union;
+          localStorage.setItem(STORAGE_PREFIX + 'favs', JSON.stringify([...union]));
+          // update visual
+          const nowInList = list.ids.includes(fid);
+          item.classList.toggle('active', nowInList);
+          const checkSpan = item.querySelector('.check');
+          if (checkSpan) checkSpan.textContent = nowInList ? '✓' : '';
+          // update counts in all items
+          picker.querySelectorAll('.fav-picker-item').forEach(pi => {
+            const li = favLists.find(l => l.id === pi.dataset.listId);
+            if (li) {
+              const nameSpan = pi.querySelector('span:last-child');
+              if (nameSpan) nameSpan.textContent = `${favListDisplayName(li)} (${li.ids.length})`;
+            }
+          });
+          // update star on page
+          const inAnyList = allFavIds().has(fid);
+          btn.classList.toggle('on', inAnyList);
+          btn.textContent = inAnyList ? '★' : '☆';
+          // persist + sync
+          persistFavLists();
+          updateFavCount();
           if (activeTab === 'fav') renderFav();
+          // keep picker open — user can keep toggling
         });
       });
       picker.querySelector('.fav-picker-new')?.addEventListener('click', () => {
+        closeFavPicker();
         const name = prompt(T('新清单名称：','New list name:'), T('新清单','New list'));
         if (name && name.trim()) {
           const newId = createList(name.trim());
-          const prevActive = activeListId;
-          activeListId = newId;
-          toggleFav(rec, { src });
-          activeListId = prevActive;
-          closeFavPicker();
+          const list = favLists.find(l => l.id === newId);
+          if (list) {
+            list.ids.push(fid);
+            favsData[fid] = { ...rec, __src: src, __savedAt: Date.now() };
+            localStorage.setItem(STORAGE_PREFIX + 'favsData', JSON.stringify(favsData));
+            persistFavLists();
+            updateFavCount();
+          }
           btn.classList.add('on');
           btn.textContent = '★';
           if (activeTab === 'fav') renderFav();
-        } else {
-          closeFavPicker();
         }
       });
     });
