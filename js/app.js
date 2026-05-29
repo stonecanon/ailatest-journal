@@ -4389,11 +4389,16 @@
         const SEARCH_FIELDS = 'id,title,publication_date,primary_location,relevance_score';
         const FIVE_YEARS_AGO = new Date(Date.now() - 5*365*24*60*60*1000).toISOString().slice(0,10);
         const DATE_FILTER = `&filter=from_publication_date:${FIVE_YEARS_AGO}`;
+        let openAlexErrorStatus = null;
+        const rememberOpenAlexError = (statusCode) => {
+          if (statusCode === 429 || !openAlexErrorStatus) openAlexErrorStatus = statusCode;
+        };
         const queryBatches = await Promise.all(queries.slice(0, 3).map(async (q) => {
           const url = `https://api.openalex.org/works?search=${encodeURIComponent(q.slice(0,120))}&per_page=30&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
           try {
             const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
             if (!r.ok) {
+              rememberOpenAlexError(r.status);
               const text = await r.text().catch(() => '');
               console.error('OpenAlex API error:', r.status, text.slice(0,200));
               return [];
@@ -4401,6 +4406,7 @@
             const d = await r.json();
             return d.results || [];
           } catch (e) {
+            rememberOpenAlexError('network');
             console.error('OpenAlex fetch error:', e?.message || e);
             return [];
           }
@@ -4427,8 +4433,10 @@
               for (const w of (d.results || [])) {
                 if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); }
               }
+            } else {
+              rememberOpenAlexError(r.status);
             }
-          } catch (e) { console.error('OpenAlex backup fetch error:', e?.message || e); }
+          } catch (e) { rememberOpenAlexError('network'); console.error('OpenAlex backup fetch error:', e?.message || e); }
         }
 
         // Chinese fallback: if still nothing and has Chinese, try short Chinese title
@@ -4440,13 +4448,20 @@
             try {
               const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
               if (r.ok) { const d = await r.json(); for (const w of (d.results||[])) { if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); } } }
-            } catch (e) { console.error('OpenAlex CN fetch error:', e?.message || e); }
+              else { rememberOpenAlexError(r.status); }
+            } catch (e) { rememberOpenAlexError('network'); console.error('OpenAlex CN fetch error:', e?.message || e); }
           }
         }
 
         const hasCnOnly = [...query].filter(c => c >= '\u4e00' && c <= '\u9fff').length > 0
           && uniqueWords.filter(w => w.length > 4).length < 2 && !explicitKeywords.length;
         if (!allWorks.length) {
+          if (openAlexErrorStatus) {
+            status.textContent = openAlexErrorStatus === 429
+              ? T('OpenAlex：Too Many Requests（429），请稍后再试', 'OpenAlex: Too Many Requests (429), please try again later')
+              : T(`OpenAlex 请求失败（${openAlexErrorStatus}），请稍后再试`, `OpenAlex request failed (${openAlexErrorStatus}), please try again later`);
+            return;
+          }
           status.textContent = hasCnOnly
             ? T('未找到相关论文。OpenAlex 对中文搜索效果不佳，建议在摘要后添加英文 Keywords: 行（如 Keywords: indoor occupancy, sensor）',
               'No papers found. OpenAlex has limited Chinese support. Try adding an English "Keywords:" line.')
