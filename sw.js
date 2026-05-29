@@ -5,7 +5,7 @@
    - data JSON: network-first, cache fallback (so updates win, offline still works)
    - everything else: network only
 */
-const VERSION = '20260529-11';
+const VERSION = '20260529-12';
 const SHELL_CACHE = `shell-${VERSION}`;
 const DATA_CACHE = `data-${VERSION}`;
 

@@ -240,6 +240,106 @@ function publicUser(u) {
 }
 
 // ───────── routes: email ─────────
+function monthFromSec(sec) {
+  return new Date(sec * 1000).toISOString().slice(0, 7);
+}
+
+function nextUtcDayStart(sec) {
+  const d = new Date(sec * 1000);
+  return Math.floor(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() + 1) / 1000);
+}
+
+function nextUtcMonthStart(sec) {
+  const d = new Date(sec * 1000);
+  return Math.floor(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 1) / 1000);
+}
+
+function isOwnerUser(u) {
+  const email = String(u?.email || '').toLowerCase();
+  const login = String(u?.login || '').toLowerCase();
+  return email === 'jiantaoweng@gmail.com' || login === 'jiantaoweng@gmail.com';
+}
+
+async function getPickQuota(env, userId) {
+  try {
+    const row = await env.DB.prepare(
+      'SELECT plan, daily_limit, monthly_limit, paid_until FROM user_quotas WHERE user_id = ?'
+    ).bind(userId).first();
+    return row || { plan: 'free', daily_limit: 5, monthly_limit: null, paid_until: null };
+  } catch (e) {
+    return { plan: 'free', daily_limit: 5, monthly_limit: null, paid_until: null };
+  }
+}
+
+async function ensurePickQuotaTables(env) {
+  await env.DB.batch([
+    env.DB.prepare(
+      `CREATE TABLE IF NOT EXISTS user_quotas (
+        user_id       INTEGER PRIMARY KEY,
+        plan          TEXT    NOT NULL DEFAULT 'free',
+        daily_limit   INTEGER NOT NULL DEFAULT 5,
+        monthly_limit INTEGER,
+        paid_until    INTEGER,
+        updated_at    INTEGER NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )`
+    ),
+    env.DB.prepare(
+      `CREATE TABLE IF NOT EXISTS pick_usage (
+        user_id     INTEGER NOT NULL,
+        period      TEXT    NOT NULL,
+        period_key  TEXT    NOT NULL,
+        used        INTEGER NOT NULL DEFAULT 0,
+        updated_at  INTEGER NOT NULL,
+        PRIMARY KEY (user_id, period, period_key),
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )`
+    ),
+    env.DB.prepare('CREATE INDEX IF NOT EXISTS idx_pick_usage_user_period ON pick_usage(user_id, period, period_key)'),
+  ]);
+}
+
+async function routeConsumePickQuota(req, env) {
+  const u = await getUser(req, env);
+  if (!u) return err('login required', 401);
+
+  const now = nowSec();
+  if (isOwnerUser(u)) {
+    return json({ ok: true, allowed: true, plan: 'owner', unlimited: true, used: 0, limit: null, remaining: null, period: 'none', period_key: '', reset_at: null });
+  }
+
+  await ensurePickQuotaTables(env);
+  const quota = await getPickQuota(env, u.id);
+  const hasPaid = quota.plan !== 'free'
+    && Number(quota.monthly_limit || 0) > 0
+    && (!quota.paid_until || Number(quota.paid_until) >= now);
+  const period = hasPaid ? 'month' : 'day';
+  const periodKey = hasPaid ? monthFromSec(now) : dayFromSec(now);
+  const limit = hasPaid ? Number(quota.monthly_limit) : Number(quota.daily_limit || 5);
+  const resetAt = hasPaid ? nextUtcMonthStart(now) : nextUtcDayStart(now);
+
+  await env.DB.prepare(
+    `INSERT OR IGNORE INTO pick_usage (user_id, period, period_key, used, updated_at)
+     VALUES (?, ?, ?, 0, ?)`
+  ).bind(u.id, period, periodKey, now).run();
+
+  const usage = await env.DB.prepare(
+    'SELECT used FROM pick_usage WHERE user_id = ? AND period = ? AND period_key = ?'
+  ).bind(u.id, period, periodKey).first();
+  const used = Number(usage?.used || 0);
+  if (used >= limit) {
+    return json({ ok: false, allowed: false, plan: hasPaid ? quota.plan : 'free', used, limit, remaining: 0, period, period_key: periodKey, reset_at: resetAt, error: 'quota exceeded' }, 429);
+  }
+
+  await env.DB.prepare(
+    `UPDATE pick_usage SET used = used + 1, updated_at = ?
+     WHERE user_id = ? AND period = ? AND period_key = ?`
+  ).bind(now, u.id, period, periodKey).run();
+
+  const nextUsed = used + 1;
+  return json({ ok: true, allowed: true, plan: hasPaid ? quota.plan : 'free', used: nextUsed, limit, remaining: Math.max(0, limit - nextUsed), period, period_key: periodKey, reset_at: resetAt });
+}
+
 async function routeEmailRequest(req, env) {
   const body = await req.json().catch(() => null);
   const email = (body?.email || '').trim().toLowerCase();
@@ -939,6 +1039,7 @@ export default {
       if (p === '/auth/google/callback'&& req.method === 'GET')  return routeGoogleCallback(req, env);
       if (p === '/analytics/pageview' && req.method === 'POST')  return routePageview(req, env);
       if (p === '/me'                  && req.method === 'GET')  return routeMe(req, env);
+      if (p === '/pick/quota/consume'  && req.method === 'POST') return routeConsumePickQuota(req, env);
       if (p === '/favorites'           && req.method === 'GET')  return routeGetFavs(req, env);
       if (p === '/favorites'           && req.method === 'PUT')  return routePutFavs(req, env);
       if (p === '/lists'               && req.method === 'GET')  return routeGetLists(req, env);
