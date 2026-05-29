@@ -4248,8 +4248,14 @@
     : `${location.origin}/openalex`;
 
   function openAlexWorksUrl(params) {
-    const qs = params instanceof URLSearchParams ? params.toString() : String(params || '');
-    return `${OPENALEX_WORKS_ENDPOINT}?${qs}`;
+    const searchParams = params instanceof URLSearchParams
+      ? new URLSearchParams(params)
+      : new URLSearchParams(String(params || ''));
+    const email = String(user?.email || '').trim().toLowerCase();
+    if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && !searchParams.has('mailto')) {
+      searchParams.set('mailto', email);
+    }
+    return `${OPENALEX_WORKS_ENDPOINT}?${searchParams.toString()}`;
   }
 
   function initPickTool() {
