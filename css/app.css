@@ -2274,12 +2274,6 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   border-bottom:1px solid var(--border);
 }
 .pick-card:last-child { border-bottom:none }
-/* Zone color strip at top of card */
-.pick-zone-strip {
-  position:absolute; top:0; left:0; right:0; height:4px;
-  transition:height .2s;
-}
-.pick-card:hover .pick-zone-strip { height:5px }
 /* Zone tags row above journal name — colored badges with visual weight */
 .pick-zone-tags { display:flex; gap:5px; margin-bottom:6px; flex-wrap:wrap }
 .pick-zone-tags .zone,

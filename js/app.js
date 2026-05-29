@@ -4615,7 +4615,6 @@
           // Build badges — zone/JCR go in zone-tags above title
           let badgesHtml = '';
           let zoneTagsHtml = '';
-          let zoneColor = '';
           let pubBadge = '';
           if (e.journalRec) {
             const r = e.journalRec;
@@ -4665,14 +4664,6 @@
               ? `<span class="zone jcr-${e.jcr_q.toLowerCase()}">JCR ${e.jcr_q}</span>`
               : '';
             zoneTagsHtml = [zTag, jcrTag].filter(Boolean).join('');
-            // Zone strip color
-            zoneColor = e.zone === '1' || e.zone === 1 ? '#1f3a5f'
-              : e.zone === '2' || e.zone === 2 ? '#4f6f9b'
-              : e.zone === '3' || e.zone === 3 ? '#9eb1cb'
-              : e.zone === '4' || e.zone === 4 ? '#d3dbe6'
-              : e.jcr_q === 'Q1' ? '#7a2030'
-              : e.jcr_q === 'Q2' ? '#a04a5a'
-              : '';
           }
 
           // Compute score color for the score bar and strip
@@ -4683,12 +4674,9 @@
             : '#8e9aaf';
 
           const cardZoneClass = e.zone ? ` zone-${e.zone}` : '';
-          // Use score-based strip color (consistent), only show for journals with zone data
-          const zoneStripColor = e.zone ? barColor : '';
 
           const hl = scorePct >= 60 ? " pick-card-highlight" : scorePct >= 40 ? " pick-card-mid" : "";
           return `<div class="pick-card${cardZoneClass}${hl}" data-issn="${escape(issnStr)}">
-            ${zoneStripColor ? `<div class="pick-zone-strip" style="background:${zoneStripColor}"></div>` : ''}
             ${zoneTagsHtml ? `<div class="pick-zone-tags">${zoneTagsHtml}</div>` : ''}
             <h3><a href="#j/${escape(e.journalRec ? favId(e.journalRec) : issnStr)}">${escape(name)}</a></h3>
             <div class="pick-head">
