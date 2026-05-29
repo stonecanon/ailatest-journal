@@ -1906,8 +1906,15 @@
       if (!jcr || !activeJcr.has(jcr)) return false;
     }
     if (activeXr.size) {
-      const xr = r.cas_xr != null ? String(r.cas_xr) : '';
-      if (!xr || !activeXr.has(xr)) return false;
+      const xr = r.cas_xr;
+      if (!xr) return false;
+      const xrZone = typeof xr === 'object' ? String(xr.zone || '') : String(xr);
+      const xrZones = new Set();
+      if (xrZone) xrZones.add(xrZone);
+      if (typeof xr === 'object' && xr.top) xrZones.add('xr-top');
+      let ok = false;
+      for (const z of activeXr) if (xrZones.has(z)) { ok = true; break; }
+      if (!ok) return false;
     }
     if (activeAbdc.size) {
       const abdc = r.abdc && r.abdc.rating ? r.abdc.rating : '';
