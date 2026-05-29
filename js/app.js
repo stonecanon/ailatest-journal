@@ -5,7 +5,7 @@
   const fetchJSON = async (url) => {
     const resp = await fetch(url);
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-    if (url.split('?')[0].endsWith('.gz')) {
+    if (url.endsWith('.gz')) {
       const ds = new DecompressionStream('gzip');
       const stream = resp.body.pipeThrough(ds);
       return await new Response(stream).json();
@@ -1652,7 +1652,7 @@
   // 国内来源交叉徽章
   function badgeDomSrc(tag) {
     const map = {
-      cssci: 'CSSCI', cssci_ext: T('CSSCI 扩展','CSSCI Ext'), pku: T('北大核心','PKU Core'),
+      cssci: 'CSSCI', cssci_ext: T('CSSCI 扩','CSSCI Ext'), pku: T('北大核心','PKU Core'),
       cnkx_T1: T('科协 T1','CAST T1'), cnkx_T2: T('科协 T2','CAST T2'), cnkx_T3: T('科协 T3','CAST T3'),
       ccft_T1: 'CCF-T1', ccft_T2: 'CCF-T2', ccft_T3: 'CCF-T3',
       zju: T('浙大目录','ZJU'), school_a: T('学校 A','School A'),
@@ -1708,9 +1708,8 @@
         if (!m) return '';
         return `<span class="flagship-pill ${m[1]}" title="${m[0]}">★ ${m[0]}</span>`;
       }
-      function badgeXR(z, top) {
+      function badgeXR(z) {
         if (!z) return '';
-        if (top) return `<span class="xr-pill xr-top" title="${T('中科院 2026 新锐版分区 · TOP','CAS Emerging Edition 2026 · TOP')}">${T('新锐','Emerging')} ${z}${T('区','')}·TOP</span>`;
         return `<span class="xr-pill xr-${z}" title="${T('中科院 2026 新锐版分区','CAS Emerging Edition 2026')}">${T('新锐','Emerging')} ${z}${T('区','')}</span>`;
       }
       function badgeWarn(w, isCard) {
@@ -1745,7 +1744,7 @@
     return [
       badgeJCR(r.if_quartile),
       badgeCAS(r.cas_zone, r.cas_top),
-      badgeXR(r.cas_xr && r.cas_xr.zone, r.cas_xr && r.cas_xr.top),
+      badgeXR(r.cas_xr && r.cas_xr.zone),
       badgeCCF(r.ccf),
       badgeABDC(r.abdc),
       badgeABS(r.abs),
@@ -1795,7 +1794,7 @@
       addDomIndex(r.name, 'name', { source:'cssci', label:'CSSCI', tag:'', discipline:r.discipline });
     });
     (d.cssci_ext||[]).forEach(r => {
-      addDomIndex(r.name, 'name', { source:'cssci_ext', label:T('CSSCI 扩展','CSSCI Ext'), tag:'', discipline:r.discipline });
+      addDomIndex(r.name, 'name', { source:'cssci_ext', label:T('CSSCI 扩','CSSCI Ext'), tag:'', discipline:r.discipline });
     });
     (d.pku_core||[]).forEach(r => {
       addDomIndex(r.name, 'name', { source:'pku', label:T('北大核心','PKU Core'), tag:'', category:r.category });
@@ -1902,15 +1901,8 @@
       if (!jcr || !activeJcr.has(jcr)) return false;
     }
     if (activeXr.size) {
-      const xr = r.cas_xr;
-      if (!xr) return false;
-      const xrZone = typeof xr === 'object' ? String(xr.zone || '') : String(xr);
-      const xrZones = new Set();
-      if (xrZone) xrZones.add(xrZone);
-      if (typeof xr === 'object' && xr.top) xrZones.add('xr-top');
-      let ok = false;
-      for (const z of activeXr) if (xrZones.has(z)) { ok = true; break; }
-      if (!ok) return false;
+      const xr = r.cas_xr != null ? String(r.cas_xr) : '';
+      if (!xr || !activeXr.has(xr)) return false;
     }
     if (activeAbdc.size) {
       const abdc = r.abdc && r.abdc.rating ? r.abdc.rating : '';
@@ -2278,7 +2270,7 @@
             const hits = lookupDom(r);
             const badges = [
               ...hits.filter(h => h.source === 'cssci').map(() => `<span class="domsrc-pill ds-cssci">CSSCI</span>`),
-              ...hits.filter(h => h.source === 'cssci_ext').map(() => `<span class="domsrc-pill ds-cssci-ext">${T('CSSCI 扩展','CSSCI Ext')}</span>`),
+              ...hits.filter(h => h.source === 'cssci_ext').map(() => `<span class="domsrc-pill ds-cssci-ext">${T('CSSCI 扩','CSSCI Ext')}</span>`),
               ...hits.filter(h => h.source === 'pku').map(() => `<span class="domsrc-pill ds-pku">${T('北大核心','PKU Core')}</span>`),
               ...hits.filter(h => h.source === 'ccft').map(h => `<span class="domsrc-pill ds-ccft">CCF-${h.tag||'T'}</span>`),
               ...hits.filter(h => h.source === 'zju').map(h => `<span class="domsrc-pill ds-zju">${escape(h.label)}</span>`),
@@ -2405,8 +2397,8 @@
         return true;
       });
 
-      // 保持原有排序（T1→T2→T3，不按刊名重排）
-      // filtered.sort((a, b) => (a.name||'').localeCompare(b.name||'', 'zh'));
+      // 按刊名排序
+      filtered.sort((a, b) => (a.name||'').localeCompare(b.name||'', 'zh'));
 
       // 分页
       const visible = filtered.slice(0, window.__cnkxShown);
@@ -2532,7 +2524,7 @@
         const hits = lookupDom(r);
         const badges = [
           ...hits.filter(h => h.source === 'cssci').map(() => `<span class="domsrc-pill ds-cssci">CSSCI</span>`),
-          ...hits.filter(h => h.source === 'cssci_ext').map(() => `<span class="domsrc-pill ds-cssci-ext">${T('CSSCI 扩展','CSSCI Ext')}</span>`),
+          ...hits.filter(h => h.source === 'cssci_ext').map(() => `<span class="domsrc-pill ds-cssci-ext">${T('CSSCI 扩','CSSCI Ext')}</span>`),
           ...hits.filter(h => h.source === 'pku').map(() => `<span class="domsrc-pill ds-pku">${T('北大核心','PKU Core')}</span>`),
           ...hits.filter(h => h.source === 'ccft').map(h => `<span class="domsrc-pill ds-ccft" title="${escape(h.org||'')}">CCF-${h.tag||'T'}</span>`),
           ...hits.filter(h => h.source === 'zju').map(h => `<span class="domsrc-pill ds-zju">${escape(h.label)}</span>`),
@@ -2864,7 +2856,7 @@
     if (!drawer || !body) return;
     // 懒加载 OpenAlex 数据（首次打开抽屉时加载）
     if (!oaMap) {
-      try { oaMap = await fetchJSON('data/oa.json.gz?v=' + (typeof __BUILD_VER !== 'undefined' ? __BUILD_VER : Date.now())); }
+      try { oaMap = await fetchJSON('data/oa.json.gz'); }
       catch(e) { oaMap = {}; }
     }
     // 上报浏览（无需登录），结果回填进 cache
@@ -2884,7 +2876,7 @@
     const ir = intRec || {};
     // 徽章块 — 分两行：索引收录 / 分区等级
     const drawerIndexBadges = (src === 'int' || intRec) ? renderIndexBadges(ir) : '';
-    let drawerRankBadges = (src === 'int' || intRec) ? renderRankBadges(ir) : '';
+    const drawerRankBadges = (src === 'int' || intRec) ? renderRankBadges(ir) : '';
     const tierBadge = r.tier && /^T[123]$/.test(r.tier) ? badgeTier(r.tier)
                     : r.tier ? `<span class="tier-pill t3">${escape(tn(r.tier, "tier"))}</span>` : '';
     const crossBadges = renderDomCrossBadges(r, src);
@@ -2943,49 +2935,18 @@
     const stats = [];
     if (ir.if_2024 != null) stats.push([T('影响因子 / IF','Impact Factor'), ir.if_2024]);
     if (ir.if_rank) stats.push([T('IF 排名','IF Rank'), ir.if_rank]);
-    // 审稿周期 — CrossRef 优先，DOAJ 次之
+    // 审稿周期 — 从嵌入的 DOAJ review_weeks 读取
     {
-      const cr = r.crossref || ir.crossref;
-      if (cr && cr.median_days > 0) {
-        const m = (cr.median_days / 30.44).toFixed(1);
-        stats.push([T('审稿周期','Review Cycle'), m + T(' 个月',' months'), T('收稿→录用 (Crossref, ','Submission→acceptance (') + (cr.sample_size || '?') + T('篇)',' samples)')]);
-      } else {
-        const weeks = parseFloat(r.doaj?.review_weeks || ir.doaj?.review_weeks);
-        if (weeks > 0) {
-          const m = (weeks / 4.33).toFixed(1);
-          stats.push([T('审稿周期','Review Cycle'), m + T(' 个月',' months'), T('投稿→出版 (DOAJ)','Submission→pub. (DOAJ)')]);
-        }
+      const weeks = parseFloat(r.doaj?.review_weeks || ir.doaj?.review_weeks);
+      if (weeks > 0) {
+        const m = (weeks / 4.33).toFixed(1);
+        stats.push([T('审稿周期','Review Cycle'), m + T(' 个月',' months'), T('投稿→出版 (DOAJ)','Submission→pub. (DOAJ)')]);
       }
     }
     const ifNote = ir.if_2024 != null ? T('JCR 2025发布 · 2024指标','JCR 2025 rel. · 2024 metric') : '';
     const statsHTML = stats.length ? `<div class="stats-grid">${stats.map(([k,v,sub]) =>
       `<div class="stat"><div class="stat-v">${escape(String(v))}</div><div class="stat-k">${k}</div>${sub?`<div class="stat-sub">${sub}</div>`:''}</div>`
     ).join('')}</div>${ifNote ? `<div class="stats-sub">${ifNote}</div>` : ''}` : '';
-
-    // JCR 分区详情 — 大类(primary category with Q/rank) + 小类(all categories)
-    const jcrHTML = (() => {
-      const q = ir.if_quartile;
-      const rk = ir.if_rank;
-      const cat = ir.jcr_cat;
-      const cats = ir.jcr_cats;
-      if (!q && !rk && !cat && !cats) return '';
-      const primaryLine = cat ? `<div class="cat-major-line">
-        <span class="cat-major-name">${escape(cat)}</span>
-        ${q ? `<span class="cat-major-zone jcr-q${q.toLowerCase()}">JCR ${q}</span>` : ''}
-        ${rk ? `<span class="cat-major-rank">${escape(rk)}</span>` : ''}
-      </div>` : '';
-      const all = cats && cats.length ? cats : (cat ? [cat] : []);
-      const extra = (cat && all.length > 1) ? all.filter(c => c !== cat) : [];
-      const extraItems = extra.length
-        ? `<ul class="cas-sub-list">${extra.map(c => `<li>${escape(c)}</li>`).join('')}</ul>`
-        : '';
-      if (!primaryLine && !extraItems) return '';
-      return `<div class="drawer-section">
-        <h4>${T('JCR 2025 · Category Quartiles','JCR 2025 · Category Quartiles')}</h4>
-        ${primaryLine}
-        ${extraItems ? `<div class="cat-sub-label">${T('Other Categories','Other Categories')}</div>${extraItems}` : ''}
-      </div>`;
-    })();
 
     // WoS 学科分类
     const wosHTML = (Array.isArray(ir.wos_categories) && ir.wos_categories.length)
@@ -3053,7 +3014,7 @@
       if (!hasMajor && !hasSub) return '';
       const majorLine = hasMajor ? `<div class="cat-major-line">
         ${xr.major_cn ? `<span class="cat-major-name">${escape(xr.major_cn)}</span>` : ''}
-        ${xr.zone ? `<span class="cat-major-zone">${xr.zone}${T('区','')}${xr.top ? '·TOP' : ''}</span>` : ''}
+        ${xr.zone ? `<span class="cat-major-zone">${xr.zone}${T('区','')}</span>` : ''}
       </div>` : '';
       const items = hasSub ? xr.sub.map(s => {
         const nm = s.cat || s.name || '';
@@ -3080,14 +3041,6 @@
 
     // 警示刊
     const warnHTML = (() => {
-      // Manual journal flag from data file
-      const _manualFlag = ir.issn ? getManualFlag(ir) : '';
-      if (_manualFlag) {
-        return `<div class="drawer-section warn-block">
-           <h4>⚠ ${T('期刊提示','Journal Notice')}</h4>
-           <p>${escape(_manualFlag)}${T('。投稿前请谨慎评估。',' Please evaluate carefully before submission.')}</p>
-         </div>`;
-      }
       const w = ir.warning;
       if (!w) return '';
       // 兼容旧值（true / 字符串）
@@ -3217,7 +3170,6 @@
         </div>
       </div>
       ${statsHTML}
-      ${jcrHTML}
       ${casHTML}
       ${xrHTML}
       ${wosHTML}
@@ -3627,16 +3579,11 @@
     if (r.frequency) meta.push([T('刊期','Frequency'), r.frequency]);
     if (ir.cas_xr && ir.cas_xr.major_cn) meta.push([T('新锐版大类','Emerging Major'), ir.cas_xr.major_cn]);
 
-    // 审稿周期 — CrossRef 优先，DOAJ 次之
+    // 审稿周期 — 从嵌入的 DOAJ review_weeks 读取
     let cycTxt = '';
-    const cr = r.crossref || ir.crossref;
-    if (cr && cr.median_days > 0) {
-      cycTxt = `${(cr.median_days / 30.44).toFixed(1)}${T(' 个月 (收稿→录用，Crossref)',' months (submission→acceptance)')}`;
-    } else {
-      const weeks = parseFloat(r.doaj?.review_weeks || ir.doaj?.review_weeks);
-      if (weeks > 0) {
-        cycTxt = `${(weeks / 4.33).toFixed(1)}${T(' 个月 (投稿→出版，DOAJ)',' months (submission→pub.)')}`;
-      }
+    const weeks = parseFloat(r.doaj?.review_weeks || ir.doaj?.review_weeks);
+    if (weeks > 0) {
+      cycTxt = `${(weeks / 4.33).toFixed(1)}${T(' 个月 (投稿→出版，DOAJ)',' months (submission→pub.)')}`;
     }
     if (cycTxt) {
       meta.push([T('审稿周期','Review Cycle'), cycTxt]);
@@ -3791,7 +3738,7 @@
       // 加载期刊主库以反查索引/JCR
       let lookup = {};
       try {
-        const arr = await fetchJSON('/data/journals.json.gz?v=' + (typeof __BUILD_VER !== 'undefined' ? __BUILD_VER : Date.now())).catch(() => []);
+        const arr = await fetchJSON('/data/journals.json.gz').catch(() => []);
         for (const j of arr) {
           const k1 = (j.issn||'').replace(/-/g,'').toUpperCase();
           const k2 = (j.eissn||'').replace(/-/g,'').toUpperCase();
@@ -3955,7 +3902,7 @@
     const casCell = casVal ? escape(casVal) : '<span class="muted-cell">—</span>';
     const esiCell = esiVal ? escape(esiVal) : '<span class="muted-cell">—</span>';
     const SRC_LABEL = {
-      int: T('国际','Int’l'), cssci: 'CSSCI', cssci_core: 'CSSCI', cssci_ext: T('CSSCI 扩展','CSSCI Ext'),
+      int: T('国际','Int’l'), cssci: 'CSSCI', cssci_core: 'CSSCI', cssci_ext: T('CSSCI扩展','CSSCI Ext'),
       pku: T('北大核心','PKU Core'), pku_core: T('北大核心','PKU Core'), cnkx: T('科协','CAST'), ccft: 'CCF-T',
       zju: T('浙大','ZJU'), school_a: T('高校目录','In-house'),
     };
@@ -4045,49 +3992,12 @@
       $$('.tab-panel').forEach(p => p.hidden = p.dataset.panel !== activeTab);
       $$('[data-international]').forEach(el => el.hidden = activeTab !== 'int');
       $$('[data-domestic]').forEach(el => el.hidden = activeTab !== 'dom');
-      // Update hash for direct linking
-      try { history.replaceState(null, '', '#' + activeTab); } catch (_) {}
       applyI18n(); // refresh placeholder
       if (activeTab === 'dom') renderDomestic();
       else if (activeTab === 'fav') renderFav();
       else if (activeTab === 'int') renderInt();
       else if (activeTab === 'pick') initPickTool();
     }));
-
-    // Tab routing from hash
-    const initTabFromHash = () => {
-      const hash = location.hash.replace(/^#/, '');
-      if (['int','dom','fav','pick'].includes(hash)) {
-        const tab = $$('.tab').find(t => t.dataset.tab === hash);
-        if (tab) tab.click();
-      }
-    };
-    window.addEventListener('hashchange', initTabFromHash);
-
-    // ─── Sub-navigation ───
-    document.addEventListener('click', (e) => {
-      const btn = e.target.closest('.subnav-btn');
-      if (!btn) return;
-      const subnav = btn.closest('.subnav');
-      if (!subnav) return;
-      subnav.querySelectorAll('.subnav-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      // For domestic subnav: trigger filter
-      const panel = subnav.closest('.tab-panel');
-      if (panel && panel.dataset.panel === 'dom') {
-        const dom = btn.dataset.sub;
-        // Toggle sidebar domestic source chips
-        const badgeToggles = document.getElementById('domestic-badge-toggles');
-        if (badgeToggles) {
-          $$('input[type="checkbox"]', badgeToggles).forEach(cb => cb.checked = false);
-          if (dom !== 'all') {
-            const target = badgeToggles.querySelector(`input[value="${dom}"]`);
-            if (target) target.checked = true;
-          }
-          badgeToggles.dispatchEvent(new Event('change'));
-        }
-      }
-    });
 
     $('#fav-tab').addEventListener('click', () => {
       const favTab = $$('.tab').find(t => t.dataset.tab === 'fav');
@@ -4332,38 +4242,8 @@
   }
 
   // ───────── pick-for-me (journal recommendation) ─────────
-  const _manualFlags = () => window.__manualFlags || {};
-  function getManualFlag(journalRec) {
-    if (!journalRec) return '';
-    const flags = _manualFlags();
-    const issn = journalRec.issn || '';
-    const eissn = journalRec.eissn || '';
-    const name = (journalRec.name || '').toUpperCase();
-    return flags[issn] || flags[eissn] || flags[name] || '';
-  }
   let _pickInit = false;
-  /**
-   * Fetch from OpenAlex directly. Returns { ok, data, errorMsg }.
-   * Includes API key from localStorage if available.
-   */
-  async function openAlexFetch(urlPath) {
-    const apiKey = localStorage.getItem('ailatest_oa_key') || '';
-    const sep = urlPath.includes('?') ? '&' : '?';
-    const url = apiKey
-      ? `https://api.openalex.org/${urlPath}${sep}api_key=${encodeURIComponent(apiKey)}`
-      : `https://api.openalex.org/${urlPath}`;
-    try {
-      const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
-      if (!r.ok) {
-        const text = await r.text().catch(() => '');
-        return { ok: false, data: null, errorMsg: `HTTP ${r.status}: ${text.slice(0,200)}` };
-      }
-      const d = await r.json();
-      return { ok: true, data: d.results || [] };
-    } catch (e) {
-      return { ok: false, data: null, errorMsg: e?.message || String(e) };
-    }
-  }
+  const OA_API = 'https://api.openalex.org';
 
   function initPickTool() {
     if (_pickInit) return;
@@ -4373,17 +4253,6 @@
     const input = $('#pick-input');
     const results = $('#pick-results');
     const status = $('#pick-status');
-
-    // Restore OpenAlex API key from localStorage
-    const apiKeyInput = $('#pick-apikey');
-    if (apiKeyInput) {
-      const saved = localStorage.getItem('ailatest_oa_key') || '';
-      if (saved) apiKeyInput.value = saved;
-      apiKeyInput.addEventListener('blur', () => {
-        const val = apiKeyInput.value.trim();
-        localStorage.setItem('ailatest_oa_key', val);
-      });
-    }
 
     async function doSearch() {
       const query = input.value.trim();
@@ -4416,7 +4285,7 @@
       try {
         // Lazy-load oaMap for topic matching (only if pick tool is first to need it)
         if (!oaMap) {
-          try { oaMap = await fetchJSON('data/oa.json.gz?v=' + (typeof __BUILD_VER !== 'undefined' ? __BUILD_VER : Date.now())); }
+          try { oaMap = await fetchJSON('data/oa.json.gz'); }
           catch(e) { oaMap = {}; }
         }
 
@@ -4441,8 +4310,8 @@
         const firstLine = lines.find(l => !/^keywords?:/i.test(l) && !/^关键词[：:]/.test(l));
         if (firstLine) {
           let t = firstLine.replace(/[.。！!?？,，;；]+$/, '').trim();
-          if (t.length > 150) {
-            const firstPart = t.slice(0, 120);
+          if (t.length > 80) {
+            const firstPart = t.slice(0, 60);
             const lastSpace = firstPart.lastIndexOf(' ');
             t = (lastSpace > 20 ? firstPart.slice(0, lastSpace) : firstPart).replace(/[,;，；]+$/, '');
           }
@@ -4454,16 +4323,20 @@
         // We run 2-3 complementary queries, deduplicate papers, then aggregate by journal.
 
         const bodyText = lines.slice(1).filter(l => !/^keywords?:/i.test(l) && !/^关键词[：:]/.test(l)).join(' ');
-        const MAX_URL = 2000;
+        const MAX_URL = 155;
 
-        const stopWords = new Set((
-          'about above after against also although among another any are around because before '+
-          'being below between both but can could does each else even ever every few for from further get got had has have '+
-          'here how however into just least less let like likely may might more most much must need neither never next nor '+
-          'not now often once only onto other our own per quite rather really same shall should show shown shows side since '+
-          'some still such than that the their them then there these they this those through thus till to toward towards under '+
-          'upon very via was way were what when where which while who why will with within without would yet'
-        ).split(' '));
+        const stopWords = new Set(('this that with from which were have been than into also their about '+
+          'study show were used using based results method model data paper these between while where '+
+          'after before other there analysis approach process system research above during well such '+
+          'each both more most some than very just also although however therefore because without '+
+          'within across among through before after below under over upon could should would may might '+
+          'shall can will does did has had been being made make made made using used based related '+
+          'significant different important various multiple including following providing performing '+
+          'proposes presents demonstrates investigates examines explores develops describes reports '+
+          'shows found test tests testing methods models datasets dataset experiments experimental '+
+          'proposed presented demonstrated investigated examined explored developed described reported '+
+          'tested showed found approach techniques algorithm algorithms features feature accuracy '+
+          'performance evaluation values value results analysis prediction predictions').split(' '));
 
         // Collect all English words (length > 3) from title + body
         const allText = [(titleTerms[0]||''), bodyText].join(' ').toLowerCase();
@@ -4477,15 +4350,15 @@
 
         // Q1: Explicit keywords (if present) — these are the most reliable signal
         if (explicitKeywords.length) {
-          const q = explicitKeywords.slice(0, 6).join(' ');
+          const q = explicitKeywords.slice(0, 4).join(' ');
           if (encodeURIComponent(q).length < MAX_URL) queries.push(q);
         }
 
         // Q2: Title-derived keywords (core topic of the paper)
         const titleLower = (titleTerms[0]||'').toLowerCase().replace(/[^a-z\s-]/g, '').replace(/-/g, ' ');
         const titleKws = titleLower.split(/\s+/).filter(w => w.length > 3 && !stopWords.has(w));
-        if (titleKws.length >= 2) {
-          const q = titleKws.slice(0, 12).join(' ');
+        if (titleKws.length >= 3) {
+          const q = titleKws.slice(0, 10).join(' ');
           if (encodeURIComponent(q).length < MAX_URL && !queries.some(x => x.toLowerCase().includes(q.slice(0,15)))) {
             queries.push(q);
           }
@@ -4494,7 +4367,7 @@
         // Q3: Body-derived technical terms (methods, algorithms, sensors, etc.)
         // Pick words that are ≥5 chars (more specific), not already covered by Q1/Q2
         const covered = queries.join(' ').toLowerCase();
-        const bodyKws = uniqueWords.filter(w => w.length >= 5 && !covered.includes(w)).slice(0, 8);
+        const bodyKws = uniqueWords.filter(w => w.length >= 4 && !covered.includes(w)).slice(0, 6);
         if (bodyKws.length >= 3) {
           const q = bodyKws.join(' ');
           if (encodeURIComponent(q).length < MAX_URL) queries.push(q);
@@ -4503,50 +4376,6 @@
         // Fallback: if no queries built, just use first 5 unique words
         if (!queries.length) {
           queries.push(uniqueWords.slice(0, 6).join(' '));
-        }
-
-        // ── Synonym expansion: add related terms to broaden recall ──
-        const SYNONYMS = {
-          'detection': ['detection', 'estimation', 'recognition', 'identification'],
-          'estimation': ['estimation', 'detection', 'prediction', 'forecasting'],
-          'prediction': ['prediction', 'estimation', 'forecasting', 'detection'],
-          'occupancy': ['occupancy', 'occupant', 'occupation', 'crowd'],
-          'machine': ['machine', 'deep', 'neural'],
-          'learning': ['learning', 'network', 'networks'],
-          'indoor': ['indoor', 'indoor', 'building', 'indoor environment'],
-          'building': ['building', 'buildings', 'indoor', 'construction'],
-          'sensor': ['sensor', 'sensors', 'sensing', 'monitoring', 'measurement'],
-          'energy': ['energy', 'power', 'consumption'],
-          'evaluation': ['evaluation', 'assessment', 'analysis', 'measurement'],
-          'explainable': ['explainable', 'interpretable', 'transparent'],
-          'non-invasive': ['noninvasive', 'non-invasive', 'contactless', 'unobtrusive'],
-          'classification': ['classification', 'recognition', 'identification', 'detection'],
-          'optimization': ['optimization', 'optimisation', 'improvement'],
-          'performance': ['performance', 'accuracy', 'efficiency'],
-          'monitoring': ['monitoring', 'sensing', 'detection', 'tracking'],
-          'model': ['model', 'models', 'modeling', 'modelling', 'approach'],
-          'data': ['data', 'dataset', 'datasets', 'information'],
-        };
-        // Collect all keyword tokens again for synonym expansion (lowercase)
-        const allKeyTokens = [...new Set([
-          ...explicitKeywords.flatMap(k => k.toLowerCase().split(/[\s,-]+/).filter(w => w.length > 2)),
-          ...titleKws.map(w => w.toLowerCase()),
-          ...bodyKws.map(w => w.toLowerCase()),
-          ...uniqueWords.map(w => w.toLowerCase()),
-        ])].filter(w => w.length > 2);
-        // Build synonym-expanded token set
-        const expandedTokens = new Set(allKeyTokens);
-        for (const tok of allKeyTokens) {
-          const syns = SYNONYMS[tok];
-          if (syns && syns.length > 1) {
-            syns.forEach(s => { if (s !== tok) expandedTokens.add(s); });
-          }
-        }
-        // Build a synonym query from the expanded set (skip duplicates with existing queries)
-        const synQuery = [...expandedTokens].slice(0, 15).join(' ');
-        const synQueryShort = synQuery.slice(0, 30);
-        if (!queries.some(q => q.toLowerCase().includes(synQueryShort))) {
-          queries.push(synQuery);
         }
 
         // Collect all search keyword tokens for title matching
@@ -4561,15 +4390,16 @@
         const FIVE_YEARS_AGO = new Date(Date.now() - 5*365*24*60*60*1000).toISOString().slice(0,10);
         const DATE_FILTER = `&filter=from_publication_date:${FIVE_YEARS_AGO}`;
         const queryBatches = await Promise.all(queries.slice(0, 3).map(async (q) => {
-          const searchQ = q.slice(0,120);
-          const r = await openAlexFetch(`works?search=${encodeURIComponent(searchQ)}&per_page=100&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`);
-          if (!r.ok) {
-            console.error('OpenAlex query failed:', r.errorMsg);
-            status.textContent = T('搜索失败：','Search failed: ') + r.errorMsg;
-            return [];
-          }
-          return r.data;
+          const url = OA_API + `/works?search=${encodeURIComponent(q.slice(0,120))}&per_page=30&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
+          try {
+            const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
+            if (!r.ok) return [];
+            const d = await r.json();
+            return d.results || [];
+          } catch { return []; }
         }));
+
+        // Deduplicate by work ID
         const seenIds = new Set();
         const allWorks = [];
         for (const batch of queryBatches) {
@@ -4581,30 +4411,36 @@
           }
         }
 
-        // Backup: if very few results, try a broader query with fewer keywords
-        if (allWorks.length < 3) {
-          const backup = uniqueWords.slice(0, 6).join(' ');
-          if (backup) {
-            const r = await openAlexFetch(`works?search=${encodeURIComponent(backup)}&per_page=50&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`);
+        // If too few results, try a broader backup query
+        if (allWorks.length < 8) {
+          const backup = uniqueWords.slice(0, 5).join(' ');
+          try {
+            const url = OA_API + `/works?search=${encodeURIComponent(backup)}&per_page=30&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
+            const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
             if (r.ok) {
-              for (const w of (r.data || [])) {
+              const d = await r.json();
+              for (const w of (d.results || [])) {
                 if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); }
               }
             }
-          }
+          } catch {}
         }
 
-        // Chinese fallback: if only Chinese input, try short Chinese title
+        // Chinese fallback: if still nothing and has Chinese, try short Chinese title
         if (allWorks.length < 3 && titleTerms[0]) {
           const chn = titleTerms[0].replace(/[a-zA-Z0-9\s]/g, '').replace(/[，。、；：！？（）【】《》""''\s]/g, '');
           if (chn) {
-            const cnQuery = chn.slice(0, 8);
-            const r = await openAlexFetch(`works?search=${encodeURIComponent(cnQuery)}&per_page=50&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`);
-            if (r.ok) {
-              for (const w of (r.data || [])) {
-                if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); }
+            const cnQuery = chn.slice(0, 12); // 12 Chinese chars ≈ 108 URL chars
+            try {
+              const url = OA_API + `/works?search=${encodeURIComponent(cnQuery)}&per_page=20&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
+              const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
+              if (r.ok) {
+                const d = await r.json();
+                for (const w of (d.results || [])) {
+                  if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); }
+                }
               }
-            }
+            } catch {}
           }
         }
 
@@ -4652,35 +4488,25 @@
         }
 
         // Step 3: Build ranked results — multi-factor scoring
-        // Primary signal: OpenAlex relevance_score (BM25) — 40%
-        // Secondary: keyword match in paper titles — 30%
-        // Tertiary: paper count (volume) — 20%
-        // Bonus: oaMap topic match — 10% (only when >0)
         const maxCount = Math.max(...[...journalMap.values()].map(j => j.count), 1);
 
-        // Build normalized keyword tokens for topic matching
-        const topicTokens = [...searchKeywords].filter(w => w.length > 3);
+        // Compute topic frequency across journals (for topic match scoring)
+        const topicJournalCount = {};
+        for (const [, j] of journalMap) {
+          for (const t of j.topics) {
+            topicJournalCount[t] = (topicJournalCount[t] || 0) + 1;
+          }
+        }
+        const maxTopicFreq = Math.max(...Object.values(topicJournalCount), 1);
 
         const entries = [...journalMap.entries()].map(([issn, j]) => {
           const countRatio = j.count / maxCount;
           const kwMatchRatio = j.count > 0 ? j.kwMatch / j.count : 0;
-          const avgRel = j.scores.length ? j.scores.reduce((a,b) => a+b, 0) / j.scores.length : 0;
+          const topicMatch = j.topics.size > 0
+            ? [...j.topics].reduce((sum, t) => sum + (topicJournalCount[t] || 0), 0) / (j.topics.size * maxTopicFreq)
+            : 0;
 
-          // Direct topic match: score how well journal's oaMap topics match the search keywords
-          let topicScore = 0;
-          const oaEntry = oaMap && oaMap[issn];
-          if (oaEntry && Array.isArray(oaEntry.tp) && oaEntry.tp.length > 0 && topicTokens.length > 0) {
-            let totalMatches = 0;
-            for (const topicName of oaEntry.tp) {
-              const lower = topicName.toLowerCase();
-              for (const tok of topicTokens) {
-                if (lower.includes(tok)) totalMatches++;
-              }
-            }
-            topicScore = Math.min(1, totalMatches / (oaEntry.tp.length * Math.min(topicTokens.length, 3)));
-          }
-
-          const totalScore = avgRel * 0.40 + kwMatchRatio * 0.30 + countRatio * 0.20 + (topicScore > 0 ? topicScore * 0.10 : 0);
+          const totalScore = countRatio * 0.60 + kwMatchRatio * 0.30 + topicMatch * 0.10;
 
           const journalRec = journals.find(r => r.issn === issn || r.eissn === issn);
           const zoneVal = journalRec?.cas_zone;
@@ -4704,7 +4530,7 @@
         // Step 4: Filter and sort
         let filtered = entries;
         // Exclude single-paper journals (noise from broad queries)
-        filtered = filtered.filter(e => e.count >= 1);
+        filtered = filtered.filter(e => e.count >= 2);
         const ifMin = parseFloat(document.getElementById('pick-if-min')?.value || '0');
         if (document.getElementById('pick-filter-if')?.checked && ifMin > 0) {
           filtered = filtered.filter(e => e.if != null && e.if >= ifMin);
@@ -4753,8 +4579,7 @@
           // Build badges — zone/JCR go in zone-tags above title
           let badgesHtml = '';
           let zoneTagsHtml = '';
-          let pubBadge = '';
-          let multiBadge = '';
+          let zoneColor = '';
           if (e.journalRec) {
             const r = e.journalRec;
             // Index badges (SCIE/SSCI/AHCI/ESCI)
@@ -4767,34 +4592,7 @@
             const ifBdg = badgeIF(e.if);
             // CCF
             const ccfTxt = r.ccf_2026_type ? `<span class="badge b-ccf">CCF ${r.ccf_2026_type}</span>` : '';
-            // Publisher badges (MDPI/Frontiers/Hindawi)
-            const pubLower = (r.publisher || '').toLowerCase();
-            if (pubLower.includes('mdpi')) pubBadge = '<span class="badge b-mdpi-lt">MDPI</span>';
-            else if (pubLower.includes('frontiers')) pubBadge = '<span class="badge b-frontiers-lt">Frontiers</span>';
-            else if (pubLower.includes('hindawi')) pubBadge = '<span class="badge b-hindawi-lt">Hindawi</span>';
-            // Warning badge
-            let warnBadge = '';
-            if (r.warning) {
-              const w = r.warning;
-              if (typeof w === 'object') {
-                const arr = Array.isArray(w) ? w : [w];
-                const latest = arr.reduce((a,b) => (!a || (b.year && b.year > (a.year||0))) ? b : a, null);
-                const label = (latest && (latest.year || latest.level)) ? `${latest.year||''}${latest.level?'/'+latest.level:''}` : '';
-                warnBadge = `<span class="badge b-warn">⚠ ${escape(label||'Warning')}</span>`;
-              } else {
-                warnBadge = '<span class="badge b-warn">⚠ Warning</span>';
-              }
-            }
-            // Manual journal flag (high-risk, on-hold, etc.)
-            const _manualFlag = getManualFlag(r);
-            if (_manualFlag) {
-              warnBadge = `<span class="badge b-warn b-warn-high">⚠ ${escape(_manualFlag)}</span>`;
-            }
-            // Multidisciplinary badge
-            const cats = e.wos_categories || [];
-            const isMulti = cats.some(c => /multidisciplinary/i.test(c));
-            if (isMulti) multiBadge = '<span class="badge b-multi-lt">综合</span>';
-            badgesHtml = [idxBadges, scBadge, eiBdg, ifBdg, ccfTxt, warnBadge].filter(Boolean).join('');
+            badgesHtml = [idxBadges, scBadge, eiBdg, ifBdg, ccfTxt].filter(Boolean).join('');
             // Prominent zone/JCR tags at top of card
             const zTag = e.zone
               ? `<span class="zone z${e.zone}">${e.top ? 'TOP·' : ''}${e.zone}${T('区','')}</span>`
@@ -4803,21 +4601,30 @@
               ? `<span class="zone jcr-${e.jcr_q.toLowerCase()}">JCR ${e.jcr_q}</span>`
               : '';
             zoneTagsHtml = [zTag, jcrTag].filter(Boolean).join('');
+            // Zone strip color
+            zoneColor = e.zone === '1' || e.zone === 1 ? '#1f3a5f'
+              : e.zone === '2' || e.zone === 2 ? '#4f6f9b'
+              : e.zone === '3' || e.zone === 3 ? '#9eb1cb'
+              : e.zone === '4' || e.zone === 4 ? '#d3dbe6'
+              : e.jcr_q === 'Q1' ? '#7a2030'
+              : e.jcr_q === 'Q2' ? '#a04a5a'
+              : '';
           }
 
-          // Compute score color for the score bar and strip
-          const barColor = scorePct >= 80 ? '#1a3a5f'
-            : scorePct >= 60 ? '#2d5a8e'
-            : scorePct >= 40 ? '#5a8ab5'
-            : scorePct >= 20 ? '#8ab5d4'
-            : '#b8d4e8';
+          // Compute score color for the score bar
+          const barColor = scorePct >= 80 ? '#1a8b3c'
+            : scorePct >= 60 ? '#2d9d5e'
+            : scorePct >= 40 ? '#d4a017'
+            : scorePct >= 20 ? '#5a8fc9'
+            : '#8e9aaf';
 
           const cardZoneClass = e.zone ? ` zone-${e.zone}` : '';
+          const zoneStripStyle = zoneColor ? `style="background:${zoneColor}"` : '';
 
-          return `<div class="pick-card${cardZoneClass}" style="border-left:4px solid ${barColor}" data-issn="${escape(issnStr)}">
+          return `<div class="pick-card${cardZoneClass}" data-issn="${escape(issnStr)}">
+            ${zoneColor ? `<div class="pick-zone-strip" ${zoneStripStyle}></div>` : ''}
             ${zoneTagsHtml ? `<div class="pick-zone-tags">${zoneTagsHtml}</div>` : ''}
             <h3><a href="#j/${escape(e.journalRec ? favId(e.journalRec) : issnStr)}">${escape(name)}</a></h3>
-            ${pubBadge || multiBadge ? `<div class="pick-name-tags">${pubBadge}${multiBadge}</div>` : ''}
             <div class="pick-head">
               <span class="pick-count">${e.count}<small> ${T('篇论文','papers')}</small></span>
               <div class="pick-head-right">
@@ -4829,18 +4636,11 @@
             ${(function(){
               const r2 = e.journalRec;
               let txt = '📅 ' + T('审稿周期','Review cycle') + ': ';
-              // Prefer CrossRef (measured in days), fall back to DOAJ (weeks)
-              const cr = r2?.crossref;
-              if (cr && cr.median_days > 0) {
-                const months = (cr.median_days / 30.44).toFixed(1);
-                txt += months + T(' 个月 (收稿→录用,Crossref,',' months (submission→acceptance, ') + (cr.sample_size || '?') + T('篇样本)',' samples)');
+              const weeks = parseFloat(r2?.doaj?.review_weeks);
+              if (weeks > 0) {
+                txt += (weeks / 4.33).toFixed(1) + T(' 个月 (投稿→出版,DOAJ)',' months (submission→pub.)');
               } else {
-                const weeks = parseFloat(r2?.doaj?.review_weeks);
-                if (weeks > 0) {
-                  txt += (weeks / 4.33).toFixed(1) + T(' 个月 (投稿→出版,DOAJ)',' months (submission→pub.,DOAJ)');
-                } else {
-                  txt += 'N/A';
-                }
+                txt += T('≈4.0 个月 (DOAJ 平均)','≈4.0 months (DOAJ avg)');
               }
               return '<div class="pick-cycle">' + txt + '</div>';
             })()}
@@ -4880,7 +4680,7 @@
     }
 
     btn.addEventListener('click', doSearch);
-    input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); doSearch(); } });
+    input.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.ctrlKey) doSearch(); });
 
     // ── Search history ──
     const HISTORY_KEY = 'ailatest.pick.history';
@@ -4956,17 +4756,15 @@
     // 分享着陆页：/s/<id> 直接接管 main，不走主流程
     if (await maybeRenderShareLanding()) return;
     try {
-      const [j, d, m, esi, aliases, holdMap] = await Promise.all([
-        fetchJSON('data/journals.json.gz' + (typeof __BUILD_VER !== 'undefined' ? '?v=' + __BUILD_VER : '')),
-        fetch('data/domestic.json' + (typeof __BUILD_VER !== 'undefined' ? '?v=' + __BUILD_VER : '')).then(r => r.json()).catch(() => null),
-        fetch('data/meta.json' + (typeof __BUILD_VER !== 'undefined' ? '?v=' + __BUILD_VER : '')).then(r => r.json()).catch(() => null),
-        fetch('data/esi_categories.json' + (typeof __BUILD_VER !== 'undefined' ? '?v=' + __BUILD_VER : '')).then(r => r.json()).catch(() => []),
-        fetch('data/journal_aliases.json' + (typeof __BUILD_VER !== 'undefined' ? '?v=' + __BUILD_VER : '')).then(r => r.json()).catch(() => DEFAULT_JOURNAL_ALIASES),
-        fetchJSON('data/manual_flags.json?v=' + (typeof __BUILD_VER !== 'undefined' ? __BUILD_VER : Date.now())).catch(() => ({})),
+      const [j, d, m, esi, aliases] = await Promise.all([
+        fetchJSON('data/journals.json.gz'),
+        fetch('data/domestic.json').then(r => r.json()).catch(() => null),
+        fetch('data/meta.json').then(r => r.json()).catch(() => null),
+        fetch('data/esi_categories.json').then(r => r.json()).catch(() => []),
+        fetch('data/journal_aliases.json').then(r => r.json()).catch(() => DEFAULT_JOURNAL_ALIASES),
       ]);
       setJournalAliases(aliases);
       journals = j; domestic = d; meta = m; esiCats = esi; oaMap = null;
-      window.__manualFlags = holdMap;
       journals.forEach(journalSearchMeta);
       buildDomIndex(domestic);
       buildIntIndex(journals);
@@ -5011,8 +4809,6 @@
       $('#hint').textContent = 'Load failed: ' + e.message;
       console.error(e);
     }
-    // Initialize tab from hash (after bind sets up click listeners)
-    if (typeof initTabFromHash === 'function') initTabFromHash();
   }
 
   boot();
