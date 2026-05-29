@@ -3995,6 +3995,9 @@
       $$('.tab-panel').forEach(p => p.hidden = p.dataset.panel !== activeTab);
       $$('[data-international]').forEach(el => el.hidden = activeTab !== 'int');
       $$('[data-domestic]').forEach(el => el.hidden = activeTab !== 'dom');
+      // 选刊 tab 不需要搜索框
+      const topbar = $('.topbar');
+      if (topbar) topbar.hidden = activeTab === 'pick';
       applyI18n(); // refresh placeholder
       if (activeTab === 'dom') renderDomestic();
       else if (activeTab === 'fav') renderFav();
