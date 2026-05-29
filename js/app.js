@@ -1008,8 +1008,7 @@
 
   function updateFavCount() {
     const total = allFavIds().size;
-    const el = $('#fav-count');
-    if (el) el.textContent = total;
+    // count shown in 我的收藏 tab
   }
 
   // list 管理
@@ -4019,11 +4018,6 @@
       else if (activeTab === 'int') renderInt();
       else if (activeTab === 'pick') initPickTool();
     }));
-
-    $('#fav-tab').addEventListener('click', () => {
-      const favTab = $$('.tab').find(t => t.dataset.tab === 'fav');
-      if (favTab) favTab.click();
-    });
 
     // ─── 国内导航 ───
     document.querySelectorAll('[data-domestic] .nav-item').forEach(btn => {
