@@ -4309,13 +4309,7 @@
         // Title = first non-empty line (keep concise)
         const firstLine = lines.find(l => !/^keywords?:/i.test(l) && !/^关键词[：:]/.test(l));
         if (firstLine) {
-          let t = firstLine.replace(/[.。！!?？,，;；]+$/, '').trim();
-          if (t.length > 80) {
-            const firstPart = t.slice(0, 60);
-            const lastSpace = firstPart.lastIndexOf(' ');
-            t = (lastSpace > 20 ? firstPart.slice(0, lastSpace) : firstPart).replace(/[,;，；]+$/, '');
-          }
-          titleTerms = [t];
+          titleTerms = [firstLine.replace(/[.。！!?？,，;；]+$/, '').trim().slice(0, 200)];
         }
 
         // ── Multi-query search with OpenAlex 'search' (relevance) param ──
