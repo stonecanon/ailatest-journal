@@ -4393,13 +4393,21 @@
         const FIVE_YEARS_AGO = new Date(Date.now() - 5*365*24*60*60*1000).toISOString().slice(0,10);
         const DATE_FILTER = `&filter=from_publication_date:${FIVE_YEARS_AGO}`;
         const queryBatches = await Promise.all(queries.slice(0, 3).map(async (q) => {
-          const url = OA_API + `/works?search=${encodeURIComponent(q.slice(0,120))}&per_page=30&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
+          const searchQ = encodeURIComponent(q.slice(0,120));
+          const baseParams = `per_page=30&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
+          // Try direct OpenAlex first, fall back to CF Pages proxy (for China users)
+          let results = [];
           try {
-            const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
-            if (!r.ok) return [];
-            const d = await r.json();
-            return d.results || [];
-          } catch { return []; }
+            const r = await fetch(`https://api.openalex.org/works?search=${searchQ}&${baseParams}`, { headers: { 'Accept': 'application/json' }, signal: AbortSignal.timeout(5000) });
+            if (r.ok) { results = (await r.json()).results || []; }
+          } catch {}
+          if (!results.length) {
+            try {
+              const r = await fetch(`https://api.ailatest.org/openalex?${`works?search=${searchQ}&${baseParams}`}`, { headers: { 'Accept': 'application/json' }, signal: AbortSignal.timeout(8000) });
+              if (r.ok) { results = (await r.json()).results || []; }
+            } catch {}
+          }
+          return results;
         }));
 
         // Deduplicate by work ID
@@ -4417,33 +4425,44 @@
         // If too few results, try a broader backup query
         if (allWorks.length < 8) {
           const backup = uniqueWords.slice(0, 5).join(' ');
+          const bQ = encodeURIComponent(backup);
+          const bParams = `per_page=30&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
+          let bResults = [];
           try {
-            const url = OA_API + `/works?search=${encodeURIComponent(backup)}&per_page=30&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
-            const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
-            if (r.ok) {
-              const d = await r.json();
-              for (const w of (d.results || [])) {
-                if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); }
-              }
-            }
+            const r = await fetch(`https://api.openalex.org/works?search=${bQ}&${bParams}`, { headers: { 'Accept': 'application/json' }, signal: AbortSignal.timeout(5000) });
+            if (r.ok) { bResults = (await r.json()).results || []; }
           } catch {}
+          if (!bResults.length) {
+            try {
+              const r = await fetch(`https://api.ailatest.org/openalex?${`works?search=${bQ}&${bParams}`}`, { headers: { 'Accept': 'application/json' }, signal: AbortSignal.timeout(8000) });
+              if (r.ok) { bResults = (await r.json()).results || []; }
+            } catch {}
+          }
+          for (const w of bResults) {
+            if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); }
+          }
         }
 
         // Chinese fallback: if still nothing and has Chinese, try short Chinese title
         if (allWorks.length < 3 && titleTerms[0]) {
           const chn = titleTerms[0].replace(/[a-zA-Z0-9\s]/g, '').replace(/[，。、；：！？（）【】《》""''\s]/g, '');
           if (chn) {
-            const cnQuery = chn.slice(0, 12); // 12 Chinese chars ≈ 108 URL chars
+            const cnQ = encodeURIComponent(chn.slice(0, 12));
+            const cnParams = `per_page=20&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
+            let cnResults = [];
             try {
-              const url = OA_API + `/works?search=${encodeURIComponent(cnQuery)}&per_page=20&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
-              const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
-              if (r.ok) {
-                const d = await r.json();
-                for (const w of (d.results || [])) {
-                  if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); }
-                }
-              }
+              const r = await fetch(`https://api.openalex.org/works?search=${cnQ}&${cnParams}`, { headers: { 'Accept': 'application/json' }, signal: AbortSignal.timeout(5000) });
+              if (r.ok) { cnResults = (await r.json()).results || []; }
             } catch {}
+            if (!cnResults.length) {
+              try {
+                const r = await fetch(`https://api.ailatest.org/openalex?${`works?search=${cnQ}&${cnParams}`}`, { headers: { 'Accept': 'application/json' }, signal: AbortSignal.timeout(8000) });
+                if (r.ok) { cnResults = (await r.json()).results || []; }
+              } catch {}
+            }
+            for (const w of cnResults) {
+              if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); }
+            }
           }
         }
 
