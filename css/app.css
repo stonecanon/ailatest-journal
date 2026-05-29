@@ -98,24 +98,46 @@ a:hover { border-bottom-color: var(--accent); }
 
 /* ─────────── Layout ─────────── */
 body {
-  display: grid;
-  grid-template-columns: 260px 1fr;
-  min-height: 100vh;
+  display: block;
+  max-width: 1000px;
+  margin: 0 auto;
 }
 
-aside.sidebar {
+#sidebar {
+  width: auto;
   background: var(--paper-soft);
-  border-right: 1px solid var(--rule);
-  padding: 28px 22px 20px;
-  position: sticky; top: 0;
-  height: 100vh;
-  overflow-y: auto;
-  font-size: 13.5px;
+  border-top: 1px solid var(--rule);
+  padding: 16px 14px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 6px 14px;
+  position: static;
+  height: auto;
+  overflow: visible;
+  font-size: 12px;
 }
+#sidebar .brand,
+#sidebar .brand-sub,
+#sidebar .aside-foot,
+#sidebar .wos-list,
+#sidebar .wos-all-btn,
+#sidebar .side-section[data-international]:has(.wos-list),
+#sidebar .side-section[data-international]:has(#wos-list) {
+  display: none !important;
+}
+#sidebar .side-section {
+  flex: 0 0 auto;
+  min-width: 80px;
+}
+#sidebar .side-section[hidden] { display: none !important; }
+#sidebar .side-label { font-size: 10px; margin-bottom: 2px; }
+#sidebar .chip-row { gap: 3px; }
+#sidebar .chip { font-size: 10px; padding: 2px 6px; }
 
 main.main {
   min-width: 0;
-  padding: 36px 52px 80px;
+  padding: 14px 16px 60px;
   max-width: 1280px;
 }
 
@@ -1359,53 +1381,38 @@ td.empty,
 
 /* responsive */
 @media (max-width: 900px) {
-  body { grid-template-columns: 1fr; }
-  aside.sidebar {
-    position: fixed; top: 0; left: 0; bottom: 0;
-    width: min(300px, 86vw);
-    height: 100vh;
-    border-right: 1px solid var(--rule);
-    border-bottom: 0;
-    z-index: 90;
-    transform: translateX(-100%);
-    transition: transform 0.25s cubic-bezier(.2,.7,.2,1);
-    overflow-y: auto;
-    box-shadow: 8px 0 32px rgba(60,40,20,.18);
+  #sidebar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 6px 14px;
+    position: static;
+    height: auto;
+    overflow: visible;
+    width: auto;
+    transform: none;
+    box-shadow: none;
+    z-index: auto;
+    background: var(--paper-soft);
+    border-top: 1px solid var(--rule);
+    border-right: none;
+    padding: 16px 14px;
+    transition: none;
   }
-  aside.sidebar.open { transform: translateX(0); }
+  #sidebar.open { transform: none; }
   main.main {
     padding: 14px 16px 60px;
     display: flex; flex-direction: column;
   }
-  /* 搜索框放最上面：topbar 排 1，tabs 排 2 */
-  main.main .topbar { order: 1; margin-bottom: 12px; }
-  main.main .tabs   { order: 2; margin: 0 -16px 14px; padding: 0 16px; overflow-x: auto; gap: 2px; }
+  /* 内容排上面，搜索框和侧栏排下面 */
+  main.main .tabs   { order: 1; margin: 0 -16px 14px; padding: 0 16px; overflow-x: auto; gap: 2px; }
   main.main .tab    { min-width: 76px; padding: 10px 14px 8px; }
   main.main .tab .tab-icon { font-size: 18px; }
   main.main .tab .tab-label { font-size: 14px; letter-spacing: 0.04em; }
-  main.main .tab-panel { order: 3; }
-  main.main .site-foot { order: 4; }
-  .side-toggle { display: inline-flex; align-items: center; justify-content: center; }
-  /* 手机端 topbar: 两行布局
-     第一行：☰ + 搜索框（搜索框占满）
-     第二行：收藏 / 登录 / 中EN 右对齐 */
-  main.main .topbar {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    grid-template-rows: auto auto;
-    grid-template-areas:
-      "toggle search"
-      "actions actions";
-    gap: 8px 10px;
-    align-items: center;
-  }
-  main.main .topbar .side-toggle { grid-area: toggle; width: 38px; height: 38px; }
-  main.main .topbar .search-wrap { grid-area: search; }
-  main.main .topbar-actions {
-    grid-area: actions;
-    justify-content: flex-end;
-    gap: 8px;
-  }
+  main.main .tab-panel { order: 2; }
+  main.main .topbar { order: 3; margin-bottom: 12px; }
+  main.main #sidebar { order: 4; }
+  main.main .site-foot { order: 5; }
   .lang-toggle, .auth-btn, .fav-tab {
     padding: 6px 10px;
     font-size: 12px;
@@ -2286,7 +2293,10 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .jcard-idx.idx-scopus { background: #b8341a; }
 /* Pick-for-me coming-soon */
 /* Pick-for-me tool */
-.pick-tool { max-width:800px; margin:0 auto; padding:0 16px 40px }
+.pick-tool { max-width:800px; margin:0 auto; padding:0 16px 40px; display:flex; flex-direction:column; }
+.pick-results { order:1; }
+.pick-history { order:2; }
+.pick-input-wrap { order:3; }
 /* Input area — distinctive color block section */
 .pick-input-wrap {
   background:linear-gradient(135deg, #eef3fb 0%, #f0f4fa 50%, #f5f2ec 100%);
