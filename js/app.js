@@ -3055,12 +3055,12 @@
 
     // 警示刊
     const warnHTML = (() => {
-      // On Hold from manual list
-      const _holdLabel = ir.issn ? getOnHoldLabel(ir) : '';
-      if (_holdLabel) {
+      // Manual journal flag from data file
+      const _manualFlag = ir.issn ? getManualFlag(ir) : '';
+      if (_manualFlag) {
         return `<div class="drawer-section warn-block">
-           <h4>⚠ ${T('高风险警示','High-Risk Warning')}</h4>
-           <p>${T('该刊被标记为：','This journal has been flagged as: ')}${escape(_holdLabel)}${T('。投稿前请谨慎评估。',' Evaluate carefully before submission.')}</p>
+           <h4>⚠ ${T('期刊提示','Journal Notice')}</h4>
+           <p>${escape(_manualFlag)}${T('。投稿前请谨慎评估。',' Please evaluate carefully before submission.')}</p>
          </div>`;
       }
       const w = ir.warning;
@@ -4269,14 +4269,14 @@
   }
 
   // ───────── pick-for-me (journal recommendation) ─────────
-  const _holdMap = () => window.__holdMap || {};
-  function getOnHoldLabel(journalRec) {
+  const _manualFlags = () => window.__manualFlags || {};
+  function getManualFlag(journalRec) {
     if (!journalRec) return '';
-    const hm = _holdMap();
+    const flags = _manualFlags();
     const issn = journalRec.issn || '';
     const eissn = journalRec.eissn || '';
     const name = (journalRec.name || '').toUpperCase();
-    return hm[issn] || hm[eissn] || hm[name] || '';
+    return flags[issn] || flags[eissn] || flags[name] || '';
   }
   let _pickInit = false;
   const OA_API = 'https://api.openalex.org';
@@ -4646,10 +4646,10 @@
                 warnBadge = '<span class="badge b-warn">⚠ Warning</span>';
               }
             }
-            // On Hold label from manual list (SCI on hold, high-risk, etc.)
-            const _holdLabel = getOnHoldLabel(r);
-            if (_holdLabel) {
-              warnBadge = `<span class="badge b-warn b-warn-high">⚠ ${escape(_holdLabel)}</span>`;
+            // Manual journal flag (high-risk, on-hold, etc.)
+            const _manualFlag = getManualFlag(r);
+            if (_manualFlag) {
+              warnBadge = `<span class="badge b-warn b-warn-high">⚠ ${escape(_manualFlag)}</span>`;
             }
             // Multidisciplinary badge
             const cats = e.wos_categories || [];
@@ -4824,11 +4824,11 @@
         fetch('data/meta.json' + (typeof __BUILD_VER !== 'undefined' ? '?v=' + __BUILD_VER : '')).then(r => r.json()).catch(() => null),
         fetch('data/esi_categories.json' + (typeof __BUILD_VER !== 'undefined' ? '?v=' + __BUILD_VER : '')).then(r => r.json()).catch(() => []),
         fetch('data/journal_aliases.json' + (typeof __BUILD_VER !== 'undefined' ? '?v=' + __BUILD_VER : '')).then(r => r.json()).catch(() => DEFAULT_JOURNAL_ALIASES),
-        fetchJSON('data/manual_hold_journals.json?v=' + (typeof __BUILD_VER !== 'undefined' ? __BUILD_VER : Date.now())).catch(() => ({})),
+        fetchJSON('data/manual_flags.json?v=' + (typeof __BUILD_VER !== 'undefined' ? __BUILD_VER : Date.now())).catch(() => ({})),
       ]);
       setJournalAliases(aliases);
       journals = j; domestic = d; meta = m; esiCats = esi; oaMap = null;
-      window.__holdMap = holdMap;
+      window.__manualFlags = holdMap;
       journals.forEach(journalSearchMeta);
       buildDomIndex(domestic);
       buildIntIndex(journals);
