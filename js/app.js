@@ -4153,9 +4153,11 @@
       $$('.tab-panel').forEach(p => p.hidden = p.dataset.panel !== activeTab);
       $$('[data-international]').forEach(el => el.hidden = activeTab !== 'int');
       $$('[data-domestic]').forEach(el => el.hidden = activeTab !== 'dom');
-      // 选刊 tab 不需要全站搜索框；登录和语言入口在标签栏右侧保留。
-      const topbar = $('.topbar');
-      if (topbar) topbar.hidden = activeTab === 'pick';
+      // 选刊 tab 隐藏搜索框，保留登录和语言入口
+      const searchWrap = $('.search-wrap');
+      const sideToggle = $('#side-toggle');
+      if (searchWrap) searchWrap.style.display = activeTab === 'pick' ? 'none' : '';
+      if (sideToggle) sideToggle.style.display = activeTab === 'pick' ? 'none' : '';;
       if (!opts.skipPath) {
         const nextPath = TAB_PATHS[activeTab] || '/';
         if (location.pathname !== nextPath) {
