@@ -34,10 +34,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- End Google Tag Manager -->
 <link rel="preload" href="/data/journals.json.gz" as="fetch" crossorigin="anonymous" />
 <link rel="preload" href="/data/journal_aliases.json" as="fetch" crossorigin="anonymous" />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="/css/app.css?v=20260529-10" />
+<link rel="stylesheet" href="/css/app.css?v=20260529-13" />
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json" />
@@ -205,6 +202,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="pick-tool">
       <div class="pick-input-wrap">
         <textarea id="pick-input" class="pick-input" rows="4" maxlength="200" placeholder="输入论文标题、摘要或关键词… 例如：indoor air quality occupancy estimation machine learning" data-i18n-placeholder="pick_placeholder"></textarea>
+        <div class="pick-input-meta">
+          <span class="pick-input-hint">建议输入题目 + 关键词，最多 200 字符</span>
+          <span id="pick-char-count" class="pick-char-count">0 / 200</span>
+        </div>
         <div class="pick-options">
           <div class="pick-option-group">
             <label class="pick-opt"><input type="checkbox" id="pick-filter-topics" checked> <span data-i18n="pick_filter_topics">匹配研究领域 (Topics)</span></label>
@@ -225,7 +226,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           </div>
         </div>
         <div class="pick-apikey-row">
-          <input type="text" id="pick-apikey" placeholder="OpenAlex API Key（可选，填了解除额度限制）" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:4px;background:var(--bg);color:var(--ink);font-size:12px;box-sizing:border-box">
+          <input type="text" id="pick-apikey" class="pick-apikey" placeholder="OpenAlex API Key（可选，填了解除额度限制）">
         </div>
         <div class="pick-actions">
           <button id="pick-search-btn" class="big-btn primary" data-i18n="pick_search_btn">开始推荐</button>
@@ -413,7 +414,7 @@ const __BUILD_VER = 'v20260529-09';
   }
 })();
 </script>
-<script src="/js/app.js?v=v20260529-10" defer></script>
+<script src="/js/app.js?v=v20260529-13" defer></script>
 <script>
   // Custom install prompt
   let __pwaPrompt = null;

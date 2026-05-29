@@ -4352,7 +4352,19 @@
     const results = $('#pick-results');
     const status = $('#pick-status');
     const quotaEl = $('#pick-quota');
+    const charCount = $('#pick-char-count');
     quotaEl.textContent = T('由 OpenAlex 开放学术数据驱动 · 填 API Key 获更多额度','Powered by OpenAlex · add API key for more credits');
+
+    function updatePickCharCount() {
+      if (!input || !charCount) return;
+      const max = parseInt(input.getAttribute('maxlength') || '200', 10);
+      const len = input.value.length;
+      charCount.textContent = `${len} / ${max}`;
+      charCount.classList.toggle('near', len >= Math.floor(max * 0.85) && len < max);
+      charCount.classList.toggle('limit', len >= max);
+    }
+    input?.addEventListener('input', updatePickCharCount);
+    updatePickCharCount();
 
     async function doSearch() {
       const query = input.value.trim();
