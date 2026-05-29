@@ -2274,7 +2274,13 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   border-bottom:1px solid var(--border);
 }
 .pick-card:last-child { border-bottom:none }
-/* Zone tags row above journal name — colored badges with visual weight */
+/* Journal name tags — MDPI/Frontiers/Hindawi/综合 — lighter, after journal name */
+.pick-name-tags { display:flex; align-items:center; gap:5px; margin-bottom:4px; flex-wrap:wrap }
+.pick-name-tags .badge { font-size:10px; padding:1px 6px; font-weight:600; border-radius:3px; letter-spacing:0.03em }
+.badge.b-mdpi-lt     { background: #f0d8de; color: #b82a4a; }
+.badge.b-frontiers-lt { background: #d4ead4; color: #1a6b3c; }
+.badge.b-hindawi-lt  { background: #f5e0d0; color: #b85a20; }
+.badge.b-multi-lt    { background: #e0d8e8; color: #5a4a7a; }
 .pick-zone-tags { display:flex; gap:5px; margin-bottom:6px; flex-wrap:wrap }
 .pick-zone-tags .zone,
 .pick-zone-tags .pick-zone-badge {
