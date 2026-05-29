@@ -4608,9 +4608,10 @@
         }
 
         // Step 3: Build ranked results — multi-factor scoring
-        // Primary signal: direct keyword-to-topic match (oaMap tp) — 60%
-        // Secondary: keyword match in paper titles — 25%
-        // Tertiary: paper count (volume signal) — 15%
+        // Primary signal: OpenAlex relevance_score (BM25) — 40%
+        // Secondary: keyword match in paper titles — 30%
+        // Tertiary: paper count (volume) — 20%
+        // Bonus: oaMap topic match — 10% (only when >0)
         const maxCount = Math.max(...[...journalMap.values()].map(j => j.count), 1);
 
         // Build normalized keyword tokens for topic matching
@@ -4619,6 +4620,7 @@
         const entries = [...journalMap.entries()].map(([issn, j]) => {
           const countRatio = j.count / maxCount;
           const kwMatchRatio = j.count > 0 ? j.kwMatch / j.count : 0;
+          const avgRel = j.scores.length ? j.scores.reduce((a,b) => a+b, 0) / j.scores.length : 0;
 
           // Direct topic match: score how well journal's oaMap topics match the search keywords
           let topicScore = 0;
@@ -4631,11 +4633,10 @@
                 if (lower.includes(tok)) totalMatches++;
               }
             }
-            // Normalize: matches per topic, capped at 1.0
             topicScore = Math.min(1, totalMatches / (oaEntry.tp.length * Math.min(topicTokens.length, 3)));
           }
 
-          const totalScore = topicScore * 0.60 + kwMatchRatio * 0.25 + countRatio * 0.15;
+          const totalScore = avgRel * 0.40 + kwMatchRatio * 0.30 + countRatio * 0.20 + (topicScore > 0 ? topicScore * 0.10 : 0);
 
           const journalRec = journals.find(r => r.issn === issn || r.eissn === issn);
           const zoneVal = journalRec?.cas_zone;
