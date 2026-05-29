@@ -485,11 +485,11 @@ main.main {
 }
 
 .col-fav { width: 64px; text-align: center; padding-left: 4px; padding-right: 4px; }
-.col-cas, .col-esi { font-size: 12.5px; line-height: 1.4; width: 180px; max-width: 180px; overflow: hidden; }
+.col-cas, .col-esi, .col-wos { font-size: 12.5px; line-height: 1.4; width: 172px; max-width: 172px; overflow: hidden; }
 .col-cas { color: var(--ink); }
-.col-esi { color: var(--ink-soft); font-family: var(--sans); font-size: 12px; }
-.col-esi .th-select, .col-cas .th-select { max-width: 100%; box-sizing: border-box; text-overflow: ellipsis; overflow: hidden; }
-.col-esi td, .col-cas td { white-space: normal; word-break: break-word; }
+.col-esi, .col-wos { color: var(--ink-soft); font-family: var(--sans); font-size: 12px; }
+.col-esi .th-select, .col-cas .th-select, .col-wos .th-select { max-width: 100%; box-sizing: border-box; text-overflow: ellipsis; overflow: hidden; }
+td.col-esi, td.col-cas, td.col-wos { white-space: normal; word-break: break-word; }
 .col-if { width: 64px; max-width: 64px; text-align: right; padding-right: 14px; font-family: var(--mono); font-feature-settings: 'tnum'; font-variant-numeric: tabular-nums; }
 .col-if .if-cell { font-size: 13.5px; font-weight: 600; color: var(--ink); }
 th.col-if { text-align: right; padding-right: 14px; }
@@ -966,11 +966,11 @@ body.share-mode main.main { max-width: 760px; margin: 0 auto; padding: 28px 20px
 .share-brand-title { display: block; font-family: var(--serif); font-size: 22px; font-weight: 600; letter-spacing: 0.01em; }
 .share-brand-title em { font-style: italic; font-weight: 400; color: var(--ink-faint); }
 .share-brand-sub { display: block; font-size: 11.5px; color: var(--ink-faint); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 2px; }
-.cat-chip.asjc-life     { background: #1f6a3d; color: #fff; border-color: #1f6a3d; }
-.cat-chip.asjc-health   { background: #a23b3b; color: #fff; border-color: #a23b3b; }
-.cat-chip.asjc-physical { background: #25437f; color: #fff; border-color: #25437f; }
-.cat-chip.asjc-social   { background: #9a6a18; color: #fff; border-color: #9a6a18; }
-.cat-chip.asjc-multidisciplinary { background: #5b3a91; color: #fff; border-color: #5b3a91; }
+.cat-chip.asjc-life     { background: #edf5ef; color: #2d6141; border-color: #c9dfd0; }
+.cat-chip.asjc-health   { background: #f8eeee; color: #7a3a3a; border-color: #e7cccc; }
+.cat-chip.asjc-physical { background: #eef2f8; color: #394d78; border-color: #cdd7ea; }
+.cat-chip.asjc-social   { background: #f7f1e5; color: #715821; border-color: #e4d6b8; }
+.cat-chip.asjc-multidisciplinary { background: #f1eef7; color: #584575; border-color: #d8cfe8; }
 
 .zone {
   display: inline-flex; align-items: center;
@@ -1445,12 +1445,15 @@ td.empty,
   overflow-y: auto;
   flex: 1 1 auto;
   -webkit-overflow-scrolling: touch;
+  font-family: var(--sans, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+  font-size: 13px;
+  line-height: 1.62;
 }
 
 .drawer-hero { margin-bottom: 16px; }
 .drawer-title {
-  font-family: var(--serif, "Source Serif Pro", Georgia, serif);
-  font-size: 20px; line-height: 1.3;
+  font-family: var(--sans, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+  font-size: 19px; line-height: 1.32;
   color: var(--ink, #3a2d1a);
   font-weight: 600;
   margin-bottom: 3px;
@@ -1691,12 +1694,12 @@ td.empty,
 }
 .drawer-section:first-of-type { border-top: 0; padding-top: 4px; }
 .drawer-section h4 {
-  font-family: var(--mono);
-  font-size: 10.5px; letter-spacing: 0.14em;
+  font-family: var(--sans, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+  font-size: 12px; letter-spacing: 0.02em;
   text-transform: uppercase;
   color: var(--ink-faint);
   margin: 0 0 10px;
-  font-weight: 500;
+  font-weight: 650;
 }
 
 /* 表头内嵌下拉（如大类列 CAS/ESI 切换） */
@@ -1988,13 +1991,15 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .cat-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
 .cat-chip {
   display: inline-block;
-  padding: 4px 10px;
-  font-size: 11.5px;
-  background: #8b7758;
-  border: 1px solid #8b7758;
-  border-radius: 12px;
-  color: #fff;
+  padding: 3px 8px;
+  font-size: 12px;
+  line-height: 1.45;
+  background: var(--paper-soft);
+  border: 1px solid var(--rule-soft);
+  border-radius: 6px;
+  color: var(--ink-soft);
   font-family: var(--sans);
+  font-weight: 500;
 }
 .esi-row {
   margin-top: 10px; padding-top: 10px;
