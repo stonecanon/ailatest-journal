@@ -1026,6 +1026,35 @@ table.journals tr:last-child td { border-bottom: 0; }
   .share-actions button { flex: 1 1 calc(50% - 5px); justify-content: center; }
 }
 
+@media (max-width: 600px) {
+  .cnki-table-wrap { overflow-x: auto; }
+  table.cnki-table {
+    min-width: 720px;
+    table-layout: fixed;
+  }
+  table.cnki-table th:nth-child(1),
+  table.cnki-table td:nth-child(1) { width: 34px !important; padding-left: 8px; padding-right: 6px; }
+  table.cnki-table th:nth-child(2),
+  table.cnki-table td:nth-child(2) { width: 270px; }
+  table.cnki-table th:nth-child(3),
+  table.cnki-table td:nth-child(3) { width: 145px; }
+  table.cnki-table th:nth-child(4),
+  table.cnki-table td:nth-child(4) { width: 105px !important; }
+  table.cnki-table th:nth-child(5),
+  table.cnki-table td:nth-child(5) { width: 92px !important; }
+  table.cnki-table th:nth-child(6),
+  table.cnki-table td:nth-child(6) { width: 74px !important; }
+  .cnki-name {
+    font-size: 15.5px;
+    line-height: 1.36;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  table.cnki-table .cat-inline { display: inline; margin-right: 4px; }
+}
+
 /* share landing 单列布局：屏蔽主站 grid + 侧边栏 */
 body.share-mode { display: block; grid-template-columns: none; }
 body.share-mode #sidebar,
