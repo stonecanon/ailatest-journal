@@ -4190,13 +4190,24 @@
       showJournalShareModal(_currentDrawerRec);
     });
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeDrawer();
+      if (e.key === 'Escape') { closeDrawer(); closeSidebar(); }
     });
 
-    // 侧栏筛选 — 现在始终在内容下方显示（桌面/移动端皆然）
-    $('#side-toggle')?.style.setProperty('display', 'none');
-    const sideScrim = $('#sidebar-scrim');
-    if (sideScrim) sideScrim.hidden = true;
+    function closeSidebar() {
+      $('#sidebar').classList.remove('open');
+      $('#sidebar-scrim').classList.remove('on');
+    }
+
+    // 侧栏切换
+    $('#side-toggle')?.addEventListener('click', () => {
+      $('#sidebar').classList.toggle('open');
+      $('#sidebar-scrim').classList.toggle('on');
+      $('#sidebar-scrim').hidden = false;
+    });
+    $('#sidebar-scrim')?.addEventListener('click', () => {
+      $('#sidebar').classList.remove('open');
+      $('#sidebar-scrim').classList.remove('on');
+    });
   
     // auth
     $('#auth-btn').addEventListener('click', () => {

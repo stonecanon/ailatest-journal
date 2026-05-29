@@ -104,34 +104,34 @@ body {
 }
 
 #sidebar {
-  width: auto;
-  background: var(--paper-soft);
-  border-top: 1px solid var(--rule);
-  padding: 16px 14px;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  gap: 6px 14px;
-  position: static;
-  height: auto;
-  overflow: visible;
+  position: fixed;
+  top: 0; right: 0;
+  width: 320px;
+  max-width: 85vw;
+  height: 100vh;
+  background: var(--paper);
+  border-left: 1px solid var(--rule);
+  box-shadow: -4px 0 20px rgba(43,42,39,.12);
+  z-index: 90;
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 20px 18px 24px;
   font-size: 12px;
 }
-#sidebar .brand,
-#sidebar .brand-sub,
-#sidebar .aside-foot,
-#sidebar .wos-list,
-#sidebar .wos-all-btn,
-#sidebar .side-section[data-international]:has(.wos-list),
-#sidebar .side-section[data-international]:has(#wos-list) {
-  display: none !important;
-}
+#sidebar.open { transform: translateX(0); }
 #sidebar .side-section {
-  flex: 0 0 auto;
-  min-width: 80px;
+  margin-bottom: 16px;
 }
 #sidebar .side-section[hidden] { display: none !important; }
-#sidebar .side-label { font-size: 10px; margin-bottom: 2px; }
+#sidebar .side-label {
+  font-size: 10px;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink-faint);
+}
 #sidebar .chip-row { gap: 3px; }
 #sidebar .chip { font-size: 10px; padding: 2px 6px; }
 
@@ -976,7 +976,7 @@ table.journals tr:last-child td { border-bottom: 0; }
 
 /* share landing 单列布局：屏蔽主站 grid + 侧边栏 */
 body.share-mode { display: block; grid-template-columns: none; }
-body.share-mode aside.sidebar,
+body.share-mode #sidebar,
 body.share-mode .sidebar-scrim,
 body.share-mode #drawer,
 body.share-mode #scrim { display: none !important; }
@@ -1382,22 +1382,8 @@ td.empty,
 /* responsive */
 @media (max-width: 900px) {
   #sidebar {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-start;
-    gap: 6px 14px;
-    position: static;
-    height: auto;
-    overflow: visible;
-    width: auto;
-    transform: none;
-    box-shadow: none;
-    z-index: auto;
-    background: var(--paper-soft);
-    border-top: 1px solid var(--rule);
-    border-right: none;
-    padding: 16px 14px;
-    transition: none;
+    max-width: 90vw;
+    padding: 16px 14px 20px;
   }
   #sidebar.open { transform: none; }
   main.main {
@@ -1411,7 +1397,6 @@ td.empty,
   main.main .tab .tab-icon { font-size: 18px; }
   main.main .tab .tab-label { font-size: 14px; letter-spacing: 0.04em; }
   main.main .tab-panel { order: 3; }
-  main.main #sidebar { order: 4; }
   main.main .site-foot { order: 5; }
   .lang-toggle, .auth-btn, .fav-tab {
     padding: 6px 10px;
