@@ -4279,7 +4279,48 @@
     return flags[issn] || flags[eissn] || flags[name] || '';
   }
   let _pickInit = false;
-  const OA_API = '/api/openalex';
+  let _openAlexFallback = false;
+  let _openAlexRateLimited = false;
+
+  /**
+   * Fetch from OpenAlex with automatic fallback to proxy.
+   * - Tries direct api.openalex.org first.
+   * - If blocked (ad-blocker / CORS), falls back to /api/openalex proxy.
+   * - Returns { ok, data, rateLimited }.
+   */
+  async function openAlexFetch(urlPath) {
+    const base = _openAlexFallback ? '/api/openalex' : 'https://api.openalex.org';
+    const url = `${base}/${urlPath}`;
+    try {
+      const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
+      if (!r.ok) {
+        const text = await r.text().catch(() => '');
+        // Rate limit on proxy → signal caller
+        if (r.status === 429 && _openAlexFallback) {
+          return { ok: false, rateLimited: true, data: null };
+        }
+        // Direct call failed with HTTP error → try proxy once
+        if (!_openAlexFallback) {
+          console.warn('OpenAlex direct HTTP error', r.status, '→ fallback to proxy');
+          _openAlexFallback = true;
+          return openAlexFetch(urlPath);
+        }
+        console.error('OpenAlex API error:', r.status, text.slice(0,200));
+        return { ok: false, rateLimited: false, data: null };
+      }
+      const d = await r.json();
+      return { ok: true, rateLimited: false, data: d.results || [] };
+    } catch (e) {
+      // Network error (ad-blocker/CORS) → try proxy once
+      if (!_openAlexFallback) {
+        console.warn('OpenAlex direct blocked, falling back to proxy');
+        _openAlexFallback = true;
+        return openAlexFetch(urlPath);
+      }
+      console.error('OpenAlex fetch error:', e?.message || e);
+      return { ok: false, rateLimited: false, data: null };
+    }
+  }
 
   function initPickTool() {
     if (_pickInit) return;
@@ -4293,6 +4334,8 @@
     async function doSearch() {
       const query = input.value.trim();
       if (!query) { status.textContent = T('请输入内容','Please enter a query'); return; }
+      _openAlexFallback = false; // Reset fallback per search
+      _openAlexRateLimited = false;
 
       // ── Daily usage limit (localStorage) ──
       // Bypass: owner email hardcoded
@@ -4426,20 +4469,14 @@
         const FIVE_YEARS_AGO = new Date(Date.now() - 5*365*24*60*60*1000).toISOString().slice(0,10);
         const DATE_FILTER = `&filter=from_publication_date:${FIVE_YEARS_AGO}`;
         const queryBatches = await Promise.all(queries.slice(0, 4).map(async (q) => {
-          const url = `${OA_API}/works?search=${encodeURIComponent(q.slice(0,120))}&per_page=200&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
-          try {
-            const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
-            if (!r.ok) {
-              const text = await r.text().catch(() => '');
-              console.error('OpenAlex API error:', r.status, text.slice(0,200));
-              return [];
-            }
-            const d = await r.json();
-            return d.results || [];
-          } catch (e) {
-            console.error('OpenAlex fetch error:', e?.message || e);
+          const searchQ = q.slice(0,120);
+          const r = await openAlexFetch(`works?search=${encodeURIComponent(searchQ)}&per_page=200&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`);
+          if (r.rateLimited) {
+            _openAlexRateLimited = true;
+            status.textContent = T('OpenAlex API 临时额度已用完，稍后重试','OpenAlex API rate limit reached, try again later');
             return [];
           }
+          return r.data;
         }));
         const seenIds = new Set();
         const allWorks = [];
@@ -4453,40 +4490,42 @@
         }
 
         // If too few results, try a broader backup query
-        if (allWorks.length < 8) {
+        if (allWorks.length < 8 && !_openAlexRateLimited) {
           const backup = uniqueWords.slice(0, 8).join(' ');
-          const url = `${OA_API}/works?search=${encodeURIComponent(backup)}&per_page=200&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
-          try {
-            const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
-            if (r.ok) {
-              const d = await r.json();
-              for (const w of (d.results || [])) {
-                if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); }
-              }
+          const r = await openAlexFetch(`works?search=${encodeURIComponent(backup)}&per_page=200&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`);
+          if (r.ok && !r.rateLimited) {
+            for (const w of (r.data || [])) {
+              if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); }
             }
-          } catch (e) { console.error('OpenAlex backup fetch error:', e?.message || e); }
+          }
         }
 
         // Chinese fallback: if still nothing and has Chinese, try short Chinese title
-        if (allWorks.length < 3 && titleTerms[0]) {
+        if (allWorks.length < 3 && !_openAlexRateLimited && titleTerms[0]) {
           const chn = titleTerms[0].replace(/[a-zA-Z0-9\s]/g, '').replace(/[，。、；：！？（）【】《》""''\s]/g, '');
           if (chn) {
             const cnQuery = chn.slice(0, 12);
-            const url = `${OA_API}/works?search=${encodeURIComponent(cnQuery)}&per_page=200&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
-            try {
-              const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
-              if (r.ok) { const d = await r.json(); for (const w of (d.results||[])) { if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); } } }
-            } catch (e) { console.error('OpenAlex CN fetch error:', e?.message || e); }
+            const r = await openAlexFetch(`works?search=${encodeURIComponent(cnQuery)}&per_page=200&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`);
+            if (r.ok && !r.rateLimited) {
+              for (const w of (r.data || [])) {
+                if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); }
+              }
+            }
           }
         }
 
         const hasCnOnly = [...query].filter(c => c >= '\u4e00' && c <= '\u9fff').length > 0
           && uniqueWords.filter(w => w.length > 4).length < 2 && !explicitKeywords.length;
         if (!allWorks.length) {
+          if (_openAlexRateLimited) {
+            status.textContent = T('OpenAlex API 临时额度已用完，请稍后重试','OpenAlex API rate limit reached, try again later');
+            return;
+          }
+          const adblockTip = _openAlexFallback ? T(' 提示：检测到广告拦截器，如结果不符合预期请尝试禁用后重试。',' ℹ Ad-blocker detected. Try disabling it for this site.') : '';
           status.textContent = hasCnOnly
             ? T('未找到相关论文。OpenAlex 对中文搜索效果不佳，建议在摘要后添加英文 Keywords: 行（如 Keywords: indoor occupancy, sensor）',
               'No papers found. OpenAlex has limited Chinese support. Try adding an English "Keywords:" line.')
-            : T('未找到相关论文，请尝试其他关键词','No papers found, try different keywords');
+            : T('未找到相关论文，请尝试其他关键词','No papers found, try different keywords') + adblockTip;
           return;
         }
 
