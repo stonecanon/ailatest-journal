@@ -4413,6 +4413,11 @@
         status.textContent = T('正在搜索相关论文…','Searching related papers…');
         const SEARCH_FIELDS = 'id,title,publication_date,primary_location,relevance_score';
         const FIVE_YEARS_AGO = new Date(Date.now() - 5*365*24*60*60*1000).toISOString().slice(0,10);
+        const PICK_SEARCH_PAGE_SIZE = 60;
+        const PICK_BACKUP_PAGE_SIZE = 60;
+        const PICK_CN_PAGE_SIZE = 40;
+        const PICK_MAX_JOURNALS = 60;
+        const PICK_PAPERS_PER_JOURNAL = 8;
         let openAlexErrorStatus = null;
         const rememberOpenAlexError = (statusCode) => {
           if (statusCode === 429 || !openAlexErrorStatus) openAlexErrorStatus = statusCode;
@@ -4420,7 +4425,7 @@
         const queryBatches = await Promise.all(queries.slice(0, 3).map(async (q) => {
           const params = new URLSearchParams({
             search: q.slice(0, 120),
-            per_page: '30',
+            per_page: String(PICK_SEARCH_PAGE_SIZE),
             sort: 'relevance_score:desc',
             select: SEARCH_FIELDS,
           });
@@ -4454,11 +4459,11 @@
         }
 
         // If too few results, try a broader backup query
-        if (allWorks.length < 8) {
+        if (allWorks.length < 16) {
           const backup = uniqueWords.slice(0, 5).join(' ');
           const params = new URLSearchParams({
             search: backup,
-            per_page: '30',
+            per_page: String(PICK_BACKUP_PAGE_SIZE),
             sort: 'relevance_score:desc',
             select: SEARCH_FIELDS,
           });
@@ -4478,13 +4483,13 @@
         }
 
         // Chinese fallback: if still nothing and has Chinese, try short Chinese title
-        if (allWorks.length < 3 && titleTerms[0]) {
+        if (allWorks.length < 6 && titleTerms[0]) {
           const chn = titleTerms[0].replace(/[a-zA-Z0-9\s]/g, '').replace(/[，。、；：！？（）【】《》""''\s]/g, '');
           if (chn) {
             const cnQuery = chn.slice(0, 12);
             const params = new URLSearchParams({
               search: cnQuery,
-              per_page: '20',
+              per_page: String(PICK_CN_PAGE_SIZE),
               sort: 'relevance_score:desc',
               select: SEARCH_FIELDS,
             });
@@ -4582,7 +4587,7 @@
             issn, journalRec, zone: zoneVal, top: topVal,
             jcr_q: qVal, scopus: scopusVal, ei: eiVal,
             indices, wos_categories: wosCats,
-            count: j.count, papers: j.papers.slice(0,5),
+            count: j.count, papers: j.papers.slice(0, PICK_PAPERS_PER_JOURNAL),
             topics: [...j.topics].slice(0,6),
             score: totalScore, srcName: j.srcName,
           };
@@ -4615,7 +4620,7 @@
           filtered = filtered.filter(e => e.score > 0.1);
         }
         filtered.sort((a, b) => b.score - a.score);
-        filtered = filtered.slice(0, 30);
+        filtered = filtered.slice(0, PICK_MAX_JOURNALS);
 
         // Normalize: top journal = 100%
         const maxScore = filtered.length > 0 ? filtered[0].score : 1;
