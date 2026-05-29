@@ -2397,8 +2397,8 @@
         return true;
       });
 
-      // 按刊名排序
-      filtered.sort((a, b) => (a.name||'').localeCompare(b.name||'', 'zh'));
+      // 保持原有排序（T1→T2→T3，不按刊名重排）
+      // filtered.sort((a, b) => (a.name||'').localeCompare(b.name||'', 'zh'));
 
       // 分页
       const visible = filtered.slice(0, window.__cnkxShown);
