@@ -4616,6 +4616,7 @@
           let badgesHtml = '';
           let zoneTagsHtml = '';
           let pubBadge = '';
+          let multiBadge = '';
           if (e.journalRec) {
             const r = e.journalRec;
             // Index badges (SCIE/SSCI/AHCI/ESCI)
@@ -4630,9 +4631,9 @@
             const ccfTxt = r.ccf_2026_type ? `<span class="badge b-ccf">CCF ${r.ccf_2026_type}</span>` : '';
             // Publisher badges (MDPI/Frontiers/Hindawi)
             const pubLower = (r.publisher || '').toLowerCase();
-            if (pubLower.includes('mdpi')) pubBadge = '<span class="badge b-mdpi">MDPI</span>';
-            else if (pubLower.includes('frontiers')) pubBadge = '<span class="badge b-frontiers">Frontiers</span>';
-            else if (pubLower.includes('hindawi')) pubBadge = '<span class="badge b-hindawi">Hindawi</span>';
+            if (pubLower.includes('mdpi')) pubBadge = '<span class="badge b-mdpi-lt">MDPI</span>';
+            else if (pubLower.includes('frontiers')) pubBadge = '<span class="badge b-frontiers-lt">Frontiers</span>';
+            else if (pubLower.includes('hindawi')) pubBadge = '<span class="badge b-hindawi-lt">Hindawi</span>';
             // Warning badge
             let warnBadge = '';
             if (r.warning) {
@@ -4654,8 +4655,8 @@
             // Multidisciplinary badge
             const cats = e.wos_categories || [];
             const isMulti = cats.some(c => /multidisciplinary/i.test(c));
-            const multiBadge = isMulti ? '<span class="badge b-multi">综合</span>' : '';
-            badgesHtml = [idxBadges, scBadge, eiBdg, ifBdg, ccfTxt, warnBadge, multiBadge].filter(Boolean).join('');
+            if (isMulti) multiBadge = '<span class="badge b-multi-lt">综合</span>';
+            badgesHtml = [idxBadges, scBadge, eiBdg, ifBdg, ccfTxt, warnBadge].filter(Boolean).join('');
             // Prominent zone/JCR tags at top of card
             const zTag = e.zone
               ? `<span class="zone z${e.zone}">${e.top ? 'TOP·' : ''}${e.zone}${T('区','')}</span>`
@@ -4679,6 +4680,7 @@
           return `<div class="pick-card${cardZoneClass}${hl}" data-issn="${escape(issnStr)}">
             ${zoneTagsHtml ? `<div class="pick-zone-tags">${zoneTagsHtml}</div>` : ''}
             <h3><a href="#j/${escape(e.journalRec ? favId(e.journalRec) : issnStr)}">${escape(name)}</a></h3>
+            ${pubBadge || multiBadge ? `<div class="pick-name-tags">${pubBadge}${multiBadge}</div>` : ''}
             <div class="pick-head">
               <span class="pick-count">${e.count}<small> ${T('篇论文','papers')}</small></span>
               <div class="pick-head-right">
@@ -4687,7 +4689,6 @@
               </div>
             </div>
             ${badgesHtml ? `<div class="pick-badges">${badgesHtml}</div>` : ''}
-            ${pubBadge ? `<div class="pick-publisher-badge">${pubBadge}${T('出版社','ublisher')}</div>` : ''}
             ${(function(){
               const r2 = e.journalRec;
               let txt = '📅 ' + T('审稿周期','Review cycle') + ': ';
