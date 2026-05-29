@@ -1055,6 +1055,9 @@ body.share-mode main.main { max-width: 760px; margin: 0 auto; padding: 28px 20px
 .xr-pill.xr-4 { background: #d3e6e3; color: #1f5f5a; }
 .xr-pill.xr-top { background: var(--zone-top); color: #fff; font-weight: 600; }
 
+/* 新锐分区 TOP 侧边栏标签 */
+.chip.xr-top:has(input:checked) { background: var(--zone-top); border-color: var(--zone-top); color: #fff; }
+
 /* Nature / Science / Cell 旗舰徽章 */
 .flagship-pill {
   display: inline-block;
