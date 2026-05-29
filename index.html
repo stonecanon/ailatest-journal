@@ -126,7 +126,35 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <tr>
               <th class="col-fav" aria-label="Favorite"></th>
               <th class="col-name" data-i18n="col_name">期刊 Title</th>
-              <th class="col-badge" data-i18n="col_badges">索引 / 分区</th>
+              <th class="col-badge">
+                <select id="idx-col-filter" class="th-select th-select-sm" aria-label="筛选索引">
+                  <option value="__all">索引</option>
+                  <option value="SCIE">SCIE</option>
+                  <option value="SSCI">SSCI</option>
+                  <option value="AHCI">AHCI</option>
+                  <option value="ESCI">ESCI</option>
+                  <option value="EI">EI</option>
+                </select>
+                <select id="tier-col-filter" class="th-select th-select-sm" aria-label="筛选分区">
+                  <option value="__all">分区</option>
+                  <option value="Q1">Q1</option>
+                  <option value="Q2">Q2</option>
+                  <option value="Q3">Q3</option>
+                  <option value="Q4">Q4</option>
+                  <option value="1">1区</option>
+                  <option value="2">2区</option>
+                  <option value="3">3区</option>
+                  <option value="4">4区</option>
+                  <option value="top">TOP</option>
+                </select>
+                <select id="extra-col-filter" class="th-select th-select-sm" aria-label="筛选附加">
+                  <option value="__all">附加</option>
+                  <option value="scopus">Scopus</option>
+                  <option value="oaj">OAJ</option>
+                  <option value="doaj">DOAJ</option>
+                  <option value="warning">预警</option>
+                </select>
+              </th>
               <th class="col-if sortable" data-if-sort="int" title="按 IF 排序">IF <span class="sort-arrow">▼</span></th>
               <th class="col-cas">
                 <select id="cas-col-filter" class="th-select" aria-label="筛选中科院大类">
