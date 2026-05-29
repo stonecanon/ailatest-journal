@@ -504,8 +504,17 @@ main.main {
 .col-esi, .col-wos { color: var(--ink-soft); font-family: var(--sans); font-size: 12px; }
 .col-esi .th-select, .col-cas .th-select, .col-wos .th-select { max-width: 100%; box-sizing: border-box; text-overflow: ellipsis; overflow: hidden; }
 td.col-esi, td.col-cas, td.col-wos { white-space: normal; word-break: break-word; }
-.col-if { width: 64px; max-width: 64px; text-align: right; padding-right: 14px; font-family: var(--mono); font-feature-settings: 'tnum'; font-variant-numeric: tabular-nums; }
-.col-if .if-cell { font-size: 13.5px; font-weight: 600; color: var(--ink); }
+.col-if {
+  width: 64px;
+  max-width: 64px;
+  text-align: right;
+  padding-right: 14px;
+  font-family: var(--sans);
+  font-feature-settings: 'tnum';
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+}
+.col-if .if-cell { font-size: 13.5px; font-weight: 680; color: var(--ink-soft); }
 th.col-if { text-align: right; padding-right: 14px; }
 
 /* drawer 大类/小类 标签（区分新锐版双 4 区等情况） */
