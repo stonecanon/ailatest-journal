@@ -1856,7 +1856,17 @@
     // 第一行：索引（SCIE/SSCI/AHCI/ESCI/EI）— 回答"这本被哪些数据库收录"
     const indexBadges = renderIndexBadges(r);
     // 第二行：分区/等级/预警 — 回答"这本的等级和影响力"（IF 已移到独立列）
-    const rankBadges = [renderRankBadges(r), crossBadges].filter(Boolean).join('');
+    // Additional badges: publisher warning labels
+    const _pub = (r.publisher || '').toLowerCase();
+    let _pubBadge = '';
+    if (_pub.includes('mdpi')) _pubBadge = '<span class="badge b-mdpi">MDPI</span>';
+    else if (_pub.includes('frontiers')) _pubBadge = '<span class="badge b-frontiers">Frontiers</span>';
+    else if (_pub.includes('hindawi')) _pubBadge = '<span class="badge b-hindawi">Hindawi</span>';
+    // Multidisciplinary badge
+    const _cats = r.wos_categories || [];
+    const _isMulti = _cats.some(c => /multidisciplinary/i.test(c));
+    const _multiBadge = _isMulti ? '<span class="badge b-multi">综合</span>' : '';
+    const rankBadges = [renderRankBadges(r), crossBadges, _pubBadge, _multiBadge].filter(Boolean).join('');
     const badgeCell = renderBadgeCell(indexBadges, rankBadges);
     const casVal = (lang === 'zh-CN' || lang === 'zh-TW') ? (r.cas_major_cn || '') : tn(r.cas_major_cn || '', 'domain');
     const esiVal = r.esi_category || '';
@@ -2876,7 +2886,15 @@
     const ir = intRec || {};
     // 徽章块 — 分两行：索引收录 / 分区等级
     const drawerIndexBadges = (src === 'int' || intRec) ? renderIndexBadges(ir) : '';
-    const drawerRankBadges = (src === 'int' || intRec) ? renderRankBadges(ir) : '';
+    let drawerRankBadges = (src === 'int' || intRec) ? renderRankBadges(ir) : '';
+    if (src === 'int' || intRec) {
+      const _pub2 = (ir.publisher || '').toLowerCase();
+      if (_pub2.includes('mdpi')) drawerRankBadges += '<span class="badge b-mdpi">MDPI</span>';
+      else if (_pub2.includes('frontiers')) drawerRankBadges += '<span class="badge b-frontiers">Frontiers</span>';
+      else if (_pub2.includes('hindawi')) drawerRankBadges += '<span class="badge b-hindawi">Hindawi</span>';
+      const _cats2 = ir.wos_categories || [];
+      if (_cats2.some(c => /multidisciplinary/i.test(c))) drawerRankBadges += '<span class="badge b-multi">综合</span>';
+    }
     const tierBadge = r.tier && /^T[123]$/.test(r.tier) ? badgeTier(r.tier)
                     : r.tier ? `<span class="tier-pill t3">${escape(tn(r.tier, "tier"))}</span>` : '';
     const crossBadges = renderDomCrossBadges(r, src);
@@ -4541,7 +4559,7 @@
         // Step 4: Filter and sort
         let filtered = entries;
         // Exclude single-paper journals (noise from broad queries)
-        filtered = filtered.filter(e => e.count >= 2);
+        filtered = filtered.filter(e => e.count >= 1);
         const ifMin = parseFloat(document.getElementById('pick-if-min')?.value || '0');
         if (document.getElementById('pick-filter-if')?.checked && ifMin > 0) {
           filtered = filtered.filter(e => e.if != null && e.if >= ifMin);
@@ -4603,7 +4621,30 @@
             const ifBdg = badgeIF(e.if);
             // CCF
             const ccfTxt = r.ccf_2026_type ? `<span class="badge b-ccf">CCF ${r.ccf_2026_type}</span>` : '';
-            badgesHtml = [idxBadges, scBadge, eiBdg, ifBdg, ccfTxt].filter(Boolean).join('');
+            // Publisher badges (MDPI/Frontiers/Hindawi)
+            const pubLower = (r.publisher || '').toLowerCase();
+            let pubBadge = '';
+            if (pubLower.includes('mdpi')) pubBadge = '<span class="badge b-mdpi">MDPI</span>';
+            else if (pubLower.includes('frontiers')) pubBadge = '<span class="badge b-frontiers">Frontiers</span>';
+            else if (pubLower.includes('hindawi')) pubBadge = '<span class="badge b-hindawi">Hindawi</span>';
+            // Warning badge
+            let warnBadge = '';
+            if (r.warning) {
+              const w = r.warning;
+              if (typeof w === 'object') {
+                const arr = Array.isArray(w) ? w : [w];
+                const latest = arr.reduce((a,b) => (!a || (b.year && b.year > (a.year||0))) ? b : a, null);
+                const label = (latest && (latest.year || latest.level)) ? `${latest.year||''}${latest.level?'/'+latest.level:''}` : '';
+                warnBadge = `<span class="badge b-warn">⚠ ${escape(label||'Warning')}</span>`;
+              } else {
+                warnBadge = '<span class="badge b-warn">⚠ Warning</span>';
+              }
+            }
+            // Multidisciplinary badge
+            const cats = e.wos_categories || [];
+            const isMulti = cats.some(c => /multidisciplinary/i.test(c));
+            const multiBadge = isMulti ? '<span class="badge b-multi">综合</span>' : '';
+            badgesHtml = [idxBadges, scBadge, eiBdg, ifBdg, ccfTxt, pubBadge, warnBadge, multiBadge].filter(Boolean).join('');
             // Prominent zone/JCR tags at top of card
             const zTag = e.zone
               ? `<span class="zone z${e.zone}">${e.top ? 'TOP·' : ''}${e.zone}${T('区','')}</span>`

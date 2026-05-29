@@ -646,6 +646,11 @@ table.journals tr:last-child td { border-bottom: 0; }
 .badge.b-oaj { background: #147a6b; }
 .badge.b-doaj { background: #4b7f21; }
 .badge.b-view { color: #6b5d52; background: #e9dfc8; font-variant-numeric: tabular-nums; opacity: 0.9; }
+.badge.b-mdpi     { background: #b82a4a; color: #fff; }
+.badge.b-frontiers { background: #1a6b3c; color: #fff; }
+.badge.b-hindawi  { background: #c4551a; color: #fff; }
+.badge.b-warn     { background: #cc3333; color: #fff; }
+.badge.b-multi    { background: #6b5a8a; color: #fff; }
 
 /* share dialog */
 .share-modal { position: fixed; inset: 0; z-index: 200; display: none; align-items: center; justify-content: center; background: rgba(28,22,12,0.55); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); padding: 16px; }
