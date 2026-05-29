@@ -37,7 +37,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="/css/app.css?v=20260527-52" />
+<link rel="stylesheet" href="/css/app.css?v=20260527-53" />
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json" />
@@ -330,7 +330,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </section>
     <div class="pick-tool">
       <div class="pick-input-wrap">
-        <textarea id="pick-input" class="pick-input" rows="4" placeholder="输入论文标题、摘要或关键词… 例如：indoor air quality occupancy estimation machine learning" data-i18n-placeholder="pick_placeholder"></textarea>
+        <textarea id="pick-input" class="pick-input" rows="4" maxlength="200" placeholder="输入论文标题、摘要或关键词… 例如：indoor air quality occupancy estimation machine learning" data-i18n-placeholder="pick_placeholder"></textarea>
         <div class="pick-options">
           <div class="pick-option-group">
             <label class="pick-opt"><input type="checkbox" id="pick-filter-topics" checked> <span data-i18n="pick_filter_topics">匹配研究领域 (Topics)</span></label>
