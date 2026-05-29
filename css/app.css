@@ -2145,7 +2145,7 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 }
 .domsrc-pill.ds-cnkx     { background: #8b4513; color: #fff; }
 .domsrc-pill.ds-cssci    { background: #6a3a8b; color: #fff; }
-.domsrc-pill.ds-cssci_ext{ background: #8a5aa6; color: #fff; }
+.domsrc-pill.ds-cssci-ext{ background: #8a5aa6; color: #fff; }
 .domsrc-pill.ds-pku      { background: #a33a2a; color: #fff; }
 .domsrc-pill.ds-zju      { background: #1f5f5a; color: #fff; }
 .domsrc-pill.ds-school_a { background: #4a6b2a; color: #fff; }
@@ -2153,7 +2153,7 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .domsrc-pill.ds-cnki_major { background: #2a6b8a; color: #fff; }
 [data-theme="dark"] .domsrc-pill.ds-cnkx,
 [data-theme="dark"] .domsrc-pill.ds-cssci,
-[data-theme="dark"] .domsrc-pill.ds-cssci_ext,
+[data-theme="dark"] .domsrc-pill.ds-cssci-ext,
 [data-theme="dark"] .domsrc-pill.ds-pku,
 [data-theme="dark"] .domsrc-pill.ds-zju,
 [data-theme="dark"] .domsrc-pill.ds-school_a,

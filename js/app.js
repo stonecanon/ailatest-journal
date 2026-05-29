@@ -1652,7 +1652,7 @@
   // 国内来源交叉徽章
   function badgeDomSrc(tag) {
     const map = {
-      cssci: 'CSSCI', cssci_ext: T('CSSCI 扩','CSSCI Ext'), pku: T('北大核心','PKU Core'),
+      cssci: 'CSSCI', cssci_ext: T('CSSCI 扩展','CSSCI Ext'), pku: T('北大核心','PKU Core'),
       cnkx_T1: T('科协 T1','CAST T1'), cnkx_T2: T('科协 T2','CAST T2'), cnkx_T3: T('科协 T3','CAST T3'),
       ccft_T1: 'CCF-T1', ccft_T2: 'CCF-T2', ccft_T3: 'CCF-T3',
       zju: T('浙大目录','ZJU'), school_a: T('学校 A','School A'),
@@ -1794,7 +1794,7 @@
       addDomIndex(r.name, 'name', { source:'cssci', label:'CSSCI', tag:'', discipline:r.discipline });
     });
     (d.cssci_ext||[]).forEach(r => {
-      addDomIndex(r.name, 'name', { source:'cssci_ext', label:T('CSSCI 扩','CSSCI Ext'), tag:'', discipline:r.discipline });
+      addDomIndex(r.name, 'name', { source:'cssci_ext', label:T('CSSCI 扩展','CSSCI Ext'), tag:'', discipline:r.discipline });
     });
     (d.pku_core||[]).forEach(r => {
       addDomIndex(r.name, 'name', { source:'pku', label:T('北大核心','PKU Core'), tag:'', category:r.category });
@@ -2270,7 +2270,7 @@
             const hits = lookupDom(r);
             const badges = [
               ...hits.filter(h => h.source === 'cssci').map(() => `<span class="domsrc-pill ds-cssci">CSSCI</span>`),
-              ...hits.filter(h => h.source === 'cssci_ext').map(() => `<span class="domsrc-pill ds-cssci-ext">${T('CSSCI 扩','CSSCI Ext')}</span>`),
+              ...hits.filter(h => h.source === 'cssci_ext').map(() => `<span class="domsrc-pill ds-cssci-ext">${T('CSSCI 扩展','CSSCI Ext')}</span>`),
               ...hits.filter(h => h.source === 'pku').map(() => `<span class="domsrc-pill ds-pku">${T('北大核心','PKU Core')}</span>`),
               ...hits.filter(h => h.source === 'ccft').map(h => `<span class="domsrc-pill ds-ccft">CCF-${h.tag||'T'}</span>`),
               ...hits.filter(h => h.source === 'zju').map(h => `<span class="domsrc-pill ds-zju">${escape(h.label)}</span>`),
@@ -2524,7 +2524,7 @@
         const hits = lookupDom(r);
         const badges = [
           ...hits.filter(h => h.source === 'cssci').map(() => `<span class="domsrc-pill ds-cssci">CSSCI</span>`),
-          ...hits.filter(h => h.source === 'cssci_ext').map(() => `<span class="domsrc-pill ds-cssci-ext">${T('CSSCI 扩','CSSCI Ext')}</span>`),
+          ...hits.filter(h => h.source === 'cssci_ext').map(() => `<span class="domsrc-pill ds-cssci-ext">${T('CSSCI 扩展','CSSCI Ext')}</span>`),
           ...hits.filter(h => h.source === 'pku').map(() => `<span class="domsrc-pill ds-pku">${T('北大核心','PKU Core')}</span>`),
           ...hits.filter(h => h.source === 'ccft').map(h => `<span class="domsrc-pill ds-ccft" title="${escape(h.org||'')}">CCF-${h.tag||'T'}</span>`),
           ...hits.filter(h => h.source === 'zju').map(h => `<span class="domsrc-pill ds-zju">${escape(h.label)}</span>`),
@@ -3913,7 +3913,7 @@
     const casCell = casVal ? escape(casVal) : '<span class="muted-cell">—</span>';
     const esiCell = esiVal ? escape(esiVal) : '<span class="muted-cell">—</span>';
     const SRC_LABEL = {
-      int: T('国际','Int’l'), cssci: 'CSSCI', cssci_core: 'CSSCI', cssci_ext: T('CSSCI扩展','CSSCI Ext'),
+      int: T('国际','Int’l'), cssci: 'CSSCI', cssci_core: 'CSSCI', cssci_ext: T('CSSCI 扩展','CSSCI Ext'),
       pku: T('北大核心','PKU Core'), pku_core: T('北大核心','PKU Core'), cnkx: T('科协','CAST'), ccft: 'CCF-T',
       zju: T('浙大','ZJU'), school_a: T('高校目录','In-house'),
     };
