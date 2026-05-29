@@ -77,6 +77,26 @@ CREATE TABLE IF NOT EXISTS page_events (
   client_language TEXT
 );
 
+CREATE TABLE IF NOT EXISTS user_quotas (
+  user_id       INTEGER PRIMARY KEY,
+  plan          TEXT    NOT NULL DEFAULT 'free',
+  daily_limit   INTEGER NOT NULL DEFAULT 5,
+  monthly_limit INTEGER,
+  paid_until    INTEGER,
+  updated_at    INTEGER NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS pick_usage (
+  user_id     INTEGER NOT NULL,
+  period      TEXT    NOT NULL,
+  period_key  TEXT    NOT NULL,
+  used        INTEGER NOT NULL DEFAULT 0,
+  updated_at  INTEGER NOT NULL,
+  PRIMARY KEY (user_id, period, period_key),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
 CREATE INDEX IF NOT EXISTS idx_fav_lists_user ON fav_lists(user_id);
 CREATE INDEX IF NOT EXISTS idx_favorites_user ON favorites(user_id);
 CREATE INDEX IF NOT EXISTS idx_users_email    ON users(email);
@@ -88,3 +108,4 @@ CREATE INDEX IF NOT EXISTS idx_login_events_user_day ON login_events(user_id, da
 CREATE INDEX IF NOT EXISTS idx_page_events_day ON page_events(day);
 CREATE INDEX IF NOT EXISTS idx_page_events_session_day ON page_events(session_id, day);
 CREATE INDEX IF NOT EXISTS idx_page_events_visitor_day ON page_events(visitor_id, day);
+CREATE INDEX IF NOT EXISTS idx_pick_usage_user_period ON pick_usage(user_id, period, period_key);

@@ -4265,25 +4265,43 @@
       const query = input.value.trim();
       if (!query) { status.textContent = T('请输入内容','Please enter a query'); return; }
 
-      // ── Daily usage limit (localStorage) ──
-      // Bypass: owner email hardcoded
-      const OWNER_EMAIL = 'jiantaoweng@gmail.com';
-      const isUnlocked = localStorage.getItem('ailatest_unlocked') === '1'
-        || (user && (user.email === OWNER_EMAIL || user.login === OWNER_EMAIL || user.name === OWNER_EMAIL));
-      if (!isUnlocked) {
-        const today = new Date().toISOString().slice(0,10);
-        const limitKey = 'ailatest.pick.count';
-        let dailyData;
-        try { dailyData = JSON.parse(localStorage.getItem(limitKey) || '{}'); } catch(e) { dailyData = {}; }
-        if (dailyData.date !== today) { dailyData = { date: today, count: 0 }; }
-        if (dailyData.count >= 5) {
-          status.textContent = T('今日免费次数已用完，购买解锁无限使用 → support@ailatest.org','Daily limit reached. Purchase unlimited → support@ailatest.org');
+      if (!user || !user.token) {
+        status.textContent = T('请先登录/注册后使用推荐期刊功能', 'Please sign in or create an account to use journal recommendations');
+        results.innerHTML = `<div class="pick-no-results" style="padding:40px 20px">
+          <p>${T('推荐期刊需要登录账号，每个账号拥有独立使用额度。','Journal recommendations require an account. Each account has its own quota.')}</p>
+          <button class="btn primary" id="pick-login-btn" type="button">${T('登录 / 注册','Sign in / Sign up')}</button>
+        </div>`;
+        document.getElementById('pick-login-btn')?.addEventListener('click', startLogin);
+        return;
+      }
+
+      let quotaInfo = null;
+      try {
+        const quotaResp = await fetch(`${API_BASE}/pick/quota/consume`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${user.token}` },
+        });
+        quotaInfo = await readJsonResponse(quotaResp, T('额度检查失败','Quota check failed'));
+      } catch (err) {
+        const msg = err.message || '';
+        if (/login required|unauthorized|401/i.test(msg)) {
+          status.textContent = T('登录已过期，请重新登录后使用推荐期刊功能','Your session has expired. Please sign in again to use journal recommendations');
           results.innerHTML = `<div class="pick-no-results" style="padding:40px 20px">
-            <p>${T('免费用户每天限 5 次搜索','Free: 5 searches/day')}</p>
-            <p>${T('联系 support@ailatest.org 购买解锁无限使用','Contact support@ailatest.org to unlock unlimited use')}</p>
+            <button class="btn primary" id="pick-login-btn" type="button">${T('重新登录','Sign in again')}</button>
+          </div>`;
+          document.getElementById('pick-login-btn')?.addEventListener('click', startLogin);
+          return;
+        }
+        if (/quota exceeded|429/i.test(msg)) {
+          status.textContent = T('今日免费推荐次数已用完，可升级后继续使用','Daily free recommendation quota used up. Upgrade to continue');
+          results.innerHTML = `<div class="pick-no-results" style="padding:40px 20px">
+            <p>${T('免费账号每天 5 次；付费账号可配置更高月额度。','Free accounts get 5 searches per day. Paid accounts can receive a higher monthly quota.')}</p>
+            <p>${T('联系 support@ailatest.org 升级额度','Contact support@ailatest.org to upgrade your quota')}</p>
           </div>`;
           return;
         }
+        status.textContent = fetchFailureMessage(err, T('额度检查','Quota check'));
+        return;
       }
 
       status.textContent = T('正在搜索相关论文…','Searching related papers…');
@@ -4710,17 +4728,10 @@
           });
         }
 
-        status.textContent = `${T('已发表','Published')} ${allWorks.length} ${T('篇相关论文','related papers')}，${T('分布在','in')} ${journalMap.size} ${T('个期刊','journals')}，${T('推荐','recommended')} ${filtered.length} ${T('个','')}`;
-        // Increment daily counter (only for non-unlocked users)
-        if (!isUnlocked) {
-          const today = new Date().toISOString().slice(0,10);
-          const limitKey = 'ailatest.pick.count';
-          let dailyData;
-          try { dailyData = JSON.parse(localStorage.getItem(limitKey) || '{"date":"","count":0}'); } catch(e) { dailyData = {date:'',count:0}; }
-          if (dailyData.date !== today) { dailyData = { date: today, count: 0 }; }
-          dailyData.count++;
-          localStorage.setItem(limitKey, JSON.stringify(dailyData));
-        }
+        const quotaText = quotaInfo && quotaInfo.remaining != null
+          ? T(`，剩余额度 ${quotaInfo.remaining}/${quotaInfo.limit}`, `, quota left ${quotaInfo.remaining}/${quotaInfo.limit}`)
+          : '';
+        status.textContent = `${T('已发表','Published')} ${allWorks.length} ${T('篇相关论文','related papers')}，${T('分布在','in')} ${journalMap.size} ${T('个期刊','journals')}，${T('推荐','recommended')} ${filtered.length} ${T('个','')}${quotaText}`;
         // ── Save to search history ──
         savePickHistory(query);
       } catch (e) {
