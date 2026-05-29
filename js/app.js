@@ -4263,6 +4263,24 @@
     const input = $('#pick-input');
     const results = $('#pick-results');
     const status = $('#pick-status');
+    const quotaEl = $('#pick-quota');
+
+    // ── Show daily quota ──
+    (function updateQuota() {
+      const OWNER_EMAIL = 'jiantaoweng@gmail.com';
+      const isOwner = localStorage.getItem('ailatest_unlocked') === '1'
+        || (user && (user.email === OWNER_EMAIL || user.login === OWNER_EMAIL || user.name === OWNER_EMAIL));
+      if (isOwner) {
+        quotaEl.textContent = T('无限次使用（已解锁）','Unlimited (unlocked)');
+        return;
+      }
+      const today = new Date().toISOString().slice(0,10);
+      let dailyData;
+      try { dailyData = JSON.parse(localStorage.getItem('ailatest.pick.count') || '{}'); } catch(e) { dailyData = {}; }
+      const used = dailyData.date === today ? dailyData.count : 0;
+      const remaining = Math.max(0, 5 - used);
+      quotaEl.textContent = T(`每日 ${remaining} / 5 次剩余`,`${remaining} / 5 searches remaining`);
+    })();
 
     async function doSearch() {
       const query = input.value.trim();
@@ -4707,6 +4725,7 @@
           if (dailyData.date !== today) { dailyData = { date: today, count: 0 }; }
           dailyData.count++;
           localStorage.setItem(limitKey, JSON.stringify(dailyData));
+          quotaEl.textContent = T(`每日 ${Math.max(0,5-dailyData.count)} / 5 次剩余`,`${Math.max(0,5-dailyData.count)} / 5 searches remaining`);
         }
         // ── Save to search history ──
         savePickHistory(query);
