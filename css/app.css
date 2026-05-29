@@ -1359,7 +1359,6 @@ td.empty,
 
 /* sidebar drawer toggle (mobile only) */
 .side-toggle {
-  display: none;
   background: transparent;
   border: 1px solid var(--rule);
   border-radius: 2px;
