@@ -306,27 +306,26 @@ main.main {
 }
 .tab {
   font-family: var(--serif);
-  padding: 12px 20px 10px;
+  padding: 14px 24px 12px;
   background: transparent;
   border: 0;
   color: var(--ink-faint);
   cursor: pointer;
   letter-spacing: 0.03em;
-  border-bottom: 2px solid transparent;
+  border-bottom: 3px solid transparent;
   margin-bottom: -2px;
-  transition: all .15s;
-  display: flex; flex-direction: column; align-items: center; gap: 2px;
-  min-width: 90px;
+  transition: all .2s;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  min-width: 100px;
+  position: relative;
 }
-.tab:hover { color: var(--accent); }
+.tab:hover { color: var(--accent); background: rgba(180,83,31,.04); }
 .tab.active {
   color: var(--ink);
   border-bottom-color: var(--accent);
 }
-.tab .tab-icon { font-size: 18px; line-height: 1.2; }
-.tab .tab-label { font-size: 15px; font-weight: 600; line-height: 1.3; }
-.tab .tab-desc { font-size: 11px; font-weight: 400; color: var(--ink-faint); opacity: 0.7; line-height: 1.2; }
-.tab.active .tab-desc { opacity: 1; color: var(--ink-soft); }
+.tab .tab-icon { font-size: 22px; line-height: 1.2; }
+.tab .tab-label { font-size: 16px; font-weight: 700; line-height: 1.3; letter-spacing: 0.06em; }
 
 /* Sub-navigation bar */
 .subnav {
@@ -1381,8 +1380,9 @@ td.empty,
   /* 搜索框放最上面：topbar 排 1，tabs 排 2 */
   main.main .topbar { order: 1; margin-bottom: 12px; }
   main.main .tabs   { order: 2; margin: 0 -16px 14px; padding: 0 16px; overflow-x: auto; gap: 2px; }
-  main.main .tab    { min-width: 76px; padding: 10px 12px 8px; }
-  main.main .tab .tab-desc { font-size: 10px; }
+  main.main .tab    { min-width: 76px; padding: 10px 14px 8px; }
+  main.main .tab .tab-icon { font-size: 18px; }
+  main.main .tab .tab-label { font-size: 14px; letter-spacing: 0.04em; }
   main.main .tab-panel { order: 3; }
   main.main .site-foot { order: 4; }
   .side-toggle { display: inline-flex; align-items: center; justify-content: center; }
