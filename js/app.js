@@ -4243,7 +4243,14 @@
 
   // ───────── pick-for-me (journal recommendation) ─────────
   let _pickInit = false;
-  const OA_API = 'https://api.openalex.org';
+  const OPENALEX_WORKS_ENDPOINT = location.hostname === 'localhost'
+    ? `${API_BASE}/openalex`
+    : `${location.origin}/openalex`;
+
+  function openAlexWorksUrl(params) {
+    const qs = params instanceof URLSearchParams ? params.toString() : String(params || '');
+    return `${OPENALEX_WORKS_ENDPOINT}?${qs}`;
+  }
 
   function initPickTool() {
     if (_pickInit) return;
@@ -4388,13 +4395,19 @@
         status.textContent = T('正在搜索相关论文…','Searching related papers…');
         const SEARCH_FIELDS = 'id,title,publication_date,primary_location,relevance_score';
         const FIVE_YEARS_AGO = new Date(Date.now() - 5*365*24*60*60*1000).toISOString().slice(0,10);
-        const DATE_FILTER = `&filter=from_publication_date:${FIVE_YEARS_AGO}`;
         let openAlexErrorStatus = null;
         const rememberOpenAlexError = (statusCode) => {
           if (statusCode === 429 || !openAlexErrorStatus) openAlexErrorStatus = statusCode;
         };
         const queryBatches = await Promise.all(queries.slice(0, 3).map(async (q) => {
-          const url = `https://api.openalex.org/works?search=${encodeURIComponent(q.slice(0,120))}&per_page=30&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
+          const params = new URLSearchParams({
+            search: q.slice(0, 120),
+            per_page: '30',
+            sort: 'relevance_score:desc',
+            select: SEARCH_FIELDS,
+          });
+          params.set('filter', `from_publication_date:${FIVE_YEARS_AGO}`);
+          const url = openAlexWorksUrl(params);
           try {
             const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
             if (!r.ok) {
@@ -4425,7 +4438,14 @@
         // If too few results, try a broader backup query
         if (allWorks.length < 8) {
           const backup = uniqueWords.slice(0, 5).join(' ');
-          const url = `https://api.openalex.org/works?search=${encodeURIComponent(backup)}&per_page=30&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
+          const params = new URLSearchParams({
+            search: backup,
+            per_page: '30',
+            sort: 'relevance_score:desc',
+            select: SEARCH_FIELDS,
+          });
+          params.set('filter', `from_publication_date:${FIVE_YEARS_AGO}`);
+          const url = openAlexWorksUrl(params);
           try {
             const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
             if (r.ok) {
@@ -4444,7 +4464,14 @@
           const chn = titleTerms[0].replace(/[a-zA-Z0-9\s]/g, '').replace(/[，。、；：！？（）【】《》""''\s]/g, '');
           if (chn) {
             const cnQuery = chn.slice(0, 12);
-            const url = `https://api.openalex.org/works?search=${encodeURIComponent(cnQuery)}&per_page=20&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`;
+            const params = new URLSearchParams({
+              search: cnQuery,
+              per_page: '20',
+              sort: 'relevance_score:desc',
+              select: SEARCH_FIELDS,
+            });
+            params.set('filter', `from_publication_date:${FIVE_YEARS_AGO}`);
+            const url = openAlexWorksUrl(params);
             try {
               const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
               if (r.ok) { const d = await r.json(); for (const w of (d.results||[])) { if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); } } }
@@ -4457,9 +4484,10 @@
           && uniqueWords.filter(w => w.length > 4).length < 2 && !explicitKeywords.length;
         if (!allWorks.length) {
           if (openAlexErrorStatus) {
-            status.textContent = openAlexErrorStatus === 429
-              ? T('OpenAlex：Too Many Requests（429），请稍后再试', 'OpenAlex: Too Many Requests (429), please try again later')
-              : T(`OpenAlex 请求失败（${openAlexErrorStatus}），请稍后再试`, `OpenAlex request failed (${openAlexErrorStatus}), please try again later`);
+            status.textContent = T(
+              `OpenAlex 暂时不可用（${openAlexErrorStatus}），请稍后再试`,
+              `OpenAlex is temporarily unavailable (${openAlexErrorStatus}), please try again later`
+            );
             return;
           }
           status.textContent = hasCnOnly
