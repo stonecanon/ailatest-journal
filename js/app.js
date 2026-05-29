@@ -4481,7 +4481,7 @@
 
         // Q1: Explicit keywords (if present) — these are the most reliable signal
         if (explicitKeywords.length) {
-          const q = explicitKeywords.slice(0, 8).join(' ');
+          const q = explicitKeywords.slice(0, 5).join(' ');
           if (encodeURIComponent(q).length < MAX_URL) queries.push(q);
         }
 
@@ -4489,7 +4489,7 @@
         const titleLower = (titleTerms[0]||'').toLowerCase().replace(/[^a-z\s-]/g, '').replace(/-/g, ' ');
         const titleKws = titleLower.split(/\s+/).filter(w => w.length > 3 && !stopWords.has(w));
         if (titleKws.length >= 2) {
-          const q = titleKws.slice(0, 15).join(' ');
+          const q = titleKws.slice(0, 8).join(' ');
           if (encodeURIComponent(q).length < MAX_URL && !queries.some(x => x.toLowerCase().includes(q.slice(0,15)))) {
             queries.push(q);
           }
@@ -4498,7 +4498,7 @@
         // Q3: Body-derived technical terms (methods, algorithms, sensors, etc.)
         // Pick words that are ≥5 chars (more specific), not already covered by Q1/Q2
         const covered = queries.join(' ').toLowerCase();
-        const bodyKws = uniqueWords.filter(w => w.length >= 4 && !covered.includes(w)).slice(0, 10);
+        const bodyKws = uniqueWords.filter(w => w.length >= 4 && !covered.includes(w)).slice(0, 5);
         if (bodyKws.length >= 3) {
           const q = bodyKws.join(' ');
           if (encodeURIComponent(q).length < MAX_URL) queries.push(q);
@@ -4522,7 +4522,7 @@
         const DATE_FILTER = `&filter=from_publication_date:${FIVE_YEARS_AGO}`;
         const queryBatches = await Promise.all(queries.slice(0, 2).map(async (q) => {
           const searchQ = q.slice(0,120);
-          const r = await openAlexFetch(`works?search=${encodeURIComponent(searchQ)}&per_page=200&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`);
+          const r = await openAlexFetch(`works?search=${encodeURIComponent(searchQ)}&per_page=80&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`);
           if (!r.ok) {
             console.error('OpenAlex query failed:', r.errorMsg);
             status.textContent = T('搜索失败：','Search failed: ') + r.errorMsg;
@@ -4541,30 +4541,8 @@
           }
         }
 
-        // If too few results, try a broader backup query
-        if (allWorks.length < 8) {
-          const backup = uniqueWords.slice(0, 8).join(' ');
-          const r = await openAlexFetch(`works?search=${encodeURIComponent(backup)}&per_page=200&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`);
-          if (r.ok) {
-            for (const w of (r.data || [])) {
-              if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); }
-            }
-          }
-        }
-
-        // Chinese fallback: if still nothing and has Chinese, try short Chinese title
-        if (allWorks.length < 3 && titleTerms[0]) {
-          const chn = titleTerms[0].replace(/[a-zA-Z0-9\s]/g, '').replace(/[，。、；：！？（）【】《》""''\s]/g, '');
-          if (chn) {
-            const cnQuery = chn.slice(0, 12);
-            const r = await openAlexFetch(`works?search=${encodeURIComponent(cnQuery)}&per_page=200&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`);
-            if (r.ok) {
-              for (const w of (r.data || [])) {
-                if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); }
-              }
-            }
-          }
-        }
+        // No backup query — primary queries are sufficient with per_page=80
+        // No Chinese fallback — OpenAlex Chinese search is unreliable
 
         const hasCnOnly = [...query].filter(c => c >= '\u4e00' && c <= '\u9fff').length > 0
           && uniqueWords.filter(w => w.length > 4).length < 2 && !explicitKeywords.length;
@@ -4652,7 +4630,7 @@
         // Step 4: Filter and sort
         let filtered = entries;
         // Exclude single-paper journals (noise from broad queries)
-        filtered = filtered.filter(e => e.count >= 1);
+        filtered = filtered.filter(e => e.count >= 2);
         const ifMin = parseFloat(document.getElementById('pick-if-min')?.value || '0');
         if (document.getElementById('pick-filter-if')?.checked && ifMin > 0) {
           filtered = filtered.filter(e => e.if != null && e.if >= ifMin);
@@ -4762,8 +4740,7 @@
 
           const cardZoneClass = e.zone ? ` zone-${e.zone}` : '';
 
-          const hl = scorePct >= 60 ? " pick-card-highlight" : scorePct >= 40 ? " pick-card-mid" : "";
-          return `<div class="pick-card${cardZoneClass}${hl}" data-issn="${escape(issnStr)}">
+          return `<div class="pick-card${cardZoneClass}" data-issn="${escape(issnStr)}">
             ${zoneTagsHtml ? `<div class="pick-zone-tags">${zoneTagsHtml}</div>` : ''}
             <h3><a href="#j/${escape(e.journalRec ? favId(e.journalRec) : issnStr)}">${escape(name)}</a></h3>
             ${pubBadge || multiBadge ? `<div class="pick-name-tags">${pubBadge}${multiBadge}</div>` : ''}
