@@ -705,6 +705,9 @@
   let activeTab = 'int';
   let activeCat = '__all';   // ESI subject filter (legacy name)
   let activeCasMajor = '__all'; // CAS 大类 filter
+  let activeIdxFilter = '__all'; // 索引快捷筛选
+  let activeTierFilter = '__all'; // 分区快捷筛选
+  let activeExtraFilter = '__all'; // 附加筛选
   let activeIndices = new Set(['SCIE','SSCI','AHCI','ESCI','EI']);
   let activeZones = new Set();
   let activeJcr = new Set();
@@ -1918,6 +1921,23 @@
     if (activeFeats.has('abs')  && !(r.abs  && r.abs.rating))  return false;
     if (activeCat !== '__all' && r.esi_category !== activeCat) return false;
     if (activeCasMajor !== '__all' && (r.cas_major_cn || '') !== activeCasMajor) return false;
+    if (activeIdxFilter !== '__all' && !(r.indices || []).includes(activeIdxFilter)) return false;
+    if (activeTierFilter !== '__all') {
+      const q = (r.if_quartile || '').toUpperCase();
+      const z = r.cas_zone != null ? String(r.cas_zone) : '';
+      const isTop = !!r.cas_top;
+      let tierMatch = false;
+      if (activeTierFilter.startsWith('Q') && q === activeTierFilter) tierMatch = true;
+      else if (activeTierFilter === 'top' && isTop) tierMatch = true;
+      else if (['1','2','3','4'].includes(activeTierFilter) && z === activeTierFilter) tierMatch = true;
+      if (!tierMatch) return false;
+    }
+    if (activeExtraFilter !== '__all') {
+      if (activeExtraFilter === 'scopus' && !(r.scopus && r.scopus.active)) return false;
+      if (activeExtraFilter === 'oaj' && !r.oaj) return false;
+      if (activeExtraFilter === 'doaj' && !r.doaj) return false;
+      if (activeExtraFilter === 'warning' && !r.warning) return false;
+    }
     if (activeWos.size) {
       const wc = r.wos_categories || [];
       let ok = false;
@@ -2093,6 +2113,19 @@
         renderInt();
       });
     }
+    // 题头快捷筛选：索引、分区、附加
+    ['idx-col-filter','tier-col-filter','extra-col-filter'].forEach(id => {
+      const sel = $(`#${id}`);
+      if (!sel || sel.__bound) return;
+      sel.__bound = true;
+      sel.addEventListener('change', () => {
+        if (id === 'idx-col-filter') activeIdxFilter = sel.value;
+        else if (id === 'tier-col-filter') activeTierFilter = sel.value;
+        else activeExtraFilter = sel.value;
+        shown = PAGE;
+        renderInt();
+      });
+    });
   }
 
 
