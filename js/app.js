@@ -4732,11 +4732,11 @@
           }
 
           // Compute score color for the score bar and strip
-          const barColor = scorePct >= 80 ? '#1a8b3c'
-            : scorePct >= 60 ? '#2d9d5e'
-            : scorePct >= 40 ? '#d4a017'
-            : scorePct >= 20 ? '#5a8fc9'
-            : '#8e9aaf';
+          const barColor = scorePct >= 80 ? '#1a3a5f'
+            : scorePct >= 60 ? '#2d5a8e'
+            : scorePct >= 40 ? '#5a8ab5'
+            : scorePct >= 20 ? '#8ab5d4'
+            : '#b8d4e8';
 
           const cardZoneClass = e.zone ? ` zone-${e.zone}` : '';
 
