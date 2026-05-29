@@ -4505,6 +4505,50 @@
           queries.push(uniqueWords.slice(0, 6).join(' '));
         }
 
+        // ── Synonym expansion: add related terms to broaden recall ──
+        const SYNONYMS = {
+          'detection': ['detection', 'estimation', 'recognition', 'identification'],
+          'estimation': ['estimation', 'detection', 'prediction', 'forecasting'],
+          'prediction': ['prediction', 'estimation', 'forecasting', 'detection'],
+          'occupancy': ['occupancy', 'occupant', 'occupation', 'crowd'],
+          'machine': ['machine', 'deep', 'neural'],
+          'learning': ['learning', 'network', 'networks'],
+          'indoor': ['indoor', 'indoor', 'building', 'indoor environment'],
+          'building': ['building', 'buildings', 'indoor', 'construction'],
+          'sensor': ['sensor', 'sensors', 'sensing', 'monitoring', 'measurement'],
+          'energy': ['energy', 'power', 'consumption'],
+          'evaluation': ['evaluation', 'assessment', 'analysis', 'measurement'],
+          'explainable': ['explainable', 'interpretable', 'transparent'],
+          'non-invasive': ['noninvasive', 'non-invasive', 'contactless', 'unobtrusive'],
+          'classification': ['classification', 'recognition', 'identification', 'detection'],
+          'optimization': ['optimization', 'optimisation', 'improvement'],
+          'performance': ['performance', 'accuracy', 'efficiency'],
+          'monitoring': ['monitoring', 'sensing', 'detection', 'tracking'],
+          'model': ['model', 'models', 'modeling', 'modelling', 'approach'],
+          'data': ['data', 'dataset', 'datasets', 'information'],
+        };
+        // Collect all keyword tokens again for synonym expansion (lowercase)
+        const allKeyTokens = [...new Set([
+          ...explicitKeywords.flatMap(k => k.toLowerCase().split(/[\s,-]+/).filter(w => w.length > 2)),
+          ...titleKws.map(w => w.toLowerCase()),
+          ...bodyKws.map(w => w.toLowerCase()),
+          ...uniqueWords.map(w => w.toLowerCase()),
+        ])].filter(w => w.length > 2);
+        // Build synonym-expanded token set
+        const expandedTokens = new Set(allKeyTokens);
+        for (const tok of allKeyTokens) {
+          const syns = SYNONYMS[tok];
+          if (syns && syns.length > 1) {
+            syns.forEach(s => { if (s !== tok) expandedTokens.add(s); });
+          }
+        }
+        // Build a synonym query from the expanded set (skip duplicates with existing queries)
+        const synQuery = [...expandedTokens].slice(0, 15).join(' ');
+        const synQueryShort = synQuery.slice(0, 30);
+        if (!queries.some(q => q.toLowerCase().includes(synQueryShort))) {
+          queries.push(synQuery);
+        }
+
         // Collect all search keyword tokens for title matching
         const searchKeywords = new Set();
         [...explicitKeywords, ...titleKws, ...bodyKws, ...uniqueWords].forEach(k => {
@@ -4516,7 +4560,7 @@
         const SEARCH_FIELDS = 'id,title,publication_date,primary_location,relevance_score';
         const FIVE_YEARS_AGO = new Date(Date.now() - 5*365*24*60*60*1000).toISOString().slice(0,10);
         const DATE_FILTER = `&filter=from_publication_date:${FIVE_YEARS_AGO}`;
-        const queryBatches = await Promise.all(queries.slice(0, 2).map(async (q) => {
+        const queryBatches = await Promise.all(queries.slice(0, 3).map(async (q) => {
           const searchQ = q.slice(0,120);
           const r = await openAlexFetch(`works?search=${encodeURIComponent(searchQ)}&per_page=100&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`);
           if (!r.ok) {
