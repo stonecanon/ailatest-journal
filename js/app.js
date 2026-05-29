@@ -4673,7 +4673,8 @@
           const cardZoneClass = e.zone ? ` zone-${e.zone}` : '';
           const zoneStripStyle = zoneColor ? `style="background:${zoneColor}"` : '';
 
-          return `<div class="pick-card${cardZoneClass}" data-issn="${escape(issnStr)}">
+          const hl = scorePct >= 60 ? " pick-card-highlight" : scorePct >= 40 ? " pick-card-mid" : "";
+          return `<div class="pick-card${cardZoneClass}${hl}" data-issn="${escape(issnStr)}">
             ${zoneColor ? `<div class="pick-zone-strip" ${zoneStripStyle}></div>` : ''}
             ${zoneTagsHtml ? `<div class="pick-zone-tags">${zoneTagsHtml}</div>` : ''}
             <h3><a href="#j/${escape(e.journalRec ? favId(e.journalRec) : issnStr)}">${escape(name)}</a></h3>

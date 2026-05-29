@@ -2316,6 +2316,10 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 [data-theme="dark"] .pick-card.zone-2 { background:linear-gradient(135deg, #1e2230 0%, #1c1c2a 100%) }
 .pick-card .pick-stripe { display:none }
 .pick-card:hover { background:var(--hover-bg,var(--bg)); box-shadow:0 2px 12px rgba(0,0,0,.1) }
+.pick-card-highlight { background:linear-gradient(135deg, #f0f8f0 0%, #e6f3e6 100%) !important; border-left:3px solid #2a8b4a; }
+.pick-card-mid { background:linear-gradient(135deg, #f8f4e8 0%, #f5f0e0 100%) !important; }
+[data-theme="dark"] .pick-card-highlight { background:linear-gradient(135deg, #1a2e1a 0%, #1c3a1c 100%) !important; border-left:3px solid #3aaa5a; }
+[data-theme="dark"] .pick-card-mid { background:linear-gradient(135deg, #2e2a1a 0%, #3a3420 100%) !important; }
 .pick-card h3 { margin:0 0 4px; font-size:17px; line-height:1.4; font-weight:700 }
 .pick-card h3 a { color:var(--fg); text-decoration:none }
 .pick-card h3 a:hover { color:var(--accent) }
