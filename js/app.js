@@ -4740,7 +4740,7 @@
 
           const cardZoneClass = e.zone ? ` zone-${e.zone}` : '';
 
-          return `<div class="pick-card${cardZoneClass}" data-issn="${escape(issnStr)}">
+          return `<div class="pick-card${cardZoneClass}" style="border-left:4px solid ${barColor}" data-issn="${escape(issnStr)}">
             ${zoneTagsHtml ? `<div class="pick-zone-tags">${zoneTagsHtml}</div>` : ''}
             <h3><a href="#j/${escape(e.journalRec ? favId(e.journalRec) : issnStr)}">${escape(name)}</a></h3>
             ${pubBadge || multiBadge ? `<div class="pick-name-tags">${pubBadge}${multiBadge}</div>` : ''}
