@@ -1489,7 +1489,7 @@ td.empty,
   main.main .topbar     { order: 2; margin-bottom: 14px; }
   main.main .tab    { flex: 1 1 0; min-width: 0; padding: 10px 4px 8px; }
   main.main .tab .tab-icon { font-size: 20px; }
-  main.main .tab .tab-label { font-size: 15px; letter-spacing: 0.04em; }
+  main.main .tab .tab-label { font-size: 12px; letter-spacing: 0.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   main.main .tab-panel { order: 3; }
   main.main .site-foot { order: 5; }
   .topbar {
@@ -1522,8 +1522,7 @@ td.empty,
 
 @media (max-width: 480px) {
   main.main .tabs {
-    flex-wrap: wrap;
-    overflow-x: visible;
+    overflow-x: auto;
     row-gap: 8px;
     padding-bottom: 6px;
   }
