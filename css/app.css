@@ -98,28 +98,45 @@ a:hover { border-bottom-color: var(--accent); }
 
 /* ─────────── Layout ─────────── */
 body {
-  display: flex;
-  max-width: 1260px;
-  min-height: 100vh;
+  display: block;
+  max-width: 1000px;
   margin: 0 auto;
 }
 
 #sidebar {
   position: sticky;
   top: 0;
-  width: 240px;
-  flex-shrink: 0;
+  width: 220px;
   height: 100vh;
   background: var(--paper-soft);
   border-right: 1px solid var(--rule);
-  padding: 20px 16px 24px;
+  padding: 20px 14px 24px;
   overflow-y: auto;
   overflow-x: hidden;
   font-size: 12px;
-  transform: none;
-  box-shadow: none;
+  box-sizing: border-box;
 }
-#sidebar.open { transform: none; }
+/* desktop: sidebar in left column via grid */
+@media (min-width: 901px) {
+  main.main {
+    max-width: 1240px;
+    display: grid;
+    grid-template-columns: 220px 1fr;
+  }
+  #sidebar {
+    grid-column: 1;
+    grid-row: 1 / -1;
+    width: 220px;
+    position: sticky;
+    top: 0;
+    align-self: start;
+  }
+  #sidebar.open { transform: none; }
+  main.main > *:not(#sidebar) {
+    grid-column: 2;
+    min-width: 0;
+  }
+}
 #sidebar .side-section {
   margin-bottom: 16px;
 }
@@ -415,8 +432,7 @@ main.main {
   display: flex; align-items: center; gap: 8px;
 }
 .lang-toggle,
-.auth-btn,
-.fav-tab {
+.auth-btn {
   font-family: var(--serif); font-size: 13px;
   background: transparent; border: 1px solid var(--rule);
   padding: 6px 12px; border-radius: 2px;
@@ -425,8 +441,7 @@ main.main {
   white-space: nowrap;
 }
 .lang-toggle:hover,
-.auth-btn:hover,
-.fav-tab:hover { border-color: var(--accent); color: var(--accent); }
+.auth-btn:hover { border-color: var(--accent); color: var(--accent); }
 
 /* 语言切换下拉菜单 */
 .lang-toggle-wrap { position: relative; display: inline-block; }
@@ -457,22 +472,6 @@ main.main {
 .lang-dropdown button .lang-code { font-size: 11px; opacity: 0.6; font-family: var(--sans); min-width: 24px; text-align: center; }
 @media (max-width: 720px) {
   .lang-dropdown { right: auto; left: 0; }
-}
-.fav-tab {
-  color: var(--accent);
-  border-color: var(--rule);
-}
-.fav-tab #fav-count {
-  display: inline-block;
-  min-width: 18px;
-  padding: 1px 5px;
-  font-family: var(--mono);
-  font-size: 10px;
-  margin-left: 2px;
-  background: var(--accent);
-  color: var(--paper);
-  border-radius: 9px;
-  line-height: 1.2;
 }
 
 /* favorite star button on row — 淡雅米色调，与主题一致 */
@@ -1381,11 +1380,6 @@ td.empty,
 
 /* responsive */
 @media (max-width: 900px) {
-  body {
-    display: block;
-    max-width: 100%;
-    min-height: auto;
-  }
   #sidebar {
     position: fixed;
     top: 0; left: 0;
@@ -1416,7 +1410,7 @@ td.empty,
   main.main .tab .tab-label { font-size: 14px; letter-spacing: 0.04em; }
   main.main .tab-panel { order: 3; }
   main.main .site-foot { order: 5; }
-  .lang-toggle, .auth-btn, .fav-tab {
+  .lang-toggle, .auth-btn {
     padding: 6px 10px;
     font-size: 12px;
     height: 32px;
