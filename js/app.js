@@ -4505,35 +4505,6 @@
           queries.push(uniqueWords.slice(0, 6).join(' '));
         }
 
-        // ── Phrase query: detect important 2-word terms and wrap in quotes ──
-        // This forces OpenAlex exact phrase match, dramatically improving precision.
-        const inputAll = [(titleTerms[0]||''), bodyText, ...explicitKeywords].join(' ').toLowerCase();
-        // Find consecutive word pairs where both words are ≥4 chars and not stop words
-        const words = inputAll.replace(/[^a-z0-9\s-]/g, ' ').split(/\s+/).filter(w => w.length > 3 && !stopWords.has(w) && !/^\d+$/.test(w));
-        const phraseSet = new Set();
-        for (let i = 0; i < words.length - 1; i++) {
-          const pair = words[i] + ' ' + words[i + 1];
-          // Only keep phrases where the pair appears at least twice in input or both words are ≥5 chars
-          const wordCount = inputAll.split(pair).length - 1;
-          if (wordCount >= 1 && words[i].length >= 4 && words[i+1].length >= 4) {
-            phraseSet.add(pair);
-          }
-        }
-        // Also add explicit keyword pairs as phrases
-        for (const ek of explicitKeywords) {
-          const ekWords = ek.split(/\s+/);
-          if (ekWords.length >= 2) {
-            phraseSet.add(ek.toLowerCase());
-          }
-        }
-        const phrases = [...phraseSet].slice(0, 4); // max 4 phrases
-        if (phrases.length) {
-          const phraseQuery = phrases.map(p => `"${p}"`).join(' ') + ' ' + uniqueWords.slice(0, 4).join(' ');
-          if (encodeURIComponent(phraseQuery).length < MAX_URL) {
-            queries.unshift(phraseQuery); // put phrase query first (highest priority)
-          }
-        }
-
         // Collect all search keyword tokens for title matching
         const searchKeywords = new Set();
         [...explicitKeywords, ...titleKws, ...bodyKws, ...uniqueWords].forEach(k => {
@@ -4547,7 +4518,7 @@
         const DATE_FILTER = `&filter=from_publication_date:${FIVE_YEARS_AGO}`;
         const queryBatches = await Promise.all(queries.slice(0, 2).map(async (q) => {
           const searchQ = q.slice(0,120);
-          const r = await openAlexFetch(`works?search=${encodeURIComponent(searchQ)}&per_page=80&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`);
+          const r = await openAlexFetch(`works?search=${encodeURIComponent(searchQ)}&per_page=100&sort=relevance_score:desc&select=${SEARCH_FIELDS}${DATE_FILTER}`);
           if (!r.ok) {
             console.error('OpenAlex query failed:', r.errorMsg);
             status.textContent = T('搜索失败：','Search failed: ') + r.errorMsg;
