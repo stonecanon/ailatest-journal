@@ -43,3 +43,4 @@ data/journals.json.bak_*
 # Track only .gz version for CF Pages 25MB limit; keep .json locally
 !data/journals.json.gz
 data/journals.json
+*.err.log
