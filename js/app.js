@@ -3514,12 +3514,11 @@
 
     // 单一有序表格 + 拖动
     const tbody = rows.map(r => renderFavRow(r)).join('');
-    const hint = activeQuery ? '' : `<div class="fav-drag-hint">${T('按住','Hold')} <span class="drag-ico">⋮⋮</span> ${T('拖动排序 · 长按手机端同样支持','to drag-reorder · long-press on mobile')}</div>`;
+    const hint = activeQuery ? '' : `<div class="fav-drag-hint">${T('拖动期刊名可排序 · 长按手机端同样支持','Drag journal name to reorder · long-press on mobile')}</div>`;
     box.innerHTML = toolbar + hint + `
       <div class="table-wrap" style="margin-top:10px">
         <table class="journals fav-table">
           <thead><tr>
-            <th class="col-drag" style="width:28px"></th>
             <th class="col-fav" aria-label="Favorite"></th>
             <th class="col-name">${T('期刊 Title','Journal Title')}</th>
             <th class="col-badge">${T('索引 / 分区','Indices / Tier')}</th>
@@ -3539,7 +3538,7 @@
       const tb = document.getElementById('fav-tbody');
       if (tb) {
         Sortable.create(tb, {
-          handle: '.drag-handle',
+          handle: '.col-name',
           animation: 150,
           delay: 200,          // 手机端长按触发
           delayOnTouchOnly: true,
@@ -4069,7 +4068,6 @@
     const ifVal = (r.if_2024 != null) ? (+r.if_2024).toFixed(1) : '';
     const ifCell = ifVal ? `<span class="if-cell">${ifVal}</span>` : '<span class="muted-cell">—</span>';
     return `<tr class="j-row clickable" data-fid="${escape(fid)}" data-src="${escape(r.__src)}">
-      <td class="col-drag"><span class="drag-handle" title="${T('拖动排序','Drag to reorder')}">⋮⋮</span></td>
       <td class="col-fav">${starBtn(r, r.__src)}</td>
       <td class="col-name">${nameHtml}</td>
       <td class="col-badge col-badge-split">${badgeCell}</td>
@@ -4359,7 +4357,6 @@
     // 行点击 → 详情抽屉
     document.addEventListener('click', (e) => {
       if (e.target.closest('.fav-star')) return;
-      if (e.target.closest('.drag-handle')) return;
       const row = e.target.closest('tr.j-row.clickable'); if (!row) return;
       const fid = row.dataset.fid;
       const rec = rowRecordsByFid[fid] || journals.find(r => favId(r) === fid) || favsData[fid];
