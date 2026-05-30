@@ -4203,7 +4203,7 @@
         return;
       }
 
-      // Build table similar to int panel but simpler
+      // Build table — same columns as int tab for consistent spacing
       let html = `<div class="results-head" style="margin-bottom:8px">
         <span class="results-count">${t('showing')} ${visible.length} ${t('of')} ${total.toLocaleString()} ${t('total_items')}</span>
       </div>
@@ -4211,7 +4211,7 @@
         <th class="col-fav"></th>
         <th class="col-name">${t('col_name')}</th>
         <th class="col-badge">${t('col_index')}</th>
-        <th class="col-if">IF</th>
+        <th class="col-if">IF <span class="sort-arrow">▼</span></th>
         <th class="col-cas">${t('col_cas')}</th>
       </tr></thead><tbody>`;
       html += visible.map(renderRow).join('');
@@ -4268,6 +4268,9 @@
       // Sidebar: show on int/dom, hide on home/fav/pick
       const sidebar = $('#sidebar');
       if (sidebar) sidebar.style.display = (activeTab === 'int' || activeTab === 'dom') ? '' : 'none';
+      // Footer: hide on home tab
+      const siteFoot = $('.site-foot');
+      if (siteFoot) siteFoot.style.display = activeTab === 'home' ? 'none' : '';
       // Search box in topbar: hide on home and pick (home has its own search)
       const searchWrap = $('.search-wrap');
       const sideToggle = $('#side-toggle');
