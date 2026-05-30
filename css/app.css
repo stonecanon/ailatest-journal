@@ -2534,9 +2534,9 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 /* Search box */
 .pick-search-wrap {
   position: relative;
-  max-width: 800px;
+  max-width: 680px;
   width: 100%;
-  margin: 0 auto;
+  margin: 24px auto 0;
 }
 .pick-search-icon {
   position: absolute;
@@ -2550,11 +2550,11 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 }
 .pick-search-input {
   width: 100%;
-  padding: 22px 28px;
-  font-size: 22px;
+  padding: 18px 24px;
+  font-size: 18px;
   font-family: var(--sans);
   border: 2px solid var(--rule);
-  border-radius: 16px;
+  border-radius: 14px;
   background: rgba(255,255,255,0.85);
   color: var(--ink);
   outline: 0;
