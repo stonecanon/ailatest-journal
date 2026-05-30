@@ -262,7 +262,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <option value="4">4 区</option>
               </select>
             </label>
-            <label class="pick-opt"><input type="checkbox" id="pick-filter-scopus"> <span data-i18n="pick_filter_scopus">仅 Scopus 收录</span></label>
+            <label class="pick-opt"><input type="checkbox" id="pick-filter-sci" checked> <span data-i18n="pick_filter_sci">SCIE</span></label>
+            <label class="pick-opt"><input type="checkbox" id="pick-filter-ssci" checked> <span data-i18n="pick_filter_ssci">SSCI</span></label>
+            <label class="pick-opt"><input type="checkbox" id="pick-filter-ahci" checked> <span data-i18n="pick_filter_ahci">AHCI</span></label>
             <label class="pick-opt"><input type="checkbox" id="pick-filter-comprehensive"> <span data-i18n="pick_filter_compre">排除综合性期刊</span></label>
           </div>
         </div>
@@ -297,6 +299,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <label class="chip tag-ahci"><input type="checkbox" value="AHCI" checked>AHCI</label>
         <label class="chip tag-esci"><input type="checkbox" value="ESCI" checked>ESCI</label>
         <label class="chip tag-ei"><input type="checkbox" value="EI" checked>EI</label>
+        <label class="chip tag-esi"><input type="checkbox" value="ESI">ESI</label>
       </div>
     </div>
 
@@ -447,7 +450,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <button id="pwa-install" class="pwa-install" hidden data-i18n="pwa_install">📲 安装到主屏</button>
 <script>
 // Build version for cache busting data files
-const __BUILD_VER = 'v20260529-10';
+const __BUILD_VER = 'v20260529-13';
 // Service Worker 清理 — 必须在 app.js 加载前运行
 (function() {
   if ('serviceWorker' in navigator) {
