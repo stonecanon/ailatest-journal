@@ -511,14 +511,17 @@ main.main {
 }
 .fav-header-btn {
   background: none;
-  border: none;
+  border: 1px solid var(--rule);
   cursor: pointer;
-  font-size: 18px;
-  padding: 4px 10px;
+  font-size: 20px;
+  padding: 6px 16px;
   color: var(--ink-soft);
   transition: color .15s, transform .15s;
   line-height: 1;
-  border-radius: 6px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 .fav-header-btn:hover { color: var(--gold, #e6a817); transform: scale(1.12); background: rgba(0,0,0,.03); }
 .fav-header-btn { text-decoration: none; }
