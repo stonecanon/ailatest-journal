@@ -4446,6 +4446,13 @@
       }
     }
     window.__activateJournalTab = activateTab;
+    // Home entry pills → switch tab
+    document.querySelectorAll('.home-pill[data-tab]').forEach(b => {
+      b.addEventListener('click', (e) => {
+        e.preventDefault();
+        activateTab(b.dataset.tab);
+      });
+    });
     // Process any clicks that happened before boot() finished
     if (window.__journalTabQueue) {
       window.__journalTabQueue.forEach(t => activateTab(t));

@@ -150,6 +150,20 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <svg class="home-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
         <input id="home-q" type="search" class="home-search-input" data-i18n="search_home_ph" placeholder="搜索期刊名、ISSN…" autocomplete="off" spellcheck="false" />
       </div>
+      <div class="home-entry-pills">
+        <button class="home-pill" data-tab="int">
+          <svg class="pill-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          <span data-i18n="tab_int">国际</span>
+        </button>
+        <button class="home-pill" data-tab="dom">
+          <span class="pill-icon pill-icon-text">🇨🇳</span>
+          <span data-i18n="tab_dom">中国</span>
+        </button>
+        <button class="home-pill" data-tab="fav">
+          <svg class="pill-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3.7l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3.7z"/></svg>
+          <span data-i18n="tab_fav">收藏</span>
+        </button>
+      </div>
     </div>
     <div id="home-results" class="home-results" hidden></div>
   </section>
