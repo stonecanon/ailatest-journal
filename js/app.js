@@ -2073,6 +2073,9 @@
       if (activeExtraFilter === 'scopus' && !(r.scopus && r.scopus.active)) return false;
       if (activeExtraFilter === 'oaj' && !r.oaj) return false;
       if (activeExtraFilter === 'doaj' && !r.doaj) return false;
+      if (activeExtraFilter === 'medline' && !r.medline) return false;
+      if (activeExtraFilter === 'pubmed' && !r.pubmed) return false;
+      if (activeExtraFilter === 'pmc' && !r.pmc) return false;
       if (activeExtraFilter === 'warning' && !r.warning) return false;
       if (activeExtraFilter.startsWith('abdc:')) {
         const want = activeExtraFilter.slice(5);
