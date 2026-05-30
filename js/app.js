@@ -4272,7 +4272,7 @@
       const searchWrap = $('.search-wrap');
       const sideToggle = $('#side-toggle');
       const showSearch = activeTab !== 'pick' && activeTab !== 'home';
-      if (searchWrap) searchWrap.style.display = showSearch ? '' : 'none';
+      if (searchWrap) searchWrap.style.display = showSearch ? 'flex' : 'none';
       if (sideToggle) sideToggle.style.display = showSearch ? '' : 'none';
       // Sync home search input with #q when on home tab
       const homeQ = $('#home-q');
