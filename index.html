@@ -246,40 +246,21 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <section class="tab-panel" data-panel="pick" hidden>
     <div class="pick-tool">
       <div class="pick-search-wrap">
-        <input id="pick-input" type="search" class="pick-search-input" maxlength="200" placeholder="输入论文标题、摘要或关键词… 例如：indoor air quality occupancy estimation machine learning" data-i18n-placeholder="pick_placeholder" autocomplete="off" spellcheck="false" />
-      </div>
-      <div class="pick-input-meta">
-        <span class="pick-input-hint">建议输入标题 + 关键词，最多 200 字符</span>
-        <span id="pick-char-count" class="pick-char-count">0 / 200</span>
-      </div>
-      <div class="pick-filter-bar">
-        <div class="pick-filter-group">
-          <label class="pick-opt"><input type="checkbox" id="pick-filter-topics" checked> <span data-i18n="pick_filter_topics">Topics</span></label>
-          <label class="pick-opt"><input type="checkbox" id="pick-filter-if"> <span data-i18n="pick_filter_if">IF ></span> <input type="number" id="pick-if-min" class="pick-num" value="0" min="0" step="0.5"></label>
-        </div>
-        <div class="pick-filter-group">
-          <label class="pick-opt"><span data-i18n="pick_filter_zone">中科院分区</span>
-            <select id="pick-zone" class="pick-select">
-              <option value="all">全部</option>
-              <option value="1">1 区</option>
-              <option value="2">2 区</option>
-              <option value="3">3 区</option>
-              <option value="4">4 区</option>
-            </select>
-          </label>
-        </div>
-        <div class="pick-filter-group">
-          <label class="pick-opt"><input type="checkbox" id="pick-filter-sci" checked> <span data-i18n="pick_filter_sci">SCIE</span></label>
-          <label class="pick-opt"><input type="checkbox" id="pick-filter-ssci" checked> <span data-i18n="pick_filter_ssci">SSCI</span></label>
-          <label class="pick-opt"><input type="checkbox" id="pick-filter-ahci" checked> <span data-i18n="pick_filter_ahci">AHCI</span></label>
-          <label class="pick-opt"><input type="checkbox" id="pick-filter-comprehensive"> <span data-i18n="pick_filter_compre">排除综合刊</span></label>
-        </div>
+        <input id="pick-input" type="search" class="pick-search-input" maxlength="200" placeholder="建议输入标题 + 关键词，最多 200 字符" data-i18n-placeholder="pick_placeholder" autocomplete="off" spellcheck="false" />
       </div>
       <div class="pick-action-row">
         <button id="pick-search-btn" class="big-btn primary" data-i18n="pick_search_btn">开始推荐</button>
         <span id="pick-status" class="pick-status muted-cell"></span>
         <input type="text" id="pick-apikey" class="pick-apikey" placeholder="OpenAlex API Key（可选）">
         <span id="pick-quota" class="pick-quota muted-cell"></span>
+      </div>
+      <div class="pick-filter-bar">
+        <div class="pick-filter-group">
+          <label class="pick-opt"><input type="checkbox" id="pick-filter-sci" checked> <span data-i18n="pick_filter_sci">SCIE</span></label>
+          <label class="pick-opt"><input type="checkbox" id="pick-filter-ssci" checked> <span data-i18n="pick_filter_ssci">SSCI</span></label>
+          <label class="pick-opt"><input type="checkbox" id="pick-filter-ahci" checked> <span data-i18n="pick_filter_ahci">AHCI</span></label>
+          <label class="pick-opt"><input type="checkbox" id="pick-filter-comprehensive"> <span data-i18n="pick_filter_compre">排除综合刊</span></label>
+        </div>
       </div>
       <div id="pick-history" class="pick-history" style="display:none">
         <div class="pick-history-head"><span data-i18n="pick_history">搜索历史</span><button id="pick-history-clear" class="clear-btn" data-i18n="pick_history_clear">清空</button></div>

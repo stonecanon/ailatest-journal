@@ -51,7 +51,7 @@
       hero_body_fav: '点击任意期刊右侧的 <b>★</b> 可加入收藏。未登录时保存在本机 localStorage；登录后自动同步到云端，可跨设备访问。',
       hero_title_pick: '帮我选刊',
       hero_body_pick: '采用自研大模型算法，深度分析你的研究主题与海量期刊数据的匹配度，智能推荐最合适的目标期刊。每人每天免费使用 5 次。',
-      pick_placeholder: '输入论文标题、摘要或关键词… 例如：indoor air quality occupancy estimation machine learning',
+      pick_placeholder: '建议输入标题 + 关键词，最多 200 字符',
       pick_search_btn: '开始推荐',
       pick_filter_topics: '匹配研究领域 (Topics)',
       pick_filter_if: '限 IF >',
@@ -112,7 +112,7 @@
       hero_body_fav: 'Click the <b>★</b> on any row to bookmark. Saved locally when signed-out; syncs to the cloud when signed-in.',
       hero_title_pick: 'Pick for me',
       hero_body_pick: 'Powered by proprietary large-model algorithm — intelligently matches your research topic against millions of journal data points to recommend the best target journals. 5 free searches per day per user.',
-      pick_placeholder: 'Enter your paper title, abstract or keywords… e.g. indoor air quality occupancy estimation machine learning',
+      pick_placeholder: 'Enter title + keywords, max 200 characters',
       pick_search_btn: 'Start',
       pick_filter_topics: 'Match Topics',
       pick_filter_if: 'IF >',
@@ -5087,14 +5087,6 @@
         let filtered = entries;
         // Exclude single-paper journals (noise from broad queries)
         filtered = filtered.filter(e => e.count >= 2);
-        const ifMin = parseFloat(document.getElementById('pick-if-min')?.value || '0');
-        if (document.getElementById('pick-filter-if')?.checked && ifMin > 0) {
-          filtered = filtered.filter(e => e.if != null && e.if >= ifMin);
-        }
-        const zoneVal = document.getElementById('pick-zone')?.value || 'all';
-        if (zoneVal !== 'all') {
-          filtered = filtered.filter(e => e.zone != null && String(e.zone) === zoneVal);
-        }
         // Index filter: three core indices (SCIE/SSCI/AHCI)
         const wantSci = document.getElementById('pick-filter-sci')?.checked;
         const wantSsci = document.getElementById('pick-filter-ssci')?.checked;
@@ -5116,10 +5108,8 @@
             return !cats.some(c => /multidisciplinary/i.test(c));
           });
         }
-        // Topic filter (always on if checkbox checked, acts as minimum signal filter)
-        if (document.getElementById('pick-filter-topics')?.checked) {
-          filtered = filtered.filter(e => e.score > 0.1);
-        }
+        // Topic filter (always on — minimum signal filter)
+        filtered = filtered.filter(e => e.score > 0.1);
         filtered.sort((a, b) => b.score - a.score);
         filtered = filtered.slice(0, 30);
 
