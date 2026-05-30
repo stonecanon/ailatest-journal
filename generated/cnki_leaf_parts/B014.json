@@ -1,0 +1,1159 @@
+{
+  "category": {
+    "code": "B014",
+    "title": "化学",
+    "count": 63,
+    "major_code": "",
+    "major_title": ""
+  },
+  "pages": [
+    {
+      "page": 1,
+      "rows": 21,
+      "pageCount": 3
+    },
+    {
+      "page": 2,
+      "rows": 21,
+      "pageCount": 3
+    },
+    {
+      "page": 3,
+      "rows": 21,
+      "pageCount": 3
+    }
+  ],
+  "records": [
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 1,
+      "title": "Chinese Journal of Catalysis",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOXpvfWQ1RRK5OxokTuBOqlFcwNrHXYGwOCypDo0DVqbUt_6j2vLLllLoXlErNpv3gDPVz2fQjddVC7txtjuo1ucijlL3UjWUutHZ88NrCM0w==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "5.361",
+      "comprehensive_if": "3.353",
+      "issn": "0253-9837",
+      "cn": "21-1601/O6",
+      "sponsor": "中国科学院大连化学物理研究所;中国化学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 1,
+      "title": "物理化学学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOXpvfWQ1RRK5OxokTuBOqlFcwNrHXYGwOCypDo0DVqbUt_6j2vLLllLoXlErNpv3h-PxPtoElLfvzsbwf34r1BQrSyZEigmqNWvcq3if46Kw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "5.210",
+      "comprehensive_if": "3.819",
+      "issn": "1000-6818",
+      "cn": "11-1892/O6",
+      "sponsor": "中国化学会;北京大学",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 1,
+      "title": "Journal of Energy Chemistry",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOXpvfWQ1RRK5OxokTuBOqlFcwNrHXYGwOCypDo0DVqbUt_6j2vLLllLoXlErNpv3gDOxgNu9LWCf18XC0LCXX7b-vlHDUUBmx--2EpiP0T4A==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "4.661",
+      "comprehensive_if": "2.721",
+      "issn": "2095-4956",
+      "cn": "10-1287/O6",
+      "sponsor": "中国科技出版传媒股份有限公司",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 1,
+      "title": "Chinese Chemical Letters",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOXpvfWQ1RRK5OxokTuBOqlFcwNrHXYGwOCypDo0DVqbUt_6j2vLLllLoXlErNpv3hnoqmC6_bv5A-UY-jEvJDCiTlbBFQ04A9Wzton21F8Tw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "3.047",
+      "comprehensive_if": "2.030",
+      "issn": "1001-8417",
+      "cn": "11-2710/O6",
+      "sponsor": "中国化学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 1,
+      "title": "Science China Chemistry",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOXpvfWQ1RRK5OxokTuBOqlFcwNrHXYGwOCypDo0DVqbUt_6j2vLLllLoXlErNpv3gC7J8BnyYiRXxnjRsWErmeg9ts8Kui1__dY_WALfd7TA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.854",
+      "comprehensive_if": "1.998",
+      "issn": "1674-7291",
+      "cn": "11-5839/O6",
+      "sponsor": "中国科学院;国家自然科学基金委员会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 1,
+      "title": "Journal of Rare Earths",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOXpvfWQ1RRK5OxokTuBOqlFcwNrHXYGwOCypDo0DVqbUt_6j2vLLllLoXlErNpv3gaPu_WjGfWkwuTa-hIDGzq3odjgo2wBU3Pbm8TBJGg_w==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.815",
+      "comprehensive_if": "1.912",
+      "issn": "1002-0721",
+      "cn": "11-2788/TF",
+      "sponsor": "中国稀土学会;有研科技集团有限公司",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 1,
+      "title": "中国稀土学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOXpvfWQ1RRK5OxokTuBOqlFcwNrHXYGwOCypDo0DVqbUt_6j2vLLllLoXlErNpv3j3M454s2uikQC9eLtG9qA100EARmY0Q7_pInb5rxqcdg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.612",
+      "comprehensive_if": "1.433",
+      "issn": "1000-4343",
+      "cn": "11-2365/TG",
+      "sponsor": "中国稀土学会;中国有研科技集团有限公司",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 1,
+      "title": "色谱",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOXpvfWQ1RRK5OxokTuBOqlFcwNrHXYGwOCypDo0DVqbUt_6j2vLLllLoXlErNpv3gW0QqABH7G1LTBbWSEJVEz622mBpqFJo-9IV33cdkksw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.606",
+      "comprehensive_if": "2.077",
+      "issn": "1000-8713",
+      "cn": "21-1185/O6",
+      "sponsor": "中国化学会;中国科学院大连化学物理研究所",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 1,
+      "title": "中国无机分析化学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOXpvfWQ1RRK5OxokTuBOqlFcwNrHXYGwOCypDo0DVqbUt_6j2vLLllLoXlErNpv3g0X1Ya4xiWGrM-dAy59-Wmk_KpYY-FD43e9ph5xYRpow==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.564",
+      "comprehensive_if": "2.316",
+      "issn": "2095-1035",
+      "cn": "11-6005/O6",
+      "sponsor": "矿冶科技集团有限公司",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 1,
+      "title": "Chinese Journal of Structural Chemistry",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOXpvfWQ1RRK5OxokTuBOqlFcwNrHXYGwOCypDo0DVqbUt_6j2vLLllLoXlErNpv3hBpAdh0vwC0y2ZWEC1ebBOj7aQFdqCcD7S6yQUj2-YJA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.410",
+      "comprehensive_if": "2.084",
+      "issn": "0254-5861",
+      "cn": "35-1112/TQ",
+      "sponsor": "中国科学院福建物质结构研究所;中国化学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 1,
+      "title": "岩矿测试",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOXpvfWQ1RRK5OxokTuBOqlFcwNrHXYGwOCypDo0DVqbUt_6j2vLLllLoXlErNpv3hzhvbhztKao6vRNVxN7FXiPVCm68_j7j8YIJ1yGx78Eg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.407",
+      "comprehensive_if": "1.950",
+      "issn": "0254-5357",
+      "cn": "11-2131/TD",
+      "sponsor": "中国地质学会;国家地质实验测试中心",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 1,
+      "title": "光谱学与光谱分析",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOXpvfWQ1RRK5OxokTuBOqlFcwNrHXYGwOCypDo0DVqbUt_6j2vLLllLoXlErNpv3gmbu9X_VGRTWQEbOmBFs-vpHOfxzgJ04yAWEveTSmB6w==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.280",
+      "comprehensive_if": "1.322",
+      "issn": "1000-0593",
+      "cn": "11-2200/O4",
+      "sponsor": "中国光学学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 1,
+      "title": "分析化学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOXpvfWQ1RRK5OxokTuBOqlFcwNrHXYGwOCypDo0DVqbUt_6j2vLLllLoXlErNpv3hUSuj0rO-Vw0OaTkeDFfN9SAhoCOrRoOcvbp-3y3XjVA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.172",
+      "comprehensive_if": "1.443",
+      "issn": "0253-3820",
+      "cn": "22-1125/O6",
+      "sponsor": "中国科学院长春应用化学研究所;中国化学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 1,
+      "title": "分析测试学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOXpvfWQ1RRK5OxokTuBOqlFcwNrHXYGwOCypDo0DVqbUt_6j2vLLllLoXlErNpv3gdvU20rmaZ0xRErAX_ESR3ppea-U61ohq3q9QCPFGg5Q==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.034",
+      "comprehensive_if": "1.649",
+      "issn": "1004-4957",
+      "cn": "44-1318/TH",
+      "sponsor": "中国广州分析测试中心;中国分析测试协会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 1,
+      "title": "化学进展",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOXpvfWQ1RRK5OxokTuBOqlFcwNrHXYGwOCypDo0DVqbUt_6j2vLLllLoXlErNpv3i-B_nZIjPUg-MrUQGn-0lpRTfW6JK2uOeN3dn8PTDudw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.931",
+      "comprehensive_if": "0.970",
+      "issn": "1005-281X",
+      "cn": "11-3383/O6",
+      "sponsor": "中国科学院基础科学局;中国科学院化学部;中国科学院文献情报中心;国家自然科学基金委员会化学科学部",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 1,
+      "title": "化学试剂",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOXpvfWQ1RRK5OxokTuBOqlFcwNrHXYGwOCypDo0DVqbUt_6j2vLLllLoXlErNpv3gLiODgng6cyAYXUKb0wdc8jkC70d1nuaG4Iaa_-gZ-pQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.843",
+      "comprehensive_if": "1.320",
+      "issn": "0258-3283",
+      "cn": "11-2135/TQ",
+      "sponsor": "中国分析测试协会;国药集团化学试剂有限公司;北京国化精试咨询有限公司",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 1,
+      "title": "化学学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOXpvfWQ1RRK5OxokTuBOqlFcwNrHXYGwOCypDo0DVqbUt_6j2vLLllLoXlErNpv3hw9BGG9InyfnX_TY8J7YFf0idJy_MkwP4ZzRD9dyssjQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.827",
+      "comprehensive_if": "1.219",
+      "issn": "0567-7351",
+      "cn": "31-1320/O6",
+      "sponsor": "中国化学会;中国科学院上海有机化学研究所",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 1,
+      "title": "分析试验室",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOXpvfWQ1RRK5OxokTuBOqlFcwNrHXYGwOCypDo0DVqbUt_6j2vLLllLoXlErNpv3jX2Zq21cWxwRV7Oy-8RMcQiHHLIOS_XBpB61rHsfskOQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.800",
+      "comprehensive_if": "1.485",
+      "issn": "1000-0720",
+      "cn": "11-2017/TF",
+      "sponsor": "中国有色金属学会;中国有研科技集团有限公司",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 1,
+      "title": "Journal of Analysis and Testing",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOXpvfWQ1RRK5OxokTuBOqlFcwNrHXYGwOCypDo0DVqbUt_6j2vLLllLoXlErNpv3gnkkJfrbkUumCzpPXoc8J1i5uf2vKx_MC5uAvLetcbpA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.785",
+      "comprehensive_if": "1.456",
+      "issn": "2096-241X",
+      "cn": "10-1412/O6",
+      "sponsor": "中国有色金属学会;有研科技集团有限公司",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 1,
+      "title": "分子催化(中英文)",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOXpvfWQ1RRK5OxokTuBOqlFcwNrHXYGwOCypDo0DVqbUt_6j2vLLllLoXlErNpv3gEAXfotBEYC5dcMnkkamuQHhmuWowKanAnWE-9lOTpAA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.784",
+      "comprehensive_if": "1.459",
+      "issn": "1001-3555",
+      "cn": "62-1227/O6",
+      "sponsor": "中国科学院兰州化学物理研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 1,
+      "title": "高分子通报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOXpvfWQ1RRK5OxokTuBOqlFcwNrHXYGwOCypDo0DVqbUt_6j2vLLllLoXlErNpv3jfjlczy2YSztC091MlQdLMBgx5S-0lOrDWhZ4y5KGQEw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.717",
+      "comprehensive_if": "1.187",
+      "issn": "1003-3726",
+      "cn": "11-2051/O6",
+      "sponsor": "中国化学会;中国科学院化学研究所",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 2,
+      "title": "高分子学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN7sXws43yeg-1B_K0wqil_Pa_OUuztD89lBHqbO3iwf8_Rdc5hzQIzVI58fwR6Oz5frWIrXTCX9oRL-ZJQNAN0zAi5cpHBSXwp4T5h0r2lwg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.694",
+      "comprehensive_if": "1.086",
+      "issn": "1000-3304",
+      "cn": "11-1857/O6",
+      "sponsor": "中国科学院化学研究所;中国化学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 2,
+      "title": "电化学(中英文)",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN7sXws43yeg-1B_K0wqil_Pa_OUuztD89lBHqbO3iwf8_Rdc5hzQIzVI58fwR6Oz6yXlVeJW9qlgto-tCFoHWCSIVCDabjVO8uC5fmPzasHA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.565",
+      "comprehensive_if": "1.000",
+      "issn": "1006-3471",
+      "cn": "35-1350/O6",
+      "sponsor": "中国化学会;厦门大学",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 2,
+      "title": "应用化学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN7sXws43yeg-1B_K0wqil_Pa_OUuztD89lBHqbO3iwf8_Rdc5hzQIzVI58fwR6Oz7W9D7PsHpbxXBSa5gos9IplAk9HKyuIeewdiZ4nZhGWw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.519",
+      "comprehensive_if": "0.988",
+      "issn": "1000-0518",
+      "cn": "22-1128/O6",
+      "sponsor": "中国科学院长春应用化学研究所;中国化学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 2,
+      "title": "功能高分子学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN7sXws43yeg-1B_K0wqil_Pa_OUuztD89lBHqbO3iwf8_Rdc5hzQIzVI58fwR6Oz5Zm7rc4rgzXskIub29wZlYROvveD3QRliqTcHAkdOt-A==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.389",
+      "comprehensive_if": "0.913",
+      "issn": "1008-9357",
+      "cn": "31-1633/O6",
+      "sponsor": "华东理工大学",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 2,
+      "title": "理化检验-化学分册",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN7sXws43yeg-1B_K0wqil_Pa_OUuztD89lBHqbO3iwf8_Rdc5hzQIzVI58fwR6Oz71KxhGEjoRiX-tfNCzEysMHYdy2Gn8G9jtqFJGO5pdoQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.365",
+      "comprehensive_if": "1.217",
+      "issn": "1001-4020",
+      "cn": "31-1337/TB",
+      "sponsor": "上海材料研究所有限公司",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 2,
+      "title": "质谱学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN7sXws43yeg-1B_K0wqil_Pa_OUuztD89lBHqbO3iwf8_Rdc5hzQIzVI58fwR6Oz68oQnnAdZwFsAiIL2sLoj1M5Ts3drR46nJNzZc4KoOTg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.350",
+      "comprehensive_if": "1.070",
+      "issn": "1004-2997",
+      "cn": "11-2979/TH",
+      "sponsor": "北京中科科仪技术发展有限责任公司;中国物理学会质谱分会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 2,
+      "title": "稀土",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN7sXws43yeg-1B_K0wqil_Pa_OUuztD89lBHqbO3iwf8_Rdc5hzQIzVI58fwR6Oz5BdqpRICT1TZZdAR_wKPPuyLun1iVXVC2qQv0izNf-iw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.330",
+      "comprehensive_if": "0.813",
+      "issn": "1004-0277",
+      "cn": "15-1099/TF",
+      "sponsor": "包头稀土研究院;中国稀土学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 2,
+      "title": "Chinese Journal of Polymer Science",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN7sXws43yeg-1B_K0wqil_Pa_OUuztD89lBHqbO3iwf8_Rdc5hzQIzVI58fwR6Oz5uBtRGNT5c1aZWPT7oeC_iU9naXAn9zYXhg_0dbcqeGw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.322",
+      "comprehensive_if": "0.902",
+      "issn": "0256-7679",
+      "cn": "11-2015/O6",
+      "sponsor": "中国化学会;中国科学院化学研究所",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 2,
+      "title": "影像科学与光化学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN7sXws43yeg-1B_K0wqil_Pa_OUuztD89lBHqbO3iwf8_Rdc5hzQIzVI58fwR6Oz4V1V0Mjrjz6HtJfIPInYB6Ca_t7fPaE4dRU-DGqvOfuQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.295",
+      "comprehensive_if": "1.105",
+      "issn": "1674-0475",
+      "cn": "11-5604/O6",
+      "sponsor": "中国科学院理化技术研究所;中国感光学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 2,
+      "title": "Chinese Journal of Chemistry",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN7sXws43yeg-1B_K0wqil_Pa_OUuztD89lBHqbO3iwf8_Rdc5hzQIzVI58fwR6Oz7C4LEjcq3G1fcIIFjbb4CxUgT5IQgOJ15CTpvHo7EkBg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.281",
+      "comprehensive_if": "0.980",
+      "issn": "1001-604X",
+      "cn": "31-1547/O6",
+      "sponsor": "中国化学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 2,
+      "title": "分析科学学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN7sXws43yeg-1B_K0wqil_Pa_OUuztD89lBHqbO3iwf8_Rdc5hzQIzVI58fwR6Oz45K9QL5gtTgJ3vn3zkNK4Gsz6tSiT76Qq4SE08BC9Tmw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.276",
+      "comprehensive_if": "0.943",
+      "issn": "1006-6144",
+      "cn": "42-1338/O",
+      "sponsor": "武汉大学;北京大学;南京大学",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 2,
+      "title": "冶金分析",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN7sXws43yeg-1B_K0wqil_Pa_OUuztD89lBHqbO3iwf8_Rdc5hzQIzVI58fwR6Oz7WcIyo-9p-xY_iiTxBqOVFLw82e5ioLIvH0y_y08ZPcw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.184",
+      "comprehensive_if": "1.069",
+      "issn": "1000-7571",
+      "cn": "11-2030/TF",
+      "sponsor": "中国钢研科技集团有限公司;中国金属学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 2,
+      "title": "化学分析计量",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN7sXws43yeg-1B_K0wqil_Pa_OUuztD89lBHqbO3iwf8_Rdc5hzQIzVI58fwR6Oz4SUlbc30eQaew8fEIwrX_2kQGdjHP7CvGWDKRSvmN5Ww==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.166",
+      "comprehensive_if": "1.004",
+      "issn": "1008-6145",
+      "cn": "37-1315/O6",
+      "sponsor": "中国兵器工业集团第五三研究所(国防科技工业应用化学一级计量站)",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 2,
+      "title": "大学化学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN7sXws43yeg-1B_K0wqil_Pa_OUuztD89lBHqbO3iwf8_Rdc5hzQIzVI58fwR6Oz7TGXVgdLgBte9QqoddNAgto_V_lMC9rl3W55aJB81u7g==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.149",
+      "comprehensive_if": "0.991",
+      "issn": "1000-8438",
+      "cn": "11-1815/O6",
+      "sponsor": "北京大学;中国化学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 2,
+      "title": "波谱学杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN7sXws43yeg-1B_K0wqil_Pa_OUuztD89lBHqbO3iwf8_Rdc5hzQIzVI58fwR6Oz7umMny-dYtJJYiTzB0zBdHipIHVJAZmZoI0GIwOAIrgQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.129",
+      "comprehensive_if": "0.929",
+      "issn": "1000-4556",
+      "cn": "42-1180/O4",
+      "sponsor": "中国科学院精密测量科学与技术创新研究院",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 2,
+      "title": "化学通报(中英文)",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN7sXws43yeg-1B_K0wqil_Pa_OUuztD89lBHqbO3iwf8_Rdc5hzQIzVI58fwR6Oz5pQaF2qnIAMnb39kDPWtBn8faOa15dOzwsvymNs29aSA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.097",
+      "comprehensive_if": "0.615",
+      "issn": "0441-3776",
+      "cn": "11-1804/O6",
+      "sponsor": "中国科学院化学研究所;中国化学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 2,
+      "title": "无机化学学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN7sXws43yeg-1B_K0wqil_Pa_OUuztD89lBHqbO3iwf8_Rdc5hzQIzVI58fwR6Oz5z5ll0y7A4XekkablbF7tSyACwX8Wh5N6qQasQ_k16oQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.070",
+      "comprehensive_if": "0.725",
+      "issn": "1001-4861",
+      "cn": "32-1185/O6",
+      "sponsor": "中国化学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 2,
+      "title": "中国科学:化学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN7sXws43yeg-1B_K0wqil_Pa_OUuztD89lBHqbO3iwf8_Rdc5hzQIzVI58fwR6Oz5aevB_S76Xbus7w89pGra6lv-DqFm4roMIhW73f-A38A==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.070",
+      "comprehensive_if": "0.611",
+      "issn": "1674-7224",
+      "cn": "11-5838/O6",
+      "sponsor": "中国科学院;国家自然科学基金委员会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 2,
+      "title": "有机化学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN7sXws43yeg-1B_K0wqil_Pa_OUuztD89lBHqbO3iwf8_Rdc5hzQIzVI58fwR6Oz40d2Row1K94Pjdqmd5SwSy4DMk-kMo9Lo-fntKhP-guw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.069",
+      "comprehensive_if": "0.861",
+      "issn": "0253-2786",
+      "cn": "31-1321/O6",
+      "sponsor": "中国科学院上海有机化学研究所;中国化学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 2,
+      "title": "化学研究与应用",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN7sXws43yeg-1B_K0wqil_Pa_OUuztD89lBHqbO3iwf8_Rdc5hzQIzVI58fwR6Oz5hITdj0fuMIhkAqjjtZPli0zY3MZpAY3HyzqF-sYepJw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.063",
+      "comprehensive_if": "0.776",
+      "issn": "1004-1656",
+      "cn": "51-1378/O6",
+      "sponsor": "四川省化学化工学会;四川大学",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 2,
+      "title": "Chemical Research in Chinese Universities",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN7sXws43yeg-1B_K0wqil_Pa_OUuztD89lBHqbO3iwf8_Rdc5hzQIzVI58fwR6Oz6hgCQTjI8hrlmA76SclOZFE0H5Jhaeso7ybQEyUPSUjA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.050",
+      "comprehensive_if": "0.710",
+      "issn": "1005-9040",
+      "cn": "22-1183/O6",
+      "sponsor": "吉林大学",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 3,
+      "title": "分析测试技术与仪器",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMA-CnSBJDaTC7xaw2sO24vmNI7PJ6pveAreBfHbPp9h2-LMjMPXlDMSiZUBKfrv9q9fGTAkRWWBpJNjJq71jhFedBuZzatxHLTv3EBHLIvoQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.015",
+      "comprehensive_if": "0.742",
+      "issn": "1006-3757",
+      "cn": "62-1123/O6",
+      "sponsor": "中国科学院兰州化学物理研究所",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 3,
+      "title": "高等学校化学学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMA-CnSBJDaTC7xaw2sO24vmNI7PJ6pveAreBfHbPp9h2-LMjMPXlDMSiZUBKfrv9pm7Rl6Ok4WBGbcA74WQ-FQobytl4ww-uWf8B7vDlZOuw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.009",
+      "comprehensive_if": "0.637",
+      "issn": "0251-0790",
+      "cn": "22-1131/O6",
+      "sponsor": "吉林大学",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 3,
+      "title": "核化学与放射化学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMA-CnSBJDaTC7xaw2sO24vmNI7PJ6pveAreBfHbPp9h2-LMjMPXlDMSiZUBKfrv9rHYvDxzpQfAEcCAT2XV0AUmsFJs6tyB7TbwArNWsPptA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.919",
+      "comprehensive_if": "0.621",
+      "issn": "0253-9950",
+      "cn": "11-2045/TL",
+      "sponsor": "中国核学会核化学与放射化学学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 3,
+      "title": "化学研究",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMA-CnSBJDaTC7xaw2sO24vmNI7PJ6pveAreBfHbPp9h2-LMjMPXlDMSiZUBKfrv9qFS_JYNUVXav5heC6ZPXixmSXlJA5rwtvspmTNC0GjhA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.875",
+      "comprehensive_if": "0.535",
+      "issn": "1008-1011",
+      "cn": "41-1083/O6",
+      "sponsor": "河南大学",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 3,
+      "title": "人工晶体学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMA-CnSBJDaTC7xaw2sO24vmNI7PJ6pveAreBfHbPp9h2-LMjMPXlDMSiZUBKfrv9q-x4KahDpDQeW5rjGIgh-QuOds16Y9xrNJaQ2xx1lUDg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.816",
+      "comprehensive_if": "0.514",
+      "issn": "1000-985X",
+      "cn": "11-2637/O7",
+      "sponsor": "中材人工晶体研究院有限公司",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 3,
+      "title": "化学世界",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMA-CnSBJDaTC7xaw2sO24vmNI7PJ6pveAreBfHbPp9h2-LMjMPXlDMSiZUBKfrv9qOwUkNM09_g5VZLfGLnEDDYxHPcFv4DyyvZfWO8i6tZg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.806",
+      "comprehensive_if": "0.478",
+      "issn": "0367-6358",
+      "cn": "31-1274/TQ",
+      "sponsor": "上海市化学化工学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 3,
+      "title": "离子交换与吸附",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMA-CnSBJDaTC7xaw2sO24vmNI7PJ6pveAreBfHbPp9h2-LMjMPXlDMSiZUBKfrv9oNkLJn-c8m5ryPjf3dxq_ESXQlcHLZIxKo5iEApU9T0Q==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.792",
+      "comprehensive_if": "0.531",
+      "issn": "1001-5493",
+      "cn": "12-1147/O6",
+      "sponsor": "南开大学",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 3,
+      "title": "ChemPhysMater",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMA-CnSBJDaTC7xaw2sO24vmNI7PJ6pveAreBfHbPp9h2-LMjMPXlDMSiZUBKfrv9pisL_qLW9T6nuJaBqW1eh0DVit0JXW0qcOJqUBvyV1yA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.649",
+      "comprehensive_if": "0.473",
+      "issn": "2097-0323",
+      "cn": "37-1531/O",
+      "sponsor": "山东大学",
+      "tags": [
+        "完全OA期刊"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 3,
+      "title": "福建分析测试",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMA-CnSBJDaTC7xaw2sO24vmNI7PJ6pveAreBfHbPp9h2-LMjMPXlDMSiZUBKfrv9r8KMfj0Vgxlq7aOz9EGg2FyPhY68gVfRENBYsb69MuJA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.596",
+      "comprehensive_if": "0.470",
+      "issn": "1009-8143",
+      "cn": "35-1246/T",
+      "sponsor": "福建省测试技术研究所",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 3,
+      "title": "广州化学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMA-CnSBJDaTC7xaw2sO24vmNI7PJ6pveAreBfHbPp9h2-LMjMPXlDMSiZUBKfrv9o9b_TmGvPi5kqmzXQMFJM7JOy366rAbEt2S2S1MwPEew==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.564",
+      "comprehensive_if": "0.342",
+      "issn": "1009-220X",
+      "cn": "44-1317/O6",
+      "sponsor": "中国科学院广州化学研究所",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 3,
+      "title": "Journal of Molecular Science",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMA-CnSBJDaTC7xaw2sO24vmNI7PJ6pveAreBfHbPp9h2-LMjMPXlDMSiZUBKfrv9rhacKlrsvs6p8tl1__e704I7gmMb8oYZrx6N93gCJk1w==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.545",
+      "comprehensive_if": "0.350",
+      "issn": "1000-9035",
+      "cn": "22-1262/O4",
+      "sponsor": "中国化学会",
+      "tags": [
+        "网络首发",
+        "增强出版",
+        "完全OA期刊"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 3,
+      "title": "Chinese Journal of Chemical Physics",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMA-CnSBJDaTC7xaw2sO24vmNI7PJ6pveAreBfHbPp9h2-LMjMPXlDMSiZUBKfrv9qDH6UULrgtyJzWStepPr-lztBxSZ_8u7A2xHaZ6A7M5Q==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.443",
+      "comprehensive_if": "0.292",
+      "issn": "1674-0068",
+      "cn": "34-1295/O6",
+      "sponsor": "中国物理学会",
+      "tags": [
+        "混合OA期刊"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 3,
+      "title": "Magnetic Resonance Letters",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMA-CnSBJDaTC7xaw2sO24vmNI7PJ6pveAreBfHbPp9h2-LMjMPXlDMSiZUBKfrv9pvp4RiEvnFS5aLuDcuv982wku-hC5NFv1wSJVEc8xyVA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.404",
+      "comprehensive_if": "0.298",
+      "issn": "2097-0048",
+      "cn": "42-1917/O4",
+      "sponsor": "中国科学院精密测量科学与技术创新研究院",
+      "tags": [
+        "网络首发",
+        "完全OA期刊"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 3,
+      "title": "合成化学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMA-CnSBJDaTC7xaw2sO24vmNI7PJ6pveAreBfHbPp9h2-LMjMPXlDMSiZUBKfrv9qs4hM2UWqe4RkS7ypNoAGvTsIzeFE_IoeeYgnuGpOMUw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.362",
+      "comprehensive_if": "0.253",
+      "issn": "1005-1511",
+      "cn": "51-1427/O6",
+      "sponsor": "四川省化学化工学会;中国科学院成都有机化学有限公司",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 3,
+      "title": "Chinese Journal of Reactive Polymers",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMA-CnSBJDaTC7xaw2sO24vmNI7PJ6pveAreBfHbPp9h2-LMjMPXlDMSiZUBKfrv9pcHFqpy1fBEGgqH1Gw7LX9dT2KDTkWJ-ILsEtuyMiePA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1004-7646",
+      "cn": "12-1191/O4",
+      "sponsor": "南开大学",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 3,
+      "title": "Green Carbon",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMA-CnSBJDaTC7xaw2sO24vmNI7PJ6pveAreBfHbPp9h2-LMjMPXlDMSiZUBKfrv9pJq4m4DqbCu4P8SlxnlBiSJxEmHZSVSZeUfnhRKRj4gg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "2950-1555",
+      "cn": "37-1549/O6",
+      "sponsor": "中国科学院青岛生物能源与过程研究所",
+      "tags": [
+        "网络首发",
+        "增强出版",
+        "完全OA期刊"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 3,
+      "title": "光谱实验室",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMA-CnSBJDaTC7xaw2sO24vmNI7PJ6pveAreBfHbPp9h2-LMjMPXlDMSiZUBKfrv9rcIzPFJBIZDXPejRIaNFXc3a5FOCN9ogQ4HUCW84PhLw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1004-8138",
+      "cn": "11-3157/O4",
+      "sponsor": "中国科学院化工冶金研究所;钢铁研究总院;中国科学院成都有机化学研究所",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 3,
+      "title": "计算机与应用化学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMA-CnSBJDaTC7xaw2sO24vmNI7PJ6pveAreBfHbPp9h2-LMjMPXlDMSiZUBKfrv9potNjjDslx8BKA87fs4KA2LHGYdm1dslHCAfqVCfB08g==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1001-4160",
+      "cn": "11-3763/TP",
+      "sponsor": "中国科学院过程工程研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 3,
+      "title": "Surface Science and Technology",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMA-CnSBJDaTC7xaw2sO24vmNI7PJ6pveAreBfHbPp9h2-LMjMPXlDMSiZUBKfrv9pMc-2nLqsdJGidRJoUvJJiyi6ShUpdK6hjocFCasm7sQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "2097-3624",
+      "cn": "50-1227/TG",
+      "sponsor": "中国兵器装备集团西南技术工程研究所",
+      "tags": [
+        "完全OA期刊"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 3,
+      "title": "实验室检测",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMA-CnSBJDaTC7xaw2sO24vmNI7PJ6pveAreBfHbPp9h2-LMjMPXlDMSiZUBKfrv9r_e5u_Lr9eggHRn5XMw-yD7-7583nrNKm-2ab3kiwobQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "2097-261X",
+      "cn": "10-1875/TB",
+      "sponsor": "中国检验检测学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "化学",
+      "category_code": "B014",
+      "page": 3,
+      "title": "实验与分析",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMA-CnSBJDaTC7xaw2sO24vmNI7PJ6pveAreBfHbPp9h2-LMjMPXlDMSiZUBKfrv9rWcBQIFNPROVnKYmWtudz_zmSLifNE3x7ndjwSvem-NA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "2097-325X",
+      "cn": "10-1898/TH",
+      "sponsor": "中国机械工业联合会",
+      "tags": [
+        "网络首发"
+      ]
+    }
+  ]
+}

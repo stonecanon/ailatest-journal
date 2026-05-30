@@ -1,0 +1,98 @@
+{
+  "category": {
+    "code": "J156",
+    "title": "服务业经济",
+    "count": 5,
+    "major_code": "",
+    "major_title": ""
+  },
+  "pages": [
+    {
+      "page": 1,
+      "rows": 5,
+      "pageCount": 1
+    }
+  ],
+  "records": [
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "服务业经济",
+      "category_code": "J156",
+      "page": 1,
+      "title": "餐饮世界",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPfCBVQKrJyDogNd3drkX24LRqAKfgPsnxDXvAQE9-SzsZIHJgB2E_GMttm3DHLo7Bi1qkbwjkOVi0UG82dx5h1DQsHVFOMiX5GPTKUWFnbxQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1671-2447",
+      "cn": "11-4694/G0",
+      "sponsor": "世界中餐业联合会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "服务业经济",
+      "category_code": "J156",
+      "page": 1,
+      "title": "饭店现代化",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPfCBVQKrJyDogNd3drkX24LRqAKfgPsnxDXvAQE9-SzsZIHJgB2E_GMttm3DHLo7D0iZ6gBzzKLe5GwmwG7K8wRTq1h8KKAcrYnkg4Umf4pQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1672-4399",
+      "cn": "11-4670/T",
+      "sponsor": "全国服务科技信息中心;商业科技质量中心",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "服务业经济",
+      "category_code": "J156",
+      "page": 1,
+      "title": "服务外包",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPfCBVQKrJyDogNd3drkX24LRqAKfgPsnxDXvAQE9-SzsZIHJgB2E_GMttm3DHLo7CbY0YSt8Vo-ttoeWmQQBScp3K3IKF84qGUhGvJuBntEw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "2095-8463",
+      "cn": "10-1245/F",
+      "sponsor": "商务部国际贸易经济合作研究院",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "服务业经济",
+      "category_code": "J156",
+      "page": 1,
+      "title": "家庭服务",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPfCBVQKrJyDogNd3drkX24LRqAKfgPsnxDXvAQE9-SzsZIHJgB2E_GMttm3DHLo7AVwNx-_DVPgb_M4bZDbspUuX6ie--T8NokqDuIYWcA8Q==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "2095-8722",
+      "cn": "10-1257/TS",
+      "sponsor": "中国劳动社会保障出版社",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "服务业经济",
+      "category_code": "J156",
+      "page": 1,
+      "title": "青岛酒店管理职业技术学院学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPfCBVQKrJyDogNd3drkX24LRqAKfgPsnxDXvAQE9-SzsZIHJgB2E_GMttm3DHLo7Cwr9commgAIaNckM3PZwmRg5wb6QHPHZJGlx9KOAbfBA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1674-5655",
+      "cn": "37-1465/G4",
+      "sponsor": "青岛酒店管理职业技术学院",
+      "tags": []
+    }
+  ]
+}

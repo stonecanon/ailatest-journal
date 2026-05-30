@@ -1,0 +1,227 @@
+{
+  "category": {
+    "code": "E071",
+    "title": "精神病学",
+    "count": 12,
+    "major_code": "",
+    "major_title": ""
+  },
+  "pages": [
+    {
+      "page": 1,
+      "rows": 12,
+      "pageCount": 1
+    }
+  ],
+  "records": [
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "精神病学",
+      "category_code": "E071",
+      "page": 1,
+      "title": "General Psychiatry",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMy_7cGtJMzjlVIbHiKMbO9MIoRyFMz-1e1b3czxyfSlZi9xTpPGJi-lWjUo2l7DHbajM0VroQHQmr1F3pGYtC2qn_GT0C957Nr-exXUH1S-g==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.188",
+      "comprehensive_if": "1.670",
+      "issn": "2096-5923",
+      "cn": "31-2152/R",
+      "sponsor": "上海市精神卫生中心",
+      "tags": [
+        "完全OA期刊"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "精神病学",
+      "category_code": "E071",
+      "page": 1,
+      "title": "国际精神病学杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMy_7cGtJMzjlVIbHiKMbO9MIoRyFMz-1e1b3czxyfSlZi9xTpPGJi-lWjUo2l7DHaHlROzw2e6eX2qVJD7EIiBuEp_ZiafW1BT2-G_IPFd8Q==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.473",
+      "comprehensive_if": "1.226",
+      "issn": "1673-2952",
+      "cn": "43-1457/R",
+      "sponsor": "中南大学",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "精神病学",
+      "category_code": "E071",
+      "page": 1,
+      "title": "临床精神医学杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMy_7cGtJMzjlVIbHiKMbO9MIoRyFMz-1e1b3czxyfSlZi9xTpPGJi-lWjUo2l7DHZ2NacyauqLXZySP2PsULxxeZfiP5ZtXgeMbdatjpEFng==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.350",
+      "comprehensive_if": "1.094",
+      "issn": "1005-3220",
+      "cn": "32-1391/R",
+      "sponsor": "南京医科大学附属脑科医院",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "精神病学",
+      "category_code": "E071",
+      "page": 1,
+      "title": "中华精神科杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMy_7cGtJMzjlVIbHiKMbO9MIoRyFMz-1e1b3czxyfSlZi9xTpPGJi-lWjUo2l7DHbhoX32k7O7IFNtCM6HneEEjHV04oKhmWYIi7jbz-JDJw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.252",
+      "comprehensive_if": "1.081",
+      "issn": "1006-7884",
+      "cn": "11-3661/R",
+      "sponsor": "中华医学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "精神病学",
+      "category_code": "E071",
+      "page": 1,
+      "title": "中国神经精神疾病杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMy_7cGtJMzjlVIbHiKMbO9MIoRyFMz-1e1b3czxyfSlZi9xTpPGJi-lWjUo2l7DHaVDf1Mpdbq4oJrYOc7EmxIBFmg8l23KBW2-gBGeEmfwQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.239",
+      "comprehensive_if": "1.043",
+      "issn": "1002-0152",
+      "cn": "44-1213/R",
+      "sponsor": "中山大学",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "精神病学",
+      "category_code": "E071",
+      "page": 1,
+      "title": "神经疾病与精神卫生",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMy_7cGtJMzjlVIbHiKMbO9MIoRyFMz-1e1b3czxyfSlZi9xTpPGJi-lWjUo2l7DHaSDlv8ZwK-XYxYC5UUZEBawL0ymlfwilYgQCCJ0njX5A==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.222",
+      "comprehensive_if": "0.922",
+      "issn": "1009-6574",
+      "cn": "23-1479/R",
+      "sponsor": "齐齐哈尔医学院;中国医师协会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "精神病学",
+      "category_code": "E071",
+      "page": 1,
+      "title": "四川精神卫生",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMy_7cGtJMzjlVIbHiKMbO9MIoRyFMz-1e1b3czxyfSlZi9xTpPGJi-lWjUo2l7DHa-_9FCCoPC1AVnA4_PwCOzZYDwk3S0q1euMRJFVj85hw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.214",
+      "comprehensive_if": "0.806",
+      "issn": "1007-3256",
+      "cn": "51-1457/R",
+      "sponsor": "绵阳市精神卫生中心",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "精神病学",
+      "category_code": "E071",
+      "page": 1,
+      "title": "临床心身疾病杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMy_7cGtJMzjlVIbHiKMbO9MIoRyFMz-1e1b3czxyfSlZi9xTpPGJi-lWjUo2l7DHb12EljW8s5ohYFS_WbFu4RZYBgazdl4fpeJrEnZ0387w==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.153",
+      "comprehensive_if": "0.907",
+      "issn": "1672-187X",
+      "cn": "10-1340/R",
+      "sponsor": "中国医师协会;河南省精神病医院",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "精神病学",
+      "category_code": "E071",
+      "page": 1,
+      "title": "阿尔茨海默病及相关病杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMy_7cGtJMzjlVIbHiKMbO9MIoRyFMz-1e1b3czxyfSlZi9xTpPGJi-lWjUo2l7DHYkZsGE1BO_aDW6GBUOLlxdfFK6WZ4167Cp8zpEbkZXuQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.973",
+      "comprehensive_if": "0.712",
+      "issn": "2096-5516",
+      "cn": "10-1536/R",
+      "sponsor": "阿尔茨海默病防治协会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "精神病学",
+      "category_code": "E071",
+      "page": 1,
+      "title": "精神医学杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMy_7cGtJMzjlVIbHiKMbO9MIoRyFMz-1e1b3czxyfSlZi9xTpPGJi-lWjUo2l7DHbv_okQEHjIQK8lgrVxNUzdS8G4efqDOoH8FqFT0Qu1ww==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.757",
+      "comprehensive_if": "0.609",
+      "issn": "2095-9346",
+      "cn": "37-1454/R",
+      "sponsor": "山东省精神卫生中心",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "精神病学",
+      "category_code": "E071",
+      "page": 1,
+      "title": "神经病学与神经康复学杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOjJDMwFHLlIzZxNaai7K5wwEPeGYoxzj6QsQeHTXHnJsYXGKh4yM_xhCAGXUZE97MaXRCcL62mIt1Alk9AVr1lq6wh4h7WrU3abxm4ub-aIA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.326",
+      "comprehensive_if": "0.302",
+      "issn": "1672-7061",
+      "cn": "31-1927/R",
+      "sponsor": "上海中西医结合学会;上海交通大学医学院附属仁济医院",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "精神病学",
+      "category_code": "E071",
+      "page": 1,
+      "title": "上海精神医学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOjJDMwFHLlIzZxNaai7K5wwEPeGYoxzj6QsQeHTXHnJsYXGKh4yM_xhCAGXUZE97OXA2-p6n4C7ciPredn6LgpMAgnwEOWh0zYoqHKhbO5kA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1002-0829",
+      "cn": "31-1564/R",
+      "sponsor": "上海市精神卫生中心",
+      "tags": []
+    }
+  ]
+}

@@ -1,0 +1,309 @@
+{
+  "category": {
+    "code": "F102",
+    "title": "心理学",
+    "count": 17,
+    "major_code": "",
+    "major_title": ""
+  },
+  "pages": [
+    {
+      "page": 1,
+      "rows": 17,
+      "pageCount": 1
+    }
+  ],
+  "records": [
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心理学",
+      "category_code": "F102",
+      "page": 1,
+      "title": "心理发展与教育",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMUIsuGLtUUldTVDvbtzPCAXx0W-iTV5Mfd5cae6McLeKRXefHuopIzs4OuAFG_Pq-A3-HwohZqcAm4X2vTn5i9W4wJchQoluK61z6MSusu1g==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "7.660",
+      "comprehensive_if": "2.223",
+      "issn": "1001-4918",
+      "cn": "11-1608/B",
+      "sponsor": "北京师范大学",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心理学",
+      "category_code": "F102",
+      "page": 1,
+      "title": "心理科学进展",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMUIsuGLtUUldTVDvbtzPCAXx0W-iTV5Mfd5cae6McLeKRXefHuopIzs4OuAFG_Pq9azT0oHE1d7tbkYu1GwFrM3_84RE6MFA-NDIqAUHNTdg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "5.887",
+      "comprehensive_if": "2.531",
+      "issn": "1671-3710",
+      "cn": "11-4766/R",
+      "sponsor": "中国科学院心理研究所",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心理学",
+      "category_code": "F102",
+      "page": 1,
+      "title": "心理学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMUIsuGLtUUldTVDvbtzPCAXx0W-iTV5Mfd5cae6McLeKRXefHuopIzs4OuAFG_Pq8zNH6SnDusB81euRg2bePc0yS2mSRp4vieZSlU3s8o_A==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "4.394",
+      "comprehensive_if": "1.953",
+      "issn": "0439-755X",
+      "cn": "11-1911/B",
+      "sponsor": "中国心理学会;中国科学院心理研究所",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心理学",
+      "category_code": "F102",
+      "page": 1,
+      "title": "心理与行为研究",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMUIsuGLtUUldTVDvbtzPCAXx0W-iTV5Mfd5cae6McLeKRXefHuopIzs4OuAFG_Pq9Qow-C5mt6xzk0NojP7n66J1Kon1p37LsskZjPOvZ-dg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "3.328",
+      "comprehensive_if": "1.228",
+      "issn": "1672-0628",
+      "cn": "12-1348/B",
+      "sponsor": "天津师范大学",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心理学",
+      "category_code": "F102",
+      "page": 1,
+      "title": "心理研究",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMUIsuGLtUUldTVDvbtzPCAXx0W-iTV5Mfd5cae6McLeKRXefHuopIzs4OuAFG_Pq9jKw_WKL-Enk-yt4anyUnQ0kxgojn5KjWYUb12a6tpjw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.944",
+      "comprehensive_if": "0.976",
+      "issn": "2095-1159",
+      "cn": "41-1393/B",
+      "sponsor": "河南大学",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心理学",
+      "category_code": "F102",
+      "page": 1,
+      "title": "应用心理学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMUIsuGLtUUldTVDvbtzPCAXx0W-iTV5Mfd5cae6McLeKRXefHuopIzs4OuAFG_Pq86jVs1c1qiDIZGTJB6JtmPtcMwEN_DfN2eAESaaIfPvA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.800",
+      "comprehensive_if": "1.191",
+      "issn": "1006-6020",
+      "cn": "33-1012/B",
+      "sponsor": "浙江省心理学会;浙江大学",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心理学",
+      "category_code": "F102",
+      "page": 1,
+      "title": "心理科学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMUIsuGLtUUldTVDvbtzPCAXx0W-iTV5Mfd5cae6McLeKRXefHuopIzs4OuAFG_Pq94uEfQn1PeicyZtcf9p0rzMAzIWXjH0Ii_bZx_3w-AUw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.489",
+      "comprehensive_if": "0.979",
+      "issn": "1671-6981",
+      "cn": "31-1582/B",
+      "sponsor": "中国心理学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心理学",
+      "category_code": "F102",
+      "page": 1,
+      "title": "心理技术与应用",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMUIsuGLtUUldTVDvbtzPCAXx0W-iTV5Mfd5cae6McLeKRXefHuopIzs4OuAFG_Pq_9jJTxFeWh1bz8kZCAHfumbpq0gMZt_8efUoN2vv20Fg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.401",
+      "comprehensive_if": "0.711",
+      "issn": "2095-5588",
+      "cn": "10-1104/R",
+      "sponsor": "开明出版社有限公司;中央财经大学",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心理学",
+      "category_code": "F102",
+      "page": 1,
+      "title": "校园心理",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMUIsuGLtUUldTVDvbtzPCAXx0W-iTV5Mfd5cae6McLeKRXefHuopIzs4OuAFG_Pq-JGPKAy9sD07LFEYtnc6kNaEYtC6B32tt1Hso_rz4mTg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.720",
+      "comprehensive_if": "0.251",
+      "issn": "1673-1662",
+      "cn": "14-1326/R",
+      "sponsor": "山西医药卫生传媒集团有限责任公司",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心理学",
+      "category_code": "F102",
+      "page": 1,
+      "title": "心理学探新",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMUIsuGLtUUldTVDvbtzPCAXx0W-iTV5Mfd5cae6McLeKRXefHuopIzs4OuAFG_Pq-o-WZq5UMb4D8If0nv-qJxieP-Qk3csAmAZb2nYaODPQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.648",
+      "comprehensive_if": "0.290",
+      "issn": "1003-5184",
+      "cn": "36-1228/B",
+      "sponsor": "江西师范大学",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心理学",
+      "category_code": "F102",
+      "page": 1,
+      "title": "心理学通讯",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPgMBYM_XPtRb4Lzm0z5FSynAEctT9OKg07OHigMzSnlavDMI12sLEgXiI6xx2TfEREUXQtmCDjjWQCI1mTe_VstdpvS2PQDd6pA4lowV2VgQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.243",
+      "comprehensive_if": "0.149",
+      "issn": "2096-5494",
+      "cn": "31-2151/B",
+      "sponsor": "上海市精神卫生中心",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心理学",
+      "category_code": "F102",
+      "page": 1,
+      "title": "大众心理学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPgMBYM_XPtRb4Lzm0z5FSynAEctT9OKg07OHigMzSnlavDMI12sLEgXiI6xx2TfERUHDL0-1KMI40eXgl_NRA8VPRMf-KQ6ehpg9cDm0qNAg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1004-6100",
+      "cn": "31-1228/G3",
+      "sponsor": "华东师范大学",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心理学",
+      "category_code": "F102",
+      "page": 1,
+      "title": "生命叙事与心理传记学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPgMBYM_XPtRb4Lzm0z5FSynAEctT9OKg07OHigMzSnlavDMI12sLEgXiI6xx2TfEQX8yNJ1Ht5pydc2SOouuONKKm8sM8E87cL8Y5DDANVgA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "",
+      "cn": "",
+      "sponsor": "中央编译出版社",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心理学",
+      "category_code": "F102",
+      "page": 1,
+      "title": "社区心理学研究",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPgMBYM_XPtRb4Lzm0z5FSynAEctT9OKg07OHigMzSnlavDMI12sLEgXiI6xx2TfEQmv3ejWaQkf4MlNrzu2K8MCh6cDdP9XuCcjMfA6N4-yw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "",
+      "cn": "",
+      "sponsor": "重庆市人文社会科学重点研究基地;西南大学心理学与社会发展研究中心",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心理学",
+      "category_code": "F102",
+      "page": 1,
+      "title": "网络心理与行为",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPgMBYM_XPtRb4Lzm0z5FSynAEctT9OKg07OHigMzSnlavDMI12sLEgXiI6xx2TfEShG2Tu1vB0CMCv3OFDz5RoHuxh5COs2JKAAJpoScxuVg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "",
+      "cn": "",
+      "sponsor": "青少年网络心理与行为教育部重点实验室;华中师范大学心理学院;中国心理学会网络心理专委会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心理学",
+      "category_code": "F102",
+      "page": 1,
+      "title": "心理与健康",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPgMBYM_XPtRb4Lzm0z5FSynAEctT9OKg07OHigMzSnlavDMI12sLEgXiI6xx2TfESeN2Ob7FNyOgPhrZr668qY5kgsAuktk0llvlzcKMln1w==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1005-7064",
+      "cn": "11-3387/R",
+      "sponsor": "中国心理卫生协会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心理学",
+      "category_code": "F102",
+      "page": 1,
+      "title": "心理传记与质性心理学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPgMBYM_XPtRb4Lzm0z5FSynAEctT9OKg07OHigMzSnlavDMI12sLEgXiI6xx2TfEQxMjfe0VQZwc4B6AiIncb6ia2VMGuIQSpYDWYG46lRSw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "",
+      "cn": "",
+      "sponsor": "中国心理学会心理学质性研究专业委员会;岭南师范学院心理传记学与生命叙事研究所",
+      "tags": []
+    }
+  ]
+}

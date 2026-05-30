@@ -1,0 +1,228 @@
+{
+  "category": {
+    "code": "H125",
+    "title": "人口学与计划生育",
+    "count": 12,
+    "major_code": "",
+    "major_title": ""
+  },
+  "pages": [
+    {
+      "page": 1,
+      "rows": 12,
+      "pageCount": 1
+    }
+  ],
+  "records": [
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "人口学与计划生育",
+      "category_code": "H125",
+      "page": 1,
+      "title": "人口研究",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN9mgvjoLaM4RRSYyaJLa_u5dadbGCOO8HKYRph0UZICfptSMLAIOaPlStree8IMdfgiyeYrz1JB5BAcZnwfTmziahZ4wBB_x9Egv8DQukAMg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "11.566",
+      "comprehensive_if": "7.425",
+      "issn": "1000-6087",
+      "cn": "11-1489/C",
+      "sponsor": "中国人民大学",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "人口学与计划生育",
+      "category_code": "H125",
+      "page": 1,
+      "title": "中国人口科学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINccLXL7O4ydCK8snazlOYIy6kF76zXdIPmvmNX2OeXxMkUy3UwS2hsDZhL2O087aPbWkMjQWbPGiniJrGIeEVu7SNqOnP4JAk0ApC7WZILRA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "10.286",
+      "comprehensive_if": "7.095",
+      "issn": "1000-7881",
+      "cn": "11-1043/C",
+      "sponsor": "中国社会科学院人口与劳动经济研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "人口学与计划生育",
+      "category_code": "H125",
+      "page": 1,
+      "title": "人口学刊",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINccLXL7O4ydCK8snazlOYIy6kF76zXdIPmvmNX2OeXxMkUy3UwS2hsDZhL2O087aM06CQGOF2Qt5oMEv-fUIbgeh47Cgi7lSfCxZ3aAwgjSA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "8.615",
+      "comprehensive_if": "5.427",
+      "issn": "1004-129X",
+      "cn": "22-1017/C",
+      "sponsor": "吉林大学",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "人口学与计划生育",
+      "category_code": "H125",
+      "page": 1,
+      "title": "人口与经济",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINccLXL7O4ydCK8snazlOYIy6kF76zXdIPmvmNX2OeXxMkUy3UwS2hsDZhL2O087aO-_SNerAO3PnBEn8HG2xgM_DWLV1cTXk79QPgPrUy2CQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "6.866",
+      "comprehensive_if": "3.902",
+      "issn": "1000-4149",
+      "cn": "11-1115/F",
+      "sponsor": "首都经济贸易大学",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "人口学与计划生育",
+      "category_code": "H125",
+      "page": 1,
+      "title": "西北人口",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINccLXL7O4ydCK8snazlOYIy6kF76zXdIPmvmNX2OeXxMkUy3UwS2hsDZhL2O087aPezALaw6NbpdaN0_9cUZayu7nYtQNUHcW2OoYjtUm4hw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "6.410",
+      "comprehensive_if": "3.376",
+      "issn": "1007-0672",
+      "cn": "62-1019/C",
+      "sponsor": "兰州大学(西北人口研究所）",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "人口学与计划生育",
+      "category_code": "H125",
+      "page": 1,
+      "title": "人口与发展",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINccLXL7O4ydCK8snazlOYIy6kF76zXdIPmvmNX2OeXxMkUy3UwS2hsDZhL2O087aPMpBPEfLhV0vTJcw6ZfuSR0aUV6vpdvWEu77cmHkwAqg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "6.091",
+      "comprehensive_if": "3.321",
+      "issn": "1674-1668",
+      "cn": "11-5646/F",
+      "sponsor": "北京大学",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "人口学与计划生育",
+      "category_code": "H125",
+      "page": 1,
+      "title": "南方人口",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINccLXL7O4ydCK8snazlOYIy6kF76zXdIPmvmNX2OeXxMkUy3UwS2hsDZhL2O087aNINhmR1OiN-awV0fwq9FVNuxwc9HRzCx0yTL9zydHAEg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "3.507",
+      "comprehensive_if": "1.733",
+      "issn": "1004-1613",
+      "cn": "44-1114/C",
+      "sponsor": "中山大学人口研究所",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "人口学与计划生育",
+      "category_code": "H125",
+      "page": 1,
+      "title": "人口与社会",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINccLXL7O4ydCK8snazlOYIy6kF76zXdIPmvmNX2OeXxMkUy3UwS2hsDZhL2O087aMxeQzsyuuKn1bQNmDfplK2D8VvsQbQlTNGCHsQ_Bn2pw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.371",
+      "comprehensive_if": "1.505",
+      "issn": "2095-7963",
+      "cn": "32-1851/C",
+      "sponsor": "南京邮电大学",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "人口学与计划生育",
+      "category_code": "H125",
+      "page": 1,
+      "title": "Chinese Journal of Population,Resources and Environment",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINccLXL7O4ydCK8snazlOYIy6kF76zXdIPmvmNX2OeXxMkUy3UwS2hsDZhL2O087aO7NSfXaNqRo5Ml9GMo1RqtklKxeb3ff5Kzoy1V5Fmesg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.114",
+      "comprehensive_if": "0.557",
+      "issn": "2096-9589",
+      "cn": "37-1202/N",
+      "sponsor": "中国可持续发展研究会;山东省可持续发展研究中心;中国21世纪议程管理中心;山东师范大学",
+      "tags": [
+        "网络首发",
+        "完全OA期刊"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "人口学与计划生育",
+      "category_code": "H125",
+      "page": 1,
+      "title": "China Population Today",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINccLXL7O4ydCK8snazlOYIy6kF76zXdIPmvmNX2OeXxMkUy3UwS2hsDZhL2O087aMTFWQMjD3LmSEGXmgIDDIPbVIK2ltF5p3OOJeAVojNlg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1003-4595",
+      "cn": "11-2872/C",
+      "sponsor": "中国人口与发展研究中心",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "人口学与计划生育",
+      "category_code": "H125",
+      "page": 1,
+      "title": "人口与计划生育",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINccLXL7O4ydCK8snazlOYIy6kF76zXdIPmvmNX2OeXxMkUy3UwS2hsDZhL2O087aM9tBemkR1-Nu2K6PDYtp8Ny8H1LN3RYfN5CgfAT_XPlg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1004-8197",
+      "cn": "11-3148/C",
+      "sponsor": "人口与计划生育杂志社",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "人口学与计划生育",
+      "category_code": "H125",
+      "page": 1,
+      "title": "人口战线",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINccLXL7O4ydCK8snazlOYIy6kF76zXdIPmvmNX2OeXxMkUy3UwS2hsDZhL2O087aOxWvrDfyrlcD2MRP5VQwuWyg_AzA_gQkGhyR5nb7Dseg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1007-3647",
+      "cn": "13-1041/C",
+      "sponsor": "河北省计化生育委员会;省计化生育协会;省人口学会",
+      "tags": []
+    }
+  ]
+}

@@ -1,0 +1,345 @@
+{
+  "category": {
+    "code": "E067",
+    "title": "泌尿科学",
+    "count": 19,
+    "major_code": "",
+    "major_title": ""
+  },
+  "pages": [
+    {
+      "page": 1,
+      "rows": 19,
+      "pageCount": 1
+    }
+  ],
+  "records": [
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "泌尿科学",
+      "category_code": "E067",
+      "page": 1,
+      "title": "中华男科学杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPkrhlrQ4clk_G9pEaJo4kt274b6dQzpu4oocSdsQpWXjF2ug6t888_Jjz1h6lrAQ2Upxa-05LGnY8HKUkC15qp_n5gk8zZFdMQso2nWi2dPw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.572",
+      "comprehensive_if": "1.247",
+      "issn": "1009-3591",
+      "cn": "10-1966/R",
+      "sponsor": "融通医健期刊出版(北京)有限公司",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "泌尿科学",
+      "category_code": "E067",
+      "page": 1,
+      "title": "中国性科学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPkrhlrQ4clk_G9pEaJo4kt274b6dQzpu4oocSdsQpWXjF2ug6t888_Jjz1h6lrAQ3pRWVAcD5AA0oQOsQC8Jwo2R70Tce2zx9LqTqYv1ZbIw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.274",
+      "comprehensive_if": "1.075",
+      "issn": "1672-1993",
+      "cn": "11-4982/R",
+      "sponsor": "中国性学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "泌尿科学",
+      "category_code": "E067",
+      "page": 1,
+      "title": "临床泌尿外科杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPkrhlrQ4clk_G9pEaJo4kt274b6dQzpu4oocSdsQpWXjF2ug6t888_Jjz1h6lrAQ1oc1jmMWBg--DWal51BmE7IQ0UbLTBGg74izAJPPYT0w==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.122",
+      "comprehensive_if": "0.940",
+      "issn": "1001-1420",
+      "cn": "42-1131/R",
+      "sponsor": "华中科技大学同济医学院附属协和医院;同济医院",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "泌尿科学",
+      "category_code": "E067",
+      "page": 1,
+      "title": "中华泌尿外科杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPkrhlrQ4clk_G9pEaJo4kt274b6dQzpu4oocSdsQpWXjF2ug6t888_Jjz1h6lrAQ19U_ssAOhp6LYeC2G2BQga20av3mJCYwqXjzFehfyfPA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.113",
+      "comprehensive_if": "1.002",
+      "issn": "1000-6702",
+      "cn": "11-2330/R",
+      "sponsor": "中华医学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "泌尿科学",
+      "category_code": "E067",
+      "page": 1,
+      "title": "临床肾脏病杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPkrhlrQ4clk_G9pEaJo4kt274b6dQzpu4oocSdsQpWXjF2ug6t888_Jjz1h6lrAQ20xqEPVS56-bftDOH0cRdkZ0kNpzxgf3fNuhCQdnk1Ng==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.086",
+      "comprehensive_if": "0.826",
+      "issn": "1671-2390",
+      "cn": "42-1637/R",
+      "sponsor": "中华医学会武汉分会;湖北省微循环学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "泌尿科学",
+      "category_code": "E067",
+      "page": 1,
+      "title": "现代泌尿外科杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPkrhlrQ4clk_G9pEaJo4kt274b6dQzpu4oocSdsQpWXjF2ug6t888_Jjz1h6lrAQ37Hap5y9ZIFK7qCho_Tqo2SvgUGJca2FRGJqbEJQwcxg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.069",
+      "comprehensive_if": "0.920",
+      "issn": "1009-8291",
+      "cn": "61-1374/R",
+      "sponsor": "西安交通大学",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "泌尿科学",
+      "category_code": "E067",
+      "page": 1,
+      "title": "肾脏病与透析肾移植杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPkrhlrQ4clk_G9pEaJo4kt274b6dQzpu4oocSdsQpWXjF2ug6t888_Jjz1h6lrAQ2Grz2k2fgVKInzPGNeJAz7oT9djsSl8UKRyZrQSso8ag==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.033",
+      "comprehensive_if": "0.779",
+      "issn": "1006-298X",
+      "cn": "32-1425/R",
+      "sponsor": "江苏省医学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "泌尿科学",
+      "category_code": "E067",
+      "page": 1,
+      "title": "中国男科学杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPkrhlrQ4clk_G9pEaJo4kt274b6dQzpu4oocSdsQpWXjF2ug6t888_Jjz1h6lrAQ0zDdG_q414tX_1M7b28rE2_POt43PyV3ynLEmHP9f2EQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.007",
+      "comprehensive_if": "0.779",
+      "issn": "1008-0848",
+      "cn": "31-1762/R",
+      "sponsor": "上海交通大学医学院附属仁济医院",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "泌尿科学",
+      "category_code": "E067",
+      "page": 1,
+      "title": "中华肾脏病杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPkrhlrQ4clk_G9pEaJo4kt274b6dQzpu4oocSdsQpWXjF2ug6t888_Jjz1h6lrAQ2J6SUM8CvvfsJk2URm5pLgxIkfMedjz39L_HNglC0a8w==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.940",
+      "comprehensive_if": "0.840",
+      "issn": "1001-7097",
+      "cn": "44-1217/R",
+      "sponsor": "中华医学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "泌尿科学",
+      "category_code": "E067",
+      "page": 1,
+      "title": "Asian Journal of Andrology",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPkrhlrQ4clk_G9pEaJo4kt274b6dQzpu4oocSdsQpWXjF2ug6t888_Jjz1h6lrAQ2s-GLSPy_Lkxpw1g0Ai8TX6JTQtHnfmkVMk-6yqfsdnw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.930",
+      "comprehensive_if": "0.706",
+      "issn": "1008-682X",
+      "cn": "31-1795/R",
+      "sponsor": "中科院上海药物研究所",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "泌尿科学",
+      "category_code": "E067",
+      "page": 1,
+      "title": "微创泌尿外科杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPkrhlrQ4clk_G9pEaJo4kt274b6dQzpu4oocSdsQpWXjF2ug6t888_Jjz1h6lrAQ0P3TKYMPmGLH28Bj4v0p4Ip2QkqbKlJQKodvMrKNfe0w==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.747",
+      "comprehensive_if": "0.669",
+      "issn": "2095-5146",
+      "cn": "10-1020/R",
+      "sponsor": "融通医健期刊出版(北京)有限公司",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "泌尿科学",
+      "category_code": "E067",
+      "page": 1,
+      "title": "中华腔镜泌尿外科杂志(电子版)",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPkrhlrQ4clk_G9pEaJo4kt274b6dQzpu4oocSdsQpWXjF2ug6t888_Jjz1h6lrAQ3gFvfyWyVyRkXQbS-gD8U-oRIVOfkFJNq1BA0i0zaZTQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.611",
+      "comprehensive_if": "0.538",
+      "issn": "1674-3253",
+      "cn": "11-9287/R",
+      "sponsor": "中华医学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "泌尿科学",
+      "category_code": "E067",
+      "page": 1,
+      "title": "国际泌尿系统杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPkrhlrQ4clk_G9pEaJo4kt274b6dQzpu4oocSdsQpWXjF2ug6t888_Jjz1h6lrAQ27_3k3QCr54B-bEtUuFFhZHdN3xyvicjm35UXWwXd-sg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.480",
+      "comprehensive_if": "0.413",
+      "issn": "1673-4416",
+      "cn": "43-1460/R",
+      "sponsor": "中华医学会;湖南省医学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "泌尿科学",
+      "category_code": "E067",
+      "page": 1,
+      "title": "泌尿外科杂志(电子版)",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPkrhlrQ4clk_G9pEaJo4kt274b6dQzpu4oocSdsQpWXjF2ug6t888_Jjz1h6lrAQ2ds8ztviJgQ7-SZhmip6Juk4U9nJ0aWL73sW3v249Jbg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.463",
+      "comprehensive_if": "0.389",
+      "issn": "1674-7410",
+      "cn": "11-9302/R",
+      "sponsor": "人民卫生出版社有限公司",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "泌尿科学",
+      "category_code": "E067",
+      "page": 1,
+      "title": "中华肾病研究电子杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPkrhlrQ4clk_G9pEaJo4kt274b6dQzpu4oocSdsQpWXjF2ug6t888_Jjz1h6lrAQ3s3nXPp_3wBU1O1cVirJCSZaVQArNqqw7bcHqmTEINpg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.174",
+      "comprehensive_if": "0.174",
+      "issn": "2095-3216",
+      "cn": "11-9325/R",
+      "sponsor": "中华医学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "泌尿科学",
+      "category_code": "E067",
+      "page": 1,
+      "title": "Current Urology",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPkrhlrQ4clk_G9pEaJo4kt274b6dQzpu4oocSdsQpWXjF2ug6t888_Jjz1h6lrAQ0wLef2TGlLx-3zZhTAvJyDJo8h29eSufwzqQst9jYbuw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.141",
+      "comprehensive_if": "0.130",
+      "issn": "1661-7649",
+      "cn": "37-1543/R4",
+      "sponsor": "山东大学",
+      "tags": [
+        "增强出版",
+        "完全OA期刊"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "泌尿科学",
+      "category_code": "E067",
+      "page": 1,
+      "title": "Asian Journal of Urology",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPkrhlrQ4clk_G9pEaJo4kt274b6dQzpu4oocSdsQpWXjF2ug6t888_Jjz1h6lrAQ0CNfFKGr2MmrNhWqPDfCEUsxXK9V6y_ZBSSJ_pi1wCDQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "2214-3882",
+      "cn": "31-2124/R",
+      "sponsor": "同济大学",
+      "tags": [
+        "完全OA期刊"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "泌尿科学",
+      "category_code": "E067",
+      "page": 1,
+      "title": "Uroprecision",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPkrhlrQ4clk_G9pEaJo4kt274b6dQzpu4oocSdsQpWXjF2ug6t888_Jjz1h6lrAQ0NMwNvPs8V-P22TKqnwoyL-qXLSeisXVAiVgFGTUlMXw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "2835-1061",
+      "cn": "10-1884/R",
+      "sponsor": "高等教育出版社有限公司",
+      "tags": [
+        "完全OA期刊"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "泌尿科学",
+      "category_code": "E067",
+      "page": 1,
+      "title": "预诊漫谈",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPkrhlrQ4clk_G9pEaJo4kt274b6dQzpu4oocSdsQpWXjF2ug6t888_Jjz1h6lrAQ2FvtXCuEe9JUI08SYtbEIXAffy08nWu0LmUpLrP8VIMg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "",
+      "cn": "",
+      "sponsor": "深圳市第三人民医院",
+      "tags": [
+        "增强出版"
+      ]
+    }
+  ]
+}

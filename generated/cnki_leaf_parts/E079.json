@@ -1,0 +1,1303 @@
+{
+  "category": {
+    "code": "E079",
+    "title": "药学",
+    "count": 71,
+    "major_code": "",
+    "major_title": ""
+  },
+  "pages": [
+    {
+      "page": 1,
+      "rows": 21,
+      "pageCount": 4
+    },
+    {
+      "page": 2,
+      "rows": 21,
+      "pageCount": 4
+    },
+    {
+      "page": 3,
+      "rows": 21,
+      "pageCount": 4
+    },
+    {
+      "page": 4,
+      "rows": 8,
+      "pageCount": 4
+    }
+  ],
+  "records": [
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 1,
+      "title": "Acta Pharmaceutica Sinica B",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPWpK7zVgokNhIOaQ1w2JomAwtJVC4ZzaOFy_tKVslXBiNgzyynbi2tMex3n5L4YbQAC7NeabGcIki3aA8BiUm1AcwHcqhh8EQ9Cqks55H7PA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "4.112",
+      "comprehensive_if": "2.856",
+      "issn": "2211-3835",
+      "cn": "10-1171/R",
+      "sponsor": "中国药学会药物研究所;中国医学科学院",
+      "tags": [
+        "网络首发",
+        "完全OA期刊"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 1,
+      "title": "Acta Pharmacologica Sinica",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPWpK7zVgokNhIOaQ1w2JomAwtJVC4ZzaOFy_tKVslXBiNgzyynbi2tMex3n5L4YbT2Rr9jwSLjWvrEc4k4GG1_xeh92_FnYq94GfrtVfiyzA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.591",
+      "comprehensive_if": "1.804",
+      "issn": "1671-4083",
+      "cn": "31-1347/R",
+      "sponsor": "中国药理学会;中科院上海药物研究所",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 1,
+      "title": "中国药理学通报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPWpK7zVgokNhIOaQ1w2JomAwtJVC4ZzaOFy_tKVslXBiNgzyynbi2tMex3n5L4YbSDQqSFsh4P_JSYtYIsZqZsRa5dVD4y0Jmh43kUrz5tuw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.519",
+      "comprehensive_if": "1.838",
+      "issn": "1001-1978",
+      "cn": "34-1086/R",
+      "sponsor": "中国药理学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 1,
+      "title": "药物评价研究",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPWpK7zVgokNhIOaQ1w2JomAwtJVC4ZzaOFy_tKVslXBiNgzyynbi2tMex3n5L4YbR1aj-901DokxZxvmXvTiCakIFCBrTvd6EgJqVmIR-uYQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.434",
+      "comprehensive_if": "1.720",
+      "issn": "1674-6376",
+      "cn": "12-1409/R",
+      "sponsor": "天津药物研究院;中国药学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 1,
+      "title": "中国药房",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPWpK7zVgokNhIOaQ1w2JomAwtJVC4ZzaOFy_tKVslXBiNgzyynbi2tMex3n5L4YbTPrzrYdxWoOsdRjXai_9q85YGnRNzMi9eGoy2OwkW-GQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.336",
+      "comprehensive_if": "1.788",
+      "issn": "1001-0408",
+      "cn": "50-1055/R",
+      "sponsor": "中国医院协会;重庆大学附属肿瘤医院",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 1,
+      "title": "华西药学杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPWpK7zVgokNhIOaQ1w2JomAwtJVC4ZzaOFy_tKVslXBiNgzyynbi2tMex3n5L4YbT0m5ulwoc5UazoIywk01QHZDLqo6HE4dCfD_ay-eIgOA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.237",
+      "comprehensive_if": "1.430",
+      "issn": "1006-0103",
+      "cn": "51-1218/R",
+      "sponsor": "四川大学;四川省药学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 1,
+      "title": "中国新药杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPWpK7zVgokNhIOaQ1w2JomAwtJVC4ZzaOFy_tKVslXBiNgzyynbi2tMex3n5L4YbTliNL4orG1rsySMqn-IxJ-8AITHsnUJPW60KrK2mIOQg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.235",
+      "comprehensive_if": "1.748",
+      "issn": "1003-3734",
+      "cn": "11-2850/R",
+      "sponsor": "中国医药科技出版社有限公司;中国医药集团有限公司;中国药学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 1,
+      "title": "中国临床药理学杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPWpK7zVgokNhIOaQ1w2JomAwtJVC4ZzaOFy_tKVslXBiNgzyynbi2tMex3n5L4YbSf3lD7OIVfC7SX_Rd-hmQOx_aqsu4QIqadcgSlbe5hjQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.206",
+      "comprehensive_if": "1.851",
+      "issn": "1001-6821",
+      "cn": "11-2220/R",
+      "sponsor": "中国药学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 1,
+      "title": "药学学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPWpK7zVgokNhIOaQ1w2JomAwtJVC4ZzaOFy_tKVslXBiNgzyynbi2tMex3n5L4YbQWD-CWs5fyBxVVgmMA7_XaUE0KcjzvtU2TMVDfEmpDSw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.176",
+      "comprehensive_if": "1.499",
+      "issn": "0513-4870",
+      "cn": "11-2163/R",
+      "sponsor": "中国药学会;中国医学科学院药物研究所",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 1,
+      "title": "中国药学杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPWpK7zVgokNhIOaQ1w2JomAwtJVC4ZzaOFy_tKVslXBiNgzyynbi2tMex3n5L4YbQVt0gCvP6igCY02KISEuZWulkOoQnpxrb1Thbf94gfPw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.042",
+      "comprehensive_if": "1.583",
+      "issn": "1001-2494",
+      "cn": "11-2162/R",
+      "sponsor": "中国药学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 1,
+      "title": "中国医院药学杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPWpK7zVgokNhIOaQ1w2JomAwtJVC4ZzaOFy_tKVslXBiNgzyynbi2tMex3n5L4YbSRXXePsDk4cTJK9YbHJT1ZCaw23fppYpl830mkZrlZbg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.958",
+      "comprehensive_if": "1.549",
+      "issn": "1001-5213",
+      "cn": "42-1204/R",
+      "sponsor": "中国药学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 1,
+      "title": "西北药学杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPWpK7zVgokNhIOaQ1w2JomAwtJVC4ZzaOFy_tKVslXBiNgzyynbi2tMex3n5L4YbTEZLiY89x_dyT1qXYHvijW9qn7fbH1mb5X3eWQUI_SYA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.888",
+      "comprehensive_if": "1.341",
+      "issn": "1004-2407",
+      "cn": "61-1108/R",
+      "sponsor": "西安交通大学;陕西省药学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 1,
+      "title": "医药导报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPWpK7zVgokNhIOaQ1w2JomAwtJVC4ZzaOFy_tKVslXBiNgzyynbi2tMex3n5L4YbQYDImm9QEZ5ncGxG26hNBIZ6-iDsIhIBh4l2fWCBpyzw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.882",
+      "comprehensive_if": "1.497",
+      "issn": "1004-0781",
+      "cn": "42-1293/R",
+      "sponsor": "华中科技大学同济医学院附属同济医院;中国药理学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 1,
+      "title": "中国现代应用药学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPWpK7zVgokNhIOaQ1w2JomAwtJVC4ZzaOFy_tKVslXBiNgzyynbi2tMex3n5L4YbTd7Yjxz-O7bLRWZtxyRZUOnsLhP8bRx_dEcQRBPeDgfg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.855",
+      "comprehensive_if": "1.467",
+      "issn": "1007-7693",
+      "cn": "33-1210/R",
+      "sponsor": "中国药学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 1,
+      "title": "Asian Journal of Pharmaceutical Sciences",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPWpK7zVgokNhIOaQ1w2JomAwtJVC4ZzaOFy_tKVslXBiNgzyynbi2tMex3n5L4YbQfGRbKul27seJTzMFNWJvQYDMolEj3oZ7ipkfpyT3Szg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.824",
+      "comprehensive_if": "1.261",
+      "issn": "1818-0876",
+      "cn": "21-1608/R",
+      "sponsor": "沈阳药科大学",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 1,
+      "title": "沈阳药科大学学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPWpK7zVgokNhIOaQ1w2JomAwtJVC4ZzaOFy_tKVslXBiNgzyynbi2tMex3n5L4YbR0kuc_PqOeaPS0GBEwjYYaTmaSh3z63nUi35DaGiVjLw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.814",
+      "comprehensive_if": "1.368",
+      "issn": "1006-2858",
+      "cn": "21-1349/R",
+      "sponsor": "沈阳药科大学",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 1,
+      "title": "中国新药与临床杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPWpK7zVgokNhIOaQ1w2JomAwtJVC4ZzaOFy_tKVslXBiNgzyynbi2tMex3n5L4YbSsozF6iamOHnDZWdTj_q8X8n6HhKY15MdXtWdBt7Tt9w==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.756",
+      "comprehensive_if": "1.290",
+      "issn": "1007-7669",
+      "cn": "31-1746/R",
+      "sponsor": "中国药学会;上海市食品药品监督管理局科技情报研究所",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 1,
+      "title": "广东药科大学学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPWpK7zVgokNhIOaQ1w2JomAwtJVC4ZzaOFy_tKVslXBiNgzyynbi2tMex3n5L4YbQeu57jO6KuAN44W293KLYTYsFJpePWVJ-xrOg9uHBv0Q==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.678",
+      "comprehensive_if": "1.284",
+      "issn": "2096-3653",
+      "cn": "44-1733/R",
+      "sponsor": "广东药科大学",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 1,
+      "title": "中国临床药理学与治疗学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPWpK7zVgokNhIOaQ1w2JomAwtJVC4ZzaOFy_tKVslXBiNgzyynbi2tMex3n5L4YbTt6RmgNyV6_s9UqNqadVQtlMXtrQj7npQRShuKProwZA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.662",
+      "comprehensive_if": "1.264",
+      "issn": "1009-2501",
+      "cn": "34-1206/R",
+      "sponsor": "中国药理学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 1,
+      "title": "药物分析杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPWpK7zVgokNhIOaQ1w2JomAwtJVC4ZzaOFy_tKVslXBiNgzyynbi2tMex3n5L4YbRDMh6zwRnIYj3TSck-VhieHk3rs9Tnzdz_OLZFPSL0pg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.658",
+      "comprehensive_if": "1.371",
+      "issn": "0254-1793",
+      "cn": "11-2224/R",
+      "sponsor": "中国药学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 1,
+      "title": "中国药物应用与监测",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPWpK7zVgokNhIOaQ1w2JomAwtJVC4ZzaOFy_tKVslXBiNgzyynbi2tMex3n5L4YbQ74UeYxevIpxgAzP9HbYkuqEDkn5pabdwa_mFz3Z3IwQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.651",
+      "comprehensive_if": "1.550",
+      "issn": "1672-8157",
+      "cn": "11-5227/R",
+      "sponsor": "融通医健期刊出版(北京)有限公司",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 2,
+      "title": "中国抗生素杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMCtenvE5zzwFN0NxmybT1Y4tPrC4EAS109O7-h_8wY0DLVk5630mM7Wrmo-6EXKJCGHmx80dUNpxBrtJtEZr33NQ8Mg_KAlzT1d6UX6eSyoQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.639",
+      "comprehensive_if": "1.268",
+      "issn": "1001-8689",
+      "cn": "51-1126/R",
+      "sponsor": "中国医药集团总公司四川抗菌素工业研究所;中国医学科学院医药生物技术研究所",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 2,
+      "title": "中国药事",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMCtenvE5zzwFN0NxmybT1Y4tPrC4EAS109O7-h_8wY0DLVk5630mM7Wrmo-6EXKJCGvdzNS6Zp3o8BGSI9Rzbloc4BipuaUm3fShy7VwY0IA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.598",
+      "comprehensive_if": "1.286",
+      "issn": "1002-7777",
+      "cn": "11-2858/R",
+      "sponsor": "中国食品药品检定研究院",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 2,
+      "title": "药学前沿",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMKM2TAgld21kJUxDuZF7gEDQTu30HwhKGYMjm02xdHP3zEGsu4lJRoCgl0ruGaEZBM45ycSNh7ysoNTa9cn8qp0aYgckjBk3JjfcbRpmSnGw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.527",
+      "comprehensive_if": "1.137",
+      "issn": "2097-4922",
+      "cn": "42-1948/R",
+      "sponsor": "武汉大学;湖北省药品监督检验研究院",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 2,
+      "title": "实用药物与临床",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMKM2TAgld21kJUxDuZF7gEDQTu30HwhKGYMjm02xdHP3zEGsu4lJRoCgl0ruGaEZD82umSWIaov-j0mk27BTqPyf2wXEZNEMAtwBMB-IAA2A==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.396",
+      "comprehensive_if": "1.149",
+      "issn": "1673-0070",
+      "cn": "21-1516/R",
+      "sponsor": "辽宁省药学会;中国医科大学附属盛京医院",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 2,
+      "title": "中国药理学与毒理学杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMKM2TAgld21kJUxDuZF7gEDQTu30HwhKGYMjm02xdHP3zEGsu4lJRoCgl0ruGaEZCrfzstKCy_MGB3Bq-KLKz8qGdFKVfxG72c5vnkvC2zyg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.396",
+      "comprehensive_if": "1.046",
+      "issn": "1000-3002",
+      "cn": "11-1155/R",
+      "sponsor": "军事科学院军事医学研究院",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 2,
+      "title": "中南药学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMKM2TAgld21kJUxDuZF7gEDQTu30HwhKGYMjm02xdHP3zEGsu4lJRoCgl0ruGaEZDswGbi1R0caBP59ZTWz3b8UUFeDl-rCq7brd_s8sHp8A==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.358",
+      "comprehensive_if": "1.035",
+      "issn": "1672-2981",
+      "cn": "43-1408/R",
+      "sponsor": "湖南省药学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 2,
+      "title": "中国药科大学学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMKM2TAgld21kJUxDuZF7gEDQTu30HwhKGYMjm02xdHP3zEGsu4lJRoCgl0ruGaEZAH_ReP5APAkyL503rUTk-34WBoLwVE6NMnJaUBrcAbVQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.355",
+      "comprehensive_if": "1.052",
+      "issn": "1000-5048",
+      "cn": "32-1157/R",
+      "sponsor": "中国药科大学",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 2,
+      "title": "中国药物警戒",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMKM2TAgld21kJUxDuZF7gEDQTu30HwhKGYMjm02xdHP3zEGsu4lJRoCgl0ruGaEZB88HGj76_sAfQpPcuqH01VolumlhEZKFbe8nqISaQqkw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.317",
+      "comprehensive_if": "1.112",
+      "issn": "1672-8629",
+      "cn": "11-5219/R",
+      "sponsor": "国家药品监督管理局药品评价中心(国家药品不良反应监测中心)",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 2,
+      "title": "药学进展",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMKM2TAgld21kJUxDuZF7gEDQTu30HwhKGYMjm02xdHP3zEGsu4lJRoCgl0ruGaEZCF9kmPMZOFlMCGIANj5Se8cwTHLktQmW6UZB9JWfRKOw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.311",
+      "comprehensive_if": "0.883",
+      "issn": "1001-5094",
+      "cn": "32-1109/R",
+      "sponsor": "中国药科大学;中国药学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 2,
+      "title": "药学研究",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMKM2TAgld21kJUxDuZF7gEDQTu30HwhKGYMjm02xdHP3zEGsu4lJRoCgl0ruGaEZCUFizCW3k4Bfb7Kf9wWErKFm7Bh2y0XD0kz6LO-dyJRw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.311",
+      "comprehensive_if": "0.968",
+      "issn": "2095-5375",
+      "cn": "37-1493/R",
+      "sponsor": "山东省食品药品检验研究院;山东省药学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 2,
+      "title": "中国药业",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMKM2TAgld21kJUxDuZF7gEDQTu30HwhKGYMjm02xdHP3zEGsu4lJRoCgl0ruGaEZCO0YG9oCHYoJrNhGx0luReNW_d-XjqBw1TMYxIl-b5ww==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.278",
+      "comprehensive_if": "1.054",
+      "issn": "1006-4931",
+      "cn": "50-1054/R",
+      "sponsor": "西南大学",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 2,
+      "title": "中国医院用药评价与分析",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMKM2TAgld21kJUxDuZF7gEDQTu30HwhKGYMjm02xdHP3zEGsu4lJRoCgl0ruGaEZDCTEUVqvhl-2FlMJ2bH9g4HASCIhUi8JK5wYrkBaJq0A==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.275",
+      "comprehensive_if": "0.944",
+      "issn": "1672-2124",
+      "cn": "11-4975/R",
+      "sponsor": "中国医药生物技术协会;重庆大学附属肿瘤医院",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 2,
+      "title": "临床药物治疗杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMKM2TAgld21kJUxDuZF7gEDQTu30HwhKGYMjm02xdHP3zEGsu4lJRoCgl0ruGaEZAi059KOjbb0ml1uRQOdD9NJqyMQTUb8_C2ZdFA6Xk_Yg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.266",
+      "comprehensive_if": "1.062",
+      "issn": "1672-3384",
+      "cn": "11-4989/R",
+      "sponsor": "北京药学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 2,
+      "title": "国外医药(抗生素分册)",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMKM2TAgld21kJUxDuZF7gEDQTu30HwhKGYMjm02xdHP3zEGsu4lJRoCgl0ruGaEZDNfLahY0dk_iTGN6G-5Ff3vwmaDoMT8Eh7RMwMOLmNQQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.259",
+      "comprehensive_if": "1.068",
+      "issn": "1001-8751",
+      "cn": "51-1127/R",
+      "sponsor": "中国医药集团总公司四川抗菌素工业研究所;中国医学科学院医药生物技术研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 2,
+      "title": "中国药物评价",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMKM2TAgld21kJUxDuZF7gEDQTu30HwhKGYMjm02xdHP3zEGsu4lJRoCgl0ruGaEZA3nY82iakeqtJ1Xypwp6aQXENEnZwNZh4tbpLpKuY7eg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.218",
+      "comprehensive_if": "0.939",
+      "issn": "2095-3593",
+      "cn": "10-1056/R",
+      "sponsor": "国家药品监督管理局信息中心",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 2,
+      "title": "药物流行病学杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMKM2TAgld21kJUxDuZF7gEDQTu30HwhKGYMjm02xdHP3zEGsu4lJRoCgl0ruGaEZBWdqpHogku-dKR8PV7CZqf0yir2CvuQJ_jIEl4bGroHQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.199",
+      "comprehensive_if": "1.048",
+      "issn": "1005-0698",
+      "cn": "42-1333/R",
+      "sponsor": "湖北省药品监督检验研究院;中国药学会;武汉大学中南医院",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 2,
+      "title": "今日药学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMKM2TAgld21kJUxDuZF7gEDQTu30HwhKGYMjm02xdHP3zEGsu4lJRoCgl0ruGaEZAY_tOwewskD8FkwO_txkglVPFxAjaP4r131-txWmRzeA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.178",
+      "comprehensive_if": "0.935",
+      "issn": "1674-229X",
+      "cn": "44-1650/R",
+      "sponsor": "广东省药学会;中国药学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 2,
+      "title": "药物生物技术",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMKM2TAgld21kJUxDuZF7gEDQTu30HwhKGYMjm02xdHP3zEGsu4lJRoCgl0ruGaEZC7sGL9s_Jn-tCWkzcXdX85pBrvBEt8A8OZ6mQbgvcYng==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.120",
+      "comprehensive_if": "0.842",
+      "issn": "1005-8915",
+      "cn": "32-1488/R",
+      "sponsor": "中国药科大学;中国医药科技出版社;中国药学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 2,
+      "title": "中国合理用药探索",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMKM2TAgld21kJUxDuZF7gEDQTu30HwhKGYMjm02xdHP3zEGsu4lJRoCgl0ruGaEZBHgNR-BacVlrIJIvVZlq-0Om-kKgjmbH1QhR9aAqubxQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.011",
+      "comprehensive_if": "0.718",
+      "issn": "2096-3327",
+      "cn": "10-1462/R",
+      "sponsor": "中国健康传媒集团有限公司",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 2,
+      "title": "药学与临床研究",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMKM2TAgld21kJUxDuZF7gEDQTu30HwhKGYMjm02xdHP3zEGsu4lJRoCgl0ruGaEZDZGzY_y8St6f-h0YiT5BtaR-XIVJPAMLAkqDve3qPT-A==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.952",
+      "comprehensive_if": "0.833",
+      "issn": "1673-7806",
+      "cn": "32-1773/R",
+      "sponsor": "江苏省药学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 2,
+      "title": "中国医药工业杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMKM2TAgld21kJUxDuZF7gEDQTu30HwhKGYMjm02xdHP3zEGsu4lJRoCgl0ruGaEZBKsjVQK4-xXrnVrBM2jK81G3fxmAV3NJFVjXB_5jZ-zw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.885",
+      "comprehensive_if": "0.711",
+      "issn": "1001-8255",
+      "cn": "31-1243/R",
+      "sponsor": "上海医药工业研究院;中国药学会;中国化学制药工业协会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 3,
+      "title": "上海医药",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN9enykrMnQ2e4cKKXXsFfWTBHz_1I0ss0cUER4FKeOsOb5VmQOZ3GHthSCmg-kma09kfnjWZdo6WGidpXGY_4nVID_6DYKObswywJ4dmKnIQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.869",
+      "comprehensive_if": "0.602",
+      "issn": "1006-1533",
+      "cn": "31-1663/R",
+      "sponsor": "上海医药行业协会;上海市医药股份有限公司",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 3,
+      "title": "中国药物依赖性杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN9enykrMnQ2e4cKKXXsFfWTBHz_1I0ss0cUER4FKeOsOb5VmQOZ3GHthSCmg-kma0RmDS5bcJ2jiDP4FORvpPoEgNXlYe9iM9arAaJWyZSug==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.846",
+      "comprehensive_if": "0.548",
+      "issn": "1007-9718",
+      "cn": "11-3920/R",
+      "sponsor": "北京大学;中国毒理学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 3,
+      "title": "药学实践与服务",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN9enykrMnQ2e4cKKXXsFfWTBHz_1I0ss0cUER4FKeOsOb5VmQOZ3GHthSCmg-kma3Kkymz7ZZHw92ut8jTiUqTJd0XnGwEsMoyuNRqPO5KaA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.827",
+      "comprehensive_if": "0.643",
+      "issn": "2097-2024",
+      "cn": "31-2185/R",
+      "sponsor": "海军军医大学药学系",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 3,
+      "title": "世界临床药物",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN9enykrMnQ2e4cKKXXsFfWTBHz_1I0ss0cUER4FKeOsOb5VmQOZ3GHthSCmg-kma3HpW_FjQF7tZASDx9SOmH_8uKeor-8U8Ao0NqJ67CNNw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.825",
+      "comprehensive_if": "0.593",
+      "issn": "1672-9188",
+      "cn": "31-1939/R",
+      "sponsor": "上海医药工业研究院;中国药学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 3,
+      "title": "中国药物化学杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN9enykrMnQ2e4cKKXXsFfWTBHz_1I0ss0cUER4FKeOsOb5VmQOZ3GHthSCmg-kma3sJsMffDNgStNM8yLgCCXGVu3JplX5CNhS3jt-upPuoA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.823",
+      "comprehensive_if": "0.562",
+      "issn": "1005-0108",
+      "cn": "21-1313/R",
+      "sponsor": "沈阳药科大学;中国药学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 3,
+      "title": "天津药学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN9enykrMnQ2e4cKKXXsFfWTBHz_1I0ss0cUER4FKeOsOb5VmQOZ3GHthSCmg-kma1saHv0XGbS6s3L_oThDxxsWGvHhy0o9hIp2BiJ4ri5tg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.813",
+      "comprehensive_if": "0.537",
+      "issn": "1006-5687",
+      "cn": "12-1230/R",
+      "sponsor": "天津市医药集团有限公司;天津市药学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 3,
+      "title": "中国药物与临床",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN9enykrMnQ2e4cKKXXsFfWTBHz_1I0ss0cUER4FKeOsOb5VmQOZ3GHthSCmg-kma3i-JP-lrad24YxjkyybnZ7oWf4JpuGGB6_O5cifyqa5w==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.808",
+      "comprehensive_if": "0.617",
+      "issn": "1671-2560",
+      "cn": "11-4706/R",
+      "sponsor": "中国医院协会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 3,
+      "title": "中国药品标准",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN9enykrMnQ2e4cKKXXsFfWTBHz_1I0ss0cUER4FKeOsOb5VmQOZ3GHthSCmg-kma2JDxhv6Ed4BKDckoHX_lwLZAYujC2SncthdeNLIUrmrw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.795",
+      "comprehensive_if": "0.705",
+      "issn": "1009-3656",
+      "cn": "11-4422/R",
+      "sponsor": "国家药典委员会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 3,
+      "title": "Journal of Chinese Pharmaceutical Sciences",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN9enykrMnQ2e4cKKXXsFfWTBHz_1I0ss0cUER4FKeOsOb5VmQOZ3GHthSCmg-kma36UeYF6Vg0k_vXetkM6keykFxNP_zYmcihiITGV7VFJA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.747",
+      "comprehensive_if": "0.543",
+      "issn": "1003-1057",
+      "cn": "11-2863/R",
+      "sponsor": "中国药学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 3,
+      "title": "中国药物经济学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN9enykrMnQ2e4cKKXXsFfWTBHz_1I0ss0cUER4FKeOsOb5VmQOZ3GHthSCmg-kma3LwWphaoGVDUczaYnrxqh7mhVfmOFGhVZ-gAbhWYo3dg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.654",
+      "comprehensive_if": "0.406",
+      "issn": "1673-5846",
+      "cn": "11-5482/R",
+      "sponsor": "中国中医药研究促进会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 3,
+      "title": "中国临床药学杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN9enykrMnQ2e4cKKXXsFfWTBHz_1I0ss0cUER4FKeOsOb5VmQOZ3GHthSCmg-kma2aSjeFsTYpbqZW4HImdwExzg90royPPG_rB1m7kryZbg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.606",
+      "comprehensive_if": "0.547",
+      "issn": "1007-4406",
+      "cn": "31-1726/R",
+      "sponsor": "中国药学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 3,
+      "title": "中国处方药",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN9enykrMnQ2e4cKKXXsFfWTBHz_1I0ss0cUER4FKeOsOb5VmQOZ3GHthSCmg-kma3Aw3k2TXpZpkCeTXvlztXPGkWR-40T-caVJOgo6z0zqw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.596",
+      "comprehensive_if": "0.397",
+      "issn": "1671-945X",
+      "cn": "44-1549/T",
+      "sponsor": "国家药品监督管理局南方医药经济研究所",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 3,
+      "title": "中国药物滥用防治杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN9enykrMnQ2e4cKKXXsFfWTBHz_1I0ss0cUER4FKeOsOb5VmQOZ3GHthSCmg-kma167EESRW0uUQWL1eTYbMy9dwNjbNPPTRfPxBkRQUY3AQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.592",
+      "comprehensive_if": "0.432",
+      "issn": "1006-902X",
+      "cn": "11-3742/R",
+      "sponsor": "中国药物滥用防治协会;军事医学科学院毒物药物研究所",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 3,
+      "title": "临床合理用药",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN9enykrMnQ2e4cKKXXsFfWTBHz_1I0ss0cUER4FKeOsOb5VmQOZ3GHthSCmg-kma0SEP3X6Su4uI60kYv9CiVeYGNsCzrgVGowlnTm-pJbaw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.546",
+      "comprehensive_if": "0.340",
+      "issn": "1674-3296",
+      "cn": "13-1389/R",
+      "sponsor": "河北省科学技术协会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 3,
+      "title": "药物不良反应杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN9enykrMnQ2e4cKKXXsFfWTBHz_1I0ss0cUER4FKeOsOb5VmQOZ3GHthSCmg-kma3MhYJ-WJO1ZdDhbkhDU291u1JEygNzzWz5K1jP1Kyk9w==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.543",
+      "comprehensive_if": "0.503",
+      "issn": "1008-5734",
+      "cn": "11-4015/R",
+      "sponsor": "中华医学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 3,
+      "title": "药品评价",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN9enykrMnQ2e4cKKXXsFfWTBHz_1I0ss0cUER4FKeOsOb5VmQOZ3GHthSCmg-kma2HkqpPDy0sqdhZJ2TcKGkz7f_0slgA263bPUeDElQFtQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.520",
+      "comprehensive_if": "0.351",
+      "issn": "1672-2809",
+      "cn": "36-1259/R",
+      "sponsor": "江西省药学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 3,
+      "title": "海峡药学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN9enykrMnQ2e4cKKXXsFfWTBHz_1I0ss0cUER4FKeOsOb5VmQOZ3GHthSCmg-kma2Uvra2R_YlCkervED1Hg-rY06XXLqeUrXCekflWY1UMQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.464",
+      "comprehensive_if": "0.336",
+      "issn": "1006-3765",
+      "cn": "35-1173/R",
+      "sponsor": "福建省药学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 3,
+      "title": "中国现代药物应用",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN9enykrMnQ2e4cKKXXsFfWTBHz_1I0ss0cUER4FKeOsOb5VmQOZ3GHthSCmg-kma3RCnNYNg-jxT4QtLr8qmVLG__rbPohfOZqMjVRjRnpWg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.446",
+      "comprehensive_if": "0.276",
+      "issn": "1673-9523",
+      "cn": "11-5581/R",
+      "sponsor": "中国康复医学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 3,
+      "title": "抗感染药学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINyQB7H-Prww5iqXefYJVdfgDBkgkR0TH1hXbeu_tEKW1B7HMRuxw3q9xM0rNGF3ajvKh1dV8IqhrcBHaMIBpMj3nRND9keR3zwFPehnyATaA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.343",
+      "comprehensive_if": "0.252",
+      "issn": "1672-7878",
+      "cn": "32-1726/R",
+      "sponsor": "苏州市第五人民医院",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 3,
+      "title": "解放军药学学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINyQB7H-Prww5iqXefYJVdfgDBkgkR0TH1hXbeu_tEKW1B7HMRuxw3q9xM0rNGF3aj43HBLUY0YLXdrGrBhwSbjMj8jzdvUiZvjPD3CRLFXMw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.264",
+      "comprehensive_if": "0.260",
+      "issn": "1008-9926",
+      "cn": "11-4227/R",
+      "sponsor": "联勤保障部队药品仪器监督检验总站",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 3,
+      "title": "北方药学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINyQB7H-Prww5iqXefYJVdfgDBkgkR0TH1hXbeu_tEKW1B7HMRuxw3q9xM0rNGF3agBP_GcVFoMinj4G73asRXEIRt0HiS7F_ZqAJ8XOmNugg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.244",
+      "comprehensive_if": "0.172",
+      "issn": "1672-8351",
+      "cn": "15-1333/R",
+      "sponsor": "内蒙古自治区食品药品学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 4,
+      "title": "国际药学研究杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPr0WCAU8jrAqreCR-GmlJIju-hH3e33bk7Tebj8M_0449QT_nJSzYwt5ha8PhZSem5sV3Rj04ELDh8qj6oXl3f0EvfqJhPl0W1wreaLTi4rw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1674-0440",
+      "cn": "11-5619/R",
+      "sponsor": "军事医学科学院毒物药物研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 4,
+      "title": "家庭用药",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPr0WCAU8jrAqreCR-GmlJIju-hH3e33bk7Tebj8M_0449QT_nJSzYwt5ha8PhZSekmqQqb9uAtPCalehCrkw47et8E1tWDq9H3yn2WGfMYUw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1009-6620",
+      "cn": "31-1845/R",
+      "sponsor": "中国科学院上海药物研究所;上海市药理学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 4,
+      "title": "首都食品与医药",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPr0WCAU8jrAqreCR-GmlJIju-hH3e33bk7Tebj8M_0449QT_nJSzYwt5ha8PhZSenQywcWhjpIyiTYPrzO91w84_3Xc6_4LvXswed7aUmISA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "2096-8213",
+      "cn": "10-1288/R",
+      "sponsor": "《首都食品与医药》杂志社",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 4,
+      "title": "药物与人",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPr0WCAU8jrAqreCR-GmlJIju-hH3e33bk7Tebj8M_0449QT_nJSzYwt5ha8PhZSelCtPoSlDe7ffGRhgbXoi6X8DZ4p82iKgMhqopCUI2J5A==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1002-3763",
+      "cn": "11-2233/R",
+      "sponsor": "北京药学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 4,
+      "title": "药学服务与研究",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPr0WCAU8jrAqreCR-GmlJIju-hH3e33bk7Tebj8M_0449QT_nJSzYwt5ha8PhZSelxFQtFb-YekeX6O_tweEgtJsXcL8s7rizShwSdDgZZkA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1671-2838",
+      "cn": "31-1877/R",
+      "sponsor": "海军军医大学",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 4,
+      "title": "中国生化药物杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPr0WCAU8jrAqreCR-GmlJIju-hH3e33bk7Tebj8M_0449QT_nJSzYwt5ha8PhZSema84x5fYtB-81J7_SG6NkSUOA654mKNahtsDjsjGi0Sw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1005-1678",
+      "cn": "32-1355/R",
+      "sponsor": "无锡锡报期刊传媒有限公司",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 4,
+      "title": "中国药剂学杂志(网络版)",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPr0WCAU8jrAqreCR-GmlJIju-hH3e33bk7Tebj8M_0449QT_nJSzYwt5ha8PhZSekxyRtht22YLKBBOKXFjc3lX3hWU0Udq-eiQYxGDp8WWQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "2617-8117",
+      "cn": "",
+      "sponsor": "沈阳药科大学",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "药学",
+      "category_code": "E079",
+      "page": 4,
+      "title": "中国药学药品知识仓库",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPr0WCAU8jrAqreCR-GmlJIju-hH3e33bk7Tebj8M_0449QT_nJSzYwt5ha8PhZSemQG25O4pGexcVEZJYPBkEQh4XxPnK8llldx_3flermiQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1673-2510",
+      "cn": "11-9119/R",
+      "sponsor": "中核战略规划研究总院有限公司",
+      "tags": [
+        "网络首发"
+      ]
+    }
+  ]
+}

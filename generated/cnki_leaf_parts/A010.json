@@ -1,0 +1,552 @@
+{
+  "category": {
+    "code": "A010",
+    "title": "海洋学",
+    "count": 30,
+    "major_code": "",
+    "major_title": ""
+  },
+  "pages": [
+    {
+      "page": 1,
+      "rows": 21,
+      "pageCount": 2
+    },
+    {
+      "page": 2,
+      "rows": 9,
+      "pageCount": 2
+    }
+  ],
+  "records": [
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "海洋学",
+      "category_code": "A010",
+      "page": 1,
+      "title": "海洋气象学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOuWm3-HweqlDv_iJSaCo4zCfzG2m0nSGkDkJ5eYgTAyAWkoWCeC1jCZTDbcIZhjgWwLPleDQo_uDXbNPzpt7Flh1wMermoVqMTIpdNgFAOKg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.913",
+      "comprehensive_if": "1.663",
+      "issn": "2096-3599",
+      "cn": "37-1512/P",
+      "sponsor": "山东气象学会;山东省气象科学研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "海洋学",
+      "category_code": "A010",
+      "page": 1,
+      "title": "海洋地质前沿",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOuWm3-HweqlDv_iJSaCo4zCfzG2m0nSGkDkJ5eYgTAyAWkoWCeC1jCZTDbcIZhjgWBDI_7LoBPbNCLIbPouXd7dCG2hwGpP8_AvMQWNGtK_A==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.788",
+      "comprehensive_if": "1.459",
+      "issn": "1009-2722",
+      "cn": "37-1475/P",
+      "sponsor": "青岛海洋地质研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "海洋学",
+      "category_code": "A010",
+      "page": 1,
+      "title": "广东海洋大学学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOuWm3-HweqlDv_iJSaCo4zCfzG2m0nSGkDkJ5eYgTAyAWkoWCeC1jCZTDbcIZhjgWkeYz7kYTiwgbPx4YLd3bza-B1i2-r-D2XcJ1DpXV5yw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.765",
+      "comprehensive_if": "1.357",
+      "issn": "1673-9159",
+      "cn": "44-1635/N",
+      "sponsor": "广东海洋大学",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "海洋学",
+      "category_code": "A010",
+      "page": 1,
+      "title": "应用海洋学学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOuWm3-HweqlDv_iJSaCo4zCfzG2m0nSGkDkJ5eYgTAyAWkoWCeC1jCZTDbcIZhjgVwXVN9JgA82Mlp_1Ty2PjwkPw5IGyset6LmWazkvQ4SA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.682",
+      "comprehensive_if": "1.153",
+      "issn": "2095-4972",
+      "cn": "35-1319/P",
+      "sponsor": "自然资源部第三海洋研究所;中国海洋学会;福建省海洋学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "海洋学",
+      "category_code": "A010",
+      "page": 1,
+      "title": "海洋科学进展",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOuWm3-HweqlDv_iJSaCo4zCfzG2m0nSGkDkJ5eYgTAyAWkoWCeC1jCZTDbcIZhjgXs-IbZX5amLShThJtUrBmESpLRa8h7RtIKRE4Relad8Q==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.557",
+      "comprehensive_if": "1.074",
+      "issn": "1671-6647",
+      "cn": "37-1387/P",
+      "sponsor": "自然资源部第一海洋研究所;中国海洋学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "海洋学",
+      "category_code": "A010",
+      "page": 1,
+      "title": "海洋工程",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOuWm3-HweqlDv_iJSaCo4zCfzG2m0nSGkDkJ5eYgTAyAWkoWCeC1jCZTDbcIZhjgXPVCBsTFA3VRvEr66biGVs1ssZh7LqEe2G1kGmVju0EQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.471",
+      "comprehensive_if": "1.214",
+      "issn": "1005-9865",
+      "cn": "32-1423/P",
+      "sponsor": "中国海洋学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "海洋学",
+      "category_code": "A010",
+      "page": 1,
+      "title": "海洋通报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOuWm3-HweqlDv_iJSaCo4zCfzG2m0nSGkDkJ5eYgTAyAWkoWCeC1jCZTDbcIZhjgUjnFk3uCIPlhK5NaXToOPp0KAv0-a-y_yr-dmbohAPvA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.469",
+      "comprehensive_if": "1.077",
+      "issn": "1001-6392",
+      "cn": "12-1076/P",
+      "sponsor": "国家海洋信息中心;中国海洋学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "海洋学",
+      "category_code": "A010",
+      "page": 1,
+      "title": "海岸工程",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOuWm3-HweqlDv_iJSaCo4zCfzG2m0nSGkDkJ5eYgTAyAWkoWCeC1jCZTDbcIZhjgWeZPhnQOSMeD-4v0Ne80mGl84BupTAue0_RZXSNpdfCA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.440",
+      "comprehensive_if": "0.947",
+      "issn": "1002-3682",
+      "cn": "37-1144/U",
+      "sponsor": "山东海岸工程学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "海洋学",
+      "category_code": "A010",
+      "page": 1,
+      "title": "海洋开发与管理",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOuWm3-HweqlDv_iJSaCo4zCfzG2m0nSGkDkJ5eYgTAyAWkoWCeC1jCZTDbcIZhjgV2F9WcWjrABOl5fbghLOZ_6W_O0xpZvIIuPK54Y3vNyg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.422",
+      "comprehensive_if": "0.867",
+      "issn": "1005-9857",
+      "cn": "11-3525/P",
+      "sponsor": "海洋出版社有限公司",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "海洋学",
+      "category_code": "A010",
+      "page": 1,
+      "title": "海洋与湖沼",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOuWm3-HweqlDv_iJSaCo4zCfzG2m0nSGkDkJ5eYgTAyAWkoWCeC1jCZTDbcIZhjgUefIXvvuf6QTI7hd4cKxcVnXMQpsDbtauIx5PYVP0F2g==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.396",
+      "comprehensive_if": "0.994",
+      "issn": "0029-814X",
+      "cn": "37-1149/P",
+      "sponsor": "中国海洋湖沼学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "海洋学",
+      "category_code": "A010",
+      "page": 1,
+      "title": "海洋学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOuWm3-HweqlDv_iJSaCo4zCfzG2m0nSGkDkJ5eYgTAyAWkoWCeC1jCZTDbcIZhjgXDecYEHhbKoe9U6iCjAIt4LOXFiEK73fmnGII0j9KUEg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.380",
+      "comprehensive_if": "0.882",
+      "issn": "0253-4193",
+      "cn": "11-2055/P",
+      "sponsor": "中国海洋学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "海洋学",
+      "category_code": "A010",
+      "page": 1,
+      "title": "海洋预报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOuWm3-HweqlDv_iJSaCo4zCfzG2m0nSGkDkJ5eYgTAyAWkoWCeC1jCZTDbcIZhjgUqIgTI7F3kl3Hkn55adUPJQ1xY12vU-NAJYoElPm7vMg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.353",
+      "comprehensive_if": "0.940",
+      "issn": "1003-0239",
+      "cn": "11-1837/P",
+      "sponsor": "国家海洋环境预报中心",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "海洋学",
+      "category_code": "A010",
+      "page": 1,
+      "title": "热带海洋学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOuWm3-HweqlDv_iJSaCo4zCfzG2m0nSGkDkJ5eYgTAyAWkoWCeC1jCZTDbcIZhjgWy3Rwg9kS21P76A-56LDWFkPGnlJAsbyHWNQXUMy8qiQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.313",
+      "comprehensive_if": "0.810",
+      "issn": "1009-5470",
+      "cn": "44-1500/P",
+      "sponsor": "中国科学院南海海洋研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "海洋学",
+      "category_code": "A010",
+      "page": 1,
+      "title": "海洋地质与第四纪地质",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOuWm3-HweqlDv_iJSaCo4zCfzG2m0nSGkDkJ5eYgTAyAWkoWCeC1jCZTDbcIZhjgX9fwapvYynfevcFiYFcRbqEaE9Kh3eLDr63-XvO1W9VQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.292",
+      "comprehensive_if": "0.954",
+      "issn": "0256-1492",
+      "cn": "37-1117/P",
+      "sponsor": "青岛海洋地质研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "海洋学",
+      "category_code": "A010",
+      "page": 1,
+      "title": "中国海洋大学学报(自然科学版)",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOuWm3-HweqlDv_iJSaCo4zCfzG2m0nSGkDkJ5eYgTAyAWkoWCeC1jCZTDbcIZhjgWimleAZqcV2FmUeXFf2xI3HgD1GgqqwYTkIy8V_mNuxQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.278",
+      "comprehensive_if": "0.722",
+      "issn": "1672-5174",
+      "cn": "37-1414/P",
+      "sponsor": "中国海洋大学",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "海洋学",
+      "category_code": "A010",
+      "page": 1,
+      "title": "海洋学研究",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOuWm3-HweqlDv_iJSaCo4zCfzG2m0nSGkDkJ5eYgTAyAWkoWCeC1jCZTDbcIZhjgUSLCtIxUZWLIxAzqM7pXZkHfudOjfTvEPFhO349V1g2A==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.176",
+      "comprehensive_if": "0.718",
+      "issn": "1001-909X",
+      "cn": "33-1330/P",
+      "sponsor": "中国海洋学会;自然资源部第二海洋研究所;浙江省海洋学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "海洋学",
+      "category_code": "A010",
+      "page": 1,
+      "title": "海洋科学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOuWm3-HweqlDv_iJSaCo4zCfzG2m0nSGkDkJ5eYgTAyAWkoWCeC1jCZTDbcIZhjgWkTINEmjTjDeQJ8mLN1YiQn-6rtABFKuDjdU5lWBbyKg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.079",
+      "comprehensive_if": "0.759",
+      "issn": "1000-3096",
+      "cn": "37-1151/P",
+      "sponsor": "中国科学院海洋研究所",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "海洋学",
+      "category_code": "A010",
+      "page": 1,
+      "title": "海洋技术学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOuWm3-HweqlDv_iJSaCo4zCfzG2m0nSGkDkJ5eYgTAyAWkoWCeC1jCZTDbcIZhjgXZGiUNBBQUwZ0TC9OXT8EnvUUMmS1yUEhb93CSVe-iHQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.882",
+      "comprehensive_if": "0.596",
+      "issn": "1003-2029",
+      "cn": "12-1435/P",
+      "sponsor": "国家海洋技术中心;中国海洋学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "海洋学",
+      "category_code": "A010",
+      "page": 1,
+      "title": "中国海洋平台",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOuWm3-HweqlDv_iJSaCo4zCfzG2m0nSGkDkJ5eYgTAyAWkoWCeC1jCZTDbcIZhjgWzzuLqd3szCfmQIB8cOiTwTZ6dkmRCKtXAdNdLeKjMSg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.694",
+      "comprehensive_if": "0.544",
+      "issn": "1001-4500",
+      "cn": "31-1546/TE",
+      "sponsor": "中国船舶工业集团公司第十一研究所",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "海洋学",
+      "category_code": "A010",
+      "page": 1,
+      "title": "海洋信息技术与应用",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOuWm3-HweqlDv_iJSaCo4zCfzG2m0nSGkDkJ5eYgTAyAWkoWCeC1jCZTDbcIZhjgWN8GHMKPVJpF7UZNT6U1wBi_A94j-9vkFLQFknX7h9ww==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.632",
+      "comprehensive_if": "0.559",
+      "issn": "2097-0307",
+      "cn": "12-1469/P7",
+      "sponsor": "国家海洋信息中心",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "海洋学",
+      "category_code": "A010",
+      "page": 1,
+      "title": "Acta Oceanologica Sinica",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOuWm3-HweqlDv_iJSaCo4zCfzG2m0nSGkDkJ5eYgTAyAWkoWCeC1jCZTDbcIZhjgVGRgllvc27167Hy_Do3eWHQPhq6Bjw9E9ZkAfjWHxLNQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.598",
+      "comprehensive_if": "0.426",
+      "issn": "0253-505X",
+      "cn": "11-2056/P",
+      "sponsor": "中国科学技术协会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "海洋学",
+      "category_code": "A010",
+      "page": 2,
+      "title": "Journal of Oceanology and Limnology",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPjjMGnbdrRBHN6ssrwfkIuZVy4gV4uVmXkQNHPmPYveHM0u7ivfBgj2-dd5HcK-exYPFH7D07x5Q8qtkff44Tmgvuhnlzn_7XORwU7RmOh5Q==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.546",
+      "comprehensive_if": "0.331",
+      "issn": "2096-5508",
+      "cn": "37-1518/P",
+      "sponsor": "中国海洋湖沼学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "海洋学",
+      "category_code": "A010",
+      "page": 2,
+      "title": "China Ocean Engineering",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPjjMGnbdrRBHN6ssrwfkIuZVy4gV4uVmXkQNHPmPYveHM0u7ivfBgj2-dd5HcK-eyon3pRxOFdjznuJICPWHx_hkfXrvcD0eim_mayBBsOvw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.503",
+      "comprehensive_if": "0.374",
+      "issn": "0890-5487",
+      "cn": "32-1441/P",
+      "sponsor": "中国海洋学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "海洋学",
+      "category_code": "A010",
+      "page": 2,
+      "title": "海洋工程装备与技术",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPjjMGnbdrRBHN6ssrwfkIuZVy4gV4uVmXkQNHPmPYveHM0u7ivfBgj2-dd5HcK-ezQwd1R5AQiSYawsIWdw6z8ions0ibElbEwTFGLa7LSmw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.485",
+      "comprehensive_if": "0.403",
+      "issn": "2095-7297",
+      "cn": "31-2088/P",
+      "sponsor": "上海交通大学",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "海洋学",
+      "category_code": "A010",
+      "page": 2,
+      "title": "Journal of Ocean University of China",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPjjMGnbdrRBHN6ssrwfkIuZVy4gV4uVmXkQNHPmPYveHM0u7ivfBgj2-dd5HcK-exj7V5YoRAHH5CIA9lK4i8Uzw271ohPSRdE4MaRyivJ5A==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.472",
+      "comprehensive_if": "0.277",
+      "issn": "1672-5182",
+      "cn": "37-1415/P",
+      "sponsor": "中国海洋大学",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "海洋学",
+      "category_code": "A010",
+      "page": 2,
+      "title": "Marine Science Bulletin",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPjjMGnbdrRBHN6ssrwfkIuZVy4gV4uVmXkQNHPmPYveHM0u7ivfBgj2-dd5HcK-eyGwbHMcaPNjXeQ32Gxvf8RRj0y1w7c_JYyPnwWm-SOdg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.185",
+      "comprehensive_if": "0.111",
+      "issn": "1000-9620",
+      "cn": "12-1271/N",
+      "sponsor": "国家海洋信息中心",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "海洋学",
+      "category_code": "A010",
+      "page": 2,
+      "title": "海洋科学集刊",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPjjMGnbdrRBHN6ssrwfkIuZVy4gV4uVmXkQNHPmPYveHM0u7ivfBgj2-dd5HcK-ezO7ApWZV1V3xixiTuOpQOghtLJxGut5khDaCdcw0CeLA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "",
+      "cn": "",
+      "sponsor": "中国科学院海洋研究所;中国海洋湖沼学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "海洋学",
+      "category_code": "A010",
+      "page": 2,
+      "title": "海洋世界",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPjjMGnbdrRBHN6ssrwfkIuZVy4gV4uVmXkQNHPmPYveHM0u7ivfBgj2-dd5HcK-exd37w1FY-tDAoECErJi8M6OabEs8wEEAlOCH4Vzu9GTg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1001-5043",
+      "cn": "11-1261/P",
+      "sponsor": "中国科技协会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "海洋学",
+      "category_code": "A010",
+      "page": 2,
+      "title": "海洋文化研究",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPjjMGnbdrRBHN6ssrwfkIuZVy4gV4uVmXkQNHPmPYveHM0u7ivfBgj2-dd5HcK-exjpW6blFuHaUCG2nzmLh6CsBkWT2D_geDgr27dPqFkDw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "",
+      "cn": "",
+      "sponsor": "海南热带海洋学院东盟研究院;海南省南海文明研究基地",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "海洋学",
+      "category_code": "A010",
+      "page": 2,
+      "title": "南海地质研究",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPjjMGnbdrRBHN6ssrwfkIuZVy4gV4uVmXkQNHPmPYveHM0u7ivfBgj2-dd5HcK-exBVCEgws0PWuos7C3bUP9OfzK7Nz7so55KgIXheQqXIg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "",
+      "cn": "",
+      "sponsor": "广州海洋地质调查局信息资料所",
+      "tags": []
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+HTTP/1.1 200 Connection established
+
+HTTP/1.1 302 
+date: Wed, 27 May 2026 06:11:49 GMT
+content-length: 0
+vary: Origin
+vary: Access-Control-Request-Method
+vary: Access-Control-Request-Headers
+location: https://kns.cnki.net/verify/home?captchaType=blockPuzzle&ident=eea05a&captchaId=321d6695-64e7-4d6e-a33f-6f322824df82&returnUrl=VXx3H9YWxMWMBaU09_u5e6RmledMdzfFplKYuItYomzmwcrn1BEGpLm9A9knV5NZ
+access-control-allow-origin: *.cnki.net
+access-control-allow-credentials: true
+set-cookie: SID_navi=018111; path=/; Secure
+connection: close
+
+HTTP/1.1 200 Connection established
+
+HTTP/1.1 200 OK
+date: Wed, 27 May 2026 06:11:49 GMT
+content-type: text/html
+content-length: 2154
+last-modified: Thu, 23 Oct 2025 01:44:36 GMT
+etag: "68f98884-86a"
+accept-ranges: bytes
+set-cookie: SID_kns_new=kns15018106; path=/
+cache-control: private
+connection: close
+

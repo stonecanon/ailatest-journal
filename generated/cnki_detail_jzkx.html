@@ -1,0 +1,2458 @@
+﻿<!doctype html>
+<html lang="zh">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>中国知网</title>
+    <meta
+      name="keywords"
+      content="中国知网,数字出版,知识发现,知识服务,知识管理,数字出版,增强出版,CAJ-N,网络首发,CNKI首发,数字图书馆,学术文献,期刊,博士论文,硕士论文,会议论文,报纸,年鉴,统计数据,专利,科技成果,标准,法规,古籍,工具书,引文,图片搜索,外文文献"
+    />
+    <meta
+      name="description"
+      content="中国知网知识发现网络平台—面向海内外读者提供中国学术文献、外文文献、学位论文、报纸、会议、年鉴、工具书等各类资源统一检索、统一导航、在线阅读和下载服务。涵盖基础科学、文史哲、工程科技、社会科学、农业、经济与管理科学、医药卫生、信息科技等十大领域。"
+    />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <!-- <link rel="stylesheet" href="nvsmcss_min/nindex.min.css?v=4.16" /> -->
+    <link
+      rel="stylesheet"
+      href="https://piccache.cnki.net/kdn/index/kns8s/nvsmcss_min/nindex.min.css?v=4.16"
+    />
+    <script
+      type="text/javascript"
+      src="https://piccache.cnki.net/kdn/index/kns8s/nvsmscripts/jquery.min.js?v=1.12.4"
+    ></script>
+  </head>
+  <body>
+    <div class="top-banner" id="slideBanner">
+      <a class="close-adv" href="javascript:void(0);">&times;</a>
+        <ul class="items">    
+            <li style="background-color: #fdc3b5;"><a href="https://au.cnki.net/author/home" target="_blank"><img src="" data-src="https://piccache.cnki.net/index/images2009/other/2026/topbanner01.jpg?v=5.13" /></a></li>         
+            <li style="background-color: #fc4307;"><a href="https://book.cnki.net/organ?code=1041" target="_blank"><img src="" data-src="https://piccache.cnki.net/index/images2009/other/2026/topbanner02.jpg?v=5.7" /></a></li>            
+            <li style="background-color: #0056fb;"><a href="https://mp.weixin.qq.com/s/AhlO_6GGFKxlcYFGFunGrg?scene=1&click_id=1" target="_blank"><img src="" data-src="https://piccache.cnki.net/index/images2009/other/2026/topbanner04.jpg?v=5.6" /></a></li>         
+            <li style="background-color: #3a83c8;"><a href="https://aiwh.cnki.net/dushuyue/2026/" target="_blank"><img src="" data-src="https://piccache.cnki.net/index/images2009/other/2026/topbanner03.jpg?v=4.22"/></a></li>
+            <li style="background-color: #bcddfc;"><a href="https://mp.weixin.qq.com/s/fnVPfnTI4Up341Sm8ZJYjw" target="_blank"><img src="" data-src="https://piccache.cnki.net/index/images2009/other/2026/topbanner05.jpg?v=4.9" /></a></li>  
+        </ul>
+    </div>
+    <div class="wrapper">
+      <div class="banner" id="mainBanner"></div>
+      <!--header start-->
+      <header>
+        <div class="header" id="Recommendation">
+          <div class="head-main">
+            <div class="head-left">
+              <ul class="link-list">
+                <li class="home"><i class="trademark"></i></li>
+                <li class="dropdown-arrow-l">
+                  <a href="javascript:void(0)">手机版</a>
+                  <ul class="dropdown-content" style="display: none">
+                    <li>
+                      <i class="icon icon-kb"></i
+                      ><span
+                        ><a
+                          href="https://m.cnki.net/mcnkidown/index.html"
+                          target="_blank"
+                          >全球学术快报>></a
+                        ></span
+                      ><em>(机构用户)</em>
+                    </li>
+                    <li>
+                      <i class="icon icon-wap"></i
+                      ><span
+                        ><a
+                          href="https://wap.cnki.net/cnkiclient.aspx"
+                          target="_blank"
+                          >手机知网>></a
+                        ></span
+                      ><em>(个人读者)</em>
+                    </li>
+                  </ul>
+                </li>
+                <li class="dropdown">
+                  <a href="javascript:void(0)">读者服务</a>
+                  <div class="dropdown-content" style="display: none">
+                    <i class="dropdown-content-close">×</i>
+                    <div class="dropdown-content-left">
+                      <div class="con">
+                        <h5>读者服务</h5>
+                        <p>AI驱动+智慧互联，服务个人创新全生命周期。</p>
+                        <a href="https://member.cnki.net/reader" target="_blank"
+                          >进入读者服务 ></a
+                        >
+                      </div>
+                    </div>
+                    <div class="dropdown-content-list">
+                      <div class="unit">
+                        <h6>工具应用</h6>
+                        <dl class="fl">
+                          <dd>
+                            <a href="https://ai.cnki.net" target="_blank"
+                              >CNKI AI</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://chaxin.cnki.net/" target="_blank"
+                              >科技查新</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://dict.cnki.net/" target="_blank"
+                              >翻译助手</a
+                            >
+                          </dd>
+                        </dl>
+                        <dl class="fl">
+                          <dd>
+                            <a href="https://cx.cnki.net/" target="_blank"
+                              >个人查重服务</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://qb.cnki.net" target="_blank"
+                              >CNKI学术情报</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://aibk.cnki.net" target="_blank"
+                              >AI智能备课</a
+                            >
+                          </dd>
+                        </dl>
+                        <dl class="fl">
+                          <dd>
+                            <a href="https://cx.cnki.net/aigc" target="_blank"
+                              >个人AIGC检测</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://pb.cnki.net" target="_blank"
+                              >个人智能排版</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://sj.cnki.net" target="_blank"
+                              >个人智能审校</a
+                            >
+                          </dd>
+                        </dl>
+                      </div>
+                      <!-- unit -->
+                      <div class="unit ml-max">
+                        <h6>服务拓展</h6>
+                        <dl class="fl">
+                          <dd>
+                            <a href="https://wenku.cnki.net" target="_blank"
+                              >知网文库</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://book.cnki.net/" target="_blank"
+                              >知网书店</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://a.cnki.net" target="_blank"
+                              >智赢广告</a
+                            >
+                          </dd>
+                        </dl>
+                        <dl class="fr">
+                          <dd>
+                            <a href="https://saishi.cnki.net/" target="_blank"
+                              >赛事星</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://wexpt.cnki.net" target="_blank"
+                              >WExpt</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://zwh.cnki.net" target="_blank"
+                              >知网号</a
+                            >
+                          </dd>
+                        </dl>
+                      </div>
+                      <!-- unit -->
+                      <div class="unit ml-max">
+                        <h6>阅读学习</h6>
+                        <dl class="fl">
+                          <dd>
+                            <a href="https://mall.cnki.net" target="_blank"
+                              >知网阅读</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://cnki.com.cn" target="_blank"
+                              >知网空间</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://scholar.cnki.net/" target="_blank"
+                              >学术搜索</a
+                            >
+                          </dd>
+                        </dl>
+                        <dl class="fr">
+                          <dd>
+                            <a href="https://x.cnki.net" target="_blank"
+                              >知网研学</a
+                            >
+                          </dd>
+                          <dd>
+                            <a
+                              href="https://x.cnki.net/web/yx-web-activity/closebeta.html"
+                              target="_blank"
+                              >研学智得AI</a
+                            >
+                          </dd>
+                          <dd>
+                            <a
+                              href="https://x.cnki.net/xmrd/#/home"
+                              target="_blank"
+                              >学科资源包</a
+                            >
+                          </dd>
+                        </dl>
+                      </div>
+                      <!-- unit -->
+                    </div>
+                  </div>
+                  <!-- dropdown-content -->
+                </li>
+                <li class="dropdown">
+                  <a href="javascript:void(0)">作者服务</a>
+                  <div class="dropdown-content" style="display: none">
+                    <i class="dropdown-content-close">×</i>
+                    <div class="dropdown-content-left">
+                      <div class="con">
+                        <h5>作者服务</h5>
+                        <p>服务全球6400万+作者，各项权益，一站式服务。</p>
+                        <a
+                          href="https://www.cnki.net/subpages/authorservice.html"
+                          target="_blank"
+                          >进入作者服务 ></a
+                        >
+                      </div>
+                    </div>
+                    <div class="dropdown-content-list">
+                      <div class="unit">
+                        <h6>学术研究</h6>
+                        <dl class="fl">
+                          <dd>
+                            <a href="https://xsjy.cnki.net/" target="_blank"
+                              >学术精要</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://x.cnki.net" target="_blank"
+                              >知网研学</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://conf.cnki.net/Home" target="_blank"
+                              >中国学术会议网</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://k.cnki.net" target="_blank"
+                              >学术大讲堂（知网视频）</a
+                            >
+                          </dd>
+                        </dl>
+                      </div>
+                      <!-- unit -->
+                      <div class="unit">
+                        <h6>文献撰写与发表</h6>
+                        <dl>
+                          <dd>
+                            <a href="https://xztg.cnki.net" target="_blank"
+                              >CNKI写作投稿平台</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://aidoc.cnki.net/" target="_blank"
+                              >知网智能写作</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://author.cnki.net" target="_blank"
+                              >论文智能排版</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://sycb.cnki.net/" target="_blank"
+                              >双语出版（翻译与润色）</a
+                            >
+                          </dd>
+                          <dd>
+                            <a
+                              href="https://piccache.cnki.net/index/images2009/other/2024/thesis_collecting_notice.pdf"
+                              target="_blank"
+                              >学位论文征稿启事</a
+                            >
+                          </dd>
+                          <dd>
+                            <a
+                              href="https://au.cnki.net/act/callForPaper"
+                              target="_blank"
+                              >会议论文征稿启事</a
+                            >
+                          </dd>
+                          <dd>
+                            <a
+                              href="https://yccb.cnki.net/#/home"
+                              target="_blank"
+                              >原创出版</a
+                            >
+                          </dd>
+                        </dl>
+                      </div>
+                      <!-- unit -->
+                      <div class="unit">
+                        <h6>成果认领与传播</h6>
+                        <dl class="fl">
+                          <dd>
+                            <a href="https://au.cnki.net/" target="_blank"
+                              >作者服务平台（成果认领与权益服务）</a
+                            >
+                          </dd>
+                          <dd>
+                            <a
+                              href="https://xs.cnki.net/List/HCS_List"
+                              target="_blank"
+                              >全国高被引学者（查询与认证）</a
+                            >
+                          </dd>
+                          <dd>
+                            <a
+                              href="https://piccache.cnki.net/index/images2009/other/2023/thesis_remuneration_notice.pdf"
+                              target="_blank"
+                              >学位论文领取稿酬通告</a
+                            >
+                          </dd>
+                        </dl>
+                      </div>
+                      <!-- unit -->
+                    </div>
+                  </div>
+                  <!-- dropdown-content -->
+                </li>
+                <li class="dropdown">
+                  <a href="javascript:void(0)">出版服务</a>
+                  <div class="dropdown-content" style="display: none">
+                    <i class="dropdown-content-close">×</i>
+                    <div class="dropdown-content-left">
+                      <div class="con">
+                        <h5>出版服务</h5>
+                        <p>
+                          为“选题策划、稿件采集、编辑加工、审校、排版、发表、传播评价”提供全流程数字出版平台与技术服务。
+                        </p>
+                        <a
+                          href="https://www.cnki.net/subpages/publishservice.html"
+                          target="_blank"
+                          >进入出版服务 ></a
+                        >
+                      </div>
+                    </div>
+                    <div class="dropdown-content-list">
+                      <div class="unit">
+                        <h6>期刊社</h6>
+                        <dl class="fl">
+                          <dd>
+                            <a
+                              href="https://cbptapp.cnki.net/findcb"
+                              target="_blank"
+                              >腾云期刊出版平台</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://check.cnki.net/" target="_blank"
+                              >学术不端文献检测系统</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://aibot.cnki.net/" target="_blank"
+                              >AI编辑助手（审校工具）</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://jtp.cnki.net/" target="_blank"
+                              >双语数据库</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://jif.cnki.net/" target="_blank"
+                              >个刊统计（期刊影响力提升）</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://caj.cnki.net/login" target="_blank"
+                              >学术期刊网络首发出版发布系统</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://fast.cnki.net/" target="_blank"
+                              >学术期刊印后上网提交平台</a
+                            >
+                          </dd>
+                        </dl>
+                      </div>
+                      <!-- unit -->
+
+                      <div class="unit">
+                        <h6>学位论文授予单位</h6>
+                        <dl class="fl">
+                          <dd>
+                            <a href="https://xztg.cnki.net" target="_blank"
+                              >CNKI写作投稿平台</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://xs.cnki.net/" target="_blank"
+                              >学术评价支撑平台</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://thesis.cnki.net" target="_blank"
+                              >学位论文首发出版平台</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://dss.cnki.net/" target="_blank"
+                              >学位论文提交服务系统</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://cdmdpj.cnki.net/" target="_blank"
+                              >博硕学位论文统计</a
+                            >
+                          </dd>
+                        </dl>
+                      </div>
+                      <!-- unit -->
+
+                      <div class="unit">
+                        <h6>学协会</h6>
+                        <dl class="fl">
+                          <dd>
+                            <a href="https://conf.cnki.net/Home" target="_blank"
+                              >中国学术会议网</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://aibot.cnki.net/" target="_blank"
+                              >AI编辑助手（审校工具）</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://xztg.cnki.net" target="_blank"
+                              >CNKI写作投稿平台</a
+                            >
+                          </dd>
+                          <dd>
+                            <a
+                              href="https://fast.cnki.net/WebFirstHY/"
+                              target="_blank"
+                              >会议论文提交系统</a
+                            >
+                          </dd>
+                          <dd>
+                            <a
+                              href="https://autool.cnki.net/accredit-web"
+                              target="_blank"
+                              >会议论文授权工具</a
+                            >
+                          </dd>
+                        </dl>
+                      </div>
+                      <!-- unit -->
+                      <div class="unit">
+                        <h6>图书出版社</h6>
+                        <dl class="fl">
+                          <dd>
+                            <a href="https://aibot.cnki.net/" target="_blank"
+                              >AI编辑助手（审校工具）</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://dp.cnki.net" target="_blank"
+                              >腾云全流程数字出版平台</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://cbad.cnki.net/" target="_blank"
+                              >图书评价</a
+                            >
+                          </dd>
+                        </dl>
+                      </div>
+                      <!-- unit -->
+                      <div class="unit">
+                        <h6>知网出版</h6>
+                        <dl class="fl">
+                          <dd>
+                            <a
+                              href="https://piccache.cnki.net/index/images2009/other/2026/qcnki327.1-2026.pdf"
+                              target="_blank"
+                              >知网出版规范</a
+                            >
+                          </dd>
+                          <dd>
+                            <a
+                              href="https://cajn.cnki.net/cajn/"
+                              target="_blank"
+                              >网络首发</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://sycb.cnki.net/" target="_blank"
+                              >双语出版（翻译与润色）</a
+                            >
+                          </dd>
+                          <dd>
+                            <a
+                              href="https://yccb.cnki.net/#/home"
+                              target="_blank"
+                              >原创出版</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://cnkiopen.net/home" target="_blank"
+                              >CNKI OPEN</a
+                            >
+                          </dd>
+                        </dl>
+                      </div>
+                      <!-- unit -->
+                    </div>
+                  </div>
+                  <!-- dropdown-content -->
+                </li>
+                <li class="dropdown">
+                  <a href="javascript:void(0)">产品解决方案</a>
+                  <div class="dropdown-content" style="display: none">
+                    <i class="dropdown-content-close">×</i>
+                    <div class="dropdown-content-left">
+                      <div class="con">
+                        <h5>产品解决方案</h5>
+                        <p>
+                          服务科技创新，促进学术传播，奋力建设中国特色、世界一流的学术资源信息平台。
+                        </p>
+                        <a
+                          href="https://www.cnki.net/subpages/productsolution.html"
+                          target="_blank"
+                          >进入产品解决方案 ></a
+                        >
+                      </div>
+                    </div>
+                    <div class="dropdown-content-list">
+                      <div class="unit">
+                        <h6>数字出版服务</h6>
+                        <dl class="fl">
+                          <dt>知识资源</dt>
+                          <dd>
+                            <a href="https://express.cnki.net/" target="_blank"
+                              >全球学术快报·学科版</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://kepu.cnki.net/" target="_blank"
+                              >精品科普</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://wenyi.cnki.net/" target="_blank"
+                              >精品文艺</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://wenhua.cnki.net/" target="_blank"
+                              >精品文化</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://hd.cnki.net/" target="_blank"
+                              >汉语大辞典&康熙字典</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://ftm.cnki.net/" target="_blank"
+                              >食品安全检测方法</a
+                            >
+                          </dd>
+                          <dd>
+                            <a
+                              href="https://scholar.cnki.net/new"
+                              target="_blank"
+                              >外文资源总库</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://elib.cnki.net/" target="_blank"
+                              >个人/机构馆</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://zszy.cnki.net/" target="_blank"
+                              >知识资源数据行业创新中心</a
+                            >
+                          </dd>
+                          <dd>
+                            <a
+                              href="https://jtp.cnki.net/bilingual"
+                              target="_blank"
+                              >双语数据库</a
+                            >
+                          </dd>
+                        </dl>
+                        <!-- <dl class="fr">
+                          <dt>新服务</dt>
+                          <dd>
+                            <a
+                              href="https://huazhi.cnki.net/#/sw"
+                              target="_blank"
+                              >华知大模型</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://zszy.cnki.net" target="_blank"
+                              >数据交易</a
+                            >
+                          </dd>
+                        </dl> -->
+                      </div>
+                      <!-- unit -->
+                      <div class="unit">
+                        <h6>行业增值服务</h6>
+                        <dl class="fl">
+                          <dt>党政金融</dt>
+                          <dd>
+                            <a href="https://gov.cnki.net" target="_blank"
+                              >党政知识</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://dj.cnki.net" target="_blank"
+                              >党建学习</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://finance.cnki.net/" target="_blank"
+                              >金融知识</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://gw.cnki.net" target="_blank"
+                              >智能公文</a
+                            >
+                          </dd>
+                          <dd>
+                            <a
+                              href="https://r.cnki.net/index/lib/"
+                              target="_blank"
+                              >公共文化</a
+                            >
+                          </dd>
+                          <dd>
+                            <a
+                              href="https://r.cnki.net/index/zwwb/"
+                              target="_blank"
+                              >智慧文博</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://xczx.cnki.net" target="_blank"
+                              >乡村振兴</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://yuqing.cnki.net/" target="_blank"
+                              >舆情情报</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://bigdata.cnki.net/" target="_blank"
+                              >数据治理</a
+                            >
+                          </dd>
+                        </dl>
+                        <dl class="fl">
+                          <dt>科技企业</dt>
+                          <dd>
+                            <a href="https://kc.cnki.net/" target="_blank"
+                              >科技创新</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://aipat.cnki.net/" target="_blank"
+                              >专利分析</a
+                            >
+                          </dd>
+                          <dd>
+                            <a
+                              href="https://kjqy.cnki.net/intell/home"
+                              target="_blank"
+                              >科技情报</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://okms.cnki.net" target="_blank"
+                              >OKMS</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://dsi.cnki.net" target="_blank"
+                              >数字标准</a
+                            >
+                          </dd>
+                        </dl>
+                        <dl class="fl">
+                          <dt>智慧法治</dt>
+                          <dd>
+                            <a href="https://law.cnki.net/" target="_blank"
+                              >法律智库</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://cichpro.cnki.net/" target="_blank"
+                              >智慧办案</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://lifa.cnki.net" target="_blank"
+                              >智慧立法</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://zhengbao.cnki.net/" target="_blank"
+                              >政报公报</a
+                            >
+                          </dd>
+                        </dl>
+                        <dl class="fl">
+                          <dt>智慧健康</dt>
+                          <dd>
+                            <a href="https://chkd.cnki.net" target="_blank"
+                              >医院总库</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://yiyao.cnki.net/" target="_blank"
+                              >知医网药</a
+                            >
+                          </dd>
+                          <dd>
+                            <a
+                              href="https://yiyao.cnki.net/fzzl.html"
+                              target="_blank"
+                              >临床诊疗</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://pvls.cnki.net" target="_blank"
+                              >药物警戒</a
+                            >
+                          </dd>
+                        </dl>
+                        <dl class="fr">
+                          <dt>教育科研</dt>
+                          <dd>
+                            <a href="https://check.cnki.net" target="_blank"
+                              >科研诚信</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://co.cnki.net" target="_blank"
+                              >本科教学</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://q.cnki.net" target="_blank"
+                              >研究生管理</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://gj.cnki.net/" target="_blank"
+                              >学科建设</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://ky.cnki.net" target="_blank"
+                              >科研管理</a
+                            >
+                          </dd>
+                          <dd>
+                            <a
+                              href="https://check.cnki.net/scheck"
+                              target="_blank"
+                              >人事评审</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://zyjs.cnki.net" target="_blank"
+                              >职业教育</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://cfed.cnki.net" target="_blank"
+                              >基础教育</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://x.cnki.net" target="_blank"
+                              >知网研学</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://aidoc.cnki.net/" target="_blank"
+                              >知网智能写作</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://data.cnki.net" target="_blank"
+                              >经济社会</a
+                            >
+                          </dd>
+                        </dl>
+                      </div>
+                      <!-- unit -->
+                      <div class="new-unit">
+                        <a href="https://zszy.cnki.net" target="_blank"
+                          >数据交易</a
+                        >
+                      </div>
+                      <div class="new-unit">
+                        <a href="https://huazhi.cnki.net/#/sw" target="_blank"
+                          >华知大模型</a
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </li>
+                <li class="dropdown">
+                  <a href="javascript:void(0)">学术评价</a>
+                  <div class="dropdown-content" style="display: none">
+                    <i class="dropdown-content-close">×</i>
+                    <div class="dropdown-content-left">
+                      <div class="con">
+                        <h5>学术评价</h5>
+                        <p>
+                          依托国家新闻出版署“出版智库”—中国科学文献计量评价研究中心，提供学术评价服务及报告，为用户开展科研管理和创新性评价工作提供支撑。
+                        </p>
+                        <a href="https://eval.cnki.net/" target="_blank"
+                          >进入学术评价 ></a
+                        >
+                      </div>
+                    </div>
+                    <div
+                      class="dropdown-content-list"
+                      style="min-height: 230px"
+                    >
+                      <div class="unit">
+                        <dl>
+                          <dd>
+                            <a href="https://xs.cnki.net/" target="_blank"
+                              >学术评价支撑平台</a
+                            >
+                          </dd>
+                          <dd>
+                            <a
+                              href="https://ref.cnki.net/refnew/home"
+                              target="_blank"
+                              >中国引文库</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://xszx.cnki.net/home" target="_blank"
+                              >成果统计（学术知析）</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://xsjy.cnki.net/" target="_blank"
+                              >论文评价（学术精要）</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://cbad.cnki.net/" target="_blank"
+                              >图书评价</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://cjcr.cnki.net/" target="_blank"
+                              >期刊评价</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://fund.cnki.net/" target="_blank"
+                              >中外科研基金</a
+                            >
+                          </dd>
+                        </dl>
+                      </div>
+                      <!-- unit -->
+                      <div class="unit">
+                        <dl>
+                          <dd>
+                            <a
+                              href="https://eval.cnki.net/ItemListSummary.html"
+                              target="_blank"
+                              >评价报告与榜单</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://jif.cnki.net/" target="_blank"
+                              >个刊统计</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://wjci.cnki.net/" target="_blank"
+                              >世界期刊评价（WJCI报告）</a
+                            >
+                          </dd>
+                          <dd>
+                            <a
+                              href="https://xs.cnki.net/List/HCS_List"
+                              target="_blank"
+                              >全国高被引学者</a
+                            >
+                          </dd>
+                          <dd>
+                            <a href="https://cdmdpj.cnki.net/" target="_blank"
+                              >博硕学位论文统计</a
+                            >
+                          </dd>
+                        </dl>
+                      </div>
+                      <!-- unit -->
+                      <div class="unit">
+                        <dl>
+                          <dd>
+                            <a
+                              href="https://eval.cnki.net/Info/JournalIDZT_PJItem"
+                              target="_blank"
+                              >期刊影响力提升服务</a
+                            >
+                          </dd>
+                          <dd>
+                            <a
+                              href="https://eval.cnki.net/Info/Person_PJItem"
+                              target="_blank"
+                              >学者成果检索服务</a
+                            >
+                          </dd>
+                          <dd>
+                            <a
+                              href="https://eval.cnki.net/Info/SUB_PJItem"
+                              target="_blank"
+                              >学科评价服务</a
+                            >
+                          </dd>
+                        </dl>
+                      </div>
+                      <!-- unit -->
+                    </div>
+                  </div>
+                </li>
+                <!-- <li>
+                  <a href="https://huazhi.cnki.net/#/sw" target="_blank"
+                    >华知大模型</a
+                  >
+                </li>
+                <li>
+                  <a href="https://zszy.cnki.net" target="_blank">数据交易</a>
+                </li> -->
+                <li>
+                  <a
+                    href="https://www.cnki.net/subpages/contactus.html"
+                    target="_blank"
+                    >联系我们</a
+                  >
+                </li>
+                <li>
+                  <a href="https://service.cnki.net/" target="_blank">帮助</a>
+                </li>
+              </ul>
+            </div>
+            <!--head-left-->
+            <div class="head-right">
+              <div id="headerBox">
+                <script
+                  type="text/javascript"
+                  id="toploginstruct"
+                  src="https://login.cnki.net/tlogin/scripts/top.js?v=20240830"
+                  data="style=3&placeid=headerBox&laylocate=right&isAutoIpLogin=1&nojquery=1&reutrnurl="
+                ></script>
+                <!-- <script
+                  type="text/javascript"
+                  id="toploginstruct"
+                  src="http://e.dev.cnki.net/tlogin/scripts/top.js?v=20240719"
+                  data="style=3&placeid=headerBox&laylocate=right&isAutoIpLogin=1&nojquery=1&showmember=0&reutrnurl="
+                ></script> -->
+              </div>
+              <ul class="link-list">
+                <li class="old">
+                  <a href="https://www.cnki.net/old/" target="_blank"
+                    >旧版入口</a
+                  >
+                </li>
+                <li class="dropdown-arrow-r">
+                  <a href="javascript:void(0)"
+                    >充值<i class="icon-dropdown"></i
+                  ></a>
+                  <ul class="dropdown-content">
+                    <li>
+                      <a href="https://zhifu.cnki.net/" target="_blank"
+                        >充值中心</a
+                      >
+                    </li>
+                    <li>
+                      <a
+                        href="https://vipcard.cnki.net/ec/skwd/skwd.htm"
+                        target="_blank"
+                        >购买知网卡</a
+                      >
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="https://mall.cnki.net/user/user.html" target="_blank"
+                    >会员</a
+                  >
+                </li>
+              </ul>
+            </div>
+            <!--head-right-->
+          </div>
+          <!--head-main-->
+        </div>
+        <!--header end-->
+        <div class="mask-bg"></div>
+      </header>
+      <!--searchmain start-->
+      <div class="searchmain">
+        <div class="page-title">
+          <img
+            src="https://piccache.cnki.net/kdn/index/kns8s/nimages/logo.png"
+            alt="CNKI"
+          />
+        </div>
+        <ul class="search-tab">
+          <li class="on" val="doc">检 索</li>
+          <li val="ai">CNKI AI</li>
+        </ul>
+        <div class="search-tab-content search-form cur">
+          <input
+            type="hidden"
+            id="curdbcode"
+            name="curdbcode"
+            value="SCDB"
+            autocomplete="off"
+          />
+          <input type="hidden" id="txt_sug" name="txt_sug" value="主题" />
+          <div class="input-box clearfix">
+            <div class="sort reopt" id="DBFieldBox">
+              <div class="sort-default">
+                <span>主题</span>
+                <i class="sort-icon">▼</i>
+              </div>
+              <div id="DBFieldList" class="sort-list">
+                <ul></ul>
+              </div>
+            </div>
+            <!--sort-->
+            <!-- 新增：检索区文件上传展示框（复用AI区样式，ID加search前缀） -->
+            <div class="search-input-wrap">
+              <div
+                id="searchUploadFileBox"
+                class="upload-file-box"
+                style="display: none"
+              >
+                <div class="img-box">
+                  <img id="searchDocTypeIcon" class="doc-type-icon" alt="" />
+                </div>
+                <div class="file-info">
+                  <div class="o-ellipsis">
+                    <span id="searchFileTitle" class="title"></span>
+                  </div>
+                  <div id="searchProgressBox" class="progress_box"></div>
+                </div>
+                <div
+                  id="searchDeleteFileBtn"
+                  class="icon-close"
+                  style="display: none"
+                ></div>
+              </div>
+              <div
+                id="searchTxtBoxContainer"
+                class="txt-box-container"
+                style="display: none"
+              ></div>
+              <textarea
+                class="search-input"
+                id="txt_SearchText"
+                name="txt_SearchText"
+                type="text"
+                autocomplete="off"
+                placeholder="中文文献、外文文献"
+                maxlength="100"
+                rows="2"
+              ></textarea>
+            </div>
+            <div>
+              <!-- <input class="search-btn" type="button" value="检索" /> -->
+              <div class="search-btn"><i class="sprite-icon"></i>检索</div>
+              <div class="search-aux-btn-group">
+                <a class="ai-btn" href="javascript:;"></a>
+                <div class="search-tooltip-wrap search-voice-wrap">
+                  <a
+                    class="voice-btn"
+                    id="voiceBtn"
+                    href="javascript:void(0);"
+                    tabindex="0"
+                  >
+                    <i class="sprite-icon icon-voice"></i>
+                  </a>
+                  <div class="custom-tooltip voice-tooltip">语音输入</div>
+                </div>
+                <div class="search-tooltip-wrap search-file-wrap">
+                  <a class="link-btn" href="javascript:void(0);" tabindex="0">
+                    <i class="sprite-icon icon-file"></i>
+                  </a>
+                  <div class="custom-tooltip file-tooltip">
+                    快速提取总结文档内容，支持格式：Word、PDF、PPT、TXT，单个文件最大50MB
+                  </div>
+                </div>
+                <div class="search-tooltip-wrap search-pic-wrap">
+                  <a class="pic-btn" href="javascript:void(0);" tabindex="0">
+                    <i class="sprite-icon icon-pic"></i>
+                  </a>
+                  <div class="custom-tooltip image-tooltip">
+                    智能解读图片内容，支持格式：JPG、PNG、JPEG，单个图片最大3MB
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!--input-box-->
+
+          <div class="readvce">
+            <a
+              href="https://kns.cnki.net/starter/advanced"
+              target="_blank"
+              id="highSearch"
+              >高级检索 &gt;</a
+            >
+            <a
+              href="https://navi.cnki.net/knavi"
+              target="_blank"
+              id="naviSearch"
+              >出版物检索 &gt;</a
+            >
+            <a
+              href="https://ai.cnki.net/aisearch"
+              target="_blank"
+              id="enhanceSearch"
+              class="enhance-search"
+              >增强检索</a
+            >
+          </div>
+          <div class="option-list">
+            <ul>
+              <li class="selected" id="CJFQ" val="CJFQ" onclick="CrossDb(this)">
+                <i></i
+                ><a
+                  href="https://kns.cnki.net/res/category/journal"
+                  target="_blank"
+                  >学术期刊</a
+                >
+              </li>
+              <li class="selected" id="CDMD" val="CDMD" onclick="CrossDb(this)">
+                <i></i
+                ><a
+                  href="https://kns.cnki.net/res/category/dissertation"
+                  target="_blank"
+                  >学位论文</a
+                >
+              </li>
+              <li class="selected" id="CIPD" val="CIPD" onclick="CrossDb(this)">
+                <i></i
+                ><a
+                  href="https://kns.cnki.net/res/category/conference"
+                  target="_blank"
+                  >会议</a
+                >
+              </li>
+              <li class="selected" id="CCND" val="CCND" onclick="CrossDb(this)">
+                <i></i
+                ><a href="https://kns.cnki.net/res/ccnd" target="_blank"
+                  >报纸</a
+                >
+              </li>
+              <li id="CYFD" val="CYFD" onclick="CrossDb(this)">
+                <i></i
+                ><a href="https://kns.cnki.net/res/cyfd" target="_blank"
+                  >年鉴</a
+                >
+              </li>
+              <li id="SCOD" val="SCOD" onclick="CrossDb(this)">
+                <i></i
+                ><a
+                  href="https://kns.cnki.net/res/category/patent"
+                  target="_blank"
+                  >专利</a
+                >
+              </li>
+              <li class="selected" id="CISD" val="CISD" onclick="CrossDb(this)">
+                <i></i
+                ><a
+                  href="https://kns.cnki.net/res/category/standard"
+                  target="_blank"
+                  >标准</a
+                >
+              </li>
+              <li class="selected" id="SNAD" val="SNAD" onclick="CrossDb(this)">
+                <i></i
+                ><a
+                  href="https://kns.cnki.net/res/category/achievements"
+                  target="_blank"
+                  >成果</a
+                >
+              </li>
+              <li class="selected" id="CCJD" val="CCJD" onclick="CrossDb(this)">
+                <i></i
+                ><a href="https://kns.cnki.net/res/ccjd" target="_blank"
+                  >学术辑刊</a
+                >
+              </li>
+              <li class="selected" id="BDZK" val="BDZK" onclick="CrossDb(this)">
+                <i></i
+                ><a
+                  href="https://kns.cnki.net/res/category/book"
+                  target="_blank"
+                  >图书</a
+                >
+              </li>
+              <li id="WENKU" val="WENKU" onclick="CrossDb(this)">
+                <i></i><a href="https://wenku.cnki.net" target="_blank">文库</a>
+              </li>
+              <li id="CLKLP" val="CLKLP" onclick="CrossDb(this)">
+                <i></i
+                ><a
+                  href="https://lawpro.cnki.net/inds/advsearch?ES8LPH01Aw4ZFCVwCvh5Kn4zqnJ1PxwCGGUiOoNlycTCTXEH1Z7bvSTxfXxCacnkimmd2FMsOWGI8LvFnvyH19rs2DytdIIrUOL6ott"
+                  target="_blank"
+                  >法律法规</a
+                >
+              </li>
+            </ul>
+            <ul>
+              <!--不进行检索-->
+              <li
+                id="CRFD"
+                val="CRFD"
+                onclick="LinkDb(this, 'https://gongjushu.cnki.net/')"
+              >
+                <a href="javascript:void(0)"><em></em>工具书</a>
+              </li>
+              <li
+                id="ywk"
+                val="ywk"
+                onclick="LinkDb(this, 'https://ref.cnki.net')"
+              >
+                <a href="javascript:void(0)"><em></em>中国引文库</a>
+              </li>
+              <li
+                id="IMAGE"
+                val="IMAGE"
+                onclick="LinkDb(this, 'https://image.cnki.net/')"
+              >
+                <a href="javascript:void(0)"><em></em>学术图片</a>
+              </li>
+              <li
+                id="video"
+                val="video"
+                onclick="LinkDb(this, 'https://k.cnki.net')"
+              >
+                <a href="javascript:void(0)"><em></em>学术视频</a>
+              </li>
+              <li
+                id="audio"
+                val="audio"
+                onclick="LinkDb(this, 'https://kv.cnki.net/hsyy/index')"
+              >
+                <a href="javascript:void(0)"><em></em>音频</a>
+              </li>
+              <li id="CSYD" val="CSYD">
+                <a
+                  href="javascript:void(0)"
+                  onclick="LinkDb(this, 'https://data.cnki.net/')"
+                  ><em></em>统计数据</a
+                ><sup onclick="LinkDb(this, 'https://data.cnki.net/aidata')"
+                  >AI知数</sup
+                >
+              </li>
+              <!-- <li
+                id="CLKD"
+                val="CLKD"
+                onclick="
+                  LinkDb(
+                    this,
+                    'https://lawpro.cnki.net/urtp-cli/advsearch?sysid=7000&res=clkl',
+                  )
+                "
+              >
+                <a href="javascript:void(0)"><em></em>法律法规</a>
+              </li> -->
+              <li
+                id="gwkt"
+                val="gwkt"
+                onclick="
+                  LinkDb(this, 'https://r.cnki.net/inds/advsearch?sysid=101')
+                "
+              >
+                <a href="javascript:void(0)"><em></em>政府文件</a>
+              </li>
+              <li
+                id="kjbg"
+                val="kjbg"
+                onclick="
+                  LinkDb(this, 'https://r.cnki.net/inds/advsearch?sysid=103')
+                "
+              >
+                <a href="javascript:void(0)"><em></em>科技报告</a>
+              </li>
+              <li
+                id="oa"
+                val="oa"
+                onclick="LinkDb(this, 'https://cnkiopen.net/home')"
+              >
+                <a href="javascript:void(0)"><em></em>OA</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <!--search-form-->
+
+        <div class="search-tab-content search-form-ai">
+          <div class="textarea-box">
+            <!-- 上传文件/图片的展示区域 -->
+            <!-- 文件展示框 -->
+            <div
+              id="uploadFileBox"
+              class="upload-file-box"
+              style="display: none"
+            >
+              <div class="img-box">
+                <img id="docTypeIcon" class="doc-type-icon" alt="" />
+              </div>
+              <div class="file-info">
+                <div class="o-ellipsis">
+                  <span id="fileTitle" class="title"></span>
+                </div>
+                <div id="progressBox" class="progress_box"></div>
+              </div>
+              <div
+                id="deleteFileBtn"
+                class="icon-close"
+                style="display: none"
+              ></div>
+            </div>
+            <div
+              id="txtBoxContainer"
+              class="txt-box-container"
+              style="display: none"
+            ></div>
+            <textarea
+              name="txt_SearchText_ai"
+              id="txt_SearchText_ai"
+              placeholder="CNKI AI 专注科研学习，助您高效探索。请提出您的问题"
+              rows="3"
+              maxlength="500"
+            ></textarea>
+            <div class="btn-left-container">
+              <!-- 第一个按钮：下拉菜单 -->
+              <div class="btn btn-dropdown active" id="dropdownBtn">
+                <span class="icon icon_folder"></span>
+                <span>知网文献</span>
+              </div>
+              <div class="dropdown-menu" id="dropdownMenu">
+                <ul>
+                  <li
+                    data-value="全库问答"
+                    data-icon="icon_qkwd"
+                    class="selected"
+                  >
+                    <span class="icon icon_qkwd"></span>
+                    <span>全库问答</span>
+                  </li>
+                  <li data-value="核心期刊" data-icon="icon_hxqk">
+                    <span class="icon icon_hxqk"></span>
+                    <span>核心期刊</span>
+                  </li>
+                  <li data-value="中英文献" data-icon="icon_zywx">
+                    <span class="icon icon_zywx"></span>
+                    <span>中英文献</span>
+                  </li>
+                  <li data-value="我的资料" data-icon="icon_wdzl">
+                    <span class="icon icon_wdzl"></span>
+                    <span>我的资料</span>
+                  </li>
+                </ul>
+              </div>
+
+              <!-- 第二个按钮：联网搜索 -->
+              <div class="btn" id="searchBtn">
+                <span class="icon icon_globe"></span>
+                <span>联网搜索</span>
+              </div>
+
+              <!-- 第三个按钮：深度思考-R1 -->
+              <div class="btn" id="thinkBtn">
+                <span class="icon icon_bulb"></span>
+                <span>深度思考-R1</span>
+              </div>
+            </div>
+            <input class="search-btn-ai" type="button" title="检索" />
+            <div class="tooltip-wrap voice-wrap">
+              <a
+                class="voice-btn"
+                id="voiceBtnAI"
+                href="javascript:;"
+                tabindex="0"
+              >
+                <i class="sprite-icon icon-voice"></i>
+              </a>
+              <div class="custom-tooltip voice-tooltip">语音输入</div>
+            </div>
+
+            <!-- 文件按钮+容器-->
+            <div class="tooltip-wrap file-wrap">
+              <a
+                class="link-btn upload-trigger"
+                data-type="file"
+                href="javascript:;"
+              >
+                <i class="sprite-icon icon-file"></i>
+              </a>
+              <div class="custom-tooltip file-tooltip">
+                快速提取总结文档内容，支持格式：Word、PDF、PPT、TXT，单个文件最大50MB
+              </div>
+            </div>
+            <!-- 图片按钮+容器 -->
+            <div class="tooltip-wrap pic-wrap">
+              <a
+                class="pic-btn upload-trigger"
+                data-type="image"
+                href="javascript:;"
+              >
+                <i class="sprite-icon icon-pic"></i>
+              </a>
+              <div class="custom-tooltip image-tooltip">
+                智能解读图片内容，支持格式：JPG、PNG、JPEG，单个图片最大3MB
+              </div>
+            </div>
+            <input
+              id="fileUploadInput"
+              type="file"
+              style="display: none"
+              accept=".doc,.docx,.pdf,.ppt,.pptx,.txt,.jpg,.png,.jpeg"
+            />
+          </div>
+
+          <div class="option-list">
+            <ul>
+              <!--不进行检索-->
+              <li onclick="LinkDb(this, 'https://ai.cnki.net/wxjl')">
+                <a href="javascript:void(0)"><em></em>文献计量</a>
+              </li>
+              <li onclick="LinkDb(this, 'https://ai.cnki.net/studyHome')">
+                <a href="javascript:void(0)"><em></em>智能研读</a>
+              </li>
+              <li onclick="LinkDb(this, 'https://ai.cnki.net/aicreation')">
+                <a href="javascript:void(0)"><em></em>辅助创作</a>
+              </li>
+              <li onclick="LinkDb(this, 'https://ai.cnki.net/sumup/trend')">
+                <a href="javascript:void(0)"><em></em>学术趋势</a>
+              </li>
+              <li
+                onclick="
+                  LinkDb(this, 'https://ai.cnki.net/fulltranslate/introduce')
+                "
+              >
+                <a href="javascript:void(0)"><em></em>全文翻译</a>
+              </li>
+              <li onclick="LinkDb(this, 'https://ai.cnki.net/sumup/ppt')">
+                <a href="javascript:void(0)"><em></em>学术PPT</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <!--search-form-ai-->
+      </div>
+      <!--searchmain end-->
+
+      <!-- 上传提示弹窗 -->
+      <div id="uploadTipModal" class="ai-dialog" style="display: none">
+        <div class="dialog-close" onclick="handleModalClose()"></div>
+        <div class="dialog-content">
+          <div id="uploadTipText" class="tip"></div>
+          <div class="dialog-btn-container">
+            <div class="btn blue" onclick="handleModalClose()">知道了</div>
+          </div>
+        </div>
+      </div>
+      <!-- 遮罩层 -->
+      <div id="modalMask" class="modal-mask" style="display: none"></div>
+
+      <!-- 未登录提示弹框 -->
+      <!-- <div class="noLoginModal" id="noLoginModal">
+        <div class="bj">
+          <div class="top">
+            <p class="left">
+              <span class="text1">登录CNKI AI，</span>
+              <span class="text2">体验智能文档分析</span>
+            </p>
+            <p class="right">
+              <span class="closeBtn"></span>
+            </p>
+          </div>
+        </div>
+        <div class="content">
+          <div>
+            <div class="tip functional_experience">
+              <div><span class="icon-try"></span>功能体验</div>
+              <p>
+                上传文档或图片并快速获取总结、解析等高级功能，需要您登录个人账号
+              </p>
+            </div>
+            <div class="tip new_user_benefits">
+              <div><span class="icon-gift"></span>新用户福利</div>
+              <p>
+                立即注册，即可<span style="color: #3370ff">获得 2 次免费</span
+                >问答体验
+              </p>
+            </div>
+          </div>
+        </div>
+      </div> -->
+
+      <div class="wrap common-service">
+        <!-- <h4>
+          <span class="title"><i></i>常用服务：</span>
+          <span class="tip">（可拖拽自定义排序）</span>
+        </h4> -->
+        <i class="btn-setting" title="设置"></i>
+        <div class="common-service-content">
+          <div class="common-service-topbar">
+            <ul class="selected-list">
+              <li class="btn-add"><b></b><span>更多</span></li>
+            </ul>
+          </div>
+          <!-- common-service-topbar -->
+          <div class="common-service-dropdown">
+            <div class="tabs-bar">
+              <h5 class="tabs-title">选择添加</h5>
+              <ul class="tabs-list">
+                <li class="active" data-id="product-hot">热门服务</li>
+                <li data-id="product-publish">数字出版服务</li>
+                <li data-id="product-industry">行业增值服务</li>
+                <li data-id="product-reader">个人用户服务</li>
+              </ul>
+              <div class="tabs-search">
+                <input type="text" maxlength="15" />
+                <button></button>
+              </div>
+            </div>
+
+            <div class="tabs-content active" id="product-hot"></div>
+            <div class="tabs-content" id="product-publish"></div>
+            <div class="tabs-content industry" id="product-industry"></div>
+            <div class="tabs-content" id="product-reader"></div>
+            <div class="tabs-content" id="product-result"></div>
+
+            <div class="tabs-btns">
+              <a class="btn-sure" href="javascript:void(0)">确定</a>
+              <a class="btn-cancel" href="javascript:void(0)">取消</a>
+              <span class="btn-reset">恢复默认</span>
+            </div>
+          </div>
+          <!-- common-service-dropdown -->
+        </div>
+      </div>
+      <!-- common-service -->
+      <!-- 证书模态框iframe -->
+      <iframe
+        id="certificateIframe"
+        style="
+          position: fixed;
+          width: 100%;
+          height: 100%;
+          top: 0;
+          left: 0;
+          z-index: 9999; /* 确保层级最高 */
+          display: none; /* 初始隐藏 */
+          border: none; /* 去掉边框 */
+        "
+        src=""
+      ></iframe>
+
+      <!-- 模态框结构词云 -->
+      <div class="modal-overlay" id="ciyunmyModal">
+        <div class="modal-ciyuncontent">
+          <span
+            onclick="closeshowciyun(this)"
+            class="close-ciyunbtn"
+            id="closeModal"
+            >&times;</span
+          >
+          <h3 style="text-align: center">“<span id="kwInModal"></span>”词云</h3>
+          <div class="tags">
+            <span
+              onclick="toggleHighlightxg(this)"
+              class="active"
+              data-type="related"
+              >相关词</span
+            >
+            <span onclick="toggleHighlightxs(this)" data-type="similar"
+              >相似词</span
+            >
+          </div>
+          <div class="ciyunimg">
+            <div
+              class="relatedwords relatedwords-container"
+              id="relatedwords"
+            ></div>
+            <div
+              class="similarwords similarwords-container"
+              id="similarwords"
+            ></div>
+            <div class="opera" onclick="jump2CNKI(this)">
+              <span>相关文献 ></span>
+            </div>
+          </div>
+          <div class="nociyunimg">
+            <div class="bgc"></div>
+            <p class="text">暂无词云分析</p>
+          </div>
+        </div>
+      </div>
+      <!-- 网络首发-->
+      <div class="first-publish" id="firstPublish">
+        <span class="label">网络首发</span>
+        <span class="time" id="latest-time"></span>
+      </div>
+      <div class="column-module">
+        <div class="left">
+          <div class="title-wrap">
+            <span class="sprite-icon icon-zrkx"></span
+            ><span class="title">自然科学</span>
+            <span class="title-right"
+              ><span class="sprite-icon icon-change"></span>换一换</span
+            >
+          </div>
+          <div class="content">
+            <ul class="list" id="zrkx-list"></ul>
+          </div>
+        </div>
+        <div class="center">
+          <div class="title-wrap">
+            <span class="sprite-icon icon-sxll"></span
+            ><span class="title">思想理论</span>
+            <span class="title-right"
+              ><span class="sprite-icon icon-change"></span>换一换</span
+            >
+          </div>
+          <div class="content">
+            <ul class="list" id="sxll-list"></ul>
+          </div>
+        </div>
+        <div class="right">
+          <div class="title-wrap">
+            <span class="sprite-icon icon-rwsk"></span
+            ><span class="title">人文社科</span>
+            <span class="title-right"
+              ><span class="sprite-icon icon-change"></span>换一换</span
+            >
+          </div>
+          <div class="content">
+            <ul class="list" id="rwsk-list"></ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="ranking">
+        <div class="wrap">
+          <div class="ranking-item-left">
+            <div class="toptitle">
+              <span class="download">下载热榜</span>
+              <div class="icon-container">
+                <span class="download-icon"></span>
+                <div class="download-tip">
+                  <div class="container">
+                    <div class="tip-line tip-Instructions">说明：</div>
+                    <div class="tip-line">
+                      1、<span class="highlight">“下载热榜”</span
+                      >旨在动态呈现中国知网总库平台中具有高学术价值、高影响力且符合学术规范与出版导向的文献，反映学界关注热点与研究趋势。
+                    </div>
+                    <div class="tip-line">
+                      2、<span class="highlight">“下载热榜”</span
+                      >基于中国知网全平台文献下载数据，以PDSI指数作为排序依据，建立了文献相对影响力评价机制，弥合了学科差异，确保了榜单的时效性与公平性。
+                    </div>
+                    <div class="introBj"></div>
+                    <div class="tip-line">
+                      3、<span class="highlight">“下载热榜”</span>
+                      通过数据源认证、动态时序校准、反作弊过滤、多维度校验等机制，确保榜单的科学性。下载统计遵循国际通行的COUNTER标准，以关键的防刷机制确保数据真实可靠；学科分类结合《中国图书馆分类法》和教育部学科分类，建设专辑专题分类体系，实现学科领域全覆盖；对PDSI指数超过学科均值三倍以上的文献，引入人工审核和同行评议，确保极值文献入榜的科学性。
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="hot-tag">
+              <div class="hot-taglf">
+                <span class="active toggle-highlight">全部</span>
+                <span class="toggle-highlight">自然科学</span>
+                <span class="toggle-highlight">社会科学</span>
+                <span class="toggle-highlight">哲学与人文科学</span>
+              </div>
+              <div class="hot-tagrg">
+                <span class="time">
+                  <span class="week active toggle-highlight">周</span>
+                  <span class="month toggle-highlight">月</span>
+                </span>
+              </div>
+            </div>
+            <!-- <h6 class="ranking-item-title">周下载排行</h6> -->
+            <ul class="articleRecommend" id="articleRecommend"></ul>
+          </div>
+          <div class="ranking-item-right">
+            <p class="toptitle"><span class="hotword">热词榜</span></p>
+            <div class="hot-tag hot-tag-box">
+              <span class="time">
+                <span class="week active toggle-highlight">周</span>
+                <span class="month toggle-highlight">月</span>
+              </span>
+            </div>
+            <!-- <h6 class="ranking-item-title">周热词排行</h6> -->
+            <ul class="hotSearch" id="hotSearch"></ul>
+          </div>
+        </div>
+      </div>
+      <div class="recommend">
+        <div class="wrap">
+          <h2 class="wrap-title">
+            <i>Recommendation</i>
+            <span>知网推荐</span>
+          </h2>
+          <div class="tab-header">
+            <span class="tab-btn active" data-tab="editor">主编推荐</span>
+            <span class="tab-btn" data-tab="tracking" id="tracking"
+              >追踪关注</span
+            >
+            <span class="tab-btn" data-tab="book">图书推荐</span>
+          </div>
+
+          <div class="editor-content tab-panel active" id="editor-panel">
+            <div class="editor-new" id="editor-new">
+              <div class="header-label">
+                <div class="left-label">最新</div>
+                <div class="right-label">
+                  <span class="prev-page"></span>
+                  <span class="next-page"></span>
+                </div>
+              </div>
+              <div class="new-list" id="new-list"></div>
+            </div>
+            <div class="editor-hot" id="editor-hot">
+              <div class="header-label">
+                <div class="left-label">热门</div>
+                <div class="right-label">
+                  <span class="prev-page"></span>
+                  <span class="next-page"></span>
+                </div>
+              </div>
+              <div class="new-list" id="hot-list"></div>
+            </div>
+            <div class="editor-theme" id="editor-theme">
+              <div class="header-label">
+                <div class="left-label">专题</div>
+                <div class="right-label">
+                  <span class="prev-page"></span>
+                  <span class="next-page"></span>
+                </div>
+              </div>
+              <div class="img-list" id="special-topics"></div>
+            </div>
+            <!-- trends-news -->
+          </div>
+
+          <div class="track-content tab-panel" id="tracking-panel">
+            <div class="track-banner">
+              <div id="track-gallery" class="royalSlider rsDefault"></div>
+            </div>
+            <div class="track-list" id="track-list"></div>
+            <!-- trends-news -->
+          </div>
+
+          <div class="book-content tab-panel" id="book-panel">
+            <div class="book-banner">
+              <div id="book-gallery" class="royalSlider rsDefault"></div>
+            </div>
+            <div class="book-list">
+              <div class="book-type paper-book">纸质图书</div>
+              <div class="paper-book-container"></div>
+
+              <div class="book-type e-book">电子图书</div>
+              <div class="book-item">
+                <a
+                  class="item-title"
+                  href="https://thinker.cnki.net/bookStore/Book/bookdetail?bookcode=9787506819442001&type=book"
+                  target="_blank"
+                  title="中国阅读 全民阅读蓝皮书 第一卷"
+                  >中国阅读 全民阅读蓝皮书 第一卷
+                </a>
+                <a
+                  class="item-source"
+                  href="https://thinker.cnki.net/bookstore/search/result?field=出版者&word=中国书籍出版社"
+                  target="_blank"
+                  title="中国书籍出版社"
+                  >中国书籍出版社</a
+                >
+              </div>
+              <div class="book-item">
+                <a
+                  class="item-title"
+                  href="https://thinker.cnki.net/bookStore/Book/bookdetail?bookcode=9787506826044001&type=book"
+                  target="_blank"
+                  title="中国阅读 全民阅读蓝皮书 第二卷"
+                  >中国阅读 全民阅读蓝皮书 第二卷
+                </a>
+                <a
+                  class="item-source"
+                  href="https://thinker.cnki.net/bookstore/search/result?field=出版者&word=中国书籍出版社"
+                  target="_blank"
+                  title="中国书籍出版社"
+                  >中国书籍出版社</a
+                >
+              </div>
+              <div class="book-item">
+                <a
+                  class="item-title"
+                  href="https://thinker.cnki.net/bookStore/Book/bookdetail?bookcode=9787505437975000&type=book"
+                  target="_blank"
+                  title="图书馆阅读推广研究"
+                  >图书馆阅读推广研究
+                </a>
+                <a
+                  class="item-source"
+                  href="https://thinker.cnki.net/bookstore/search/result?field=出版者&word=朝华出版社"
+                  target="_blank"
+                  title="朝华出版社"
+                  >朝华出版社</a
+                >
+              </div>
+              <div class="book-item">
+                <a
+                  class="item-title"
+                  href="https://thinker.cnki.net/bookStore/Book/bookdetail?bookcode=9787505437913000&type=book"
+                  target="_blank"
+                  title="图书馆阅读推广基础理论"
+                  >图书馆阅读推广基础理论
+                </a>
+                <a
+                  class="item-source"
+                  href="https://thinker.cnki.net/bookstore/search/result?field=出版者&word=朝华出版社"
+                  target="_blank"
+                  title="朝华出版社"
+                  >朝华出版社</a
+                >
+              </div>
+              <div class="book-item">
+                <a
+                  class="item-title"
+                  href="https://thinker.cnki.net/bookStore/Book/bookdetail?bookcode=9787505437968000&type=book"
+                  target="_blank"
+                  title="图书馆阅读推广基础工作"
+                  >图书馆阅读推广基础工作
+                </a>
+                <a
+                  class="item-source"
+                  href="https://thinker.cnki.net/bookstore/search/result?field=出版者&word=朝华出版社"
+                  target="_blank"
+                  title="朝华出版社"
+                  >朝华出版社</a
+                >
+              </div>
+              <div class="book-item">
+                <a
+                  class="item-title"
+                  href="https://thinker.cnki.net/bookStore/Book/bookdetail?bookcode=9787505437920000&type=book"
+                  target="_blank"
+                  title="图书馆儿童阅读推广"
+                  >图书馆儿童阅读推广
+                </a>
+                <a
+                  class="item-source"
+                  href="https://thinker.cnki.net/bookstore/search/result?field=出版者&word=朝华出版社"
+                  target="_blank"
+                  title="朝华出版社"
+                  >朝华出版社</a
+                >
+              </div>
+            </div>
+            <!-- trends-news -->
+          </div>
+
+          <!--trends-banner-->
+        </div>
+      </div>
+
+      <div class="trends">
+        <div class="wrap">
+          <h2 class="wrap-title">
+            <i>CNKI Updates</i>
+            <span>知网动态</span>
+            <a
+              href="https://www.cnki.net/subpages/news.html"
+              target="_blank"
+              class="more"
+              data-tag="trends"
+              >了解更多</a
+            >
+          </h2>
+          <div class="trends-news">
+
+            <div class="item">
+              <p class="item-date">
+                <span class="data-time">04-28</span>
+                <span class="data-year">2026</span>
+              </p>
+              <div class="item-con">
+                <a href="https://mp.weixin.qq.com/s/-L5Szo7UbRFnbNaal8eyTA" target="_blank" title="诚邀参加2026年“陶行知教育思想理论研究与创新实践”学术研讨会！">诚邀参加2026年“陶行知教育思想理论研究与创新实践”学术研讨会！</a>
+                <p>2026年6月27日至30日，2026年“陶行知教育思想理论研究与创新实践”学术研讨会将于南京举办！</p>
+              </div>
+            </div>
+
+            <div class="item">
+              <p class="item-date">
+                <span class="data-time">04-27</span>
+                <span class="data-year">2026</span>
+              </p>
+              <div class="item-con">
+                <a href="https://k.cnki.net/themeInfo/1987" target="_blank" title="《管理世界》大讲堂2026年第四期来啦!">《管理世界》大讲堂2026年第四期来啦!</a>
+                <p>本期嘉宾来自：温州商学院、南京大学、复旦大学、同济大学、上海人工智能实验室、浙江工商大学、湖南大学、南开大学、清华大学及中国人民大学。</p>
+              </div>
+            </div>
+
+            <div class="item">
+              <p class="item-date">
+                <span class="data-time">04-21</span>
+                <span class="data-year">2026</span>
+              </p>
+              <div class="item-con">
+                <a href="https://yuedu.cnki.net/jiangxi.html" target="_blank" title="第五届全民阅读大会“江右书旅”——知网邀您共赴书香之约">第五届全民阅读大会“江右书旅”——知网邀您共赴书香之约</a>
+                <p>2026年全民阅读大会即将在江西南昌拉开帷幕，由咪咕数媒、中国知网、京东、帆书、凯叔讲故事多方共同搭建的线上主会场——“江右书旅”互动专区已于4月10日正式上线，中国知网诚邀全国读者共赴一场有温度、有回响的书香盛宴。</p>
+              </div>
+            </div>
+
+            <div class="item">
+              <p class="item-date">
+                <span class="data-time">04-20</span>
+                <span class="data-year">2026</span>
+              </p>
+              <div class="item-con">
+                <a href="https://yccb.cnki.net/#/article-detail?id=9898b6f8-6ac2-4fab-8ec1-fa9502041850&type=5&hideSearch=1" target="_blank" title="“学术成果汇编”征稿启事">“学术成果汇编”征稿启事</a>
+                <p>“学术成果汇编”由中国知网推出，汇编作者本人/他人知网收录文献，以纸质图书或电子图书形式出版，并同步上线知网各平台。</p>
+              </div>
+            </div>
+
+            <div class="item">
+              <p class="item-date">
+                <span class="data-time">04-15</span>
+                <span class="data-year">2026</span>
+              </p>
+              <div class="item-con">
+                <a href="https://yccb.cnki.net/#/article-detail?id=ba238438-bf51-47c8-9002-d9fbdec27de6&type=5&hideSearch=1" target="_blank" title="《基层农技推广》征稿啦">《基层农技推广》征稿啦</a>
+                <p>《基层农技推广》面向农业院校师生、农技推广人员、农业从业者、农业领域管理人员等征稿啦！</p>
+              </div>
+            </div>
+
+          </div>
+          <!-- trends-news -->
+
+          <div class="trends-banner">
+            <div id="js-gallery" class="royalSlider rsDefault">
+
+              <div class="rsContent">
+                <a class="rsImg" href="https://piccache.cnki.net/kdn/index/kns8s/nimages/temp/lb09.jpg?v=4.27"></a>
+                <a class="rsABlock sampleBlock" href="https://mp.weixin.qq.com/s/-L5Szo7UbRFnbNaal8eyTA" target="_blank"></a>
+                <div class="rsTmb">
+                    <h5 title='诚邀参加2026年“陶行知教育思想理论研究与创新实践”学术研讨会！'>诚邀参加2026年“陶行知教育思想理论研究与创新实践”学术研讨会！</h5>
+                </div>
+              </div>
+
+              <div class="rsContent">
+                <a class="rsImg" href="https://piccache.cnki.net/kdn/index/kns8s/nimages/temp/lb08.jpg?v=4.27"></a>
+                <a class="rsABlock sampleBlock" href="https://k.cnki.net/themeInfo/1987" target="_blank"></a>
+                <div class="rsTmb">
+                    <h5 title='《管理世界》大讲堂2026年第四期来啦!'>《管理世界》大讲堂2026年第四期来啦!</h5>
+                </div>
+              </div>
+
+              <div class="rsContent">
+                <a class="rsImg" href="https://piccache.cnki.net/kdn/index/kns8s/nimages/temp/lb10.jpg?v=4.21"></a>
+                <a class="rsABlock sampleBlock" href="https://yuedu.cnki.net/jiangxi.html" target="_blank"></a>
+                <div class="rsTmb">
+                    <h5 title='第五届全民阅读大会“江右书旅”——知网邀您共赴书香之约'>第五届全民阅读大会“江右书旅”——知网邀您共赴书香之约</h5>
+                </div>
+            </div>
+
+              <div class="rsContent">
+                <a class="rsImg" href="https://piccache.cnki.net/kdn/index/kns8s/nimages/temp/lb05.jpg?v=4.20"></a>
+                <a class="rsABlock sampleBlock" href="https://yccb.cnki.net/#/article-detail?id=9898b6f8-6ac2-4fab-8ec1-fa9502041850&type=5&hideSearch=1" target="_blank"></a>
+                <div class="rsTmb">
+                    <h5 title='“学术成果汇编”征稿启事'>“学术成果汇编”征稿启事</h5>
+                </div>
+              </div>
+
+              <div class="rsContent">
+                <a class="rsImg" href="https://piccache.cnki.net/kdn/index/kns8s/nimages/temp/lb01.jpg?v=4.15"></a>
+                <a class="rsABlock sampleBlock" href="https://yccb.cnki.net/#/article-detail?id=ba238438-bf51-47c8-9002-d9fbdec27de6&type=5&hideSearch=1" target="_blank"></a>
+                <div class="rsTmb">
+                    <h5 title='《基层农技推广》征稿啦'>《基层农技推广》征稿啦</h5>
+                </div>
+            </div>
+
+              <div class="rsContent">
+                <a class="rsImg" href="https://piccache.cnki.net/kdn/index/kns8s/nimages/temp/lb03.jpg?v=3.30"></a>
+                <a class="rsABlock sampleBlock" href="https://e.cnki.net/h5/activity-home.html" target="_blank"></a>
+                <div class="rsTmb">
+                    <h5 title='展师能·塑名师“创意写作赋能写作教育”论文、课例征集活动正式启动'>展师能·塑名师“创意写作赋能写作教育”论文、课例征集活动正式启动</h5>
+                </div>
+              </div>
+
+              <div class="rsContent">
+                <a
+                  class="rsImg"
+                  href="https://piccache.cnki.net/kdn/index/kns8s/nimages/temp/lb07.jpg?v=1.13"
+                ></a>
+                <a
+                  class="rsABlock sampleBlock"
+                  href="https://k.cnki.net/themeInfo/1950"
+                  target="_blank"
+                ></a>
+                <div class="rsTmb">
+                  <h5
+                    title="“2026科研诚信公益大讲堂——大学生毕业论文写作指导系列讲座之第二讲：论文撰写与答辩”重磅开讲！"
+                  >
+                    “2026科研诚信公益大讲堂——大学生毕业论文写作指导系列讲座之第二讲：论文撰写与答辩”重磅开讲！
+                  </h5>
+                </div>
+              </div>
+
+              <div class="rsContent">
+                <a
+                  class="rsImg"
+                  href="https://piccache.cnki.net/kdn/index/kns8s/nimages/temp/lb02.jpg?v=12.15"
+                ></a>
+                <a
+                  class="rsABlock sampleBlock"
+                  href="https://sycb.cnki.net/"
+                  target="_blank"
+                ></a>
+                <div class="rsTmb">
+                  <h5 title="出版级人工翻译母语润色，为知识全球传播保驾护航！">
+                    出版级人工翻译母语润色，为知识全球传播保驾护航！
+                  </h5>
+                </div>
+              </div>
+
+              <div class="rsContent">
+                <a
+                  class="rsImg"
+                  href="https://piccache.cnki.net/kdn/index/kns8s/nimages/temp/lb06.jpg?v=9.14"
+                ></a>
+                <a
+                  class="rsABlock sampleBlock"
+                  href="https://au.cnki.net/act/xslwzg"
+                  target="_blank"
+                ></a>
+                <div class="rsTmb">
+                  <h5 title="中国知网博士学术专著丛书征稿启事">
+                    中国知网博士学术专著丛书征稿启事
+                  </h5>
+                </div>
+              </div>
+
+              <div class="rsContent">
+                <a
+                  class="rsImg"
+                  href="https://piccache.cnki.net/kdn/index/kns8s/nimages/temp/lb04.jpg?v=6.20"
+                ></a>
+                <a
+                  class="rsABlock sampleBlock"
+                  href="https://au.cnki.net/act/zgh"
+                  target="_blank"
+                ></a>
+                <div class="rsTmb">
+                  <h5 title="中国知网高被引学者个人成果汇编/学术专著征稿函">
+                    中国知网高被引学者个人成果汇编/学术专著征稿函
+                  </h5>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!--trends-banner-->
+        </div>
+      </div>
+      <!-- trends -->
+
+      <div class="new-products">
+        <div class="wrap">
+          <h2 class="wrap-title">
+            <i>New Products</i>
+            <span>新品速递</span>
+          </h2>
+          <ul class="new-products-content">
+            <li>
+              <div class="item">
+                <div class="pic">
+                  <a href="https://claw.cnki.net/" target="_blank"
+                    ><img
+                      data-lazy="https://piccache.cnki.net/kdn/index/kns8s/nimages/temp/product03.jpg?v=5.22"
+                      alt=""
+                  /></a>
+                </div>
+                <div class="item-text">
+                  <h6 class="title">
+                    <a href="https://claw.cnki.net/" target="_blank"
+                      >CNKI Claw全新上线</a
+                    >
+                  </h6>
+                  <p class="intro">
+                    CNKI Claw助你读懂海量文献，构建知识体系，守护科研初心，让深度探索不再孤独！
+                    <a href="https://claw.cnki.net/" target="_blank">[查看详情]</a>
+                  </p>
+                  <p class="date">2026-05-22</p>
+                </div>
+              </div>
+            </li>
+            <li>
+              <div class="item">
+                <div class="pic">
+                  <a href="https://gw.cnki.net/" target="_blank"
+                    ><img
+                      data-lazy="https://piccache.cnki.net/kdn/index/kns8s/nimages/temp/product04.jpg?v=12.26"
+                      alt=""
+                  /></a>
+                </div>
+                <div class="item-text">
+                  <h6 class="title">
+                    <a href="https://gw.cnki.net/" target="_blank"
+                      >公文大模型（政知通）重磅升级</a
+                    >
+                  </h6>
+                  <p class="intro">
+                    面向党政机关、科研院所和企事业单位提供调研助手、智能公文写作、智能公文核稿、智能查重比对...
+                    <a href="https://gw.cnki.net/" target="_blank"
+                      >[查看详情]</a
+                    >
+                  </p>
+                  <p class="date">2025-12-26</p>
+                </div>
+              </div>
+            </li>
+            <li>
+              <div class="item">
+                <div class="pic">
+                  <a href="https://biaozhi.cnki.net" target="_blank"
+                    ><img
+                      data-lazy="https://piccache.cnki.net/kdn/index/kns8s/nimages/temp/product01.jpg?v=12.16"
+                      alt=""
+                  /></a>
+                </div>
+                <div class="item-text">
+                  <h6 class="title">
+                    <a href="https://biaozhi.cnki.net" target="_blank"
+                      >标准质量评估服务平台重磅发布！</a
+                    >
+                  </h6>
+                  <p class="intro">
+                    标准质量评估服务平台集成全量标准资源，以提升标准制定质量为核心，聚焦于标准质量的专业评估...
+                    <a href="https://biaozhi.cnki.net" target="_blank"
+                      >[查看详情]</a
+                    >
+                  </p>
+                  <p class="date">2025-12-16</p>
+                </div>
+              </div>
+            </li>
+            <li>
+              <div class="item">
+                <div class="pic">
+                  <a href="https://cajx.cnki.net/webcaj/" target="_blank"
+                    ><img
+                      data-lazy="https://piccache.cnki.net/kdn/index/kns8s/nimages/temp/product02.jpg?v=12.8"
+                      alt=""
+                  /></a>
+                </div>
+                <div class="item-text">
+                  <h6 class="title">
+                    <a href="https://cajx.cnki.net/webcaj/" target="_blank"
+                      >CAJX阅读器云服务版</a
+                    >
+                  </h6>
+                  <p class="intro">
+                    CAJX阅读器云服务版是最新打造的桌面级在线阅读服务，提供在线全文翻译、格式转换等系列实用...
+                    <a href="https://cajx.cnki.net/webcaj/" target="_blank"
+                      >[查看详情]</a
+                    >
+                  </p>
+                  <p class="date">2025-12-08</p>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <!-- new-products -->
+
+      <!--footer start-->
+      <div class="footer">
+        <div class="foot-top">
+          <ul class="content">
+            <li>
+              <b>读者服务</b>
+              <a
+                target="_blank"
+                href="https://vipcard.cnki.net/ec/skwd/skwd.htm"
+                >购买知网卡</a
+              >
+              <a target="_blank" href="https://zhifu.cnki.net/">充值中心</a>
+              <a target="_blank" href="https://i.cnki.net/">我的CNKI</a>
+              <a target="_blank" href="https://service.cnki.net/">帮助中心</a>
+            </li>
+            <li>
+              <b>CNKI常用软件下载</b>
+              <a target="_blank" href="https://cajviewer.cnki.net"
+                >CAJViewer浏览器</a
+              >
+              <a target="_blank" href="https://estudy.cnki.net/"
+                >知网研学（原E-Study）</a
+              >
+              <a target="_blank" href="https://www.cnki.net/software/xzydq.htm"
+                >下载中心</a
+              >
+              <a
+                target="_blank"
+                href="https://piccache.cnki.net/kdn/software/standardreader.exe"
+                >标准阅读器</a
+              >
+            </li>
+            <li>
+              <b>特色服务</b>
+              <a target="_blank" href="https://wap.cnki.net/">手机知网</a>
+              <a target="_blank" href="https://book.cnki.net/">知网书店</a>
+              <a target="_blank" href="https://wenku.cnki.net">知网文库</a>
+              <a target="_blank" href="https://mall.cnki.net/">知网阅读</a>
+            </li>
+            <li>
+              <b>客户服务</b>
+              <span>订卡热线：400-819-9993</span>
+              <span>服务热线：400-810-9888</span>
+              <span
+                >在线咨询：<a target="_blank" href="https://service.cnki.net/"
+                  >service.cnki.net</a
+                ></span
+              >
+              <span>邮件咨询：help@cnki.net</span>
+            </li>
+            <li>
+              <b>监督举报</b>
+              <span>违法和不良信息举报电话：400-062-8866</span>
+              <span>违法和不良信息举报邮箱：jubao@cnki.net</span>
+              <span>合规举报邮箱：zwhegui-tsjb@cnki.net</span>
+              <span
+                >服务监督：400-819-1966（<a
+                  target="_blank"
+                  href="https://fwjd.cnki.net"
+                  >fwjd.cnki.net</a
+                >）</span
+              >
+            </li>
+            <li class="weibo">
+              <a target="_blank" href="https://e.weibo.com/u/3059308095">
+                <i class="icon icon-xl"></i>
+                <span>新浪微博客服</span>
+              </a>
+              <a class="qrcode" href="javascript:void(0)">
+                <i class="icon icon-wx"></i>
+                <span>官方微信</span>
+                <span class="wechat-qrcode"><i></i></span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="content foot-bot clearfix">
+          <div class="t">
+            <span class="logo"></span>
+            <div class="mid">
+              <span>
+                <a target="_blank" href="https://www.cnki.net/gycnki/gycnki.htm"
+                  >关于我们</a
+                >
+                <a
+                  target="_blank"
+                  href="https://www.cnki.net/other/gonggao/gongsirongyu.html"
+                  >CNKI 荣誉</a
+                >
+                <a target="_blank" href="https://service.cnki.net/">客服中心</a>
+                <a target="_blank" href="https://service.cnki.net/home?flag=1"
+                  >用户建议</a
+                >
+                <a
+                  target="_blank"
+                  href="https://piccache.cnki.net/index/cnkirecruit/index.html"
+                  >知网招聘</a
+                >
+                <a target="_blank" href="https://a.cnki.net/">知网推广</a>
+              </span>
+              <span
+                >© 1998-<label id="thisYear">2021</label> 中国知网（CNKI）</span
+              >
+              <script type="text/javascript">
+                document.getElementById("thisYear").innerHTML =
+                  new Date().getFullYear();
+              </script>
+            </div>
+            <!--可信网站图片LOGO安装开始-->
+            <a
+              id="___szfw_logo___"
+              class="kxwz"
+              href="https://ss.knet.cn/verifyseal.dll?sn=e13111111010043364isll000000&a=1&pa=0.08881110103584755"
+              target="_blank"
+            ></a>
+            <!--可信网站图片LOGO安装结束-->
+          </div>
+          <div class="b">
+            <span
+              ><a
+                href="https://beian.miit.gov.cn/"
+                target="_blank"
+                rel="noopener"
+                >京ICP备11019815号-4</a
+              >
+              京ICP证040431号
+              <a
+                target="_blank"
+                href="https://piccache.cnki.net/index/images/gb/416.jpg"
+                >网络出版服务许可证网出证(京)字第416号</a
+              ><a
+                target="_blank"
+                href="https://piccache.cnki.net/index/images/gb/170001.jpg"
+                >出版物经营许可证</a
+              >
+              京公网安备11010802020460号&emsp;互联网宗教信息服务许可证：京（2026）0000014</span
+            >
+            <span
+              >&nbsp;同方知网数字科技有限公司&emsp;KDN 平台基础技术由 AIKBase
+              提供.</span
+            >
+          </div>
+        </div>
+        <!--foot-bot-->
+      </div>
+      <!--footer end-->
+
+      <div class="sidefixedbar hideBackTop">
+        <a class="back-top" href="javascript:void(0);" title="返回顶部"
+          ><i></i
+        ></a>
+        <a class="adviceside" href="https://service.cnki.net" target="_blank"
+          ><span><i></i><b>在线咨询</b></span></a
+        >
+      </div>
+    </div>
+    <!--wrapper-->
+    <script
+      type="text/javascript"
+      src="https://piccache.cnki.net/kdn/index/kns8s/nvsmscripts/min/nranking.min.js?v=5.22"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://piccache.cnki.net/kdn/index/kns8s/nvsmscripts/min/ninitpage.min.js?v=5.8"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://piccache.cnki.net/kdn/index/kns8s/nvsmscripts/min/nallproducts.min.js?v=5.12"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://piccache.cnki.net/kdn/index/kns8s/nvsmscripts/min/ncustompage.min.js?v=4.29"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://piccache.cnki.net/kdn/index/kns8s/nvsmjson/fail_back_data.min.js?v=2.9"
+    ></script>
+    <script
+      type="module"
+      src="https://piccache.cnki.net/kdn/index/kns8s/nvsmscripts/requestapi.js?v=5.19"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://piccache.cnki.net/kdn/index/kns8s/nvsmscripts/min/jquery.royalslider.min.js"
+    ></script>
+    <script type="text/javascript">
+      var sugpath = "https://kns.cnki.net";
+      LoadScript(
+        "https://piccache.cnki.net/kdn/index/kns8s/nvsmscripts/min/cnkisug.min.js?v=2.5",
+        function () {
+          sugPara.IsTopK = false;
+          sugPara.IsExp = true;
+          sugPara.IsAttr = false;
+          InitSug("https://kns.cnki.net");
+        },
+      );
+    </script>
+    <script
+      type="text/javascript"
+      src="https://piccache.cnki.net/kdn/index/kns8s/nvsmscripts/min/recordplugin.min.js?v=2.5"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://piccache.cnki.net/kdn/index/kns8s/nvsmscripts/min/echarts.min.js?v=4.13"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://piccache.cnki.net/kdn/index/kns8s/nvsmscripts/min/echarts-wordcloud.min.js?v=2.5"
+    ></script>
+    <div id="__droplist" class="dictdiv"></div>
+  </body>
+</html>
+
+<script>
+  (function () {
+    // 判断是否为生产环境
+    var isProduction = !window.location.hostname.match(
+      /(localhost|127\.0\.0\.1|^$)/,
+    );
+
+    if (isProduction) {
+      // 保存原始的console方法（可选）
+      window.originalConsole = {
+        log: console.log,
+        warn: console.warn,
+        info: console.info,
+      };
+
+      // 在生产环境重写console方法
+      console.log = function () {};
+      console.warn = function () {};
+      console.info = function () {};
+      console.debug = function () {};
+
+      // 保留error方法以便查看错误
+      // console.error 保持不变
+    }
+  })();
+</script>

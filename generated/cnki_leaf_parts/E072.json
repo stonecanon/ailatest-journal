@@ -1,0 +1,779 @@
+{
+  "category": {
+    "code": "E072",
+    "title": "肿瘤学",
+    "count": 43,
+    "major_code": "",
+    "major_title": ""
+  },
+  "pages": [
+    {
+      "page": 1,
+      "rows": 21,
+      "pageCount": 3
+    },
+    {
+      "page": 2,
+      "rows": 21,
+      "pageCount": 3
+    },
+    {
+      "page": 3,
+      "rows": 1,
+      "pageCount": 3
+    }
+  ],
+  "records": [
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "肿瘤学",
+      "category_code": "E072",
+      "page": 1,
+      "title": "中国肿瘤",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOrPqFXsK1gX6e-9rDfrVDb609LGoSGxsWy7mQb0PlY4_SfhrtxFeJ90ovaoeE0JrazH0y6F6wdfg-NQZi9jp8aUucE5DVeGsEx_uW4rd87FQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "5.202",
+      "comprehensive_if": "3.637",
+      "issn": "1004-0242",
+      "cn": "11-2859/R",
+      "sponsor": "中国医学科学院（全国肿瘤防治研究办公室）",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "肿瘤学",
+      "category_code": "E072",
+      "page": 1,
+      "title": "中华肿瘤杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOrPqFXsK1gX6e-9rDfrVDb609LGoSGxsWy7mQb0PlY4_SfhrtxFeJ90ovaoeE0JraoKA4OzKCQrDgw3rimz8bmD_yNsUcntaWWRN2yJmF24g==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "3.036",
+      "comprehensive_if": "2.298",
+      "issn": "0253-3766",
+      "cn": "11-2152/R",
+      "sponsor": "中华医学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "肿瘤学",
+      "category_code": "E072",
+      "page": 1,
+      "title": "癌症",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOrPqFXsK1gX6e-9rDfrVDb609LGoSGxsWy7mQb0PlY4_SfhrtxFeJ90ovaoeE0JranlpnufTKcRL88mqTIzm3q86UD3YxS-6ixQHd8nvwLdQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.729",
+      "comprehensive_if": "1.948",
+      "issn": "1000-467X",
+      "cn": "44-1195/R",
+      "sponsor": "中山大学肿瘤防治中心",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "肿瘤学",
+      "category_code": "E072",
+      "page": 1,
+      "title": "中国癌症杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOrPqFXsK1gX6e-9rDfrVDb609LGoSGxsWy7mQb0PlY4_SfhrtxFeJ90ovaoeE0JraPHRMLrpsID8im1XbRnzteCG0INv_WZTY2QLrjcKO9Sw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.529",
+      "comprehensive_if": "2.004",
+      "issn": "1007-3639",
+      "cn": "31-1727/R",
+      "sponsor": "复旦大学附属肿瘤医院",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "肿瘤学",
+      "category_code": "E072",
+      "page": 1,
+      "title": "中国肺癌杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOrPqFXsK1gX6e-9rDfrVDb609LGoSGxsWy7mQb0PlY4_SfhrtxFeJ90ovaoeE0JrYi8qkjqw79gy88GwlenUtjX91IQYXga9QgPq5-6AX_Jw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.397",
+      "comprehensive_if": "1.719",
+      "issn": "1009-3419",
+      "cn": "12-1395/R",
+      "sponsor": "中国抗癌协会;中国防痨协会;天津医科大学总医院",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "肿瘤学",
+      "category_code": "E072",
+      "page": 1,
+      "title": "实用肿瘤杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOrPqFXsK1gX6e-9rDfrVDb609LGoSGxsWy7mQb0PlY4_SfhrtxFeJ90ovaoeE0JrYl2HzZsH_Lu3EDXYS2ImQ8kWCSrRmG6OVwaSc5lERLCQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.232",
+      "comprehensive_if": "1.829",
+      "issn": "1001-1692",
+      "cn": "33-1074/R",
+      "sponsor": "浙江大学",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "肿瘤学",
+      "category_code": "E072",
+      "page": 1,
+      "title": "Chinese Journal of Cancer Research",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOrPqFXsK1gX6e-9rDfrVDb609LGoSGxsWy7mQb0PlY4_SfhrtxFeJ90ovaoeE0JrZ-GDhKM-CsJV0aYUuMZaIPpeykq7lSEBIVDcvWKYW2aQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.041",
+      "comprehensive_if": "1.531",
+      "issn": "1000-9604",
+      "cn": "11-2591/R",
+      "sponsor": "中国抗癌协会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "肿瘤学",
+      "category_code": "E072",
+      "page": 1,
+      "title": "Cancer Biology & Medicine",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOrPqFXsK1gX6e-9rDfrVDb609LGoSGxsWy7mQb0PlY4_SfhrtxFeJ90ovaoeE0JrZnd1G3Hw-R9VA8s2TUL_81rADOMdc9ZmQOPDtaqg_tfg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.023",
+      "comprehensive_if": "1.324",
+      "issn": "2095-3941",
+      "cn": "12-1431/R",
+      "sponsor": "中国抗癌协会;天津医科大学肿瘤医院",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "肿瘤学",
+      "category_code": "E072",
+      "page": 1,
+      "title": "中华肿瘤防治杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMraV_znIwLLfbly9y6x_2z2qjFkxE-yJw8b_0Tsb4KdbAShht6A9PJ_T-Xw2ztneCbnauayBcTCgN0GnVhmAIsd68aoCogOPxMK9vRzlEP2w==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.996",
+      "comprehensive_if": "1.440",
+      "issn": "1673-5269",
+      "cn": "11-5456/R",
+      "sponsor": "中华预防医学会;山东省肿瘤防治研究院",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "肿瘤学",
+      "category_code": "E072",
+      "page": 1,
+      "title": "肿瘤综合治疗电子杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMraV_znIwLLfbly9y6x_2z2qjFkxE-yJw8b_0Tsb4KdbAShht6A9PJ_T-Xw2ztneDbC9UUra2JwxP6w3wfauSIK1eZY09HKUGrtHueys7AHA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.992",
+      "comprehensive_if": "1.110",
+      "issn": "2096-2940",
+      "cn": "11-9368/R",
+      "sponsor": "人民卫生出版社有限公司",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "肿瘤学",
+      "category_code": "E072",
+      "page": 1,
+      "title": "肿瘤代谢与营养电子杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMraV_znIwLLfbly9y6x_2z2qjFkxE-yJw8b_0Tsb4KdbAShht6A9PJ_T-Xw2ztneDAKCqktZyy_VO3w--qgV-388ggI9gvrL_Rf-ACjSGyTg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.811",
+      "comprehensive_if": "1.494",
+      "issn": "2095-7807",
+      "cn": "11-9349/R",
+      "sponsor": "人民卫生出版社有限公司",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "肿瘤学",
+      "category_code": "E072",
+      "page": 1,
+      "title": "中医肿瘤学杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMraV_znIwLLfbly9y6x_2z2qjFkxE-yJw8b_0Tsb4KdbAShht6A9PJ_T-Xw2ztneA4XaP_3rlYtHgMzI2iACXyC5f1y627VC3mH4Uzi64KQg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.805",
+      "comprehensive_if": "1.264",
+      "issn": "2096-6628",
+      "cn": "44-1743/R73",
+      "sponsor": "广州中医药大学第一附属医院;中华中医药学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "肿瘤学",
+      "category_code": "E072",
+      "page": 1,
+      "title": "中国肿瘤临床与康复",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMraV_znIwLLfbly9y6x_2z2qjFkxE-yJw8b_0Tsb4KdbAShht6A9PJ_T-Xw2ztneCEm2q7FE9Cgi93-TREqPXKVUnYsL4sdFE-K1lh8cExnQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.493",
+      "comprehensive_if": "1.251",
+      "issn": "1005-8664",
+      "cn": "11-3494/R",
+      "sponsor": "中国癌症基金会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "肿瘤学",
+      "category_code": "E072",
+      "page": 1,
+      "title": "肿瘤防治研究",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMraV_znIwLLfbly9y6x_2z2qjFkxE-yJw8b_0Tsb4KdbAShht6A9PJ_T-Xw2ztneC5OsJ8I4bSSfLkLnYp66m7PSwUZCyywL1yk-wKQ8QD-w==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.468",
+      "comprehensive_if": "1.093",
+      "issn": "1000-8578",
+      "cn": "42-1241/R",
+      "sponsor": "湖北省肿瘤医院;中国抗癌协会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "肿瘤学",
+      "category_code": "E072",
+      "page": 1,
+      "title": "中国肿瘤临床",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMraV_znIwLLfbly9y6x_2z2qjFkxE-yJw8b_0Tsb4KdbAShht6A9PJ_T-Xw2ztneBtBbLxRjvpZ47vvsARds4RP5Lx-1Ilwe1BdVwXE1hDRw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.402",
+      "comprehensive_if": "1.085",
+      "issn": "1000-8179",
+      "cn": "12-1099/R",
+      "sponsor": "中国抗癌协会;天津医科大学肿瘤医院",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "肿瘤学",
+      "category_code": "E072",
+      "page": 1,
+      "title": "中国癌症防治杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMraV_znIwLLfbly9y6x_2z2qjFkxE-yJw8b_0Tsb4KdbAShht6A9PJ_T-Xw2ztneDt1CgHJKyB3RYQzVtV2lPAKDCnP7wbwzcWaThMrlRw7Q==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.357",
+      "comprehensive_if": "1.063",
+      "issn": "1674-5671",
+      "cn": "45-1366/R",
+      "sponsor": "中国医师协会;广西肿瘤防治研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "肿瘤学",
+      "category_code": "E072",
+      "page": 1,
+      "title": "中国肿瘤外科杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMraV_znIwLLfbly9y6x_2z2qjFkxE-yJw8b_0Tsb4KdbAShht6A9PJ_T-Xw2ztneAXkLIR6TV7SpbNJMofq2V7s5kywiW50G2jbpaaAfiYFQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.342",
+      "comprehensive_if": "1.040",
+      "issn": "1674-4136",
+      "cn": "32-1795/R",
+      "sponsor": "中国医师协会;江苏省医学情报研究所;江苏省肿瘤医院",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "肿瘤学",
+      "category_code": "E072",
+      "page": 1,
+      "title": "现代肿瘤医学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMraV_znIwLLfbly9y6x_2z2qjFkxE-yJw8b_0Tsb4KdbAShht6A9PJ_T-Xw2ztneBsal7n21wA5xwIqfG-snPGG6VeqZ7NWsofhZy_Mlnggg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.299",
+      "comprehensive_if": "0.973",
+      "issn": "1672-4992",
+      "cn": "61-1415/R",
+      "sponsor": "中国抗癌协会;陕西省抗癌协会;陕西省肿瘤防治研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "肿瘤学",
+      "category_code": "E072",
+      "page": 1,
+      "title": "中国肿瘤生物治疗杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMraV_znIwLLfbly9y6x_2z2qjFkxE-yJw8b_0Tsb4KdbAShht6A9PJ_T-Xw2ztneDjbSduA8pFezFF0zvtyBYj7KoHjHzbObQtjoTg6dGzFA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.238",
+      "comprehensive_if": "1.016",
+      "issn": "1007-385X",
+      "cn": "31-1725/R",
+      "sponsor": "中国免疫学会;中国抗癌协会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "肿瘤学",
+      "category_code": "E072",
+      "page": 1,
+      "title": "实用癌症杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMraV_znIwLLfbly9y6x_2z2qjFkxE-yJw8b_0Tsb4KdbAShht6A9PJ_T-Xw2ztneDMNEEfTMSsXB6GlYixF6jpkj69EAjyIxDyUkLrdsQwNA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.198",
+      "comprehensive_if": "0.991",
+      "issn": "1001-5930",
+      "cn": "36-1101/R",
+      "sponsor": "江西省肿瘤医院;江西省肿瘤研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "肿瘤学",
+      "category_code": "E072",
+      "page": 1,
+      "title": "中国骨与关节杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMraV_znIwLLfbly9y6x_2z2qjFkxE-yJw8b_0Tsb4KdbAShht6A9PJ_T-Xw2ztneD31NqeGKFaXnwi9_H3J80Qik7kFo4J0PJklQN2RGyRwg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.178",
+      "comprehensive_if": "0.885",
+      "issn": "2095-252X",
+      "cn": "10-1022/R",
+      "sponsor": "中国医师协会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "肿瘤学",
+      "category_code": "E072",
+      "page": 2,
+      "title": "肿瘤预防与治疗",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINugRN4VsnwclI4OFHIA5c2t1LTiXzfzbF6AEfxyecsDsWBtksIOKpoMbvxkdZdkQMiHF5Zs3mdv5a8g1YfQ0vkRpISaMW4SJL1HupvV1KJzw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.174",
+      "comprehensive_if": "0.918",
+      "issn": "1674-0904",
+      "cn": "51-1703/R",
+      "sponsor": "四川省肿瘤医院",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "肿瘤学",
+      "category_code": "E072",
+      "page": 2,
+      "title": "消化肿瘤杂志(电子版)",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINugRN4VsnwclI4OFHIA5c2t1LTiXzfzbF6AEfxyecsDsWBtksIOKpoMbvxkdZdkQNKa2UXGbpF_QLMweOzgWhPz-ach_iXtGODEYpzCPQwnw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.136",
+      "comprehensive_if": "1.030",
+      "issn": "1674-7402",
+      "cn": "11-9301/R",
+      "sponsor": "人民卫生出版社有限公司",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "肿瘤学",
+      "category_code": "E072",
+      "page": 2,
+      "title": "临床肿瘤学杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINugRN4VsnwclI4OFHIA5c2t1LTiXzfzbF6AEfxyecsDsWBtksIOKpoMbvxkdZdkQMasB4LdiwKD_dDwKvBMDqWKN8xCoHzKiHHiX1GkTU5XQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.105",
+      "comprehensive_if": "0.927",
+      "issn": "1009-0460",
+      "cn": "10-1957/R",
+      "sponsor": "融通医健期刊出版(北京)有限公司",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "肿瘤学",
+      "category_code": "E072",
+      "page": 2,
+      "title": "肿瘤",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINugRN4VsnwclI4OFHIA5c2t1LTiXzfzbF6AEfxyecsDsWBtksIOKpoMbvxkdZdkQM2bU_sj296o2Zs8GTCtV9uQtTSvNT6VOKnH_ChN1sC0g==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.040",
+      "comprehensive_if": "0.983",
+      "issn": "1000-7431",
+      "cn": "31-1372/R",
+      "sponsor": "上海交通大学医学院附属仁济医院;上海市肿瘤研究所",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "肿瘤学",
+      "category_code": "E072",
+      "page": 2,
+      "title": "肿瘤药学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINugRN4VsnwclI4OFHIA5c2t1LTiXzfzbF6AEfxyecsDsWBtksIOKpoMbvxkdZdkQOph9h2mT45_45fqLtdw48KaXpEvfC4Zc6NpMV9J5aM5Q==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.030",
+      "comprehensive_if": "0.801",
+      "issn": "2095-1264",
+      "cn": "43-1507/R",
+      "sponsor": "湖南省肿瘤医院",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "肿瘤学",
+      "category_code": "E072",
+      "page": 2,
+      "title": "实用肿瘤学杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINugRN4VsnwclI4OFHIA5c2t1LTiXzfzbF6AEfxyecsDsWBtksIOKpoMbvxkdZdkQOjZqx9a-zYgMDIblJ0E0A0ErNB0X0U5yM4YJAFzmC9lQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.985",
+      "comprehensive_if": "0.768",
+      "issn": "1002-3070",
+      "cn": "23-1212/R",
+      "sponsor": "哈尔滨医科大学附属肿瘤医院",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "肿瘤学",
+      "category_code": "E072",
+      "page": 2,
+      "title": "癌症进展",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINugRN4VsnwclI4OFHIA5c2t1LTiXzfzbF6AEfxyecsDsWBtksIOKpoMbvxkdZdkQNQMi9RMprYJl2a_-hIW4RA87HGCxLOIHWisKfoeucOtA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.983",
+      "comprehensive_if": "0.837",
+      "issn": "1672-1535",
+      "cn": "11-4971/R",
+      "sponsor": "中国医学科学院",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "肿瘤学",
+      "category_code": "E072",
+      "page": 2,
+      "title": "肿瘤基础与临床",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINugRN4VsnwclI4OFHIA5c2t1LTiXzfzbF6AEfxyecsDsWBtksIOKpoMbvxkdZdkQPLDQW9cOh8WskeWl9F8J1hW2piWJHcpfXW5s0GAtoiLg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.928",
+      "comprehensive_if": "0.812",
+      "issn": "1673-5412",
+      "cn": "41-1383/R",
+      "sponsor": "河南省抗癌协会;郑州大学;河南省肿瘤医院;河南省肿瘤研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "肿瘤学",
+      "category_code": "E072",
+      "page": 2,
+      "title": "肝癌电子杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINugRN4VsnwclI4OFHIA5c2t1LTiXzfzbF6AEfxyecsDsWBtksIOKpoMbvxkdZdkQOrhwLqAUsICXEV7wpJ9QOVnVatZO0-3frtGOm5mRo8_A==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.922",
+      "comprehensive_if": "0.753",
+      "issn": "2095-7815",
+      "cn": "11-9351/R",
+      "sponsor": "人民卫生出版社有限公司",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "肿瘤学",
+      "category_code": "E072",
+      "page": 2,
+      "title": "癌变·畸变·突变",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINugRN4VsnwclI4OFHIA5c2t1LTiXzfzbF6AEfxyecsDsWBtksIOKpoMbvxkdZdkQM4cO8As2y4Jzp6ltNaNUKvQQwCc38318eKgdkU7K_fIQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.822",
+      "comprehensive_if": "0.523",
+      "issn": "1004-616X",
+      "cn": "44-1063/R",
+      "sponsor": "中国环境诱变剂学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "肿瘤学",
+      "category_code": "E072",
+      "page": 2,
+      "title": "肿瘤学杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINugRN4VsnwclI4OFHIA5c2t1LTiXzfzbF6AEfxyecsDsWBtksIOKpoMbvxkdZdkQOlGSVmv82zGmOnoE6Jre_PvEaHNnpUURRt8QS5QOMTfw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.751",
+      "comprehensive_if": "0.554",
+      "issn": "1671-170X",
+      "cn": "33-1266/R",
+      "sponsor": "浙江省肿瘤医院;浙江省抗癌协会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "肿瘤学",
+      "category_code": "E072",
+      "page": 2,
+      "title": "Journal of Nutritional Oncology",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINugRN4VsnwclI4OFHIA5c2t1LTiXzfzbF6AEfxyecsDsWBtksIOKpoMbvxkdZdkQMpvxFdUDFtkdbjUB4ZiuidBPCkn8X6Pq9TEA9wt2xhQA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.609",
+      "comprehensive_if": "0.565",
+      "issn": "2096-2746",
+      "cn": "10-1448/R",
+      "sponsor": "人民卫生出版社有限公司",
+      "tags": [
+        "完全OA期刊"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "肿瘤学",
+      "category_code": "E072",
+      "page": 2,
+      "title": "现代泌尿生殖肿瘤杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINugRN4VsnwclI4OFHIA5c2t1LTiXzfzbF6AEfxyecsDsWBtksIOKpoMbvxkdZdkQOguBkI7NhVh194OEBMevVYsfiZZHQEI8X5hPeUIMSjVg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.575",
+      "comprehensive_if": "0.489",
+      "issn": "1674-4624",
+      "cn": "42-1790/R",
+      "sponsor": "华中科技大学",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "肿瘤学",
+      "category_code": "E072",
+      "page": 2,
+      "title": "中华放射肿瘤学杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINugRN4VsnwclI4OFHIA5c2t1LTiXzfzbF6AEfxyecsDsWBtksIOKpoMbvxkdZdkQO2sNgNwI60EBRDBL8qqn-_rQf7L7vEtquH-HPxlzlczA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.542",
+      "comprehensive_if": "0.470",
+      "issn": "1004-4221",
+      "cn": "11-3030/R",
+      "sponsor": "中华医学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "肿瘤学",
+      "category_code": "E072",
+      "page": 2,
+      "title": "国际肿瘤学杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINugRN4VsnwclI4OFHIA5c2t1LTiXzfzbF6AEfxyecsDsWBtksIOKpoMbvxkdZdkQO5gA1TyUxTdI9zWlJ2A3WnIxFolhiU4SNkHFhthjzLlw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.502",
+      "comprehensive_if": "0.431",
+      "issn": "1673-422X",
+      "cn": "37-1439/R",
+      "sponsor": "中华医学会;山东省医学科学院",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "肿瘤学",
+      "category_code": "E072",
+      "page": 2,
+      "title": "肿瘤研究与临床",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINugRN4VsnwclI4OFHIA5c2t1LTiXzfzbF6AEfxyecsDsWBtksIOKpoMbvxkdZdkQMjy3DqbSO2de-xKqCrppdacWwrE6t0emm-6fr2V6CJmA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.380",
+      "comprehensive_if": "0.349",
+      "issn": "1006-9801",
+      "cn": "11-5355/R",
+      "sponsor": "中华医学会;山西省肿瘤研究所;山西省肿瘤医院",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "肿瘤学",
+      "category_code": "E072",
+      "page": 2,
+      "title": "中华转移性肿瘤杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINugRN4VsnwclI4OFHIA5c2t1LTiXzfzbF6AEfxyecsDsWBtksIOKpoMbvxkdZdkQPRAF3fDCXZD7RydB3edo8n4NRidUZxEpU7d4lZbe37Vw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.212",
+      "comprehensive_if": "0.188",
+      "issn": "2096-5400",
+      "cn": "10-1548/R",
+      "sponsor": "中华医学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "肿瘤学",
+      "category_code": "E072",
+      "page": 2,
+      "title": "白血病·淋巴瘤",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINugRN4VsnwclI4OFHIA5c2t1LTiXzfzbF6AEfxyecsDsWBtksIOKpoMbvxkdZdkQOzWKO4fleBnnS4QqdcquorQ9BPMWQn0-NIEdYe6H_1Ew==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.202",
+      "comprehensive_if": "0.165",
+      "issn": "1009-9921",
+      "cn": "11-5356/R",
+      "sponsor": "中华医学会;山西省肿瘤研究所;山西省肿瘤医院",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "肿瘤学",
+      "category_code": "E072",
+      "page": 2,
+      "title": "Oncology and Translational Medicine",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINugRN4VsnwclI4OFHIA5c2t1LTiXzfzbF6AEfxyecsDsWBtksIOKpoMbvxkdZdkQOGccRZpjHiVBt1IUoV8GietCb5czxoPoI3fR-jCbg_OA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.090",
+      "comprehensive_if": "0.090",
+      "issn": "2095-9621",
+      "cn": "42-1865/R",
+      "sponsor": "华中科技大学同济医学院",
+      "tags": [
+        "完全OA期刊"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "肿瘤学",
+      "category_code": "E072",
+      "page": 2,
+      "title": "Intelligent Oncology",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINugRN4VsnwclI4OFHIA5c2t1LTiXzfzbF6AEfxyecsDsWBtksIOKpoMbvxkdZdkQN_TkAROd_MTKteo0R02XGgF2axH2SmkHxva7QP9f9e7A==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "2097-7131",
+      "cn": "50-1240/R73",
+      "sponsor": "重庆大学",
+      "tags": [
+        "完全OA期刊"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "肿瘤学",
+      "category_code": "E072",
+      "page": 2,
+      "title": "抗癌之窗",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINugRN4VsnwclI4OFHIA5c2t1LTiXzfzbF6AEfxyecsDsWBtksIOKpoMbvxkdZdkQPhiME9x2whnHb3Het7-ffiA6IzHBge-OXBX_baNJFTmQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1673-5757",
+      "cn": "11-5458/R",
+      "sponsor": "中国医学科学院",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "肿瘤学",
+      "category_code": "E072",
+      "page": 3,
+      "title": "Malignancy Spectrum",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPM_co8LFn0qXX4-dCXogecR0aPYEE0-55Xu-eBj1IVcQq-hr3KOk27DTtUPWBDCVzbBkeq6E_GeZcB9g0DnG8rvK05_oXz4dU1wyiads3sJw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "2770-9140",
+      "cn": "10-1989/R",
+      "sponsor": "高等教育出版社有限公司",
+      "tags": [
+        "完全OA期刊"
+      ]
+    }
+  ]
+}

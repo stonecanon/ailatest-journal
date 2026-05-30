@@ -159,8 +159,9 @@ export async function onRequest(context) {
   const siteUrl = url.origin;
 
   // Extract slug from the [[slug]] param (array of path segments)
-  const slugSegments = params.slug || [];
-  const slug = slugSegments.filter(Boolean).join('/');
+  // /journal/2053-1583/ → ['2053-1583', '']; /journal/2053-1583 → ['2053-1583']
+  const slugSegments = (params.slug || []).filter(s => s.trim() !== '');
+  const slug = slugSegments.join('/');
 
   if (!slug) {
     // /journal/ with no slug → redirect to home

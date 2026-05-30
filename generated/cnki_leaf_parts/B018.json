@@ -1,0 +1,301 @@
+{
+  "category": {
+    "code": "B018",
+    "title": "一般化学工业",
+    "count": 16,
+    "major_code": "",
+    "major_title": ""
+  },
+  "pages": [
+    {
+      "page": 1,
+      "rows": 16,
+      "pageCount": 1
+    }
+  ],
+  "records": [
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "一般化学工业",
+      "category_code": "B018",
+      "page": 1,
+      "title": "中国油脂",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIM7o4CZJyFHX8dn1xfEJ8i2ba-UIUW4y9YF8VWkCoycwYeeeBFa7dX4tbv34f78Eoob2yBbmxmVazLlTj4jr5vPUaUBrHI94SU8FnAdQB7y2A==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.672",
+      "comprehensive_if": "1.596",
+      "issn": "1003-7969",
+      "cn": "61-1099/TS",
+      "sponsor": "中粮工科(西安)国际工程有限公司",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "一般化学工业",
+      "category_code": "B018",
+      "page": 1,
+      "title": "涂料工业",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIM7o4CZJyFHX8dn1xfEJ8i2ba-UIUW4y9YF8VWkCoycwYeeeBFa7dX4tbv34f78Eopw0VvIf83kZcXWDLHybx_2GU9AdwNWmfseYP1_D1Ca_Q==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.305",
+      "comprehensive_if": "1.022",
+      "issn": "0253-4312",
+      "cn": "32-1154/TQ",
+      "sponsor": "中海油常州涂料化工研究院有限公司",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "一般化学工业",
+      "category_code": "B018",
+      "page": 1,
+      "title": "日用化学工业(中英文)",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIM7o4CZJyFHX8dn1xfEJ8i2ba-UIUW4y9YF8VWkCoycwYeeeBFa7dX4tbv34f78EorHJgE3GVqirVtEf4--qel6kUpd_tQ9wPSjeXdZQuo1Cg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.149",
+      "comprehensive_if": "0.855",
+      "issn": "2097-2806",
+      "cn": "14-1412/TQ",
+      "sponsor": "中国日用化学研究院有限公司",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "一般化学工业",
+      "category_code": "B018",
+      "page": 1,
+      "title": "香料香精化妆品",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIM7o4CZJyFHX8dn1xfEJ8i2ba-UIUW4y9YF8VWkCoycwYeeeBFa7dX4tbv34f78EootyzFznn5kP5vysFVUTeyfXmJquehAHoFM2j45HowPMg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.845",
+      "comprehensive_if": "0.748",
+      "issn": "1000-4475",
+      "cn": "31-1470/TQ",
+      "sponsor": "上海香料研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "一般化学工业",
+      "category_code": "B018",
+      "page": 1,
+      "title": "染料与染色",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIM7o4CZJyFHX8dn1xfEJ8i2ba-UIUW4y9YF8VWkCoycwYeeeBFa7dX4tbv34f78EorMEFSAoSCT4f5w-DXJaXlSrNbVVRIFsvhND41Da3R1QQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.844",
+      "comprehensive_if": "0.531",
+      "issn": "1672-1179",
+      "cn": "21-1483/TQ",
+      "sponsor": "沈阳化工研究院有限公司",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "一般化学工业",
+      "category_code": "B018",
+      "page": 1,
+      "title": "工业微生物",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIM7o4CZJyFHX8dn1xfEJ8i2ba-UIUW4y9YF8VWkCoycwYeeeBFa7dX4tbv34f78EoolBNU7czVnqemx3ms08400P-RRnfqGocy7a6YXn0WERQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.829",
+      "comprehensive_if": "0.610",
+      "issn": "1001-6678",
+      "cn": "31-1438/Q",
+      "sponsor": "全国工业微生物信息中心;上海市工业微生物研究所",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "一般化学工业",
+      "category_code": "B018",
+      "page": 1,
+      "title": "涂层与防护",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIM7o4CZJyFHX8dn1xfEJ8i2ba-UIUW4y9YF8VWkCoycwYeeeBFa7dX4tbv34f78Eopfymhw3yp109IhcK2_ViGJBMKlhOpFqK3Oh_snVuZ9zw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.662",
+      "comprehensive_if": "0.489",
+      "issn": "2096-8639",
+      "cn": "32-1879/TQ",
+      "sponsor": "中海油常州涂料化工研究院有限公司;中国化工学会涂料涂装专业委员会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "一般化学工业",
+      "category_code": "B018",
+      "page": 1,
+      "title": "江西化工",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIM7o4CZJyFHX8dn1xfEJ8i2ba-UIUW4y9YF8VWkCoycwYeeeBFa7dX4tbv34f78Eor5gGJrZO-J_M8w9LE8zfD016HV413ui0hJ0YMYRdHb5Q==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.545",
+      "comprehensive_if": "0.397",
+      "issn": "1008-3103",
+      "cn": "36-1108/TQ",
+      "sponsor": "江西省检验检测认证总院;江西省化学化工学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "一般化学工业",
+      "category_code": "B018",
+      "page": 1,
+      "title": "中国涂料",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIM7o4CZJyFHX8dn1xfEJ8i2ba-UIUW4y9YF8VWkCoycwYeeeBFa7dX4tbv34f78Eoq302PmYP0XfLqpd1ylrqvdQohAV5FbyepZeQEzkunnMA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.530",
+      "comprehensive_if": "0.431",
+      "issn": "1006-2556",
+      "cn": "11-3544/TQ",
+      "sponsor": "中国涂料工业协会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "一般化学工业",
+      "category_code": "B018",
+      "page": 1,
+      "title": "信息记录材料",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIM7o4CZJyFHX8dn1xfEJ8i2ba-UIUW4y9YF8VWkCoycwYeeeBFa7dX4tbv34f78Eopf2he3f_oMKiJRNLVkpkn_25d2UR6i7FuSXk-HokUQUQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.418",
+      "comprehensive_if": "0.210",
+      "issn": "1009-5624",
+      "cn": "10-2021/TQ",
+      "sponsor": "北京乐凯科技有限公司",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "一般化学工业",
+      "category_code": "B018",
+      "page": 1,
+      "title": "口腔护理用品工业",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIM7o4CZJyFHX8dn1xfEJ8i2ba-UIUW4y9YF8VWkCoycwYeeeBFa7dX4tbv34f78Eoo3gPTtZCaj54aj51rc5jVLdvhwviaEjD2tPy0_tliLaQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.342",
+      "comprehensive_if": "0.272",
+      "issn": "2095-3607",
+      "cn": "23-1559/TS",
+      "sponsor": "黑龙江省轻工科学研究院;中国口腔清洁护理用品工业协会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "一般化学工业",
+      "category_code": "B018",
+      "page": 1,
+      "title": "上海涂料",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIM7o4CZJyFHX8dn1xfEJ8i2ba-UIUW4y9YF8VWkCoycwYeeeBFa7dX4tbv34f78EoqqNCK2hco1ynPQXRWu-xK9yn67OX-y9RPffiZyww1MLw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.333",
+      "comprehensive_if": "0.253",
+      "issn": "1009-1696",
+      "cn": "31-1792/TQ",
+      "sponsor": "上海华谊精细化工有限公司;上海市涂料研究所有限公司",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "一般化学工业",
+      "category_code": "B018",
+      "page": 1,
+      "title": "中国生漆",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIM7o4CZJyFHX8dn1xfEJ8i2ba-UIUW4y9YF8VWkCoycwYeeeBFa7dX4tbv34f78EooUMMqK-w27PlYg4seycKWn6VU0OSAiO3a_ek_CjqfzYw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.257",
+      "comprehensive_if": "0.162",
+      "issn": "1000-7067",
+      "cn": "61-1098/TQ",
+      "sponsor": "中华全国供销合作总社;西安生漆涂料研究所",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "一般化学工业",
+      "category_code": "B018",
+      "page": 1,
+      "title": "现代涂料与涂装",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIM7o4CZJyFHX8dn1xfEJ8i2ba-UIUW4y9YF8VWkCoycwYeeeBFa7dX4tbv34f78EoohY1F7mMiSzYEQq2_CVVkyf4oYZJM5If8yCPMSLeS3KQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.255",
+      "comprehensive_if": "0.196",
+      "issn": "1007-9548",
+      "cn": "62-1135/TQ",
+      "sponsor": "中昊北方涂料工业研究设计院有限公司",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "一般化学工业",
+      "category_code": "B018",
+      "page": 1,
+      "title": "China Detergent & Cosmetics",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIM7o4CZJyFHX8dn1xfEJ8i2ba-UIUW4y9YF8VWkCoycwYeeeBFa7dX4tbv34f78EorRqPrhzJmuYF27uFI7tr4stO7OT9JiTFS8rUdxutEVnQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.024",
+      "comprehensive_if": "0.024",
+      "issn": "2096-0700",
+      "cn": "14-1382/TS",
+      "sponsor": "中国日用化学研究院有限公司",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "一般化学工业",
+      "category_code": "B018",
+      "page": 1,
+      "title": "上海染料",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIM7o4CZJyFHX8dn1xfEJ8i2ba-UIUW4y9YF8VWkCoycwYeeeBFa7dX4tbv34f78Eoo16oFyhNWqYC_oPj4Sy4J-ZZKDt7AMGNIaNKbGbQ3x9g==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1008-1348",
+      "cn": "31-1490/TQ",
+      "sponsor": "上海涂料染料行业协会",
+      "tags": []
+    }
+  ]
+}

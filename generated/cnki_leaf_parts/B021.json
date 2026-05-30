@@ -1,0 +1,1600 @@
+{
+  "category": {
+    "code": "B021",
+    "title": "矿业工程",
+    "count": 87,
+    "major_code": "",
+    "major_title": ""
+  },
+  "pages": [
+    {
+      "page": 1,
+      "rows": 21,
+      "pageCount": 5
+    },
+    {
+      "page": 2,
+      "rows": 21,
+      "pageCount": 5
+    },
+    {
+      "page": 3,
+      "rows": 21,
+      "pageCount": 5
+    },
+    {
+      "page": 4,
+      "rows": 21,
+      "pageCount": 5
+    },
+    {
+      "page": 5,
+      "rows": 3,
+      "pageCount": 5
+    }
+  ],
+  "records": [
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 1,
+      "title": "煤炭学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPCkqgW5YdO82suoVVoNPyTq8wiPxH0ci0xvbJ2n7UMvVtn7j7lHpivTffZeE0FnvDIe-M9YNYjZ295ue3dgNvOu92JlJV9GMeKnaZLvoH6fg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "8.293",
+      "comprehensive_if": "5.941",
+      "issn": "0253-9993",
+      "cn": "11-2190/TD",
+      "sponsor": "中国煤炭学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 1,
+      "title": "采矿与岩层控制工程学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPCkqgW5YdO82suoVVoNPyTq8wiPxH0ci0xvbJ2n7UMvVtn7j7lHpivTffZeE0FnvCXuX9kySsq50EhQahTVQdxMHn0RbiSLNUILYs0IAdclg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "6.514",
+      "comprehensive_if": "5.147",
+      "issn": "2096-7187",
+      "cn": "10-1638/TD",
+      "sponsor": "煤炭科学研究总院有限公司",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 1,
+      "title": "采矿与安全工程学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPCkqgW5YdO82suoVVoNPyTq8wiPxH0ci0xvbJ2n7UMvVtn7j7lHpivTffZeE0FnvBonliEWIKq_yBGnNrcIwVY2_hAUZhF9bO5a89HtI8a9A==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "5.901",
+      "comprehensive_if": "4.042",
+      "issn": "1673-3363",
+      "cn": "32-1760/TD",
+      "sponsor": "中国矿业大学;中国煤炭工业安全科学技术学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 1,
+      "title": "煤炭科学技术",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPCkqgW5YdO82suoVVoNPyTq8wiPxH0ci0xvbJ2n7UMvVtn7j7lHpivTffZeE0FnvD8qFpFVyu16bTmd6b-VxNzNE8aAlpzM8DkXLF3UIBvJw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "5.656",
+      "comprehensive_if": "4.135",
+      "issn": "0253-2336",
+      "cn": "11-2402/TD",
+      "sponsor": "煤炭科学研究总院",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 1,
+      "title": "煤田地质与勘探",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPCkqgW5YdO82suoVVoNPyTq8wiPxH0ci0xvbJ2n7UMvVtn7j7lHpivTffZeE0FnvASpx0KnBbs1Vw_f-oc6a1MeNd2EVo_ZRQvMrDyyZqPDg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "4.899",
+      "comprehensive_if": "3.998",
+      "issn": "1001-1986",
+      "cn": "61-1155/P",
+      "sponsor": "中煤科工西安研究院(集团)有限公司",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 1,
+      "title": "工矿自动化",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPCkqgW5YdO82suoVVoNPyTq8wiPxH0ci0xvbJ2n7UMvVtn7j7lHpivTffZeE0FnvC3Lq7xd2QEfYNBeDmLVD9jzLGuqFYmJFjSJDdMR5YF8Q==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "3.810",
+      "comprehensive_if": "2.563",
+      "issn": "1671-251X",
+      "cn": "32-1627/TP",
+      "sponsor": "中煤科工集团常州研究院有限公司",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 1,
+      "title": "矿业安全与环保",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPCkqgW5YdO82suoVVoNPyTq8wiPxH0ci0xvbJ2n7UMvVtn7j7lHpivTffZeE0FnvBWW2HCiVhvxuTmzbJhD07sZPx_q5MaBx_XbPGwle4WsQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "3.588",
+      "comprehensive_if": "2.759",
+      "issn": "1008-4495",
+      "cn": "50-1062/TD",
+      "sponsor": "中煤科工集团重庆研究院有限公司;国家煤矿安全技术工程研究中心",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 1,
+      "title": "矿业科学学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPCkqgW5YdO82suoVVoNPyTq8wiPxH0ci0xvbJ2n7UMvVtn7j7lHpivTffZeE0FnvAVDYWv5JVP3gsdUg4ndG6uhLmNCEbCCKaKOG4gacbaNA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "3.194",
+      "comprehensive_if": "2.382",
+      "issn": "2096-2193",
+      "cn": "10-1417/TD",
+      "sponsor": "中国矿业大学(北京)",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 1,
+      "title": "煤炭工程",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPCkqgW5YdO82suoVVoNPyTq8wiPxH0ci0xvbJ2n7UMvVtn7j7lHpivTffZeE0FnvBbb6ULv1nwAxqR4TGcos-0km1U64tMDZZBHuHprfJhXw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.894",
+      "comprehensive_if": "2.400",
+      "issn": "1671-0959",
+      "cn": "11-4658/TD",
+      "sponsor": "中煤国际工程设计研究总院有限公司",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 1,
+      "title": "地质与勘探",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPCkqgW5YdO82suoVVoNPyTq8wiPxH0ci0xvbJ2n7UMvVtn7j7lHpivTffZeE0FnvA52V-JesoAF1kMHq5ROKjcFnzALsjSXHOou2gALAm_3g==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.885",
+      "comprehensive_if": "2.389",
+      "issn": "0495-5331",
+      "cn": "11-2043/P",
+      "sponsor": "中国冶金地质总局矿产资源研究院;中国地质学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 1,
+      "title": "中国煤炭",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPCkqgW5YdO82suoVVoNPyTq8wiPxH0ci0xvbJ2n7UMvVtn7j7lHpivTffZeE0FnvD8QltKez_VvpeQJOO6Y4huC0vaO7AhaiI693Wu7kBRMQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.690",
+      "comprehensive_if": "1.978",
+      "issn": "1006-530X",
+      "cn": "11-3621/TD",
+      "sponsor": "煤炭信息研究院",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 1,
+      "title": "有色金属科学与工程",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPCkqgW5YdO82suoVVoNPyTq8wiPxH0ci0xvbJ2n7UMvVtn7j7lHpivTffZeE0FnvDCflbbCb2h2HTypF3dbcfscYb6PYLmfwzTGly3kE5DUg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.557",
+      "comprehensive_if": "1.958",
+      "issn": "1674-9669",
+      "cn": "36-1311/TF",
+      "sponsor": "江西理工大学;江西省有色金属学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 1,
+      "title": "煤矿安全",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPCkqgW5YdO82suoVVoNPyTq8wiPxH0ci0xvbJ2n7UMvVtn7j7lHpivTffZeE0FnvBg3DUCDrj5n3AO_iIha9XaV724Q-uMPeKT1qsc-fxlkg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.506",
+      "comprehensive_if": "1.966",
+      "issn": "1003-496X",
+      "cn": "21-1232/TD",
+      "sponsor": "中煤科工集团沈阳研究院有限公司",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 1,
+      "title": "金属矿山",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPCkqgW5YdO82suoVVoNPyTq8wiPxH0ci0xvbJ2n7UMvVtn7j7lHpivTffZeE0FnvCvKH0AGxsgEambUhtj2C2PMwa6I84IbOjM0oTs3B3A-g==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.488",
+      "comprehensive_if": "1.913",
+      "issn": "1001-1250",
+      "cn": "34-1055/TD",
+      "sponsor": "中国金属学会;中钢集团马鞍山矿山研究总院股份有限公司",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 1,
+      "title": "矿产保护与利用",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPCkqgW5YdO82suoVVoNPyTq8wiPxH0ci0xvbJ2n7UMvVtn7j7lHpivTffZeE0FnvCfyEaCFuKnMf54NBNevK2XovG7_WfUT30bNSVXnpLdvg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.420",
+      "comprehensive_if": "1.832",
+      "issn": "1001-0076",
+      "cn": "41-1122/TD",
+      "sponsor": "中国地质科学院郑州矿产综合利用研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 1,
+      "title": "矿业研究与开发",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPCkqgW5YdO82suoVVoNPyTq8wiPxH0ci0xvbJ2n7UMvVtn7j7lHpivTffZeE0FnvD7ULTzdlTAAFFVi3lCw27EZF7KrQybRzokE3Tbjvy5jw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.367",
+      "comprehensive_if": "1.696",
+      "issn": "1005-2763",
+      "cn": "43-1215/TD",
+      "sponsor": "长沙矿山研究院有限责任公司;中国有色金属学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 1,
+      "title": "矿床地质",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPCkqgW5YdO82suoVVoNPyTq8wiPxH0ci0xvbJ2n7UMvVtn7j7lHpivTffZeE0FnvCDuLhjy8dK-QQ6BjB32KhAwyMUkkCeWUV3HsXRRDTFeg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.336",
+      "comprehensive_if": "2.087",
+      "issn": "0258-7106",
+      "cn": "11-1965/P",
+      "sponsor": "中国地质学会矿床地质专业委员会;中国地质科学院矿产资源研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 1,
+      "title": "矿产综合利用",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINummC9hWXiZZliuO703oNfP4bFvXDB7JfCGemr9cQ8fCioCE8N32agiS6Dkrm8D47363hDTY1YnrK7BvimjGPVcKb1l7o3N700K7Mr5Q_vQg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.286",
+      "comprehensive_if": "1.810",
+      "issn": "1000-6532",
+      "cn": "51-1251/TD",
+      "sponsor": "中国地质科学院矿产综合利用研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 1,
+      "title": "有色金属(选矿部分)",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINummC9hWXiZZliuO703oNfP4bFvXDB7JfCGemr9cQ8fCioCE8N32agiS6Dkrm8D44oOJWEXOQ06QmSPVlQgPNKKqNvLPOm_ZJVnnKgTPME0A==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.263",
+      "comprehensive_if": "2.000",
+      "issn": "1671-9492",
+      "cn": "11-1840/TF",
+      "sponsor": "矿冶科技集团有限公司",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 1,
+      "title": "中国矿业",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINummC9hWXiZZliuO703oNfP4bFvXDB7JfCGemr9cQ8fCioCE8N32agiS6Dkrm8D45hOlcSw4V-O8rBpYfmCzozh42-52gsBLescXjoMrjTRA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.251",
+      "comprehensive_if": "1.687",
+      "issn": "1004-4051",
+      "cn": "11-3033/TD",
+      "sponsor": "中国矿业联合会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 1,
+      "title": "铀矿地质",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINummC9hWXiZZliuO703oNfP4bFvXDB7JfCGemr9cQ8fCioCE8N32agiS6Dkrm8D47Tk0iILHWjxI7dD5JadainOj-4QpYPMHe5V4WM-uitlg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.193",
+      "comprehensive_if": "1.898",
+      "issn": "1000-0658",
+      "cn": "11-1971/TL",
+      "sponsor": "中国核学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 2,
+      "title": "资源与产业",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMiwTKUt9GtlSUNZj4jlX4VTSZwTk02m4rcADIfQ8vJJLqxL0GGtWLwNRkoYEeYGntTZ9fFd5HjE8BOwnTMLvicZganvx5kdWblej-7kmifyw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.103",
+      "comprehensive_if": "1.000",
+      "issn": "1673-2464",
+      "cn": "11-5426/TD",
+      "sponsor": "中国地质大学(北京);中国地质调查局;自然资源部人力资源开发中心",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 2,
+      "title": "矿冶工程",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMiwTKUt9GtlSUNZj4jlX4VTSZwTk02m4rcADIfQ8vJJLqxL0GGtWLwNRkoYEeYGnuKfwM8ATMRKbTUb0Pi1BCkv_oEcFsahIunTVoH5D2zlw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.011",
+      "comprehensive_if": "1.678",
+      "issn": "0253-6099",
+      "cn": "43-1104/TD",
+      "sponsor": "长沙矿冶研究院有限责任公司;中国金属学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 2,
+      "title": "化工矿物与加工",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMiwTKUt9GtlSUNZj4jlX4VTSZwTk02m4rcADIfQ8vJJLqxL0GGtWLwNRkoYEeYGnv-V6YW0foLZ2x3TWzlOesxrFuYZuXcJooJJHVQ_RYW6Q==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.996",
+      "comprehensive_if": "1.336",
+      "issn": "1008-7524",
+      "cn": "32-1492/TQ",
+      "sponsor": "中蓝连海设计研究院有限公司",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 2,
+      "title": "煤炭技术",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPhf9d0XckHzdW_CPjFqOEE-mDZCKVr3aaR3yrrS9xKQpmbAsAVsDoQoxVbHtCxoG8o46EyBWk4D8smY7ePPgmc0LEws1rDHr41OaUjvri6Xg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.850",
+      "comprehensive_if": "1.379",
+      "issn": "1008-8725",
+      "cn": "23-1393/TD",
+      "sponsor": "哈尔滨煤矿机械研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 2,
+      "title": "有色金属(矿山部分)",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPhf9d0XckHzdW_CPjFqOEE-mDZCKVr3aaR3yrrS9xKQpmbAsAVsDoQoxVbHtCxoG96KMoCA0bcwwxSMR0VxoGLOtkVks8pAtWUKXUYSacHzw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.845",
+      "comprehensive_if": "1.578",
+      "issn": "1671-4172",
+      "cn": "11-1839/TF",
+      "sponsor": "矿冶科技集团有限公司",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 2,
+      "title": "钻探工程",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPhf9d0XckHzdW_CPjFqOEE-mDZCKVr3aaR3yrrS9xKQpmbAsAVsDoQoxVbHtCxoG9biCcww49PbnKDHj6KVXizeGptro7ZNYLyMvY7CEGaQA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.809",
+      "comprehensive_if": "1.664",
+      "issn": "2096-9686",
+      "cn": "10-1730/TD",
+      "sponsor": "中国矿业报社;中国地质科学院勘探技术研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 2,
+      "title": "黄金科学技术",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPhf9d0XckHzdW_CPjFqOEE-mDZCKVr3aaR3yrrS9xKQpmbAsAVsDoQoxVbHtCxoG_zB34CbFvOTB7qMpF5x98FseR8MRkiq5c8MhQDmJgJoQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.800",
+      "comprehensive_if": "1.444",
+      "issn": "1005-2518",
+      "cn": "62-1112/TF",
+      "sponsor": "中国科学院资源环境科学信息中心",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 2,
+      "title": "中国矿山工程",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPhf9d0XckHzdW_CPjFqOEE-mDZCKVr3aaR3yrrS9xKQpmbAsAVsDoQoxVbHtCxoG_8mhNKjIDGEirem-2dOl3JYtpvk6vfojkC9kG4T9he5w==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.622",
+      "comprehensive_if": "1.400",
+      "issn": "1672-609X",
+      "cn": "11-5068/TF",
+      "sponsor": "中国有色工程有限公司",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 2,
+      "title": "International Journal of Coal Science & Technology",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPhf9d0XckHzdW_CPjFqOEE-mDZCKVr3aaR3yrrS9xKQpmbAsAVsDoQoxVbHtCxoG-qJuj8D7M_OjWqqKHnuWy-vpquJu6SiNje6_r3qlgREQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.550",
+      "comprehensive_if": "1.183",
+      "issn": "2095-8293",
+      "cn": "10-1252/TD",
+      "sponsor": "中国煤炭学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 2,
+      "title": "中国煤炭地质",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPhf9d0XckHzdW_CPjFqOEE-mDZCKVr3aaR3yrrS9xKQpmbAsAVsDoQoxVbHtCxoG8oY_jmXx1kNHCtKcfjHIRHpYJJmASyxe1gcje6GJp5Ww==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.445",
+      "comprehensive_if": "1.206",
+      "issn": "1674-1803",
+      "cn": "10-1364/TD",
+      "sponsor": "中国煤炭地质总局",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 2,
+      "title": "矿冶",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPhf9d0XckHzdW_CPjFqOEE-mDZCKVr3aaR3yrrS9xKQpmbAsAVsDoQoxVbHtCxoG9weJYlvJmceukkZnq7v_abF5bPthL0obfnFey3VJ4Gig==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.430",
+      "comprehensive_if": "1.198",
+      "issn": "1005-7854",
+      "cn": "11-3479/TD",
+      "sponsor": "矿冶科技集团有限公司",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 2,
+      "title": "地质与资源",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPhf9d0XckHzdW_CPjFqOEE-mDZCKVr3aaR3yrrS9xKQpmbAsAVsDoQoxVbHtCxoG8djTc-z2YjW-PpFqxQvnSEURyuV7o3n8tCG0Ic-MzOng==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.408",
+      "comprehensive_if": "1.152",
+      "issn": "1671-1947",
+      "cn": "21-1458/P",
+      "sponsor": "中国地质调查局沈阳地质调查中心",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 2,
+      "title": "矿产勘查",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPhf9d0XckHzdW_CPjFqOEE-mDZCKVr3aaR3yrrS9xKQpmbAsAVsDoQoxVbHtCxoG_TbrrW1SSTAVUL700Q28OmF1LRUzu2KlN7YoEjgxKn7g==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.327",
+      "comprehensive_if": "1.203",
+      "issn": "1674-7801",
+      "cn": "11-5875/TD",
+      "sponsor": "有色金属矿产地质调查中心",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 2,
+      "title": "黄金",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPhf9d0XckHzdW_CPjFqOEE-mDZCKVr3aaR3yrrS9xKQpmbAsAVsDoQoxVbHtCxoG9QwyVymASM7_bhri7i4d5WahzsHPQLHDtfVljn9zZ2hw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.313",
+      "comprehensive_if": "1.204",
+      "issn": "1001-1277",
+      "cn": "22-1110/TF",
+      "sponsor": "长春黄金研究院有限公司",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 2,
+      "title": "非金属矿",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPhf9d0XckHzdW_CPjFqOEE-mDZCKVr3aaR3yrrS9xKQpmbAsAVsDoQoxVbHtCxoG8vdaa-BSxNtlSdT9CNszlAGKKQ2DSE1OF3zdEoXx2hsg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.211",
+      "comprehensive_if": "0.964",
+      "issn": "1000-8098",
+      "cn": "32-1144/TD",
+      "sponsor": "苏州非金属矿工业设计研究院",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 2,
+      "title": "中国非金属矿工业导刊",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPhf9d0XckHzdW_CPjFqOEE-mDZCKVr3aaR3yrrS9xKQpmbAsAVsDoQoxVbHtCxoG9K6b7IQ8uPn-8K3rLzCanFIQ-taK4Pz7f9b_DH-3Elvw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.135",
+      "comprehensive_if": "1.052",
+      "issn": "1007-9386",
+      "cn": "11-3924/TD",
+      "sponsor": "中国建材集团有限公司;中国建筑材料工业地质勘查中心;中国非金属矿工业协会",
+      "tags": [
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 2,
+      "title": "煤炭科技",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPhf9d0XckHzdW_CPjFqOEE-mDZCKVr3aaR3yrrS9xKQpmbAsAVsDoQoxVbHtCxoG_PyF_u__JCYK9DM-G_gw-1H4R6RvzUsrKV2O0fPX9h4g==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.095",
+      "comprehensive_if": "0.924",
+      "issn": "1008-3731",
+      "cn": "32-1491/TD",
+      "sponsor": "徐州矿务集团有限公司;江苏省煤炭学会;中国矿业大学",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 2,
+      "title": "采矿技术",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPhf9d0XckHzdW_CPjFqOEE-mDZCKVr3aaR3yrrS9xKQpmbAsAVsDoQoxVbHtCxoG-YZk868EN_-5rAvSEdBmk7R9wO0P6c_pKFjbQ4i-63fw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.089",
+      "comprehensive_if": "0.901",
+      "issn": "1671-2900",
+      "cn": "43-1347/TD",
+      "sponsor": "长沙矿山研究院有限责任公司",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 2,
+      "title": "智能矿山",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPhf9d0XckHzdW_CPjFqOEE-mDZCKVr3aaR3yrrS9xKQpmbAsAVsDoQoxVbHtCxoG-E1TqqDJComIrl0LcC562q6DVHZIxBrNKK_9kbIkxhHA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.070",
+      "comprehensive_if": "1.047",
+      "issn": "2096-9139",
+      "cn": "10-1709/TN",
+      "sponsor": "煤炭科学研究总院",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 2,
+      "title": "煤质技术",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPhf9d0XckHzdW_CPjFqOEE-mDZCKVr3aaR3yrrS9xKQpmbAsAVsDoQoxVbHtCxoG-Fb3ogFjxgOFGWQ3F0BzkpQLY9DxHBR2ohuRIvwsYyaA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.031",
+      "comprehensive_if": "0.811",
+      "issn": "1007-7677",
+      "cn": "11-3862/TD",
+      "sponsor": "煤炭科学研究总院",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 2,
+      "title": "选煤技术",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPhf9d0XckHzdW_CPjFqOEE-mDZCKVr3aaR3yrrS9xKQpmbAsAVsDoQoxVbHtCxoG8GpyHGG0pqehpgPsHW7z946ACEwINGV0Ec5aqus0j_0A==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.010",
+      "comprehensive_if": "0.828",
+      "issn": "1001-3571",
+      "cn": "13-1115/TD",
+      "sponsor": "中煤科工集团唐山研究院有限公司",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 3,
+      "title": "煤炭加工与综合利用",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIP4PQXF_wZvCSW_UnSK_eYEIjwfUa_N0_uRWYHfQhCccwuOBLHFgsNfack9AaxNgQ_NPxPsQKnhiBDz_3F8t6LOFve5Maq4PxEDrVG14n87jQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.985",
+      "comprehensive_if": "0.791",
+      "issn": "1005-8397",
+      "cn": "11-2627/TD",
+      "sponsor": "中国煤炭加工利用协会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 3,
+      "title": "建井技术",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIP4PQXF_wZvCSW_UnSK_eYEIjwfUa_N0_uRWYHfQhCccwuOBLHFgsNfack9AaxNgQ-chlvErF0sHoBwhbxqKlF3IjMmT2EWGbeur73Ul7O05g==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.965",
+      "comprehensive_if": "0.836",
+      "issn": "1002-6029",
+      "cn": "11-2456/TD",
+      "sponsor": "煤炭科学研究总院",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 3,
+      "title": "能源与环保",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIP4PQXF_wZvCSW_UnSK_eYEIjwfUa_N0_uRWYHfQhCccwuOBLHFgsNfack9AaxNgQ82H9qUX4SNoLLiRdkXbrylNCy8JnI2yz6PIcOrF26fLA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.958",
+      "comprehensive_if": "0.793",
+      "issn": "1003-0506",
+      "cn": "41-1443/TK",
+      "sponsor": "河南省煤炭科学研究院有限公司;河南省煤炭学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 3,
+      "title": "陕西煤炭",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIP4PQXF_wZvCSW_UnSK_eYEIjwfUa_N0_uRWYHfQhCccwuOBLHFgsNfack9AaxNgQ_CYs9NZ44VXrCd5n4J5F00KN_vx-YWdOZfCaSd3r9mTw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.927",
+      "comprehensive_if": "0.805",
+      "issn": "1671-749X",
+      "cn": "61-1382/TD",
+      "sponsor": "陕西煤业化工集团;陕西省煤炭工业协会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 3,
+      "title": "江西煤炭科技",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIP4PQXF_wZvCSW_UnSK_eYEIjwfUa_N0_uRWYHfQhCccwuOBLHFgsNfack9AaxNgQ_H6Z9yOyNMNpAoCfyBESCWJKhLw-XXB36O-zi8rkCwLw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.912",
+      "comprehensive_if": "0.841",
+      "issn": "1006-2572",
+      "cn": "36-1121/TD",
+      "sponsor": "江西省煤炭学会;江西省能源集团有限公司;江西省煤炭经济研究会;江西省煤炭工业科学研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 3,
+      "title": "能源科技",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIP4PQXF_wZvCSW_UnSK_eYEIjwfUa_N0_uRWYHfQhCccwuOBLHFgsNfack9AaxNgQ_ZrKn_sayn4oBlqNy1pZ2088r9fJ2b7rYp1pFTlTsoIA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.853",
+      "comprehensive_if": "0.528",
+      "issn": "2096-7691",
+      "cn": "64-1074/TK",
+      "sponsor": "国家能源集团宁夏煤业有限责任公司",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 3,
+      "title": "煤矿机械",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIP4PQXF_wZvCSW_UnSK_eYEIjwfUa_N0_uRWYHfQhCccwuOBLHFgsNfack9AaxNgQ8-JS91mC7jszw61CX6uWJAjGuX-gThWAoGiVSVJJgwfw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.836",
+      "comprehensive_if": "0.696",
+      "issn": "1003-0794",
+      "cn": "23-1280/TD",
+      "sponsor": "哈尔滨煤矿机械研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 3,
+      "title": "化工矿产地质",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIP4PQXF_wZvCSW_UnSK_eYEIjwfUa_N0_uRWYHfQhCccwuOBLHFgsNfack9AaxNgQ8LJAceGTo3Qmd45cUQ8miCZsp08dfVjAdAs2XcP0gMLw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.829",
+      "comprehensive_if": "0.613",
+      "issn": "1006-5296",
+      "cn": "13-1190/P",
+      "sponsor": "中化地质矿山总局地质研究院",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 3,
+      "title": "山西煤炭",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIP4PQXF_wZvCSW_UnSK_eYEIjwfUa_N0_uRWYHfQhCccwuOBLHFgsNfack9AaxNgQ9RLHge1RgPyks6uwdWMvWIlxtddlZKcCu8SYtP5mpeLw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.792",
+      "comprehensive_if": "0.636",
+      "issn": "1672-5050",
+      "cn": "14-1096/TD",
+      "sponsor": "太原理工大学;山西省煤炭学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 3,
+      "title": "露天采矿技术",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIP4PQXF_wZvCSW_UnSK_eYEIjwfUa_N0_uRWYHfQhCccwuOBLHFgsNfack9AaxNgQ-VIWmTrquTViaDNn7VZXdljduUOwtZX1UC4r1HeUkv6A==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.752",
+      "comprehensive_if": "0.624",
+      "issn": "1671-9816",
+      "cn": "21-1477/TD",
+      "sponsor": "煤科集团沈阳研究院有限公司;中煤平朔煤业有限责任公司;神华准格尔能源有限责任公司",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 3,
+      "title": "矿业工程研究",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIP4PQXF_wZvCSW_UnSK_eYEIjwfUa_N0_uRWYHfQhCccwuOBLHFgsNfack9AaxNgQ_nZ3-qetiNLyFzpTsN-wdLo6OpwyW65bCCrMVGuoys6A==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.711",
+      "comprehensive_if": "0.500",
+      "issn": "1674-5876",
+      "cn": "43-1493/TD",
+      "sponsor": "湖南科技大学",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 3,
+      "title": "矿产与地质",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIP4PQXF_wZvCSW_UnSK_eYEIjwfUa_N0_uRWYHfQhCccwuOBLHFgsNfack9AaxNgQ9jBmdBw-M_3idvDd3CX9wBJK5OZ86Fu7_tKtmVq9qF7w==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.709",
+      "comprehensive_if": "0.639",
+      "issn": "1001-5663",
+      "cn": "45-1174/TD",
+      "sponsor": "中国有色桂林矿产地质研究院有限公司",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 3,
+      "title": "煤",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIP4PQXF_wZvCSW_UnSK_eYEIjwfUa_N0_uRWYHfQhCccwuOBLHFgsNfack9AaxNgQ8bU6LPgpVUy90s48GUAcdQjWkMSfX6xh1zGOSvqZq4zw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.702",
+      "comprehensive_if": "0.597",
+      "issn": "1005-2798",
+      "cn": "14-1171/TD",
+      "sponsor": "山西潞安矿业(集团)有限责任公司",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 3,
+      "title": "煤矿现代化",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIP4PQXF_wZvCSW_UnSK_eYEIjwfUa_N0_uRWYHfQhCccwuOBLHFgsNfack9AaxNgQ-f4OfwAkALJ_oGECP5HoKa_0lIYsqil8gYrMRrREDw0Q==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.695",
+      "comprehensive_if": "0.610",
+      "issn": "1009-0797",
+      "cn": "37-1205/TD",
+      "sponsor": "山东能源集团科技发展有限公司",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 3,
+      "title": "矿山机械",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIP4PQXF_wZvCSW_UnSK_eYEIjwfUa_N0_uRWYHfQhCccwuOBLHFgsNfack9AaxNgQ8KXjtfACee0zmRgEuP_r5yV8Zlx-jj4wxD8KF_jUCgqg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.678",
+      "comprehensive_if": "0.566",
+      "issn": "1001-3954",
+      "cn": "41-1138/TD",
+      "sponsor": "洛阳矿山机械工程设计研究院有限责任公司",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 3,
+      "title": "铀矿冶",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIP4PQXF_wZvCSW_UnSK_eYEIjwfUa_N0_uRWYHfQhCccwuOBLHFgsNfack9AaxNgQ93CRGF7_7d1Onno128lZSD_Fe88_8xYiQYufyLPpNBfA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.657",
+      "comprehensive_if": "0.555",
+      "issn": "1000-8063",
+      "cn": "11-1969/TL",
+      "sponsor": "中国核学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 3,
+      "title": "地质找矿论丛",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIP4PQXF_wZvCSW_UnSK_eYEIjwfUa_N0_uRWYHfQhCccwuOBLHFgsNfack9AaxNgQ_AsQ35rB2XztXkfCehVYtqvmP-ZlW5O5vLspi0I1b3Fg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.638",
+      "comprehensive_if": "0.614",
+      "issn": "1001-1412",
+      "cn": "12-1131/P",
+      "sponsor": "天津地热勘查开发设计院",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 3,
+      "title": "现代矿业",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIP4PQXF_wZvCSW_UnSK_eYEIjwfUa_N0_uRWYHfQhCccwuOBLHFgsNfack9AaxNgQ_d--_36G0084U3z0EVrNdnCMlQHSslTZvTQcYbTnBEVg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.559",
+      "comprehensive_if": "0.455",
+      "issn": "1674-6082",
+      "cn": "34-1308/TD",
+      "sponsor": "中钢集团马鞍山矿山研究总院股份有限公司",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 3,
+      "title": "山西焦煤科技",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIP4PQXF_wZvCSW_UnSK_eYEIjwfUa_N0_uRWYHfQhCccwuOBLHFgsNfack9AaxNgQ81ef4jihuUqUcCzZJ3I3UkC8oO0TqOUEDpyOEw-oDxxw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.542",
+      "comprehensive_if": "0.435",
+      "issn": "1672-0652",
+      "cn": "14-1311/TD",
+      "sponsor": "山西焦煤集团有限责任公司",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 3,
+      "title": "能源技术与管理",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIP4PQXF_wZvCSW_UnSK_eYEIjwfUa_N0_uRWYHfQhCccwuOBLHFgsNfack9AaxNgQ-Yh8A16Ut4JFGNC5y-dBDuKIqiXx86hoS9hwipCNnGQw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.540",
+      "comprehensive_if": "0.412",
+      "issn": "1672-9943",
+      "cn": "32-1735/TD",
+      "sponsor": "江苏省煤炭学会;江苏省煤炭工业协会;中国矿业大学",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 3,
+      "title": "矿业工程",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIP4PQXF_wZvCSW_UnSK_eYEIjwfUa_N0_uRWYHfQhCccwuOBLHFgsNfack9AaxNgQ-LfO6vyxbeP4qotFSnHC-i-yERbak_pDACfSVEVQ5ymQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.537",
+      "comprehensive_if": "0.439",
+      "issn": "1671-8550",
+      "cn": "21-1478/TD",
+      "sponsor": "中冶北方工程技术有限公司",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 4,
+      "title": "煤炭与化工",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMU-WfNuCRcQOOMaP3sHQdVl8LN6PGzl5x-wPAAVUm9lmcShH_CjzgeZs-tqRxgf_CccSMmrfjLuF2SGBBSwPzZfY7tblHkZkYM3EE9NHcv0A==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.535",
+      "comprehensive_if": "0.421",
+      "issn": "2095-5979",
+      "cn": "13-1416/TD",
+      "sponsor": "河北煤炭科学研究院;河北省化学工业研究院",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 4,
+      "title": "山东煤炭科技",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMU-WfNuCRcQOOMaP3sHQdVl8LN6PGzl5x-wPAAVUm9lmcShH_CjzgeZs-tqRxgf_BodkVh2_E2kzK0BtpIrOTdNZaprQuewL85lWsROuPEAQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.525",
+      "comprehensive_if": "0.463",
+      "issn": "1005-2801",
+      "cn": "37-1236/TD",
+      "sponsor": "国家矿山安全监察局山东局信息计算中心",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 4,
+      "title": "中国煤层气",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMU-WfNuCRcQOOMaP3sHQdVl8LN6PGzl5x-wPAAVUm9lmcShH_CjzgeZs-tqRxgf_BRDc0Nng2XfafD_HS8gMfH5d6XkpV4oiLi3hmb_y1Kig==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.492",
+      "comprehensive_if": "0.468",
+      "issn": "1672-3074",
+      "cn": "11-5011/TD",
+      "sponsor": "煤炭信息研究院;中联煤层气有限责任公司",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 4,
+      "title": "煤矿机电",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMU-WfNuCRcQOOMaP3sHQdVl8LN6PGzl5x-wPAAVUm9lmcShH_CjzgeZs-tqRxgf_DRk4gutMO7mekxy1B07BQwRgeWuBpyDgkKp-3HbtRLBg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.488",
+      "comprehensive_if": "0.450",
+      "issn": "1001-0874",
+      "cn": "31-1509/TD",
+      "sponsor": "中煤科工集团上海研究院有限公司",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 4,
+      "title": "晋控科学技术",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMU-WfNuCRcQOOMaP3sHQdVl8LN6PGzl5x-wPAAVUm9lmcShH_CjzgeZs-tqRxgf_CnRuJ6kH5m93HbltCMHR7uiErG8kbph3JNPwbPjLJWXA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.427",
+      "comprehensive_if": "0.365",
+      "issn": "2097-2156",
+      "cn": "14-1411/TD",
+      "sponsor": "晋能控股山西科学技术研究院有限公司",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 4,
+      "title": "有色矿冶",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMU-WfNuCRcQOOMaP3sHQdVl8LN6PGzl5x-wPAAVUm9lmcShH_CjzgeZs-tqRxgf_AQf2iNOOVeeG8FNTAdRashPzVacakdy5NWidho8NVPUA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.395",
+      "comprehensive_if": "0.359",
+      "issn": "1007-967X",
+      "cn": "21-1112/TF",
+      "sponsor": "辽宁省有色金属学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 4,
+      "title": "西部探矿工程",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMU-WfNuCRcQOOMaP3sHQdVl8LN6PGzl5x-wPAAVUm9lmcShH_CjzgeZs-tqRxgf_DEvuK_ZxRMWAPDtudtR1n9ADFo5UxTtp6BiLnA4npixw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.372",
+      "comprehensive_if": "0.285",
+      "issn": "1004-5716",
+      "cn": "65-1124/TD",
+      "sponsor": "新疆维吾尔自治区地质矿产研究所",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 4,
+      "title": "山西能源学院学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMU-WfNuCRcQOOMaP3sHQdVl8LN6PGzl5x-wPAAVUm9lmcShH_CjzgeZs-tqRxgf_AhxFDqh0HujwPPR2nH6xi6dB6HpMFMgiQR3s3E4nJCAQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.344",
+      "comprehensive_if": "0.232",
+      "issn": "2096-4102",
+      "cn": "14-1390/TK",
+      "sponsor": "山西能源学院",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 4,
+      "title": "云南地质",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMU-WfNuCRcQOOMaP3sHQdVl8LN6PGzl5x-wPAAVUm9lmcShH_CjzgeZs-tqRxgf_DYg6eHCiH88fbNmJbCDx49Gcpc5sid7qW1ckcGnxStCA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.317",
+      "comprehensive_if": "0.240",
+      "issn": "1004-1885",
+      "cn": "53-1041/P",
+      "sponsor": "云南地矿总公司(集团)",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 4,
+      "title": "煤炭高等教育",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMU-WfNuCRcQOOMaP3sHQdVl8LN6PGzl5x-wPAAVUm9lmcShH_CjzgeZs-tqRxgf_Dwej3UUAGkNDCZieHX2C8PSwgCVSCKEiW0pWwOpxFblQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.301",
+      "comprehensive_if": "0.256",
+      "issn": "1004-8154",
+      "cn": "32-1365/G4",
+      "sponsor": "中国煤炭教育协会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 4,
+      "title": "凿岩机械气动工具",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMU-WfNuCRcQOOMaP3sHQdVl8LN6PGzl5x-wPAAVUm9lmcShH_CjzgeZs-tqRxgf_C5MC_qGCVLC8X_L2D11hAMtMbjAZGHJsSQ48YmY1HQjQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.167",
+      "comprehensive_if": "0.111",
+      "issn": "2095-6282",
+      "cn": "62-1088/TD",
+      "sponsor": "天水凿岩机械气动工具研究所",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 4,
+      "title": "China Coal",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMU-WfNuCRcQOOMaP3sHQdVl8LN6PGzl5x-wPAAVUm9lmcShH_CjzgeZs-tqRxgf_BfSHmbBkj1dtn8c6JkorszLoJ5gTmd1Mqyg-Bn2NmL2A==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1006-5318",
+      "cn": "11-3622/TD",
+      "sponsor": "煤炭科学技术信息研究所",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 4,
+      "title": "当代矿工",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMU-WfNuCRcQOOMaP3sHQdVl8LN6PGzl5x-wPAAVUm9lmcShH_CjzgeZs-tqRxgf_DrZXkWrKoplzBB9mLi47mjtuP_YmZqITy1bGWguMT-xQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1002-8897",
+      "cn": "11-2762/C",
+      "sponsor": "中国煤炭学会;煤炭信息研究院",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 4,
+      "title": "Green and Smart Mining Engineering",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMU-WfNuCRcQOOMaP3sHQdVl8LN6PGzl5x-wPAAVUm9lmcShH_CjzgeZs-tqRxgf_DUSL_x7HC_Nxqc46dk5cKsnCIKYDjaheOJVHhUFzXZ3g==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "2097-521X",
+      "cn": "10-2016/TD",
+      "sponsor": "北京科技大学",
+      "tags": [
+        "完全OA期刊"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 4,
+      "title": "国外金属矿选矿",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMU-WfNuCRcQOOMaP3sHQdVl8LN6PGzl5x-wPAAVUm9lmcShH_CjzgeZs-tqRxgf_CreR-D8umsQtBl2Q2hZ9FEktsS-1OVj-67gS4FF_gsaQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1003-4129",
+      "cn": "11-1842/TF",
+      "sponsor": "北京矿冶研究总院",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 4,
+      "title": "河北煤炭",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMU-WfNuCRcQOOMaP3sHQdVl8LN6PGzl5x-wPAAVUm9lmcShH_CjzgeZs-tqRxgf_BkJU4sHtZPmR2WHkYJc_8K0_l_YDEczLlhZ_P1_bGtZQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1007-1083",
+      "cn": "13-1074/TD",
+      "sponsor": "河北省煤炭学会;河北煤炭科学研究院",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 4,
+      "title": "黄金地质",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMU-WfNuCRcQOOMaP3sHQdVl8LN6PGzl5x-wPAAVUm9lmcShH_CjzgeZs-tqRxgf_CeZ0gV617TS4Scqv1uGYTwNKUxvIm_o-3BZ2nrpzUKnw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1006-558X",
+      "cn": "11-3623/TD",
+      "sponsor": "中国人民武装警察部队黄金指挥部",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 4,
+      "title": "矿山测量",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMU-WfNuCRcQOOMaP3sHQdVl8LN6PGzl5x-wPAAVUm9lmcShH_CjzgeZs-tqRxgf_D-DFeN1XXcWrS9MB4llilNYg2sUpE-ghbjbR5dDUB1xw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1001-358X",
+      "cn": "10-1770/TD",
+      "sponsor": "煤炭科学研究总院",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 4,
+      "title": "矿业装备",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMU-WfNuCRcQOOMaP3sHQdVl8LN6PGzl5x-wPAAVUm9lmcShH_CjzgeZs-tqRxgf_CYbFzf6ebN_Qt7WcrtX3rge2kN-QRAs5bwUFBb4bXNhg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "2095-1418",
+      "cn": "11-6027/TH",
+      "sponsor": "北京卓众出版有限公司",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 4,
+      "title": "绿色矿山",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOtTBFKV6aXa57chgAbvs1FlnkgBHCMHxfF3kpJktsjgzgIsd1nInWHQUa388PKrLzfF0ToiBuvDwBuAw6p853UBh-tf4JABj9u9HyDeFNVNQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "2097-3357",
+      "cn": "10-1912/TD",
+      "sponsor": "煤炭科学研究总院有限公司",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 4,
+      "title": "MetaResource",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOtTBFKV6aXa57chgAbvs1FlnkgBHCMHxfF3kpJktsjgzgIsd1nInWHQUa388PKrLxKmADfcraY74k4Y4UrPMFpFTto_06FIHx2pAAa1RAAKA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "2959-8850",
+      "cn": "10-2029/TD",
+      "sponsor": "中国有色金属学会;矿冶科技集团有限公司",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 5,
+      "title": "煤炭新视界",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINFG7Vsz4Yt7Y9t6KGoH5RF9tUkySpHauM4n4w_-35iYUKgEpaCCIjYINDQulA7W2ES6MHGjkCgmvOJGe_7oFC829sswvCCW3OB-L5MFQJKnw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "2095-4875",
+      "cn": "10-1090/TD",
+      "sponsor": "煤炭信息研究院",
+      "tags": [
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 5,
+      "title": "水力采煤与管道运输",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINFG7Vsz4Yt7Y9t6KGoH5RF9tUkySpHauM4n4w_-35iYUKgEpaCCIjYINDQulA7W2HhG6Zy7XWdVZ1fB-Lnxa8x3C256vSErA3p_9FmPqk0Hw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1006-0898",
+      "cn": "13-1185/TN",
+      "sponsor": "煤炭科学研究总院唐山分院",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "矿业工程",
+      "category_code": "B021",
+      "page": 5,
+      "title": "西北地质科学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINFG7Vsz4Yt7Y9t6KGoH5RF9tUkySpHauM4n4w_-35iYUKgEpaCCIjYINDQulA7W2E6C6oEbYXNBIi1zbw4Ggdk76QJ4yH3BYPm66qXTS9xTw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1004-7786",
+      "cn": "61-1225/P",
+      "sponsor": "国土资源部西安地质矿产研究所",
+      "tags": []
+    }
+  ]
+}

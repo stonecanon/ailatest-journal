@@ -1,0 +1,258 @@
+{
+  "category": {
+    "code": "E077",
+    "title": "急救医学",
+    "count": 14,
+    "major_code": "",
+    "major_title": ""
+  },
+  "pages": [
+    {
+      "page": 1,
+      "rows": 14,
+      "pageCount": 1
+    }
+  ],
+  "records": [
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "急救医学",
+      "category_code": "E077",
+      "page": 1,
+      "title": "中国急救医学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINXUQ2X30VTuJYZIUQIX5L0XfJIpjFLPB93TribM0xHaS9EE_TcS4Z8lm291Jx1rMRnDXjP4tyqoTVkT39ycSCFd6sUlNzebA7wpO3SiX-7Lw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.938",
+      "comprehensive_if": "1.618",
+      "issn": "1002-1949",
+      "cn": "23-1201/R",
+      "sponsor": "中国医师协会;黑龙江省科学技术情报研究院",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "急救医学",
+      "category_code": "E077",
+      "page": 1,
+      "title": "中华危重病急救医学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINXUQ2X30VTuJYZIUQIX5L0XfJIpjFLPB93TribM0xHaS9EE_TcS4Z8lm291Jx1rMR98jZlpKXqrjhXrBdBsJPQCfwisEOFQI12wPLNdncUnA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.901",
+      "comprehensive_if": "1.650",
+      "issn": "2095-4352",
+      "cn": "12-1430/R",
+      "sponsor": "中华医学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "急救医学",
+      "category_code": "E077",
+      "page": 1,
+      "title": "中国急救复苏与灾害医学杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINXUQ2X30VTuJYZIUQIX5L0XfJIpjFLPB93TribM0xHaS9EE_TcS4Z8lm291Jx1rMSiR36BB1i722Zdu1LNjXwDjx3D9l_Tq8xYx5PLb9pAbw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.598",
+      "comprehensive_if": "1.455",
+      "issn": "1673-6966",
+      "cn": "11-5452/R",
+      "sponsor": "中国医学救援协会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "急救医学",
+      "category_code": "E077",
+      "page": 1,
+      "title": "临床急诊杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINXUQ2X30VTuJYZIUQIX5L0XfJIpjFLPB93TribM0xHaS9EE_TcS4Z8lm291Jx1rMQeNGXjgc32KZJbkDXdNwiaNjfXlkLeyaFsf_kLAc3Jyg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.507",
+      "comprehensive_if": "1.270",
+      "issn": "1009-5918",
+      "cn": "42-1607/R",
+      "sponsor": "华中科技大学同济医学院附属协和医院",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "急救医学",
+      "category_code": "E077",
+      "page": 1,
+      "title": "中华急诊医学杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINXUQ2X30VTuJYZIUQIX5L0XfJIpjFLPB93TribM0xHaS9EE_TcS4Z8lm291Jx1rMS2vODvhryUQvNQe9l1NoGCytwuZwg2WNkrjILPq-Qz0Q==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.297",
+      "comprehensive_if": "1.190",
+      "issn": "1671-0282",
+      "cn": "11-4656/R",
+      "sponsor": "中华医学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "急救医学",
+      "category_code": "E077",
+      "page": 1,
+      "title": "内科急危重症杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINXUQ2X30VTuJYZIUQIX5L0XfJIpjFLPB93TribM0xHaS9EE_TcS4Z8lm291Jx1rMTitF9pV_1AaKxk0lkFPq36jNtO4EUUcE3AYIGxRY2dmA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.188",
+      "comprehensive_if": "1.050",
+      "issn": "1007-1024",
+      "cn": "42-1394/R",
+      "sponsor": "华中科技大学同济医学院",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "急救医学",
+      "category_code": "E077",
+      "page": 1,
+      "title": "中华灾害救援医学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINXUQ2X30VTuJYZIUQIX5L0XfJIpjFLPB93TribM0xHaS9EE_TcS4Z8lm291Jx1rMQW4Fc0KFq32eptW7YUd_8r3lH05AQJ33QIKYL4CONQJg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.162",
+      "comprehensive_if": "0.895",
+      "issn": "2095-6274",
+      "cn": "10-1158/R",
+      "sponsor": "融通医健期刊出版(北京)有限公司",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "急救医学",
+      "category_code": "E077",
+      "page": 1,
+      "title": "World Journal of Emergency Medicine",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINXUQ2X30VTuJYZIUQIX5L0XfJIpjFLPB93TribM0xHaS9EE_TcS4Z8lm291Jx1rMTgWsyaITJAZSy-C26Q9XFYWYkjk0YXNAVIn3GqStGCfw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.897",
+      "comprehensive_if": "0.740",
+      "issn": "1920-8642",
+      "cn": "33-1408/R",
+      "sponsor": "浙江大学医学院附属第二医院",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "急救医学",
+      "category_code": "E077",
+      "page": 1,
+      "title": "创伤与急危重病医学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINXUQ2X30VTuJYZIUQIX5L0XfJIpjFLPB93TribM0xHaS9EE_TcS4Z8lm291Jx1rMT-NOnZW8ztCcITKZscYDwG8aB-otLpCBP1aEFNkNhalA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.890",
+      "comprehensive_if": "0.686",
+      "issn": "2095-5561",
+      "cn": "10-1955/R",
+      "sponsor": "融通医健期刊出版(北京)有限公司",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "急救医学",
+      "category_code": "E077",
+      "page": 1,
+      "title": "中华危重症医学杂志(电子版)",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINXUQ2X30VTuJYZIUQIX5L0XfJIpjFLPB93TribM0xHaS9EE_TcS4Z8lm291Jx1rMQcWpA6D2LMWIUVeeVbByRHKeCs8PyWeY_u7yCirJNb7A==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.560",
+      "comprehensive_if": "0.551",
+      "issn": "1674-6880",
+      "cn": "11-9297/R",
+      "sponsor": "中华医学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "急救医学",
+      "category_code": "E077",
+      "page": 1,
+      "title": "岭南急诊医学杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINXUQ2X30VTuJYZIUQIX5L0XfJIpjFLPB93TribM0xHaS9EE_TcS4Z8lm291Jx1rMRcl_hnRek0MLS-lWZiB-jsh10tI8OakEcZqGkMEJIryg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.509",
+      "comprehensive_if": "0.365",
+      "issn": "1671-301X",
+      "cn": "44-1539/R",
+      "sponsor": "广东省医学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "急救医学",
+      "category_code": "E077",
+      "page": 1,
+      "title": "创伤与急诊电子杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINXUQ2X30VTuJYZIUQIX5L0XfJIpjFLPB93TribM0xHaS9EE_TcS4Z8lm291Jx1rMTpfjMrHw7m4Q9Q9UPFD0Zl-A5VuOU2ddeYAJR6LUibgw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.221",
+      "comprehensive_if": "0.169",
+      "issn": "2095-5316",
+      "cn": "11-9332/R",
+      "sponsor": "人民卫生出版社有限公司",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "急救医学",
+      "category_code": "E077",
+      "page": 1,
+      "title": "Emergency and Critical Care Medicine",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINXUQ2X30VTuJYZIUQIX5L0XfJIpjFLPB93TribM0xHaS9EE_TcS4Z8lm291Jx1rMQxVEl9XeX_w3xHE0-Mlox-r7zH9Mawl0h-YLp2sknjPA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.082",
+      "comprehensive_if": "0.082",
+      "issn": "2097-0617",
+      "cn": "37-1533/R",
+      "sponsor": "山东大学",
+      "tags": [
+        "完全OA期刊"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "急救医学",
+      "category_code": "E077",
+      "page": 1,
+      "title": "中华卫生应急电子杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINXUQ2X30VTuJYZIUQIX5L0XfJIpjFLPB93TribM0xHaS9EE_TcS4Z8lm291Jx1rMR5Ka9COS-9z0mrD2_Lnbducu_mwP8SUl9vPETx-sXU8Q==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.079",
+      "comprehensive_if": "0.067",
+      "issn": "2095-9133",
+      "cn": "11-9361/R",
+      "sponsor": "中华医学会",
+      "tags": []
+    }
+  ]
+}
