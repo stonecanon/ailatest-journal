@@ -1,2 +1,22 @@
 # Generated SEO pages (run generate_seo_pages.py locally if needed)
 /journal/
+
+# Temp / generated files
+/generated/
+/scripts/__pycache__/
+/worker/.wrangler/
+/.wrangler/
+/.DS_Store
+/list/.DS_Store
+*.pyc
+__pycache__/
+
+# Large data caches (not committed)
+data/openalex_cache.json
+data/journals.json
+data/oa.json
+data/*.bak
+
+# IDE / system
+CODEX_REVIEW.md
+.dashboard-server*
