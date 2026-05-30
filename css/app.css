@@ -655,9 +655,12 @@ main.main {
   bottom: 14px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 12px;
   pointer-events: none;
+}
+.search-actions:has(.search-meta-group:not([hidden])) {
+  justify-content: space-between;
 }
 .search-meta {
   display: inline-flex;
