@@ -4499,6 +4499,7 @@
             if (activeTab === 'dom') renderDomestic();
             else if (activeTab === 'fav') renderFav();
             else if (activeTab === 'int') renderInt();
+            else if (activeTab === 'pick') refreshPickI18n();
             closeDropdown();
           });
           dropdown.appendChild(opt);
@@ -5374,6 +5375,11 @@
       $('#hint').textContent = 'Load failed: ' + e.message;
       console.error(e);
     }
+  }
+
+  function refreshPickI18n() {
+    const quotaEl = $('#pick-quota');
+    if (quotaEl) quotaEl.textContent = T('由 OpenAlex 开放学术数据驱动 · 填 API Key 获更多额度','Powered by OpenAlex · add API key for more credits');
   }
 
   boot();
