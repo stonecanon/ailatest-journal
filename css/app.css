@@ -2248,9 +2248,9 @@ td.empty,
   padding: 1px 18px 1px 0;
   font: inherit;
   font-size: 13.5px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--ink);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.04em;
   cursor: pointer;
   appearance: none;
   -webkit-appearance: none;
