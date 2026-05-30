@@ -1188,32 +1188,55 @@ def main():
     journals = list(store.values())
     journals.sort(key=lambda r: r['name'])
 
-    # ────── PubMed/MEDLINE match ──────
-    print('== PubMed/MEDLINE ==')
-    pubmed_path = LIST_DIR / 'pubmed_issns.json'
-    pubmed_issns = set()
-    if pubmed_path.exists():
-        with open(pubmed_path) as f:
-            import json as _json
-            for issn in _json.load(f):
-                pubmed_issns.add(issn)
-                pubmed_issns.add(f'{issn[:4]}-{issn[4:]}')  # both bare and hyphenated
-    pm_count = 0
+    # ────── PubMed / MEDLINE / PMC match ──────
+    print('== PubMed / MEDLINE / PMC ==')
+    def load_issn_set(fname):
+        p = LIST_DIR / fname
+        s = set()
+        if p.exists():
+            with open(p) as f:
+                import json as _j
+                for issn in _j.load(f):
+                    s.add(issn)
+                    s.add(f'{issn[:4]}-{issn[4:]}')
+        return s
+    medline_issns = load_issn_set('pubmed_issns.json')
+    pubmed_only_issns = load_issn_set('pubmed_only_issns.json')
+    pmc_issns = load_issn_set('pmc_issns.json')
+    medline_c = pubmed_c = pmc_c = 0
     for r in journals:
         for k in ('issn', 'eissn'):
             v = r.get(k, '')
-            if v and v.replace('-', '') in pubmed_issns:
-                r['pubmed'] = True
-                pm_count += 1
+            if not v: continue
+            bare = v.replace('-', '')
+            if bare in medline_issns:
+                r['medline'] = True
+                medline_c += 1
                 break
-    print(f'  PubMed matched: {pm_count}')
+        for k in ('issn', 'eissn'):
+            v = r.get(k, '')
+            if not v: continue
+            bare = v.replace('-', '')
+            if bare in pubmed_only_issns:
+                r['pubmed'] = True
+                pubmed_c += 1
+                break
+        for k in ('issn', 'eissn'):
+            v = r.get(k, '')
+            if not v: continue
+            bare = v.replace('-', '')
+            if bare in pmc_issns:
+                r['pmc'] = True
+                pmc_c += 1
+                break
+    print(f'  MEDLINE: {medline_c}  PubMed (broader): {pubmed_c}  PMC: {pmc_c}')
 
     # stats
     idx_c = Counter()
     for r in journals:
         for i in r['indices']: idx_c[i] += 1
     cas_c = Counter(); cas_top = 0
-    if_count = 0; warning_count = 0; cn_name_count = 0; ccf_count = 0; abdc_count = 0; abs_count = 0; cnkx_count = 0; scopus_count = 0; ei_count = 0; oaj_count = 0; doaj_count = 0; pubmed_count = 0
+    if_count = 0; warning_count = 0; cn_name_count = 0; ccf_count = 0; abdc_count = 0; abs_count = 0; cnkx_count = 0; scopus_count = 0; ei_count = 0; oaj_count = 0; doaj_count = 0; medline_count = 0; pubmed_count = 0; pmc_count = 0
     for r in journals:
         z = r.get('cas_zone')
         if z: cas_c[z] += 1
@@ -1229,13 +1252,15 @@ def main():
         if 'EI' in r.get('indices', []): ei_count += 1
         if r.get('oaj'): oaj_count += 1
         if r.get('doaj'): doaj_count += 1
+        if r.get('medline'): medline_count += 1
         if r.get('pubmed'): pubmed_count += 1
+        if r.get('pmc'): pmc_count += 1
 
     print('== Stats ==')
     print(f'  total: {len(journals)}')
     print(f'  indices: {dict(idx_c)}')
     print(f'  CAS zones: {dict(cas_c)} Top={cas_top}')
-    print(f'  IF: {if_count}  warning: {warning_count}  中文刊名: {cn_name_count}  CCF: {ccf_count}  ABDC: {abdc_count}  ABS: {abs_count}  CNKX: {cnkx_count}  Scopus: {scopus_count}  EI: {ei_count}  OAJ: {oaj_count}  DOAJ: {doaj_count}  PubMed: {pubmed_count}')
+    print(f'  IF: {if_count}  warning: {warning_count}  中文刊名: {cn_name_count}  CCF: {ccf_count}  ABDC: {abdc_count}  ABS: {abs_count}  CNKX: {cnkx_count}  Scopus: {scopus_count}  EI: {ei_count}  OAJ: {oaj_count}  DOAJ: {doaj_count}  MEDLINE: {medline_count}  PubMed: {pubmed_count}  PMC: {pmc_count}')
 
     # Strip large non-essential fields to stay under CF Pages 25 MB limit
     for r in journals:

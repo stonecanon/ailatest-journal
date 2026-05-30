@@ -1687,9 +1687,17 @@
     const license = doaj.lic || doaj.license || '';
     return `<span class="badge b-doaj" title="${T('DOAJ 开放获取期刊目录','Directory of Open Access Journals')}${license ? ' · ' + escape(license) : ''}">DOAJ</span>`;
   }
+  function badgeMEDLINE(m) {
+    if (!m) return '';
+    return `<span class="badge b-medline" title="${T('MEDLINE 数据库收录（NLM 精选索引）','Indexed in MEDLINE (NLM curated)')}">MEDLINE</span>`;
+  }
   function badgePubMed(pm) {
     if (!pm) return '';
-    return `<span class="badge b-pubmed" title="${T('PubMed/MEDLINE 收录','Indexed by PubMed/MEDLINE')}">PubMed</span>`;
+    return `<span class="badge b-pubmed" title="${T('PubMed 数据库收录（含所有引文来源）','Included in PubMed (all citation sources)')}">PubMed</span>`;
+  }
+  function badgePMC(pm) {
+    if (!pm) return '';
+    return `<span class="badge b-pmc" title="${T('PubMed Central 全文库收录','Full text in PubMed Central')}">PMC</span>`;
   }
   // 期刊浏览量缓存（journal_key → count）
   const viewsCache = {};
@@ -1852,7 +1860,9 @@
       badgeScopus(r.scopus),
       badgeOAJ(r.oaj),
       badgeDOAJ(r.doaj),
+      badgeMEDLINE(r.medline),
       badgePubMed(r.pubmed),
+      badgePMC(r.pmc),
     ].filter(Boolean).join('');
   }
   function renderRankBadges(r) {
