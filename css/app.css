@@ -246,11 +246,16 @@ main.main {
 .chip.tag-ahci:has(input:checked) { background: var(--tag-ahci); border-color: var(--tag-ahci); }
 .chip.tag-esci:has(input:checked) { background: var(--tag-esci); border-color: var(--tag-esci); }
 .chip.tag-ei:has(input:checked)   { background: var(--tag-ei);   border-color: var(--tag-ei); }
-.chip.zone-1:has(input:checked) { background: var(--zone-1); border-color: var(--zone-1); color: #fff; }
-.chip.zone-2:has(input:checked) { background: var(--zone-2); border-color: var(--zone-2); color: #fff; }
-.chip.zone-3:has(input:checked) { background: var(--zone-3); border-color: var(--zone-3); color: #fff; }
-.chip.zone-4:has(input:checked) { background: var(--zone-4); border-color: var(--zone-4); color: #fff; }
-.chip.zone-top:has(input:checked) { background: var(--zone-top); border-color: var(--zone-top); color: #fff; }
+.chip.zone-1:has(input:checked) { background: #8a909b; border-color: #8a909b; color: #fff; }
+.chip.zone-2:has(input:checked) { background: #8a909b; border-color: #8a909b; color: #fff; }
+.chip.zone-3:has(input:checked) { background: #8a909b; border-color: #8a909b; color: #fff; }
+.chip.zone-4:has(input:checked) { background: #8a909b; border-color: #8a909b; color: #fff; }
+.chip.zone-top:has(input:checked) { background: #8a909b; border-color: #8a909b; color: #fff; }
+.chip.xr-1:has(input:checked),
+.chip.xr-2:has(input:checked),
+.chip.xr-3:has(input:checked),
+.chip.xr-4:has(input:checked),
+.chip.xr-top:has(input:checked) { background: #8a909b; border-color: #8a909b; color: #fff; }
 /* domestic source chips */
 .chip.ds-chip-cssci:has(input:checked) { background: #b33c6e; border-color: #b33c6e; }
 .chip.ds-chip-cssci-ext:has(input:checked) { background: #b33c6e; border-color: #b33c6e; opacity: 0.75; }
@@ -1069,17 +1074,9 @@ body.share-mode main.main { max-width: 760px; margin: 0 auto; padding: 28px 20px
   border-radius: 2px;
   border: 0;
   color: #fff;
+  background: #8a909b; /* unified muted gray for all zone/rank badges */
 }
-.zone.z1 { background: #1f3a5f; color: #fff; }
-.zone.z2 { background: #4f6f9b; color: #fff; }
-.zone.z3 { background: #9eb1cb; color: #1f3a5f; }
-.zone.z4 { background: #d3dbe6; color: #1f3a5f; }
-.zone.ztop { background: var(--zone-top); font-size: 10.5px; letter-spacing: 0.06em; }
-/* JCR Q (burgundy palette, 与分享卡片同源) */
-.zone.jcr-q1 { background: #7a2030; color: #fff; }
-.zone.jcr-q2 { background: #a04a5a; color: #fff; }
-.zone.jcr-q3 { background: #c89099; color: #5a1820; }
-.zone.jcr-q4 { background: #ead0d4; color: #5a1820; }
+/* All zone/rank/tier badges use single muted gray (no per-level colors) */
 .zone sup { font-size: 8px; font-weight: 400; opacity: 0.8; }
 
 .if-pill {
@@ -1087,76 +1084,48 @@ body.share-mode main.main { max-width: 760px; margin: 0 auto; padding: 28px 20px
   padding: 2px 7px;
   font-family: var(--sans);
   font-size: 10.5px; font-weight: 700;
-  background: var(--gold);
+  background: #8a909b;
   color: #fff;
   border-radius: 2px;
   letter-spacing: 0.04em;
 }
-.if-pill.iq-Q1 { background: #7a2030; color: #fff; }
-.if-pill.iq-Q2 { background: #a04a5a; color: #fff; }
-.if-pill.iq-Q3 { background: #c89099; color: #5a1820; }
-.if-pill.iq-Q4 { background: #ead0d4; color: #5a1820; }
 
 .ccf-pill {
   display: inline-block;
   padding: 2px 6px;
   font-family: var(--sans);
   font-size: 10.5px; font-weight: 700;
-  background: var(--deep);
+  background: #8a909b;
   color: #fff;
   border-radius: 2px;
   border: 0;
   letter-spacing: 0.04em;
 }
-.ccf-pill.ccf-A { background: var(--crimson); }
-.ccf-pill.ccf-B { background: var(--accent); }
-.ccf-pill.ccf-C { background: var(--sage); }
 
 .abdc-pill {
   display: inline-block;
   padding: 2px 6px;
   font-family: var(--sans);
   font-size: 10.5px; font-weight: 700;
-  background: #6b7f9f;
+  background: #8a909b;
   color: #fff;
   border: 0;
   border-radius: 2px;
   letter-spacing: 0.04em;
 }
-.abdc-pill.abdc-a-star { background: #21385f; color: #fff; }
-.abdc-pill.abdc-a { background: #476fa6; color: #fff; }
-.abdc-pill.abdc-b { background: #8ea7c7; color: #1f3a5f; }
-.abdc-pill.abdc-c { background: #c6d2df; color: #294969; }
-
-/* ABS / AJG (Chartered ABS Academic Journal Guide 2024) — burgundy 色系；用 .zone 形状 */
-.zone.abs-g4s { background: #5a1820; color: #fff; }
-.zone.abs-g4  { background: #7a2030; color: #fff; }
-.zone.abs-g3  { background: #a04a5a; color: #fff; }
-.zone.abs-g2  { background: #e6cdd2; color: #5a1820; }
-.zone.abs-g1  { background: #f4e6e9; color: #7a2030; }
-
 .tier-pill {
   display: inline-block;
   padding: 2px 7px;
   font-family: var(--sans);
   font-size: 10.5px; font-weight: 700;
-  background: var(--deep);
+  background: #8a909b;
   color: #fff;
   border-radius: 2px;
   letter-spacing: 0.04em;
   border: none;
 }
-/* 中国科协 理工 T1/T2/T3 — 边框=填充色 */
-.tier-pill.t1 { background: #8b1a1a; }
-.tier-pill.t2 { background: #b47a1e; }
-.tier-pill.t3 { background: #4a6741; }
-/* 中国科协 管理 A/B/C/D */
-.tier-pill.ta-a { background: #8b1a1a; }
-.tier-pill.ta-b { background: #b47a1e; }
-.tier-pill.ta-c { background: #4a6741; }
-.tier-pill.ta-d { background: #6b5d52; }
 
-/* 中科院新锐版分区（teal 单色，由深到浅） */
+/* 中科院新锐版分区 — 统一灰 */
 .xr-pill {
   display: inline-block;
   padding: 2px 6px;
@@ -1166,15 +1135,8 @@ body.share-mode main.main { max-width: 760px; margin: 0 auto; padding: 28px 20px
   border: 0;
   color: #fff;
   letter-spacing: 0.04em;
+  background: #8a909b;
 }
-.xr-pill.xr-1 { background: #1f5f5a; color: #fff; }
-.xr-pill.xr-2 { background: #4f9b95; color: #fff; }
-.xr-pill.xr-3 { background: #9ec9c5; color: #1f5f5a; }
-.xr-pill.xr-4 { background: #d3e6e3; color: #1f5f5a; }
-.xr-pill.xr-top { background: #0f766e; color: #fff; font-weight: 700; }
-
-/* 新锐分区 TOP 侧边栏标签 */
-.chip.xr-top:has(input:checked) { background: var(--zone-top); border-color: var(--zone-top); color: #fff; }
 
 /* Nature / Science / Cell 旗舰徽章 */
 .flagship-pill {
@@ -1185,17 +1147,7 @@ body.share-mode main.main { max-width: 760px; margin: 0 auto; padding: 28px 20px
   border-radius: 2px;
   letter-spacing: 0.04em;
   border: 0;
-}
-.flagship-pill.flag-nature-main,
-.flagship-pill.flag-science-main,
-.flagship-pill.flag-cell-main {
-  background: linear-gradient(135deg, #c9a227 0%, #8b6914 100%);
-  color: #fff;
-}
-.flagship-pill.flag-nature-sub,
-.flagship-pill.flag-science-sub,
-.flagship-pill.flag-cell-sub {
-  background: #c9a227;
+  background: #8a909b;
   color: #fff;
 }
 .jname-flagship { color: #9b7414; }

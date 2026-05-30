@@ -4518,6 +4518,33 @@
         const bodyText = lines.slice(1).filter(l => !/^keywords?:/i.test(l) && !/^关键词[：:]/.test(l)).join(' ');
         const MAX_URL = 155;
 
+        // Synonym map: expand common academic terms to improve recall
+        const SYNONYM_MAP = {
+          occupancy: ['occupant','people counting','crowd estimation'],
+          sensor: ['sensing','detector','sensor array'],
+          indoor: ['indoor environment','built environment','interior'],
+          ambient: ['environmental','surrounding','background'],
+          prediction: ['forecasting','estimation','predictive'],
+          'machine learning': ['deep learning','neural network','supervised learning'],
+          'deep learning': ['neural network','machine learning','convolutional neural network'],
+          thermal: ['temperature','thermal comfort'],
+          comfort: ['satisfaction','well-being'],
+          co2: ['carbon dioxide','co₂'],
+          ventilation: ['air exchange','airflow','hvac'],
+          particulate: ['pm','particle','aerosol'],
+          noise: ['sound level','acoustic'],
+          illumination: ['lighting','daylight','light intensity'],
+          air: ['iaq','air quality'],
+          quality: ['condition','comfort','environmental quality'],
+        };
+        function expandWithSynonyms(words) {
+          const result = new Set(words);
+          words.forEach(w => {
+            if (SYNONYM_MAP[w]) SYNONYM_MAP[w].forEach(syn => result.add(syn));
+          });
+          return [...result];
+        }
+
         const stopWords = new Set(('this that with from which were have been than into also their about '+
           'study show were used using based results method model data paper these between while where '+
           'after before other there analysis approach process system research above during well such '+
@@ -4541,7 +4568,7 @@
           .filter(w => w.length > 3 && !stopWords.has(w) && !/^\d+$/.test(w) && !w.startsWith('http'));
         const uniqueWords = allWords.filter((w, i) => allWords.indexOf(w) === i);
 
-        // Build 2-3 diverse queries from different keyword subsets
+        // Build 2-4 diverse queries from different keyword subsets
         const queries = [];
 
         // Q1: Explicit keywords (if present) — these are the most reliable signal
@@ -4567,6 +4594,14 @@
         if (bodyKws.length >= 3) {
           const q = bodyKws.join(' ');
           if (encodeURIComponent(q).length < MAX_URL) queries.push(q);
+        }
+
+        // Q4: Synonym-expanded query — broader recall for underrepresented terms
+        const synWords = expandWithSynonyms(titleKws.slice(0, 5));
+        const synQuery = synWords.slice(0, 12).join(' ');
+        if (synQuery.length > 10 && !queries.some(x => synQuery.includes(x.slice(0,10)))) {
+          const synQ = synQuery;
+          if (encodeURIComponent(synQ).length < MAX_URL) queries.push(synQ);
         }
 
         // Fallback: if no queries built, just use first 5 unique words
@@ -4607,10 +4642,10 @@
             return [];
           }
         }
-        const queryBatches = await Promise.all(queries.slice(0, 3).map(async (q) => {
+        const queryBatches = await Promise.all(queries.slice(0, 4).map(async (q) => {
           const params = new URLSearchParams({
             search: q.slice(0, 120),
-            per_page: '30',
+            per_page: '60',
             sort: 'relevance_score:desc',
             select: SEARCH_FIELDS,
           });
@@ -4636,7 +4671,7 @@
           try {
             const params = new URLSearchParams({
               search: backup,
-              per_page: '30',
+              per_page: '50',
               sort: 'relevance_score:desc',
               select: SEARCH_FIELDS,
             });
@@ -4943,9 +4978,16 @@
       list.innerHTML = history.map(h => {
         const q = escape(h.query);
         const preview = h.query.length > 40 ? h.query.slice(0, 40) + '…' : h.query;
-        const timeStr = h.time ? new Date(h.time).toLocaleString(lang === 'zh' ? 'zh-CN' : 'en-US', {
-          month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
-        }) : '';
+        const timeStr = h.time ? (() => {
+          const d = new Date(h.time);
+          try {
+            return d.toLocaleString(lang === 'zh' ? 'zh-CN' : 'en-US', {
+              month: 'short', day: 'numeric',
+              hour: '2-digit', minute: '2-digit',
+              hour12: false,
+            });
+          } catch { return ''; }
+        })() : '';
         return `<div class="pick-history-item" data-query="${q}">
           <span class="pick-history-text">${escape(preview)}</span>
           <span class="pick-history-time">${timeStr}</span>
