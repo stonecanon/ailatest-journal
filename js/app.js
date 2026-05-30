@@ -4399,13 +4399,6 @@
     }));
     window.addEventListener('popstate', () => activateTab(tabFromPath(), { skipPath: true }));
 
-    // Browse home pills (int/dom) — switch to full list tab
-    $$('.home-browse-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        activateTab(btn.dataset.tab);
-      });
-    });
-
     // Favorites header button → fav tab
     const favHeaderBtn = $('#fav-header-btn');
     if (favHeaderBtn) {
