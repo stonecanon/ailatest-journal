@@ -38,7 +38,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- End Google Tag Manager -->
 <link rel="preload" href="/data/journals.json.gz" as="fetch" crossorigin="anonymous" />
 <link rel="preload" href="/data/journal_aliases.json" as="fetch" crossorigin="anonymous" />
-<link rel="stylesheet" href="/css/app.css?v=20260530-48" />
+<link rel="stylesheet" href="/css/app.css?v=20260530-50" />
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json" />
@@ -155,11 +155,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <header class="topbar">
     <button class="side-toggle" id="side-toggle" aria-label="Toggle filters / 打开筛选侧栏">☰</button>
     <div class="search-wrap">
-      <input id="q" type="search" maxlength="200" placeholder="Search: journal title / abbr / ISSN" autocomplete="off" spellcheck="false" />
+      <input id="q" type="text" maxlength="200" placeholder="Search: journal title / abbr / ISSN" autocomplete="off" spellcheck="false" />
       <div class="search-actions">
         <span class="search-help"><kbd>Enter</kbd><span data-i18n="search_submit_hint">搜索</span></span>
         <button class="search-submit" id="search-submit" type="button" aria-label="Search">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5 21 21"/></svg>
           <span data-i18n="search_button">Search</span>
         </button>
       </div>
@@ -274,7 +273,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <section class="tab-panel" data-panel="pick" hidden>
     <div class="pick-tool">
       <div class="pick-action-row">
-        <button id="pick-search-btn" class="big-btn primary" data-i18n="pick_search_btn">开始推荐</button>
         <span id="pick-status" class="pick-status muted-cell"></span>
         <input type="text" id="pick-apikey" class="pick-apikey" data-i18n-placeholder="pick_apikey_ph" placeholder="OpenAlex API Key（可选）">
         <span id="pick-quota" class="pick-quota muted-cell" data-i18n="pick_quota">由 OpenAlex 开放学术数据驱动 · 填 API Key 获更多额度</span>
@@ -459,7 +457,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <button id="pwa-install" class="pwa-install" hidden data-i18n="pwa_install">📲 安装到主屏</button>
 <script>
 // Build version for cache busting data files
-const __BUILD_VER = 'v20260530-48';
+const __BUILD_VER = 'v20260530-50';
 // Service Worker 清理 — 必须在 app.js 加载前运行
 (function() {
   if ('serviceWorker' in navigator) {
@@ -472,7 +470,7 @@ const __BUILD_VER = 'v20260530-48';
   }
 })();
 </script>
-<script src="/js/app.js?v=20260530-48" defer></script>
+<script src="/js/app.js?v=20260530-50" defer></script>
 <script>
   // Custom install prompt
   let __pwaPrompt = null;

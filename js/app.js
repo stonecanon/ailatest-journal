@@ -967,9 +967,20 @@
                     : 'search_dom';
       $('#q').placeholder = t(search);
     }
+    updateSearchSubmitLabel();
     $('#lang-toggle').textContent = LANG_META[lang]?.label || '中文';
     $('#auth-btn').textContent = user ? (user.name || user.login || t('logout')) : t('login');
     document.documentElement.lang = LANG_META[lang]?.html || 'zh-CN';
+  }
+
+  function updateSearchSubmitLabel() {
+    const btn = $('#search-submit');
+    const label = $('#search-submit [data-i18n]');
+    if (!label) return;
+    const key = activeTab === 'pick' ? 'pick_search_btn' : 'search_button';
+    label.dataset.i18n = key;
+    label.textContent = t(key);
+    btn?.setAttribute('aria-label', t(key));
   }
 
   // ───────── favorites (multi-list + drag sort) ─────────
@@ -4413,6 +4424,7 @@
 
       $$('[data-tab]').forEach(x => x.classList.toggle('active', x.dataset.tab === tab));
       activeTab = tab;
+      updateSearchSubmitLabel();
       $$('.tab-panel').forEach(p => p.hidden = p.dataset.panel !== activeTab);
       $$('[data-international]').forEach(el => el.hidden = activeTab !== 'int');
       $$('[data-domestic]').forEach(el => el.hidden = activeTab !== 'dom');
@@ -5277,7 +5289,7 @@
       }
     }
 
-    btn.addEventListener('click', doSearch);
+    btn?.addEventListener('click', doSearch);
     input.addEventListener('keydown', (e) => { if (activeTab !== 'pick') return; if (e.key === 'Enter') { e.preventDefault(); doSearch(); } });
 
     // ── Search history ──
