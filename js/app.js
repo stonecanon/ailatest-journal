@@ -948,10 +948,12 @@
       const k = el.dataset.i18nTitle;
       const v = t(k); if (v) el.title = v;
     });
-    const search = activeTab === 'int' ? 'search_int'
-                  : activeTab === 'fav' ? 'search_fav'
-                  : 'search_dom';
-    $('#q').placeholder = t(search);
+    if (activeTab !== 'pick') {
+      const search = activeTab === 'int' ? 'search_int'
+                    : activeTab === 'fav' ? 'search_fav'
+                    : 'search_dom';
+      $('#q').placeholder = t(search);
+    }
     $('#lang-toggle').textContent = LANG_ORDER.map(code => LANG_META[code].label).join(' · ');
     $('#auth-btn').textContent = user ? (user.name || user.login || t('logout')) : t('login');
     document.documentElement.lang = LANG_META[lang]?.html || 'zh-CN';
