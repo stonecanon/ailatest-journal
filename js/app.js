@@ -2233,15 +2233,6 @@
       tbody.innerHTML = visible.map(renderRow).join('');
     }
     $('#results-count').textContent = `${t('showing')} ${visible.length} ${t('of')} ${filtered.length.toLocaleString()} ${t('total_items')}`;
-    const dbg = $('#debug-filter');
-    if (dbg) {
-      // Compare matches() vs direct field check for the current idx filter
-      let fieldCheck = -1;
-      if (activeIdxFilter === 'medline') fieldCheck = journals.filter(r => r.medline).length;
-      else if (activeIdxFilter === 'pubmed') fieldCheck = journals.filter(r => r.pubmed).length;
-      else if (activeIdxFilter === 'pmc') fieldCheck = journals.filter(r => r.pmc).length;
-      dbg.textContent = `D: idx=${activeIdxFilter} q="${activeQuery}" feats=[${[...activeFeats].join(',')}] match=${filtered.length} field=${fieldCheck >= 0 ? fieldCheck : '—'}`;
-    }
     const more = $('#more');
     more.hidden = filtered.length <= shown;
   }
@@ -2326,14 +2317,6 @@
       sel.addEventListener('change', () => {
         if (id === 'idx-col-filter') {
           activeIdxFilter = sel.value;
-          const cnt = journals.filter(r => {
-            if (sel.value === 'medline') return r.medline;
-            if (sel.value === 'pubmed') return r.pubmed;
-            if (sel.value === 'pmc') return r.pmc;
-            if (['SCIE','SSCI','AHCI','ESCI','EI'].includes(sel.value)) return (r.indices||[]).includes(sel.value);
-            return true;
-          }).length;
-          console.log('[debug] idx:', sel.value, 'direct count:', cnt);
         }
         else if (id === 'tier-col-filter') activeTierFilter = sel.value;
         else activeExtraFilter = sel.value;
