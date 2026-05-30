@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-30T17:12:36.590Z",
+  "generated_at": "2026-05-30T17:17:36.155Z",
   "source": "remote D1",
   "notes": [
     "注册量来自 users.created_at，当前是最可靠口径。",
@@ -47,13 +47,13 @@
     "avg_rating": 4.46,
     "lists": 8,
     "users_with_lists": 8,
-    "total_pageviews": 934,
-    "total_visitors": 256,
+    "total_pageviews": 935,
+    "total_visitors": 257,
     "total_cn_hint_events": 467,
     "total_cn_hint_visitors": 124,
     "total_cn_hint_sessions": 229,
     "total_login_events": 25,
-    "latest_pageview_at": 1780108962
+    "latest_pageview_at": 1780161211
   },
   "series": {
     "providerMix": [
@@ -298,9 +298,9 @@
       },
       {
         "day": "2026-05-30",
-        "pageviews": 1,
-        "sessions": 1,
-        "visitors": 1,
+        "pageviews": 2,
+        "sessions": 2,
+        "visitors": 2,
         "cn_hint_events": 0,
         "cn_hint_visitors": 0,
         "cn_hint_sessions": 0
@@ -523,8 +523,8 @@
     "topPaths": [
       {
         "path": "/",
-        "pageviews": 800,
-        "visitors": 158
+        "pageviews": 801,
+        "visitors": 159
       },
       {
         "path": "/?ref=producthunt",
@@ -637,9 +637,9 @@
       },
       {
         "country": "US",
-        "pageviews": 109,
-        "visitors": 72,
-        "sessions": 88,
+        "pageviews": 110,
+        "visitors": 73,
+        "sessions": 89,
         "cn_hint_events": 31,
         "cn_hint_visitors": 22,
         "cn_hint_sessions": 27,
