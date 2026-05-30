@@ -1013,6 +1013,7 @@
   }
 
   function getActiveList() {
+    if (!favLists.length) return null;
     return favLists.find(l => l.id === activeListId) || favLists[0];
   }
   function allFavIds() {
@@ -3477,7 +3478,7 @@
   function renderFav() {
     const box = $('#fav-content');
     const list = getActiveList();
-    if (!list) { box.innerHTML = ''; return; }
+    if (!list) { box.innerHTML = `<div class="empty" style="padding:60px 20px;text-align:center;color:var(--muted)">${T('还没有收藏。切到「国际 SCI/SSCI」点任意一行右边的 ★ 就能收藏。','No favorites yet. Go to "International" and click the ★ on any row.')}</div>`; return; }
 
     // list 管理栏（全列表切换 + 新建/重命名/删除）
     const bar = favLists.map(l => `
