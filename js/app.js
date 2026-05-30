@@ -2,6 +2,12 @@
 (() => {
   const $ = (s, r=document) => r.querySelector(s);
   const $$ = (s, r=document) => [...r.querySelectorAll(s)];
+
+  // Early stub: if user clicks ★ before boot(), queue it
+  window.__activateJournalTab = function(tab) {
+    if (!window.__journalTabQueue) window.__journalTabQueue = [];
+    window.__journalTabQueue.push(tab);
+  };
   const fetchJSON = async (url) => {
     const resp = await fetch(url);
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
@@ -4440,6 +4446,11 @@
       }
     }
     window.__activateJournalTab = activateTab;
+    // Process any clicks that happened before boot() finished
+    if (window.__journalTabQueue) {
+      window.__journalTabQueue.forEach(t => activateTab(t));
+      window.__journalTabQueue = null;
+    }
     $$('.tab[data-tab]').forEach(b => b.addEventListener('click', (e) => {
       e.preventDefault();
       activateTab(b.dataset.tab);
