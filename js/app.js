@@ -3022,6 +3022,11 @@
   }
   function applyHashRoute() {
     const hash = location.hash || '';
+    // #fav → 收藏 tab
+    if (hash === '#fav' || hash === '#favorites') {
+      activateTab('fav');
+      return;
+    }
     // #search?q=<query> → switch to pick tab and fill search
     const searchMatch = hash.match(/^#search\?q=(.+)$/);
     if (searchMatch) {
@@ -4418,14 +4423,12 @@
     }));
     window.addEventListener('popstate', () => activateTab(tabFromPath(), { skipPath: true }));
 
-    // Favorites header button → fav tab
-    // <a> with href="/favorites" so it works even without JS
+    // Favorites header button → fav tab (hash nav = reliable on all browsers)
     const favHeaderBtn = $('#fav-header-btn');
     if (favHeaderBtn) {
       favHeaderBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        e.stopPropagation();
-        activateTab('fav');
+        location.hash = '#fav';
       });
     }
 
