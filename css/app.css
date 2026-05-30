@@ -20,6 +20,7 @@
   --tag-ahci:       #724a58;
   --tag-esci:       #3b4f3b;
   --tag-ei:         #6b4a1f;
+  --tag-pubmed:     #1d6f42;  /* PubMed green */
 
   --zone-1:         #1f3a5f;
   --zone-2:         #4f6f9b;
@@ -106,6 +107,7 @@ body.share-mode .app-rail { display: none !important; }
 .rail-nav-btn,
 .app-rail .auth-btn,
 .app-rail .lang-toggle {
+  position: relative;
   width: 52px;
   min-height: 52px;
   padding: 0;
@@ -761,6 +763,8 @@ main.main {
   border-radius: 8px; background: var(--gold, #e6a817); color: #fff;
   font-size: 10px; font-weight: 700; line-height: 1;
   vertical-align: top; margin-left: 2px;
+  white-space: nowrap;
+  flex: 0 0 auto;
 }
 .lang-toggle,
 .auth-btn {
@@ -1044,6 +1048,7 @@ table.journals tr:last-child td { border-bottom: 0; }
 .badge.b-ahci { background: #1f3a5f; }              /* 三大索引统一深蓝 */
 .badge.b-esci { background: #6a7a6a; }               /* 低饱和绿 — 次要收录 */
 .badge.b-ei   { background: #7a7a6a; }               /* 低饱和橄榄 — 次要收录 */
+.badge.b-pubmed { background: var(--tag-pubmed); }
 .badge.b-esi  { background: #5a5a7a; }               /* 紫灰 — ESI 大类 */
 .badge.b-scopus { background: #8a706a; }              /* 低饱和红褐 — 次要收录 */
 .badge.b-oaj { background: #5a7a7a; }                 /* 低饱和青 — 次要收录 */
@@ -1779,6 +1784,17 @@ td.empty,
   .rail-nav-btn span:not(.rail-flag):not(.fav-count-badge) {
     display: none;
   }
+  .fav-count-badge {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    min-width: 15px;
+    height: 15px;
+    padding: 0 4px;
+    margin-left: 0;
+    border-radius: 999px;
+    font-size: 9px;
+  }
   .app-rail .auth-btn,
   .app-rail .lang-toggle {
     width: auto;
@@ -1906,7 +1922,7 @@ td.empty,
   position: fixed; inset: 0;
   background: rgba(32, 24, 16, 0.42);
   backdrop-filter: blur(2px);
-  z-index: 90;
+  z-index: 210;
   opacity: 0; pointer-events: none;
   transition: opacity 0.2s ease;
 }
@@ -1918,7 +1934,7 @@ td.empty,
   background: var(--paper, #f6f0e2);
   border-left: 1px solid var(--rule, #d8ccb4);
   box-shadow: -12px 0 40px rgba(60, 40, 20, 0.15);
-  z-index: 100;
+  z-index: 220;
   transform: translateX(100%);
   transition: transform 0.28s cubic-bezier(.2,.7,.2,1);
   display: flex; flex-direction: column;
