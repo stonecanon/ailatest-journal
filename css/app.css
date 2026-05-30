@@ -241,21 +241,24 @@ main.main {
   color: var(--paper);
   border-color: var(--ink);
 }
+/* 索引侧边栏已选状态：三大索引保留原色，次要索引低调 */
 .chip.tag-scie:has(input:checked) { background: var(--tag-scie); border-color: var(--tag-scie); }
 .chip.tag-ssci:has(input:checked) { background: var(--tag-ssci); border-color: var(--tag-ssci); }
 .chip.tag-ahci:has(input:checked) { background: var(--tag-ahci); border-color: var(--tag-ahci); }
-.chip.tag-esci:has(input:checked) { background: var(--tag-esci); border-color: var(--tag-esci); }
-.chip.tag-ei:has(input:checked)   { background: var(--tag-ei);   border-color: var(--tag-ei); }
-.chip.zone-1:has(input:checked) { background: #8a909b; border-color: #8a909b; color: #fff; }
-.chip.zone-2:has(input:checked) { background: #8a909b; border-color: #8a909b; color: #fff; }
-.chip.zone-3:has(input:checked) { background: #8a909b; border-color: #8a909b; color: #fff; }
-.chip.zone-4:has(input:checked) { background: #8a909b; border-color: #8a909b; color: #fff; }
-.chip.zone-top:has(input:checked) { background: #8a909b; border-color: #8a909b; color: #fff; }
+.chip.tag-esci:has(input:checked) { background: #6a7a6a; border-color: #6a7a6a; }
+.chip.tag-ei:has(input:checked)   { background: #7a7a6a; border-color: #7a7a6a; }
+/* 分区筛选项 — 分区组钢蓝灰 */
+.chip.zone-1:has(input:checked),
+.chip.zone-2:has(input:checked),
+.chip.zone-3:has(input:checked),
+.chip.zone-4:has(input:checked),
+.chip.zone-top:has(input:checked) { background: #5a6f8a; border-color: #5a6f8a; color: #fff; }
+/* 新锐分区 — 同分区组钢蓝灰 */
 .chip.xr-1:has(input:checked),
 .chip.xr-2:has(input:checked),
 .chip.xr-3:has(input:checked),
 .chip.xr-4:has(input:checked),
-.chip.xr-top:has(input:checked) { background: #8a909b; border-color: #8a909b; color: #fff; }
+.chip.xr-top:has(input:checked) { background: #5a6f8a; border-color: #5a6f8a; color: #fff; }
 /* domestic source chips */
 .chip.ds-chip-cssci:has(input:checked) { background: #b33c6e; border-color: #b33c6e; }
 .chip.ds-chip-cssci-ext:has(input:checked) { background: #b33c6e; border-color: #b33c6e; opacity: 0.75; }
@@ -693,14 +696,14 @@ table.journals tr:last-child td { border-bottom: 0; }
   white-space: nowrap;
   color: #fff;
 }
-.badge.b-scie { background: var(--tag-scie); }
-.badge.b-ssci { background: var(--tag-ssci); }
-.badge.b-ahci { background: var(--tag-ahci); }
-.badge.b-esci { background: var(--tag-esci); }
-.badge.b-ei   { background: var(--tag-ei); }
-.badge.b-scopus { background: #b8341a; }
-.badge.b-oaj { background: #147a6b; }
-.badge.b-doaj { background: #4b7f21; }
+.badge.b-scie { background: var(--tag-scie); }      /* 深蓝 — 三大索引 */
+.badge.b-ssci { background: var(--tag-ssci); }      /* 琥珀 — 三大索引 */
+.badge.b-ahci { background: var(--tag-ahci); }      /* 酒红 — 三大索引 */
+.badge.b-esci { background: #6a7a6a; }               /* 低饱和绿 — 次要收录 */
+.badge.b-ei   { background: #7a7a6a; }               /* 低饱和橄榄 — 次要收录 */
+.badge.b-scopus { background: #8a706a; }              /* 低饱和红褐 — 次要收录 */
+.badge.b-oaj { background: #5a7a7a; }                 /* 低饱和青 — 次要收录 */
+.badge.b-doaj { background: #6a8a6a; }                /* 低饱和绿 — 次要收录 */
 .badge.b-view { color: #6b5d52; background: #e9dfc8; font-variant-numeric: tabular-nums; opacity: 0.9; }
 .badge.b-mdpi     { background: #b82a4a; color: #fff; }
 .badge.b-frontiers { background: #1a6b3c; color: #fff; }
@@ -1074,17 +1077,28 @@ body.share-mode main.main { max-width: 760px; margin: 0 auto; padding: 28px 20px
   border-radius: 2px;
   border: 0;
   color: #fff;
-  background: #8a909b; /* unified muted gray for all zone/rank badges */
+  background: #5a6f8a; /* 分区组：CAS/JCR/新锐/IF/旗舰 统一钢蓝灰 */
 }
-/* All zone/rank/tier badges use single muted gray (no per-level colors) */
+/* ABDC/ABS 商科组使用暖灰褐 */
+.abdc-pill,
+.zone.abs-g4s,
+.zone.abs-g4,
+.zone.abs-g3,
+.zone.abs-g2,
+.zone.abs-g1 { background: #7a6f5a; }
+/* 科协组使用鼠尾绿 */
+.tier-pill { background: #5a7a5a; }
+/* CCF 使用紫灰 */
+.ccf-pill { background: #5a5a7a; }
 .zone sup { font-size: 8px; font-weight: 400; opacity: 0.8; }
 
+/* IF 评级 — 同分区组钢蓝灰 */
 .if-pill {
   display: inline-block;
   padding: 2px 7px;
   font-family: var(--sans);
   font-size: 10.5px; font-weight: 700;
-  background: #8a909b;
+  background: #5a6f8a;
   color: #fff;
   border-radius: 2px;
   letter-spacing: 0.04em;
@@ -1125,7 +1139,7 @@ body.share-mode main.main { max-width: 760px; margin: 0 auto; padding: 28px 20px
   border: none;
 }
 
-/* 中科院新锐版分区 — 统一灰 */
+/* 新锐分区 — 同分区组钢蓝灰 */
 .xr-pill {
   display: inline-block;
   padding: 2px 6px;
@@ -1135,10 +1149,10 @@ body.share-mode main.main { max-width: 760px; margin: 0 auto; padding: 28px 20px
   border: 0;
   color: #fff;
   letter-spacing: 0.04em;
-  background: #8a909b;
+  background: #5a6f8a;
 }
 
-/* Nature / Science / Cell 旗舰徽章 */
+/* Nature / Science / Cell 旗舰徽章 — 同分区组钢蓝灰 */
 .flagship-pill {
   display: inline-block;
   padding: 2px 7px;
@@ -1147,7 +1161,7 @@ body.share-mode main.main { max-width: 760px; margin: 0 auto; padding: 28px 20px
   border-radius: 2px;
   letter-spacing: 0.04em;
   border: 0;
-  background: #8a909b;
+  background: #5a6f8a;
   color: #fff;
 }
 .jname-flagship { color: #9b7414; }
