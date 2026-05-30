@@ -1770,7 +1770,7 @@
   // 国内来源交叉徽章
   function badgeDomSrc(tag) {
     const map = {
-      cssci: 'CSSCI', cssci_ext: T('CSSCI 扩','CSSCI Ext'), pku: T('北大核心','PKU Core'),
+      cssci: 'CSSCI', cssci_ext: T('CSSCI 扩展','CSSCI Ext'), pku: T('北大核心','PKU Core'),
       cnkx_T1: T('科协 T1','CAST T1'), cnkx_T2: T('科协 T2','CAST T2'), cnkx_T3: T('科协 T3','CAST T3'),
       ccft_T1: 'CCF-T1', ccft_T2: 'CCF-T2', ccft_T3: 'CCF-T3',
       zju: T('浙大目录','ZJU'), school_a: T('学校 A','School A'),
@@ -2058,7 +2058,17 @@
     if (activeFeats.has('abs')  && !(r.abs  && r.abs.rating))  return false;
     if (activeCat !== '__all' && r.esi_category !== activeCat) return false;
     if (activeCasMajor !== '__all' && (r.cas_major_cn || '') !== activeCasMajor) return false;
-    if (activeIdxFilter !== '__all' && !(r.indices || []).includes(activeIdxFilter)) return false;
+    if (activeIdxFilter !== '__all') {
+      const idxValues = ['SCIE','SSCI','AHCI','ESCI','EI'];
+      if (idxValues.includes(activeIdxFilter)) {
+        if (!(r.indices || []).includes(activeIdxFilter)) return false;
+      } else if (activeIdxFilter === 'scopus' && !(r.scopus && r.scopus.active)) return false;
+      else if (activeIdxFilter === 'oaj' && !r.oaj) return false;
+      else if (activeIdxFilter === 'doaj' && !r.doaj) return false;
+      else if (activeIdxFilter === 'medline' && !r.medline) return false;
+      else if (activeIdxFilter === 'pubmed' && !r.pubmed) return false;
+      else if (activeIdxFilter === 'pmc' && !r.pmc) return false;
+    }
     if (activeTierFilter !== '__all') {
       const q = (r.if_quartile || '').toUpperCase();
       const z = r.cas_zone != null ? String(r.cas_zone) : '';
@@ -2070,12 +2080,6 @@
       if (!tierMatch) return false;
     }
     if (activeExtraFilter !== '__all') {
-      if (activeExtraFilter === 'scopus' && !(r.scopus && r.scopus.active)) return false;
-      if (activeExtraFilter === 'oaj' && !r.oaj) return false;
-      if (activeExtraFilter === 'doaj' && !r.doaj) return false;
-      if (activeExtraFilter === 'medline' && !r.medline) return false;
-      if (activeExtraFilter === 'pubmed' && !r.pubmed) return false;
-      if (activeExtraFilter === 'pmc' && !r.pmc) return false;
       if (activeExtraFilter === 'warning' && !r.warning) return false;
       if (activeExtraFilter.startsWith('abdc:')) {
         const want = activeExtraFilter.slice(5);

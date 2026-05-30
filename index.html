@@ -38,7 +38,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- End Google Tag Manager -->
 <link rel="preload" href="/data/journals.json.gz" as="fetch" crossorigin="anonymous" />
 <link rel="preload" href="/data/journal_aliases.json" as="fetch" crossorigin="anonymous" />
-<link rel="stylesheet" href="/css/app.css?v=20260530-63" />
+<link rel="stylesheet" href="/css/app.css?v=20260530-64" />
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json" />
@@ -202,9 +202,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                   <option value="AHCI">AHCI</option>
                   <option value="ESCI">ESCI</option>
                   <option value="EI">EI</option>
+                  <option value="scopus">Scopus</option>
+                  <option value="oaj">OAJ</option>
+                  <option value="doaj">DOAJ</option>
+                  <option value="medline">MEDLINE</option>
+                  <option value="pubmed">PubMed</option>
+                  <option value="pmc">PMC</option>
                 </select>
-                <select id="tier-col-filter" class="th-select th-select-sm" aria-label="筛选分区">
-                  <option value="__all">分区</option>
+                <select id="tier-col-filter" class="th-select th-select-sm" aria-label="筛选主流分区">
+                  <option value="__all">主流分区</option>
                   <option value="Q1">Q1</option>
                   <option value="Q2">Q2</option>
                   <option value="Q3">Q3</option>
@@ -215,14 +221,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                   <option value="4">4区</option>
                   <option value="top">TOP</option>
                 </select>
-                <select id="extra-col-filter" class="th-select th-select-sm" aria-label="筛选附加">
-                  <option value="__all">附加</option>
-                  <option value="scopus">Scopus</option>
-                  <option value="oaj">OAJ</option>
-                  <option value="doaj">DOAJ</option>
-                  <option value="medline">MEDLINE</option>
-                  <option value="pubmed">PubMed</option>
-                  <option value="pmc">PMC</option>
+                <select id="extra-col-filter" class="th-select th-select-sm" aria-label="筛选其他分区">
+                  <option value="__all">其他分区</option>
                   <option value="warning">预警</option>
                   <option value="abdc:A*">ABDC A*</option>
                   <option value="abdc:A">ABDC A</option>
@@ -474,7 +474,7 @@ const __BUILD_VER = 'v20260530-60';
   }
 })();
 </script>
-<script src="/js/app.js?v=20260530-63" defer></script>
+<script src="/js/app.js?v=20260530-64" defer></script>
 <script>
   // Custom install prompt
   let __pwaPrompt = null;
