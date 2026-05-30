@@ -3039,10 +3039,10 @@
       try {
         const q = decodeURIComponent(searchMatch[1]);
         const pickEl = document.querySelector('[data-tab="pick"]');
-        const pickInput = $('#pick-input');
-        if (pickEl && pickInput) {
+        if (pickEl) {
           pickEl.click();
-          pickInput.value = q;
+          const searchInput = $('#q');
+          if (searchInput) searchInput.value = q;
           setTimeout(() => {
             const btn = $('#pick-search-btn');
             if (btn) btn.click();
@@ -4169,9 +4169,8 @@
     $('#q').addEventListener('input', (e) => {
       activeQuery = e.target.value.trim();
       shown = PAGE;
+      if (activeTab === 'pick') return; // pick tab uses Enter
       if (activeTab === 'home') {
-        const homeQ = $('#home-q');
-        if (homeQ) homeQ.value = activeQuery;
         showHomeSearchResults();
       } else {
         activeTab === 'int' ? renderInt()
@@ -4197,7 +4196,6 @@
     });
 
     /* ───────── Home tab: auto-detect search ───────── */
-    const homeQ = $('#home-q');
     const homeResults = $('#home-results');
     const homePanel = $('.tab-panel[data-panel="home"]');
 
@@ -4357,18 +4355,6 @@
       });
     }
 
-    // Home search input → sync with activeQuery
-    if (homeQ) {
-      homeQ.addEventListener('input', (e) => {
-        activeQuery = e.target.value.trim();
-        shown = PAGE;
-        // Sync the topbar search too
-        const topQ = $('#q');
-        if (topQ) topQ.value = activeQuery;
-        showHomeSearchResults();
-      });
-    }
-
     // Also sync topbar search when on home tab
     const origSearchHandler = $('#q')?.addEventListener;
     // (the existing #q listener already handles this for int/dom/fav)
@@ -4377,17 +4363,9 @@
       if (!TAB_PATHS[tab]) tab = 'home';
       // ── 切换前：把当前搜索框的值存到 activeQuery ──
       const prevTab = activeTab;
-      if (prevTab === 'pick') {
-        const pi = $('#pick-input');
-        if (pi && pi.value) activeQuery = pi.value;
-      } else if (prevTab && prevTab !== 'home') {
-        const q = $('#q');
-        if (q && q.value) activeQuery = q.value;
-      }
-      if (prevTab === 'home') {
-        const hq = $('#home-q');
-        if (hq && hq.value) activeQuery = hq.value;
-      }
+      const qEl = $('#q');
+      if (qEl) activeQuery = qEl.value;
+
       $$('[data-tab]').forEach(x => x.classList.toggle('active', x.dataset.tab === tab));
       activeTab = tab;
       $$('.tab-panel').forEach(p => p.hidden = p.dataset.panel !== activeTab);
@@ -4396,27 +4374,17 @@
       // Sidebar: show on int/dom, hide on home/fav/pick
       const sidebar = $('#sidebar');
       if (sidebar) sidebar.style.display = (activeTab === 'int' || activeTab === 'dom') ? '' : 'none';
-      // Search box in topbar: hide on home and pick (home has its own search)
-      const searchWrap = $('.search-wrap');
-      const sideToggle = $('#side-toggle');
-      const showSearch = activeTab !== 'pick' && activeTab !== 'home';
-      if (searchWrap) searchWrap.style.display = showSearch ? 'flex' : 'none';
-      if (sideToggle) sideToggle.style.display = showSearch ? '' : 'none';
-      // Sync home search input with #q when on home tab
-      const homeQ = $('#home-q');
-      if (activeTab === 'home' && homeQ) {
-        homeQ.value = activeQuery || '';
-        homeQ.placeholder = $('#q')?.placeholder || 'Search: journal title / abbr / ISSN';
-      }
-      // 切换到选刊：把 activeQuery 填入 pick 搜索框
-      if (activeTab === 'pick') {
-        const pi = $('#pick-input');
-        if (pi && activeQuery) pi.value = activeQuery;
-      }
-      // 切换到 int/dom/fav：把 activeQuery 填入顶栏搜索框
-      if (activeTab !== 'home' && activeTab !== 'pick') {
-        const q = $('#q');
-        if (q && activeQuery) q.value = activeQuery;
+      // 统一搜索框 #q：更新 placeholder 和内容
+      if (qEl) {
+        qEl.value = activeQuery || '';
+        qEl.maxLength = 200;
+        if (activeTab === 'pick') {
+          qEl.placeholder = T('建议输入标题 + 关键词，最多 200 字符','Enter title + keywords, max 200 characters');
+        } else if (activeTab === 'home') {
+          qEl.placeholder = 'Search: journal title / abbr / ISSN';
+        } else {
+          qEl.placeholder = 'Search: journal title / abbr / ISSN';
+        }
       }
       // Reset home UI state when switching away
       if (activeTab !== 'home') {
@@ -4746,7 +4714,7 @@
     _pickInit = true;
 
     const btn = $('#pick-search-btn');
-    const input = $('#pick-input');
+    const input = $('#q');
     const results = $('#pick-results');
     const status = $('#pick-status');
     const quotaEl = $('#pick-quota');
@@ -5259,7 +5227,7 @@
     }
 
     btn.addEventListener('click', doSearch);
-    input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); doSearch(); } });
+    input.addEventListener('keydown', (e) => { if (activeTab !== 'pick') return; if (e.key === 'Enter') { e.preventDefault(); doSearch(); } });
 
     // ── Search history ──
     const HISTORY_KEY = 'ailatest.pick.history';
