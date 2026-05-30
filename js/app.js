@@ -2217,6 +2217,8 @@
       tbody.innerHTML = visible.map(renderRow).join('');
     }
     $('#results-count').textContent = `${t('showing')} ${visible.length} ${t('of')} ${filtered.length.toLocaleString()} ${t('total_items')}`;
+    const dbg = $('#debug-filter');
+    if (dbg) dbg.textContent = `DEBUG: activeIdxFilter=${activeIdxFilter} activeFeats=[${[...activeFeats].join(',')}] filtered=${filtered.length} shown=${shown}`;
     const more = $('#more');
     more.hidden = filtered.length <= shown;
   }
