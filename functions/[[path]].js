@@ -81,12 +81,14 @@ export async function onRequest(ctx) {
   try {
     // Handle /journal/<slug>/
     if (path.startsWith('/journal/')) {
-      const slug = path.replace('/journal/', '').replace(/\/$/, '');
-      if (!slug) {
+      const rawSlug = path.replace('/journal/', '').replace(/\/$/, '');
+      if (!rawSlug) {
         return Response.redirect(url.origin + '/', 302);
       }
 
       const index = await loadIndex(ctx);
+      // Try exact match first (name-based slug), then try bare ISSN (strip hyphens)
+      const slug = index[rawSlug] ? rawSlug : rawSlug.replace(/-/g, '');
       let j = index[slug];
 
       if (!j) {
