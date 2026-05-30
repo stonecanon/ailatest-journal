@@ -4287,8 +4287,13 @@
         <span class="results-count">${T('找到','Found')} ${totalCount.toLocaleString()} ${T('个结果','results')}</span>
       </div>`;
       for (const sec of sections) {
-        const more = sec.count > (hasChinese ? (sec.label.includes('国际') ? 15 : 30) : (sec.label.includes('国际') ? 30 : 10))
-          ? `<div class="muted-cell" style="font-size:12px;padding:4px 0 10px">${T('仅显示前','Showing first')} ${hasChinese ? (sec.label.includes('国际')?15:30) : (sec.label.includes('国际')?30:10)} ${T('条','')}</div>`
+        const limit = hasChinese ? (sec.label.includes('国际') ? 15 : 30) : (sec.label.includes('国际') ? 30 : 10);
+        const tabTarget = sec.label.includes('国际') ? 'int' : 'dom';
+        const more = sec.count > limit
+          ? `<div style="padding:4px 0 10px;display:flex;justify-content:space-between;align-items:center">
+              <span class="muted-cell" style="font-size:12px">${T('已显示前','Showing first')} ${limit} ${T('条','')}</span>
+              <button class="home-viewall-btn" data-viewall-tab="${tabTarget}" style="font-size:12px;color:var(--accent,#b4531f);background:none;border:none;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:2px">${T('查看全部','View all')} ${sec.count} →</button>
+            </div>`
           : '';
         html += `<div class="home-section-label">${sec.label}</div>
           <div class="table-wrap"><table class="journals"><thead><tr>
@@ -4311,6 +4316,16 @@
           renderHomeIntResults();
         });
       }
+      // "查看全部" buttons → switch to full list tab
+      homeResults.querySelectorAll('.home-viewall-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const tab = btn.dataset.viewallTab;
+          // Sync query to topbar search so the target tab picks it up
+          const topQ = $('#q');
+          if (topQ) topQ.value = activeQuery;
+          activateTab(tab);
+        });
+      });
     }
 
     // Home search input → sync with activeQuery
