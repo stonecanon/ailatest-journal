@@ -38,7 +38,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- End Google Tag Manager -->
 <link rel="preload" href="/data/journals.json.gz" as="fetch" crossorigin="anonymous" />
 <link rel="preload" href="/data/journal_aliases.json" as="fetch" crossorigin="anonymous" />
-<link rel="stylesheet" href="/css/app.css?v=20260530-04" />
+<link rel="stylesheet" href="/css/app.css?v=20260530-05" />
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json" />
@@ -126,7 +126,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
   <header class="topbar">
     <button class="side-toggle" id="side-toggle" aria-label="Toggle filters / 打开筛选侧栏">☰</button>
-    <div class="search-label" id="search-label" hidden>📝 输入你的论文标题和关键词</div>
     <div class="search-wrap">
       <input id="q" type="search" maxlength="200" placeholder="Search: journal title / abbr / ISSN" autocomplete="off" spellcheck="false" />
       <span class="hint" id="hint" data-i18n="loading">加载中…</span>
@@ -442,7 +441,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <button id="pwa-install" class="pwa-install" hidden data-i18n="pwa_install">📲 安装到主屏</button>
 <script>
 // Build version for cache busting data files
-const __BUILD_VER = 'v20260530-04';
+const __BUILD_VER = 'v20260530-05';
 // Service Worker 清理 — 必须在 app.js 加载前运行
 (function() {
   if ('serviceWorker' in navigator) {
@@ -455,7 +454,7 @@ const __BUILD_VER = 'v20260530-04';
   }
 })();
 </script>
-<script src="/js/app.js?v=20260530-04" defer></script>
+<script src="/js/app.js?v=20260530-05" defer></script>
 <script>
   // Custom install prompt
   let __pwaPrompt = null;

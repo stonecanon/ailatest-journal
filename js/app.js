@@ -4379,19 +4379,11 @@
         qEl.value = activeQuery || '';
         qEl.maxLength = 200;
         if (activeTab === 'pick') {
-          qEl.placeholder = T('建议输入标题 + 关键词，最多 200 字符','Enter title + keywords, max 200 characters');
+          qEl.placeholder = T('输入你的论文标题和关键词，如：基于深度学习的室内人数预测', 'Enter your paper title and keywords, e.g.: Deep learning for indoor occupancy estimation');
         } else if (activeTab === 'home') {
           qEl.placeholder = 'Search: journal title / abbr / ISSN';
         } else {
           qEl.placeholder = 'Search: journal title / abbr / ISSN';
-        }
-      }
-      // 选刊搜索提示标签
-      const searchLabel = $('#search-label');
-      if (searchLabel) {
-        searchLabel.hidden = activeTab !== 'pick';
-        if (activeTab === 'pick') {
-          searchLabel.textContent = '📝 ' + T('输入你的论文标题和关键词', 'Enter your paper title and keywords');
         }
       }
       // Reset home UI state when switching away
