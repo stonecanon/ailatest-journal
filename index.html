@@ -131,17 +131,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </header>
 
   <div class="tabs">
-    <a class="tab active" data-tab="int" href="/international">
-      <span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.4 2.5 3.6 5.5 3.6 9s-1.2 6.5-3.6 9"/><path d="M12 3c-2.4 2.5-3.6 5.5-3.6 9s1.2 6.5 3.6 9"/></svg></span>
-      <span class="tab-label" data-i18n="tab_int">国际</span>
-    </a>
-    <a class="tab" data-tab="dom" href="/china">
-      <span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 16c4-2 6-8 10-8s6 6 10 8"/><path d="M2 16v4h20v-4"/><rect x="4" y="10" width="3" height="6"/><rect x="10" y="10" width="3" height="6"/><rect x="17" y="10" width="3" height="6"/><rect x="10.5" y="12" width="2" height="4" rx="1"/></svg></span>
-      <span class="tab-label" data-i18n="tab_dom">中国</span>
-    </a>
-    <a class="tab" data-tab="fav" href="/favorites">
-      <span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3.7l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3.7z"/></svg></span>
-      <span class="tab-label" data-i18n="tab_fav">收藏</span>
+    <a class="tab active" data-tab="home" href="/">
+      <span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10a1 1 0 0 0 1 1h3v-5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v5h3a1 1 0 0 0 1-1V10"/></svg></span>
+      <span class="tab-label" data-i18n="tab_home">首页</span>
     </a>
     <a class="tab" data-tab="pick" href="/pick">
       <span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 19l3.2-1 7.8-7.8a2.1 2.1 0 0 0-3-3L5.2 15 4 20z"/><path d="M12.5 7.5l4 4"/><path d="M18 4l1 2 2 1-2 1-1 2-1-2-2-1 2-1z"/></svg></span>
@@ -149,6 +141,30 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </a>
     <a class="mobile-nav-brand" href="/" aria-label="AILatest Journal"><em>Journal</em><span>.ailatest</span></a>
   </div>
+
+  <!-- ─── Home tab ─── -->
+  <section class="tab-panel" data-panel="home">
+    <div class="home-hero">
+      <h1 class="home-title">AILatest Journal</h1>
+      <p class="home-subtitle" data-i18n="tagline">面向科研人员的期刊检索与投稿决策工具</p>
+      <div class="home-search-wrap">
+        <svg class="home-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input id="home-q" type="search" class="home-search-input" placeholder="Search: journal title / abbr / ISSN" autocomplete="off" spellcheck="false" />
+      </div>
+      <div id="home-quick-links" class="home-quick-links">
+        <a class="home-quick-chip" data-nav="int">🌍 国际期刊 · 按学科浏览</a>
+        <a class="home-quick-chip" data-nav="dom">🇨🇳 中国期刊目录</a>
+        <a class="home-quick-chip" data-nav="fav">⭐ 我的收藏</a>
+      </div>
+    </div>
+    <div id="home-subtabs" class="home-subtabs" hidden>
+      <button class="home-subtab active" data-subtab="all" data-i18n="tab_all">全部</button>
+      <button class="home-subtab" data-subtab="int" data-i18n="tab_int">国际</button>
+      <button class="home-subtab" data-subtab="dom" data-i18n="tab_dom">中国</button>
+      <button class="home-subtab" data-subtab="fav" data-i18n="tab_fav">收藏</button>
+    </div>
+    <div id="home-results" class="home-results" hidden></div>
+  </section>
 
   <!-- ─── International tab ─── -->
   <section class="tab-panel" data-panel="int">
@@ -450,7 +466,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <button id="pwa-install" class="pwa-install" hidden data-i18n="pwa_install">📲 安装到主屏</button>
 <script>
 // Build version for cache busting data files
-const __BUILD_VER = 'v20260529-13';
+const __BUILD_VER = 'v20260529-40';
 // Service Worker 清理 — 必须在 app.js 加载前运行
 (function() {
   if ('serviceWorker' in navigator) {
@@ -463,7 +479,7 @@ const __BUILD_VER = 'v20260529-13';
   }
 })();
 </script>
-<script src="/js/app.js?v=v20260529-27" defer></script>
+<script src="/js/app.js?v=20260529-40" defer></script>
 <script>
   // Custom install prompt
   let __pwaPrompt = null;

@@ -704,9 +704,13 @@
   }
 
   let activeTab = 'int';
-  const TAB_PATHS = { int: '/international', dom: '/china', fav: '/favorites', pick: '/pick' };
-  const PATH_TABS = { '/international': 'int', '/journals': 'int', '/china': 'dom', '/favorites': 'fav', '/pick': 'pick' };
+  const TAB_PATHS = { home: '/', int: '/international', dom: '/china', fav: '/favorites', pick: '/pick' };
+  const PATH_TABS = { '/': 'home', '/international': 'int', '/journals': 'int', '/china': 'dom', '/favorites': 'fav', '/pick': 'pick' };
   const TAB_SEO = {
+    home: {
+      title: 'AILatest Journal — 期刊查询 · 选刊推荐 · SCI期刊检索',
+      desc: 'AILatest Journal 是面向科研人员的免费期刊查询与选刊推荐工具。聚合 SCI/SSCI/AHCI、JCR 影响因子、中科院分区、CCF、CSSCI 等数据，支持期刊搜索、选刊推荐、收藏同步。'
+    },
     int: {
       title: 'International Journal Search | SCI SSCI JCR IF CAS Tiers - AILatest Journal',
       desc: 'Search international journals by SCI, SSCI, AHCI, ESCI, EI, JCR impact factor, CAS tiers, Web of Science subjects, Scopus, DOAJ and warning lists.'
@@ -726,12 +730,12 @@
   };
   function tabFromPath(pathname = location.pathname) {
     const clean = pathname.replace(/\/+$/, '') || '/';
-    return PATH_TABS[clean] || 'int';
+    return PATH_TABS[clean] || 'home';
   }
   function updatePageSeo(tab = activeTab) {
     const seo = TAB_SEO[tab] || TAB_SEO.int;
     document.title = seo.title;
-    const canonicalPath = (tab === 'int' && (location.pathname === '/' || location.pathname === '')) ? '/' : (TAB_PATHS[tab] || '/');
+    const canonicalPath = (tab === 'home' || (tab === 'int' && (location.pathname === '/' || location.pathname === ''))) ? '/' : (TAB_PATHS[tab] || '/');
     const desc = document.querySelector('meta[name="description"]');
     if (desc) desc.setAttribute('content', seo.desc);
     const canonical = document.querySelector('link[rel="canonical"]');
@@ -4131,10 +4135,16 @@
     $('#q').addEventListener('input', (e) => {
       activeQuery = e.target.value.trim();
       shown = PAGE;
-      activeTab === 'int' ? renderInt()
-        : activeTab === 'fav' ? renderFav()
-        : activeTab === 'dom' ? renderDomestic()
-        : null;
+      if (activeTab === 'home') {
+        const homeQ = $('#home-q');
+        if (homeQ) homeQ.value = activeQuery;
+        showHomeSearchResults('all');
+      } else {
+        activeTab === 'int' ? renderInt()
+          : activeTab === 'fav' ? renderFav()
+          : activeTab === 'dom' ? renderDomestic()
+          : null;
+      }
     });
     $('#more').addEventListener('click', () => { shown += PAGE; renderInt(); });
 
@@ -4152,18 +4162,163 @@
       }
     });
 
+    /* ───────── Home tab: search + sub-tabs + quick links ───────── */
+    const homeQ = $('#home-q');
+    const homeSubtabs = $('#home-subtabs');
+    const homeResults = $('#home-results');
+    const homePanel = $('.tab-panel[data-panel="home"]');
+
+    function showHomeSearchResults(subtab) {
+      if (!activeQuery) {
+        if (homeResults) homeResults.hidden = true;
+        if (homeSubtabs) homeSubtabs.hidden = true;
+        if (homePanel) homePanel.classList.remove('home-tab-has-results');
+        return;
+      }
+      if (homePanel) homePanel.classList.add('home-tab-has-results');
+      if (homeSubtabs) homeSubtabs.hidden = false;
+      if (homeResults) homeResults.hidden = false;
+
+      // Update active sub-tab
+      if (homeSubtabs) {
+        homeSubtabs.querySelectorAll('.home-subtab').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.subtab === subtab);
+        });
+      }
+
+      if (subtab === 'all') {
+        // Render international results into home-results
+        renderHomeIntResults();
+      } else {
+        // Navigate to the corresponding tab
+        activateTab(subtab);
+      }
+    }
+
+    function renderHomeIntResults() {
+      if (!homeResults) return;
+      let filtered = journals.filter(matches);
+      if (activeQuery) {
+        const q = activeQuery;
+        filtered = filtered
+          .map(r => ({ r, s: scoreRecord(r, q) }))
+          .sort((a, b) => {
+            if (b.s !== a.s) return b.s - a.s;
+            const fa = a.r.flagship ? 1 : 0;
+            const fb = b.r.flagship ? 1 : 0;
+            if (fa !== fb) return fb - fa;
+            const ifa = a.r.if_2024 ?? -1;
+            const ifb = b.r.if_2024 ?? -1;
+            if (ifa !== ifb) return ifb - ifa;
+            return (a.r.name||'').localeCompare(b.r.name||'');
+          })
+          .map(x => x.r);
+      }
+      filtered = sortByIF(filtered, intIfSort);
+      const visible = filtered.slice(0, shown);
+      const total = filtered.length;
+
+      if (!visible.length) {
+        homeResults.innerHTML = `<div class="empty-state">${t('empty')}</div>`;
+        return;
+      }
+
+      // Build table similar to int panel but simpler
+      let html = `<div class="results-head" style="margin-bottom:8px">
+        <span class="results-count">${t('showing')} ${visible.length} ${t('of')} ${total.toLocaleString()} ${t('total_items')}</span>
+      </div>
+      <div class="table-wrap"><table class="journals"><thead><tr>
+        <th class="col-fav"></th>
+        <th class="col-name">${t('col_name')}</th>
+        <th class="col-badge">${t('col_index')}</th>
+        <th class="col-if">IF</th>
+        <th class="col-cas">${t('col_cas')}</th>
+      </tr></thead><tbody>`;
+      html += visible.map(renderRow).join('');
+      html += '</tbody></table></div>';
+      if (total > shown) {
+        html += `<div class="pager"><button class="big-btn primary" id="home-more-btn" data-i18n="load_more">${t('load_more')}</button></div>`;
+      }
+      homeResults.innerHTML = html;
+
+      // Wire "load more" button
+      const moreBtn = $('#home-more-btn');
+      if (moreBtn) {
+        moreBtn.addEventListener('click', () => {
+          shown += PAGE;
+          renderHomeIntResults();
+        });
+      }
+    }
+
+    // Home search input → sync with activeQuery
+    if (homeQ) {
+      homeQ.addEventListener('input', (e) => {
+        activeQuery = e.target.value.trim();
+        shown = PAGE;
+        // Sync the topbar search too
+        const topQ = $('#q');
+        if (topQ) topQ.value = activeQuery;
+        showHomeSearchResults('all');
+      });
+    }
+
+    // Also sync topbar search when on home tab
+    const origSearchHandler = $('#q')?.addEventListener;
+    // (the existing #q listener already handles this for int/dom/fav)
+
+    // Quick link chips
+    document.querySelectorAll('.home-quick-chip[data-nav]').forEach(chip => {
+      chip.addEventListener('click', (e) => {
+        e.preventDefault();
+        const nav = chip.dataset.nav;
+        if (nav === 'int' || nav === 'dom' || nav === 'fav') {
+          activateTab(nav);
+        }
+      });
+    });
+
+    // Home sub-tabs
+    if (homeSubtabs) {
+      homeSubtabs.addEventListener('click', (e) => {
+        const btn = e.target.closest('.home-subtab');
+        if (!btn) return;
+        const subtab = btn.dataset.subtab;
+        showHomeSearchResults(subtab);
+      });
+    }
+
     function activateTab(tab, opts = {}) {
-      if (!TAB_PATHS[tab]) tab = 'int';
+      if (!TAB_PATHS[tab]) tab = 'home';
       $$('[data-tab]').forEach(x => x.classList.toggle('active', x.dataset.tab === tab));
       activeTab = tab;
       $$('.tab-panel').forEach(p => p.hidden = p.dataset.panel !== activeTab);
       $$('[data-international]').forEach(el => el.hidden = activeTab !== 'int');
       $$('[data-domestic]').forEach(el => el.hidden = activeTab !== 'dom');
-      // 选刊 tab 隐藏搜索框，保留登录和语言入口
+      // Sidebar: show on int/dom, hide on home/fav/pick
+      const sidebar = $('#sidebar');
+      if (sidebar) sidebar.style.display = (activeTab === 'int' || activeTab === 'dom') ? '' : 'none';
+      // Search box in topbar: hide on home and pick (home has its own search)
       const searchWrap = $('.search-wrap');
       const sideToggle = $('#side-toggle');
-      if (searchWrap) searchWrap.style.display = activeTab === 'pick' ? 'none' : '';
-      if (sideToggle) sideToggle.style.display = activeTab === 'pick' ? 'none' : '';;
+      const showSearch = activeTab !== 'pick' && activeTab !== 'home';
+      if (searchWrap) searchWrap.style.display = showSearch ? '' : 'none';
+      if (sideToggle) sideToggle.style.display = showSearch ? '' : 'none';
+      // Sync home search input with #q when on home tab
+      const homeQ = $('#home-q');
+      if (activeTab === 'home' && homeQ) {
+        homeQ.value = activeQuery || '';
+        homeQ.placeholder = $('#q')?.placeholder || 'Search: journal title / abbr / ISSN';
+      }
+      // Reset home UI state when switching away
+      if (activeTab !== 'home') {
+        const results = $('#home-results');
+        const subtabs = $('#home-subtabs');
+        const hero = $('.home-hero');
+        if (results) results.hidden = true;
+        if (subtabs) subtabs.hidden = true;
+        if (hero) hero.closest('.tab-panel')?.classList.remove('home-tab-has-results');
+      }
       if (!opts.skipPath) {
         const nextPath = TAB_PATHS[activeTab] || '/';
         if (location.pathname !== nextPath) {
@@ -4177,6 +4332,10 @@
       else if (activeTab === 'fav') renderFav();
       else if (activeTab === 'int') renderInt();
       else if (activeTab === 'pick') initPickTool();
+      // Home tab: if there's an active query, show results
+      else if (activeTab === 'home' && activeQuery) {
+        showHomeSearchResults('all');
+      }
     }
     window.__activateJournalTab = activateTab;
     $$('.tab[data-tab]').forEach(b => b.addEventListener('click', (e) => {

@@ -379,6 +379,133 @@ main.main {
   color: #fff;
 }
 
+/* ─────────── Home tab ─────────── */
+.home-hero {
+  text-align: center;
+  padding: 60px 20px 40px;
+}
+.home-title {
+  font-size: 36px;
+  font-weight: 780;
+  letter-spacing: 0.01em;
+  margin: 0 0 8px;
+  color: var(--ink);
+}
+.home-subtitle {
+  font-size: 14px;
+  color: var(--ink-faint);
+  margin: 0 0 36px;
+  letter-spacing: 0.06em;
+}
+.home-search-wrap {
+  position: relative;
+  max-width: 640px;
+  margin: 0 auto;
+}
+.home-search-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  color: var(--ink-faint);
+  pointer-events: none;
+}
+.home-search-input {
+  width: 100%;
+  padding: 16px 20px 16px 48px;
+  font-size: 17px;
+  font-family: var(--sans);
+  border: 2px solid var(--rule);
+  border-radius: 14px;
+  background: rgba(255,255,255,0.85);
+  color: var(--ink);
+  outline: 0;
+  box-shadow: 0 4px 20px rgba(43,42,39,.06);
+  transition: all .2s;
+  -webkit-appearance: none;
+}
+.home-search-input:focus {
+  border-color: var(--accent);
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(180,83,31,0.10), 0 8px 30px rgba(43,42,39,.08);
+}
+.home-quick-links {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 28px;
+}
+.home-quick-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  background: rgba(255,255,255,0.72);
+  border: 1px solid var(--rule);
+  border-radius: 24px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all .15s;
+}
+.home-quick-chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(180,83,31,.04);
+}
+
+/* Sub-tabs for search results */
+.home-subtabs {
+  display: flex;
+  gap: 4px;
+  margin: 0 0 20px;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 0;
+}
+.home-subtab {
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 18px;
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  color: var(--ink-faint);
+  cursor: pointer;
+  transition: all .15s;
+  margin-bottom: -1px;
+}
+.home-subtab:hover { color: var(--ink); }
+.home-subtab.active {
+  color: var(--ink);
+  border-bottom-color: var(--ink);
+}
+.home-results {
+  margin-top: 4px;
+}
+
+/* When showing results on home, tighten the hero */
+.home-tab-has-results .home-hero {
+  padding: 20px 20px 24px;
+}
+.home-tab-has-results .home-title {
+  font-size: 24px;
+}
+.home-tab-has-results .home-subtitle {
+  display: none;
+}
+.home-tab-has-results .home-quick-links {
+  display: none;
+}
+.home-tab-has-results .home-search-wrap {
+  max-width: 100%;
+}
+
 .topbar {
   order: 2;
   display: flex; align-items: center; gap: 16px;
