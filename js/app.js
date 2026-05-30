@@ -4851,6 +4851,7 @@
 
           // Build badges — zone/JCR go in zone-tags above title
           let badgesHtml = '';
+          let flagsHtml = '';
           let zoneTagsHtml = '';
           let zoneColor = '';
           if (e.journalRec) {
@@ -4867,7 +4868,6 @@
             const ccfTxt = r.ccf_2026_type ? `<span class="badge b-ccf">CCF ${r.ccf_2026_type}</span>` : '';
             badgesHtml = [idxBadges, scBadge, eiBdg, ifBdg, ccfTxt].filter(Boolean).join('');
             // Warning & publisher flags
-            let flagsHtml = '';
             const r2 = e.journalRec;
             if (r2) {
               // Warning list
