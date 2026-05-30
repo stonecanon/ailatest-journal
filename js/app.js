@@ -4361,10 +4361,12 @@
 
     function activateTab(tab, opts = {}) {
       if (!TAB_PATHS[tab]) tab = 'home';
-      // ── 切换前：把当前搜索框的值存到 activeQuery ──
+      // ── 切换前：把当前搜索框的值存到 activeQuery（仅非选刊tab）──
       const prevTab = activeTab;
-      const qEl = $('#q');
-      if (qEl) activeQuery = qEl.value;
+      if (prevTab !== 'pick') {
+        const qEl = $('#q');
+        if (qEl) activeQuery = qEl.value;
+      }
 
       $$('[data-tab]').forEach(x => x.classList.toggle('active', x.dataset.tab === tab));
       activeTab = tab;
@@ -4375,8 +4377,14 @@
       const sidebar = $('#sidebar');
       if (sidebar) sidebar.style.display = (activeTab === 'int' || activeTab === 'dom') ? '' : 'none';
       // 统一搜索框 #q：更新 placeholder 和内容
+      const qEl = $('#q');
       if (qEl) {
-        qEl.value = activeQuery || '';
+        // 选刊tab：清空内容，独立于其他tab
+        if (activeTab === 'pick') {
+          qEl.value = '';
+        } else {
+          qEl.value = activeQuery || '';
+        }
         qEl.maxLength = 200;
         if (activeTab === 'pick') {
           qEl.placeholder = T('输入你的论文标题和关键词，如：基于深度学习的室内人数预测', 'Enter your paper title and keywords, e.g.: Deep learning for indoor occupancy estimation');
