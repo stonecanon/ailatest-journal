@@ -2004,6 +2004,9 @@
 
   // ───────── filtering ─────────
   function matches(r) {
+    // When index dropdown is active, let all journals pass — renderInt() handles the actual filter
+    if (activeIdxFilter !== '__all') return true;
+    
     // Index filter: exclude ESI from indices[] check (ESI stored as esi_category)
     // ESI adds another OR condition — journal with esi_category also shows
     const esiActive = activeIndices.has('ESI');
@@ -2184,6 +2187,19 @@
 
   function renderInt() {
     let filtered = journals.filter(matches);
+    // ENSURE: if index dropdown is set, apply it directly as a safety net
+    if (activeIdxFilter !== '__all') {
+      filtered = filtered.filter(r => {
+        if (activeIdxFilter === 'medline') return r.medline;
+        if (activeIdxFilter === 'pubmed') return r.pubmed;
+        if (activeIdxFilter === 'pmc') return r.pmc;
+        if (activeIdxFilter === 'scopus') return r.scopus && r.scopus.active;
+        if (activeIdxFilter === 'oaj') return r.oaj;
+        if (activeIdxFilter === 'doaj') return r.doaj;
+        if (['SCIE','SSCI','AHCI','ESCI','EI'].includes(activeIdxFilter)) return (r.indices||[]).includes(activeIdxFilter);
+        return true;
+      });
+    }
     if (activeQuery) {
       // 按相关性排序
       const q = activeQuery;
