@@ -2013,9 +2013,12 @@
     const bypassIdx = nonWosIdx.includes(activeIdxFilter);
     const matchesAny = bypassIdx || !idxOnly.size || (r.indices || []).some(i => idxOnly.has(i));
     if (!matchesAny && !(esiActive && r.esi_category)) {
-      // When OAJ / DOAJ is checked, OA directory journals bypass the index filter
-      // (allows pure OA directory journals without WoS/EI indices to show)
-      if (!((activeFeats.has('oaj') && r.oaj) || (activeFeats.has('doaj') && r.doaj))) return false;
+      // When OAJ / DOAJ / MEDLINE / PubMed / PMC is checked, those journals bypass the
+      // index filter (allows pure directory-journals without WoS/EI indices to show)
+      if (!((activeFeats.has('oaj') && r.oaj) || (activeFeats.has('doaj') && r.doaj) ||
+            (activeFeats.has('medline') && r.medline) ||
+            (activeFeats.has('pubmed') && r.pubmed) ||
+            (activeFeats.has('pmc') && r.pmc))) return false;
     }
     if (activeZones.size) {
       const zones = new Set();
