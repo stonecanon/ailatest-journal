@@ -521,6 +521,14 @@ main.main {
   border-radius: 6px;
 }
 .fav-header-btn:hover { color: var(--gold, #e6a817); transform: scale(1.12); background: rgba(0,0,0,.03); }
+.fav-header-btn { text-decoration: none; }
+.fav-count-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 16px; height: 16px; padding: 0 4px;
+  border-radius: 8px; background: var(--gold, #e6a817); color: #fff;
+  font-size: 10px; font-weight: 700; line-height: 1;
+  vertical-align: top; margin-left: 2px;
+}
 .lang-toggle,
 .auth-btn {
   font-family: var(--sans); font-size: 12px;

@@ -1056,7 +1056,26 @@
 
   function updateFavCount() {
     const total = allFavIds().size;
-    // count shown in 我的收藏 tab
+    const badge = $('#fav-count-badge');
+    if (badge) {
+      if (total > 0) {
+        badge.textContent = total > 99 ? '99+' : String(total);
+        badge.style.display = 'inline-flex';
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+  }
+
+  function showFavToast(msg) {
+    const old = document.querySelector('.fav-toast');
+    if (old) old.remove();
+    const t = document.createElement('div');
+    t.className = 'fav-toast';
+    t.textContent = msg;
+    document.body.appendChild(t);
+    requestAnimationFrame(() => t.classList.add('show'));
+    setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 1800);
   }
 
   // list 管理
@@ -4400,16 +4419,13 @@
     window.addEventListener('popstate', () => activateTab(tabFromPath(), { skipPath: true }));
 
     // Favorites header button → fav tab
+    // <a> with href="/favorites" so it works even without JS
     const favHeaderBtn = $('#fav-header-btn');
     if (favHeaderBtn) {
       favHeaderBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        try {
-          activateTab('fav');
-        } catch(_) {
-          // fallback: direct navigation
-          window.location.href = '/favorites';
-        }
+        e.stopPropagation();
+        activateTab('fav');
       });
     }
 
