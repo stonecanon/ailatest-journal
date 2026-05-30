@@ -142,12 +142,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <a class="mobile-nav-brand" href="/" aria-label="AILatest Journal"><em>Journal</em><span>.ailatest</span></a>
   </div>
 
-  <!-- Browse subnav (int/dom) — below search, pill style -->
-  <div class="subnav" id="browse-subnav">
-    <button class="subnav-btn" data-tab="int"><span data-i18n="tab_int">国际</span></button>
-    <button class="subnav-btn" data-tab="dom"><span data-i18n="tab_dom">中国</span></button>
-  </div>
-
   <!-- ─── Home tab ─── -->
   <section class="tab-panel" data-panel="home">
     <div class="home-hero">
@@ -155,6 +149,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div class="home-search-wrap">
         <svg class="home-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
         <input id="home-q" type="search" class="home-search-input" data-i18n="search_home_ph" placeholder="搜索期刊名、ISSN…" autocomplete="off" spellcheck="false" />
+      </div>
+      <!-- Browse pills: 国际/中国, below search -->
+      <div class="home-browse-pills">
+        <button class="home-browse-btn" data-tab="int">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="10" cy="10" r="8"/><path d="M2 10h16"/><path d="M10 2c2 2 3 4.5 3 8s-1 6-3 8c-2-2-3-4.5-3-8s1-6 3-8z"/></svg>
+          <span data-i18n="tab_int">国际</span>
+        </button>
+        <button class="home-browse-btn" data-tab="dom">
+          <svg viewBox="0 0 20 16" fill="currentColor" width="16" height="13"><path d="M1 14h18V3H1v11zM0 2h20v13H0V2z"/><path d="M3 4h2v9H3V4zm6 0h2v9H9V4zm6 0h2v9h-2V4z"/><rect x="1" y="2" width="18" height="2" rx="1"/></svg>
+          <span data-i18n="tab_dom">中国</span>
+        </button>
       </div>
     </div>
     <div id="home-results" class="home-results" hidden></div>
