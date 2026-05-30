@@ -1217,7 +1217,7 @@ def main():
             v = r.get(k, '')
             if not v: continue
             bare = v.replace('-', '')
-            if bare in pubmed_only_issns:
+            if bare in pubmed_only_issns or bare in medline_issns:
                 r['pubmed'] = True
                 pubmed_c += 1
                 break

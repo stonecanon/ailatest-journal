@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-30T08:32:35.722Z",
+  "generated_at": "2026-05-30T14:52:36.921Z",
   "source": "remote D1",
   "notes": [
     "注册量来自 users.created_at，当前是最可靠口径。",
@@ -52,7 +52,7 @@
     "total_cn_hint_events": 467,
     "total_cn_hint_visitors": 124,
     "total_cn_hint_sessions": 229,
-    "total_login_events": 22,
+    "total_login_events": 25,
     "latest_pageview_at": 1780108962
   },
   "series": {
@@ -139,7 +139,11 @@
       },
       {
         "day": "2026-05-29",
-        "active_users_proxy": 2
+        "active_users_proxy": 1
+      },
+      {
+        "day": "2026-05-30",
+        "active_users_proxy": 1
       }
     ],
     "loginEventsByDay": [
@@ -177,12 +181,17 @@
         "day": "2026-05-29",
         "login_events": 3,
         "login_users": 2
+      },
+      {
+        "day": "2026-05-30",
+        "login_events": 3,
+        "login_users": 1
       }
     ],
     "loginProviderMix": [
       {
         "provider": "google",
-        "login_events": 10,
+        "login_events": 13,
         "login_users": 2
       },
       {
@@ -911,7 +920,7 @@
         "login": "jiantaoweng",
         "name": "H&S一心菌 (石头小石头)",
         "created_at": 1778766419,
-        "updated_at": 1780088723
+        "updated_at": 1780151927
       },
       {
         "id": 3,
