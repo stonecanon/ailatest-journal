@@ -724,7 +724,7 @@
     return null;
   }
 
-  let activeTab = 'int';
+  let activeTab = 'home';
   const TAB_PATHS = { home: '/', int: '/international', dom: '/china', fav: '/favorites', pick: '/pick' };
   const PATH_TABS = { '/': 'home', '/international': 'int', '/journals': 'int', '/china': 'dom', '/favorites': 'fav', '/pick': 'pick' };
   const TAB_SEO = {

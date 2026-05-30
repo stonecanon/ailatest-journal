@@ -38,7 +38,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- End Google Tag Manager -->
 <link rel="preload" href="/data/journals.json.gz" as="fetch" crossorigin="anonymous" />
 <link rel="preload" href="/data/journal_aliases.json" as="fetch" crossorigin="anonymous" />
-<link rel="stylesheet" href="/css/app.css?v=20260530-54" />
+<link rel="stylesheet" href="/css/app.css?v=20260530-55" />
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json" />
@@ -143,7 +143,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <section class="home-hero" aria-label="AILatest Journal">
     <h1 class="home-title">
       <span class="home-brand-row">
-        <span>Journal <em>AILatest<span class="brand-dot">.</span><span class="brand-org">org</span></em></span>
+        <span>Journal <em><span class="brand-ai">AI</span>Latest<span class="brand-dot">.</span><span class="brand-org">org</span></em></span>
       </span>
       <small data-i18n="home_subtitle">面向科研人员的期刊检索与投稿决策工具</small>
     </h1>
@@ -182,7 +182,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </section>
 
   <!-- ─── International tab ─── -->
-  <section class="tab-panel" data-panel="int">
+  <section class="tab-panel" data-panel="int" hidden>
     <section class="results">
       <div class="results-head">
         <h1 id="results-title" data-i18n="results_all">全部期刊</h1>
@@ -455,7 +455,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <button id="pwa-install" class="pwa-install" hidden data-i18n="pwa_install">📲 安装到主屏</button>
 <script>
 // Build version for cache busting data files
-const __BUILD_VER = 'v20260530-54';
+const __BUILD_VER = 'v20260530-55';
 // Service Worker 清理 — 必须在 app.js 加载前运行
 (function() {
   if ('serviceWorker' in navigator) {
@@ -468,7 +468,7 @@ const __BUILD_VER = 'v20260530-54';
   }
 })();
 </script>
-<script src="/js/app.js?v=20260530-54" defer></script>
+<script src="/js/app.js?v=20260530-55" defer></script>
 <script>
   // Custom install prompt
   let __pwaPrompt = null;
