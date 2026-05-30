@@ -1049,7 +1049,7 @@ table.journals tr:last-child td { border-bottom: 0; }
 .badge.b-esci { background: #6a7a6a; }               /* 低饱和绿 — 次要收录 */
 .badge.b-ei   { background: #7a7a6a; }               /* 低饱和橄榄 — 次要收录 */
 .badge.b-medline { background: #1a5276; }               /* 深蓝 — MEDLINE 精选索引 */
-.badge.b-pubmed  { background: #2e86c1; }               /* 中蓝 — PubMed 全部收录 */
+.badge.b-pubmed  { background: #1a5f91; }               /* 深蓝 — PubMed 全部收录 */
 .badge.b-pmc    { background: #1d6f42; }                /* 绿 — PMC 全文库 */
 .badge.b-esi  { background: #5a5a7a; }               /* 紫灰 — ESI 大类 */
 .badge.b-scopus { background: #8a706a; }              /* 低饱和红褐 — 次要收录 */
