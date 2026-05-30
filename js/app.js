@@ -4446,14 +4446,7 @@
     }));
     window.addEventListener('popstate', () => activateTab(tabFromPath(), { skipPath: true }));
 
-    // Favorites header button → fav tab (hash nav = reliable on all browsers)
-    const favHeaderBtn = $('#fav-header-btn');
-    if (favHeaderBtn) {
-      favHeaderBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        location.hash = '#fav';
-      });
-    }
+    // Favorites header link → <a href="#fav"> works natively, hashchange handled below
 
     // ─── 国内导航 ───
     $('#dom-content')?.addEventListener('click', (e) => {
