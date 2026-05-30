@@ -2563,7 +2563,7 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 }
 .pick-search-input {
   width: 100%;
-  padding: 14px 24px 14px 50px;
+  padding: 14px 24px;
   font-size: 16px;
   font-family: var(--sans);
   border: 2px solid var(--rule);
