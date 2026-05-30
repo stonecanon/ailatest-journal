@@ -2218,7 +2218,14 @@
     }
     $('#results-count').textContent = `${t('showing')} ${visible.length} ${t('of')} ${filtered.length.toLocaleString()} ${t('total_items')}`;
     const dbg = $('#debug-filter');
-    if (dbg) dbg.textContent = `DEBUG: idx=${activeIdxFilter} q="${activeQuery}" feats=[${[...activeFeats].join(',')}] idxSet=[${[...activeIndices].join(',')}] zones=[${[...activeZones].join(',')}] jcr=[${[...activeJcr].join(',')}] filtered=${filtered.length}`;
+    if (dbg) {
+      // Compare matches() vs direct field check for the current idx filter
+      let fieldCheck = -1;
+      if (activeIdxFilter === 'medline') fieldCheck = journals.filter(r => r.medline).length;
+      else if (activeIdxFilter === 'pubmed') fieldCheck = journals.filter(r => r.pubmed).length;
+      else if (activeIdxFilter === 'pmc') fieldCheck = journals.filter(r => r.pmc).length;
+      dbg.textContent = `D: idx=${activeIdxFilter} q="${activeQuery}" feats=[${[...activeFeats].join(',')}] match=${filtered.length} field=${fieldCheck >= 0 ? fieldCheck : '—'}`;
+    }
     const more = $('#more');
     more.hidden = filtered.length <= shown;
   }
