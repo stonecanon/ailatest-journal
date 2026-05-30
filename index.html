@@ -258,8 +258,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div class="pick-action-row">
         <button id="pick-search-btn" class="big-btn primary" data-i18n="pick_search_btn">开始推荐</button>
         <span id="pick-status" class="pick-status muted-cell"></span>
-        <input type="text" id="pick-apikey" class="pick-apikey" placeholder="OpenAlex API Key（可选）">
-        <span id="pick-quota" class="pick-quota muted-cell"></span>
+        <input type="text" id="pick-apikey" class="pick-apikey" data-i18n-placeholder="pick_apikey_ph" placeholder="OpenAlex API Key（可选）">
+        <span id="pick-quota" class="pick-quota muted-cell" data-i18n="pick_quota">由 OpenAlex 开放学术数据驱动 · 填 API Key 获更多额度</span>
       </div>
       <div class="pick-filter-bar">
         <div class="pick-filter-group">
@@ -441,7 +441,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <button id="pwa-install" class="pwa-install" hidden data-i18n="pwa_install">📲 安装到主屏</button>
 <script>
 // Build version for cache busting data files
-const __BUILD_VER = 'v20260530-11';
+const __BUILD_VER = 'v20260530-12';
 // Service Worker 清理 — 必须在 app.js 加载前运行
 (function() {
   if ('serviceWorker' in navigator) {
