@@ -4866,6 +4866,30 @@
             // CCF
             const ccfTxt = r.ccf_2026_type ? `<span class="badge b-ccf">CCF ${r.ccf_2026_type}</span>` : '';
             badgesHtml = [idxBadges, scBadge, eiBdg, ifBdg, ccfTxt].filter(Boolean).join('');
+            // Warning & publisher flags
+            let flagsHtml = '';
+            const r2 = e.journalRec;
+            if (r2) {
+              // Warning list
+              if (r2.warning) {
+                const w = r2.warning;
+                if (typeof w === 'object') {
+                  const arr = Array.isArray(w) ? w : [w];
+                  const latest = arr.reduce((a,b) => (!a || (b.year && b.year > (a.year||0))) ? b : a, null);
+                  const yearStr = latest && latest.year ? latest.year : '';
+                  const levelStr = latest && latest.level ? latest.level : '';
+                  const label = yearStr ? `${yearStr}${levelStr ? '/'+levelStr : ''}` : (levelStr || '⚠');
+                  flagsHtml += `<span class="badge b-warn">⚠ ${escape(label)}</span>`;
+                } else {
+                  flagsHtml += `<span class="badge b-warn">⚠ Warning</span>`;
+                }
+              }
+              // OA publisher badges (MDPI / Frontiers / Hindawi)
+              const pub = (r2.publisher || '').toLowerCase();
+              if (pub.includes('mdpi')) flagsHtml += `<span class="badge b-mdpi">MDPI</span>`;
+              if (pub.includes('frontier')) flagsHtml += `<span class="badge b-frontiers">Frontiers</span>`;
+              if (pub.includes('hindawi')) flagsHtml += `<span class="badge b-hindawi">Hindawi</span>`;
+            }
             // Prominent zone/JCR tags at top of card
             const zTag = e.zone
               ? `<span class="zone z${e.zone}">${e.top ? 'TOP·' : ''}${e.zone}${T('区','')}</span>`
@@ -4906,6 +4930,7 @@
               </div>
             </div>
             ${badgesHtml ? `<div class="pick-badges">${badgesHtml}</div>` : ''}
+            ${flagsHtml ? `<div class="pick-flags">${flagsHtml}</div>` : ''}
             ${(function(){
               const r2 = e.journalRec;
               let txt = '📅 ' + T('审稿周期','Review cycle') + ': ';
