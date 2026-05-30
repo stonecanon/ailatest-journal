@@ -403,6 +403,7 @@ main.main {
   box-shadow: 0 2px 8px rgba(0,0,0,.06);
 }
 .home-browse-btn svg { flex-shrink: 0; }
+.home-browse-btn .browse-icon { font-size: 18px; line-height: 1; }
 
 /* Hide pills when home tab shows results (search active) */
 .home-tab-has-results .home-browse-pills { display: none; }
