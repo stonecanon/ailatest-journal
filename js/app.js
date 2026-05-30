@@ -4369,6 +4369,19 @@
 
     function activateTab(tab, opts = {}) {
       if (!TAB_PATHS[tab]) tab = 'home';
+      // ── 切换前：把当前搜索框的值存到 activeQuery ──
+      const prevTab = activeTab;
+      if (prevTab === 'pick') {
+        const pi = $('#pick-input');
+        if (pi && pi.value) activeQuery = pi.value;
+      } else if (prevTab && prevTab !== 'home') {
+        const q = $('#q');
+        if (q && q.value) activeQuery = q.value;
+      }
+      if (prevTab === 'home') {
+        const hq = $('#home-q');
+        if (hq && hq.value) activeQuery = hq.value;
+      }
       $$('[data-tab]').forEach(x => x.classList.toggle('active', x.dataset.tab === tab));
       activeTab = tab;
       $$('.tab-panel').forEach(p => p.hidden = p.dataset.panel !== activeTab);
@@ -4388,6 +4401,16 @@
       if (activeTab === 'home' && homeQ) {
         homeQ.value = activeQuery || '';
         homeQ.placeholder = $('#q')?.placeholder || 'Search: journal title / abbr / ISSN';
+      }
+      // 切换到选刊：把 activeQuery 填入 pick 搜索框
+      if (activeTab === 'pick') {
+        const pi = $('#pick-input');
+        if (pi && activeQuery) pi.value = activeQuery;
+      }
+      // 切换到 int/dom/fav：把 activeQuery 填入顶栏搜索框
+      if (activeTab !== 'home' && activeTab !== 'pick') {
+        const q = $('#q');
+        if (q && activeQuery) q.value = activeQuery;
       }
       // Reset home UI state when switching away
       if (activeTab !== 'home') {
