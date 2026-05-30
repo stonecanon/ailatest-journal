@@ -246,6 +246,7 @@ main.main {
 .chip.tag-ssci:has(input:checked),
 .chip.tag-ahci:has(input:checked) { background: #1f3a5f; border-color: #1f3a5f; }
 .chip.tag-esci:has(input:checked) { background: #6a7a6a; border-color: #6a7a6a; }
+.chip.tag-esi:has(input:checked) { background: #7a6a8a; border-color: #7a6a8a; color:#fff; }
 .chip.tag-ei:has(input:checked)   { background: #7a7a6a; border-color: #7a7a6a; }
 /* 分区筛选项 — 分区组 */
 .chip.zone-1:has(input:checked),
@@ -701,6 +702,7 @@ table.journals tr:last-child td { border-bottom: 0; }
 .badge.b-ahci { background: #1f3a5f; }              /* 三大索引统一深蓝 */
 .badge.b-esci { background: #6a7a6a; }               /* 低饱和绿 — 次要收录 */
 .badge.b-ei   { background: #7a7a6a; }               /* 低饱和橄榄 — 次要收录 */
+.badge.b-esi  { background: #5a5a7a; }               /* 紫灰 — ESI 大类 */
 .badge.b-scopus { background: #8a706a; }              /* 低饱和红褐 — 次要收录 */
 .badge.b-oaj { background: #5a7a7a; }                 /* 低饱和青 — 次要收录 */
 .badge.b-doaj { background: #6a8a6a; }                /* 低饱和绿 — 次要收录 */

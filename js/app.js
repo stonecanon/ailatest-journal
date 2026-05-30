@@ -51,7 +51,9 @@
       pick_filter_topics: '匹配研究领域 (Topics)',
       pick_filter_if: '限 IF >',
       pick_filter_zone: '中科院分区',
-      pick_filter_scopus: '仅 Scopus 收录',
+      pick_filter_sci: 'SCIE',
+      pick_filter_ssci: 'SSCI',
+      pick_filter_ahci: 'AHCI',
       pick_filter_compre: '排除综合性期刊',
       pick_history: '搜索历史', pick_history_clear: '清空',
       results_all: '全部期刊', load_more: '加载更多',
@@ -109,7 +111,9 @@
       pick_filter_topics: 'Match Topics',
       pick_filter_if: 'IF >',
       pick_filter_zone: 'CAS Zone',
-      pick_filter_scopus: 'Scopus only',
+      pick_filter_sci: 'SCIE',
+      pick_filter_ssci: 'SSCI',
+      pick_filter_ahci: 'AHCI',
       pick_filter_compre: 'Exclude multidisciplinary',
       pick_history: 'Search History', pick_history_clear: 'Clear',
       results_all: 'All journals', load_more: 'Load more',
@@ -1924,7 +1928,12 @@
 
   // ───────── filtering ─────────
   function matches(r) {
-    if (activeIndices.size && !(r.indices || []).some(i => activeIndices.has(i))) {
+    // Index filter: exclude ESI from indices[] check (ESI stored as esi_category)
+    // ESI adds another OR condition — journal with esi_category also shows
+    const esiActive = activeIndices.has('ESI');
+    const idxOnly = new Set([...activeIndices].filter(v => v !== 'ESI'));
+    const matchesAny = !idxOnly.size || (r.indices || []).some(i => idxOnly.has(i));
+    if (!matchesAny && !(esiActive && r.esi_category)) {
       // When OAJ / DOAJ is checked, OA directory journals bypass the index filter
       // (allows pure OA directory journals without WoS/EI indices to show)
       if (!((activeFeats.has('oaj') && r.oaj) || (activeFeats.has('doaj') && r.doaj))) return false;
@@ -4812,8 +4821,19 @@
         if (zoneVal !== 'all') {
           filtered = filtered.filter(e => e.zone != null && String(e.zone) === zoneVal);
         }
-        if (document.getElementById('pick-filter-scopus')?.checked) {
-          filtered = filtered.filter(e => e.journalRec?.scopus);
+        // Index filter: three core indices (SCIE/SSCI/AHCI)
+        const wantSci = document.getElementById('pick-filter-sci')?.checked;
+        const wantSsci = document.getElementById('pick-filter-ssci')?.checked;
+        const wantAhci = document.getElementById('pick-filter-ahci')?.checked;
+        if (wantSci || wantSsci || wantAhci) {
+          filtered = filtered.filter(e => {
+            const idx = e.journalRec?.indices || [];
+            if (!idx.length) return false;
+            if (wantSci && idx.includes('SCIE')) return true;
+            if (wantSsci && idx.includes('SSCI')) return true;
+            if (wantAhci && idx.includes('AHCI')) return true;
+            return false;
+          });
         }
         // Comprehensive journal filter (use wos_categories)
         if (document.getElementById('pick-filter-comprehensive')?.checked) {
