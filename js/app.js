@@ -3097,7 +3097,7 @@
     if (!id) return null;
     if (Array.isArray(journals)) {
       for (const r of journals) {
-        if (favId(r) === id) {
+        if (favId(r) === id || r.slug === id) {
           const rr = Object.assign({}, r);
           if (!rr.__src) rr.__src = 'int';
           return rr;

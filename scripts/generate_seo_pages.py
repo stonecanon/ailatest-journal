@@ -24,8 +24,11 @@ def load_journals():
         return json.loads(gzip.decompress(f.read()))
 
 def make_slug(r):
-    """Stable slug: ISSN if available, else fallback."""
-    return (r.get('issn') or r.get('eissn') or '').strip()
+    """SEO-friendly slug: journal name if available, else ISSN."""
+    s = r.get('slug', '').strip()
+    if s:
+        return s
+    return (r.get('issn') or r.get('eissn') or '').replace('-', '').strip()
 
 def escape(s):
     if s is None: return ''
@@ -212,8 +215,15 @@ def generate_all():
             'z': r.get('cas_zone'),
             'ix': (r.get('indices') or [])[:3],
             'p': r.get('publisher') or '',
+            'sl': slug,
         }
+        # Primary key: name-based slug
         index[slug] = entry
+        # Also add ISSN-based entries for 301 redirects
+        for issn_key in ('i', 'is'):
+            v = entry.get(issn_key, '').replace('-', '')
+            if v and v not in index:
+                index[v] = {'_r': slug}
     
     INDEX_FILE = DATA_DIR / 'journal_index.json'
     with open(INDEX_FILE, 'w', encoding='utf-8') as f:

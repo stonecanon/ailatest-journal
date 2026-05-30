@@ -1231,6 +1231,34 @@ def main():
                 break
     print(f'  MEDLINE: {medline_c}  PubMed (broader): {pubmed_c}  PMC: {pmc_c}')
 
+    # ────── Generate SEO slugs ──────
+    import re
+    slug_counts = {}
+    first_run = True
+    for r in journals:
+        name = r.get('name') or r.get('cn_name') or r.get('en_name') or ''
+        if not name:
+            r['slug'] = (r.get('issn') or r.get('eissn') or 'j').replace('-', '')
+            continue
+        # Generate slug: lowercase, keep CJK/letters/digits/hyphens, collapse whitespace
+        slug = name.lower().strip()
+        slug = re.sub(r'[^a-z0-9\u4e00-\u9fff\-]+', '-', slug)
+        slug = re.sub(r'-+', '-', slug).strip('-')
+        slug = slug[:60].rstrip('-')
+        if not slug:
+            slug = (r.get('issn') or r.get('eissn') or 'j').replace('-', '')
+        # Deduplicate
+        if slug in slug_counts:
+            slug_counts[slug] += 1
+            issn_part = (r.get('issn') or r.get('eissn') or str(slug_counts[slug])).replace('-', '')
+            slug = slug[:50].rstrip('-') + '-' + issn_part
+        else:
+            slug_counts[slug] = 1
+        r['slug'] = slug
+    slug_count = len(set(r.get('slug', '') for r in journals))
+    deduped = sum(1 for c in slug_counts.values() if c > 1)
+    print(f'  Slugs: {slug_count} unique, {deduped} with dedup suffix')
+
     # stats
     idx_c = Counter()
     for r in journals:
