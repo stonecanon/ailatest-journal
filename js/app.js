@@ -4731,6 +4731,8 @@
     const quotaEl = $('#pick-quota');
     const charCount = $('#pick-char-count');
     quotaEl.textContent = T('由 OpenAlex 开放学术数据驱动 · 填 API Key 获更多额度','Powered by OpenAlex · add API key for more credits');
+    const apikey = $('#pick-apikey');
+    if (apikey) apikey.placeholder = T('OpenAlex API Key（可选）','OpenAlex API Key (optional)');
 
     function updatePickCharCount() {
       if (!input || !charCount) return;
@@ -5380,6 +5382,8 @@
   function refreshPickI18n() {
     const quotaEl = $('#pick-quota');
     if (quotaEl) quotaEl.textContent = T('由 OpenAlex 开放学术数据驱动 · 填 API Key 获更多额度','Powered by OpenAlex · add API key for more credits');
+    const apikey = $('#pick-apikey');
+    if (apikey) apikey.placeholder = T('OpenAlex API Key（可选）','OpenAlex API Key (optional)');
   }
 
   boot();
