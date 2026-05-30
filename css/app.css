@@ -16,8 +16,8 @@
   --gold:           #a07a2a;
   --crimson:        #7a2020;
   --tag-scie:       #1f3a5f;
-  --tag-ssci:       #5b3e1c;
-  --tag-ahci:       #5a2b3b;
+  --tag-ssci:       #735a3e;
+  --tag-ahci:       #724a58;
   --tag-esci:       #3b4f3b;
   --tag-ei:         #6b4a1f;
 
@@ -252,13 +252,13 @@ main.main {
 .chip.zone-2:has(input:checked),
 .chip.zone-3:has(input:checked),
 .chip.zone-4:has(input:checked),
-.chip.zone-top:has(input:checked) { background: #5b3e1c; border-color: #5b3e1c; color: #fff; }
+.chip.zone-top:has(input:checked) { background: #735a3e; border-color: #735a3e; color: #fff; }
 /* 新锐分区 — 同分区组 */
 .chip.xr-1:has(input:checked),
 .chip.xr-2:has(input:checked),
 .chip.xr-3:has(input:checked),
 .chip.xr-4:has(input:checked),
-.chip.xr-top:has(input:checked) { background: #5b3e1c; border-color: #5b3e1c; color: #fff; }
+.chip.xr-top:has(input:checked) { background: #735a3e; border-color: #735a3e; color: #fff; }
 /* domestic source chips */
 .chip.ds-chip-cssci:has(input:checked) { background: #b33c6e; border-color: #b33c6e; }
 .chip.ds-chip-cssci-ext:has(input:checked) { background: #b33c6e; border-color: #b33c6e; opacity: 0.75; }
@@ -1077,7 +1077,7 @@ body.share-mode main.main { max-width: 760px; margin: 0 auto; padding: 28px 20px
   border-radius: 2px;
   border: 0;
   color: #fff;
-  background: #5b3e1c; /* 分区组：CAS/JCR/新锐/IF/旗舰 用琥珀 */
+  background: #735a3e; /* 分区组：CAS/JCR/新锐/IF/旗舰 用琥珀 */
 }
 /* ABDC/ABS 商科组使用酒红 */
 .abdc-pill,
@@ -1085,11 +1085,11 @@ body.share-mode main.main { max-width: 760px; margin: 0 auto; padding: 28px 20px
 .zone.abs-g4,
 .zone.abs-g3,
 .zone.abs-g2,
-.zone.abs-g1 { background: #5a2b3b; }
+.zone.abs-g1 { background: #724a58; }
 /* 科协组使用钢蓝灰 */
-.tier-pill { background: #5a6f8a; }
+.tier-pill { background: #72849b; }
 /* CCF 使用紫灰 */
-.ccf-pill { background: #5a5a7a; }
+.ccf-pill { background: #72728d; }
 .zone sup { font-size: 8px; font-weight: 400; opacity: 0.8; }
 
 /* IF 评级 — 同分区组 */
@@ -1098,7 +1098,7 @@ body.share-mode main.main { max-width: 760px; margin: 0 auto; padding: 28px 20px
   padding: 2px 7px;
   font-family: var(--sans);
   font-size: 10.5px; font-weight: 700;
-  background: #5b3e1c;
+  background: #735a3e;
   color: #fff;
   border-radius: 2px;
   letter-spacing: 0.04em;
@@ -1109,7 +1109,7 @@ body.share-mode main.main { max-width: 760px; margin: 0 auto; padding: 28px 20px
   padding: 2px 6px;
   font-family: var(--sans);
   font-size: 10.5px; font-weight: 700;
-  background: #5a5a7a;
+  background: #72728d;
   color: #fff;
   border-radius: 2px;
   border: 0;
@@ -1121,7 +1121,7 @@ body.share-mode main.main { max-width: 760px; margin: 0 auto; padding: 28px 20px
   padding: 2px 6px;
   font-family: var(--sans);
   font-size: 10.5px; font-weight: 700;
-  background: #5a2b3b;
+  background: #724a58;
   color: #fff;
   border: 0;
   border-radius: 2px;
@@ -1132,7 +1132,7 @@ body.share-mode main.main { max-width: 760px; margin: 0 auto; padding: 28px 20px
   padding: 2px 7px;
   font-family: var(--sans);
   font-size: 10.5px; font-weight: 700;
-  background: #5a6f8a;
+  background: #72849b;
   color: #fff;
   border-radius: 2px;
   letter-spacing: 0.04em;
@@ -1149,7 +1149,7 @@ body.share-mode main.main { max-width: 760px; margin: 0 auto; padding: 28px 20px
   border: 0;
   color: #fff;
   letter-spacing: 0.04em;
-  background: #5b3e1c;
+  background: #735a3e;
 }
 
 /* Nature / Science / Cell 旗舰徽章 — 同分区组 */
@@ -1161,7 +1161,7 @@ body.share-mode main.main { max-width: 760px; margin: 0 auto; padding: 28px 20px
   border-radius: 2px;
   letter-spacing: 0.04em;
   border: 0;
-  background: #5b3e1c;
+  background: #735a3e;
   color: #fff;
 }
 .jname-flagship { color: #9b7414; }
@@ -1181,7 +1181,7 @@ body.share-mode main.main { max-width: 760px; margin: 0 auto; padding: 28px 20px
   border-radius: 2px;
   color: #fff;
   vertical-align: 1px;
-  background: #5a6f8a;
+  background: #72849b;
 }
 
 .warn-pill {
