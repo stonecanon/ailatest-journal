@@ -2050,6 +2050,9 @@
     if (activeFeats.has('scopus') && !(r.scopus && r.scopus.active)) return false;
     if (activeFeats.has('oaj') && !r.oaj) return false;
     if (activeFeats.has('doaj') && !r.doaj) return false;
+    if (activeFeats.has('medline') && !r.medline) return false;
+    if (activeFeats.has('pubmed') && !r.pubmed) return false;
+    if (activeFeats.has('pmc') && !r.pmc) return false;
     if (activeFeats.has('warning') && !r.warning) return false;
     if (activeFeats.has('abdc') && !(r.abdc && r.abdc.rating)) return false;
     if (activeFeats.has('abs')  && !(r.abs  && r.abs.rating))  return false;
