@@ -1169,7 +1169,7 @@ body.share-mode main.main { max-width: 760px; margin: 0 auto; padding: 28px 20px
   background: linear-gradient(to right, rgba(201,162,39,0.06), transparent 40%);
 }
 
-/* cnkx 大类 summary 上的 T1/T2/T3 计数迷你徽章 */
+/* cnkx 大类 summary 上的 T1/T2/T3 计数迷你徽章 — 同科协组钢蓝灰 */
 .tier-mini {
   display: inline-block;
   margin-left: 6px;
@@ -1181,14 +1181,8 @@ body.share-mode main.main { max-width: 760px; margin: 0 auto; padding: 28px 20px
   border-radius: 2px;
   color: #fff;
   vertical-align: 1px;
+  background: #5a6f8a;
 }
-.tier-mini.t1 { background: #8b1a1a; }
-.tier-mini.t2 { background: #b47a1e; }
-.tier-mini.t3 { background: #4a6741; }
-.tier-mini.ta-a { background: #8b1a1a; }
-.tier-mini.ta-b { background: #b47a1e; }
-.tier-mini.ta-c { background: #4a6741; }
-.tier-mini.ta-d { background: #6b5d52; }
 
 .warn-pill {
   display: inline-block;
