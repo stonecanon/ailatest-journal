@@ -241,10 +241,10 @@ main.main {
   color: var(--paper);
   border-color: var(--ink);
 }
-/* 索引侧边栏已选状态：三大索引保留原色，次要索引低调 */
-.chip.tag-scie:has(input:checked) { background: var(--tag-scie); border-color: var(--tag-scie); }
-.chip.tag-ssci:has(input:checked) { background: var(--tag-ssci); border-color: var(--tag-ssci); }
-.chip.tag-ahci:has(input:checked) { background: var(--tag-ahci); border-color: var(--tag-ahci); }
+/* 索引侧边栏已选状态：三大索引统一深蓝，次要索引低调 */
+.chip.tag-scie:has(input:checked),
+.chip.tag-ssci:has(input:checked),
+.chip.tag-ahci:has(input:checked) { background: #1f3a5f; border-color: #1f3a5f; }
 .chip.tag-esci:has(input:checked) { background: #6a7a6a; border-color: #6a7a6a; }
 .chip.tag-ei:has(input:checked)   { background: #7a7a6a; border-color: #7a7a6a; }
 /* 分区筛选项 — 分区组 */
@@ -252,13 +252,13 @@ main.main {
 .chip.zone-2:has(input:checked),
 .chip.zone-3:has(input:checked),
 .chip.zone-4:has(input:checked),
-.chip.zone-top:has(input:checked) { background: #4a7a7a; border-color: #4a7a7a; color: #fff; }
+.chip.zone-top:has(input:checked) { background: #5b3e1c; border-color: #5b3e1c; color: #fff; }
 /* 新锐分区 — 同分区组 */
 .chip.xr-1:has(input:checked),
 .chip.xr-2:has(input:checked),
 .chip.xr-3:has(input:checked),
 .chip.xr-4:has(input:checked),
-.chip.xr-top:has(input:checked) { background: #4a7a7a; border-color: #4a7a7a; color: #fff; }
+.chip.xr-top:has(input:checked) { background: #5b3e1c; border-color: #5b3e1c; color: #fff; }
 /* domestic source chips */
 .chip.ds-chip-cssci:has(input:checked) { background: #b33c6e; border-color: #b33c6e; }
 .chip.ds-chip-cssci-ext:has(input:checked) { background: #b33c6e; border-color: #b33c6e; opacity: 0.75; }
@@ -696,9 +696,9 @@ table.journals tr:last-child td { border-bottom: 0; }
   white-space: nowrap;
   color: #fff;
 }
-.badge.b-scie { background: var(--tag-scie); }      /* 深蓝 — 三大索引 */
-.badge.b-ssci { background: var(--tag-ssci); }      /* 琥珀 — 三大索引 */
-.badge.b-ahci { background: var(--tag-ahci); }      /* 酒红 — 三大索引 */
+.badge.b-scie,
+.badge.b-ssci,
+.badge.b-ahci { background: #1f3a5f; }              /* 三大索引统一深蓝 */
 .badge.b-esci { background: #6a7a6a; }               /* 低饱和绿 — 次要收录 */
 .badge.b-ei   { background: #7a7a6a; }               /* 低饱和橄榄 — 次要收录 */
 .badge.b-scopus { background: #8a706a; }              /* 低饱和红褐 — 次要收录 */
@@ -1077,15 +1077,15 @@ body.share-mode main.main { max-width: 760px; margin: 0 auto; padding: 28px 20px
   border-radius: 2px;
   border: 0;
   color: #fff;
-  background: #4a7a7a; /* 分区组：CAS/JCR/新锐/IF/旗舰 用清透teal */
+  background: #5b3e1c; /* 分区组：CAS/JCR/新锐/IF/旗舰 用琥珀 */
 }
-/* ABDC/ABS 商科组使用暖灰褐 */
+/* ABDC/ABS 商科组使用酒红 */
 .abdc-pill,
 .zone.abs-g4s,
 .zone.abs-g4,
 .zone.abs-g3,
 .zone.abs-g2,
-.zone.abs-g1 { background: #7a6f5a; }
+.zone.abs-g1 { background: #5a2b3b; }
 /* 科协组使用钢蓝灰 */
 .tier-pill { background: #5a6f8a; }
 /* CCF 使用紫灰 */
@@ -1098,7 +1098,7 @@ body.share-mode main.main { max-width: 760px; margin: 0 auto; padding: 28px 20px
   padding: 2px 7px;
   font-family: var(--sans);
   font-size: 10.5px; font-weight: 700;
-  background: #4a7a7a;
+  background: #5b3e1c;
   color: #fff;
   border-radius: 2px;
   letter-spacing: 0.04em;
@@ -1121,7 +1121,7 @@ body.share-mode main.main { max-width: 760px; margin: 0 auto; padding: 28px 20px
   padding: 2px 6px;
   font-family: var(--sans);
   font-size: 10.5px; font-weight: 700;
-  background: #7a6f5a;
+  background: #5a2b3b;
   color: #fff;
   border: 0;
   border-radius: 2px;
@@ -1149,7 +1149,7 @@ body.share-mode main.main { max-width: 760px; margin: 0 auto; padding: 28px 20px
   border: 0;
   color: #fff;
   letter-spacing: 0.04em;
-  background: #4a7a7a;
+  background: #5b3e1c;
 }
 
 /* Nature / Science / Cell 旗舰徽章 — 同分区组 */
@@ -1161,7 +1161,7 @@ body.share-mode main.main { max-width: 760px; margin: 0 auto; padding: 28px 20px
   border-radius: 2px;
   letter-spacing: 0.04em;
   border: 0;
-  background: #4a7a7a;
+  background: #5b3e1c;
   color: #fff;
 }
 .jname-flagship { color: #9b7414; }
@@ -2437,11 +2437,11 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   background: #6b5d52; color: #fff;
   font-size: 11.5px; font-weight: 700; letter-spacing: 0.04em; font-family: var(--sans);
 }
-.jcard-idx.idx-scie { background: var(--tag-scie); }
-.jcard-idx.idx-ssci { background: var(--tag-ssci); }
-.jcard-idx.idx-ahci { background: var(--tag-ahci); }
-.jcard-idx.idx-esci { background: var(--tag-esci); }
-.jcard-idx.idx-ei { background: var(--tag-ei); }
+.jcard-idx.idx-scie,
+.jcard-idx.idx-ssci,
+.jcard-idx.idx-ahci { background: #1f3a5f; }
+.jcard-idx.idx-esci { background: #6a7a6a; }
+.jcard-idx.idx-ei { background: #7a7a6a; }
 .jcard-idx.idx-scopus { background: #b8341a; }
 /* Pick-for-me coming-soon */
 /* Pick-for-me tool */
