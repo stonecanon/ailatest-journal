@@ -2548,36 +2548,12 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .jcard-idx.idx-esci { background: #6a7a6a; }
 .jcard-idx.idx-ei { background: #7a7a6a; }
 .jcard-idx.idx-scopus { background: #b8341a; }
-/* Pick-for-me coming-soon */
 /* Pick-for-me tool */
 .pick-tool { max-width:800px; margin:0 auto; padding:0 16px 40px; display:flex; flex-direction:column; }
 .pick-history { order:2; }
 .pick-results { order:3; }
 
-/* Pick hero (match home-hero style) */
-.pick-hero {
-  text-align: center;
-  padding: 24px 20px 16px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-}
-.pick-hero-title {
-  font-size: 24px;
-  font-weight: 750;
-  margin: 0 0 4px;
-  color: var(--ink);
-  line-height: 1.35;
-}
-.pick-hero-sub {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--ink-faint);
-  margin: 0 0 16px;
-}
-
-/* Search box — matches home-search-input style */
+/* Search box */
 .pick-search-wrap {
   position: relative;
   max-width: 680px;
@@ -2596,23 +2572,23 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 }
 .pick-search-input {
   width: 100%;
-  padding: 14px 24px;
-  font-size: 16px;
+  padding: 12px 16px;
+  font-size: 15px;
   font-family: var(--sans);
-  border: 2px solid var(--rule);
-  border-radius: 14px;
-  background: rgba(255,255,255,0.85);
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.72);
   color: var(--ink);
   outline: 0;
-  box-shadow: 0 4px 20px rgba(43,42,39,.06);
-  transition: all .2s;
+  box-shadow: inset 0 1px 2px rgba(43,42,39,.04), 0 10px 24px rgba(43,42,39,.07);
+  transition: all .15s;
   -webkit-appearance: none;
   box-sizing: border-box;
 }
 .pick-search-input:focus {
   border-color: var(--accent);
-  background: #fff;
-  box-shadow: 0 0 0 4px rgba(180,83,31,0.10), 0 8px 30px rgba(43,42,39,.08);
+  background: var(--paper);
+  box-shadow: inset 0 1px 2px rgba(43,42,39,.04), 0 0 0 3px rgba(180,83,31,0.10), 0 12px 28px rgba(43,42,39,.09);
 }
 .pick-input-meta {
   display: flex;
