@@ -4386,6 +4386,14 @@
           qEl.placeholder = 'Search: journal title / abbr / ISSN';
         }
       }
+      // 选刊搜索提示标签
+      const searchLabel = $('#search-label');
+      if (searchLabel) {
+        searchLabel.hidden = activeTab !== 'pick';
+        if (activeTab === 'pick') {
+          searchLabel.textContent = '📝 ' + T('输入你的论文标题和关键词', 'Enter your paper title and keywords');
+        }
+      }
       // Reset home UI state when switching away
       if (activeTab !== 'home') {
         const results = $('#home-results');

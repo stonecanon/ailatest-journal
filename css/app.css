@@ -455,9 +455,19 @@ main.main {
 
 .topbar {
   order: 2;
-  display: flex; align-items: center; gap: 16px;
-  margin-bottom: 24px;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 16px;
+  margin-bottom: 16px;
 }
+.search-label {
+  flex: 0 0 100%;
+  order: -1;
+  font-size: 13px;
+  color: var(--ink-faint);
+  font-weight: 500;
+  margin-bottom: -8px;
+  padding-left: 2px;
+}
+.search-label[hidden] { display: none; }
 .search-wrap { flex: 1; position: relative; display: flex; }
 .search-wrap input {
   width: 100%;
