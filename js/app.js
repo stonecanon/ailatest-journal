@@ -4402,8 +4402,14 @@
     // Favorites header button → fav tab
     const favHeaderBtn = $('#fav-header-btn');
     if (favHeaderBtn) {
-      favHeaderBtn.addEventListener('click', () => {
-        activateTab('fav');
+      favHeaderBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        try {
+          activateTab('fav');
+        } catch(_) {
+          // fallback: direct navigation
+          window.location.href = '/favorites';
+        }
       });
     }
 
