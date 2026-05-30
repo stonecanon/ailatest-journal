@@ -194,6 +194,32 @@ def generate_all():
     
     SITEMAP.write_text('\n'.join(xml_parts) + '\n', encoding='utf-8')
     
+    # Also write a compact journal index for the Pages Function
+    print('Writing journal index for Pages Function...')
+    index = {}
+    for r in journals:
+        slug = make_slug(r)
+        if not slug:
+            continue
+        entry = {
+            'n': r.get('name') or r.get('cn_name') or r.get('en_name') or '',
+            'c': r.get('cn_name') or '',
+            'e': r.get('en_name') or '',
+            'i': r.get('issn') or '',
+            'is': r.get('eissn') or '',
+            'f': r.get('if_2024'),
+            'q': r.get('if_quartile') or '',
+            'z': r.get('cas_zone'),
+            'ix': (r.get('indices') or [])[:3],
+            'p': r.get('publisher') or '',
+        }
+        index[slug] = entry
+    
+    INDEX_FILE = DATA_DIR / 'journal_index.json'
+    with open(INDEX_FILE, 'w', encoding='utf-8') as f:
+        json.dump(index, f, ensure_ascii=False)
+    print(f'Journal index: {INDEX_FILE.stat().st_size / 1024:.1f} KB ({len(index)} entries)')
+    
     mode = 'sitemap only' if sitemap_only else 'pages + sitemap'
     print(f'\nDone ({mode}): {count} pages generated, {errors} skipped (no ISSN), sitemap written')
     print(f'Sitemap size: {SITEMAP.stat().st_size / 1024:.1f} KB')
