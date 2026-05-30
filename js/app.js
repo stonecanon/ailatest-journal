@@ -46,6 +46,7 @@
       hero_title_pick: '帮我选刊',
       hero_body_pick: '采用自研大模型算法，深度分析你的研究主题与海量期刊数据的匹配度，智能推荐最合适的目标期刊。每人每天免费使用 5 次。',
       pick_placeholder: '输入论文标题、摘要或关键词… 例如：indoor air quality occupancy estimation machine learning',
+      pick_hero_sub: '输入论文标题、摘要或关键词，智能匹配目标期刊',
       pick_search_btn: '开始推荐',
       pick_filter_topics: '匹配研究领域 (Topics)',
       pick_filter_if: '限 IF >',
@@ -64,6 +65,8 @@
       search_int: '搜索：期刊全称 / 官方缩写 / 社群缩写 / ISSN / 中文刊名',
       search_dom: '搜索：刊名 / ISSN / CN 号（跨库搜索）',
       search_fav: '搜索收藏：期刊 / 缩写 / ISSN',
+      search_home_ph: '搜索期刊名、ISSN…',
+      home_subtitle: '面向科研人员的期刊检索与投稿决策工具',
       showing: '显示', of: '条 / 共', total_items: '条',
       empty: '未找到匹配的期刊',
       empty_fav: '还没有收藏。切到「国际 SCI/SSCI」点任意一行右边的 ★ 就能收藏。',
@@ -104,7 +107,8 @@
       hero_body_fav: 'Click the <b>★</b> on any row to bookmark. Saved locally when signed-out; syncs to the cloud when signed-in.',
       hero_title_pick: 'Pick for me',
       hero_body_pick: 'Powered by proprietary large-model algorithm — intelligently matches your research topic against millions of journal data points to recommend the best target journals. 5 free searches per day per user.',
-      pick_placeholder: 'Enter paper title, abstract or keywords... e.g. indoor air quality occupancy estimation machine learning',
+      pick_placeholder: 'Enter your paper title, abstract or keywords… e.g. indoor air quality occupancy estimation machine learning',
+      pick_hero_sub: 'Enter title, abstract, or keywords — AI will match target journals',
       pick_search_btn: 'Start',
       pick_filter_topics: 'Match Topics',
       pick_filter_if: 'IF >',
@@ -123,6 +127,8 @@
       search_int: 'Search: title / abbr / acronym / ISSN / Chinese name',
       search_dom: 'Search: title / ISSN / CN (cross-source)',
       search_fav: 'Search favorites: title / acronym / ISSN',
+      search_home_ph: 'Search journal name, ISSN…',
+      home_subtitle: 'Journal search & submission decision tool for researchers',
       showing: 'Showing', of: 'of', total_items: '',
       empty: 'No journals match.',
       empty_fav: 'No favorites yet. Switch to Int’l SCI/SSCI and click ★ on any row to bookmark.',
@@ -153,7 +159,9 @@
     hero_body_fav: '點擊任一期刊右側的 <b>★</b> 可加入收藏。未登入時保存在本機 localStorage；登入後自動同步到雲端。',
     hero_body_pick: '敬請期待。這裡將根據你的研究主題、影響因子區間、審稿週期、版面費、收錄索引等條件推薦目標期刊。未來更新。',
     pick_coming_title: '敬請期待', pick_coming_desc: '未來更新', results_all: '全部期刊', load_more: '載入更多',
-    col_name: '期刊 Title', col_abbr: '縮寫 Abbr', col_badges: '索引 / 分區', search_int: '搜尋：期刊全稱 / 官方縮寫 / ISSN / 中文刊名', search_dom: '搜尋：中文刊名 / 英文刊名 / ISSN / CN 號', search_fav: '搜尋收藏：期刊 / 縮寫 / ISSN', showing: '顯示', of: '條 / 共', total_items: '條', empty: '未找到匹配的期刊', login: '登入', logout: '登出', fav_added: '已收藏', fav_removed: '已移除', syncing: '同步中…', synced: '已同步', wos_subjects: 'WoS 細分學科', wos_search_ph: '篩選學科（A-Z）…', wos_clear_title: '清空選擇'
+    col_name: '期刊 Title', col_abbr: '縮寫 Abbr', col_badges: '索引 / 分區', search_int: '搜尋：期刊全稱 / 官方縮寫 / ISSN / 中文刊名', search_dom: '搜尋：中文刊名 / 英文刊名 / ISSN / CN 號', search_fav: '搜尋收藏：期刊 / 縮寫 / ISSN',
+      search_home_ph: '搜尋期刊名、ISSN…',
+      home_subtitle: '面向科研人員的期刊檢索與投稿決策工具', showing: '顯示', of: '條 / 共', total_items: '條', empty: '未找到匹配的期刊', login: '登入', logout: '登出', fav_added: '已收藏', fav_removed: '已移除', syncing: '同步中…', synced: '已同步', wos_subjects: 'WoS 細分學科', wos_search_ph: '篩選學科（A-Z）…', wos_clear_title: '清空選擇'
   };
   Object.assign(I18N, {
     ja: {
@@ -4159,7 +4167,7 @@
       }
     });
 
-    /* ───────── Home tab: search + quick links ───────── */
+    /* ───────── Home tab: auto-detect search ───────── */
     const homeQ = $('#home-q');
     const homeResults = $('#home-results');
     const homePanel = $('.tab-panel[data-panel="home"]');
@@ -4177,55 +4185,129 @@
 
     function renderHomeIntResults() {
       if (!homeResults) return;
-      let filtered = journals.filter(matches);
-      if (activeQuery) {
-        const q = activeQuery;
-        filtered = filtered
-          .map(r => ({ r, s: scoreRecord(r, q) }))
-          .sort((a, b) => {
-            if (b.s !== a.s) return b.s - a.s;
-            const fa = a.r.flagship ? 1 : 0;
-            const fb = b.r.flagship ? 1 : 0;
-            if (fa !== fb) return fb - fa;
-            const ifa = a.r.if_2024 ?? -1;
-            const ifb = b.r.if_2024 ?? -1;
-            if (ifa !== ifb) return ifb - ifa;
-            return (a.r.name||'').localeCompare(b.r.name||'');
-          })
-          .map(x => x.r);
-      }
-      filtered = sortByIF(filtered, intIfSort);
-      const visible = filtered.slice(0, shown);
-      const total = filtered.length;
+      const q = activeQuery ? activeQuery.toLowerCase() : '';
+      if (!q) { homeResults.innerHTML = ''; return; }
+      const matchTxt = (...parts) => parts.filter(Boolean).join(' ').toLowerCase().includes(q);
 
-      if (!visible.length) {
+      // Auto-detect: if query has Chinese characters, prioritize domestic
+      const hasChinese = /[\u4e00-\u9fff]/.test(q);
+      const intLimit = hasChinese ? 15 : 30;
+      const domLimit = hasChinese ? 30 : 10;
+
+      let totalCount = 0;
+      let sections = [];
+
+      // ── International results ──
+      let intFiltered = journals.filter(matches);
+      intFiltered = intFiltered
+        .map(r => ({ r, s: scoreRecord(r, q) }))
+        .sort((a, b) => {
+          if (b.s !== a.s) return b.s - a.s;
+          const fa = a.r.flagship ? 1 : 0;
+          const fb = b.r.flagship ? 1 : 0;
+          if (fa !== fb) return fb - fa;
+          const ifa = a.r.if_2024 ?? -1;
+          const ifb = b.r.if_2024 ?? -1;
+          if (ifa !== ifb) return ifb - ifa;
+          return (a.r.name||'').localeCompare(b.r.name||'');
+        })
+        .map(x => x.r);
+      intFiltered = sortByIF(intFiltered, intIfSort);
+      const intCount = intFiltered.length;
+
+      if (intCount) {
+        sections.push({
+          label: T('国际期刊','International Journals'),
+          html: intFiltered.slice(0, intLimit).map(renderRow).join(''),
+          count: intCount
+        });
+        totalCount += intCount;
+      }
+
+      // ── Domestic results ──
+      let domCount = 0;
+      let domHtml = '';
+      if (domestic) {
+        const allDomestic = [];
+        for (const key of ['cnkx', 'cnki_major', 'zju']) {
+          const src = domestic[key];
+          if (src && src.records) {
+            for (const r of src.records) {
+              if (matchTxt(r.name, r.issn, r.cn_code, r.en_name)) {
+                allDomestic.push({ ...r, __src: key });
+              }
+            }
+          }
+        }
+        domCount = allDomestic.length;
+        if (domCount) {
+          domHtml = allDomestic.slice(0, domLimit).map(r => {
+            const fid = favId(r);
+            rowRecordsByFid[fid] = { ...r, __src: r.__src };
+            const name = r.name || r.cn_name || '';
+            const cnName = r.en_name ? `<span class="jname-cn">${escape(titleCase(r.en_name))}</span>` : '';
+            const crossBadges = renderDomCrossBadges({ name, issn: r.issn, cn_code: r.cn_code }, r.__src);
+            return `<tr data-fid="${escape(fid)}" class="j-row clickable" data-src="${escape(r.__src)}">
+              <td class="col-fav">${starBtn(r, r.__src)}</td>
+              <td class="jname" style="font-size:13.5px">${escape(titleCase(name.replace(/\*$/,'')))}${cnName}</td>
+              <td class="col-cross"><div class="badges">${crossBadges}</div></td>
+              <td colspan="2" class="muted-cell">${T('国内来源','Domestic Source')}</td>
+            </tr>`;
+          }).join('');
+        }
+      }
+
+      // Order sections: Chinese query → domestic first, English query → int first
+      if (hasChinese) {
+        if (domCount) {
+          sections.unshift({
+            label: T('国内期刊','Domestic Journals'),
+            html: domHtml,
+            count: domCount
+          });
+          totalCount += domCount;
+        }
+      } else {
+        if (domCount) {
+          sections.push({
+            label: T('国内期刊','Domestic Journals'),
+            html: domHtml,
+            count: domCount
+          });
+          totalCount += domCount;
+        }
+      }
+
+      if (!sections.length) {
         homeResults.innerHTML = `<div class="empty-state">${t('empty')}</div>`;
         return;
       }
 
-      // Build table — same columns as int tab for consistent spacing
       let html = `<div class="results-head" style="margin-bottom:8px">
-        <span class="results-count">${t('showing')} ${visible.length} ${t('of')} ${total.toLocaleString()} ${t('total_items')}</span>
-      </div>
-      <div class="table-wrap"><table class="journals"><thead><tr>
-        <th class="col-fav"></th>
-        <th class="col-name">${t('col_name')}</th>
-        <th class="col-badge">${t('col_index')}</th>
-        <th class="col-if">IF <span class="sort-arrow">▼</span></th>
-        <th class="col-cas">${t('col_cas')}</th>
-      </tr></thead><tbody>`;
-      html += visible.map(renderRow).join('');
-      html += '</tbody></table></div>';
-      if (total > shown) {
+        <span class="results-count">${T('找到','Found')} ${totalCount.toLocaleString()} ${T('个结果','results')}</span>
+      </div>`;
+      for (const sec of sections) {
+        const more = sec.count > (hasChinese ? (sec.label.includes('国际') ? 15 : 30) : (sec.label.includes('国际') ? 30 : 10))
+          ? `<div class="muted-cell" style="font-size:12px;padding:4px 0 10px">${T('仅显示前','Showing first')} ${hasChinese ? (sec.label.includes('国际')?15:30) : (sec.label.includes('国际')?30:10)} ${T('条','')}</div>`
+          : '';
+        html += `<div class="home-section-label">${sec.label}</div>
+          <div class="table-wrap"><table class="journals"><thead><tr>
+            <th class="col-fav"></th>
+            <th class="col-name">${t('col_name')}</th>
+            <th class="col-badge">${t('col_index')}</th>
+            <th class="col-if">IF <span class="sort-arrow">▼</span></th>
+            <th class="col-cas">${t('col_cas')}</th>
+          </tr></thead><tbody>${sec.html}</tbody></table></div>${more}`;
+      }
+      if (totalCount > intLimit + domLimit) {
         html += `<div class="pager"><button class="big-btn primary" id="home-more-btn" data-i18n="load_more">${t('load_more')}</button></div>`;
       }
       homeResults.innerHTML = html;
 
-      // Wire "load more" button
       const moreBtn = $('#home-more-btn');
       if (moreBtn) {
         moreBtn.addEventListener('click', () => {
-          shown += PAGE;
+          shown += 30;
           renderHomeIntResults();
         });
       }
@@ -4246,17 +4328,6 @@
     // Also sync topbar search when on home tab
     const origSearchHandler = $('#q')?.addEventListener;
     // (the existing #q listener already handles this for int/dom/fav)
-
-    // Quick link chips
-    document.querySelectorAll('.home-quick-chip[data-nav]').forEach(chip => {
-      chip.addEventListener('click', (e) => {
-        e.preventDefault();
-        const nav = chip.dataset.nav;
-        if (nav === 'int' || nav === 'dom' || nav === 'fav') {
-          activateTab(nav);
-        }
-      });
-    });
 
     function activateTab(tab, opts = {}) {
       if (!TAB_PATHS[tab]) tab = 'home';
@@ -5117,7 +5188,7 @@
     }
 
     btn.addEventListener('click', doSearch);
-    input.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.ctrlKey) doSearch(); });
+    input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); doSearch(); } });
 
     // ── Search history ──
     const HISTORY_KEY = 'ailatest.pick.history';

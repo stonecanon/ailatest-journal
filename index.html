@@ -116,27 +116,26 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <div id="sidebar-scrim" class="sidebar-scrim" hidden></div>
 
 <main class="main">
+  <div class="top-actions">
+    <button class="auth-btn" id="auth-btn" aria-label="Sign in" data-i18n="login">登录</button>
+    <div class="lang-toggle-wrap">
+      <button class="lang-toggle" id="lang-toggle" aria-label="Switch language">中文</button>
+    </div>
+  </div>
+
   <header class="topbar">
     <button class="side-toggle" id="side-toggle" aria-label="Toggle filters / 打开筛选侧栏">☰</button>
     <div class="search-wrap">
       <input id="q" type="search" placeholder="Search: journal title / abbr / ISSN" autocomplete="off" spellcheck="false" />
       <span class="hint" id="hint" data-i18n="loading">加载中…</span>
     </div>
-    <div class="topbar-actions">
-      <button class="auth-btn" id="auth-btn" aria-label="Sign in" data-i18n="login">登录</button>
-      <div class="lang-toggle-wrap">
-        <button class="lang-toggle" id="lang-toggle" aria-label="Switch language">中文</button>
-      </div>
-    </div>
   </header>
 
-  <div class="tabs">
+  <div id="mode-tabs">
     <a class="tab active" data-tab="home" href="/">
-      <span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10a1 1 0 0 0 1 1h3v-5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v5h3a1 1 0 0 0 1-1V10"/></svg></span>
       <span class="tab-label" data-i18n="tab_home">查刊</span>
     </a>
     <a class="tab" data-tab="pick" href="/pick">
-      <span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 19l3.2-1 7.8-7.8a2.1 2.1 0 0 0-3-3L5.2 15 4 20z"/><path d="M12.5 7.5l4 4"/><path d="M18 4l1 2 2 1-2 1-1 2-1-2-2-1 2-1z"/></svg></span>
       <span class="tab-label" data-i18n="tab_pick">选刊</span>
     </a>
     <a class="mobile-nav-brand" href="/" aria-label="AILatest Journal"><em>Journal</em><span>.ailatest</span></a>
@@ -145,15 +144,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <!-- ─── Home tab ─── -->
   <section class="tab-panel" data-panel="home">
     <div class="home-hero">
-      <h1 class="home-title">AILatest <em>Journal</em><br><small>面向科研人员的期刊检索与投稿决策工具</small></h1>
+      <h1 class="home-title">AILatest <em>Journal</em><br><small data-i18n="home_subtitle">面向科研人员的期刊检索与投稿决策工具</small></h1>
       <div class="home-search-wrap">
         <svg class="home-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
-        <input id="home-q" type="search" class="home-search-input" placeholder="搜索期刊名、ISSN…" autocomplete="off" spellcheck="false" />
-      </div>
-      <div id="home-quick-links" class="home-quick-links">
-        <a class="home-quick-chip" data-nav="int">🌍 国际</a>
-        <a class="home-quick-chip" data-nav="dom">🇨🇳 中国</a>
-        <a class="home-quick-chip" data-nav="fav">⭐ 收藏</a>
+        <input id="home-q" type="search" class="home-search-input" data-i18n="search_home_ph" placeholder="搜索期刊名、ISSN…" autocomplete="off" spellcheck="false" />
       </div>
     </div>
     <div id="home-results" class="home-results" hidden></div>
@@ -249,42 +243,47 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
   <!-- ─── Pick-for-me tab ─── -->
   <section class="tab-panel" data-panel="pick" hidden>
+    <div class="pick-hero">
+      <h2 class="pick-hero-title" data-i18n="tab_pick">帮我选刊</h2>
+      <p class="pick-hero-sub" data-i18n="pick_hero_sub">输入论文标题、摘要或关键词，智能匹配目标期刊</p>
+    </div>
     <div class="pick-tool">
-      <div class="pick-input-wrap">
-        <textarea id="pick-input" class="pick-input" rows="4" maxlength="200" placeholder="输入论文标题、摘要或关键词… 例如：indoor air quality occupancy estimation machine learning" data-i18n-placeholder="pick_placeholder"></textarea>
-        <div class="pick-input-meta">
-          <span class="pick-input-hint">建议输入题目 + 关键词，最多 200 字符</span>
-          <span id="pick-char-count" class="pick-char-count">0 / 200</span>
+      <div class="pick-search-wrap">
+        <svg class="pick-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input id="pick-input" type="search" class="pick-search-input" maxlength="200" placeholder="输入论文标题、摘要或关键词… 例如：indoor air quality occupancy estimation machine learning" data-i18n-placeholder="pick_placeholder" autocomplete="off" spellcheck="false" />
+      </div>
+      <div class="pick-input-meta">
+        <span class="pick-input-hint">建议输入标题 + 关键词，最多 200 字符</span>
+        <span id="pick-char-count" class="pick-char-count">0 / 200</span>
+      </div>
+      <div class="pick-filter-bar">
+        <div class="pick-filter-group">
+          <label class="pick-opt"><input type="checkbox" id="pick-filter-topics" checked> <span data-i18n="pick_filter_topics">Topics</span></label>
+          <label class="pick-opt"><input type="checkbox" id="pick-filter-if"> <span data-i18n="pick_filter_if">IF ></span> <input type="number" id="pick-if-min" class="pick-num" value="0" min="0" step="0.5"></label>
         </div>
-        <div class="pick-options">
-          <div class="pick-option-group">
-            <label class="pick-opt"><input type="checkbox" id="pick-filter-topics" checked> <span data-i18n="pick_filter_topics">匹配研究领域 (Topics)</span></label>
-            <label class="pick-opt"><input type="checkbox" id="pick-filter-if"> <span data-i18n="pick_filter_if">限 IF ></span> <input type="number" id="pick-if-min" class="pick-num" value="0" min="0" step="0.5" style="width:60px"></label>
-          </div>
-          <div class="pick-option-group">
-            <label class="pick-opt"><span data-i18n="pick_filter_zone">中科院分区</span>
-              <select id="pick-zone" class="pick-select">
-                <option value="all">全部</option>
-                <option value="1">1 区</option>
-                <option value="2">2 区</option>
-                <option value="3">3 区</option>
-                <option value="4">4 区</option>
-              </select>
-            </label>
-            <label class="pick-opt"><input type="checkbox" id="pick-filter-sci" checked> <span data-i18n="pick_filter_sci">SCIE</span></label>
-            <label class="pick-opt"><input type="checkbox" id="pick-filter-ssci" checked> <span data-i18n="pick_filter_ssci">SSCI</span></label>
-            <label class="pick-opt"><input type="checkbox" id="pick-filter-ahci" checked> <span data-i18n="pick_filter_ahci">AHCI</span></label>
-            <label class="pick-opt"><input type="checkbox" id="pick-filter-comprehensive"> <span data-i18n="pick_filter_compre">排除综合性期刊</span></label>
-          </div>
+        <div class="pick-filter-group">
+          <label class="pick-opt"><span data-i18n="pick_filter_zone">中科院分区</span>
+            <select id="pick-zone" class="pick-select">
+              <option value="all">全部</option>
+              <option value="1">1 区</option>
+              <option value="2">2 区</option>
+              <option value="3">3 区</option>
+              <option value="4">4 区</option>
+            </select>
+          </label>
         </div>
-        <div class="pick-apikey-row">
-          <input type="text" id="pick-apikey" class="pick-apikey" placeholder="OpenAlex API Key（可选，填了解除额度限制）">
+        <div class="pick-filter-group">
+          <label class="pick-opt"><input type="checkbox" id="pick-filter-sci" checked> <span data-i18n="pick_filter_sci">SCIE</span></label>
+          <label class="pick-opt"><input type="checkbox" id="pick-filter-ssci" checked> <span data-i18n="pick_filter_ssci">SSCI</span></label>
+          <label class="pick-opt"><input type="checkbox" id="pick-filter-ahci" checked> <span data-i18n="pick_filter_ahci">AHCI</span></label>
+          <label class="pick-opt"><input type="checkbox" id="pick-filter-comprehensive"> <span data-i18n="pick_filter_compre">排除综合刊</span></label>
         </div>
-        <div class="pick-actions">
-          <button id="pick-search-btn" class="big-btn primary" data-i18n="pick_search_btn">开始推荐</button>
-          <span id="pick-status" class="pick-status muted-cell"></span>
-        </div>
-        <p id="pick-quota" class="pick-quota muted-cell" style="margin:6px 0 0;font-size:11px;text-align:right"></p>
+      </div>
+      <div class="pick-action-row">
+        <button id="pick-search-btn" class="big-btn primary" data-i18n="pick_search_btn">开始推荐</button>
+        <span id="pick-status" class="pick-status muted-cell"></span>
+        <input type="text" id="pick-apikey" class="pick-apikey" placeholder="OpenAlex API Key（可选）">
+        <span id="pick-quota" class="pick-quota muted-cell"></span>
       </div>
       <div id="pick-history" class="pick-history" style="display:none">
         <div class="pick-history-head"><span data-i18n="pick_history">搜索历史</span><button id="pick-history-clear" class="clear-btn" data-i18n="pick_history_clear">清空</button></div>
@@ -458,7 +457,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <button id="pwa-install" class="pwa-install" hidden data-i18n="pwa_install">📲 安装到主屏</button>
 <script>
 // Build version for cache busting data files
-const __BUILD_VER = 'v20260529-40';
+const __BUILD_VER = 'v20260529-41';
 // Service Worker 清理 — 必须在 app.js 加载前运行
 (function() {
   if ('serviceWorker' in navigator) {
