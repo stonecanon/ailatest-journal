@@ -38,7 +38,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- End Google Tag Manager -->
 <link rel="preload" href="/data/journals.json.gz" as="fetch" crossorigin="anonymous" />
 <link rel="preload" href="/data/journal_aliases.json" as="fetch" crossorigin="anonymous" />
-<link rel="stylesheet" href="/css/app.css?v=20260530-09" />
+<link rel="stylesheet" href="/css/app.css?v=20260530-47" />
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json" />
@@ -115,19 +115,54 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
 <div id="sidebar-scrim" class="sidebar-scrim" hidden></div>
 
-<main class="main">
-  <div class="top-actions">
-    <button class="fav-header-btn" id="fav-header-btn" onclick="window.__activateJournalTab('fav')" aria-label="Favorites" title="收藏">★ <span id="fav-count-badge" class="fav-count-badge" style="display:none"></span></button>
+<aside class="app-rail" aria-label="Primary navigation">
+  <nav class="rail-top">
+    <button class="rail-nav-btn" data-tab="int" aria-label="国际期刊" title="国际期刊">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 3.4 9A14 14 0 0 1 12 21a14 14 0 0 1-3.4-9A14 14 0 0 1 12 3Z"/></svg>
+      <span data-i18n="rail_int">国际期刊</span>
+    </button>
+    <button class="rail-nav-btn" data-tab="dom" aria-label="中国期刊" title="中国期刊">
+      <span class="rail-flag" aria-hidden="true">🇨🇳</span>
+      <span data-i18n="rail_dom">中国期刊</span>
+    </button>
+    <button class="rail-nav-btn" id="fav-header-btn" data-tab="fav" aria-label="我的收藏" title="我的收藏">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.7l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3.7z"/></svg>
+      <span data-i18n="rail_fav">我的收藏</span>
+      <span id="fav-count-badge" class="fav-count-badge" style="display:none"></span>
+    </button>
+  </nav>
+  <div class="rail-bottom">
     <button class="auth-btn" id="auth-btn" aria-label="Sign in" data-i18n="login">登录</button>
     <div class="lang-toggle-wrap">
       <button class="lang-toggle" id="lang-toggle" aria-label="Switch language">中文</button>
     </div>
   </div>
+</aside>
+
+<main class="main">
+  <section class="home-hero" aria-label="AILatest Journal">
+    <h1 class="home-title">
+      <span class="home-brand-row">
+        <span class="home-logo-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M4.5 5.8c2.8-.9 5.2-.4 7.5 1.6 2.3-2 4.7-2.5 7.5-1.6v12.8c-2.8-.9-5.2-.4-7.5 1.6-2.3-2-4.7-2.5-7.5-1.6V5.8Z"/><path d="M12 7.4v12.8"/><path d="M7 9.2c1.1-.1 2.1.2 3 .8"/><path d="M14 10c.9-.6 1.9-.9 3-.8"/><path d="M7 13c1.1-.1 2.1.2 3 .8"/><path d="M14 13.8c.9-.6 1.9-.9 3-.8"/></svg>
+        </span>
+        <span>AILatest <em>Journal</em></span>
+      </span>
+      <small data-i18n="home_subtitle">面向科研人员的期刊检索与投稿决策工具</small>
+    </h1>
+  </section>
 
   <header class="topbar">
     <button class="side-toggle" id="side-toggle" aria-label="Toggle filters / 打开筛选侧栏">☰</button>
     <div class="search-wrap">
       <input id="q" type="search" maxlength="200" placeholder="Search: journal title / abbr / ISSN" autocomplete="off" spellcheck="false" />
+      <div class="search-actions">
+        <span class="search-help"><kbd>Enter</kbd><span data-i18n="search_submit_hint">搜索</span></span>
+        <button class="search-submit" id="search-submit" type="button" aria-label="Search">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5 21 21"/></svg>
+          <span data-i18n="search_button">Search</span>
+        </button>
+      </div>
       <span class="hint" id="hint" data-i18n="loading">加载中…</span>
     </div>
   </header>
@@ -144,23 +179,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
   <!-- ─── Home tab ─── -->
   <section class="tab-panel" data-panel="home">
-    <div class="home-hero">
-      <h1 class="home-title">AILatest <em>Journal</em><br><small data-i18n="home_subtitle">面向科研人员的期刊检索与投稿决策工具</small></h1>
-      <div class="home-entry-pills">
-        <button class="home-pill" data-tab="int">
-          <svg class="pill-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-          <span data-i18n="tab_int">国际</span>
-        </button>
-        <button class="home-pill" data-tab="dom">
-          <span class="pill-icon pill-icon-text">🇨🇳</span>
-          <span data-i18n="tab_dom">中国</span>
-        </button>
-        <button class="home-pill" data-tab="fav">
-          <svg class="pill-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3.7l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3.7z"/></svg>
-          <span data-i18n="tab_fav">收藏</span>
-        </button>
-      </div>
-    </div>
     <div id="home-results" class="home-results" hidden></div>
   </section>
 
@@ -441,7 +459,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <button id="pwa-install" class="pwa-install" hidden data-i18n="pwa_install">📲 安装到主屏</button>
 <script>
 // Build version for cache busting data files
-const __BUILD_VER = 'v20260530-12';
+const __BUILD_VER = 'v20260530-47';
 // Service Worker 清理 — 必须在 app.js 加载前运行
 (function() {
   if ('serviceWorker' in navigator) {
@@ -454,7 +472,7 @@ const __BUILD_VER = 'v20260530-12';
   }
 })();
 </script>
-<script src="/js/app.js?v=20260530-09" defer></script>
+<script src="/js/app.js?v=20260530-47" defer></script>
 <script>
   // Custom install prompt
   let __pwaPrompt = null;

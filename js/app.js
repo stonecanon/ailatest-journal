@@ -41,6 +41,7 @@
       pwa_install: '📲 安装到主屏',
       footer_data: '数据来源：Clarivate WoS Core Collection (SCIE/SSCI/AHCI/ESCI) · JCR 2025 · ESI · EI Compendex · Scopus · DOAJ · 中科院文献情报中心分区表 2025 · ShowJCR (GPL-3.0) · CCF 2026 (A/B/C) · CCF-T 2025 · ABDC 2025 · ABS 2024 · 中国科协 2025 · CSSCI · 北大核心 · CNKI · 浙江大学 2024 · 高校自编目录 2023 · CrossRef · OpenAlex。© <a href="https://journal.ailatest.org">AILatest Journal</a>',
       tab_home: '查刊', tab_int: '国际', tab_dom: '中国', tab_fav: '收藏', tab_pick: '选刊',
+      rail_int: '国际期刊', rail_dom: '中国期刊', rail_fav: '我的收藏',
       loading: '加载中…',
       hero_title_int: 'SCI / SSCI 国际期刊检索',
       hero_body_int: '資料來源：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI）· 更新至 2026-05-18，並合併 <b>EI Compendex</b> 期刊目錄（2025-10-10）。',
@@ -73,6 +74,8 @@
       search_dom: '搜索：刊名 / ISSN / CN 号（跨库搜索）',
       search_fav: '搜索收藏：期刊 / 缩写 / ISSN',
       search_home_ph: '搜索期刊名、ISSN…',
+      search_submit_hint: '搜索',
+      search_button: 'Search',
       home_subtitle: '面向科研人员的期刊检索与投稿决策工具',
       showing: '显示', of: '条 / 共', total_items: '条',
       empty: '未找到匹配的期刊',
@@ -106,6 +109,7 @@
       pwa_install: '📲 Install to Home',
       footer_data: 'Sources: Clarivate WoS Core Collection (SCIE/SSCI/AHCI/ESCI) · JCR 2025 · ESI · EI Compendex · Scopus · DOAJ · CAS NSL Tiers 2025 · ShowJCR (GPL-3.0) · CCF 2026 (A/B/C) · CCF-T 2025 · ABDC 2025 · ABS 2024 · CAST 2025 · CSSCI · PKU Core · CNKI · ZJU 2024 · School A 2023 · CrossRef · OpenAlex. © <a href="https://journal.ailatest.org">AILatest Journal</a>',
       tab_home: 'Journals', tab_int: 'International', tab_dom: 'China', tab_fav: 'Favorites', tab_pick: 'Journal Finder',
+      rail_int: 'International Journals', rail_dom: 'Chinese Journals', rail_fav: 'Favorites',
       loading: 'Loading…',
       hero_title_int: 'International SCI / SSCI Search',
       hero_body_int: 'Source: <b>Web of Science Core Collection</b> (SCIE / SSCI / AHCI / ESCI), updated 2026-05-18, merged with <b>EI Compendex</b> source list (2025-10-10).',
@@ -136,6 +140,8 @@
       search_dom: 'Search: title / ISSN / CN (cross-source)',
       search_fav: 'Search favorites: title / acronym / ISSN',
       search_home_ph: 'Search journal name, ISSN…',
+      search_submit_hint: 'search',
+      search_button: 'Search',
       home_subtitle: 'Journal search & submission decision tool for researchers',
       showing: 'Showing', of: 'of', total_items: '',
       empty: 'No journals match.',
@@ -159,7 +165,9 @@
     indices: '索引', cas_zone: '中科院 2025 分區', filters: '附加篩選', all: '全部',
     filter_xinrui: '新銳分區', filter_warning: '預警', domestic_sources: '中國分級來源',
     src_cnkx: '中國科協高品質目錄', src_cssci_core: 'CSSCI 來源期刊', src_cssci_ext: 'CSSCI 擴展版', src_pku: '北大核心 (2023)', src_zju: '浙江大學 2024', src_ccft: 'CCF 中文 T 分區', nav_sub_inhouse: '院校自編目錄', paid_label: '付費', drawer_kicker: '期刊詳情',
-        tab_home: '查刊', tab_int: '國際', tab_dom: '中國', tab_fav: '收藏', tab_pick: '選刊', loading: '載入中…',
+        tab_home: '查刊', tab_int: '國際', tab_dom: '中國', tab_fav: '收藏', tab_pick: '選刊',
+    rail_int: '國際期刊', rail_dom: '中國期刊', rail_fav: '我的收藏',
+    loading: '載入中…',
     hero_title_int: 'SCI / SSCI 國際期刊檢索',
     hero_body_int: '資料來源：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI）· 更新至 2026-05-18，並合併 <b>EI Compendex</b> 期刊目錄（2025-10-10）。',
     hero_note: '徽章語義：<b>SCIE/SSCI/AHCI/ESCI/EI</b> 索引收錄 · <b>中科院</b> 2025 大類分區（1-4 區，TOP 標誌） · <b>JCR Q</b> Quartile（Q1-Q4） · <b>新銳</b> 2026 新銳版分區 · <b>CCF</b> 中國計算機學會 2026 推薦（A/B/C） · <b>ABDC</b> 澳洲經管期刊分級（A*/A/B/C） · <b>ABS</b> 英國 Chartered ABS Academic Journal Guide 2024（4*/4/3/2/1，僅經管商科） · <b>T1/T2/T3</b> 中國科協 2025 高質量期刊分級 · <b>⚠ Warning</b> 國際期刊預警名單。',
@@ -953,12 +961,13 @@
       const v = t(k); if (v) el.title = v;
     });
     if (activeTab !== 'pick') {
-      const search = activeTab === 'int' ? 'search_int'
+      const search = activeTab === 'home' ? 'search_home_ph'
+                    : activeTab === 'int' ? 'search_int'
                     : activeTab === 'fav' ? 'search_fav'
                     : 'search_dom';
       $('#q').placeholder = t(search);
     }
-    $('#lang-toggle').textContent = LANG_ORDER.map(code => LANG_META[code].label).join(' · ');
+    $('#lang-toggle').textContent = LANG_META[lang]?.label || '中文';
     $('#auth-btn').textContent = user ? (user.name || user.login || t('logout')) : t('login');
     document.documentElement.lang = LANG_META[lang]?.html || 'zh-CN';
   }
@@ -4185,6 +4194,34 @@
           : null;
       }
     });
+    $('#q').addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' || activeTab === 'pick') return;
+      e.preventDefault();
+      activeQuery = e.currentTarget.value.trim();
+      shown = PAGE;
+      if (!activeQuery) return;
+      if (activeTab === 'home') showHomeSearchResults();
+      else if (activeTab === 'int') renderInt();
+      else if (activeTab === 'fav') renderFav();
+      else if (activeTab === 'dom') renderDomestic();
+    });
+    $('#search-submit')?.addEventListener('click', () => {
+      const qEl = $('#q');
+      if (!qEl) return;
+      activeQuery = qEl.value.trim();
+      shown = PAGE;
+      if (!activeQuery) {
+        qEl.focus();
+        return;
+      }
+      if (activeTab === 'pick') {
+        qEl.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      } else if (activeTab === 'home') {
+        showHomeSearchResults();
+      } else if (activeTab === 'int') renderInt();
+      else if (activeTab === 'fav') renderFav();
+      else if (activeTab === 'dom') renderDomestic();
+    });
     $('#more').addEventListener('click', () => { shown += PAGE; renderInt(); });
 
     document.addEventListener('click', (e) => {
@@ -4395,9 +4432,9 @@
         if (activeTab === 'pick') {
           qEl.placeholder = T('输入你的论文标题和关键词，如：基于深度学习的室内人数预测', 'Enter your paper title and keywords, e.g.: Deep learning for indoor occupancy estimation');
         } else if (activeTab === 'home') {
-          qEl.placeholder = 'Search: journal title / abbr / ISSN';
+          qEl.placeholder = t('search_home_ph');
         } else {
-          qEl.placeholder = 'Search: journal title / abbr / ISSN';
+          qEl.placeholder = t(activeTab === 'dom' ? 'search_dom' : 'search_int');
         }
       }
       // Reset home UI state when switching away
@@ -4429,7 +4466,7 @@
     }
     window.__activateJournalTab = activateTab;
     // Home entry pills → switch tab
-    document.querySelectorAll('.home-pill[data-tab]').forEach(b => {
+    document.querySelectorAll('.home-pill[data-tab], .rail-nav-btn[data-tab]').forEach(b => {
       b.addEventListener('click', (e) => {
         e.preventDefault();
         activateTab(b.dataset.tab);
