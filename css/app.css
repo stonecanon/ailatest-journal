@@ -528,6 +528,17 @@ main.main {
   font-style: normal;
   font-weight: inherit;
 }
+.brand-dot {
+  opacity: .72;
+}
+.brand-org {
+  display: inline-block;
+  font-size: .46em;
+  font-weight: 680;
+  letter-spacing: 0;
+  opacity: .72;
+  transform: translateY(-.09em);
+}
 .home-title-sep { display: none; }
 .home-search-wrap {
   position: relative;
@@ -598,7 +609,7 @@ main.main {
   backdrop-filter: blur(18px);
   overflow: hidden;
 }
-.search-wrap input {
+.search-wrap > #q {
   width: 100%;
   min-height: 142px;
   background: transparent;
@@ -614,7 +625,7 @@ main.main {
   -webkit-appearance: none;
   box-sizing: border-box;
 }
-.search-wrap input::placeholder { color: rgba(117,111,104,.58); }
+.search-wrap > #q::placeholder { color: rgba(117,111,104,.58); }
 .search-wrap:focus-within {
   border-color: var(--accent);
   background: #fff;
@@ -622,7 +633,7 @@ main.main {
     0 0 0 4px rgba(249,115,22,.10),
     0 26px 72px rgba(39,35,31,.13);
 }
-.search-wrap input:focus {
+.search-wrap > #q:focus {
   border-color: transparent;
   background: transparent;
   box-shadow: none;
@@ -650,6 +661,14 @@ main.main {
   font-weight: 520;
   line-height: 1.35;
   text-align: left;
+}
+.search-meta-group {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  max-width: calc(100% - 150px);
 }
 .search-submit {
   pointer-events: auto;
@@ -1766,10 +1785,17 @@ td.empty,
     height: 32px;
     display: inline-flex; align-items: center;
   }
-  .search-wrap input { min-height: 132px; padding: 18px 18px 64px; font-size: 16px; }
+  .search-wrap > #q { min-height: 132px; padding: 18px 18px 64px; font-size: 16px; }
   .hint { display: none; }
   .search-actions { left: 16px; right: 12px; bottom: 12px; }
-  .search-meta { font-size: 10.5px; max-width: 170px; }
+  .search-meta { font-size: 10.5px; }
+  .search-meta-group {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    max-width: calc(100% - 118px);
+  }
+  .pick-apikey.search-apikey { width: 136px; min-width: 0; height: 32px; padding: 5px 8px; font-size: 11px; }
   .search-submit { min-width: 104px; min-height: 42px; padding: 0 16px; border-radius: 15px; font-size: 13px; }
   .col-name { min-width: 130px; width: 26%; }
   .jname { font-size: 13px !important; }
@@ -2880,6 +2906,15 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   font-family: var(--sans);
   width: 200px;
   transition: border-color .15s;
+}
+.search-apikey {
+  width: min(230px, 34vw);
+  min-width: 150px;
+  height: 34px;
+  background: rgba(255,255,255,.78);
+  border-color: rgba(39,35,31,.11);
+  border-radius: 12px;
+  font-size: 12px;
 }
 .pick-apikey:focus {
   outline: none;

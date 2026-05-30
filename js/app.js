@@ -62,7 +62,7 @@
       pick_filter_ahci: 'AHCI',
       pick_filter_compre: '排除综合性期刊',
       pick_history: '搜索历史', pick_history_clear: '清空',
-      pick_quota: '由 OpenAlex 开放学术数据驱动 · 填 API Key 获更多额度',
+      pick_quota: 'OpenAlex 驱动 · API Key 可选',
       pick_apikey_ph: 'OpenAlex API Key（可选）',
       results_all: '全部期刊', load_more: '加载更多',
       col_name: '期刊 Title', col_abbr: '缩写 Abbr', col_badges: '索引 / 分区',
@@ -128,7 +128,7 @@
       pick_filter_ahci: 'AHCI',
       pick_filter_compre: 'Exclude multidisciplinary',
       pick_history: 'Search History', pick_history_clear: 'Clear',
-      pick_quota: 'Powered by OpenAlex · add API key for more credits',
+      pick_quota: 'OpenAlex powered · API key optional',
       pick_apikey_ph: 'OpenAlex API Key (optional)',
       results_all: 'All journals', load_more: 'Load more',
       col_name: 'Journal Title', col_abbr: 'Abbr', col_badges: 'Index / Tier',
@@ -976,13 +976,13 @@
   function updateSearchSubmitLabel() {
     const btn = $('#search-submit');
     const label = $('#search-submit [data-i18n]');
-    const quota = $('#pick-quota');
+    const meta = $('#pick-search-meta');
     if (!label) return;
     const key = activeTab === 'pick' ? 'pick_search_btn' : 'search_button';
     label.dataset.i18n = key;
     label.textContent = t(key);
     btn?.setAttribute('aria-label', t(key));
-    if (quota) quota.hidden = activeTab !== 'pick';
+    if (meta) meta.hidden = activeTab !== 'pick';
   }
 
   // ───────── favorites (multi-list + drag sort) ─────────
