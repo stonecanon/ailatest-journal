@@ -2296,7 +2296,17 @@
       if (!sel || sel.__bound) return;
       sel.__bound = true;
       sel.addEventListener('change', () => {
-        if (id === 'idx-col-filter') activeIdxFilter = sel.value;
+        if (id === 'idx-col-filter') {
+          activeIdxFilter = sel.value;
+          const cnt = journals.filter(r => {
+            if (sel.value === 'medline') return r.medline;
+            if (sel.value === 'pubmed') return r.pubmed;
+            if (sel.value === 'pmc') return r.pmc;
+            if (['SCIE','SSCI','AHCI','ESCI','EI'].includes(sel.value)) return (r.indices||[]).includes(sel.value);
+            return true;
+          }).length;
+          console.log('[debug] idx:', sel.value, 'direct count:', cnt);
+        }
         else if (id === 'tier-col-filter') activeTierFilter = sel.value;
         else activeExtraFilter = sel.value;
         shown = PAGE;
