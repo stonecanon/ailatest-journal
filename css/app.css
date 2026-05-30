@@ -405,7 +405,7 @@ main.main {
   margin-top: 4px;
 }
 .home-title em {
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: 'Palatino Linotype', 'Palatino', 'Book Antiqua', Georgia, serif;
   font-style: italic;
   font-weight: 700;
 }
@@ -1575,7 +1575,7 @@ td.empty,
     text-decoration: none;
   }
   .mobile-nav-brand em {
-    font-family: Georgia, 'Times New Roman', serif;
+    font-family: 'Palatino Linotype', 'Palatino', 'Book Antiqua', Georgia, serif;
     font-style: italic;
     font-weight: 700;
     font-size: 20px;
