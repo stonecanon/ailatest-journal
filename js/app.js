@@ -4271,9 +4271,6 @@
       // Sidebar: show on int/dom, hide on home/fav/pick
       const sidebar = $('#sidebar');
       if (sidebar) sidebar.style.display = (activeTab === 'int' || activeTab === 'dom') ? '' : 'none';
-      // Footer: hide on home (shown after search or on other tabs)
-      const siteFoot = $('.site-foot');
-      if (siteFoot) siteFoot.style.display = activeTab === 'home' ? 'none' : '';
       // Search box in topbar: hide on home and pick (home has its own search)
       const searchWrap = $('.search-wrap');
       const sideToggle = $('#side-toggle');
