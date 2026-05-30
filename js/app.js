@@ -4138,7 +4138,7 @@
       if (activeTab === 'home') {
         const homeQ = $('#home-q');
         if (homeQ) homeQ.value = activeQuery;
-        showHomeSearchResults('all');
+        showHomeSearchResults();
       } else {
         activeTab === 'int' ? renderInt()
           : activeTab === 'fav' ? renderFav()
@@ -4162,37 +4162,20 @@
       }
     });
 
-    /* ───────── Home tab: search + sub-tabs + quick links ───────── */
+    /* ───────── Home tab: search + quick links ───────── */
     const homeQ = $('#home-q');
-    const homeSubtabs = $('#home-subtabs');
     const homeResults = $('#home-results');
     const homePanel = $('.tab-panel[data-panel="home"]');
 
-    function showHomeSearchResults(subtab) {
+    function showHomeSearchResults() {
       if (!activeQuery) {
         if (homeResults) homeResults.hidden = true;
-        if (homeSubtabs) homeSubtabs.hidden = true;
         if (homePanel) homePanel.classList.remove('home-tab-has-results');
         return;
       }
       if (homePanel) homePanel.classList.add('home-tab-has-results');
-      if (homeSubtabs) homeSubtabs.hidden = false;
       if (homeResults) homeResults.hidden = false;
-
-      // Update active sub-tab
-      if (homeSubtabs) {
-        homeSubtabs.querySelectorAll('.home-subtab').forEach(btn => {
-          btn.classList.toggle('active', btn.dataset.subtab === subtab);
-        });
-      }
-
-      if (subtab === 'all') {
-        // Render international results into home-results
-        renderHomeIntResults();
-      } else {
-        // Navigate to the corresponding tab
-        activateTab(subtab);
-      }
+      renderHomeIntResults();
     }
 
     function renderHomeIntResults() {
@@ -4259,7 +4242,7 @@
         // Sync the topbar search too
         const topQ = $('#q');
         if (topQ) topQ.value = activeQuery;
-        showHomeSearchResults('all');
+        showHomeSearchResults();
       });
     }
 
@@ -4278,16 +4261,6 @@
       });
     });
 
-    // Home sub-tabs
-    if (homeSubtabs) {
-      homeSubtabs.addEventListener('click', (e) => {
-        const btn = e.target.closest('.home-subtab');
-        if (!btn) return;
-        const subtab = btn.dataset.subtab;
-        showHomeSearchResults(subtab);
-      });
-    }
-
     function activateTab(tab, opts = {}) {
       if (!TAB_PATHS[tab]) tab = 'home';
       $$('[data-tab]').forEach(x => x.classList.toggle('active', x.dataset.tab === tab));
@@ -4298,6 +4271,9 @@
       // Sidebar: show on int/dom, hide on home/fav/pick
       const sidebar = $('#sidebar');
       if (sidebar) sidebar.style.display = (activeTab === 'int' || activeTab === 'dom') ? '' : 'none';
+      // Footer: hide on home (shown after search or on other tabs)
+      const siteFoot = $('.site-foot');
+      if (siteFoot) siteFoot.style.display = activeTab === 'home' ? 'none' : '';
       // Search box in topbar: hide on home and pick (home has its own search)
       const searchWrap = $('.search-wrap');
       const sideToggle = $('#side-toggle');
@@ -4334,7 +4310,7 @@
       else if (activeTab === 'pick') initPickTool();
       // Home tab: if there's an active query, show results
       else if (activeTab === 'home' && activeQuery) {
-        showHomeSearchResults('all');
+        showHomeSearchResults();
       }
     }
     window.__activateJournalTab = activateTab;
