@@ -2793,6 +2793,7 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .domsrc-pill.ds-zju      { background: #1f5f5a; color: #fff; }
 .domsrc-pill.ds-school_a { background: #4a6b2a; color: #fff; }
 .domsrc-pill.ds-ccf      { background: #7a2030; color: #fff; }
+.domsrc-pill.ds-ccft     { background: #7a2030; color: #fff; }
 .domsrc-pill.ds-cnki_major { background: #2a6b8a; color: #fff; }
 
 /* ───────── 单本期刊分享名片（jcard） ───────── */
