@@ -2008,7 +2008,10 @@
     // ESI adds another OR condition — journal with esi_category also shows
     const esiActive = activeIndices.has('ESI');
     const idxOnly = new Set([...activeIndices].filter(v => v !== 'ESI'));
-    const matchesAny = !idxOnly.size || (r.indices || []).some(i => idxOnly.has(i));
+    const nonWosIdx = ['scopus','oaj','doaj','medline','pubmed','pmc'];
+    // If column header idx filter selects a non‑WoS index, bypass sidebar activeIndices
+    const bypassIdx = nonWosIdx.includes(activeIdxFilter);
+    const matchesAny = bypassIdx || !idxOnly.size || (r.indices || []).some(i => idxOnly.has(i));
     if (!matchesAny && !(esiActive && r.esi_category)) {
       // When OAJ / DOAJ is checked, OA directory journals bypass the index filter
       // (allows pure OA directory journals without WoS/EI indices to show)
