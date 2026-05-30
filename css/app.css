@@ -316,7 +316,7 @@ main.main {
 }
 #mode-tabs .tab {
   font-family: var(--sans);
-  padding: 8px 28px;
+  padding: 10px 32px;
   background: transparent;
   border: 0;
   color: var(--ink-faint);
@@ -330,7 +330,7 @@ main.main {
   min-width: 0;
   position: relative;
   border-radius: 28px;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   line-height: 1.3;
 }
@@ -1523,7 +1523,7 @@ td.empty,
     display: flex; flex-direction: column;
   }
   main.main #mode-tabs { order: 1; margin: 16px auto 10px; padding: 4px; overflow-x: hidden; gap: 4px; width: fit-content; max-width: 100%; }
-  main.main #mode-tabs .tab { flex: 0 0 auto; padding: 6px 20px; font-size: 13px; min-width: 0; }
+  main.main #mode-tabs .tab { flex: 0 0 auto; padding: 8px 24px; font-size: 14px; min-width: 0; }
   main.main #mode-tabs .tab .tab-icon { display: none; }
   .mobile-nav-brand { display: none !important; }
   main.main .topbar     { order: 2; margin-bottom: 14px; }
