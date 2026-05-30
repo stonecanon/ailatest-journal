@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>AILatest Journal — Journal Finder &amp; Journal Search for Researchers | 期刊查询 · 选刊推荐 · SCI期刊检索</title>
-<meta name="description" content="AILatest Journal 是面向科研人员的免费期刊查询与选刊推荐工具。聚合 SCI/SSCI/AHCI/ESCI/EI 索引、JCR 影响因子、中科院分区、CCF 推荐、CSSCI、北大核心等数据，支持期刊检索、影响因子查询、选刊推荐、收藏同步。Journal finder &amp; search tool with IF, CAS tiers, Scopus, DOAJ, review cycles." />
-<meta name="keywords" content="journal finder, journal search, 期刊查询, SCI期刊查询, 期刊检索, 选刊推荐, 投稿期刊推荐, 中科院分区查询, 影响因子查询, JCR分区, CCF推荐, CSSCI, 北大核心, journal recommendation, journal matcher, find journal for paper" />
+<title>AILatest Journal — Journal Finder &amp; Journal Search for Researchers | 期刊查询 · 荐刊推荐 · SCI期刊检索</title>
+<meta name="description" content="AILatest Journal 是面向科研人员的免费期刊查询与荐刊推荐工具。聚合 SCI/SSCI/AHCI/ESCI/EI 索引、JCR 影响因子、中科院分区、CCF 推荐、CSSCI、北大核心等数据，支持期刊检索、影响因子查询、荐刊推荐、收藏同步。Journal finder &amp; search tool with IF, CAS tiers, Scopus, DOAJ, review cycles." />
+<meta name="keywords" content="journal finder, journal search, 期刊查询, SCI期刊查询, 期刊检索, 荐刊推荐, 投稿期刊推荐, 中科院分区查询, 影响因子查询, JCR分区, CCF推荐, CSSCI, 北大核心, journal recommendation, journal matcher, find journal for paper" />
 <link rel="canonical" href="https://journal.ailatest.org/" />
 <link rel="alternate" href="https://journal.ailatest.org/international" hreflang="zh-CN" />
 <link rel="alternate" href="https://journal.ailatest.org/china" hreflang="zh-CN" />
@@ -15,13 +15,13 @@
 <!-- Open Graph -->
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://journal.ailatest.org/" />
-<meta property="og:title" content="AILatest Journal — Journal Finder · 期刊查询与选刊推荐" />
+<meta property="og:title" content="AILatest Journal — Journal Finder · 期刊查询与荐刊推荐" />
 <meta property="og:description" content="Free journal finder &amp; search tool for researchers. SCI/SSCI/AHCI/ESCI/EI, JCR IF, CAS tiers, CCF, CSSCI, PKU Core, Scopus, DOAJ, review cycles, and smart journal recommendation." />
 <meta property="og:image" content="https://journal.ailatest.org/icons/og-image.png" />
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="AILatest Journal — Journal Finder · 期刊查询与选刊推荐" />
+<meta name="twitter:title" content="AILatest Journal — Journal Finder · 期刊查询与荐刊推荐" />
 <meta name="twitter:description" content="Free journal finder &amp; search for researchers. SCI/SSCI, IF, CAS tiers, CCF, CSSCI, Scopus — all in one place." />
 
 <!-- Hreflang for multilingual -->
@@ -38,7 +38,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- End Google Tag Manager -->
 <link rel="preload" href="/data/journals.json.gz" as="fetch" crossorigin="anonymous" />
 <link rel="preload" href="/data/journal_aliases.json" as="fetch" crossorigin="anonymous" />
-<link rel="stylesheet" href="/css/app.css?v=20260530-50" />
+<link rel="stylesheet" href="/css/app.css?v=20260530-51" />
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json" />
@@ -56,7 +56,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   "@context": "https://schema.org",
   "@type": "WebSite",
   "name": "AILatest Journal",
-  "alternateName": ["期刊查询", "选刊推荐", "Journal Finder", "Journal Search"],
+  "alternateName": ["期刊查询", "荐刊推荐", "Journal Finder", "Journal Search"],
   "url": "https://journal.ailatest.org/",
   "description": "Free journal finder & search tool for researchers. SCI/SSCI, JCR IF, CAS tiers, CCF, CSSCI, Scopus, DOAJ, review cycles, and smart journal recommendation.",
   "inLanguage": ["zh-CN", "en"],
@@ -157,7 +157,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="search-wrap">
       <input id="q" type="text" maxlength="200" placeholder="Search: journal title / abbr / ISSN" autocomplete="off" spellcheck="false" />
       <div class="search-actions">
-        <span class="search-help"><kbd>Enter</kbd><span data-i18n="search_submit_hint">搜索</span></span>
+        <span id="pick-quota" class="search-meta pick-quota muted-cell" data-i18n="pick_quota" hidden>由 OpenAlex 开放学术数据驱动 · 填 API Key 获更多额度</span>
         <button class="search-submit" id="search-submit" type="button" aria-label="Search">
           <span data-i18n="search_button">Search</span>
         </button>
@@ -171,7 +171,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <span class="tab-label" data-i18n="tab_home">查刊</span>
     </a>
     <a class="tab" data-tab="pick" href="/pick">
-      <span class="tab-label" data-i18n="tab_pick">选刊</span>
+      <span class="tab-label" data-i18n="tab_pick">荐刊</span>
     </a>
     <a class="mobile-nav-brand" href="/" aria-label="AILatest Journal"><em>Journal</em><span>.ailatest</span></a>
   </div>
@@ -275,7 +275,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div class="pick-action-row">
         <span id="pick-status" class="pick-status muted-cell"></span>
         <input type="text" id="pick-apikey" class="pick-apikey" data-i18n-placeholder="pick_apikey_ph" placeholder="OpenAlex API Key（可选）">
-        <span id="pick-quota" class="pick-quota muted-cell" data-i18n="pick_quota">由 OpenAlex 开放学术数据驱动 · 填 API Key 获更多额度</span>
       </div>
       <div class="pick-filter-bar">
         <div class="pick-filter-group">
@@ -457,7 +456,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <button id="pwa-install" class="pwa-install" hidden data-i18n="pwa_install">📲 安装到主屏</button>
 <script>
 // Build version for cache busting data files
-const __BUILD_VER = 'v20260530-50';
+const __BUILD_VER = 'v20260530-51';
 // Service Worker 清理 — 必须在 app.js 加载前运行
 (function() {
   if ('serviceWorker' in navigator) {
@@ -470,7 +469,7 @@ const __BUILD_VER = 'v20260530-50';
   }
 })();
 </script>
-<script src="/js/app.js?v=20260530-50" defer></script>
+<script src="/js/app.js?v=20260530-51" defer></script>
 <script>
   // Custom install prompt
   let __pwaPrompt = null;

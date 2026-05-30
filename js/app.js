@@ -40,7 +40,7 @@
       drawer_kicker: '期刊详情',
       pwa_install: '📲 安装到主屏',
       footer_data: '数据来源：Clarivate WoS Core Collection (SCIE/SSCI/AHCI/ESCI) · JCR 2025 · ESI · EI Compendex · Scopus · DOAJ · 中科院文献情报中心分区表 2025 · ShowJCR (GPL-3.0) · CCF 2026 (A/B/C) · CCF-T 2025 · ABDC 2025 · ABS 2024 · 中国科协 2025 · CSSCI · 北大核心 · CNKI · 浙江大学 2024 · 高校自编目录 2023 · CrossRef · OpenAlex。© <a href="https://journal.ailatest.org">AILatest Journal</a>',
-      tab_home: '查刊', tab_int: '国际', tab_dom: '中国', tab_fav: '收藏', tab_pick: '选刊',
+      tab_home: '查刊', tab_int: '国际', tab_dom: '中国', tab_fav: '收藏', tab_pick: '荐刊',
       rail_int: '国际期刊', rail_dom: '中国期刊', rail_fav: '我的收藏',
       loading: '加载中…',
       hero_title_int: 'SCI / SSCI 国际期刊检索',
@@ -50,7 +50,7 @@
       hero_note: '徽章语义：<b>SCIE/SSCI/AHCI/ESCI/EI</b> 索引收录 · <b>中科院</b> 中科院 2025 大类分区（1-4 区，TOP 标志） · <b>JCR Q</b> Quartile（Q1-Q4） · <b>新锐</b> 中科院 2026 新锐版分区 · <b>CCF</b> 中国计算机学会 2026 推荐（A/B/C） · <b>ABDC</b> 澳洲经管期刊分级（A*/A/B/C） · <b>ABS</b> 英国 Chartered ABS Academic Journal Guide 2024（4*/4/3/2/1，仅经管商科） · <b>T1/T2/T3</b> 中国科协 2025 高质量期刊分级 · <b>⚠ Warning</b> 国际期刊预警名单。',
       hero_title_fav: '我的收藏',
       hero_body_fav: '点击任意期刊右侧的 <b>★</b> 可加入收藏。未登录时保存在本机 localStorage；登录后自动同步到云端，可跨设备访问。',
-      hero_title_pick: '帮我选刊',
+      hero_title_pick: '智能荐刊',
       hero_body_pick: '采用自研大模型算法，深度分析你的研究主题与海量期刊数据的匹配度，智能推荐最合适的目标期刊。每人每天免费使用 5 次。',
       pick_placeholder: '建议输入标题 + 关键词，最多 200 字符',
       pick_search_btn: '开始推荐',
@@ -108,7 +108,7 @@
       drawer_kicker: 'Journal Details',
       pwa_install: '📲 Install to Home',
       footer_data: 'Sources: Clarivate WoS Core Collection (SCIE/SSCI/AHCI/ESCI) · JCR 2025 · ESI · EI Compendex · Scopus · DOAJ · CAS NSL Tiers 2025 · ShowJCR (GPL-3.0) · CCF 2026 (A/B/C) · CCF-T 2025 · ABDC 2025 · ABS 2024 · CAST 2025 · CSSCI · PKU Core · CNKI · ZJU 2024 · School A 2023 · CrossRef · OpenAlex. © <a href="https://journal.ailatest.org">AILatest Journal</a>',
-      tab_home: 'Journals', tab_int: 'International', tab_dom: 'China', tab_fav: 'Favorites', tab_pick: 'Journal Finder',
+      tab_home: 'Journals', tab_int: 'International', tab_dom: 'China', tab_fav: 'Favorites', tab_pick: 'Recommend',
       rail_int: 'International Journals', rail_dom: 'Chinese Journals', rail_fav: 'Favorites',
       loading: 'Loading…',
       hero_title_int: 'International SCI / SSCI Search',
@@ -165,7 +165,7 @@
     indices: '索引', cas_zone: '中科院 2025 分區', filters: '附加篩選', all: '全部',
     filter_xinrui: '新銳分區', filter_warning: '預警', domestic_sources: '中國分級來源',
     src_cnkx: '中國科協高品質目錄', src_cssci_core: 'CSSCI 來源期刊', src_cssci_ext: 'CSSCI 擴展版', src_pku: '北大核心 (2023)', src_zju: '浙江大學 2024', src_ccft: 'CCF 中文 T 分區', nav_sub_inhouse: '院校自編目錄', paid_label: '付費', drawer_kicker: '期刊詳情',
-        tab_home: '查刊', tab_int: '國際', tab_dom: '中國', tab_fav: '收藏', tab_pick: '選刊',
+        tab_home: '查刊', tab_int: '國際', tab_dom: '中國', tab_fav: '收藏', tab_pick: '薦刊',
     rail_int: '國際期刊', rail_dom: '中國期刊', rail_fav: '我的收藏',
     loading: '載入中…',
     hero_title_int: 'SCI / SSCI 國際期刊檢索',
@@ -729,8 +729,8 @@
   const PATH_TABS = { '/': 'home', '/international': 'int', '/journals': 'int', '/china': 'dom', '/favorites': 'fav', '/pick': 'pick' };
   const TAB_SEO = {
     home: {
-      title: 'AILatest Journal — 期刊查询 · 选刊推荐 · SCI期刊检索',
-      desc: 'AILatest Journal 是面向科研人员的免费期刊查询与选刊推荐工具。聚合 SCI/SSCI/AHCI、JCR 影响因子、中科院分区、CCF、CSSCI 等数据，支持期刊搜索、选刊推荐、收藏同步。'
+      title: 'AILatest Journal — 期刊查询 · 荐刊推荐 · SCI期刊检索',
+      desc: 'AILatest Journal 是面向科研人员的免费期刊查询与荐刊推荐工具。聚合 SCI/SSCI/AHCI、JCR 影响因子、中科院分区、CCF、CSSCI 等数据，支持期刊搜索、荐刊推荐、收藏同步。'
     },
     int: {
       title: 'International Journal Search | SCI SSCI JCR IF CAS Tiers - AILatest Journal',
@@ -745,7 +745,7 @@
       desc: '保存、同步、排序并分享你的目标期刊清单，支持跨设备收藏和期刊清单分享。'
     },
     pick: {
-      title: '选刊推荐工具 | Journal Finder for Paper Title and Keywords - AILatest Journal',
+      title: '荐刊推荐工具 | Journal Finder for Paper Title and Keywords - AILatest Journal',
       desc: '输入论文题目、摘要或关键词，智能匹配研究主题、SCI/SSCI/EI 收录、JCR 分区、中科院分区、Scopus 与影响因子，推荐适合投稿的目标期刊。'
     }
   };
@@ -976,11 +976,13 @@
   function updateSearchSubmitLabel() {
     const btn = $('#search-submit');
     const label = $('#search-submit [data-i18n]');
+    const quota = $('#pick-quota');
     if (!label) return;
     const key = activeTab === 'pick' ? 'pick_search_btn' : 'search_button';
     label.dataset.i18n = key;
     label.textContent = t(key);
     btn?.setAttribute('aria-label', t(key));
+    if (quota) quota.hidden = activeTab !== 'pick';
   }
 
   // ───────── favorites (multi-list + drag sort) ─────────
