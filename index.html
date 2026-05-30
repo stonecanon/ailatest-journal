@@ -118,6 +118,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <main class="main">
   <div class="top-actions">
     <button class="auth-btn" id="auth-btn" aria-label="Sign in" data-i18n="login">登录</button>
+    <button class="fav-header-btn" id="fav-header-btn" aria-label="Favorites" title="收藏">★</button>
     <div class="lang-toggle-wrap">
       <button class="lang-toggle" id="lang-toggle" aria-label="Switch language">中文</button>
     </div>
@@ -135,16 +136,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <a class="tab active" data-tab="home" href="/">
       <span class="tab-label" data-i18n="tab_home">查刊</span>
     </a>
-    <a class="tab" data-tab="int" href="/international">
-      <span class="tab-label" data-i18n="tab_int">国际</span>
-    </a>
-    <a class="tab" data-tab="dom" href="/china">
-      <span class="tab-label" data-i18n="tab_dom">中国</span>
-    </a>
     <a class="tab" data-tab="pick" href="/pick">
       <span class="tab-label" data-i18n="tab_pick">选刊</span>
     </a>
     <a class="mobile-nav-brand" href="/" aria-label="AILatest Journal"><em>Journal</em><span>.ailatest</span></a>
+  </div>
+
+  <!-- Browse subnav (int/dom) — below search, pill style -->
+  <div class="subnav" id="browse-subnav">
+    <button class="subnav-btn" data-tab="int"><span data-i18n="tab_int">国际</span></button>
+    <button class="subnav-btn" data-tab="dom"><span data-i18n="tab_dom">中国</span></button>
   </div>
 
   <!-- ─── Home tab ─── -->

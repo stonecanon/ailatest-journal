@@ -509,6 +509,18 @@ main.main {
   padding: 4px 0 2px;
   margin-bottom: 0;
 }
+.fav-header-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 4px 10px;
+  color: var(--ink-soft);
+  transition: color .15s, transform .15s;
+  line-height: 1;
+  border-radius: 6px;
+}
+.fav-header-btn:hover { color: var(--gold, #e6a817); transform: scale(1.12); background: rgba(0,0,0,.03); }
 .lang-toggle,
 .auth-btn {
   font-family: var(--sans); font-size: 12px;
@@ -1545,7 +1557,8 @@ td.empty,
     margin-left: 1px;
   }
   .lang-toggle-wrap,
-  .auth-btn {
+  .auth-btn,
+  .fav-header-btn {
     flex: 0 0 auto;
   }
   .lang-toggle,

@@ -4360,6 +4360,13 @@
       const showSearch = activeTab !== 'pick' && activeTab !== 'home';
       if (searchWrap) searchWrap.style.display = showSearch ? 'flex' : 'none';
       if (sideToggle) sideToggle.style.display = showSearch ? '' : 'none';
+      // Browse subnav: show on home/int/dom, hide on pick/fav
+      const browseSubnav = $('#browse-subnav');
+      if (browseSubnav) browseSubnav.style.display = (activeTab === 'home' || activeTab === 'int' || activeTab === 'dom') ? '' : 'none';
+      // Highlight active subnav button
+      browseSubnav?.querySelectorAll('.subnav-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === activeTab);
+      });
       // Sync home search input with #q when on home tab
       const homeQ = $('#home-q');
       if (activeTab === 'home' && homeQ) {
@@ -4399,6 +4406,21 @@
       activateTab(b.dataset.tab);
     }));
     window.addEventListener('popstate', () => activateTab(tabFromPath(), { skipPath: true }));
+
+    // Browse subnav handlers (int/dom pill buttons)
+    $$('#browse-subnav .subnav-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activateTab(btn.dataset.tab);
+      });
+    });
+
+    // Favorites header button → fav tab
+    const favHeaderBtn = $('#fav-header-btn');
+    if (favHeaderBtn) {
+      favHeaderBtn.addEventListener('click', () => {
+        activateTab('fav');
+      });
+    }
 
     // ─── 国内导航 ───
     $('#dom-content')?.addEventListener('click', (e) => {
