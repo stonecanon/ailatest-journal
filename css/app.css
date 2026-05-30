@@ -2532,10 +2532,13 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   position:relative; overflow:hidden;
   background:var(--bg2); border-radius:8px; padding:18px 20px 16px;
   cursor:pointer; transition:box-shadow .2s,background .2s;
-  margin-bottom:10px;
+  margin-bottom:12px;
   border:1px solid var(--border);
+  box-shadow:0 2px 8px rgba(0,0,0,.06);
 }
 .pick-card:last-child { margin-bottom:0 }
+.pick-card + .pick-card { border-top: none; }
+.pick-card:hover { box-shadow:0 4px 16px rgba(0,0,0,.12); }
 /* Journal name tags — MDPI/Frontiers/Hindawi/综合 — lighter, after journal name */
 .pick-name-tags { display:flex; align-items:center; gap:5px; margin-bottom:4px; flex-wrap:wrap }
 .pick-name-tags .badge { font-size:10px; padding:1px 6px; font-weight:600; border-radius:3px; letter-spacing:0.03em }
@@ -2563,8 +2566,7 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 /* Dark mode zone tags */
 /* Card background — all same, zone shown via strip+tags only */
 .pick-card .pick-stripe { display:none }
-.pick-card:hover { box-shadow:0 2px 12px rgba(0,0,0,.1) }
-/* Score highlight applied to journal name only, not whole card */
+/* Pick-card highlight system */
 .pick-card-highlight h3 a { background:linear-gradient(135deg, #e6f3e6 0%, #d4ead4 100%); padding:2px 8px; border-radius:4px; display:inline-block; }
 .pick-card-mid h3 a { background:linear-gradient(135deg, #f8f4e8 0%, #f0e8d0 100%); padding:2px 8px; border-radius:4px; display:inline-block; }
 .pick-card h3 { margin:0 0 4px; font-size:17px; line-height:1.4; font-weight:700 }
