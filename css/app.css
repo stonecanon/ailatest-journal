@@ -771,6 +771,10 @@ body.topbar-compact .search-submit {
   font-size: 13px;
   box-shadow: none;
 }
+
+body.topbar-compact .results-head {
+  display: none;
+}
 .tab-panel { order: 4; }
 .tab-panel[data-panel="home"] { order: 4; }
 .site-foot { order: 5; }
