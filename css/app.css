@@ -946,7 +946,7 @@ body.topbar-compact .results-head {
   color: var(--accent);
 }
 
-.col-fav { width: 44px; text-align: center; padding-left: 4px; padding-right: 4px; }
+.col-fav { width: 48px; text-align: center; padding-left: 4px; padding-right: 8px; }
 .col-free { width: 68px; text-align: center; white-space: nowrap; }
 .free-th-filter {
   display: inline-flex;
@@ -1956,6 +1956,7 @@ td.empty,
     flex-direction: row;
     gap: 6px;
   }
+  .rail-top { padding-left: 4px; }
   .rail-nav-btn {
     width: 40px;
     min-height: 40px;
@@ -2079,7 +2080,7 @@ td.empty,
   .col-wos { width: 90px; max-width: 90px; font-size: 11px; }
   .col-badge { width: 130px; min-width: 130px; }
   .col-badge-split { min-width: 130px; width: 130px; }
-  .col-fav { width: 36px; }
+  .col-fav { width: 40px; }
   .col-free { width: 58px; }
   .col-if { width: 44px; max-width: 44px; padding-right: 4px; }
   body.journal-route {
