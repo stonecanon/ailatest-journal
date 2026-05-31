@@ -117,8 +117,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <aside class="app-rail" aria-label="Primary navigation">
   <nav class="rail-top">
-    <button class="rail-brand-btn" data-tab="home" aria-label="知刊" title="知刊">
-      <span class="rail-brand-text">知刊</span>
+    <button class="rail-nav-btn" data-tab="int" aria-label="国际期刊" title="国际期刊">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 3.4 9A14 14 0 0 1 12 21a14 14 0 0 1-3.4-9A14 14 0 0 1 12 3Z"/></svg>
+      <span data-i18n="rail_int">国际期刊</span>
     </button>
     <button class="rail-nav-btn" data-tab="dom" aria-label="中国期刊" title="中国期刊">
       <span class="rail-flag" aria-hidden="true">🇨🇳</span>
@@ -131,6 +132,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </button>
   </nav>
   <div class="rail-bottom">
+    <button class="rail-brand-mobile" data-tab="home" aria-label="知刊" title="回到首页">知刊</button>
     <button class="auth-btn" id="auth-btn" aria-label="Sign in" data-i18n="login">登录</button>
     <div class="lang-toggle-wrap">
       <button class="lang-toggle" id="lang-toggle" aria-label="Switch language">中文</button>
@@ -142,7 +144,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <section class="home-hero" aria-label="AILatest Journal">
     <h1 class="home-title">
       <span class="home-brand-row">
-        <span><span data-i18n="brand_title">知刊 Journal</span> <em><span class="brand-ai">AI</span>Latest<span class="brand-dot">.</span><span class="brand-org">org</span></em></span>
+        <span><span data-i18n="brand_title">Journal</span> <em><span class="brand-ai">AI</span>Latest<span class="brand-dot">.</span><span class="brand-org">org</span></em></span>
       </span>
       <small data-i18n="home_subtitle">全球期刊检索与推荐平台</small>
     </h1>
@@ -174,14 +176,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <a class="tab active" data-tab="home" href="/">
       <span class="tab-label" data-i18n="tab_home">查刊</span>
     </a>
-    <a class="tab" data-tab="int" href="/international">
-      <span class="tab-label" data-i18n="tab_int">国际期刊</span>
-    </a>
     <a class="tab" data-tab="pick" href="/pick">
       <span class="tab-label" data-i18n="tab_pick">荐刊</span>
     </a>
-    <a class="mobile-nav-brand" href="/" aria-label="AILatest Journal"><em data-i18n="brand_title">知刊 Journal</em><span>.ailatest</span></a>
+    <a class="mobile-nav-brand" href="/" aria-label="AILatest Journal"><em data-i18n="brand_title">Journal</em><span>.ailatest</span></a>
   </div>
+
+  <div class="page-brand" id="page-brand" data-tab="home" title="回到首页">知刊</div>
 
   <!-- ─── Home tab ─── -->
   <section class="tab-panel" data-panel="home">
@@ -316,7 +317,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
   <section class="sidebar" id="sidebar">
     <h1 class="brand">
-      <a href="./">AILatest<span data-i18n="brand_title">知刊 Journal</span></a>
+      <a href="./">AILatest<span data-i18n="brand_title">Journal</span></a>
     </h1>
     <div class="brand-sub" data-i18n="tagline"><b>AILatest Journal</b> — 面向科研人员的期刊检索与投稿决策工具，聚合 SCI/SSCI、中科院分区、JCR、ESI、CSSCI、北大核心、浙大目录等数据，支持收藏、评分与跨设备同步。</div>
 
@@ -493,7 +494,7 @@ const __BUILD_VER = 'v20260530-79';
   }
 })();
 </script>
-<script src="/js/app.js?v=20260531-04" defer></script>
+<script src="/js/app.js?v=20260531-05" defer></script>
 <script>
   // Custom install prompt
   let __pwaPrompt = null;
