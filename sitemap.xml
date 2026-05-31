@@ -44845,17 +44845,6 @@
   <url><loc>https://journal.ailatest.org/journal/mu-li-t-i-mud-riyyat/</loc><priority>0.8</priority></url>
   <url><loc>https://journal.ailatest.org/journal/majallah-i-ilm-i-sh-l-t-i-r-n/</loc><priority>0.8</priority></url>
   <url><loc>https://journal.ailatest.org/journal/生物医学转化/</loc><priority>0.8</priority></url>
-  <url><loc>https://journal.ailatest.org/rankings/</loc><priority>0.7</priority></url>
-  <url><loc>https://journal.ailatest.org/rankings/energy/</loc><priority>0.7</priority></url>
-  <url><loc>https://journal.ailatest.org/rankings/architecture/</loc><priority>0.7</priority></url>
-  <url><loc>https://journal.ailatest.org/rankings/environmental-science/</loc><priority>0.7</priority></url>
-  <url><loc>https://journal.ailatest.org/rankings/medicine/</loc><priority>0.7</priority></url>
-  <url><loc>https://journal.ailatest.org/rankings/computer-science/</loc><priority>0.7</priority></url>
-  <url><loc>https://journal.ailatest.org/rankings/engineering/</loc><priority>0.7</priority></url>
-  <url><loc>https://journal.ailatest.org/rankings/materials-science/</loc><priority>0.7</priority></url>
-  <url><loc>https://journal.ailatest.org/rankings/social-sciences/</loc><priority>0.7</priority></url>
-  <url><loc>https://journal.ailatest.org/rankings/management/</loc><priority>0.7</priority></url>
-  <url><loc>https://journal.ailatest.org/rankings/education/</loc><priority>0.7</priority></url>
   <url><loc>https://journal.ailatest.org/indexes/</loc><priority>0.7</priority></url>
   <url><loc>https://journal.ailatest.org/indexes/sci/</loc><priority>0.7</priority></url>
   <url><loc>https://journal.ailatest.org/indexes/scie/</loc><priority>0.7</priority></url>
@@ -44867,4 +44856,25 @@
   <url><loc>https://journal.ailatest.org/indexes/medline/</loc><priority>0.7</priority></url>
   <url><loc>https://journal.ailatest.org/indexes/pmc/</loc><priority>0.7</priority></url>
   <url><loc>https://journal.ailatest.org/indexes/doaj/</loc><priority>0.7</priority></url>
+  <url><loc>https://journal.ailatest.org/subjects/</loc><priority>0.7</priority></url>
+  <url><loc>https://journal.ailatest.org/subjects/engineering/</loc><priority>0.7</priority></url>
+  <url><loc>https://journal.ailatest.org/subjects/clinical-medicine/</loc><priority>0.7</priority></url>
+  <url><loc>https://journal.ailatest.org/subjects/computer-science/</loc><priority>0.7</priority></url>
+  <url><loc>https://journal.ailatest.org/subjects/materials-science/</loc><priority>0.7</priority></url>
+  <url><loc>https://journal.ailatest.org/subjects/environment-ecology/</loc><priority>0.7</priority></url>
+  <url><loc>https://journal.ailatest.org/subjects/chemistry/</loc><priority>0.7</priority></url>
+  <url><loc>https://journal.ailatest.org/subjects/biology-biochemistry/</loc><priority>0.7</priority></url>
+  <url><loc>https://journal.ailatest.org/subjects/physics/</loc><priority>0.7</priority></url>
+  <url><loc>https://journal.ailatest.org/subjects/neuroscience-behavior/</loc><priority>0.7</priority></url>
+  <url><loc>https://journal.ailatest.org/subjects/pharmacology-toxicology/</loc><priority>0.7</priority></url>
+  <url><loc>https://journal.ailatest.org/subjects/economics-business/</loc><priority>0.7</priority></url>
+  <url><loc>https://journal.ailatest.org/subjects/social-sciences/</loc><priority>0.7</priority></url>
+  <url><loc>https://journal.ailatest.org/subjects/geosciences/</loc><priority>0.7</priority></url>
+  <url><loc>https://journal.ailatest.org/subjects/mathematics/</loc><priority>0.7</priority></url>
+  <url><loc>https://journal.ailatest.org/subjects/plant-animal-science/</loc><priority>0.7</priority></url>
+  <url><loc>https://journal.ailatest.org/subjects/agricultural-sciences/</loc><priority>0.7</priority></url>
+  <url><loc>https://journal.ailatest.org/subjects/molecular-biology-genetics/</loc><priority>0.7</priority></url>
+  <url><loc>https://journal.ailatest.org/subjects/immunology/</loc><priority>0.7</priority></url>
+  <url><loc>https://journal.ailatest.org/subjects/microbiology/</loc><priority>0.7</priority></url>
+  <url><loc>https://journal.ailatest.org/subjects/psychiatry-psychology/</loc><priority>0.7</priority></url>
 </urlset>
