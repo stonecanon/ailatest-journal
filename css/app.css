@@ -132,7 +132,7 @@ body.share-mode .app-rail { display: none !important; }
   .page-brand { display: block; }
 }
 
-/* ─── Mobile brand in rail-bottom (right side) ─── */
+/* ─── Mobile brand in rail-top (first) ─── */
 .rail-brand-mobile {
   display: none;
 }

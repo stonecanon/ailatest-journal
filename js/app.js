@@ -68,6 +68,9 @@
       pick_apikey_ph: 'API Key 可选',
       results_all: '全部期刊', load_more: '加载更多',
       col_name: '期刊 Title', col_free: '免费', col_abbr: '缩写 Abbr', col_badges: '索引 / 分区',
+      col_if: 'IF', col_cycle: '审稿周期',
+      filter_idx: '索引', filter_tier: '分区', filter_extra: '其他',
+      brand_zhikan: '知刊',
       col_cat: 'ESI / 中科院大类',
       hero_title_dom: '国内学术期刊分级目录',
       hero_body_dom: '<b>中国科协 高质量科技期刊分级目录 (2025-12 修订)</b> 共 11,084 条 / 59 学科领域；<b>中文期刊目录</b> 共 7,755 条 / 10 大学科分类，CSSCI / 北大核心 / CCF 中文以徽章形式叠加；<b>浙江大学 2024 版</b> 与 <b>高校自编目录 2023</b>（付费解锁）。',
@@ -134,7 +137,10 @@
       pick_quota: 'OpenAlex powered',
       pick_apikey_ph: 'API key optional',
       results_all: 'All journals', load_more: 'Load more',
-      col_name: 'Journal Title', col_free: 'FREE', col_abbr: 'Abbr', col_badges: 'Index / Tier',
+      col_name: 'Journal Title', col_free: 'FREE', col_abbr: 'Abbr', col_badges: 'Indices / Tier',
+      col_if: 'IF', col_cycle: 'Review Cycle',
+      filter_idx: 'Index', filter_tier: 'Tier', filter_extra: 'More',
+      brand_zhikan: '',
       col_cat: 'ESI / CAS Major',
       hero_title_dom: 'Domestic Chinese Journal Directories',
       hero_body_dom: '<b>China Association for Science and Technology (CAST) High-Quality Sci-Tech Journal Tiered Directory (Dec 2025)</b> — 11,084 journals across 59 disciplines; <b>Chinese Journal Directory</b> — 7,755 journals across 10 subject categories, with CSSCI / PKU Core / CCF Chinese badges; <b>ZJU 2024</b>; <b>School A 2023</b> (paywalled).',
@@ -188,6 +194,7 @@
       ...I18N.en,
       tagline: '<b>AILatest Journal</b> — 研究者向けのジャーナル検索・投稿判断ツール。SCI/SSCI、CAS区分、JCR、ESI、CSSCI、PKU Core、ZJU などを統合。',
       brand_title: 'Journal',
+      brand_zhikan: '知刊',
       indices: '索引', cas_zone: 'CAS 2025 区分', filters: 'フィルター', all: 'すべて', filter_xinrui: 'Emerging 区分', filter_warning: '警告リスト', domestic_sources: '中国国内ソース',
       tab_home: 'ジャーナル', tab_int: '国際', tab_dom: '中国', tab_fav: 'お気に入り', tab_pick: '投稿先を選ぶ', loading: '読み込み中…',
       hero_title_int: 'SCI / SSCI 国際ジャーナル検索',
@@ -197,7 +204,7 @@
     },
     ko: {
       ...I18N.en,
-      tagline: '<b>AILatest Journal</b> — 연구자를 위한 저널 검색 및 투고 의사결정 도구입니다.', brand_title: 'Journal', indices: '색인', cas_zone: 'CAS 2025 등급', filters: '필터', all: '전체', filter_xinrui: '신예 등급', filter_warning: '경고 목록', domestic_sources: '중국 국내 목록', tab_home: '저널', tab_int: '국제', tab_dom: '중국', tab_fav: '즐겨찾기', tab_pick: '저널 추천', loading: '불러오는 중…',
+      tagline: '<b>AILatest Journal</b> — 연구자를 위한 저널 검색 및 투고 의사결정 도구입니다.', brand_title: 'Journal', brand_zhikan: '知刊', indices: '색인', cas_zone: 'CAS 2025 등급', filters: '필터', all: '전체', filter_xinrui: '신예 등급', filter_warning: '경고 목록', domestic_sources: '중국 국내 목록', tab_home: '저널', tab_int: '국제', tab_dom: '중국', tab_fav: '즐겨찾기', tab_pick: '저널 추천', loading: '불러오는 중…',
       hero_title_int: 'SCI / SSCI 국제 저널 검색', hero_body_int: '데이터: <b>Web of Science Core Collection</b>(2026-05-18) 및 <b>EI Compendex</b>(2025-10-10). <b>JCR 2025</b> 색인, <b>ESI</b>, <b>CAS 2025</b>, <b>ShowJCR</b> JCR 2025 릴리스 · 2024 지표(IF/분야/순위), CCF 2026, 경고 목록을 통합했습니다. 총 <b id="total">—</b> 종.', hero_note: '배지 범례: <b>SCIE/SSCI/AHCI/ESCI/EI</b> 색인 수록 · <b>CAS</b> CAS 2025 대분류(1-4구, TOP표시) · <b>JCR Q</b> Quartile(Q1-Q4) · <b>Emerging</b> CAS 2026 신흥판 구분 · <b>CCF</b> CCF 2026 추천(A/B/C) · <b>ABDC</b> 호주 경영저널 등급(A*/A/B/C) · <b>ABS</b> Chartered ABS Academic Journal Guide 2024(4*/4/3/2/1, 경영·상학만) · <b>T1/T2/T3</b> 중국과학기협 2025 고품질 학술지 등급 · <b>⚠ Warning</b> 국제 학술지 경고 목록.', hero_title_dom: '중국 학술지 등급 목록', hero_title_fav: '즐겨찾기', hero_title_pick: '저널 추천', hero_body_pick: '곧 제공됩니다. 연구 주제, IF 범위, 심사 기간, APC, 색인 조건으로 추천합니다.', pick_coming_title: '준비 중', pick_coming_desc: '향후 업데이트', results_all: '전체 저널', load_more: '더 보기', col_name: '저널 Title', col_free: '무료', col_abbr: '약어 Abbr', col_badges: '색인 / 등급', search_int: '검색: 제목 / 약어 / ISSN / 중국어명', search_dom: '검색: 중국어명 / 영어명 / ISSN / CN', search_fav: '즐겨찾기 검색', showing: '표시', of: '/', total_items: '개', empty: '일치하는 저널이 없습니다', login: '로그인', logout: '로그아웃', wos_subjects: 'WoS 세부분야', wos_search_ph: '분야 필터(A-Z)…'
     },
     es: {

@@ -117,7 +117,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <aside class="app-rail" aria-label="Primary navigation">
   <nav class="rail-top">
-    <button class="rail-brand-mobile" data-tab="home" aria-label="知刊" title="回到首页">知刊</button>
+    <button class="rail-brand-mobile" data-tab="home" aria-label="知刊" title="回到首页" data-i18n="brand_zhikan">知刊</button>
     <button class="rail-nav-btn" data-tab="int" aria-label="国际期刊" title="国际期刊">
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 3.4 9A14 14 0 0 1 12 21a14 14 0 0 1-3.4-9A14 14 0 0 1 12 3Z"/></svg>
       <span data-i18n="rail_int">国际期刊</span>
@@ -182,7 +182,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <a class="mobile-nav-brand" href="/" aria-label="AILatest Journal"><em data-i18n="brand_title">Journal</em><span>.ailatest</span></a>
   </div>
 
-  <div class="page-brand" id="page-brand" data-tab="home" title="回到首页">知刊</div>
+  <div class="page-brand" id="page-brand" data-tab="home" title="回到首页" data-i18n="brand_zhikan">知刊</div>
 
   <!-- ─── Home tab ─── -->
   <section class="tab-panel" data-panel="home">
@@ -210,7 +210,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               </th>
               <th class="col-badge">
                 <div class="th-dropdown" id="idx-dropdown">
-                  <button class="th-dropdown-btn"><span class="dd-label">索引</span><span class="dd-arrow">▼</span></button>
+                  <button class="th-dropdown-btn"><span class="dd-label" data-i18n="filter_idx">索引</span><span class="dd-arrow">▼</span></button>
                   <div class="th-dropdown-panel" id="idx-panel">
                   <label class="th-chk" data-filter="index" data-value="SCIE"><input type="checkbox"><span>SCIE</span></label>
                     <label class="th-chk" data-filter="index" data-value="SSCI"><input type="checkbox"><span>SSCI</span></label>
@@ -225,7 +225,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                   </div>
                 </div>
                 <div class="th-dropdown" id="tier-dropdown">
-                  <button class="th-dropdown-btn"><span class="dd-label">分区</span><span class="dd-arrow">▼</span></button>
+                  <button class="th-dropdown-btn"><span class="dd-label" data-i18n="filter_tier">分区</span><span class="dd-arrow">▼</span></button>
                   <div class="th-dropdown-panel" id="tier-panel">
                   <label class="th-chk" data-filter="jcr" data-value="Q1"><input type="checkbox"><span>JCR Q1</span></label>
                   <label class="th-chk" data-filter="jcr" data-value="Q2"><input type="checkbox"><span>JCR Q2</span></label>
@@ -246,7 +246,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                   </div>
                 </div>
                 <div class="th-dropdown" id="extra-dropdown">
-                  <button class="th-dropdown-btn"><span class="dd-label">其他</span><span class="dd-arrow">▼</span></button>
+                  <button class="th-dropdown-btn"><span class="dd-label" data-i18n="filter_extra">其他</span><span class="dd-arrow">▼</span></button>
                   <div class="th-dropdown-panel" id="extra-panel">
                   <label class="th-chk" data-filter="feat" data-value="warning"><input type="checkbox"><span>中科院预警</span></label>
                    <label class="th-chk" data-filter="feat" data-value="under_review"><input type="checkbox"><span>新锐 Under Review</span></label>
@@ -265,8 +265,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                   </div>
                 </div>
               </th>
-              <th class="col-if sortable" data-if-sort="int" title="按 IF 排序">IF <span class="sort-arrow">▼</span></th>
-              <th class="col-cycle">审稿周期</th>
+              <th class="col-if sortable" data-if-sort="int" title="按 IF 排序"><span data-i18n="col_if">IF</span> <span class="sort-arrow">▼</span></th>
+              <th class="col-cycle"><span data-i18n="col_cycle">审稿周期</span></th>
               <th class="col-wos">
                 <select id="wos-col-filter" class="th-select" aria-label="筛选 Web of Science 学科">
                   <option value="__all">WoS Subject</option>
@@ -494,7 +494,7 @@ const __BUILD_VER = 'v20260530-79';
   }
 })();
 </script>
-<script src="/js/app.js?v=20260531-05" defer></script>
+<script src="/js/app.js?v=20260531-06" defer></script>
 <script>
   // Custom install prompt
   let __pwaPrompt = null;
