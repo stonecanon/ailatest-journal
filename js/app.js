@@ -2293,6 +2293,7 @@
       else if (filter === 'feat') checked = activeFeats.has(val);
       else if (filter === 'jcr') checked = activeJcr.has(val);
       else if (filter === 'zone') checked = activeZones.has(val);
+      else if (filter === 'xr') checked = activeXr.has(val);
       else if (filter === 'abdc') checked = activeAbdc.has(val);
       else if (filter === 'abs') checked = activeAbs.has(val);
       cb.checked = checked;
@@ -2405,6 +2406,7 @@
                 else if (sf === 'feat') { if (cb.checked) activeFeats.add(sv); else activeFeats.delete(sv); }
                 else if (sf === 'jcr') { if (cb.checked) activeJcr.add(sv); else activeJcr.delete(sv); }
                 else if (sf === 'zone') { if (cb.checked) activeZones.add(sv); else activeZones.delete(sv); }
+                else if (sf === 'xr') { if (cb.checked) activeXr.add(sv); else activeXr.delete(sv); }
                 else if (sf === 'abdc') { if (cb.checked) activeAbdc.add(sv); else activeAbdc.delete(sv); }
                 else if (sf === 'abs') { if (cb.checked) activeAbs.add(sv); else activeAbs.delete(sv); }
               }
@@ -2428,6 +2430,9 @@
           } else if (filter === 'zone') {
             if (cb.checked) activeZones.add(val);
             else activeZones.delete(val);
+          } else if (filter === 'xr') {
+            if (cb.checked) activeXr.add(val);
+            else activeXr.delete(val);
           } else if (filter === 'abdc') {
             if (cb.checked) activeAbdc.add(val);
             else activeAbdc.delete(val);
