@@ -1691,6 +1691,10 @@
     if (!m) return '';
     return `<span class="badge b-medline" title="${T('MEDLINE 数据库收录（NLM 精选索引）','Indexed in MEDLINE (NLM curated)')}">MEDLINE</span>`;
   }
+  function badgeFree(f) {
+    if (!f) return '';
+    return `<span class="badge b-free" title="${T('可免费发表（Diamond OA，无版面费）','Free to publish (Diamond OA, no APC)')}">${T('免费发表','FREE')}</span>`;
+  }
   // 期刊浏览量缓存（journal_key → count）
   const viewsCache = {};
   function badgeView(key) {
@@ -1853,6 +1857,7 @@
       badgeOAJ(r.oaj),
       badgeDOAJ(r.doaj),
       badgeMEDLINE(r.medline),
+      badgeFree(r.free),
     ].filter(Boolean).join('');
   }
   function renderRankBadges(r) {
@@ -2001,7 +2006,7 @@
     // ESI adds another OR condition — journal with esi_category also shows
     const esiActive = activeIndices.has('ESI');
     const idxOnly = new Set([...activeIndices].filter(v => v !== 'ESI'));
-    const nonWosIdx = ['scopus','oaj','doaj','medline'];
+    const nonWosIdx = ['scopus','oaj','doaj','medline','free'];
     // If column header idx filter selects a non‑WoS index, bypass sidebar activeIndices
     const bypassIdx = nonWosIdx.includes(activeIdxFilter);
     const matchesAny = bypassIdx || !idxOnly.size || (r.indices || []).some(i => idxOnly.has(i));
@@ -2010,6 +2015,7 @@
       // index filter (allows pure directory-journals without WoS/EI indices to show)
       if (!((activeFeats.has('oaj') && r.oaj) || (activeFeats.has('doaj') && r.doaj) ||
             (activeFeats.has('medline') && r.medline) ||
+            (activeFeats.has('free') && r.free) ||
             (activeFeats.has('warning') && r.warning))) return false;
     }
     if (activeZones.size) {
@@ -2049,6 +2055,7 @@
     if (activeFeats.has('oaj') && !r.oaj) return false;
     if (activeFeats.has('doaj') && !r.doaj) return false;
     if (activeFeats.has('medline') && !r.medline) return false;
+    if (activeFeats.has('free') && !r.free) return false;
     if (activeFeats.has('warning') && !r.warning) return false;
     if (activeFeats.has('abdc') && !(r.abdc && r.abdc.rating)) return false;
     if (activeFeats.has('abs')  && !(r.abs  && r.abs.rating))  return false;
@@ -3360,6 +3367,7 @@
       const apcText = (ir.doaj?.apc === 'Yes' && doajFee) ? doajFee : (ir.doaj?.apc === 'Yes' ? T('有 APC','Has APC') : '');
       const doajBadge = doaj ? `<span class="oa-chip oa-doaj">&check; ${T('收录 DOAJ','In DOAJ')}</span>` : '';
       const isoaBadge = isoa ? '<span class="oa-chip oa-isoa">Open Access</span>' : '';
+      const freeBadge = r.free ? `<span class="oa-chip oa-free" title="${T('可免费发表（Diamond OA，作者不付费）','Free to publish (Diamond OA, no author fees)')}">${T('✓ 免费发表','✓ FREE')}</span>` : '';
       const rows = [];
       if (homepage) rows.push([T('官网','Website'), `<a href="${escape(homepage)}" target="_blank" rel="noopener nofollow">${escape(homepage.replace(/^https?:\/\//,'').replace(/\/$/,''))}</a>`]);
       if (apcText) rows.push([T('版面费 (APC)','APC'), escape(apcText)]);
@@ -3369,7 +3377,7 @@
         <h4>${T('开放获取 / 版面费','Open Access / APC')}</h4>
         <div class="oa-head">
           <span class="oa-pill ${L.cls}">${L.text}</span>
-          ${doajBadge}${isoaBadge}
+          ${doajBadge}${isoaBadge}${freeBadge}
         </div>
         ${L.desc ? `<div class="oa-desc muted">${L.desc}</div>` : ''}
         ${rows.length ? `<div class="oa-rows">${rows.map(([k,v]) =>
