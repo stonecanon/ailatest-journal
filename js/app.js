@@ -799,6 +799,7 @@
     const ogDesc = document.querySelector('meta[property="og:description"]');
     if (ogDesc) ogDesc.setAttribute('content', seo.desc);
   }
+  let activeTopics = new Set();
   let activeCat = '__all';   // ESI subject filter (legacy name)
   let activeCasMajor = '__all'; // CAS 大类 filter
   /* column header checkbox groups replaced the old single-value filters */
@@ -809,9 +810,7 @@
   let activeAbdc = new Set();
   let activeAbs = new Set();
   let activeFeats = new Set();
-  let activeWos = new Set();
-  let activeOaSf = new Set();
-  let wosCats = [];   // [{name,count}] sorted A-Z
+  let topicList = []; // [{name,count}] sorted A-Z, merged WoS + OA
   let activeQuery = '';
   let activeDom = 'cnki_major';   // 中文期刊目录
   let activeDomBadges = new Set(); // 默认不勾选 = 显示全部；勾选 = 只看有该徽章的
@@ -2124,7 +2123,7 @@
       <td class="col-badge col-badge-split">${badgeCell}</td>
       <td class="col-if">${ifCell}</td>
       <td class="col-cycle">${cycleCell}</td>
-      <td class="col-wos">${wosCell}</td>
+      <td class="col-topic">${wosCell}</td>
     </tr>`;
   }
 
@@ -2201,25 +2200,17 @@
     if (activeFeats.has('abdc') && !(r.abdc && r.abdc.rating)) return false;
     if (activeFeats.has('abs')  && !(r.abs  && r.abs.rating))  return false;
     if (activeCat !== '__all' && r.esi_category !== activeCat) return false;
-    if (activeWos.size) {
+    if (activeTopics.size) {
       const wc = r.wos_categories || [];
       let ok = false;
-      for (const c of wc) if (activeWos.has(c)) { ok = true; break; }
+      for (const c of wc) if (activeTopics.has(c)) { ok = true; break; }
       if (!ok) {
         // Also check OpenAlex subfields
         const issn = (r.issn || r.eissn || '').toUpperCase();
         const rec = oaMap[issn];
         const sf = (rec && Array.isArray(rec.sf)) ? rec.sf : [];
-        for (const s of sf) if (activeWos.has(s)) { ok = true; break; }
+        for (const s of sf) if (activeTopics.has(s)) { ok = true; break; }
       }
-      if (!ok) return false;
-    }
-    if (activeOaSf.size) {
-      const issn = (r.issn || r.eissn || '').toUpperCase();
-      const rec = oaMap[issn];
-      const sf = (rec && Array.isArray(rec.sf)) ? rec.sf : [];
-      let ok = false;
-      for (const s of sf) if (activeOaSf.has(s)) { ok = true; break; }
       if (!ok) return false;
     }
     if (activeQuery) {
@@ -2434,60 +2425,32 @@
   // ───────── category nav ─────────
   function renderCatList() {
     initThDropdowns();
-    const total = $('#count-all');
-    if (total) total.textContent = journals.length.toLocaleString();
-    const allBtn = $('#wos-all-btn');
-    const wosSel = $('#wos-col-filter');
+    const total = $('#count-topic');
+    if (total) total.textContent = topicList.length.toLocaleString();
+    const allBtn = $('#topic-all-btn');
     if (allBtn && !allBtn.__bound) {
       allBtn.__bound = true;
       allBtn.addEventListener('click', () => {
-        activeWos.clear();
+        activeTopics.clear();
         $$('.wos-item').forEach(el => el.classList.remove('on'));
-        $$('#wos-list input[type=checkbox]').forEach(cb => cb.checked = false);
-        if (wosSel) wosSel.value = '__all';
-        const inp = $('#wos-search'); if (inp) inp.value = '';
-        renderWosList();
+        $$('#topic-list input[type=checkbox]').forEach(cb => cb.checked = false);
+        const inp = $('#topic-search'); if (inp) inp.value = '';
+        renderTopicList();
         activeCat = '__all';
         shown = PAGE;
         renderInt();
       });
     }
-    // 大类列下拉切换：WoS 学科（v31: 表头下拉填充 distinct 学科 + 触发筛选）
-    if (wosSel && !wosSel.__bound) {
-      wosSel.__bound = true;
-      const wosSet = new Set();
-      journals.forEach(j => (j.wos_categories || []).forEach(c => { if (c) wosSet.add(c); }));
-      const wosList = [...wosSet].sort((a,b) => a.localeCompare(b, 'en'));
-      // Collect OA subfields not already in WoS
-      const issnSet = new Set(journals.map(j => (j.issn || j.eissn || '').toUpperCase()).filter(Boolean));
-      const oaSfSet = new Set();
-      for (const issn of issnSet) {
-        const rec = oaMap[issn];
-        if (rec && Array.isArray(rec.sf)) {
-          for (const s of rec.sf) if (s && !wosSet.has(s)) oaSfSet.add(s);
-        }
-      }
-      const oaSfList = [...oaSfSet].sort((a,b) => a.localeCompare(b, 'en'));
-      wosSel.innerHTML = `<option value="__all">—</option>` +
-        `<optgroup label="${T('WoS 学科','WoS Subject')}">` +
-        wosList.map(v => `<option value="${escape(v)}">${escape(v)}</option>`).join('') +
-        `</optgroup>` +
-        `<optgroup label="${T('OA 研究主题','OA Topics')}">` +
-        oaSfList.map(v => `<option value="${escape(v)}">${escape(v)}</option>`).join('') +
-        `</optgroup>`;
-      wosSel.addEventListener('change', () => {
-        activeWos.clear();
-        if (wosSel.value !== '__all') activeWos.add(wosSel.value);
-        $$('#wos-list input[type=checkbox]').forEach(cb => { cb.checked = activeWos.has(cb.value); });
-        $$('.wos-item').forEach(el => {
-          const v = el.querySelector('input')?.value;
-          el.classList.toggle('on', !!v && activeWos.has(v));
-        });
+    const clearBtn = $('#topic-clear');
+    if (clearBtn && !clearBtn.__bound) {
+      clearBtn.__bound = true;
+      clearBtn.addEventListener('click', () => {
+        activeTopics.clear();
+        renderTopicList();
         shown = PAGE;
         renderInt();
       });
     }
-    if (wosSel) wosSel.value = activeWos.size === 1 ? [...activeWos][0] : '__all';
     // 同步题头复选框状态与 Sets 一致
     syncThChkState();
     // 题头下拉复选框筛选：复选框直接操作 Sets
@@ -2625,20 +2588,23 @@
     return [...expanded];
   }
 
-  function renderWosList() {
-    const box = $('#wos-list');
-    if (!box || !wosCats.length) return;
-    const raw = ($('#wos-search')?.value || '').trim().toLowerCase();
+  function renderTopicList() {
+    const box = $('#topic-list');
+    if (!box || !topicList.length) return;
+    const raw = ($('#topic-search')?.value || '').trim().toLowerCase();
     const tokens = expandWosQuery(raw);
     const filtered = !tokens.length
-      ? wosCats
-      : wosCats.filter(c => {
+      ? topicList
+      : topicList.filter(c => {
           const name = c.name.toLowerCase();
           return tokens.some(t => name.includes(t));
         });
+    const total = topicList.length;
+    const totalEl = $('#count-topic');
+    if (totalEl) totalEl.textContent = total.toLocaleString();
     box.innerHTML = filtered.map(c =>
-      `<label class="wos-item${activeWos.has(c.name) ? ' on' : ''}">
-         <input type="checkbox" value="${escape(c.name)}" ${activeWos.has(c.name) ? 'checked' : ''}>
+      `<label class="wos-item${activeTopics.has(c.name) ? ' on' : ''}">
+         <input type="checkbox" value="${escape(c.name)}" ${activeTopics.has(c.name) ? 'checked' : ''}>
          <span class="wos-name">${escape(c.name)}</span>
          <span class="wos-count">${c.count}</span>
        </label>`
@@ -2646,50 +2612,7 @@
     // bind change
     box.querySelectorAll('input[type=checkbox]').forEach(cb => {
       cb.addEventListener('change', () => {
-        if (cb.checked) activeWos.add(cb.value); else activeWos.delete(cb.value);
-        cb.closest('.wos-item').classList.toggle('on', cb.checked);
-        const wosSel = $('#wos-col-filter');
-        if (wosSel) wosSel.value = activeWos.size === 1 ? [...activeWos][0] : '__all';
-        shown = PAGE;
-        renderInt();
-      });
-    });
-  }
-
-  // ─── OpenAlex subfield topic list (sidebar) ───
-  function renderOaSfList() {
-    const box = $('#oa-sf-list');
-    if (!box) return;
-    if (!oaMap || !Object.keys(oaMap).length) { box.innerHTML = '<span class="muted-cell">—</span>'; return; }
-    // Collect subfield counts from oaMap
-    const sfCount = {};
-    const issnSet = new Set(journals.map(j => (j.issn || j.eissn || '').toUpperCase()).filter(Boolean));
-    for (const issn of issnSet) {
-      const rec = oaMap[issn];
-      if (rec && Array.isArray(rec.sf)) {
-        for (const s of rec.sf) {
-          sfCount[s] = (sfCount[s] || 0) + 1;
-        }
-      }
-    }
-    const raw = ($('#oa-sf-search')?.value || '').trim().toLowerCase();
-    const entries = Object.entries(sfCount)
-      .map(([name, count]) => ({ name, count }))
-      .sort((a, b) => a.name.localeCompare(b.name, 'en'));
-    const filtered = !raw ? entries : entries.filter(e => e.name.toLowerCase().includes(raw));
-    const total = entries.length;
-    const totalEl = $('#count-oa-sf');
-    if (totalEl) totalEl.textContent = total.toLocaleString();
-    box.innerHTML = filtered.map(e =>
-      `<label class="wos-item${activeOaSf.has(e.name) ? ' on' : ''}">
-         <input type="checkbox" value="${escape(e.name)}" ${activeOaSf.has(e.name) ? 'checked' : ''}>
-         <span class="wos-name">${escape(e.name)}</span>
-         <span class="wos-count">${e.count}</span>
-       </label>`
-    ).join('');
-    box.querySelectorAll('input[type=checkbox]').forEach(cb => {
-      cb.addEventListener('change', () => {
-        if (cb.checked) activeOaSf.add(cb.value); else activeOaSf.delete(cb.value);
+        if (cb.checked) activeTopics.add(cb.value); else activeTopics.delete(cb.value);
         cb.closest('.wos-item').classList.toggle('on', cb.checked);
         shown = PAGE;
         renderInt();
@@ -4759,23 +4682,17 @@
       e.preventDefault();
       setFreeFilter(!activeFeats.has('free'));
     });
-    $('#wos-search')?.addEventListener('input', () => renderWosList());
-    $('#wos-clear')?.addEventListener('click', () => {
-      activeWos.clear();
-      const inp = $('#wos-search'); if (inp) inp.value = '';
-      renderWosList();
+    $('#topic-search')?.addEventListener('input', () => renderTopicList());
+    $('#topic-clear')?.addEventListener('click', () => {
+      activeTopics.clear();
+      const inp = $('#topic-search'); if (inp) inp.value = '';
+      renderTopicList();
       shown = PAGE; renderInt();
     });
-    $('#oa-sf-search')?.addEventListener('input', () => renderOaSfList());
-    $('#oa-sf-clear')?.addEventListener('click', () => {
-      activeOaSf.clear();
-      const inp = $('#oa-sf-search'); if (inp) inp.value = '';
-      renderOaSfList();
-      shown = PAGE; renderInt();
-    });
-    $('#oa-sf-all-btn')?.addEventListener('click', () => {
-      activeOaSf.clear();
-      renderOaSfList();
+    $('#topic-all-btn')?.addEventListener('click', () => {
+      activeTopics.clear();
+      const inp = $('#topic-search'); if (inp) inp.value = '';
+      renderTopicList();
       shown = PAGE; renderInt();
     });
     $('#q').addEventListener('input', (e) => {
@@ -5143,9 +5060,7 @@
             persistFavLists(false);
             applyI18n();
             // 重置列头下拉的__bound标记，使其下次用新语言重建
-            const wosSel2 = $('#wos-col-filter'); if (wosSel2) wosSel2.__bound = false;
-            renderWosList();
-            renderOaSfList();
+            renderTopicList();
             if (activeTab === 'dom') renderDomestic();
             else if (activeTab === 'fav') renderFav();
             else if (activeTab === 'int') renderInt();
@@ -6038,17 +5953,26 @@
         }
         if (dirty) localStorage.setItem(STORAGE_PREFIX + 'favsData', JSON.stringify(favsData));
       })();
-      // 计算 WoS 学科表（按字母 A-Z 排序）
+      // 计算合并的 topicList（WoS 学科 + OpenAlex subfield）
       const _wc = Object.create(null);
       for (const r of journals) for (const c of (r.wos_categories||[])) _wc[c] = (_wc[c]||0)+1;
-      wosCats = Object.entries(_wc).map(([name,count])=>({name,count})).sort((a,b)=>a.name.localeCompare(b.name,'en'));
+      // Add OA subfield counts for topics not in WoS
+      const issnSet = new Set(journals.map(j => (j.issn || j.eissn || '').toUpperCase()).filter(Boolean));
+      for (const issn of issnSet) {
+        const rec = oaMap[issn];
+        if (rec && Array.isArray(rec.sf)) {
+          for (const s of rec.sf) {
+            if (s && !(s in _wc)) _wc[s] = (_wc[s]||0) + 1;
+          }
+        }
+      }
+      topicList = Object.entries(_wc).map(([name,count])=>({name,count})).sort((a,b)=>a.name.localeCompare(b.name,'en'));
       if (meta?.total && $('#total')) $('#total').textContent = meta.total.toLocaleString();
       $('#hint').textContent = lang === 'zh'
         ? `${T('已加载','Loaded')} ${journals.length.toLocaleString()} ${T('本期刊','journals')}`
         : `${journals.length.toLocaleString()} journals loaded`;
       renderCatList();
-      renderWosList();
-      renderOaSfList();
+      renderTopicList();
       if (renderJournalRoutePage()) {
         window.addEventListener('hashchange', applyHashRoute);
         if (user) await pullFavs();

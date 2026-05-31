@@ -267,11 +267,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               </th>
               <th class="col-if sortable" data-if-sort="int" title="按 IF 排序"><span data-i18n="col_if">IF</span> <span class="sort-arrow">▼</span></th>
               <th class="col-cycle"><span data-i18n="col_cycle">审稿周期</span></th>
-              <th class="col-wos">
-                <select id="wos-col-filter" class="th-select" aria-label="筛选 Web of Science 学科">
-                  <option value="__all">WoS Subject</option>
-                </select>
-              </th>
+              <th class="col-topic"><span data-i18n="col_topic">学科</span></th>
             </tr>
           </thead>
           <tbody id="tbody"></tbody>
@@ -403,27 +399,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
 
     <div class="side-section" data-international>
-      <div class="side-label" data-i18n="wos_subjects">WoS 细分学科</div>
+      <div class="side-label"><span data-i18n="wos_subjects">学科 / 研究主题</span> <span class="muted-cell" style="font-size:11px">(WoS + OpenAlex)</span></div>
       <div class="wos-actions">
-        <button class="wos-clear" id="wos-clear" type="button" title="清空选择 / Clear" data-i18n-title="wos_clear_title">×</button>
+        <button class="wos-clear" id="topic-clear" type="button" title="清空选择" data-i18n-title="wos_clear_title">×</button>
       </div>
       <div class="wos-search-wrap">
-        <input id="wos-search" type="search" placeholder="筛选学科（A-Z）…" data-i18n-placeholder="wos_search_ph" autocomplete="off" spellcheck="false" />
+        <input id="topic-search" type="search" placeholder="筛选学科或主题…" data-i18n-placeholder="wos_search_ph" autocomplete="off" spellcheck="false" />
       </div>
-      <div class="wos-list wos-list-tall" id="wos-list"></div>
-      <button class="nav-item" data-cat="__all" id="wos-all-btn" style="margin-top:8px"><span data-i18n="all">全部</span> <span class="count" id="count-all">—</span></button>
-    </div>
-
-    <div class="side-section" data-international>
-      <div class="side-label"><span data-i18n="oa_sf_label">研究主题</span> <span class="muted-cell" style="font-size:11px">(OpenAlex)</span></div>
-      <div class="wos-actions">
-        <button class="wos-clear" id="oa-sf-clear" type="button" data-i18n-title="oa_sf_clear" title="清空选择">×</button>
-      </div>
-      <div class="wos-search-wrap">
-        <input id="oa-sf-search" type="search" data-i18n-placeholder="oa_sf_ph" placeholder="筛选主题…" autocomplete="off" spellcheck="false" />
-      </div>
-      <div class="wos-list wos-list-tall" id="oa-sf-list"></div>
-      <button class="nav-item" id="oa-sf-all-btn" style="margin-top:8px"><span data-i18n="all">全部</span> <span class="count" id="count-oa-sf">—</span></button>
+      <div class="wos-list wos-list-tall" id="topic-list"></div>
+      <button class="nav-item" id="topic-all-btn" style="margin-top:8px"><span data-i18n="all">全部</span> <span class="count" id="count-topic">—</span></button>
     </div>
 
     <div class="side-section" data-domestic hidden>
@@ -506,7 +490,7 @@ const __BUILD_VER = 'v20260530-79';
   }
 })();
 </script>
-<script src="/js/app.js?v=20260601-02" defer></script>
+<script src="/js/app.js?v=20260601-03" defer></script>
 <script>
   // Custom install prompt
   let __pwaPrompt = null;
