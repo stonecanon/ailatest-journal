@@ -318,12 +318,16 @@ function renderCloudflare(data) {
   const kpis = document.querySelector('.cf-kpis');
   if (kpis) kpis.innerHTML = '';
   if (!ok) return;
+  const note = document.querySelector('#cf-note');
+  if (note && src.reason) {
+    note.innerHTML = `<div class="empty">${src.reason}</div>`;
+  }
   const today = src.today || {};
   const totals = src.totals || {};
   if (kpis) kpis.append(
-    kpi('今日请求数', n(today.requests), `${today.day || ''} 全部 HTTP 请求`, 'CF'),
-    kpi('今日页面浏览', n(today.pageviews), '由 Cloudflare 统计（含直接访问）', 'PV'),
-    kpi('今日独立访客', n(today.visitors), '按 Cloudflare 去重', 'UV'),
+    kpi('今日请求数', n(today.requests), `${today.day || ''} ${src.mode === 'httpRequestsAdaptiveGroups' ? 'Adaptive Groups' : '全部 HTTP 请求'}`, 'CF'),
+    kpi('今日页面浏览', n(today.pageviews), src.mode === 'httpRequestsAdaptiveGroups' ? 'Cloudflare visits 近似口径' : '由 Cloudflare 统计（含直接访问）', 'PV'),
+    kpi('今日独立访客', n(today.visitors), src.mode === 'httpRequestsAdaptiveGroups' ? 'Adaptive Groups 不提供 uniques，暂用 visits' : '按 Cloudflare 去重', 'UV'),
     kpi('今日流量', humanBytes(today.bytes), `加密请求 ${n(today.encrypted_requests)}`, '↯'),
     kpi('近 14 天累计', `${n(totals.requests)} 请求`, `浏览 ${n(totals.pageviews)} · 访客 ${n(totals.visitors)} · 威胁拦截 ${n(totals.threats)}`, 'Σ'),
   );
@@ -591,13 +595,14 @@ function renderLoginGate(message) {
     </section>`;
 }
 
-async function loadDashboardData() {
+async function loadDashboardData(options = {}) {
   const token = ownerToken();
   if (!token) {
     renderLoginGate('未检测到登录凭证。请用站长的 Gmail 邮箱登录主站后再访问本看板。');
     return;
   }
-  const resp = await fetch(`${API_BASE}/analytics/dashboard?ts=${Date.now()}`, {
+  const nocache = options.nocache ? '&nocache=1' : '';
+  const resp = await fetch(`${API_BASE}/analytics/dashboard?ts=${Date.now()}${nocache}`, {
     cache: 'no-store',
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -616,7 +621,7 @@ async function refreshFromServer(button) {
     button.textContent = '刷新中...';
   }
   try {
-    await loadDashboardData();
+    await loadDashboardData({ nocache: true });
   } finally {
     if (button) {
       button.disabled = false;

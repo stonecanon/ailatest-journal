@@ -19,6 +19,11 @@ function daysAgoUTC(n) {
   d.setUTCDate(d.getUTCDate() - n);
   return ymd(d);
 }
+function tomorrowUTC() {
+  const d = new Date();
+  d.setUTCDate(d.getUTCDate() + 1);
+  return ymd(d);
+}
 function num(v) {
   const n = Number(v || 0);
   return Number.isFinite(n) ? n : 0;
@@ -165,10 +170,24 @@ async function buildCloudflare(env) {
   }
   const since = daysAgoUTC(13);
   const until = daysAgoUTC(0);
+  const untilExclusive = tomorrowUTC();
+  const runGraphql = async query => {
+    const resp = await fetch('https://api.cloudflare.com/client/v4/graphql', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query }),
+    });
+    const body = await resp.json().catch(() => null);
+    if (!resp.ok || body?.errors?.length) {
+      const reason = body?.errors?.map(e => e.message).join('; ') || `HTTP ${resp.status}`;
+      throw new Error(reason);
+    }
+    return body;
+  };
   // Dates/zoneTag inlined as string literals (zoneId + dates are server-controlled).
   // httpRequests1dGroups date filters expect the Cloudflare `string` scalar, so passing
   // them via typed GraphQL variables is fragile — inlining avoids any type mismatch.
-  const query = `{
+  const dailyQuery = `{
     viewer { zones(filter: { zoneTag: "${zoneId}" }) {
       httpRequests1dGroups(limit: 30, filter: { date_geq: "${since}", date_leq: "${until}" }, orderBy: [date_ASC]) {
         dimensions { date }
@@ -177,18 +196,35 @@ async function buildCloudflare(env) {
       }
     } }
   }`;
-  const resp = await fetch('https://api.cloudflare.com/client/v4/graphql', {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ query }),
-  });
-  const body = await resp.json().catch(() => null);
-  if (!resp.ok || body?.errors?.length) {
-    const reason = body?.errors?.map(e => e.message).join('; ') || `HTTP ${resp.status}`;
-    return { source: 'Cloudflare Analytics', status: 'error', reason };
+  const adaptiveQuery = `{
+    viewer { zones(filter: { zoneTag: "${zoneId}" }) {
+      httpRequestsAdaptiveGroups(
+        limit: 30,
+        filter: {
+          datetime_geq: "${since}T00:00:00Z",
+          datetime_lt: "${untilExclusive}T00:00:00Z",
+          requestSource: "eyeball"
+        },
+        orderBy: [datetimeDay_ASC]
+      ) {
+        count
+        dimensions { datetimeDay }
+        sum { visits edgeResponseBytes }
+      }
+    } }
+  }`;
+
+  let sourceMode = 'httpRequests1dGroups';
+  let groups = [];
+  let primaryError = '';
+  try {
+    const body = await runGraphql(dailyQuery);
+    groups = body?.data?.viewer?.zones?.[0]?.httpRequests1dGroups || [];
+  } catch (e) {
+    primaryError = e.message || String(e);
   }
-  const groups = body?.data?.viewer?.zones?.[0]?.httpRequests1dGroups || [];
-  const series = groups.map(g => ({
+
+  let series = groups.map(g => ({
     day: g.dimensions.date,
     requests: num(g.sum.requests),
     pageviews: num(g.sum.pageViews),
@@ -198,11 +234,38 @@ async function buildCloudflare(env) {
     encrypted_requests: num(g.sum.encryptedRequests),
     threats: num(g.sum.threats),
   }));
+
+  if (!series.length || !series.some(row => row.requests || row.pageviews || row.visitors)) {
+    try {
+      const body = await runGraphql(adaptiveQuery);
+      const adaptive = body?.data?.viewer?.zones?.[0]?.httpRequestsAdaptiveGroups || [];
+      if (adaptive.length) {
+        sourceMode = 'httpRequestsAdaptiveGroups';
+        series = adaptive.map(g => ({
+          day: String(g.dimensions.datetimeDay || '').slice(0, 10),
+          requests: num(g.count),
+          pageviews: num(g.sum?.visits),
+          visitors: num(g.sum?.visits),
+          bytes: num(g.sum?.edgeResponseBytes),
+          cached_requests: 0,
+          encrypted_requests: 0,
+          threats: 0,
+        })).filter(row => row.day);
+      }
+    } catch (e) {
+      if (primaryError) {
+        return { source: 'Cloudflare Analytics', status: 'error', reason: `${primaryError}; adaptive fallback: ${e.message || e}` };
+      }
+      return { source: 'Cloudflare Analytics', status: 'error', reason: e.message || String(e) };
+    }
+  }
+
   const sum = key => series.reduce((s, r) => s + num(r[key]), 0);
   return {
     source: 'Cloudflare Analytics',
     status: 'ok',
-    reason: '',
+    reason: primaryError && sourceMode !== 'httpRequests1dGroups' ? `主查询无数据或失败，已使用 Adaptive Groups：${primaryError}` : '',
+    mode: sourceMode,
     zone_id: zoneId,
     today: series[series.length - 1] || null,
     totals: {

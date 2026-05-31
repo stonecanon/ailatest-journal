@@ -15,6 +15,8 @@
 
 ---
 
+> **🏆 Featured on:** [AILatest Journal](https://journal.ailatest.org) — the most comprehensive free journal finder for academic researchers. Search 44,000+ journals across SCIE, SSCI, AHCI, ESCI, EI, Scopus, DOAJ & MEDLINE with Impact Factors, quartiles, CAS tiers, CCF, CSSCI rankings, and AI-powered journal recommendation.
+
 ## ✨ Features
 
 | 功能 | Feature | 说明 |
