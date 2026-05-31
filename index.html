@@ -38,7 +38,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- End Google Tag Manager -->
 <link rel="preload" href="/data/journals.json.gz" as="fetch" crossorigin="anonymous" />
 <link rel="preload" href="/data/journal_aliases.json" as="fetch" crossorigin="anonymous" />
-<link rel="stylesheet" href="/css/app.css?v=20260530-85" />
+<link rel="stylesheet" href="/css/app.css?v=20260531-01" />
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json" />
@@ -233,10 +233,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <select id="extra-col-filter" class="th-select th-select-sm" aria-label="筛选其他分区">
                   <option value="__all">其他分区</option>
                   <option value="warning">预警</option>
+                  <option value="abdc:__all">ABDC (All)</option>
                   <option value="abdc:A*">ABDC A*</option>
                   <option value="abdc:A">ABDC A</option>
                   <option value="abdc:B">ABDC B</option>
                   <option value="abdc:C">ABDC C</option>
+                  <option value="abs:__all">ABS (All)</option>
                   <option value="abs:4*">ABS 4*</option>
                   <option value="abs:4">ABS 4</option>
                   <option value="abs:3">ABS 3</option>
@@ -482,7 +484,7 @@ const __BUILD_VER = 'v20260530-79';
   }
 })();
 </script>
-<script src="/js/app.js?v=20260530-79" defer></script>
+<script src="/js/app.js?v=20260531-01" defer></script>
 <script>
   // Custom install prompt
   let __pwaPrompt = null;
