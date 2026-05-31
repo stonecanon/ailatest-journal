@@ -4736,6 +4736,10 @@
 
     function activateTab(tab, opts = {}) {
       if (!TAB_PATHS[tab]) tab = 'home';
+      if (document.body.classList.contains('journal-route')) {
+        _drawerStack = [];
+        closeDrawer(true);
+      }
       // ── 切换前：把当前搜索框的值存到 activeQuery（仅非选刊tab）──
       const prevTab = activeTab;
       if (prevTab !== 'pick') {
