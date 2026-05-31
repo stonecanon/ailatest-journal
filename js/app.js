@@ -840,6 +840,17 @@
     }
   }
 
+  let lastTrackedPageview = '';
+  let routeAnalyticsTimer = 0;
+
+  function analyticsPath() {
+    const trackedUrl = new URL(location.href);
+    trackedUrl.searchParams.delete('token');
+    trackedUrl.searchParams.delete('state');
+    trackedUrl.searchParams.delete('code');
+    return `${trackedUrl.pathname}${trackedUrl.search ? trackedUrl.search.slice(0, 180) : ''}${trackedUrl.hash ? trackedUrl.hash.slice(0, 80) : ''}`;
+  }
+
   function trackPageview() {
     try {
       if (new URLSearchParams(location.search).has('noanalytics')) {
@@ -847,12 +858,11 @@
       }
       if (localStorage.getItem('ailatest.analytics.ignore') === '1') return;
     } catch (_) {}
-    const trackedUrl = new URL(location.href);
-    trackedUrl.searchParams.delete('token');
-    trackedUrl.searchParams.delete('state');
-    trackedUrl.searchParams.delete('code');
+    const path = analyticsPath();
+    if (path === lastTrackedPageview) return;
+    lastTrackedPageview = path;
     const payload = {
-      path: `${trackedUrl.pathname}${trackedUrl.search ? trackedUrl.search.slice(0, 180) : ''}`,
+      path,
       referrer: document.referrer || '',
       visitor_id: getAnalyticsId('ailatest.analytics.visitor', localStorage),
       session_id: getAnalyticsId('ailatest.analytics.session', sessionStorage),
@@ -873,6 +883,26 @@
       body,
       keepalive: true,
     }).catch(() => {});
+  }
+
+  function scheduleRoutePageview() {
+    clearTimeout(routeAnalyticsTimer);
+    routeAnalyticsTimer = setTimeout(trackPageview, 80);
+  }
+
+  function installRouteAnalytics() {
+    if (window.__ailatestRouteAnalyticsInstalled) return;
+    window.__ailatestRouteAnalyticsInstalled = true;
+    for (const method of ['pushState', 'replaceState']) {
+      const original = history[method];
+      history[method] = function(...args) {
+        const result = original.apply(this, args);
+        scheduleRoutePageview();
+        return result;
+      };
+    }
+    window.addEventListener('popstate', scheduleRoutePageview);
+    window.addEventListener('hashchange', scheduleRoutePageview);
   }
 
   function t(k) { return (I18N[lang] && I18N[lang][k]) ?? I18N.en[k] ?? I18N['zh-CN'][k] ?? k; }
@@ -5840,6 +5870,7 @@
     if (window.location.search.includes(OWNER_EMAIL)) {
       try { localStorage.setItem('ailatest_unlocked', '1'); } catch {}
     }
+    installRouteAnalytics();
     trackPageview();
     loadFavLists();
     bind();
