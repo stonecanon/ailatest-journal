@@ -2282,7 +2282,8 @@
 
   // 同步题头复选框状态
   function syncThChkState() {
-    document.querySelectorAll('.th-chk').forEach(label => {
+    // 先同步所有普通选项
+    document.querySelectorAll('.th-chk:not([data-select-all])').forEach(label => {
       const cb = label.querySelector('input[type=checkbox]');
       if (!cb) return;
       const filter = label.dataset.filter;
@@ -2295,6 +2296,14 @@
       else if (filter === 'abdc') checked = activeAbdc.has(val);
       else if (filter === 'abs') checked = activeAbs.has(val);
       cb.checked = checked;
+    });
+    // 再同步全选：本组全部勾上则全选也勾
+    document.querySelectorAll('.th-chk[data-select-all]').forEach(allLabel => {
+      const group = allLabel.closest('.th-chk-group');
+      if (!group) return;
+      const sibs = group.querySelectorAll('label.th-chk:not([data-select-all]) input[type=checkbox]');
+      const allCb = allLabel.querySelector('input[type=checkbox]');
+      if (allCb) allCb.checked = sibs.length > 0 && [...sibs].every(cb => cb.checked);
     });
   }
 
@@ -2381,6 +2390,30 @@
         const cb = label.querySelector('input[type=checkbox]');
         if (!cb) return;
         cb.addEventListener('change', () => {
+          // 全选：切换本组所有选项
+          if (label.dataset.selectAll === 'true') {
+            const group = label.closest('.th-chk-group');
+            if (!group) return;
+            group.querySelectorAll('label.th-chk:not([data-select-all])').forEach(sibLabel => {
+              const sibCb = sibLabel.querySelector('input[type=checkbox]');
+              if (!sibCb) return;
+              if (sibCb.checked !== cb.checked) {
+                sibCb.checked = cb.checked;
+                const sf = sibLabel.dataset.filter;
+                const sv = sibLabel.dataset.value;
+                if (sf === 'index') { if (cb.checked) activeIndices.add(sv); else activeIndices.delete(sv); }
+                else if (sf === 'feat') { if (cb.checked) activeFeats.add(sv); else activeFeats.delete(sv); }
+                else if (sf === 'jcr') { if (cb.checked) activeJcr.add(sv); else activeJcr.delete(sv); }
+                else if (sf === 'zone') { if (cb.checked) activeZones.add(sv); else activeZones.delete(sv); }
+                else if (sf === 'abdc') { if (cb.checked) activeAbdc.add(sv); else activeAbdc.delete(sv); }
+                else if (sf === 'abs') { if (cb.checked) activeAbs.add(sv); else activeAbs.delete(sv); }
+              }
+            });
+            shown = PAGE;
+            renderInt();
+            return;
+          }
+          // 普通选项
           const filter = label.dataset.filter;
           const val = label.dataset.value;
           if (filter === 'index') {
