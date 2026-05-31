@@ -782,9 +782,7 @@
   }
   let activeCat = '__all';   // ESI subject filter (legacy name)
   let activeCasMajor = '__all'; // CAS 大类 filter
-  let activeIdxFilter = '__all'; // 索引快捷筛选
-  let activeTierFilter = '__all'; // 分区快捷筛选
-  let activeExtraFilter = '__all'; // 附加筛选
+  /* column header checkbox groups replaced the old single-value filters */
   let activeIndices = new Set(['SCIE','SSCI','AHCI','ESCI','EI']);
   let activeZones = new Set();
   let activeJcr = new Set();
@@ -2077,17 +2075,11 @@
 
   // ───────── filtering ─────────
   function matches(r) {
-    // When index dropdown is active, let all journals pass — renderInt() handles the actual filter
-    if (activeIdxFilter !== '__all') return true;
-    
     // Index filter: exclude ESI from indices[] check (ESI stored as esi_category)
     // ESI adds another OR condition — journal with esi_category also shows
     const esiActive = activeIndices.has('ESI');
     const idxOnly = new Set([...activeIndices].filter(v => v !== 'ESI'));
-    const nonWosIdx = ['scopus','oaj','doaj','medline','free'];
-    // If column header idx filter selects a non‑WoS index, bypass sidebar activeIndices
-    const bypassIdx = nonWosIdx.includes(activeIdxFilter);
-    const matchesAny = bypassIdx || !idxOnly.size || (r.indices || []).some(i => idxOnly.has(i));
+    const matchesAny = !idxOnly.size || (r.indices || []).some(i => idxOnly.has(i));
     if (!matchesAny && !(esiActive && r.esi_category)) {
       // When OAJ / DOAJ / MEDLINE / PubMed / PMC is checked, those journals bypass the
       // index filter (allows pure directory-journals without WoS/EI indices to show)
@@ -2139,44 +2131,6 @@
     if (activeFeats.has('abs')  && !(r.abs  && r.abs.rating))  return false;
     if (activeCat !== '__all' && r.esi_category !== activeCat) return false;
     if (activeCasMajor !== '__all' && (r.cas_major_cn || '') !== activeCasMajor) return false;
-    if (activeIdxFilter !== '__all') {
-      const idxValues = ['SCIE','SSCI','AHCI','ESCI','EI'];
-      if (idxValues.includes(activeIdxFilter)) {
-        if (!(r.indices || []).includes(activeIdxFilter)) return false;
-      } else if (activeIdxFilter === 'scopus' && !(r.scopus && r.scopus.active)) return false;
-      else if (activeIdxFilter === 'oaj' && !r.oaj) return false;
-      else if (activeIdxFilter === 'doaj' && !r.doaj) return false;
-      else if (activeIdxFilter === 'medline' && !r.medline) return false;
-    }
-    if (activeTierFilter !== '__all') {
-      const q = (r.if_quartile || '').toUpperCase();
-      const z = r.cas_zone != null ? String(r.cas_zone) : '';
-      const isTop = !!r.cas_top;
-      let tierMatch = false;
-      if (activeTierFilter.startsWith('Q') && q === activeTierFilter) tierMatch = true;
-      else if (activeTierFilter === 'top' && isTop) tierMatch = true;
-      else if (['1','2','3','4'].includes(activeTierFilter) && z === activeTierFilter) tierMatch = true;
-      if (!tierMatch) return false;
-    }
-    if (activeExtraFilter !== '__all') {
-      if (activeExtraFilter === 'warning' && !r.warning) return false;
-      if (activeExtraFilter.startsWith('abdc:')) {
-        const want = activeExtraFilter.slice(5);
-        if (want === '__all') {
-          if (!r.abdc) return false;
-        } else {
-          if (!r.abdc || r.abdc.rating !== want) return false;
-        }
-      }
-      if (activeExtraFilter.startsWith('abs:')) {
-        const want = activeExtraFilter.slice(4);
-        if (want === '__all') {
-          if (!r.abs) return false;
-        } else {
-          if (!r.abs || r.abs.rating !== want) return false;
-        }
-      }
-    }
     if (activeWos.size) {
       const wc = r.wos_categories || [];
       let ok = false;
@@ -2285,17 +2239,6 @@
   function renderInt() {
     updateThStickyTop();
     let filtered = journals.filter(matches);
-    // ENSURE: if index dropdown is set, apply it directly as a safety net
-    if (activeIdxFilter !== '__all') {
-      filtered = filtered.filter(r => {
-        if (activeIdxFilter === 'medline') return r.medline;
-        if (activeIdxFilter === 'scopus') return r.scopus && r.scopus.active;
-        if (activeIdxFilter === 'oaj') return r.oaj;
-        if (activeIdxFilter === 'doaj') return r.doaj;
-        if (['SCIE','SSCI','AHCI','ESCI','EI'].includes(activeIdxFilter)) return (r.indices||[]).includes(activeIdxFilter);
-        return true;
-      });
-    }
     if (activeQuery) {
       // 按相关性排序
       const q = activeQuery;
@@ -2334,9 +2277,28 @@
     $('#results-count').textContent = `${t('showing')} ${visible.length} ${t('of')} ${filtered.length.toLocaleString()} ${t('total_items')}`;
     const more = $('#more');
     more.hidden = filtered.length <= shown;
+    syncThChkState();
   }
 
-  // ───────── category nav (ESI sidebar removed; only "全部" reset button remains) ─────────
+  // 同步题头复选框状态
+  function syncThChkState() {
+    document.querySelectorAll('.th-chk').forEach(label => {
+      const cb = label.querySelector('input[type=checkbox]');
+      if (!cb) return;
+      const filter = label.dataset.filter;
+      const val = label.dataset.value;
+      let checked = false;
+      if (filter === 'index') checked = activeIndices.has(val);
+      else if (filter === 'feat') checked = activeFeats.has(val);
+      else if (filter === 'jcr') checked = activeJcr.has(val);
+      else if (filter === 'zone') checked = activeZones.has(val);
+      else if (filter === 'abdc') checked = activeAbdc.has(val);
+      else if (filter === 'abs') checked = activeAbs.has(val);
+      cb.checked = checked;
+    });
+  }
+
+  // ───────── category nav ─────────
   function renderCatList() {
     const total = $('#count-all');
     if (total) total.textContent = journals.length.toLocaleString();
@@ -2408,19 +2370,41 @@
       });
     }
     if (wosSel) wosSel.value = activeWos.size === 1 ? [...activeWos][0] : '__all';
-    // 题头快捷筛选：索引、分区、附加
-    ['idx-col-filter','tier-col-filter','extra-col-filter'].forEach(id => {
-      const sel = $(`#${id}`);
-      if (!sel || sel.__bound) return;
-      sel.__bound = true;
-      sel.addEventListener('change', () => {
-        if (id === 'idx-col-filter') {
-          activeIdxFilter = sel.value;
-        }
-        else if (id === 'tier-col-filter') activeTierFilter = sel.value;
-        else activeExtraFilter = sel.value;
-        shown = PAGE;
-        renderInt();
+    // 同步题头复选框状态与 Sets 一致
+    syncThChkState();
+    // 题头多选复选框筛选：复选框直接操作 Sets
+    ['idx-chk-group','tier-chk-group','extra-chk-group'].forEach(groupId => {
+      const g = $(`#${groupId}`);
+      if (!g || g.__bound) return;
+      g.__bound = true;
+      g.querySelectorAll('label.th-chk').forEach(label => {
+        const cb = label.querySelector('input[type=checkbox]');
+        if (!cb) return;
+        cb.addEventListener('change', () => {
+          const filter = label.dataset.filter;
+          const val = label.dataset.value;
+          if (filter === 'index') {
+            if (cb.checked) activeIndices.add(val);
+            else activeIndices.delete(val);
+          } else if (filter === 'feat') {
+            if (cb.checked) activeFeats.add(val);
+            else activeFeats.delete(val);
+          } else if (filter === 'jcr') {
+            if (cb.checked) activeJcr.add(val);
+            else activeJcr.delete(val);
+          } else if (filter === 'zone') {
+            if (cb.checked) activeZones.add(val);
+            else activeZones.delete(val);
+          } else if (filter === 'abdc') {
+            if (cb.checked) activeAbdc.add(val);
+            else activeAbdc.delete(val);
+          } else if (filter === 'abs') {
+            if (cb.checked) activeAbs.add(val);
+            else activeAbs.delete(val);
+          }
+          shown = PAGE;
+          renderInt();
+        });
       });
     });
   }

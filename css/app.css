@@ -2902,6 +2902,45 @@ body.journal-route .journal-not-found {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* 题头多选复选框组 */
+.th-chk-group {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 2px 0;
+  margin-right: 4px;
+}
+.th-chk-group:not(:last-child)::after {
+  content: '';
+  display: inline-block;
+  width: 1px;
+  height: 14px;
+  background: var(--rule);
+  margin: 1px 4px 0 2px;
+  align-self: center;
+}
+.th-chk {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  white-space: nowrap;
+  padding: 0 2px;
+  letter-spacing: 0;
+}
+.th-chk input {
+  width: 11px;
+  height: 11px;
+  margin: 0;
+  accent-color: var(--accent);
+}
+.th-chk:has(input:checked) {
+  color: var(--accent);
+  font-weight: 700;
+}
 #cnki-cat-select, #cnkx-domain-select, #cnkx-sub-select { width: 100%; }
 .rating-placeholder {
   padding: 20px 18px;
