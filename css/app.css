@@ -1006,6 +1006,9 @@ table.journals th {
   background: var(--paper);
   border-bottom: 1px solid var(--rule-soft);
   white-space: nowrap;
+  position: sticky;
+  top: var(--th-sticky-top, 0);
+  z-index: 40;
 }
 table.journals td {
   padding: 8px 8px;

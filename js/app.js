@@ -2255,7 +2255,17 @@
     });
   }
 
+  /* ───────── Update thead sticky top to clear the search bar ───────── */
+  function updateThStickyTop() {
+    const topbar = $('.topbar');
+    if (topbar) {
+      const h = topbar.getBoundingClientRect().height;
+      document.documentElement.style.setProperty('--th-sticky-top', h + 'px');
+    }
+  }
+
   function renderInt() {
+    updateThStickyTop();
     let filtered = journals.filter(matches);
     // ENSURE: if index dropdown is set, apply it directly as a safety net
     if (activeIdxFilter !== '__all') {
@@ -2681,6 +2691,7 @@
 
   // ───────── domestic tab ─────────
   function renderDomestic() {
+    updateThStickyTop();
     const box = $('#dom-content');
     if (!domestic) { box.innerHTML = `<div class="empty">${T('无数据','No data')}</div>`; return; }
     const q = activeQuery.toLowerCase();
