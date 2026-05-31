@@ -1693,11 +1693,11 @@
   }
   function badgePubMed(pm) {
     if (!pm) return '';
-    return `<span class="badge b-pubmed" title="${T('PubMed 数据库收录（含所有引文来源）','Included in PubMed (all citation sources)')}">PubMed</span>`;
+    return `<span class="badge b-pubmed" title="${T('PubMed 数据库收录','Included in PubMed')}">PubMed Indexed</span>`;
   }
   function badgePMC(pm) {
     if (!pm) return '';
-    return `<span class="badge b-pmc" title="${T('PubMed Central 全文库收录','Full text in PubMed Central')}">PMC</span>`;
+    return `<span class="badge b-pmc" title="${T('PubMed Central 全文存档','Archived in PubMed Central')}">PMC Archived</span>`;
   }
   // 期刊浏览量缓存（journal_key → count）
   const viewsCache = {};
@@ -2011,7 +2011,7 @@
     // ESI adds another OR condition — journal with esi_category also shows
     const esiActive = activeIndices.has('ESI');
     const idxOnly = new Set([...activeIndices].filter(v => v !== 'ESI'));
-    const nonWosIdx = ['scopus','oaj','doaj','medline','pubmed','pmc'];
+    const nonWosIdx = ['scopus','oaj','doaj','medline'];
     // If column header idx filter selects a non‑WoS index, bypass sidebar activeIndices
     const bypassIdx = nonWosIdx.includes(activeIdxFilter);
     const matchesAny = bypassIdx || !idxOnly.size || (r.indices || []).some(i => idxOnly.has(i));
@@ -2020,8 +2020,7 @@
       // index filter (allows pure directory-journals without WoS/EI indices to show)
       if (!((activeFeats.has('oaj') && r.oaj) || (activeFeats.has('doaj') && r.doaj) ||
             (activeFeats.has('medline') && r.medline) ||
-            (activeFeats.has('pubmed') && r.pubmed) ||
-            (activeFeats.has('pmc') && r.pmc))) return false;
+            (activeFeats.has('warning') && r.warning))) return false;
     }
     if (activeZones.size) {
       const zones = new Set();
@@ -2060,8 +2059,6 @@
     if (activeFeats.has('oaj') && !r.oaj) return false;
     if (activeFeats.has('doaj') && !r.doaj) return false;
     if (activeFeats.has('medline') && !r.medline) return false;
-    if (activeFeats.has('pubmed') && !r.pubmed) return false;
-    if (activeFeats.has('pmc') && !r.pmc) return false;
     if (activeFeats.has('warning') && !r.warning) return false;
     if (activeFeats.has('abdc') && !(r.abdc && r.abdc.rating)) return false;
     if (activeFeats.has('abs')  && !(r.abs  && r.abs.rating))  return false;
@@ -2075,8 +2072,6 @@
       else if (activeIdxFilter === 'oaj' && !r.oaj) return false;
       else if (activeIdxFilter === 'doaj' && !r.doaj) return false;
       else if (activeIdxFilter === 'medline' && !r.medline) return false;
-      else if (activeIdxFilter === 'pubmed' && !r.pubmed) return false;
-      else if (activeIdxFilter === 'pmc' && !r.pmc) return false;
     }
     if (activeTierFilter !== '__all') {
       const q = (r.if_quartile || '').toUpperCase();
@@ -2191,8 +2186,6 @@
     if (activeIdxFilter !== '__all') {
       filtered = filtered.filter(r => {
         if (activeIdxFilter === 'medline') return r.medline;
-        if (activeIdxFilter === 'pubmed') return r.pubmed;
-        if (activeIdxFilter === 'pmc') return r.pmc;
         if (activeIdxFilter === 'scopus') return r.scopus && r.scopus.active;
         if (activeIdxFilter === 'oaj') return r.oaj;
         if (activeIdxFilter === 'doaj') return r.doaj;
