@@ -783,7 +783,7 @@
   let activeCat = '__all';   // ESI subject filter (legacy name)
   let activeCasMajor = '__all'; // CAS 大类 filter
   /* column header checkbox groups replaced the old single-value filters */
-  let activeIndices = new Set(['SCIE','SSCI','AHCI','ESCI','EI']);
+  let activeIndices = new Set(); // 默认全不勾选
   let activeZones = new Set();
   let activeJcr = new Set();
   let activeXr = new Set();

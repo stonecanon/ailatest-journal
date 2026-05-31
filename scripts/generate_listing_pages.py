@@ -59,28 +59,61 @@ SKELETON = '''<!doctype html>
 <meta property="og:title" content="__TITLE__" />
 <meta property="og:description" content="__DESC__" />
 <meta name="robots" content="index,follow" />
+<meta name="theme-color" content="#b4531f" />
 __JSONLD__
 <style>
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;margin:0;padding:20px;background:#fafafa;color:#222;line-height:1.6}
-.wrap{max-width:1000px;margin:0 auto;background:#fff;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.08);padding:20px}
-h1{font-size:22px;margin:0 0 8px}
-p.sub{color:#666;margin-bottom:20px}
-p.count{color:#888;font-size:13px;margin-bottom:16px}
+:root{--accent:#b4531f;--accent-light:#f59e0b;--bg:#f7f5f0;--paper:#fff;--ink:#1c1917;--ink-soft:#6b6559;--rule:#e3ddd0;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+*{box-sizing:border-box}
+body{font-family:var(--sans);margin:0;padding:0;background:var(--bg);color:var(--ink);line-height:1.6}
+.header{background:var(--paper);border-bottom:1px solid var(--rule);padding:14px 20px;position:sticky;top:0;z-index:10}
+.header-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:16px}
+.header a{color:var(--ink);text-decoration:none;font-weight:700;font-size:15px;letter-spacing:.02em}
+.header a:hover{color:var(--accent)}
+.header .logo{display:flex;align-items:center;gap:6px}
+.header .logo-symbol{font-size:22px;line-height:1}
+.header .nav-links{display:flex;gap:16px;margin-left:auto;font-size:13px}
+.header .nav-links a{font-weight:500;color:var(--ink-soft)}
+.wrap{max-width:1100px;margin:0 auto;padding:20px}
+h1{font-size:20px;margin:0 0 6px;font-weight:700;letter-spacing:-.01em}
+.breadcrumb{font-size:12px;color:var(--ink-soft);margin-bottom:12px}
+.breadcrumb a{color:var(--accent);text-decoration:none}
+.breadcrumb a:hover{text-decoration:underline}
+.sub{color:var(--ink-soft);font-size:14px;margin-bottom:12px}
+.count{color:var(--ink-soft);font-size:12px;margin-bottom:14px}
+.table-wrap{background:var(--paper);border:1px solid var(--rule);border-radius:8px;overflow:hidden;overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:13px}
-th{text-align:left;padding:8px;border-bottom:2px solid #ddd;font-weight:700;white-space:nowrap}
-td{padding:8px;border-bottom:1px solid #eee;vertical-align:top}
-a{color:#2563eb;text-decoration:none}
+th{text-align:left;padding:10px 12px;border-bottom:2px solid var(--rule);font-weight:700;white-space:nowrap;color:var(--ink);font-size:11px;letter-spacing:.04em;text-transform:uppercase;background:var(--bg)}
+td{padding:8px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+tr:last-child td{border-bottom:0}
+tr:hover td{background:#faf8f4}
+a{color:var(--accent);text-decoration:none;font-weight:500}
 a:hover{text-decoration:underline}
-.back{display:inline-block;margin-top:20px;padding:8px 20px;background:#2563eb;color:#fff!important;text-decoration:none;border-radius:6px;font-size:14px}
+.muted{color:var(--ink-soft)}
+.back-wrap{margin-top:18px}
+.back{display:inline-block;padding:8px 22px;background:var(--accent);color:#fff!important;text-decoration:none;border-radius:6px;font-size:13px;font-weight:600}
+.back:hover{opacity:.9;text-decoration:none}
+.footer{text-align:center;padding:24px;color:var(--ink-soft);font-size:12px;border-top:1px solid var(--rule);margin-top:24px}
+.footer a{color:var(--ink-soft)}
 </style></head><body>
+<div class="header">
+<div class="header-inner">
+  <a href="__ORIGIN__/" class="logo"><span class="logo-symbol">📖</span> AILatest Journal</a>
+  <span class="nav-links">
+    <a href="__ORIGIN__/indexes/">Indexes</a>
+    <a href="__ORIGIN__/subjects/">Subjects</a>
+  </span>
+</div></div>
 <div class="wrap">
 <h1>__TITLE__</h1>
+<p class="breadcrumb"><a href="__ORIGIN__/">Home</a> › <a href="__BACK__">__BACK_LABEL__</a></p>
 <p class="sub">__DESC__</p>
 <p class="count">__COUNT__</p>
-<table><thead><tr>__HEADERS__</tr></thead>
-<tbody>__ROWS__</tbody></table>
-<p><a class="back" href="__BACK__">← Back</a></p>
-</div></body></html>'''
+<div class="table-wrap"><table><thead><tr>__HEADERS__</tr></thead>
+<tbody>__ROWS__</tbody></table></div>
+<p class="back-wrap"><a class="back" href="__BACK__">← Back</a></p>
+</div>
+<div class="footer"><a href="__ORIGIN__/">AILatest Journal</a> — journal search &amp; submission decision tool for researchers</div>
+</body></html>'''
 
 def make_slug(r):
     s = r.get('slug', '').strip()
@@ -141,8 +174,9 @@ def generate_subjects(journals, origin):
 
         html = SKELETON.replace('__TITLE__', esc(seo_title)).replace('__DESC__', esc(seo_desc))
         html = html.replace('__CANONICAL__', esc(canonical)).replace('__JSONLD__', jsonld_tag)
+        html = html.replace('__ORIGIN__', origin)
         html = html.replace('__COUNT__', esc(count)).replace('__HEADERS__', th_html)
-        html = html.replace('__ROWS__', rows_html).replace('__BACK__', f'{origin}/subjects/')
+        html = html.replace('__ROWS__', rows_html).replace('__BACK__', f'{origin}/subjects/').replace('__BACK_LABEL__', 'All Subjects')
         (ROOT / 'subjects' / slug).mkdir(parents=True, exist_ok=True)
         (ROOT / 'subjects' / slug / 'index.html').write_text(html, encoding='utf-8')
         print(f'  /subjects/{slug}/ → {len(top)}/{total} journals')
@@ -170,8 +204,9 @@ def generate_indexes(journals, origin):
 
         html = SKELETON.replace('__TITLE__', esc(seo_title)).replace('__DESC__', esc(seo_desc))
         html = html.replace('__CANONICAL__', esc(canonical)).replace('__JSONLD__', jsonld_tag)
+        html = html.replace('__ORIGIN__', origin)
         html = html.replace('__COUNT__', esc(count)).replace('__HEADERS__', th_html)
-        html = html.replace('__ROWS__', rows_html).replace('__BACK__', f'{origin}/indexes/')
+        html = html.replace('__ROWS__', rows_html).replace('__BACK__', f'{origin}/indexes/').replace('__BACK_LABEL__', 'All Indexes')
         (ROOT / 'indexes' / slug).mkdir(parents=True, exist_ok=True)
         (ROOT / 'indexes' / slug / 'index.html').write_text(html, encoding='utf-8')
         print(f'  /indexes/{slug}/ → {len(top)} journals')
