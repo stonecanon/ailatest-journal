@@ -453,7 +453,7 @@ function renderLoginGate(message) {
 async function loadDashboardData() {
   const token = ownerToken();
   if (!token) {
-    renderLoginGate('未检测到登录凭证。请用站长账号（jiantaoweng@gmail.com）登录主站后再访问本看板。');
+    renderLoginGate('未检测到登录凭证。请用站长的 Gmail 邮箱登录主站后再访问本看板。');
     return;
   }
   const resp = await fetch(`${API_BASE}/analytics/dashboard?ts=${Date.now()}`, {
@@ -461,7 +461,7 @@ async function loadDashboardData() {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (resp.status === 401 || resp.status === 403) {
-    renderLoginGate('当前账号无权访问（看板仅限站长 jiantaoweng@gmail.com）。请用站长账号登录主站后重试。');
+    renderLoginGate('当前账号无权访问（看板仅限站长）。请用站长的 Gmail 邮箱登录主站后重试。');
     return;
   }
   if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
