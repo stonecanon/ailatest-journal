@@ -154,19 +154,22 @@ async function buildCloudflare(env) {
   }
   const since = daysAgoUTC(13);
   const until = daysAgoUTC(0);
-  const query = `query($zoneTag:String!,$since:Date!,$until:Date!){
-    viewer{ zones(filter:{zoneTag:$zoneTag}){
-      httpRequests1dGroups(limit:30, filter:{date_geq:$since, date_leq:$until}, orderBy:[date_ASC]){
-        dimensions{ date }
-        sum{ requests pageViews bytes cachedRequests encryptedRequests threats }
-        uniq{ uniques }
+  // Dates/zoneTag inlined as string literals (zoneId + dates are server-controlled).
+  // httpRequests1dGroups date filters expect the Cloudflare `string` scalar, so passing
+  // them via typed GraphQL variables is fragile — inlining avoids any type mismatch.
+  const query = `{
+    viewer { zones(filter: { zoneTag: "${zoneId}" }) {
+      httpRequests1dGroups(limit: 30, filter: { date_geq: "${since}", date_leq: "${until}" }, orderBy: [date_ASC]) {
+        dimensions { date }
+        sum { requests pageViews bytes cachedRequests encryptedRequests threats }
+        uniq { uniques }
       }
-    }}
+    } }
   }`;
   const resp = await fetch('https://api.cloudflare.com/client/v4/graphql', {
     method: 'POST',
     headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ query, variables: { zoneTag: zoneId, since, until } }),
+    body: JSON.stringify({ query }),
   });
   const body = await resp.json().catch(() => null);
   if (!resp.ok || body?.errors?.length) {
