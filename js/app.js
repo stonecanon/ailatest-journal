@@ -2078,7 +2078,14 @@
     const ifVal = (r.if_2024 != null) ? (+r.if_2024).toFixed(1) : '';
     const ifCell = ifVal ? `<span class="if-cell">${ifVal}</span>` : '<span class="muted-cell">—</span>';
     const cr = r.crossref;
-    const cycleDays = cr && cr.median_days ? +cr.median_days : null;
+    const doaj = r.doaj;
+    // Review cycle: CrossRef median_days → DOAJ review_weeks → —
+    let cycleDays = null;
+    if (cr && cr.median_days) {
+      cycleDays = +cr.median_days;
+    } else if (doaj && typeof doaj === 'object' && doaj.review_weeks) {
+      cycleDays = +doaj.review_weeks * 7;
+    }
     const cycleCell = cycleDays
       ? `${Math.round(cycleDays / 30.4 * 10) / 10}月`
       : '<span class="muted-cell">—</span>';
@@ -4587,7 +4594,13 @@
     const ifVal = (r.if_2024 != null) ? (+r.if_2024).toFixed(1) : '';
     const ifCell = ifVal ? `<span class="if-cell">${ifVal}</span>` : '<span class="muted-cell">—</span>';
     const cr = r.crossref;
-    const cycleDays = cr && cr.median_days ? +cr.median_days : null;
+    const doaj = r.doaj;
+    let cycleDays = null;
+    if (cr && cr.median_days) {
+      cycleDays = +cr.median_days;
+    } else if (doaj && typeof doaj === 'object' && doaj.review_weeks) {
+      cycleDays = +doaj.review_weeks * 7;
+    }
     const cycleCell = cycleDays
       ? `${Math.round(cycleDays / 30.4 * 10) / 10}月`
       : '<span class="muted-cell">—</span>';

@@ -21,12 +21,11 @@ def load_journals():
 def load_wos_categories():
     with open(WOS_CATS_FILE, 'r', encoding='utf-8') as f:
         data = json.load(f)
-    # Sort by count descending, take top 100
+    # Sort by count descending, take all
     data.sort(key=lambda x: -x['count'])
-    top = data[:100]
     # Build: (slug, title, desc, wos_name)
     result = []
-    for item in top:
+    for item in data:
         name = item['name']
         slug = name.lower().replace(' & ', '-').replace(' &', '-').replace('& ', '-')
         slug = slug.replace(' & ', '-').replace('&', '-').replace(',', '').replace("'", '')
@@ -35,6 +34,7 @@ def load_wos_categories():
         result.append((slug, name, desc, name))
     # Sort alphabetically by title
     result.sort(key=lambda x: x[1].lower())
+    print(f'  Generated {len(result)} subject entries')
     return result
 
 SUBJECTS = None  # will be loaded from wos_categories.json at runtime
