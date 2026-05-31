@@ -2099,7 +2099,7 @@
       cycleDays = +doaj.review_weeks * 7;
     }
     const cycleCell = cycleDays
-      ? `${Math.round(cycleDays / 30.4)}月`
+      ? `${Math.round(cycleDays / 30.4)}${T('个月','mo')}`
       : '<span class="muted-cell">—</span>';
     return `<tr data-fid="${escape(fid)}" class="j-row clickable ${r.flagship ? 'row-flagship' : ''}" data-src="int">
       <td class="col-fav">${starBtn(r, 'int')}</td>
@@ -3518,6 +3518,13 @@
         stats.push([T('审稿周期','Review Cycle'), m + T(' 个月',' months'), T('投稿→出版 (DOAJ)','Submission→pub. (DOAJ)')]);
       }
     }
+    // 已发表论文数量（来自 OpenAlex）
+    {
+      const oaWorks = oa?.w || oa?.works_count;
+      if (oaWorks) {
+        stats.push([T('已发表论文','Published Works'), oaWorks.toLocaleString()]);
+      }
+    }
     const ifNote = ir.if_2024 != null ? T('JCR 2025发布 · 2024指标','JCR 2025 rel. · 2024 metric') : '';
     const statsHTML = stats.length ? `<div class="stats-grid stats-count-${Math.min(stats.length, 4)}">${stats.map(([k,v,sub]) =>
       `<div class="stat"><div class="stat-v">${escape(String(v))}</div><div class="stat-k">${k}</div>${sub?`<div class="stat-sub">${sub}</div>`:''}</div>`
@@ -4600,7 +4607,7 @@
       cycleDays = +doaj.review_weeks * 7;
     }
     const cycleCell = cycleDays
-      ? `${Math.round(cycleDays / 30.4)}月`
+      ? `${Math.round(cycleDays / 30.4)}${T('个月','mo')}`
       : '<span class="muted-cell">—</span>';
     return `<tr class="j-row clickable" data-fid="${escape(fid)}" data-src="${escape(r.__src)}">
       <td class="col-drag"><span class="drag-handle" title="${T('拖动排序','Drag to reorder')}">⋮⋮</span></td>
