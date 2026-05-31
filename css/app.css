@@ -1974,7 +1974,7 @@ td.empty,
   body.topbar-compact .topbar { margin-bottom: 10px; }
   body.topbar-compact .search-wrap > #q { height: 46px; min-height: 46px; padding: 0 112px 0 14px; font-size: 14px; }
   body.topbar-compact .search-submit { min-width: 90px; min-height: 34px; padding: 0 12px; }
-  .table-wrap { overflow-x: visible; }
+  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
   .top-actions { order: 0; justify-content: flex-end; gap: 4px; padding: 2px 0; }
   .tab-panel { order: 4; }
   .tab-panel[data-panel="home"] { order: 4; }
@@ -2149,6 +2149,13 @@ body.journal-route .j-drawer.journal-page {
   transform: none;
   z-index: auto;
   overflow: visible;
+}
+
+/* very small screens: hide these columns to fit table */
+@media (max-width: 480px) {
+  .col-cycle, .col-wos { display: none; }
+  .col-badge { width: 100px; min-width: 100px; }
+  .col-badge-split { width: 100px; min-width: 100px; }
 }
 
 body.journal-route .drawer-head {
