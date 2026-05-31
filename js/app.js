@@ -2205,6 +2205,13 @@
       const wc = r.wos_categories || [];
       let ok = false;
       for (const c of wc) if (activeWos.has(c)) { ok = true; break; }
+      if (!ok) {
+        // Also check OpenAlex subfields
+        const issn = (r.issn || r.eissn || '').toUpperCase();
+        const rec = oaMap[issn];
+        const sf = (rec && Array.isArray(rec.sf)) ? rec.sf : [];
+        for (const s of sf) if (activeWos.has(s)) { ok = true; break; }
+      }
       if (!ok) return false;
     }
     if (activeOaSf.size) {
@@ -2451,8 +2458,23 @@
       const wosSet = new Set();
       journals.forEach(j => (j.wos_categories || []).forEach(c => { if (c) wosSet.add(c); }));
       const wosList = [...wosSet].sort((a,b) => a.localeCompare(b, 'en'));
-      wosSel.innerHTML = `<option value="__all">${T('WoS 学科','WoS Subject')}</option>` +
-        wosList.map(v => `<option value="${escape(v)}">${escape(v)}</option>`).join('');
+      // Collect OA subfields not already in WoS
+      const issnSet = new Set(journals.map(j => (j.issn || j.eissn || '').toUpperCase()).filter(Boolean));
+      const oaSfSet = new Set();
+      for (const issn of issnSet) {
+        const rec = oaMap[issn];
+        if (rec && Array.isArray(rec.sf)) {
+          for (const s of rec.sf) if (s && !wosSet.has(s)) oaSfSet.add(s);
+        }
+      }
+      const oaSfList = [...oaSfSet].sort((a,b) => a.localeCompare(b, 'en'));
+      wosSel.innerHTML = `<option value="__all">—</option>` +
+        `<optgroup label="${T('WoS 学科','WoS Subject')}">` +
+        wosList.map(v => `<option value="${escape(v)}">${escape(v)}</option>`).join('') +
+        `</optgroup>` +
+        `<optgroup label="${T('OA 研究主题','OA Topics')}">` +
+        oaSfList.map(v => `<option value="${escape(v)}">${escape(v)}</option>`).join('') +
+        `</optgroup>`;
       wosSel.addEventListener('change', () => {
         activeWos.clear();
         if (wosSel.value !== '__all') activeWos.add(wosSel.value);
