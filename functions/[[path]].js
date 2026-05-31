@@ -119,7 +119,8 @@ export async function onRequest(ctx) {
       const html = await journalPage(ctx, j, slug, url.origin);
       return new Response(html, {
         headers: { 'Content-Type': 'text/html;charset=utf-8',
-                   'Cache-Control': 'public, max-age=3600, s-maxage=86400' }
+                   'Cache-Control': 'no-store, no-cache, must-revalidate',
+                   'CDN-Cache-Control': 'no-store' }
       });
     }
 
