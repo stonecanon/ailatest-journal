@@ -2099,7 +2099,7 @@
       cycleDays = +doaj.review_weeks * 7;
     }
     const cycleCell = cycleDays
-      ? `${Math.round(cycleDays / 30.4 * 10) / 10}月`
+      ? `${Math.round(cycleDays / 30.4)}月`
       : '<span class="muted-cell">—</span>';
     return `<tr data-fid="${escape(fid)}" class="j-row clickable ${r.flagship ? 'row-flagship' : ''}" data-src="int">
       <td class="col-fav">${starBtn(r, 'int')}</td>
@@ -2185,7 +2185,6 @@
     if (activeFeats.has('abdc') && !(r.abdc && r.abdc.rating)) return false;
     if (activeFeats.has('abs')  && !(r.abs  && r.abs.rating))  return false;
     if (activeCat !== '__all' && r.esi_category !== activeCat) return false;
-    if (activeCasMajor !== '__all' && (r.cas_major_cn || '') !== activeCasMajor) return false;
     if (activeWos.size) {
       const wc = r.wos_categories || [];
       let ok = false;
@@ -2421,24 +2420,7 @@
         renderInt();
       });
     }
-    // 大类列下拉切换：CAS / ESI（v30 移除：现已拆为独立两列）
-    // v31: 表头两个下拉填充 distinct 学科 + 触发筛选
-    const casSel = $('#cas-col-filter');
-    if (casSel && !casSel.__bound) {
-      casSel.__bound = true;
-      const casSet = new Set();
-      journals.forEach(j => { if (j.cas_major_cn) casSet.add(j.cas_major_cn); });
-      const casList = [...casSet].sort((a,b) => a.localeCompare(b, 'zh'));
-      casSel.innerHTML = `<option value="__all">${T('中科院大类','CAS Major')}</option>` +
-        casList.map(v => `<option value="${escape(v)}">${escape(v)}</option>`).join('');
-      casSel.value = activeCasMajor;
-      casSel.addEventListener('change', () => {
-        activeCasMajor = casSel.value;
-        shown = PAGE;
-        renderInt();
-      });
-    }
-    const wosSel = $('#wos-col-filter');
+    // 大类列下拉切换：WoS 学科（v31: 表头下拉填充 distinct 学科 + 触发筛选）
     if (wosSel && !wosSel.__bound) {
       wosSel.__bound = true;
       const wosSet = new Set();
@@ -4618,7 +4600,7 @@
       cycleDays = +doaj.review_weeks * 7;
     }
     const cycleCell = cycleDays
-      ? `${Math.round(cycleDays / 30.4 * 10) / 10}月`
+      ? `${Math.round(cycleDays / 30.4)}月`
       : '<span class="muted-cell">—</span>';
     return `<tr class="j-row clickable" data-fid="${escape(fid)}" data-src="${escape(r.__src)}">
       <td class="col-drag"><span class="drag-handle" title="${T('拖动排序','Drag to reorder')}">⋮⋮</span></td>
@@ -5054,8 +5036,6 @@
             persistFavLists(false);
             applyI18n();
             // 重置列头下拉的__bound标记，使其下次用新语言重建
-            const casSel2 = $('#cas-col-filter'); if (casSel2) casSel2.__bound = false;
-            const esiSel2 = $('#esi-col-filter'); if (esiSel2) esiSel2.__bound = false;
             const wosSel2 = $('#wos-col-filter'); if (wosSel2) wosSel2.__bound = false;
             renderWosList();
             if (activeTab === 'dom') renderDomestic();

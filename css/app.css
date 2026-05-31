@@ -939,11 +939,10 @@ body.topbar-compact .results-head {
   width: 30%;
   min-width: 240px;
 }
-.col-cas, .col-esi, .col-wos { font-size: 12px; line-height: 1.4; width: 110px; max-width: 110px; overflow: hidden; }
-.col-cas { color: var(--ink); }
-.col-esi, .col-wos { color: var(--ink-soft); font-family: var(--sans); }
-.col-esi .th-select, .col-cas .th-select, .col-wos .th-select { max-width: 100%; box-sizing: border-box; text-overflow: ellipsis; overflow: hidden; }
-td.col-esi, td.col-cas, td.col-wos { white-space: normal; word-break: break-word; }
+.col-wos { font-size: 12px; line-height: 1.4; width: 110px; max-width: 110px; overflow: hidden; }
+.col-wos { color: var(--ink-soft); font-family: var(--sans); }
+.col-esi .th-select, .col-wos .th-select { max-width: 100%; box-sizing: border-box; text-overflow: ellipsis; overflow: hidden; }
+td.col-wos { white-space: normal; word-break: break-word; }
 .col-if {
   width: 56px;
   max-width: 56px;
@@ -2023,7 +2022,7 @@ td.empty,
   .col-name { min-width: 130px; width: 26%; }
   .jname { font-size: 13px !important; }
   table.journals th, table.journals td { padding: 6px 5px; }
-  .col-cas, .col-esi, .col-wos { width: 90px; max-width: 90px; font-size: 11px; }
+  .col-wos { width: 90px; max-width: 90px; font-size: 11px; }
   .col-badge { width: 130px; min-width: 130px; }
   .col-badge-split { min-width: 130px; width: 130px; }
   .col-fav { width: 36px; }
