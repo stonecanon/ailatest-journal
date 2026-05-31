@@ -2280,10 +2280,10 @@
     syncThChkState();
   }
 
-  // 同步题头复选框状态
+  // 同步题头复选框状态 + 更新按钮标签
   function syncThChkState() {
     // 先同步所有普通选项
-    document.querySelectorAll('.th-chk:not([data-select-all])').forEach(label => {
+    document.querySelectorAll('.th-dropdown-panel .th-chk:not([data-select-all])').forEach(label => {
       const cb = label.querySelector('input[type=checkbox]');
       if (!cb) return;
       const filter = label.dataset.filter;
@@ -2299,17 +2299,65 @@
       cb.checked = checked;
     });
     // 再同步全选：本组全部勾上则全选也勾
-    document.querySelectorAll('.th-chk[data-select-all]').forEach(allLabel => {
-      const group = allLabel.closest('.th-chk-group');
-      if (!group) return;
-      const sibs = group.querySelectorAll('label.th-chk:not([data-select-all]) input[type=checkbox]');
+    document.querySelectorAll('.th-dropdown-panel .th-chk[data-select-all]').forEach(allLabel => {
+      const panel = allLabel.closest('.th-dropdown-panel');
+      if (!panel) return;
+      const sibs = panel.querySelectorAll('label.th-chk:not([data-select-all]) input[type=checkbox]');
       const allCb = allLabel.querySelector('input[type=checkbox]');
       if (allCb) allCb.checked = sibs.length > 0 && [...sibs].every(cb => cb.checked);
+    });
+    // 更新按钮标签（显示选中数量）
+    document.querySelectorAll('.th-dropdown').forEach(dd => {
+      const btn = dd.querySelector('.th-dropdown-btn');
+      const panel = dd.querySelector('.th-dropdown-panel');
+      if (!btn || !panel) return;
+      const checkedCount = panel.querySelectorAll('.th-chk:not([data-select-all]) input[type=checkbox]:checked').length;
+      const totalCount = panel.querySelectorAll('.th-chk:not([data-select-all]) input[type=checkbox]').length;
+      const labelEl = btn.querySelector('.dd-label');
+      if (!labelEl) return;
+      const baseLabel = labelEl.textContent.replace(/\s*\(\d+\)\s*$/, '');
+      if (checkedCount > 0 && checkedCount < totalCount) {
+        labelEl.textContent = baseLabel + ' (' + checkedCount + ')';
+        btn.classList.add('active');
+      } else if (checkedCount === totalCount) {
+        labelEl.textContent = baseLabel;
+        btn.classList.remove('active');
+      } else {
+        labelEl.textContent = baseLabel;
+        btn.classList.remove('active');
+      }
+    });
+  }
+
+  // 初始化题头下拉菜单（打开/关闭 + 点击外部关闭）
+  function initThDropdowns() {
+    // 按钮点击切换面板
+    document.querySelectorAll('.th-dropdown-btn').forEach(btn => {
+      if (btn.__ddBound) return;
+      btn.__ddBound = true;
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const panel = btn.parentElement.querySelector('.th-dropdown-panel');
+        if (!panel) return;
+        const wasOpen = panel.classList.contains('open');
+        // 关闭所有其他面板
+        document.querySelectorAll('.th-dropdown-panel.open').forEach(p => p.classList.remove('open'));
+        if (!wasOpen) panel.classList.add('open');
+      });
+    });
+    // 点击外部关闭所有面板
+    document.addEventListener('click', () => {
+      document.querySelectorAll('.th-dropdown-panel.open').forEach(p => p.classList.remove('open'));
+    });
+    // 点击面板内部不冒泡（防止点击复选框时关闭面板）
+    document.querySelectorAll('.th-dropdown-panel').forEach(p => {
+      p.addEventListener('click', e => e.stopPropagation());
     });
   }
 
   // ───────── category nav ─────────
   function renderCatList() {
+    initThDropdowns();
     const total = $('#count-all');
     if (total) total.textContent = journals.length.toLocaleString();
     const allBtn = $('#wos-all-btn');
@@ -2382,20 +2430,20 @@
     if (wosSel) wosSel.value = activeWos.size === 1 ? [...activeWos][0] : '__all';
     // 同步题头复选框状态与 Sets 一致
     syncThChkState();
-    // 题头多选复选框筛选：复选框直接操作 Sets
-    ['idx-chk-group','tier-chk-group','extra-chk-group'].forEach(groupId => {
-      const g = $(`#${groupId}`);
-      if (!g || g.__bound) return;
-      g.__bound = true;
-      g.querySelectorAll('label.th-chk').forEach(label => {
+    // 题头下拉复选框筛选：复选框直接操作 Sets
+    ['idx-panel','tier-panel','extra-panel'].forEach(panelId => {
+      const pnl = $(`#${panelId}`);
+      if (!pnl || pnl.__bound) return;
+      pnl.__bound = true;
+      pnl.querySelectorAll('label.th-chk').forEach(label => {
         const cb = label.querySelector('input[type=checkbox]');
         if (!cb) return;
         cb.addEventListener('change', () => {
           // 全选：切换本组所有选项
           if (label.dataset.selectAll === 'true') {
-            const group = label.closest('.th-chk-group');
-            if (!group) return;
-            group.querySelectorAll('label.th-chk:not([data-select-all])').forEach(sibLabel => {
+            const panel = label.closest('.th-dropdown-panel');
+            if (!panel) return;
+            panel.querySelectorAll('label.th-chk:not([data-select-all])').forEach(sibLabel => {
               const sibCb = sibLabel.querySelector('input[type=checkbox]');
               if (!sibCb) return;
               if (sibCb.checked !== cb.checked) {
