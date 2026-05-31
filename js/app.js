@@ -2260,8 +2260,18 @@
     const topbar = $('.topbar');
     if (topbar) {
       const h = topbar.getBoundingClientRect().height;
-      document.documentElement.style.setProperty('--th-sticky-top', h + 'px');
+      const top = parseFloat(getComputedStyle(topbar).top) || 0;
+      document.documentElement.style.setProperty('--th-sticky-top', Math.ceil(top + h) + 'px');
     }
+  }
+
+  function updateStickySearchState() {
+    const shouldCompact = !document.body.classList.contains('journal-route')
+      && ['int', 'dom', 'fav'].includes(activeTab)
+      && window.scrollY > 96;
+    const changed = document.body.classList.toggle('topbar-compact', shouldCompact);
+    if (changed) requestAnimationFrame(updateThStickyTop);
+    else updateThStickyTop();
   }
 
   function renderInt() {
@@ -4877,6 +4887,7 @@
       else if (activeTab === 'home' && activeQuery) {
         showHomeSearchResults();
       }
+      updateStickySearchState();
     }
     window.__activateJournalTab = activateTab;
     // Home entry pills → switch tab
@@ -5850,8 +5861,9 @@
       applyHashRoute();
       if (user) await pullFavs();
       // 设置表头吸顶偏移 = 搜索栏高度
-      updateThStickyTop();
-      window.addEventListener('resize', updateThStickyTop);
+      updateStickySearchState();
+      window.addEventListener('resize', updateStickySearchState);
+      window.addEventListener('scroll', updateStickySearchState, { passive: true });
     } catch (e) {
       $('#hint').textContent = 'Load failed: ' + e.message;
       console.error(e);
@@ -5862,7 +5874,8 @@
     const topbar = document.querySelector('.topbar');
     if (topbar) {
       const h = topbar.getBoundingClientRect().height;
-      document.documentElement.style.setProperty('--th-sticky-top', h + 'px');
+      const top = parseFloat(getComputedStyle(topbar).top) || 0;
+      document.documentElement.style.setProperty('--th-sticky-top', Math.ceil(top + h) + 'px');
     }
   }
 
