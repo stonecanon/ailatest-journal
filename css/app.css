@@ -1119,6 +1119,7 @@ table.journals tr:last-child td { border-bottom: 0; }
 /* 徽章 */
 .badges { display: flex; flex-wrap: wrap; gap: 4px; }
 /* 国际行：索引栏 + 分区栏 两行分隔 */
+.col-badge { width: 160px; min-width: 160px; }
 .col-badge-split { min-width: 160px; width: 160px; }
 .col-badge-split .badges { margin: 0; }
 .col-badge-split .badges-idx  { gap: 3px; }
@@ -1972,6 +1973,7 @@ td.empty,
   .jname { font-size: 13px !important; }
   table.journals th, table.journals td { padding: 6px 5px; }
   .col-cas, .col-esi, .col-wos { width: 90px; max-width: 90px; font-size: 11px; }
+  .col-badge { width: 130px; min-width: 130px; }
   .col-badge-split { min-width: 130px; width: 130px; }
   .col-fav { width: 36px; }
   .col-free { width: 58px; }
