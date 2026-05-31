@@ -71,7 +71,7 @@ function journalSeo(j, slug, origin) {
   const name = titleCaseName(j.n || 'Journal');
   const ifVal = j.f;
   const quartile = j.q;
-  const indices = j.ia || j.ix || [];
+  const indices = j.ix || [];
   const issn = j.i || slug;
   const titleParts = [name];
   if (ifVal != null) titleParts.push(`IF ${ifVal}`);
@@ -98,22 +98,14 @@ function buildFAQ(j) {
   qa.push({ q: `What is the Impact Factor of ${escJson(name)}?`,
     a: j.f != null ? `The Impact Factor of ${escJson(name)} is ${j.f}.` : 'Not available in the current database.' });
   qa.push({ q: `What is the JCR Quartile of ${escJson(name)}?`,
-    a: j.q ? `${escJson(name)} has a JCR quartile of ${j.q.toUpperCase()}.${j.ifr ? ' Rank: ' + j.ifr + '.' : ''}` : 'Not available in the current database.' });
+    a: j.q ? `${escJson(name)} has a JCR quartile of ${j.q.toUpperCase()}.` : 'Not available in the current database.' });
   if (j.z != null) {
-    const casStr = j.cm ? ` (${escJson(j.cm)})` : '';
-    qa.push({ q: `What is the CAS Ranking of ${escJson(name)}?`, a: `${escJson(name)} is ranked CAS ${j.z}区${casStr}.` });
+    qa.push({ q: `What is the CAS Ranking of ${escJson(name)}?`, a: `${escJson(name)} is ranked CAS ${j.z}区.` });
   } else {
     qa.push({ q: `What is the CAS Ranking of ${escJson(name)}?`, a: 'Not available in the current database.' });
   }
-  const allIdx = j.ia || j.ix || [];
-  const idxChecks = [
-    ['SCIE', allIdx.includes('SCIE')], ['SSCI', allIdx.includes('SSCI')],
-    ['AHCI', allIdx.includes('AHCI')], ['ESCI', allIdx.includes('ESCI')],
-    ['Scopus', j.sf === 1], ['PubMed', j.pb === 1],
-    ['MEDLINE', j.md === 1], ['PMC', j.pc === 1],
-    ['EI', allIdx.includes('EI')], ['DOAJ', j.dj === 1],
-  ];
-  const idxParts = idxChecks.filter(([_, v]) => v).map(([n]) => n);
+  const allIdx = j.ix || [];
+  const idxParts = allIdx.filter(Boolean);
   qa.push({ q: `Is ${escJson(name)} indexed in SCI, SSCI, AHCI, ESCI, Scopus, PubMed, MEDLINE or PMC?`,
     a: idxParts.length ? `Yes, ${escJson(name)} is indexed in: ${idxParts.join(', ')}.` : 'Not available in the current database.' });
   qa.push({ q: `Where can I submit to ${escJson(name)}?`,
@@ -159,7 +151,7 @@ function buildPeriodicalJsonLd(j) {
   if (issn) pd.issn = issn.replace(/(\d{4})(\d{3}[\dX])/, '$1-$2');
   const eissn = j.is || '';
   if (eissn) pd.eissn = eissn.replace(/(\d{4})(\d{3}[\dX])/, '$1-$2');
-  const allIdx = j.ia || j.ix || [];
+  const allIdx = j.ix || [];
   if (allIdx.length) pd.description = `Indexed in ${allIdx.join(', ')}.`;
   if (j.p) pd.publisher = { '@type': 'Organization', name: j.p };
   if (j.f != null) pd.impactFactor = j.f;
@@ -173,7 +165,7 @@ function buildAiSummary(j) {
   const ifVal = j.f != null ? `Impact Factor of ${j.f}` : '';
   const q = j.q ? `, JCR ${j.q.toUpperCase()}` : '';
   const z = j.z != null ? `, and CAS ${j.z}区` : '';
-  const indices = j.ia || j.ix || [];
+  const indices = j.ix || [];
   const idxStr = indices.length ? `Indexed in ${indices.join(', ')}` : '';
   const parts = [name, pub, ifVal, q, z, idxStr].filter(Boolean);
   return `${parts.join('. ')}.`;
@@ -185,9 +177,9 @@ function buildAboutHtml(j) {
   const ifVal = j.f != null ? `It has a JCR Impact Factor of ${j.f}` : '';
   const q = j.q ? ` and is ranked ${j.q.toUpperCase()} in JCR quartile` : '';
   const z = j.z != null ? `. In the CAS ranking system, it is classified as ${j.z}区` : '';
-  const indices = j.ia || j.ix || [];
+  const indices = j.ix || [];
   const idxStr = indices.length ? `. It is indexed in ${indices.join(', ')}` : '';
-  const esi = j.es ? `, and belongs to the ESI category of ${j.es}` : '';
+  
   let text = `${name} is a scholarly journal ${pub}${ifVal}${q}${z}${idxStr}${esi}.`;
   if (!ifVal && !pub) text = `${name}. Detailed journal information is available in the database.`;
   if (text.length > 300) text = text.slice(0, 297) + '...';
@@ -252,8 +244,8 @@ async function comparePage(ctx, j1, j2, slug1, slug2, origin) {
 
   // Build comparison table
   const rows = [];
-  const fmtIdx = (j) => { const a = j.ia || j.ix || []; return a.length ? a.join(', ') : '—'; };
-  const fmtOA = (j) => { const flags = []; if (j.oj) flags.push('OAJ'); if (j.dj) flags.push('DOAJ'); if (j.fr) flags.push('Free'); return flags.length ? flags.join(', ') : '—'; };
+  const fmtIdx = (j) => { const a = j.ix || []; return a.length ? a.join(', ') : '—'; };
+  const fmtOA = () => '—';
   rows.push(compareCell('Publisher', j1.p, j2.p));
   rows.push(compareCell('ISSN', j1.i || '—', j2.i || '—'));
   rows.push(compareCell('Impact Factor', j1.f, j2.f));
