@@ -984,9 +984,11 @@ th.col-if { text-align: right; padding-right: 8px; }
 
 .table-wrap {
   overflow-x: auto;
+  overflow-y: visible;
   background: var(--paper);
   border: 1px solid var(--rule-soft);
   border-radius: 6px;
+  position: relative;
 }
 
 table.journals {
@@ -995,11 +997,16 @@ table.journals {
   font-size: 13.5px;
 }
 table.journals thead {
+  position: relative;
+  z-index: 50;
+}
+table.journals thead th {
   position: sticky;
   top: var(--th-sticky-top, 0);
-  z-index: 40;
+  z-index: 55;
+  background: color-mix(in srgb, var(--paper) 94%, #fff);
+  box-shadow: 0 1px 0 var(--rule-soft), 0 8px 18px rgba(66, 49, 27, 0.06);
 }
-table.journals thead th { background: var(--paper); }
 table.journals th {
   font-family: var(--sans);
   font-weight: 700;
@@ -1011,6 +1018,7 @@ table.journals th {
   padding: 8px 8px;
   border-bottom: 1px solid var(--rule-soft);
   white-space: nowrap;
+  vertical-align: middle;
 }
 table.journals td {
   padding: 8px 8px;
