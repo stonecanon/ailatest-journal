@@ -2072,22 +2072,24 @@
     const esiVal = r.esi_category || '';
     const wosVals = Array.isArray(r.wos_categories) ? r.wos_categories.filter(Boolean) : [];
     const wosShown = wosVals.slice(0, 2).join(' / ');
-    const casCell = casVal ? escape(casVal) : '<span class="muted-cell">—</span>';
-    const esiCell = esiVal ? escape(esiVal) : '<span class="muted-cell">—</span>';
     const wosCell = wosVals.length
       ? `<span title="${escape(wosVals.join(' / '))}">${escape(wosShown)}${wosVals.length > 2 ? ` <span class="muted-cell">+${wosVals.length - 2}</span>` : ''}</span>`
       : '<span class="muted-cell">—</span>';
     const ifVal = (r.if_2024 != null) ? (+r.if_2024).toFixed(1) : '';
     const ifCell = ifVal ? `<span class="if-cell">${ifVal}</span>` : '<span class="muted-cell">—</span>';
+    const cr = r.crossref;
+    const cycleDays = cr && cr.median_days ? +cr.median_days : null;
+    const cycleCell = cycleDays
+      ? `${Math.round(cycleDays / 30.4 * 10) / 10}月`
+      : '<span class="muted-cell">—</span>';
     return `<tr data-fid="${escape(fid)}" class="j-row clickable ${r.flagship ? 'row-flagship' : ''}" data-src="int">
       <td class="col-fav">${starBtn(r, 'int')}</td>
       <td class="col-name">${nameHtml}</td>
       <td class="col-free">${freeBadgeCell(r)}</td>
       <td class="col-badge col-badge-split">${badgeCell}</td>
       <td class="col-if">${ifCell}</td>
-      <td class="col-cas">${casCell}</td>
+      <td class="col-cycle">${cycleCell}</td>
       <td class="col-wos">${wosCell}</td>
-      <td class="col-esi">${esiCell}</td>
     </tr>`;
   }
 
@@ -2300,7 +2302,7 @@
     const visible = filtered.slice(0, shown);
     const tbody = $('#tbody');
     if (!visible.length) {
-      tbody.innerHTML = `<tr><td colspan="8" class="empty">${t('empty')}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="7" class="empty">${t('empty')}</td></tr>`;
     } else {
       tbody.innerHTML = visible.map(renderRow).join('');
     }
@@ -2409,21 +2411,6 @@
       casSel.value = activeCasMajor;
       casSel.addEventListener('change', () => {
         activeCasMajor = casSel.value;
-        shown = PAGE;
-        renderInt();
-      });
-    }
-    const esiSel = $('#esi-col-filter');
-    if (esiSel && !esiSel.__bound) {
-      esiSel.__bound = true;
-      const esiSet = new Set();
-      journals.forEach(j => { if (j.esi_category) esiSet.add(j.esi_category); });
-      const esiList = [...esiSet].sort();
-      esiSel.innerHTML = `<option value="__all">${T('ESI 学科','ESI Subject')}</option>` +
-        esiList.map(v => `<option value="${escape(v)}">${escape(v)}</option>`).join('');
-      esiSel.value = activeCat;
-      esiSel.addEventListener('change', () => {
-        activeCat = esiSel.value;
         shown = PAGE;
         renderInt();
       });
@@ -4060,8 +4047,7 @@
             <th class="col-name">${T('期刊 Title','Journal Title')}</th>
             <th class="col-badge">${T('索引 / 分区','Indices / Tier')}</th>
             <th class="col-if sortable ${favIfSort === 'desc' ? 'sort-desc' : favIfSort === 'asc' ? 'sort-asc' : ''}" data-if-sort="fav">IF <span class="sort-arrow">${favIfSort === 'asc' ? '▲' : '▼'}</span></th>
-            <th class="col-cas">${T('中科院大类','CAS Major')}</th>
-            <th class="col-esi">ESI Subject</th>
+            <th class="col-cycle">审稿周期</th>
             <th class="col-src" style="width:90px">${T('来源','Source')}</th>
           </tr></thead>
           <tbody id="fav-tbody">${tbody}</tbody>
@@ -4593,10 +4579,6 @@
     const crossBadges = renderDomCrossBadges(r, r.__src);
     const otherBadges = [tierBadge, crossBadges].filter(Boolean).join('');
     const badgeCell = renderBadgeCell(indexBadges, [rankBadges, otherBadges].filter(Boolean).join(''));
-    const casVal = (lang === 'zh-CN' || lang === 'zh-TW') ? (r.cas_major_cn || '') : tn(r.cas_major_cn || '', 'domain');
-    const esiVal = r.esi_category || '';
-    const casCell = casVal ? escape(casVal) : '<span class="muted-cell">—</span>';
-    const esiCell = esiVal ? escape(esiVal) : '<span class="muted-cell">—</span>';
     const SRC_LABEL = {
       int: T('国际','Int’l'), cssci: 'CSSCI', cssci_core: 'CSSCI', cssci_ext: T('CSSCI扩展','CSSCI Ext'),
       pku: T('北大核心','PKU Core'), pku_core: T('北大核心','PKU Core'), cnkx: T('科协','CAST'), ccft: 'CCF-T',
@@ -4604,14 +4586,18 @@
     };
     const ifVal = (r.if_2024 != null) ? (+r.if_2024).toFixed(1) : '';
     const ifCell = ifVal ? `<span class="if-cell">${ifVal}</span>` : '<span class="muted-cell">—</span>';
+    const cr = r.crossref;
+    const cycleDays = cr && cr.median_days ? +cr.median_days : null;
+    const cycleCell = cycleDays
+      ? `${Math.round(cycleDays / 30.4 * 10) / 10}月`
+      : '<span class="muted-cell">—</span>';
     return `<tr class="j-row clickable" data-fid="${escape(fid)}" data-src="${escape(r.__src)}">
       <td class="col-drag"><span class="drag-handle" title="${T('拖动排序','Drag to reorder')}">⋮⋮</span></td>
       <td class="col-fav">${starBtn(r, r.__src)}</td>
       <td class="col-name">${nameHtml}</td>
       <td class="col-badge col-badge-split">${badgeCell}</td>
       <td class="col-if">${ifCell}</td>
-      <td class="col-cas">${casCell}</td>
-      <td class="col-esi">${esiCell}</td>
+      <td class="col-cycle">${cycleCell}</td>
       <td class="col-src"><span class="src-tag src-${escape(r.__src)}">${SRC_LABEL[r.__src] || r.__src}</span></td>
     </tr>`;
   }

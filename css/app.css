@@ -949,6 +949,12 @@ td.col-esi, td.col-cas, td.col-wos { white-space: normal; word-break: break-word
 }
 .col-if .if-cell { font-size: 13px; font-weight: 680; color: var(--ink-soft); }
 th.col-if { text-align: right; padding-right: 8px; }
+.col-cycle {
+  width: 72px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--ink-soft);
+}
 
 /* drawer 大类/小类 标签（区分新锐版双 4 区等情况） */
 .zone-tier {

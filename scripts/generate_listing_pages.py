@@ -33,6 +33,8 @@ def load_wos_categories():
         slug = slug.replace('(', '').replace(')', '').replace(' ', '-').replace('--', '-').strip('-')
         desc = f'{name} journals — browse top journals in the Web of Science {name} category with Impact Factor, Quartile, CAS tier and indexing information.'
         result.append((slug, name, desc, name))
+    # Sort alphabetically by title
+    result.sort(key=lambda x: x[1].lower())
     return result
 
 SUBJECTS = None  # will be loaded from wos_categories.json at runtime
@@ -80,6 +82,7 @@ h1{font-size:20px;margin:0 0 6px;font-weight:700;letter-spacing:-.01em}
 .breadcrumb a:hover{text-decoration:underline}
 .sub{color:var(--ink-soft);font-size:14px;margin-bottom:12px}
 .count{color:var(--ink-soft);font-size:12px;margin-bottom:14px}
+.card{background:var(--paper);border:1px solid var(--rule);border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,0.06),0 4px 12px rgba(0,0,0,0.04);overflow:hidden}
 .table-wrap{background:var(--paper);border:1px solid var(--rule);border-radius:8px;overflow:hidden;overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:13px}
 th{text-align:left;padding:10px 12px;border-bottom:2px solid var(--rule);font-weight:700;white-space:nowrap;color:var(--ink);font-size:11px;letter-spacing:.04em;text-transform:uppercase;background:var(--bg)}
@@ -108,8 +111,8 @@ a:hover{text-decoration:underline}
 <p class="breadcrumb"><a href="__ORIGIN__/">Home</a> › <a href="__BACK__">__BACK_LABEL__</a></p>
 <p class="sub">__DESC__</p>
 <p class="count">__COUNT__</p>
-<div class="table-wrap"><table><thead><tr>__HEADERS__</tr></thead>
-<tbody>__ROWS__</tbody></table></div>
+<div class="card"><div class="table-wrap"><table><thead><tr>__HEADERS__</tr></thead>
+<tbody>__ROWS__</tbody></table></div></div>
 <p class="back-wrap"><a class="back" href="__BACK__">← Back</a></p>
 </div>
 <div class="footer"><a href="__ORIGIN__/">AILatest Journal</a> — journal search &amp; submission decision tool for researchers</div>
@@ -216,35 +219,100 @@ def generate_landing(origin):
     indexes = INDEXES
 
     # Subjects landing
-    r_list = '\n'.join(f'<li><a href="{origin}/subjects/{s}/"><strong>{esc(t)}</strong></a></li>' for s, t, _, _ in subjects)
+    r_list = '\n'.join(f'<li><a href="{origin}/subjects/{s}/" class="cat-link"><strong>{esc(t)}</strong></a></li>' for s, t, _, _ in subjects)
     r_html = f'''<!doctype html><html lang="en">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Browse Journals by WoS Subject | AILatest Journal</title>
 <meta name="description" content="Browse academic journals by Web of Science subject area: Education, Economics, History, Engineering, Medicine, Computer Science and 94+ more categories. Top journals by Impact Factor." />
 <link rel="canonical" href="{origin}/subjects/" /><meta name="robots" content="index,follow" />
-<style>body{{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;margin:0;padding:20px;background:#fafafa;color:#222;line-height:1.6}}
-.wrap{{max-width:800px;margin:0 auto;background:#fff;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.08);padding:20px}}
-h1{{font-size:22px}}p.sub{{color:#666}}a{{color:#2563eb;text-decoration:none}}a:hover{{text-decoration:underline}}
-ul{{line-height:2;columns:3}}.back{{display:inline-block;margin-top:20px;padding:8px 20px;background:#2563eb;color:#fff!important;text-decoration:none;border-radius:6px}}</style>
-</head><body><div class="wrap"><h1>Browse Journals by WoS Subject</h1><p class="sub">Select a Web of Science subject category to browse top journals sorted by Impact Factor.</p>
-<ul>{r_list}</ul><p><a class="back" href="{origin}/">← Back to Journal Search</a></p></div></body></html>'''
+<meta name="theme-color" content="#b4531f" />
+<style>
+:root{{--accent:#b4531f;--bg:#f7f5f0;--paper:#fff;--ink:#1c1917;--ink-soft:#6b6559;--rule:#e3ddd0;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}}
+*{{box-sizing:border-box}}
+body{{font-family:var(--sans);margin:0;padding:0;background:var(--bg);color:var(--ink);line-height:1.6}}
+.header{{background:var(--paper);border-bottom:1px solid var(--rule);padding:14px 20px;position:sticky;top:0;z-index:10}}
+.header-inner{{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:16px}}
+.header a{{color:var(--ink);text-decoration:none;font-weight:700;font-size:15px;letter-spacing:.02em}}
+.header a:hover{{color:var(--accent)}}
+.header .logo{{display:flex;align-items:center;gap:6px}}
+.header .logo-symbol{{font-size:22px;line-height:1}}
+.header .nav-links{{display:flex;gap:16px;margin-left:auto;font-size:13px}}
+.header .nav-links a{{font-weight:500;color:var(--ink-soft)}}
+.header .nav-links a:hover{{color:var(--accent)}}
+.wrap{{max-width:1100px;margin:0 auto;padding:20px}}
+h1{{font-size:20px;margin:0 0 6px;font-weight:700}}
+.breadcrumb{{font-size:12px;color:var(--ink-soft);margin-bottom:16px}}
+.breadcrumb a{{color:var(--accent);text-decoration:none}}
+.sub{{color:var(--ink-soft);font-size:14px;margin-bottom:16px}}
+.card{{background:var(--paper);border:1px solid var(--rule);border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,0.06),0 4px 12px rgba(0,0,0,0.04);padding:16px 24px}}
+.cat-list{{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px 16px}}
+.cat-link{{display:block;padding:6px 10px;color:var(--accent);text-decoration:none;font-size:13px;border-radius:4px;transition:background .1s}}
+.cat-link:hover{{background:#f5f0ea;text-decoration:none}}
+.back-wrap{{margin-top:20px}}
+.back{{display:inline-block;padding:8px 22px;background:var(--accent);color:#fff!important;text-decoration:none;border-radius:6px;font-size:13px;font-weight:600}}
+.back:hover{{opacity:.9;text-decoration:none}}
+.footer{{text-align:center;padding:24px;color:var(--ink-soft);font-size:12px;border-top:1px solid var(--rule);margin-top:24px}}
+.footer a{{color:var(--ink-soft)}}
+</style>
+</head><body>
+<div class="header"><div class="header-inner"><a href="{origin}/" class="logo"><span class="logo-symbol">📖</span> AILatest Journal</a>
+<span class="nav-links"><a href="{origin}/indexes/">Indexes</a><a href="{origin}/subjects/">Subjects</a></span></div></div>
+<div class="wrap"><h1>Browse Journals by WoS Subject</h1><p class="breadcrumb"><a href="{origin}/">Home</a></p>
+<p class="sub">Select a Web of Science subject category to browse top journals sorted by Impact Factor.</p>
+<div class="card"><ul class="cat-list">{r_list}</ul></div>
+<p class="back-wrap"><a class="back" href="{origin}/">← Back</a></p></div>
+<div class="footer"><a href="{origin}/">AILatest Journal</a> — journal search &amp; submission decision tool for researchers</div>
+</body></html>'''
     (ROOT / 'subjects').mkdir(parents=True, exist_ok=True)
     (ROOT / 'subjects' / 'index.html').write_text(r_html, encoding='utf-8')
     print('  /subjects/ (landing)')
 
     # Indexes landing
-    i_list = '\n'.join(f'<li><a href="{origin}/indexes/{s}/"><strong>{esc(t)}</strong></a></li>' for s, t, _, _ in indexes)
+    i_list = '\n'.join(f'<li><a href="{origin}/indexes/{s}/" class="cat-link"><strong>{esc(t)}</strong></a></li>' for s, t, _, _ in indexes)
     i_html = f'''<!doctype html><html lang="en">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Browse Journals by Indexing Database | AILatest Journal</title>
 <meta name="description" content="Browse academic journals indexed in SCIE, SSCI, EI Compendex, Scopus and MEDLINE." />
 <link rel="canonical" href="{origin}/indexes/" /><meta name="robots" content="index,follow" />
-<style>body{{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;margin:0;padding:20px;background:#fafafa;color:#222;line-height:1.6}}
-.wrap{{max-width:800px;margin:0 auto;background:#fff;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.08);padding:20px}}
-h1{{font-size:22px}}p.sub{{color:#666}}a{{color:#2563eb;text-decoration:none}}a:hover{{text-decoration:underline}}
-ul{{line-height:2;columns:2}}.back{{display:inline-block;margin-top:20px;padding:8px 20px;background:#2563eb;color:#fff!important;text-decoration:none;border-radius:6px}}</style>
-</head><body><div class="wrap"><h1>Browse Journals by Indexing Database</h1><p class="sub">Select an indexing database to browse indexed journals sorted by Impact Factor.</p>
-<ul>{i_list}</ul><p><a class="back" href="{origin}/">← Back to Journal Search</a></p></div></body></html>'''
+<meta name="theme-color" content="#b4531f" />
+<style>
+:root{{--accent:#b4531f;--bg:#f7f5f0;--paper:#fff;--ink:#1c1917;--ink-soft:#6b6559;--rule:#e3ddd0;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}}
+*{{box-sizing:border-box}}
+body{{font-family:var(--sans);margin:0;padding:0;background:var(--bg);color:var(--ink);line-height:1.6}}
+.header{{background:var(--paper);border-bottom:1px solid var(--rule);padding:14px 20px;position:sticky;top:0;z-index:10}}
+.header-inner{{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:16px}}
+.header a{{color:var(--ink);text-decoration:none;font-weight:700;font-size:15px;letter-spacing:.02em}}
+.header a:hover{{color:var(--accent)}}
+.header .logo{{display:flex;align-items:center;gap:6px}}
+.header .logo-symbol{{font-size:22px;line-height:1}}
+.header .nav-links{{display:flex;gap:16px;margin-left:auto;font-size:13px}}
+.header .nav-links a{{font-weight:500;color:var(--ink-soft)}}
+.header .nav-links a:hover{{color:var(--accent)}}
+.wrap{{max-width:1100px;margin:0 auto;padding:20px}}
+h1{{font-size:20px;margin:0 0 6px;font-weight:700}}
+.breadcrumb{{font-size:12px;color:var(--ink-soft);margin-bottom:16px}}
+.breadcrumb a{{color:var(--accent);text-decoration:none}}
+.sub{{color:var(--ink-soft);font-size:14px;margin-bottom:16px}}
+.card{{background:var(--paper);border:1px solid var(--rule);border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,0.06),0 4px 12px rgba(0,0,0,0.04);padding:16px 24px}}
+.cat-list{{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px 16px}}
+.cat-list li{{}}
+.cat-link{{display:block;padding:6px 10px;color:var(--accent);text-decoration:none;font-size:13px;border-radius:4px;transition:background .1s}}
+.cat-link:hover{{background:#f5f0ea;text-decoration:none}}
+.back-wrap{{margin-top:20px}}
+.back{{display:inline-block;padding:8px 22px;background:var(--accent);color:#fff!important;text-decoration:none;border-radius:6px;font-size:13px;font-weight:600}}
+.back:hover{{opacity:.9;text-decoration:none}}
+.footer{{text-align:center;padding:24px;color:var(--ink-soft);font-size:12px;border-top:1px solid var(--rule);margin-top:24px}}
+.footer a{{color:var(--ink-soft)}}
+</style>
+</head><body>
+<div class="header"><div class="header-inner"><a href="{origin}/" class="logo"><span class="logo-symbol">📖</span> AILatest Journal</a>
+<span class="nav-links"><a href="{origin}/indexes/">Indexes</a><a href="{origin}/subjects/">Subjects</a></span></div></div>
+<div class="wrap"><h1>Browse Journals by Indexing Database</h1><p class="breadcrumb"><a href="{origin}/">Home</a></p>
+<p class="sub">Select an indexing database to browse indexed journals sorted by Impact Factor.</p>
+<div class="card"><ul class="cat-list">{i_list}</ul></div>
+<p class="back-wrap"><a class="back" href="{origin}/">← Back</a></p></div>
+<div class="footer"><a href="{origin}/">AILatest Journal</a> — journal search &amp; submission decision tool for researchers</div>
+</body></html>'''
     (ROOT / 'indexes' / 'index.html').write_text(i_html, encoding='utf-8')
     print('  /indexes/ (landing)')
 
