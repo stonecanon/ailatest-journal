@@ -334,7 +334,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
 
     <div class="side-section" data-international>
-      <div class="side-label">JCR Quartile</div>
+      <div class="side-label" data-i18n="jcr_label">JCR 分区</div>
       <div class="chip-row" id="jcr-toggles">
         <label class="chip jcr-q1"><input type="checkbox" value="Q1">Q1</label>
         <label class="chip jcr-q2"><input type="checkbox" value="Q2">Q2</label>
@@ -366,7 +366,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
 
     <div class="side-section" data-international>
-      <div class="side-label">ABDC</div>
+      <div class="side-label" data-i18n="abdc_label">ABDC</div>
       <div class="chip-row" id="abdc-toggles">
         <label class="chip"><input type="checkbox" value="A*">A*</label>
         <label class="chip"><input type="checkbox" value="A">A</label>
@@ -376,7 +376,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
 
     <div class="side-section" data-international>
-      <div class="side-label">ABS</div>
+      <div class="side-label" data-i18n="abs_label">ABS</div>
       <div class="chip-row" id="abs-toggles">
         <label class="chip"><input type="checkbox" value="4*">4*</label>
         <label class="chip"><input type="checkbox" value="4">4</label>
@@ -389,15 +389,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="side-section" data-international>
       <div class="side-label" data-i18n="filters">附加筛选</div>
       <div class="chip-row feat-row">
-        <label class="chip"><input type="checkbox" value="if" data-feat>IF</label>
+        <label class="chip"><input type="checkbox" value="if" data-feat><span data-i18n="col_if">IF</span></label>
         <label class="chip"><input type="checkbox" value="ccf" data-feat>CCF</label>
         <label class="chip" hidden style="display:none"><input type="checkbox" value="cnkx" data-feat>T1/T2/T3</label>
-        <label class="chip"><input type="checkbox" value="flagship" data-feat>N/S/C</label>
+        <label class="chip"><input type="checkbox" value="flagship" data-feat><span data-i18n="filter_nsc">N/S/C</span></label>
         <label class="chip"><input type="checkbox" value="scopus" data-feat>Scopus</label>
         <label class="chip"><input type="checkbox" value="oaj" data-feat>OAJ</label>
         <label class="chip"><input type="checkbox" value="doaj" data-feat>DOAJ</label>
         <label class="chip"><input type="checkbox" value="medline" data-feat>MEDLINE</label>
-        <label class="chip"><input type="checkbox" value="free" data-feat>免费发表</label>
+        <label class="chip"><input type="checkbox" value="free" data-feat><span data-i18n="filter_free">免费发表</span></label>
         <label class="chip"><input type="checkbox" value="warning" data-feat><span data-i18n="filter_warning">预警</span></label>
       </div>
     </div>
@@ -415,12 +415,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
 
     <div class="side-section" data-international>
-      <div class="side-label">研究主题 <span class="muted-cell" style="font-size:11px">(OpenAlex)</span></div>
+      <div class="side-label"><span data-i18n="oa_sf_label">研究主题</span> <span class="muted-cell" style="font-size:11px">(OpenAlex)</span></div>
       <div class="wos-actions">
-        <button class="wos-clear" id="oa-sf-clear" type="button" title="清空选择 / Clear">×</button>
+        <button class="wos-clear" id="oa-sf-clear" type="button" data-i18n-title="oa_sf_clear" title="清空选择">×</button>
       </div>
       <div class="wos-search-wrap">
-        <input id="oa-sf-search" type="search" placeholder="筛选主题…" autocomplete="off" spellcheck="false" />
+        <input id="oa-sf-search" type="search" data-i18n-placeholder="oa_sf_ph" placeholder="筛选主题…" autocomplete="off" spellcheck="false" />
       </div>
       <div class="wos-list wos-list-tall" id="oa-sf-list"></div>
       <button class="nav-item" id="oa-sf-all-btn" style="margin-top:8px"><span data-i18n="all">全部</span> <span class="count" id="count-oa-sf">—</span></button>
@@ -506,7 +506,7 @@ const __BUILD_VER = 'v20260530-79';
   }
 })();
 </script>
-<script src="/js/app.js?v=20260531-07" defer></script>
+<script src="/js/app.js?v=20260531-08" defer></script>
 <script>
   // Custom install prompt
   let __pwaPrompt = null;
