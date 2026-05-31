@@ -214,8 +214,22 @@ def generate_all():
             'q': r.get('if_quartile') or '',
             'z': r.get('cas_zone'),
             'ix': (r.get('indices') or [])[:3],
+            'ia': (r.get('indices') or []),
             'p': r.get('publisher') or '',
             'sl': slug,
+            'md': 1 if r.get('medline') else 0,
+            'pb': 1 if r.get('pubmed') else 0,
+            'pc': 1 if r.get('pmc') else 0,
+            'sf': 1 if (r.get('scopus') or {}).get('active') else 0,
+            'oj': 1 if r.get('oaj') else 0,
+            'dj': 1 if r.get('doaj') else 0,
+            'w': 1 if r.get('warning') else 0,
+            'fr': 1 if r.get('free') else 0,
+            'jc': r.get('jcr_cat') or '',
+            'wc': (r.get('wos_categories') or [])[:3],
+            'es': r.get('esi_category') or '',
+            'cm': r.get('cas_major_cn') or '',
+            'ifr': r.get('if_rank') or '',
         }
         # Primary key: name-based slug
         index[slug] = entry
