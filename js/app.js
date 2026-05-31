@@ -1946,10 +1946,10 @@
         return `<span class="warn-pill">⚠ Warning</span>`;
       }
       function badgeUnderReview() {
-        return `<span class="under-review-pill">Under Review</span>`;
+        return `<span class="under-review-pill">新锐 Under Review</span>`;
       }
       function badgeOnHold() {
-        return `<span class="on-hold-pill">On Hold</span>`;
+        return `<span class="on-hold-pill">WoS On Hold</span>`;
       }
 
   // 统一标签组合：主页 / 收藏页 / 抽屉 / 分享卡片共用同一批 badge 函数与 CSS 类。
