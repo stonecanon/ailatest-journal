@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-31T00:41:14.314Z",
+  "generated_at": "2026-05-31T00:52:35.732Z",
   "source": "remote D1",
   "notes": [
     "注册量来自 users.created_at，当前是最可靠口径。",
@@ -38,9 +38,9 @@
     "google_users": 3,
     "first_signup_at": 1778628305,
     "latest_signup_at": 1780072333,
-    "favorite_rows": 37,
+    "favorite_rows": 38,
     "users_with_favorites": 6,
-    "avg_favorites_per_active_user": 6.17,
+    "avg_favorites_per_active_user": 6.33,
     "rating_rows": 23,
     "users_with_ratings": 5,
     "rated_journals": 18,

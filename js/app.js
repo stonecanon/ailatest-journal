@@ -2216,6 +2216,9 @@
         })
         .map(x => x.r);
     }
+    if (activeQuery) {
+      intIfSort = '';
+    }
     filtered = sortByIF(filtered, intIfSort);
     document.querySelector('th.col-if[data-if-sort="int"]')?.classList.toggle('sort-desc', intIfSort === 'desc');
     document.querySelector('th.col-if[data-if-sort="int"]')?.classList.toggle('sort-asc', intIfSort === 'asc');
