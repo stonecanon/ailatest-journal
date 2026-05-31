@@ -2430,13 +2430,14 @@
     const total = $('#count-all');
     if (total) total.textContent = journals.length.toLocaleString();
     const allBtn = $('#wos-all-btn');
+    const wosSel = $('#wos-col-filter');
     if (allBtn && !allBtn.__bound) {
       allBtn.__bound = true;
       allBtn.addEventListener('click', () => {
         activeWos.clear();
         $$('.wos-item').forEach(el => el.classList.remove('on'));
         $$('#wos-list input[type=checkbox]').forEach(cb => cb.checked = false);
-        const wosSel = $('#wos-col-filter'); if (wosSel) wosSel.value = '__all';
+        if (wosSel) wosSel.value = '__all';
         const inp = $('#wos-search'); if (inp) inp.value = '';
         renderWosList();
         activeCat = '__all';
