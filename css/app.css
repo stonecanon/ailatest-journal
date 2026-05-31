@@ -539,7 +539,8 @@ main.main {
   align-items: center;
   justify-content: center;
   gap: clamp(10px, 1.4vw, 16px);
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  white-space: nowrap;
 }
 .home-brand-row [data-i18n="brand_title"] {
   display: flex;
