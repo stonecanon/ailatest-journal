@@ -338,9 +338,9 @@ export async function onRequest(ctx) {
 
       const index = await loadIndex(ctx);
       const ca = journalSlugCandidates(rawA);
-      const slugA = ca.find(s => index[s]);
+      let slugA = ca.find(s => index[s]);
       const cb = journalSlugCandidates(rawB);
-      const slugB = cb.find(s => index[s]);
+      let slugB = cb.find(s => index[s]);
       if (!slugA || !slugB) return notFound('One or both journals not found.');
       let jA = slugA ? index[slugA] : null;
       let jB = slugB ? index[slugB] : null;
