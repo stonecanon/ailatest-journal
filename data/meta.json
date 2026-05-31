@@ -31,10 +31,10 @@
     "has_homepage": 53337,
     "has_apc": 17261,
     "labels": {
-      "diamond": 23058,
-      "subscription_paid_read": 22906,
       "hybrid": 9960,
-      "gold_apc": 11978
+      "gold_apc": 11978,
+      "subscription_paid_read": 22906,
+      "diamond": 23058
     },
     "is_oa": 35036,
     "in_doaj": 30206

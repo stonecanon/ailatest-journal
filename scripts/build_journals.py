@@ -1470,8 +1470,11 @@ def main():
             print(f'  oa.json: {oa_size/1024/1024:.1f} MB → oa.json.gz: {gz_size/1024/1024:.1f} MB')
 
         # ────── Embed "free" flag from OpenAlex OA labels ──────
-        # free = any journal that offers OA (diamond, gold_apc, hybrid) — excludes pure subscription
-        OA_FREE_LABELS = {'diamond', 'gold_apc', 'hybrid'}
+        # free = author can publish without paying APC (subscription/hybrid/diamond — excludes gold_apc where author pays)
+        # subscription_paid_read / hybrid → author free via subscription path
+        # diamond → fully free both ways
+        # gold_apc → author pays APC (not free for author)
+        OA_FREE_LABELS = {'diamond', 'hybrid', 'subscription_paid_read'}
         oa_gz = DATA_DIR / 'oa.json.gz'
         if oa_gz.exists():
             with open(oa_gz, 'rb') as f:
@@ -1490,7 +1493,7 @@ def main():
             with open(DATA_DIR / 'journals.json', 'rb') as fin:
                 with gzip.open(DATA_DIR / 'journals.json.gz', 'wb', compresslevel=9) as fout:
                     shutil.copyfileobj(fin, fout)
-            print(f'  Free-to-publish flag: {free_count} journals (diamond/gold/hybrid OA)')
+            print(f'  Free-to-publish flag: {free_count} journals (author-free: subscription/hybrid/diamond)')
     else:
         print('  skip: merge_openalex.py or openalex_cache.json not found')
     return 0
