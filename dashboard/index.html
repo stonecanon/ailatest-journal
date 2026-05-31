@@ -3,53 +3,60 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>AILatest Journal 本地运营看板</title>
+  <title>AILatest Journal 运营看板</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <main class="shell">
-    <header class="topbar">
-      <div>
-        <h1><span class="brand-word">AILatest</span> <em>Journal</em> <span class="title-tail">流量看板</span></h1>
-        <p class="subtitle">每日浏览、访客、会话和互动数据集中在一个运营工作台里。</p>
+  <div class="shell">
+    <aside class="sidebar" aria-label="看板导航">
+      <div class="brand">
+        <div class="brand-logo">A</div>
+        <div class="brand-text">
+          <div class="brand-name">AILatest</div>
+          <div class="brand-sub">运营看板 · v1</div>
+        </div>
       </div>
-      <div class="meta">
-        <div><span class="pill" id="source">remote D1</span></div>
-        <div>生成时间：<span id="generated-at">-</span></div>
-        <div>最后浏览上报：<span id="latest-pageview-at">-</span></div>
-        <button class="refresh-btn" id="refresh-now" type="button">刷新数据</button>
-      </div>
-    </header>
 
-    <div class="app-frame" aria-label="运营看板应用界面">
-      <aside class="rail" aria-label="看板导航">
-        <div class="rail-logo">A</div>
-        <nav>
-          <span class="rail-item active" title="Overview">⌘</span>
-          <span class="rail-item" title="Traffic">◇</span>
-          <span class="rail-item" title="Users">◌</span>
-          <span class="rail-item" title="Reports">▥</span>
-          <span class="rail-item" title="Notes">?</span>
-        </nav>
-        <span class="rail-exit" title="Export">↗</span>
-      </aside>
+      <nav class="nav">
+        <div class="nav-section">概览</div>
+        <a class="nav-link active" href="#top"><span class="ni">◫</span><span>总览</span></a>
+        <a class="nav-link" href="#sec-cf"><span class="ni">☁</span><span>Cloudflare</span></a>
+        <a class="nav-link" href="#sec-ga"><span class="ni">◳</span><span>Google Analytics</span></a>
+        <a class="nav-link" href="#sec-first"><span class="ni">◎</span><span>站内埋点</span></a>
+        <a class="nav-link" href="#sec-users"><span class="ni">☺</span><span>用户与互动</span></a>
+
+        <div class="nav-section">更多</div>
+        <a class="nav-link" href="#sec-paths"><span class="ni">⤳</span><span>访问路径</span></a>
+        <a class="nav-link" href="#sec-notes"><span class="ni">≡</span><span>口径说明</span></a>
+      </nav>
+
+      <a class="nav-link nav-foot" href="https://journal.ailatest.org/" target="_blank" rel="noopener">
+        <span class="ni">⏏</span><span>返回主站</span>
+      </a>
+    </aside>
+
+    <main class="main" id="top">
+      <header class="topbar">
+        <div class="greeting">
+          <h1 id="greeting">运营概览</h1>
+          <p class="subtitle">
+            <span class="dot"></span>生成 <span id="generated-at">-</span>
+            <span class="sep">·</span> 最后浏览上报 <span id="latest-pageview-at">-</span>
+          </p>
+        </div>
+        <div class="topbar-actions">
+          <span class="pill" id="source">remote D1</span>
+          <button class="btn-primary" id="refresh-now" type="button">刷新数据</button>
+          <span class="userchip"><span class="avatar">Z</span><span class="uc-name">站长</span></span>
+        </div>
+      </header>
 
       <div class="workspace">
-        <section class="workspace-head">
+        <section class="section-label" id="sec-cf">
           <div>
-            <span class="eyebrow">Overview</span>
-            <h2>Portfolio</h2>
+            <h2>Cloudflare 流量 <span class="tag tag-cf">全站口径</span></h2>
+            <p>来自 Cloudflare Analytics，统计到达边缘的所有请求，含静态资源、接口、爬虫与直接访问——数字最大、最接近真实总量。</p>
           </div>
-          <div class="head-actions" aria-hidden="true">
-            <span>⌕</span>
-            <span>◐</span>
-            <span class="avatar">Z</span>
-          </div>
-        </section>
-
-        <section class="section-label">
-          <h2>Cloudflare 流量（全站口径）</h2>
-          <p>来自 Cloudflare Analytics，统计到达边缘的所有请求，含静态资源、接口、爬虫与直接访问——数字最大、最接近真实总量。</p>
         </section>
         <div id="cf-note"></div>
         <section class="grid cf-kpis" aria-label="Cloudflare 指标"></section>
@@ -60,9 +67,11 @@
           </article>
         </section>
 
-        <section class="section-label">
-          <h2>Google Analytics（GTM 口径）</h2>
-          <p>来自 GA4（GTM-NBNXL7FB），统计成功加载并运行 GA 脚本的访问，是行业通用口径。数据可能有数小时处理延迟。</p>
+        <section class="section-label" id="sec-ga">
+          <div>
+            <h2>Google Analytics <span class="tag tag-ga">GTM 口径</span></h2>
+            <p>来自 GA4（GTM-NBNXL7FB），统计成功加载并运行 GA 脚本的访问，是行业通用口径。数据可能有数小时处理延迟。</p>
+          </div>
         </section>
         <div id="ga-note"></div>
         <section class="grid ga-kpis" aria-label="Google Analytics 指标"></section>
@@ -77,14 +86,16 @@
           <article class="card panel"><h2>GA4 访客地区</h2><div class="bar-list" id="ga-top-countries"></div></article>
         </section>
 
-        <section class="section-label">
-          <h2>站内埋点（第一方，最窄口径）</h2>
-          <p>只统计成功运行本站脚本并上报的访问，用于精确分析路径与互动，数字最小但最干净。</p>
+        <section class="section-label" id="sec-first">
+          <div>
+            <h2>站内埋点 <span class="tag tag-first">第一方 · 最窄口径</span></h2>
+            <p>只统计成功运行本站脚本并上报的访问，用于精确分析路径与互动，数字最小但最干净。</p>
+          </div>
         </section>
         <section class="traffic-summary" aria-label="访问概览">
           <div class="summary-copy">
             <div class="summary-metric">
-              <span>Portfolio balance</span>
+              <span>累计页面浏览量</span>
               <strong id="hero-pageviews">-</strong>
             </div>
             <p>逐日访问是主指标。页面浏览量看页面被打开多少次，独立访客数看大概多少个不同的人来过，访问人次更接近“来了多少趟”。</p>
@@ -114,7 +125,7 @@
           </article>
         </section>
 
-        <section class="grid traffic-breakdown">
+        <section class="grid traffic-breakdown" id="sec-paths">
           <article class="card panel">
             <h2>热门访问路径</h2>
             <div class="bar-list" id="top-paths"></div>
@@ -126,9 +137,11 @@
           </article>
         </section>
 
-        <section class="section-label">
-          <h2>用户与互动</h2>
-          <p>注册、登录和内容互动用于判断访问后的行为质量。</p>
+        <section class="section-label" id="sec-users">
+          <div>
+            <h2>用户与互动</h2>
+            <p>注册、登录和内容互动用于判断访问后的行为质量。</p>
+          </div>
         </section>
 
         <section class="grid secondary-kpis" aria-label="用户与互动指标"></section>
@@ -158,14 +171,14 @@
             <h2>最近注册用户</h2>
             <div id="recent-users"></div>
           </article>
-          <article class="card panel">
+          <article class="card panel" id="sec-notes">
             <h2>口径说明</h2>
             <ul class="note-list" id="notes"></ul>
           </article>
         </section>
       </div>
-    </div>
-  </main>
+    </main>
+  </div>
 
   <script src="dashboard.js"></script>
 </body>

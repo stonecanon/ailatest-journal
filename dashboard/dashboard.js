@@ -79,6 +79,25 @@ function mergeSeries(rows, keys) {
   });
 }
 
+function smoothPath(pts) {
+  if (!pts.length) return '';
+  if (pts.length === 1) return `M ${pts[0][0].toFixed(1)} ${pts[0][1].toFixed(1)}`;
+  let d = `M ${pts[0][0].toFixed(1)} ${pts[0][1].toFixed(1)}`;
+  const t = 0.16;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[i - 1] || pts[i];
+    const p1 = pts[i];
+    const p2 = pts[i + 1];
+    const p3 = pts[i + 2] || p2;
+    const c1x = p1[0] + (p2[0] - p0[0]) * t;
+    const c1y = p1[1] + (p2[1] - p0[1]) * t;
+    const c2x = p2[0] - (p3[0] - p1[0]) * t;
+    const c2y = p2[1] - (p3[1] - p1[1]) * t;
+    d += ` C ${c1x.toFixed(1)} ${c1y.toFixed(1)}, ${c2x.toFixed(1)} ${c2y.toFixed(1)}, ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`;
+  }
+  return d;
+}
+
 function lineChart(target, rows, series, options = {}) {
   const host = document.querySelector(target);
   if (!rows.length) {
@@ -87,28 +106,56 @@ function lineChart(target, rows, series, options = {}) {
   }
   const width = 760;
   const height = 280;
-  const pad = { l: 42, r: 18, t: 20, b: 38 };
+  const pad = { l: 44, r: 20, t: 30, b: 38 };
+  const uid = `c${Math.abs([...target].reduce((a, c) => (a * 31 + c.charCodeAt(0)) | 0, 7))}`;
   const max = Math.max(1, ...rows.flatMap(row => series.map(s => Number(row[s.key] || 0))));
   const x = index => pad.l + (rows.length === 1 ? 0 : index * (width - pad.l - pad.r) / (rows.length - 1));
   const y = value => height - pad.b - (Number(value || 0) / max) * (height - pad.t - pad.b);
-  const paths = series.map(s => {
-    const d = rows.map((row, index) => `${index ? 'L' : 'M'} ${x(index).toFixed(1)} ${y(row[s.key]).toFixed(1)}`).join(' ');
-    return `<path d="${d}" fill="none" stroke="${s.color}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>`;
+
+  // horizontal gridlines + y labels
+  const ticks = 4;
+  const grid = Array.from({ length: ticks + 1 }, (_, i) => {
+    const gy = pad.t + i * (height - pad.t - pad.b) / ticks;
+    const val = Math.round(max * (1 - i / ticks));
+    return `<line x1="${pad.l}" y1="${gy.toFixed(1)}" x2="${width - pad.r}" y2="${gy.toFixed(1)}" stroke="#eef2ef"/>`
+      + `<text x="${pad.l - 8}" y="${(gy + 4).toFixed(1)}" text-anchor="end" font-size="10.5" fill="#9aa49f">${val}</text>`;
   }).join('');
+
+  // area fill under the primary (first) series
+  const first = series[0];
+  const firstPts = rows.map((row, i) => [x(i), y(row[first.key])]);
+  const linePath = smoothPath(firstPts);
+  const areaPath = `${linePath} L ${x(rows.length - 1).toFixed(1)} ${(height - pad.b).toFixed(1)} L ${x(0).toFixed(1)} ${(height - pad.b).toFixed(1)} Z`;
+
+  const paths = series.map((s, si) => {
+    const pts = rows.map((row, i) => [x(i), y(row[s.key])]);
+    const dash = si === 0 ? '' : ' stroke-dasharray="2 6"';
+    const opacity = si === 0 ? 1 : 0.85;
+    return `<path d="${smoothPath(pts)}" fill="none" stroke="${s.color}" stroke-width="${si === 0 ? 3 : 2.2}" stroke-opacity="${opacity}" stroke-linecap="round" stroke-linejoin="round"${dash}/>`;
+  }).join('');
+
   const dots = series.map(s => rows.map((row, index) =>
-    `<circle cx="${x(index).toFixed(1)}" cy="${y(row[s.key]).toFixed(1)}" r="3.5" fill="${s.color}"><title>${row.day} · ${s.name}: ${row[s.key] || 0}</title></circle>`
+    `<circle cx="${x(index).toFixed(1)}" cy="${y(row[s.key]).toFixed(1)}" r="2.6" fill="#fff" stroke="${s.color}" stroke-width="1.6"><title>${row.day} · ${s.name}: ${row[s.key] || 0}</title></circle>`
   ).join('')).join('');
+
   const labels = rows.map((row, index) => {
     if (rows.length > 8 && index % Math.ceil(rows.length / 6) !== 0 && index !== rows.length - 1) return '';
-    return `<text x="${x(index).toFixed(1)}" y="${height - 12}" text-anchor="middle" font-size="11" fill="#657176">${row.day.slice(5)}</text>`;
+    return `<text x="${x(index).toFixed(1)}" y="${height - 12}" text-anchor="middle" font-size="10.5" fill="#9aa49f">${row.day.slice(5)}</text>`;
   }).join('');
-  const legend = series.map((s, i) => `<g transform="translate(${pad.l + i * 130}, 8)"><circle r="5" fill="${s.color}"/><text x="10" y="4" font-size="12" fill="#657176">${s.name}</text></g>`).join('');
+
+  const legend = series.map((s, i) => `<g transform="translate(${pad.l + i * 132}, 10)"><rect x="-2" y="-7" width="11" height="11" rx="3.5" fill="${s.color}"/><text x="15" y="2.5" font-size="11.5" font-weight="600" fill="#5e6b66">${s.name}</text></g>`).join('');
+
   host.innerHTML = `
     <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${options.label || '趋势图'}">
-      <line x1="${pad.l}" y1="${height - pad.b}" x2="${width - pad.r}" y2="${height - pad.b}" stroke="#d8dedb"/>
-      <line x1="${pad.l}" y1="${pad.t}" x2="${pad.l}" y2="${height - pad.b}" stroke="#d8dedb"/>
-      <text x="8" y="${pad.t + 5}" font-size="11" fill="#657176">${max}</text>
-      ${legend}${paths}${dots}${labels}
+      <defs>
+        <linearGradient id="${uid}" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="${first.color}" stop-opacity="0.26"/>
+          <stop offset="100%" stop-color="${first.color}" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      ${grid}
+      <path d="${areaPath}" fill="url(#${uid})" stroke="none"/>
+      ${paths}${dots}${labels}${legend}
     </svg>
   `;
 }
@@ -398,7 +445,7 @@ function renderLoginGate(message) {
     <section class="card panel" style="max-width:520px;margin:40px auto;text-align:center">
       <h2>需要站长登录</h2>
       <p style="color:#657176;margin:12px 0 20px">${message || '此看板仅站长可见。请先用站长账号登录主站，然后回到本页。'}</p>
-      <a class="refresh-btn" href="${SITE_BASE}/" target="_blank" rel="noopener" style="text-decoration:none">去主站登录</a>
+      <a class="btn-primary" href="${SITE_BASE}/" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;text-decoration:none">去主站登录</a>
       <p style="color:#9aa4a0;font-size:12px;margin-top:16px">登录后回到本页点击“刷新数据”即可。</p>
     </section>`;
 }
@@ -437,7 +484,16 @@ async function refreshFromServer(button) {
   }
 }
 
+function setGreeting() {
+  const el = document.querySelector('#greeting');
+  if (!el) return;
+  const h = new Date().getHours();
+  const word = h < 6 ? '凌晨好' : h < 12 ? '上午好' : h < 14 ? '中午好' : h < 18 ? '下午好' : '晚上好';
+  el.textContent = `${word}，运营概览`;
+}
+
 async function main() {
+  setGreeting();
   await loadDashboardData();
   const button = document.querySelector('#refresh-now');
   button?.addEventListener('click', () => refreshFromServer(button));
