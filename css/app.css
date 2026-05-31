@@ -1044,6 +1044,7 @@ table.journals {
   width: 100%;
   border-collapse: collapse;
   font-size: 13.5px;
+  table-layout: fixed;
 }
 table.journals thead {
   position: relative;
