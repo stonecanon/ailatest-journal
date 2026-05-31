@@ -477,13 +477,28 @@ function normTitle(value) {
   return cleanKey(value).toLowerCase().replace(/\s+/g, ' ');
 }
 
+function prettyJournalName(value) {
+  const name = cleanKey(value);
+  if (!name || /[a-z]/.test(name) || !/[A-Z]/.test(name)) return name;
+  const keep = new Set(['AI', 'IEEE', 'ACM', 'JCR', 'SCI', 'SSCI', 'SCIE', 'ESCI', 'AHCI', 'EI']);
+  const lower = new Set(['and', 'or', 'of', 'in', 'on', 'for', 'to', 'the', 'a', 'an', 'by', 'with']);
+  return name.toLowerCase().replace(/[a-z0-9&+/-]+/gi, (word, offset) => {
+    const upper = word.toUpperCase();
+    if (keep.has(upper) || /\d/.test(word)) return upper;
+    if (offset > 0 && lower.has(word)) return word;
+    return word.charAt(0).toUpperCase() + word.slice(1);
+  });
+}
+
 function displayJournalName(row) {
-  return cleanKey(row.cn_name)
-    || cleanKey(row.name)
-    || cleanKey(row.en_name)
-    || cleanKey(row.title)
-    || cleanKey(row.abbr20)
-    || '';
+  return prettyJournalName(
+    cleanKey(row.cn_name)
+      || cleanKey(row.name)
+      || cleanKey(row.en_name)
+      || cleanKey(row.title)
+      || cleanKey(row.abbr20)
+      || '',
+  );
 }
 
 function addJournalKeys(index, row) {
