@@ -414,6 +414,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <button class="nav-item" data-cat="__all" id="wos-all-btn" style="margin-top:8px"><span data-i18n="all">全部</span> <span class="count" id="count-all">—</span></button>
     </div>
 
+    <div class="side-section" data-international>
+      <div class="side-label">研究主题 <span class="muted-cell" style="font-size:11px">(OpenAlex)</span></div>
+      <div class="wos-actions">
+        <button class="wos-clear" id="oa-sf-clear" type="button" title="清空选择 / Clear">×</button>
+      </div>
+      <div class="wos-search-wrap">
+        <input id="oa-sf-search" type="search" placeholder="筛选主题…" autocomplete="off" spellcheck="false" />
+      </div>
+      <div class="wos-list wos-list-tall" id="oa-sf-list"></div>
+      <button class="nav-item" id="oa-sf-all-btn" style="margin-top:8px"><span data-i18n="all">全部</span> <span class="count" id="count-oa-sf">—</span></button>
+    </div>
+
     <div class="side-section" data-domestic hidden>
       <div class="side-label" data-i18n="domestic_sources">国内分级来源</div>
       <div class="chip-row" id="domestic-badge-toggles">
@@ -494,7 +506,7 @@ const __BUILD_VER = 'v20260530-79';
   }
 })();
 </script>
-<script src="/js/app.js?v=20260531-06" defer></script>
+<script src="/js/app.js?v=20260531-07" defer></script>
 <script>
   // Custom install prompt
   let __pwaPrompt = null;

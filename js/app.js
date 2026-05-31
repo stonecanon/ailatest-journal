@@ -802,6 +802,7 @@
   let activeAbs = new Set();
   let activeFeats = new Set();
   let activeWos = new Set();
+  let activeOaSf = new Set();
   let wosCats = [];   // [{name,count}] sorted A-Z
   let activeQuery = '';
   let activeDom = 'cnki_major';   // 中文期刊目录
@@ -2198,6 +2199,14 @@
       for (const c of wc) if (activeWos.has(c)) { ok = true; break; }
       if (!ok) return false;
     }
+    if (activeOaSf.size) {
+      const issn = (r.issn || r.eissn || '').toUpperCase();
+      const rec = oaMap[issn];
+      const sf = (rec && Array.isArray(rec.sf)) ? rec.sf : [];
+      let ok = false;
+      for (const s of sf) if (activeOaSf.has(s)) { ok = true; break; }
+      if (!ok) return false;
+    }
     if (activeQuery) {
       return scoreRecord(r, activeQuery) > 0;
     }
@@ -2610,6 +2619,47 @@
         cb.closest('.wos-item').classList.toggle('on', cb.checked);
         const wosSel = $('#wos-col-filter');
         if (wosSel) wosSel.value = activeWos.size === 1 ? [...activeWos][0] : '__all';
+        shown = PAGE;
+        renderInt();
+      });
+    });
+  }
+
+  // ─── OpenAlex subfield topic list (sidebar) ───
+  function renderOaSfList() {
+    const box = $('#oa-sf-list');
+    if (!box) return;
+    if (!oaMap || !Object.keys(oaMap).length) { box.innerHTML = '<span class="muted-cell">—</span>'; return; }
+    // Collect subfield counts from oaMap
+    const sfCount = {};
+    const issnSet = new Set(journals.map(j => (j.issn || j.eissn || '').toUpperCase()).filter(Boolean));
+    for (const issn of issnSet) {
+      const rec = oaMap[issn];
+      if (rec && Array.isArray(rec.sf)) {
+        for (const s of rec.sf) {
+          sfCount[s] = (sfCount[s] || 0) + 1;
+        }
+      }
+    }
+    const raw = ($('#oa-sf-search')?.value || '').trim().toLowerCase();
+    const entries = Object.entries(sfCount)
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => a.name.localeCompare(b.name, 'en'));
+    const filtered = !raw ? entries : entries.filter(e => e.name.toLowerCase().includes(raw));
+    const total = entries.length;
+    const totalEl = $('#count-oa-sf');
+    if (totalEl) totalEl.textContent = total.toLocaleString();
+    box.innerHTML = filtered.map(e =>
+      `<label class="wos-item${activeOaSf.has(e.name) ? ' on' : ''}">
+         <input type="checkbox" value="${escape(e.name)}" ${activeOaSf.has(e.name) ? 'checked' : ''}>
+         <span class="wos-name">${escape(e.name)}</span>
+         <span class="wos-count">${e.count}</span>
+       </label>`
+    ).join('');
+    box.querySelectorAll('input[type=checkbox]').forEach(cb => {
+      cb.addEventListener('change', () => {
+        if (cb.checked) activeOaSf.add(cb.value); else activeOaSf.delete(cb.value);
+        cb.closest('.wos-item').classList.toggle('on', cb.checked);
         shown = PAGE;
         renderInt();
       });
@@ -4685,6 +4735,18 @@
       renderWosList();
       shown = PAGE; renderInt();
     });
+    $('#oa-sf-search')?.addEventListener('input', () => renderOaSfList());
+    $('#oa-sf-clear')?.addEventListener('click', () => {
+      activeOaSf.clear();
+      const inp = $('#oa-sf-search'); if (inp) inp.value = '';
+      renderOaSfList();
+      shown = PAGE; renderInt();
+    });
+    $('#oa-sf-all-btn')?.addEventListener('click', () => {
+      activeOaSf.clear();
+      renderOaSfList();
+      shown = PAGE; renderInt();
+    });
     $('#q').addEventListener('input', (e) => {
       activeQuery = e.target.value.trim();
       shown = PAGE;
@@ -5052,6 +5114,7 @@
             // 重置列头下拉的__bound标记，使其下次用新语言重建
             const wosSel2 = $('#wos-col-filter'); if (wosSel2) wosSel2.__bound = false;
             renderWosList();
+            renderOaSfList();
             if (activeTab === 'dom') renderDomestic();
             else if (activeTab === 'fav') renderFav();
             else if (activeTab === 'int') renderInt();
@@ -5889,7 +5952,7 @@
     // 分享着陆页：/s/<id> 直接接管 main，不走主流程
     if (await maybeRenderShareLanding()) return;
     try {
-      const [j, d, m, esi, aliases, underReviewIssns, onHoldIssns] = await Promise.all([
+      const [j, d, m, esi, aliases, underReviewIssns, onHoldIssns, oa] = await Promise.all([
         fetchJSON('data/journals.json.gz'),
         fetch('/data/domestic.json').then(r => r.json()).catch(() => null),
         fetch('/data/meta.json').then(r => r.json()).catch(() => null),
@@ -5897,9 +5960,10 @@
         fetch('/data/journal_aliases.json').then(r => r.json()).catch(() => DEFAULT_JOURNAL_ALIASES),
         fetch('/data/under_review_issn.json').then(r => r.json()).catch(() => []),
         fetch('/data/on_hold_issn.json').then(r => r.json()).catch(() => []),
+        fetchJSON('data/oa.json.gz').catch(() => ({})),
       ]);
       setJournalAliases(aliases);
-      journals = j; domestic = d; meta = m; esiCats = esi; oaMap = null;
+      journals = j; domestic = d; meta = m; esiCats = esi; oaMap = oa;
       // Build Under Review lookup set
       const underReviewSet = new Set((underReviewIssns||[]).map(s => s.replace(/[^0-9xX]/gi,'').toLowerCase()));
       journals.forEach(r => {
@@ -5953,6 +6017,7 @@
         : `${journals.length.toLocaleString()} journals loaded`;
       renderCatList();
       renderWosList();
+      renderOaSfList();
       if (renderJournalRoutePage()) {
         window.addEventListener('hashchange', applyHashRoute);
         if (user) await pullFavs();

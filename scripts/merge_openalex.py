@@ -77,13 +77,23 @@ def main():
             "w": rec.get("works_count") or None,
             "t": rec.get("type") or None,
         }
-        # Extract top topic subfield names (max 8, sorted by count desc)
+        # Extract top topic names (granular, top 8 by count)
         topics = rec.get("topics") or []
         if topics:
             sorted_topics = sorted(topics, key=lambda x: x.get("count", 0), reverse=True)
             names = [st.get("display_name", "") for st in sorted_topics[:8] if st.get("display_name")]
             if names:
                 row["tp"] = names
+        # Extract subfield-level topics (deduplicated, all)
+        if topics:
+            subfields = set()
+            for t in topics:
+                sf = t.get("subfield", {})
+                sfn = sf.get("display_name") if isinstance(sf, dict) else None
+                if sfn:
+                    subfields.add(sfn)
+            if subfields:
+                row["sf"] = sorted(subfields)
         # drop empty values to shrink file
         row = {k: v for k, v in row.items() if v not in (None, 0)}
         # but re-attach label always
