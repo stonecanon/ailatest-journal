@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate static SEO landing pages for /subjects/* (ESI categories) and /indexes/* (5 indexes).
+"""Generate static SEO landing pages for /subjects/* (WoS categories top 100) and /indexes/* (5 indexes).
 Also generates landing pages and updates sitemap.
 
 Usage: python3 scripts/generate_listing_pages.py
@@ -11,11 +11,40 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = ROOT / 'data'
 JOURNALS_GZ = DATA_DIR / 'journals.json.gz'
+WOS_CATS_FILE = DATA_DIR / 'wos_categories.json'
 SITE_URL = 'https://journal.ailatest.org'
 
 def load_journals():
     with open(JOURNALS_GZ, 'rb') as f:
         return json.loads(gzip.decompress(f.read()))
+
+def load_wos_categories():
+    with open(WOS_CATS_FILE, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+    # Sort by count descending, take top 100
+    data.sort(key=lambda x: -x['count'])
+    top = data[:100]
+    # Build: (slug, title, desc, wos_name)
+    result = []
+    for item in top:
+        name = item['name']
+        slug = name.lower().replace(' & ', '-').replace(' &', '-').replace('& ', '-')
+        slug = slug.replace(' & ', '-').replace('&', '-').replace(',', '').replace("'", '')
+        slug = slug.replace('(', '').replace(')', '').replace(' ', '-').replace('--', '-').strip('-')
+        desc = f'{name} journals — browse top journals in the Web of Science {name} category with Impact Factor, Quartile, CAS tier and indexing information.'
+        result.append((slug, name, desc, name))
+    return result
+
+SUBJECTS = None  # will be loaded from wos_categories.json at runtime
+
+# 5 个索引
+INDEXES = [
+    ('scie', 'SCIE', 'SCIE (Science Citation Index Expanded) indexed journals with Impact Factors, Quartiles, CAS rankings and publisher information.', ['SCIE']),
+    ('ssci', 'SSCI', 'SSCI (Social Sciences Citation Index) indexed journals with Impact Factors, Quartiles, CAS rankings and publisher information.', ['SSCI']),
+    ('ei', 'EI', 'EI Compendex indexed journals with Impact Factors, Quartiles, CAS rankings and publisher information.', ['EI']),
+    ('scopus', 'Scopus', 'Scopus indexed journals with Impact Factors, Quartiles, CAS rankings and publisher information.', None),
+    ('medline', 'MEDLINE', 'MEDLINE indexed journals from the National Library of Medicine with Impact Factors, Quartiles, CAS rankings and publisher information.', None),
+]
 
 def esc(s):
     if s is None: return ''
@@ -53,39 +82,6 @@ a:hover{text-decoration:underline}
 <p><a class="back" href="__BACK__">← Back</a></p>
 </div></body></html>'''
 
-# ESI 学科（有足够数据的选出来）
-SUBJECTS = [
-    ('engineering', 'Engineering', 'Engineering journals in the ESI Engineering category.', 'ENGINEERING'),
-    ('clinical-medicine', 'Clinical Medicine', 'Clinical medicine journals in the ESI Clinical Medicine category.', 'CLINICAL MEDICINE'),
-    ('computer-science', 'Computer Science', 'Computer science journals in the ESI Computer Science category.', 'COMPUTER SCIENCE'),
-    ('materials-science', 'Materials Science', 'Materials science journals in the ESI Materials Science category.', 'MATERIALS SCIENCE'),
-    ('environment-ecology', 'Environment/Ecology', 'Environment and ecology journals in the ESI Environment/Ecology category.', 'ENVIRONMENT/ECOLOGY'),
-    ('chemistry', 'Chemistry', 'Chemistry journals in the ESI Chemistry category.', 'CHEMISTRY'),
-    ('biology-biochemistry', 'Biology & Biochemistry', 'Biology and biochemistry journals in the ESI Biology & Biochemistry category.', 'BIOLOGY & BIOCHEMISTRY'),
-    ('physics', 'Physics', 'Physics journals in the ESI Physics category.', 'PHYSICS'),
-    ('neuroscience-behavior', 'Neuroscience & Behavior', 'Neuroscience journals in the ESI Neuroscience & Behavior category.', 'NEUROSCIENCE & BEHAVIOR'),
-    ('pharmacology-toxicology', 'Pharmacology & Toxicology', 'Pharmacology and toxicology journals.', 'PHARMACOLOGY & TOXICOLOGY'),
-    ('economics-business', 'Economics & Business', 'Economics and business journals in the ESI Economics & Business category.', 'ECONOMICS & BUSINESS'),
-    ('social-sciences', 'Social Sciences', 'Social sciences journals in the ESI Social Sciences category.', 'SOCIAL SCIENCES, GENERAL'),
-    ('geosciences', 'Geosciences', 'Geosciences journals in the ESI Geosciences category.', 'GEOSCIENCES'),
-    ('mathematics', 'Mathematics', 'Mathematics journals in the ESI Mathematics category.', 'MATHEMATICS'),
-    ('plant-animal-science', 'Plant & Animal Science', 'Plant and animal science journals.', 'PLANT & ANIMAL SCIENCE'),
-    ('agricultural-sciences', 'Agricultural Sciences', 'Agricultural sciences journals.', 'AGRICULTURAL SCIENCES'),
-    ('molecular-biology-genetics', 'Molecular Biology & Genetics', 'Molecular biology and genetics journals.', 'MOLECULAR BIOLOGY & GENETICS'),
-    ('immunology', 'Immunology', 'Immunology journals in the ESI Immunology category.', 'IMMUNOLOGY'),
-    ('microbiology', 'Microbiology', 'Microbiology journals in the ESI Microbiology category.', 'MICROBIOLOGY'),
-    ('psychiatry-psychology', 'Psychiatry/Psychology', 'Psychiatry and psychology journals.', 'PSYCHIATRY/PSYCHOLOGY'),
-]
-
-# 5 个索引
-INDEXES = [
-    ('scie', 'SCIE', 'SCIE (Science Citation Index Expanded) indexed journals with Impact Factors, Quartiles, CAS rankings and publisher information.', ['SCIE']),
-    ('ssci', 'SSCI', 'SSCI (Social Sciences Citation Index) indexed journals with Impact Factors, Quartiles, CAS rankings and publisher information.', ['SSCI']),
-    ('ei', 'EI', 'EI Compendex indexed journals with Impact Factors, Quartiles, CAS rankings and publisher information.', ['EI']),
-    ('scopus', 'Scopus', 'Scopus indexed journals with Impact Factors, Quartiles, CAS rankings and publisher information.', None),
-    ('medline', 'MEDLINE', 'MEDLINE indexed journals from the National Library of Medicine with Impact Factors, Quartiles, CAS rankings and publisher information.', None),
-]
-
 def make_slug(r):
     s = r.get('slug', '').strip()
     return s or (r.get('issn') or r.get('eissn') or '').replace('-', '').strip()
@@ -96,8 +92,9 @@ def match_index(j, slug, index_keys):
     if slug == 'medline': return bool(j.get('medline'))
     return any(k in indices for k in index_keys)
 
-def match_subject(j, esi_cat):
-    return j.get('esi_category') == esi_cat
+def match_subject(j, wos_name):
+    cats = j.get('wos_categories') or []
+    return wos_name in cats
 
 def build_table_row(j, origin, headers):
     slug = make_slug(j)
@@ -120,8 +117,8 @@ def build_table_row(j, origin, headers):
     return '<tr>' + ''.join(cells) + '</tr>'
 
 def generate_subjects(journals, origin):
-    for slug, title, desc, esi_cat in SUBJECTS:
-        matched = [j for j in journals if match_subject(j, esi_cat)]
+    for slug, title, desc, wos_name in SUBJECTS:
+        matched = [j for j in journals if match_subject(j, wos_name)]
         matched.sort(key=lambda x: -(x.get('if_2024') or -1))
         top = matched[:100]
 
@@ -129,10 +126,11 @@ def generate_subjects(journals, origin):
         th_html = ''.join(f'<th>{esc(h)}</th>' for h in ['Journal Name', 'IF', 'JCR Q', 'CAS', 'Indexing', 'Publisher'])
         rows_html = '\n'.join(build_table_row(j, origin, headers) for j in top)
 
+        total = len(matched)
         seo_title = f'{title} Journals — Impact Factor & Quartile | AILatest Journal'
-        seo_desc = f'{desc} Browse top journals sorted by Impact Factor.'
+        seo_desc = f'{desc} Browse {total} journals sorted by Impact Factor.'
         canonical = f'{origin}/subjects/{slug}/'
-        count = f'Showing {len(top)} journals sorted by Impact Factor (descending).'
+        count = f'Showing top {len(top)} of {total} journals sorted by Impact Factor (descending).'
 
         item_list = [{'@type': 'ListItem', 'position': i+1,
             'item': {'@type': 'Periodical', 'name': j.get('name',''), 'url': f'{origin}/journal/{esc(make_slug(j))}/'}}
@@ -147,7 +145,7 @@ def generate_subjects(journals, origin):
         html = html.replace('__ROWS__', rows_html).replace('__BACK__', f'{origin}/subjects/')
         (ROOT / 'subjects' / slug).mkdir(parents=True, exist_ok=True)
         (ROOT / 'subjects' / slug / 'index.html').write_text(html, encoding='utf-8')
-        print(f'  /subjects/{slug}/ → {len(top)} journals')
+        print(f'  /subjects/{slug}/ → {len(top)}/{total} journals')
 
 def generate_indexes(journals, origin):
     for slug, title, desc, index_keys in INDEXES:
@@ -186,14 +184,14 @@ def generate_landing(origin):
     r_list = '\n'.join(f'<li><a href="{origin}/subjects/{s}/"><strong>{esc(t)}</strong></a></li>' for s, t, _, _ in subjects)
     r_html = f'''<!doctype html><html lang="en">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Browse Journals by Subject | AILatest Journal</title>
-<meta name="description" content="Browse academic journals by subject area based on ESI categories: Engineering, Clinical Medicine, Computer Science, Chemistry, Physics, Materials Science and more." />
+<title>Browse Journals by WoS Subject | AILatest Journal</title>
+<meta name="description" content="Browse academic journals by Web of Science subject area: Education, Economics, History, Engineering, Medicine, Computer Science and 94+ more categories. Top journals by Impact Factor." />
 <link rel="canonical" href="{origin}/subjects/" /><meta name="robots" content="index,follow" />
 <style>body{{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;margin:0;padding:20px;background:#fafafa;color:#222;line-height:1.6}}
 .wrap{{max-width:800px;margin:0 auto;background:#fff;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.08);padding:20px}}
 h1{{font-size:22px}}p.sub{{color:#666}}a{{color:#2563eb;text-decoration:none}}a:hover{{text-decoration:underline}}
-ul{{line-height:2;columns:2}}.back{{display:inline-block;margin-top:20px;padding:8px 20px;background:#2563eb;color:#fff!important;text-decoration:none;border-radius:6px}}</style>
-</head><body><div class="wrap"><h1>Browse Journals by Subject</h1><p class="sub">Select a subject area to browse top journals sorted by Impact Factor.</p>
+ul{{line-height:2;columns:3}}.back{{display:inline-block;margin-top:20px;padding:8px 20px;background:#2563eb;color:#fff!important;text-decoration:none;border-radius:6px}}</style>
+</head><body><div class="wrap"><h1>Browse Journals by WoS Subject</h1><p class="sub">Select a Web of Science subject category to browse top journals sorted by Impact Factor.</p>
 <ul>{r_list}</ul><p><a class="back" href="{origin}/">← Back to Journal Search</a></p></div></body></html>'''
     (ROOT / 'subjects').mkdir(parents=True, exist_ok=True)
     (ROOT / 'subjects' / 'index.html').write_text(r_html, encoding='utf-8')
@@ -224,10 +222,9 @@ def update_sitemap(origin):
     new_urls.append(f'  <url><loc>{origin}/subjects/</loc><priority>0.7</priority></url>')
     for slug, _, _, _ in SUBJECTS:
         new_urls.append(f'  <url><loc>{origin}/subjects/{slug}/</loc><priority>0.7</priority></url>')
-    # Replace old rankings entries with subjects entries
-    # Remove old /rankings/ lines
+    # Remove old subjects/ links and /rankings/ lines
     lines = existing.split('\n')
-    clean = [l for l in lines if '/rankings/' not in l]
+    clean = [l for l in lines if '/rankings/' not in l and '/subjects/' not in l]
     existing = '\n'.join(clean)
     if '</urlset>' in existing:
         existing = existing.replace('</urlset>', '\n'.join(new_urls) + '\n</urlset>')
@@ -235,10 +232,19 @@ def update_sitemap(origin):
     print(f'  sitemap.xml: updated with {len(new_urls)} new URLs')
 
 def main():
+    global SUBJECTS
     origin = SITE_URL
     print('Loading journals...')
     journals = load_journals()
     print(f'Loaded {len(journals)} journals')
+
+    print('Loading WoS categories...')
+    SUBJECTS = load_wos_categories()
+    print(f'Top {len(SUBJECTS)} WoS subjects:')
+    for s, t, _, c in SUBJECTS:
+        cnt = sum(1 for j in journals if match_subject(j, c))
+        print(f'  {t}: {cnt} journals')
+    print()
 
     print('Generating subjects pages...')
     generate_subjects(journals, origin)
