@@ -20,3 +20,10 @@ data/*.bak
 # IDE / system
 CODEX_REVIEW.md
 .dashboard-server*
+.dashboard-watchdog*
+
+# Dashboard data is now served by the owner-gated Worker endpoint, not static files.
+# These local artifacts must NOT be deployed to Pages (they contain user data).
+dashboard/data.json
+dashboard/journal-views.json
+dashboard/source-cache.json

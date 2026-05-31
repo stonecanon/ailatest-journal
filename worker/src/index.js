@@ -31,6 +31,8 @@
  *   MAIL_FROM               noreply@ailatest.org (must be a verified Resend sender)
  */
 
+import { buildDashboardPayload } from './dashboard.js';
+
 const CORS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'Authorization, Content-Type',
@@ -1022,6 +1024,30 @@ async function routeGetJournalViews(req, env) {
 }
 
 // ───────── dispatcher ─────────
+// GET /analytics/dashboard  (owner only) → full dashboard payload, edge-cached ~5min
+async function routeDashboard(req, env) {
+  const u = await getUser(req, env);
+  if (!u) return err('login required', 401);
+  if (!isOwnerUser(u)) return err('forbidden', 403);
+
+  const cache = caches.default;
+  const cacheKey = new Request('https://cache.internal/analytics/dashboard', { method: 'GET' });
+  const nocache = new URL(req.url).searchParams.get('nocache') === '1';
+  if (!nocache) {
+    const hit = await cache.match(cacheKey);
+    if (hit) return new Response(hit.body, { status: 200, headers: { 'Content-Type': 'application/json', ...CORS } });
+  }
+
+  const payload = await buildDashboardPayload(env);
+  const bodyText = JSON.stringify(payload);
+  // Store under a stable, auth-free key so the cache is reusable; never served without auth
+  // because this is the only place that writes it and the route itself is owner-gated.
+  await cache.put(cacheKey, new Response(bodyText, {
+    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'max-age=300' },
+  }));
+  return new Response(bodyText, { status: 200, headers: { 'Content-Type': 'application/json', ...CORS } });
+}
+
 export default {
   async fetch(req, env) {
     if (req.method === 'OPTIONS') {
@@ -1038,6 +1064,7 @@ export default {
       if (p === '/auth/google'         && req.method === 'GET')  return routeGoogleStart(req, env);
       if (p === '/auth/google/callback'&& req.method === 'GET')  return routeGoogleCallback(req, env);
       if (p === '/analytics/pageview' && req.method === 'POST')  return routePageview(req, env);
+      if (p === '/analytics/dashboard' && req.method === 'GET')  return routeDashboard(req, env);
       if (p === '/me'                  && req.method === 'GET')  return routeMe(req, env);
       if (p === '/pick/quota/consume'  && req.method === 'POST') return routeConsumePickQuota(req, env);
       if (p === '/favorites'           && req.method === 'GET')  return routeGetFavs(req, env);

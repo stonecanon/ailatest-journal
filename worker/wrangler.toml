@@ -12,6 +12,8 @@ GITHUB_CLIENT_ID = "Ov23liKY2We6M23yTMJV"
 GOOGLE_CLIENT_ID = "393406357932-4sqvlnbm296o5pj68o60i8o8k2ujgfov.apps.googleusercontent.com"
 SITE_URL         = "https://journal.ailatest.org"
 MAIL_FROM        = "noreply@ailatest.org"   # must be a Resend-verified sender
+CF_ZONE_ID       = "435525fb783ba7bf4c686a9734e26124"  # journal.ailatest.org zone (Cloudflare Analytics)
+GA4_PROPERTY_ID  = "537014253"                          # Google Analytics 4 property
 
 [[d1_databases]]
 binding = "DB"
@@ -24,3 +26,5 @@ database_id = "861dd053-c23a-4363-b62b-2559c06ec3fd"
 #   wrangler secret put JWT_SECRET
 #   wrangler secret put RESEND_API_KEY
 #   wrangler secret put CODE_PEPPER
+#   wrangler secret put CF_ANALYTICS_TOKEN   # Cloudflare API token, Analytics:Read (dashboard)
+#   wrangler secret put GA4_SA_KEY           # GA4 service-account JSON (dashboard)

@@ -47,6 +47,40 @@
           </div>
         </section>
 
+        <section class="section-label">
+          <h2>Cloudflare 流量（全站口径）</h2>
+          <p>来自 Cloudflare Analytics，统计到达边缘的所有请求，含静态资源、接口、爬虫与直接访问——数字最大、最接近真实总量。</p>
+        </section>
+        <div id="cf-note"></div>
+        <section class="grid cf-kpis" aria-label="Cloudflare 指标"></section>
+        <section class="grid traffic-grid">
+          <article class="card panel panel-large">
+            <div class="panel-head"><div><h2>Cloudflare 逐日趋势</h2><p>请求数、页面浏览、独立访客</p></div></div>
+            <div class="chart" id="cf-chart"></div>
+          </article>
+        </section>
+
+        <section class="section-label">
+          <h2>Google Analytics（GTM 口径）</h2>
+          <p>来自 GA4（GTM-NBNXL7FB），统计成功加载并运行 GA 脚本的访问，是行业通用口径。数据可能有数小时处理延迟。</p>
+        </section>
+        <div id="ga-note"></div>
+        <section class="grid ga-kpis" aria-label="Google Analytics 指标"></section>
+        <section class="grid traffic-grid">
+          <article class="card panel panel-large">
+            <div class="panel-head"><div><h2>GA4 逐日趋势</h2><p>页面浏览、会话、用户</p></div></div>
+            <div class="chart" id="ga-chart"></div>
+          </article>
+        </section>
+        <section class="grid traffic-breakdown">
+          <article class="card panel"><h2>GA4 热门页面</h2><div class="bar-list" id="ga-top-pages"></div></article>
+          <article class="card panel"><h2>GA4 访客地区</h2><div class="bar-list" id="ga-top-countries"></div></article>
+        </section>
+
+        <section class="section-label">
+          <h2>站内埋点（第一方，最窄口径）</h2>
+          <p>只统计成功运行本站脚本并上报的访问，用于精确分析路径与互动，数字最小但最干净。</p>
+        </section>
         <section class="traffic-summary" aria-label="访问概览">
           <div class="summary-copy">
             <div class="summary-metric">
