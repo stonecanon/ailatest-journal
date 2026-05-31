@@ -994,6 +994,12 @@ table.journals {
   border-collapse: collapse;
   font-size: 13.5px;
 }
+table.journals thead {
+  position: sticky;
+  top: var(--th-sticky-top, 0);
+  z-index: 40;
+}
+table.journals thead th { background: var(--paper); }
 table.journals th {
   font-family: var(--sans);
   font-weight: 700;
@@ -1003,12 +1009,8 @@ table.journals th {
   text-transform: uppercase;
   color: var(--ink-faint);
   padding: 8px 8px;
-  background: var(--paper);
   border-bottom: 1px solid var(--rule-soft);
   white-space: nowrap;
-  position: sticky;
-  top: var(--th-sticky-top, 0);
-  z-index: 40;
 }
 table.journals td {
   padding: 8px 8px;
