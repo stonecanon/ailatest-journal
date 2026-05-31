@@ -728,7 +728,7 @@
   function journalPathSlug(pathname = location.pathname) {
     const m = pathname.match(/^\/journal\/([^/?#]+)\/?$/);
     if (!m) return '';
-    try { return decodeURIComponent(m[1]); } catch (_) { return m[1]; }
+    return decodeRoutePart(m[1]);
   }
 
   function journalPublicPath(r) {
@@ -881,6 +881,61 @@
 
   function canonicalTitle(s) {
     return String(s || '').trim().replace(/\s+/g, ' ').toUpperCase();
+  }
+
+  function decodeRoutePart(s) {
+    let out = String(s || '').trim();
+    for (let i = 0; i < 2; i++) {
+      try {
+        const next = decodeURIComponent(out);
+        if (next === out) break;
+        out = next;
+      } catch (_) {
+        break;
+      }
+    }
+    return out;
+  }
+
+  function normalizeJournalSlug(s, stripAccents = true) {
+    let out = decodeRoutePart(s).toLowerCase();
+    if (stripAccents) out = out.normalize('NFKD').replace(/[\u0300-\u036f]/g, '');
+    return out
+      .replace(/^\/?journal\//, '')
+      .replace(/\/+$/, '')
+      .replace(/[^a-z0-9\u4e00-\u9fff-]+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+  }
+
+  function compactIssnKey(s) {
+    const out = String(s || '').replace(/[^0-9Xx]/g, '').toUpperCase();
+    return out.length >= 7 ? out : '';
+  }
+
+  function journalRouteKeyList(value) {
+    const raw = decodeRoutePart(value).replace(/^\/?journal\//, '').replace(/\/+$/, '');
+    return Array.from(new Set([
+      raw,
+      raw.toLowerCase(),
+      normalizeJournalSlug(raw, false),
+      normalizeJournalSlug(raw),
+      compactIssnKey(raw),
+    ].filter(Boolean)));
+  }
+
+  function journalRouteKeys(value) {
+    return new Set(journalRouteKeyList(value));
+  }
+
+  function recordRouteKeys(r) {
+    const keys = new Set();
+    [r?.slug, favId(r), r?.issn, r?.eissn, r?.cn_code].filter(Boolean).forEach(v => {
+      journalRouteKeys(v).forEach(k => keys.add(k));
+      const compact = compactIssnKey(v);
+      if (compact) keys.add(compact);
+    });
+    return keys;
   }
 
   function normalizeAliasKey(s) {
@@ -3091,14 +3146,22 @@
   // 跨源按 favId 检索任意期刊记录（用于 #j/<id> 深链）
   function findRecByFid(id) {
     if (!id) return null;
-    if (Array.isArray(journals)) {
-      for (const r of journals) {
-        if (favId(r) === id || r.slug === id) {
-          const rr = Object.assign({}, r);
-          if (!rr.__src) rr.__src = 'int';
-          return rr;
+    const wantedList = journalRouteKeyList(id);
+    const findIn = (arr, src) => {
+      for (const wantedKey of wantedList) {
+        for (const r of arr || []) {
+          if (recordRouteKeys(r).has(wantedKey)) {
+            const rr = Object.assign({}, r);
+            if (src && !rr.__src) rr.__src = src;
+            return rr;
+          }
         }
       }
+      return null;
+    };
+    if (Array.isArray(journals)) {
+      const rr = findIn(journals, 'int');
+      if (rr) return rr;
     }
     if (domestic) {
       const groups = [
@@ -3109,9 +3172,8 @@
         ['zju', (domestic.zju && domestic.zju.records) || []],
       ];
       for (const [src, arr] of groups) {
-        for (const r of arr) {
-          if (favId(r) === id) return Object.assign({}, r, { __src: src });
-        }
+        const rr = findIn(arr, src);
+        if (rr) return rr;
       }
     }
     return null;

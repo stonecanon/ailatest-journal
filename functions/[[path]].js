@@ -27,6 +27,44 @@ function titleCaseName(s) {
   return String(s || '').toLowerCase().replace(/\b([a-z])/g, (_, c) => c.toUpperCase());
 }
 
+function decodeRoutePart(s) {
+  let out = String(s || '').trim();
+  for (let i = 0; i < 2; i++) {
+    try {
+      const next = decodeURIComponent(out);
+      if (next === out) break;
+      out = next;
+    } catch (_) {
+      break;
+    }
+  }
+  return out;
+}
+
+function normalizeJournalSlug(s, stripAccents = true) {
+  let out = decodeRoutePart(s).toLowerCase();
+  if (stripAccents) out = out.normalize('NFKD').replace(/[\u0300-\u036f]/g, '');
+  return out
+    .replace(/^\/?journal\//, '')
+    .replace(/\/+$/, '')
+    .replace(/[^a-z0-9\u4e00-\u9fff-]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+function journalSlugCandidates(rawSlug) {
+  const raw = decodeRoutePart(rawSlug).replace(/^\/?journal\//, '').replace(/\/+$/, '');
+  const compactIssn = raw.replace(/[^0-9Xx]/g, '').toUpperCase();
+  return Array.from(new Set([
+    raw,
+    raw.toLowerCase(),
+    normalizeJournalSlug(raw, false),
+    normalizeJournalSlug(raw),
+    raw.replace(/-/g, ''),
+    compactIssn.length >= 7 ? compactIssn : '',
+  ].filter(Boolean)));
+}
+
 async function loadAppShell(ctx) {
   const req = new Request('https://journal.ailatest.org/index.html');
   const resp = await ctx.env.ASSETS.fetch(req);
@@ -102,9 +140,10 @@ export async function onRequest(ctx) {
       }
 
       const index = await loadIndex(ctx);
-      // Try exact match first (name-based slug), then try bare ISSN (strip hyphens)
-      const slug = index[rawSlug] ? rawSlug : rawSlug.replace(/-/g, '');
-      let j = index[slug];
+      // Try exact match first, then decoded/normalized slug and ISSN aliases.
+      const candidates = journalSlugCandidates(rawSlug);
+      const slug = candidates.find(s => index[s]);
+      let j = slug ? index[slug] : null;
 
       if (!j) {
         return new Response('Journal not found', { status: 404,
