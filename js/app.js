@@ -66,7 +66,7 @@
       pick_quota: 'OpenAlex 驱动',
       pick_apikey_ph: 'API Key 可选',
       results_all: '全部期刊', load_more: '加载更多',
-      col_name: '期刊 Title', col_abbr: '缩写 Abbr', col_badges: '索引 / 分区',
+      col_name: '期刊 Title', col_free: '免费', col_abbr: '缩写 Abbr', col_badges: '索引 / 分区',
       col_cat: 'ESI / 中科院大类',
       hero_title_dom: '国内学术期刊分级目录',
       hero_body_dom: '<b>中国科协 高质量科技期刊分级目录 (2025-12 修订)</b> 共 11,084 条 / 59 学科领域；<b>中文期刊目录</b> 共 7,755 条 / 10 大学科分类，CSSCI / 北大核心 / CCF 中文以徽章形式叠加；<b>浙江大学 2024 版</b> 与 <b>高校自编目录 2023</b>（付费解锁）。',
@@ -86,7 +86,7 @@
       syncing: '同步中…', synced: '已同步',
       wos_subjects: 'WoS 细分学科',
       wos_search_ph: '筛选学科（A-Z）…',
-      wos_clear_title: '清空选择',
+      filter_free_only: '只看免费发表', wos_clear_title: '清空选择',
     },
     en: {
       tagline: '<b>AILatest Journal</b> — Journal search & submission decision tool for researchers. Aggregates SCI/SSCI, CAS tiers, JCR, ESI, CSSCI, PKU Core, ZJU directory and more. Favorites, ratings, cross-device sync.',
@@ -132,7 +132,7 @@
       pick_quota: 'OpenAlex powered',
       pick_apikey_ph: 'API key optional',
       results_all: 'All journals', load_more: 'Load more',
-      col_name: 'Journal Title', col_abbr: 'Abbr', col_badges: 'Index / Tier',
+      col_name: 'Journal Title', col_free: 'FREE', col_abbr: 'Abbr', col_badges: 'Index / Tier',
       col_cat: 'ESI / CAS Major',
       hero_title_dom: 'Domestic Chinese Journal Directories',
       hero_body_dom: '<b>China Association for Science and Technology (CAST) High-Quality Sci-Tech Journal Tiered Directory (Dec 2025)</b> — 11,084 journals across 59 disciplines; <b>Chinese Journal Directory</b> — 7,755 journals across 10 subject categories, with CSSCI / PKU Core / CCF Chinese badges; <b>ZJU 2024</b>; <b>School A 2023</b> (paywalled).',
@@ -152,7 +152,7 @@
       syncing: 'Syncing…', synced: 'Synced',
       wos_subjects: 'WoS Subjects',
       wos_search_ph: 'Filter subjects (A-Z)…',
-      wos_clear_title: 'Clear selection',
+      filter_free_only: 'FREE only', wos_clear_title: 'Clear selection',
     },
   };
 
@@ -176,9 +176,9 @@
     hero_body_fav: '點擊任一期刊右側的 <b>★</b> 可加入收藏。未登入時保存在本機 localStorage；登入後自動同步到雲端。',
     hero_body_pick: '敬請期待。這裡將根據你的研究主題、影響因子區間、審稿週期、版面費、收錄索引等條件推薦目標期刊。未來更新。',
     pick_coming_title: '敬請期待', pick_coming_desc: '未來更新', results_all: '全部期刊', load_more: '載入更多',
-    col_name: '期刊 Title', col_abbr: '縮寫 Abbr', col_badges: '索引 / 分區', search_int: '搜尋：期刊全稱 / 官方縮寫 / ISSN / 中文刊名', search_dom: '搜尋：中文刊名 / 英文刊名 / ISSN / CN 號', search_fav: '搜尋收藏：期刊 / 縮寫 / ISSN',
+    col_name: '期刊 Title', col_free: '免費', col_abbr: '縮寫 Abbr', col_badges: '索引 / 分區', search_int: '搜尋：期刊全稱 / 官方縮寫 / ISSN / 中文刊名', search_dom: '搜尋：中文刊名 / 英文刊名 / ISSN / CN 號', search_fav: '搜尋收藏：期刊 / 縮寫 / ISSN',
       search_home_ph: '搜尋期刊名、ISSN…',
-      home_subtitle: '面向科研人員的期刊檢索與投稿決策工具', showing: '顯示', of: '條 / 共', total_items: '條', empty: '未找到匹配的期刊', login: '登入', logout: '登出', fav_added: '已收藏', fav_removed: '已移除', syncing: '同步中…', synced: '已同步', wos_subjects: 'WoS 細分學科', wos_search_ph: '篩選學科（A-Z）…', wos_clear_title: '清空選擇'
+      home_subtitle: '面向科研人員的期刊檢索與投稿決策工具', showing: '顯示', of: '條 / 共', total_items: '條', empty: '未找到匹配的期刊', login: '登入', logout: '登出', fav_added: '已收藏', fav_removed: '已移除', syncing: '同步中…', synced: '已同步', wos_subjects: 'WoS 細分學科', wos_search_ph: '篩選學科（A-Z）…', wos_clear_title: '清空選擇', filter_free_only: '只看免費發表'
   };
   Object.assign(I18N, {
     ja: {
@@ -189,24 +189,24 @@
       hero_title_int: 'SCI / SSCI 国際ジャーナル検索',
       hero_body_int: 'データソース：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI、2026-05-18更新）に <b>EI Compendex</b>（2025-10-10）を統合。<b>JCR 2025</b> 索引、<b>ESI</b> 22分野、<b>CAS 2025</b> 区分、<b>ShowJCR</b> JCR 2025リリース・2024指標（IF / 区分 / ランク）、Emerging、CCF 2026、警告リストを収録。合計 <b id="total">—</b> 誌。',
       hero_note: 'バッジ凡例：<b>SCIE/SSCI/AHCI/ESCI/EI</b> 索引収録 · <b>CAS</b> CAS 2025 大区分（1-4区、TOP表示） · <b>JCR Q</b> Quartile（Q1-Q4） · <b>Emerging</b> CAS 2026 新興版区分 · <b>CCF</b> CCF 2026 推薦（A/B/C） · <b>ABDC</b> 豪州経営ジャーナルランキング（A*/A/B/C） · <b>ABS</b> Chartered ABS Academic Journal Guide 2024（4*/4/3/2/1、経営・商学のみ） · <b>T1/T2/T3</b> 中国科协 2025 高品質ジャーナル区分 · <b>⚠ Warning</b> 国際ジャーナル警告リスト。',
-      hero_title_dom: '中国学術ジャーナル区分', hero_title_fav: 'お気に入り', hero_title_pick: '投稿先を選ぶ', hero_body_fav: '<b>★</b> でお気に入りに追加できます。', hero_body_pick: '近日公開。研究テーマ、IF範囲、査読期間、APC、索引条件から投稿候補を推薦します。', pick_coming_title: '近日公開', pick_coming_desc: '今後更新予定', results_all: 'すべてのジャーナル', load_more: 'さらに読み込む', col_name: 'ジャーナル Title', col_abbr: '略称 Abbr', col_badges: '索引 / 区分', search_int: '検索：タイトル / 略称 / ISSN / 中国語名', search_dom: '検索：中国語名 / 英語名 / ISSN / CN', search_fav: 'お気に入りを検索', showing: '表示', of: '/', total_items: '件', empty: '一致するジャーナルがありません', login: 'ログイン', logout: 'ログアウト', wos_subjects: 'WoS 分野', wos_search_ph: '分野を絞り込み（A-Z）…'
+      hero_title_dom: '中国学術ジャーナル区分', hero_title_fav: 'お気に入り', hero_title_pick: '投稿先を選ぶ', hero_body_fav: '<b>★</b> でお気に入りに追加できます。', hero_body_pick: '近日公開。研究テーマ、IF範囲、査読期間、APC、索引条件から投稿候補を推薦します。', pick_coming_title: '近日公開', pick_coming_desc: '今後更新予定', results_all: 'すべてのジャーナル', load_more: 'さらに読み込む', col_name: 'ジャーナル Title', col_free: '無料', col_abbr: '略称 Abbr', col_badges: '索引 / 区分', search_int: '検索：タイトル / 略称 / ISSN / 中国語名', search_dom: '検索：中国語名 / 英語名 / ISSN / CN', search_fav: 'お気に入りを検索', showing: '表示', of: '/', total_items: '件', empty: '一致するジャーナルがありません', login: 'ログイン', logout: 'ログアウト', wos_subjects: 'WoS 分野', wos_search_ph: '分野を絞り込み（A-Z）…'
     },
     ko: {
       ...I18N.en,
       tagline: '<b>AILatest Journal</b> — 연구자를 위한 저널 검색 및 투고 의사결정 도구입니다.', indices: '색인', cas_zone: 'CAS 2025 등급', filters: '필터', all: '전체', filter_xinrui: '신예 등급', filter_warning: '경고 목록', domestic_sources: '중국 국내 목록', tab_home: '저널', tab_int: '국제', tab_dom: '중국', tab_fav: '즐겨찾기', tab_pick: '저널 추천', loading: '불러오는 중…',
-      hero_title_int: 'SCI / SSCI 국제 저널 검색', hero_body_int: '데이터: <b>Web of Science Core Collection</b>(2026-05-18) 및 <b>EI Compendex</b>(2025-10-10). <b>JCR 2025</b> 색인, <b>ESI</b>, <b>CAS 2025</b>, <b>ShowJCR</b> JCR 2025 릴리스 · 2024 지표(IF/분야/순위), CCF 2026, 경고 목록을 통합했습니다. 총 <b id="total">—</b> 종.', hero_note: '배지 범례: <b>SCIE/SSCI/AHCI/ESCI/EI</b> 색인 수록 · <b>CAS</b> CAS 2025 대분류(1-4구, TOP표시) · <b>JCR Q</b> Quartile(Q1-Q4) · <b>Emerging</b> CAS 2026 신흥판 구분 · <b>CCF</b> CCF 2026 추천(A/B/C) · <b>ABDC</b> 호주 경영저널 등급(A*/A/B/C) · <b>ABS</b> Chartered ABS Academic Journal Guide 2024(4*/4/3/2/1, 경영·상학만) · <b>T1/T2/T3</b> 중국과학기협 2025 고품질 학술지 등급 · <b>⚠ Warning</b> 국제 학술지 경고 목록.', hero_title_dom: '중국 학술지 등급 목록', hero_title_fav: '즐겨찾기', hero_title_pick: '저널 추천', hero_body_pick: '곧 제공됩니다. 연구 주제, IF 범위, 심사 기간, APC, 색인 조건으로 추천합니다.', pick_coming_title: '준비 중', pick_coming_desc: '향후 업데이트', results_all: '전체 저널', load_more: '더 보기', col_name: '저널 Title', col_abbr: '약어 Abbr', col_badges: '색인 / 등급', search_int: '검색: 제목 / 약어 / ISSN / 중국어명', search_dom: '검색: 중국어명 / 영어명 / ISSN / CN', search_fav: '즐겨찾기 검색', showing: '표시', of: '/', total_items: '개', empty: '일치하는 저널이 없습니다', login: '로그인', logout: '로그아웃', wos_subjects: 'WoS 세부분야', wos_search_ph: '분야 필터(A-Z)…'
+      hero_title_int: 'SCI / SSCI 국제 저널 검색', hero_body_int: '데이터: <b>Web of Science Core Collection</b>(2026-05-18) 및 <b>EI Compendex</b>(2025-10-10). <b>JCR 2025</b> 색인, <b>ESI</b>, <b>CAS 2025</b>, <b>ShowJCR</b> JCR 2025 릴리스 · 2024 지표(IF/분야/순위), CCF 2026, 경고 목록을 통합했습니다. 총 <b id="total">—</b> 종.', hero_note: '배지 범례: <b>SCIE/SSCI/AHCI/ESCI/EI</b> 색인 수록 · <b>CAS</b> CAS 2025 대분류(1-4구, TOP표시) · <b>JCR Q</b> Quartile(Q1-Q4) · <b>Emerging</b> CAS 2026 신흥판 구분 · <b>CCF</b> CCF 2026 추천(A/B/C) · <b>ABDC</b> 호주 경영저널 등급(A*/A/B/C) · <b>ABS</b> Chartered ABS Academic Journal Guide 2024(4*/4/3/2/1, 경영·상학만) · <b>T1/T2/T3</b> 중국과학기협 2025 고품질 학술지 등급 · <b>⚠ Warning</b> 국제 학술지 경고 목록.', hero_title_dom: '중국 학술지 등급 목록', hero_title_fav: '즐겨찾기', hero_title_pick: '저널 추천', hero_body_pick: '곧 제공됩니다. 연구 주제, IF 범위, 심사 기간, APC, 색인 조건으로 추천합니다.', pick_coming_title: '준비 중', pick_coming_desc: '향후 업데이트', results_all: '전체 저널', load_more: '더 보기', col_name: '저널 Title', col_free: '무료', col_abbr: '약어 Abbr', col_badges: '색인 / 등급', search_int: '검색: 제목 / 약어 / ISSN / 중국어명', search_dom: '검색: 중국어명 / 영어명 / ISSN / CN', search_fav: '즐겨찾기 검색', showing: '표시', of: '/', total_items: '개', empty: '일치하는 저널이 없습니다', login: '로그인', logout: '로그아웃', wos_subjects: 'WoS 세부분야', wos_search_ph: '분야 필터(A-Z)…'
     },
     es: {
       ...I18N.en,
-      tagline: '<b>AILatest Journal</b> — buscador de revistas y herramienta de decisión para investigadores.', indices: 'Índices', cas_zone: 'CAS 2025', filters: 'Filtros', all: 'Todo', filter_xinrui: 'Emergente', filter_warning: 'Advertencia', domestic_sources: 'Fuentes de China', tab_home: 'Revistas', tab_int: 'Internacional', tab_dom: 'China', tab_fav: 'Favoritos', tab_pick: 'Ayúdame a elegir', loading: 'Cargando…', hero_title_int: 'Búsqueda internacional SCI / SSCI', hero_body_int: 'Fuente: <b>Web of Science Core Collection</b> (actualizado 2026-05-18) con <b>EI Compendex</b> (2025-10-10). Integra <b>JCR 2025</b>, <b>ESI</b>, <b>CAS 2025</b> y <b>ShowJCR</b> versión JCR 2025 · métricas 2024 (IF / cuartiles / rangos), CCF 2026 y listas de advertencia. Total: <b id="total">—</b> revistas.', hero_note: 'Leyenda de insignias: <b>SCIE/SSCI/AHCI/ESCI/EI</b> índices de cobertura · <b>CAS</b> Categorización CAS 2025 por áreas principales (1-4, marca TOP) · <b>JCR Q</b> Cuartil (Q1-Q4) · <b>Emerging</b> Edición Emergente CAS 2026 · <b>CCF</b> Recomendación CCF 2026 (A/B/C) · <b>ABDC</b> Clasificación australiana de revistas de gestión empresarial (A*/A/B/C) · <b>ABS</b> Chartered ABS Academic Journal Guide 2024 (4*/4/3/2/1, solo negocios y gestión) · <b>T1/T2/T3</b> Clasificación CAST 2025 de revistas de alta calidad · <b>⚠ Warning</b> Lista de advertencia de revistas internacionales.', hero_title_dom: 'Directorios de revistas chinas', hero_title_fav: 'Favoritos', hero_title_pick: 'Ayúdame a elegir', hero_body_pick: 'Próximamente. Recomendará revistas según tema, rango de IF, revisión, APC e índices.', pick_coming_title: 'Próximamente', pick_coming_desc: 'Actualización futura', results_all: 'Todas las revistas', load_more: 'Cargar más', col_name: 'Revista Title', col_abbr: 'Abrev. Abbr', col_badges: 'Índice / nivel', search_int: 'Buscar: título / abreviatura / ISSN / nombre chino', search_dom: 'Buscar: nombre chino / inglés / ISSN / CN', search_fav: 'Buscar favoritos', showing: 'Mostrando', of: 'de', total_items: '', empty: 'No hay coincidencias', login: 'Iniciar sesión', logout: 'Salir', wos_subjects: 'Materias WoS', wos_search_ph: 'Filtrar materias (A-Z)…'
+      tagline: '<b>AILatest Journal</b> — buscador de revistas y herramienta de decisión para investigadores.', indices: 'Índices', cas_zone: 'CAS 2025', filters: 'Filtros', all: 'Todo', filter_xinrui: 'Emergente', filter_warning: 'Advertencia', domestic_sources: 'Fuentes de China', tab_home: 'Revistas', tab_int: 'Internacional', tab_dom: 'China', tab_fav: 'Favoritos', tab_pick: 'Ayúdame a elegir', loading: 'Cargando…', hero_title_int: 'Búsqueda internacional SCI / SSCI', hero_body_int: 'Fuente: <b>Web of Science Core Collection</b> (actualizado 2026-05-18) con <b>EI Compendex</b> (2025-10-10). Integra <b>JCR 2025</b>, <b>ESI</b>, <b>CAS 2025</b> y <b>ShowJCR</b> versión JCR 2025 · métricas 2024 (IF / cuartiles / rangos), CCF 2026 y listas de advertencia. Total: <b id="total">—</b> revistas.', hero_note: 'Leyenda de insignias: <b>SCIE/SSCI/AHCI/ESCI/EI</b> índices de cobertura · <b>CAS</b> Categorización CAS 2025 por áreas principales (1-4, marca TOP) · <b>JCR Q</b> Cuartil (Q1-Q4) · <b>Emerging</b> Edición Emergente CAS 2026 · <b>CCF</b> Recomendación CCF 2026 (A/B/C) · <b>ABDC</b> Clasificación australiana de revistas de gestión empresarial (A*/A/B/C) · <b>ABS</b> Chartered ABS Academic Journal Guide 2024 (4*/4/3/2/1, solo negocios y gestión) · <b>T1/T2/T3</b> Clasificación CAST 2025 de revistas de alta calidad · <b>⚠ Warning</b> Lista de advertencia de revistas internacionales.', hero_title_dom: 'Directorios de revistas chinas', hero_title_fav: 'Favoritos', hero_title_pick: 'Ayúdame a elegir', hero_body_pick: 'Próximamente. Recomendará revistas según tema, rango de IF, revisión, APC e índices.', pick_coming_title: 'Próximamente', pick_coming_desc: 'Actualización futura', results_all: 'Todas las revistas', load_more: 'Cargar más', col_name: 'Revista Title', col_free: 'GRATIS', col_abbr: 'Abrev. Abbr', col_badges: 'Índice / nivel', search_int: 'Buscar: título / abreviatura / ISSN / nombre chino', search_dom: 'Buscar: nombre chino / inglés / ISSN / CN', search_fav: 'Buscar favoritos', showing: 'Mostrando', of: 'de', total_items: '', empty: 'No hay coincidencias', login: 'Iniciar sesión', logout: 'Salir', wos_subjects: 'Materias WoS', wos_search_ph: 'Filtrar materias (A-Z)…'
     },
     pt: {
       ...I18N.en,
-      tagline: '<b>AILatest Journal</b> — ferramenta de busca de periódicos e decisão de submissão para pesquisadores.', indices: 'Índices', cas_zone: 'CAS 2025', filters: 'Filtros', all: 'Tudo', filter_xinrui: 'Emergente', filter_warning: 'Alerta', domestic_sources: 'Fontes chinesas', tab_home: 'Periódicos', tab_int: 'Internacional', tab_dom: 'China', tab_fav: 'Favoritos', tab_pick: 'Escolher periódico', loading: 'Carregando…', hero_title_int: 'Busca internacional SCI / SSCI', hero_body_int: 'Fonte: <b>Web of Science Core Collection</b> (2026-05-18) com <b>EI Compendex</b> (2025-10-10). Integra <b>JCR 2025</b>, <b>ESI</b>, <b>CAS 2025</b> e <b>ShowJCR</b> versão JCR 2025 · métricas 2024 (IF / quartis / rankings), CCF 2026 e listas de alerta. Total: <b id="total">—</b> periódicos.', hero_note: 'Legenda de emblemas: <b>SCIE/SSCI/AHCI/ESCI/EI</b> índices de cobertura · <b>CAS</b> Categorização CAS 2025 por grandes áreas (1-4, marca TOP) · <b>JCR Q</b> Quartil (Q1-Q4) · <b>Emerging</b> Edição Emergente CAS 2026 · <b>CCF</b> Recomendação CCF 2026 (A/B/C) · <b>ABDC</b> Classificação australiana de periódicos de gestão (A*/A/B/C) · <b>ABS</b> Chartered ABS Academic Journal Guide 2024 (4*/4/3/2/1, apenas negócios e gestão) · <b>T1/T2/T3</b> Classificação CAST 2025 de periódicos de alta qualidade · <b>⚠ Warning</b> Lista de alerta de periódicos internacionais.', hero_title_dom: 'Diretórios chineses', hero_title_fav: 'Favoritos', hero_title_pick: 'Escolher periódico', hero_body_pick: 'Em breve. Recomendará periódicos por tema, faixa de IF, revisão, APC e índices.', pick_coming_title: 'Em breve', pick_coming_desc: 'Atualização futura', results_all: 'Todos os periódicos', load_more: 'Carregar mais', col_name: 'Periódico Title', col_abbr: 'Abrev. Abbr', col_badges: 'Índice / nível', search_int: 'Buscar: título / abreviação / ISSN / nome chinês', search_dom: 'Buscar: nome chinês / inglês / ISSN / CN', search_fav: 'Buscar favoritos', showing: 'Mostrando', of: 'de', total_items: '', empty: 'Nenhum resultado', login: 'Entrar', logout: 'Sair', wos_subjects: 'Assuntos WoS', wos_search_ph: 'Filtrar assuntos (A-Z)…'
+      tagline: '<b>AILatest Journal</b> — ferramenta de busca de periódicos e decisão de submissão para pesquisadores.', indices: 'Índices', cas_zone: 'CAS 2025', filters: 'Filtros', all: 'Tudo', filter_xinrui: 'Emergente', filter_warning: 'Alerta', domestic_sources: 'Fontes chinesas', tab_home: 'Periódicos', tab_int: 'Internacional', tab_dom: 'China', tab_fav: 'Favoritos', tab_pick: 'Escolher periódico', loading: 'Carregando…', hero_title_int: 'Busca internacional SCI / SSCI', hero_body_int: 'Fonte: <b>Web of Science Core Collection</b> (2026-05-18) com <b>EI Compendex</b> (2025-10-10). Integra <b>JCR 2025</b>, <b>ESI</b>, <b>CAS 2025</b> e <b>ShowJCR</b> versão JCR 2025 · métricas 2024 (IF / quartis / rankings), CCF 2026 e listas de alerta. Total: <b id="total">—</b> periódicos.', hero_note: 'Legenda de emblemas: <b>SCIE/SSCI/AHCI/ESCI/EI</b> índices de cobertura · <b>CAS</b> Categorização CAS 2025 por grandes áreas (1-4, marca TOP) · <b>JCR Q</b> Quartil (Q1-Q4) · <b>Emerging</b> Edição Emergente CAS 2026 · <b>CCF</b> Recomendação CCF 2026 (A/B/C) · <b>ABDC</b> Classificação australiana de periódicos de gestão (A*/A/B/C) · <b>ABS</b> Chartered ABS Academic Journal Guide 2024 (4*/4/3/2/1, apenas negócios e gestão) · <b>T1/T2/T3</b> Classificação CAST 2025 de periódicos de alta qualidade · <b>⚠ Warning</b> Lista de alerta de periódicos internacionais.', hero_title_dom: 'Diretórios chineses', hero_title_fav: 'Favoritos', hero_title_pick: 'Escolher periódico', hero_body_pick: 'Em breve. Recomendará periódicos por tema, faixa de IF, revisão, APC e índices.', pick_coming_title: 'Em breve', pick_coming_desc: 'Atualização futura', results_all: 'Todos os periódicos', load_more: 'Carregar mais', col_name: 'Periódico Title', col_free: 'GRÁTIS', col_abbr: 'Abrev. Abbr', col_badges: 'Índice / nível', search_int: 'Buscar: título / abreviação / ISSN / nome chinês', search_dom: 'Buscar: nome chinês / inglês / ISSN / CN', search_fav: 'Buscar favoritos', showing: 'Mostrando', of: 'de', total_items: '', empty: 'Nenhum resultado', login: 'Entrar', logout: 'Sair', wos_subjects: 'Assuntos WoS', wos_search_ph: 'Filtrar assuntos (A-Z)…'
     },
     fr: {
       ...I18N.en,
-      tagline: '<b>AILatest Journal</b> — outil de recherche de revues et d’aide au choix de soumission pour les chercheurs.', indices: 'Index', cas_zone: 'CAS 2025', filters: 'Filtres', all: 'Tout', filter_xinrui: 'Émergent', filter_warning: 'Alerte', domestic_sources: 'Sources chinoises', tab_home: 'Revues', tab_int: 'International', tab_dom: 'Chine', tab_fav: 'Favoris', tab_pick: 'M’aider à choisir', loading: 'Chargement…', hero_title_int: 'Recherche internationale SCI / SSCI', hero_body_int: 'Source : <b>Web of Science Core Collection</b> (2026-05-18) avec <b>EI Compendex</b> (2025-10-10). Intègre <b>JCR 2025</b>, <b>ESI</b>, <b>CAS 2025</b> et <b>ShowJCR</b> version JCR 2025 · métriques 2024 (IF / quartiles / rangs), CCF 2026 et listes d’alerte. Total : <b id="total">—</b> revues.', hero_note: 'Légende des badges : <b>SCIE/SSCI/AHCI/ESCI/EI</b> indices de couverture · <b>CAS</b> Catégorisation CAS 2025 par grandes disciplines (1-4, marque TOP) · <b>JCR Q</b> Quartile (Q1-Q4) · <b>Emerging</b> Édition Émergente CAS 2026 · <b>CCF</b> Recommandation CCF 2026 (A/B/C) · <b>ABDC</b> Classement australien des revues de gestion (A*/A/B/C) · <b>ABS</b> Chartered ABS Academic Journal Guide 2024 (4*/4/3/2/1, commerce et gestion uniquement) · <b>T1/T2/T3</b> Classement CAST 2025 des revues de haute qualité · <b>⚠ Warning</b> Liste d’alerte des revues internationales.', hero_title_dom: 'Répertoires chinois', hero_title_fav: 'Favoris', hero_title_pick: 'M’aider à choisir', hero_body_pick: 'Bientôt disponible. Recommandations selon thème, IF, délai de revue, APC et index.', pick_coming_title: 'Bientôt disponible', pick_coming_desc: 'Mise à jour future', results_all: 'Toutes les revues', load_more: 'Charger plus', col_name: 'Revue Title', col_abbr: 'Abrév. Abbr', col_badges: 'Index / niveau', search_int: 'Chercher : titre / abréviation / ISSN / nom chinois', search_dom: 'Chercher : nom chinois / anglais / ISSN / CN', search_fav: 'Chercher favoris', showing: 'Affichage', of: 'sur', total_items: '', empty: 'Aucun résultat', login: 'Connexion', logout: 'Déconnexion', wos_subjects: 'Sujets WoS', wos_search_ph: 'Filtrer les sujets (A-Z)…'
+      tagline: '<b>AILatest Journal</b> — outil de recherche de revues et d’aide au choix de soumission pour les chercheurs.', indices: 'Index', cas_zone: 'CAS 2025', filters: 'Filtres', all: 'Tout', filter_xinrui: 'Émergent', filter_warning: 'Alerte', domestic_sources: 'Sources chinoises', tab_home: 'Revues', tab_int: 'International', tab_dom: 'Chine', tab_fav: 'Favoris', tab_pick: 'M’aider à choisir', loading: 'Chargement…', hero_title_int: 'Recherche internationale SCI / SSCI', hero_body_int: 'Source : <b>Web of Science Core Collection</b> (2026-05-18) avec <b>EI Compendex</b> (2025-10-10). Intègre <b>JCR 2025</b>, <b>ESI</b>, <b>CAS 2025</b> et <b>ShowJCR</b> version JCR 2025 · métriques 2024 (IF / quartiles / rangs), CCF 2026 et listes d’alerte. Total : <b id="total">—</b> revues.', hero_note: 'Légende des badges : <b>SCIE/SSCI/AHCI/ESCI/EI</b> indices de couverture · <b>CAS</b> Catégorisation CAS 2025 par grandes disciplines (1-4, marque TOP) · <b>JCR Q</b> Quartile (Q1-Q4) · <b>Emerging</b> Édition Émergente CAS 2026 · <b>CCF</b> Recommandation CCF 2026 (A/B/C) · <b>ABDC</b> Classement australien des revues de gestion (A*/A/B/C) · <b>ABS</b> Chartered ABS Academic Journal Guide 2024 (4*/4/3/2/1, commerce et gestion uniquement) · <b>T1/T2/T3</b> Classement CAST 2025 des revues de haute qualité · <b>⚠ Warning</b> Liste d’alerte des revues internationales.', hero_title_dom: 'Répertoires chinois', hero_title_fav: 'Favoris', hero_title_pick: 'M’aider à choisir', hero_body_pick: 'Bientôt disponible. Recommandations selon thème, IF, délai de revue, APC et index.', pick_coming_title: 'Bientôt disponible', pick_coming_desc: 'Mise à jour future', results_all: 'Toutes les revues', load_more: 'Charger plus', col_name: 'Revue Title', col_free: 'GRATUIT', col_abbr: 'Abrév. Abbr', col_badges: 'Index / niveau', search_int: 'Chercher : titre / abréviation / ISSN / nom chinois', search_dom: 'Chercher : nom chinois / anglais / ISSN / CN', search_fav: 'Chercher favoris', showing: 'Affichage', of: 'sur', total_items: '', empty: 'Aucun résultat', login: 'Connexion', logout: 'Déconnexion', wos_subjects: 'Sujets WoS', wos_search_ph: 'Filtrer les sujets (A-Z)…'
     }
   });
   const LANG_ORDER = ['zh-CN', 'zh-TW', 'ja', 'ko', 'en', 'es', 'pt', 'fr'];
@@ -1026,6 +1026,10 @@
     $$('[data-i18n-title]').forEach(el => {
       const k = el.dataset.i18nTitle;
       const v = t(k); if (v) el.title = v;
+    });
+    $$('[data-i18n-aria]').forEach(el => {
+      const k = el.dataset.i18nAria;
+      const v = t(k); if (v) el.setAttribute('aria-label', v);
     });
     if (activeTab !== 'pick') {
       const search = activeTab === 'home' ? 'search_home_ph'
@@ -2331,7 +2335,7 @@
       const casSet = new Set();
       journals.forEach(j => { if (j.cas_major_cn) casSet.add(j.cas_major_cn); });
       const casList = [...casSet].sort((a,b) => a.localeCompare(b, 'zh'));
-      casSel.innerHTML = `<option value="__all">中科院大类</option>` +
+      casSel.innerHTML = `<option value="__all">${T('中科院大类','CAS Major')}</option>` +
         casList.map(v => `<option value="${escape(v)}">${escape(v)}</option>`).join('');
       casSel.value = activeCasMajor;
       casSel.addEventListener('change', () => {
@@ -2346,7 +2350,7 @@
       const esiSet = new Set();
       journals.forEach(j => { if (j.esi_category) esiSet.add(j.esi_category); });
       const esiList = [...esiSet].sort();
-      esiSel.innerHTML = `<option value="__all">ESI Subject</option>` +
+      esiSel.innerHTML = `<option value="__all">${T('ESI 学科','ESI Subject')}</option>` +
         esiList.map(v => `<option value="${escape(v)}">${escape(v)}</option>`).join('');
       esiSel.value = activeCat;
       esiSel.addEventListener('change', () => {
@@ -2361,7 +2365,7 @@
       const wosSet = new Set();
       journals.forEach(j => (j.wos_categories || []).forEach(c => { if (c) wosSet.add(c); }));
       const wosList = [...wosSet].sort((a,b) => a.localeCompare(b, 'en'));
-      wosSel.innerHTML = `<option value="__all">WoS Subject</option>` +
+      wosSel.innerHTML = `<option value="__all">${T('WoS 学科','WoS Subject')}</option>` +
         wosList.map(v => `<option value="${escape(v)}">${escape(v)}</option>`).join('');
       wosSel.addEventListener('change', () => {
         activeWos.clear();
@@ -4938,11 +4942,19 @@
             localizeDefaultFavListName();
             persistFavLists(false);
             applyI18n();
+            // 重置列头下拉的__bound标记，使其下次用新语言重建
+            const casSel2 = $('#cas-col-filter'); if (casSel2) casSel2.__bound = false;
+            const esiSel2 = $('#esi-col-filter'); if (esiSel2) esiSel2.__bound = false;
+            const wosSel2 = $('#wos-col-filter'); if (wosSel2) wosSel2.__bound = false;
             renderWosList();
             if (activeTab === 'dom') renderDomestic();
             else if (activeTab === 'fav') renderFav();
             else if (activeTab === 'int') renderInt();
             else if (activeTab === 'pick') refreshPickI18n();
+            // 重绘打开的抽屉（如果有）
+            if (_currentDrawerRec) {
+              openDrawer(_currentDrawerRec, { pageMode: document.body.classList.contains('journal-route') });
+            }
             closeDropdown();
           });
           dropdown.appendChild(opt);
