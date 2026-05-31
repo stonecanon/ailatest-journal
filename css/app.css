@@ -1925,6 +1925,7 @@ td.empty,
   body.topbar-compact .topbar { margin-bottom: 10px; }
   body.topbar-compact .search-wrap > #q { height: 46px; min-height: 46px; padding: 0 112px 0 14px; font-size: 14px; }
   body.topbar-compact .search-submit { min-width: 90px; min-height: 34px; padding: 0 12px; }
+  .table-wrap { overflow-x: visible; }
   .top-actions { order: 0; justify-content: flex-end; gap: 4px; padding: 2px 0; }
   .tab-panel { order: 4; }
   .tab-panel[data-panel="home"] { order: 4; }
