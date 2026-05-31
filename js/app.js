@@ -77,7 +77,7 @@
       search_home_ph: '搜索期刊名、ISSN…',
       search_submit_hint: '搜索',
       search_button: 'Search',
-      home_subtitle: '面向科研人员的期刊检索与投稿决策工具',
+      home_subtitle: '全球期刊检索与推荐平台',
       showing: '显示', of: '条 / 共', total_items: '条',
       empty: '未找到匹配的期刊',
       empty_fav: '还没有收藏。切到「国际 SCI/SSCI」点任意一行右边的 ★ 就能收藏。',
@@ -4484,8 +4484,27 @@
     document.querySelectorAll('.feat-row').forEach(row => {
       row.addEventListener('change', () => {
         activeFeats = new Set([...document.querySelectorAll('.feat-row input:checked')].map(i => i.value));
+        const freeCol = document.getElementById('free-col-filter');
+        if (freeCol) freeCol.checked = activeFeats.has('free');
         shown = PAGE; renderInt();
       });
+    });
+    const setFreeFilter = (checked) => {
+      const freeCol = document.getElementById('free-col-filter');
+      if (freeCol) freeCol.checked = checked;
+      document.querySelectorAll('.feat-row input[value="free"]').forEach(input => { input.checked = checked; });
+      if (checked) activeFeats.add('free');
+      else activeFeats.delete('free');
+      shown = PAGE;
+      renderInt();
+    };
+    document.getElementById('free-col-filter')?.addEventListener('change', (e) => {
+      setFreeFilter(e.target.checked);
+    });
+    document.getElementById('free-col-filter-label')?.addEventListener('click', (e) => {
+      if (e.target && e.target.id === 'free-col-filter') return;
+      e.preventDefault();
+      setFreeFilter(!activeFeats.has('free'));
     });
     $('#wos-search')?.addEventListener('input', () => renderWosList());
     $('#wos-clear')?.addEventListener('click', () => {

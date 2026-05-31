@@ -855,6 +855,24 @@ main.main {
 
 .col-fav { width: 44px; text-align: center; padding-left: 4px; padding-right: 4px; }
 .col-free { width: 68px; text-align: center; white-space: nowrap; }
+.free-th-filter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  user-select: none;
+}
+.free-th-filter input {
+  width: 13px;
+  height: 13px;
+  margin: 0;
+  accent-color: var(--accent);
+}
+.free-th-filter:has(input:checked) {
+  color: var(--accent);
+  font-weight: 800;
+}
 .col-name {
   width: 30%;
   min-width: 240px;
