@@ -5849,9 +5849,20 @@
       window.addEventListener('hashchange', applyHashRoute);
       applyHashRoute();
       if (user) await pullFavs();
+      // 设置表头吸顶偏移 = 搜索栏高度
+      updateThStickyTop();
+      window.addEventListener('resize', updateThStickyTop);
     } catch (e) {
       $('#hint').textContent = 'Load failed: ' + e.message;
       console.error(e);
+    }
+  }
+
+  function updateThStickyTop() {
+    const topbar = document.querySelector('.topbar');
+    if (topbar) {
+      const h = topbar.getBoundingClientRect().height;
+      document.documentElement.style.setProperty('--th-sticky-top', h + 'px');
     }
   }
 
