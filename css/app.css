@@ -104,6 +104,38 @@ body.share-mode .app-rail { display: none !important; }
   align-items: center;
   gap: 12px;
 }
+.rail-brand-btn {
+  position: relative;
+  width: 52px;
+  min-height: 52px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 18px;
+  background: var(--accent);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: .15s;
+  font-family: var(--display);
+  font-weight: 780;
+  font-size: 17px;
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+}
+.rail-brand-btn:hover {
+  background: var(--accent-hover);
+  opacity: .88;
+}
+.rail-brand-btn.active {
+  background: var(--accent);
+  opacity: 1;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,.2);
+}
+.rail-brand-btn .rail-brand-text {
+  line-height: 1;
+}
 .rail-nav-btn,
 .app-rail .auth-btn,
 .app-rail .lang-toggle {
@@ -1930,6 +1962,12 @@ td.empty,
     min-height: 40px;
     border-radius: 14px;
     font-size: 0;
+  }
+  .rail-brand-btn {
+    width: 40px;
+    min-height: 40px;
+    border-radius: 14px;
+    font-size: 15px;
   }
   .rail-nav-btn span:not(.rail-flag):not(.fav-count-badge) {
     display: none;

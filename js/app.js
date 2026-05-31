@@ -4962,7 +4962,7 @@
     }
     window.__activateJournalTab = activateTab;
     // Home entry pills → switch tab
-    document.querySelectorAll('.home-pill[data-tab], .rail-nav-btn[data-tab]').forEach(b => {
+    document.querySelectorAll('.home-pill[data-tab], .rail-nav-btn[data-tab], .rail-brand-btn[data-tab]').forEach(b => {
       b.addEventListener('click', (e) => {
         e.preventDefault();
         activateTab(b.dataset.tab);
