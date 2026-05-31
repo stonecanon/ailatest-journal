@@ -844,6 +844,7 @@ main.main {
 }
 
 .col-fav { width: 44px; text-align: center; padding-left: 4px; padding-right: 4px; }
+.col-free { width: 68px; text-align: center; white-space: nowrap; }
 .col-name {
   width: 30%;
   min-width: 240px;
@@ -1872,6 +1873,7 @@ td.empty,
   .col-cas, .col-esi, .col-wos { width: 90px; max-width: 90px; font-size: 11px; }
   .col-badge-split { min-width: 130px; width: 130px; }
   .col-fav { width: 36px; }
+  .col-free { width: 58px; }
   .col-if { width: 44px; max-width: 44px; padding-right: 4px; }
 }
 

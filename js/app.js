@@ -1984,12 +1984,20 @@
     return `<tr data-fid="${escape(fid)}" class="j-row clickable ${r.flagship ? 'row-flagship' : ''}" data-src="int">
       <td class="col-fav">${starBtn(r, 'int')}</td>
       <td class="col-name">${nameHtml}</td>
+      <td class="col-free">${freeBadgeCell(r)}</td>
       <td class="col-badge col-badge-split">${badgeCell}</td>
       <td class="col-if">${ifCell}</td>
       <td class="col-cas">${casCell}</td>
       <td class="col-wos">${wosCell}</td>
       <td class="col-esi">${esiCell}</td>
     </tr>`;
+  }
+
+  /* ───────── FREE badge helper ───────── */
+  function freeBadgeCell(r) {
+    return r.free
+      ? `<span class="badge b-free" title="${T('可免费发表（Diamond OA，无版面费）','Free to publish (Diamond OA, no APC)')}">${T('免费发表','FREE')}</span>`
+      : '<span class="muted-cell">&mdash;</span>';
   }
 
   function escape(s) {
@@ -2218,7 +2226,7 @@
     const visible = filtered.slice(0, shown);
     const tbody = $('#tbody');
     if (!visible.length) {
-      tbody.innerHTML = `<tr><td colspan="7" class="empty">${t('empty')}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="8" class="empty">${t('empty')}</td></tr>`;
     } else {
       tbody.innerHTML = visible.map(renderRow).join('');
     }
