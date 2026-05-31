@@ -1691,14 +1691,6 @@
     if (!m) return '';
     return `<span class="badge b-medline" title="${T('MEDLINE 数据库收录（NLM 精选索引）','Indexed in MEDLINE (NLM curated)')}">MEDLINE</span>`;
   }
-  function badgePubMed(pm) {
-    if (!pm) return '';
-    return `<span class="badge b-pubmed" title="${T('PubMed 数据库收录','Included in PubMed')}">PubMed Indexed</span>`;
-  }
-  function badgePMC(pm) {
-    if (!pm) return '';
-    return `<span class="badge b-pmc" title="${T('PubMed Central 全文存档','Archived in PubMed Central')}">PMC Archived</span>`;
-  }
   // 期刊浏览量缓存（journal_key → count）
   const viewsCache = {};
   function badgeView(key) {
@@ -1861,8 +1853,6 @@
       badgeOAJ(r.oaj),
       badgeDOAJ(r.doaj),
       badgeMEDLINE(r.medline),
-      badgePubMed(r.pubmed),
-      badgePMC(r.pmc),
     ].filter(Boolean).join('');
   }
   function renderRankBadges(r) {
@@ -3410,6 +3400,22 @@
       </div>
     </div>` : '';
 
+    // PubMed 数据库收录
+    const pubmedHTML = r.pubmed ? `<div class="drawer-section">
+      <h4>${T('PubMed 数据库收录','Included in PubMed')}</h4>
+      <div class="muted-cell" style="font-size:12px">
+        ${T('期刊被 PubMed 数据库收录，包含 NLM 精选索引的引文数据。','Journal is included in PubMed, the NLM citation database.')}
+      </div>
+    </div>` : '';
+
+    // PMC 全文存档
+    const pmcHTML = r.pmc ? `<div class="drawer-section">
+      <h4>${T('PMC 全文存档','Archived in PubMed Central')}</h4>
+      <div class="muted-cell" style="font-size:12px">
+        ${T('期刊全文存储在 PubMed Central（PMC），NLM 的免费数字档案库。','Full text stored in PubMed Central (PMC), NLM\'s free digital archive.')}
+      </div>
+    </div>` : '';
+
     const doajHTML = ir.doaj ? `<div class="drawer-section">
       <h4>${T('DOAJ 开放获取期刊目录','DOAJ — Directory of Open Access Journals')}</h4>
       <div class="meta-row"><div class="meta-k">${T('许可证','License')}</div><div class="meta-v">${escape(ir.doaj.lic || ir.doaj.license || '—')}</div></div>
@@ -3456,6 +3462,8 @@
       ${eiHTML}
       ${oajHTML}
       ${doajHTML}
+      ${pubmedHTML}
+      ${pmcHTML}
       ${cycleHTML}
       ${oaHTML}
       ${topicsHTML}
