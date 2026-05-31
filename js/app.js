@@ -2062,9 +2062,9 @@
     const crossBadges = renderDomCrossBadges({ name, issn: r.issn, cn_code: r.cn_code }, src);
     const tierBadge = showTier && tierValue ? badgeTier(tierValue) : '';
     return `<tr class="j-row clickable" data-fid="${escape(fid)}" data-src="${escape(src)}">
-      <td class="col-fav" style="width:36px">${starBtn(r, src)}</td>
+      <td class="col-fav">${starBtn(r, src)}</td>
       ${showTier ? `<td style="width:60px">${tierBadge}</td>` : ''}
-      <td class="jname" style="font-size:13.5px">${escape(titleCase(name.replace(/\*$/,'')))}${enName}</td>
+      <td class="col-name"><div class="jname" style="font-size:13.5px">${escape(titleCase(name.replace(/\*$/,'')))}${enName}</div></td>
       <td class="col-cross"><div class="badges">${extraBadges}${crossBadges}</div></td>
       ${extraCols}
     </tr>`;
@@ -2665,7 +2665,7 @@
           title: T('中国科协高质量目录','CAST Tiered Directory'),
           count: recs.length,
           html: `<div class="table-wrap"><table class="journals"><thead><tr>
-            <th style="width:36px" aria-label="Favorite"></th><th style="width:60px">${T('T级','Tier')}</th><th>${T('期刊','Journal')}</th><th>${T('交叉收录','Also In')}</th><th style="width:100px">ISSN</th><th style="width:110px">${T('学科 / 细分','Domain / Sub')}</th>
+            <th class="col-fav" aria-label="Favorite"></th><th style="width:60px">${T('T级','Tier')}</th><th class="col-name">${T('期刊','Journal')}</th><th>${T('交叉收录','Also In')}</th><th style="width:100px">ISSN</th><th style="width:110px">${T('学科 / 细分','Domain / Sub')}</th>
           </tr></thead><tbody>
           ${recs.slice(0, 200).map(r => renderDomRow(r, {
             src: 'cnkx', showTier: true, tierValue: r.tier,
@@ -2687,7 +2687,7 @@
           title: T('中文期刊目录','Chinese Journal Directory'),
           count: list.length,
           html: `<div class="table-wrap"><table class="journals"><thead><tr>
-            <th style="width:36px" aria-label="Favorite"></th><th>${T('期刊名称','Journal')}</th><th>${T('收录索引','Indices')}</th><th style="width:110px">ISSN</th><th style="width:100px">CN</th><th style="width:110px">${T('学科分类','Category')}</th>
+            <th class="col-fav" aria-label="Favorite"></th><th class="col-name">${T('期刊名称','Journal')}</th><th>${T('收录索引','Indices')}</th><th style="width:110px">ISSN</th><th style="width:100px">CN</th><th style="width:110px">${T('学科分类','Category')}</th>
           </tr></thead><tbody>
           ${list.slice(0, 200).map(r => {
             const hits = lookupDom(r);
