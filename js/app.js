@@ -2517,7 +2517,7 @@
     // 2) 中文期刊目录 (CNKI Major)
     if (domestic.cnki_major && domestic.cnki_major.records) {
       const list = domestic.cnki_major.records.filter(r =>
-        matchTxt(r.name, r.issn, r.cn_code, r.sponsor, ...(r.major_categories||[]))
+        matchTxt(r.name, r.issn, r.cn_code, r.sponsor, r.category, r.category_code, ...(r.major_categories||[]), ...(r.categories||[]))
       );
       if (list.length) {
         sections.push({
@@ -2543,7 +2543,7 @@
               <td class="col-cross"><div class="badges">${badges || '<span class="muted-cell">—</span>'}</div></td>
               <td class="muted-cell" style="width:110px">${escape(r.issn||'—')}</td>
               <td class="muted-cell" style="width:100px">${escape(r.cn_code||'—')}</td>
-              <td class="muted-cell" style="width:110px">${escape((r.major_categories||[]).join(' · '))}</td>
+              <td class="muted-cell" style="width:110px">${escape(((r.major_categories||[]).length ? r.major_categories : (r.categories||[])).join(' · ') || '—')}</td>
             </tr>`;
           }).join('')}
           ${list.length > 200 ? `<tr><td colspan="6" class="empty">${T('仅显示前 200 条','First 200 only')}</td></tr>` : ''}
@@ -2744,7 +2744,7 @@
         const hits = lookupDom(r);
         // 搜索过滤
         if (q) {
-          const hay = (r.name + ' ' + (r.issn||'') + ' ' + (r.cn_code||'') + ' ' + (r.sponsor||'') + ' ' + (r.major_categories||[]).join(' ')).toLowerCase();
+          const hay = (r.name + ' ' + (r.issn||'') + ' ' + (r.cn_code||'') + ' ' + (r.sponsor||'') + ' ' + (r.category||'') + ' ' + (r.category_code||'') + ' ' + (r.major_categories||[]).join(' ') + ' ' + (r.categories||[]).join(' ')).toLowerCase();
           if (!hay.includes(q)) return false;
         }
         // 学科分类过滤
@@ -2813,7 +2813,8 @@
         ].filter(Boolean).join('');
         const name = r.name || '';
         const isnCell = r.issn ? `<span class="jissn">${escape(r.issn)}</span>` : (r.cn_code ? `<span class="jissn">${escape(r.cn_code)}</span>` : '<span class="muted-cell">—</span>');
-        const catCell = (r.major_categories||[]).length ? r.major_categories.map(c => `<span class="cat-inline">${escape(c)}</span>`).join('') : '<span class="muted-cell">—</span>';
+        const displayCats = (r.major_categories || []).length ? r.major_categories : (r.categories || []);
+        const catCell = displayCats.length ? displayCats.map(c => `<span class="cat-inline">${escape(c)}</span>`).join('') : '<span class="muted-cell">—</span>';
         return `<tr class="j-row clickable cnki-row" data-fid="${escape(fid)}" data-src="cnki_major">
           <td class="col-fav" style="width:36px">${starBtn(r, 'cnki_major')}</td>
           <td class="jname cnki-name">${escape(name)}</td>
@@ -3187,13 +3188,14 @@
     const meta = [];
     if (r.abbr20 && r.abbr20 !== (r.name||'').replace(/\*$/,'')) meta.push([T('期刊缩写','Abbreviation'), r.abbr20]);
     if (r.publisher) meta.push([T('出版商','Publisher'), r.publisher]);
-    if (r.org) meta.push([T('主办单位','Sponsor'), r.org]);
+    if (r.org || r.sponsor) meta.push([T('主办单位','Sponsor'), r.org || r.sponsor]);
     if (r.address) meta.push([T('出版地址','Address'), r.address]);
     if (r.country) meta.push([T('国家/地区','Country/Region'), r.country]);
     if (r.languages || r.language_cn || r.language) meta.push([T('语种','Language'), r.languages || r.language_cn || r.language]);
     if (r.frequency) meta.push([T('出版周期','Frequency'), r.frequency]);
     if (r.discipline) meta.push([T('学科','Discipline'), tn(r.discipline, 'cssci')]);
     if (r.category) meta.push([T('分类','Category'), tn(r.category, 'pku')]);
+    if (Array.isArray(r.categories) && r.categories.length) meta.push([T('CNKI 分类','CNKI Categories'), r.categories.join(' · ')]);
     if (r.domain) meta.push([T('科协领域','CAST Domain'), tn(r.domain, 'domain') + (r.subdomain ? ' · ' + tn(r.subdomain, 'sub') : '')]);
     if (r.ccf_area) meta.push([T('CCF 方向','CCF Area'), r.ccf_area]);
     if (ir.abdc && ir.abdc.rating) meta.push([T('ABDC 等级','ABDC Rating'), ir.abdc.rating + (ir.abdc.field ? ' · ' + ir.abdc.field : '')]);
@@ -3208,6 +3210,15 @@
       const plainName = title;
       const plainCats = cats.join(lang.startsWith('zh') ? '、' : ', ');
       const major = ir.cas_major_cn || ir.jcr_cat || cats[0] || ir.esi_category || '';
+      const isDomesticJournal = src !== 'int';
+      const domesticFields = [
+        r.discipline ? tn(r.discipline, 'cssci') : '',
+        r.category ? tn(r.category, 'pku') : '',
+        r.domain ? tn(r.domain, 'domain') : '',
+        r.subdomain ? tn(r.subdomain, 'sub') : '',
+        r.ccf_area || '',
+      ].filter(Boolean);
+      const domesticFieldText = [...new Set(domesticFields)].slice(0, 3).join('、');
       const cnName = r.cn_name || ir.cn_name || '';
       const abbr = r.abbr20 || ir.abbr20 || '';
       const doajWeeks = parseFloat(r.doaj?.review_weeks || ir.doaj?.review_weeks);
@@ -3227,7 +3238,8 @@
         const isOa = ir.cas_oa || r.cas_oa || r.doaj || ir.doaj || label === 'gold_apc' || label === 'diamond';
         if (lang.startsWith('zh')) {
           if (label === 'hybrid') return '本刊为 Hybrid 期刊，可选择开放获取发表';
-          return isOa ? '本刊是一本 OA 开放访问期刊' : '本刊暂未标记为全 OA 开放访问期刊';
+          if (isOa) return '本刊是一本 OA 开放访问期刊';
+          return '';
         }
         if (label === 'hybrid') return 'This is a hybrid journal with optional open access publishing';
         return isOa ? 'This is an open access journal' : 'This journal is not currently marked as fully open access';
@@ -3239,13 +3251,24 @@
       const topicList = (oa && Array.isArray(oa.tp) && oa.tp.length)
         ? oa.tp.slice(0, 4)
         : cats;
+      const zhSentence = (s) => {
+        const text = String(s || '').replace(/\s+/g, ' ').replace(/[，、；：:,.。\s]+$/, '');
+        return text ? `${text}。` : '';
+      };
       const fallbackText = lang.startsWith('zh')
-        ? [
-            `${plainName} 是一份国际专业期刊，致力于汇集全球范围内 ${major || plainCats || '相关学科'} 领域研究者，为其提供展示最新研究成果、交流学术思想的平台。`,
-            `${cnName ? `该期刊中文名称：${cnName}，` : ''}${abbr ? `国际简称：${abbr}，` : ''}${ir.cas_zone ? `在中科院分区表 2025 年版中大类学科位于 ${ir.cas_zone} 区${ir.cas_top ? '，为 Top 期刊' : ''}` : ''}${ir.if_quartile ? `；JCR 分区为 ${String(ir.if_quartile).toUpperCase()}` : ''}${ir.if_2024 != null ? `，影响因子 IF ${ir.if_2024}` : ''}${ir.if_rank ? `，IF 排名 ${ir.if_rank}` : ''}${tierText}。`,
-            `${oaText}${apcText ? `，${apcText}` : ''}${reviewText ? `，${reviewText}` : ''}。`,
-            `${topicList.length ? `期刊聚焦 ${topicList.join('、')} 等方向，` : ''}${indexText ? `目前收录于 ${indexText}。` : ''}`,
-          ].filter(Boolean).join(' ')
+        ? (isDomesticJournal
+          ? [
+              zhSentence(`${plainName} 是一份中文学术期刊${domesticFieldText ? `，主要关注${domesticFieldText}等方向` : ''}${r.org || r.sponsor ? `，由${r.org || r.sponsor}主办` : r.publisher ? `，出版单位为${r.publisher}` : ''}`),
+              zhSentence(`${r.cn_code ? `国内统一连续出版物号：${r.cn_code}` : ''}${issn ? `${r.cn_code ? '，' : ''}ISSN：${issn}` : ''}${r.frequency ? `${(r.cn_code || issn) ? '，' : ''}出版周期：${r.frequency}` : ''}`),
+              zhSentence(`${crossBadges ? '该刊已收录于本站标注的相关中文核心/评价目录' : ''}${r.tier ? `${crossBadges ? '，' : ''}科协分级：${tn(r.tier, 'tier')}` : ''}`),
+              zhSentence(`${oaText}${apcText ? `${oaText ? '，' : ''}${apcText}` : ''}${reviewText ? `${(oaText || apcText) ? '，' : ''}${reviewText}` : ''}`),
+            ].filter(Boolean).join(' ')
+          : [
+              zhSentence(`${plainName} 是一份国际学术期刊${major || plainCats ? `，主要面向${major || plainCats}等研究方向` : ''}，为相关研究成果提供发表平台`),
+              zhSentence(`${cnName ? `该期刊中文名称：${cnName}` : ''}${abbr ? `${cnName ? '，' : ''}国际简称：${abbr}` : ''}${ir.cas_zone ? `${(cnName || abbr) ? '，' : ''}在中科院分区表 2025 年版中大类学科位于 ${ir.cas_zone} 区${ir.cas_top ? '，为 Top 期刊' : ''}` : ''}${ir.if_quartile ? `，JCR 分区为 ${String(ir.if_quartile).toUpperCase()}` : ''}${ir.if_2024 != null ? `，影响因子 IF ${ir.if_2024}` : ''}${ir.if_rank ? `，IF 排名 ${ir.if_rank}` : ''}${tierText}`),
+              zhSentence(`${oaText}${apcText ? `${oaText ? '，' : ''}${apcText}` : ''}${reviewText ? `${(oaText || apcText) ? '，' : ''}${reviewText}` : ''}`),
+              zhSentence(`${topicList.length ? `期刊聚焦 ${topicList.join('、')} 等方向` : ''}${indexText ? `${topicList.length ? '，' : ''}目前收录于 ${indexText}` : ''}`),
+            ].filter(Boolean).join(' '))
         : [
             `${plainName} is an international scholarly journal for researchers in ${major || plainCats || 'related fields'}, providing a venue for new research and academic exchange.`,
             `${abbr ? `Abbreviation: ${abbr}. ` : ''}${ir.cas_zone ? `CAS 2025 major tier: ${ir.cas_zone}${ir.cas_top ? ' · Top' : ''}. ` : ''}${ir.if_quartile ? `JCR ${String(ir.if_quartile).toUpperCase()}. ` : ''}${ir.if_2024 != null ? `IF ${ir.if_2024}. ` : ''}${ir.if_rank ? `IF rank ${ir.if_rank}.` : ''}`,
@@ -3266,6 +3289,34 @@
           <p>${officialText ? escape(officialText) : escape(fallbackText)}</p>
         </div>
         <div class="journal-cover">${cover}</div>
+      </div>`;
+    })();
+
+    const cnkiHTML = (() => {
+      if (src !== 'cnki_major' && !(r.source || '').includes('CNKI')) return '';
+      const categories = Array.isArray(r.categories) && r.categories.length
+        ? r.categories
+        : (r.category ? [r.category] : []);
+      const majors = Array.isArray(r.major_categories) ? r.major_categories.filter(Boolean) : [];
+      const tags = Array.isArray(r.tags)
+        ? r.tags
+        : (typeof r.tags === 'string' ? r.tags.split(/[|;；,，]/).map(s => s.trim()).filter(Boolean) : []);
+      const rows = [
+        r.sponsor ? [T('主办单位','Sponsor'), r.sponsor] : null,
+        r.cn_code ? ['CN', r.cn_code] : null,
+        r.issn ? ['ISSN', r.issn] : null,
+        r.compound_if ? [T('复合影响因子','Compound IF'), r.compound_if] : null,
+        r.comprehensive_if ? [T('综合影响因子','Comprehensive IF'), r.comprehensive_if] : null,
+        r.category_code ? [T('CNKI 分类号','CNKI Category Code'), r.category_code] : null,
+      ].filter(Boolean);
+      if (!rows.length && !categories.length && !majors.length && !tags.length && !r.detail_url) return '';
+      return `<div class="drawer-section cnki-section">
+        <h4>${T('CNKI 中文期刊信息','CNKI Journal Information')}</h4>
+        ${rows.map(([k,v]) => `<div class="meta-row"><div class="meta-k">${escape(k)}</div><div class="meta-v">${escape(v)}</div></div>`).join('')}
+        ${categories.length ? `<div class="cat-sub-label">${T('细分学科','Subject Categories')}</div><div class="cat-chips">${categories.map(c => `<span class="cat-chip">${escape(c)}</span>`).join('')}</div>` : ''}
+        ${majors.length ? `<div class="cat-sub-label">${T('大类','Major Categories')}</div><div class="cat-chips">${majors.map(c => `<span class="cat-chip">${escape(c)}</span>`).join('')}</div>` : ''}
+        ${tags.length ? `<div class="cat-sub-label">${T('标签','Tags')}</div><div class="cat-chips">${tags.map(c => `<span class="cat-chip">${escape(c)}</span>`).join('')}</div>` : ''}
+        ${r.detail_url ? `<div class="meta-row"><div class="meta-k">CNKI</div><div class="meta-v"><a href="${escape(r.detail_url)}" target="_blank" rel="noopener">${T('打开 CNKI 详情页','Open CNKI detail page')}</a></div></div>` : ''}
       </div>`;
     })();
 
@@ -3602,8 +3653,9 @@
 	        ${cycleHTML}
 	        ${oaHTML}
 	        ${topicsHTML}
-	        ${warnHTML}
-	        ${metaHTML ? `<div class="meta-block">${metaHTML}</div>` : ''}
+		        ${warnHTML}
+		        ${cnkiHTML}
+		        ${metaHTML ? `<div class="meta-block">${metaHTML}</div>` : ''}
 	        ${cnkxHTML}
 	        ${lockedSrcHTML}
 	        <div class="drawer-section rating-section" data-rating-key="${escape(favId(r))}">
