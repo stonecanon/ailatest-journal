@@ -2282,8 +2282,7 @@
 
   // 同步题头复选框状态 + 更新按钮标签
   function syncThChkState() {
-    // 先同步所有普通选项
-    document.querySelectorAll('.th-dropdown-panel .th-chk:not([data-select-all])').forEach(label => {
+    document.querySelectorAll('.th-dropdown-panel .th-chk').forEach(label => {
       const cb = label.querySelector('input[type=checkbox]');
       if (!cb) return;
       const filter = label.dataset.filter;
@@ -2298,21 +2297,13 @@
       else if (filter === 'abs') checked = activeAbs.has(val);
       cb.checked = checked;
     });
-    // 再同步全选：本组全部勾上则全选也勾
-    document.querySelectorAll('.th-dropdown-panel .th-chk[data-select-all]').forEach(allLabel => {
-      const panel = allLabel.closest('.th-dropdown-panel');
-      if (!panel) return;
-      const sibs = panel.querySelectorAll('label.th-chk:not([data-select-all]) input[type=checkbox]');
-      const allCb = allLabel.querySelector('input[type=checkbox]');
-      if (allCb) allCb.checked = sibs.length > 0 && [...sibs].every(cb => cb.checked);
-    });
     // 更新按钮标签（显示选中数量）
     document.querySelectorAll('.th-dropdown').forEach(dd => {
       const btn = dd.querySelector('.th-dropdown-btn');
       const panel = dd.querySelector('.th-dropdown-panel');
       if (!btn || !panel) return;
-      const checkedCount = panel.querySelectorAll('.th-chk:not([data-select-all]) input[type=checkbox]:checked').length;
-      const totalCount = panel.querySelectorAll('.th-chk:not([data-select-all]) input[type=checkbox]').length;
+      const checkedCount = panel.querySelectorAll('.th-chk input[type=checkbox]:checked').length;
+      const totalCount = panel.querySelectorAll('.th-chk input[type=checkbox]').length;
       const labelEl = btn.querySelector('.dd-label');
       if (!labelEl) return;
       const baseLabel = labelEl.textContent.replace(/\s*\(\d+\)\s*$/, '');
@@ -2439,31 +2430,6 @@
         const cb = label.querySelector('input[type=checkbox]');
         if (!cb) return;
         cb.addEventListener('change', () => {
-          // 全选：切换本组所有选项
-          if (label.dataset.selectAll === 'true') {
-            const panel = label.closest('.th-dropdown-panel');
-            if (!panel) return;
-            panel.querySelectorAll('label.th-chk:not([data-select-all])').forEach(sibLabel => {
-              const sibCb = sibLabel.querySelector('input[type=checkbox]');
-              if (!sibCb) return;
-              if (sibCb.checked !== cb.checked) {
-                sibCb.checked = cb.checked;
-                const sf = sibLabel.dataset.filter;
-                const sv = sibLabel.dataset.value;
-                if (sf === 'index') { if (cb.checked) activeIndices.add(sv); else activeIndices.delete(sv); }
-                else if (sf === 'feat') { if (cb.checked) activeFeats.add(sv); else activeFeats.delete(sv); }
-                else if (sf === 'jcr') { if (cb.checked) activeJcr.add(sv); else activeJcr.delete(sv); }
-                else if (sf === 'zone') { if (cb.checked) activeZones.add(sv); else activeZones.delete(sv); }
-                else if (sf === 'xr') { if (cb.checked) activeXr.add(sv); else activeXr.delete(sv); }
-                else if (sf === 'abdc') { if (cb.checked) activeAbdc.add(sv); else activeAbdc.delete(sv); }
-                else if (sf === 'abs') { if (cb.checked) activeAbs.add(sv); else activeAbs.delete(sv); }
-              }
-            });
-            shown = PAGE;
-            renderInt();
-            return;
-          }
-          // 普通选项
           const filter = label.dataset.filter;
           const val = label.dataset.value;
           if (filter === 'index') {

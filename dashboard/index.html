@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>AILatest Journal 运营看板</title>
-  <link rel="stylesheet" href="styles.css?v=20260531-2" />
+  <link rel="stylesheet" href="styles.css?v=20260531-3" />
 </head>
 <body>
   <div class="shell">
@@ -95,10 +95,10 @@
         <section class="traffic-summary" aria-label="访问概览">
           <div class="summary-copy">
             <div class="summary-metric">
-              <span>累计页面浏览量</span>
+              <span>主浏览量</span>
               <strong id="hero-pageviews">-</strong>
             </div>
-            <p>逐日访问是主指标。页面浏览量看页面被打开多少次，独立访客数看大概多少个不同的人来过，访问人次更接近“来了多少趟”。</p>
+            <p>优先显示 GA4 近 14 天页面浏览量；GA4 不可用时回退到 Cloudflare，再回退到第一方埋点。</p>
             <div class="mini-line" aria-hidden="true"></div>
           </div>
           <div class="grid traffic-kpis"></div>
@@ -168,6 +168,10 @@
             <div id="top-rated"></div>
           </article>
           <article class="card panel">
+            <h2>浏览最多的期刊详情页</h2>
+            <div id="top-journal-views"></div>
+          </article>
+          <article class="card panel">
             <h2>最近注册用户</h2>
             <div id="recent-users"></div>
           </article>
@@ -180,6 +184,6 @@
     </main>
   </div>
 
-  <script src="dashboard.js?v=20260531-2"></script>
+  <script src="dashboard.js?v=20260531-3"></script>
 </body>
 </html>

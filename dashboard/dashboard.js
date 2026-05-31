@@ -42,16 +42,45 @@ function latestTrafficRow(data) {
   return rows[0] || {};
 }
 
+function preferredTrafficTotals(data) {
+  const ga = data.google_analytics;
+  if (ga?.status === 'ok') {
+    return {
+      source: 'GA4 近 14 天',
+      pageviews: ga.totals?.pageviews,
+      visitors: ga.totals?.users,
+      sessions: ga.totals?.sessions,
+    };
+  }
+  const cf = data.cloudflare;
+  if (cf?.status === 'ok') {
+    return {
+      source: 'Cloudflare 近 14 天',
+      pageviews: cf.totals?.pageviews,
+      visitors: cf.totals?.visitors,
+      sessions: cf.totals?.requests,
+    };
+  }
+  return {
+    source: '第一方累计',
+    pageviews: data.kpis.total_pageviews,
+    visitors: data.kpis.total_visitors,
+    sessions: sumRows(data.series.pageviewsByDay, 'sessions'),
+  };
+}
+
 function renderTrafficKpis(data) {
   const k = data.kpis;
   const latest = latestTrafficRow(data);
   const sessions = sumRows(data.series.pageviewsByDay, 'sessions');
-  document.querySelector('#hero-pageviews').textContent = n(k.total_pageviews);
+  const preferred = preferredTrafficTotals(data);
+  document.querySelector('#hero-pageviews').textContent = n(preferred.pageviews);
   document.querySelector('.traffic-kpis').append(
+    kpi('看板主浏览量', n(preferred.pageviews), `${preferred.source} · 用户/访客 ${n(preferred.visitors)} · 会话/请求 ${n(preferred.sessions)}`, 'PV'),
     kpi('最近一天页面浏览量', n(latest.pageviews), latest.day ? `${latest.day} 页面被打开的次数` : '暂无访问记录', 'PV'),
     kpi('最近一天独立访客数', n(latest.visitors), '同一浏览器访客去重', 'UV'),
     kpi('最近一天访问人次', n(latest.sessions), '同一浏览器会话去重', 'S'),
-    kpi('累计浏览量 / 访客数', `${n(k.total_pageviews)} / ${n(k.total_visitors)}`, `累计访问人次 ${n(sessions)}`, 'Σ'),
+    kpi('第一方累计浏览 / 访客', `${n(k.total_pageviews)} / ${n(k.total_visitors)}`, `累计访问人次 ${n(sessions)}`, 'Σ'),
     kpi('最后一次浏览上报', fromUnixDateTime(k.latest_pageview_at), '远程 D1 page_events 最新记录', '↻'),
   );
 }
@@ -64,6 +93,7 @@ function renderSecondaryKpis(data) {
     kpi('GitHub / Google', `${n(k.github_users)} / ${n(k.google_users)}`, 'OAuth 注册来源', 'G'),
     kpi('收藏行为', n(k.favorite_rows), `${n(k.users_with_favorites)} 人使用收藏`, '☆'),
     kpi('评分行为', n(k.rating_rows), `${n(k.rated_journals)} 本期刊被评分`, '★'),
+    kpi('期刊详情浏览', n(k.total_journal_views), `${n(k.viewed_journals)} 本期刊被浏览 · 最高 ${n(k.max_journal_views)} 次`, 'J'),
   );
 }
 
@@ -249,6 +279,7 @@ function clearDynamicContent() {
     '#traffic-countries',
     '#top-favorites',
     '#top-rated',
+    '#top-journal-views',
     '#recent-users',
     '#daily-traffic',
     '#notes',
@@ -331,8 +362,9 @@ function renderGoogleAnalytics(data) {
   barList('#ga-top-countries', countries, 'country_label', 'users', '#34a853');
 }
 
-function renderDashboard(data) {
+async function renderDashboard(data) {
   clearDynamicContent();
+  await applyJournalNames(data);
   renderCloudflare(data);
   renderGoogleAnalytics(data);
   document.querySelector('#generated-at').textContent = dateFmt.format(new Date(data.generated_at));
@@ -384,6 +416,11 @@ function renderDashboard(data) {
     { title: '评分数', key: 'ratings' },
     { title: '均分', key: 'avg_rating' },
   ]);
+  table('#top-journal-views', data.tables_data.topJournalViews || [], [
+    { title: '期刊', render: row => row.label || row.journal_key },
+    { title: '浏览量', render: row => n(row.views) },
+    { title: '最后浏览', render: row => fromUnixDateTime(row.updated_at) },
+  ]);
   table('#recent-users', data.tables_data.recentUsers || [], [
     { title: 'ID', key: 'id' },
     { title: '来源', key: 'provider' },
@@ -430,6 +467,95 @@ const API_BASE = (function () {
 const SITE_BASE = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
   ? 'https://journal.ailatest.org' : location.origin;
 
+let journalNameIndexPromise = null;
+
+function cleanKey(value) {
+  return String(value || '').trim();
+}
+
+function normTitle(value) {
+  return cleanKey(value).toLowerCase().replace(/\s+/g, ' ');
+}
+
+function displayJournalName(row) {
+  return cleanKey(row.cn_name)
+    || cleanKey(row.name)
+    || cleanKey(row.en_name)
+    || cleanKey(row.title)
+    || cleanKey(row.abbr20)
+    || '';
+}
+
+function addJournalKeys(index, row) {
+  const name = displayJournalName(row);
+  if (!name) return;
+  const keys = [
+    row.issn,
+    row.eissn,
+    row.cn_code,
+    row.slug,
+    row.name,
+    row.en_name,
+    row.cn_name,
+    row.title,
+    row.abbr20,
+  ];
+  for (const key of keys) {
+    const cleaned = cleanKey(key);
+    if (cleaned && !index.has(cleaned)) index.set(cleaned, name);
+    const normalized = normTitle(key);
+    if (normalized && !index.has(normalized)) index.set(normalized, name);
+  }
+}
+
+async function dashboardFetchJSON(url) {
+  const resp = await fetch(url, { cache: 'force-cache' });
+  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  if (String(url).endsWith('.gz')) {
+    if (!('DecompressionStream' in window)) {
+      throw new Error('当前浏览器不支持 gzip 解压');
+    }
+    const stream = resp.body.pipeThrough(new DecompressionStream('gzip'));
+    return new Response(stream).json();
+  }
+  return resp.json();
+}
+
+async function loadJournalNameIndex() {
+  if (journalNameIndexPromise) return journalNameIndexPromise;
+  journalNameIndexPromise = (async () => {
+    const index = new Map();
+    const [international, domestic] = await Promise.all([
+      dashboardFetchJSON('/data/journals.json.gz').catch(() => dashboardFetchJSON('/data/journals.json').catch(() => [])),
+      dashboardFetchJSON('/data/domestic.json').catch(() => ({})),
+    ]);
+    for (const row of (Array.isArray(international) ? international : [])) addJournalKeys(index, row);
+    for (const rows of Object.values(domestic || {})) {
+      if (!Array.isArray(rows)) continue;
+      for (const row of rows) addJournalKeys(index, row);
+    }
+    return index;
+  })();
+  return journalNameIndexPromise;
+}
+
+async function applyJournalNames(data) {
+  const index = await loadJournalNameIndex().catch(() => new Map());
+  const rowsets = [
+    data.tables_data?.topFavorites,
+    data.tables_data?.topRated,
+    data.tables_data?.topJournalViews,
+  ];
+  for (const rows of rowsets) {
+    if (!Array.isArray(rows)) continue;
+    for (const row of rows) {
+      const key = cleanKey(row.journal_key);
+      const mapped = index.get(key) || index.get(normTitle(key));
+      if (mapped) row.label = mapped;
+    }
+  }
+}
+
 function ownerToken() {
   try {
     const u = JSON.parse(localStorage.getItem('ailatest.user') || 'null');
@@ -466,7 +592,7 @@ async function loadDashboardData() {
   }
   if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
   const data = await resp.json();
-  renderDashboard(data);
+  await renderDashboard(data);
 }
 
 async function refreshFromServer(button) {

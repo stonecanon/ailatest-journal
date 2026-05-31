@@ -2948,8 +2948,7 @@ body.journal-route .journal-not-found {
 }
 .th-dropdown-panel.open { display: block; }
 
-.th-dropdown-panel .th-chk,
-.th-dropdown-panel .th-chk-all {
+.th-dropdown-panel .th-chk {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -2959,31 +2958,18 @@ body.journal-route .journal-not-found {
   color: var(--ink);
   white-space: nowrap;
 }
-.th-dropdown-panel .th-chk:hover,
-.th-dropdown-panel .th-chk-all:hover {
+.th-dropdown-panel .th-chk:hover {
   background: var(--hover-bg, #f5f5f5);
 }
-.th-dropdown-panel .th-chk input,
-.th-dropdown-panel .th-chk-all input {
+.th-dropdown-panel .th-chk input {
   width: 13px;
   height: 13px;
   margin: 0;
   accent-color: var(--accent);
 }
-.th-dropdown-panel .th-chk:has(input:checked),
-.th-dropdown-panel .th-chk-all:has(input:checked) {
+.th-dropdown-panel .th-chk:has(input:checked) {
   color: var(--accent);
   font-weight: 600;
-}
-.th-dropdown-panel .th-chk-all {
-  opacity: 0.65;
-  font-size: 11px;
-  font-weight: 500;
-}
-.th-dropdown-panel .th-chk-all:has(input:checked) {
-  opacity: 1;
-  color: var(--accent);
-  font-weight: 700;
 }
 .dd-sep {
   height: 1px;

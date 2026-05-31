@@ -42,6 +42,7 @@ async function buildD1(env) {
   const [
     userTotals, providerMix, registrationsByDay, activeProxyByDay,
     favoritesSummary, topFavorites, ratingsSummary, topRated, listSummary,
+    journalViewsSummary, topJournalViews,
     loginEventsByDay, loginProviderMix, latestPageview, pageviewsByDay,
     topPaths, trafficCountries, recentUsers,
   ] = await Promise.all([
@@ -71,6 +72,11 @@ async function buildD1(env) {
         ROUND(AVG(json_array_length(ids_json)),2) AS avg_items_per_list,
         MAX(json_array_length(ids_json)) AS max_items_in_list
       FROM fav_lists`),
+    maybe('journal_views', `SELECT COUNT(*) AS viewed_journals, COALESCE(SUM(count),0) AS total_journal_views,
+        MAX(count) AS max_journal_views, MAX(updated_at) AS latest_journal_view_at
+      FROM journal_views`),
+    maybe('journal_views', `SELECT journal_key, count AS views, updated_at
+      FROM journal_views ORDER BY count DESC, updated_at DESC, journal_key ASC LIMIT 30`),
     maybe('login_events', `SELECT day, COUNT(*) AS login_events, COUNT(DISTINCT user_id) AS login_users
       FROM login_events GROUP BY day ORDER BY day`),
     maybe('login_events', `SELECT COALESCE(provider,'unknown') AS provider, COUNT(*) AS login_events,
@@ -120,6 +126,10 @@ async function buildD1(env) {
       avg_rating: scalar(ratingsSummary[0], 'avg_rating', 0),
       lists: scalar(listSummary[0], 'lists'),
       users_with_lists: scalar(listSummary[0], 'users_with_lists'),
+      viewed_journals: scalar(journalViewsSummary[0], 'viewed_journals'),
+      total_journal_views: scalar(journalViewsSummary[0], 'total_journal_views'),
+      max_journal_views: scalar(journalViewsSummary[0], 'max_journal_views'),
+      latest_journal_view_at: scalar(journalViewsSummary[0], 'latest_journal_view_at', null),
       total_pageviews: sumBy(pageviewsByDay, 'pageviews'),
       total_visitors: sumBy(pageviewsByDay, 'visitors'),
       total_cn_hint_events: sumBy(pageviewsByDay, 'cn_hint_events'),
@@ -135,6 +145,7 @@ async function buildD1(env) {
     tables_data: {
       topFavorites: enrich(topFavorites),
       topRated: enrich(topRated),
+      topJournalViews: enrich(topJournalViews),
       topPaths,
       trafficCountries,
       recentUsers: recentUsers.map(user => ({
