@@ -9,6 +9,7 @@
     window.__journalTabQueue.push(tab);
   };
   const fetchJSON = async (url) => {
+    if (typeof url === 'string' && url.startsWith('data/')) url = '/' + url;
     const resp = await fetch(url);
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
     if (url.endsWith('.gz')) {
@@ -722,6 +723,17 @@
       if (oaMap[k]) return oaMap[k];
     }
     return null;
+  }
+
+  function journalPathSlug(pathname = location.pathname) {
+    const m = pathname.match(/^\/journal\/([^/?#]+)\/?$/);
+    if (!m) return '';
+    try { return decodeURIComponent(m[1]); } catch (_) { return m[1]; }
+  }
+
+  function journalPublicPath(r) {
+    const slug = r?.slug || favId(r);
+    return slug ? `/journal/${encodeURIComponent(slug)}/` : '/';
   }
 
   let activeTab = 'home';
@@ -1854,12 +1866,11 @@
       badgeFlagship(r.flagship),
       ...((r.indices) || []).map(badgeIndex),
       badgeScopus(r.scopus),
-      badgeOAJ(r.oaj),
-      badgeDOAJ(r.doaj),
-      badgeMEDLINE(r.medline),
-      badgeFree(r.free),
-    ].filter(Boolean).join('');
-  }
+	      badgeOAJ(r.oaj),
+	      badgeDOAJ(r.doaj),
+	      badgeMEDLINE(r.medline),
+	    ].filter(Boolean).join('');
+	  }
   function renderRankBadges(r) {
     if (!r) return '';
     return [
@@ -3105,6 +3116,7 @@
     return null;
   }
   function applyHashRoute() {
+    if (journalPathSlug()) return;
     const hash = location.hash || '';
     // #fav → 收藏 tab
     if (hash === '#fav' || hash === '#favorites') {
@@ -3135,10 +3147,12 @@
     try { id = decodeURIComponent(m[1]); } catch (_) { id = m[1]; }
     if (_currentDrawerRec && favId(_currentDrawerRec) === id) return;
     const r = findRecByFid(id);
-    if (r) openDrawer(r, { fromHash: true });
+    if (r) openDrawer(r, { fromHash: true, pageMode: true });
   }
   async function openDrawer(r, opts) {
     _currentDrawerRec = r;
+    const pageMode = !!(opts && opts.pageMode);
+    document.body.classList.toggle('journal-route', pageMode);
     const drawer = $('#j-drawer'), scrim = $('#drawer-scrim'), body = $('#drawer-body');
     if (!drawer || !body) return;
     // 懒加载 OpenAlex 数据（首次打开抽屉时加载）
@@ -3162,9 +3176,10 @@
     const intRec = src === 'int' ? r : lookupInt(r);
     const ir = intRec || {};
     // 徽章块 — 分两行：索引收录 / 分区等级
-    const drawerIndexBadges = (src === 'int' || intRec) ? renderIndexBadges(ir) : '';
-    const drawerRankBadges = (src === 'int' || intRec) ? renderRankBadges(ir) : '';
-    const tierBadge = r.tier && /^T[123]$/.test(r.tier) ? badgeTier(r.tier)
+	    const drawerIndexBadges = (src === 'int' || intRec) ? renderIndexBadges(ir) : '';
+	    const drawerRankBadges = (src === 'int' || intRec) ? renderRankBadges(ir) : '';
+	    const titleFeatureBadges = (ir.free || r.free) ? badgeFree(true) : '';
+	    const tierBadge = r.tier && /^T[123]$/.test(r.tier) ? badgeTier(r.tier)
                     : r.tier ? `<span class="tier-pill t3">${escape(tn(r.tier, "tier"))}</span>` : '';
     const crossBadges = renderDomCrossBadges(r, src);
 
@@ -3184,6 +3199,75 @@
     if (ir.abdc && ir.abdc.rating) meta.push([T('ABDC 等级','ABDC Rating'), ir.abdc.rating + (ir.abdc.field ? ' · ' + ir.abdc.field : '')]);
     if (r.note) meta.push([T('备注','Note'), r.note]);
     const metaHTML = meta.map(([k,v]) => `<div class="meta-row"><div class="meta-k">${k}</div><div class="meta-v">${escape(v)}</div></div>`).join('');
+    const oa = ir.oa || lookupOA(ir.issn || ir.eissn ? ir : r);
+
+    const journalIntroHTML = (() => {
+      const officialText = r.official_desc || ir.official_desc || r.description || ir.description || '';
+      const cats = Array.isArray(ir.wos_categories) ? ir.wos_categories.slice(0, 3) : [];
+      const indexText = Array.isArray(ir.indices) && ir.indices.length ? ir.indices.join('/') : '';
+      const plainName = title;
+      const plainCats = cats.join(lang.startsWith('zh') ? '、' : ', ');
+      const major = ir.cas_major_cn || ir.jcr_cat || cats[0] || ir.esi_category || '';
+      const cnName = r.cn_name || ir.cn_name || '';
+      const abbr = r.abbr20 || ir.abbr20 || '';
+      const doajWeeks = parseFloat(r.doaj?.review_weeks || ir.doaj?.review_weeks);
+      const apcValue = oa?.apc || oa?.apc_usd || r.doaj?.fee || ir.doaj?.fee || r.doaj?.apc_amount || ir.doaj?.apc_amount || '';
+      const apcText = apcValue
+        ? (typeof apcValue === 'number'
+            ? (lang.startsWith('zh') ? `版面费 APC 约 ${apcValue.toLocaleString()} USD` : `APC is approximately ${apcValue.toLocaleString()} USD`)
+            : (lang.startsWith('zh') ? `版面费 APC：${apcValue}` : `APC: ${apcValue}`))
+        : '';
+      const reviewText = doajWeeks > 0
+        ? (lang.startsWith('zh')
+            ? `公开数据记录的投稿至出版周期约 ${(doajWeeks / 4.33).toFixed(1)} 个月（约 ${doajWeeks.toFixed(1)} 周）`
+            : `public data records an estimated submission-to-publication cycle of ${(doajWeeks / 4.33).toFixed(1)} months (${doajWeeks.toFixed(1)} weeks)`)
+        : '';
+      const oaText = (() => {
+        const label = oa?.l || oa?.label || '';
+        const isOa = ir.cas_oa || r.cas_oa || r.doaj || ir.doaj || label === 'gold_apc' || label === 'diamond';
+        if (lang.startsWith('zh')) {
+          if (label === 'hybrid') return '本刊为 Hybrid 期刊，可选择开放获取发表';
+          return isOa ? '本刊是一本 OA 开放访问期刊' : '本刊暂未标记为全 OA 开放访问期刊';
+        }
+        if (label === 'hybrid') return 'This is a hybrid journal with optional open access publishing';
+        return isOa ? 'This is an open access journal' : 'This journal is not currently marked as fully open access';
+      })();
+      const cnkxTiers = Array.isArray(ir.cnkx || r.cnkx)
+        ? (ir.cnkx || r.cnkx).map(x => x.tier).filter(Boolean)
+        : [];
+      const tierText = cnkxTiers.length ? `，并入选中国科协高质量科技期刊分级目录（${[...new Set(cnkxTiers)].join(' / ')}）` : '';
+      const topicList = (oa && Array.isArray(oa.tp) && oa.tp.length)
+        ? oa.tp.slice(0, 4)
+        : cats;
+      const fallbackText = lang.startsWith('zh')
+        ? [
+            `${plainName} 是一份国际专业期刊，致力于汇集全球范围内 ${major || plainCats || '相关学科'} 领域研究者，为其提供展示最新研究成果、交流学术思想的平台。`,
+            `${cnName ? `该期刊中文名称：${cnName}，` : ''}${abbr ? `国际简称：${abbr}，` : ''}${ir.cas_zone ? `在中科院分区表 2025 年版中大类学科位于 ${ir.cas_zone} 区${ir.cas_top ? '，为 Top 期刊' : ''}` : ''}${ir.if_quartile ? `；JCR 分区为 ${String(ir.if_quartile).toUpperCase()}` : ''}${ir.if_2024 != null ? `，影响因子 IF ${ir.if_2024}` : ''}${ir.if_rank ? `，IF 排名 ${ir.if_rank}` : ''}${tierText}。`,
+            `${oaText}${apcText ? `，${apcText}` : ''}${reviewText ? `，${reviewText}` : ''}。`,
+            `${topicList.length ? `期刊聚焦 ${topicList.join('、')} 等方向，` : ''}${indexText ? `目前收录于 ${indexText}。` : ''}`,
+          ].filter(Boolean).join(' ')
+        : [
+            `${plainName} is an international scholarly journal for researchers in ${major || plainCats || 'related fields'}, providing a venue for new research and academic exchange.`,
+            `${abbr ? `Abbreviation: ${abbr}. ` : ''}${ir.cas_zone ? `CAS 2025 major tier: ${ir.cas_zone}${ir.cas_top ? ' · Top' : ''}. ` : ''}${ir.if_quartile ? `JCR ${String(ir.if_quartile).toUpperCase()}. ` : ''}${ir.if_2024 != null ? `IF ${ir.if_2024}. ` : ''}${ir.if_rank ? `IF rank ${ir.if_rank}.` : ''}`,
+            `${oaText}${apcText ? `; ${apcText}` : ''}${reviewText ? `; ${reviewText}` : ''}.`,
+            `${topicList.length ? `Focus areas include ${topicList.join(', ')}. ` : ''}${indexText ? `Indexed in ${indexText}.` : ''}`,
+          ].filter(Boolean).join(' ');
+      const coverUrl = r.cover_url || ir.cover_url || r.official_cover_url || ir.official_cover_url || '';
+      const cover = coverUrl
+        ? `<img class="journal-cover-img" src="${escape(coverUrl)}" alt="${escape(title)} cover" loading="lazy" />`
+        : `<div class="journal-cover-fallback" aria-hidden="true">
+             <div class="journal-cover-mark">${escape((title || 'J').split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase())}</div>
+             <div class="journal-cover-name">${escape(title)}</div>
+             ${r.publisher ? `<div class="journal-cover-pub">${escape(r.publisher)}</div>` : ''}
+           </div>`;
+      return `<div class="journal-overview">
+        <div class="journal-overview-copy">
+          <h4>${officialText ? T('官方介绍','Official Description') : T('期刊概览','Journal Overview')}</h4>
+          <p>${officialText ? escape(officialText) : escape(fallbackText)}</p>
+        </div>
+        <div class="journal-cover">${cover}</div>
+      </div>`;
+    })();
 
     // 解锁源收录状态（高校自编目录 2023，已解锁才显示）
     const lockedSrcHTML = (() => {
@@ -3231,9 +3315,30 @@
       }
     }
     const ifNote = ir.if_2024 != null ? T('JCR 2025发布 · 2024指标','JCR 2025 rel. · 2024 metric') : '';
-    const statsHTML = stats.length ? `<div class="stats-grid">${stats.map(([k,v,sub]) =>
+    const statsHTML = stats.length ? `<div class="stats-grid stats-count-${Math.min(stats.length, 4)}">${stats.map(([k,v,sub]) =>
       `<div class="stat"><div class="stat-v">${escape(String(v))}</div><div class="stat-k">${k}</div>${sub?`<div class="stat-sub">${sub}</div>`:''}</div>`
     ).join('')}</div>${ifNote ? `<div class="stats-sub">${ifNote}</div>` : ''}` : '';
+
+    const jcrHTML = (() => {
+      const q = ir.if_quartile ? String(ir.if_quartile).toUpperCase() : '';
+      const mainCat = ir.jcr_cat || (Array.isArray(ir.jcr_cats) ? ir.jcr_cats[0] : '');
+      const cats = Array.isArray(ir.jcr_cats) && ir.jcr_cats.length
+        ? ir.jcr_cats
+        : (mainCat ? [mainCat] : []);
+      if (!mainCat && !cats.length && !q && !ir.if_rank) return '';
+      const majorLine = `<div class="cat-major-line">
+        <span class="cat-major-name">${T('JCR 主类','JCR Primary Category')}</span>
+        ${mainCat ? `<span class="cat-major-zone">${escape(mainCat)}</span>` : ''}
+        ${q ? `<span class="cat-major-zone jcr-${q.toLowerCase()}">${q}</span>` : ''}
+        ${ir.if_rank ? `<span class="cat-major-rank">${T('IF 排名','IF Rank')} ${escape(ir.if_rank)}</span>` : ''}
+      </div>`;
+      const items = cats.map(c => `<li>${escape(c)}${q ? ` · <b>${q}</b>` : ''}</li>`).join('');
+      return `<div class="drawer-section jcr-section">
+        <h4>${T('JCR 2025 学科分区','JCR 2025 Subject Categories')}</h4>
+        ${majorLine}
+        ${items ? `<div class="cat-sub-label">${T('小类 / 学科分类','Subject Categories')}</div><ul class="cas-sub-list">${items}</ul>` : ''}
+      </div>`;
+    })();
 
     // WoS 学科分类
     const wosHTML = (Array.isArray(ir.wos_categories) && ir.wos_categories.length)
@@ -3357,7 +3462,6 @@
     })();
 
     // OpenAlex enriched block (homepage / OA / APC)
-    const oa = ir.oa || lookupOA(ir.issn || ir.eissn ? ir : r);
     const oaHTML = oa ? (() => {
       const labelMap = {
         diamond:                 { text: T('Diamond OA · 读投全免费','Diamond OA · free to read & publish'),   cls: 'oa-diamond',  desc: T('由机构/基金全额资助，作者读者都不付费。','Fully funded by institutions / grants. No fees for authors or readers.') },
@@ -3452,53 +3556,66 @@
     const on = isFav(r);
     body.innerHTML = `
       <div class="drawer-hero">
-        <div class="drawer-title">${escape(title.replace(/\*$/,''))}</div>
-        ${sub ? `<div class="drawer-sub">${escape(sub)}</div>` : ''}
-        <div class="drawer-issn">
-          ${issn ? 'ISSN ' + escape(issn) : ''}${eissn ? ' · eISSN ' + escape(eissn) : ''}
-          <span class="drawer-views" id="drawer-views" data-fid="${escape(favId(r))}"></span>
-        </div>
-        ${drawerIndexBadges ? `<div class="drawer-section badges-section"><h4>${T('索引收录','Index Coverage')}</h4><div class="badges">${drawerIndexBadges}</div></div>` : ''}
-        ${(drawerRankBadges || tierBadge || crossBadges) ? `<div class="drawer-section badges-section"><h4>${T('分区等级','Tier & Ranking')}</h4><div class="badges">${drawerRankBadges}${tierBadge}${crossBadges}</div></div>` : ''}
-        <div class="drawer-actions">
-          <div class="rating-pill" data-rating-key="${escape(favId(r))}" title="${T('综合推荐评分','Overall rating')}">
-            <span class="rating-avg" id="rating-avg">—</span><span class="rating-avg-suffix">/ 5</span>
-            <span class="rating-avg-stars" id="rating-avg-stars"></span>
-            <span class="rating-count muted-cell" id="rating-count">${T('暂无评分','No ratings yet')}</span>
+        <div class="drawer-titlebar">
+          <div class="drawer-title-main">
+            <div class="drawer-title-line">
+              <div class="drawer-title">${escape(title.replace(/\*$/,''))}</div>
+              ${titleFeatureBadges ? `<div class="drawer-title-badges">${titleFeatureBadges}</div>` : ''}
+            </div>
+            ${sub ? `<div class="drawer-sub">${escape(sub)}</div>` : ''}
           </div>
-          <button class="big-btn ${on?'ghost':'primary'}" id="drawer-fav-big">${on ? T('★ 已收藏（点击取消）','★ Favorited (click to remove)') : T('☆ 加入收藏','☆ Add to favorites')}</button>
-          ${favLists.length > 1 ? `<div class="drawer-fav-select">
-            <span class="muted-cell" style="font-size:12px">${T('保存到：','Save to:')}</span>
-            <select id="drawer-fav-list-select">${favLists.map(l => `<option value="${escape(l.id)}" ${l.id===activeListId?'selected':''}>${escape(favListDisplayName(l))} (${l.ids.length})</option>`).join('')}</select>
-          </div>` : ''}
+          <div class="drawer-actions">
+            <div class="rating-pill" data-rating-key="${escape(favId(r))}" title="${T('综合推荐评分','Overall rating')}">
+              <span class="rating-avg" id="rating-avg">—</span><span class="rating-avg-suffix">/ 5</span>
+              <span class="rating-avg-stars" id="rating-avg-stars"></span>
+              <span class="rating-count muted-cell" id="rating-count">${T('暂无评分','No ratings yet')}</span>
+            </div>
+            <button class="big-btn ${on?'ghost':'primary'}" id="drawer-fav-big">${on ? T('★ 已收藏（点击取消）','★ Favorited (click to remove)') : T('☆ 加入收藏','☆ Add to favorites')}</button>
+            ${favLists.length > 1 ? `<div class="drawer-fav-select">
+              <span class="muted-cell" style="font-size:12px">${T('保存到：','Save to:')}</span>
+              <select id="drawer-fav-list-select">${favLists.map(l => `<option value="${escape(l.id)}" ${l.id===activeListId?'selected':''}>${escape(favListDisplayName(l))} (${l.ids.length})</option>`).join('')}</select>
+            </div>` : ''}
+          </div>
         </div>
-      </div>
-      ${statsHTML}
-      ${casHTML}
-      ${xrHTML}
-      ${wosHTML}
-      ${scopusHTML}
-      ${eiHTML}
-      ${oajHTML}
-      ${doajHTML}
-      ${pubmedHTML}
-      ${pmcHTML}
-      ${cycleHTML}
-      ${oaHTML}
-      ${topicsHTML}
-      ${warnHTML}
-      ${metaHTML ? `<div class="meta-block">${metaHTML}</div>` : ''}
-      ${cnkxHTML}
-      ${lockedSrcHTML}
-      <div class="drawer-section rating-section" data-rating-key="${escape(favId(r))}">
-        <h4>${T('我的评分','My Rating')}</h4>
-        <div class="rating-my-wrap">
-          <div class="rating-stars-input" id="rating-input" role="radiogroup" aria-label="${T('评分','Rating')}"></div>
-          <div class="rating-my-hint muted-cell" id="rating-hint">${T('登录后可打分 · 半星可评 · 可随时修改','Sign in to rate · half-stars supported · editable anytime')}</div>
-        </div>
-      </div>
-      ${renderRelatedHTML(r)}
-    `;
+	        <div class="drawer-issn">
+	          ${issn ? 'ISSN ' + escape(issn) : ''}${eissn ? ' · eISSN ' + escape(eissn) : ''}
+	          <span class="drawer-views" id="drawer-views" data-fid="${escape(favId(r))}"></span>
+	        </div>
+	        ${journalIntroHTML}
+	        ${(drawerIndexBadges || drawerRankBadges || tierBadge || crossBadges) ? `<div class="hero-badge-grid">
+	          ${drawerIndexBadges ? `<div class="drawer-section badges-section"><h4>${T('索引收录','Index Coverage')}</h4><div class="badges">${drawerIndexBadges}</div></div>` : ''}
+	          ${(drawerRankBadges || tierBadge || crossBadges) ? `<div class="drawer-section badges-section"><h4>${T('分区等级','Tier & Ranking')}</h4><div class="badges">${drawerRankBadges}${tierBadge}${crossBadges}</div></div>` : ''}
+	        </div>` : ''}
+	      </div>
+	      ${statsHTML}
+	      <div class="journal-detail-masonry">
+	        ${jcrHTML}
+	        ${casHTML}
+	        ${xrHTML}
+	        ${wosHTML}
+	        ${scopusHTML}
+	        ${eiHTML}
+	        ${oajHTML}
+	        ${doajHTML}
+	        ${pubmedHTML}
+	        ${pmcHTML}
+	        ${cycleHTML}
+	        ${oaHTML}
+	        ${topicsHTML}
+	        ${warnHTML}
+	        ${metaHTML ? `<div class="meta-block">${metaHTML}</div>` : ''}
+	        ${cnkxHTML}
+	        ${lockedSrcHTML}
+	        <div class="drawer-section rating-section" data-rating-key="${escape(favId(r))}">
+	          <h4>${T('我的评分','My Rating')}</h4>
+	          <div class="rating-my-wrap">
+	            <div class="rating-stars-input" id="rating-input" role="radiogroup" aria-label="${T('评分','Rating')}"></div>
+	            <div class="rating-my-hint muted-cell" id="rating-hint">${T('登录后可打分 · 半星可评 · 可随时修改','Sign in to rate · half-stars supported · editable anytime')}</div>
+	          </div>
+	        </div>
+	      </div>
+	      ${renderRelatedHTML(r)}
+	    `;
     // init rating widget
     setTimeout(() => initRatingWidget(favId(r)), 0);
     // related journal cards → click to open that journal's drawer
@@ -3508,7 +3625,7 @@
         const rec = journals.find(j => favId(j) === fid) || favsData[fid];
         if (rec) {
           if (_currentDrawerRec) _drawerStack.push(_currentDrawerRec);
-          openDrawer(rec);
+          openDrawer(rec, { pageMode: document.body.classList.contains('journal-route') });
         }
       });
     });
@@ -3531,7 +3648,7 @@
           updateFavCount();
           if (typeof syncFavs === 'function') syncFavs();
         }
-        openDrawer(r); // refresh drawer state
+        openDrawer(r, { pageMode: document.body.classList.contains('journal-route') }); // refresh state
         // 同步主表星号
         document.querySelectorAll(`.fav-star[data-fav="${fid}"]`).forEach(btn => {
           const now = isFav(r);
@@ -3545,7 +3662,7 @@
       // If user selected a different list in dropdown, switch first
       if (drawerListSel && drawerListSel.value !== activeListId) switchList(drawerListSel.value);
       toggleFav(r, { src });
-      openDrawer(r); // 刷新状态
+      openDrawer(r, { pageMode: document.body.classList.contains('journal-route') }); // 刷新状态
       document.querySelectorAll(`.fav-star[data-fav="${favId(r)}"]`).forEach(btn => {
         const now = isFav(r);
         btn.classList.toggle('on', now);
@@ -3572,33 +3689,95 @@
     }
 
     drawer.classList.add('open');
-    scrim?.classList.add('on');
-    scrim && (scrim.hidden = false);
+    drawer.classList.toggle('journal-page', pageMode);
+    if (pageMode) {
+      scrim?.classList.remove('on');
+      if (scrim) scrim.hidden = true;
+    } else {
+      scrim?.classList.add('on');
+      scrim && (scrim.hidden = false);
+    }
     drawerOpen = true;
-    // 同步 URL hash（仅当非来自 hash 路由时），便于分享
-    if (!opts || !opts.fromHash) {
+    if (pageMode) {
+      const nextPath = journalPublicPath(r);
+      if (location.pathname !== nextPath) {
+        try { history.pushState({ journal: favId(r) }, '', nextPath); } catch (_) {}
+      }
+      updateJournalSeo(r);
+    } else if (!opts || !opts.fromHash) {
       const id = favId(r);
       const newHash = '#j/' + encodeURIComponent(id);
       if (location.hash !== newHash) {
         try { history.replaceState(null, '', newHash); } catch (_) { location.hash = newHash; }
       }
     }
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = pageMode ? '' : 'hidden';
   }
   function closeDrawer(skipHashClear) {
     if (!drawerOpen) return;
-    $('#j-drawer')?.classList.remove('open');
+    $('#j-drawer')?.classList.remove('open', 'journal-page');
     const scrim = $('#drawer-scrim');
     scrim?.classList.remove('on');
     if (scrim) scrim.hidden = true;
     drawerOpen = false;
     _currentDrawerRec = null;
+    document.body.classList.remove('journal-route');
     document.body.style.overflow = '';
     // 清掉 #j/<id> hash（避免回到列表后浏览器仍显示旧 hash）
     if (!skipHashClear && /^#j\//.test(location.hash || '')) {
       try { history.replaceState(null, '', location.pathname + location.search); }
       catch (_) { location.hash = ''; }
     }
+  }
+
+  function updateJournalSeo(r) {
+    const name = titleCase((r.name || r.cn_name || 'Journal').replace(/\*$/, ''));
+    const bits = [name];
+    if (r.if_2024 != null) bits.push(`IF ${r.if_2024}`);
+    if (r.cas_zone) bits.push(`CAS ${r.cas_zone}${T('区','')}`);
+    if (r.if_quartile) bits.push(`JCR ${String(r.if_quartile).toUpperCase()}`);
+    bits.push('AILatest Journal');
+    const title = bits.join(' | ');
+    document.title = title;
+    const descParts = [name];
+    if (r.publisher) descParts.push(r.publisher);
+    if (r.issn) descParts.push(`ISSN ${r.issn}`);
+    if (Array.isArray(r.indices) && r.indices.length) descParts.push(r.indices.join('/'));
+    const descText = `${descParts.join(' · ')}. 查看影响因子、中科院分区、JCR 分区、索引收录、开放获取、版面费与相关期刊推荐。`;
+    const desc = document.querySelector('meta[name="description"]');
+    if (desc) desc.setAttribute('content', descText);
+    const canonical = document.querySelector('link[rel="canonical"]');
+    if (canonical) canonical.setAttribute('href', 'https://journal.ailatest.org' + journalPublicPath(r));
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    if (ogTitle) ogTitle.setAttribute('content', title);
+    const ogDesc = document.querySelector('meta[property="og:description"]');
+    if (ogDesc) ogDesc.setAttribute('content', descText);
+    const ogUrl = document.querySelector('meta[property="og:url"]');
+    if (ogUrl) ogUrl.setAttribute('content', 'https://journal.ailatest.org' + journalPublicPath(r));
+  }
+
+  function renderJournalRoutePage() {
+    const slug = journalPathSlug();
+    if (!slug) return false;
+    const rec = findRecByFid(slug);
+    if (!rec) {
+      document.body.classList.add('journal-route');
+      const drawer = $('#j-drawer'), body = $('#drawer-body'), scrim = $('#drawer-scrim');
+      if (drawer && body) {
+        drawer.classList.add('open', 'journal-page');
+        scrim?.classList.remove('on');
+        if (scrim) scrim.hidden = true;
+        body.innerHTML = `<div class="journal-not-found">
+          <div class="drawer-kicker">${T('期刊详情','Journal Details')}</div>
+          <h1>${T('没有找到这个期刊','Journal not found')}</h1>
+          <p>${T('这个链接可能已过期，或者该期刊不在当前数据库中。','This link may be stale, or the journal is not in the current database.')}</p>
+          <a class="big-btn primary" href="/">${T('返回首页','Back to home')}</a>
+        </div>`;
+      }
+      return true;
+    }
+    openDrawer(rec, { pageMode: true, fromPath: true });
+    return true;
   }
 
   // ───────── favorites tab ─────────
@@ -4564,7 +4743,10 @@
       e.preventDefault();
       activateTab(b.dataset.tab);
     }));
-    window.addEventListener('popstate', () => activateTab(tabFromPath(), { skipPath: true }));
+    window.addEventListener('popstate', () => {
+      if (renderJournalRoutePage()) return;
+      activateTab(tabFromPath(), { skipPath: true });
+    });
 
     // Favorites header link → <a href="#fav"> works natively, hashchange handled below
 
@@ -4790,12 +4972,20 @@
       const row = e.target.closest('tr.j-row.clickable'); if (!row) return;
       const fid = row.dataset.fid;
       const rec = rowRecordsByFid[fid] || journals.find(r => favId(r) === fid) || favsData[fid];
-      if (rec) openDrawer(rec);
+      if (rec) openDrawer(rec, { pageMode: true });
     });
-    $('#drawer-close')?.addEventListener('click', () => closeDrawer());
+    $('#drawer-close')?.addEventListener('click', () => {
+      if (document.body.classList.contains('journal-route')) {
+        try { history.pushState({ tab: 'int' }, '', '/international'); } catch (_) {}
+        closeDrawer(true);
+        activateTab('int', { skipPath: true });
+        return;
+      }
+      closeDrawer();
+    });
     $('#drawer-back')?.addEventListener('click', () => {
       const prev = _drawerStack.pop();
-      if (prev) openDrawer(prev);
+      if (prev) openDrawer(prev, { pageMode: document.body.classList.contains('journal-route') });
     });
     $('#drawer-scrim')?.addEventListener('click', () => closeDrawer());
     // 复制当前期刊的分享链接 + 生成卡片图片
@@ -5446,10 +5636,10 @@
     try {
       const [j, d, m, esi, aliases] = await Promise.all([
         fetchJSON('data/journals.json.gz'),
-        fetch('data/domestic.json').then(r => r.json()).catch(() => null),
-        fetch('data/meta.json').then(r => r.json()).catch(() => null),
-        fetch('data/esi_categories.json').then(r => r.json()).catch(() => []),
-        fetch('data/journal_aliases.json').then(r => r.json()).catch(() => DEFAULT_JOURNAL_ALIASES),
+        fetch('/data/domestic.json').then(r => r.json()).catch(() => null),
+        fetch('/data/meta.json').then(r => r.json()).catch(() => null),
+        fetch('/data/esi_categories.json').then(r => r.json()).catch(() => []),
+        fetch('/data/journal_aliases.json').then(r => r.json()).catch(() => DEFAULT_JOURNAL_ALIASES),
       ]);
       setJournalAliases(aliases);
       journals = j; domestic = d; meta = m; esiCats = esi; oaMap = null;
@@ -5488,6 +5678,11 @@
         : `${journals.length.toLocaleString()} journals loaded`;
       renderCatList();
       renderWosList();
+      if (renderJournalRoutePage()) {
+        window.addEventListener('hashchange', applyHashRoute);
+        if (user) await pullFavs();
+        return;
+      }
       if (window.__activateJournalTab) window.__activateJournalTab(tabFromPath(), { skipPath: true });
       else renderInt();
       // 启用 #j/<id> 深链

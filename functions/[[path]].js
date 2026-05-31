@@ -23,8 +23,19 @@ function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-function journalPage(j, slug, origin) {
-  const name = j.n || 'Journal';
+function titleCaseName(s) {
+  return String(s || '').toLowerCase().replace(/\b([a-z])/g, (_, c) => c.toUpperCase());
+}
+
+async function loadAppShell(ctx) {
+  const req = new Request('https://journal.ailatest.org/index.html');
+  const resp = await ctx.env.ASSETS.fetch(req);
+  if (!resp.ok) throw new Error(`App shell fetch: ${resp.status}`);
+  return resp.text();
+}
+
+function journalSeo(j, slug, origin) {
+  const name = titleCaseName(j.n || 'Journal');
   const ifVal = j.f;
   const quartile = j.q;
   const indices = j.ix || [];
@@ -32,45 +43,49 @@ function journalPage(j, slug, origin) {
 
   const titleParts = [name];
   if (ifVal != null) titleParts.push(`IF ${ifVal}`);
+  if (j.z != null) titleParts.push(`CAS ${j.z}区`);
   if (quartile) titleParts.push(quartile.toUpperCase());
-  if (indices.length) titleParts.push(indices.slice(0, 3).join('/'));
+  if (indices.length) titleParts.push(indices.slice(0, 2).join('/'));
   titleParts.push('AILatest Journal');
   const title = titleParts.join(' | ');
 
-  let desc = `${esc(name)}`;
+  let desc = `${name}`;
   if (ifVal != null) desc += `: impact factor ${ifVal}`;
+  if (j.z != null) desc += `, CAS ${j.z}区`;
   if (quartile) desc += `, JCR ${quartile.toUpperCase()}`;
   if (indices.length) desc += `, indexed in ${indices.join('/')}`;
-  if (j.p) desc += `. Published by ${esc(j.p)}`;
+  if (j.p) desc += `. Published by ${j.p}`;
   desc += `. ISSN: ${issn}.`;
   if (desc.length > 300) desc = desc.slice(0, 297) + '...';
 
-  const metaRows = [];
-  if (issn) metaRows.push(`<tr><td style="padding:4px 8px 4px 0;color:#666">ISSN</td><td>${esc(issn)}</td></tr>`);
-  if (ifVal != null) metaRows.push(`<tr><td style="padding:4px 8px 4px 0;color:#666">IF 2024</td><td>${ifVal}</td></tr>`);
-  if (quartile) metaRows.push(`<tr><td style="padding:4px 8px 4px 0;color:#666">JCR</td><td>${quartile.toUpperCase()}</td></tr>`);
-  if (indices.length) metaRows.push(`<tr><td style="padding:4px 8px 4px 0;color:#666">Indexing</td><td>${esc(indices.join(', '))}</td></tr>`);
-  if (j.p) metaRows.push(`<tr><td style="padding:4px 8px 4px 0;color:#666">Publisher</td><td>${esc(j.p)}</td></tr>`);
+  return {
+    title,
+    desc,
+    url: `${origin}/journal/${slug}/`,
+  };
+}
 
-  return `<!doctype html>
-<html lang="en">
-<head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>${esc(title)}</title>
-<meta name="description" content="${esc(desc)}" />
-<link rel="canonical" href="${origin}/journal/${slug}/" />
-<meta property="og:title" content="${esc(title)}" />
-<meta property="og:description" content="${esc(desc)}" />
-<meta name="robots" content="index,follow" />
-<style>body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;margin:0;padding:24px;background:#fafafa;color:#222;line-height:1.6}.card{max-width:680px;margin:0 auto;background:#fff;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.08);padding:24px}</style>
-</head>
-<body><div class="card">
-<h1 style="margin:0 0 8px;font-size:20px">${esc(name)}</h1>
-<div style="font-size:13px;color:#888;margin-bottom:16px">ISSN: ${esc(issn)}</div>
-<table style="font-size:14px;width:100%">${metaRows.join('')}</table>
-<a href="${origin}/" style="display:inline-block;margin-top:16px;padding:8px 20px;background:#2563eb;color:#fff;text-decoration:none;border-radius:6px">← Back to Journal Search</a>
-<script>window.location.replace("${origin}/#j/${encodeURIComponent(j.sl || slug)}")</script>
-</div></body>
-</html>`;
+function replaceMeta(html, selector, replacement) {
+  if (selector.test(html)) return html.replace(selector, replacement);
+  return html.replace('</head>', `${replacement}\n</head>`);
+}
+
+async function journalPage(ctx, j, slug, origin) {
+  const seo = journalSeo(j, slug, origin);
+  let html = await loadAppShell(ctx);
+  html = html
+    .replace(/<title>[\s\S]*?<\/title>/i, `<title>${esc(seo.title)}</title>`);
+  html = replaceMeta(html, /<meta name="description" content="[^"]*"\s*\/?>/i, `<meta name="description" content="${esc(seo.desc)}" />`);
+  html = replaceMeta(html, /<link rel="canonical" href="[^"]*"\s*\/?>/i, `<link rel="canonical" href="${esc(seo.url)}" />`);
+  html = replaceMeta(html, /<meta property="og:url" content="[^"]*"\s*\/?>/i, `<meta property="og:url" content="${esc(seo.url)}" />`);
+  html = replaceMeta(html, /<meta property="og:title" content="[^"]*"\s*\/?>/i, `<meta property="og:title" content="${esc(seo.title)}" />`);
+  html = replaceMeta(html, /<meta property="og:description" content="[^"]*"\s*\/?>/i, `<meta property="og:description" content="${esc(seo.desc)}" />`);
+  html = replaceMeta(html, /<meta name="twitter:title" content="[^"]*"\s*\/?>/i, `<meta name="twitter:title" content="${esc(seo.title)}" />`);
+  html = replaceMeta(html, /<meta name="twitter:description" content="[^"]*"\s*\/?>/i, `<meta name="twitter:description" content="${esc(seo.desc)}" />`);
+  if (!/<meta name="robots"/i.test(html)) {
+    html = html.replace('</head>', '<meta name="robots" content="index,follow" />\n</head>');
+  }
+  return html;
 }
 
 export async function onRequest(ctx) {
@@ -101,7 +116,7 @@ export async function onRequest(ctx) {
         return Response.redirect(url.origin + '/journal/' + j._r + '/', 301);
       }
 
-      const html = journalPage(j, slug, url.origin);
+      const html = await journalPage(ctx, j, slug, url.origin);
       return new Response(html, {
         headers: { 'Content-Type': 'text/html;charset=utf-8',
                    'Cache-Control': 'public, max-age=3600, s-maxage=86400' }
