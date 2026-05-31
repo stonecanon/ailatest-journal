@@ -543,11 +543,7 @@ main.main {
   white-space: nowrap;
 }
 .home-brand-row [data-i18n="brand_title"] {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
   line-height: 1.15;
-  text-align: right;
 }
 .home-logo-mark {
   width: clamp(42px, 5vw, 58px);
