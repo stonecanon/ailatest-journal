@@ -1945,6 +1945,12 @@
         }
         return `<span class="warn-pill">⚠ Warning</span>`;
       }
+      function badgeUnderReview() {
+        return `<span class="under-review-pill">Under Review</span>`;
+      }
+      function badgeOnHold() {
+        return `<span class="on-hold-pill">On Hold</span>`;
+      }
 
   // 统一标签组合：主页 / 收藏页 / 抽屉 / 分享卡片共用同一批 badge 函数与 CSS 类。
   function renderIndexBadges(r) {
@@ -1969,6 +1975,8 @@
       badgeABS(r.abs),
         // cnkx tier badges removed — now handled by renderDomCrossBadges via domIndex
       r.warning ? badgeWarn(r.warning, true) : '',
+      r.under_review ? badgeUnderReview() : '',
+      r.on_hold ? badgeOnHold() : '',
     ].filter(Boolean).join('');
   }
   function renderBadgeCell(indexBadges, rankBadges) {
@@ -2125,7 +2133,9 @@
       if (!((activeFeats.has('oaj') && r.oaj) || (activeFeats.has('doaj') && r.doaj) ||
             (activeFeats.has('medline') && r.medline) ||
             (activeFeats.has('free') && r.free) ||
-            (activeFeats.has('warning') && r.warning))) return false;
+            (activeFeats.has('warning') && r.warning) ||
+            (activeFeats.has('under_review') && r.under_review) ||
+            (activeFeats.has('on_hold') && r.on_hold))) return false;
     }
     if (activeZones.size) {
       const zones = new Set();
@@ -2166,6 +2176,8 @@
     if (activeFeats.has('medline') && !r.medline) return false;
     if (activeFeats.has('free') && !r.free) return false;
     if (activeFeats.has('warning') && !r.warning) return false;
+    if (activeFeats.has('under_review') && !r.under_review) return false;
+    if (activeFeats.has('on_hold') && !r.on_hold) return false;
     if (activeFeats.has('abdc') && !(r.abdc && r.abdc.rating)) return false;
     if (activeFeats.has('abs')  && !(r.abs  && r.abs.rating))  return false;
     if (activeCat !== '__all' && r.esi_category !== activeCat) return false;
@@ -5879,15 +5891,35 @@
     // 分享着陆页：/s/<id> 直接接管 main，不走主流程
     if (await maybeRenderShareLanding()) return;
     try {
-      const [j, d, m, esi, aliases] = await Promise.all([
+      const [j, d, m, esi, aliases, underReviewIssns, onHoldIssns] = await Promise.all([
         fetchJSON('data/journals.json.gz'),
         fetch('/data/domestic.json').then(r => r.json()).catch(() => null),
         fetch('/data/meta.json').then(r => r.json()).catch(() => null),
         fetch('/data/esi_categories.json').then(r => r.json()).catch(() => []),
         fetch('/data/journal_aliases.json').then(r => r.json()).catch(() => DEFAULT_JOURNAL_ALIASES),
+        fetch('/data/under_review_issn.json').then(r => r.json()).catch(() => []),
+        fetch('/data/on_hold_issn.json').then(r => r.json()).catch(() => []),
       ]);
       setJournalAliases(aliases);
       journals = j; domestic = d; meta = m; esiCats = esi; oaMap = null;
+      // Build Under Review lookup set
+      const underReviewSet = new Set((underReviewIssns||[]).map(s => s.replace(/[^0-9xX]/gi,'').toLowerCase()));
+      journals.forEach(r => {
+        const issnClean = (r.issn||'').replace(/[^0-9xX]/gi,'').toLowerCase();
+        const eissnClean = (r.eissn||'').replace(/[^0-9xX]/gi,'').toLowerCase();
+        if (underReviewSet.has(issnClean) || underReviewSet.has(eissnClean)) {
+          r.under_review = true;
+        }
+      });
+      // Build On Hold lookup set
+      const onHoldSet = new Set((onHoldIssns||[]).map(s => s.replace(/[^0-9xX]/gi,'').toLowerCase()));
+      journals.forEach(r => {
+        const issnClean = (r.issn||'').replace(/[^0-9xX]/gi,'').toLowerCase();
+        const eissnClean = (r.eissn||'').replace(/[^0-9xX]/gi,'').toLowerCase();
+        if (onHoldSet.has(issnClean) || onHoldSet.has(eissnClean)) {
+          r.on_hold = true;
+        }
+      });
       journals.forEach(journalSearchMeta);
       buildDomIndex(domestic);
       buildIntIndex(journals);
@@ -5905,7 +5937,7 @@
                 cas_zone: live.cas_zone, cas_top: live.cas_top, indices: live.indices,
                 flagship: live.flagship, esi_category: live.esi_category,
                 if_quartile: live.if_quartile, publisher: live.publisher, ccf: live.ccf,
-                scopus: live.scopus, warning: live.warning,
+                scopus: live.scopus, warning: live.warning, under_review: live.under_review, on_hold: live.on_hold,
               };
               dirty = true;
             }
