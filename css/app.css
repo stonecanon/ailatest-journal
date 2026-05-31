@@ -2151,9 +2151,8 @@ body.journal-route .j-drawer.journal-page {
   overflow: visible;
 }
 
-/* very small screens: hide these columns to fit table */
+/* very small screens: scroll horizontally to see all columns */
 @media (max-width: 480px) {
-  .col-cycle, .col-wos { display: none; }
   .col-badge { width: 100px; min-width: 100px; }
   .col-badge-split { width: 100px; min-width: 100px; }
 }
