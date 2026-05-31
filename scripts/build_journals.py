@@ -1469,7 +1469,9 @@ def main():
             gz_size = (DATA_DIR / 'oa.json.gz').stat().st_size
             print(f'  oa.json: {oa_size/1024/1024:.1f} MB → oa.json.gz: {gz_size/1024/1024:.1f} MB')
 
-        # ────── Embed "free" flag from OpenAlex diamond label ──────
+        # ────── Embed "free" flag from OpenAlex OA labels ──────
+        # free = any journal that offers OA (diamond, gold_apc, hybrid) — excludes pure subscription
+        OA_FREE_LABELS = {'diamond', 'gold_apc', 'hybrid'}
         oa_gz = DATA_DIR / 'oa.json.gz'
         if oa_gz.exists():
             with open(oa_gz, 'rb') as f:
@@ -1478,7 +1480,7 @@ def main():
             for r in journals:
                 for k in ('issn', 'eissn'):
                     v = r.get(k, '')
-                    if v and v in oa_data and oa_data[v].get('l') == 'diamond':
+                    if v and v in oa_data and oa_data[v].get('l') in OA_FREE_LABELS:
                         r['free'] = True
                         free_count += 1
                         break
@@ -1488,7 +1490,7 @@ def main():
             with open(DATA_DIR / 'journals.json', 'rb') as fin:
                 with gzip.open(DATA_DIR / 'journals.json.gz', 'wb', compresslevel=9) as fout:
                     shutil.copyfileobj(fin, fout)
-            print(f'  Free-to-publish flag: {free_count} journals (diamond OA, no APC)')
+            print(f'  Free-to-publish flag: {free_count} journals (diamond/gold/hybrid OA)')
     else:
         print('  skip: merge_openalex.py or openalex_cache.json not found')
     return 0

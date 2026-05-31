@@ -1693,7 +1693,7 @@
   }
   function badgeFree(f) {
     if (!f) return '';
-    return `<span class="badge b-free" title="${T('可免费发表（Diamond OA，无版面费）','Free to publish (Diamond OA, no APC)')}">${T('免费发表','FREE')}</span>`;
+    return `<span class="badge b-free" title="${T('提供 OA 发表选项（含 Diamond/Gold/Hybrid）','Offers OA publishing option (Diamond/Gold/Hybrid)')}">${T('免费发表','FREE')}</span>`;
   }
   // 期刊浏览量缓存（journal_key → count）
   const viewsCache = {};
@@ -1996,7 +1996,7 @@
   /* ───────── FREE badge helper ───────── */
   function freeBadgeCell(r) {
     return r.free
-      ? `<span class="badge b-free" title="${T('可免费发表（Diamond OA，无版面费）','Free to publish (Diamond OA, no APC)')}">${T('免费发表','FREE')}</span>`
+      ? `<span class="badge b-free" title="${T('提供 OA 发表选项（含 Diamond/Gold/Hybrid）','Offers OA publishing option (Diamond/Gold/Hybrid)')}">${T('免费发表','FREE')}</span>`
       : '<span class="muted-cell">&mdash;</span>';
   }
 
@@ -3375,7 +3375,7 @@
       const apcText = (ir.doaj?.apc === 'Yes' && doajFee) ? doajFee : (ir.doaj?.apc === 'Yes' ? T('有 APC','Has APC') : '');
       const doajBadge = doaj ? `<span class="oa-chip oa-doaj">&check; ${T('收录 DOAJ','In DOAJ')}</span>` : '';
       const isoaBadge = isoa ? '<span class="oa-chip oa-isoa">Open Access</span>' : '';
-      const freeBadge = r.free ? `<span class="oa-chip oa-free" title="${T('可免费发表（Diamond OA，作者不付费）','Free to publish (Diamond OA, no author fees)')}">${T('✓ 免费发表','✓ FREE')}</span>` : '';
+      const freeBadge = r.free ? `<span class="oa-chip oa-free" title="${T('提供 OA 发表选项（含 Diamond/Gold/Hybrid）','Offers OA publishing option (Diamond/Gold/Hybrid)')}">${T('✓ 免费发表','✓ FREE')}</span>` : '';
       const rows = [];
       if (homepage) rows.push([T('官网','Website'), `<a href="${escape(homepage)}" target="_blank" rel="noopener nofollow">${escape(homepage.replace(/^https?:\/\//,'').replace(/\/$/,''))}</a>`]);
       if (apcText) rows.push([T('版面费 (APC)','APC'), escape(apcText)]);
