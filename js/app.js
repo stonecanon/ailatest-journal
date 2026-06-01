@@ -2451,6 +2451,27 @@
         renderInt();
       });
     }
+    // 表头学科下拉：填充 topicList（WoS + OA 合并）
+    const wosSel = $('#wos-col-filter');
+    if (wosSel) {
+      wosSel.innerHTML = `<option value="__all">${T('学科 / 主题','Topic')}</option>` +
+        topicList.map(v => `<option value="${escape(v.name)}">${escape(v.name)}</option>`).join('');
+      if (!wosSel.__bound) {
+        wosSel.__bound = true;
+        wosSel.addEventListener('change', () => {
+          activeTopics.clear();
+          if (wosSel.value !== '__all') activeTopics.add(wosSel.value);
+          $$('#topic-list input[type=checkbox]').forEach(cb => { cb.checked = activeTopics.has(cb.value); });
+          $$('.wos-item').forEach(el => {
+            const v = el.querySelector('input')?.value;
+            el.classList.toggle('on', !!v && activeTopics.has(v));
+          });
+          shown = PAGE;
+          renderInt();
+        });
+      }
+    }
+    if (wosSel) wosSel.value = activeTopics.size === 1 ? [...activeTopics][0] : '__all';
     // 同步题头复选框状态与 Sets 一致
     syncThChkState();
     // 题头下拉复选框筛选：复选框直接操作 Sets
@@ -5060,7 +5081,8 @@
             persistFavLists(false);
             applyI18n();
             // 重置列头下拉的__bound标记，使其下次用新语言重建
-            renderTopicList();
+            const wosSel2 = $('#wos-col-filter'); if (wosSel2) wosSel2.__bound = false;
+            renderCatList();
             if (activeTab === 'dom') renderDomestic();
             else if (activeTab === 'fav') renderFav();
             else if (activeTab === 'int') renderInt();

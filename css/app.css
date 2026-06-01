@@ -970,10 +970,11 @@ body.topbar-compact .results-head {
   width: 30%;
   min-width: 240px;
 }
-.col-topic { font-size: 12px; line-height: 1.4; width: 110px; max-width: 110px; overflow: hidden; color: var(--ink-soft); font-family: var(--sans); }
+.col-wos, .col-topic { font-size: 12px; line-height: 1.4; width: 110px; max-width: 110px; overflow: hidden; color: var(--ink-soft); font-family: var(--sans); }
+.col-esi .th-select, .col-wos .th-select { max-width: 100%; box-sizing: border-box; text-overflow: ellipsis; overflow: hidden; }
 td.col-topic { white-space: normal; word-break: break-word; }
 @media (max-width: 768px) {
-  .col-topic { width: 90px; max-width: 90px; font-size: 11px; }
+  .col-wos, .col-topic { width: 90px; max-width: 90px; font-size: 11px; }
 }
 .col-if {
   font-family: var(--sans);
