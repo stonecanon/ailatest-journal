@@ -90,6 +90,7 @@ h1{font-size:20px;margin:0 0 6px;font-weight:700;letter-spacing:-.01em}
 table{width:100%;border-collapse:collapse;font-size:13px}
 th{text-align:left;padding:10px 12px;border-bottom:2px solid var(--rule);font-weight:700;white-space:nowrap;color:var(--ink);font-size:11px;letter-spacing:.04em;text-transform:uppercase;background:var(--bg)}
 td{padding:8px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+td.row-num{text-align:center;color:var(--ink-soft);font-size:11px;width:32px;min-width:32px}
 tr:last-child td{border-bottom:0}
 tr:hover td{background:#faf8f4}
 a{color:var(--accent);text-decoration:none;font-weight:500}
@@ -142,23 +143,25 @@ def match_subject(j, wos_name):
     cats = j.get('wos_categories') or []
     return wos_name in cats
 
-def build_table_row(j, origin, headers, extra_cells=None):
+def build_table_row(j, origin, headers, extra_cells=None, seq=0):
     slug = make_slug(j)
     name = j.get('name') or j.get('en_name') or j.get('cn_name') or ''
     if_v = j.get('if_2024')
     q = (j.get('if_quartile') or '').upper()
     z = f"{j.get('cas_zone')}区" if j.get('cas_zone') is not None else '—'
-    idx = ', '.join((j.get('indices') or [])[:4]) or '—'
+    inds = ', '.join((j.get('indices') or [])[:4]) or '—'
     pub = j.get('publisher') or '—'
     issn = j.get('issn') or '—'
     cells = []
     ec = iter(extra_cells or [])
     for h in headers:
-        if h == 'name': cells.append(f'<td><a href="{origin}/journal/{esc(slug)}/">{esc(name)}</a></td>')
+        if h == 'num':
+            cells.append(f'<td class="row-num">{seq}</td>')
+        elif h == 'name': cells.append(f'<td><a href="{origin}/journal/{esc(slug)}/">{esc(name)}</a></td>')
         elif h == 'if': cells.append(f'<td>{esc(str(if_v)) if if_v is not None else "—"}</td>')
         elif h == 'q': cells.append(f'<td>{esc(q) if q else "—"}</td>')
         elif h == 'z': cells.append(f'<td>{esc(z)}</td>')
-        elif h == 'idx': cells.append(f'<td>{esc(idx)}</td>')
+        elif h == 'idx': cells.append(f'<td>{esc(inds)}</td>')
         elif h == 'pub': cells.append(f'<td>{esc(pub)}</td>')
         elif h == 'issn': cells.append(f'<td>{esc(issn)}</td>')
         elif h == 'status': cells.append(f'<td>{next(ec, "")}</td>')
@@ -170,9 +173,9 @@ def generate_subjects(journals, origin):
         matched.sort(key=lambda x: -(x.get('if_2024') or -1))
         top = matched[:100]
 
-        headers = ['name', 'if', 'q', 'z', 'idx', 'pub']
-        th_html = ''.join(f'<th>{esc(h)}</th>' for h in ['Journal Name', 'IF', 'JCR Q', 'CAS', 'Indexing', 'Publisher'])
-        rows_html = '\n'.join(build_table_row(j, origin, headers) for j in top)
+        headers = ['num', 'name', 'if', 'q', 'z', 'idx', 'pub']
+        th_html = ''.join(f'<th>{esc(h)}</th>' for h in ['#', 'Journal Name', 'IF', 'JCR Q', 'CAS', 'Indexing', 'Publisher'])
+        rows_html = '\n'.join(build_table_row(j, origin, headers, seq=i+1) for i, j in enumerate(top))
 
         total = len(matched)
         seo_title = f'{title} Journals — Impact Factor & Quartile | AILatest Journal'
@@ -210,8 +213,8 @@ def generate_indexes(journals, origin):
         top = matched[:200]
         if table_type == 'status':
             # 状态列表：加 Status 徽章列
-            headers = ['name', 'if', 'q', 'z', 'status', 'pub']
-            th_html = ''.join(f'<th>{esc(h)}</th>' for h in ['Journal Name', 'IF', 'JCR Q', 'CAS', 'Status', 'Publisher'])
+            headers = ['num', 'name', 'if', 'q', 'z', 'status', 'pub']
+            th_html = ''.join(f'<th>{esc(h)}</th>' for h in ['#', 'Journal Name', 'IF', 'JCR Q', 'CAS', 'Status', 'Publisher'])
             def status_badge(j):
                 if slug == 'under-review': return '<span class="pill pill-under-review">新锐 Under Review</span>'
                 if slug == 'on-hold': return '<span class="pill pill-on-hold">WoS On Hold</span>'
@@ -230,13 +233,13 @@ def generate_indexes(journals, origin):
                     return '<span class="pill pill-warning">中科院预警</span>'
                 return ''
             rows_html = '\n'.join(
-                build_table_row(j, origin, headers, extra_cells=[status_badge(j)]) for j in top
+                build_table_row(j, origin, headers, extra_cells=[status_badge(j)], seq=i+1) for i, j in enumerate(top)
             )
             seo_title = f'{title} | AILatest Journal'
         else:
-            headers = ['name', 'if', 'q', 'z', 'issn', 'pub']
-            th_html = ''.join(f'<th>{esc(h)}</th>' for h in ['Journal Name', 'IF', 'JCR Q', 'CAS', 'ISSN', 'Publisher'])
-            rows_html = '\n'.join(build_table_row(j, origin, headers) for j in top)
+            headers = ['num', 'name', 'if', 'q', 'z', 'issn', 'pub']
+            th_html = ''.join(f'<th>{esc(h)}</th>' for h in ['#', 'Journal Name', 'IF', 'JCR Q', 'CAS', 'ISSN', 'Publisher'])
+            rows_html = '\n'.join(build_table_row(j, origin, headers, seq=i+1) for i, j in enumerate(top))
             seo_title = f'{title} Indexed Journals | AILatest Journal'
         seo_desc = desc
         canonical = f'{origin}/indexes/{slug}/'
