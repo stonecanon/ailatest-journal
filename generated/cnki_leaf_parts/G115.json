@@ -1,0 +1,98 @@
+{
+  "category": {
+    "code": "G115",
+    "title": "宪法",
+    "count": 5,
+    "major_code": "",
+    "major_title": ""
+  },
+  "pages": [
+    {
+      "page": 1,
+      "rows": 5,
+      "pageCount": 1
+    }
+  ],
+  "records": [
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "宪法",
+      "category_code": "G115",
+      "page": 1,
+      "title": "反歧视评论",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINdvj2NaIoVz4MOKmpPRvB78ZefYBjPc0VDQTyDikAkHx-Sdi_6rH0c4RFITYoLo-UWSE2hGN-6Imt14Uu3or275u1VZ9KhJhLASTpZi5LZfQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "",
+      "cn": "",
+      "sponsor": "中国政法大学人权研究院",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "宪法",
+      "category_code": "G115",
+      "page": 1,
+      "title": "法制现代化研究",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINdvj2NaIoVz4MOKmpPRvB78ZefYBjPc0VDQTyDikAkHx-Sdi_6rH0c4RFITYoLo-Vz5sbG-xMIV7z4nSANSJ8kz_3mMAabGqOQhfy1y4dV3Q==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "",
+      "cn": "",
+      "sponsor": "南京师范大学法学院;法制现代化研究中心",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "宪法",
+      "category_code": "G115",
+      "page": 1,
+      "title": "立法前沿",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINdvj2NaIoVz4MOKmpPRvB78ZefYBjPc0VDQTyDikAkHx-Sdi_6rH0c4RFITYoLo-UnIS01fMMPLMgUqLFHINjPS00OIqwn6BlP78AkZQpCVw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "",
+      "cn": "",
+      "sponsor": "浙江省法制研究所",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "宪法",
+      "category_code": "G115",
+      "page": 1,
+      "title": "岳麓法学评论",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINdvj2NaIoVz4MOKmpPRvB78ZefYBjPc0VDQTyDikAkHx-Sdi_6rH0c4RFITYoLo-WfFwpQq5xw6yaJ7_tpMePBgXp1IA7aMQK_ZrIxbaWboQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "",
+      "cn": "",
+      "sponsor": "湖南大学法学院",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "宪法",
+      "category_code": "G115",
+      "page": 1,
+      "title": "中国宪法年刊",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINdvj2NaIoVz4MOKmpPRvB78ZefYBjPc0VDQTyDikAkHx-Sdi_6rH0c4RFITYoLo-U-tr7HLXp7-ThgJvxz_Os7U942xKejihqspa7ynh2IRA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "",
+      "cn": "",
+      "sponsor": "中国宪法学研究会",
+      "tags": []
+    }
+  ]
+}

@@ -1,12 +1,19 @@
 {
   "pages": [
-    "pages/index/index"
+    "pages/index/index",
+    "pages/detail/detail",
+    "pages/rankings/rankings",
+    "pages/ranklist/ranklist",
+    "pages/filter/filter",
+    "pages/favorites/favorites",
+    "pages/folder/folder",
+    "pages/profile/profile"
   ],
   "window": {
-    "navigationBarTitleText": "Journal Search",
-    "navigationBarBackgroundColor": "#FAFBFD",
+    "navigationBarTitleText": "JournalAI分区速查",
+    "navigationBarBackgroundColor": "#FFF9F1",
     "navigationBarTextStyle": "black",
-    "backgroundColor": "#FAFBFD"
+    "backgroundColor": "#FFF9F1"
   },
   "sitemapLocation": "sitemap.json",
   "lazyCodeLoading": "requiredComponents"

@@ -1,0 +1,33 @@
+<view class="paper-bg">
+  <view class="safe-page page-pad">
+    <view class="profile-card card">
+      <view class="avatar">AI</view>
+      <view class="profile-main">
+        <view class="name">{{loggedIn ? user.name : '未登录'}}</view>
+        <view class="desc">{{loggedIn ? user.email : '登录后同步收藏、浏览记录和荐刊次数'}}</view>
+      </view>
+      <button class="login-btn" bindtap="signIn">{{loggedIn ? '已登录' : '登录'}}</button>
+    </view>
+
+    <view class="stats-card card">
+      <view wx:for="{{stats}}" wx:key="label" class="stat-item">
+        <strong>{{item.value}}</strong>
+        <text>{{item.label}}</text>
+      </view>
+    </view>
+
+    <view class="menu card">
+      <view class="menu-row" bindtap="goTab" data-url="/pages/favorites/favorites"><text>我的收藏</text><strong>查看</strong></view>
+      <view class="menu-row"><text>浏览记录</text><strong>待同步</strong></view>
+      <view class="menu-row"><text>荐刊记录</text><strong>待同步</strong></view>
+      <view class="menu-row"><text>版本</text><strong>MVP 预览版</strong></view>
+    </view>
+  </view>
+
+  <view class="bottom-tabs">
+    <view class="bottom-tab" bindtap="goTab" data-url="/pages/index/index"><text class="tab-icon">⌂</text><text>首页</text></view>
+    <view class="bottom-tab" bindtap="goTab" data-url="/pages/rankings/rankings"><text class="tab-icon">☷</text><text>榜单</text></view>
+    <view class="bottom-tab" bindtap="goTab" data-url="/pages/favorites/favorites"><text class="tab-icon">♡</text><text>收藏</text></view>
+    <view class="bottom-tab active"><text class="tab-icon">♙</text><text>我的</text></view>
+  </view>
+</view>

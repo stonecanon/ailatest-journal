@@ -1,0 +1,107 @@
+.page-pad {
+  padding-top: 56rpx;
+}
+
+.profile-card {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  padding: 30rpx;
+}
+
+.avatar {
+  width: 92rpx;
+  height: 92rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 22rpx;
+  background: #ffe5cf;
+  color: #f05a14;
+  font-size: 40rpx;
+  font-weight: 900;
+}
+
+.profile-main {
+  min-width: 0;
+  flex: 1;
+}
+
+.name {
+  color: #171717;
+  font-size: 34rpx;
+  font-weight: 900;
+}
+
+.desc {
+  margin-top: 8rpx;
+  color: #6f6a64;
+  font-size: 25rpx;
+}
+
+.login-btn {
+  width: 116rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999rpx;
+  background: linear-gradient(180deg, #ff6a1a 0%, #ef4d00 100%);
+  color: #fff;
+  font-size: 24rpx;
+  font-weight: 850;
+}
+
+.stats-card {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin-top: 22rpx;
+  padding: 24rpx 0;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6rpx;
+  border-right: 1rpx solid #f0e6da;
+}
+
+.stat-item:last-child {
+  border-right: 0;
+}
+
+.stat-item strong {
+  color: #171717;
+  font-size: 36rpx;
+  font-weight: 900;
+}
+
+.stat-item text {
+  color: #756d64;
+  font-size: 23rpx;
+}
+
+.menu {
+  margin-top: 24rpx;
+  padding: 10rpx 28rpx;
+}
+
+.menu-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 24rpx;
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid #f0e6da;
+  color: #756d64;
+}
+
+.menu-row:last-child {
+  border-bottom: 0;
+}
+
+.menu-row strong {
+  color: #171717;
+  font-weight: 700;
+  text-align: right;
+}

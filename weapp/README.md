@@ -1,65 +1,42 @@
-# AILatest Journal 微信小程序
+# 分区速查微信小程序
 
-基于 WebView 包装的微信小程序，直接加载 [journal.ailatest.org](https://journal.ailatest.org/)。
+原生微信小程序 MVP，不使用网页嵌入组件。当前风格沿用网站的暖白学术橙：米白纸张背景、浅网格、黑色标题、橙色搜索按钮、期刊指标卡片。
 
-## 开发准备
+## 页面
 
-### 1. 注册小程序账号
-- 前往 [mp.weixin.qq.com](https://mp.weixin.qq.com) 注册个人开发者账号
-- 年费 **30 元/年**
-- 获取 **AppID**（在开发 → 开发设置中查看）
-
-### 2. 安装微信开发者工具
-- 下载地址：https://developers.weixin.qq.com/miniprogram/dev/devtools/download.html
-- macOS 选稳定版（Stable Build）
-
-### 3. 配置域名白名单
-在微信公众平台 → 开发 → 开发管理 → 服务器域名：
-- `request` 白名单添加：`https://journal.ailatest.org`
-- `web-view` 业务域名添加：`https://journal.ailatest.org`
-
-> ⚠️ 如果使用 web-view 组件，必须在「业务域名」中添加 journal.ailatest.org
-
-### 4. 导入项目
-1. 打开微信开发者工具
-2. 项目 → 导入项目
-3. 目录选择 `weapp/` 文件夹
-4. 填入 AppID（project.config.json 中也要改）
-5. 点击导入
-
-### 5. 本地预览
-- 编译后即可在模拟器/真机预览
-- web-view 需要真机调试才能完整显示
-
-## 项目结构
-
-```
+```text
 weapp/
-├── project.config.json    # 项目配置（需填入 AppID）
-├── app.json               # 全局配置
-├── app.js                 # 生命周期
-├── app.wxss               # 全局样式
-├── sitemap.json           # 搜索索引
+├── app.json
+├── app.wxss
 └── pages/
-    └── index/
-        ├── index.wxml     # 主页面（web-view）
-        ├── index.js       # 页面逻辑（加载/错误处理/分享）
-        ├── index.wxss     # 页面样式
-        └── index.json     # 页面配置
+    ├── index/   # 首页：搜索、热门词、快捷筛选、期刊列表
+    └── detail/  # 详情：索引、分区、IF、期刊概览、基本信息
 ```
 
-## 重要注意事项
+## 数据接入
 
-### 分享
-- 当前支持分享给 **好友/群**
-- **不支持分享到朋友圈**（原生 Page 分享才支持朋友圈，web-view 页面无法实现）
-- 如果需要朋友圈分享，需要额外做一个原生落地页
+页面会优先请求：
 
-### 小程序审核提醒
-- 类目选「工具 > 信息查询」或「教育 > 教育信息服务」
-- 数据来源在网站底部已有标注（Web of Science / Scopus / CAS / 中科院等），审核时如果有疑问可以提供
-- 名称避免「刊」字可能更安全
+```text
+GET https://api.ailatest.org/journals/search
+GET https://api.ailatest.org/journals/:slug
+```
 
-### 更新
-- 网站更新后，小程序自动加载最新内容（无需发版）
-- 如果修改了小程序代码（如配置文件），需要重新提交审核
+当前 API 未就绪时会自动使用内置示例数据，方便先在微信开发者工具里确认视觉、布局和交互骨架。
+
+## 小程序后台配置
+
+在小程序后台添加 request 合法域名：
+
+```text
+https://api.ailatest.org
+```
+
+不需要配置业务域名。
+
+## 导入项目
+
+1. 打开微信开发者工具。
+2. 导入 `weapp/` 目录。
+3. 将 `project.config.json` 里的 `appid` 替换成真实 AppID。
+4. 编译预览。

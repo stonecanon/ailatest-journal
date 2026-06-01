@@ -1,0 +1,114 @@
+<view class="detail-page">
+  <view class="hero">
+    <view class="cover {{journal.logoTone}}">{{journal.initials}}</view>
+    <view class="hero-main">
+      <view class="title">{{journal.title}}</view>
+      <view class="meta">ISSN {{journal.issn}} <text wx:if="{{journal.eissn}}"> eISSN {{journal.eissn}}</text></view>
+      <view class="publisher">{{journal.publisher}}</view>
+    </view>
+    <view class="fav-box">
+      <view class="fav-star">★</view>
+      <view>收藏</view>
+    </view>
+  </view>
+
+  <view class="badge-row">
+    <text wx:for="{{journal.badges}}" wx:key="*this" class="badge {{index === 0 ? 'badge-green' : index === 1 ? 'badge-blue' : index === 2 ? 'badge-orange' : 'badge-teal'}}">{{item}}</text>
+  </view>
+
+  <view class="metric-card card">
+    <view class="metric">
+      <text>IF</text>
+      <strong>{{journal.ifText}}</strong>
+      <small>2025 年发布</small>
+    </view>
+    <view class="metric">
+      <text>JCR</text>
+      <strong>{{journal.jcr}}</strong>
+      <small>{{journal.jcrCat}}</small>
+    </view>
+    <view class="metric">
+      <text>中科院分区</text>
+      <strong>{{journal.cas}}</strong>
+      <small>{{journal.casMajor}}</small>
+    </view>
+  </view>
+
+  <view class="mini-facts">
+    <text>新锐分区：{{journal.xinrui}}</text>
+    <text>科协分级：{{journal.cnkx}}</text>
+    <text>ABDC：{{journal.abdc}}</text>
+    <text>CCF：{{journal.ccf}}</text>
+  </view>
+
+  <view class="section card">
+    <view class="section-title">期刊概览</view>
+    <view class="overview">{{journal.overview}}</view>
+  </view>
+
+  <view class="section card">
+    <view class="section-title">分区与排名</view>
+    <view class="info-row"><text>JCR 主类</text><strong>{{journal.jcrCat}} · {{journal.jcr}}</strong></view>
+    <view class="info-row"><text>JCR 小类</text><strong>{{journal.jcrSubcategories.join('；')}}</strong></view>
+    <view class="info-row"><text>中科院大类</text><strong>{{journal.casMajor}} · {{journal.cas}}</strong></view>
+    <view class="info-row"><text>中科院小类</text><strong>{{journal.casSubcategories.join('；')}}</strong></view>
+    <view class="info-row"><text>新锐分区</text><strong>{{journal.xinrui}}</strong></view>
+    <view class="info-row"><text>科协分级</text><strong>{{journal.cnkx}}</strong></view>
+  </view>
+
+  <view class="section card">
+    <view class="section-title">索引与数据库</view>
+    <view class="info-row"><text>Scopus ID</text><strong>{{journal.scopusId}}</strong></view>
+    <view class="info-row"><text>ESI 高被引学科</text><strong>{{journal.esiSubject}}</strong></view>
+    <view class="info-row"><text>PubMed</text><strong>{{journal.pubmed}}</strong></view>
+    <view class="info-row"><text>PMC 全文存档</text><strong>{{journal.pmc}}</strong></view>
+  </view>
+
+  <view class="section card">
+    <view class="section-title">学科与主题</view>
+    <view class="chip-title">Web of Science 分类</view>
+    <view class="detail-chips">
+      <text wx:for="{{journal.wosSubjects}}" wx:key="*this">{{item}}</text>
+    </view>
+    <view class="chip-title" wx:if="{{journal.eiSubjects.length}}">EI Compendex 主题</view>
+    <view class="detail-chips" wx:if="{{journal.eiSubjects.length}}">
+      <text wx:for="{{journal.eiSubjects}}" wx:key="*this">{{item}}</text>
+    </view>
+    <view class="chip-title" wx:if="{{journal.mainFields.length}}">主要研究领域</view>
+    <view class="detail-chips" wx:if="{{journal.mainFields.length}}">
+      <text wx:for="{{journal.mainFields}}" wx:key="*this">{{item}}</text>
+    </view>
+  </view>
+
+  <view class="section card">
+    <view class="section-title">开放获取 / 版面费</view>
+    <view class="info-row"><text>发表费用</text><strong>{{journal.freeText}}</strong></view>
+    <view class="info-row"><text>OA 情况</text><strong>{{journal.oa}}</strong></view>
+    <view class="info-row"><text>APC 费用</text><strong>{{journal.apc}}</strong></view>
+    <view class="info-row"><text>官网</text><strong>{{journal.website}}</strong></view>
+  </view>
+
+  <view class="section card">
+    <view class="section-title">基本信息</view>
+    <view class="info-row"><text>期刊简称</text><strong>{{journal.initials}}</strong></view>
+    <view class="info-row"><text>出版商</text><strong>{{journal.publisher}}</strong></view>
+    <view class="info-row"><text>国家/地区</text><strong>{{journal.country}}</strong></view>
+    <view class="info-row"><text>出版周期</text><strong>{{journal.frequency}}</strong></view>
+    <view class="info-row"><text>审稿周期</text><strong>{{journal.reviewCycle}}</strong></view>
+    <view class="info-row"><text>已发表论文</text><strong>{{journal.publishedWorks}}</strong></view>
+  </view>
+
+  <view class="section card">
+    <view class="section-title">评级与风险</view>
+    <view class="info-row"><text>ABDC</text><strong>{{journal.abdc}}</strong></view>
+    <view class="info-row"><text>ABS</text><strong>{{journal.abs || '-'}}</strong></view>
+    <view class="info-row"><text>CCF</text><strong>{{journal.ccf}}</strong></view>
+    <view class="info-row"><text>中科院预警</text><strong>{{journal.warning}}</strong></view>
+    <view class="info-row"><text>中信所预警</text><strong>{{journal.citicWarning}}</strong></view>
+  </view>
+
+  <view class="action-bar">
+    <button class="primary-action">☆ 加入收藏</button>
+    <button class="plain-action" open-type="share">分享</button>
+  </view>
+</view>

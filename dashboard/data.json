@@ -1,0 +1,954 @@
+{
+  "generated_at": "2026-05-31T01:31:23.128Z",
+  "source": "remote D1",
+  "notes": [
+    "注册量来自 users.created_at，当前是最可靠口径。",
+    "每日登录人数来自 login_events；部署 0005 migration 和新版 Worker 后开始累积。",
+    "埋点上线前，active_users_proxy 使用 users.updated_at 作为粗略活跃代理，不等同真实登录。",
+    "页面浏览量：同一人刷新或打开多个页面会重复计数。",
+    "独立访客数：按浏览器本地匿名访客标识去重，同一人换设备或清缓存会被算作新访客。",
+    "访问人次：按浏览器会话去重，更接近“来了多少趟”。",
+    "浏览量来自访问事件表；前端埋点上线后开始累积页面浏览量、独立访客数、访问人次、路径和访问网络出口地区。",
+    "访问网络出口地区来自 Cloudflare 对请求 IP 的国家/地区识别，更接近 VPN、代理或运营商出口位置，不等同真实所在地。",
+    "新版埋点会额外记录浏览器时区和语言，可辅助判断中国用户，例如 Asia/Shanghai 或 zh-CN。",
+    "疑似中国访问按浏览器时区 Asia/Shanghai 或语言 zh-* 粗略判断，可用于弥补 VPN、代理和 Pages 中转导致的 IP 出口偏差。",
+    "Cloudflare 后台的地区流量包含所有静态资源、接口、机器人和历史请求；站内埋点只统计成功运行网页脚本并上报的访问。"
+  ],
+  "tables": [
+    "_cf_KV",
+    "d1_migrations",
+    "email_codes",
+    "fav_lists",
+    "favorites",
+    "journal_views",
+    "login_events",
+    "page_events",
+    "pick_usage",
+    "ratings",
+    "shares",
+    "sqlite_sequence",
+    "user_quotas",
+    "users"
+  ],
+  "kpis": {
+    "total_users": 16,
+    "users_with_email": 11,
+    "email_users": 8,
+    "github_users": 5,
+    "google_users": 3,
+    "first_signup_at": 1778628305,
+    "latest_signup_at": 1780072333,
+    "favorite_rows": 38,
+    "users_with_favorites": 6,
+    "avg_favorites_per_active_user": 6.33,
+    "rating_rows": 23,
+    "users_with_ratings": 5,
+    "rated_journals": 18,
+    "avg_rating": 4.46,
+    "lists": 8,
+    "users_with_lists": 8,
+    "total_pageviews": 935,
+    "total_visitors": 257,
+    "total_cn_hint_events": 467,
+    "total_cn_hint_visitors": 124,
+    "total_cn_hint_sessions": 229,
+    "total_login_events": 25,
+    "latest_pageview_at": 1780161211
+  },
+  "series": {
+    "providerMix": [
+      {
+        "provider": "email",
+        "users": 8
+      },
+      {
+        "provider": "github",
+        "users": 5
+      },
+      {
+        "provider": "google",
+        "users": 3
+      }
+    ],
+    "registrationsByDay": [
+      {
+        "day": "2026-05-12",
+        "signups": 1
+      },
+      {
+        "day": "2026-05-13",
+        "signups": 2
+      },
+      {
+        "day": "2026-05-14",
+        "signups": 1
+      },
+      {
+        "day": "2026-05-19",
+        "signups": 1
+      },
+      {
+        "day": "2026-05-20",
+        "signups": 2
+      },
+      {
+        "day": "2026-05-21",
+        "signups": 3
+      },
+      {
+        "day": "2026-05-22",
+        "signups": 2
+      },
+      {
+        "day": "2026-05-26",
+        "signups": 3
+      },
+      {
+        "day": "2026-05-29",
+        "signups": 1
+      }
+    ],
+    "activeProxyByDay": [
+      {
+        "day": "2026-05-13",
+        "active_users_proxy": 2
+      },
+      {
+        "day": "2026-05-19",
+        "active_users_proxy": 1
+      },
+      {
+        "day": "2026-05-20",
+        "active_users_proxy": 2
+      },
+      {
+        "day": "2026-05-21",
+        "active_users_proxy": 3
+      },
+      {
+        "day": "2026-05-22",
+        "active_users_proxy": 2
+      },
+      {
+        "day": "2026-05-26",
+        "active_users_proxy": 3
+      },
+      {
+        "day": "2026-05-27",
+        "active_users_proxy": 1
+      },
+      {
+        "day": "2026-05-29",
+        "active_users_proxy": 1
+      },
+      {
+        "day": "2026-05-30",
+        "active_users_proxy": 1
+      }
+    ],
+    "loginEventsByDay": [
+      {
+        "day": "2026-05-20",
+        "login_events": 5,
+        "login_users": 3
+      },
+      {
+        "day": "2026-05-21",
+        "login_events": 3,
+        "login_users": 3
+      },
+      {
+        "day": "2026-05-22",
+        "login_events": 2,
+        "login_users": 2
+      },
+      {
+        "day": "2026-05-25",
+        "login_events": 3,
+        "login_users": 1
+      },
+      {
+        "day": "2026-05-26",
+        "login_events": 4,
+        "login_users": 3
+      },
+      {
+        "day": "2026-05-27",
+        "login_events": 2,
+        "login_users": 2
+      },
+      {
+        "day": "2026-05-29",
+        "login_events": 3,
+        "login_users": 2
+      },
+      {
+        "day": "2026-05-30",
+        "login_events": 3,
+        "login_users": 1
+      }
+    ],
+    "loginProviderMix": [
+      {
+        "provider": "google",
+        "login_events": 13,
+        "login_users": 2
+      },
+      {
+        "provider": "github",
+        "login_events": 6,
+        "login_users": 5
+      },
+      {
+        "provider": "email",
+        "login_events": 6,
+        "login_users": 5
+      }
+    ],
+    "pageviewsByDay": [
+      {
+        "day": "2026-05-20",
+        "pageviews": 258,
+        "sessions": 94,
+        "visitors": 49,
+        "cn_hint_events": 0,
+        "cn_hint_visitors": 0,
+        "cn_hint_sessions": 0
+      },
+      {
+        "day": "2026-05-21",
+        "pageviews": 199,
+        "sessions": 86,
+        "visitors": 63,
+        "cn_hint_events": 22,
+        "cn_hint_visitors": 9,
+        "cn_hint_sessions": 11
+      },
+      {
+        "day": "2026-05-22",
+        "pageviews": 62,
+        "sessions": 48,
+        "visitors": 37,
+        "cn_hint_events": 50,
+        "cn_hint_visitors": 25,
+        "cn_hint_sessions": 36
+      },
+      {
+        "day": "2026-05-23",
+        "pageviews": 8,
+        "sessions": 6,
+        "visitors": 4,
+        "cn_hint_events": 5,
+        "cn_hint_visitors": 2,
+        "cn_hint_sessions": 4
+      },
+      {
+        "day": "2026-05-24",
+        "pageviews": 16,
+        "sessions": 13,
+        "visitors": 10,
+        "cn_hint_events": 13,
+        "cn_hint_visitors": 8,
+        "cn_hint_sessions": 11
+      },
+      {
+        "day": "2026-05-25",
+        "pageviews": 67,
+        "sessions": 36,
+        "visitors": 20,
+        "cn_hint_events": 66,
+        "cn_hint_visitors": 20,
+        "cn_hint_sessions": 36
+      },
+      {
+        "day": "2026-05-26",
+        "pageviews": 55,
+        "sessions": 40,
+        "visitors": 26,
+        "cn_hint_events": 51,
+        "cn_hint_visitors": 22,
+        "cn_hint_sessions": 36
+      },
+      {
+        "day": "2026-05-27",
+        "pageviews": 110,
+        "sessions": 31,
+        "visitors": 14,
+        "cn_hint_events": 106,
+        "cn_hint_visitors": 10,
+        "cn_hint_sessions": 27
+      },
+      {
+        "day": "2026-05-28",
+        "pageviews": 18,
+        "sessions": 18,
+        "visitors": 15,
+        "cn_hint_events": 14,
+        "cn_hint_visitors": 11,
+        "cn_hint_sessions": 14
+      },
+      {
+        "day": "2026-05-29",
+        "pageviews": 140,
+        "sessions": 54,
+        "visitors": 17,
+        "cn_hint_events": 140,
+        "cn_hint_visitors": 17,
+        "cn_hint_sessions": 54
+      },
+      {
+        "day": "2026-05-30",
+        "pageviews": 2,
+        "sessions": 2,
+        "visitors": 2,
+        "cn_hint_events": 0,
+        "cn_hint_visitors": 0,
+        "cn_hint_sessions": 0
+      }
+    ]
+  },
+  "tables_data": {
+    "topFavorites": [
+      {
+        "journal_key": "0028-0836",
+        "favorites": 3,
+        "label": "NATURE"
+      },
+      {
+        "journal_key": "1346-7581",
+        "favorites": 3,
+        "label": "JOURNAL OF ASIAN ARCHITECTURE AND BUILDING ENGINEERING"
+      },
+      {
+        "journal_key": "2045-2322",
+        "favorites": 3,
+        "label": "SCIENTIFIC REPORTS"
+      },
+      {
+        "journal_key": "2352-7102",
+        "favorites": 3,
+        "label": "JOURNAL OF BUILDING ENGINEERING"
+      },
+      {
+        "journal_key": "0360-1323",
+        "favorites": 2,
+        "label": "BUILDING AND ENVIRONMENT"
+      },
+      {
+        "journal_key": "2075-5309",
+        "favorites": 2,
+        "label": "BUILDINGS"
+      },
+      {
+        "journal_key": "2662-9992",
+        "favorites": 2,
+        "label": "HUMANITIES & SOCIAL SCIENCES COMMUNICATIONS"
+      },
+      {
+        "journal_key": "0001-4966",
+        "favorites": 1,
+        "label": "JOURNAL OF THE ACOUSTICAL SOCIETY OF AMERICA"
+      },
+      {
+        "journal_key": "0031-9155",
+        "favorites": 1,
+        "label": "PHYSICS IN MEDICINE AND BIOLOGY"
+      },
+      {
+        "journal_key": "0143-6244",
+        "favorites": 1,
+        "label": "BUILDING SERVICES ENGINEERING RESEARCH & TECHNOLOGY"
+      },
+      {
+        "journal_key": "0378-7788",
+        "favorites": 1,
+        "label": "ENERGY AND BUILDINGS"
+      },
+      {
+        "journal_key": "0944-7113",
+        "favorites": 1,
+        "label": "PHYTOMEDICINE"
+      },
+      {
+        "journal_key": "0961-3218",
+        "favorites": 1,
+        "label": "BUILDING RESEARCH AND INFORMATION"
+      },
+      {
+        "journal_key": "1110-0168",
+        "favorites": 1,
+        "label": "ALEXANDRIA ENGINEERING JOURNAL"
+      },
+      {
+        "journal_key": "1740-1526",
+        "favorites": 1,
+        "label": "NATURE REVIEWS MICROBIOLOGY"
+      },
+      {
+        "journal_key": "1940-1493",
+        "favorites": 1,
+        "label": "JOURNAL OF BUILDING PERFORMANCE SIMULATION"
+      },
+      {
+        "journal_key": "1996-1073",
+        "favorites": 1,
+        "label": "ENERGIES"
+      },
+      {
+        "journal_key": "2052-4463",
+        "favorites": 1,
+        "label": "SCIENTIFIC DATA"
+      },
+      {
+        "journal_key": "2053-1583",
+        "favorites": 1,
+        "label": "2D MATERIALS"
+      },
+      {
+        "journal_key": "2210-6707",
+        "favorites": 1,
+        "label": "SUSTAINABLE CITIES AND SOCIETY"
+      }
+    ],
+    "topRated": [
+      {
+        "journal_key": "0028-0836",
+        "ratings": 2,
+        "avg_rating": 5,
+        "label": "NATURE"
+      },
+      {
+        "journal_key": "2662-9992",
+        "ratings": 2,
+        "avg_rating": 5,
+        "label": "HUMANITIES & SOCIAL SCIENCES COMMUNICATIONS"
+      },
+      {
+        "journal_key": "1346-7581",
+        "ratings": 2,
+        "avg_rating": 4.75,
+        "label": "JOURNAL OF ASIAN ARCHITECTURE AND BUILDING ENGINEERING"
+      },
+      {
+        "journal_key": "2053-1583",
+        "ratings": 2,
+        "avg_rating": 4.5,
+        "label": "2D MATERIALS"
+      },
+      {
+        "journal_key": "2352-7102",
+        "ratings": 2,
+        "avg_rating": 4.5,
+        "label": "JOURNAL OF BUILDING ENGINEERING"
+      },
+      {
+        "journal_key": "0001-4966",
+        "ratings": 1,
+        "avg_rating": 5,
+        "label": "JOURNAL OF THE ACOUSTICAL SOCIETY OF AMERICA"
+      },
+      {
+        "journal_key": "0378-7788",
+        "ratings": 1,
+        "avg_rating": 5,
+        "label": "ENERGY AND BUILDINGS"
+      },
+      {
+        "journal_key": "2210-6707",
+        "ratings": 1,
+        "avg_rating": 5,
+        "label": "SUSTAINABLE CITIES AND SOCIETY"
+      },
+      {
+        "journal_key": "2662-1355",
+        "ratings": 1,
+        "avg_rating": 5,
+        "label": "NATURE FOOD"
+      },
+      {
+        "journal_key": "1474-1776",
+        "ratings": 1,
+        "avg_rating": 4.5,
+        "label": "NATURE REVIEWS DRUG DISCOVERY"
+      },
+      {
+        "journal_key": "1740-1526",
+        "ratings": 1,
+        "avg_rating": 4.5,
+        "label": "NATURE REVIEWS MICROBIOLOGY"
+      },
+      {
+        "journal_key": "2045-2322",
+        "ratings": 1,
+        "avg_rating": 4.5,
+        "label": "SCIENTIFIC REPORTS"
+      },
+      {
+        "journal_key": "2571-6255",
+        "ratings": 1,
+        "avg_rating": 4,
+        "label": "FIRE-SWITZERLAND"
+      },
+      {
+        "journal_key": "t:安徽大学学报哲学社会科学版",
+        "ratings": 1,
+        "avg_rating": 4,
+        "label": "t:安徽大学学报哲学社会科学版"
+      },
+      {
+        "journal_key": "1550-7416",
+        "ratings": 1,
+        "avg_rating": 3.5,
+        "label": "AAPS JOURNAL"
+      },
+      {
+        "journal_key": "2075-5309",
+        "ratings": 1,
+        "avg_rating": 3.5,
+        "label": "BUILDINGS"
+      },
+      {
+        "journal_key": "2649-664X",
+        "ratings": 1,
+        "avg_rating": 3.5,
+        "label": "20 ET 21-REVUE D HISTOIRE"
+      },
+      {
+        "journal_key": "1996-1073",
+        "ratings": 1,
+        "avg_rating": 3,
+        "label": "ENERGIES"
+      }
+    ],
+    "topPaths": [
+      {
+        "path": "/",
+        "pageviews": 801,
+        "visitors": 159
+      },
+      {
+        "path": "/?ref=producthunt",
+        "pageviews": 44,
+        "visitors": 32
+      },
+      {
+        "path": "/%E4%B8%80%E7%AB%99%E5%BC%8F%E7%A7%91%E7%A0%94%E6%9C%9F%E5%88%8A%E6%9F%A5%E8%AF%A2%E5%B9%B3%E5%8F%B0",
+        "pageviews": 10,
+        "visitors": 6
+      },
+      {
+        "path": "/s/3P9gQfdK",
+        "pageviews": 8,
+        "visitors": 6
+      },
+      {
+        "path": "/?q=nature",
+        "pageviews": 5,
+        "visitors": 4
+      },
+      {
+        "path": "/%E4%B8%80%E7%AB%99%E5%BC%8F%E7%A7%91%E7%A0%94%E6%9C%9F%E5%88%8A%E6%9F%A5",
+        "pageviews": 5,
+        "visitors": 2
+      },
+      {
+        "path": "/s/H2uiCp5y",
+        "pageviews": 3,
+        "visitors": 2
+      },
+      {
+        "path": "/s/1vZeToFQ",
+        "pageviews": 3,
+        "visitors": 1
+      },
+      {
+        "path": "/s/03byCMGP",
+        "pageviews": 2,
+        "visitors": 1
+      },
+      {
+        "path": "/?verify=9d9976a-2",
+        "pageviews": 2,
+        "visitors": 1
+      },
+      {
+        "path": "/?verify=9d9976a",
+        "pageviews": 2,
+        "visitors": 1
+      },
+      {
+        "path": "/?t=v44verify",
+        "pageviews": 2,
+        "visitors": 1
+      },
+      {
+        "path": "/?t=v42verify",
+        "pageviews": 2,
+        "visitors": 1
+      },
+      {
+        "path": "/?t=v41check",
+        "pageviews": 2,
+        "visitors": 1
+      },
+      {
+        "path": "/?t=prod",
+        "pageviews": 2,
+        "visitors": 1
+      },
+      {
+        "path": "/?q=nature&_t=1",
+        "pageviews": 2,
+        "visitors": 1
+      },
+      {
+        "path": "/?force=1",
+        "pageviews": 2,
+        "visitors": 2
+      },
+      {
+        "path": "/s/zcqYju0Q",
+        "pageviews": 1,
+        "visitors": 1
+      },
+      {
+        "path": "/s/xXZ1zTGM",
+        "pageviews": 1,
+        "visitors": 1
+      },
+      {
+        "path": "/s/vmXylHMj",
+        "pageviews": 1,
+        "visitors": 1
+      }
+    ],
+    "trafficCountries": [
+      {
+        "country": "JP",
+        "pageviews": 678,
+        "visitors": 68,
+        "sessions": 222,
+        "cn_hint_events": 367,
+        "cn_hint_visitors": 37,
+        "cn_hint_sessions": 138,
+        "colos": "NRT",
+        "client_timezones": ",Asia/Shanghai,Asia/Seoul,Asia/Tokyo,Asia/Taipei",
+        "client_languages": ",en-US,zh-CN,en,ko-KR"
+      },
+      {
+        "country": "US",
+        "pageviews": 110,
+        "visitors": 73,
+        "sessions": 89,
+        "cn_hint_events": 31,
+        "cn_hint_visitors": 22,
+        "cn_hint_sessions": 27,
+        "colos": "LAX,SEA,IAD,SJC,ORD,ATL,DFW,EWR,PDX",
+        "client_timezones": "Etc/Unknown,UTC,America/Chicago,Asia/Shanghai,America/Los_Angeles,,Asia/Hong_Kong,Etc/GMT-8",
+        "client_languages": "en-US,zh-CN,en-US@posix,"
+      },
+      {
+        "country": "NL",
+        "pageviews": 32,
+        "visitors": 20,
+        "sessions": 23,
+        "cn_hint_events": 10,
+        "cn_hint_visitors": 9,
+        "cn_hint_sessions": 9,
+        "colos": "AMS",
+        "client_timezones": "Asia/Shanghai",
+        "client_languages": "en-US,zh-CN,en"
+      },
+      {
+        "country": "SG",
+        "pageviews": 30,
+        "visitors": 16,
+        "sessions": 21,
+        "cn_hint_events": 6,
+        "cn_hint_visitors": 5,
+        "cn_hint_sessions": 6,
+        "colos": "SIN",
+        "client_timezones": "Asia/Calcutta,Asia/Shanghai,Etc/GMT-8,",
+        "client_languages": "en-US,zh-CN,"
+      },
+      {
+        "country": "HK",
+        "pageviews": 24,
+        "visitors": 15,
+        "sessions": 21,
+        "cn_hint_events": 19,
+        "cn_hint_visitors": 12,
+        "cn_hint_sessions": 18,
+        "colos": "HKG",
+        "client_timezones": "Asia/Shanghai,,Etc/GMT-8",
+        "client_languages": "zh-CN,,en-US"
+      },
+      {
+        "country": "CN",
+        "pageviews": 20,
+        "visitors": 12,
+        "sessions": 18,
+        "cn_hint_events": 19,
+        "cn_hint_visitors": 11,
+        "cn_hint_sessions": 17,
+        "colos": "LAX,AMS,SEA,HKG,SJC",
+        "client_timezones": "Asia/Shanghai,",
+        "client_languages": "zh-CN,,en-US"
+      },
+      {
+        "country": "DE",
+        "pageviews": 11,
+        "visitors": 9,
+        "sessions": 9,
+        "cn_hint_events": 5,
+        "cn_hint_visitors": 4,
+        "cn_hint_sessions": 4,
+        "colos": "DUS,FRA",
+        "client_timezones": "America/New_York,Asia/Shanghai,UTC,Europe/Berlin",
+        "client_languages": "en-US,zh-CN"
+      },
+      {
+        "country": "GB",
+        "pageviews": 8,
+        "visitors": 5,
+        "sessions": 6,
+        "cn_hint_events": 0,
+        "cn_hint_visitors": 0,
+        "cn_hint_sessions": 0,
+        "colos": "LHR,MAN",
+        "client_timezones": "Europe/London",
+        "client_languages": "en-GB"
+      },
+      {
+        "country": "TW",
+        "pageviews": 7,
+        "visitors": 3,
+        "sessions": 5,
+        "cn_hint_events": 5,
+        "cn_hint_visitors": 2,
+        "cn_hint_sessions": 4,
+        "colos": "TPE",
+        "client_timezones": "Asia/Shanghai",
+        "client_languages": "zh-CN"
+      },
+      {
+        "country": "IN",
+        "pageviews": 5,
+        "visitors": 2,
+        "sessions": 2,
+        "cn_hint_events": 0,
+        "cn_hint_visitors": 0,
+        "cn_hint_sessions": 0,
+        "colos": "BOM,AMS",
+        "client_timezones": "Asia/Calcutta",
+        "client_languages": "en-GB"
+      },
+      {
+        "country": "KR",
+        "pageviews": 4,
+        "visitors": 2,
+        "sessions": 4,
+        "cn_hint_events": 4,
+        "cn_hint_visitors": 2,
+        "cn_hint_sessions": 4,
+        "colos": "ICN,HKG",
+        "client_timezones": "Asia/Shanghai,Asia/Seoul",
+        "client_languages": "zh-CN"
+      },
+      {
+        "country": "ZA",
+        "pageviews": 2,
+        "visitors": 1,
+        "sessions": 1,
+        "cn_hint_events": 0,
+        "cn_hint_visitors": 0,
+        "cn_hint_sessions": 0,
+        "colos": "DUR",
+        "client_timezones": null,
+        "client_languages": null
+      },
+      {
+        "country": "NG",
+        "pageviews": 2,
+        "visitors": 1,
+        "sessions": 1,
+        "cn_hint_events": 0,
+        "cn_hint_visitors": 0,
+        "cn_hint_sessions": 0,
+        "colos": "LOS",
+        "client_timezones": null,
+        "client_languages": null
+      },
+      {
+        "country": "NZ",
+        "pageviews": 1,
+        "visitors": 1,
+        "sessions": 1,
+        "cn_hint_events": 0,
+        "cn_hint_visitors": 0,
+        "cn_hint_sessions": 0,
+        "colos": "AKL",
+        "client_timezones": "UTC",
+        "client_languages": "en-US"
+      },
+      {
+        "country": "EE",
+        "pageviews": 1,
+        "visitors": 1,
+        "sessions": 1,
+        "cn_hint_events": 1,
+        "cn_hint_visitors": 1,
+        "cn_hint_sessions": 1,
+        "colos": "TLL",
+        "client_timezones": "Asia/Shanghai",
+        "client_languages": "zh-CN"
+      }
+    ],
+    "recentUsers": [
+      {
+        "id": 16,
+        "provider": "email",
+        "email": "lz***@163.com",
+        "login": "lzr991218",
+        "name": "lzr991218",
+        "created_at": 1780072333,
+        "updated_at": 1780072333
+      },
+      {
+        "id": 15,
+        "provider": "email",
+        "email": "10***@qq.com",
+        "login": "1012238555",
+        "name": "1012238555",
+        "created_at": 1779811726,
+        "updated_at": 1779812013
+      },
+      {
+        "id": 14,
+        "provider": "github",
+        "email": "",
+        "login": "ShuoLi0311",
+        "name": "Shuo Li",
+        "created_at": 1779806119,
+        "updated_at": 1779806119
+      },
+      {
+        "id": 13,
+        "provider": "github",
+        "email": "",
+        "login": "qingc188",
+        "name": "Tianyu Zhou",
+        "created_at": 1779794141,
+        "updated_at": 1779794141
+      },
+      {
+        "id": 12,
+        "provider": "email",
+        "email": "li***@lib.pku.edu.cn",
+        "login": "liud",
+        "name": "liud",
+        "created_at": 1779440996,
+        "updated_at": 1779440996
+      },
+      {
+        "id": 11,
+        "provider": "github",
+        "email": "",
+        "login": "thomasghc",
+        "name": "thomasghc",
+        "created_at": 1779428180,
+        "updated_at": 1779428180
+      },
+      {
+        "id": 10,
+        "provider": "github",
+        "email": "",
+        "login": "Hi1993Ryan",
+        "name": "Hi1993Ryan",
+        "created_at": 1779404069,
+        "updated_at": 1779404069
+      },
+      {
+        "id": 9,
+        "provider": "email",
+        "email": "hk***@163.com",
+        "login": "hkzeng2021",
+        "name": "hkzeng2021",
+        "created_at": 1779351336,
+        "updated_at": 1779351336
+      },
+      {
+        "id": 8,
+        "provider": "google",
+        "email": "ch***@gmail.com",
+        "login": "chen5188119",
+        "name": "zhian chen",
+        "created_at": 1779350638,
+        "updated_at": 1779350638
+      },
+      {
+        "id": 7,
+        "provider": "email",
+        "email": "28***@qq.com",
+        "login": "2844347195",
+        "name": "2844347195",
+        "created_at": 1779294026,
+        "updated_at": 1779294026
+      },
+      {
+        "id": 6,
+        "provider": "google",
+        "email": "be***@gmail.com",
+        "login": "beacontorta",
+        "name": "Wu Adrain",
+        "created_at": 1779258177,
+        "updated_at": 1779258177
+      },
+      {
+        "id": 5,
+        "provider": "email",
+        "email": "lu***@gmail.com",
+        "login": "luli2359594",
+        "name": "luli2359594",
+        "created_at": 1779188365,
+        "updated_at": 1779188365
+      },
+      {
+        "id": 4,
+        "provider": "google",
+        "email": "ji***@gmail.com",
+        "login": "jiantaoweng",
+        "name": "H&S一心菌 (石头小石头)",
+        "created_at": 1778766419,
+        "updated_at": 1780151927
+      },
+      {
+        "id": 3,
+        "provider": "email",
+        "email": "wz***@163.com",
+        "login": "wzy1318599914",
+        "name": "wzy1318599914",
+        "created_at": 1778657204,
+        "updated_at": 1778657276
+      },
+      {
+        "id": 2,
+        "provider": "email",
+        "email": "ar***@163.com",
+        "login": "arc_wjt",
+        "name": "arc_wjt",
+        "created_at": 1778656798,
+        "updated_at": 1778675798
+      },
+      {
+        "id": 1,
+        "provider": "github",
+        "email": "",
+        "login": "stonecanon",
+        "name": "stonecanon",
+        "created_at": 1778628305,
+        "updated_at": 1779864405
+      }
+    ]
+  }
+}

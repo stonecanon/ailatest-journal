@@ -1,0 +1,69 @@
+<view class="paper-bg">
+  <view class="safe-page page-pad">
+    <view class="page-title">筛选</view>
+
+    <view class="filter-section card">
+      <view class="section-title">索引收录</view>
+      <view class="chips">
+        <view wx:for="{{indices}}" wx:key="key" class="chip {{selectedMap[item.key] ? 'active' : ''}}" bindtap="toggleOption" data-key="{{item.key}}">{{item.label}}</view>
+      </view>
+    </view>
+
+    <view class="filter-section card">
+      <view class="section-title">JCR 分区</view>
+      <view class="chips">
+        <view wx:for="{{jcrZones}}" wx:key="key" class="chip {{selectedMap[item.key] ? 'active' : ''}}" bindtap="toggleOption" data-key="{{item.key}}">{{item.label}}</view>
+      </view>
+    </view>
+
+    <view class="filter-section card">
+      <view class="section-title">中科院分区</view>
+      <view class="chips">
+        <view wx:for="{{casZones}}" wx:key="key" class="chip {{selectedMap[item.key] ? 'active' : ''}}" bindtap="toggleOption" data-key="{{item.key}}">{{item.label}}</view>
+      </view>
+    </view>
+
+    <view class="filter-section card">
+      <view class="section-title">新锐分区</view>
+      <view class="chips">
+        <view wx:for="{{xrZones}}" wx:key="key" class="chip {{selectedMap[item.key] ? 'active' : ''}}" bindtap="toggleOption" data-key="{{item.key}}">{{item.label}}</view>
+      </view>
+    </view>
+
+    <view class="filter-section card">
+      <view class="section-title">ABS / ABDC</view>
+      <view class="chips">
+        <view wx:for="{{ratings}}" wx:key="key" class="chip {{selectedMap[item.key] ? 'active' : ''}}" bindtap="toggleOption" data-key="{{item.key}}">{{item.label}}</view>
+      </view>
+    </view>
+
+    <view class="filter-section card">
+      <view class="section-title">状态</view>
+      <view class="chips">
+        <view wx:for="{{features}}" wx:key="key" class="chip {{selectedMap[item.key] ? 'active' : ''}}" bindtap="toggleOption" data-key="{{item.key}}">{{item.label}}</view>
+      </view>
+    </view>
+
+    <view class="filter-section card">
+      <view class="section-title">学科</view>
+      <picker mode="selector" range="{{subjects}}" value="{{subjectIndex}}" bindchange="onSubjectChange">
+        <view class="select-row">
+          <text>{{subjects[subjectIndex]}}</text>
+          <text class="select-arrow">⌄</text>
+        </view>
+      </picker>
+    </view>
+
+    <view class="filter-actions">
+      <button class="ghost-btn" bindtap="resetFilters">重置</button>
+      <button class="apply-btn" bindtap="applyFilters">应用筛选</button>
+    </view>
+  </view>
+
+  <view class="bottom-tabs">
+    <view class="bottom-tab" bindtap="goTab" data-url="/pages/index/index"><text class="tab-icon">⌂</text><text>首页</text></view>
+    <view class="bottom-tab" bindtap="goTab" data-url="/pages/rankings/rankings"><text class="tab-icon">☷</text><text>榜单</text></view>
+    <view class="bottom-tab" bindtap="goTab" data-url="/pages/favorites/favorites"><text class="tab-icon">♡</text><text>收藏</text></view>
+    <view class="bottom-tab" bindtap="goTab" data-url="/pages/profile/profile"><text class="tab-icon">♙</text><text>我的</text></view>
+  </view>
+</view>

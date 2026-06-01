@@ -1,0 +1,815 @@
+{
+  "category": {
+    "code": "D047",
+    "title": "农作物",
+    "count": 44,
+    "major_code": "",
+    "major_title": ""
+  },
+  "pages": [
+    {
+      "page": 1,
+      "rows": 21,
+      "pageCount": 3
+    },
+    {
+      "page": 2,
+      "rows": 21,
+      "pageCount": 3
+    },
+    {
+      "page": 3,
+      "rows": 2,
+      "pageCount": 3
+    }
+  ],
+  "records": [
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农作物",
+      "category_code": "D047",
+      "page": 1,
+      "title": "中国水稻科学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOQSlKmZ5syO3Gbj7-KcvxJqmdpxcYTQtxi4Yfa41ZgdEAehS4OVFaBQZR4--1nrhpwVUsApXw7NjrioGasPH2C7T1nmPuHSG-cFo9vim3oXw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "4.730",
+      "comprehensive_if": "2.500",
+      "issn": "1001-7216",
+      "cn": "33-1146/S",
+      "sponsor": "中国水稻研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农作物",
+      "category_code": "D047",
+      "page": 1,
+      "title": "作物学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIO0I9h11Xegj6yDAv03tsqpnEr9xNYU0-mQoswxEwiYsKRypt_wXagAj4E3yznc0KTfCazrsaX3VFGcLh1zhocvzvBPAxotSb-GIxgM-twI3g==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "4.582",
+      "comprehensive_if": "2.402",
+      "issn": "0496-3490",
+      "cn": "11-1809/S",
+      "sponsor": "中国作物学会;中国农业科学院作物科学研究所;中国科技出版传媒股份有限公司",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农作物",
+      "category_code": "D047",
+      "page": 1,
+      "title": "土壤与作物",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIO0I9h11Xegj6yDAv03tsqpnEr9xNYU0-mQoswxEwiYsKRypt_wXagAj4E3yznc0KS0G7urenjgMnAvR33sSCw8FiPSr2hQ60spuWHYPE_W1Q==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "3.639",
+      "comprehensive_if": "1.763",
+      "issn": "2095-2961",
+      "cn": "23-1580/S",
+      "sponsor": "中国科学院东北地理与农业生态研究所农业技术中心",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农作物",
+      "category_code": "D047",
+      "page": 1,
+      "title": "茶叶科学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIO0I9h11Xegj6yDAv03tsqpnEr9xNYU0-mQoswxEwiYsKRypt_wXagAj4E3yznc0KQGlAc7mFOBhgBUMZq1rAWTvlapNokWkdfeKZ2k5q4ADg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "3.586",
+      "comprehensive_if": "2.338",
+      "issn": "1000-369X",
+      "cn": "33-1115/S",
+      "sponsor": "中国茶叶学会;中国农业科学院茶叶研究所",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农作物",
+      "category_code": "D047",
+      "page": 1,
+      "title": "作物杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIO0I9h11Xegj6yDAv03tsqpnEr9xNYU0-mQoswxEwiYsKRypt_wXagAj4E3yznc0KT7c9gf0Spl6h4iG_v5Ngus4uulQ4IZZW32ziWmQbGjCQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "3.439",
+      "comprehensive_if": "1.988",
+      "issn": "1001-7283",
+      "cn": "11-1808/S",
+      "sponsor": "中国作物学会;中国农业科学院作物科学研究所",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农作物",
+      "category_code": "D047",
+      "page": 1,
+      "title": "麦类作物学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIO0I9h11Xegj6yDAv03tsqpnEr9xNYU0-mQoswxEwiYsKRypt_wXagAj4E3yznc0KS3mBNBBagRbsxX81mLvbkt2CNtae-Ecrc1T8L6wqnlxg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "3.202",
+      "comprehensive_if": "1.711",
+      "issn": "1009-1041",
+      "cn": "61-1359/S",
+      "sponsor": "西北农林科技大学;中国作物学会;国家小麦工程技术研究中心",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农作物",
+      "category_code": "D047",
+      "page": 1,
+      "title": "中国油料作物学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIO0I9h11Xegj6yDAv03tsqpnEr9xNYU0-mQoswxEwiYsKRypt_wXagAj4E3yznc0KSpsNSmgK81TsWpZOTWYBYegyolCZ1489K9ZhMNHV5E3A==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "3.127",
+      "comprehensive_if": "1.823",
+      "issn": "1007-9084",
+      "cn": "42-1429/S",
+      "sponsor": "中国农业科学院油料作物研究所",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农作物",
+      "category_code": "D047",
+      "page": 1,
+      "title": "中国稻米",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIO0I9h11Xegj6yDAv03tsqpnEr9xNYU0-mQoswxEwiYsKRypt_wXagAj4E3yznc0KSV1ChiKzuYa02uvTYNZk1QEoSgph7lxWomC5MvtQEunA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "3.099",
+      "comprehensive_if": "1.969",
+      "issn": "1006-8082",
+      "cn": "33-1201/S",
+      "sponsor": "中国水稻研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农作物",
+      "category_code": "D047",
+      "page": 1,
+      "title": "中国烟草学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIO0I9h11Xegj6yDAv03tsqpnEr9xNYU0-mQoswxEwiYsKRypt_wXagAj4E3yznc0KQ7O8ZFKWKSqpR2S4A1DtNc62qVPnpgw7S5b71dGeo1Yw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.950",
+      "comprehensive_if": "2.055",
+      "issn": "1004-5708",
+      "cn": "11-2985/TS",
+      "sponsor": "中国烟草学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农作物",
+      "category_code": "D047",
+      "page": 1,
+      "title": "大豆科学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIO0I9h11Xegj6yDAv03tsqpnEr9xNYU0-mQoswxEwiYsKRypt_wXagAj4E3yznc0KRUdR3hLJmz_dxpOHB3G_OPXxekSyvmqujgPax2W7NfGw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.922",
+      "comprehensive_if": "1.760",
+      "issn": "1000-9841",
+      "cn": "23-1227/S",
+      "sponsor": "黑龙江省农业科学院",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农作物",
+      "category_code": "D047",
+      "page": 1,
+      "title": "中国烟草科学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIO0I9h11Xegj6yDAv03tsqpnEr9xNYU0-mQoswxEwiYsKRypt_wXagAj4E3yznc0KQxRLTVBHgzyhEq6eeOQ1X85MiiWbvCzMpC_ekc4C_vTg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.606",
+      "comprehensive_if": "2.006",
+      "issn": "1007-5119",
+      "cn": "37-1277/S",
+      "sponsor": "中国农业科学院烟草研究所;中国烟草总公司青州烟草研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农作物",
+      "category_code": "D047",
+      "page": 1,
+      "title": "玉米科学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIO0I9h11Xegj6yDAv03tsqpnEr9xNYU0-mQoswxEwiYsKRypt_wXagAj4E3yznc0KT093LN3Tnf3uqOqSFntGEdhTGXyYewizeJN7kaCSV3Rg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.567",
+      "comprehensive_if": "1.464",
+      "issn": "1005-0906",
+      "cn": "22-1201/S",
+      "sponsor": "吉林省农业科学院;国家玉米工程技术研究中心(吉林);国家玉米改良中心;中国农业科技东北创新中心",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农作物",
+      "category_code": "D047",
+      "page": 1,
+      "title": "The Crop Journal",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIO0I9h11Xegj6yDAv03tsqpnEr9xNYU0-mQoswxEwiYsKRypt_wXagAj4E3yznc0KT83-uQOo5Dzzwc3yXhk_VPKyhrlAZJvquNF7eY90WWXg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.564",
+      "comprehensive_if": "1.245",
+      "issn": "2095-5421",
+      "cn": "10-1112/S",
+      "sponsor": "中国农业科学院作物科学研究所;中国农业科学院;中国科学出版传媒集团有限公司(科学出版社)",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农作物",
+      "category_code": "D047",
+      "page": 1,
+      "title": "花生学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIO0I9h11Xegj6yDAv03tsqpnEr9xNYU0-mQoswxEwiYsKRypt_wXagAj4E3yznc0KTRCSzzvqyuF2QiRMupdyYneZgaka7F5Zdk7JQW3ZsXQw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.313",
+      "comprehensive_if": "1.438",
+      "issn": "1002-4093",
+      "cn": "37-1366/S",
+      "sponsor": "山东省花生研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农作物",
+      "category_code": "D047",
+      "page": 1,
+      "title": "棉花学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIO0I9h11Xegj6yDAv03tsqpnEr9xNYU0-mQoswxEwiYsKRypt_wXagAj4E3yznc0KR1zaQdU1v4Kytl-Jb-Ejx0AW6__Jk5CzvaGI0rUXFO4Q==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.961",
+      "comprehensive_if": "1.471",
+      "issn": "1002-7807",
+      "cn": "41-1163/S",
+      "sponsor": "中国农学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农作物",
+      "category_code": "D047",
+      "page": 1,
+      "title": "茶叶通讯",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIO0I9h11Xegj6yDAv03tsqpnEr9xNYU0-mQoswxEwiYsKRypt_wXagAj4E3yznc0KTnHVgipOfLDMXp8Yag5YIH7WgBfAuS1fXBR7GryI1eYQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.917",
+      "comprehensive_if": "1.524",
+      "issn": "1009-525X",
+      "cn": "43-1106/S",
+      "sponsor": "湖南省茶叶学会;湖南省茶叶研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农作物",
+      "category_code": "D047",
+      "page": 1,
+      "title": "大豆科技",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIO0I9h11Xegj6yDAv03tsqpnEr9xNYU0-mQoswxEwiYsKRypt_wXagAj4E3yznc0KRRNARYcOn_III1aOEoKs0kxFabow87f-N62dvlFL-BVg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.742",
+      "comprehensive_if": "1.258",
+      "issn": "1674-3547",
+      "cn": "23-1549/S",
+      "sponsor": "黑龙江省绿色食品科学研究院",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农作物",
+      "category_code": "D047",
+      "page": 1,
+      "title": "种子",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIO0I9h11Xegj6yDAv03tsqpnEr9xNYU0-mQoswxEwiYsKRypt_wXagAj4E3yznc0KQiEbx-TNZ6Iw-tVtI-uHVJNaDvFkqG9icR9rz9gcQBGQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.719",
+      "comprehensive_if": "1.294",
+      "issn": "1001-4705",
+      "cn": "52-1066/S",
+      "sponsor": "贵州农业职业学院;贵州省种子管理站",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农作物",
+      "category_code": "D047",
+      "page": 1,
+      "title": "Rice Science",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIO0I9h11Xegj6yDAv03tsqpnEr9xNYU0-mQoswxEwiYsKRypt_wXagAj4E3yznc0KSQK32sT_jnN_hI024yIzp3YJlOi9x1apibCYqm0hlfMA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.661",
+      "comprehensive_if": "0.991",
+      "issn": "1672-6308",
+      "cn": "33-1317/S",
+      "sponsor": "中国水稻研究所",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农作物",
+      "category_code": "D047",
+      "page": 1,
+      "title": "中国糖料",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIO0I9h11Xegj6yDAv03tsqpnEr9xNYU0-mQoswxEwiYsKRypt_wXagAj4E3yznc0KQIGOGHwb2bTcJ3OgITW9xT1CD9tREU6SF8EBoA3FrNUA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.606",
+      "comprehensive_if": "1.067",
+      "issn": "1007-2624",
+      "cn": "23-1406/S",
+      "sponsor": "黑龙江大学",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农作物",
+      "category_code": "D047",
+      "page": 1,
+      "title": "作物研究",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIO0I9h11Xegj6yDAv03tsqpnEr9xNYU0-mQoswxEwiYsKRypt_wXagAj4E3yznc0KSWWLBC8OBCV_k1DDPflB1ksFb8SY_ff7DDcepvPirN5Q==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.528",
+      "comprehensive_if": "1.009",
+      "issn": "1001-5280",
+      "cn": "43-1110/S",
+      "sponsor": "省作物学会;湖南农大",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农作物",
+      "category_code": "D047",
+      "page": 2,
+      "title": "中国棉花",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN6dg8DSmqB6VWtb0YykacL-1uPdzkRMeflUnugzYLP5lX4Kp2CTsYuSTe09ALoFRFqnGOkZhkIfwKyNbHnswC53fnKiaseHEIFnqJQWiQK2g==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.421",
+      "comprehensive_if": "1.239",
+      "issn": "1000-632X",
+      "cn": "41-1140/S",
+      "sponsor": "中国农业科学院棉花研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农作物",
+      "category_code": "D047",
+      "page": 2,
+      "title": "中国马铃薯",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN6dg8DSmqB6VWtb0YykacL-1uPdzkRMeflUnugzYLP5lX4Kp2CTsYuSTe09ALoFRFlGTenBhaW309sIRM9K5M-aD4JMs4-jvSRh9tMzJkCqg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.333",
+      "comprehensive_if": "0.878",
+      "issn": "1672-3635",
+      "cn": "23-1477/S",
+      "sponsor": "东北农业大学",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农作物",
+      "category_code": "D047",
+      "page": 2,
+      "title": "中国麻业科学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN6dg8DSmqB6VWtb0YykacL-1uPdzkRMeflUnugzYLP5lX4Kp2CTsYuSTe09ALoFREFi2LMMLUdmzz8p4bRDezwpN8NtSUkwAFjZHZoFo918g==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.310",
+      "comprehensive_if": "0.977",
+      "issn": "1671-3532",
+      "cn": "43-1467/S",
+      "sponsor": "中国农业科学院麻类研究所",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农作物",
+      "category_code": "D047",
+      "page": 2,
+      "title": "杂交水稻",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN6dg8DSmqB6VWtb0YykacL-1uPdzkRMeflUnugzYLP5lX4Kp2CTsYuSTe09ALoFRGHXQj2teg3ucP7_7JJMEnu7Ey98rkWgCNJOhHWD3fc3g==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.117",
+      "comprehensive_if": "0.762",
+      "issn": "1005-3956",
+      "cn": "43-1137/S",
+      "sponsor": "国家杂交水稻工程技术研究中心;省杂交水稻研究中心",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农作物",
+      "category_code": "D047",
+      "page": 2,
+      "title": "茶叶学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN6dg8DSmqB6VWtb0YykacL-1uPdzkRMeflUnugzYLP5lX4Kp2CTsYuSTe09ALoFRGVv6hpkRYEUEo71fdg4zMVVTvPY2Qc1EBnodtJjLtu7A==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.960",
+      "comprehensive_if": "0.730",
+      "issn": "2096-0220",
+      "cn": "35-1330/S",
+      "sponsor": "福建省农业科学院茶叶研究所",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农作物",
+      "category_code": "D047",
+      "page": 2,
+      "title": "大麦与谷类科学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN6dg8DSmqB6VWtb0YykacL-1uPdzkRMeflUnugzYLP5lX4Kp2CTsYuSTe09ALoFRHVJyW0TfcDyCiMahIntFYJuhdB7mGW_Pr7ivkejONEVQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.955",
+      "comprehensive_if": "0.669",
+      "issn": "1673-6486",
+      "cn": "32-1769/S",
+      "sponsor": "江苏沿海地区农业科学研究所",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农作物",
+      "category_code": "D047",
+      "page": 2,
+      "title": "广西糖业",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN6dg8DSmqB6VWtb0YykacL-1uPdzkRMeflUnugzYLP5lX4Kp2CTsYuSTe09ALoFRHZ9-Rss2wZ5R-DtzjnCGVIkzemuqLHLFQZbm-U9ybobg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.907",
+      "comprehensive_if": "0.713",
+      "issn": "2095-820X",
+      "cn": "45-1397/S",
+      "sponsor": "广西壮族自治区农业科学院",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农作物",
+      "category_code": "D047",
+      "page": 2,
+      "title": "Oil Crop Science",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN6dg8DSmqB6VWtb0YykacL-1uPdzkRMeflUnugzYLP5lX4Kp2CTsYuSTe09ALoFRGqHH9DeoWtxP9mVk1X_HbonP8j7YtiK4-w9DKS__LQAg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.881",
+      "comprehensive_if": "0.576",
+      "issn": "2096-2428",
+      "cn": "42-1861/S",
+      "sponsor": "中国农业科学院油料作物研究所",
+      "tags": [
+        "完全OA期刊"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农作物",
+      "category_code": "D047",
+      "page": 2,
+      "title": "中国种业",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN6dg8DSmqB6VWtb0YykacL-1uPdzkRMeflUnugzYLP5lX4Kp2CTsYuSTe09ALoFRGGRJ4UERgs0MNbvzKTk6VFY73YCsjafWi92UKzoKwzqQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.850",
+      "comprehensive_if": "0.669",
+      "issn": "1671-895X",
+      "cn": "11-4413/S",
+      "sponsor": "中国农业科学院作物科学研究所;中国种子协会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农作物",
+      "category_code": "D047",
+      "page": 2,
+      "title": "棉花科学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN6dg8DSmqB6VWtb0YykacL-1uPdzkRMeflUnugzYLP5lX4Kp2CTsYuSTe09ALoFREBDn5sI-bDg8tXHbZxPYAGAYJkKdMUruI481zssM75Jg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.839",
+      "comprehensive_if": "0.458",
+      "issn": "2095-3143",
+      "cn": "36-1319/S",
+      "sponsor": "江西省报刊传媒有限责任公司",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农作物",
+      "category_code": "D047",
+      "page": 2,
+      "title": "Journal of Cotton Research",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN6dg8DSmqB6VWtb0YykacL-1uPdzkRMeflUnugzYLP5lX4Kp2CTsYuSTe09ALoFRHurniVnZNi5C7VuXY7r66CWMj24EvX9ZpBc2tPi4rwhw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.824",
+      "comprehensive_if": "0.608",
+      "issn": "2096-5044",
+      "cn": "41-1451/S",
+      "sponsor": "中国农业科学院棉花研究所;中国农学会",
+      "tags": [
+        "完全OA期刊"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农作物",
+      "category_code": "D047",
+      "page": 2,
+      "title": "北方水稻",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN6dg8DSmqB6VWtb0YykacL-1uPdzkRMeflUnugzYLP5lX4Kp2CTsYuSTe09ALoFREUnInDsZgY1-NVq-xr_Vxi93gflshtqaX52_PaAdvBSA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.517",
+      "comprehensive_if": "0.303",
+      "issn": "1673-6737",
+      "cn": "21-1530/S",
+      "sponsor": "辽宁省盐碱地利用研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农作物",
+      "category_code": "D047",
+      "page": 2,
+      "title": "种业导刊",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN6dg8DSmqB6VWtb0YykacL-1uPdzkRMeflUnugzYLP5lX4Kp2CTsYuSTe09ALoFRGc7ofJ79JCrR2OqJvb4AvJQ314qsKGrGMpEehpFiYNDw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.493",
+      "comprehensive_if": "0.260",
+      "issn": "1003-4749",
+      "cn": "41-1392/S",
+      "sponsor": "河南省农业科学院农业信息技术研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农作物",
+      "category_code": "D047",
+      "page": 2,
+      "title": "园艺与种苗",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN6dg8DSmqB6VWtb0YykacL-1uPdzkRMeflUnugzYLP5lX4Kp2CTsYuSTe09ALoFRFywHuy849kaDSk4N69wuEFPYbXCnrpStc36gbs1fINNQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.438",
+      "comprehensive_if": "0.298",
+      "issn": "2095-0896",
+      "cn": "21-1574/S",
+      "sponsor": "辽宁省农业科学院",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农作物",
+      "category_code": "D047",
+      "page": 2,
+      "title": "茶业通报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN6dg8DSmqB6VWtb0YykacL-1uPdzkRMeflUnugzYLP5lX4Kp2CTsYuSTe09ALoFRFEWPM-Q7OO1AGcSFfPB5xTpcZDWbQ08yVrBV-R6WFzQA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.410",
+      "comprehensive_if": "0.308",
+      "issn": "1006-5768",
+      "cn": "34-1079/S",
+      "sponsor": "安徽省茶业学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农作物",
+      "category_code": "D047",
+      "page": 2,
+      "title": "种子科技",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN6dg8DSmqB6VWtb0YykacL-1uPdzkRMeflUnugzYLP5lX4Kp2CTsYuSTe09ALoFRF0XddydC4nc-CGYhjmRhZXgWvBiYz242qNt1JEbUpd3Q==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.395",
+      "comprehensive_if": "0.241",
+      "issn": "1005-2690",
+      "cn": "14-1160/S",
+      "sponsor": "山西科技新闻出版传媒集团有限责任公司;山西省种子协会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农作物",
+      "category_code": "D047",
+      "page": 2,
+      "title": "茶叶",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN6dg8DSmqB6VWtb0YykacL-1uPdzkRMeflUnugzYLP5lX4Kp2CTsYuSTe09ALoFRGTjsB63XSS4UeR-xcAt1AdrIkm7JtBpZ0d4b6JuTRZhw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.376",
+      "comprehensive_if": "0.228",
+      "issn": "0577-8921",
+      "cn": "33-1096/S",
+      "sponsor": "浙江省茶叶学会;中国茶叶博物馆",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农作物",
+      "category_code": "D047",
+      "page": 2,
+      "title": "福建稻麦科技",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN6dg8DSmqB6VWtb0YykacL-1uPdzkRMeflUnugzYLP5lX4Kp2CTsYuSTe09ALoFRGeo339o8a_9kzWocsoqQo9-6JV9vrl1Mzy2NbxjkergQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.160",
+      "comprehensive_if": "0.128",
+      "issn": "1008-9799",
+      "cn": "35-1147/S",
+      "sponsor": "福建省农业科学院水稻研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农作物",
+      "category_code": "D047",
+      "page": 2,
+      "title": "Chinese Rice Research Newsletter",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN6dg8DSmqB6VWtb0YykacL-1uPdzkRMeflUnugzYLP5lX4Kp2CTsYuSTe09ALoFREA-8JJ23Lzou_1wid5cK56cF8ucn2gGDWS3GFSb7BsWw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1005-4111",
+      "cn": "33-1179/S",
+      "sponsor": "中国水稻研究所",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农作物",
+      "category_code": "D047",
+      "page": 2,
+      "title": "茶道",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN6dg8DSmqB6VWtb0YykacL-1uPdzkRMeflUnugzYLP5lX4Kp2CTsYuSTe09ALoFRF2IHr229ARaXtIOq9emk7oBW2ePwZT5beU_RNMtieEKw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "",
+      "cn": "35-1325/TS",
+      "sponsor": "福建日报报业集团",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农作物",
+      "category_code": "D047",
+      "page": 2,
+      "title": "贵茶",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN6dg8DSmqB6VWtb0YykacL-1uPdzkRMeflUnugzYLP5lX4Kp2CTsYuSTe09ALoFRFm1NKVm27Qfwp4GI7cIap00obszsG7dIiZBWzClSBvZQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "2097-2601",
+      "cn": "52-1166/S",
+      "sponsor": "贵州日报当代融媒体集团有限责任公司",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农作物",
+      "category_code": "D047",
+      "page": 3,
+      "title": "现代种业",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMQdMsJbLcfS622By2dHd6b6Hj42yRe0iQzD72wLbjUkOYAbhbSPHjIpkcCES-GU0ixdoRmhmNiuEhXI5rhs7gFjm1cipYApL4tkbW2tbTlLg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1672-1918",
+      "cn": "61-1409/S",
+      "sponsor": "陕西省种业集团有限责任公司;杨凌秦丰农业股份公司",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农作物",
+      "category_code": "D047",
+      "page": 3,
+      "title": "种子世界",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMQdMsJbLcfS622By2dHd6b6Hj42yRe0iQzD72wLbjUkOYAbhbSPHjIpkcCES-GU0gmPD4iDKSxyZXfbnB3YZcvvEora3kUBP0BykQDv-FjKA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1000-8071",
+      "cn": "23-1213/S",
+      "sponsor": "黑龙江省现代农业试验示范中心",
+      "tags": []
+    }
+  ]
+}

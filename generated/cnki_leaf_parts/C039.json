@@ -1,0 +1,836 @@
+{
+  "category": {
+    "code": "C039",
+    "title": "动力工程",
+    "count": 46,
+    "major_code": "",
+    "major_title": ""
+  },
+  "pages": [
+    {
+      "page": 1,
+      "rows": 21,
+      "pageCount": 3
+    },
+    {
+      "page": 2,
+      "rows": 21,
+      "pageCount": 3
+    },
+    {
+      "page": 3,
+      "rows": 4,
+      "pageCount": 3
+    }
+  ],
+  "records": [
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 1,
+      "title": "综合智慧能源",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIP050LkrZNgbgE5cnlSOEqWW0gzUjfA-55pVAVumXwE8VFnCwW-r9VY_OtGXMy1cteU8KWojnfHSxfXVkcJohoCFzsnte8TLKD3gbkoGZTNrw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "3.024",
+      "comprehensive_if": "2.240",
+      "issn": "2097-0706",
+      "cn": "41-1461/TK",
+      "sponsor": "华电郑州机械设计研究院有限公司;中国华电科工集团有限公司",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 1,
+      "title": "热力发电",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPZDAuavHyXsd7G-1Yr8RRpppPEXZPwi-AcHZSyJHqroPKwnPeRsvrq8lhWDVyv1h2VjFUrDpJPqShpbl-Az8uBrs_nlPwD_-Ecxp7VbI_zyw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.950",
+      "comprehensive_if": "1.974",
+      "issn": "1002-3364",
+      "cn": "61-1111/TM",
+      "sponsor": "西安热工研究院有限公司;中国电机工程学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 1,
+      "title": "动力工程学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPZDAuavHyXsd7G-1Yr8RRpppPEXZPwi-AcHZSyJHqroPKwnPeRsvrq8lhWDVyv1h2ng-7cIDm-NQRRUOq6bSmlF5IIfLLFPeZ59PKAdnYCtQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.755",
+      "comprehensive_if": "2.067",
+      "issn": "1674-7607",
+      "cn": "31-2041/TK",
+      "sponsor": "上海上发院发电成套设备工程有限公司;中国动力工程学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 1,
+      "title": "压力容器",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPZDAuavHyXsd7G-1Yr8RRpppPEXZPwi-AcHZSyJHqroPKwnPeRsvrq8lhWDVyv1h1Ea8L9Ng1Eo8QB1NUqEyR6HXiypUBwYJWWsf-AZbBjJQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.229",
+      "comprehensive_if": "2.011",
+      "issn": "1001-4837",
+      "cn": "34-1058/TH",
+      "sponsor": "中国机械工程学会;压力容器分会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 1,
+      "title": "能源研究与管理",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPZDAuavHyXsd7G-1Yr8RRpppPEXZPwi-AcHZSyJHqroPKwnPeRsvrq8lhWDVyv1h2s72Jq3rs19dyYOZSSMDpKT3qPbH7EbkHidU9QjMLiiw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.816",
+      "comprehensive_if": "1.303",
+      "issn": "2096-7705",
+      "cn": "36-1310/TK",
+      "sponsor": "江西省科学院能源研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 1,
+      "title": "热能动力工程",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPZDAuavHyXsd7G-1Yr8RRpppPEXZPwi-AcHZSyJHqroPKwnPeRsvrq8lhWDVyv1h0cX5r6WABj4bYedewi3s9-48OZRTb3i-hVpuGAuz357A==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.631",
+      "comprehensive_if": "1.054",
+      "issn": "1001-2060",
+      "cn": "23-1176/TK",
+      "sponsor": "中国船舶重工集团第七O三研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 1,
+      "title": "内燃机学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPZDAuavHyXsd7G-1Yr8RRpppPEXZPwi-AcHZSyJHqroPKwnPeRsvrq8lhWDVyv1h1blu6ef6f1XmcSNn9mNS_6NVAvKRHjLJKS6uk3C6ctNQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.350",
+      "comprehensive_if": "0.920",
+      "issn": "1000-0909",
+      "cn": "12-1086/TK",
+      "sponsor": "中国内燃机学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 1,
+      "title": "锅炉技术",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPZDAuavHyXsd7G-1Yr8RRpppPEXZPwi-AcHZSyJHqroPKwnPeRsvrq8lhWDVyv1h0KYRPe83d-eMsQsh9f4cmevI8vkFvCqhZ1g-FQ5hZ9Pw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.297",
+      "comprehensive_if": "1.063",
+      "issn": "1672-4763",
+      "cn": "31-1508/TK",
+      "sponsor": "上海锅炉厂有限公司",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 1,
+      "title": "火箭推进",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPZDAuavHyXsd7G-1Yr8RRpppPEXZPwi-AcHZSyJHqroPKwnPeRsvrq8lhWDVyv1h3bZ0vLpTDpuVkP6_JtKk5MdMCijAIBCs0wlpW8zX14kw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.288",
+      "comprehensive_if": "1.124",
+      "issn": "1672-9374",
+      "cn": "61-1436/V",
+      "sponsor": "航天推进技术研究院",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 1,
+      "title": "能源工程",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPZDAuavHyXsd7G-1Yr8RRpppPEXZPwi-AcHZSyJHqroPKwnPeRsvrq8lhWDVyv1h2gt-Su7o5xEuC6xaKHL6ypo6rl6FdU5Gz2EUdePfBbFw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.286",
+      "comprehensive_if": "1.000",
+      "issn": "1004-3950",
+      "cn": "33-1113/TK",
+      "sponsor": "浙江浙能技术研究院有限公司;浙江省能源研究会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 1,
+      "title": "节能技术",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPZDAuavHyXsd7G-1Yr8RRpppPEXZPwi-AcHZSyJHqroPKwnPeRsvrq8lhWDVyv1h2BT2qjYVFwdX4PNDLyWpmmBEDklLS7s3_P-OPmqup4TQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.256",
+      "comprehensive_if": "1.062",
+      "issn": "1002-6339",
+      "cn": "23-1302/TK",
+      "sponsor": "国防科技工业节能技术服务中心",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 1,
+      "title": "固体火箭技术",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPZDAuavHyXsd7G-1Yr8RRpppPEXZPwi-AcHZSyJHqroPKwnPeRsvrq8lhWDVyv1h3HDzcVMbW3ogC9CYCD62Tb6ylXkqBer9cCA04FIkIDIw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.212",
+      "comprehensive_if": "0.924",
+      "issn": "1006-2793",
+      "cn": "61-1176/V",
+      "sponsor": "航天动力技术研究院;中国宇航学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 1,
+      "title": "中外能源",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPZDAuavHyXsd7G-1Yr8RRpppPEXZPwi-AcHZSyJHqroPKwnPeRsvrq8lhWDVyv1h1fO-qbSRp-AIuF6T3QG3QW6fYR5jIlUa5BnHNBvrfFFg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.149",
+      "comprehensive_if": "0.642",
+      "issn": "1673-579X",
+      "cn": "11-5438/TK",
+      "sponsor": "中国能源研究会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 1,
+      "title": "内燃机工程",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPZDAuavHyXsd7G-1Yr8RRpppPEXZPwi-AcHZSyJHqroPKwnPeRsvrq8lhWDVyv1h214hKFAxu7HHVfnHYm8ZkWMJD0Ky6uwAmkxxM04SYTIA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.054",
+      "comprehensive_if": "0.780",
+      "issn": "1000-0925",
+      "cn": "31-1255/TK",
+      "sponsor": "中国内燃机学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 1,
+      "title": "Journal of Thermal Science",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPZDAuavHyXsd7G-1Yr8RRpppPEXZPwi-AcHZSyJHqroPKwnPeRsvrq8lhWDVyv1h2j-z23ZGrM0kOO8wwDGNPkrJzycBvZyv6OiAPHRb6WHQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.992",
+      "comprehensive_if": "0.725",
+      "issn": "1003-2169",
+      "cn": "11-2853/O4",
+      "sponsor": "中国科学院工程热物理研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 1,
+      "title": "燃烧科学与技术",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPZDAuavHyXsd7G-1Yr8RRpppPEXZPwi-AcHZSyJHqroPKwnPeRsvrq8lhWDVyv1h2HGUJL1l70eJl44RNXtC7ygfhY7N2FfYofcHu9MtU3aA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.989",
+      "comprehensive_if": "0.772",
+      "issn": "1006-8740",
+      "cn": "12-1240/TK",
+      "sponsor": "天津大学",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 1,
+      "title": "工程热物理学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPZDAuavHyXsd7G-1Yr8RRpppPEXZPwi-AcHZSyJHqroPKwnPeRsvrq8lhWDVyv1h3pVaNYeXTTlwBTkEQO7ujEZowaQ-TGdMaxCF-BrMIZXw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.927",
+      "comprehensive_if": "0.589",
+      "issn": "0253-231X",
+      "cn": "11-2091/O4",
+      "sponsor": "中国科学院工程热物理研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 1,
+      "title": "能源研究与利用",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPZDAuavHyXsd7G-1Yr8RRpppPEXZPwi-AcHZSyJHqroPKwnPeRsvrq8lhWDVyv1h0pmfakzpr8fzIUAOorHnLMQH3MRxWY7GtEMVrbRKVPvw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.885",
+      "comprehensive_if": "0.511",
+      "issn": "1001-5523",
+      "cn": "32-1196/TK",
+      "sponsor": "江苏省节能技术服务中心;江苏省能源研究会;东南大学热能工程研究所",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 1,
+      "title": "ENGINEERING Energy",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPZDAuavHyXsd7G-1Yr8RRpppPEXZPwi-AcHZSyJHqroPKwnPeRsvrq8lhWDVyv1h38FVR2698NZFm5wF976GrmzhdjZyFTnQz8r6Irroms4w==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.860",
+      "comprehensive_if": "0.690",
+      "issn": "2095-1701",
+      "cn": "11-6017/TK",
+      "sponsor": "高等教育出版社有限公司;中国工程院;上海交通大学",
+      "tags": [
+        "增强出版",
+        "混合OA期刊"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 1,
+      "title": "车用发动机",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPZDAuavHyXsd7G-1Yr8RRpppPEXZPwi-AcHZSyJHqroPKwnPeRsvrq8lhWDVyv1h2UZ6EHAa13cfjEq5GLSCv67Dt0C-wreInXczZ46EIjtQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.838",
+      "comprehensive_if": "0.519",
+      "issn": "1001-2222",
+      "cn": "12-1466/TH",
+      "sponsor": "中国北方发动机研究所(天津）",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 1,
+      "title": "能源研究与信息",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPZDAuavHyXsd7G-1Yr8RRpppPEXZPwi-AcHZSyJHqroPKwnPeRsvrq8lhWDVyv1h3ulMHLS5KOGGHwT8HdoDHOb9fXwvfyv2w7Vuz6C4E3cQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.821",
+      "comprehensive_if": "0.657",
+      "issn": "1008-8857",
+      "cn": "31-1410/TK",
+      "sponsor": "上海理工大学;上海市能源研究会;上海电气(集团)总公司",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 2,
+      "title": "热科学与技术",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIM_2GAbNdr7oXCngRLmgk_c_iT3b3ohXzlc67_jN2PyBySmVIPhclhwnBSk20pP3YFBx4hRNY8DPplkgIKvQnvFuL2GmMNj2qave5RaAQXHnw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.739",
+      "comprehensive_if": "0.523",
+      "issn": "1671-8097",
+      "cn": "21-1472/T",
+      "sponsor": "大连理工大学",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 2,
+      "title": "节能",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIM_2GAbNdr7oXCngRLmgk_c_iT3b3ohXzlc67_jN2PyBySmVIPhclhwnBSk20pP3YFcPdwuKzDewAdjm6eCpIfShuRYv5F51Ig_9JvP1Vumtg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.734",
+      "comprehensive_if": "0.485",
+      "issn": "1004-7948",
+      "cn": "21-1115/TK",
+      "sponsor": "辽宁省科技信息研究所(辽宁省科技档案馆)",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 2,
+      "title": "能源与节能",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIM_2GAbNdr7oXCngRLmgk_c_iT3b3ohXzlc67_jN2PyBySmVIPhclhwnBSk20pP3YE3DS1Iffay1rQBNakh4356AZu3J3jMChEYZRwTOnFHfA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.724",
+      "comprehensive_if": "0.517",
+      "issn": "2095-0802",
+      "cn": "14-1360/TD",
+      "sponsor": "山西科技新闻出版传媒集团有限责任公司",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 2,
+      "title": "汽轮机技术",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIM_2GAbNdr7oXCngRLmgk_c_iT3b3ohXzlc67_jN2PyBySmVIPhclhwnBSk20pP3YH5JLJWGRA015fnRC35kIp96DbtByYhErSJn7AxDgaKTw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.723",
+      "comprehensive_if": "0.561",
+      "issn": "1001-5884",
+      "cn": "23-1251/TH",
+      "sponsor": "哈尔滨汽轮机厂有限责任公司",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 2,
+      "title": "发电设备",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPgMoeNuAziMDwClVw4g9mwMiEJ80Mdhwc7fTG2KM0stzP6EI9MVacl1Y7pafPUWn4YxBxhJDyg-fgzr1_97Cx4LyWvjhDCBiVl5x3pBPr5Nw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.717",
+      "comprehensive_if": "0.572",
+      "issn": "1671-086X",
+      "cn": "31-1391/TN",
+      "sponsor": "上海上发院发电成套设备工程有限公司",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 2,
+      "title": "风能",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPgMoeNuAziMDwClVw4g9mwMiEJ80Mdhwc7fTG2KM0stzP6EI9MVacl1Y7pafPUWn4cQt4UIrcR_ZwEMYr4MOn6lpOQnmPl_wy4pJC3BxBuaA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.685",
+      "comprehensive_if": "0.411",
+      "issn": "1674-9219",
+      "cn": "11-5942/TK",
+      "sponsor": "中国电子信息产业发展研究院;赛迪工业和信息化研究院(集团)有限公司",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 2,
+      "title": "上海节能",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPgMoeNuAziMDwClVw4g9mwMiEJ80Mdhwc7fTG2KM0stzP6EI9MVacl1Y7pafPUWn4QtiaqA_7CRUkrhWj_-krtyXZ5Z7q4fTw01NbtX-TZ2g==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.634",
+      "comprehensive_if": "0.388",
+      "issn": "2095-705X",
+      "cn": "31-1500/TK",
+      "sponsor": "上海市节能协会;上海市节能监察中心",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 2,
+      "title": "电力与能源",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPgMoeNuAziMDwClVw4g9mwMiEJ80Mdhwc7fTG2KM0stzP6EI9MVacl1Y7pafPUWn7RVsfwwcqyqaKmmTCIJcLijREaiExpcgNMtTwHEm3lIg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.631",
+      "comprehensive_if": "0.485",
+      "issn": "2095-1256",
+      "cn": "31-2051/TK",
+      "sponsor": "上海市能源研究所;上海市电力公司;上海市工程热物理学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 2,
+      "title": "节能与环保",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPgMoeNuAziMDwClVw4g9mwMiEJ80Mdhwc7fTG2KM0stzP6EI9MVacl1Y7pafPUWn706ehg9mM447t6rUSaJu_33PMNWPYtcLOp1Pry4k9Buw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.601",
+      "comprehensive_if": "0.379",
+      "issn": "1009-539X",
+      "cn": "11-4454/TK",
+      "sponsor": "北京节能环保中心",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 2,
+      "title": "工业加热",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPgMoeNuAziMDwClVw4g9mwMiEJ80Mdhwc7fTG2KM0stzP6EI9MVacl1Y7pafPUWn6kIyWj1vmZm2WzX7HA4Vqrdvr539847dZ1qsbsHT65Sg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.586",
+      "comprehensive_if": "0.439",
+      "issn": "1002-1639",
+      "cn": "61-1208/TM",
+      "sponsor": "西安电炉研究所有限公司",
+      "tags": [
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 2,
+      "title": "电站系统工程",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPgMoeNuAziMDwClVw4g9mwMiEJ80Mdhwc7fTG2KM0stzP6EI9MVacl1Y7pafPUWn4UmJNewWquU-6_z3rY8l5mQYOULJ7uMOiS_GzqJvtMoQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.585",
+      "comprehensive_if": "0.455",
+      "issn": "1005-006X",
+      "cn": "23-1334/TM",
+      "sponsor": "哈尔滨电站设备成套设计研究所有限公司",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 2,
+      "title": "热力透平",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPgMoeNuAziMDwClVw4g9mwMiEJ80Mdhwc7fTG2KM0stzP6EI9MVacl1Y7pafPUWn5mY7X0jaw72c_FmvoVSUm9v7zRlwECnVHLTC0nmLDT4w==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.568",
+      "comprehensive_if": "0.441",
+      "issn": "1672-5549",
+      "cn": "31-1922/TH",
+      "sponsor": "上海汽轮机厂有限公司",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 2,
+      "title": "能源与环境",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPgMoeNuAziMDwClVw4g9mwMiEJ80Mdhwc7fTG2KM0stzP6EI9MVacl1Y7pafPUWn5R1o7iw8rQdQDIVVnstuRNvvwaqaMUQKSqDcSGM0S7gA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.537",
+      "comprehensive_if": "0.350",
+      "issn": "1672-9064",
+      "cn": "35-1272/TK",
+      "sponsor": "福建省能源研究会;福建省节能协会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 2,
+      "title": "工业锅炉",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPgMoeNuAziMDwClVw4g9mwMiEJ80Mdhwc7fTG2KM0stzP6EI9MVacl1Y7pafPUWn6wkBWlOc0rJzDhyAT66tKMuO-gXgTYo-ggNvTkDuedzQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.527",
+      "comprehensive_if": "0.433",
+      "issn": "1004-8774",
+      "cn": "31-1400/TK",
+      "sponsor": "上海工业锅炉研究所有限公司",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 2,
+      "title": "燃气轮机技术",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPgMoeNuAziMDwClVw4g9mwMiEJ80Mdhwc7fTG2KM0stzP6EI9MVacl1Y7pafPUWn5uNPB6bLRAqSYzAvomRT5gvq0vjR9y6IxeuxPwcJ40TA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.480",
+      "comprehensive_if": "0.390",
+      "issn": "1009-2889",
+      "cn": "32-1393/TK",
+      "sponsor": "南京燃气轮机研究所",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 2,
+      "title": "东方汽轮机",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPgMoeNuAziMDwClVw4g9mwMiEJ80Mdhwc7fTG2KM0stzP6EI9MVacl1Y7pafPUWn6pAvmjpLeaX1QgEwXWG_nWx2dNpQI8BXrfQTZbEv0a6g==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.435",
+      "comprehensive_if": "0.384",
+      "issn": "1674-9987",
+      "cn": "51-1722/TK",
+      "sponsor": "东方电气集团东方汽轮机有限公司",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 2,
+      "title": "内燃机与配件",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPgMoeNuAziMDwClVw4g9mwMiEJ80Mdhwc7fTG2KM0stzP6EI9MVacl1Y7pafPUWn4y3mLt4QaoLiuasl-DvBEf40MZfDplDvenLocuB_eOFw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.409",
+      "comprehensive_if": "0.189",
+      "issn": "1674-957X",
+      "cn": "13-1397/TH",
+      "sponsor": "中国内燃机工业协会(CICEIA);石家庄金刚内燃机零部件集团有限公司",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 2,
+      "title": "内燃机与动力装置",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPgMoeNuAziMDwClVw4g9mwMiEJ80Mdhwc7fTG2KM0stzP6EI9MVacl1Y7pafPUWn5VOW3DdNNjSdp7nvso0tmcECOd7ZkF0MG8unqDZIBthg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.327",
+      "comprehensive_if": "0.193",
+      "issn": "1673-6397",
+      "cn": "37-1445/TK",
+      "sponsor": "山东交通学院",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 2,
+      "title": "内燃机",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPgMoeNuAziMDwClVw4g9mwMiEJ80Mdhwc7fTG2KM0stzP6EI9MVacl1Y7pafPUWn6TsyiVWlu3NKeCZkkaXYINhGnZ3YgywoKcLmZAqDE0BA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.293",
+      "comprehensive_if": "0.188",
+      "issn": "1000-6494",
+      "cn": "50-1100/TK",
+      "sponsor": "中国内燃机学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 2,
+      "title": "小型内燃机与车辆技术",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPgMoeNuAziMDwClVw4g9mwMiEJ80Mdhwc7fTG2KM0stzP6EI9MVacl1Y7pafPUWn7_PGmn_Yv46yRm4bTlv9v-FOpPEuZMWoy_C4qVtgORsA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.289",
+      "comprehensive_if": "0.209",
+      "issn": "2095-8234",
+      "cn": "12-1440/TK",
+      "sponsor": "天津大学",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 2,
+      "title": "锅炉制造",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPgMoeNuAziMDwClVw4g9mwMiEJ80Mdhwc7fTG2KM0stzP6EI9MVacl1Y7pafPUWn4NMJV45NTtK-cVJtnI8-3rEbrgiUoU34I-GtD8BO04xA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.265",
+      "comprehensive_if": "0.215",
+      "issn": "1674-1005",
+      "cn": "23-1249/TK",
+      "sponsor": "哈尔滨锅炉厂有限责任公司",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 3,
+      "title": "现代车用动力",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMqL31F4V_ZzoJ-1earjEh02FqlzNF79h6dfFsTkcs6MvbA1mW0LUkv7BPjcpoYfSxvrxemr5sIJ6Tua_m7GDCWi5wMlA1e0vZbnSzM_Oh_kA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.257",
+      "comprehensive_if": "0.152",
+      "issn": "1671-5446",
+      "cn": "32-1642/TH",
+      "sponsor": "中国一汽无锡油泵油嘴研究所",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 3,
+      "title": "柴油机",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMqL31F4V_ZzoJ-1earjEh02FqlzNF79h6dfFsTkcs6MvbA1mW0LUkv7BPjcpoYfSx1JhZsXvHPrKtsqB8POqLnTWRr9N2J252Y9mMBQwJiog==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.220",
+      "comprehensive_if": "0.159",
+      "issn": "1001-4357",
+      "cn": "31-1261/TK",
+      "sponsor": "中国船舶集团有限公司第七一一研究所",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 3,
+      "title": "柴油机设计与制造",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMqL31F4V_ZzoJ-1earjEh02FqlzNF79h6dfFsTkcs6MvbA1mW0LUkv7BPjcpoYfSxUMXYFdxVVlJg4ncNvP_YbTIuZvSo4H0NGv5Pt0JKmJQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.187",
+      "comprehensive_if": "0.147",
+      "issn": "1671-0614",
+      "cn": "31-1430/TH",
+      "sponsor": "上海柴油机股份有限公司",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "动力工程",
+      "category_code": "C039",
+      "page": 3,
+      "title": "应用能源技术",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMqL31F4V_ZzoJ-1earjEh02FqlzNF79h6dfFsTkcs6MvbA1mW0LUkv7BPjcpoYfSyAplSk_mzfIva1kNKQxgX2o52WwOhd_-c7m5sOftmjlg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1009-3230",
+      "cn": "23-1184/TK",
+      "sponsor": "黑龙江省建筑材料工业规划设计研究院",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    }
+  ]
+}

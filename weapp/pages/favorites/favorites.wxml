@@ -1,0 +1,31 @@
+<view class="paper-bg">
+  <view class="safe-page page-pad">
+    <view class="page-title">我的收藏</view>
+    <view class="page-sub">按用途新建收藏夹，也可以分享整组期刊</view>
+
+    <button class="create-btn" bindtap="createFolder">＋ 新建收藏夹</button>
+
+    <view class="folder-list">
+      <view wx:for="{{folders}}" wx:key="id" class="folder-card card" bindtap="openFolder" data-id="{{item.id}}">
+        <view class="folder-top">
+          <view>
+            <view class="folder-title">{{item.title}}</view>
+            <view class="folder-desc">{{item.desc}}</view>
+          </view>
+          <view class="folder-count">{{item.count}}</view>
+        </view>
+        <view class="folder-preview">{{item.preview}}</view>
+        <view class="folder-actions">
+          <button catchtap="shareFolder" data-id="{{item.id}}" open-type="share">分享 list</button>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="bottom-tabs">
+    <view class="bottom-tab" bindtap="goTab" data-url="/pages/index/index"><text class="tab-icon">⌂</text><text>首页</text></view>
+    <view class="bottom-tab" bindtap="goTab" data-url="/pages/rankings/rankings"><text class="tab-icon">☷</text><text>榜单</text></view>
+    <view class="bottom-tab active"><text class="tab-icon">♡</text><text>收藏</text></view>
+    <view class="bottom-tab" bindtap="goTab" data-url="/pages/profile/profile"><text class="tab-icon">♙</text><text>我的</text></view>
+  </view>
+</view>

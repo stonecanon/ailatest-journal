@@ -1,0 +1,102 @@
+.page-pad {
+  padding-top: 56rpx;
+}
+
+.page-title {
+  color: #171717;
+  font-size: 52rpx;
+  font-weight: 900;
+}
+
+.page-sub {
+  margin-top: 12rpx;
+  color: #6f6a64;
+  font-size: 27rpx;
+}
+
+.filter-section {
+  margin-top: 24rpx;
+  padding: 28rpx;
+}
+
+.section-title {
+  margin-bottom: 18rpx;
+  color: #171717;
+  font-size: 30rpx;
+  font-weight: 850;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14rpx;
+}
+
+.chip {
+  min-height: 58rpx;
+  padding: 0 22rpx;
+  display: flex;
+  align-items: center;
+  border: 1rpx solid #f1cfae;
+  border-radius: 12rpx;
+  background: #fff8ee;
+  color: #4d4036;
+  font-size: 24rpx;
+}
+
+.chip.active {
+  border-color: #ef4d00;
+  background: #fff0df;
+  color: #ef4d00;
+  font-weight: 800;
+}
+
+.select-row {
+  height: 76rpx;
+  padding: 0 22rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1rpx solid #eadfd2;
+  border-radius: 14rpx;
+  background: #fffaf3;
+  color: #302922;
+  font-size: 27rpx;
+}
+
+.select-arrow {
+  color: #8f8378;
+  font-size: 30rpx;
+}
+
+.filter-actions {
+  position: sticky;
+  bottom: calc(110rpx + env(safe-area-inset-bottom));
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 18rpx;
+  margin-top: 28rpx;
+  padding: 14rpx 0;
+}
+
+.ghost-btn,
+.apply-btn {
+  height: 84rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  font-weight: 850;
+}
+
+.ghost-btn {
+  border: 1rpx solid #e3d6c7;
+  background: rgba(255, 255, 255, 0.94);
+  color: #5d554e;
+}
+
+.apply-btn {
+  background: linear-gradient(180deg, #ff6a1a 0%, #ef4d00 100%);
+  color: #fff;
+}

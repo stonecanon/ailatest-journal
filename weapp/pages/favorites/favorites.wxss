@@ -1,0 +1,88 @@
+.page-pad {
+  padding-top: 56rpx;
+}
+
+.page-title {
+  color: #171717;
+  font-size: 52rpx;
+  font-weight: 900;
+}
+
+.page-sub {
+  margin-top: 12rpx;
+  color: #6f6a64;
+  font-size: 27rpx;
+}
+
+.create-btn {
+  height: 76rpx;
+  margin-top: 28rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16rpx;
+  background: linear-gradient(180deg, #ff6a1a 0%, #ef4d00 100%);
+  color: #fff;
+  font-size: 27rpx;
+  font-weight: 850;
+}
+
+.folder-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18rpx;
+  margin-top: 24rpx;
+}
+
+.folder-card {
+  padding: 26rpx;
+}
+
+.folder-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 20rpx;
+}
+
+.folder-title {
+  color: #171717;
+  font-size: 31rpx;
+  font-weight: 850;
+}
+
+.folder-desc,
+.folder-preview {
+  margin-top: 10rpx;
+  color: #766d63;
+  font-size: 24rpx;
+  line-height: 1.5;
+}
+
+.folder-count {
+  min-width: 64rpx;
+  height: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999rpx;
+  background: #fff0df;
+  color: #ef4d00;
+  font-size: 24rpx;
+  font-weight: 800;
+}
+
+.folder-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 18rpx;
+}
+
+.folder-actions button {
+  height: 52rpx;
+  padding: 0 20rpx;
+  border: 1rpx solid #ead0bc;
+  border-radius: 999rpx;
+  background: #fffaf3;
+  color: #7b4a24;
+  font-size: 23rpx;
+}

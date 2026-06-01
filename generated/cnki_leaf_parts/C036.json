@@ -1,0 +1,543 @@
+{
+  "category": {
+    "code": "C036",
+    "title": "船舶工业",
+    "count": 30,
+    "major_code": "",
+    "major_title": ""
+  },
+  "pages": [
+    {
+      "page": 1,
+      "rows": 21,
+      "pageCount": 2
+    },
+    {
+      "page": 2,
+      "rows": 9,
+      "pageCount": 2
+    }
+  ],
+  "records": [
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "船舶工业",
+      "category_code": "C036",
+      "page": 1,
+      "title": "中国舰船研究",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINJ9gUv4ECEU5n9f_sBjcDjAcAIEOsWqZWv8fd2k548lr_AIbiMm5AO3fzf_0O7M6QST83GfrxFnVe-jxuwaNWJ9h_x3PgqcKU6aRj9yQGPHg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.350",
+      "comprehensive_if": "1.596",
+      "issn": "1673-3185",
+      "cn": "42-1755/TJ",
+      "sponsor": "中国舰船研究设计中心",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "船舶工业",
+      "category_code": "C036",
+      "page": 1,
+      "title": "中国航海",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINJ9gUv4ECEU5n9f_sBjcDjAcAIEOsWqZWv8fd2k548lr_AIbiMm5AO3fzf_0O7M6QOfDUWdP-4d3XGDtMgI5OKl2_dRQt7lsaLvYmM4kEwfQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.935",
+      "comprehensive_if": "1.088",
+      "issn": "1000-4653",
+      "cn": "10-1741/U",
+      "sponsor": "中国航海学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "船舶工业",
+      "category_code": "C036",
+      "page": 1,
+      "title": "船舶力学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMcziR49J4T4AylssvQYUvBo_k_gCt-LkfFny4Srt7L8mZn2rV_A61sPerGzBEd3RYpisJzcin0Ki9Ip7Ny3dY2xDkkcV5-uTyvE_4IgClz-Q==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.207",
+      "comprehensive_if": "0.790",
+      "issn": "1007-7294",
+      "cn": "32-1468/U",
+      "sponsor": "中国船舶科学研究中心;中国造船工程学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "船舶工业",
+      "category_code": "C036",
+      "page": 1,
+      "title": "船舶工程",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMcziR49J4T4AylssvQYUvBo_k_gCt-LkfFny4Srt7L8mZn2rV_A61sPerGzBEd3RbIbmJ1wDqg9CYO07-y-1ysVtMDc0O2JisllDGpDusCAA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.095",
+      "comprehensive_if": "0.649",
+      "issn": "1000-6982",
+      "cn": "31-1281/U",
+      "sponsor": "中国造船工程学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "船舶工业",
+      "category_code": "C036",
+      "page": 1,
+      "title": "中国造船",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMcziR49J4T4AylssvQYUvBo_k_gCt-LkfFny4Srt7L8mZn2rV_A61sPerGzBEd3RZJJTUFKx7tw6t_Afw7DBj2HyabSLr7Sr4YffX0JTKk-Q==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.075",
+      "comprehensive_if": "0.738",
+      "issn": "1000-4882",
+      "cn": "31-1497/U",
+      "sponsor": "中国造船工程学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "船舶工业",
+      "category_code": "C036",
+      "page": 1,
+      "title": "船舶",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMcziR49J4T4AylssvQYUvBo_k_gCt-LkfFny4Srt7L8mZn2rV_A61sPerGzBEd3RYwHOLGZOTcERdkm0sJP9QMxUIUiltYEZ5eWP1wL5LfPQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.988",
+      "comprehensive_if": "0.710",
+      "issn": "1001-9855",
+      "cn": "31-1561/U",
+      "sponsor": "中国船舶及海洋工程设计研究院",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "船舶工业",
+      "category_code": "C036",
+      "page": 1,
+      "title": "舰船科学技术",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMcziR49J4T4AylssvQYUvBo_k_gCt-LkfFny4Srt7L8mZn2rV_A61sPerGzBEd3RY7gEndHravRUZ3kdG9BisC2EZyCZy3UX1B0qvm44BWBQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.815",
+      "comprehensive_if": "0.524",
+      "issn": "1672-7649",
+      "cn": "11-1885/U",
+      "sponsor": "中国舰船研究院;中国船舶重工集团公司第七一四研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "船舶工业",
+      "category_code": "C036",
+      "page": 1,
+      "title": "船海工程",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMcziR49J4T4AylssvQYUvBo_k_gCt-LkfFny4Srt7L8mZn2rV_A61sPerGzBEd3RYuCJaJdjNFiae9Pr2hY1TE4wgSzcRM66EcBZE-z_9Tvw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.759",
+      "comprehensive_if": "0.617",
+      "issn": "1671-7953",
+      "cn": "42-1645/U",
+      "sponsor": "武汉造船工程学会;武汉理工大学",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "船舶工业",
+      "category_code": "C036",
+      "page": 1,
+      "title": "世界海运",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMcziR49J4T4AylssvQYUvBo_k_gCt-LkfFny4Srt7L8mZn2rV_A61sPerGzBEd3RZIUBJFi5jZLp6VS7G9OaY-qWJDVygd19o7tzuxA5tjsg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.578",
+      "comprehensive_if": "0.364",
+      "issn": "1006-7728",
+      "cn": "21-1284/U",
+      "sponsor": "大连海事大学",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "船舶工业",
+      "category_code": "C036",
+      "page": 1,
+      "title": "船电技术",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMcziR49J4T4AylssvQYUvBo_k_gCt-LkfFny4Srt7L8mZn2rV_A61sPerGzBEd3Ra0vEAf72Ictvn5NaX-ASHUKzkzOyaLmusOcO615gaLCw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.564",
+      "comprehensive_if": "0.321",
+      "issn": "1003-4862",
+      "cn": "42-1267/U",
+      "sponsor": "武汉船用电力推进装置研究所;中国造船工程学会轮机学术委员会;船舶综合电力技术重点实验室",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "船舶工业",
+      "category_code": "C036",
+      "page": 1,
+      "title": "航海教育研究",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMcziR49J4T4AylssvQYUvBo_k_gCt-LkfFny4Srt7L8mZn2rV_A61sPerGzBEd3RZ2mDeywpDUsLHJigyvCcpqAPTZ2jLF7Mmot1ibUGpKwQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.518",
+      "comprehensive_if": "0.348",
+      "issn": "1006-8724",
+      "cn": "21-1305/G4",
+      "sponsor": "大连海事大学",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "船舶工业",
+      "category_code": "C036",
+      "page": 1,
+      "title": "上海船舶运输科学研究所学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMcziR49J4T4AylssvQYUvBo_k_gCt-LkfFny4Srt7L8mZn2rV_A61sPerGzBEd3RYTgqcSPOCcBEXyKqgwl28gqpCK_qk4vvdj6WIgmw4VrQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.500",
+      "comprehensive_if": "0.351",
+      "issn": "1674-5949",
+      "cn": "31-2023/U",
+      "sponsor": "上海船舶运输科学研究所有限公司",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "船舶工业",
+      "category_code": "C036",
+      "page": 1,
+      "title": "造船技术",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMcziR49J4T4AylssvQYUvBo_k_gCt-LkfFny4Srt7L8mZn2rV_A61sPerGzBEd3RaFbNb8PBLuGLM-VDxj0TT6bEXdmy40XZmrOkp6I3iyrg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.441",
+      "comprehensive_if": "0.314",
+      "issn": "1000-3878",
+      "cn": "31-1247/U",
+      "sponsor": "中国船舶工业集团公司第十一研究所",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "船舶工业",
+      "category_code": "C036",
+      "page": 1,
+      "title": "船舶与海洋工程",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMcziR49J4T4AylssvQYUvBo_k_gCt-LkfFny4Srt7L8mZn2rV_A61sPerGzBEd3RbfYYSK0rUIgfJ4JfRxMwlULhbYertCBZNHY4exMF763Q==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.424",
+      "comprehensive_if": "0.282",
+      "issn": "2095-4069",
+      "cn": "31-2076/U",
+      "sponsor": "上海市船舶与海洋工程学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "船舶工业",
+      "category_code": "C036",
+      "page": 1,
+      "title": "天津航海",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMcziR49J4T4AylssvQYUvBo_k_gCt-LkfFny4Srt7L8mZn2rV_A61sPerGzBEd3RYQVFnA0RV0D9IfBq4BuZ2LFvO-X4xlrY8IeLjzDEE48Q==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.397",
+      "comprehensive_if": "0.282",
+      "issn": "1005-9660",
+      "cn": "12-1129/U",
+      "sponsor": "天津市航海学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "船舶工业",
+      "category_code": "C036",
+      "page": 1,
+      "title": "船舶物资与市场",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMcziR49J4T4AylssvQYUvBo_k_gCt-LkfFny4Srt7L8mZn2rV_A61sPerGzBEd3RZkHvselwLtvVsIcrVOGLWEhIlq0f7cPaXKwz_RJPmbgw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.366",
+      "comprehensive_if": "0.216",
+      "issn": "1006-6969",
+      "cn": "11-3636/F",
+      "sponsor": "中船重工物资贸易集团有限公司;中国船舶重工集团公司第七一四研究所",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "船舶工业",
+      "category_code": "C036",
+      "page": 1,
+      "title": "武汉船舶职业技术学院学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMcziR49J4T4AylssvQYUvBo_k_gCt-LkfFny4Srt7L8mZn2rV_A61sPerGzBEd3Rbd7GBtAiwpSOgl1PuOxBZ_W7vxArIpayK9k0IV88oQVQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.347",
+      "comprehensive_if": "0.291",
+      "issn": "1671-8100",
+      "cn": "42-1670/Z",
+      "sponsor": "武汉船舶职业技术学院",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "船舶工业",
+      "category_code": "C036",
+      "page": 1,
+      "title": "机电设备",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMcziR49J4T4AylssvQYUvBo_k_gCt-LkfFny4Srt7L8mZn2rV_A61sPerGzBEd3Rb4dsVBKzJxfViWAahNu76fT3G9UklPFXv3vycCr3PUyA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.328",
+      "comprehensive_if": "0.183",
+      "issn": "1005-8354",
+      "cn": "31-1420/TM",
+      "sponsor": "上海船舶设备研究所",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "船舶工业",
+      "category_code": "C036",
+      "page": 1,
+      "title": "青岛远洋船员职业学院学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMcziR49J4T4AylssvQYUvBo_k_gCt-LkfFny4Srt7L8mZn2rV_A61sPerGzBEd3Rafwg6p9WvojwDfL2fh3f_MncOmHV3PXlAVX41jV8eYiQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.284",
+      "comprehensive_if": "0.142",
+      "issn": "2095-3747",
+      "cn": "37-1489/U",
+      "sponsor": "青岛远洋船员职业学院",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "船舶工业",
+      "category_code": "C036",
+      "page": 1,
+      "title": "航海技术",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMcziR49J4T4AylssvQYUvBo_k_gCt-LkfFny4Srt7L8mZn2rV_A61sPerGzBEd3RbYcHxYb9jVqyENzPmHKfO5_KjKtVHc1S4LOVC4oikw8A==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.270",
+      "comprehensive_if": "0.202",
+      "issn": "1006-1738",
+      "cn": "10-1744/U",
+      "sponsor": "中国航海学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "船舶工业",
+      "category_code": "C036",
+      "page": 1,
+      "title": "船舶标准化工程师",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIMcziR49J4T4AylssvQYUvBo_k_gCt-LkfFny4Srt7L8mZn2rV_A61sPerGzBEd3RYeCBnPJJvYttO9uaNBJJNFD49f1CETLSYZ8tylpF4w5w==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.259",
+      "comprehensive_if": "0.161",
+      "issn": "1005-7560",
+      "cn": "31-1981/U",
+      "sponsor": "中国船舶重工集团公司第七〇四研究所",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "船舶工业",
+      "category_code": "C036",
+      "page": 2,
+      "title": "江苏船舶",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPEzB7LGusAlFXSxsgoTVMqdd2vRS2I-dysA5Ld88bptqNNzeiPVqtr8xCZpWAGBYYdOM0dJ8lc7hY6HU2_pPXHBypiRRS3nfkuRiYHDzkCFA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.222",
+      "comprehensive_if": "0.165",
+      "issn": "1001-5388",
+      "cn": "32-1230/U",
+      "sponsor": "江苏省造船工程学会;江苏省船舶设计研究所",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "船舶工业",
+      "category_code": "C036",
+      "page": 2,
+      "title": "中国修船",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPEzB7LGusAlFXSxsgoTVMqdd2vRS2I-dysA5Ld88bptqNNzeiPVqtr8xCZpWAGBYYH1a1TYL1qLnWlhFy3lF1VP2qVfUFmbBUS1-gxpB31Kw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.211",
+      "comprehensive_if": "0.117",
+      "issn": "1001-8328",
+      "cn": "12-1144/U",
+      "sponsor": "天津修船技术研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "船舶工业",
+      "category_code": "C036",
+      "page": 2,
+      "title": "船舶设计通讯",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPEzB7LGusAlFXSxsgoTVMqdd2vRS2I-dysA5Ld88bptqNNzeiPVqtr8xCZpWAGBYZqqUeNHXaNaT-MD2cU-EEH1s0FMESYfWa3y_U1s-kOnw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.187",
+      "comprehensive_if": "0.147",
+      "issn": "1001-4624",
+      "cn": "31-1397/U",
+      "sponsor": "上海船舶研究设计院",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "船舶工业",
+      "category_code": "C036",
+      "page": 2,
+      "title": "广东造船",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPEzB7LGusAlFXSxsgoTVMqdd2vRS2I-dysA5Ld88bptqNNzeiPVqtr8xCZpWAGBYbcqR5yRTEpBqQmcBDGKG0LKktv7yYqyXKXjd9eyf1SPw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.157",
+      "comprehensive_if": "0.106",
+      "issn": "2095-6622",
+      "cn": "44-1270/U",
+      "sponsor": "广东造船工程学会",
+      "tags": [
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "船舶工业",
+      "category_code": "C036",
+      "page": 2,
+      "title": "船舶标准化与质量",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPEzB7LGusAlFXSxsgoTVMqdd2vRS2I-dysA5Ld88bptqNNzeiPVqtr8xCZpWAGBYYtlsmmShi6kUj-fXA0Ej7NKf5-ktzyOwkD5suc20v17Q==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.087",
+      "comprehensive_if": "0.047",
+      "issn": "1007-9750",
+      "cn": "11-3922/U",
+      "sponsor": "中国船舶集团有限公司综合技术经济研究院",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "船舶工业",
+      "category_code": "C036",
+      "page": 2,
+      "title": "船艇",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPEzB7LGusAlFXSxsgoTVMqdd2vRS2I-dysA5Ld88bptqNNzeiPVqtr8xCZpWAGBYZkNOs4DUvU-Yf5n1Fah9lOcssadjdLBcU2YbTjJT18Og==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1673-5056",
+      "cn": "11-5431/U",
+      "sponsor": "中国船舶工业综合技术经济研究院",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "船舶工业",
+      "category_code": "C036",
+      "page": 2,
+      "title": "广船科技",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPEzB7LGusAlFXSxsgoTVMqdd2vRS2I-dysA5Ld88bptqNNzeiPVqtr8xCZpWAGBYb4Huic97Ho5Y7nmWnpzbi7fUOy34aNKBv_FVgq8MWVAA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "2095-4506",
+      "cn": "44-1208/U",
+      "sponsor": "广州广船国际股份有限公司科学技术协会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "船舶工业",
+      "category_code": "C036",
+      "page": 2,
+      "title": "航海",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPEzB7LGusAlFXSxsgoTVMqdd2vRS2I-dysA5Ld88bptqNNzeiPVqtr8xCZpWAGBYbA7ZUM1_7LEVzxfrBtuCygNq8PvMx0-0BVwR82EDHS-g==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1000-0356",
+      "cn": "31-1121/U",
+      "sponsor": "上海市航海学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "船舶工业",
+      "category_code": "C036",
+      "page": 2,
+      "title": "中船重工",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPEzB7LGusAlFXSxsgoTVMqdd2vRS2I-dysA5Ld88bptqNNzeiPVqtr8xCZpWAGBYbJwfBRoKLFXO8MNaLKiBKFio5pYFHIiIMENA9DwXwCtw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1671-9360",
+      "cn": "11-4760/U",
+      "sponsor": "中国船舶重工集团公司",
+      "tags": []
+    }
+  ]
+}

@@ -1,0 +1,1053 @@
+{
+  "category": {
+    "code": "A005",
+    "title": "物理学",
+    "count": 57,
+    "major_code": "",
+    "major_title": ""
+  },
+  "pages": [
+    {
+      "page": 1,
+      "rows": 21,
+      "pageCount": 3
+    },
+    {
+      "page": 2,
+      "rows": 21,
+      "pageCount": 3
+    },
+    {
+      "page": 3,
+      "rows": 15,
+      "pageCount": 3
+    }
+  ],
+  "records": [
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 1,
+      "title": "中国激光",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIP1Z9hVdciB4nKwXghyMHduP52W4DiPaU3WTP-ue-x7gfERK3pmUlib0HCjdDKE0iib4Yt8sM94NLEi9dPa3Y-soOTMe7x4vAu_iCmP-VqdXA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.994",
+      "comprehensive_if": "2.334",
+      "issn": "0258-7025",
+      "cn": "31-1339/TN",
+      "sponsor": "中国科学院上海光学精密机械研究所;中国光学学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 1,
+      "title": "激光与光电子学进展",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIP1Z9hVdciB4nKwXghyMHduP52W4DiPaU3WTP-ue-x7gfERK3pmUlib0HCjdDKE0ihm85ue7q9JQsPHdlfxwpIPPIN7lwj5FpA8Gg4rGfiwRA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.725",
+      "comprehensive_if": "1.794",
+      "issn": "1006-4125",
+      "cn": "31-1690/TN",
+      "sponsor": "中国科学院上海光学精密机械研究所",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 1,
+      "title": "光学学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIP1Z9hVdciB4nKwXghyMHduP52W4DiPaU3WTP-ue-x7gfERK3pmUlib0HCjdDKE0iiOA5qTLLoisKmcNiLUfdkISKXFl2SKPwxnflBDbKPVCg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.576",
+      "comprehensive_if": "1.992",
+      "issn": "0253-2239",
+      "cn": "31-1252/O4",
+      "sponsor": "中国科学院上海光学精密机械研究所;中国光学学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 1,
+      "title": "光谱学与光谱分析",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIP1Z9hVdciB4nKwXghyMHduP52W4DiPaU3WTP-ue-x7gfERK3pmUlib0HCjdDKE0iho4sQ4cZ9JjV-lPXDXD0iWgHf3vQZMOYNELb0fuTLklg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.280",
+      "comprehensive_if": "1.322",
+      "issn": "1000-0593",
+      "cn": "11-2200/O4",
+      "sponsor": "中国光学学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 1,
+      "title": "Advanced Photonics",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIP1Z9hVdciB4nKwXghyMHduP52W4DiPaU3WTP-ue-x7gfERK3pmUlib0HCjdDKE0ihjvATJ2Qu4ouj0SF8BoZav_-hv4mUgHRF7-Z4UHcDsKA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.213",
+      "comprehensive_if": "2.135",
+      "issn": "2577-5421",
+      "cn": "31-2165/O4",
+      "sponsor": "中国科学院上海光学精密机械研究所",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 1,
+      "title": "Science China(Physics,Mechanics & Astronomy)",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIP1Z9hVdciB4nKwXghyMHduP52W4DiPaU3WTP-ue-x7gfERK3pmUlib0HCjdDKE0iiulrPyDQiGN04RbOiVV4kcAPIinsO90hyGMJfZsyIr0g==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.181",
+      "comprehensive_if": "1.805",
+      "issn": "1674-7348",
+      "cn": "11-5849/N",
+      "sponsor": "中国科学院;国家自然科学基金委员会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 1,
+      "title": "中国光学(中英文)",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIP1Z9hVdciB4nKwXghyMHduP52W4DiPaU3WTP-ue-x7gfERK3pmUlib0HCjdDKE0igvP4sqEWqd31TWqepDl2NlGMfWpj24d_vXQxz2yjxP9w==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.036",
+      "comprehensive_if": "1.492",
+      "issn": "2097-1842",
+      "cn": "22-1431/O4",
+      "sponsor": "中国科学院长春光学精密机械与物理研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 1,
+      "title": "激光技术",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIP1Z9hVdciB4nKwXghyMHduP52W4DiPaU3WTP-ue-x7gfERK3pmUlib0HCjdDKE0ig8KpphE9uPvHg1RqzJ6MmnEoWXxp7oE7zQtVJtknpw0Q==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.854",
+      "comprehensive_if": "1.205",
+      "issn": "1001-3806",
+      "cn": "51-1125/TN",
+      "sponsor": "西南技术物理研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 1,
+      "title": "Photonics Research",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIP1Z9hVdciB4nKwXghyMHduP52W4DiPaU3WTP-ue-x7gfERK3pmUlib0HCjdDKE0igrPoyfuexZrHEVIBJWEB2ud986-uhfbV5gN1BDqsjNXw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.824",
+      "comprehensive_if": "1.329",
+      "issn": "2327-9125",
+      "cn": "31-2126/O4",
+      "sponsor": "中国科学院上海光学精密机械研究所",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 1,
+      "title": "Chinese Physics Letters",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIP1Z9hVdciB4nKwXghyMHduP52W4DiPaU3WTP-ue-x7gfERK3pmUlib0HCjdDKE0ijon5Ut5tBF59HbJV-MOvjc_kHPstcNjoCKJwc8fW4Viw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.770",
+      "comprehensive_if": "1.541",
+      "issn": "0256-307X",
+      "cn": "11-1959/O4",
+      "sponsor": "中国科学院物理研究所;中国物理学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 1,
+      "title": "光子学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIP1Z9hVdciB4nKwXghyMHduP52W4DiPaU3WTP-ue-x7gfERK3pmUlib0HCjdDKE0ihyRzm9kX8KLLB75RmXTJcSQsV1UZDFXy-eGnLQ319gOg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.766",
+      "comprehensive_if": "1.114",
+      "issn": "1004-4213",
+      "cn": "61-1235/O4",
+      "sponsor": "中国科学院西安光学精密机械研究所;中国光学学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 1,
+      "title": "发光学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIP1Z9hVdciB4nKwXghyMHduP52W4DiPaU3WTP-ue-x7gfERK3pmUlib0HCjdDKE0ij53MDKdMSy9lDIpEkcrZdmRa1pVO-naGTidjm_jN9AMQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.595",
+      "comprehensive_if": "1.118",
+      "issn": "1000-7032",
+      "cn": "22-1116/O4",
+      "sponsor": "中国科学院长春光学精密机械与物理研究所;中国物理学会发光分会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 1,
+      "title": "声学学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIP1Z9hVdciB4nKwXghyMHduP52W4DiPaU3WTP-ue-x7gfERK3pmUlib0HCjdDKE0ihpkhodM-mE01KDnJB4ZebgWO80IRZEb92Dbj4-yWljoA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.480",
+      "comprehensive_if": "1.025",
+      "issn": "0371-0025",
+      "cn": "11-2065/O4",
+      "sponsor": "中国科学院声学研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 1,
+      "title": "应用光学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIP1Z9hVdciB4nKwXghyMHduP52W4DiPaU3WTP-ue-x7gfERK3pmUlib0HCjdDKE0igmsiftjBurGyxqSHV-s0Kma4N1ZIe1Ak92HhSmHwcOFQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.415",
+      "comprehensive_if": "0.941",
+      "issn": "1002-2082",
+      "cn": "61-1171/O4",
+      "sponsor": "中国兵器工业第二〇五研究所;中国兵工学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 1,
+      "title": "Frontiers of Physics",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIP1Z9hVdciB4nKwXghyMHduP52W4DiPaU3WTP-ue-x7gfERK3pmUlib0HCjdDKE0ijT5xjajsnWUTjtVYvLpriviTmwOYsuzhp7udVor8fYCQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.300",
+      "comprehensive_if": "1.059",
+      "issn": "2095-0462",
+      "cn": "11-5994/O4",
+      "sponsor": "高等教育出版社有限公司",
+      "tags": [
+        "混合OA期刊"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 1,
+      "title": "光学技术",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIP1Z9hVdciB4nKwXghyMHduP52W4DiPaU3WTP-ue-x7gfERK3pmUlib0HCjdDKE0iju9XausMb85UDEF3HZxt3ewGoAd1mtziHv6-XcR3Lq_Q==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.235",
+      "comprehensive_if": "0.761",
+      "issn": "1002-1582",
+      "cn": "11-1879/O4",
+      "sponsor": "中国北方光电工业总公司;中国兵工学会;北京理工大学",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 1,
+      "title": "高压物理学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINkBk8GyEuvUNKYgIPO1eUpo2yT3CcFdGJLSGTqt9xI11_PJqPSHNWwmuwj1MVffkV03oqH-RrX8QFxvYE5Q4rjMOYWBIyIsNehaGLzfqSxnA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.192",
+      "comprehensive_if": "0.826",
+      "issn": "1000-5773",
+      "cn": "51-1147/O4",
+      "sponsor": "中国物理学会;高压物理专业委员会;四川省物理学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 1,
+      "title": "Chinese Optics Letters",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINkBk8GyEuvUNKYgIPO1eUpo2yT3CcFdGJLSGTqt9xI11_PJqPSHNWwmuwj1MVffkWDtmiJ6L3OJhfzL4ijNIqMygCDRNywOMs2CHl0W04-jQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.154",
+      "comprehensive_if": "0.853",
+      "issn": "1671-7694",
+      "cn": "31-1890/O4",
+      "sponsor": "中国科学院上海光学精密机械研究所;中国光学学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 1,
+      "title": "波谱学杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINkBk8GyEuvUNKYgIPO1eUpo2yT3CcFdGJLSGTqt9xI11_PJqPSHNWwmuwj1MVffkUx5VCHV_sHavShM1ffeX8WFwVrV9Vi1cjvTQPba3xa9w==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.129",
+      "comprehensive_if": "0.929",
+      "issn": "1000-4556",
+      "cn": "42-1180/O4",
+      "sponsor": "中国科学院精密测量科学与技术创新研究院",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 1,
+      "title": "量子电子学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINkBk8GyEuvUNKYgIPO1eUpo2yT3CcFdGJLSGTqt9xI11_PJqPSHNWwmuwj1MVffkXmM-UA45rs-_xI7jy7iiKL4x2rKHjFMk__ImwdwRDovw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.114",
+      "comprehensive_if": "0.674",
+      "issn": "1007-5461",
+      "cn": "34-1163/TN",
+      "sponsor": "中国光学学会基础光学专业委员会;中国科学院合肥物质科学研究院",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 1,
+      "title": "应用声学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINkBk8GyEuvUNKYgIPO1eUpo2yT3CcFdGJLSGTqt9xI11_PJqPSHNWwmuwj1MVffkXBuvo7GO_-tW9oRx2diCum4JVJNH7aJ1yr5heMeeo7Xw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.096",
+      "comprehensive_if": "0.668",
+      "issn": "1000-310X",
+      "cn": "11-2121/O4",
+      "sponsor": "中国科学院声学研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 2,
+      "title": "物理学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN59dKVjeiwWlOyNUbqy4A31hQF4jLn3ve7wlDchzKmpGRq-wouILUdti7nFG4itsv3BBviCziaq9bkcHLN8Ry4Me9fUISOzBammFiALpUc-Q==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.093",
+      "comprehensive_if": "0.688",
+      "issn": "1000-3290",
+      "cn": "11-1958/O4",
+      "sponsor": "中国物理学会;中国科学院物理研究所",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 2,
+      "title": "Matter and Radiation at Extremes",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN59dKVjeiwWlOyNUbqy4A31hQF4jLn3ve7wlDchzKmpGRq-wouILUdti7nFG4itsujKBMcdOx1fUe2f6AqgRZk6lcU2x_P7daRHVl4UiwHcA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.078",
+      "comprehensive_if": "1.039",
+      "issn": "2468-2047",
+      "cn": "51-1768/O4",
+      "sponsor": "中国工程物理研究院科技信息中心;中国工程物理研究院流体物理研究所;中国工程物理研究院激光聚变研究中心;北京应用物理与计算数学研究所",
+      "tags": [
+        "完全OA期刊"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 2,
+      "title": "计算物理",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN59dKVjeiwWlOyNUbqy4A31hQF4jLn3ve7wlDchzKmpGRq-wouILUdti7nFG4itstH1JX0KfUeCLYY4Ih6auUnBRhjjCF2tVwz9vObyKHc4g==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.053",
+      "comprehensive_if": "0.770",
+      "issn": "1001-246X",
+      "cn": "11-2011/O4",
+      "sponsor": "中国核学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 2,
+      "title": "电子显微学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN59dKVjeiwWlOyNUbqy4A31hQF4jLn3ve7wlDchzKmpGRq-wouILUdti7nFG4itsvbGVJzYs1zJwr7G2xJqGdi4m8nnTXC6OZWkMUMGtcCUA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.983",
+      "comprehensive_if": "0.703",
+      "issn": "1000-6281",
+      "cn": "11-2295/TN",
+      "sponsor": "中国物理学会",
+      "tags": [
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 2,
+      "title": "光散射学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN59dKVjeiwWlOyNUbqy4A31hQF4jLn3ve7wlDchzKmpGRq-wouILUdti7nFG4itsuU2oF_Z7922L2qOXhwuLGejSxAu680DnM153usvi0qJg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.969",
+      "comprehensive_if": "0.896",
+      "issn": "1004-5929",
+      "cn": "51-1395/O4",
+      "sponsor": "中国物理学会光散射专业委员会;四川省物理学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 2,
+      "title": "强激光与粒子束",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN59dKVjeiwWlOyNUbqy4A31hQF4jLn3ve7wlDchzKmpGRq-wouILUdti7nFG4itsvc1pCZ9zdJ5BBarOqJXKH5bL-G4VLyitYjuJEg-GVNEw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.938",
+      "comprehensive_if": "0.669",
+      "issn": "1001-4322",
+      "cn": "51-1311/O4",
+      "sponsor": "中国工程物理研究院;中国核学会;四川省核学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 2,
+      "title": "物理",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN59dKVjeiwWlOyNUbqy4A31hQF4jLn3ve7wlDchzKmpGRq-wouILUdti7nFG4itsvon9Nc0_jfybw-r2qKnndl7kkMKSt9IHiEB5SmNugPqQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.889",
+      "comprehensive_if": "0.459",
+      "issn": "0379-4148",
+      "cn": "11-1957/O4",
+      "sponsor": "中国物理学会;中国科学院物理研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 2,
+      "title": "中国科学:物理学 力学 天文学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN59dKVjeiwWlOyNUbqy4A31hQF4jLn3ve7wlDchzKmpGRq-wouILUdti7nFG4itssTO-wQUGhkN_oZ0pSVI2S77Z7Yx125SaHuA9OT9zyEYQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.882",
+      "comprehensive_if": "0.635",
+      "issn": "1674-7275",
+      "cn": "11-5848/N",
+      "sponsor": "中国科学院;国家自然科学基金委员会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 2,
+      "title": "人工晶体学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN59dKVjeiwWlOyNUbqy4A31hQF4jLn3ve7wlDchzKmpGRq-wouILUdti7nFG4itsvZJsaNys5GJyJn4E7AVBkIJAFi3L77NmepY_r740TBDw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.816",
+      "comprehensive_if": "0.514",
+      "issn": "1000-985X",
+      "cn": "11-2637/O7",
+      "sponsor": "中材人工晶体研究院有限公司",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 2,
+      "title": "现代应用物理",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN59dKVjeiwWlOyNUbqy4A31hQF4jLn3ve7wlDchzKmpGRq-wouILUdti7nFG4itsuB6r-XHGf9IpNLEYVq5wX4NHz1SXu_4Kos1a1iY3I61Q==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.747",
+      "comprehensive_if": "0.627",
+      "issn": "2095-6223",
+      "cn": "61-1491/O4",
+      "sponsor": "西北核技术研究所科技信息中心",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 2,
+      "title": "Plasma Science and Technology",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN59dKVjeiwWlOyNUbqy4A31hQF4jLn3ve7wlDchzKmpGRq-wouILUdti7nFG4itssGVEL6qbAWmNbBX4kMlxZSQrlbmd9ieTAs4P6paf9sGg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.745",
+      "comprehensive_if": "0.563",
+      "issn": "1009-0630",
+      "cn": "34-1187/TL",
+      "sponsor": "中国科学院合肥物质科学研究院;中国力学学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 2,
+      "title": "物理与工程",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN59dKVjeiwWlOyNUbqy4A31hQF4jLn3ve7wlDchzKmpGRq-wouILUdti7nFG4itsthGElq6XqkGKEG_L5m38KP7CLPyiUQdfAxB3YiGHXlWg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.723",
+      "comprehensive_if": "0.468",
+      "issn": "1009-7104",
+      "cn": "11-4483/O3",
+      "sponsor": "清华大学",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 2,
+      "title": "Chinese Physics B",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN59dKVjeiwWlOyNUbqy4A31hQF4jLn3ve7wlDchzKmpGRq-wouILUdti7nFG4itsv6E4jGTUT3W2KcqImmbHbMysVEfQfaaI7X8MX9JfFOWg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.658",
+      "comprehensive_if": "0.454",
+      "issn": "1674-1056",
+      "cn": "11-5639/O4",
+      "sponsor": "中国物理学会和中国科学院物理研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 2,
+      "title": "Chinese Physics C",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN59dKVjeiwWlOyNUbqy4A31hQF4jLn3ve7wlDchzKmpGRq-wouILUdti7nFG4itssOQsZTMOW4gU2p0IOnwoNO7LhynygudI4QOKGPNre6Gg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.609",
+      "comprehensive_if": "0.470",
+      "issn": "1674-1137",
+      "cn": "11-5641/O4",
+      "sponsor": "中国物理学会;中国科学院高能物理研究所;中国科学院近代物理研究所",
+      "tags": [
+        "网络首发",
+        "完全OA期刊"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 2,
+      "title": "物理实验",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN59dKVjeiwWlOyNUbqy4A31hQF4jLn3ve7wlDchzKmpGRq-wouILUdti7nFG4itsvA9K6jwBde66TjPbWcjYAc6Bp3fzq6hpPfq7NovCd5dA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.595",
+      "comprehensive_if": "0.358",
+      "issn": "1005-4642",
+      "cn": "22-1144/O4",
+      "sponsor": "东北师范大学",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 2,
+      "title": "大学物理",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN59dKVjeiwWlOyNUbqy4A31hQF4jLn3ve7wlDchzKmpGRq-wouILUdti7nFG4itsvwzZwYp3dq1oKwAr7-KJTB9R9BETABT-y0rKwPVK537g==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.582",
+      "comprehensive_if": "0.412",
+      "issn": "1000-0712",
+      "cn": "11-1910/O4",
+      "sponsor": "中国物理学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 2,
+      "title": "原子核物理评论",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN59dKVjeiwWlOyNUbqy4A31hQF4jLn3ve7wlDchzKmpGRq-wouILUdti7nFG4itsvHq08sYQZhk3QCYDIiBNuljbv8QypWCdcGt2YsH3Wwvg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.569",
+      "comprehensive_if": "0.464",
+      "issn": "1007-4627",
+      "cn": "62-1131/O4",
+      "sponsor": "中国科学院近代物理研究所;中国核物理学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 2,
+      "title": "原子与分子物理学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN59dKVjeiwWlOyNUbqy4A31hQF4jLn3ve7wlDchzKmpGRq-wouILUdti7nFG4itsuY6bXdd4iP-Wc5a4bfk0-b3qphwVL9lzN-jdd0ioFf3w==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.525",
+      "comprehensive_if": "0.258",
+      "issn": "1000-0364",
+      "cn": "51-1199/O4",
+      "sponsor": "四川大学;四川省物理学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 2,
+      "title": "大学物理实验",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN59dKVjeiwWlOyNUbqy4A31hQF4jLn3ve7wlDchzKmpGRq-wouILUdti7nFG4itsufRpyqoo8Y40AirPvmB1ubCAi4R2XTT9051xbOL8BCug==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.421",
+      "comprehensive_if": "0.291",
+      "issn": "1007-2934",
+      "cn": "22-1228/O4",
+      "sponsor": "吉林化工学院",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 2,
+      "title": "Magnetic Resonance Letters",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN59dKVjeiwWlOyNUbqy4A31hQF4jLn3ve7wlDchzKmpGRq-wouILUdti7nFG4itsu2pVj5-gGhktaoCa2BWaS1HLwfXtxdBjGd-5HEKbw_Ig==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.404",
+      "comprehensive_if": "0.298",
+      "issn": "2097-0048",
+      "cn": "42-1917/O4",
+      "sponsor": "中国科学院精密测量科学与技术创新研究院",
+      "tags": [
+        "网络首发",
+        "完全OA期刊"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 2,
+      "title": "量子光学学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN59dKVjeiwWlOyNUbqy4A31hQF4jLn3ve7wlDchzKmpGRq-wouILUdti7nFG4itsu0JaYXDXie93q4Nw6AdT5bv8tu-fWNUeip365OoD1Mng==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.389",
+      "comprehensive_if": "0.168",
+      "issn": "1007-6654",
+      "cn": "14-1187/O4",
+      "sponsor": "山西省物理学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 3,
+      "title": "Communications in Theoretical Physics",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPqmOLKKD0DNByDxZLpkhrF3YV9n0NLAvPeqhbcZrSKxOZ5ntKtH8PgbRkosea66JHaJ3b5Cx9eCQ4sLHYxJQDtT8dEuqBS8UDum_D6z-SLDw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.383",
+      "comprehensive_if": "0.306",
+      "issn": "0253-6102",
+      "cn": "11-2592/O3",
+      "sponsor": "中国科学院理论物理研究所;中国物理学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 3,
+      "title": "核聚变与等离子体物理",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPqmOLKKD0DNByDxZLpkhrF3YV9n0NLAvPeqhbcZrSKxOZ5ntKtH8PgbRkosea66JHNg8tNHNu1gTEbYvp9v6K1Xwzk_MjDq-grlSSad_cj3g==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.316",
+      "comprehensive_if": "0.221",
+      "issn": "0254-6086",
+      "cn": "51-1151/TL",
+      "sponsor": "核工业西南物理研究院",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 3,
+      "title": "低温物理学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPqmOLKKD0DNByDxZLpkhrF3YV9n0NLAvPeqhbcZrSKxOZ5ntKtH8PgbRkosea66JGDuY0L9lqra31wZFI77KdUaoGgkZkkyQvJEeiXC-wpIg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.204",
+      "comprehensive_if": "0.151",
+      "issn": "1000-3258",
+      "cn": "34-1053/O4",
+      "sponsor": "中国科技大学",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 3,
+      "title": "广西物理",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPqmOLKKD0DNByDxZLpkhrF3YV9n0NLAvPeqhbcZrSKxOZ5ntKtH8PgbRkosea66JGjBhN8TpePO-BP19-FGkFqmMJkI9GPMd43f2Zu5FA4Pw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.145",
+      "comprehensive_if": "0.061",
+      "issn": "1003-7551",
+      "cn": "45-1150/O4",
+      "sponsor": "广西师范大学;广西物理学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 3,
+      "title": "物理学进展",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPqmOLKKD0DNByDxZLpkhrF3YV9n0NLAvPeqhbcZrSKxOZ5ntKtH8PgbRkosea66JFu7L-nJueZ7qPQf5kW2KetUVQ1hb9N5Gec59tF5iH6BQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.138",
+      "comprehensive_if": "0.069",
+      "issn": "1000-0542",
+      "cn": "32-1127/O4",
+      "sponsor": "中国物理学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 3,
+      "title": "Chinese Journal of Acoustics",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPqmOLKKD0DNByDxZLpkhrF3YV9n0NLAvPeqhbcZrSKxOZ5ntKtH8PgbRkosea66JGSmgEqYc8HEBOysXuVTh4XNrsFZY7yihoV9E43mzW7oA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.068",
+      "comprehensive_if": "0.017",
+      "issn": "0217-9776",
+      "cn": "11-2066/O3",
+      "sponsor": "中国科学院声学研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 3,
+      "title": "Advanced Photonics Nexus",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPqmOLKKD0DNByDxZLpkhrF3YV9n0NLAvPeqhbcZrSKxOZ5ntKtH8PgbRkosea66JGE4wCpz67Niho3B6jcqyk8rAWcTxLUZUtUEqbJiVhjDg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "2791-1519",
+      "cn": "31-2222/O4",
+      "sponsor": "中国科学院上海光学精密机械研究所",
+      "tags": [
+        "完全OA期刊"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 3,
+      "title": "Chinese Journal of Lasers",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPqmOLKKD0DNByDxZLpkhrF3YV9n0NLAvPeqhbcZrSKxOZ5ntKtH8PgbRkosea66JECZKb1yI2JiDPhRdE2Por58X7cZLvG8-iKobKc5E1b5w==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1004-2822",
+      "cn": "31-1615/TN",
+      "sponsor": "中国光学学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 3,
+      "title": "Chinese journal of nuclear physics",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPqmOLKKD0DNByDxZLpkhrF3YV9n0NLAvPeqhbcZrSKxOZ5ntKtH8PgbRkosea66JHPLuS3UIkou12pQvrOEbOttctkUZtVDBbvxvigz2kwKQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "",
+      "cn": "11-2636",
+      "sponsor": "中国核物理学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 3,
+      "title": "光谱实验室",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPqmOLKKD0DNByDxZLpkhrF3YV9n0NLAvPeqhbcZrSKxOZ5ntKtH8PgbRkosea66JGWQI5pA2aGs0j5K6xIqbeSeWn_y_-Vloqz34snN5jk7g==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1004-8138",
+      "cn": "11-3157/O4",
+      "sponsor": "中国科学院化工冶金研究所;钢铁研究总院;中国科学院成都有机化学研究所",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 3,
+      "title": "光学学报(网络版)",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPqmOLKKD0DNByDxZLpkhrF3YV9n0NLAvPeqhbcZrSKxOZ5ntKtH8PgbRkosea66JF8Us0N-WWrlD7advAMFMKHhAY9K3EaAMG-o9gFVyBF0g==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "2097-3306",
+      "cn": "31-6001/O4",
+      "sponsor": "中国科学院上海光学精密机械研究所;中国光学学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 3,
+      "title": "IMP & HIRFL Annual Report",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPqmOLKKD0DNByDxZLpkhrF3YV9n0NLAvPeqhbcZrSKxOZ5ntKtH8PgbRkosea66JF7YY759aw_qIgOHJb4N1MP2BPN880I2X4njSC6lSpvHA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "",
+      "cn": "",
+      "sponsor": "Atomic Energy Physics",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 3,
+      "title": "Opto-Electronic Technology",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPqmOLKKD0DNByDxZLpkhrF3YV9n0NLAvPeqhbcZrSKxOZ5ntKtH8PgbRkosea66JEN2GtttfHYXB_vosRd37CV2dUKV5yiyuuAPvn627sknA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "2097-6003",
+      "cn": "51-1811/O4",
+      "sponsor": "中国科学院光电技术研究所",
+      "tags": [
+        "完全OA期刊"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 3,
+      "title": "Photonics Insights",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPqmOLKKD0DNByDxZLpkhrF3YV9n0NLAvPeqhbcZrSKxOZ5ntKtH8PgbRkosea66JG1gsyOpkudeEG1N27lUiksIKp8GSbeGcFPn_waU9G5qQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "2791-1748",
+      "cn": "31-2212/O4",
+      "sponsor": "中国科学院上海光学精密机械研究所",
+      "tags": [
+        "完全OA期刊"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "物理学",
+      "category_code": "A005",
+      "page": 3,
+      "title": "现代物理知识",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPqmOLKKD0DNByDxZLpkhrF3YV9n0NLAvPeqhbcZrSKxOZ5ntKtH8PgbRkosea66JE0ckzxsj9R69qQf77rX17-yGgcc9jk44YO6JFeg1d84Q==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1001-0610",
+      "cn": "11-2441/O3",
+      "sponsor": "中国科学院高能物理研究所",
+      "tags": []
+    }
+  ]
+}

@@ -1,0 +1,574 @@
+{
+  "category": {
+    "code": "D043",
+    "title": "农业基础科学",
+    "count": 31,
+    "major_code": "",
+    "major_title": ""
+  },
+  "pages": [
+    {
+      "page": 1,
+      "rows": 21,
+      "pageCount": 2
+    },
+    {
+      "page": 2,
+      "rows": 10,
+      "pageCount": 2
+    }
+  ],
+  "records": [
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农业基础科学",
+      "category_code": "D043",
+      "page": 1,
+      "title": "土壤学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN_SFz7NVaQ4IGAbaudRRmULLr8AFRYrFqCupavotoLTzjG2LcBGwNE7moQInseQq7pQZyGC0lCOJSaaTWIYL-G-pKnU7Vv-xonzVz-HauD3Q==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "7.628",
+      "comprehensive_if": "4.454",
+      "issn": "0564-3929",
+      "cn": "32-1119/P",
+      "sponsor": "中国土壤学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农业基础科学",
+      "category_code": "D043",
+      "page": 1,
+      "title": "中国生态农业学报(中英文)",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN_SFz7NVaQ4IGAbaudRRmULLr8AFRYrFqCupavotoLTzjG2LcBGwNE7moQInseQq5L5e7bKk7yy-6OgyWLbavVjpPjnKlJK-s1dqyuDJ12eQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "7.011",
+      "comprehensive_if": "3.911",
+      "issn": "2096-6237",
+      "cn": "13-1432/S",
+      "sponsor": "中国科学院遗传与发育生物学研究所;中国生态经济学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农业基础科学",
+      "category_code": "D043",
+      "page": 1,
+      "title": "水土保持研究",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN_SFz7NVaQ4IGAbaudRRmULLr8AFRYrFqCupavotoLTzjG2LcBGwNE7moQInseQq6UtJbohhxE7xvwSBz2ZGjKG9KMRwkPX0oUFicuvI1K9w==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "5.406",
+      "comprehensive_if": "3.025",
+      "issn": "1005-3409",
+      "cn": "61-1272/P",
+      "sponsor": "中国科学院水利部水土保持研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农业基础科学",
+      "category_code": "D043",
+      "page": 1,
+      "title": "植物营养与肥料学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN_SFz7NVaQ4IGAbaudRRmULLr8AFRYrFqCupavotoLTzjG2LcBGwNE7moQInseQq7BvR7RewAEgJ84n11aCxalPmhPH5R3JSuJiBx0WW_Ccw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "5.329",
+      "comprehensive_if": "3.044",
+      "issn": "1008-505X",
+      "cn": "11-3996/S",
+      "sponsor": "中国植物营养与肥料学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农业基础科学",
+      "category_code": "D043",
+      "page": 1,
+      "title": "水土保持学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN_SFz7NVaQ4IGAbaudRRmULLr8AFRYrFqCupavotoLTzjG2LcBGwNE7moQInseQq7FO4wrIxSS-rSXsUHsHJjW7QpSRHdPYn5yScBSvOy8CA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "5.153",
+      "comprehensive_if": "2.763",
+      "issn": "1009-2242",
+      "cn": "61-1362/TV",
+      "sponsor": "中国土壤学会;中国科学院水利部水土保持研究所",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农业基础科学",
+      "category_code": "D043",
+      "page": 1,
+      "title": "土壤通报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN_SFz7NVaQ4IGAbaudRRmULLr8AFRYrFqCupavotoLTzjG2LcBGwNE7moQInseQq7o6R3bOzrJvyicKA3FmGQU9ERtJHi_vPmJ33rhPfvGvQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "4.864",
+      "comprehensive_if": "2.746",
+      "issn": "0564-3945",
+      "cn": "21-1172/S",
+      "sponsor": "中国土壤学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农业基础科学",
+      "category_code": "D043",
+      "page": 1,
+      "title": "干旱区研究",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN_SFz7NVaQ4IGAbaudRRmULLr8AFRYrFqCupavotoLTzjG2LcBGwNE7moQInseQq61EoaVWEfWItxGqK5lz-JSy5WetL1yCVwoDqlOc3Mowg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "4.405",
+      "comprehensive_if": "2.897",
+      "issn": "1001-4675",
+      "cn": "65-1095/X",
+      "sponsor": "中国科学院新疆生态与地理研究所;中国土壤学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农业基础科学",
+      "category_code": "D043",
+      "page": 1,
+      "title": "中国农业气象",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN_SFz7NVaQ4IGAbaudRRmULLr8AFRYrFqCupavotoLTzjG2LcBGwNE7moQInseQq6ilhkZ2Iz17SsYgV4DpT9jHIyPAN-3qDEZBPGlcHqYJw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "4.006",
+      "comprehensive_if": "2.609",
+      "issn": "1000-6362",
+      "cn": "11-1999/S",
+      "sponsor": "中国农业科学院农业环境与可持续发展研究所",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农业基础科学",
+      "category_code": "D043",
+      "page": 1,
+      "title": "土壤",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN_SFz7NVaQ4IGAbaudRRmULLr8AFRYrFqCupavotoLTzjG2LcBGwNE7moQInseQq6CC9QTfrhPTQdox3mllRUl8Jmc10pvQ_-_gUV8YiBjfw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "3.941",
+      "comprehensive_if": "2.520",
+      "issn": "0253-9829",
+      "cn": "32-1118/P",
+      "sponsor": "中国科学院南京土壤研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农业基础科学",
+      "category_code": "D043",
+      "page": 1,
+      "title": "水土保持通报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN_SFz7NVaQ4IGAbaudRRmULLr8AFRYrFqCupavotoLTzjG2LcBGwNE7moQInseQq6EUVTAtTZ9dYxFUnVM1cBeoHpqcCHyCun0r5ETrR4yzg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "3.867",
+      "comprehensive_if": "2.348",
+      "issn": "1000-288X",
+      "cn": "61-1094/X",
+      "sponsor": "中国科学院水利部水土保持研究所;水利部水土保持监测中心",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农业基础科学",
+      "category_code": "D043",
+      "page": 1,
+      "title": "干旱地区农业研究",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN_SFz7NVaQ4IGAbaudRRmULLr8AFRYrFqCupavotoLTzjG2LcBGwNE7moQInseQq6-4z9SFfe7g4eYea21PWnHDrMUrIBqRWtW4NLIRyMlMQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "3.795",
+      "comprehensive_if": "2.101",
+      "issn": "1000-7601",
+      "cn": "61-1088/S",
+      "sponsor": "西北农林科技大学",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农业基础科学",
+      "category_code": "D043",
+      "page": 1,
+      "title": "中国土壤与肥料",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOMj8DIlphnyscOKzMDMgKJHPbwRNMi1ZmUuNrx_k9qFuZtiKcXTSsv8DKV5GSM1isWfrSnrg7MzIM5Cue7nvuCQmMMaQtfGi3eTNkmT53LJQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "3.494",
+      "comprehensive_if": "2.025",
+      "issn": "1673-6257",
+      "cn": "11-5498/S",
+      "sponsor": "中国农业科学院农业资源与农业区划研究所;中国植物营养与肥料学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农业基础科学",
+      "category_code": "D043",
+      "page": 1,
+      "title": "核农学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOMj8DIlphnyscOKzMDMgKJHPbwRNMi1ZmUuNrx_k9qFuZtiKcXTSsv8DKV5GSM1ittDH7z1lYtQYxbdjn5PKE0ZdS2L3IUCRzwh6ScumbqHA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.803",
+      "comprehensive_if": "1.670",
+      "issn": "1000-8551",
+      "cn": "11-2265/S",
+      "sponsor": "中国原子能农学会;中国农业科学院农产品加工研究所(前中国农业科学院原子能利用研究所)",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农业基础科学",
+      "category_code": "D043",
+      "page": 1,
+      "title": "中国水土保持科学(中英文)",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOMj8DIlphnyscOKzMDMgKJHPbwRNMi1ZmUuNrx_k9qFuZtiKcXTSsv8DKV5GSM1iuRUfD9uSW7xf9VYr414L4I3VDnCa4o8Mjr_10A6J9DDQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.722",
+      "comprehensive_if": "1.713",
+      "issn": "2096-2673",
+      "cn": "10-1449/S",
+      "sponsor": "中国水土保持学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农业基础科学",
+      "category_code": "D043",
+      "page": 1,
+      "title": "Pedosphere",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOMj8DIlphnyscOKzMDMgKJHPbwRNMi1ZmUuNrx_k9qFuZtiKcXTSsv8DKV5GSM1iv_bizwP-NYHVfO9eUp3ggBrtpVSbTDgAaoOdRgy_L1tA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.260",
+      "comprehensive_if": "1.019",
+      "issn": "1002-0160",
+      "cn": "32-1315/P",
+      "sponsor": "中国科学院南京土壤研究所;中国土壤学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农业基础科学",
+      "category_code": "D043",
+      "page": 1,
+      "title": "Grain & Oil Science and Technology",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOMj8DIlphnyscOKzMDMgKJHPbwRNMi1ZmUuNrx_k9qFuZtiKcXTSsv8DKV5GSM1iuT55EgAK03Btv_8pnyAPdECe9wDrsqsJmWJkr-6Cnoxw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.175",
+      "comprehensive_if": "0.675",
+      "issn": "2096-4501",
+      "cn": "41-1447/TS",
+      "sponsor": "河南工业大学",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农业基础科学",
+      "category_code": "D043",
+      "page": 1,
+      "title": "中国水土保持",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOMj8DIlphnyscOKzMDMgKJHPbwRNMi1ZmUuNrx_k9qFuZtiKcXTSsv8DKV5GSM1iuT-XMerz6yGSZ71HlAOV7GT7D3zlqTxr7qCcu9wCd2yQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.069",
+      "comprehensive_if": "0.803",
+      "issn": "1000-0941",
+      "cn": "41-1144/TV",
+      "sponsor": "水利部黄河水利委员会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农业基础科学",
+      "category_code": "D043",
+      "page": 1,
+      "title": "生态产业科学与磷氟工程",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOMj8DIlphnyscOKzMDMgKJHPbwRNMi1ZmUuNrx_k9qFuZtiKcXTSsv8DKV5GSM1itjwdI1smvcs-I_-zE34RetJGCYyViw1wkcxS27z-05eQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.040",
+      "comprehensive_if": "0.788",
+      "issn": "2097-4566",
+      "cn": "41-1471/TQ",
+      "sponsor": "郑州大学;中国磷复肥工业协会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农业基础科学",
+      "category_code": "D043",
+      "page": 1,
+      "title": "腐植酸",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOMj8DIlphnyscOKzMDMgKJHPbwRNMi1ZmUuNrx_k9qFuZtiKcXTSsv8DKV5GSM1isNQSLPcWJchXxE0y-54RF3o-tVJkFIUHtPW6Jj6fZAXQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.000",
+      "comprehensive_if": "0.537",
+      "issn": "1671-9212",
+      "cn": "11-4736/TQ",
+      "sponsor": "中国腐植酸工业协会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农业基础科学",
+      "category_code": "D043",
+      "page": 1,
+      "title": "Soil Ecology Letters",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOMj8DIlphnyscOKzMDMgKJHPbwRNMi1ZmUuNrx_k9qFuZtiKcXTSsv8DKV5GSM1itZ6fk2Lvge1FccPJLe4O13wGhfVFlUjfDQN0YW3Ng-9Q==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.000",
+      "comprehensive_if": "0.663",
+      "issn": "2662-2289",
+      "cn": "10-1628/S1",
+      "sponsor": "高等教育出版社有限公司;中国科学院城市环境研究所",
+      "tags": [
+        "混合OA期刊"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农业基础科学",
+      "category_code": "D043",
+      "page": 1,
+      "title": "中国农史",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOMj8DIlphnyscOKzMDMgKJHPbwRNMi1ZmUuNrx_k9qFuZtiKcXTSsv8DKV5GSM1itdQemex4QZCK_sob11TxUGVOlitjG9wdTYN0l5p8G95w==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.897",
+      "comprehensive_if": "0.658",
+      "issn": "1000-4459",
+      "cn": "32-1061/S",
+      "sponsor": "中国农业历史学会;中国农科院南京农业大学中国农业遗产研究室;全国农业展览馆(中国农业博物馆)",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农业基础科学",
+      "category_code": "D043",
+      "page": 2,
+      "title": "水土保持应用技术",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINS-Iue99504ChnmBqqXlAEOoHHxV1Hk1mHWFEzjaYkohojm9T_2BLfUKO33PwE2AdQBvqA4vqY1MsmnfGjwDoZvXPNW4KwclUQdd_dBXduqw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.876",
+      "comprehensive_if": "0.709",
+      "issn": "1673-5366",
+      "cn": "21-1532/S",
+      "sponsor": "辽宁省旱地农林研究所(辽宁省水土保持研究所;辽宁省干旱地区造林研究所)",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农业基础科学",
+      "category_code": "D043",
+      "page": 2,
+      "title": "农业大数据学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINS-Iue99504ChnmBqqXlAEOoHHxV1Hk1mHWFEzjaYkohojm9T_2BLfUKO33PwE2AcJBjG3FNQDjv1REAsI-GPDxD2wH6dM4ihiaRUL6c5a2Q==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.649",
+      "comprehensive_if": "0.381",
+      "issn": "2096-6369",
+      "cn": "10-1555/G2",
+      "sponsor": "中国农业科学院农业信息研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农业基础科学",
+      "category_code": "D043",
+      "page": 2,
+      "title": "亚热带水土保持",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINS-Iue99504ChnmBqqXlAEOoHHxV1Hk1mHWFEzjaYkohojm9T_2BLfUKO33PwE2AdfTP80lrkPnErPCx0QvCciuGjzM9Ghto2j0cVWFv671g==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.638",
+      "comprehensive_if": "0.457",
+      "issn": "1002-2651",
+      "cn": "35-1283/TV",
+      "sponsor": "福建省水土保持试验站;福建省水土保持学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农业基础科学",
+      "category_code": "D043",
+      "page": 2,
+      "title": "智慧农业导刊",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINS-Iue99504ChnmBqqXlAEOoHHxV1Hk1mHWFEzjaYkohojm9T_2BLfUKO33PwE2Af4z9baE6_4wnwq0Bqr905ojWzvpj82aRUAFm5qRiHthQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.496",
+      "comprehensive_if": "0.261",
+      "issn": "2096-9902",
+      "cn": "23-1613/S",
+      "sponsor": "黑龙江省农业科学院",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农业基础科学",
+      "category_code": "D043",
+      "page": 2,
+      "title": "古今农业",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINS-Iue99504ChnmBqqXlAEOoHHxV1Hk1mHWFEzjaYkohojm9T_2BLfUKO33PwE2AfezfUHbPIDKxh-ZQ5hRbaSQ4yUtQ0LhJ7XNZkviv-7vQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.380",
+      "comprehensive_if": "0.231",
+      "issn": "1672-2787",
+      "cn": "11-4997/S",
+      "sponsor": "全国农业展览馆",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农业基础科学",
+      "category_code": "D043",
+      "page": 2,
+      "title": "山西水土保持科技",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINS-Iue99504ChnmBqqXlAEOoHHxV1Hk1mHWFEzjaYkohojm9T_2BLfUKO33PwE2Ad6kY9OkK_-IHw7RspC6CQKyNYowZ-QQKLdUef3PQ0jBg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.275",
+      "comprehensive_if": "0.229",
+      "issn": "1008-0120",
+      "cn": "14-1103/TV",
+      "sponsor": "山西水利出版传媒中心",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农业基础科学",
+      "category_code": "D043",
+      "page": 2,
+      "title": "当代生态农业",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINS-Iue99504ChnmBqqXlAEOoHHxV1Hk1mHWFEzjaYkohojm9T_2BLfUKO33PwE2Ac7kmpeyPIyxsOIa5HQ0pPp31TJ-BRixEAQJzWAf5YUcQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1672-8807",
+      "cn": "22-1242/S",
+      "sponsor": "吉林省人参商会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农业基础科学",
+      "category_code": "D043",
+      "page": 2,
+      "title": "核农学通报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINS-Iue99504ChnmBqqXlAEOoHHxV1Hk1mHWFEzjaYkohojm9T_2BLfUKO33PwE2AeEJIj1T24aoHQUrGxXje7ISZqhcqXmBdJ44yzsvX1BAw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1001-1676",
+      "cn": "11-2266/S",
+      "sponsor": "中国原子能农学会;中国农业科学院原子能利用所",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农业基础科学",
+      "category_code": "D043",
+      "page": 2,
+      "title": "农业系统科学与综合研究",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINS-Iue99504ChnmBqqXlAEOoHHxV1Hk1mHWFEzjaYkohojm9T_2BLfUKO33PwE2AdZU_6IiY2BPdF9-mloJGJpapY_qvmuWqMV2adWUy4eiw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1001-0068",
+      "cn": "23-1158/S",
+      "sponsor": "中国科学院东北地理与农业生态所",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "农业基础科学",
+      "category_code": "D043",
+      "page": 2,
+      "title": "土壤学进展",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINS-Iue99504ChnmBqqXlAEOoHHxV1Hk1mHWFEzjaYkohojm9T_2BLfUKO33PwE2Ad_sWY-DcWkEsOnyHj49ko05XohJSzI-b2LjAi0HxIe-g==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "0254-010X",
+      "cn": "32-1120/P",
+      "sponsor": "中国科学院南京土壤研究所",
+      "tags": []
+    }
+  ]
+}

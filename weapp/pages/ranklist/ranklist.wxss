@@ -1,0 +1,13 @@
+.page-pad { padding-top: 56rpx; }
+.page-title { color: #171717; font-size: 48rpx; font-weight: 900; }
+.page-sub { margin-top: 10rpx; color: #756d64; font-size: 24rpx; }
+.list { display: flex; flex-direction: column; gap: 18rpx; margin-top: 28rpx; }
+.empty-card, .loading-card { margin-top: 28rpx; padding: 34rpx; text-align: center; }
+.empty-title { color: #171717; font-size: 30rpx; font-weight: 900; }
+.empty-sub { margin-top: 12rpx; color: #756d64; font-size: 24rpx; line-height: 1.6; }
+.rank-row { padding: 24rpx; }
+.rank-name { color: #171717; font-size: 30rpx; line-height: 1.3; font-weight: 900; }
+.rank-meta { margin-top: 8rpx; color: #756d64; font-size: 22rpx; }
+.rank-metrics { display: flex; flex-wrap: wrap; gap: 12rpx; margin-top: 16rpx; }
+.rank-metrics text { padding: 8rpx 12rpx; border-radius: 8rpx; background: #fff4e8; color: #7b4a24; font-size: 22rpx; font-weight: 750; }
+.badges { display: flex; flex-wrap: wrap; margin-top: 14rpx; }

@@ -1,0 +1,150 @@
+{
+  "category": {
+    "code": "F098",
+    "title": "人物传记",
+    "count": 8,
+    "major_code": "",
+    "major_title": ""
+  },
+  "pages": [
+    {
+      "page": 1,
+      "rows": 8,
+      "pageCount": 1
+    }
+  ],
+  "records": [
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "人物传记",
+      "category_code": "F098",
+      "page": 1,
+      "title": "风流一代",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPr0J9T8vdPEJaLK9Ac_c8eQtBFFcYdTNOeO2Wi5eJbzYDM90YqB4eXkOmUdRtiF2ESJNs4jSRCslLqcSVjueAWH2sXIUn0dRnq7jJdNwKWJA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1004-0145",
+      "cn": "32-1071/C",
+      "sponsor": "江苏省青少年研究所(共青团江苏省委新媒体发展中心)",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "人物传记",
+      "category_code": "F098",
+      "page": 1,
+      "title": "科学家",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPr0J9T8vdPEJaLK9Ac_c8eQtBFFcYdTNOeO2Wi5eJbzYDM90YqB4eXkOmUdRtiF2F_V3s6-CbDO3eyLVMmm6S-uBjrou67poRfJi8SnwKeOQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "2095-6363",
+      "cn": "10-1135/N",
+      "sponsor": "中国科技新闻学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "人物传记",
+      "category_code": "F098",
+      "page": 1,
+      "title": "钱学森研究",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPr0J9T8vdPEJaLK9Ac_c8eQtBFFcYdTNOeO2Wi5eJbzYDM90YqB4eXkOmUdRtiF2GrHV9dG-vizGWG-Or1N5vCStC5j1ZBigsVyjt0q4bPsg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "",
+      "cn": "",
+      "sponsor": "上海交通大学钱学森研究中心",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "人物传记",
+      "category_code": "F098",
+      "page": 1,
+      "title": "上海教师",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPr0J9T8vdPEJaLK9Ac_c8eQtBFFcYdTNOeO2Wi5eJbzYDM90YqB4eXkOmUdRtiF2HsqRLVHt6gFnqcU3ZILRg5OpvMA9a9z3UOx2v_BvNrcQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "",
+      "cn": "",
+      "sponsor": "上海市教师教育学院",
+      "tags": [
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "人物传记",
+      "category_code": "F098",
+      "page": 1,
+      "title": "沈周研究",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPr0J9T8vdPEJaLK9Ac_c8eQtBFFcYdTNOeO2Wi5eJbzYDM90YqB4eXkOmUdRtiF2F2gM2nm5JiT_x117c_VnQw2LHI90vadBN59rvzGihAJw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "",
+      "cn": "",
+      "sponsor": "华东师范大学中国语言文学系",
+      "tags": [
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "人物传记",
+      "category_code": "F098",
+      "page": 1,
+      "title": "现代传记研究",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPr0J9T8vdPEJaLK9Ac_c8eQtBFFcYdTNOeO2Wi5eJbzYDM90YqB4eXkOmUdRtiF2HXc0-r2NAe23uY0u323NPfz3Xj1GGRDPubSrsO_Dbjlg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "",
+      "cn": "",
+      "sponsor": "上海交通大学传记中心",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "人物传记",
+      "category_code": "F098",
+      "page": 1,
+      "title": "张謇与近代中国",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPr0J9T8vdPEJaLK9Ac_c8eQtBFFcYdTNOeO2Wi5eJbzYDM90YqB4eXkOmUdRtiF2F_5axylzHbvIAW4IL3zfRoK2drCKvHc1k6xAgB7B4lEA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "",
+      "cn": "",
+      "sponsor": "南通大学张謇研究院",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "人物传记",
+      "category_code": "F098",
+      "page": 1,
+      "title": "中华儿女",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPr0J9T8vdPEJaLK9Ac_c8eQtBFFcYdTNOeO2Wi5eJbzYDM90YqB4eXkOmUdRtiF2GhiP4MZWX4r6-NmPwJT2FtpGDdeEEmEBSfckxWP2sTwA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1003-0557",
+      "cn": "11-1404/C",
+      "sponsor": "中华全国青年联合会",
+      "tags": []
+    }
+  ]
+}

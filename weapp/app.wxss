@@ -1,6 +1,108 @@
-/* 全局样式 - 留空，web-view 内的样式由网页控制 */
 page {
-  height: 100%;
-  overflow: hidden;
-  background: #FAFBFD;
+  min-height: 100%;
+  background: #fff8ef;
+  color: #171717;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+  font-size: 28rpx;
+}
+
+view, text, input, button {
+  box-sizing: border-box;
+}
+
+button {
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  border: 0;
+  line-height: inherit;
+}
+
+button::after {
+  border: 0;
+}
+
+.paper-bg {
+  min-height: 100vh;
+  background:
+    linear-gradient(180deg, rgba(255, 238, 220, 0.94) 0%, rgba(255, 249, 241, 0.78) 34%, rgba(255, 253, 248, 0.96) 100%),
+    radial-gradient(circle at 50% 0%, rgba(255, 106, 26, 0.13), transparent 42%),
+    linear-gradient(90deg, rgba(226, 216, 204, 0.42) 1rpx, transparent 1rpx),
+    linear-gradient(180deg, rgba(226, 216, 204, 0.42) 1rpx, transparent 1rpx),
+    #fff8ef;
+  background-size: 100% 100%, 100% 100%, 96rpx 96rpx, 96rpx 96rpx, 100% 100%;
+}
+
+.safe-page {
+  min-height: 100vh;
+  padding: 28rpx 28rpx 140rpx;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1rpx solid rgba(232, 222, 210, 0.95);
+  border-radius: 24rpx;
+  box-shadow: 0 14rpx 34rpx rgba(60, 48, 36, 0.08);
+}
+
+.orange {
+  color: #ff6a1a;
+}
+
+.muted {
+  color: #716a62;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34rpx;
+  padding: 0 14rpx;
+  margin: 0 8rpx 8rpx 0;
+  border-radius: 7rpx;
+  color: #fff;
+  font-size: 21rpx;
+  font-weight: 700;
+}
+
+.badge-blue { background: #0f315f; }
+.badge-green { background: #15834f; }
+.badge-brown { background: #7a5b42; }
+.badge-orange { background: #f05a14; }
+.badge-teal { background: #24758a; }
+.badge-soft {
+  color: #8b4a18;
+  background: #fff0df;
+}
+
+.bottom-tabs {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  display: flex;
+  justify-content: space-around;
+  padding: 12rpx 28rpx calc(18rpx + env(safe-area-inset-bottom));
+  background: rgba(255, 253, 248, 0.96);
+  border-top: 1rpx solid #eadfd2;
+  backdrop-filter: blur(18rpx);
+}
+
+.bottom-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4rpx;
+  color: #6f6a64;
+  font-size: 22rpx;
+}
+
+.bottom-tab.active {
+  color: #f05a14;
+  font-weight: 700;
+}
+
+.tab-icon {
+  font-size: 34rpx;
 }

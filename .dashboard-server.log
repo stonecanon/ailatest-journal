@@ -1,0 +1,1152 @@
+[dashboard] serving http://127.0.0.1:4177/dashboard/
+[dashboard] serving http://127.0.0.1:4177/dashboard/
+[dashboard] data refreshed at 2026-05-28T04:06:35.079Z
+[dashboard] data refreshed at 2026-05-28T04:11:35.807Z
+[dashboard] data refreshed at 2026-05-28T04:16:35.856Z
+[dashboard] data refreshed at 2026-05-28T04:21:37.330Z
+[dashboard] data refreshed at 2026-05-28T04:26:35.594Z
+[dashboard] data refreshed at 2026-05-28T04:31:36.408Z
+[dashboard] data refreshed at 2026-05-28T04:36:36.254Z
+[dashboard] data refreshed at 2026-05-28T04:41:35.556Z
+[dashboard] data refreshed at 2026-05-28T04:46:36.745Z
+[dashboard] data refreshed at 2026-05-28T04:51:35.482Z
+[dashboard] data refreshed at 2026-05-28T04:56:36.464Z
+[dashboard] data refreshed at 2026-05-28T05:01:36.793Z
+[dashboard] data refreshed at 2026-05-28T05:06:36.200Z
+[dashboard] data refreshed at 2026-05-28T05:11:36.558Z
+[dashboard] data refreshed at 2026-05-28T05:16:36.335Z
+[dashboard] data refreshed at 2026-05-28T05:21:36.739Z
+[dashboard] data refreshed at 2026-05-28T05:26:37.491Z
+[dashboard] data refreshed at 2026-05-28T05:31:36.527Z
+[dashboard] data refreshed at 2026-05-28T05:36:36.234Z
+[dashboard] data refreshed at 2026-05-28T05:41:36.973Z
+[dashboard] data refreshed at 2026-05-28T05:46:36.411Z
+[dashboard] data refreshed at 2026-05-28T05:51:35.739Z
+[dashboard] data refreshed at 2026-05-28T05:56:39.360Z
+[dashboard] data refreshed at 2026-05-28T06:01:35.610Z
+[dashboard] data refreshed at 2026-05-28T06:06:36.365Z
+[dashboard] data refreshed at 2026-05-28T06:11:36.302Z
+[dashboard] data refreshed at 2026-05-28T06:16:36.785Z
+[dashboard] data refreshed at 2026-05-28T06:21:38.595Z
+[dashboard] data refreshed at 2026-05-28T06:26:36.152Z
+[dashboard] data refreshed at 2026-05-28T06:31:50.410Z
+[dashboard] data refreshed at 2026-05-28T06:36:42.971Z
+[dashboard] data refreshed at 2026-05-28T06:41:40.245Z
+[dashboard] data refreshed at 2026-05-28T06:46:37.847Z
+[dashboard] data refreshed at 2026-05-28T06:51:36.136Z
+[dashboard] data refreshed at 2026-05-28T06:56:37.518Z
+[dashboard] data refreshed at 2026-05-28T07:01:36.427Z
+[dashboard] data refreshed at 2026-05-28T07:06:36.828Z
+[dashboard] data refreshed at 2026-05-28T07:11:38.854Z
+[dashboard] data refreshed at 2026-05-28T07:16:37.558Z
+[dashboard] data refreshed at 2026-05-28T07:21:38.518Z
+[dashboard] data refreshed at 2026-05-28T07:26:36.723Z
+[dashboard] data refreshed at 2026-05-28T07:31:37.565Z
+[dashboard] data refreshed at 2026-05-28T07:36:41.588Z
+[dashboard] data refreshed at 2026-05-28T07:41:36.310Z
+[dashboard] data refreshed at 2026-05-28T07:46:42.685Z
+[dashboard] data refreshed at 2026-05-28T07:51:37.302Z
+[dashboard] data refreshed at 2026-05-28T07:56:37.084Z
+[dashboard] data refreshed at 2026-05-28T08:01:41.027Z
+[dashboard] data refreshed at 2026-05-28T08:06:48.910Z
+[dashboard] data refreshed at 2026-05-28T08:11:36.809Z
+[dashboard] data refreshed at 2026-05-28T08:16:37.662Z
+[dashboard] data refreshed at 2026-05-28T08:21:36.675Z
+[dashboard] data refreshed at 2026-05-28T08:26:41.089Z
+[dashboard] data refreshed at 2026-05-28T08:31:36.544Z
+[dashboard] data refreshed at 2026-05-28T08:36:46.911Z
+[dashboard] data refreshed at 2026-05-28T08:41:43.163Z
+[dashboard] data refreshed at 2026-05-28T08:47:09.309Z
+[dashboard] data refreshed at 2026-05-28T08:51:50.603Z
+[dashboard] data refreshed at 2026-05-28T08:56:47.464Z
+[dashboard] data refreshed at 2026-05-28T09:01:37.890Z
+[dashboard] data refreshed at 2026-05-28T09:06:36.386Z
+[dashboard] data refreshed at 2026-05-28T09:11:36.507Z
+[dashboard] data refreshed at 2026-05-28T09:16:36.257Z
+[dashboard] data refreshed at 2026-05-28T09:21:37.011Z
+[dashboard] data refreshed at 2026-05-28T09:26:36.638Z
+[dashboard] data refreshed at 2026-05-28T09:31:37.472Z
+[dashboard] data refreshed at 2026-05-28T09:36:36.186Z
+[dashboard] data refreshed at 2026-05-28T09:41:37.158Z
+[dashboard] data refreshed at 2026-05-28T09:46:36.743Z
+[dashboard] refresh failed: node:internal/errors:983
+  const err = new Error(message);
+              ^
+
+Error: Command failed: npx wrangler d1 execute ailatest-journal --remote --command 
+    SELECT
+      COALESCE(SUM(c), 0) AS favorite_rows,
+      COUNT(*) AS users_with_favorites,
+      ROUND(AVG(c), 2) AS avg_favorites_per_active_user,
+      MAX(c) AS max_favorites_by_user
+    FROM (
+      SELECT user_id, COUNT(*) AS c FROM favorites GROUP BY user_id
+    )
+  
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mA request to the Cloudflare API (/accounts/e7dbf2ec3ab60aa5557cc2364a7a2f26/d1/database/861dd053-c23a-4363-b62b-2559c06ec3fd/query) failed.[0m
+
+  Authentication error [code: 10000]
+
+
+🪵  Logs were written to "/Users/zhizhi/.wrangler/logs/wrangler-2026-05-28_09-51-34_443.log"
+
+    at genericNodeError (node:internal/errors:983:15)
+    at wrappedFn (node:internal/errors:537:14)
+    at ChildProcess.exithandler (node:child_process:417:12)
+    at ChildProcess.emit (node:events:519:28)
+    at maybeClose (node:internal/child_process:1101:16)
+    at ChildProcess._handle.onexit (node:internal/child_process:304:5) {
+  code: 1,
+  killed: false,
+  signal: null,
+  cmd: 'npx wrangler d1 execute ailatest-journal --remote --command \n' +
+    '    SELECT\n' +
+    '      COALESCE(SUM(c), 0) AS favorite_rows,\n' +
+    '      COUNT(*) AS users_with_favorites,\n' +
+    '      ROUND(AVG(c), 2) AS avg_favorites_per_active_user,\n' +
+    '      MAX(c) AS max_favorites_by_user\n' +
+    '    FROM (\n' +
+    '      SELECT user_id, COUNT(*) AS c FROM favorites GROUP BY user_id\n' +
+    '    )\n' +
+    '  ',
+  stdout: '\n' +
+    ' ⛅️ wrangler 4.95.0\n' +
+    '───────────────────\n' +
+    'Cloudflare agent skills are available for: Claude Code, Codex. Run wrangler in an interactive terminal to install them, or use `--install-skills` to install without prompting.\n' +
+    'Resource location: remote \n' +
+    '\n' +
+    '🌀 Executing on remote database ailatest-journal (861dd053-c23a-4363-b62b-2559c06ec3fd):\n' +
+    '🌀 To execute on your local development database, remove the --remote flag from your wrangler command.\n' +
+    '\n' +
+    'Getting User settings...\n' +
+    '👋 You are logged in with an OAuth Token, associated with the email jiantaoweng@gmail.com.\n' +
+    '┌─────────────────────────────────┬──────────────────────────────────┐\n' +
+    '│ Account Name                    │ Account ID                       │\n' +
+    '├─────────────────────────────────┼──────────────────────────────────┤\n' +
+    "│ Jiantaoweng@gmail.com's Account │ e7dbf2ec3ab60aa5557cc2364a7a2f26 │\n" +
+    '└─────────────────────────────────┴──────────────────────────────────┘\n' +
+    '🔓 Token Permissions:\n' +
+    'Scope (Access)\n' +
+    '- account (read)\n' +
+    '- user (read)\n' +
+    '- workers (write)\n' +
+    '- workers_kv (write)\n' +
+    '- workers_routes (write)\n' +
+    '- workers_scripts (write)\n' +
+    '- workers_tail (read)\n' +
+    '- d1 (write)\n' +
+    '- pages (write)\n' +
+    '- zone (read)\n' +
+    '- ssl_certs (write)\n' +
+    '- ai (write)\n' +
+    '- ai-search (write)\n' +
+    '- ai-search (run)\n' +
+    '- queues (write)\n' +
+    '- pipelines (write)\n' +
+    '- secrets_store (write)\n' +
+    '- artifacts (write)\n' +
+    '- flagship (write)\n' +
+    '- containers (write)\n' +
+    '- cloudchamber (write)\n' +
+    '- connectivity (admin)\n' +
+    '- email_routing (write)\n' +
+    '- email_sending (write)\n' +
+    '- browser (write)\n' +
+    '- offline_access \n' +
+    `🎢 Membership roles in "Jiantaoweng@gmail.com's Account": Contact account super admin to change your permissions.\n` +
+    '- Super Administrator - All Privileges\n',
+  stderr: '\x1B[31m✘ \x1B[41;31m[\x1B[41;97mERROR\x1B[41;31m]\x1B[0m \x1B[1mA request to the Cloudflare API (/accounts/e7dbf2ec3ab60aa5557cc2364a7a2f26/d1/database/861dd053-c23a-4363-b62b-2559c06ec3fd/query) failed.\x1B[0m\n' +
+    '\n' +
+    '  Authentication error [code: 10000]\n' +
+    '\n' +
+    '\n' +
+    '🪵  Logs were written to "/Users/zhizhi/.wrangler/logs/wrangler-2026-05-28_09-51-34_443.log"\n'
+}
+
+Node.js v22.22.2
+[dashboard] data refreshed at 2026-05-28T09:56:36.879Z
+[dashboard] serving http://127.0.0.1:4177/dashboard/
+[dashboard] data refreshed at 2026-05-28T09:57:44.343Z
+[dashboard] data refreshed at 2026-05-28T10:02:51.529Z
+[dashboard] data refreshed at 2026-05-28T10:07:47.307Z
+[dashboard] data refreshed at 2026-05-28T10:12:45.554Z
+[dashboard] data refreshed at 2026-05-28T10:17:44.927Z
+[dashboard] data refreshed at 2026-05-28T10:22:47.388Z
+[dashboard] data refreshed at 2026-05-28T10:27:45.924Z
+[dashboard] refresh failed: node:internal/errors:983
+  const err = new Error(message);
+              ^
+
+Error: Command failed: npx wrangler d1 execute ailatest-journal --remote --command 
+    SELECT
+      COUNT(*) AS total_users,
+      COUNT(email) AS users_with_email,
+      SUM(CASE WHEN provider='email' THEN 1 ELSE 0 END) AS email_users,
+      SUM(CASE WHEN provider='github' THEN 1 ELSE 0 END) AS github_users,
+      SUM(CASE WHEN provider='google' THEN 1 ELSE 0 END) AS google_users,
+      MIN(created_at) AS first_signup_at,
+      MAX(created_at) AS latest_signup_at
+    FROM users
+  
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mA fetch request failed, likely due to a connectivity issue.[0m
+
+  
+  Common causes:
+    - No internet connection or network connectivity problems
+    - Firewall or VPN blocking the request
+    - Network proxy configuration issues
+  
+  Please check your network connection and try again.
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mfetch failed[0m
+
+
+🪵  Logs were written to "/Users/zhizhi/.wrangler/logs/wrangler-2026-05-28_10-32-42_737.log"
+
+    at genericNodeError (node:internal/errors:983:15)
+    at wrappedFn (node:internal/errors:537:14)
+    at ChildProcess.exithandler (node:child_process:417:12)
+    at ChildProcess.emit (node:events:519:28)
+    at maybeClose (node:internal/child_process:1101:16)
+    at ChildProcess._handle.onexit (node:internal/child_process:304:5) {
+  code: 1,
+  killed: false,
+  signal: null,
+  cmd: 'npx wrangler d1 execute ailatest-journal --remote --command \n' +
+    '    SELECT\n' +
+    '      COUNT(*) AS total_users,\n' +
+    '      COUNT(email) AS users_with_email,\n' +
+    "      SUM(CASE WHEN provider='email' THEN 1 ELSE 0 END) AS email_users,\n" +
+    "      SUM(CASE WHEN provider='github' THEN 1 ELSE 0 END) AS github_users,\n" +
+    "      SUM(CASE WHEN provider='google' THEN 1 ELSE 0 END) AS google_users,\n" +
+    '      MIN(created_at) AS first_signup_at,\n' +
+    '      MAX(created_at) AS latest_signup_at\n' +
+    '    FROM users\n' +
+    '  ',
+  stdout: '\n' +
+    ' ⛅️ wrangler 4.95.0\n' +
+    '───────────────────\n' +
+    'Cloudflare agent skills are available for: Claude Code, Codex. Run wrangler in an interactive terminal to install them, or use `--install-skills` to install without prompting.\n' +
+    'Resource location: remote \n' +
+    '\n' +
+    '🌀 Executing on remote database ailatest-journal (861dd053-c23a-4363-b62b-2559c06ec3fd):\n' +
+    '🌀 To execute on your local development database, remove the --remote flag from your wrangler command.\n' +
+    '\n' +
+    '\x1B[32mIf you think this is a bug then please create an issue at https://github.com/cloudflare/workers-sdk/issues/new/choose\x1B[0m\n',
+  stderr: '\x1B[33m▲ \x1B[43;33m[\x1B[43;30mWARNING\x1B[43;33m]\x1B[0m \x1B[1mA fetch request failed, likely due to a connectivity issue.\x1B[0m\n' +
+    '\n' +
+    '  \n' +
+    '  Common causes:\n' +
+    '    - No internet connection or network connectivity problems\n' +
+    '    - Firewall or VPN blocking the request\n' +
+    '    - Network proxy configuration issues\n' +
+    '  \n' +
+    '  Please check your network connection and try again.\n' +
+    '\n' +
+    '\n' +
+    '\x1B[31m✘ \x1B[41;31m[\x1B[41;97mERROR\x1B[41;31m]\x1B[0m \x1B[1mfetch failed\x1B[0m\n' +
+    '\n' +
+    '\n' +
+    '🪵  Logs were written to "/Users/zhizhi/.wrangler/logs/wrangler-2026-05-28_10-32-42_737.log"\n'
+}
+
+Node.js v22.22.2
+[dashboard] data refreshed at 2026-05-28T10:37:46.204Z
+[dashboard] data refreshed at 2026-05-28T10:42:45.009Z
+[dashboard] data refreshed at 2026-05-28T10:47:44.773Z
+[dashboard] data refreshed at 2026-05-28T10:52:45.183Z
+[dashboard] data refreshed at 2026-05-28T10:57:44.711Z
+[dashboard] data refreshed at 2026-05-28T11:02:44.952Z
+[dashboard] data refreshed at 2026-05-28T11:07:54.544Z
+[dashboard] data refreshed at 2026-05-28T11:12:45.073Z
+[dashboard] data refreshed at 2026-05-28T11:17:45.396Z
+[dashboard] data refreshed at 2026-05-28T11:22:49.216Z
+[dashboard] data refreshed at 2026-05-28T11:27:46.096Z
+[dashboard] data refreshed at 2026-05-28T11:32:55.330Z
+[dashboard] data refreshed at 2026-05-28T11:37:44.830Z
+[dashboard] data refreshed at 2026-05-28T11:42:44.955Z
+[dashboard] data refreshed at 2026-05-28T11:47:44.797Z
+[dashboard] data refreshed at 2026-05-28T11:53:07.007Z
+[dashboard] data refreshed at 2026-05-28T11:57:44.943Z
+[dashboard] data refreshed at 2026-05-28T12:02:45.697Z
+[dashboard] data refreshed at 2026-05-28T12:07:47.424Z
+[dashboard] data refreshed at 2026-05-28T12:12:45.163Z
+[dashboard] data refreshed at 2026-05-28T12:17:46.266Z
+[dashboard] data refreshed at 2026-05-28T12:22:45.652Z
+[dashboard] data refreshed at 2026-05-28T12:27:45.937Z
+[dashboard] data refreshed at 2026-05-28T12:32:45.977Z
+[dashboard] data refreshed at 2026-05-28T12:37:45.701Z
+[dashboard] data refreshed at 2026-05-28T12:42:46.565Z
+[dashboard] data refreshed at 2026-05-28T12:47:45.983Z
+[dashboard] data refreshed at 2026-05-28T12:53:08.838Z
+[dashboard] data refreshed at 2026-05-28T12:57:45.342Z
+[dashboard] data refreshed at 2026-05-28T13:02:45.891Z
+[dashboard] data refreshed at 2026-05-28T13:07:46.236Z
+[dashboard] data refreshed at 2026-05-28T13:12:46.891Z
+[dashboard] data refreshed at 2026-05-28T13:17:45.698Z
+[dashboard] data refreshed at 2026-05-28T13:22:45.390Z
+[dashboard] data refreshed at 2026-05-28T13:27:46.591Z
+[dashboard] data refreshed at 2026-05-28T13:32:45.641Z
+[dashboard] data refreshed at 2026-05-28T13:37:45.675Z
+[dashboard] data refreshed at 2026-05-28T13:42:47.639Z
+[dashboard] data refreshed at 2026-05-28T13:47:46.224Z
+[dashboard] data refreshed at 2026-05-28T13:52:46.325Z
+[dashboard] data refreshed at 2026-05-28T13:57:47.299Z
+[dashboard] data refreshed at 2026-05-28T14:02:59.900Z
+[dashboard] data refreshed at 2026-05-28T14:07:46.430Z
+[dashboard] data refreshed at 2026-05-28T14:12:45.133Z
+[dashboard] data refreshed at 2026-05-28T14:17:45.938Z
+[dashboard] data refreshed at 2026-05-28T14:22:48.918Z
+[dashboard] data refreshed at 2026-05-28T14:27:46.892Z
+[dashboard] data refreshed at 2026-05-28T14:32:46.629Z
+[dashboard] data refreshed at 2026-05-28T14:37:45.159Z
+[dashboard] data refreshed at 2026-05-28T14:42:45.709Z
+[dashboard] data refreshed at 2026-05-28T14:47:46.600Z
+[dashboard] data refreshed at 2026-05-28T14:52:46.530Z
+[dashboard] data refreshed at 2026-05-28T14:57:45.541Z
+[dashboard] data refreshed at 2026-05-28T15:02:46.291Z
+[dashboard] data refreshed at 2026-05-28T15:07:46.074Z
+[dashboard] data refreshed at 2026-05-28T15:12:45.602Z
+[dashboard] data refreshed at 2026-05-28T15:17:46.004Z
+[dashboard] data refreshed at 2026-05-28T15:22:45.625Z
+[dashboard] data refreshed at 2026-05-28T15:27:46.923Z
+[dashboard] data refreshed at 2026-05-28T15:32:46.300Z
+[dashboard] data refreshed at 2026-05-28T15:37:45.207Z
+[dashboard] data refreshed at 2026-05-28T15:42:46.058Z
+[dashboard] data refreshed at 2026-05-28T15:47:46.594Z
+[dashboard] data refreshed at 2026-05-28T15:52:46.233Z
+[dashboard] data refreshed at 2026-05-28T15:57:47.087Z
+[dashboard] data refreshed at 2026-05-28T16:02:45.655Z
+[dashboard] data refreshed at 2026-05-28T16:07:47.460Z
+[dashboard] data refreshed at 2026-05-28T16:12:46.273Z
+[dashboard] data refreshed at 2026-05-28T16:17:47.628Z
+[dashboard] data refreshed at 2026-05-28T16:22:46.640Z
+[dashboard] data refreshed at 2026-05-28T16:27:48.916Z
+[dashboard] data refreshed at 2026-05-28T16:32:45.895Z
+[dashboard] data refreshed at 2026-05-28T16:37:46.280Z
+[dashboard] data refreshed at 2026-05-28T16:42:45.953Z
+[dashboard] data refreshed at 2026-05-28T16:47:47.212Z
+[dashboard] data refreshed at 2026-05-28T16:52:48.370Z
+[dashboard] data refreshed at 2026-05-28T16:58:10.621Z
+[dashboard] data refreshed at 2026-05-28T17:02:47.359Z
+[dashboard] data refreshed at 2026-05-28T17:07:46.078Z
+[dashboard] data refreshed at 2026-05-28T17:12:45.878Z
+[dashboard] data refreshed at 2026-05-28T17:17:48.836Z
+[dashboard] data refreshed at 2026-05-28T17:22:46.054Z
+[dashboard] data refreshed at 2026-05-28T17:27:45.757Z
+[dashboard] data refreshed at 2026-05-28T17:32:45.880Z
+[dashboard] data refreshed at 2026-05-28T17:37:45.925Z
+[dashboard] data refreshed at 2026-05-28T17:42:47.496Z
+[dashboard] data refreshed at 2026-05-28T17:47:45.462Z
+[dashboard] data refreshed at 2026-05-28T17:52:46.404Z
+[dashboard] data refreshed at 2026-05-28T17:57:45.551Z
+[dashboard] data refreshed at 2026-05-28T18:02:45.569Z
+[dashboard] data refreshed at 2026-05-28T18:07:46.044Z
+[dashboard] data refreshed at 2026-05-28T18:12:45.018Z
+[dashboard] data refreshed at 2026-05-28T18:17:45.718Z
+[dashboard] data refreshed at 2026-05-28T18:22:45.498Z
+[dashboard] data refreshed at 2026-05-28T18:27:45.948Z
+[dashboard] data refreshed at 2026-05-28T18:32:45.435Z
+[dashboard] data refreshed at 2026-05-28T18:37:45.609Z
+[dashboard] data refreshed at 2026-05-28T18:42:45.050Z
+[dashboard] data refreshed at 2026-05-28T18:47:46.090Z
+[dashboard] data refreshed at 2026-05-28T18:52:45.241Z
+[dashboard] data refreshed at 2026-05-28T18:57:45.465Z
+[dashboard] data refreshed at 2026-05-28T19:03:04.754Z
+[dashboard] data refreshed at 2026-05-28T19:07:44.915Z
+[dashboard] data refreshed at 2026-05-28T19:12:44.864Z
+[dashboard] data refreshed at 2026-05-28T19:17:45.206Z
+[dashboard] data refreshed at 2026-05-28T19:22:45.145Z
+[dashboard] data refreshed at 2026-05-28T19:27:44.969Z
+[dashboard] data refreshed at 2026-05-28T19:32:45.315Z
+[dashboard] data refreshed at 2026-05-28T19:37:45.142Z
+[dashboard] data refreshed at 2026-05-28T19:42:45.737Z
+[dashboard] data refreshed at 2026-05-28T19:47:46.272Z
+[dashboard] data refreshed at 2026-05-28T19:52:45.464Z
+[dashboard] data refreshed at 2026-05-28T19:57:45.491Z
+[dashboard] data refreshed at 2026-05-28T20:03:04.783Z
+[dashboard] data refreshed at 2026-05-28T20:07:45.013Z
+[dashboard] data refreshed at 2026-05-28T20:12:45.470Z
+[dashboard] data refreshed at 2026-05-28T20:17:45.535Z
+[dashboard] data refreshed at 2026-05-28T20:22:45.353Z
+[dashboard] data refreshed at 2026-05-28T20:27:44.999Z
+[dashboard] data refreshed at 2026-05-28T20:32:45.851Z
+[dashboard] data refreshed at 2026-05-28T20:37:45.277Z
+[dashboard] data refreshed at 2026-05-28T20:42:44.949Z
+[dashboard] data refreshed at 2026-05-28T20:47:45.425Z
+[dashboard] data refreshed at 2026-05-28T20:52:45.182Z
+[dashboard] data refreshed at 2026-05-28T20:57:45.322Z
+[dashboard] data refreshed at 2026-05-28T21:03:04.401Z
+[dashboard] data refreshed at 2026-05-28T21:07:45.601Z
+[dashboard] data refreshed at 2026-05-28T21:12:45.226Z
+[dashboard] data refreshed at 2026-05-28T21:17:45.333Z
+[dashboard] data refreshed at 2026-05-28T21:22:45.095Z
+[dashboard] data refreshed at 2026-05-28T21:27:44.922Z
+[dashboard] data refreshed at 2026-05-28T21:32:45.477Z
+[dashboard] data refreshed at 2026-05-28T21:37:45.307Z
+[dashboard] data refreshed at 2026-05-28T21:42:45.141Z
+[dashboard] data refreshed at 2026-05-28T21:47:45.398Z
+[dashboard] data refreshed at 2026-05-28T21:52:45.125Z
+[dashboard] data refreshed at 2026-05-28T21:57:45.329Z
+[dashboard] data refreshed at 2026-05-28T22:02:51.597Z
+[dashboard] data refreshed at 2026-05-28T22:07:45.210Z
+[dashboard] data refreshed at 2026-05-28T22:12:45.027Z
+[dashboard] data refreshed at 2026-05-28T22:17:46.190Z
+[dashboard] data refreshed at 2026-05-28T22:22:45.295Z
+[dashboard] data refreshed at 2026-05-28T22:27:44.926Z
+[dashboard] data refreshed at 2026-05-28T22:32:45.117Z
+[dashboard] data refreshed at 2026-05-28T22:37:45.931Z
+[dashboard] data refreshed at 2026-05-28T22:42:45.732Z
+[dashboard] data refreshed at 2026-05-28T22:47:45.441Z
+[dashboard] data refreshed at 2026-05-28T22:52:44.858Z
+[dashboard] data refreshed at 2026-05-28T22:57:45.203Z
+[dashboard] data refreshed at 2026-05-28T23:02:44.847Z
+[dashboard] data refreshed at 2026-05-28T23:07:45.238Z
+[dashboard] data refreshed at 2026-05-28T23:12:45.302Z
+[dashboard] data refreshed at 2026-05-28T23:17:45.033Z
+[dashboard] data refreshed at 2026-05-28T23:22:45.270Z
+[dashboard] data refreshed at 2026-05-28T23:27:45.320Z
+[dashboard] data refreshed at 2026-05-28T23:32:45.353Z
+[dashboard] data refreshed at 2026-05-28T23:37:45.325Z
+[dashboard] data refreshed at 2026-05-28T23:42:45.060Z
+[dashboard] data refreshed at 2026-05-28T23:47:45.036Z
+[dashboard] data refreshed at 2026-05-28T23:52:45.161Z
+[dashboard] data refreshed at 2026-05-28T23:57:46.054Z
+[dashboard] data refreshed at 2026-05-29T00:02:45.365Z
+[dashboard] data refreshed at 2026-05-29T00:08:04.951Z
+[dashboard] data refreshed at 2026-05-29T00:12:45.531Z
+[dashboard] refresh failed: node:internal/errors:983
+  const err = new Error(message);
+              ^
+
+Error: Command failed: npx wrangler d1 execute ailatest-journal --remote --command 
+    SELECT
+      COALESCE(country, 'unknown') AS country,
+      COUNT(*) AS pageviews,
+      COUNT(DISTINCT visitor_id) AS visitors,
+      COUNT(DISTINCT session_id) AS sessions,
+      SUM(CASE WHEN client_timezone='Asia/Shanghai' OR client_language LIKE 'zh%' THEN 1 ELSE 0 END) AS cn_hint_events,
+      COUNT(DISTINCT CASE WHEN client_timezone='Asia/Shanghai' OR client_language LIKE 'zh%' THEN visitor_id END) AS cn_hint_visitors,
+      COUNT(DISTINCT CASE WHEN client_timezone='Asia/Shanghai' OR client_language LIKE 'zh%' THEN session_id END) AS cn_hint_sessions,
+      GROUP_CONCAT(DISTINCT colo) AS colos,
+      GROUP_CONCAT(DISTINCT client_timezone) AS client_timezones,
+      GROUP_CONCAT(DISTINCT client_language) AS client_languages
+    FROM page_events
+    GROUP BY COALESCE(country, 'unknown')
+    ORDER BY pageviews DESC
+    LIMIT 20
+  
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mA fetch request failed, likely due to a connectivity issue.[0m
+
+  
+  Common causes:
+    - No internet connection or network connectivity problems
+    - Firewall or VPN blocking the request
+    - Network proxy configuration issues
+  
+  Please check your network connection and try again.
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mfetch failed[0m
+
+
+🪵  Logs were written to "/Users/zhizhi/.wrangler/logs/wrangler-2026-05-29_00-17-43_298.log"
+
+    at genericNodeError (node:internal/errors:983:15)
+    at wrappedFn (node:internal/errors:537:14)
+    at ChildProcess.exithandler (node:child_process:417:12)
+    at ChildProcess.emit (node:events:519:28)
+    at maybeClose (node:internal/child_process:1101:16)
+    at ChildProcess._handle.onexit (node:internal/child_process:304:5) {
+  code: 1,
+  killed: false,
+  signal: null,
+  cmd: 'npx wrangler d1 execute ailatest-journal --remote --command \n' +
+    '    SELECT\n' +
+    "      COALESCE(country, 'unknown') AS country,\n" +
+    '      COUNT(*) AS pageviews,\n' +
+    '      COUNT(DISTINCT visitor_id) AS visitors,\n' +
+    '      COUNT(DISTINCT session_id) AS sessions,\n' +
+    "      SUM(CASE WHEN client_timezone='Asia/Shanghai' OR client_language LIKE 'zh%' THEN 1 ELSE 0 END) AS cn_hint_events,\n" +
+    "      COUNT(DISTINCT CASE WHEN client_timezone='Asia/Shanghai' OR client_language LIKE 'zh%' THEN visitor_id END) AS cn_hint_visitors,\n" +
+    "      COUNT(DISTINCT CASE WHEN client_timezone='Asia/Shanghai' OR client_language LIKE 'zh%' THEN session_id END) AS cn_hint_sessions,\n" +
+    '      GROUP_CONCAT(DISTINCT colo) AS colos,\n' +
+    '      GROUP_CONCAT(DISTINCT client_timezone) AS client_timezones,\n' +
+    '      GROUP_CONCAT(DISTINCT client_language) AS client_languages\n' +
+    '    FROM page_events\n' +
+    "    GROUP BY COALESCE(country, 'unknown')\n" +
+    '    ORDER BY pageviews DESC\n' +
+    '    LIMIT 20\n' +
+    '  ',
+  stdout: '\n' +
+    ' ⛅️ wrangler 4.95.0\n' +
+    '───────────────────\n' +
+    'Cloudflare agent skills are available for: Claude Code, Codex. Run wrangler in an interactive terminal to install them, or use `--install-skills` to install without prompting.\n' +
+    'Resource location: remote \n' +
+    '\n' +
+    '🌀 Executing on remote database ailatest-journal (861dd053-c23a-4363-b62b-2559c06ec3fd):\n' +
+    '🌀 To execute on your local development database, remove the --remote flag from your wrangler command.\n' +
+    '\n' +
+    '\x1B[32mIf you think this is a bug then please create an issue at https://github.com/cloudflare/workers-sdk/issues/new/choose\x1B[0m\n',
+  stderr: '\x1B[33m▲ \x1B[43;33m[\x1B[43;30mWARNING\x1B[43;33m]\x1B[0m \x1B[1mA fetch request failed, likely due to a connectivity issue.\x1B[0m\n' +
+    '\n' +
+    '  \n' +
+    '  Common causes:\n' +
+    '    - No internet connection or network connectivity problems\n' +
+    '    - Firewall or VPN blocking the request\n' +
+    '    - Network proxy configuration issues\n' +
+    '  \n' +
+    '  Please check your network connection and try again.\n' +
+    '\n' +
+    '\n' +
+    '\x1B[31m✘ \x1B[41;31m[\x1B[41;97mERROR\x1B[41;31m]\x1B[0m \x1B[1mfetch failed\x1B[0m\n' +
+    '\n' +
+    '\n' +
+    '🪵  Logs were written to "/Users/zhizhi/.wrangler/logs/wrangler-2026-05-29_00-17-43_298.log"\n'
+}
+
+Node.js v22.22.2
+[dashboard] data refreshed at 2026-05-29T00:22:45.296Z
+[dashboard] data refreshed at 2026-05-29T00:27:45.049Z
+[dashboard] data refreshed at 2026-05-29T00:32:45.825Z
+[dashboard] data refreshed at 2026-05-29T00:37:45.532Z
+[dashboard] data refreshed at 2026-05-29T00:42:44.953Z
+[dashboard] data refreshed at 2026-05-29T00:47:45.500Z
+[dashboard] data refreshed at 2026-05-29T00:52:45.744Z
+[dashboard] data refreshed at 2026-05-29T00:57:45.061Z
+[dashboard] data refreshed at 2026-05-29T01:02:45.665Z
+[dashboard] data refreshed at 2026-05-29T01:08:05.484Z
+[dashboard] data refreshed at 2026-05-29T01:12:45.243Z
+[dashboard] data refreshed at 2026-05-29T01:17:45.665Z
+[dashboard] data refreshed at 2026-05-29T01:22:45.497Z
+[dashboard] data refreshed at 2026-05-29T01:27:46.077Z
+[dashboard] data refreshed at 2026-05-29T01:32:45.071Z
+[dashboard] data refreshed at 2026-05-29T01:37:45.786Z
+[dashboard] data refreshed at 2026-05-29T01:42:45.468Z
+[dashboard] data refreshed at 2026-05-29T01:47:45.508Z
+[dashboard] data refreshed at 2026-05-29T01:52:45.684Z
+[dashboard] data refreshed at 2026-05-29T01:57:46.094Z
+[dashboard] data refreshed at 2026-05-29T02:02:46.130Z
+[dashboard] data refreshed at 2026-05-29T02:08:07.413Z
+[dashboard] data refreshed at 2026-05-29T02:12:45.248Z
+[dashboard] data refreshed at 2026-05-29T02:17:45.568Z
+[dashboard] data refreshed at 2026-05-29T02:22:46.447Z
+[dashboard] data refreshed at 2026-05-29T02:27:45.505Z
+[dashboard] data refreshed at 2026-05-29T02:32:46.465Z
+[dashboard] data refreshed at 2026-05-29T02:37:45.377Z
+[dashboard] data refreshed at 2026-05-29T02:42:45.413Z
+[dashboard] data refreshed at 2026-05-29T02:47:45.351Z
+[dashboard] data refreshed at 2026-05-29T02:52:45.175Z
+[dashboard] data refreshed at 2026-05-29T02:57:46.445Z
+[dashboard] data refreshed at 2026-05-29T03:02:45.483Z
+[dashboard] data refreshed at 2026-05-29T03:07:46.188Z
+[dashboard] data refreshed at 2026-05-29T03:13:06.848Z
+[dashboard] data refreshed at 2026-05-29T03:18:04.192Z
+[dashboard] data refreshed at 2026-05-29T03:22:47.841Z
+[dashboard] data refreshed at 2026-05-29T03:27:45.695Z
+[dashboard] data refreshed at 2026-05-29T03:32:45.518Z
+[dashboard] data refreshed at 2026-05-29T03:37:45.893Z
+[dashboard] data refreshed at 2026-05-29T03:42:44.771Z
+[dashboard] data refreshed at 2026-05-29T03:47:46.431Z
+[dashboard] data refreshed at 2026-05-29T03:52:45.730Z
+[dashboard] data refreshed at 2026-05-29T03:57:45.997Z
+[dashboard] data refreshed at 2026-05-29T04:02:44.903Z
+[dashboard] data refreshed at 2026-05-29T04:07:46.265Z
+[dashboard] data refreshed at 2026-05-29T04:12:51.212Z
+[dashboard] data refreshed at 2026-05-29T04:17:45.312Z
+[dashboard] data refreshed at 2026-05-29T04:22:45.861Z
+[dashboard] data refreshed at 2026-05-29T04:27:45.281Z
+[dashboard] data refreshed at 2026-05-29T04:32:46.440Z
+[dashboard] data refreshed at 2026-05-29T04:37:46.005Z
+[dashboard] data refreshed at 2026-05-29T04:42:45.484Z
+[dashboard] data refreshed at 2026-05-29T04:47:45.713Z
+[dashboard] data refreshed at 2026-05-29T04:52:46.655Z
+[dashboard] data refreshed at 2026-05-29T04:57:45.119Z
+[dashboard] data refreshed at 2026-05-29T05:02:45.406Z
+[dashboard] data refreshed at 2026-05-29T05:07:45.512Z
+[dashboard] data refreshed at 2026-05-29T05:13:06.354Z
+[dashboard] data refreshed at 2026-05-29T05:17:45.567Z
+[dashboard] data refreshed at 2026-05-29T05:22:46.893Z
+[dashboard] data refreshed at 2026-05-29T05:27:44.812Z
+[dashboard] data refreshed at 2026-05-29T05:32:45.587Z
+[dashboard] data refreshed at 2026-05-29T05:37:44.860Z
+[dashboard] data refreshed at 2026-05-29T05:42:44.866Z
+[dashboard] data refreshed at 2026-05-29T05:47:45.633Z
+[dashboard] data refreshed at 2026-05-29T05:52:45.187Z
+[dashboard] data refreshed at 2026-05-29T05:57:46.320Z
+[dashboard] data refreshed at 2026-05-29T06:02:45.921Z
+[dashboard] data refreshed at 2026-05-29T06:07:45.537Z
+[dashboard] data refreshed at 2026-05-29T06:13:07.919Z
+[dashboard] data refreshed at 2026-05-29T06:17:45.436Z
+[dashboard] data refreshed at 2026-05-29T06:22:46.109Z
+[dashboard] data refreshed at 2026-05-29T06:27:45.614Z
+[dashboard] data refreshed at 2026-05-29T06:32:45.173Z
+[dashboard] data refreshed at 2026-05-29T06:37:45.161Z
+[dashboard] data refreshed at 2026-05-29T06:42:46.410Z
+[dashboard] data refreshed at 2026-05-29T06:47:48.314Z
+[dashboard] data refreshed at 2026-05-29T06:52:45.481Z
+[dashboard] data refreshed at 2026-05-29T06:57:48.701Z
+[dashboard] data refreshed at 2026-05-29T07:03:05.122Z
+[dashboard] data refreshed at 2026-05-29T07:07:45.379Z
+[dashboard] data refreshed at 2026-05-29T07:12:45.516Z
+[dashboard] data refreshed at 2026-05-29T07:18:06.542Z
+[dashboard] data refreshed at 2026-05-29T07:22:45.624Z
+[dashboard] data refreshed at 2026-05-29T07:27:46.349Z
+[dashboard] data refreshed at 2026-05-29T07:32:47.052Z
+[dashboard] data refreshed at 2026-05-29T07:37:56.357Z
+[dashboard] data refreshed at 2026-05-29T07:42:55.926Z
+[dashboard] data refreshed at 2026-05-29T07:47:56.505Z
+[dashboard] data refreshed at 2026-05-29T07:52:54.340Z
+[dashboard] data refreshed at 2026-05-29T07:57:46.578Z
+[dashboard] data refreshed at 2026-05-29T08:02:47.185Z
+[dashboard] data refreshed at 2026-05-29T08:07:48.043Z
+[dashboard] data refreshed at 2026-05-29T08:12:50.232Z
+[dashboard] data refreshed at 2026-05-29T08:17:46.178Z
+[dashboard] data refreshed at 2026-05-29T08:22:45.566Z
+[dashboard] data refreshed at 2026-05-29T08:27:48.807Z
+[dashboard] data refreshed at 2026-05-29T08:32:45.900Z
+[dashboard] data refreshed at 2026-05-29T08:37:46.729Z
+[dashboard] data refreshed at 2026-05-29T08:42:50.858Z
+[dashboard] data refreshed at 2026-05-29T08:47:46.353Z
+[dashboard] refresh failed: node:internal/errors:983
+  const err = new Error(message);
+              ^
+
+Error: Command failed: npx wrangler d1 execute ailatest-journal --remote --command 
+    SELECT day, COUNT(*) AS login_events, COUNT(DISTINCT user_id) AS login_users
+    FROM login_events
+    GROUP BY day
+    ORDER BY day
+  
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mA request to the Cloudflare API (/accounts/e7dbf2ec3ab60aa5557cc2364a7a2f26/d1/database/861dd053-c23a-4363-b62b-2559c06ec3fd/query) failed.[0m
+
+  The given account is not valid or is not authorized to access this service [code: 7403]
+  
+  If you think this is a bug, please open an issue at: [4mhttps://github.com/cloudflare/workers-sdk/issues/new/choose[0m
+
+
+🪵  Logs were written to "/Users/zhizhi/.wrangler/logs/wrangler-2026-05-29_08-52-43_044.log"
+
+    at genericNodeError (node:internal/errors:983:15)
+    at wrappedFn (node:internal/errors:537:14)
+    at ChildProcess.exithandler (node:child_process:417:12)
+    at ChildProcess.emit (node:events:519:28)
+    at maybeClose (node:internal/child_process:1101:16)
+    at Socket.<anonymous> (node:internal/child_process:456:11)
+    at Socket.emit (node:events:519:28)
+    at Pipe.<anonymous> (node:net:346:12) {
+  code: 1,
+  killed: false,
+  signal: null,
+  cmd: 'npx wrangler d1 execute ailatest-journal --remote --command \n' +
+    '    SELECT day, COUNT(*) AS login_events, COUNT(DISTINCT user_id) AS login_users\n' +
+    '    FROM login_events\n' +
+    '    GROUP BY day\n' +
+    '    ORDER BY day\n' +
+    '  ',
+  stdout: '\n' +
+    ' ⛅️ wrangler 4.95.0\n' +
+    '───────────────────\n' +
+    'Cloudflare agent skills are available for: Claude Code, Codex. Run wrangler in an interactive terminal to install them, or use `--install-skills` to install without prompting.\n' +
+    'Resource location: remote \n' +
+    '\n' +
+    '🌀 Executing on remote database ailatest-journal (861dd053-c23a-4363-b62b-2559c06ec3fd):\n' +
+    '🌀 To execute on your local development database, remove the --remote flag from your wrangler command.\n' +
+    '\n',
+  stderr: '\x1B[31m✘ \x1B[41;31m[\x1B[41;97mERROR\x1B[41;31m]\x1B[0m \x1B[1mA request to the Cloudflare API (/accounts/e7dbf2ec3ab60aa5557cc2364a7a2f26/d1/database/861dd053-c23a-4363-b62b-2559c06ec3fd/query) failed.\x1B[0m\n' +
+    '\n' +
+    '  The given account is not valid or is not authorized to access this service [code: 7403]\n' +
+    '  \n' +
+    '  If you think this is a bug, please open an issue at: \x1B[4mhttps://github.com/cloudflare/workers-sdk/issues/new/choose\x1B[0m\n' +
+    '\n' +
+    '\n' +
+    '🪵  Logs were written to "/Users/zhizhi/.wrangler/logs/wrangler-2026-05-29_08-52-43_044.log"\n'
+}
+
+Node.js v22.22.2
+[dashboard] data refreshed at 2026-05-29T08:57:45.442Z
+[dashboard] data refreshed at 2026-05-29T09:02:46.243Z
+[dashboard] data refreshed at 2026-05-29T09:07:44.782Z
+[dashboard] data refreshed at 2026-05-29T09:12:45.612Z
+[dashboard] data refreshed at 2026-05-29T09:18:10.602Z
+[dashboard] data refreshed at 2026-05-29T09:22:46.955Z
+[dashboard] serving http://127.0.0.1:4177/dashboard/
+[dashboard] data refreshed at 2026-05-29T09:23:37.936Z
+[dashboard] serving http://127.0.0.1:4177/dashboard/
+[dashboard] data refreshed at 2026-05-29T09:25:06.071Z
+[dashboard] serving http://127.0.0.1:4177/dashboard/
+[dashboard] data refreshed at 2026-05-29T09:27:35.537Z
+[dashboard] data refreshed at 2026-05-29T09:32:36.008Z
+[dashboard] data refreshed at 2026-05-29T09:37:35.764Z
+[dashboard] data refreshed at 2026-05-29T09:42:35.052Z
+[dashboard] data refreshed at 2026-05-29T09:47:35.956Z
+[dashboard] data refreshed at 2026-05-29T09:52:36.489Z
+[dashboard] data refreshed at 2026-05-29T09:57:36.711Z
+[dashboard] data refreshed at 2026-05-29T10:02:35.928Z
+[dashboard] data refreshed at 2026-05-29T10:07:35.979Z
+[dashboard] data refreshed at 2026-05-29T10:12:36.160Z
+[dashboard] data refreshed at 2026-05-29T10:17:36.146Z
+[dashboard] data refreshed at 2026-05-29T10:22:54.318Z
+[dashboard] data refreshed at 2026-05-29T10:27:33.947Z
+[dashboard] data refreshed at 2026-05-29T10:32:33.851Z
+[dashboard] data refreshed at 2026-05-29T10:37:34.148Z
+[dashboard] data refreshed at 2026-05-29T10:42:34.027Z
+[dashboard] data refreshed at 2026-05-29T10:47:34.164Z
+[dashboard] data refreshed at 2026-05-29T10:52:33.891Z
+[dashboard] data refreshed at 2026-05-29T10:57:34.620Z
+[dashboard] data refreshed at 2026-05-29T11:02:34.243Z
+[dashboard] data refreshed at 2026-05-29T11:07:33.787Z
+[dashboard] data refreshed at 2026-05-29T11:12:34.108Z
+[dashboard] data refreshed at 2026-05-29T11:17:34.193Z
+[dashboard] data refreshed at 2026-05-29T11:22:33.903Z
+[dashboard] data refreshed at 2026-05-29T11:27:34.615Z
+[dashboard] data refreshed at 2026-05-29T11:32:34.329Z
+[dashboard] data refreshed at 2026-05-29T11:37:33.867Z
+[dashboard] data refreshed at 2026-05-29T11:42:34.980Z
+[dashboard] data refreshed at 2026-05-29T11:47:34.014Z
+[dashboard] data refreshed at 2026-05-29T11:52:34.102Z
+[dashboard] data refreshed at 2026-05-29T11:57:34.133Z
+[dashboard] data refreshed at 2026-05-29T12:02:33.931Z
+[dashboard] data refreshed at 2026-05-29T12:07:34.474Z
+[dashboard] data refreshed at 2026-05-29T12:12:33.376Z
+[dashboard] data refreshed at 2026-05-29T12:17:33.914Z
+[dashboard] data refreshed at 2026-05-29T12:22:38.489Z
+[dashboard] data refreshed at 2026-05-29T12:27:33.975Z
+[dashboard] data refreshed at 2026-05-29T12:32:33.889Z
+[dashboard] data refreshed at 2026-05-29T12:37:33.816Z
+[dashboard] data refreshed at 2026-05-29T12:42:33.990Z
+[dashboard] data refreshed at 2026-05-29T12:47:34.073Z
+[dashboard] data refreshed at 2026-05-29T12:52:37.057Z
+[dashboard] data refreshed at 2026-05-29T12:57:33.358Z
+[dashboard] data refreshed at 2026-05-29T13:02:34.671Z
+[dashboard] data refreshed at 2026-05-29T13:07:33.997Z
+[dashboard] data refreshed at 2026-05-29T13:12:34.468Z
+[dashboard] data refreshed at 2026-05-29T13:17:34.896Z
+[dashboard] data refreshed at 2026-05-29T13:23:00.322Z
+[dashboard] data refreshed at 2026-05-29T13:27:34.474Z
+[dashboard] data refreshed at 2026-05-29T13:32:35.339Z
+[dashboard] data refreshed at 2026-05-29T13:37:34.199Z
+[dashboard] data refreshed at 2026-05-29T13:42:35.001Z
+[dashboard] data refreshed at 2026-05-29T13:47:35.005Z
+[dashboard] data refreshed at 2026-05-29T13:52:35.190Z
+[dashboard] data refreshed at 2026-05-29T13:57:35.186Z
+[dashboard] data refreshed at 2026-05-29T14:02:34.517Z
+[dashboard] data refreshed at 2026-05-29T14:07:34.674Z
+[dashboard] data refreshed at 2026-05-29T14:12:36.992Z
+[dashboard] data refreshed at 2026-05-29T14:17:34.406Z
+[dashboard] data refreshed at 2026-05-29T14:22:54.826Z
+[dashboard] data refreshed at 2026-05-29T14:27:33.986Z
+[dashboard] data refreshed at 2026-05-29T14:32:34.692Z
+[dashboard] data refreshed at 2026-05-29T14:37:34.147Z
+[dashboard] data refreshed at 2026-05-29T14:42:33.564Z
+[dashboard] data refreshed at 2026-05-29T14:47:33.894Z
+[dashboard] data refreshed at 2026-05-29T14:52:36.708Z
+[dashboard] data refreshed at 2026-05-29T14:57:35.125Z
+[dashboard] data refreshed at 2026-05-29T15:07:34.084Z
+[dashboard] data refreshed at 2026-05-29T15:12:34.357Z
+[dashboard] data refreshed at 2026-05-29T15:17:34.954Z
+[dashboard] data refreshed at 2026-05-29T15:22:56.000Z
+[dashboard] data refreshed at 2026-05-29T15:27:35.065Z
+[dashboard] data refreshed at 2026-05-29T15:32:34.518Z
+[dashboard] data refreshed at 2026-05-29T15:37:34.240Z
+[dashboard] data refreshed at 2026-05-29T15:42:35.073Z
+[dashboard] data refreshed at 2026-05-29T15:47:35.364Z
+[dashboard] data refreshed at 2026-05-29T15:52:36.382Z
+[dashboard] data refreshed at 2026-05-29T15:57:35.877Z
+[dashboard] data refreshed at 2026-05-29T16:02:35.098Z
+[dashboard] data refreshed at 2026-05-29T16:07:35.655Z
+[dashboard] data refreshed at 2026-05-29T16:12:35.293Z
+[dashboard] data refreshed at 2026-05-29T16:17:35.862Z
+[dashboard] data refreshed at 2026-05-29T16:22:42.464Z
+[dashboard] data refreshed at 2026-05-29T16:27:35.868Z
+[dashboard] data refreshed at 2026-05-29T16:32:34.734Z
+[dashboard] data refreshed at 2026-05-29T16:37:36.820Z
+[dashboard] data refreshed at 2026-05-29T16:42:38.499Z
+[dashboard] data refreshed at 2026-05-29T16:47:37.807Z
+[dashboard] data refreshed at 2026-05-29T16:52:35.527Z
+[dashboard] data refreshed at 2026-05-29T16:57:38.605Z
+[dashboard] data refreshed at 2026-05-29T17:02:35.176Z
+[dashboard] data refreshed at 2026-05-29T17:07:36.508Z
+[dashboard] data refreshed at 2026-05-29T17:12:35.566Z
+[dashboard] data refreshed at 2026-05-29T17:17:35.081Z
+[dashboard] data refreshed at 2026-05-29T17:22:36.011Z
+[dashboard] data refreshed at 2026-05-29T17:27:35.352Z
+[dashboard] data refreshed at 2026-05-29T17:32:34.353Z
+[dashboard] data refreshed at 2026-05-29T17:37:34.405Z
+[dashboard] data refreshed at 2026-05-29T17:42:33.980Z
+[dashboard] data refreshed at 2026-05-29T17:47:34.995Z
+[dashboard] data refreshed at 2026-05-29T17:52:34.533Z
+[dashboard] data refreshed at 2026-05-29T17:57:34.325Z
+[dashboard] data refreshed at 2026-05-29T18:02:34.918Z
+[dashboard] data refreshed at 2026-05-29T18:07:34.164Z
+[dashboard] data refreshed at 2026-05-29T18:12:33.957Z
+[dashboard] data refreshed at 2026-05-29T18:17:35.127Z
+[dashboard] data refreshed at 2026-05-29T18:22:34.740Z
+[dashboard] data refreshed at 2026-05-29T18:27:54.039Z
+[dashboard] data refreshed at 2026-05-29T18:32:34.039Z
+[dashboard] data refreshed at 2026-05-29T18:37:34.212Z
+[dashboard] data refreshed at 2026-05-29T18:42:34.635Z
+[dashboard] data refreshed at 2026-05-29T18:47:33.955Z
+[dashboard] data refreshed at 2026-05-29T18:52:34.607Z
+[dashboard] data refreshed at 2026-05-29T18:57:34.026Z
+[dashboard] data refreshed at 2026-05-29T19:02:34.021Z
+[dashboard] data refreshed at 2026-05-29T19:07:34.350Z
+[dashboard] data refreshed at 2026-05-29T19:12:34.350Z
+[dashboard] data refreshed at 2026-05-29T19:17:34.008Z
+[dashboard] data refreshed at 2026-05-29T19:22:34.447Z
+[dashboard] data refreshed at 2026-05-29T19:27:53.499Z
+[dashboard] data refreshed at 2026-05-29T19:32:34.050Z
+[dashboard] data refreshed at 2026-05-29T19:37:34.243Z
+[dashboard] data refreshed at 2026-05-29T19:42:34.051Z
+[dashboard] data refreshed at 2026-05-29T19:47:34.017Z
+[dashboard] data refreshed at 2026-05-29T19:52:34.820Z
+[dashboard] data refreshed at 2026-05-29T19:57:34.131Z
+[dashboard] data refreshed at 2026-05-29T20:02:34.042Z
+[dashboard] data refreshed at 2026-05-29T20:07:34.256Z
+[dashboard] data refreshed at 2026-05-29T20:12:33.991Z
+[dashboard] data refreshed at 2026-05-29T20:17:34.020Z
+[dashboard] data refreshed at 2026-05-29T20:22:34.446Z
+[dashboard] data refreshed at 2026-05-29T20:27:34.147Z
+[dashboard] data refreshed at 2026-05-29T20:32:34.040Z
+[dashboard] data refreshed at 2026-05-29T20:37:34.269Z
+[dashboard] data refreshed at 2026-05-29T20:42:33.963Z
+[dashboard] data refreshed at 2026-05-29T20:47:34.088Z
+[dashboard] data refreshed at 2026-05-29T20:52:34.207Z
+[dashboard] data refreshed at 2026-05-29T20:57:34.072Z
+[dashboard] data refreshed at 2026-05-29T21:02:34.076Z
+[dashboard] data refreshed at 2026-05-29T21:07:34.037Z
+[dashboard] data refreshed at 2026-05-29T21:12:33.651Z
+[dashboard] data refreshed at 2026-05-29T21:17:34.192Z
+[dashboard] data refreshed at 2026-05-29T21:22:34.054Z
+[dashboard] data refreshed at 2026-05-29T21:27:34.210Z
+[dashboard] data refreshed at 2026-05-29T21:32:34.056Z
+[dashboard] data refreshed at 2026-05-29T21:37:34.019Z
+[dashboard] data refreshed at 2026-05-29T21:42:34.953Z
+[dashboard] data refreshed at 2026-05-29T21:47:34.015Z
+[dashboard] data refreshed at 2026-05-29T21:52:34.267Z
+[dashboard] data refreshed at 2026-05-29T21:57:34.004Z
+[dashboard] data refreshed at 2026-05-29T22:02:34.178Z
+[dashboard] data refreshed at 2026-05-29T22:07:34.215Z
+[dashboard] data refreshed at 2026-05-29T22:12:34.034Z
+[dashboard] data refreshed at 2026-05-29T22:17:34.273Z
+[dashboard] data refreshed at 2026-05-29T22:22:34.189Z
+[dashboard] data refreshed at 2026-05-29T22:27:54.154Z
+[dashboard] data refreshed at 2026-05-29T22:32:34.170Z
+[dashboard] data refreshed at 2026-05-29T22:37:34.468Z
+[dashboard] data refreshed at 2026-05-29T22:42:34.209Z
+[dashboard] data refreshed at 2026-05-29T22:47:34.083Z
+[dashboard] data refreshed at 2026-05-29T22:52:34.208Z
+[dashboard] data refreshed at 2026-05-29T22:57:34.119Z
+[dashboard] data refreshed at 2026-05-29T23:02:34.095Z
+[dashboard] data refreshed at 2026-05-29T23:07:34.208Z
+[dashboard] data refreshed at 2026-05-29T23:12:34.176Z
+[dashboard] data refreshed at 2026-05-29T23:17:34.259Z
+[dashboard] data refreshed at 2026-05-29T23:22:34.201Z
+[dashboard] data refreshed at 2026-05-29T23:27:34.122Z
+[dashboard] data refreshed at 2026-05-29T23:32:53.539Z
+[dashboard] data refreshed at 2026-05-29T23:37:34.010Z
+[dashboard] data refreshed at 2026-05-29T23:42:34.433Z
+[dashboard] data refreshed at 2026-05-29T23:47:34.079Z
+[dashboard] data refreshed at 2026-05-29T23:52:34.195Z
+[dashboard] data refreshed at 2026-05-29T23:57:34.057Z
+[dashboard] data refreshed at 2026-05-30T00:02:34.612Z
+[dashboard] data refreshed at 2026-05-30T00:07:34.146Z
+[dashboard] data refreshed at 2026-05-30T00:12:34.130Z
+[dashboard] data refreshed at 2026-05-30T00:17:34.381Z
+[dashboard] data refreshed at 2026-05-30T00:22:33.679Z
+[dashboard] data refreshed at 2026-05-30T00:27:33.831Z
+[dashboard] data refreshed at 2026-05-30T00:32:54.408Z
+[dashboard] data refreshed at 2026-05-30T00:37:33.985Z
+[dashboard] data refreshed at 2026-05-30T00:42:33.667Z
+[dashboard] data refreshed at 2026-05-30T00:47:34.049Z
+[dashboard] data refreshed at 2026-05-30T00:52:34.049Z
+[dashboard] data refreshed at 2026-05-30T00:57:35.273Z
+[dashboard] data refreshed at 2026-05-30T01:02:34.246Z
+[dashboard] data refreshed at 2026-05-30T01:07:34.142Z
+[dashboard] data refreshed at 2026-05-30T01:12:34.679Z
+[dashboard] data refreshed at 2026-05-30T01:17:34.246Z
+[dashboard] data refreshed at 2026-05-30T01:22:34.372Z
+[dashboard] data refreshed at 2026-05-30T01:27:34.296Z
+[dashboard] data refreshed at 2026-05-30T01:32:56.840Z
+[dashboard] data refreshed at 2026-05-30T01:37:34.190Z
+[dashboard] data refreshed at 2026-05-30T01:42:34.228Z
+[dashboard] data refreshed at 2026-05-30T01:47:34.673Z
+[dashboard] data refreshed at 2026-05-30T01:52:34.155Z
+[dashboard] data refreshed at 2026-05-30T01:57:34.707Z
+[dashboard] data refreshed at 2026-05-30T02:02:34.567Z
+[dashboard] data refreshed at 2026-05-30T02:07:34.209Z
+[dashboard] data refreshed at 2026-05-30T02:12:34.193Z
+[dashboard] data refreshed at 2026-05-30T02:17:33.948Z
+[dashboard] data refreshed at 2026-05-30T02:22:33.785Z
+[dashboard] data refreshed at 2026-05-30T02:27:34.095Z
+[dashboard] data refreshed at 2026-05-30T02:32:34.581Z
+[dashboard] data refreshed at 2026-05-30T02:37:33.910Z
+[dashboard] data refreshed at 2026-05-30T02:42:34.657Z
+[dashboard] data refreshed at 2026-05-30T02:47:34.326Z
+[dashboard] data refreshed at 2026-05-30T02:52:35.154Z
+[dashboard] data refreshed at 2026-05-30T02:57:33.989Z
+[dashboard] data refreshed at 2026-05-30T03:02:34.874Z
+[dashboard] data refreshed at 2026-05-30T03:07:35.405Z
+[dashboard] data refreshed at 2026-05-30T03:12:35.269Z
+[dashboard] data refreshed at 2026-05-30T03:17:34.445Z
+[dashboard] data refreshed at 2026-05-30T03:22:34.988Z
+[dashboard] data refreshed at 2026-05-30T03:27:34.048Z
+[dashboard] data refreshed at 2026-05-30T03:32:34.586Z
+[dashboard] data refreshed at 2026-05-30T03:37:34.545Z
+[dashboard] data refreshed at 2026-05-30T03:42:35.532Z
+[dashboard] data refreshed at 2026-05-30T03:47:34.460Z
+[dashboard] data refreshed at 2026-05-30T03:52:34.352Z
+[dashboard] data refreshed at 2026-05-30T03:57:34.405Z
+[dashboard] data refreshed at 2026-05-30T04:02:36.009Z
+[dashboard] data refreshed at 2026-05-30T04:07:35.438Z
+[dashboard] data refreshed at 2026-05-30T04:12:36.069Z
+[dashboard] data refreshed at 2026-05-30T04:17:35.856Z
+[dashboard] data refreshed at 2026-05-30T04:22:35.772Z
+[dashboard] data refreshed at 2026-05-30T04:27:34.983Z
+[dashboard] data refreshed at 2026-05-30T04:32:34.430Z
+[dashboard] data refreshed at 2026-05-30T04:37:35.009Z
+[dashboard] data refreshed at 2026-05-30T04:42:34.833Z
+[dashboard] data refreshed at 2026-05-30T04:47:34.905Z
+[dashboard] data refreshed at 2026-05-30T04:52:34.850Z
+[dashboard] data refreshed at 2026-05-30T04:57:35.337Z
+[dashboard] data refreshed at 2026-05-30T05:02:34.808Z
+[dashboard] data refreshed at 2026-05-30T05:07:35.988Z
+[dashboard] data refreshed at 2026-05-30T05:12:34.446Z
+[dashboard] data refreshed at 2026-05-30T05:17:34.858Z
+[dashboard] data refreshed at 2026-05-30T05:22:34.756Z
+[dashboard] data refreshed at 2026-05-30T05:27:35.259Z
+[dashboard] data refreshed at 2026-05-30T05:32:34.605Z
+[dashboard] data refreshed at 2026-05-30T05:38:07.051Z
+[dashboard] data refreshed at 2026-05-30T05:42:35.162Z
+[dashboard] data refreshed at 2026-05-30T05:47:34.649Z
+[dashboard] data refreshed at 2026-05-30T05:52:35.432Z
+[dashboard] data refreshed at 2026-05-30T05:57:34.935Z
+[dashboard] data refreshed at 2026-05-30T06:02:36.058Z
+[dashboard] data refreshed at 2026-05-30T06:07:34.334Z
+[dashboard] data refreshed at 2026-05-30T06:12:34.717Z
+[dashboard] data refreshed at 2026-05-30T06:17:35.339Z
+[dashboard] data refreshed at 2026-05-30T06:22:35.418Z
+[dashboard] data refreshed at 2026-05-30T06:27:34.921Z
+[dashboard] data refreshed at 2026-05-30T06:32:35.065Z
+[dashboard] data refreshed at 2026-05-30T06:37:56.307Z
+[dashboard] data refreshed at 2026-05-30T06:42:34.810Z
+[dashboard] data refreshed at 2026-05-30T06:47:35.727Z
+[dashboard] data refreshed at 2026-05-30T06:52:35.367Z
+[dashboard] data refreshed at 2026-05-30T06:57:36.175Z
+[dashboard] data refreshed at 2026-05-30T07:02:35.498Z
+[dashboard] data refreshed at 2026-05-30T07:07:36.091Z
+[dashboard] data refreshed at 2026-05-30T07:12:35.371Z
+[dashboard] data refreshed at 2026-05-30T07:17:35.146Z
+[dashboard] data refreshed at 2026-05-30T07:22:35.117Z
+[dashboard] data refreshed at 2026-05-30T07:27:35.190Z
+[dashboard] data refreshed at 2026-05-30T07:32:34.907Z
+[dashboard] data refreshed at 2026-05-30T07:37:38.091Z
+[dashboard] data refreshed at 2026-05-30T07:42:35.688Z
+[dashboard] data refreshed at 2026-05-30T07:47:35.567Z
+[dashboard] data refreshed at 2026-05-30T07:52:36.245Z
+[dashboard] data refreshed at 2026-05-30T07:57:35.432Z
+[dashboard] data refreshed at 2026-05-30T08:02:35.845Z
+[dashboard] data refreshed at 2026-05-30T08:07:36.577Z
+[dashboard] data refreshed at 2026-05-30T08:12:36.230Z
+[dashboard] data refreshed at 2026-05-30T08:17:35.906Z
+[dashboard] data refreshed at 2026-05-30T08:22:35.199Z
+[dashboard] data refreshed at 2026-05-30T08:27:35.016Z
+[dashboard] data refreshed at 2026-05-30T08:32:35.733Z
+[dashboard] data refreshed at 2026-05-30T08:37:34.735Z
+[dashboard] data refreshed at 2026-05-30T08:42:34.667Z
+[dashboard] data refreshed at 2026-05-30T08:47:35.236Z
+[dashboard] data refreshed at 2026-05-30T08:52:35.175Z
+[dashboard] data refreshed at 2026-05-30T08:57:35.307Z
+[dashboard] data refreshed at 2026-05-30T09:02:34.911Z
+[dashboard] data refreshed at 2026-05-30T09:07:35.539Z
+[dashboard] data refreshed at 2026-05-30T09:12:34.899Z
+[dashboard] data refreshed at 2026-05-30T09:17:34.597Z
+[dashboard] data refreshed at 2026-05-30T09:22:35.772Z
+[dashboard] data refreshed at 2026-05-30T09:27:35.476Z
+[dashboard] data refreshed at 2026-05-30T09:32:34.849Z
+[dashboard] data refreshed at 2026-05-30T09:37:40.547Z
+[dashboard] data refreshed at 2026-05-30T09:42:34.931Z
+[dashboard] data refreshed at 2026-05-30T09:47:34.933Z
+[dashboard] data refreshed at 2026-05-30T09:52:35.002Z
+[dashboard] data refreshed at 2026-05-30T09:57:34.889Z
+[dashboard] data refreshed at 2026-05-30T10:02:34.940Z
+[dashboard] data refreshed at 2026-05-30T10:07:35.179Z
+[dashboard] data refreshed at 2026-05-30T10:12:35.632Z
+[dashboard] data refreshed at 2026-05-30T10:17:35.020Z
+[dashboard] data refreshed at 2026-05-30T10:22:34.755Z
+[dashboard] data refreshed at 2026-05-30T10:27:35.564Z
+[dashboard] data refreshed at 2026-05-30T10:32:35.440Z
+[dashboard] data refreshed at 2026-05-30T10:37:34.982Z
+[dashboard] data refreshed at 2026-05-30T10:42:39.061Z
+[dashboard] data refreshed at 2026-05-30T10:47:34.918Z
+[dashboard] data refreshed at 2026-05-30T10:52:34.864Z
+[dashboard] data refreshed at 2026-05-30T10:57:35.114Z
+[dashboard] data refreshed at 2026-05-30T11:02:34.288Z
+[dashboard] data refreshed at 2026-05-30T11:07:35.215Z
+[dashboard] data refreshed at 2026-05-30T11:12:35.525Z
+[dashboard] data refreshed at 2026-05-30T11:17:35.058Z
+[dashboard] data refreshed at 2026-05-30T11:22:35.180Z
+[dashboard] data refreshed at 2026-05-30T11:27:35.010Z
+[dashboard] data refreshed at 2026-05-30T11:32:35.299Z
+[dashboard] data refreshed at 2026-05-30T11:37:34.958Z
+[dashboard] data refreshed at 2026-05-30T11:42:56.056Z
+[dashboard] data refreshed at 2026-05-30T11:47:38.974Z
+[dashboard] data refreshed at 2026-05-30T11:52:36.667Z
+[dashboard] data refreshed at 2026-05-30T11:57:35.597Z
+[dashboard] data refreshed at 2026-05-30T12:02:35.386Z
+[dashboard] data refreshed at 2026-05-30T12:07:34.975Z
+[dashboard] data refreshed at 2026-05-30T12:12:35.356Z
+[dashboard] data refreshed at 2026-05-30T12:17:36.588Z
+[dashboard] data refreshed at 2026-05-30T12:22:35.358Z
+[dashboard] data refreshed at 2026-05-30T12:27:35.299Z
+[dashboard] data refreshed at 2026-05-30T12:32:35.056Z
+[dashboard] data refreshed at 2026-05-30T12:37:35.117Z
+[dashboard] data refreshed at 2026-05-30T12:42:35.064Z
+[dashboard] data refreshed at 2026-05-30T12:47:35.974Z
+[dashboard] data refreshed at 2026-05-30T12:52:35.292Z
+[dashboard] data refreshed at 2026-05-30T12:57:34.677Z
+[dashboard] data refreshed at 2026-05-30T13:02:35.089Z
+[dashboard] data refreshed at 2026-05-30T13:07:35.403Z
+[dashboard] data refreshed at 2026-05-30T13:12:35.599Z
+[dashboard] data refreshed at 2026-05-30T13:17:35.857Z
+[dashboard] data refreshed at 2026-05-30T13:22:35.140Z
+[dashboard] data refreshed at 2026-05-30T13:27:35.491Z
+[dashboard] data refreshed at 2026-05-30T13:32:35.305Z
+[dashboard] data refreshed at 2026-05-30T13:37:36.618Z
+[dashboard] data refreshed at 2026-05-30T13:42:36.404Z
+[dashboard] data refreshed at 2026-05-30T13:47:36.472Z
+[dashboard] data refreshed at 2026-05-30T13:52:35.964Z
+[dashboard] data refreshed at 2026-05-30T13:57:38.729Z
+[dashboard] data refreshed at 2026-05-30T14:02:37.965Z
+[dashboard] data refreshed at 2026-05-30T14:07:36.322Z
+[dashboard] data refreshed at 2026-05-30T14:12:37.479Z
+[dashboard] data refreshed at 2026-05-30T14:17:38.322Z
+[dashboard] data refreshed at 2026-05-30T14:22:36.610Z
+[dashboard] data refreshed at 2026-05-30T14:27:36.742Z
+[dashboard] data refreshed at 2026-05-30T14:32:37.582Z
+[dashboard] data refreshed at 2026-05-30T14:37:36.482Z
+[dashboard] data refreshed at 2026-05-30T14:42:37.366Z
+[dashboard] data refreshed at 2026-05-30T14:47:37.285Z
+[dashboard] data refreshed at 2026-05-30T14:52:36.935Z
+[dashboard] data refreshed at 2026-05-30T14:57:36.014Z
+[dashboard] data refreshed at 2026-05-30T15:02:36.846Z
+[dashboard] data refreshed at 2026-05-30T15:07:37.144Z
+[dashboard] data refreshed at 2026-05-30T15:12:37.409Z
+[dashboard] data refreshed at 2026-05-30T15:17:36.656Z
+[dashboard] data refreshed at 2026-05-30T15:22:37.215Z
+[dashboard] data refreshed at 2026-05-30T15:27:36.589Z
+[dashboard] data refreshed at 2026-05-30T15:32:36.709Z
+[dashboard] data refreshed at 2026-05-30T15:37:36.842Z
+[dashboard] data refreshed at 2026-05-30T15:42:36.975Z
+[dashboard] data refreshed at 2026-05-30T15:47:47.974Z
+[dashboard] data refreshed at 2026-05-30T15:52:37.276Z
+[dashboard] data refreshed at 2026-05-30T15:57:36.252Z
+[dashboard] data refreshed at 2026-05-30T16:02:36.175Z
+[dashboard] data refreshed at 2026-05-30T16:07:36.947Z
+[dashboard] data refreshed at 2026-05-30T16:12:36.917Z
+[dashboard] data refreshed at 2026-05-30T16:17:36.140Z
+[dashboard] data refreshed at 2026-05-30T16:22:38.217Z
+[dashboard] data refreshed at 2026-05-30T16:27:36.615Z
+[dashboard] data refreshed at 2026-05-30T16:32:35.814Z
+[dashboard] data refreshed at 2026-05-30T16:37:37.181Z
+[dashboard] data refreshed at 2026-05-30T16:42:37.955Z
+[dashboard] data refreshed at 2026-05-30T16:47:45.465Z
+[dashboard] data refreshed at 2026-05-30T16:52:36.087Z
+[dashboard] data refreshed at 2026-05-30T17:02:35.426Z
+[dashboard] data refreshed at 2026-05-30T17:07:35.096Z
+[dashboard] data refreshed at 2026-05-30T17:12:36.600Z
+[dashboard] data refreshed at 2026-05-30T17:17:36.160Z
+[dashboard] data refreshed at 2026-05-30T17:22:35.248Z
+[dashboard] data refreshed at 2026-05-30T17:27:35.494Z
+[dashboard] data refreshed at 2026-05-30T17:32:35.173Z
+[dashboard] data refreshed at 2026-05-30T17:37:35.405Z
+[dashboard] data refreshed at 2026-05-30T17:42:36.168Z
+[dashboard] data refreshed at 2026-05-30T17:47:39.348Z
+[dashboard] data refreshed at 2026-05-30T17:52:36.115Z
+[dashboard] data refreshed at 2026-05-30T17:57:35.333Z
+[dashboard] data refreshed at 2026-05-30T18:02:35.894Z
+[dashboard] data refreshed at 2026-05-30T18:07:35.541Z
+[dashboard] data refreshed at 2026-05-30T18:12:35.765Z
+[dashboard] data refreshed at 2026-05-30T18:17:36.689Z
+[dashboard] data refreshed at 2026-05-30T18:22:35.650Z
+[dashboard] data refreshed at 2026-05-30T18:27:35.238Z
+[dashboard] data refreshed at 2026-05-30T18:32:35.285Z
+[dashboard] data refreshed at 2026-05-30T18:37:35.272Z
+[dashboard] data refreshed at 2026-05-30T18:42:35.533Z
+[dashboard] data refreshed at 2026-05-30T18:47:35.540Z
+[dashboard] data refreshed at 2026-05-30T18:52:34.771Z
+[dashboard] data refreshed at 2026-05-30T18:57:35.120Z
+[dashboard] data refreshed at 2026-05-30T19:02:35.193Z
+[dashboard] data refreshed at 2026-05-30T19:07:35.250Z
+[dashboard] data refreshed at 2026-05-30T19:12:35.131Z
+[dashboard] data refreshed at 2026-05-30T19:17:35.529Z
+[dashboard] data refreshed at 2026-05-30T19:22:35.164Z
+[dashboard] data refreshed at 2026-05-30T19:27:35.251Z
+[dashboard] data refreshed at 2026-05-30T19:32:35.138Z
+[dashboard] data refreshed at 2026-05-30T19:37:35.074Z
+[dashboard] data refreshed at 2026-05-30T19:42:35.262Z
+[dashboard] data refreshed at 2026-05-30T19:47:35.224Z
+[dashboard] data refreshed at 2026-05-30T19:52:35.680Z
+[dashboard] data refreshed at 2026-05-30T19:57:35.489Z
+[dashboard] data refreshed at 2026-05-30T20:02:35.499Z
+[dashboard] data refreshed at 2026-05-30T20:07:35.441Z
+[dashboard] data refreshed at 2026-05-30T20:12:35.520Z
+[dashboard] data refreshed at 2026-05-30T20:17:35.558Z
+[dashboard] data refreshed at 2026-05-30T20:22:35.520Z
+[dashboard] data refreshed at 2026-05-30T20:27:35.345Z
+[dashboard] data refreshed at 2026-05-30T20:32:35.309Z
+[dashboard] data refreshed at 2026-05-30T20:37:35.595Z
+[dashboard] data refreshed at 2026-05-30T20:42:35.575Z
+[dashboard] data refreshed at 2026-05-30T20:47:35.414Z
+[dashboard] data refreshed at 2026-05-30T20:52:35.520Z
+[dashboard] data refreshed at 2026-05-30T20:57:35.522Z
+[dashboard] data refreshed at 2026-05-30T21:02:35.353Z
+[dashboard] data refreshed at 2026-05-30T21:07:35.629Z
+[dashboard] data refreshed at 2026-05-30T21:12:35.396Z
+[dashboard] data refreshed at 2026-05-30T21:17:35.727Z
+[dashboard] data refreshed at 2026-05-30T21:22:35.385Z
+[dashboard] data refreshed at 2026-05-30T21:27:35.377Z
+[dashboard] data refreshed at 2026-05-30T21:32:35.361Z
+[dashboard] data refreshed at 2026-05-30T21:37:35.411Z
+[dashboard] data refreshed at 2026-05-30T21:42:35.522Z
+[dashboard] data refreshed at 2026-05-30T21:47:45.762Z
+[dashboard] data refreshed at 2026-05-30T21:52:35.646Z
+[dashboard] data refreshed at 2026-05-30T21:57:35.745Z
+[dashboard] data refreshed at 2026-05-30T22:02:35.659Z
+[dashboard] data refreshed at 2026-05-30T22:07:35.601Z
+[dashboard] data refreshed at 2026-05-30T22:12:35.581Z
+[dashboard] data refreshed at 2026-05-30T22:17:35.538Z
+[dashboard] data refreshed at 2026-05-30T22:22:35.541Z
+[dashboard] data refreshed at 2026-05-30T22:27:35.612Z
+[dashboard] data refreshed at 2026-05-30T22:32:35.567Z
+[dashboard] data refreshed at 2026-05-30T22:37:35.557Z
+[dashboard] data refreshed at 2026-05-30T22:42:35.567Z
+[dashboard] data refreshed at 2026-05-30T22:47:35.504Z
+[dashboard] data refreshed at 2026-05-30T22:52:55.773Z
+[dashboard] data refreshed at 2026-05-30T22:57:35.454Z
+[dashboard] data refreshed at 2026-05-30T23:02:35.521Z
+[dashboard] data refreshed at 2026-05-30T23:07:35.660Z
+[dashboard] data refreshed at 2026-05-30T23:12:35.547Z
+[dashboard] data refreshed at 2026-05-30T23:17:35.785Z
+[dashboard] data refreshed at 2026-05-30T23:22:35.639Z
+[dashboard] data refreshed at 2026-05-30T23:27:35.604Z
+[dashboard] data refreshed at 2026-05-30T23:32:35.615Z
+[dashboard] data refreshed at 2026-05-30T23:37:35.612Z
+[dashboard] data refreshed at 2026-05-30T23:42:36.101Z
+[dashboard] data refreshed at 2026-05-30T23:47:35.555Z
+[dashboard] data refreshed at 2026-05-30T23:52:35.618Z
+[dashboard] data refreshed at 2026-05-30T23:57:35.520Z
+[dashboard] data refreshed at 2026-05-31T00:02:35.693Z
+[dashboard] data refreshed at 2026-05-31T00:07:35.954Z
+[dashboard] data refreshed at 2026-05-31T00:12:35.485Z
+[dashboard] data refreshed at 2026-05-31T00:17:35.676Z
+[dashboard] data refreshed at 2026-05-31T00:22:35.619Z
+[dashboard] data refreshed at 2026-05-31T00:27:35.493Z
+[dashboard] data refreshed at 2026-05-31T00:32:35.098Z
+[dashboard] data refreshed at 2026-05-31T00:37:35.962Z
+[dashboard] data refreshed at 2026-05-31T00:42:35.991Z
+[dashboard] data refreshed at 2026-05-31T00:47:35.578Z
+[dashboard] data refreshed at 2026-05-31T00:52:35.740Z
+[dashboard] data refreshed at 2026-05-31T00:57:36.444Z
+[dashboard] data refreshed at 2026-05-31T01:02:36.523Z

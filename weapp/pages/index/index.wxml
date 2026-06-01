@@ -1,21 +1,100 @@
-<view class="container">
-  <!-- 加载/错误提示 -->
-  <view class="loading-mask" wx:if="{{!loaded && !error}}">
-    <view class="loading-spinner"></view>
-    <text class="loading-text">加载中...</text>
+<view class="paper-bg">
+  <view class="safe-page home">
+    <view class="brand-block">
+      <view class="brand-title">
+        <text>Journal</text><text class="brand-ai">AI</text><text>分区速查</text>
+      </view>
+      <view class="brand-sub">期刊检索与推荐工具</view>
+    </view>
+
+    <view class="mode-switch">
+      <view class="mode-item {{mode === 'search' ? 'active' : ''}}" bindtap="switchMode" data-mode="search">查刊</view>
+      <view class="mode-item {{mode === 'pick' ? 'active' : ''}}" bindtap="switchMode" data-mode="pick">荐刊</view>
+    </view>
+
+    <view class="search-card card {{mode === 'pick' ? 'pick-card' : ''}}">
+      <view class="search-line">
+        <text class="search-icon">⌕</text>
+        <input
+          wx:if="{{mode === 'search'}}"
+          class="search-input"
+          value="{{query}}"
+          placeholder="搜索期刊名 / ISSN / 主题 / 学科"
+          confirm-type="search"
+          bindinput="onInput"
+          bindconfirm="runSearch"
+        />
+        <textarea
+          wx:else
+          class="pick-input"
+          value="{{query}}"
+          maxlength="200"
+          fixed
+          placeholder="输入题目、关键词等，最多 200 字"
+          bindinput="onInput"
+        />
+      </view>
+      <button class="search-btn" bindtap="runSearch">{{mode === 'pick' ? '开始推荐' : '搜索'}}</button>
+    </view>
+
+    <view class="filter-grid">
+      <view wx:for="{{quickFilters}}" wx:key="key" class="filter-cell card {{activeFilter === item.key ? 'active' : ''}}" bindtap="selectFilter" data-key="{{item.key}}">
+        <view class="filter-icon">{{item.icon}}</view>
+        <view>{{item.label}}</view>
+      </view>
+    </view>
+
+    <view class="inline-filter card" wx:if="{{currentOptions.length}}">
+      <view wx:for="{{currentOptions}}" wx:key="key" class="inline-chip {{item.active ? 'active' : ''}}" bindtap="toggleInlineFilter" data-key="{{item.key}}">{{item.label}}</view>
+    </view>
+
+    <view class="filter-summary" wx:if="{{filterSummary}}">已筛选：{{filterSummary}}</view>
+
+    <view class="list-head">
+      <view>
+        <view class="section-title">{{searched ? '搜索结果' : '期刊推荐'}}</view>
+        <view class="result-count">{{loading ? '查询中...' : '共 ' + total + ' 条结果'}}</view>
+      </view>
+      <button class="refresh-btn" bindtap="shuffleFeatured">换一批</button>
+    </view>
+
+    <view class="journal-list">
+      <view wx:for="{{journals}}" wx:key="id" class="journal-card card" bindtap="openDetail" data-slug="{{item.slug}}">
+        <view class="journal-logo {{item.logoTone}}">{{item.initials}}</view>
+        <view class="journal-main">
+          <view class="journal-title-row">
+            <view class="journal-title">{{item.title}}</view>
+            <view class="star">☆</view>
+          </view>
+          <view class="journal-meta">ISSN {{item.issn}} <text wx:if="{{item.publisher}}"> | {{item.publisher}}</text></view>
+          <view class="metric-row">
+            <view class="metric"><text>IF</text><strong>{{item.ifText}}</strong></view>
+            <view class="metric"><text>JCR</text><strong>{{item.jcr}}</strong></view>
+            <view class="metric"><text>中科院</text><strong>{{item.cas}}</strong></view>
+            <view class="metric"><text>新锐</text><strong>{{item.xr}}</strong></view>
+          </view>
+          <view class="journal-extra">
+            <text>{{item.reviewCycle}}</text>
+            <text>{{item.freeText}}</text>
+          </view>
+          <view class="badges">
+            <text wx:for="{{item.badges}}" wx:key="*this" class="badge {{index === 0 ? 'badge-blue' : index === 1 ? 'badge-green' : index === 2 ? 'badge-brown' : 'badge-soft'}}">{{item}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="empty-state" wx:if="{{!loading && journals.length === 0}}">
+      <view class="empty-icon">⌕</view>
+      <view>没有找到匹配期刊</view>
+      <text>换个关键词或减少筛选条件试试</text>
+    </view>
   </view>
 
-  <view class="error-mask" wx:if="{{error}}">
-    <text class="error-icon">⚠️</text>
-    <text class="error-text">{{errorMsg}}</text>
-    <button class="retry-btn" bindtap="retry">重试</button>
+  <view class="bottom-tabs">
+    <view class="bottom-tab active" bindtap="goTab" data-url="/pages/index/index"><text class="tab-icon">⌂</text><text>首页</text></view>
+    <view class="bottom-tab" bindtap="goTab" data-url="/pages/rankings/rankings"><text class="tab-icon">☷</text><text>榜单</text></view>
+    <view class="bottom-tab" bindtap="goTab" data-url="/pages/favorites/favorites"><text class="tab-icon">♡</text><text>收藏</text></view>
+    <view class="bottom-tab" bindtap="goTab" data-url="/pages/profile/profile"><text class="tab-icon">♙</text><text>我的</text></view>
   </view>
-
-  <!-- WebView 主体 -->
-  <web-view
-    wx:if="{{!error}}"
-    src="{{webviewUrl}}"
-    bindload="onLoadSuccess"
-    binderror="onLoadError"
-  ></web-view>
 </view>

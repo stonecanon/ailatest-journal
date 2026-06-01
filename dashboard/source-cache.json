@@ -1,0 +1,110 @@
+{
+  "google_analytics": null,
+  "cloudflare": {
+    "source": "Cloudflare Analytics",
+    "status": "ok",
+    "reason": "",
+    "zone_id": "435525fb783ba7bf4c686a9734e26124",
+    "generated_at": "2026-05-29T10:17:36.126Z",
+    "today": {
+      "day": "2026-05-29",
+      "requests": 2652,
+      "pageviews": 181,
+      "visitors": 57,
+      "bytes": 303065950,
+      "cached_requests": 0,
+      "encrypted_requests": 2632,
+      "threats": 0
+    },
+    "totals": {
+      "requests": 18050,
+      "pageviews": 1888,
+      "visitors": 919,
+      "cached_requests": 0,
+      "encrypted_requests": 15648,
+      "threats": 71
+    },
+    "series": [
+      {
+        "day": "2026-05-22",
+        "requests": 1709,
+        "pageviews": 169,
+        "visitors": 142,
+        "bytes": 262515833,
+        "cached_requests": 0,
+        "encrypted_requests": 1415,
+        "threats": 1
+      },
+      {
+        "day": "2026-05-23",
+        "requests": 415,
+        "pageviews": 125,
+        "visitors": 70,
+        "bytes": 28489827,
+        "cached_requests": 0,
+        "encrypted_requests": 346,
+        "threats": 5
+      },
+      {
+        "day": "2026-05-24",
+        "requests": 912,
+        "pageviews": 112,
+        "visitors": 100,
+        "bytes": 39275845,
+        "cached_requests": 0,
+        "encrypted_requests": 715,
+        "threats": 44
+      },
+      {
+        "day": "2026-05-25",
+        "requests": 2200,
+        "pageviews": 189,
+        "visitors": 123,
+        "bytes": 168201333,
+        "cached_requests": 0,
+        "encrypted_requests": 1579,
+        "threats": 1
+      },
+      {
+        "day": "2026-05-26",
+        "requests": 2432,
+        "pageviews": 325,
+        "visitors": 152,
+        "bytes": 282271164,
+        "cached_requests": 0,
+        "encrypted_requests": 1936,
+        "threats": 16
+      },
+      {
+        "day": "2026-05-27",
+        "requests": 6751,
+        "pageviews": 676,
+        "visitors": 152,
+        "bytes": 612091187,
+        "cached_requests": 0,
+        "encrypted_requests": 6092,
+        "threats": 0
+      },
+      {
+        "day": "2026-05-28",
+        "requests": 979,
+        "pageviews": 111,
+        "visitors": 123,
+        "bytes": 318735432,
+        "cached_requests": 0,
+        "encrypted_requests": 933,
+        "threats": 4
+      },
+      {
+        "day": "2026-05-29",
+        "requests": 2652,
+        "pageviews": 181,
+        "visitors": 57,
+        "bytes": 303065950,
+        "cached_requests": 0,
+        "encrypted_requests": 2632,
+        "threats": 0
+      }
+    ]
+  }
+}

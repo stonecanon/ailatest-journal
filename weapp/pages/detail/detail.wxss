@@ -1,0 +1,240 @@
+.detail-page {
+  min-height: 100vh;
+  padding: 32rpx 28rpx 156rpx;
+  background:
+    linear-gradient(180deg, rgba(255, 238, 220, 0.94) 0%, rgba(255, 249, 241, 0.78) 34%, rgba(255, 253, 248, 0.96) 100%),
+    radial-gradient(circle at 50% 0%, rgba(255, 106, 26, 0.13), transparent 42%),
+    linear-gradient(90deg, rgba(226, 216, 204, 0.42) 1rpx, transparent 1rpx),
+    linear-gradient(180deg, rgba(226, 216, 204, 0.42) 1rpx, transparent 1rpx),
+    #fff8ef;
+  background-size: 100% 100%, 100% 100%, 96rpx 96rpx, 96rpx 96rpx, 100% 100%;
+}
+
+.hero {
+  display: flex;
+  align-items: center;
+  gap: 22rpx;
+  margin-bottom: 28rpx;
+}
+
+.cover {
+  width: 116rpx;
+  height: 116rpx;
+  flex: 0 0 116rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14rpx;
+  font-size: 36rpx;
+  font-weight: 900;
+}
+
+.tone-orange { background: #ffe5cf; color: #f05a14; }
+.tone-green { background: #e1f4df; color: #168047; }
+.tone-blue { background: #e2efff; color: #1d6fd6; }
+
+.hero-main {
+  min-width: 0;
+  flex: 1;
+}
+
+.title {
+  font-size: 36rpx;
+  line-height: 1.22;
+  font-weight: 900;
+  color: #171717;
+}
+
+.meta, .publisher {
+  margin-top: 8rpx;
+  color: #6f6a64;
+  font-size: 23rpx;
+}
+
+.fav-box {
+  width: 88rpx;
+  height: 88rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1rpx solid #eadfd2;
+  border-radius: 16rpx;
+  background: #fff;
+  color: #f05a14;
+  font-size: 20rpx;
+  box-shadow: 0 10rpx 28rpx rgba(60, 48, 36, 0.07);
+}
+
+.fav-star {
+  font-size: 32rpx;
+}
+
+.badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 18rpx;
+}
+
+.metric-card {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  padding: 26rpx 16rpx;
+  margin-bottom: 18rpx;
+}
+
+.metric {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6rpx;
+  border-right: 1rpx solid #eee4d8;
+  text-align: center;
+}
+
+.metric:last-child {
+  border-right: 0;
+}
+
+.metric text {
+  color: #625d56;
+  font-size: 24rpx;
+  font-weight: 700;
+}
+
+.metric strong {
+  color: #111;
+  font-size: 42rpx;
+  font-weight: 900;
+}
+
+.metric small {
+  color: #736c63;
+  font-size: 20rpx;
+}
+
+.mini-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx 18rpx;
+  padding: 0 6rpx 18rpx;
+}
+
+.mini-facts text {
+  color: #3f3830;
+  font-size: 24rpx;
+}
+
+.section {
+  padding: 26rpx;
+  margin-top: 18rpx;
+}
+
+.section-title {
+  margin-bottom: 18rpx;
+  color: #171717;
+  font-size: 29rpx;
+  font-weight: 900;
+}
+
+.in-section {
+  margin-bottom: 14rpx;
+}
+
+.overview {
+  color: #2d2823;
+  font-size: 27rpx;
+  line-height: 1.8;
+  text-align: justify;
+}
+
+.chip-title {
+  margin: 22rpx 0 12rpx;
+  color: #756d64;
+  font-size: 23rpx;
+  font-weight: 800;
+}
+
+.chip-title:first-of-type {
+  margin-top: 0;
+}
+
+.detail-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.detail-chips text {
+  min-height: 44rpx;
+  padding: 0 16rpx;
+  display: inline-flex;
+  align-items: center;
+  border: 1rpx solid #eadfd2;
+  border-radius: 10rpx;
+  background: #fff8ee;
+  color: #4d4036;
+  font-size: 22rpx;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 30rpx;
+  padding: 17rpx 0;
+  border-bottom: 1rpx solid #f0e6da;
+}
+
+.info-row:last-child {
+  border-bottom: 0;
+}
+
+.info-row text {
+  color: #756d64;
+}
+
+.info-row strong {
+  max-width: 430rpx;
+  color: #171717;
+  font-weight: 700;
+  text-align: right;
+  line-height: 1.45;
+  word-break: break-word;
+}
+
+.action-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  display: flex;
+  gap: 18rpx;
+  padding: 18rpx 28rpx calc(22rpx + env(safe-area-inset-bottom));
+  background: rgba(255, 253, 248, 0.96);
+  border-top: 1rpx solid #eadfd2;
+}
+
+.primary-action,
+.plain-action {
+  flex: 1;
+  height: 84rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14rpx;
+  font-size: 28rpx;
+  font-weight: 850;
+}
+
+.primary-action {
+  background: linear-gradient(180deg, #ff6a1a 0%, #ef4d00 100%);
+  color: #fff;
+}
+
+.plain-action {
+  border: 1rpx solid #dccfc1;
+  background: #fff;
+  color: #201b16;
+}

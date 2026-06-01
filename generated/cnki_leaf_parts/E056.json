@@ -1,0 +1,2088 @@
+{
+  "category": {
+    "code": "E056",
+    "title": "中医学",
+    "count": 114,
+    "major_code": "",
+    "major_title": ""
+  },
+  "pages": [
+    {
+      "page": 1,
+      "rows": 21,
+      "pageCount": 6
+    },
+    {
+      "page": 2,
+      "rows": 21,
+      "pageCount": 6
+    },
+    {
+      "page": 3,
+      "rows": 21,
+      "pageCount": 6
+    },
+    {
+      "page": 4,
+      "rows": 21,
+      "pageCount": 6
+    },
+    {
+      "page": 5,
+      "rows": 21,
+      "pageCount": 6
+    },
+    {
+      "page": 6,
+      "rows": 9,
+      "pageCount": 6
+    }
+  ],
+  "records": [
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 1,
+      "title": "针刺研究",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPRNIV_APOEV0WQ5bodMYQ0DbztTHXBD0VEI7W1K9SvD5RNbAty8b6PtY1tbp1CgDBF_ScasrNYrVDBglbyZUkNad5D9wBK_qzbhy-qfYjiRg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "5.506",
+      "comprehensive_if": "3.568",
+      "issn": "1000-0607",
+      "cn": "11-2274/R",
+      "sponsor": "中国中医科学院针灸研究所;中国针灸学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 1,
+      "title": "中医药学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPRNIV_APOEV0WQ5bodMYQ0DbztTHXBD0VEI7W1K9SvD5RNbAty8b6PtY1tbp1CgDDdpjWqMkChPiE7F4aTs9ZAYvyZ98a8LHbdSrdOQ4_83A==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "5.376",
+      "comprehensive_if": "2.936",
+      "issn": "1002-2392",
+      "cn": "23-1193/R",
+      "sponsor": "中华中医药学会;黑龙江中医药大学",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 1,
+      "title": "中华中医药学刊",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPRNIV_APOEV0WQ5bodMYQ0DbztTHXBD0VEI7W1K9SvD5RNbAty8b6PtY1tbp1CgDA0Uv9PZE4RUi9sO8P0MsGACA4MKMp0GqQM5bP9y3SsYw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "4.987",
+      "comprehensive_if": "3.040",
+      "issn": "1673-7717",
+      "cn": "21-1546/R",
+      "sponsor": "中华中医药学会;辽宁中医药大学",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 1,
+      "title": "中医杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPRNIV_APOEV0WQ5bodMYQ0DbztTHXBD0VEI7W1K9SvD5RNbAty8b6PtY1tbp1CgDBBgxjW5_7MgfL4eS9tK2A0gK79CclYb2qs4REgGivJxw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "4.865",
+      "comprehensive_if": "3.502",
+      "issn": "1001-1668",
+      "cn": "11-2166/R",
+      "sponsor": "中华中医药学会;中国中医科学院",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 1,
+      "title": "中国针灸",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPRNIV_APOEV0WQ5bodMYQ0DbztTHXBD0VEI7W1K9SvD5RNbAty8b6PtY1tbp1CgDCmggz2bgd0DJPLJGhnfGZ97D9DByY9kCUvTjZP1CP_cg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "4.856",
+      "comprehensive_if": "2.939",
+      "issn": "0255-2930",
+      "cn": "11-2024/R",
+      "sponsor": "中国针灸学会;中国中医科学院针灸研究所",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 1,
+      "title": "北京中医药大学学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPRNIV_APOEV0WQ5bodMYQ0DbztTHXBD0VEI7W1K9SvD5RNbAty8b6PtY1tbp1CgDDT_AL8MSmZh09d45w9IMdL3C6n6LdEP83CYtc1Pi34pw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "4.492",
+      "comprehensive_if": "3.333",
+      "issn": "1006-2157",
+      "cn": "11-3574/R",
+      "sponsor": "北京中医药大学",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 1,
+      "title": "南京中医药大学学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN4d5b0Zq8bHvkC_PUZE5zOBKZ0mJFoqKHN-MB73AgxHlwLOcfsJDyCq2iFwbMXEKnB-qLl2kbK8cUiZujOST5V9l3jAc4Xe5-7Kf24YFGtLQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "4.262",
+      "comprehensive_if": "3.013",
+      "issn": "1672-0482",
+      "cn": "32-1247/R",
+      "sponsor": "南京中医药大学",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 1,
+      "title": "中医药信息",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN4d5b0Zq8bHvkC_PUZE5zOBKZ0mJFoqKHN-MB73AgxHlwLOcfsJDyCq2iFwbMXEKnyBFWwNq5W1ezu9YEMHhc07ADPEnTsR0AtBrWab1I_4A==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "4.079",
+      "comprehensive_if": "2.382",
+      "issn": "1002-2406",
+      "cn": "23-1194/R",
+      "sponsor": "中华中医药学会;黑龙江中医药大学",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 1,
+      "title": "辽宁中医药大学学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN4d5b0Zq8bHvkC_PUZE5zOBKZ0mJFoqKHN-MB73AgxHlwLOcfsJDyCq2iFwbMXEKn4ZU5QkKwb5CKoOLqNgMyzxMn6qb8duhOnymmiEp70ig==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "3.657",
+      "comprehensive_if": "2.012",
+      "issn": "1673-842X",
+      "cn": "21-1543/R",
+      "sponsor": "辽宁中医药大学",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 1,
+      "title": "中国中医基础医学杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN4d5b0Zq8bHvkC_PUZE5zOBKZ0mJFoqKHN-MB73AgxHlwLOcfsJDyCq2iFwbMXEKm1O1r3GNh5rC3nou6pp_xRvNDOoKSsGAMPOno2MX5wWw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "3.410",
+      "comprehensive_if": "2.392",
+      "issn": "1006-3250",
+      "cn": "11-3554/R",
+      "sponsor": "中国中医科学院中医基础理论研究所",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 1,
+      "title": "中国中医药信息杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN4d5b0Zq8bHvkC_PUZE5zOBKZ0mJFoqKHN-MB73AgxHlwLOcfsJDyCq2iFwbMXEKne62K9R3VyR4b1EWmjDWYFY3PZLn92ZJPwftqCtbnNlA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "3.333",
+      "comprehensive_if": "2.388",
+      "issn": "1005-5304",
+      "cn": "11-3519/R",
+      "sponsor": "中国中医科学院中医药信息研究所",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 1,
+      "title": "陕西中医",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN4d5b0Zq8bHvkC_PUZE5zOBKZ0mJFoqKHN-MB73AgxHlwLOcfsJDyCq2iFwbMXEKkrnhE35nlgD49yuzuD9SfF6lBz_oZ-QqHJBrJLoG4-Ug==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "3.275",
+      "comprehensive_if": "2.463",
+      "issn": "1000-7369",
+      "cn": "61-1105/R",
+      "sponsor": "陕西省中医药学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 1,
+      "title": "世界中医药",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN4d5b0Zq8bHvkC_PUZE5zOBKZ0mJFoqKHN-MB73AgxHlwLOcfsJDyCq2iFwbMXEKmneIU5cY0MSuyY_Sw0zR3-R8dokEtV_f_YOgJrB6kElA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "3.162",
+      "comprehensive_if": "2.295",
+      "issn": "1673-7202",
+      "cn": "11-5529/R",
+      "sponsor": "世界中医药学会联合会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 1,
+      "title": "中华中医药杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN4d5b0Zq8bHvkC_PUZE5zOBKZ0mJFoqKHN-MB73AgxHlwLOcfsJDyCq2iFwbMXEKl8WBgIgax-wPqBwuPxN9oC7Ao7mw-50L8NHFQS0puImw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.982",
+      "comprehensive_if": "2.165",
+      "issn": "1673-1727",
+      "cn": "11-5334/R",
+      "sponsor": "中华中医药学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 1,
+      "title": "针灸临床杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN4d5b0Zq8bHvkC_PUZE5zOBKZ0mJFoqKHN-MB73AgxHlwLOcfsJDyCq2iFwbMXEKkZ75r8q2mzavx__NqkPPsLs702HqfP_8SJ2h5uI7IzyQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.913",
+      "comprehensive_if": "1.702",
+      "issn": "1005-0779",
+      "cn": "23-1354/R",
+      "sponsor": "中华中医药学会;黑龙江中医药大学",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 1,
+      "title": "安徽中医药大学学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN4d5b0Zq8bHvkC_PUZE5zOBKZ0mJFoqKHN-MB73AgxHlwLOcfsJDyCq2iFwbMXEKlTopc1HZkgeVSsbC1In_8o2yER3497bvphJBh5d7bnlg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.886",
+      "comprehensive_if": "1.756",
+      "issn": "2095-7246",
+      "cn": "34-1324/R",
+      "sponsor": "安徽中医药大学",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 1,
+      "title": "广州中医药大学学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN4d5b0Zq8bHvkC_PUZE5zOBKZ0mJFoqKHN-MB73AgxHlwLOcfsJDyCq2iFwbMXEKn2XejIr7dNdKKIrsD5NrnLXsijbxpJ8MQM_YQ5QEnYgw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.738",
+      "comprehensive_if": "1.761",
+      "issn": "1007-3213",
+      "cn": "44-1425/R",
+      "sponsor": "广州中医药大学",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 1,
+      "title": "上海针灸杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN4d5b0Zq8bHvkC_PUZE5zOBKZ0mJFoqKHN-MB73AgxHlwLOcfsJDyCq2iFwbMXEKmzxgQ5d0McpqjIfPVnr1Vd4nW3XVhxW0Pqd25oxyl5UQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.713",
+      "comprehensive_if": "1.465",
+      "issn": "1005-0957",
+      "cn": "31-1317/R",
+      "sponsor": "上海市针灸学会;上海市中医药研究院",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 1,
+      "title": "上海中医药杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN4d5b0Zq8bHvkC_PUZE5zOBKZ0mJFoqKHN-MB73AgxHlwLOcfsJDyCq2iFwbMXEKlRoQL9chLFIa6HbZ4i6oxKwIGKxV6GH5ZBi94kGcsTGQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.705",
+      "comprehensive_if": "1.940",
+      "issn": "1007-1334",
+      "cn": "31-1276/R",
+      "sponsor": "上海中医药大学;上海市中医药学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 1,
+      "title": "江苏中医药",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN4d5b0Zq8bHvkC_PUZE5zOBKZ0mJFoqKHN-MB73AgxHlwLOcfsJDyCq2iFwbMXEKnHJ8Vkm7t0DfoRWBn8DpLprm832YmBMfea4FTXRZPnVA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.639",
+      "comprehensive_if": "1.516",
+      "issn": "1672-397X",
+      "cn": "32-1630/R",
+      "sponsor": "江苏省中医药学会;江苏省中西医结合学会;江苏省针灸学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 1,
+      "title": "中医学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIN4d5b0Zq8bHvkC_PUZE5zOBKZ0mJFoqKHN-MB73AgxHlwLOcfsJDyCq2iFwbMXEKnnDXD1nkB-HCrHMVBRMQ-cDM7RbFX7Bh-c2eodiQxFdA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.450",
+      "comprehensive_if": "1.640",
+      "issn": "1674-8999",
+      "cn": "41-1411/R",
+      "sponsor": "河南中医药大学;中华中医药学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 2,
+      "title": "现代中医临床",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOVd2UyoXC0--1H98h02kT7Mk6ISmU_8Ef-EFB47lpicpiS6N-2iCgyxkcYrrUJXXfPdwhqfMdTVjl3dSwL0y3NRD7CB8xTa5-_gqPJCOonLQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.445",
+      "comprehensive_if": "1.572",
+      "issn": "2095-6606",
+      "cn": "10-1157/R",
+      "sponsor": "北京中医药大学",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 2,
+      "title": "吉林中医药",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOVd2UyoXC0--1H98h02kT7Mk6ISmU_8Ef-EFB47lpicpiS6N-2iCgyxkcYrrUJXXcZdiIXc_n65LRd4mermr-S-6zP5NGnHt847PbQaDRCjg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.372",
+      "comprehensive_if": "1.481",
+      "issn": "1003-5699",
+      "cn": "22-1119/R",
+      "sponsor": "长春中医药大学",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 2,
+      "title": "康复学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOVd2UyoXC0--1H98h02kT7Mk6ISmU_8Ef-EFB47lpicpiS6N-2iCgyxkcYrrUJXXeE-AWh3IS-CzHceqPD3jqvEUlwfesDLZnRqtj2KM6ceg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.298",
+      "comprehensive_if": "1.570",
+      "issn": "2096-0328",
+      "cn": "35-1329/R",
+      "sponsor": "福建中医药大学;中国科技出版传媒股份有限公司(科学出版社)",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 2,
+      "title": "环球中医药",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOVd2UyoXC0--1H98h02kT7Mk6ISmU_8Ef-EFB47lpicpiS6N-2iCgyxkcYrrUJXXcTIEUT3G6RnygWNHq2sNvBJEh8LDiaiEC-zcVF97g6AA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.282",
+      "comprehensive_if": "1.638",
+      "issn": "1674-1749",
+      "cn": "11-5652/R",
+      "sponsor": "中华国际医学交流基金会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 2,
+      "title": "山东中医杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOVd2UyoXC0--1H98h02kT7Mk6ISmU_8Ef-EFB47lpicpiS6N-2iCgyxkcYrrUJXXcv0zVjmssCbo8Pkqo-s15Ck0odrbKAUddflHSbEhPULA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.254",
+      "comprehensive_if": "1.386",
+      "issn": "0257-358X",
+      "cn": "37-1164/R",
+      "sponsor": "山东中医药学会;山东中医药大学",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 2,
+      "title": "北京中医药",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOVd2UyoXC0--1H98h02kT7Mk6ISmU_8Ef-EFB47lpicpiS6N-2iCgyxkcYrrUJXXd1toeB7UIDdqzxYK_HK7YsmS8sgTMo5RPDCfD-kFQMhQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.249",
+      "comprehensive_if": "1.585",
+      "issn": "1674-1307",
+      "cn": "11-5635/R",
+      "sponsor": "北京中医药学会;北京中西医结合学会;北京市中药研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 2,
+      "title": "山东中医药大学学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOVd2UyoXC0--1H98h02kT7Mk6ISmU_8Ef-EFB47lpicpiS6N-2iCgyxkcYrrUJXXfdjp2lQ7SECt7BfScUZCOzBlPsKjWZHNEfkXeo3aFo9w==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.248",
+      "comprehensive_if": "1.526",
+      "issn": "1007-659X",
+      "cn": "37-1279/R",
+      "sponsor": "山东中医药大学",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 2,
+      "title": "中医药导报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOVd2UyoXC0--1H98h02kT7Mk6ISmU_8Ef-EFB47lpicpiS6N-2iCgyxkcYrrUJXXds4CuO1fFcgpiW-x2XoCQ-_k4Hat2FILCdGVQpoV9LKg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.207",
+      "comprehensive_if": "1.506",
+      "issn": "1672-951X",
+      "cn": "43-1446/R",
+      "sponsor": "湖南省中医药学会;湖南省中医管理局",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 2,
+      "title": "辽宁中医杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOVd2UyoXC0--1H98h02kT7Mk6ISmU_8Ef-EFB47lpicpiS6N-2iCgyxkcYrrUJXXccSNH7a7_aba0ovfv_1hsdpq4lID5h6sVENdjOcO18HA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.204",
+      "comprehensive_if": "1.324",
+      "issn": "1000-1719",
+      "cn": "21-1128/R",
+      "sponsor": "辽宁中医药大学",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 2,
+      "title": "湖南中医药大学学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOVd2UyoXC0--1H98h02kT7Mk6ISmU_8Ef-EFB47lpicpiS6N-2iCgyxkcYrrUJXXd4mo7cMdtI5MrYMhTeJ0XGjMrUe9BrRqiVHU5G9hlcSg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.203",
+      "comprehensive_if": "1.551",
+      "issn": "1674-070X",
+      "cn": "43-1472/R",
+      "sponsor": "湖南中医药大学",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 2,
+      "title": "天津中医药",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOVd2UyoXC0--1H98h02kT7Mk6ISmU_8Ef-EFB47lpicpiS6N-2iCgyxkcYrrUJXXfvpT3YrDGsa1a05C3hnuIHAHrsnm575URefpc9td0jsQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.196",
+      "comprehensive_if": "1.558",
+      "issn": "1672-1519",
+      "cn": "12-1349/R",
+      "sponsor": "天津中医药大学;天津市中医药学会;天津市中西医结合学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 2,
+      "title": "World Journal of Acupuncture-Moxibustion",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOVd2UyoXC0--1H98h02kT7Mk6ISmU_8Ef-EFB47lpicpiS6N-2iCgyxkcYrrUJXXdw9Tn_1BFh4qY8FvAO_lREwElNQJo0cyxWDXzM7lHHoA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.184",
+      "comprehensive_if": "1.641",
+      "issn": "1003-5257",
+      "cn": "11-2892/R",
+      "sponsor": "世界针灸学会联合会;中国中医科学院针灸研究所;中国针灸学会",
+      "tags": [
+        "网络首发",
+        "增强出版",
+        "完全OA期刊"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 2,
+      "title": "中国中医急症",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOVd2UyoXC0--1H98h02kT7Mk6ISmU_8Ef-EFB47lpicpiS6N-2iCgyxkcYrrUJXXfZpNI_V2znUTlyJFqqXcnmO2_97qVMTKihLpjB6B7EXA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.184",
+      "comprehensive_if": "1.518",
+      "issn": "1004-745X",
+      "cn": "50-1102/R",
+      "sponsor": "中华中医药学会;重庆市中医研究院",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 2,
+      "title": "西部中医药",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOVd2UyoXC0--1H98h02kT7Mk6ISmU_8Ef-EFB47lpicpiS6N-2iCgyxkcYrrUJXXeHVnHvAuIOD1YtZlgEyGIxyjHsVpSSxjKWf8-GHSNFGQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.182",
+      "comprehensive_if": "1.708",
+      "issn": "2096-9600",
+      "cn": "62-1204/R",
+      "sponsor": "甘肃省中医药研究院;中华中医药学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 2,
+      "title": "天津中医药大学学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOVd2UyoXC0--1H98h02kT7Mk6ISmU_8Ef-EFB47lpicpiS6N-2iCgyxkcYrrUJXXcwy1GjM4qUtlwqX5TtX00o55mXYpqXsHYUYLpJ5iDxPA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.114",
+      "comprehensive_if": "1.333",
+      "issn": "1673-9043",
+      "cn": "12-1391/R",
+      "sponsor": "天津中医药大学",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 2,
+      "title": "河北中医药学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOVd2UyoXC0--1H98h02kT7Mk6ISmU_8Ef-EFB47lpicpiS6N-2iCgyxkcYrrUJXXdrQbwODQhMSLXJ8liHLkqwoicggz6AmJxUsAbu9Wbouw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.096",
+      "comprehensive_if": "1.503",
+      "issn": "1007-5615",
+      "cn": "13-1214/R",
+      "sponsor": "河北中医学院",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 2,
+      "title": "时珍国医国药",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOVd2UyoXC0--1H98h02kT7Mk6ISmU_8Ef-EFB47lpicpiS6N-2iCgyxkcYrrUJXXew4kRCKMIl7zhHQ72MX4uOUwhNdJi58jDlZlduJ9-EXQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.077",
+      "comprehensive_if": "1.453",
+      "issn": "1008-0805",
+      "cn": "42-1436/R",
+      "sponsor": "时珍国医国药杂志社",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 2,
+      "title": "长春中医药大学学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOVd2UyoXC0--1H98h02kT7Mk6ISmU_8Ef-EFB47lpicpiS6N-2iCgyxkcYrrUJXXdyoBYdYxZrJPMIXTIcosXqd1flyweIiulp0k_R9kC31Q==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.055",
+      "comprehensive_if": "1.438",
+      "issn": "2095-6258",
+      "cn": "22-1375/R",
+      "sponsor": "长春中医药大学",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 2,
+      "title": "浙江中医药大学学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOVd2UyoXC0--1H98h02kT7Mk6ISmU_8Ef-EFB47lpicpiS6N-2iCgyxkcYrrUJXXdTFESdSl5wKwfuM54Ovlj73dzIE0bJMgsE4clPtgYj0Q==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.004",
+      "comprehensive_if": "1.407",
+      "issn": "1005-5509",
+      "cn": "33-1349/R",
+      "sponsor": "浙江中医药大学",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 2,
+      "title": "上海中医药大学学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOVd2UyoXC0--1H98h02kT7Mk6ISmU_8Ef-EFB47lpicpiS6N-2iCgyxkcYrrUJXXeb13SSUGTejB_fnWIapbHFjKsqwxlOmQUv7slAVDkocw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.989",
+      "comprehensive_if": "1.379",
+      "issn": "1008-861X",
+      "cn": "31-1788/R",
+      "sponsor": "上海中医药大学;上海市中医药研究院",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 2,
+      "title": "湖北中医药大学学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOVd2UyoXC0--1H98h02kT7Mk6ISmU_8Ef-EFB47lpicpiS6N-2iCgyxkcYrrUJXXccgVkM2KCm7IfKC8NQp8UYPkk39sWfNlQ_pXpdlIbAuw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.932",
+      "comprehensive_if": "1.335",
+      "issn": "1008-987X",
+      "cn": "42-1844/R",
+      "sponsor": "湖北中医药大学",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 3,
+      "title": "陕西中医药大学学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPOfET9QFFl8gbfE-dsNIRrMLRcCOwB1nlckxp1QQxUtDp2ap-5yYKSCCF2sdGCkUZ4weQbIh_sK-9sol-9khmdEBRq0JeT22Znx0Ne3c7I9g==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.900",
+      "comprehensive_if": "1.267",
+      "issn": "2096-1340",
+      "cn": "61-1501/R",
+      "sponsor": "陕西中医药大学",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 3,
+      "title": "现代中医药",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPOfET9QFFl8gbfE-dsNIRrMLRcCOwB1nlckxp1QQxUtDp2ap-5yYKSCCF2sdGCkUaZGpGXGT9RRbcPmcE-3f14Hqb0v-fwHD136hGYhr8Qww==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.846",
+      "comprehensive_if": "1.093",
+      "issn": "1672-0571",
+      "cn": "61-1397/R",
+      "sponsor": "陕西中医药大学",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 3,
+      "title": "中医肿瘤学杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPOfET9QFFl8gbfE-dsNIRrMLRcCOwB1nlckxp1QQxUtDp2ap-5yYKSCCF2sdGCkUa--gt9XECIV353qhf8BZSiH4wj4u1Mm_LfkdE49AqbKg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.805",
+      "comprehensive_if": "1.264",
+      "issn": "2096-6628",
+      "cn": "44-1743/R73",
+      "sponsor": "广州中医药大学第一附属医院;中华中医药学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 3,
+      "title": "中国中医眼科杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPOfET9QFFl8gbfE-dsNIRrMLRcCOwB1nlckxp1QQxUtDp2ap-5yYKSCCF2sdGCkUYAgReNrtZw-MAIxmuk2s5l5k7Jx1vkTZlULyyUDD_pWg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.715",
+      "comprehensive_if": "1.305",
+      "issn": "1002-4379",
+      "cn": "11-2849/R",
+      "sponsor": "中国中医科学院",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 3,
+      "title": "成都中医药大学学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPOfET9QFFl8gbfE-dsNIRrMLRcCOwB1nlckxp1QQxUtDp2ap-5yYKSCCF2sdGCkUYYYEMAVkoV16QxQtgWRelfW99qTm8Fya-plGHsbAqyNA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.688",
+      "comprehensive_if": "1.045",
+      "issn": "1004-0668",
+      "cn": "51-1501/R",
+      "sponsor": "成都中医药大学",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 3,
+      "title": "实用中医内科杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPOfET9QFFl8gbfE-dsNIRrMLRcCOwB1nlckxp1QQxUtDp2ap-5yYKSCCF2sdGCkUY4LY2n8kQaUu27hKaHFkoYY_oAr6jAJuFwYeRT2nEc6w==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.687",
+      "comprehensive_if": "0.955",
+      "issn": "1671-7813",
+      "cn": "21-1187/R",
+      "sponsor": "辽宁省中医药学会;中华中医药学会;辽宁省中医药研究院",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 3,
+      "title": "中医药临床杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPOfET9QFFl8gbfE-dsNIRrMLRcCOwB1nlckxp1QQxUtDp2ap-5yYKSCCF2sdGCkUZ0yNXWDbI90P19xqiA3RWfwIolJlGS_ifutmOwP4VO9g==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.656",
+      "comprehensive_if": "0.956",
+      "issn": "1672-7134",
+      "cn": "34-1268/R",
+      "sponsor": "中医药临床杂志社;中华中医药学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 3,
+      "title": "河北中医",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPOfET9QFFl8gbfE-dsNIRrMLRcCOwB1nlckxp1QQxUtDp2ap-5yYKSCCF2sdGCkUZ83LOffxAWDsfwG33fGlO9_PORoSwj4tbfMx0lvV-Elg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.629",
+      "comprehensive_if": "1.107",
+      "issn": "1002-2619",
+      "cn": "13-1067/R",
+      "sponsor": "河北省医学情报研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 3,
+      "title": "河南中医",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPOfET9QFFl8gbfE-dsNIRrMLRcCOwB1nlckxp1QQxUtDp2ap-5yYKSCCF2sdGCkUajB_Mfmn7WfeCQcmc1vqNP-hXifdPEWPzmDZfCPRJbGg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.588",
+      "comprehensive_if": "0.904",
+      "issn": "1003-5028",
+      "cn": "41-1114/R",
+      "sponsor": "河南中医药大学",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 3,
+      "title": "中国中医骨伤科杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPOfET9QFFl8gbfE-dsNIRrMLRcCOwB1nlckxp1QQxUtDp2ap-5yYKSCCF2sdGCkUbqnZcN4gRug5AI29N0ZtZn4wiWFllAcB1n32qxr2Yf8w==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.539",
+      "comprehensive_if": "1.087",
+      "issn": "1005-0205",
+      "cn": "42-1340/R",
+      "sponsor": "中华中医药学会;湖北省中医药研究院",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 3,
+      "title": "Digital Chinese Medicine",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPOfET9QFFl8gbfE-dsNIRrMLRcCOwB1nlckxp1QQxUtDp2ap-5yYKSCCF2sdGCkUavuQA6l6tb59f5w-y0Qdax6Nm2gspZ0JYj3-bnBvy38A==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.443",
+      "comprehensive_if": "1.063",
+      "issn": "2096-479X",
+      "cn": "43-1540/R",
+      "sponsor": "湖南中医药大学;中华中医药学会",
+      "tags": [
+        "网络首发",
+        "完全OA期刊"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 3,
+      "title": "中医正骨",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPOfET9QFFl8gbfE-dsNIRrMLRcCOwB1nlckxp1QQxUtDp2ap-5yYKSCCF2sdGCkUZOfBWk0OOAWTBlOLcUThqRzWAcaIQs7Tt0twLzFGVrTA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.437",
+      "comprehensive_if": "0.997",
+      "issn": "1001-6015",
+      "cn": "41-1162/R",
+      "sponsor": "河南省正骨研究院;中华中医药学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 3,
+      "title": "Acupuncture and Herbal Medicine",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPOfET9QFFl8gbfE-dsNIRrMLRcCOwB1nlckxp1QQxUtDp2ap-5yYKSCCF2sdGCkUYqsnQGfg0CrlUM5RmuEAYpYRc5ZrdyNn6DVB0HGgG5mw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.435",
+      "comprehensive_if": "1.290",
+      "issn": "2097-0226",
+      "cn": "12-1467/R",
+      "sponsor": "天津中医药大学;中华中医药学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 3,
+      "title": "Journal of Traditional Chinese Medicine",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPOfET9QFFl8gbfE-dsNIRrMLRcCOwB1nlckxp1QQxUtDp2ap-5yYKSCCF2sdGCkUa17S6oe4Y-0s2_AiyZwZLmiWsmCyRc8pJReIaT5Ix13g==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.431",
+      "comprehensive_if": "1.056",
+      "issn": "0255-2922",
+      "cn": "11-2167/R",
+      "sponsor": "中华医学会;中国中医科学院",
+      "tags": [
+        "网络首发",
+        "完全OA期刊"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 3,
+      "title": "四川中医",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPOfET9QFFl8gbfE-dsNIRrMLRcCOwB1nlckxp1QQxUtDp2ap-5yYKSCCF2sdGCkUZhjPRmUJQhF2ihX5JP3hJc2zfffKBVgxbl4UeAnq-TNA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.426",
+      "comprehensive_if": "0.947",
+      "issn": "1000-3649",
+      "cn": "51-1186/R",
+      "sponsor": "四川省中医药发展服务中心",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 3,
+      "title": "贵州中医药大学学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPOfET9QFFl8gbfE-dsNIRrMLRcCOwB1nlckxp1QQxUtDp2ap-5yYKSCCF2sdGCkUbA5IwwVjtCnpf_Quq0nIXkIxanRpZvHQ7Mqo6vD97czQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.419",
+      "comprehensive_if": "0.867",
+      "issn": "2096-8426",
+      "cn": "52-1174/R2",
+      "sponsor": "贵州中医药大学",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 3,
+      "title": "中华针灸电子杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPOfET9QFFl8gbfE-dsNIRrMLRcCOwB1nlckxp1QQxUtDp2ap-5yYKSCCF2sdGCkUZMhsfGmXWhvRCuUqs4_UoEFl4onVZBqPviivq74IlDrQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.364",
+      "comprehensive_if": "0.798",
+      "issn": "2095-3240",
+      "cn": "11-9326/R",
+      "sponsor": "中华医学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 3,
+      "title": "中医研究",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPOfET9QFFl8gbfE-dsNIRrMLRcCOwB1nlckxp1QQxUtDp2ap-5yYKSCCF2sdGCkUb7FajQ6HxQHhUESNUvscHl5nRcu3T5wH9oIVEhPouPOw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.333",
+      "comprehensive_if": "0.855",
+      "issn": "1001-6910",
+      "cn": "41-1124/R",
+      "sponsor": "河南省中医药研究院;中华中医药学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 3,
+      "title": "中医康复",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPOfET9QFFl8gbfE-dsNIRrMLRcCOwB1nlckxp1QQxUtDp2ap-5yYKSCCF2sdGCkUbwhfiJtVJLE7MZqfan_B03jQ-5--Cvm7Z5UrQShPj1Kg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.300",
+      "comprehensive_if": "0.615",
+      "issn": "2097-3128",
+      "cn": "44-1757/R",
+      "sponsor": "广东省第二中医院(广东省中医药工程技术研究院)",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 3,
+      "title": "云南中医中药杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINZoQ0YPyZk8pSzNZGdIA5VVMSdjQSxmP_7ZMIpA27PJ78fLUfpHSUcCq5KL0dpzjPDDepJXYZEJD572k5tyeb93l7LkUVMgSPYlhmeoCN7lg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.287",
+      "comprehensive_if": "0.696",
+      "issn": "1007-2349",
+      "cn": "53-1120/R",
+      "sponsor": "云南省中医中药研究院",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 3,
+      "title": "福建中医药",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINZoQ0YPyZk8pSzNZGdIA5VVMSdjQSxmP_7ZMIpA27PJ78fLUfpHSUcCq5KL0dpzjPI3gi08tmNm5YpsJqvugjJfXApPUmM5UZLZkZG1-cLOA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.260",
+      "comprehensive_if": "0.702",
+      "issn": "1000-338X",
+      "cn": "35-1073/R",
+      "sponsor": "福建中医药大学",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 4,
+      "title": "亚太传统医药",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINBBXMjVxlPkvzBS6MauqH1D8jUW9DtozOWe_ti8GbFtIlnnWetOevmcNcVSFixikqtNk3nifsCymR7157-EgoGwJXaJsr6vM-8Mn4FYLFjoA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.244",
+      "comprehensive_if": "0.764",
+      "issn": "1673-2197",
+      "cn": "42-1727/R",
+      "sponsor": "湖北省科技信息研究院;中华中医药学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 4,
+      "title": "中医药通报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINBBXMjVxlPkvzBS6MauqH1D8jUW9DtozOWe_ti8GbFtIlnnWetOevmcNcVSFixikpmlusbkB2XxM7W-8uvw1JTGHhlwJURh5dvA5e_S2-ZUg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.227",
+      "comprehensive_if": "0.768",
+      "issn": "1671-2749",
+      "cn": "35-1250/R",
+      "sponsor": "中华中医药学会;厦门市中医药学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 4,
+      "title": "中国中医药科技",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINBBXMjVxlPkvzBS6MauqH1D8jUW9DtozOWe_ti8GbFtIlnnWetOevmcNcVSFixiko8OOOJ9an3AhfLlUwutXUPShKFNe3fvuzBnTb0uhmSOw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.198",
+      "comprehensive_if": "0.708",
+      "issn": "1005-7072",
+      "cn": "23-1353/R",
+      "sponsor": "中华中医药学会;黑龙江省中医药管理局",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 4,
+      "title": "江西中医药大学学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINBBXMjVxlPkvzBS6MauqH1D8jUW9DtozOWe_ti8GbFtIlnnWetOevmcNcVSFixikrDi-NWMNFITEvvWjiZIyX_ZBhpLYc8btFkjuvRDSyUJg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.164",
+      "comprehensive_if": "0.712",
+      "issn": "2095-7785",
+      "cn": "36-1331/R",
+      "sponsor": "江西中医药大学",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 4,
+      "title": "湖南中医杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINBBXMjVxlPkvzBS6MauqH1D8jUW9DtozOWe_ti8GbFtIlnnWetOevmcNcVSFixikqE2dOd6YJ87kma3sGPITUQeqtWL3JTs1ABxVRQwNtuGQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.159",
+      "comprehensive_if": "0.639",
+      "issn": "1003-7705",
+      "cn": "43-1105/R",
+      "sponsor": "湖南省中医药研究院",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 4,
+      "title": "山西中医",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINBBXMjVxlPkvzBS6MauqH1D8jUW9DtozOWe_ti8GbFtIlnnWetOevmcNcVSFixikpV_VLUwD784jEIgZnNIfW_s1Zp3OdvzmpA6zyIB79eyA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.157",
+      "comprehensive_if": "0.554",
+      "issn": "1000-7156",
+      "cn": "14-1110/R",
+      "sponsor": "山西省中医药学会;山西省中医药研究院",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 4,
+      "title": "浙江中医杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINBBXMjVxlPkvzBS6MauqH1D8jUW9DtozOWe_ti8GbFtIlnnWetOevmcNcVSFixikqRKWj4swAYn9Z7VNv86F8O-eG02ymo-Nz3j_mhfSL0pQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.155",
+      "comprehensive_if": "0.765",
+      "issn": "0411-8421",
+      "cn": "33-1083/R",
+      "sponsor": "浙江省中医药研究院",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 4,
+      "title": "甘肃中医药大学学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINBBXMjVxlPkvzBS6MauqH1D8jUW9DtozOWe_ti8GbFtIlnnWetOevmcNcVSFixikphz7U00UIhFOKR7wr92TIiA9O8zYobulGFLSR0ODVImQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.154",
+      "comprehensive_if": "0.736",
+      "issn": "1003-8450",
+      "cn": "62-1214/R",
+      "sponsor": "甘肃中医药大学",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 4,
+      "title": "江西中医药",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINBBXMjVxlPkvzBS6MauqH1D8jUW9DtozOWe_ti8GbFtIlnnWetOevmcNcVSFixikq7ltIMQ6lbRYIT4L3oiF5spoOfU5cr3UJXfX2HGRxFyQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.133",
+      "comprehensive_if": "0.651",
+      "issn": "0411-9584",
+      "cn": "36-1095/R",
+      "sponsor": "江西中医药大学;江西省中医药学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 4,
+      "title": "新中医",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINBBXMjVxlPkvzBS6MauqH1D8jUW9DtozOWe_ti8GbFtIlnnWetOevmcNcVSFixiko1yMwdqKDDAVFOldD__K616nZ7RSYvBo20RBr5Wwuq4A==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.117",
+      "comprehensive_if": "0.646",
+      "issn": "0256-7415",
+      "cn": "44-1231/R",
+      "sponsor": "广州中医药大学;中华中医药学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 4,
+      "title": "广西中医药大学学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPlH2DaVMhnGgsJJpjRQfAZyL7uXkGETwyQC0hH2yLbiSZIxt3YhGSuznSQk1fcGPsIh4nl7mE8RSTpeSFdd_8HBDFy6OMBrQ510tgjUqV_2A==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.116",
+      "comprehensive_if": "0.705",
+      "issn": "2095-4441",
+      "cn": "45-1391/R",
+      "sponsor": "广西中医药大学",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 4,
+      "title": "湖北中医杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPlH2DaVMhnGgsJJpjRQfAZyL7uXkGETwyQC0hH2yLbiSZIxt3YhGSuznSQk1fcGPt1rTuzNXKrL7grapIC8ovh4gB101gSH9PHsNGsf6PyBw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.112",
+      "comprehensive_if": "0.603",
+      "issn": "1000-0704",
+      "cn": "42-1189/R",
+      "sponsor": "湖北中医药大学",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 4,
+      "title": "中医儿科杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPlH2DaVMhnGgsJJpjRQfAZyL7uXkGETwyQC0hH2yLbiSZIxt3YhGSuznSQk1fcGPuEKWsqeoh6TDAgWRS6mbY4HqdvjmnD4RwjEStIVgQ8zg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.101",
+      "comprehensive_if": "0.580",
+      "issn": "1673-4297",
+      "cn": "62-1176/R",
+      "sponsor": "甘肃中医药大学;中华中医药学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 4,
+      "title": "广西中医药",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPlH2DaVMhnGgsJJpjRQfAZyL7uXkGETwyQC0hH2yLbiSZIxt3YhGSuznSQk1fcGPsDnEcmLjHpb7R2yoX25QhlMljS1sHjL_T5bmJDDUD01Q==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.098",
+      "comprehensive_if": "0.616",
+      "issn": "1003-0719",
+      "cn": "45-1123/R",
+      "sponsor": "广西中医药大学;广西中医药学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 4,
+      "title": "中医临床研究",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPlH2DaVMhnGgsJJpjRQfAZyL7uXkGETwyQC0hH2yLbiSZIxt3YhGSuznSQk1fcGPuJ7c4GpCEjBHv98lbAXZYyXIYFQA2V8Ro2ZATfHkahjg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.035",
+      "comprehensive_if": "0.579",
+      "issn": "1674-7860",
+      "cn": "11-5895/R",
+      "sponsor": "中华中医药学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 4,
+      "title": "中国中医药图书情报杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPlH2DaVMhnGgsJJpjRQfAZyL7uXkGETwyQC0hH2yLbiSZIxt3YhGSuznSQk1fcGPskc_jYKv1oMEImGFtw8Y0yv1EMb9iFzPDUnAp71OV1lg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.014",
+      "comprehensive_if": "0.721",
+      "issn": "2095-5707",
+      "cn": "10-1113/R",
+      "sponsor": "中国中医科学院中医药信息研究所",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 4,
+      "title": "国医论坛",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPlH2DaVMhnGgsJJpjRQfAZyL7uXkGETwyQC0hH2yLbiSZIxt3YhGSuznSQk1fcGPuA46I-qsCzN1LHnS6uZT8IVveMrO4R-ScogMpspq2v1A==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.985",
+      "comprehensive_if": "0.580",
+      "issn": "1002-1078",
+      "cn": "41-1110/R",
+      "sponsor": "南阳医学高等专科学校;中华中医药学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 4,
+      "title": "中国民族民间医药",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPlH2DaVMhnGgsJJpjRQfAZyL7uXkGETwyQC0hH2yLbiSZIxt3YhGSuznSQk1fcGPsY_9CLiTgoSpgEY3zEIE-b6H6VPpKIzspq2VfzOow0bg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.961",
+      "comprehensive_if": "0.582",
+      "issn": "1007-8517",
+      "cn": "53-1102/R",
+      "sponsor": "云南省民族民间医药学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 4,
+      "title": "山西中医药大学学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPlH2DaVMhnGgsJJpjRQfAZyL7uXkGETwyQC0hH2yLbiSZIxt3YhGSuznSQk1fcGPvVFP1skLFvkRQpydAKC4leWbV3HjyxWAzIIA6FnYhhtw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.956",
+      "comprehensive_if": "0.681",
+      "issn": "2096-7403",
+      "cn": "14-1398/R",
+      "sponsor": "山西中医药大学",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 4,
+      "title": "云南中医药大学学报",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPlH2DaVMhnGgsJJpjRQfAZyL7uXkGETwyQC0hH2yLbiSZIxt3YhGSuznSQk1fcGPuGEfrTX0JWhQ795OYPMdtF9HliwkxYBQ4PeP77fLLgJg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.944",
+      "comprehensive_if": "0.658",
+      "issn": "2097-4299",
+      "cn": "53-1241/R",
+      "sponsor": "云南中医药大学",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 4,
+      "title": "光明中医",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPlH2DaVMhnGgsJJpjRQfAZyL7uXkGETwyQC0hH2yLbiSZIxt3YhGSuznSQk1fcGPs5IIefJCoSvHhoCvTQh-be0LonCWsta8BPtR_hWhx0Ew==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.933",
+      "comprehensive_if": "0.481",
+      "issn": "1003-8914",
+      "cn": "11-1592/R",
+      "sponsor": "中华中医药学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 5,
+      "title": "国际中医中药杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPsnpmlP8rbHKuZmnSvkDWzePs9cbrXM4m0Pybs8Z8MVhEgrfFVzWze3XqY02lXFMtBZHQEkfOYbaTMaDg2dywQZbrR3MEDeUjT4S_o0DMhZA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.902",
+      "comprehensive_if": "0.788",
+      "issn": "1673-4246",
+      "cn": "11-5398/R",
+      "sponsor": "中华医学会;中国中医科学院中医药信息研究所",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 5,
+      "title": "内蒙古中医药",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPsnpmlP8rbHKuZmnSvkDWzePs9cbrXM4m0Pybs8Z8MVhEgrfFVzWze3XqY02lXFMv55dLQ_e0Gn_7ppvA-XhuXAuEBXeNAxCCqYJEpdAtH3Q==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.785",
+      "comprehensive_if": "0.387",
+      "issn": "1006-0979",
+      "cn": "15-1101/R",
+      "sponsor": "内蒙古自治区中蒙医药研究院",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 5,
+      "title": "中国民间疗法",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPsnpmlP8rbHKuZmnSvkDWzePs9cbrXM4m0Pybs8Z8MVhEgrfFVzWze3XqY02lXFMtMLdSho3tRrnfG1VxgvE2qEjBowkqjjKUiMPmwrnQaVQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.784",
+      "comprehensive_if": "0.411",
+      "issn": "1007-5798",
+      "cn": "11-3555/R",
+      "sponsor": "中国中医药出版社有限公司;中国民间中医医药研究开发协会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 5,
+      "title": "实用中医药杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPsnpmlP8rbHKuZmnSvkDWzePs9cbrXM4m0Pybs8Z8MVhEgrfFVzWze3XqY02lXFMtate_MqIPFlMmYUquvsFDE0RYH0ooVMewYFlxjyMPTHg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.755",
+      "comprehensive_if": "0.391",
+      "issn": "1004-2814",
+      "cn": "50-1056/R",
+      "sponsor": "重庆医科大学中医药学院",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 5,
+      "title": "新疆中医药",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPsnpmlP8rbHKuZmnSvkDWzePs9cbrXM4m0Pybs8Z8MVhEgrfFVzWze3XqY02lXFMvcRxm4G-eKB4vnVuXtUMBi5xRKYhebWIOv4lDlBSPBPg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.735",
+      "comprehensive_if": "0.456",
+      "issn": "1009-3931",
+      "cn": "65-1067/R",
+      "sponsor": "新疆维吾尔自治区中医药学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 5,
+      "title": "Journal of Acupuncture and Tuina Science",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPsnpmlP8rbHKuZmnSvkDWzePs9cbrXM4m0Pybs8Z8MVhEgrfFVzWze3XqY02lXFMsA-qqZ6dL81fmyqdqqZwdGt1GKp7L-xK-isgYJg8J60g==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.706",
+      "comprehensive_if": "0.548",
+      "issn": "1672-3597",
+      "cn": "31-1908/R",
+      "sponsor": "上海市针灸经络研究所",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 5,
+      "title": "基层中医药",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPsnpmlP8rbHKuZmnSvkDWzePs9cbrXM4m0Pybs8Z8MVhEgrfFVzWze3XqY02lXFMsHuxpcYl8-1oxtI35RNGgHF9V-gv49XKovZWvWntjLZQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.646",
+      "comprehensive_if": "0.412",
+      "issn": "2097-1222",
+      "cn": "10-1800/R",
+      "sponsor": "中国中医科学院中药研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 5,
+      "title": "中医眼耳鼻喉杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPsnpmlP8rbHKuZmnSvkDWzePs9cbrXM4m0Pybs8Z8MVhEgrfFVzWze3XqY02lXFMu94nKdXjMSsOrVCbwoJniS-N0g-VplixZ37b4R-IMD2A==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.553",
+      "comprehensive_if": "0.355",
+      "issn": "1674-9006",
+      "cn": "51-1726/R",
+      "sponsor": "成都中医药大学",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 5,
+      "title": "中国民族医药杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPsnpmlP8rbHKuZmnSvkDWzePs9cbrXM4m0Pybs8Z8MVhEgrfFVzWze3XqY02lXFMtYM29mHpSV_cKskUW5TZDGbZI-xFktV1rwPSFtMSOGDw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.537",
+      "comprehensive_if": "0.280",
+      "issn": "1006-6810",
+      "cn": "15-1175/R",
+      "sponsor": "内蒙古自治区中蒙医药研究院",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 5,
+      "title": "中医药文化",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPsnpmlP8rbHKuZmnSvkDWzePs9cbrXM4m0Pybs8Z8MVhEgrfFVzWze3XqY02lXFMuVa4_UgVsj8hanBhy-pi3-SGj4lii9GWnfbTbhmIm3pw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.527",
+      "comprehensive_if": "0.318",
+      "issn": "1673-6281",
+      "cn": "31-1971/R",
+      "sponsor": "上海中医药大学;中华中医药学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 5,
+      "title": "World Journal of Traditional Chinese Medicine",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPsnpmlP8rbHKuZmnSvkDWzePs9cbrXM4m0Pybs8Z8MVhEgrfFVzWze3XqY02lXFMvPoezPUjayO3Opi3AyFleQH1a2LVBiNy5KgxDT18mHqw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.521",
+      "comprehensive_if": "0.417",
+      "issn": "2311-8571",
+      "cn": "10-1395/R",
+      "sponsor": "世界中医药学会联合会",
+      "tags": [
+        "网络首发",
+        "完全OA期刊"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 5,
+      "title": "Journal of Traditional Chinese Medical Sciences",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPsnpmlP8rbHKuZmnSvkDWzePs9cbrXM4m0Pybs8Z8MVhEgrfFVzWze3XqY02lXFMvdqPUCwx93qwZvVWqIrW47BIDo6zONK6RYtka8-FmKrw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.434",
+      "comprehensive_if": "0.263",
+      "issn": "2095-7548",
+      "cn": "10-1218/R",
+      "sponsor": "北京中医药大学;清华大学出版社有限公司",
+      "tags": [
+        "增强出版",
+        "完全OA期刊"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 5,
+      "title": "中医文献杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPsnpmlP8rbHKuZmnSvkDWzePs9cbrXM4m0Pybs8Z8MVhEgrfFVzWze3XqY02lXFMsVL_V3tbT7Efz4OWjuCfcv4uJ10cRzZqrcYMOPZETJ4g==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.420",
+      "comprehensive_if": "0.278",
+      "issn": "1006-4737",
+      "cn": "31-1682/R",
+      "sponsor": "上海市中医文献馆;中华中医药学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 5,
+      "title": "Chinese Medicine and Culture",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPsnpmlP8rbHKuZmnSvkDWzePs9cbrXM4m0Pybs8Z8MVhEgrfFVzWze3XqY02lXFMuHf_hPvA0n3BaRnY9UIjqCLukoQM6U0O0ERD5p13rDtA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.394",
+      "comprehensive_if": "0.333",
+      "issn": "2589-9627",
+      "cn": "31-2178/R9",
+      "sponsor": "上海中医药大学;中华中医药学会",
+      "tags": [
+        "完全OA期刊"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 5,
+      "title": "黑龙江中医药",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPsnpmlP8rbHKuZmnSvkDWzePs9cbrXM4m0Pybs8Z8MVhEgrfFVzWze3XqY02lXFMvijURi304HAhuO2FU1ZZUFlS4bBLseTS3XpbZJdjk6Sg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.120",
+      "comprehensive_if": "0.076",
+      "issn": "1000-9906",
+      "cn": "23-1221/R",
+      "sponsor": "黑龙江省中医药科学院",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 5,
+      "title": "Chinese Medicine and Natural Products",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPsnpmlP8rbHKuZmnSvkDWzePs9cbrXM4m0Pybs8Z8MVhEgrfFVzWze3XqY02lXFMuZzvdv0IRaq60n4lQH8scrhCqjikgOoHT5AChbyILZKQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.041",
+      "comprehensive_if": "0.041",
+      "issn": "2096-918X",
+      "cn": "41-1459/R2",
+      "sponsor": "河南中医药大学;中华中医药学会",
+      "tags": [
+        "完全OA期刊"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 5,
+      "title": "Clinical Traditional Medicine and Pharmacology",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPsnpmlP8rbHKuZmnSvkDWzePs9cbrXM4m0Pybs8Z8MVhEgrfFVzWze3XqY02lXFMuhnMN8agJP_ojb9gs2BJFtAkqAVDWcKQiACbGPZ-l6-Q==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "2097-3829",
+      "cn": "33-1427/R2",
+      "sponsor": "浙江中医药大学",
+      "tags": [
+        "完全OA期刊"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 5,
+      "title": "Guidelines and Standards in Chinese Medicine",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPsnpmlP8rbHKuZmnSvkDWzePs9cbrXM4m0Pybs8Z8MVhEgrfFVzWze3XqY02lXFMuDIeK0wIs3PynxQ78g-EKZfZUCzjFtz2ty5xCWWweRFA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "2837-8792",
+      "cn": "10-1924/R2",
+      "sponsor": "中国中医科学院中医基础理论研究所",
+      "tags": [
+        "完全OA期刊"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 5,
+      "title": "家庭中医药",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPsnpmlP8rbHKuZmnSvkDWzePs9cbrXM4m0Pybs8Z8MVhEgrfFVzWze3XqY02lXFMu8TdTxoiq_QxAR7vM9hg1brw1uytMLVeJ8JmzyaJGg2A==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1005-3743",
+      "cn": "11-3379/R",
+      "sponsor": "中国中医科学院中药研究所",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 5,
+      "title": "Science of Traditional Chinese Medicine",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPsnpmlP8rbHKuZmnSvkDWzePs9cbrXM4m0Pybs8Z8MVhEgrfFVzWze3XqY02lXFMsA_3N9LFpyVpbVlPufWZdu-UsaD7YomZ-B4UpL5_ihzQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "2836-922X",
+      "cn": "10-1916/R",
+      "sponsor": "中国中医科学院中药研究所",
+      "tags": [
+        "完全OA期刊"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 5,
+      "title": "双足与保健",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPsnpmlP8rbHKuZmnSvkDWzePs9cbrXM4m0Pybs8Z8MVhEgrfFVzWze3XqY02lXFMtKvYeLQ9okM7HC7YShN-vj4V8SWIZ9zg1yJjERIe28eA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1004-6569",
+      "cn": "11-3086/R",
+      "sponsor": "中国足部反射区健康法研究会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 6,
+      "title": "药食同源杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINPCgT7UFD49Xa63Itat2tZtkQS7lrztR3L8FzY30DdeJHc_03BDqkuCWBtbBFWtVOmeD14D-6x9wIkjgcNd723jjfT4_s_qokC3zEtuW4iwA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "2097-5074",
+      "cn": "43-1564/R",
+      "sponsor": "湖南中医药大学",
+      "tags": [
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 6,
+      "title": "中国气功科学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIO4WMB0U3P2SyQ7W-z7GqHCtJRR09s7VorAPf9Z4x4cK01D4ytEKNEBjuO5Oo4sXfF0xQBuI5eMTUfYVbskWbSSUHRCVB4Q6qHTG67aR8-onA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1005-2569",
+      "cn": "11-3384/R",
+      "sponsor": "中国气功科学研究会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 6,
+      "title": "中医典籍与文化",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIO4WMB0U3P2SyQ7W-z7GqHCtJRR09s7VorAPf9Z4x4cK01D4ytEKNEBjuO5Oo4sXfFKbZzHwSUHjYN6XspzIRtlqQza-VHrTUDt2ROdyAAtdg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "",
+      "cn": "",
+      "sponsor": "山东中医药大学中医文献与文化研究院;山东省中医药文化协同创新中心",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 6,
+      "title": "中医健康养生",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIO4WMB0U3P2SyQ7W-z7GqHCtJRR09s7VorAPf9Z4x4cK01D4ytEKNEBjuO5Oo4sXfFYHInGgS2dnMBa_retUj7dNgPcM1KgBAiomByXiPmU6g==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "2095-9028",
+      "cn": "10-1279/R",
+      "sponsor": "《中国中医药报》社有限公司",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 6,
+      "title": "中医外治杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIO4WMB0U3P2SyQ7W-z7GqHCtJRR09s7VorAPf9Z4x4cK01D4ytEKNEBjuO5Oo4sXfEJevUsyiCj6m2kvvnHmDj0uysOetcgKIZrqN4jeq2V4g==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1006-978X",
+      "cn": "14-1195/R",
+      "sponsor": "山西医药卫生传媒集团有限责任公司",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 6,
+      "title": "中医药历史与文化",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIO4WMB0U3P2SyQ7W-z7GqHCtJRR09s7VorAPf9Z4x4cK01D4ytEKNEBjuO5Oo4sXfEJOruFQ0xIFD0K0E2Xk2KHgzbObOBK0xF1ptuZZ_eHOA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "",
+      "cn": "",
+      "sponsor": "长春中医药大学",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 6,
+      "title": "中医药文化理论与实践",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIO4WMB0U3P2SyQ7W-z7GqHCtJRR09s7VorAPf9Z4x4cK01D4ytEKNEBjuO5Oo4sXfEjKacA5gocqyll2wCSWl7ZfgDQh6l7z2IooLMpw1VDRw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "",
+      "cn": "",
+      "sponsor": "浙江中医药大学浙江中医药文化研究院",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 6,
+      "title": "中医药文化研究",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIO4WMB0U3P2SyQ7W-z7GqHCtJRR09s7VorAPf9Z4x4cK01D4ytEKNEBjuO5Oo4sXfEa--BrMqcxncOJrmCMjC3PVLwFzjBfU9aNcnwlv0ASPA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "",
+      "cn": "",
+      "sponsor": "四川省中医药科学院;四川省中医药文化发展促进会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "中医学",
+      "category_code": "E056",
+      "page": 6,
+      "title": "壮瑶药研究",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIO4WMB0U3P2SyQ7W-z7GqHCtJRR09s7VorAPf9Z4x4cK01D4ytEKNEBjuO5Oo4sXfFM1AkF-vwPuRL8-BkypVKQFjwFLWA-vj9-0zgbpI17Xw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "",
+      "cn": "",
+      "sponsor": "壮瑶药协同创新中心;广西壮瑶药重点实验室",
+      "tags": []
+    }
+  ]
+}

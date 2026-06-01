@@ -1,0 +1,28 @@
+<view class="paper-bg">
+  <view class="safe-page page-pad">
+    <view class="page-title">{{title}}</view>
+    <view class="page-sub">{{subtitle}}</view>
+
+    <view class="empty-card card" wx:if="{{!loading && error}}">
+      <view class="empty-title">{{error}}</view>
+      <view class="empty-sub">这里后续接 Worker 榜单接口：每个榜单只返回前 20 本期刊。</view>
+    </view>
+
+    <view class="loading-card card" wx:if="{{loading}}">加载中...</view>
+
+    <view class="list">
+      <view wx:for="{{journals}}" wx:key="slug" class="rank-row card" bindtap="openDetail" data-slug="{{item.slug}}">
+        <view class="rank-name">{{item.title}}</view>
+        <view class="rank-meta">ISSN {{item.issn}}</view>
+        <view class="rank-metrics">
+          <text>IF {{item.ifText}}</text>
+          <text>JCR {{item.jcr}}</text>
+          <text>中科院 {{item.cas}}</text>
+        </view>
+        <view class="badges">
+          <text wx:for="{{item.badges}}" wx:key="*this" class="badge {{index === 0 ? 'badge-blue' : index === 1 ? 'badge-green' : 'badge-brown'}}">{{item}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,11 @@
+.page-pad { padding-top: 56rpx; }
+.folder-head { padding: 28rpx; }
+.page-title { color: #171717; font-size: 42rpx; line-height: 1.25; font-weight: 900; }
+.page-sub { margin-top: 12rpx; color: #756d64; font-size: 25rpx; line-height: 1.5; }
+.share-btn { height: 72rpx; margin-top: 24rpx; display: flex; align-items: center; justify-content: center; border-radius: 14rpx; background: linear-gradient(180deg, #ff6a1a 0%, #ef4d00 100%); color: #fff; font-size: 26rpx; font-weight: 850; }
+.journal-list { display: flex; flex-direction: column; gap: 18rpx; margin-top: 22rpx; }
+.journal-card { padding: 24rpx; }
+.journal-title { color: #171717; font-size: 30rpx; line-height: 1.3; font-weight: 900; }
+.journal-meta { margin-top: 8rpx; color: #756d64; font-size: 22rpx; }
+.metrics { display: flex; flex-wrap: wrap; gap: 12rpx; margin-top: 16rpx; }
+.metrics text { padding: 8rpx 12rpx; border-radius: 8rpx; background: #fff4e8; color: #7b4a24; font-size: 22rpx; font-weight: 750; }

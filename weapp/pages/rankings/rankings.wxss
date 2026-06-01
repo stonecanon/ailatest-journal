@@ -1,0 +1,52 @@
+.page-pad {
+  padding-top: 56rpx;
+}
+
+.page-title {
+  color: #171717;
+  font-size: 52rpx;
+  font-weight: 900;
+}
+
+.rank-section {
+  margin-top: 30rpx;
+}
+
+.section-title {
+  margin-bottom: 16rpx;
+  color: #171717;
+  font-size: 30rpx;
+  font-weight: 900;
+}
+
+.rank-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18rpx;
+}
+
+.rank-card {
+  position: relative;
+  min-height: 138rpx;
+  padding: 24rpx;
+}
+
+.rank-title {
+  color: #171717;
+  font-size: 28rpx;
+  font-weight: 850;
+}
+
+.rank-sub {
+  margin-top: 12rpx;
+  color: #756d64;
+  font-size: 22rpx;
+}
+
+.rank-arrow {
+  position: absolute;
+  right: 22rpx;
+  bottom: 16rpx;
+  color: #f05a14;
+  font-size: 42rpx;
+}

@@ -1,0 +1,119 @@
+{
+  "category": {
+    "code": "E063",
+    "title": "呼吸系统疾病",
+    "count": 6,
+    "major_code": "",
+    "major_title": ""
+  },
+  "pages": [
+    {
+      "page": 1,
+      "rows": 6,
+      "pageCount": 1
+    }
+  ],
+  "records": [
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "呼吸系统疾病",
+      "category_code": "E063",
+      "page": 1,
+      "title": "临床肺科杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOxtLZNNMtIa7T_2in5swYTY5n1XeKwr6M9oOsA9ynIoC39ZyjZY8WlmulvrFwjxXvPewuAe_AAhgJ3wc6Ts4biP7nFFx0hlqqeVFp3luV_Eg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.310",
+      "comprehensive_if": "1.045",
+      "issn": "1009-6663",
+      "cn": "34-1230/R",
+      "sponsor": "安徽医科大学",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "呼吸系统疾病",
+      "category_code": "E063",
+      "page": 1,
+      "title": "中华结核和呼吸杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOxtLZNNMtIa7T_2in5swYTY5n1XeKwr6M9oOsA9ynIoC39ZyjZY8WlmulvrFwjxXtBhQqoaFw8xLZajM5Fag5h4KfF-B56HKVDRSrfQGRPTg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.225",
+      "comprehensive_if": "0.962",
+      "issn": "1001-0939",
+      "cn": "11-2147/R",
+      "sponsor": "中华医学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "呼吸系统疾病",
+      "category_code": "E063",
+      "page": 1,
+      "title": "中国呼吸与危重监护杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOxtLZNNMtIa7T_2in5swYTY5n1XeKwr6M9oOsA9ynIoC39ZyjZY8WlmulvrFwjxXsNoCCUKbT4dJF--FvseEp_vcAzvipu6PlTzFCQ0QJy2g==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.869",
+      "comprehensive_if": "0.725",
+      "issn": "1671-6205",
+      "cn": "51-1631/R",
+      "sponsor": "四川大学华西医学中心;四川大学华西医院",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "呼吸系统疾病",
+      "category_code": "E063",
+      "page": 1,
+      "title": "中华肺部疾病杂志(电子版)",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOxtLZNNMtIa7T_2in5swYTY5n1XeKwr6M9oOsA9ynIoC39ZyjZY8WlmulvrFwjxXtFHwzp0B2sWknAWJe7gSr54YfouBPtx6ykvpmeOGCG9w==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.782",
+      "comprehensive_if": "0.614",
+      "issn": "1674-6902",
+      "cn": "11-9295/R",
+      "sponsor": "中华医学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "呼吸系统疾病",
+      "category_code": "E063",
+      "page": 1,
+      "title": "国际呼吸杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOxtLZNNMtIa7T_2in5swYTY5n1XeKwr6M9oOsA9ynIoC39ZyjZY8WlmulvrFwjxXv5EFaAfPep2COYJ6P1QjQ6_uMcro5fIDSx5EuxC1iirg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.725",
+      "comprehensive_if": "0.587",
+      "issn": "1673-436X",
+      "cn": "13-1368/R",
+      "sponsor": "中华医学会;河北医科大学",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "呼吸系统疾病",
+      "category_code": "E063",
+      "page": 1,
+      "title": "中华哮喘杂志(电子版)",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIOxtLZNNMtIa7T_2in5swYTY5n1XeKwr6M9oOsA9ynIoC39ZyjZY8WlmulvrFwjxXs3mhgl190Le8hgJrvqCNVsaE9disNbWpgBz-_88z9EYg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1674-3911",
+      "cn": "11-9292/R",
+      "sponsor": "中华医学会",
+      "tags": []
+    }
+  ]
+}

@@ -1,0 +1,656 @@
+{
+  "category": {
+    "code": "E062",
+    "title": "心血管系统疾病",
+    "count": 36,
+    "major_code": "",
+    "major_title": ""
+  },
+  "pages": [
+    {
+      "page": 1,
+      "rows": 21,
+      "pageCount": 2
+    },
+    {
+      "page": 2,
+      "rows": 15,
+      "pageCount": 2
+    }
+  ],
+  "records": [
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心血管系统疾病",
+      "category_code": "E062",
+      "page": 1,
+      "title": "中国循环杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPe00PzCVrqZMH-y4yF0fDE77PW42Www9cUxUPuZqX1AwAInIuh7B8JGReVL-H1wcC-EIPwdOxIW4U34sgg_lwNJX8Me4PYeMtbYCdtjoGOsQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "6.656",
+      "comprehensive_if": "4.926",
+      "issn": "1000-3614",
+      "cn": "11-2212/R",
+      "sponsor": "国家心血管病中心",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心血管系统疾病",
+      "category_code": "E062",
+      "page": 1,
+      "title": "中国动脉硬化杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPe00PzCVrqZMH-y4yF0fDE77PW42Www9cUxUPuZqX1AwAInIuh7B8JGReVL-H1wcDX0Z8xvnxiFnLNGF1TJcCZ0uZnjGTFlhPRR-77jVL0Kg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.552",
+      "comprehensive_if": "1.820",
+      "issn": "1007-3949",
+      "cn": "43-1262/R",
+      "sponsor": "中国病理生理学会;南华大学",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心血管系统疾病",
+      "category_code": "E062",
+      "page": 1,
+      "title": "中国心血管杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPe00PzCVrqZMH-y4yF0fDE77PW42Www9cUxUPuZqX1AwAInIuh7B8JGReVL-H1wcBayjBOYmYr4L1XALsr0txX9_ziRJ2DjXbu-7HQBFTdkQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "2.336",
+      "comprehensive_if": "1.821",
+      "issn": "1007-5410",
+      "cn": "11-3805/R",
+      "sponsor": "北京医院;天津医科大学",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心血管系统疾病",
+      "category_code": "E062",
+      "page": 1,
+      "title": "中国心血管病研究",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPe00PzCVrqZMH-y4yF0fDE77PW42Www9cUxUPuZqX1AwAInIuh7B8JGReVL-H1wcCFwhl3-LWDmxwIawmLFslrnWGN1otkOZ5-pyzWQs5E4g==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.898",
+      "comprehensive_if": "1.503",
+      "issn": "1672-5301",
+      "cn": "11-5122/R",
+      "sponsor": "中国医师协会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心血管系统疾病",
+      "category_code": "E062",
+      "page": 1,
+      "title": "临床心血管病杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWIPe00PzCVrqZMH-y4yF0fDE77PW42Www9cUxUPuZqX1AwAInIuh7B8JGReVL-H1wcDCU49ZY4C1XdUSe4k7IxH-ux_Ni-atOwDhFWjTDiIuzg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.700",
+      "comprehensive_if": "1.411",
+      "issn": "1001-1439",
+      "cn": "42-1130/R",
+      "sponsor": "华中科技大学同济医学院附属协和医院",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心血管系统疾病",
+      "category_code": "E062",
+      "page": 1,
+      "title": "实用心脑肺血管病杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINzAnRKwO367hiLsqdpHShIjbfoaZrmxd3sOahyWLCQpQW9ob4IbCERDLfauDtrDzTgEQ6qwYG0ZcV7m7Mgxho-tWm-erCNk9mX7bijot-pZA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.662",
+      "comprehensive_if": "1.252",
+      "issn": "1008-5971",
+      "cn": "13-1258/R",
+      "sponsor": "河北省医学情报研究所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心血管系统疾病",
+      "category_code": "E062",
+      "page": 1,
+      "title": "中国介入心脏病学杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINzAnRKwO367hiLsqdpHShIjbfoaZrmxd3sOahyWLCQpQW9ob4IbCERDLfauDtrDzSzTA4kQtgGcX_NAOt03Fyv-5WqwT3ZlcMzo9Ia_bIcbw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.657",
+      "comprehensive_if": "1.437",
+      "issn": "1004-8812",
+      "cn": "11-3155/R",
+      "sponsor": "北京大学",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心血管系统疾病",
+      "category_code": "E062",
+      "page": 1,
+      "title": "中华老年心脑血管病杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINzAnRKwO367hiLsqdpHShIjbfoaZrmxd3sOahyWLCQpQW9ob4IbCERDLfauDtrDzR5dc1HopW5XK1kKJh4G25Fn-qs9ZWQe5x9yJWh3d_WRw==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.645",
+      "comprehensive_if": "1.328",
+      "issn": "1009-0126",
+      "cn": "11-4468/R",
+      "sponsor": "融通医健期刊出版(北京)有限公司",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心血管系统疾病",
+      "category_code": "E062",
+      "page": 1,
+      "title": "中华高血压杂志(中英文)",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINzAnRKwO367hiLsqdpHShIjbfoaZrmxd3sOahyWLCQpQW9ob4IbCERDLfauDtrDzQCCO6L0OSrETZgpue-_4kZKpWDqj5tztfEBa35RPGa_Q==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.447",
+      "comprehensive_if": "1.052",
+      "issn": "1673-7245",
+      "cn": "11-5540/R",
+      "sponsor": "中华预防医学会;福建医科大学",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心血管系统疾病",
+      "category_code": "E062",
+      "page": 1,
+      "title": "临床血液学杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINzAnRKwO367hiLsqdpHShIjbfoaZrmxd3sOahyWLCQpQW9ob4IbCERDLfauDtrDzQalsA2FX21im0GwNLABBSUkoRTGS9H_cpBndiqFBFEwg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.384",
+      "comprehensive_if": "1.225",
+      "issn": "1004-2806",
+      "cn": "42-1284/R",
+      "sponsor": "华中科技大学同济医学院附属协和医院;北京大学医学院血研所",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心血管系统疾病",
+      "category_code": "E062",
+      "page": 1,
+      "title": "心肺血管病杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINzAnRKwO367hiLsqdpHShIjbfoaZrmxd3sOahyWLCQpQW9ob4IbCERDLfauDtrDzT-xAUElKSvtGCpzl6ZACySLUOxzq-EOWkzyW4SmN-R8w==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.247",
+      "comprehensive_if": "1.056",
+      "issn": "1007-5062",
+      "cn": "11-3097/R",
+      "sponsor": "北京市心肺血管疾病研究所-首都医科大学附属北京安贞医院",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心血管系统疾病",
+      "category_code": "E062",
+      "page": 1,
+      "title": "心血管康复医学杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINzAnRKwO367hiLsqdpHShIjbfoaZrmxd3sOahyWLCQpQW9ob4IbCERDLfauDtrDzS_fgZ_ItR93UXHoXO2hpgf2wmIu2SW3W4l8I6BeilBKQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.246",
+      "comprehensive_if": "0.891",
+      "issn": "1008-0074",
+      "cn": "35-1193/R",
+      "sponsor": "福建省康复医学会;中国康复医学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心血管系统疾病",
+      "category_code": "E062",
+      "page": 1,
+      "title": "中国循证心血管医学杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINzAnRKwO367hiLsqdpHShIjbfoaZrmxd3sOahyWLCQpQW9ob4IbCERDLfauDtrDzRrxntKHlFXzHri7crhZxvXRC4D9rv-PxTKILrWxJn3ag==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.235",
+      "comprehensive_if": "1.023",
+      "issn": "1674-4055",
+      "cn": "11-5719/R",
+      "sponsor": "融通医健期刊出版(北京)有限公司",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心血管系统疾病",
+      "category_code": "E062",
+      "page": 1,
+      "title": "中华心血管病杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINzAnRKwO367hiLsqdpHShIjbfoaZrmxd3sOahyWLCQpQW9ob4IbCERDLfauDtrDzQS3XqNU1wg5bi87ANq6UEuWcoZJt1Xv6A_kv1aNO387w==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.219",
+      "comprehensive_if": "0.997",
+      "issn": "0253-3758",
+      "cn": "11-2148/R",
+      "sponsor": "中华医学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心血管系统疾病",
+      "category_code": "E062",
+      "page": 1,
+      "title": "中国实验血液学杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINzAnRKwO367hiLsqdpHShIjbfoaZrmxd3sOahyWLCQpQW9ob4IbCERDLfauDtrDzSHy-ppRuVE9cj7waQIBgj-DYgox4QMJhnuZ6x7SoOd_Q==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "1.178",
+      "comprehensive_if": "0.915",
+      "issn": "1009-2137",
+      "cn": "11-4423/R",
+      "sponsor": "中国病理生理学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心血管系统疾病",
+      "category_code": "E062",
+      "page": 1,
+      "title": "心脑血管病防治",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINzAnRKwO367hiLsqdpHShIjbfoaZrmxd3sOahyWLCQpQW9ob4IbCERDLfauDtrDzS-IesHqGsPUPIaGt1x3BMdv4KuOVHYyToHbFK-vvv31w==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.921",
+      "comprehensive_if": "0.718",
+      "issn": "1009-816X",
+      "cn": "33-1252/R",
+      "sponsor": "浙江医院",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心血管系统疾病",
+      "category_code": "E062",
+      "page": 1,
+      "title": "心脏杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINzAnRKwO367hiLsqdpHShIjbfoaZrmxd3sOahyWLCQpQW9ob4IbCERDLfauDtrDzQGyxciPpD531KnxEEjACNatE89p3MuQ9DGzYoOrKFP3g==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.880",
+      "comprehensive_if": "0.597",
+      "issn": "1009-7236",
+      "cn": "61-1268/R",
+      "sponsor": "空军军医大学基础医学院;陕西省生理科学会",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心血管系统疾病",
+      "category_code": "E062",
+      "page": 1,
+      "title": "中华心血管病杂志(网络版)",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINzAnRKwO367hiLsqdpHShIjbfoaZrmxd3sOahyWLCQpQW9ob4IbCERDLfauDtrDzQ6pQSTOYDoDCnVB9P7tcuJjhyqs2xDDWSyyg5cwdu3jg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.868",
+      "comprehensive_if": "0.763",
+      "issn": "2096-1588",
+      "cn": "11-6031/R",
+      "sponsor": "中华医学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心血管系统疾病",
+      "category_code": "E062",
+      "page": 1,
+      "title": "血栓与止血学",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINzAnRKwO367hiLsqdpHShIjbfoaZrmxd3sOahyWLCQpQW9ob4IbCERDLfauDtrDzTgHybPZYzRCGuVkc8JS8IwK3DMBBUxsGo3XhqubyU5HA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.861",
+      "comprehensive_if": "0.677",
+      "issn": "1009-6213",
+      "cn": "44-1513/R",
+      "sponsor": "广州医科大学",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心血管系统疾病",
+      "category_code": "E062",
+      "page": 1,
+      "title": "中国分子心脏病学杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINzAnRKwO367hiLsqdpHShIjbfoaZrmxd3sOahyWLCQpQW9ob4IbCERDLfauDtrDzSB-B9hmneGKoCuTCxC32Bz2J0ofouJKsgpvhPTKD8uhg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.861",
+      "comprehensive_if": "0.671",
+      "issn": "1671-6272",
+      "cn": "11-4726/R",
+      "sponsor": "中国医学科学院;北京协和医学院",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心血管系统疾病",
+      "category_code": "E062",
+      "page": 1,
+      "title": "岭南心血管病杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINzAnRKwO367hiLsqdpHShIjbfoaZrmxd3sOahyWLCQpQW9ob4IbCERDLfauDtrDzRV5pl-QGktCBgfn74IrPR2WsMek1lekEZ0Y0MWNRvPRQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.838",
+      "comprehensive_if": "0.779",
+      "issn": "1007-9688",
+      "cn": "44-1436/R",
+      "sponsor": "广东省心血管病研究所",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心血管系统疾病",
+      "category_code": "E062",
+      "page": 2,
+      "title": "心血管病学进展",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINGiOfmvZ4ksAImkX_-4t1j8eRhmaDmbVH0nueAMrzZ43o3oWzIf9azuUTCjALx269BfKIQVE49A5akQ65zvEqM2bkIpksw6d1YVp2UWiDMyA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.797",
+      "comprehensive_if": "0.546",
+      "issn": "1004-3934",
+      "cn": "51-1187/R",
+      "sponsor": "成都市第三人民医院;成都市心血管病研究所",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心血管系统疾病",
+      "category_code": "E062",
+      "page": 2,
+      "title": "国际心血管病杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINGiOfmvZ4ksAImkX_-4t1j8eRhmaDmbVH0nueAMrzZ43o3oWzIf9azuUTCjALx268iOFGH7U88sEtYXrZd5I8E_AtpQzFXkXbEO8WjoNqy3Q==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.744",
+      "comprehensive_if": "0.600",
+      "issn": "1673-6583",
+      "cn": "31-1951/R",
+      "sponsor": "上海市卫生和健康发展研究中心(上海市医学科学技术情报研究所)",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心血管系统疾病",
+      "category_code": "E062",
+      "page": 2,
+      "title": "Journal of Geriatric Cardiology",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINGiOfmvZ4ksAImkX_-4t1j8eRhmaDmbVH0nueAMrzZ43o3oWzIf9azuUTCjALx26829ipmdXm3LfPdrTgXM-V4v-SMH4jkPs_ZD8aF4lgnyg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.700",
+      "comprehensive_if": "0.523",
+      "issn": "1671-5411",
+      "cn": "11-5329/R",
+      "sponsor": "解放军总医院医学创新研究部;解放军总医院第六医学中心心血管病医学部",
+      "tags": [
+        "网络首发",
+        "增强出版",
+        "完全OA期刊"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心血管系统疾病",
+      "category_code": "E062",
+      "page": 2,
+      "title": "中华心律失常学杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINGiOfmvZ4ksAImkX_-4t1j8eRhmaDmbVH0nueAMrzZ43o3oWzIf9azuUTCjALx26-f6hbLIrtPw3hPvEVMr0zSkRoimrwkInwpoflHT60Jew==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.669",
+      "comprehensive_if": "0.609",
+      "issn": "1007-6638",
+      "cn": "11-3859/R",
+      "sponsor": "中华医学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心血管系统疾病",
+      "category_code": "E062",
+      "page": 2,
+      "title": "中华血液学杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINGiOfmvZ4ksAImkX_-4t1j8eRhmaDmbVH0nueAMrzZ43o3oWzIf9azuUTCjALx26_kIoRX0lCG4zmlYk97V5zkLXHlHwYpSB1AQVPZe1Lb6g==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.616",
+      "comprehensive_if": "0.528",
+      "issn": "0253-2727",
+      "cn": "12-1090/R",
+      "sponsor": "中华医学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心血管系统疾病",
+      "category_code": "E062",
+      "page": 2,
+      "title": "中国心脏起搏与心电生理杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINGiOfmvZ4ksAImkX_-4t1j8eRhmaDmbVH0nueAMrzZ43o3oWzIf9azuUTCjALx268cIT_R8-VeJOgIMmlG3COIIto9y8fG64M0cbxuFstoBg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.479",
+      "comprehensive_if": "0.403",
+      "issn": "1007-2659",
+      "cn": "42-1421/R",
+      "sponsor": "中国生物医学工程学会;武汉大学人民医院",
+      "tags": [
+        "网络首发"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心血管系统疾病",
+      "category_code": "E062",
+      "page": 2,
+      "title": "中华心力衰竭和心肌病杂志(中英文)",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINGiOfmvZ4ksAImkX_-4t1j8eRhmaDmbVH0nueAMrzZ43o3oWzIf9azuUTCjALx269osP7w3ME_8PQ9VY1idGFPWza8eqxaRsyytD1G_Y03CA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.462",
+      "comprehensive_if": "0.423",
+      "issn": "2096-3076",
+      "cn": "10-1460/R",
+      "sponsor": "中华医学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心血管系统疾病",
+      "category_code": "E062",
+      "page": 2,
+      "title": "心电与循环",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINGiOfmvZ4ksAImkX_-4t1j8eRhmaDmbVH0nueAMrzZ43o3oWzIf9azuUTCjALx269KAs2EuBTUnyEBMwCza5ILKsodfUGAhTf5XjwPklp0lQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.446",
+      "comprehensive_if": "0.332",
+      "issn": "2095-3933",
+      "cn": "33-1377/R",
+      "sponsor": "浙江省医学会",
+      "tags": [
+        "网络首发",
+        "增强出版"
+      ]
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心血管系统疾病",
+      "category_code": "E062",
+      "page": 2,
+      "title": "临床心电学杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINGiOfmvZ4ksAImkX_-4t1j8eRhmaDmbVH0nueAMrzZ43o3oWzIf9azuUTCjALx26-shCfXe19jk5pmKXpplYChc9NkxYm_8eOB1LKPkU87XQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.237",
+      "comprehensive_if": "0.157",
+      "issn": "1005-0272",
+      "cn": "34-1107/R",
+      "sponsor": "中国科学技术大学附属第一医院(安徽省立医院)",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心血管系统疾病",
+      "category_code": "E062",
+      "page": 2,
+      "title": "中华心脏与心律电子杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINGiOfmvZ4ksAImkX_-4t1j8eRhmaDmbVH0nueAMrzZ43o3oWzIf9azuUTCjALx26_ZNW6UdsI2wckxPFXWWfKGwLUQGEuxy0a8uPiM_JvR7w==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.152",
+      "comprehensive_if": "0.120",
+      "issn": "2095-6568",
+      "cn": "11-9347/R",
+      "sponsor": "中华医学会",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心血管系统疾病",
+      "category_code": "E062",
+      "page": 2,
+      "title": "中西医结合心血管病电子杂志",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINGiOfmvZ4ksAImkX_-4t1j8eRhmaDmbVH0nueAMrzZ43o3oWzIf9azuUTCjALx26_veY3aa66fPPtfugTy0Qq17_YKJa_uAN_4CXH_zZSfgQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.030",
+      "comprehensive_if": "0.023",
+      "issn": "2095-6681",
+      "cn": "11-9336/R",
+      "sponsor": "中国医药科技出版社",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心血管系统疾病",
+      "category_code": "E062",
+      "page": 2,
+      "title": "South China Journal of Cardiology",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINGiOfmvZ4ksAImkX_-4t1j8eRhmaDmbVH0nueAMrzZ43o3oWzIf9azuUTCjALx26_NB0G9zItlz1Q7jTCyRJamh5c6-rDI0fsBl-hzpwT2MA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "0.015",
+      "comprehensive_if": "0.015",
+      "issn": "1009-8933",
+      "cn": "44-1512/R",
+      "sponsor": "广东省心血管病研究所",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心血管系统疾病",
+      "category_code": "E062",
+      "page": 2,
+      "title": "世界核心医学期刊文摘(心脏病学分册)",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINGiOfmvZ4ksAImkX_-4t1j8eRhmaDmbVH0nueAMrzZ43o3oWzIf9azuUTCjALx26-FT8gDP87olWw_fQgVYcpjDY3aKxwel2YpaiToRRAZlg==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1671-3141",
+      "cn": "11-9234/R",
+      "sponsor": "世界图书出版公司",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心血管系统疾病",
+      "category_code": "E062",
+      "page": 2,
+      "title": "心电图杂志(电子版)",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINGiOfmvZ4ksAImkX_-4t1j8eRhmaDmbVH0nueAMrzZ43o3oWzIf9azuUTCjALx26_A9zRMr2oKrkWU5EJQrcdNudbXfb03Grh5EoFALV4RSA==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "2095-4220",
+      "cn": "11-9318/R",
+      "sponsor": "人民军医出版社",
+      "tags": []
+    },
+    {
+      "source": "CNKI knavi",
+      "major_category": "",
+      "major_code": "",
+      "category": "心血管系统疾病",
+      "category_code": "E062",
+      "page": 2,
+      "title": "心血管病防治知识",
+      "detail_url": "https://navi.cnki.net/knavi/detail?p=5ZaO-ltDWINGiOfmvZ4ksAImkX_-4t1j8eRhmaDmbVH0nueAMrzZ43o3oWzIf9azuUTCjALx268dwNsdJvsogGGhQGrOg9l4E1EHl4lMHG524LLb1aZ0CQ==&uniplatform=NZKPT&language=CHS",
+      "compound_if": "",
+      "comprehensive_if": "",
+      "issn": "1672-3015",
+      "cn": "44-1581/R",
+      "sponsor": "广东省介入性心脏病学会;广东省岭南心血管病研究所",
+      "tags": []
+    }
+  ]
+}

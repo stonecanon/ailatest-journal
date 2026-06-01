@@ -1,4 +1,8 @@
 App({
+  globalData: {
+    apiBase: 'https://api.ailatest.org'
+  },
+
   onLaunch() {
     // 检查版本更新
     if (wx.canIUse('getUpdateManager')) {
