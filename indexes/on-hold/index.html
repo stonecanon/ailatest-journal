@@ -1,35 +1,37 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>On Hold Journals | AILatest Journal</title>
-<meta name="description" content="Journals placed on hold by Clarivate Web of Science — with Impact Factors, Quartiles, CAS rankings and indexing info." />
+<title>WoS On Hold | AILatest Journal</title>
+<meta name="description" content="Web of Science On Hold 期刊 — 因质量问题被 Clarivate 暂停收录评估的期刊，含影响因子、分区、CAS 等级和索引信息。" />
 <link rel="canonical" href="https://journal.ailatest.org/indexes/on-hold/" />
-<meta property="og:title" content="On Hold Journals | AILatest Journal" />
-<meta property="og:description" content="Journals placed on hold by Clarivate Web of Science — with Impact Factors, Quartiles, CAS rankings and indexing info." />
+<meta property="og:title" content="WoS On Hold | AILatest Journal" />
+<meta property="og:description" content="Web of Science On Hold 期刊 — 因质量问题被 Clarivate 暂停收录评估的期刊，含影响因子、分区、CAS 等级和索引信息。" />
 <meta name="robots" content="index,follow" />
 <meta name="theme-color" content="#b4531f" />
+<script type="application/ld+json">
+{"@context": "https://schema.org", "@type": "ItemList", "name": "WoS On Hold", "description": "Web of Science On Hold 期刊 — 因质量问题被 Clarivate 暂停收录评估的期刊，含影响因子、分区、CAS 等级和索引信息。", "url": "https://journal.ailatest.org/indexes/on-hold/", "itemListElement": []}
+</script>
 <style>
 :root{--accent:#b4531f;--accent-light:#f59e0b;--bg:#f7f5f0;--paper:#fff;--ink:#1c1917;--ink-soft:#6b6559;--rule:#e3ddd0;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
 *{box-sizing:border-box}
 body{font-family:var(--sans);margin:0;padding:0;background:var(--bg);color:var(--ink);line-height:1.6}
 .header{background:var(--paper);border-bottom:1px solid var(--rule);padding:14px 20px;position:sticky;top:0;z-index:10}
-.header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:16px}
+.header-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:16px}
 .header a{color:var(--ink);text-decoration:none;font-weight:700;font-size:15px;letter-spacing:.02em}
 .header a:hover{color:var(--accent)}
 .header .logo{display:flex;align-items:center;gap:6px}
 .header .logo-symbol{font-size:22px;line-height:1}
 .header .nav-links{display:flex;gap:16px;margin-left:auto;font-size:13px}
 .header .nav-links a{font-weight:500;color:var(--ink-soft)}
-.wrap{max-width:1200px;margin:0 auto;padding:20px}
+.wrap{max-width:1100px;margin:0 auto;padding:20px}
 h1{font-size:20px;margin:0 0 6px;font-weight:700;letter-spacing:-.01em}
 .breadcrumb{font-size:12px;color:var(--ink-soft);margin-bottom:12px}
 .breadcrumb a{color:var(--accent);text-decoration:none}
 .breadcrumb a:hover{text-decoration:underline}
 .sub{color:var(--ink-soft);font-size:14px;margin-bottom:12px}
 .count{color:var(--ink-soft);font-size:12px;margin-bottom:14px}
-.note-box{background:#fff8e6;border:1px solid #f0d78e;border-radius:8px;padding:12px 16px;font-size:13px;margin-bottom:16px;color:#664d00}
 .card{background:var(--paper);border:1px solid var(--rule);border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,0.06),0 4px 12px rgba(0,0,0,0.04);overflow:hidden}
-.table-wrap{overflow-x:auto}
+.table-wrap{background:var(--paper);border:1px solid var(--rule);border-radius:8px;overflow:hidden;overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:13px}
 th{text-align:left;padding:10px 12px;border-bottom:2px solid var(--rule);font-weight:700;white-space:nowrap;color:var(--ink);font-size:11px;letter-spacing:.04em;text-transform:uppercase;background:var(--bg)}
 td{padding:8px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
@@ -43,9 +45,10 @@ a:hover{text-decoration:underline}
 .back:hover{opacity:.9;text-decoration:none}
 .footer{text-align:center;padding:24px;color:var(--ink-soft);font-size:12px;border-top:1px solid var(--rule);margin-top:24px}
 .footer a{color:var(--ink-soft)}
-.pill{display:inline-block;padding:2px 7px;font-size:11px;font-weight:700;border-radius:2px;color:#fff}
-.pill-ur{background:#e67e22}
-.pill-oh{background:#c0392b}
+.pill{display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600;white-space:nowrap}
+.pill-under-review{background:#c2410c;color:#fff}
+.pill-on-hold{background:#b91c1c;color:#fff}
+.pill-warning{background:#92400e;color:#fff}
 </style></head><body>
 <div class="header">
 <div class="header-inner">
@@ -56,28 +59,13 @@ a:hover{text-decoration:underline}
   </span>
 </div></div>
 <div class="wrap">
-<h1>WoS On Hold Journals</h1>
+<h1>WoS On Hold | AILatest Journal</h1>
 <p class="breadcrumb"><a href="https://journal.ailatest.org/">Home</a> › <a href="https://journal.ailatest.org/indexes/">All Indexes</a></p>
-<p class="sub">期刊被标记为 On Hold 表示正在被 Web of Science (Clarivate) 调查并暂停论文收录，被剔除风险极高。来源：iJournal + Clarivate MJL，更新至 2026-05-24。</p>
-<p class="count">共 15 本 On Hold 期刊。</p>
-<div class="card"><div class="table-wrap"><table><thead><tr><th>Journal Name</th><th>IF</th><th>JCR Q</th><th>CAS</th><th>Index</th><th>ISSN</th><th>Publisher</th></tr></thead>
-<tbody><tr><td><a href="https://journal.ailatest.org/journal/ieee-transactions-on-intelligent-vehicles/">IEEE TRANSACTIONS ON INTELLIGENT VEHICLES</a></td><td>14.3</td><td>Q1</td><td>1区·TOP</td><td>SCIE/EI</td><td>2379-8858</td><td>IEEE</td></tr>
-<tr><td><a href="https://journal.ailatest.org/journal/international-journal-of-surgery/">INTERNATIONAL JOURNAL OF SURGERY</a></td><td>10.1</td><td>Q1</td><td>2区</td><td>SCIE</td><td>1743-9191</td><td>LIPPINCOTT WILLIAMS & WILKINS</td></tr>
-<tr><td><a href="https://journal.ailatest.org/journal/biomedicine-and-pharmacotherapy/">BIOMEDICINE & PHARMACOTHERAPY</a></td><td>7.5</td><td>Q1</td><td>2区</td><td>SCIE</td><td>0753-3322</td><td>ELSEVIER FRANCE-EDITIONS SCIENTIFIQUES MEDICALES ELSEVIER</td></tr>
-<tr><td><a href="https://journal.ailatest.org/journal/optical-and-quantum-electronics/">OPTICAL AND QUANTUM ELECTRONICS</a></td><td>4.0</td><td>Q1</td><td>3区</td><td>SCIE/EI</td><td>0306-8919</td><td>SPRINGER</td></tr>
-<tr><td><a href="https://journal.ailatest.org/journal/environmental-toxicology/">ENVIRONMENTAL TOXICOLOGY</a></td><td>3.2</td><td>Q2</td><td>3区</td><td>SCIE/EI</td><td>1520-4081</td><td>WILEY</td></tr>
-<tr><td><a href="https://journal.ailatest.org/journal/soft-computing/">SOFT COMPUTING</a></td><td>2.5</td><td>Q3</td><td>4区</td><td>SCIE/EI</td><td>1432-7643</td><td>SPRINGER</td></tr>
-<tr><td><a href="https://journal.ailatest.org/journal/frontiers-in-energy-research/">FRONTIERS IN ENERGY RESEARCH</a></td><td>2.4</td><td>Q3</td><td>4区</td><td>SCIE/EI</td><td>2296-598X</td><td>FRONTIERS MEDIA SA</td></tr>
-<tr><td><a href="https://journal.ailatest.org/journal/annals-of-medicine-and-surgery/">ANNALS OF MEDICINE AND SURGERY</a></td><td>1.6</td><td>Q2</td><td>4区</td><td>ESCI</td><td>2049-0801</td><td>LIPPINCOTT WILLIAMS & WILKINS</td></tr>
-<tr><td><a href="https://journal.ailatest.org/journal/international-journal-of-surgery-protocols/">INTERNATIONAL JOURNAL OF SURGERY PROTOCOLS</a></td><td>1.1</td><td>Q3</td><td>4区</td><td>ESCI</td><td>2468-3574</td><td>IJS PUBL GROUP</td></tr>
-<tr><td><a href="https://journal.ailatest.org/journal/journal-of-intelligent-and-fuzzy-systems/">JOURNAL OF INTELLIGENT & FUZZY SYSTEMS</a></td><td>1.0</td><td>Q4</td><td>4区</td><td>SCIE/EI</td><td>1064-1246</td><td>IOS PRESS</td></tr>
-<tr><td><a href="https://journal.ailatest.org/journal/international-journal-of-surgery-open/">INTERNATIONAL JOURNAL OF SURGERY OPEN</a></td><td>0.8</td><td>Q4</td><td>4区</td><td>ESCI</td><td>2405-8572</td><td>LIPPINCOTT WILLIAMS & WILKINS</td></tr>
-<tr><td><a href="https://journal.ailatest.org/journal/international-journal-of-surgery-case-reports/">INTERNATIONAL JOURNAL OF SURGERY CASE REPORTS</a></td><td>0.7</td><td>Q4</td><td>4区</td><td>ESCI</td><td>2210-2612</td><td>WOLTERS KLUWER MEDKNOW PUBLICATIONS</td></tr>
-<tr><td><a href="https://journal.ailatest.org/journal/international-journal-of-surgery-oncology/">INTERNATIONAL JOURNAL OF SURGERY-ONCOLOGY</a></td><td>0.1</td><td>Q4</td><td>4区</td><td>ESCI</td><td>2471-3864</td><td>LIPPINCOTT WILLIAMS & WILKINS</td></tr>
-<tr><td><a href="https://journal.ailatest.org/journal/annals-in-social-responsibility/">ANNALS IN SOCIAL RESPONSIBILITY</a></td><td>—</td><td>Q4</td><td>—</td><td>ESCI</td><td>2056-3515</td><td>EMERALD GROUP PUBLISHING LTD</td></tr>
-<tr><td><a href="https://journal.ailatest.org/journal/ingegneria-sismica/">INGEGNERIA SISMICA</a></td><td>—</td><td>—</td><td>4区</td><td>SCIE/EI</td><td>0393-1420</td><td>MEDINLIN SOFT</td></tr>
-</tbody></table></div></div>
-<div class="back-wrap"><a href="https://journal.ailatest.org/indexes/" class="back">← Back to All Indexes</a></div>
+<p class="sub">Web of Science On Hold 期刊 — 因质量问题被 Clarivate 暂停收录评估的期刊，含影响因子、分区、CAS 等级和索引信息。</p>
+<p class="count">共 0 本WoS On Hold标记的期刊（按 IF 降序）</p>
+<div class="card"><div class="table-wrap"><table><thead><tr><th>Journal Name</th><th>IF</th><th>JCR Q</th><th>CAS</th><th>Status</th><th>Publisher</th></tr></thead>
+<tbody></tbody></table></div></div>
+<p class="back-wrap"><a class="back" href="https://journal.ailatest.org/indexes/">← Back</a></p>
 </div>
-<div class="footer">© AILatest Journal · <a href="https://journal.ailatest.org/">Home</a></div>
+<div class="footer"><a href="https://journal.ailatest.org/">AILatest Journal</a> — journal search &amp; submission decision tool for researchers</div>
 </body></html>

@@ -39,13 +39,16 @@ def load_wos_categories():
 
 SUBJECTS = None  # will be loaded from wos_categories.json at runtime
 
-# 5 个索引
+# 索引 + 特殊状态列表
 INDEXES = [
-    ('scie', 'SCIE', 'SCIE (Science Citation Index Expanded) indexed journals with Impact Factors, Quartiles, CAS rankings and publisher information.', ['SCIE']),
-    ('ssci', 'SSCI', 'SSCI (Social Sciences Citation Index) indexed journals with Impact Factors, Quartiles, CAS rankings and publisher information.', ['SSCI']),
-    ('ei', 'EI', 'EI Compendex indexed journals with Impact Factors, Quartiles, CAS rankings and publisher information.', ['EI']),
-    ('scopus', 'Scopus', 'Scopus indexed journals with Impact Factors, Quartiles, CAS rankings and publisher information.', None),
-    ('medline', 'MEDLINE', 'MEDLINE indexed journals from the National Library of Medicine with Impact Factors, Quartiles, CAS rankings and publisher information.', None),
+    ('scie', 'SCIE', 'SCIE (Science Citation Index Expanded) indexed journals with Impact Factors, Quartiles, CAS rankings and publisher information.', ['SCIE'], 'index'),
+    ('ssci', 'SSCI', 'SSCI (Social Sciences Citation Index) indexed journals with Impact Factors, Quartiles, CAS rankings and publisher information.', ['SSCI'], 'index'),
+    ('ei', 'EI', 'EI Compendex indexed journals with Impact Factors, Quartiles, CAS rankings and publisher information.', ['EI'], 'index'),
+    ('scopus', 'Scopus', 'Scopus indexed journals with Impact Factors, Quartiles, CAS rankings and publisher information.', None, 'index'),
+    ('medline', 'MEDLINE', 'MEDLINE indexed journals from the National Library of Medicine with Impact Factors, Quartiles, CAS rankings and publisher information.', None, 'index'),
+    ('under-review', '新锐 Under Review', '新锐版(Under Review)期刊 — 正在被 Web of Science 评审的期刊，含影响因子、分区、CAS 等级和索引信息。', None, 'status'),
+    ('on-hold', 'WoS On Hold', 'Web of Science On Hold 期刊 — 因质量问题被 Clarivate 暂停收录评估的期刊，含影响因子、分区、CAS 等级和索引信息。', None, 'status'),
+    ('warning', '中科院预警', '中科院文献情报中心国际期刊预警名单 — 含影响因子、分区、CAS 等级和索引信息。', None, 'status'),
 ]
 
 def esc(s):
@@ -97,6 +100,10 @@ a:hover{text-decoration:underline}
 .back:hover{opacity:.9;text-decoration:none}
 .footer{text-align:center;padding:24px;color:var(--ink-soft);font-size:12px;border-top:1px solid var(--rule);margin-top:24px}
 .footer a{color:var(--ink-soft)}
+.pill{display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600;white-space:nowrap}
+.pill-under-review{background:#c2410c;color:#fff}
+.pill-on-hold{background:#b91c1c;color:#fff}
+.pill-warning{background:#92400e;color:#fff}
 </style></head><body>
 <div class="header">
 <div class="header-inner">
@@ -126,13 +133,16 @@ def match_index(j, slug, index_keys):
     indices = j.get('indices') or []
     if slug == 'scopus': return bool((j.get('scopus') or {}).get('active'))
     if slug == 'medline': return bool(j.get('medline'))
+    if slug == 'under-review': return bool(j.get('under_review'))
+    if slug == 'on-hold': return bool(j.get('on_hold'))
+    if slug == 'warning': return bool(j.get('warning'))
     return any(k in indices for k in index_keys)
 
 def match_subject(j, wos_name):
     cats = j.get('wos_categories') or []
     return wos_name in cats
 
-def build_table_row(j, origin, headers):
+def build_table_row(j, origin, headers, extra_cells=None):
     slug = make_slug(j)
     name = j.get('name') or j.get('en_name') or j.get('cn_name') or ''
     if_v = j.get('if_2024')
@@ -142,6 +152,7 @@ def build_table_row(j, origin, headers):
     pub = j.get('publisher') or '—'
     issn = j.get('issn') or '—'
     cells = []
+    ec = iter(extra_cells or [])
     for h in headers:
         if h == 'name': cells.append(f'<td><a href="{origin}/journal/{esc(slug)}/">{esc(name)}</a></td>')
         elif h == 'if': cells.append(f'<td>{esc(str(if_v)) if if_v is not None else "—"}</td>')
@@ -150,6 +161,7 @@ def build_table_row(j, origin, headers):
         elif h == 'idx': cells.append(f'<td>{esc(idx)}</td>')
         elif h == 'pub': cells.append(f'<td>{esc(pub)}</td>')
         elif h == 'issn': cells.append(f'<td>{esc(issn)}</td>')
+        elif h == 'status': cells.append(f'<td>{next(ec, "")}</td>')
     return '<tr>' + ''.join(cells) + '</tr>'
 
 def generate_subjects(journals, origin):
@@ -185,24 +197,42 @@ def generate_subjects(journals, origin):
         print(f'  /subjects/{slug}/ → {len(top)}/{total} journals')
 
 def generate_indexes(journals, origin):
-    for slug, title, desc, index_keys in INDEXES:
+    for slug, title, desc, index_keys, table_type in INDEXES:
         matched = [j for j in journals if match_index(j, slug, index_keys or [])]
         matched.sort(key=lambda x: -(x.get('if_2024') or -1))
         top = matched[:200]
-        headers = ['name', 'if', 'q', 'z', 'issn', 'pub']
-        th_html = ''.join(f'<th>{esc(h)}</th>' for h in ['Journal Name', 'IF', 'JCR Q', 'CAS', 'ISSN', 'Publisher'])
-        rows_html = '\n'.join(build_table_row(j, origin, headers) for j in top)
-
-        seo_title = f'{title} Indexed Journals | AILatest Journal'
+        if table_type == 'status':
+            # 状态列表：加 Status 徽章列
+            headers = ['name', 'if', 'q', 'z', 'status', 'pub']
+            th_html = ''.join(f'<th>{esc(h)}</th>' for h in ['Journal Name', 'IF', 'JCR Q', 'CAS', 'Status', 'Publisher'])
+            def status_badge(j):
+                if slug == 'under-review': return '<span class="pill pill-under-review">新锐 Under Review</span>'
+                if slug == 'on-hold': return '<span class="pill pill-on-hold">WoS On Hold</span>'
+                if slug == 'warning': return '<span class="pill pill-warning">中科院预警</span>'
+                return ''
+            rows_html = '\n'.join(
+                build_table_row(j, origin, headers, extra_cells=[status_badge(j)]) for j in top
+            )
+            seo_title = f'{title} | AILatest Journal'
+        else:
+            headers = ['name', 'if', 'q', 'z', 'issn', 'pub']
+            th_html = ''.join(f'<th>{esc(h)}</th>' for h in ['Journal Name', 'IF', 'JCR Q', 'CAS', 'ISSN', 'Publisher'])
+            rows_html = '\n'.join(build_table_row(j, origin, headers) for j in top)
+            seo_title = f'{title} Indexed Journals | AILatest Journal'
         seo_desc = desc
         canonical = f'{origin}/indexes/{slug}/'
-        count = f'Showing {len(top)} {title} indexed journals sorted by Impact Factor (descending).'
+        if table_type == 'status':
+            count = f'共 {len(top)} 本{title}标记的期刊（按 IF 降序）'
+            jsonld_name = f'{title}'
+        else:
+            count = f'Showing {len(top)} {title} indexed journals sorted by Impact Factor (descending).'
+            jsonld_name = f'{title} Indexed Journals'
 
         item_list = [{'@type': 'ListItem', 'position': i+1,
             'item': {'@type': 'Periodical', 'name': j.get('name',''), 'url': f'{origin}/journal/{esc(make_slug(j))}/'}}
             for i, j in enumerate(top[:50])]
         jsonld_tag = f'<script type="application/ld+json">\n' + json.dumps(
-            {'@context': 'https://schema.org', '@type': 'ItemList', 'name': f'{title} Indexed Journals',
+            {'@context': 'https://schema.org', '@type': 'ItemList', 'name': jsonld_name,
              'description': desc, 'url': canonical, 'itemListElement': item_list}, ensure_ascii=False) + '\n</script>'
 
         html = SKELETON.replace('__TITLE__', esc(seo_title)).replace('__DESC__', esc(seo_desc))
@@ -268,7 +298,7 @@ h1{{font-size:20px;margin:0 0 6px;font-weight:700}}
     print('  /subjects/ (landing)')
 
     # Indexes landing
-    i_list = '\n'.join(f'<li><a href="{origin}/indexes/{s}/" class="cat-link"><strong>{esc(t)}</strong></a></li>' for s, t, _, _ in indexes)
+    i_list = '\n'.join(f'<li><a href="{origin}/indexes/{s}/" class="cat-link"><strong>{esc(t)}</strong></a></li>' for s, t, _, _, _ in indexes)
     i_html = f'''<!doctype html><html lang="en">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Browse Journals by Indexing Database | AILatest Journal</title>
