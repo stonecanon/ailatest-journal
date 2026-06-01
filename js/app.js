@@ -2451,31 +2451,23 @@
         renderInt();
       });
     }
-    // 表头学科下拉：填充 topicList（WoS + OA 合并）
-    const wosSel = $('#wos-col-filter');
-    if (wosSel) {
-      wosSel.innerHTML = `<option value="__all">${T('学科 / 主题','Topic')}</option>` +
-        topicList.map(v => `<option value="${escape(v.name)}">${escape(v.name)}</option>`).join('');
-      if (!wosSel.__bound) {
-        wosSel.__bound = true;
-        wosSel.addEventListener('change', () => {
-          activeTopics.clear();
-          if (wosSel.value !== '__all') activeTopics.add(wosSel.value);
-          $$('#topic-list input[type=checkbox]').forEach(cb => { cb.checked = activeTopics.has(cb.value); });
-          $$('.wos-item').forEach(el => {
-            const v = el.querySelector('input')?.value;
-            el.classList.toggle('on', !!v && activeTopics.has(v));
-          });
-          shown = PAGE;
-          renderInt();
-        });
-      }
+    // 表头学科复选面板：渲染 topicList 复选列表
+    const topicPanel = $('#topic-dd-list');
+    if (topicPanel) {
+      const raw = ($('#topic-dd-search')?.value || '').trim().toLowerCase();
+      const filtered = !raw ? topicList : topicList.filter(t => t.name.toLowerCase().includes(raw));
+      topicPanel.innerHTML = filtered.map(t =>
+        `<label class="th-chk" data-filter="topic" data-value="${escape(t.name)}">
+           <input type="checkbox" ${activeTopics.has(t.name) ? 'checked' : ''}>
+           <span>${escape(t.name)}</span>
+           <span class="count">${t.count.toLocaleString()}</span>
+         </label>`
+      ).join('');
     }
-    if (wosSel) wosSel.value = activeTopics.size === 1 ? [...activeTopics][0] : '__all';
     // 同步题头复选框状态与 Sets 一致
     syncThChkState();
     // 题头下拉复选框筛选：复选框直接操作 Sets
-    ['idx-panel','tier-panel','extra-panel'].forEach(panelId => {
+    ['idx-panel','tier-panel','extra-panel','topic-panel'].forEach(panelId => {
       const pnl = $(`#${panelId}`);
       if (!pnl || pnl.__bound) return;
       pnl.__bound = true;
@@ -2506,6 +2498,9 @@
           } else if (filter === 'abs') {
             if (cb.checked) activeAbs.add(val);
             else activeAbs.delete(val);
+          } else if (filter === 'topic') {
+            if (cb.checked) activeTopics.add(val);
+            else activeTopics.delete(val);
           }
           shown = PAGE;
           renderInt();
@@ -4703,7 +4698,34 @@
       e.preventDefault();
       setFreeFilter(!activeFeats.has('free'));
     });
-    $('#topic-search')?.addEventListener('input', () => renderTopicList());
+    $('#topic-dd-search')?.addEventListener('input', () => {
+      const raw = ($('#topic-dd-search')?.value || '').trim().toLowerCase();
+      const panel = $('#topic-dd-list');
+      if (!panel) return;
+      const filtered = !raw ? topicList : topicList.filter(t => t.name.toLowerCase().includes(raw));
+      panel.innerHTML = filtered.map(t =>
+        `<label class="th-chk" data-filter="topic" data-value="${escape(t.name)}">
+           <input type="checkbox" ${activeTopics.has(t.name) ? 'checked' : ''}>
+           <span>${escape(t.name)}</span>
+           <span class="count">${t.count.toLocaleString()}</span>
+         </label>`
+      ).join('');
+      // Re-bind change events for new checkboxes
+      // (the generic handler in renderCatList uses __bound which only binds once,
+      //  but these checkboxes are new DOM nodes so the events need re-binding)
+      panel.querySelectorAll('label.th-chk').forEach(label => {
+        const cb = label.querySelector('input[type=checkbox]');
+        if (!cb || cb.__topicBound) return;
+        cb.__topicBound = true;
+        cb.addEventListener('change', () => {
+          const val = label.dataset.value;
+          if (cb.checked) activeTopics.add(val);
+          else activeTopics.delete(val);
+          shown = PAGE;
+          renderInt();
+        });
+      });
+    });
     $('#topic-clear')?.addEventListener('click', () => {
       activeTopics.clear();
       const inp = $('#topic-search'); if (inp) inp.value = '';

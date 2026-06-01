@@ -2075,7 +2075,51 @@ td.empty,
   .col-name { min-width: 130px; width: 26%; }
   .jname { font-size: 13px !important; }
   table.journals th, table.journals td { padding: 6px 5px; }
-  .col-wos { width: 90px; max-width: 90px; font-size: 11px; }
+  .th-dropdown-panel-search {
+  width: 340px;
+  max-height: 420px;
+  padding: 6px;
+}
+.th-dropdown-panel-search .dd-search-wrap {
+  padding: 0 0 6px;
+  position: sticky;
+  top: 0;
+  background: var(--paper);
+}
+.th-dropdown-panel-search .dd-search {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 6px 10px;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  font-size: 12px;
+  outline: none;
+}
+.th-dropdown-panel-search .dd-search:focus {
+  border-color: var(--accent);
+}
+.th-dropdown-panel-search .dd-check-list {
+  max-height: 340px;
+  overflow-y: auto;
+}
+.th-dropdown-panel-search .th-chk {
+  padding: 3px 6px;
+  font-size: 12px;
+}
+.th-dropdown-panel-search .th-chk .count {
+  margin-left: auto;
+  color: var(--ink-soft);
+  font-size: 11px;
+  padding-left: 6px;
+}
+.col-wos {
+  width: 70px;
+  max-width: 70px;
+}
+@media (max-width: 768px) {
+  .th-dropdown-panel-search { width: 280px; }
+  .col-wos { width: 60px; max-width: 60px; }
+}
   .col-badge { width: 130px; min-width: 130px; }
   .col-badge-split { min-width: 130px; width: 130px; }
   .col-fav { width: 40px; }

@@ -268,9 +268,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               <th class="col-if sortable" data-if-sort="int" title="按 IF 排序"><span data-i18n="col_if">IF</span> <span class="sort-arrow">▼</span></th>
               <th class="col-cycle"><span data-i18n="col_cycle">审稿周期</span></th>
               <th class="col-wos">
-                <select id="wos-col-filter" class="th-select" aria-label="筛选学科/主题">
-                  <option value="__all">学科 / 主题</option>
-                </select>
+                <div class="th-dropdown" id="topic-dropdown">
+                  <button class="th-dropdown-btn"><span class="dd-label" data-i18n="filter_topic">学科</span><span class="dd-arrow">▼</span></button>
+                  <div class="th-dropdown-panel th-dropdown-panel-search" id="topic-panel">
+                    <div class="dd-search-wrap"><input id="topic-dd-search" type="search" placeholder="搜索…" class="dd-search" autocomplete="off" spellcheck="false"></div>
+                    <div class="dd-check-list" id="topic-dd-list"></div>
+                  </div>
+                </div>
               </th>
             </tr>
           </thead>
@@ -494,7 +498,7 @@ const __BUILD_VER = 'v20260530-79';
   }
 })();
 </script>
-<script src="/js/app.js?v=20260601-04" defer></script>
+<script src="/js/app.js?v=20260601-05" defer></script>
 <script>
   // Custom install prompt
   let __pwaPrompt = null;
