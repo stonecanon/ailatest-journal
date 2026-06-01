@@ -1,5 +1,6 @@
 # 原始期刊列表文件（不上传）
 list/
+list/**
 
 # OS files
 .DS_Store
