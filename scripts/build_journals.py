@@ -494,6 +494,7 @@ def parse_showjcr_xr(path, by_title, by_issn):
         col_cname   = find('中文刊名')
         col_cn      = find('CN')
         col_lang    = find('语种')
+        col_warn_flag = find('预警标记')
         col_issn    = 'ISSN' if 'ISSN' in fieldnames else find('ISSN')
         col_eissn   = 'EISSN' if 'EISSN' in fieldnames else find('EISSN')
         col_cat_cn  = None
@@ -515,6 +516,7 @@ def parse_showjcr_xr(path, by_title, by_issn):
         col_top1    = 'Top' if 'Top' in fieldnames else None
         col_zone2   = '大类2新锐分区' if '大类2新锐分区' in fieldnames else None
         col_top2    = '大类2Top' if '大类2Top' in fieldnames else None
+        under_review_counter = 0
         # 小类 1-6 (中文名 + 分区)
         sub_cols = []
         for n in range(1, 7):
@@ -531,6 +533,13 @@ def parse_showjcr_xr(path, by_title, by_issn):
             nt = norm_title(title)
             rec = (issn and by_issn.get(issn)) or (eissn and by_issn.get(eissn)) or by_title.get(nt)
             if rec is None: continue
+            # 预警标记 → under_review (only first match per journal, preserve original order)
+            if col_warn_flag and not rec.get('under_review'):
+                wf = (row.get(col_warn_flag) or '').strip()
+                if wf == 'Under Review':
+                    rec['under_review'] = True
+                    rec['under_review_order'] = under_review_counter
+                    under_review_counter += 1
             if col_cname:
                 cname = (row.get(col_cname) or '').strip()
                 if cname and cname != title:

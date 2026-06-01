@@ -215,7 +215,19 @@ def generate_indexes(journals, origin):
             def status_badge(j):
                 if slug == 'under-review': return '<span class="pill pill-under-review">新锐 Under Review</span>'
                 if slug == 'on-hold': return '<span class="pill pill-on-hold">WoS On Hold</span>'
-                if slug == 'warning': return '<span class="pill pill-warning">中科院预警</span>'
+                if slug == 'warning':
+                    # 提取年份
+                    w = j.get('warning')
+                    years = set()
+                    if isinstance(w, dict) and w.get('year'):
+                        years.add(str(w['year']))
+                    elif isinstance(w, list):
+                        for wi in w:
+                            if wi.get('year'): years.add(str(wi['year']))
+                    year_str = ', '.join(sorted(years, reverse=True)) if years else ''
+                    if year_str:
+                        return f'<span class="pill pill-warning">中科院预警 {year_str}</span>'
+                    return '<span class="pill pill-warning">中科院预警</span>'
                 return ''
             rows_html = '\n'.join(
                 build_table_row(j, origin, headers, extra_cells=[status_badge(j)]) for j in top
