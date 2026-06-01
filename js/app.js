@@ -94,6 +94,7 @@
       syncing: '同步中…', synced: '已同步',
       wos_subjects: 'WoS 细分学科',
       wos_search_ph: '筛选学科（A-Z）…',
+      cnkx_domain: '学科领域', cnkx_sub: '细分学科',
       filter_free_only: '只看免费发表', wos_clear_title: '清空选择',
     },
     en: {
@@ -167,6 +168,7 @@
       fav_added: 'Saved', fav_removed: 'Removed',
       syncing: 'Syncing…', synced: 'Synced',
       wos_subjects: 'WoS Subjects',
+      cnkx_domain: 'Domain', cnkx_sub: 'Sub-field',
       wos_search_ph: 'Filter subjects (A-Z)…',
       filter_free_only: 'FREE only', wos_clear_title: 'Clear selection',
     },
@@ -195,7 +197,7 @@
     pick_coming_title: '敬請期待', pick_coming_desc: '未來更新', results_all: '全部期刊', load_more: '載入更多',
     col_name: '期刊 Title', col_free: '免費', col_abbr: '縮寫 Abbr', col_badges: '索引 / 分區', search_int: '搜尋：期刊全稱 / 官方縮寫 / ISSN / 中文刊名', search_dom: '搜尋：中文刊名 / 英文刊名 / ISSN / CN 號', search_fav: '搜尋收藏：期刊 / 縮寫 / ISSN',
       search_home_ph: '搜尋期刊名、ISSN…',
-      home_subtitle: '面向科研人員的期刊檢索與投稿決策工具', showing: '顯示', of: '條 / 共', total_items: '條', empty: '未找到匹配的期刊', login: '登入', logout: '登出', fav_added: '已收藏', fav_removed: '已移除', syncing: '同步中…', synced: '已同步', wos_subjects: 'WoS 細分學科', wos_search_ph: '篩選學科（A-Z）…', wos_clear_title: '清空選擇', filter_free_only: '只看免費發表'
+      home_subtitle: '面向科研人員的期刊檢索與投稿決策工具', showing: '顯示', of: '條 / 共', total_items: '條', empty: '未找到匹配的期刊', login: '登入', logout: '登出', fav_added: '已收藏', fav_removed: '已移除', syncing: '同步中…', synced: '已同步', wos_subjects: 'WoS 細分學科', wos_search_ph: '篩選學科（A-Z）…', cnkx_domain: '學科領域', cnkx_sub: '細分學科', wos_clear_title: '清空選擇', filter_free_only: '只看免費發表'
   };
   Object.assign(I18N, {
     ja: {
@@ -208,7 +210,7 @@
       hero_title_int: 'SCI / SSCI 国際ジャーナル検索',
       hero_body_int: 'データソース：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI、2026-05-18更新）に <b>EI Compendex</b>（2025-10-10）を統合。<b>JCR 2025</b> 索引、<b>ESI</b> 22分野、<b>CAS 2025</b> 区分、<b>ShowJCR</b> JCR 2025リリース・2024指標（IF / 区分 / ランク）、Emerging、CCF 2026、警告リストを収録。合計 <b id="total">—</b> 誌。',
       hero_note: 'バッジ凡例：<b>SCIE/SSCI/AHCI/ESCI/EI</b> 索引収録 · <b>CAS</b> CAS 2025 大区分（1-4区、TOP表示） · <b>JCR Q</b> Quartile（Q1-Q4） · <b>Emerging</b> CAS 2026 新興版区分 · <b>CCF</b> CCF 2026 推薦（A/B/C） · <b>ABDC</b> 豪州経営ジャーナルランキング（A*/A/B/C） · <b>ABS</b> Chartered ABS Academic Journal Guide 2024（4*/4/3/2/1、経営・商学のみ） · <b>T1/T2/T3</b> 中国科协 2025 高品質ジャーナル区分 · <b>⚠ Warning</b> 国際ジャーナル警告リスト。',
-      hero_title_dom: '中国学術ジャーナル区分', hero_title_fav: 'お気に入り', hero_title_pick: '投稿先を選ぶ', hero_body_fav: '<b>★</b> でお気に入りに追加できます。', hero_body_pick: '近日公開。研究テーマ、IF範囲、査読期間、APC、索引条件から投稿候補を推薦します。', pick_coming_title: '近日公開', pick_coming_desc: '今後更新予定', results_all: 'すべてのジャーナル', load_more: 'さらに読み込む', col_name: 'ジャーナル Title', col_free: '無料', col_abbr: '略称 Abbr', col_badges: '索引 / 区分', search_int: '検索：タイトル / 略称 / ISSN / 中国語名', search_dom: '検索：中国語名 / 英語名 / ISSN / CN', search_fav: 'お気に入りを検索', showing: '表示', of: '/', total_items: '件', empty: '一致するジャーナルがありません', login: 'ログイン', logout: 'ログアウト', wos_subjects: 'WoS 分野', wos_search_ph: '分野を絞り込み（A-Z）…'
+      hero_title_dom: '中国学術ジャーナル区分', hero_title_fav: 'お気に入り', hero_title_pick: '投稿先を選ぶ', hero_body_fav: '<b>★</b> でお気に入りに追加できます。', hero_body_pick: '近日公開。研究テーマ、IF範囲、査読期間、APC、索引条件から投稿候補を推薦します。', pick_coming_title: '近日公開', pick_coming_desc: '今後更新予定', results_all: 'すべてのジャーナル', load_more: 'さらに読み込む', col_name: 'ジャーナル Title', col_free: '無料', col_abbr: '略称 Abbr', col_badges: '索引 / 区分', search_int: '検索：タイトル / 略称 / ISSN / 中国語名', search_dom: '検索：中国語名 / 英語名 / ISSN / CN', search_fav: 'お気に入りを検索', showing: '表示', of: '/', total_items: '件', empty: '一致するジャーナルがありません', login: 'ログイン', logout: 'ログアウト', wos_subjects: 'WoS 分野', wos_search_ph: '分野を絞り込み（A-Z）…', cnkx_domain: '学問分野', cnkx_sub: '細分分野'
     },
     ko: {
       ...I18N.en,
@@ -2451,11 +2453,14 @@
         renderInt();
       });
     }
-    // 表头学科复选面板：渲染 topicList 复选列表
+    // 表头学科复选面板：渲染 topicList 复选列表（支持中英文搜索）
     const topicPanel = $('#topic-dd-list');
     if (topicPanel) {
       const raw = ($('#topic-dd-search')?.value || '').trim().toLowerCase();
-      const filtered = !raw ? topicList : topicList.filter(t => t.name.toLowerCase().includes(raw));
+      const tokens = expandWosQuery(raw);
+      const filtered = !tokens.length
+        ? topicList
+        : topicList.filter(t => tokens.some(tok => t.name.toLowerCase().includes(tok)));
       topicPanel.innerHTML = filtered.map(t =>
         `<label class="th-chk" data-filter="topic" data-value="${escape(t.name)}">
            <input type="checkbox" ${activeTopics.has(t.name) ? 'checked' : ''}>
@@ -2816,9 +2821,9 @@
       all.forEach(r => { if (r.subdomain) subdomainSet.add(r.subdomain); });
       const subdomainList = [...subdomainSet];
 
-      // 筛选状态
-      if (!window.__cnkxDomain) window.__cnkxDomain = '__all';
-      if (!window.__cnkxSub) window.__cnkxSub = '__all';
+      // 筛选状态 — 改用 Sets（多选）
+      if (!window.__cnkxDomains) window.__cnkxDomains = new Set();
+      if (!window.__cnkxSubs) window.__cnkxSubs = new Set();
       if (!window.__cnkxShown) window.__cnkxShown = 100;
 
       // 筛选
@@ -2827,8 +2832,8 @@
           const hay = (r.name + ' ' + (r.issn||'') + ' ' + (r.domain||'') + ' ' + (r.subdomain||'')).toLowerCase();
           if (!hay.includes(q)) return false;
         }
-        if (window.__cnkxDomain !== '__all' && r.domain !== window.__cnkxDomain) return false;
-        if (window.__cnkxSub !== '__all' && r.subdomain !== window.__cnkxSub) return false;
+        if (window.__cnkxDomains.size && !window.__cnkxDomains.has(r.domain)) return false;
+        if (window.__cnkxSubs.size && !window.__cnkxSubs.has(r.subdomain)) return false;
         return true;
       });
 
@@ -2838,13 +2843,23 @@
       const visible = filtered.slice(0, window.__cnkxShown);
       const total = filtered.length;
 
-      // 下拉选项
-      const domainOpts = domainList.map(d =>
-        `<option value="${escape(d)}"${window.__cnkxDomain === d ? ' selected' : ''}>${escape(tn(d, 'domain'))}</option>`
-      ).join('');
-      const subOpts = subdomainList.map(s =>
-        `<option value="${escape(s)}"${window.__cnkxSub === s ? ' selected' : ''}>${escape(tn(s, 'sub'))}</option>`
-      ).join('');
+      // 复选面板辅助：渲染 checkbox panel 内容
+      function renderCnkxPanel(panelId, items, activeSet, searchId, i18nType) {
+        const panel = document.getElementById(panelId);
+        if (!panel) return;
+        const raw = (document.getElementById(searchId)?.value || '').trim().toLowerCase();
+        const tokens = expandWosQuery(raw);
+        const filtered = !tokens.length ? items : items.filter(it => {
+          const display = (tn(it, i18nType) || it).toLowerCase();
+          return tokens.some(tok => display.includes(tok) || it.toLowerCase().includes(tok));
+        });
+        panel.innerHTML = filtered.map(it =>
+          `<label class="th-chk" data-filter="cnkx" data-value="${escape(it)}">
+             <input type="checkbox" ${activeSet.has(it) ? 'checked' : ''}>
+             <span>${escape(tn(it, i18nType))}</span>
+           </label>`
+        ).join('');
+      }
 
       // 行渲染
       const rows = visible.map(r => {
@@ -2879,8 +2894,28 @@
           <th style="width:60px">${T('T级','Tier')}</th>
           <th>${T('期刊全称','Journal')}</th>
           <th>${T('交叉收录','Also In')}</th>
-          <th style="width:160px;padding:0 4px"><select id="cnkx-domain-select" class="th-select"><option value="__all">${T('学科领域','Domain')}</option>${domainOpts}</select></th>
-          <th style="width:160px;padding:0 4px"><select id="cnkx-sub-select" class="th-select"><option value="__all">${T('细分学科','Sub-field')}</option>${subOpts}</select></th>
+          <th style="width:160px;padding:0 4px">
+            <div class="th-dropdown">
+              <button class="th-dropdown-btn" onclick="event.stopPropagation();toggleCnkxDropdown('cnkx-domain-panel')">
+                <span data-i18n="cnkx_domain" class="dd-label">${T('学科领域','Domain')}</span><span class="dd-arrow">▼</span>
+              </button>
+              <div class="th-dropdown-panel th-dropdown-panel-search" id="cnkx-domain-panel" style="display:none">
+                <div class="dd-search-wrap"><input type="search" id="cnkx-domain-search" class="dd-search" placeholder="${T('搜索…','Search…')}" autocomplete="off" spellcheck="false"></div>
+                <div class="dd-check-list" id="cnkx-domain-list"></div>
+              </div>
+            </div>
+          </th>
+          <th style="width:160px;padding:0 4px">
+            <div class="th-dropdown">
+              <button class="th-dropdown-btn" onclick="event.stopPropagation();toggleCnkxDropdown('cnkx-sub-panel')">
+                <span data-i18n="cnkx_sub" class="dd-label">${T('细分学科','Sub-field')}</span><span class="dd-arrow">▼</span>
+              </button>
+              <div class="th-dropdown-panel th-dropdown-panel-search" id="cnkx-sub-panel" style="display:none">
+                <div class="dd-search-wrap"><input type="search" id="cnkx-sub-search" class="dd-search" placeholder="${T('搜索…','Search…')}" autocomplete="off" spellcheck="false"></div>
+                <div class="dd-check-list" id="cnkx-sub-list"></div>
+              </div>
+            </div>
+          </th>
           <th style="width:110px">ISSN</th>
         </tr></thead><tbody>
           ${rows}
@@ -2889,11 +2924,35 @@
         ${total > window.__cnkxShown ? `<div class="pager"><button id="cnkx-more" class="more-btn" style="margin-top:12px;padding:8px 20px;border:1px solid var(--rule);background:var(--paper);color:var(--ink-soft);border-radius:2px;cursor:pointer">${T('加载更多','Load more')} (${total - window.__cnkxShown} ${T('条剩余','remaining')})</button></div>` : ''}
       </div>`;
 
-      // 绑定筛选下拉
-      const domSel = document.getElementById('cnkx-domain-select');
-      if (domSel) domSel.addEventListener('change', () => { window.__cnkxDomain = domSel.value; window.__cnkxShown = 100; renderDomestic(); });
-      const subSel = document.getElementById('cnkx-sub-select');
-      if (subSel) subSel.addEventListener('change', () => { window.__cnkxSub = subSel.value; window.__cnkxShown = 100; renderDomestic(); });
+      // 渲染复选面板并绑定搜索
+      renderCnkxPanel('cnkx-domain-list', domainList, window.__cnkxDomains, 'cnkx-domain-search', 'domain');
+      renderCnkxPanel('cnkx-sub-list', subdomainList, window.__cnkxSubs, 'cnkx-sub-search', 'sub');
+      // 绑定搜索输入
+      ['cnkx-domain-search','cnkx-sub-search'].forEach(id => {
+        const inp = document.getElementById(id);
+        if (inp && !inp.__cnkxBound) {
+          inp.__cnkxBound = true;
+          inp.addEventListener('input', () => {
+            if (id === 'cnkx-domain-search') renderCnkxPanel('cnkx-domain-list', domainList, window.__cnkxDomains, 'cnkx-domain-search', 'domain');
+            else renderCnkxPanel('cnkx-sub-list', subdomainList, window.__cnkxSubs, 'cnkx-sub-search', 'sub');
+          });
+        }
+      });
+      // 绑定复选框
+      document.querySelectorAll('#cnkx-domain-panel label.th-chk, #cnkx-sub-panel label.th-chk').forEach(label => {
+        if (label.__cnkxBound) return;
+        label.__cnkxBound = true;
+        const cb = label.querySelector('input[type=checkbox]');
+        if (!cb) return;
+        cb.addEventListener('change', () => {
+          const val = label.dataset.value;
+          const isDomain = label.closest('#cnkx-domain-panel');
+          const set = isDomain ? window.__cnkxDomains : window.__cnkxSubs;
+          if (cb.checked) set.add(val); else set.delete(val);
+          window.__cnkxShown = 100;
+          renderDomestic();
+        });
+      });
       const moreBtn = document.getElementById('cnkx-more');
       if (moreBtn) moreBtn.addEventListener('click', () => { window.__cnkxShown += 100; renderDomestic(); });
       return;
@@ -6050,6 +6109,15 @@
   function refreshPickI18n() {
     // data-i18n and data-i18n-placeholder are handled by applyI18n()
   }
+
+  // CNKX 复选面板切换（动态生成，不经过 initThDropdowns）
+  window.toggleCnkxDropdown = function(panelId) {
+    const panel = document.getElementById(panelId);
+    if (!panel) return;
+    const wasOpen = panel.classList.contains('open');
+    document.querySelectorAll('.th-dropdown-panel.open').forEach(p => p.classList.remove('open'));
+    if (!wasOpen) panel.classList.add('open');
+  };
 
   boot();
 })();
