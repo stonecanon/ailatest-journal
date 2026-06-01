@@ -43,6 +43,8 @@ SUBJECTS = None  # will be loaded from wos_categories.json at runtime
 INDEXES = [
     ('scie', 'SCIE', 'SCIE (Science Citation Index Expanded) indexed journals with Impact Factors, Quartiles, CAS rankings and publisher information.', ['SCIE'], 'index'),
     ('ssci', 'SSCI', 'SSCI (Social Sciences Citation Index) indexed journals with Impact Factors, Quartiles, CAS rankings and publisher information.', ['SSCI'], 'index'),
+    ('ahci', 'AHCI', 'AHCI (Arts & Humanities Citation Index) indexed journals with Impact Factors, Quartiles, CAS rankings and publisher information.', ['AHCI'], 'index'),
+    ('esci', 'ESCI', 'ESCI (Emerging Sources Citation Index) indexed journals with Impact Factors, Quartiles, CAS rankings and publisher information.', ['ESCI'], 'index'),
     ('ei', 'EI', 'EI Compendex indexed journals with Impact Factors, Quartiles, CAS rankings and publisher information.', ['EI'], 'index'),
     ('scopus', 'Scopus', 'Scopus indexed journals with Impact Factors, Quartiles, CAS rankings and publisher information.', None, 'index'),
     ('medline', 'MEDLINE', 'MEDLINE indexed journals from the National Library of Medicine with Impact Factors, Quartiles, CAS rankings and publisher information.', None, 'index'),
