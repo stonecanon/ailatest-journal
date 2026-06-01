@@ -70,6 +70,7 @@
       col_name: '期刊 Title', col_free: '免费', col_abbr: '缩写 Abbr', col_badges: '索引 / 分区',
       col_if: 'IF', col_cycle: '审稿周期',
       filter_idx: '索引', filter_tier: '分区', filter_extra: '其他',
+      filter_topic: '学科',
       filter_free: '免费发表', filter_nsc: 'Nature/Science/Cell',
       jcr_label: 'JCR 分区', abdc_label: 'ABDC', abs_label: 'ABS',
       zone_top: 'TOP', xinrui_top: 'TOP',
@@ -142,9 +143,10 @@
       pick_quota: 'OpenAlex powered',
       pick_apikey_ph: 'API key optional',
       results_all: 'All journals', load_more: 'Load more',
-      col_name: 'Journal Title', col_free: 'FREE', col_abbr: 'Abbr', col_badges: 'Indices / Tier',
+      col_name: 'Journal Title', col_free: 'FREE TO PUBLISH', col_abbr: 'Abbr', col_badges: 'Indices / Tier',
       col_if: 'IF', col_cycle: 'Review Cycle',
       filter_idx: 'Index', filter_tier: 'Tier', filter_extra: 'More',
+      filter_topic: 'Topics',
       filter_free: 'FREE to Publish', filter_nsc: 'Nature/Science/Cell',
       jcr_label: 'JCR Quartile', abdc_label: 'ABDC', abs_label: 'ABS',
       zone_top: 'TOP', xinrui_top: 'TOP',
@@ -1813,7 +1815,7 @@
   }
   function badgeFree(f) {
     if (!f) return '';
-    return `<span class="badge b-free" title="${T('提供 OA 发表选项（含 Diamond/Gold/Hybrid）','Offers OA publishing option (Diamond/Gold/Hybrid)')}">${T('免费发表','FREE')}</span>`;
+    return `<span class="badge b-free" title="${T('提供 OA 发表选项（含 Diamond/Gold/Hybrid）','Offers OA publishing option (Diamond/Gold/Hybrid)')}">${T('免费发表','FREE TO PUBLISH')}</span>`;
   }
   // 期刊浏览量缓存（journal_key → count）
   const viewsCache = {};
@@ -2132,7 +2134,7 @@
   /* ───────── FREE badge helper ───────── */
   function freeBadgeCell(r) {
     return r.free
-      ? `<span class="badge b-free" title="${T('提供 OA 发表选项（含 Diamond/Gold/Hybrid）','Offers OA publishing option (Diamond/Gold/Hybrid)')}">${T('免费发表','FREE')}</span>`
+      ? `<span class="badge b-free" title="${T('提供 OA 发表选项（含 Diamond/Gold/Hybrid）','Offers OA publishing option (Diamond/Gold/Hybrid)')}">${T('免费发表','FREE TO PUBLISH')}</span>`
       : '<span class="muted-cell">&mdash;</span>';
   }
 
@@ -2471,45 +2473,45 @@
     }
     // 同步题头复选框状态与 Sets 一致
     syncThChkState();
-    // 题头下拉复选框筛选：复选框直接操作 Sets
+    // 题头下拉复选框筛选：事件委托（支持动态渲染的 checkbox）
     ['idx-panel','tier-panel','extra-panel','topic-panel'].forEach(panelId => {
       const pnl = $(`#${panelId}`);
       if (!pnl || pnl.__bound) return;
       pnl.__bound = true;
-      pnl.querySelectorAll('label.th-chk').forEach(label => {
-        const cb = label.querySelector('input[type=checkbox]');
-        if (!cb) return;
-        cb.addEventListener('change', () => {
-          const filter = label.dataset.filter;
-          const val = label.dataset.value;
-          if (filter === 'index') {
-            if (cb.checked) activeIndices.add(val);
-            else activeIndices.delete(val);
-          } else if (filter === 'feat') {
-            if (cb.checked) activeFeats.add(val);
-            else activeFeats.delete(val);
-          } else if (filter === 'jcr') {
-            if (cb.checked) activeJcr.add(val);
-            else activeJcr.delete(val);
-          } else if (filter === 'zone') {
-            if (cb.checked) activeZones.add(val);
-            else activeZones.delete(val);
-          } else if (filter === 'xr') {
-            if (cb.checked) activeXr.add(val);
-            else activeXr.delete(val);
-          } else if (filter === 'abdc') {
-            if (cb.checked) activeAbdc.add(val);
-            else activeAbdc.delete(val);
-          } else if (filter === 'abs') {
-            if (cb.checked) activeAbs.add(val);
-            else activeAbs.delete(val);
-          } else if (filter === 'topic') {
-            if (cb.checked) activeTopics.add(val);
-            else activeTopics.delete(val);
-          }
-          shown = PAGE;
-          renderInt();
-        });
+      pnl.addEventListener('change', (e) => {
+        const cb = e.target;
+        if (cb.tagName !== 'INPUT' || cb.type !== 'checkbox') return;
+        const label = cb.closest('label.th-chk');
+        if (!label) return;
+        const filter = label.dataset.filter;
+        const val = label.dataset.value;
+        if (filter === 'index') {
+          if (cb.checked) activeIndices.add(val);
+          else activeIndices.delete(val);
+        } else if (filter === 'feat') {
+          if (cb.checked) activeFeats.add(val);
+          else activeFeats.delete(val);
+        } else if (filter === 'jcr') {
+          if (cb.checked) activeJcr.add(val);
+          else activeJcr.delete(val);
+        } else if (filter === 'zone') {
+          if (cb.checked) activeZones.add(val);
+          else activeZones.delete(val);
+        } else if (filter === 'xr') {
+          if (cb.checked) activeXr.add(val);
+          else activeXr.delete(val);
+        } else if (filter === 'abdc') {
+          if (cb.checked) activeAbdc.add(val);
+          else activeAbdc.delete(val);
+        } else if (filter === 'abs') {
+          if (cb.checked) activeAbs.add(val);
+          else activeAbs.delete(val);
+        } else if (filter === 'topic') {
+          if (cb.checked) activeTopics.add(val);
+          else activeTopics.delete(val);
+        }
+        shown = PAGE;
+        renderInt();
       });
     });
   }
@@ -3782,7 +3784,7 @@
       const apcText = (ir.doaj?.apc === 'Yes' && doajFee) ? doajFee : (ir.doaj?.apc === 'Yes' ? T('有 APC','Has APC') : '');
       const doajBadge = doaj ? `<span class="oa-chip oa-doaj">&check; ${T('收录 DOAJ','In DOAJ')}</span>` : '';
       const isoaBadge = isoa ? '<span class="oa-chip oa-isoa">Open Access</span>' : '';
-      const freeBadge = r.free ? `<span class="oa-chip oa-free" title="${T('提供 OA 发表选项（含 Diamond/Gold/Hybrid）','Offers OA publishing option (Diamond/Gold/Hybrid)')}">${T('✓ 免费发表','✓ FREE')}</span>` : '';
+      const freeBadge = r.free ? `<span class="oa-chip oa-free" title="${T('提供 OA 发表选项（含 Diamond/Gold/Hybrid）','Offers OA publishing option (Diamond/Gold/Hybrid)')}">${T('✓ 免费发表','✓ FREE TO PUBLISH')}</span>` : '';
       const rows = [];
       if (homepage) rows.push([T('官网','Website'), `<a href="${escape(homepage)}" target="_blank" rel="noopener nofollow">${escape(homepage.replace(/^https?:\/\//,'').replace(/\/$/,''))}</a>`]);
       if (apcText) rows.push([T('版面费 (APC)','APC'), escape(apcText)]);
