@@ -1,0 +1,21 @@
+<view class="container">
+  <!-- 加载/错误提示 -->
+  <view class="loading-mask" wx:if="{{!loaded && !error}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <view class="error-mask" wx:if="{{error}}">
+    <text class="error-icon">⚠️</text>
+    <text class="error-text">{{errorMsg}}</text>
+    <button class="retry-btn" bindtap="retry">重试</button>
+  </view>
+
+  <!-- WebView 主体 -->
+  <web-view
+    wx:if="{{!error}}"
+    src="{{webviewUrl}}"
+    bindload="onLoadSuccess"
+    binderror="onLoadError"
+  ></web-view>
+</view>

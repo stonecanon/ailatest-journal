@@ -1,0 +1,7 @@
+{
+  "usingComponents": {},
+  "navigationBarTitleText": "Journal",
+  "enablePullDownRefresh": false,
+  "disableScroll": true,
+  "navigationStyle": "default"
+}

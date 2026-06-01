@@ -1,0 +1,13 @@
+{
+  "pages": [
+    "pages/index/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "Journal Search",
+    "navigationBarBackgroundColor": "#FAFBFD",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#FAFBFD"
+  },
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

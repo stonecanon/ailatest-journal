@@ -1,0 +1,6 @@
+/* 全局样式 - 留空，web-view 内的样式由网页控制 */
+page {
+  height: 100%;
+  overflow: hidden;
+  background: #FAFBFD;
+}

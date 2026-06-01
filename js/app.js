@@ -6069,19 +6069,9 @@
         }
         if (dirty) localStorage.setItem(STORAGE_PREFIX + 'favsData', JSON.stringify(favsData));
       })();
-      // 计算合并的 topicList（WoS 学科 + OpenAlex subfield）
+      // 计算 topicList（仅 WoS 学科，不合并 OpenAlex subfield）
       const _wc = Object.create(null);
       for (const r of journals) for (const c of (r.wos_categories||[])) _wc[c] = (_wc[c]||0)+1;
-      // Add OA subfield counts for topics not in WoS
-      const issnSet = new Set(journals.map(j => (j.issn || j.eissn || '').toUpperCase()).filter(Boolean));
-      for (const issn of issnSet) {
-        const rec = oaMap[issn];
-        if (rec && Array.isArray(rec.sf)) {
-          for (const s of rec.sf) {
-            if (s && !(s in _wc)) _wc[s] = (_wc[s]||0) + 1;
-          }
-        }
-      }
       topicList = Object.entries(_wc).map(([name,count])=>({name,count})).sort((a,b)=>a.name.localeCompare(b.name,'en'));
       if (meta?.total && $('#total')) $('#total').textContent = meta.total.toLocaleString();
       $('#hint').textContent = lang === 'zh'
