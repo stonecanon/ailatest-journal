@@ -199,7 +199,14 @@ def generate_subjects(journals, origin):
 def generate_indexes(journals, origin):
     for slug, title, desc, index_keys, table_type in INDEXES:
         matched = [j for j in journals if match_index(j, slug, index_keys or [])]
-        matched.sort(key=lambda x: -(x.get('if_2024') or -1))
+        if table_type == 'status':
+            # 状态列表：保持原始数据源顺序，不按 IF 排序
+            order_key = (lambda x: x.get('warning_order', 999999)) if slug == 'warning' \
+                else (lambda x: x.get('on_hold_order', 999999)) if slug == 'on-hold' \
+                else (lambda x: x.get('under_review_order', 999999))
+            matched.sort(key=order_key)
+        else:
+            matched.sort(key=lambda x: -(x.get('if_2024') or -1))
         top = matched[:200]
         if table_type == 'status':
             # 状态列表：加 Status 徽章列
@@ -222,7 +229,7 @@ def generate_indexes(journals, origin):
         seo_desc = desc
         canonical = f'{origin}/indexes/{slug}/'
         if table_type == 'status':
-            count = f'共 {len(top)} 本{title}标记的期刊（按 IF 降序）'
+            count = f'共 {len(top)} 本{title}标记的期刊（按原列表排序）'
             jsonld_name = f'{title}'
         else:
             count = f'Showing {len(top)} {title} indexed journals sorted by Impact Factor (descending).'

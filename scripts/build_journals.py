@@ -334,6 +334,7 @@ def parse_warning_xlsx(path, by_title, by_issn):
         print(f'  WARNING: column mismatch in "全部名单": {e}')
         return 0
     hits = 0
+    warning_order = 0
     for row in rows[1:]:
         if not row or not row[idx_jrnl]:
             continue
@@ -351,6 +352,8 @@ def parse_warning_xlsx(path, by_title, by_issn):
             rec = by_issn.get(issn)
         if rec is None:
             continue
+        warning_order += 1
+        rec['warning_order'] = warning_order
         wobj = {'year': year, 'level': level, 'reason': reason, 'subject': subject}
         existing = rec.get('warning')
         if isinstance(existing, list):
