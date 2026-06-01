@@ -51,6 +51,7 @@ INDEXES = [
     ('under-review', '新锐 Under Review', '新锐版(Under Review)期刊 — 正在被 Web of Science 评审的期刊，含影响因子、分区、CAS 等级和索引信息。', None, 'status'),
     ('on-hold', 'WoS On Hold', 'Web of Science On Hold 期刊 — 因质量问题被 Clarivate 暂停收录评估的期刊，含影响因子、分区、CAS 等级和索引信息。', None, 'status'),
     ('warning', '中科院预警', '中科院文献情报中心国际期刊预警名单 — 含影响因子、分区、CAS 等级和索引信息。', None, 'status'),
+    ('citic-warning', '中信所预警', '中信所(中国科学技术信息研究所)国际期刊预警名单(2025) — 含影响因子、分区、CAS 等级和索引信息。', None, 'status'),
 ]
 
 def esc(s):
@@ -107,6 +108,7 @@ a:hover{text-decoration:underline}
 .pill-under-review{background:#c2410c;color:#fff}
 .pill-on-hold{background:#b91c1c;color:#fff}
 .pill-warning{background:#92400e;color:#fff}
+.pill-citic-warning{background:#7c3aed;color:#fff}
 </style></head><body>
 <div class="header">
 <div class="header-inner">
@@ -139,6 +141,7 @@ def match_index(j, slug, index_keys):
     if slug == 'under-review': return bool(j.get('under_review'))
     if slug == 'on-hold': return bool(j.get('on_hold'))
     if slug == 'warning': return bool(j.get('warning'))
+    if slug == 'citic-warning': return bool(j.get('citic_warning'))
     return any(k in indices for k in index_keys)
 
 def match_subject(j, wos_name):
@@ -208,6 +211,7 @@ def generate_indexes(journals, origin):
             # 状态列表：保持原始数据源顺序，不按 IF 排序
             order_key = (lambda x: x.get('warning_order', 999999)) if slug == 'warning' \
                 else (lambda x: x.get('on_hold_order', 999999)) if slug == 'on-hold' \
+                else (lambda x: x.get('citic_warning_order', 999999)) if slug == 'citic-warning' \
                 else (lambda x: x.get('under_review_order', 999999))
             matched.sort(key=order_key)
         else:
@@ -233,6 +237,8 @@ def generate_indexes(journals, origin):
                     if year_str:
                         return f'<span class="pill pill-warning">中科院预警 {year_str}</span>'
                     return '<span class="pill pill-warning">中科院预警</span>'
+                if slug == 'citic-warning':
+                    return '<span class="pill pill-citic-warning">中信所预警 2025</span>'
                 return ''
             rows_html = '\n'.join(
                 build_table_row(j, origin, headers, extra_cells=[status_badge(j)], seq=i+1) for i, j in enumerate(top)

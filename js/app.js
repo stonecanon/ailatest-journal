@@ -1974,6 +1974,9 @@
       function badgeOnHold() {
         return `<span class="on-hold-pill">WoS On Hold</span>`;
       }
+      function badgeCiticWarning() {
+        return `<span class="citic-warning-pill">中信所预警</span>`;
+      }
 
   // 统一标签组合：主页 / 收藏页 / 抽屉 / 分享卡片共用同一批 badge 函数与 CSS 类。
   function renderIndexBadges(r) {
@@ -2000,6 +2003,7 @@
       r.warning ? badgeWarn(r.warning, true) : '',
       r.under_review ? badgeUnderReview() : '',
       r.on_hold ? badgeOnHold() : '',
+      r.citic_warning ? badgeCiticWarning() : '',
     ].filter(Boolean).join('');
   }
   function renderBadgeCell(indexBadges, rankBadges) {
@@ -2157,6 +2161,7 @@
             (activeFeats.has('medline') && r.medline) ||
             (activeFeats.has('free') && r.free) ||
             (activeFeats.has('warning') && r.warning) ||
+            (activeFeats.has('citic_warning') && r.citic_warning) ||
             (activeFeats.has('under_review') && r.under_review) ||
             (activeFeats.has('on_hold') && r.on_hold))) return false;
     }
@@ -2199,6 +2204,7 @@
     if (activeFeats.has('medline') && !r.medline) return false;
     if (activeFeats.has('free') && !r.free) return false;
     if (activeFeats.has('warning') && !r.warning) return false;
+    if (activeFeats.has('citic_warning') && !r.citic_warning) return false;
     if (activeFeats.has('under_review') && !r.under_review) return false;
     if (activeFeats.has('on_hold') && !r.on_hold) return false;
     if (activeFeats.has('abdc') && !(r.abdc && r.abdc.rating)) return false;
@@ -6055,7 +6061,7 @@
                 cas_zone: live.cas_zone, cas_top: live.cas_top, indices: live.indices,
                 flagship: live.flagship, esi_category: live.esi_category,
                 if_quartile: live.if_quartile, publisher: live.publisher, ccf: live.ccf,
-                scopus: live.scopus, warning: live.warning, under_review: live.under_review, on_hold: live.on_hold,
+                scopus: live.scopus, warning: live.warning, under_review: live.under_review, on_hold: live.on_hold, citic_warning: live.citic_warning,
               };
               dirty = true;
             }

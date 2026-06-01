@@ -1280,6 +1280,24 @@ def main():
     total_ur = sum(1 for r in journals if r.get('under_review'))
     print(f'  On Hold: {on_hold_hits}  Under Review (ISSN): {under_review_hits} (total UR: {total_ur})')
 
+    # ────── 中信所国际期刊预警名单 2025 (CITIC warning) ──────
+    print('== 中信所国际期刊预警名单 2025 ==')
+    citic_issns = load_issn_set_from_data('citic_warning_issn.json')
+    citic_lookup = {issn: i for i, issn in enumerate(citic_issns)}
+    citic_hits = 0
+    for r in journals:
+        for k in ('issn', 'eissn'):
+            v = r.get(k, '')
+            if not v: continue
+            bare = v.replace('-', '').lower()
+            cw_idx = citic_lookup.get(bare)
+            if cw_idx is not None:
+                r['citic_warning'] = True
+                r['citic_warning_order'] = cw_idx
+                citic_hits += 1
+                break
+    print(f'  中信所预警: {citic_hits} journals matched')
+
     # ────── Generate SEO slugs ──────
     import re
     slug_counts = {}
