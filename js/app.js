@@ -3320,6 +3320,7 @@
   let drawerOpen = false;
   let _currentDrawerRec = null;
   let _drawerStack = []; // for back-navigation through related journals
+  let _drawerSourceTab = 'int'; // tab active when drawer opened in pageMode
   // 跨源按 favId 检索任意期刊记录（用于 #j/<id> 深链）
   function findRecByFid(id) {
     if (!id) return null;
@@ -3393,6 +3394,8 @@
     _currentDrawerRec = r;
     const pageMode = !!(opts && opts.pageMode);
     document.body.classList.toggle('journal-route', pageMode);
+    // 记录抽屉打开时的 tab，关闭时回到原 tab
+    if (pageMode) _drawerSourceTab = activeTab;
     const drawer = $('#j-drawer'), scrim = $('#drawer-scrim'), body = $('#drawer-body');
     if (!drawer || !body) return;
     // 懒加载 OpenAlex 数据（首次打开抽屉时加载）
@@ -5342,9 +5345,11 @@
     });
     $('#drawer-close')?.addEventListener('click', () => {
       if (document.body.classList.contains('journal-route')) {
-        try { history.pushState({ tab: 'int' }, '', '/international'); } catch (_) {}
+        const backTab = _drawerSourceTab || 'int';
+        const backPath = TAB_PATHS[backTab] || '/international';
+        try { history.pushState({ tab: backTab }, '', backPath); } catch (_) {}
         closeDrawer(true);
-        activateTab('int', { skipPath: true });
+        activateTab(backTab, { skipPath: true });
         return;
       }
       closeDrawer();
