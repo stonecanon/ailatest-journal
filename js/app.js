@@ -6027,7 +6027,7 @@
       setJournalAliases(aliases);
       journals = j; domestic = d; meta = m; esiCats = esi; oaMap = oa;
       // Build Under Review lookup set
-      const underReviewSet = new Set((underReviewIssns||[]).map(s => s.replace(/[^0-9xX]/gi,'').toLowerCase()));
+      const underReviewSet = new Set((underReviewIssns||[]).filter(Boolean).map(s => s.replace(/[^0-9xX]/gi,'').toLowerCase()));
       journals.forEach(r => {
         const issnClean = (r.issn||'').replace(/[^0-9xX]/gi,'').toLowerCase();
         const eissnClean = (r.eissn||'').replace(/[^0-9xX]/gi,'').toLowerCase();
@@ -6036,7 +6036,7 @@
         }
       });
       // Build On Hold lookup set
-      const onHoldSet = new Set((onHoldIssns||[]).map(s => s.replace(/[^0-9xX]/gi,'').toLowerCase()));
+      const onHoldSet = new Set((onHoldIssns||[]).filter(Boolean).map(s => s.replace(/[^0-9xX]/gi,'').toLowerCase()));
       journals.forEach(r => {
         const issnClean = (r.issn||'').replace(/[^0-9xX]/gi,'').toLowerCase();
         const eissnClean = (r.eissn||'').replace(/[^0-9xX]/gi,'').toLowerCase();
