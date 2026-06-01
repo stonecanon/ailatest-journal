@@ -983,7 +983,7 @@ td.col-topic { white-space: normal; word-break: break-word; }
   letter-spacing: 0;
 }
 .col-if .if-cell { font-size: 13px; font-weight: 680; color: var(--ink-soft); }
-th.col-if { text-align: right; padding-right: 8px; }
+th.col-if { text-align: right; padding-right: 8px; width: 40px; }
 .col-cycle {
   width: 72px;
   text-align: center;
@@ -1176,8 +1176,8 @@ table.journals tr:last-child td { border-bottom: 0; }
 /* 徽章 */
 .badges { display: flex; flex-wrap: wrap; gap: 4px; }
 /* 国际行：索引栏 + 分区栏 两行分隔 */
-.col-badge { width: 160px; min-width: 160px; }
-.col-badge-split { min-width: 160px; width: 160px; }
+.col-badge { width: 200px; min-width: 200px; }
+.col-badge-split { min-width: 200px; width: 200px; }
 .col-badge-split .badges { margin: 0; }
 .col-badge-split .badges-idx  { gap: 3px; }
 .col-badge-split .badges-rank {
@@ -2113,15 +2113,15 @@ td.empty,
   padding-left: 6px;
 }
 .col-wos {
-  width: 70px;
-  max-width: 70px;
+  width: 110px;
+  max-width: 110px;
 }
 @media (max-width: 768px) {
   .th-dropdown-panel-search { width: 280px; }
-  .col-wos { width: 60px; max-width: 60px; }
+  .col-wos { width: 80px; max-width: 80px; }
 }
-  .col-badge { width: 130px; min-width: 130px; }
-  .col-badge-split { min-width: 130px; width: 130px; }
+  .col-badge { width: 200px; min-width: 200px; }
+  .col-badge-split { min-width: 200px; width: 200px; }
   .col-fav { width: 40px; }
   .col-free { width: 58px; }
   .col-if { width: 44px; max-width: 44px; padding-right: 4px; }
@@ -2256,8 +2256,8 @@ body.journal-route .j-drawer.journal-page {
 
 /* very small screens: scroll horizontally to see all columns */
 @media (max-width: 480px) {
-  .col-badge { width: 100px; min-width: 100px; }
-  .col-badge-split { width: 100px; min-width: 100px; }
+  .col-badge { width: 150px; min-width: 150px; }
+  .col-badge-split { width: 150px; min-width: 150px; }
 }
 
 body.journal-route .drawer-head {
