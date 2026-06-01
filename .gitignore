@@ -1,29 +1,6 @@
-# Generated SEO pages (run generate_seo_pages.py locally if needed)
-/journal/
+# 原始期刊列表文件（不上传）
+list/
 
-# Temp / generated files
-/generated/
-/scripts/__pycache__/
-/worker/.wrangler/
-/.wrangler/
-/.DS_Store
-/list/.DS_Store
-*.pyc
-__pycache__/
-
-# Large data caches (not committed)
-data/openalex_cache.json
-data/journals.json
-data/oa.json
-data/*.bak
-
-# IDE / system
-CODEX_REVIEW.md
-.dashboard-server*
-.dashboard-watchdog*
-
-# Dashboard data is now served by the owner-gated Worker endpoint, not static files.
-# These local artifacts must NOT be deployed to Pages (they contain user data).
-dashboard/data.json
-dashboard/journal-views.json
-dashboard/source-cache.json
+# OS files
+.DS_Store
+Thumbs.db
