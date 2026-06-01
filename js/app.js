@@ -2418,8 +2418,28 @@
         if (!panel) return;
         const wasOpen = panel.classList.contains('open');
         // 关闭所有其他面板
-        document.querySelectorAll('.th-dropdown-panel.open').forEach(p => p.classList.remove('open'));
-        if (!wasOpen) panel.classList.add('open');
+        document.querySelectorAll('.th-dropdown-panel.open').forEach(p => {
+          p.classList.remove('open');
+          if (p.classList.contains('th-dropdown-panel-search')) {
+            p.style.position = '';
+            p.style.left = '';
+            p.style.top = '';
+            p.style.width = '';
+          }
+        });
+        if (!wasOpen) {
+          panel.classList.add('open');
+          // 对搜索型下拉面板使用 fixed 定位，避免被 table-wrap overflow 裁剪
+          if (panel.classList.contains('th-dropdown-panel-search')) {
+            const rect = btn.getBoundingClientRect();
+            const pw = Math.min(340, window.innerWidth - 16);
+            panel.style.position = 'fixed';
+            panel.style.left = Math.min(rect.left, window.innerWidth - pw - 8) + 'px';
+            panel.style.top = (rect.bottom + 4) + 'px';
+            panel.style.width = pw + 'px';
+            panel.style.maxHeight = Math.min(420, window.innerHeight - rect.bottom - 16) + 'px';
+          }
+        }
       });
     });
     // 点击外部关闭所有面板
