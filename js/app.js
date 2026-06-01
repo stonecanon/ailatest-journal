@@ -2899,7 +2899,7 @@
               <button class="th-dropdown-btn" onclick="event.stopPropagation();toggleCnkxDropdown('cnkx-domain-panel')">
                 <span data-i18n="cnkx_domain" class="dd-label">${T('学科领域','Domain')}</span><span class="dd-arrow">▼</span>
               </button>
-              <div class="th-dropdown-panel th-dropdown-panel-search" id="cnkx-domain-panel" style="display:none">
+              <div class="th-dropdown-panel th-dropdown-panel-search" id="cnkx-domain-panel">
                 <div class="dd-search-wrap"><input type="search" id="cnkx-domain-search" class="dd-search" placeholder="${T('搜索…','Search…')}" autocomplete="off" spellcheck="false"></div>
                 <div class="dd-check-list" id="cnkx-domain-list"></div>
               </div>
@@ -2910,7 +2910,7 @@
               <button class="th-dropdown-btn" onclick="event.stopPropagation();toggleCnkxDropdown('cnkx-sub-panel')">
                 <span data-i18n="cnkx_sub" class="dd-label">${T('细分学科','Sub-field')}</span><span class="dd-arrow">▼</span>
               </button>
-              <div class="th-dropdown-panel th-dropdown-panel-search" id="cnkx-sub-panel" style="display:none">
+              <div class="th-dropdown-panel th-dropdown-panel-search" id="cnkx-sub-panel">
                 <div class="dd-search-wrap"><input type="search" id="cnkx-sub-search" class="dd-search" placeholder="${T('搜索…','Search…')}" autocomplete="off" spellcheck="false"></div>
                 <div class="dd-check-list" id="cnkx-sub-list"></div>
               </div>
