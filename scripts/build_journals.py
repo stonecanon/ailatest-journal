@@ -1244,6 +1244,42 @@ def main():
                 break
     print(f'  MEDLINE: {medline_c}  PubMed (broader): {pubmed_c}  PMC: {pmc_c}')
 
+    # ────── On Hold / Under Review (ISSN set match) ──────
+    print('== On Hold & Under Review (ISSN set) ==')
+    def load_issn_set_from_data(fname):
+        p = DATA_DIR / fname
+        if p.exists():
+            with open(p) as f:
+                import json as _j
+                raw = _j.load(f)
+                return [s.replace('-', '').lower() for s in raw if s]
+        return []
+    on_hold_issns = load_issn_set_from_data('on_hold_issn.json')
+    under_review_issns = load_issn_set_from_data('under_review_issn.json')
+    on_hold_hits = 0
+    under_review_hits = 0
+    on_hold_order = 0
+    under_review_order = 0
+    on_hold_lookup = {issn: i for i, issn in enumerate(on_hold_issns)}
+    under_review_lookup = {issn: i for i, issn in enumerate(under_review_issns)}
+    for r in journals:
+        for k in ('issn', 'eissn'):
+            v = r.get(k, '')
+            if not v: continue
+            bare = v.replace('-', '').lower()
+            oh_idx = on_hold_lookup.get(bare)
+            if oh_idx is not None and not r.get('on_hold'):
+                r['on_hold'] = True
+                r['on_hold_order'] = oh_idx
+                on_hold_hits += 1
+            ur_idx = under_review_lookup.get(bare)
+            if ur_idx is not None and not r.get('under_review'):
+                r['under_review'] = True
+                r['under_review_order'] = ur_idx
+                under_review_hits += 1
+    total_ur = sum(1 for r in journals if r.get('under_review'))
+    print(f'  On Hold: {on_hold_hits}  Under Review (ISSN): {under_review_hits} (total UR: {total_ur})')
+
     # ────── Generate SEO slugs ──────
     import re
     slug_counts = {}
