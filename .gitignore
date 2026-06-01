@@ -1,7 +1,25 @@
 # 原始期刊列表文件（不上传）
+# 原始期刊列表文件（不上传）
 list/
-list/**
 
-# OS files
+# 生成/缓存文件
+generated/
+dashboard/
+scripts/__pycache__/
+__pycache__/
+*.pyc
+
+# 数据备份
+data/*.bak
+data/journals.json
+data/oa.json
+data/openalex_cache.json
+
+# 本地工具文件
+.wrangler/
 .DS_Store
 Thumbs.db
+
+# 日志
+*.log
+*.plist

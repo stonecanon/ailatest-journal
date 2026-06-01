@@ -1,8 +1,0 @@
-HTTP/1.1 200 Connection established
-
-HTTP/1.0 503 Service Unavailable
-Cache-Control: no-cache
-Connection: close
-Content-Length: 1594
-Content-Type: text/html
-
