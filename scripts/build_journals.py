@@ -75,6 +75,9 @@ ABS_CANDIDATES = [
     LIST_DIR / 'AJG_2024.xlsx',
     LIST_DIR / 'AJG2024.csv',
 ]
+FT50_JSON    = DATA_DIR / 'ft50.json'
+UTD24_JSON   = DATA_DIR / 'utd24.json'
+NSFC_MGMT_JSON = DATA_DIR / 'nsfc_management.json'
 SCOPUS_FILE  = LIST_DIR / 'scopus_source_list.xlsx'
 EI_FILE      = LIST_DIR / 'CPXSourceList_102025.xlsx'
 OAJ_FILE     = LIST_DIR / 'oaj_journals.json'
@@ -790,6 +793,70 @@ def parse_abs(path, by_title, by_issn, store=None):
     return hits + standalone
 
 
+# ───────────────────────── FT50 / UTD24 management lists ─────────────────────────
+
+def title_lookup(by_title, title):
+    for key in management_title_keys(title):
+        rec = by_title.get(key)
+        if rec is not None:
+            return rec
+    return None
+
+
+def management_title_keys(title):
+    variants = []
+    raw = title or ''
+    variants.append(raw)
+    variants.append(re.sub(r'^\s*THE\s+', '', raw, flags=re.I))
+    variants.append(raw.replace('&', ' and '))
+    variants.append(raw.replace('&', ' '))
+    variants.append(re.sub(r'\band\b', ' ', raw, flags=re.I))
+    keys = []
+    for v in variants:
+        k = norm_title(v)
+        if k and k not in keys:
+            keys.append(k)
+    return keys
+
+
+def parse_management_json(path, by_title, store=None, field='', label=''):
+    if not path.exists() or not field:
+        return 0, 0
+    data = json.loads(path.read_text(encoding='utf-8'))
+    records = data.get('records') or []
+    matched = standalone = 0
+    for row in records:
+        title = (row.get('name') or '').strip()
+        if not title:
+            continue
+        payload = {
+            'order': row.get('order'),
+            'subject': row.get('subject') or '',
+            'source': row.get('source') or label,
+            'source_url': row.get('source_url') or '',
+        }
+        rec = title_lookup(by_title, title)
+        if rec is not None:
+            rec[field] = payload
+            matched += 1
+        elif store is not None:
+            key = f'{field}:' + norm_title(title)
+            rec = store.get(key)
+            if rec is None:
+                rec = {
+                    'name': title, 'issn': '', 'eissn': '',
+                    'wos_categories': [], 'esi_category': '',
+                    'abbr20': '', 'country': '', 'indices': [],
+                    f'{field}_only': True,
+                }
+                store[key] = rec
+                for title_key in management_title_keys(title):
+                    by_title.setdefault(title_key, rec)
+                standalone += 1
+            rec[field] = payload
+    return matched, standalone
+
+
 # ───────────────────────── Scopus Source List ─────────────────────────
 
 def parse_scopus(path, by_title, by_issn, store=None):
@@ -1179,6 +1246,13 @@ def main():
     else:
         print('  ABS skipped: file not found')
 
+    print('== FT50 / UTD24 Management Lists ==')
+    h, s = parse_management_json(FT50_JSON, by_title, store=store, field='ft50', label='Financial Times Top 50 Journals')
+    print(f'  FT50 matched: {h}  standalone: +{s}')
+    h, s = parse_management_json(UTD24_JSON, by_title, store=store, field='utd24', label='UT Dallas Top 24 Business Journals')
+    print(f'  UTD24 matched: {h}  standalone: +{s}')
+    by_issn, by_title = rebuild_lookups()
+
     print('== 中国科协 merge ==')
     h = merge_cnkx_to_main(by_issn, by_title)
     print(f'  CNKX merged: {h}')
@@ -1331,7 +1405,7 @@ def main():
     for r in journals:
         for i in r['indices']: idx_c[i] += 1
     cas_c = Counter(); cas_top = 0
-    if_count = 0; warning_count = 0; cn_name_count = 0; ccf_count = 0; abdc_count = 0; abs_count = 0; cnkx_count = 0; scopus_count = 0; ei_count = 0; oaj_count = 0; doaj_count = 0; medline_count = 0; pubmed_count = 0; pmc_count = 0
+    if_count = 0; warning_count = 0; cn_name_count = 0; ccf_count = 0; abdc_count = 0; abs_count = 0; ft50_count = 0; utd24_count = 0; cnkx_count = 0; scopus_count = 0; ei_count = 0; oaj_count = 0; doaj_count = 0; medline_count = 0; pubmed_count = 0; pmc_count = 0
     for r in journals:
         z = r.get('cas_zone')
         if z: cas_c[z] += 1
@@ -1342,6 +1416,8 @@ def main():
         if r.get('ccf'): ccf_count += 1
         if r.get('abdc'): abdc_count += 1
         if r.get('abs'): abs_count += 1
+        if r.get('ft50'): ft50_count += 1
+        if r.get('utd24'): utd24_count += 1
         if r.get('cnkx'): cnkx_count += 1
         if r.get('scopus') and r.get('scopus', {}).get('active') is not False: scopus_count += 1
         if 'EI' in r.get('indices', []): ei_count += 1
@@ -1355,7 +1431,7 @@ def main():
     print(f'  total: {len(journals)}')
     print(f'  indices: {dict(idx_c)}')
     print(f'  CAS zones: {dict(cas_c)} Top={cas_top}')
-    print(f'  IF: {if_count}  warning: {warning_count}  中文刊名: {cn_name_count}  CCF: {ccf_count}  ABDC: {abdc_count}  ABS: {abs_count}  CNKX: {cnkx_count}  Scopus: {scopus_count}  EI: {ei_count}  OAJ: {oaj_count}  DOAJ: {doaj_count}  MEDLINE: {medline_count}  PubMed: {pubmed_count}  PMC: {pmc_count}')
+    print(f'  IF: {if_count}  warning: {warning_count}  中文刊名: {cn_name_count}  CCF: {ccf_count}  ABDC: {abdc_count}  ABS: {abs_count}  FT50: {ft50_count}  UTD24: {utd24_count}  CNKX: {cnkx_count}  Scopus: {scopus_count}  EI: {ei_count}  OAJ: {oaj_count}  DOAJ: {doaj_count}  MEDLINE: {medline_count}  PubMed: {pubmed_count}  PMC: {pmc_count}')
 
     # Strip large non-essential fields to stay under CF Pages 25 MB limit
     for r in journals:
@@ -1412,6 +1488,7 @@ def main():
         'cnkx': None,
         'zju': None,
         'school_a': None,
+        'nsfc_mgmt': None,
         'ccft': [],
         'cssci_core': [],
         'cssci_ext': [],
@@ -1427,6 +1504,8 @@ def main():
         domestic['zju'] = json.loads(ZJU_JSON.read_text(encoding='utf-8'))
     if SCHOOL_A_JSON.exists():
         domestic['school_a'] = json.loads(SCHOOL_A_JSON.read_text(encoding='utf-8'))
+    if NSFC_MGMT_JSON.exists():
+        domestic['nsfc_mgmt'] = json.loads(NSFC_MGMT_JSON.read_text(encoding='utf-8'))
     if CSSCI_CORE_JSON.exists():
         domestic['cssci_core'] = json.loads(CSSCI_CORE_JSON.read_text(encoding='utf-8'))
     if CSSCI_EXT_JSON.exists():
@@ -1524,6 +1603,8 @@ def main():
         'with_ccf': ccf_count,
         'with_abdc': abdc_count,
         'with_abs': abs_count,
+        'with_ft50': ft50_count,
+        'with_utd24': utd24_count,
         'with_oaj': oaj_count,
         'with_doaj': doaj_count,
         'with_cnkx': cnkx_count,

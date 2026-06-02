@@ -1,7 +1,7 @@
 {
   "source": "WoS Core + JCR 2025 + ESI + 中科院 2025 + 长江大学 + ShowJCR (JCR/FQB/XR/CCF/Warning) + Scopus (auto-updated) + EI Compendex Oct. 2025 + ABDC optional + ABS AJG + 中国科协 + OAJ 2025 + DOAJ Journal CSV",
   "last_updated_source": "WoS Core 2026-04-20",
-  "total": 44844,
+  "total": 44845,
   "indices": {
     "ESCI": 9449,
     "AHCI": 1819,
@@ -17,6 +17,8 @@
   "with_ccf": 279,
   "with_abdc": 2651,
   "with_abs": 1822,
+  "with_ft50": 50,
+  "with_utd24": 24,
   "with_oaj": 765,
   "with_doaj": 21395,
   "with_cnkx": 5952,
@@ -32,9 +34,9 @@
     "has_apc": 17261,
     "labels": {
       "subscription_paid_read": 22906,
-      "diamond": 23058,
       "hybrid": 9960,
-      "gold_apc": 11978
+      "gold_apc": 11978,
+      "diamond": 23058
     },
     "is_oa": 35036,
     "in_doaj": 30206

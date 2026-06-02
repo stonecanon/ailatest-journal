@@ -29,6 +29,7 @@
       z1: '1 区', z2: '2 区', z3: '3 区', z4: '4 区',
       filter_xinrui: '新锐分区', filter_warning: '预警',
       domestic_sources: '国内分级来源',
+      src_nsfc_mgmt: '国自然管理科学部',
       src_cnkx: '中国科协高质量目录',
       src_cssci_core: 'CSSCI 来源期刊',
       src_cssci_ext: 'CSSCI 扩展版',
@@ -64,8 +65,6 @@
       pick_filter_ahci: 'AHCI',
       pick_filter_compre: '排除综合性期刊',
       pick_history: '搜索历史', pick_history_clear: '清空',
-      pick_quota: 'OpenAlex 驱动',
-      pick_apikey_ph: 'API Key 可选',
       results_all: '全部期刊', load_more: '加载更多',
       col_name: '期刊 Title', col_free: '免费', col_abbr: '缩写 Abbr', col_badges: '索引 / 分区',
       col_if: 'IF', col_cycle: '审稿周期',
@@ -110,6 +109,7 @@
       z1: 'T1', z2: 'T2', z3: 'T3', z4: 'T4',
       filter_xinrui: 'Emerging Tier', filter_warning: 'Warning List',
       domestic_sources: 'Domestic Sources',
+      src_nsfc_mgmt: 'NSFC Management',
       src_cnkx: 'CAST Tiered Directory',
       src_cnki_major: 'Chinese Journal Directory',
       src_cssci_core: 'CSSCI Core',
@@ -144,8 +144,6 @@
       pick_filter_ahci: 'AHCI',
       pick_filter_compre: 'Exclude multidisciplinary',
       pick_history: 'Search History', pick_history_clear: 'Clear',
-      pick_quota: 'OpenAlex powered',
-      pick_apikey_ph: 'API key optional',
       results_all: 'All journals', load_more: 'Load more',
       col_name: 'Journal Title', col_free: 'FREE TO PUBLISH', col_abbr: 'Abbr', col_badges: 'Indices / Tier',
       col_if: 'IF', col_cycle: 'Review Cycle',
@@ -1149,13 +1147,11 @@
   function updateSearchSubmitLabel() {
     const btn = $('#search-submit');
     const label = $('#search-submit [data-i18n]');
-    const meta = $('#pick-search-meta');
     if (!label) return;
     const key = activeTab === 'pick' ? 'pick_search_btn' : 'search_button';
     label.dataset.i18n = key;
     label.textContent = t(key);
     btn?.setAttribute('aria-label', t(key));
-    if (meta) meta.hidden = activeTab !== 'pick';
   }
 
   // ───────── favorites (multi-list + drag sort) ─────────
@@ -1972,6 +1968,18 @@
     const source = (abs && abs.source) || 'Chartered ABS AJG 2024';
     return `<span class="zone ${cls}" title="${escape(source)}">ABS ${escape(label)}</span>`;
   }
+  function badgeFT50(ft50) {
+    if (!ft50) return '';
+    const source = (ft50 && ft50.source) || 'Financial Times Top 50 Journals';
+    const order = ft50 && ft50.order ? ` #${ft50.order}` : '';
+    return `<span class="zone ft50" title="${escape(source)}">FT50${escape(order)}</span>`;
+  }
+  function badgeUTD24(utd24) {
+    if (!utd24) return '';
+    const source = (utd24 && utd24.source) || 'UT Dallas Top 24 Business Journals';
+    const order = utd24 && utd24.order ? ` #${utd24.order}` : '';
+    return `<span class="zone utd24" title="${escape(source)}">UTD24${escape(order)}</span>`;
+  }
       function badgeTier(tier) {
         if (!tier) return '';
         const raw = String(tier).trim().toUpperCase();
@@ -2052,6 +2060,8 @@
       badgeCCF(r.ccf),
       badgeABDC(r.abdc),
       badgeABS(r.abs),
+      badgeFT50(r.ft50),
+      badgeUTD24(r.utd24),
         // cnkx tier badges removed — now handled by renderDomCrossBadges via domIndex
       r.warning ? badgeWarn(r.warning, true) : '',
       r.under_review ? badgeUnderReview() : '',
@@ -2111,6 +2121,10 @@
       if (!r.tier || !/^T[123]$/.test(r.tier)) return;
       addDomIndex(r.name, 'name', { source:'cnkx', label:T('科协','CAST')+' '+r.tier, tag:r.tier, domain:r.domain });
       if (r.issn) addDomIndex(r.issn, 'issn', { source:'cnkx', label:T('科协','CAST')+' '+r.tier, tag:r.tier, domain:r.domain });
+    });
+    ((d.nsfc_mgmt && d.nsfc_mgmt.records)||[]).forEach(r => {
+      addDomIndex(r.name, 'name', { source:'nsfc_mgmt', label:'NSFC '+r.tier, tag:r.tier, domain:T('管理科学部','Management Science') });
+      if (r.issn) addDomIndex(r.issn, 'issn', { source:'nsfc_mgmt', label:'NSFC '+r.tier, tag:r.tier, domain:T('管理科学部','Management Science') });
     });
     (d.ccft||[]).forEach(r => {
       addDomIndex(r.cn_name, 'name', { source:'ccft', label:'CCF-'+r.tier, tag:r.tier, org:r.org });
@@ -2705,6 +2719,7 @@
   function domSourceTabsHTML() {
     const items = [
       ['cnki_major', T('中文期刊目录','Chinese Journal Directory')],
+      ['nsfc_mgmt', T('国自然管理','NSFC Mgmt')],
       ['cnkx', T('中国科协','CAST')],
       ['zju_zju', T('浙江大学 2024','ZJU 2024')],
       ['school_a', T('学校 A · 2023','School A · 2023')],
@@ -2752,6 +2767,25 @@
       }
     }
 
+    // 1b) 国家自然科学基金委管理科学部 A/B 类
+    if (domestic.nsfc_mgmt && domestic.nsfc_mgmt.records) {
+      const recs = domestic.nsfc_mgmt.records.filter(r => matchTxt(r.name, r.tier, r.frequency));
+      if (recs.length) {
+        sections.push({
+          title: T('国自然管理科学部期刊目录','NSFC Management Science Journal List'),
+          count: recs.length,
+          html: `<div class="table-wrap"><table class="journals"><thead><tr>
+            <th class="col-fav" aria-label="Favorite"></th><th style="width:60px">${T('级别','Tier')}</th><th class="col-name">${T('期刊','Journal')}</th><th>${T('交叉收录','Also In')}</th><th style="width:110px">${T('刊期','Frequency')}</th>
+          </tr></thead><tbody>
+          ${recs.slice(0, 200).map(r => renderDomRow(r, {
+            src: 'nsfc_mgmt', showTier: true, tierValue: r.tier,
+            extraCols: `<td class="muted-cell" style="width:110px">${escape(r.frequency||'—')}</td>`,
+          })).join('')}
+          </tbody></table></div>`
+        });
+      }
+    }
+
     // 2) 中文期刊目录 (CNKI Major)
     if (domestic.cnki_major && domestic.cnki_major.records) {
       const list = domestic.cnki_major.records.filter(r =>
@@ -2773,6 +2807,7 @@
               ...hits.filter(h => h.source === 'ccft').map(h => `<span class="domsrc-pill ds-ccft">CCF-${h.tag||'T'}</span>`),
               ...hits.filter(h => h.source === 'zju').map(h => `<span class="domsrc-pill ds-zju">${escape(h.label)}</span>`),
               ...hits.filter(h => h.source === 'school_a').map(h => `<span class="domsrc-pill ds-school-a">${escape(h.label)}</span>`),
+              ...hits.filter(h => h.source === 'nsfc_mgmt').map(h => `<span class="domsrc-pill ds-nsfc_mgmt">${escape(h.label)}</span>`),
               ...hits.filter(h => h.source.startsWith('cnkx')).map(h => `<span class="domsrc-pill ds-cnkx">${escape(h.label)}</span>`),
             ].filter(Boolean).join('');
             return `<tr class="j-row clickable" data-fid="${escape(favId(r))}" data-src="cnki_major">
@@ -2950,6 +2985,36 @@
     // ===== 统一搜索：只要有搜索词就跨库聚合，忽略当前库选择 =====
     if (q) return renderDomesticUnified(box, q);
 
+    if (activeDom === 'nsfc_mgmt') {
+      const d = domestic.nsfc_mgmt;
+      if (!d) { box.innerHTML = `<div class="empty">${T('国自然管理目录缺失','NSFC Management data missing')}</div>`; return; }
+      const all = (d.records || []).slice().sort((a, b) => {
+        const ta = a.tier === 'A' ? 0 : 1;
+        const tb = b.tier === 'A' ? 0 : 1;
+        return ta - tb || (a.order || 0) - (b.order || 0);
+      });
+      const rows = all.map(r => renderDomRow(r, {
+        src: 'nsfc_mgmt',
+        showTier: true,
+        tierValue: r.tier,
+        extraCols: `<td class="muted-cell" style="width:110px">${escape(r.frequency||'—')}</td>`,
+      })).join('');
+      box.innerHTML = `<div class="section-block">
+        ${domSectionHeader(
+          T('国家自然科学基金委管理科学部期刊目录','NSFC Management Science Journal List'),
+          `${all.length.toLocaleString()} ${T('种期刊；A 类 / B 类按原目录顺序展示。','journals; A/B tiers shown in source order.')}`,
+        )}
+        <div class="table-wrap"><table class="journals"><thead><tr>
+          <th class="col-fav" aria-label="Favorite"></th>
+          <th style="width:60px">${T('级别','Tier')}</th>
+          <th class="col-name">${T('期刊','Journal')}</th>
+          <th>${T('交叉收录','Also In')}</th>
+          <th style="width:110px">${T('刊期','Frequency')}</th>
+        </tr></thead><tbody>${rows}</tbody></table></div>
+      </div>`;
+      return;
+    }
+
     if (activeDom === 'cnkx') {
       const d = domestic.cnkx;
       if (!d) { box.innerHTML = `<div class="empty">${T('中国科协数据缺失','CAST data missing')}</div>`; return; }
@@ -3014,6 +3079,7 @@
           ...hits.filter(h => h.source === 'cssci').map(() => `<span class="domsrc-pill ds-cssci">CSSCI</span>`),
           ...hits.filter(h => h.source === 'pku').map(() => `<span class="domsrc-pill ds-pku">${T('北大核心','PKU Core')}</span>`),
           ...hits.filter(h => h.source === 'ccft').map(h => `<span class="domsrc-pill ds-ccft">CCF-${h.tag||'T'}</span>`),
+          ...hits.filter(h => h.source === 'nsfc_mgmt').map(h => `<span class="domsrc-pill ds-nsfc_mgmt">${escape(h.label)}</span>`),
         ].filter(Boolean).join('');
         const subVal = r.subdomain ? tn(r.subdomain, 'sub') : '—';
         return `<tr class="j-row clickable" data-fid="${escape(fid)}" data-src="cnkx">
@@ -3184,6 +3250,7 @@
           ...hits.filter(h => h.source === 'ccft').map(h => `<span class="domsrc-pill ds-ccft" title="${escape(h.org||'')}">CCF-${h.tag||'T'}</span>`),
           ...hits.filter(h => h.source === 'zju').map(h => `<span class="domsrc-pill ds-zju">${escape(h.label)}</span>`),
           ...hits.filter(h => h.source === 'school_a').map(h => `<span class="domsrc-pill ds-school-a">${escape(h.label)}</span>`),
+          ...hits.filter(h => h.source === 'nsfc_mgmt').map(h => `<span class="domsrc-pill ds-nsfc_mgmt">${escape(h.label)}</span>`),
           ...hits.filter(h => h.source.startsWith('cnkx')).map(h => `<span class="domsrc-pill ds-cnkx">${escape(h.label)}</span>`),
         ].filter(Boolean).join('');
         const name = r.name || '';
@@ -3490,6 +3557,7 @@
         ['cssci_ext', domestic.cssci_ext || []],
         ['pku', domestic.pku_core || []],
         ['cnkx', (domestic.cnkx && domestic.cnkx.records) || []],
+        ['nsfc_mgmt', (domestic.nsfc_mgmt && domestic.nsfc_mgmt.records) || []],
         ['zju', (domestic.zju && domestic.zju.records) || []],
       ];
       for (const [src, arr] of groups) {
@@ -3522,7 +3590,7 @@
           const searchInput = $('#q');
           if (searchInput) searchInput.value = q;
           setTimeout(() => {
-            const btn = $('#pick-search-btn');
+            const btn = $('#search-submit');
             if (btn) btn.click();
           }, 800);
         }
@@ -3588,6 +3656,9 @@
     if (r.domain) meta.push([T('科协领域','CAST Domain'), tn(r.domain, 'domain') + (r.subdomain ? ' · ' + tn(r.subdomain, 'sub') : '')]);
     if (r.ccf_area) meta.push([T('CCF 方向','CCF Area'), r.ccf_area]);
     if (ir.abdc && ir.abdc.rating) meta.push([T('ABDC 等级','ABDC Rating'), ir.abdc.rating + (ir.abdc.field ? ' · ' + ir.abdc.field : '')]);
+    if (ir.ft50) meta.push(['FT50', (ir.ft50.order ? `#${ir.ft50.order}` : '') + (ir.ft50.source ? ` · ${ir.ft50.source}` : '')]);
+    if (ir.utd24) meta.push(['UTD24', (ir.utd24.order ? `#${ir.utd24.order}` : '') + (ir.utd24.subject ? ` · ${ir.utd24.subject}` : '')]);
+    if (src === 'nsfc_mgmt' || r.source === 'NSFC Management Science Department Journal List') meta.push([T('来源','Source'), T('国家自然科学基金委管理科学部期刊目录','NSFC Management Science Journal List')]);
     if (r.note) meta.push([T('备注','Note'), r.note]);
     const metaHTML = meta.map(([k,v]) => `<div class="meta-row"><div class="meta-k">${k}</div><div class="meta-v">${escape(v)}</div></div>`).join('');
     const oa = ir.oa || lookupOA(ir.issn || ir.eissn ? ir : r);
@@ -4144,7 +4215,7 @@
       const SRC = {
         int: T('SCI / SSCI 国际期刊','International SCI / SSCI'), cssci: T('CSSCI 来源期刊','CSSCI Source Journals'), cssci_ext: T('CSSCI 扩展版','CSSCI Extended'),
         pku: T('北大核心','PKU Core'), cnkx: T('中国科协高质量目录','CAST Tiered Directory'), ccft: T('CCF 推荐中文科技期刊','CCF Recommended Chinese Journals'),
-        zju: T('浙江大学 2024','ZJU 2024'), school_a: T('高校自编目录 2023','In-house School Directory 2023'), in: 'India UGC-CARE',
+        zju: T('浙江大学 2024','ZJU 2024'), school_a: T('高校自编目录 2023','In-house School Directory 2023'), nsfc_mgmt: T('国自然管理科学部','NSFC Management'), in: 'India UGC-CARE',
       };
       kicker.textContent = SRC[src] || T('期刊详情','Journal Details');
     }
@@ -4274,6 +4345,7 @@
         const src = favsData[id]?.__src || 'cnki_major';
         const domRecs = [
           ...(domestic.cnkx?.records || []).map(r => ({ ...r, __src: 'cnkx' })),
+          ...(domestic.nsfc_mgmt?.records || []).map(r => ({ ...r, __src: 'nsfc_mgmt' })),
           ...(domestic.cnki_major?.records || []).map(r => ({ ...r, __src: 'cnki_major' })),
         ];
         rec = domRecs.find(r => favId(r) === id);
@@ -4517,6 +4589,8 @@
     if (ir.cas_major_cn) meta.push([T('中科院大类','CAS Major'), ir.cas_major_cn]);
     if (ir.esi_category) meta.push([T('ESI 高被引','ESI Category'), ir.esi_category]);
     if (ir.abdc && ir.abdc.rating) meta.push([T('ABDC 等级','ABDC Rating'), ir.abdc.rating + (ir.abdc.field ? ' · ' + ir.abdc.field : '')]);
+    if (ir.ft50) meta.push(['FT50', ir.ft50.order ? `#${ir.ft50.order}` : 'Listed']);
+    if (ir.utd24) meta.push(['UTD24', ir.utd24.order ? `#${ir.utd24.order}` : 'Listed']);
     if (r.publisher) meta.push([T('出版商','Publisher'), r.publisher]);
     if (r.country) meta.push([T('国家/地区','Country'), r.country]);
     if (r.frequency) meta.push([T('刊期','Frequency'), r.frequency]);
@@ -4843,7 +4917,7 @@
     const SRC_LABEL = {
       int: T('国际','Int’l'), cssci: 'CSSCI', cssci_core: 'CSSCI', cssci_ext: T('CSSCI 扩展','CSSCI Ext'),
       pku: T('北大核心','PKU Core'), pku_core: T('北大核心','PKU Core'), cnkx: T('科协','CAST'), ccft: 'CCF-T',
-      zju: T('浙大','ZJU'), school_a: T('高校目录','In-house'), in: 'UGC-CARE',
+      zju: T('浙大','ZJU'), school_a: T('高校目录','In-house'), nsfc_mgmt: T('国自然','NSFC'), in: 'UGC-CARE',
     };
     const ifVal = (r.if_2024 != null) ? (+r.if_2024).toFixed(1) : '';
     const ifCell = ifVal ? `<span class="if-cell">${ifVal}</span>` : '<span class="muted-cell">—</span>';
@@ -5080,7 +5154,7 @@
       let domHtml = '';
       if (domestic) {
         const allDomestic = [];
-        for (const key of ['cnkx', 'cnki_major', 'zju']) {
+        for (const key of ['cnkx', 'nsfc_mgmt', 'cnki_major', 'zju']) {
           const src = domestic[key];
           if (src && src.records) {
             for (const r of src.records) {
@@ -5572,24 +5646,14 @@
 
   // ───────── pick-for-me (journal recommendation) ─────────
   let _pickInit = false;
-  const OPENALEX_WORKS_ENDPOINT = location.hostname === 'localhost'
-    ? `${API_BASE}/openalex`
-    : `${location.origin}/openalex`;
-
-  function openAlexWorksUrl(params) {
-    const qs = params instanceof URLSearchParams ? params.toString() : String(params || '');
-    return `${OPENALEX_WORKS_ENDPOINT}?${qs}`;
-  }
 
   function initPickTool() {
     if (_pickInit) return;
     _pickInit = true;
 
-    const btn = $('#pick-search-btn');
     const input = $('#q');
     const results = $('#pick-results');
     const status = $('#pick-status');
-    const quotaEl = $('#pick-quota');
     const charCount = $('#pick-char-count');
 
     function updatePickCharCount() {
@@ -5607,20 +5671,17 @@
       const query = input.value.trim();
       if (!query) { status.textContent = T('请输入内容','Please enter a query'); return; }
 
-      status.textContent = T('正在搜索相关论文…','Searching related papers…');
+      status.textContent = T('正在匹配本地期刊库…','Matching local journal profiles…');
       results.innerHTML = '';
 
       try {
-        // Lazy-load oaMap for topic matching (only if pick tool is first to need it)
+        // Lazy-load local topic snapshot for richer journal profiles. No live API calls.
         if (!oaMap) {
           try { oaMap = await fetchJSON('data/oa.json.gz'); }
           catch(e) { oaMap = {}; }
         }
 
-        // Step 1: Extract keywords from input, then search OpenAlex
         const lines = query.split('\n').filter(l => l.trim());
-        let titleTerms = [];
-        let abstractTerms = [];
         let explicitKeywords = [];
 
         for (const line of lines) {
@@ -5634,26 +5695,21 @@
           }
         }
 
-        // Title = first non-empty line (keep concise)
-        const firstLine = lines.find(l => !/^keywords?:/i.test(l) && !/^关键词[：:]/.test(l));
-        if (firstLine) {
-          titleTerms = [firstLine.replace(/[.。！!?？,，;；]+$/, '').trim().slice(0, 200)];
-        }
+        const firstLine = lines.find(l => !/^keywords?:/i.test(l) && !/^关键词[：:]/.test(l) && !/^關鍵詞[：:]/.test(l)) || query;
+        const bodyText = lines.filter(l => l !== firstLine && !/^keywords?:/i.test(l) && !/^关键词[：:]/.test(l) && !/^關鍵詞[：:]/.test(l)).join(' ');
 
-        // ── Multi-query search with OpenAlex 'search' (relevance) param ──
-        // OpenAlex 'search' uses BM25 matching (not strict AND), so 5-8 keywords work fine.
-        // We run 2-3 complementary queries, deduplicate papers, then aggregate by journal.
-
-        const bodyText = lines.slice(1).filter(l => !/^keywords?:/i.test(l) && !/^关键词[：:]/.test(l)).join(' ');
-        const MAX_URL = 155;
-
-        // Synonym map: expand common academic terms to improve recall
         const SYNONYM_MAP = {
           occupancy: ['occupant','people counting','crowd estimation'],
+          occupied: ['occupancy','occupant'],
           sensor: ['sensing','detector','sensor array'],
+          sensors: ['sensor','sensing'],
           indoor: ['indoor environment','built environment','interior'],
+          building: ['built environment','architecture','construction'],
+          buildings: ['building','built environment','architecture'],
           ambient: ['environmental','surrounding','background'],
+          explainable: ['interpretable','xai'],
           prediction: ['forecasting','estimation','predictive'],
+          detection: ['recognition','classification','monitoring'],
           'machine learning': ['deep learning','neural network','supervised learning'],
           'deep learning': ['neural network','machine learning','convolutional neural network'],
           thermal: ['temperature','thermal comfort'],
@@ -5666,15 +5722,7 @@
           air: ['iaq','air quality'],
           quality: ['condition','comfort','environmental quality'],
         };
-        function expandWithSynonyms(words) {
-          const result = new Set(words);
-          words.forEach(w => {
-            if (SYNONYM_MAP[w]) SYNONYM_MAP[w].forEach(syn => result.add(syn));
-          });
-          return [...result];
-        }
-
-        const stopWords = new Set(('this that with from which were have been than into also their about '+
+        const stopWords = new Set(('the and are was for not non into onto from this that with from which were have been than into also their about '+
           'study show were used using based results method model data paper these between while where '+
           'after before other there analysis approach process system research above during well such '+
           'each both more most some than very just also although however therefore because without '+
@@ -5690,250 +5738,102 @@
           'tested showed found approach techniques algorithm algorithms features feature accuracy '+
           'performance evaluation values value results analysis prediction predictions').split(' '));
 
-        // Collect all English words (length > 3) from title + body
-        const allText = [(titleTerms[0]||''), bodyText].join(' ').toLowerCase();
-        const allWords = allText.replace(/[^a-z0-9\s-]/g, ' ')
-          .split(/\s+/)
-          .filter(w => w.length > 3 && !stopWords.has(w) && !/^\d+$/.test(w) && !w.startsWith('http'));
-        const uniqueWords = allWords.filter((w, i) => allWords.indexOf(w) === i);
-
-        // Build 2-4 diverse queries from different keyword subsets
-        const queries = [];
-
-        // Q1: Explicit keywords (if present) — these are the most reliable signal
-        if (explicitKeywords.length) {
-          const q = explicitKeywords.slice(0, 4).join(' ');
-          if (encodeURIComponent(q).length < MAX_URL) queries.push(q);
-        }
-
-        // Q2: Title-derived keywords (core topic of the paper)
-        const titleLower = (titleTerms[0]||'').toLowerCase().replace(/[^a-z\s-]/g, '').replace(/-/g, ' ');
-        const titleKws = titleLower.split(/\s+/).filter(w => w.length > 3 && !stopWords.has(w));
-        if (titleKws.length >= 3) {
-          const q = titleKws.slice(0, 10).join(' ');
-          if (encodeURIComponent(q).length < MAX_URL && !queries.some(x => x.toLowerCase().includes(q.slice(0,15)))) {
-            queries.push(q);
-          }
-        }
-
-        // Q3: Body-derived technical terms (methods, algorithms, sensors, etc.)
-        // Pick words that are ≥5 chars (more specific), not already covered by Q1/Q2
-        const covered = queries.join(' ').toLowerCase();
-        const bodyKws = uniqueWords.filter(w => w.length >= 4 && !covered.includes(w)).slice(0, 6);
-        if (bodyKws.length >= 3) {
-          const q = bodyKws.join(' ');
-          if (encodeURIComponent(q).length < MAX_URL) queries.push(q);
-        }
-
-        // Q4: Synonym-expanded query — broader recall for underrepresented terms
-        const synWords = expandWithSynonyms(titleKws.slice(0, 5));
-        const synQuery = synWords.slice(0, 12).join(' ');
-        if (synQuery.length > 10 && !queries.some(x => synQuery.includes(x.slice(0,10)))) {
-          const synQ = synQuery;
-          if (encodeURIComponent(synQ).length < MAX_URL) queries.push(synQ);
-        }
-
-        // Fallback: if no queries built, just use first 5 unique words
-        if (!queries.length) {
-          queries.push(uniqueWords.slice(0, 6).join(' '));
-        }
-
-        // Collect all search keyword tokens for title matching
-        const searchKeywords = new Set();
-        [...explicitKeywords, ...titleKws, ...bodyKws, ...uniqueWords].forEach(k => {
-          k.toLowerCase().split(/[\s-]+/).filter(w => w.length > 2).forEach(w => searchKeywords.add(w));
+        const allText = [firstLine, bodyText, explicitKeywords.join(' ')].join(' ').toLowerCase();
+        const phraseTerms = [];
+        Object.keys(SYNONYM_MAP).forEach(p => {
+          if (p.includes(' ') && allText.includes(p)) phraseTerms.push(p);
         });
-
-        // Run all queries concurrently via Promise.all
-        status.textContent = T('正在搜索相关论文…','Searching related papers…');
-        const SEARCH_FIELDS = 'id,title,publication_date,primary_location,relevance_score';
-        const FIVE_YEARS_AGO = new Date(Date.now() - 5*365*24*60*60*1000).toISOString().slice(0,10);
-        let openAlexErrorStatus = null;
-        let openAlexErrorBody = null;
-        async function fetchOpenAlexResults(params) {
-          if (!(params instanceof URLSearchParams)) params = new URLSearchParams(params);
-          if (!params.has('mailto')) params.set('mailto', 'jiantaoweng@gmail.com');
-          // Pass user's API key if provided
-          const apiKey = $('#pick-apikey')?.value?.trim();
-          if (apiKey && !params.has('api_key')) params.set('api_key', apiKey);
-          const url = openAlexWorksUrl(params);
-          try {
-            const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
-            if (!r.ok) {
-              openAlexErrorStatus = r.status;
-              try { openAlexErrorBody = await r.json(); } catch(e) {}
-              return [];
-            }
-            const d = await r.json();
-            return d.results || [];
-          } catch (err) {
-            openAlexErrorStatus = 'network';
-            return [];
-          }
+        const allWords = allText.replace(/[^a-z0-9\u4e00-\u9fff\s-]/g, ' ')
+          .split(/\s+/)
+          .map(w => w.replace(/^-+|-+$/g, ''))
+          .filter(w => w.length > 2 && !stopWords.has(w) && !/^\d+$/.test(w) && !w.startsWith('http'));
+        const uniqueWords = allWords.filter((w, i) => allWords.indexOf(w) === i);
+        const weightedTerms = new Map();
+        function addTerm(term, weight) {
+          const s = String(term || '').toLowerCase().trim();
+          if (!s || s.length < 3 || stopWords.has(s)) return;
+          weightedTerms.set(s, Math.max(weightedTerms.get(s) || 0, weight));
         }
-        const queryBatches = await Promise.all(queries.slice(0, 4).map(async (q) => {
-          const params = new URLSearchParams({
-            search: q.slice(0, 120),
-            per_page: '60',
-            sort: 'relevance_score:desc',
-            select: SEARCH_FIELDS,
-          });
-          params.set('filter', `from_publication_date:${FIVE_YEARS_AGO}`);
-          return fetchOpenAlexResults(params);
-        }));
-
-        // Deduplicate by work ID
-        const seenIds = new Set();
-        const allWorks = [];
-        for (const batch of queryBatches) {
-          for (const w of batch) {
-            if (w.id && !seenIds.has(w.id)) {
-              seenIds.add(w.id);
-              allWorks.push(w);
-            }
-          }
-        }
-
-        // If too few results, try a broader backup query
-        if (allWorks.length < 8) {
-          const backup = uniqueWords.slice(0, 5).join(' ');
-          try {
-            const params = new URLSearchParams({
-              search: backup,
-              per_page: '50',
-              sort: 'relevance_score:desc',
-              select: SEARCH_FIELDS,
-            });
-            params.set('filter', `from_publication_date:${FIVE_YEARS_AGO}`);
-            const results = await fetchOpenAlexResults(params);
-            for (const w of results) {
-              if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); }
-            }
-          } catch {}
-        }
-
-        if (allWorks.length < 3 && titleTerms[0]) {
-          const chn = titleTerms[0].replace(/[a-zA-Z0-9\s]/g, '').replace(/[，。、；：！？（）【】《》""''\s]/g, '');
-          if (chn) {
-            const cnQuery = chn.slice(0, 12);
-            try {
-              const params = new URLSearchParams({
-                search: cnQuery,
-                per_page: '20',
-                sort: 'relevance_score:desc',
-                select: SEARCH_FIELDS,
-              });
-              params.set('filter', `from_publication_date:${FIVE_YEARS_AGO}`);
-              const results = await fetchOpenAlexResults(params);
-              for (const w of results) {
-                if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); }
-              }
-            } catch {}
-          }
-        }
-
-        const hasCnOnly = [...query].filter(c => c >= '\u4e00' && c <= '\u9fff').length > 0
-          && uniqueWords.filter(w => w.length > 4).length < 2 && !explicitKeywords.length;
-        if (!allWorks.length) {
-          if (openAlexErrorStatus) {
-            // Show budget info if OpenAlex returned it
-            const budgetMsg = openAlexErrorBody?.dailyRemainingUsd !== undefined
-              ? T(
-                  `OpenAlex 今日额度已用完，每日 UTC 0 点重置。填 API Key 可增加额度`,
-                  `OpenAlex daily budget exhausted, resets at UTC midnight. Add an API key for more credits`
-                )
-              : T(
-                  `OpenAlex 搜索接口暂时不可用（${openAlexErrorStatus}），请稍后重试`,
-                  `OpenAlex search is temporarily unavailable (${openAlexErrorStatus}), please try again later`
-                );
-            status.textContent = budgetMsg;
-            return;
-          }
-          status.textContent = hasCnOnly
-            ? T('未找到相关论文。OpenAlex 对中文搜索效果不佳，建议在摘要后添加英文 Keywords: 行（如 Keywords: indoor occupancy, sensor）',
-              'No papers found. OpenAlex has limited Chinese support. Try adding an English "Keywords:" line.')
-            : T('未找到相关论文，请尝试其他关键词','No papers found, try different keywords');
+        explicitKeywords.forEach(k => addTerm(k, 5));
+        phraseTerms.forEach(k => addTerm(k, 4));
+        uniqueWords.forEach((w, i) => addTerm(w, i < 8 ? 3 : 1.6));
+        [...weightedTerms.keys()].forEach(w => {
+          (SYNONYM_MAP[w] || []).forEach(syn => addTerm(syn, Math.max(1.5, (weightedTerms.get(w) || 2) * 0.65)));
+        });
+        const terms = [...weightedTerms.entries()].sort((a, b) => b[1] - a[1]).slice(0, 28);
+        if (!terms.length) {
+          status.textContent = T('关键词太少，请输入题目或关键词','Please enter a title or keywords');
           return;
         }
 
-        // Step 2: Aggregate by journal ISSN
-        const journalMap = new Map();
-        const topicSet = new Set();
-        for (const w of allWorks) {
-          const src = w.primary_location?.source;
-          if (!src) continue;
-          const issn = (src.issn_l || '').toUpperCase();
-          if (!issn) continue;
-          if (!journalMap.has(issn)) journalMap.set(issn, { count: 0, papers: [], scores: [], topics: new Set(), srcName: src.display_name || '', kwMatch: 0, recentCount: 0 });
-          const j = journalMap.get(issn);
-          j.count++;
-          const titleLower = (w.title || '').toLowerCase();
-          const year = (w.publication_date||'').slice(0,4);
-          // Keyword match: does paper title contain any search keyword?
-          let hasKw = false;
-          for (const kw of searchKeywords) {
-            if (titleLower.includes(kw)) { hasKw = true; break; }
+        function localTopicProfile(r) {
+          const issns = [r.issn, r.eissn].filter(Boolean).map(x => String(x).toUpperCase());
+          const topics = [];
+          for (const k of issns) {
+            const rec = oaMap && oaMap[k];
+            if (!rec) continue;
+            (rec.tp || []).forEach(t => topics.push(t));
           }
-          if (hasKw) j.kwMatch++;
-          // Recency: papers from last 2 years
-          if (year >= String(new Date().getFullYear() - 1)) j.recentCount++;
-          j.papers.push({
-            title: w.title,
-            year: year,
-            id: w.id,
-            url: w.id // OpenAlex full URL, e.g. https://openalex.org/W12345
-          });
-          j.scores.push(w.relevance_score || 0);
-          if (oaMap && oaMap[issn]) {
-            (oaMap[issn].tp || []).forEach(t => { j.topics.add(t); topicSet.add(t); });
-          }
+          return [...new Set(topics)];
+        }
+        function journalHaystack(r, topics) {
+          return [
+            r.name, r.cn_name, r.abbr20, r.publisher, r.country,
+            r.esi_category, r.cas_major_cn, r.jcr_cat, r.ccf_area,
+            ...(r.wos_categories || []),
+            ...(topics || []),
+          ].filter(Boolean).join(' ').toLowerCase();
         }
 
-        // Step 3: Build ranked results — multi-factor scoring
-        const maxCount = Math.max(...[...journalMap.values()].map(j => j.count), 1);
-
-        // Compute topic frequency across journals (for topic match scoring)
-        const topicJournalCount = {};
-        for (const [, j] of journalMap) {
-          for (const t of j.topics) {
-            topicJournalCount[t] = (topicJournalCount[t] || 0) + 1;
+        let entries = journals.map(r => {
+          const topics = localTopicProfile(r);
+          const hay = journalHaystack(r, topics);
+          const nameHay = [r.name, r.cn_name, r.abbr20].filter(Boolean).join(' ').toLowerCase();
+          let score = 0;
+          const matched = [];
+          for (const [term, weight] of terms) {
+            const parts = term.split(/\s+/).filter(Boolean);
+            const hit = hay.includes(term) || (parts.length > 1 && parts.every(p => hay.includes(p)));
+            if (!hit) continue;
+            let boost = 1;
+            if (nameHay.includes(term)) boost += 0.55;
+            if ((r.wos_categories || []).join(' ').toLowerCase().includes(term)) boost += 0.45;
+            if (topics.join(' ').toLowerCase().includes(term)) boost += 0.35;
+            score += weight * boost;
+            matched.push(term);
           }
-        }
-        const maxTopicFreq = Math.max(...Object.values(topicJournalCount), 1);
-
-        const entries = [...journalMap.entries()].map(([issn, j]) => {
-          const countRatio = j.count / maxCount;
-          const kwMatchRatio = j.count > 0 ? j.kwMatch / j.count : 0;
-          const topicMatch = j.topics.size > 0
-            ? [...j.topics].reduce((sum, t) => sum + (topicJournalCount[t] || 0), 0) / (j.topics.size * maxTopicFreq)
-            : 0;
-
-          const totalScore = countRatio * 0.60 + kwMatchRatio * 0.30 + topicMatch * 0.10;
-
-          const journalRec = journals.find(r => r.issn === issn || r.eissn === issn);
-          const zoneVal = journalRec?.cas_zone;
-          const topVal = journalRec?.cas_top;
-          const qVal = journalRec?.jcr_q;
-          const scopusVal = journalRec?.scopus;
-          const eiVal = journalRec?.ei;
-          const indices = journalRec?.indices || [];
-          const wosCats = journalRec?.wos_categories || [];
-
+          const buildingQuery = /(building|buildings|built environment|indoor|occupancy|occupant|hvac|ventilation|thermal comfort|sensor|sensing)/i.test(allText);
+          if (buildingQuery) {
+            const buildingProfile = /(building|built environment|indoor|construction|architecture|architectural|energy and comfort|ventilation|thermal comfort|urban|environmental)/i.test(hay);
+            const buildingName = /(building|built environment|indoor|construction|architecture|energy and buildings|building simulation)/i.test(nameHay);
+            if (buildingProfile) score *= 1.32;
+            if (buildingName) score *= 1.22;
+          }
+          const mlQuery = /(machine learning|deep learning|neural|algorithm|classification|prediction|detection)/i.test(allText);
+          if (mlQuery && /(machine learning|neural network|artificial intelligence|data mining|computer vision|pattern recognition)/i.test(hay)) {
+            score *= 1.08;
+          }
+          const idx = r.indices || [];
+          if (idx.includes('SCIE') || idx.includes('SSCI') || idx.includes('AHCI')) score *= 1.12;
+          if (r.cas_zone === 1 || r.if_quartile === 'Q1') score *= 1.08;
+          if (r.warning || r.citic_warning || r.on_hold || r.under_review) score *= 0.72;
           return {
-            issn, journalRec, zone: zoneVal, top: topVal,
-            jcr_q: qVal, scopus: scopusVal, ei: eiVal,
-            indices, wos_categories: wosCats,
-            count: j.count, papers: j.papers.slice(0,5),
-            topics: [...j.topics].slice(0,6),
-            score: totalScore, srcName: j.srcName,
+            journalRec: r,
+            issn: r.issn || r.eissn || favId(r),
+            zone: r.cas_zone,
+            top: r.cas_top,
+            jcr_q: r.if_quartile,
+            indices: idx,
+            wos_categories: r.wos_categories || [],
+            topics: topics.slice(0, 6),
+            matched: [...new Set(matched)].slice(0, 8),
+            count: matched.length,
+            score,
+            srcName: r.name,
           };
-        });
+        }).filter(e => e.score > 0 && e.count > 0);
 
-        // Step 4: Filter and sort
         let filtered = entries;
-        // Exclude single-paper journals (noise from broad queries)
-        filtered = filtered.filter(e => e.count >= 2);
-        // Index filter: three core indices (SCIE/SSCI/AHCI)
         const wantSci = document.getElementById('pick-filter-sci')?.checked;
         const wantSsci = document.getElementById('pick-filter-ssci')?.checked;
         const wantAhci = document.getElementById('pick-filter-ahci')?.checked;
@@ -5947,39 +5847,33 @@
             return false;
           });
         }
-        // Comprehensive journal filter (use wos_categories)
         if (document.getElementById('pick-filter-comprehensive')?.checked) {
           filtered = filtered.filter(e => {
             const cats = e.wos_categories || [];
             return !cats.some(c => /multidisciplinary/i.test(c));
           });
         }
-        // Topic filter (always on — minimum signal filter)
-        filtered = filtered.filter(e => e.score > 0.1);
-        filtered.sort((a, b) => b.score - a.score);
+        filtered.sort((a, b) => b.score - a.score || (b.journalRec.if_2024 || 0) - (a.journalRec.if_2024 || 0));
         filtered = filtered.slice(0, 30);
 
-        // Normalize: top journal = 100%
         const maxScore = filtered.length > 0 ? filtered[0].score : 1;
         filtered.forEach(e => e.score = maxScore > 0 ? e.score / maxScore : 0);
 
-        // Step 5: Render
         if (!filtered.length) {
           results.innerHTML = `<div class="pick-no-results">${T('没有符合筛选条件的期刊推荐','No journals match your filters')}</div>`;
-          status.textContent = `${T('已发表','Published')} ${allWorks.length} ${T('篇相关论文','related papers')}，${T('分布在','in')} ${journalMap.size} ${T('个期刊','journals')}`;
+          status.textContent = T('没有匹配到本地期刊画像，请换成更具体的英文关键词','No local journal profiles matched. Try more specific English keywords.');
           return;
         }
 
         results.innerHTML = filtered.map(e => {
           const scorePct = Math.round(e.score * 100);
-          const ifStr = e.if != null ? `IF ${e.if}` : '';
-          const zoneStr = e.zone ? `CAS ${e.zone}区` : '';
           const name = e.journalRec?.name || e.srcName || e.issn;
           const issnStr = e.issn;
-          const paperList = e.papers.map(p => `<a class="pick-paper" href="${escape(p.url)}" target="_blank" rel="noopener" title="${escape(p.title)}">${escape((p.title||'').slice(0,55))}${(p.title||'').length>55?'…':''} (${escape(p.year||'')})</a>`).join('');
-          const topics = e.topics.map(t => `<span class="pick-topic">${escape(t)}</span>`).join('');
+          const signalList = [
+            ...e.matched.map(t => `<span class="pick-topic">${escape(t)}</span>`),
+            ...e.topics.slice(0, 4).map(t => `<span class="pick-topic">${escape(t)}</span>`),
+          ].join('');
 
-          // Build badges — zone/JCR go in zone-tags above title
           let badgesHtml = '';
           let flagsHtml = '';
           let zoneTagsHtml = '';
@@ -5991,11 +5885,11 @@
             // Scopus
             const scBadge = badgeScopus(r.scopus);
             // EI
-            const eiBdg = r.ei ? `<span class="badge b-ei">EI</span>` : '';
+            const eiBdg = (r.indices || []).includes('EI') ? `<span class="badge b-ei">EI</span>` : '';
             // IF
-            const ifBdg = badgeIF(e.if);
+            const ifBdg = badgeIF(r.if_2024);
             // CCF
-            const ccfTxt = r.ccf_2026_type ? `<span class="badge b-ccf">CCF ${r.ccf_2026_type}</span>` : '';
+            const ccfTxt = r.ccf ? `<span class="badge b-ccf">CCF ${escape(r.ccf)}</span>` : '';
             badgesHtml = [idxBadges, scBadge, eiBdg, ifBdg, ccfTxt].filter(Boolean).join('');
             // Warning & publisher flags
             const r2 = e.journalRec;
@@ -6053,7 +5947,7 @@
             ${zoneTagsHtml ? `<div class="pick-zone-tags">${zoneTagsHtml}</div>` : ''}
             <h3><a href="#j/${escape(e.journalRec ? favId(e.journalRec) : issnStr)}">${escape(name)}</a></h3>
             <div class="pick-head">
-              <span class="pick-count">${e.count}<small> ${T('篇论文','papers')}</small></span>
+              <span class="pick-count">${e.count}<small> ${T('个匹配信号','signals')}</small></span>
               <div class="pick-head-right">
                 <span class="pick-score-bar"><span class="bar"><span class="bar-fill" style="width:${scorePct}%;background:${barColor}"></span></span></span>
                 <span class="pick-score-pct">${scorePct}%</span>
@@ -6072,7 +5966,7 @@
               }
               return '<div class="pick-cycle">' + txt + '</div>';
             })()}
-            ${paperList ? `<div class="pick-papers">${paperList}</div>` : ''}
+            ${signalList ? `<div class="pick-papers">${signalList}</div>` : ''}
           </div>`;
         }).join('');
 
@@ -6088,7 +5982,7 @@
           });
         }
 
-        status.textContent = `${T('已发表','Published')} ${allWorks.length} ${T('篇相关论文','related papers')}，${T('分布在','in')} ${journalMap.size} ${T('个期刊','journals')}，${T('推荐','recommended')} ${filtered.length} ${T('个','')}`;
+        status.textContent = `${T('本地匹配','Local match')} ${entries.length} ${T('个候选期刊','candidate journals')}，${T('推荐','recommended')} ${filtered.length} ${T('个','')}`;
         // ── Save to search history ──
         savePickHistory(query);
       } catch (e) {
@@ -6097,7 +5991,6 @@
       }
     }
 
-    btn?.addEventListener('click', doSearch);
     input.addEventListener('keydown', (e) => { if (activeTab !== 'pick') return; if (e.key === 'Enter') { e.preventDefault(); doSearch(); } });
 
     // ── Search history ──

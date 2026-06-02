@@ -44,8 +44,10 @@ def derive_label(rec):
 
 
 def main():
-    journals = json.loads(JOURNALS.read_text())
-    cache = json.loads(CACHE.read_text())
+    with open(JOURNALS, encoding="utf-8") as f:
+        journals = json.load(f)
+    with open(CACHE, encoding="utf-8") as f:
+        cache = json.load(f)
     by_issn_cache = cache["by_issn"]
 
     # Build a compact map only for ISSNs that appear in our catalogue.
@@ -110,7 +112,7 @@ def main():
     # same record under both — so sharing the dict saves a lot of bytes on disk.
     # But JSON can't represent refs, so leave as-is; gzip will collapse them.
 
-    OUT.write_text(json.dumps(out_map, ensure_ascii=False, separators=(',', ':')))
+    OUT.write_text(json.dumps(out_map, ensure_ascii=False, separators=(',', ':')), encoding="utf-8")
     size_kb = OUT.stat().st_size / 1024
     print(f"oa.json written: {len(out_map):,} ISSN keys, {size_kb:.0f} KB")
     print(f"  homepage: {stats['has_homepage']:,}")
@@ -120,11 +122,11 @@ def main():
     print(f"  labels:   {stats['labels']}")
 
     # meta update
-    m = json.loads(META.read_text()) if META.exists() else {}
+    m = json.loads(META.read_text(encoding="utf-8")) if META.exists() else {}
     m["oa_enriched"] = True
     m["oa_source"] = "OpenAlex snapshot 2026-05"
     m["oa_stats"] = stats
-    META.write_text(json.dumps(m, ensure_ascii=False, indent=2))
+    META.write_text(json.dumps(m, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
 if __name__ == "__main__":

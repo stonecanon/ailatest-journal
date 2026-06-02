@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = ROOT / 'data'
 JOURNALS_GZ = DATA_DIR / 'journals.json.gz'
 WOS_CATS_FILE = DATA_DIR / 'wos_categories.json'
+CITIC_WARNING_FILE = ROOT / 'list' / 'topeditsci_citic_2025_warning.json'
 SITE_URL = 'https://journal.ailatest.org'
 
 def load_journals():
@@ -57,6 +58,53 @@ INDEXES = [
 def esc(s):
     if s is None: return ''
     return str(s).replace('&','&amp;').replace('<','&lt;').replace('>','&gt;').replace('"','&quot;')
+
+def norm_issn(s):
+    return ''.join(ch for ch in str(s or '').upper() if ch.isdigit() or ch == 'X')
+
+def norm_title(s):
+    return ''.join(ch.lower() for ch in str(s or '') if ch.isalnum())
+
+def load_citic_warning_rows(journals):
+    if not CITIC_WARNING_FILE.exists():
+        return [j for j in journals if j.get('citic_warning')]
+    with open(CITIC_WARNING_FILE, encoding='utf-8') as f:
+        source = json.load(f)
+
+    by_issn = {}
+    by_title = {}
+    for j in journals:
+        for field in ('issn', 'eissn'):
+            key = norm_issn(j.get(field))
+            if key and key not in by_issn:
+                by_issn[key] = j
+        for field in ('name', 'en_name', 'cn_name'):
+            key = norm_title(j.get(field))
+            if key and key not in by_title:
+                by_title[key] = j
+
+    rows = []
+    for idx, item in enumerate(source.get('items', [])):
+        keys = [norm_issn(item.get('issn')), norm_issn(item.get('eissn'))]
+        matched = next((by_issn[k] for k in keys if k and k in by_issn), None)
+        if matched is None:
+            matched = by_title.get(norm_title(item.get('journal_name')))
+        if matched is not None:
+            row = dict(matched)
+            row['_citic_source_only'] = False
+        else:
+            row = {
+                'name': item.get('journal_name') or '',
+                'issn': item.get('issn') or '',
+                'eissn': item.get('eissn') or '',
+                'publisher': item.get('publisher') or '',
+                'citic_warning': True,
+                '_citic_source_only': True,
+            }
+        row['_citic_source'] = item
+        row['citic_warning_order'] = item.get('no', idx + 1) - 1
+        rows.append(row)
+    return rows
 
 SKELETON = '''<!doctype html>
 <html lang="en">
@@ -155,20 +203,28 @@ def build_table_row(j, origin, headers, extra_cells=None, seq=0):
     q = (j.get('if_quartile') or '').upper()
     z = f"{j.get('cas_zone')}区" if j.get('cas_zone') is not None else '—'
     inds = ', '.join((j.get('indices') or [])[:4]) or '—'
-    pub = j.get('publisher') or '—'
-    issn = j.get('issn') or '—'
+    source = j.get('_citic_source') or {}
+    pub = source.get('publisher') or j.get('publisher') or '—'
+    issn = source.get('issn') or j.get('issn') or '—'
+    eissn = source.get('eissn') or j.get('eissn') or ''
     cells = []
     ec = iter(extra_cells or [])
     for h in headers:
         if h == 'num':
             cells.append(f'<td class="row-num">{seq}</td>')
-        elif h == 'name': cells.append(f'<td><a href="{origin}/journal/{esc(slug)}/">{esc(name)}</a></td>')
+        elif h == 'name':
+            if j.get('_citic_source_only'):
+                cells.append(f'<td>{esc(name)}</td>')
+            else:
+                cells.append(f'<td><a href="{origin}/journal/{esc(slug)}/">{esc(name)}</a></td>')
         elif h == 'if': cells.append(f'<td>{esc(str(if_v)) if if_v is not None else "—"}</td>')
         elif h == 'q': cells.append(f'<td>{esc(q) if q else "—"}</td>')
         elif h == 'z': cells.append(f'<td>{esc(z)}</td>')
         elif h == 'idx': cells.append(f'<td>{esc(inds)}</td>')
         elif h == 'pub': cells.append(f'<td>{esc(pub)}</td>')
-        elif h == 'issn': cells.append(f'<td>{esc(issn)}</td>')
+        elif h == 'issn':
+            issn_text = issn if not eissn else f'{issn} / {eissn}' if issn and issn != '—' else eissn
+            cells.append(f'<td>{esc(issn_text)}</td>')
         elif h == 'status': cells.append(f'<td>{next(ec, "")}</td>')
     return '<tr>' + ''.join(cells) + '</tr>'
 
@@ -206,7 +262,10 @@ def generate_subjects(journals, origin):
 
 def generate_indexes(journals, origin):
     for slug, title, desc, index_keys, table_type in INDEXES:
-        matched = [j for j in journals if match_index(j, slug, index_keys or [])]
+        if slug == 'citic-warning':
+            matched = load_citic_warning_rows(journals)
+        else:
+            matched = [j for j in journals if match_index(j, slug, index_keys or [])]
         if table_type == 'status':
             # 状态列表：保持原始数据源顺序，不按 IF 排序
             order_key = (lambda x: x.get('warning_order', 999999)) if slug == 'warning' \
@@ -219,8 +278,13 @@ def generate_indexes(journals, origin):
         top = matched[:200]
         if table_type == 'status':
             # 状态列表：加 Status 徽章列
-            headers = ['num', 'name', 'if', 'q', 'z', 'status', 'pub']
-            th_html = ''.join(f'<th>{esc(h)}</th>' for h in ['#', 'Journal Name', 'IF', 'JCR Q', 'CAS', 'Status', 'Publisher'])
+            if slug == 'citic-warning':
+                headers = ['num', 'name', 'issn', 'if', 'q', 'z', 'status', 'pub']
+                th_labels = ['#', 'Journal Name', 'ISSN / EISSN', 'IF', 'JCR Q', 'CAS', 'Status', 'Publisher']
+            else:
+                headers = ['num', 'name', 'if', 'q', 'z', 'status', 'pub']
+                th_labels = ['#', 'Journal Name', 'IF', 'JCR Q', 'CAS', 'Status', 'Publisher']
+            th_html = ''.join(f'<th>{esc(h)}</th>' for h in th_labels)
             def status_badge(j):
                 if slug == 'under-review': return '<span class="pill pill-under-review">新锐 Under Review</span>'
                 if slug == 'on-hold': return '<span class="pill pill-on-hold">WoS On Hold</span>'
@@ -258,9 +322,12 @@ def generate_indexes(journals, origin):
             count = f'Showing {len(top)} {title} indexed journals sorted by Impact Factor (descending).'
             jsonld_name = f'{title} Indexed Journals'
 
-        item_list = [{'@type': 'ListItem', 'position': i+1,
-            'item': {'@type': 'Periodical', 'name': j.get('name',''), 'url': f'{origin}/journal/{esc(make_slug(j))}/'}}
-            for i, j in enumerate(top[:50])]
+        item_list = []
+        for i, j in enumerate(top[:50]):
+            item = {'@type': 'Periodical', 'name': j.get('name', '')}
+            if not j.get('_citic_source_only'):
+                item['url'] = f'{origin}/journal/{esc(make_slug(j))}/'
+            item_list.append({'@type': 'ListItem', 'position': i + 1, 'item': item})
         jsonld_tag = f'<script type="application/ld+json">\n' + json.dumps(
             {'@context': 'https://schema.org', '@type': 'ItemList', 'name': jsonld_name,
              'description': desc, 'url': canonical, 'itemListElement': item_list}, ensure_ascii=False) + '\n</script>'

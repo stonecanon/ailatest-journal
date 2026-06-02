@@ -1,0 +1,225 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>期刊分区速查 · AILatest</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;padding:0;background:#fff8ef;color:#171717;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",Arial,sans-serif;font-size:14px;line-height:1.5}
+#a{min-height:100vh;padding:48px 14px 80px}
+#side-toggle{position:fixed;left:14px;top:14px;z-index:18;width:42px;height:42px;border:1px solid #eadfd2;border-radius:10px;background:rgba(255,253,248,.92);box-shadow:0 8px 24px rgba(54,41,28,.1);color:#342d27;font-size:21px;font-weight:800;display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:inherit}
+.ns{position:fixed;inset:0;z-index:50;pointer-events:none}.ns.o{pointer-events:auto}.nsb{position:absolute;inset:0;background:rgba(24,22,20,.46);opacity:0;transition:opacity .2s ease}.ns.o .nsb{opacity:1}.np{position:absolute;top:0;bottom:0;left:0;width:min(414px,86vw);background:#fffaf6;border-right:1px solid #eadfd2;box-shadow:22px 0 50px rgba(35,29,23,.18);transform:translateX(-102%);transition:transform .22s ease;display:flex;flex-direction:column}.ns.o .np{transform:translateX(0)}.nh{height:70px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid #efe4d8}.nb{display:flex;align-items:center;gap:10px;font-size:23px;font-weight:900;color:#23201d}.nl{width:34px;height:34px;border:1.5px solid #ff8a42;border-radius:7px;color:#ef4d00;display:flex;align-items:center;justify-content:center;font-size:18px}.nx{width:38px;height:38px;border:none;background:transparent;color:#6f6a64;font-size:28px;line-height:1;cursor:pointer}.nn{padding:18px 12px;display:flex;flex-direction:column;gap:8px}.ni{height:56px;border:1px solid transparent;border-radius:8px;background:transparent;color:#3a332d;display:flex;align-items:center;gap:14px;padding:0 14px;font-size:21px;font-weight:750;text-align:left;cursor:pointer;font-family:inherit}.ni svg{width:25px;height:25px;stroke:currentColor;stroke-width:2;fill:none}.nf{width:25px;height:25px;border-radius:6px;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900}.ni.a{border-color:#ffb98f;background:linear-gradient(90deg,#fff0e4,#fff8f1);color:#ef6a1a;box-shadow:inset 3px 0 0 #ef6a1a}.nr{margin-top:auto;border-top:1px solid #efe4d8;padding:14px 16px 22px;display:flex;align-items:center;gap:18px;color:#39322d}.nr button{border:none;background:transparent;color:inherit;font-size:15px;font-weight:750;display:flex;align-items:center;gap:8px;cursor:pointer;font-family:inherit}.nr svg{width:21px;height:21px;stroke:currentColor;stroke-width:2;fill:none}.ns.o~#side-toggle{opacity:0;pointer-events:none}
+#t{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;justify-content:space-around;padding:6px 14px 15px;background:rgba(255,253,248,.96);border-top:1px solid #eadfd2;backdrop-filter:blur(9px)}
+.tb{display:flex;flex-direction:column;align-items:center;gap:2px;color:#6f6a64;font-size:11px;cursor:pointer;background:none;border:none;padding:4px 12px;font-family:inherit}
+.tb.a{color:#ef4d00;font-weight:700}
+.ti{font-size:20px}
+.b0{text-align:center;font-size:28px;font-weight:900;margin-bottom:18px}
+.b1{color:#ff6a1a}
+.ms{width:168px;height:42px;display:flex;margin:0 auto 17px;padding:4px;border:1px solid #eadfd2;border-radius:999px;background:rgba(255,255,255,.74)}
+.mi{flex:1;display:flex;align-items:center;justify-content:center;border-radius:999px;color:#5f5a54;font-weight:800;cursor:pointer;background:none;border:none;font-size:13px;font-family:inherit}
+.mi.a{background:#fff;color:#171717;box-shadow:0 4px 9px rgba(60,48,36,.1)}
+.s0{padding:12px;border:1px solid #ffb18a;border-radius:12px;background:rgba(255,255,255,.92);margin-bottom:15px}
+.s1{display:flex;align-items:flex-start;gap:8px}.s2{color:#7d766d;font-size:18px;margin-top:9px}
+.s3{flex:1;border:none;outline:none;background:transparent;font-size:14px;min-height:38px;color:#171717;font-family:inherit}
+.s4{height:38px;margin-top:8px;border-radius:7px;background:linear-gradient(180deg,#ff6a1a,#ef4d00);color:#fff;font-weight:850;font-size:14px;border:none;width:100%;cursor:pointer;font-family:inherit}
+.fg{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-top:15px}
+.fc{min-height:63px;padding:8px 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#4c4238;font-size:10px;text-align:center;cursor:pointer;border:1px solid rgba(232,222,210,.95);border-radius:12px;background:rgba(255,255,255,.92)}
+.fc.a{border-color:#ff6a1a;color:#ef4d00}.f1{color:#9a5a24;font-size:16px}
+.ic{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;padding:9px;border:1px solid rgba(232,222,210,.95);border-radius:12px;background:rgba(255,255,255,.92)}
+.ic2{min-height:25px;padding:0 9px;display:inline-flex;align-items:center;border:1px solid #eadfd2;border-radius:6px;background:#fffaf3;color:#4d4036;font-size:12px;cursor:pointer;margin:2px;font-family:inherit}
+.ic2.a{border-color:#ef4d00;background:#fff0df;color:#ef4d00;font-weight:800}
+.fs{margin-top:9px;padding:8px 10px;border:1px solid #f1cfae;border-radius:7px;background:rgba(255,248,238,.84);color:#7c4a23;font-size:11px}
+.lh{display:flex;align-items:center;justify-content:space-between;margin:21px 0 9px}
+.s5{font-size:14px;font-weight:850;color:#171717}.rc{font-size:11px;color:#81786e;margin-top:3px}
+.ft{display:flex;gap:6px;margin-bottom:14px}
+.fb{min-height:28px;padding:0 12px;border-radius:999px;background:#f1e8dc;border:none;color:#5f4a34;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit}
+.fb.a{background:#ff6a1a;color:#fff}
+.jl{display:flex;flex-direction:column;gap:9px}
+.jc{display:flex;gap:10px;padding:11px;border:1px solid rgba(232,222,210,.95);border-radius:12px;background:rgba(255,255,255,.92);cursor:pointer}
+.j0{flex:0 0 44px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:7px;font-size:15px;font-weight:900}
+.to{background:#ffe5cf;color:#f05a14}.tg{background:#e1f4df;color:#168047}.tbn{background:#e2efff;color:#1d6fd6}
+.j1{min-width:0;flex:1}.j2{display:flex;align-items:flex-start;justify-content:space-between;gap:7px}
+.j3{flex:1;font-size:14.5px;font-weight:850;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.28;color:#171717}
+.j4{color:#a29a90;font-size:17px;cursor:pointer;flex-shrink:0}.j4.fv{color:#ff6a1a}
+.j5{font-size:11px;color:#716a62;margin-top:4px;overflow:hidden;text-overflow:ellipsis}
+.mr{display:flex;justify-content:space-between;gap:7px;margin:10px 0 7px}
+.m0{display:flex;flex-direction:column;gap:1px}.m0 t{font-size:10px;color:#7c756d}.m0 b{font-size:14px;font-weight:900;color:#171717;white-space:nowrap}
+.j6{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:7px}.j7{min-height:17px;padding:0 6px;display:inline-flex;align-items:center;border-radius:4px;background:#fff4e8;color:#7b4a24;font-size:10px;font-weight:700}
+.ba{display:flex;flex-wrap:wrap;gap:4px}
+.bd{display:inline-flex;align-items:center;min-height:17px;padding:0 7px;border-radius:3px;color:#fff;font-size:10px;font-weight:700}
+.bb{background:#0f315f}.bg{background:#15834f}.br{background:#7a5b42}.bw{background:#f05a14}.bl{background:#24758a}
+.e0{text-align:center;color:#776e64;margin-top:60px;font-size:14px}
+.pt{font-size:20px;font-weight:900;margin-bottom:6px}
+.rg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.r0{padding:10px;border:1px solid rgba(232,222,210,.95);border-radius:12px;background:rgba(255,255,255,.92);cursor:pointer}
+.dm{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.d0{padding:10px;text-align:center;border:1px solid rgba(232,222,210,.95);border-radius:12px;background:rgba(255,255,255,.92)}
+.d0 b{display:block;font-size:20px;font-weight:900;color:#171717}.d0 t{display:block;font-size:11px;color:#81786e;margin-top:2px}
+.d1{margin-top:16px}.d2{font-size:13px;font-weight:800;margin-bottom:8px;color:#171717}
+.dp{padding:60px 14px 80px}
+.mo{position:fixed;inset:0;z-index:30}.ms0{position:absolute;inset:0;background:rgba(0,0,0,.35)}
+.mp{position:absolute;bottom:0;left:0;right:0;background:#fffaf3;border-radius:16px 16px 0 0;padding:16px 14px 40px;max-height:75vh;overflow-y:auto}
+.mt{font-size:15px;font-weight:850;margin-bottom:12px;color:#171717}.ml{font-size:11px;color:#81786e;margin-bottom:6px;font-weight:700}
+.mci{min-height:26px;padding:0 10px;border:1px solid #eadfd2;border-radius:5px;background:#fff;color:#4d4036;font-size:11px;cursor:pointer;display:inline-flex;align-items:center;margin:2px;font-family:inherit}
+.mci.a{border-color:#ef4d00;background:#fff0df;color:#ef4d00;font-weight:800}
+.mcl{width:100%;height:38px;margin-top:4px;border-radius:7px;background:#ff6a1a;color:#fff;border:none;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit}
+.ssi{width:100%;height:32px;border:1px solid #eadfd2;border-radius:6px;padding:0 10px;font-size:12px;background:#fffaf3;outline:none;color:#171717;font-family:inherit}
+.pc2{display:flex;align-items:center;gap:12px;padding:14px;margin-bottom:10px;border:1px solid rgba(232,222,210,.95);border-radius:12px;background:rgba(255,255,255,.92)}
+.av{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#ff6a1a,#ef4d00);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900}
+.pm{flex:1}.pn{font-size:15px;font-weight:800;color:#171717}.po{font-size:11px;color:#81786e;margin-top:2px}
+.sc2{display:flex;padding:14px;margin-bottom:10px;border:1px solid rgba(232,222,210,.95);border-radius:12px;background:rgba(255,255,255,.92)}
+.si3{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}.si3 b{font-size:18px;font-weight:900;color:#171717}.si3 t{font-size:11px;color:#81786e}
+.ld{text-align:center;padding:80px 20px;color:#9a9188;font-size:14px}.ld .sp{font-size:40px;margin-bottom:10px}
+</style></head><body>
+<div id="nav-sheet" class="ns" aria-hidden="true">
+  <div class="nsb" id="nav-scrim"></div>
+  <aside class="np" aria-label="Navigation">
+    <div class="nh">
+      <div class="nb"><span class="nl">J</span><span>Journal AILatest<span style="font-size:14px">.org</span></span></div>
+      <button class="nx" id="nav-close" aria-label="Close navigation">×</button>
+    </div>
+    <nav class="nn">
+      <button class="ni" data-nav="home"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M9.5 20v-6h5v6"/></svg><span>Home</span></button>
+      <button class="ni" data-nav="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 4 4"/></svg><span>查刊</span></button>
+      <button class="ni" data-nav="pick"><svg viewBox="0 0 24 24"><path d="M12 3v18"/><path d="M5 8h14"/><path d="M7 15h10"/></svg><span>荐刊</span></button>
+      <button class="ni" data-nav="rank"><svg viewBox="0 0 24 24"><path d="M5 20V9"/><path d="M12 20V4"/><path d="M19 20v-7"/></svg><span>榜单</span></button>
+      <button class="ni" data-nav="fav"><svg viewBox="0 0 24 24"><path d="M12 4.2 14.5 9l5.3.8-3.8 3.7.9 5.2-4.9-2.6-4.9 2.6.9-5.2-3.8-3.7 5.3-.8Z"/></svg><span>收藏</span></button>
+      <button class="ni" data-nav="cn"><span class="nf">CN</span><span>中国</span></button>
+      <button class="ni" data-nav="global"><span class="nf">GL</span><span>Global</span></button>
+      <button class="ni" data-nav="in"><span class="nf">IN</span><span>印度</span></button>
+      <button class="ni" data-nav="kr"><span class="nf">KR</span><span>韩国</span></button>
+    </nav>
+    <div class="nr">
+      <button data-nav="rank"><svg viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M4 12h10"/><path d="M4 17h7"/></svg><span>Lists</span></button>
+      <button data-nav="profile"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 21a7 7 0 0 1 14 0"/></svg><span>More</span></button>
+      <span style="margin-left:auto;font-weight:800">中文</span>
+    </div>
+  </aside>
+</div>
+<button id="side-toggle" aria-label="Open navigation" onclick="no()">☰</button>
+<div id="a"><div class="ld"><div class="sp">&#x2315;</div>加载数据中...</div></div>
+<div id="t"></div>
+<script>
+"use strict";
+var J=[],F=new Set(function(){var a;try{a=JSON.parse(localStorage.getItem("F"))}catch(e){}return Array.isArray(a)?a:[]}()),E=[],T="home",Q="",Af="",Sf={},Searched=false,Res=[],Feat="all",Mode="s";
+function $(s){return document.querySelector(s)}
+function $$(s){return[...document.querySelectorAll(s)]}
+function es(t){var d=document.createElement("div");d.textContent=t;return d.innerHTML}
+function in2(n){return n.split(/\s+/).filter(Boolean).map(function(s){return s[0]}).join("").slice(0,3).toUpperCase()}
+function to(i){return["to","tg","tbn"][i%3]}
+function o(r,v){return r!=null?String(r):v}
+function cz(r){if(r==null)return"-";var s=r+"区";return s}
+function rv(r){if(r&&r.avg_months)return"~"+Math.round(r.avg_months*10)/10+"月";if(r&&r.review_weeks){var w=parseInt(r.review_weeks);if(w)return"~"+Math.round(w/4*10)/10+"月"}return""}
+function bd(j){var a=j.indices||[],k=["SCIE","SSCI","AHCI","ESCI","EI"],x=[];if(j.scopus)x.push("Scopus");if(j.doaj)x.push("DOAJ");if(j.pubmed)x.push("MEDLINE");return a.filter(function(v){return k.includes(v)}).concat(x).slice(0,5)}
+function sv(){try{localStorage.setItem("F",JSON.stringify([...F]))}catch(e){}}
+function fv(n){F.has(n)?F.delete(n):F.add(n);sv();h()}
+function no(){var n=$("#nav-sheet");if(n){n.classList.add("o");n.setAttribute("aria-hidden","false")}}
+function nc(){var n=$("#nav-sheet");if(n){n.classList.remove("o");n.setAttribute("aria-hidden","true")}}
+function na(){var m=Mode=="p"?"pick":T=="home"?"search":T;$$(".ni").forEach(function(b){b.classList.toggle("a",b.dataset.nav==m)})}
+function ng(k){nc();if(k=="global"){location.href="/international";return}if(k=="cn"){location.href="/china";return}if(k=="in"){location.href="/in";return}if(k=="kr"){location.href="/kr";return}if(k=="search"||k=="home"){T="home";Mode="s";Searched=false;h();return}if(k=="pick"){T="home";Mode="p";Searched=false;h();return}if(k=="rank"||k=="fav"||k=="profile"){T=k;h()}}
+function jc(j,i){
+ var n=j.issn||j.eissn||j.slug||"",b=bd(j),rv0=rv(j.crossref);
+ return'<div class=jc data-s="'+j.slug+'"><div class=j0 '+to(i)+'>'+es(in2(j.name))+'</div><div class=j1><div class=j2><div class=j3>'+es(j.name)+'</div><span class=j4'+(F.has(n)?" fv":"")+' data-n="'+n+'">'+(F.has(n)?"★":"☆")+'</span></div><div class=j5>ISSN '+es(n||"-")+(j.publisher?" | "+es(j.publisher):"")+'</div><div class=mr><div class=m0><t>IF</t><b>'+o(j.if_2024,"-")+'</b></div><div class=m0><t>JCR</t><b>'+o(j.if_quartile,"-")+'</b></div><div class=m0><t>中科院</t><b>'+(j.cas_zone?cz(j.cas_zone)+(j.cas_top?" TOP":""):"-")+'</b></div><div class=m0><t>新锐</t><b>'+(j.cas_xr?cz(j.cas_xr.zone)+(j.cas_xr.top?" TOP":""):"-")+'</b></div></div>'+(rv0?'<div class=j6><span class=j7>'+es(rv0)+'</span></div>':'')+'<div class=ba>'+b.map(function(b,i){return'<span class=bd '+["bb","bg","br","bw","bl"][i%5]+'>'+es(b)+"</span>"}).join("")+'</div></div></div>'
+}
+function sr(){
+ Searched=true;
+ var q0=Q.toLowerCase().trim(),f=Sf,r=J;
+ if(q0)r=r.filter(function(j){return j.name.toLowerCase().indexOf(q0)>=0||(j.issn&&j.issn.indexOf(q0)>=0)});
+ if(f.i&&f.i.length)r=r.filter(function(j){var a=(j.indices||[]).concat(j.scopus?["Scopus"]:[]).concat(j.doaj?["DOAJ"]:[]).concat(j.pubmed?["MEDLINE"]:[]);return f.i.some(function(x){return a.indexOf(x)>=0})});
+ if(f.j&&f.j.length)r=r.filter(function(j){return f.j.indexOf(j.if_quartile)>=0});
+ if(f.c&&f.c.length)r=r.filter(function(j){if(j.cas_zone==null)return false;var z=j.cas_zone+"区";return f.c.some(function(x){return x==z||(x=="TOP"&&j.cas_top)})});
+ if(f.su&&f.su.length)r=r.filter(function(j){return f.su.some(function(x){return j.esi_category==x||(j.wos_categories||[]).indexOf(x)>=0})});
+ if(f.free=="1")r=r.filter(function(j){return j.free===true});
+ Res=r.slice(0,80);h()
+}
+function h(){
+ var a=$("#a"),t=$("#t");t.innerHTML="";["home","rank","fav","profile"].forEach(function(v,i){t.innerHTML+='<button class=tb'+(T==v?" a":"")+' data-t="'+v+'"><span class=ti>'+["⌂","☷","♡","♙"][i]+"</span>"+["首页","榜单","收藏","我的"][i]+"</button>"});
+ $$(".tb").forEach(function(b){b.addEventListener("click",function(){T=this.dataset.t;h()})});
+ na();
+ if(T=="home"){
+  var extra="",sf=Sf;
+  if(Af=="i"||Af=="j"||Af=="c"){
+   var mp={i:["SCIE","SSCI","AHCI","ESCI","EI","Scopus","DOAJ","MEDLINE"],j:["Q1","Q2","Q3","Q4"],c:["1区","2区","3区","4区","TOP"]}[Af];
+   extra='<div class=ic>'+mp.map(function(v){var a=sf[Af]||[];return'<span class=ic2'+(a.indexOf(v)>=0?" a":"")+' data-k="'+Af+":"+v+'">'+v+"</span>"}).join("")+"</div>"
+  }else if(Af=="su"){extra='<div class=ic style=display:block;padding:10px><input class=ssi id=si0 placeholder="搜索学科..." autocomplete=off><div id=sl0></div></div>'}
+  else if(Af=="more"){extra='<div class=mo><div class=ms0 id=ms0></div><div class=mp><div class=mt>更多筛选</div><div><div class=ml>发表费用</div><span class=mci'+(sf.free=="1"?" a":"")+' id=mf0>免费发表</span></div><div><div class=ml>影响因子</div><span class=mci'+(sf.if0=="1"?" a":"")+' id=mi0>有 IF</span></div><button class=mcl id=md0>完成</button></div></div>'}
+  var sumP=[];["i","j","c","su","free","if0"].forEach(function(k){var v=sf[k];if(v&&(Array.isArray(v)?v.length:v))sumP.push(String(v))});
+  var sumH=sumP.length?'<div class=fs>已选: '+sumP.join(", ")+"</div>":"";
+  var cnt=J.length.toLocaleString(),resH="";
+  if(Searched){
+   if(Res.length)resH='<div class=jl>'+Res.map(function(j,i){return jc(j,i)}).join("")+"</div>";
+   else resH='<div class=e0>⌕<div>无结果</div></div>'
+  }else if(J.length){
+   var ft=Feat=="all"?J.filter(function(j){return j.if_2024!=null}).sort(function(a,b){return(b.if_2024||0)-(a.if_2024||0)}).slice(0,20):Feat=="c1"?J.filter(function(j){return j.cas_zone===1&&j.if_2024!=null}).sort(function(a,b){return(b.if_2024||0)-(a.if_2024||0)}).slice(0,20):J.filter(function(j){return/^nature/i.test(j.name)&&j.if_2024!=null}).sort(function(a,b){return(b.if_2024||0)-(a.if_2024||0)}).slice(0,20);
+   var fl=Feat=="all"?"按 IF Top 20":Feat=="c1"?"中科院1区 Top":"Nature 系列";
+   resH='<div class=lh><div class=s5>'+fl+'</div><div class=rc>共 '+cnt+" 条</div></div><div class=ft>"+["all:高IF","c1:1区","nat:Nature"].map(function(p){var v=p.split(":")[0],l=p.split(":")[1];return'<button class=fb'+(Feat==v?" a":"")+' data-f="'+v+'">'+l+"</button>"}).join("")+'</div><div class=jl>'+ft.map(function(j,i){return jc(j,i)}).join("")+"</div>"
+  }
+  a.innerHTML='<div class=b0>Journal<span class=b1>AI</span>分区速查</div>'+
+  '<div class=ms><span class=mi'+(Mode=="s"?" a":"")+' data-m="s">查刊</span><span class=mi'+(Mode=="p"?" a":"")+' data-m="p">荐刊</span></div>'+
+  '<div class=s0><div class=s1><span class=s2>⌕</span>'+(Mode=="s"?'<input class=s3 id=in0 value="'+es(Q)+'" placeholder="搜索期刊名/ISSN" autocomplete=off>':'<textarea class=s3 style="min-height:66px;padding:8px 0 0;resize:none" placeholder="输入题目/关键词" maxlength=200></textarea>')+'</div><button class=s4 id=sb0>'+(Mode=="p"?"推荐":"搜索")+'</button></div>'+
+  '<div class=fg>'+[{k:"i",l:"索引",ic:"▣"},{k:"j",l:"JCR",ic:"◈"},{k:"c",l:"分区",ic:"▤"},{k:"su",l:"学科",ic:"☷"},{k:"more",l:"更多",ic:"☰"}].map(function(f){return'<div class=fc'+(Af===f.k?" a":"")+' data-k="'+f.k+'"><div class=f1>'+f.ic+"</div><div>"+f.l+"</div></div>"}).join("")+'</div>'+extra+sumH+resH;
+  // bind
+  $$(".mi").forEach(function(e){e.addEventListener("click",function(){Mode=this.dataset.m;h()})});
+  $("#sb0").addEventListener("click",sr);
+  var i0=$("#in0");if(i0){i0.addEventListener("input",function(e){Q=e.target.value});i0.addEventListener("keydown",function(e){if(e.key=="Enter")sr()})}
+  $$(".fc").forEach(function(e){e.addEventListener("click",function(){Af=Af==this.dataset.k?"":this.dataset.k;h()})});
+  $$(".ic2").forEach(function(e){e.addEventListener("click",function(){var p=this.dataset.k.split(":"),g=p[0],v=p[1],f=Object.assign({},Sf);var a=f[g]||[],i=a.indexOf(v);i>=0?a.splice(i,1):a.push(v);f[g]=a.length?a:undefined;Sf=f;Searched=true;h();sr()})});
+  var si0=$("#si0");if(si0)si0.addEventListener("input",function(){
+   var q2=this.value.toLowerCase(),lx=$("#sl0"),subs=E.map(function(c){return{k:c.name,l:c.name}});
+   var fl=q2?subs.filter(function(o){return o.l.toLowerCase().indexOf(q2)>=0}):subs;
+   lx.innerHTML=fl.slice(0,15).map(function(o){var sf2=Sf.su||[],act=sf2.indexOf(o.k)>=0;return'<span class=ic2'+(act?" a":"")+' data-k="su:'+o.k+'">'+es(o.l)+"</span>"}).join("");
+   $$("#sl0 .ic2").forEach(function(e){e.addEventListener("click",function(){var p=this.dataset.k.split(":"),g=p[0],v=p[1],f=Object.assign({},Sf);var a=f[g]||[],i=a.indexOf(v);i>=0?a.splice(i,1):a.push(v);f[g]=a.length?a:undefined;Sf=f;Searched=true;h();sr()})})
+  });
+  $("#ms0")&&$("#ms0").addEventListener("click",function(){Af="";h()});
+  $("#md0")&&$("#md0").addEventListener("click",function(){Af="";h();sr()});
+  $("#mf0")&&$("#mf0").addEventListener("click",function(){var f=Object.assign({},Sf);f.free=f.free=="1"?undefined:"1";Sf=f;h()});
+  $("#mi0")&&$("#mi0").addEventListener("click",function(){var f=Object.assign({},Sf);f.if0=f.if0=="1"?undefined:"1";Sf=f;h()});
+  $$(".fb").forEach(function(e){e.addEventListener("click",function(){Feat=this.dataset.f;Searched=false;h()})});
+  $$(".j4").forEach(function(e){e.addEventListener("click",function(ev){ev.stopPropagation();var n=this.dataset.n;fv(n)})});
+  $$(".jc").forEach(function(e){e.addEventListener("click",function(){var slug=this.dataset.s,sd=J.find(function(j){return j.slug==slug});if(sd)V(sd)})})
+ }else if(T=="rank"){
+  var rd=J,idxG=["SCIE","SSCI","AHCI","ESCI","EI","Scopus","MEDLINE"].map(function(v){var m={Scopus:"scopus",MEDLINE:"pubmed"};return{l:v,n:m[v]?rd.filter(function(j){return j[m[v]]}).length:rd.filter(function(j){return(j.indices||[]).indexOf(v)>=0}).length}});
+  var subG=E.slice(0,10).map(function(c){return{l:c.name,n:c.count}});
+  var casG=[1,2,3,4].map(function(z){return{l:z+"区",n:rd.filter(function(j){return j.cas_zone===z}).length}});
+  var jcrG=["Q1","Q2","Q3","Q4"].map(function(q){return{l:q,n:rd.filter(function(j){return j.if_quartile===q}).length}});
+  a.innerHTML='<div class=pt>期刊榜单</div><div class=d1><div class=d2>索引收录</div><div class=rg>'+idxG.map(function(x){return'<div class=r0 data-t="i" data-v="'+x.l+'"><div style="font-size:12px;font-weight:800;color:#171717">'+x.l+'</div><div style="font-size:10px;color:#81786e">'+x.n.toLocaleString()+" 种</div></div>"}).join("")+'</div></div>'+
+  '<div class=d1><div class=d2>ESI 学科 Top 10</div><div class=rg>'+subG.map(function(x){return'<div class=r0 data-t="s" data-v="'+x.l+'"><div style="font-size:12px;font-weight:800;color:#171717">'+x.l+'</div><div style="font-size:10px;color:#81786e">'+x.n.toLocaleString()+" 种</div></div>"}).join("")+'</div></div>'+
+  '<div class=d1><div class=d2>中科院分区</div><div class=rg>'+casG.map(function(x){return'<div class=r0 data-t="c" data-v="'+x.l+'"><div style="font-size:12px;font-weight:800;color:#171717">'+x.l+'</div><div style="font-size:10px;color:#81786e">'+x.n.toLocaleString()+" 种</div></div>"}).join("")+'</div></div>'+
+  '<div class=d1><div class=d2>JCR 分区</div><div class=rg>'+jcrG.map(function(x){return'<div class=r0 data-t="j" data-v="'+x.l+'"><div style="font-size:12px;font-weight:800;color:#171717">'+x.l+'</div><div style="font-size:10px;color:#81786e">'+x.n.toLocaleString()+" 种</div></div>"}).join("")+'</div></div>';
+  $$(".r0").forEach(function(e){e.addEventListener("click",function(){
+   var t=this.dataset.t,v=this.dataset.v;Searched=true;
+   if(t=="i"){var m={Scopus:"scopus",MEDLINE:"pubmed"};Res=m[v]?J.filter(function(j){return j[m[v]]}):J.filter(function(j){return(j.indices||[]).indexOf(v)>=0})}
+   else if(t=="c"){var zn=parseInt(v);Res=J.filter(function(j){return j.cas_zone===zn})}
+   else if(t=="j")Res=J.filter(function(j){return j.if_quartile===v});
+   else if(t=="s")Res=J.filter(function(j){return j.esi_category===v||(j.wos_categories||[]).indexOf(v)>=0});
+   Res=Res.sort(function(a,b){return(b.if_2024||0)-(a.if_2024||0)}).slice(0,80);T="home";h()
+  })})
+ }else if(T=="fav"){
+  var fv0=J.filter(function(j){var n=j.issn||j.eissn||j.slug||"";return F.has(n)});
+  a.innerHTML='<div class=pt>我的收藏</div>'+(fv0.length?'<div class=jl>'+fv0.map(function(j,i){return jc(j,i)}).join("")+"</div>":'<div class=e0>♡<div>暂无收藏</div></div>');
+  $$(".j4").forEach(function(e){e.addEventListener("click",function(ev){ev.stopPropagation();var n=this.dataset.n;fv(n);h()})});
+  $$(".jc").forEach(function(e){e.addEventListener("click",function(){var slug=this.dataset.s,sd=J.find(function(j){return j.slug==slug});if(sd)V(sd)})})
+ }else{
+  var sts=[{l:"期刊",v:J.length.toLocaleString()},{l:"收藏",v:F.size},{l:"含IF",v:J.filter(function(j){return j.if_2024!=null}).length.toLocaleString()}];
+  a.innerHTML='<div class=pt>我的</div><div class=pc2><div class=av>AI</div><div class=pm><div class=pn>分区速查</div><div class=po>本地模式</div></div></div><div class=sc2>'+sts.map(function(s){return'<div class=si3><b>'+s.v+"</b><t>"+s.l+"</t></div>"}).join("")+'</div>'+
+  '<div style="padding:12px;font-size:11px;color:#81786e;margin-top:20px;text-align:center;line-height:2">AILatest Journal · 分区速查<br>© 2026</div>'
+ }
+}
+function V(j){
+ var n=j.issn||j.eissn||j.slug||"",b=bd(j),cats=(j.wos_categories||[]).join("、")||"-",esiE=j.esi_category||"-",ext="";
+ if(j.cas_zone!=null){ext+='<div class=d1><div class=d2>中科院 2025</div><div class=dm><div class=d0><b>'+j.cas_zone+"区"+(j.cas_top?" TOP":"")+'</b><t>大区</t></div><div class=d0><b>'+(j.cas_major_cn||"-")+'</b><t>学科</t></div></div></div>'};
+ if(j.cas_xr&&j.cas_xr.zone){ext+='<div class=d1><div class=d2>新锐 2026</div><div class=dm><div class=d0><b>'+j.cas_xr.zone+"区"+(j.cas_xr.top?" TOP":"")+'</b><t>分区</t></div></div></div>'};
+ $("#a").innerHTML='<div class=dp><span id=bc style="position:fixed;top:12px;left:12px;z-index:10;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.9);border:1px solid #eadfd2;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px">←</span><div class=jc style=margin-bottom:16px;cursor:default><div class=j0 '+to(j.name.length)+'>'+es(in2(j.name))+'</div><div class=j1><div class=j2><div class=j3 style="white-space:normal;font-size:18px">'+es(j.name)+'</div><span class=j4'+(F.has(n)?" fv":"")+' id=ds0 data-n="'+n+'">'+(F.has(n)?"★":"☆")+'</span></div><div class=j5>ISSN '+es(n||"-")+(j.publisher?" | "+es(j.publisher):"")+'</div><div class=ba style=margin-top:8px>'+b.map(function(b,i){return'<span class=bd '+["bb","bg","br","bw","bl"][i%5]+'>'+es(b)+"</span>"}).join("")+'</div></div></div>'+
+ '<div class=dm><div class=d0><b>'+o(j.if_2024,"-")+'</b><t>IF</t></div><div class=d0><b>'+o(j.if_quartile,"-")+'</b><t>JCR</t></div><div class=d0><b>'+(j.cas_zone?cz(j.cas_zone)+(j.cas_top?" TOP":""):"-")+'</b><t>中科院</t></div><div class=d0><b>'+(j.cas_xr?cz(j.cas_xr.zone)+(j.cas_xr.top?" TOP":""):"-")+'</b><t>新锐</t></div></div>'+ext+
+ '<div class=d1><div class=d2>信息</div><div style="padding:12px;font-size:12px;border:1px solid rgba(232,222,210,.95);border-radius:12px;background:rgba(255,255,255,.92)"><div style=display:grid;grid-template-columns:1fr 1fr;gap:8px><div><t style=color:#81786e>出版</t><br><b>'+es(j.publisher||"-")+'</b></div><div><t style=color:#81786e>国家</t><br><b>'+es(j.country||"-")+'</b></div></div><div style=margin-top:8px><t style=color:#81786e>WoS</t><br><b>'+es(cats)+'</b></div><div style=margin-top:6px><t style=color:#81786e>ESI</t><br><b>'+es(esiE)+'</b></div></div></div>'+
+ (j.doaj&&j.doaj.u?'<div class=d1><div class=d2>链接</div><div style="padding:12px;border:1px solid rgba(232,222,210,.95);border-radius:12px;background:rgba(255,255,255,.92)"><a href="'+es(j.doaj.u)+'" target=_blank style=color:#ff6a1a;font-size:13px>官网 →</a></div></div>':"")+"</div>";
+ $("#bc").addEventListener("click",function(){h()});
+ $("#ds0").addEventListener("click",function(e){e.stopPropagation();fv(n);$("#ds0").classList.toggle("fv",F.has(n));$("#ds0").textContent=F.has(n)?"★":"☆"})
+}
+function nb(){var o=$("#side-toggle"),c=$("#nav-close"),s=$("#nav-scrim");if(o)o.addEventListener("click",no);if(c)c.addEventListener("click",nc);if(s)s.addEventListener("click",nc);$$("[data-nav]").forEach(function(b){b.addEventListener("click",function(){ng(this.dataset.nav)})});document.addEventListener("keydown",function(e){if(e.key=="Escape")nc()})}
+async function init(){nb();try{var r=await fetch("/data/journals.json.gz");var b=await r.arrayBuffer();var ds=new DecompressionStream("gzip");J=await new Response(new Blob([b]).stream().pipeThrough(ds)).json()}catch(e){try{var r2=await fetch("/data/journals.json");J=await r2.json()}catch(e2){$("#a").innerHTML="数据加载失败"}}try{var r3=await fetch("/data/esi_categories.json");E=await r3.json()}catch(e){}$("#a").innerHTML='<div class=ld><div class=sp>⌕</div>加载完毕</div>';h()}
+if(document.readyState=="loading")document.addEventListener("DOMContentLoaded",init);else init();
+
+
+</script></body></html>

@@ -1,0 +1,406 @@
+{
+  "source": "Financial Times Top 50 Journals",
+  "count": 50,
+  "records": [
+    {
+      "order": 1,
+      "name": "Academy of Management Journal",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 2,
+      "name": "Academy of Management Review",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 3,
+      "name": "Accounting, Organizations and Society",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 4,
+      "name": "Administrative Science Quarterly",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 5,
+      "name": "American Economic Review",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 6,
+      "name": "Contemporary Accounting Research",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 7,
+      "name": "Econometrica",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 8,
+      "name": "Entrepreneurship Theory and Practice",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 9,
+      "name": "Harvard Business Review",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 10,
+      "name": "Human Relations",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 11,
+      "name": "Human Resource Management",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 12,
+      "name": "Information Systems Research",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 13,
+      "name": "Journal of Accounting and Economics",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 14,
+      "name": "Journal of Accounting Research",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 15,
+      "name": "Journal of Applied Psychology",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 16,
+      "name": "Journal of Business Ethics",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 17,
+      "name": "Journal of Business Venturing",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 18,
+      "name": "Journal of Consumer Psychology",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 19,
+      "name": "Journal of Consumer Research",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 20,
+      "name": "Journal of Finance",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 21,
+      "name": "Journal of Financial and Quantitative Analysis",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 22,
+      "name": "Journal of Financial Economics",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 23,
+      "name": "Journal of International Business Studies",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 24,
+      "name": "Journal of Management",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 25,
+      "name": "Journal of Management Information Systems",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 26,
+      "name": "Journal of Management Studies",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 27,
+      "name": "Journal of Marketing",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 28,
+      "name": "Journal of Marketing Research",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 29,
+      "name": "Journal of Operations Management",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 30,
+      "name": "Journal of Political Economy",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 31,
+      "name": "Journal of the Academy of Marketing Science",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 32,
+      "name": "Management Science",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 33,
+      "name": "Manufacturing and Service Operations Management",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 34,
+      "name": "Marketing Science",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 35,
+      "name": "MIS Quarterly",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 36,
+      "name": "Operations Research",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 37,
+      "name": "Organization Science",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 38,
+      "name": "Organization Studies",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 39,
+      "name": "Organizational Behavior and Human Decision Processes",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 40,
+      "name": "Production and Operations Management",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 41,
+      "name": "Quarterly Journal of Economics",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 42,
+      "name": "Research Policy",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 43,
+      "name": "Review of Accounting Studies",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 44,
+      "name": "Review of Economic Studies",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 45,
+      "name": "Review of Finance",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 46,
+      "name": "Review of Financial Studies",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 47,
+      "name": "Sloan Management Review",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 48,
+      "name": "Strategic Entrepreneurship Journal",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 49,
+      "name": "Strategic Management Journal",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    },
+    {
+      "order": 50,
+      "name": "The Accounting Review",
+      "subject": "",
+      "source": "Financial Times Top 50 Journals",
+      "source_file": "FT50.pdf",
+      "source_url": "https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0"
+    }
+  ]
+}

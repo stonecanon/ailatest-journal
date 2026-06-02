@@ -23,3 +23,9 @@ Thumbs.db
 # 日志
 *.log
 *.plist
+
+# 小程序生成数据（weapp目录下有自己的一份）
+data/weapp/
+data/india.json
+data/journal_covers*
+data/stripped.json.gz

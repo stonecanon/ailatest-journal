@@ -185,10 +185,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="search-wrap">
       <input id="q" type="text" maxlength="200" placeholder="Search: journal title / abbr / ISSN" autocomplete="off" spellcheck="false" />
       <div class="search-actions">
-        <div id="pick-search-meta" class="search-meta-group" hidden>
-          <span id="pick-quota" class="search-meta pick-quota muted-cell" data-i18n="pick_quota">OpenAlex 驱动</span>
-          <input type="text" id="pick-apikey" class="pick-apikey search-apikey" data-i18n-placeholder="pick_apikey_ph" placeholder="API Key 可选">
-        </div>
         <button class="search-submit" id="search-submit" type="button" aria-label="Search">
           <span data-i18n="search_button">Search</span>
         </button>
@@ -467,6 +463,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="side-section" data-domestic hidden>
       <nav class="nav">
         <button class="nav-item active" data-dom="cnki_major"><span data-i18n="src_cnki_major">中文期刊目录</span></button>
+        <button class="nav-item" data-dom="nsfc_mgmt"><span data-i18n="src_nsfc_mgmt">国自然管理科学部</span></button>
         <button class="nav-item" data-dom="cnkx"><span data-i18n="src_cnkx">中国科协高质量目录</span></button>
       </nav>
       <div class="nav-divider" style="margin:8px 0"></div>
@@ -573,4 +570,3 @@ const __BUILD_VER = 'v20260530-79';
 </html>
 
 trigger
-

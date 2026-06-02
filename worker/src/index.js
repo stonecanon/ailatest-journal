@@ -1088,27 +1088,6 @@ export default {
       if (p === '/journal-view'          && req.method === 'POST')   return routeJournalView(req, env);
       if (p === '/journal-views'         && req.method === 'GET')    return routeGetJournalViews(req, env);
 
-      // OpenAlex proxy (选刊推荐论文搜索)
-      if (p === '/openalex' && req.method === 'GET') {
-        const target = u.searchParams.get('url') || '';
-        if (target) {
-          const r = await fetch(target, { headers: { 'Accept': 'application/json' } });
-          const body = await r.text();
-          return new Response(body, { status: r.status, headers: { 'Content-Type': 'application/json', ...CORS } });
-        }
-        // If no url param, treat searchParams as direct query string to pass through
-        const qs = u.search.slice(1); // remove leading ?
-        if (qs) {
-          const targetParams = new URLSearchParams(qs);
-          if (!targetParams.has('mailto')) targetParams.set('mailto', 'jiantaoweng@gmail.com');
-          const apiUrl = `https://api.openalex.org/works?${targetParams.toString()}`;
-          const r = await fetch(apiUrl, { headers: { 'Accept': 'application/json' } });
-          const body = await r.text();
-          return new Response(body, { status: r.status, headers: { 'Content-Type': 'application/json', ...CORS } });
-        }
-        return err('missing query', 400);
-      }
-
       return err('not found', 404);
     } catch (e) {
       return err('server error: ' + e.message, 500);

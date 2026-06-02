@@ -1,0 +1,198 @@
+{
+  "source": "UT Dallas Top 24 Business Journals",
+  "count": 24,
+  "records": [
+    {
+      "order": 1,
+      "name": "The Accounting Review",
+      "subject": "Accounting",
+      "source": "UT Dallas Top 24 Business Journals",
+      "source_file": "UTD24.pdf",
+      "source_url": "https://jsom.utdallas.edu/the-utd-top-100-business-school-research-rankings/"
+    },
+    {
+      "order": 2,
+      "name": "Journal of Accounting and Economics",
+      "subject": "Accounting",
+      "source": "UT Dallas Top 24 Business Journals",
+      "source_file": "UTD24.pdf",
+      "source_url": "https://jsom.utdallas.edu/the-utd-top-100-business-school-research-rankings/"
+    },
+    {
+      "order": 3,
+      "name": "Journal of Accounting Research",
+      "subject": "Accounting",
+      "source": "UT Dallas Top 24 Business Journals",
+      "source_file": "UTD24.pdf",
+      "source_url": "https://jsom.utdallas.edu/the-utd-top-100-business-school-research-rankings/"
+    },
+    {
+      "order": 4,
+      "name": "Journal of Finance",
+      "subject": "Finance",
+      "source": "UT Dallas Top 24 Business Journals",
+      "source_file": "UTD24.pdf",
+      "source_url": "https://jsom.utdallas.edu/the-utd-top-100-business-school-research-rankings/"
+    },
+    {
+      "order": 5,
+      "name": "Journal of Financial Economics",
+      "subject": "Finance",
+      "source": "UT Dallas Top 24 Business Journals",
+      "source_file": "UTD24.pdf",
+      "source_url": "https://jsom.utdallas.edu/the-utd-top-100-business-school-research-rankings/"
+    },
+    {
+      "order": 6,
+      "name": "The Review of Financial Studies",
+      "subject": "Finance",
+      "source": "UT Dallas Top 24 Business Journals",
+      "source_file": "UTD24.pdf",
+      "source_url": "https://jsom.utdallas.edu/the-utd-top-100-business-school-research-rankings/"
+    },
+    {
+      "order": 7,
+      "name": "Information Systems Research",
+      "subject": "Information Systems",
+      "source": "UT Dallas Top 24 Business Journals",
+      "source_file": "UTD24.pdf",
+      "source_url": "https://jsom.utdallas.edu/the-utd-top-100-business-school-research-rankings/"
+    },
+    {
+      "order": 8,
+      "name": "Informs Journal on Computing",
+      "subject": "Information Systems",
+      "source": "UT Dallas Top 24 Business Journals",
+      "source_file": "UTD24.pdf",
+      "source_url": "https://jsom.utdallas.edu/the-utd-top-100-business-school-research-rankings/"
+    },
+    {
+      "order": 9,
+      "name": "MIS Quarterly",
+      "subject": "Information Systems",
+      "source": "UT Dallas Top 24 Business Journals",
+      "source_file": "UTD24.pdf",
+      "source_url": "https://jsom.utdallas.edu/the-utd-top-100-business-school-research-rankings/"
+    },
+    {
+      "order": 10,
+      "name": "Journal of Consumer Research",
+      "subject": "Marketing",
+      "source": "UT Dallas Top 24 Business Journals",
+      "source_file": "UTD24.pdf",
+      "source_url": "https://jsom.utdallas.edu/the-utd-top-100-business-school-research-rankings/"
+    },
+    {
+      "order": 11,
+      "name": "Journal of Marketing",
+      "subject": "Marketing",
+      "source": "UT Dallas Top 24 Business Journals",
+      "source_file": "UTD24.pdf",
+      "source_url": "https://jsom.utdallas.edu/the-utd-top-100-business-school-research-rankings/"
+    },
+    {
+      "order": 12,
+      "name": "Journal of Marketing Research",
+      "subject": "Marketing",
+      "source": "UT Dallas Top 24 Business Journals",
+      "source_file": "UTD24.pdf",
+      "source_url": "https://jsom.utdallas.edu/the-utd-top-100-business-school-research-rankings/"
+    },
+    {
+      "order": 13,
+      "name": "Marketing Science",
+      "subject": "Marketing",
+      "source": "UT Dallas Top 24 Business Journals",
+      "source_file": "UTD24.pdf",
+      "source_url": "https://jsom.utdallas.edu/the-utd-top-100-business-school-research-rankings/"
+    },
+    {
+      "order": 14,
+      "name": "Management Science",
+      "subject": "Management/Operations",
+      "source": "UT Dallas Top 24 Business Journals",
+      "source_file": "UTD24.pdf",
+      "source_url": "https://jsom.utdallas.edu/the-utd-top-100-business-school-research-rankings/"
+    },
+    {
+      "order": 15,
+      "name": "Operations Research",
+      "subject": "Management, operations",
+      "source": "UT Dallas Top 24 Business Journals",
+      "source_file": "UTD24.pdf",
+      "source_url": "https://jsom.utdallas.edu/the-utd-top-100-business-school-research-rankings/"
+    },
+    {
+      "order": 16,
+      "name": "Journal of Operations Management",
+      "subject": "Management, operations",
+      "source": "UT Dallas Top 24 Business Journals",
+      "source_file": "UTD24.pdf",
+      "source_url": "https://jsom.utdallas.edu/the-utd-top-100-business-school-research-rankings/"
+    },
+    {
+      "order": 17,
+      "name": "Manufacturing & Service Operations Management",
+      "subject": "Management, operations",
+      "source": "UT Dallas Top 24 Business Journals",
+      "source_file": "UTD24.pdf",
+      "source_url": "https://jsom.utdallas.edu/the-utd-top-100-business-school-research-rankings/"
+    },
+    {
+      "order": 18,
+      "name": "Production and Operations Management",
+      "subject": "Management, operations",
+      "source": "UT Dallas Top 24 Business Journals",
+      "source_file": "UTD24.pdf",
+      "source_url": "https://jsom.utdallas.edu/the-utd-top-100-business-school-research-rankings/"
+    },
+    {
+      "order": 19,
+      "name": "Academy of Management Journal",
+      "subject": "Management, general",
+      "source": "UT Dallas Top 24 Business Journals",
+      "source_file": "UTD24.pdf",
+      "source_url": "https://jsom.utdallas.edu/the-utd-top-100-business-school-research-rankings/"
+    },
+    {
+      "order": 20,
+      "name": "Academy of Management Review",
+      "subject": "Management, general",
+      "source": "UT Dallas Top 24 Business Journals",
+      "source_file": "UTD24.pdf",
+      "source_url": "https://jsom.utdallas.edu/the-utd-top-100-business-school-research-rankings/"
+    },
+    {
+      "order": 21,
+      "name": "Administrative Science Quarterly",
+      "subject": "Management, general",
+      "source": "UT Dallas Top 24 Business Journals",
+      "source_file": "UTD24.pdf",
+      "source_url": "https://jsom.utdallas.edu/the-utd-top-100-business-school-research-rankings/"
+    },
+    {
+      "order": 22,
+      "name": "Organization Science",
+      "subject": "Management, general",
+      "source": "UT Dallas Top 24 Business Journals",
+      "source_file": "UTD24.pdf",
+      "source_url": "https://jsom.utdallas.edu/the-utd-top-100-business-school-research-rankings/"
+    },
+    {
+      "order": 23,
+      "name": "Journal of International Business Studies",
+      "subject": "Management, general",
+      "source": "UT Dallas Top 24 Business Journals",
+      "source_file": "UTD24.pdf",
+      "source_url": "https://jsom.utdallas.edu/the-utd-top-100-business-school-research-rankings/"
+    },
+    {
+      "order": 24,
+      "name": "Strategic Management Journal",
+      "subject": "Management, general/strategy",
+      "source": "UT Dallas Top 24 Business Journals",
+      "source_file": "UTD24.pdf",
+      "source_url": "https://jsom.utdallas.edu/the-utd-top-100-business-school-research-rankings/"
+    }
+  ]
+}
