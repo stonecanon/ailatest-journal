@@ -2119,8 +2119,8 @@
     // 中国科协 高质量科技期刊分级目录 (2025-12 修订, 11084 条)
     ((d.cnkx && d.cnkx.records)||[]).forEach(r => {
       if (!r.tier || !/^T[123]$/.test(r.tier)) return;
-      addDomIndex(r.name, 'name', { source:'cnkx', label:T('科协','CAST')+' '+r.tier, tag:r.tier, domain:r.domain });
-      if (r.issn) addDomIndex(r.issn, 'issn', { source:'cnkx', label:T('科协','CAST')+' '+r.tier, tag:r.tier, domain:r.domain });
+      addDomIndex(r.name, 'name', { source:'cnkx', label:T('科协','CAST')+' '+r.tier, tag:r.tier });
+      if (r.issn) addDomIndex(r.issn, 'issn', { source:'cnkx', label:T('科协','CAST')+' '+r.tier, tag:r.tier });
     });
     ((d.nsfc_mgmt && d.nsfc_mgmt.records)||[]).forEach(r => {
       addDomIndex(r.name, 'name', { source:'nsfc_mgmt', label:'NSFC '+r.tier, tag:r.tier, domain:T('管理科学部','Management Science') });
@@ -3670,7 +3670,10 @@
       const plainName = title;
       const plainCats = cats.join(lang.startsWith('zh') ? '、' : ', ');
       const major = ir.cas_major_cn || ir.jcr_cat || cats[0] || ir.esi_category || '';
-      const isDomesticJournal = src !== 'int';
+      // 判断是否为真正的中文学术期刊：必须有 CN 号或中文刊名（不止一个短横），且来自国内源
+      const hasCnCode = !!r.cn_code;
+      const hasRealCnName = !!r.cn_name && r.cn_name !== '-' && r.cn_name !== title;
+      const isDomesticJournal = src !== 'int' && (hasCnCode || hasRealCnName);
       const domesticFields = [
         r.discipline ? tn(r.discipline, 'cssci') : '',
         r.category ? tn(r.category, 'pku') : '',
@@ -5874,23 +5877,20 @@
             ...e.topics.slice(0, 4).map(t => `<span class="pick-topic">${escape(t)}</span>`),
           ].join('');
 
-          let badgesHtml = '';
+          let topInfoHtml = '';
           let flagsHtml = '';
           let zoneTagsHtml = '';
           let zoneColor = '';
           if (e.journalRec) {
             const r = e.journalRec;
-            // Index badges (SCIE/SSCI/AHCI/ESCI)
             const idxBadges = (e.indices||[]).map(idx => badgeIndex(idx)).join('');
-            // Scopus
             const scBadge = badgeScopus(r.scopus);
-            // EI
             const eiBdg = (r.indices || []).includes('EI') ? `<span class="badge b-ei">EI</span>` : '';
-            // IF
-            const ifBdg = badgeIF(r.if_2024);
-            // CCF
-            const ccfTxt = r.ccf ? `<span class="badge b-ccf">CCF ${escape(r.ccf)}</span>` : '';
-            badgesHtml = [idxBadges, scBadge, eiBdg, ifBdg, ccfTxt].filter(Boolean).join('');
+            const ifTxt = r.if_2024 != null && r.if_2024 !== ''
+              ? `<span class="if-pill" title="${T('JCR 2024 影响因子','JCR 2024 Impact Factor')}">IF ${(+r.if_2024).toFixed(1)}</span>`
+              : '';
+            const freeTxt = r.free ? freeBadgeCell(r) : '';
+            topInfoHtml = [idxBadges, scBadge, eiBdg, ifTxt, freeTxt].filter(Boolean).join('');
             // Warning & publisher flags
             const r2 = e.journalRec;
             if (r2) {
@@ -5914,21 +5914,26 @@
               if (pub.includes('frontier')) flagsHtml += `<span class="badge b-frontiers">Frontiers</span>`;
               if (pub.includes('hindawi')) flagsHtml += `<span class="badge b-hindawi">Hindawi</span>`;
             }
-            // Prominent zone/JCR tags at top of card
+            const jcrQ = String(e.jcr_q || '').toUpperCase();
+            const xrZone = r.cas_xr && r.cas_xr.zone ? String(r.cas_xr.zone) : '';
             const zTag = e.zone
-              ? `<span class="zone z${e.zone}">${e.top ? 'TOP·' : ''}${e.zone}${T('区','')}</span>`
+              ? `<span class="zone z${e.zone}" title="${T('中科院 2025 大类分区','CAS 2025 major category tier')}">${T('中科院2025','CAS 2025')} ${e.zone}${T('区','')}${e.top ? ' TOP' : ''}</span>`
               : '';
-            const jcrTag = e.jcr_q
-              ? `<span class="zone jcr-${e.jcr_q.toLowerCase()}">JCR ${e.jcr_q}</span>`
+            const jcrTag = /^Q[1-4]$/.test(jcrQ)
+              ? `<span class="zone jcr-${jcrQ.toLowerCase()}" title="${T('JCR 2024 分区','JCR 2024 quartile')}">JCR 2024 ${jcrQ}</span>`
               : '';
-            zoneTagsHtml = [zTag, jcrTag].filter(Boolean).join('');
+            const xrTag = /^[1-4]$/.test(xrZone)
+              ? `<span class="zone z${xrZone}" title="${T('中科院新锐 2026 分区','CAS Emerging 2026 tier')}">${T('新锐2026','Emerging 2026')} ${xrZone}${T('区','')}${r.cas_xr.top ? ' TOP' : ''}</span>`
+              : '';
+            const ccfTxt = r.ccf ? `<span class="badge b-ccf" title="${T('中国计算机学会推荐等级','CCF recommended ranking')}">CCF ${escape(r.ccf)}</span>` : '';
+            zoneTagsHtml = [zTag, jcrTag, xrTag, ccfTxt].filter(Boolean).join('');
             // Zone strip color
             zoneColor = e.zone === '1' || e.zone === 1 ? '#1f3a5f'
               : e.zone === '2' || e.zone === 2 ? '#4f6f9b'
               : e.zone === '3' || e.zone === 3 ? '#9eb1cb'
               : e.zone === '4' || e.zone === 4 ? '#d3dbe6'
-              : e.jcr_q === 'Q1' ? '#7a2030'
-              : e.jcr_q === 'Q2' ? '#a04a5a'
+              : jcrQ === 'Q1' ? '#7a2030'
+              : jcrQ === 'Q2' ? '#a04a5a'
               : '';
           }
 
@@ -5941,32 +5946,44 @@
 
           const cardZoneClass = e.zone ? ` zone-${e.zone}` : '';
           const zoneStripStyle = zoneColor ? `style="background:${zoneColor}"` : '';
+          const coverRec = e.journalRec ? lookupCover(e.journalRec) : null;
+          const coverUrl = e.journalRec?.cover_url || e.journalRec?.official_cover_url || coverRec?.u || '';
+          const coverMark = name.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase() || 'J';
+          const coverFallback = `<div class="pick-cover-fallback"><span>${escape(coverMark)}</span><b>${escape(name)}</b></div>`;
+          const coverHtml = `<div class="pick-cover ${coverUrl ? 'has-cover' : ''}" aria-hidden="true">${
+            coverUrl
+              ? `<img src="${escape(coverUrl)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.closest('.pick-cover').classList.add('cover-failed');this.remove()" />${coverFallback}`
+              : coverFallback
+          }</div>`;
 
           return `<div class="pick-card${cardZoneClass}" data-issn="${escape(issnStr)}">
             ${zoneColor ? `<div class="pick-zone-strip" ${zoneStripStyle}></div>` : ''}
-            ${zoneTagsHtml ? `<div class="pick-zone-tags">${zoneTagsHtml}</div>` : ''}
-            <h3><a href="#j/${escape(e.journalRec ? favId(e.journalRec) : issnStr)}">${escape(name)}</a></h3>
-            <div class="pick-head">
-              <span class="pick-count">${e.count}<small> ${T('个匹配信号','signals')}</small></span>
-              <div class="pick-head-right">
-                <span class="pick-score-bar"><span class="bar"><span class="bar-fill" style="width:${scorePct}%;background:${barColor}"></span></span></span>
-                <span class="pick-score-pct">${scorePct}%</span>
+            <div class="pick-card-main">
+              ${topInfoHtml ? `<div class="pick-index-line">${topInfoHtml}</div>` : ''}
+              <h3><a href="#j/${escape(e.journalRec ? favId(e.journalRec) : issnStr)}">${escape(name)}</a></h3>
+              ${zoneTagsHtml ? `<div class="pick-zone-tags">${zoneTagsHtml}</div>` : ''}
+              <div class="pick-head">
+                <span class="pick-count">${e.count}<small> ${T('个匹配信号','signals')}</small></span>
+                <div class="pick-head-right">
+                  <span class="pick-score-bar"><span class="bar"><span class="bar-fill" style="width:${scorePct}%;background:${barColor}"></span></span></span>
+                  <span class="pick-score-pct">${scorePct}%</span>
+                </div>
               </div>
+              ${flagsHtml ? `<div class="pick-flags">${flagsHtml}</div>` : ''}
+              ${(function(){
+                const r2 = e.journalRec;
+                let txt = '📅 ' + T('审稿周期','Review cycle') + ': ';
+                const weeks = parseFloat(r2?.doaj?.review_weeks);
+                if (weeks > 0) {
+                  txt += (weeks / 4.33).toFixed(1) + T(' 个月 (投稿→出版,DOAJ)',' months (submission→pub.)');
+                } else {
+                  txt += T('≈4.0 个月 (DOAJ 平均)','≈4.0 months (DOAJ avg)');
+                }
+                return '<div class="pick-cycle">' + txt + '</div>';
+              })()}
+              ${signalList ? `<div class="pick-papers">${signalList}</div>` : ''}
             </div>
-            ${badgesHtml ? `<div class="pick-badges">${badgesHtml}</div>` : ''}
-            ${flagsHtml ? `<div class="pick-flags">${flagsHtml}</div>` : ''}
-            ${(function(){
-              const r2 = e.journalRec;
-              let txt = '📅 ' + T('审稿周期','Review cycle') + ': ';
-              const weeks = parseFloat(r2?.doaj?.review_weeks);
-              if (weeks > 0) {
-                txt += (weeks / 4.33).toFixed(1) + T(' 个月 (投稿→出版,DOAJ)',' months (submission→pub.)');
-              } else {
-                txt += T('≈4.0 个月 (DOAJ 平均)','≈4.0 months (DOAJ avg)');
-              }
-              return '<div class="pick-cycle">' + txt + '</div>';
-            })()}
-            ${signalList ? `<div class="pick-papers">${signalList}</div>` : ''}
+            ${coverHtml}
           </div>`;
         }).join('');
 
