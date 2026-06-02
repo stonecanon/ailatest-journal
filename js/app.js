@@ -2125,8 +2125,8 @@
     // 中国科协 高质量科技期刊分级目录 (2025-12 修订, 11084 条)
     ((d.cnkx && d.cnkx.records)||[]).forEach(r => {
       if (!r.tier || !/^T[123]$/.test(r.tier)) return;
-      addDomIndex(r.name, 'name', { source:'cnkx', label:T('科协','CAST')+' '+r.tier, tag:r.tier });
-      if (r.issn) addDomIndex(r.issn, 'issn', { source:'cnkx', label:T('科协','CAST')+' '+r.tier, tag:r.tier });
+      addDomIndex(r.name, 'name', { source:'cnkx', label:T('科协','CAST')+' '+r.tier, tag:r.tier, domain:r.domain });
+      if (r.issn) addDomIndex(r.issn, 'issn', { source:'cnkx', label:T('科协','CAST')+' '+r.tier, tag:r.tier, domain:r.domain });
     });
     ((d.nsfc_mgmt && d.nsfc_mgmt.records)||[]).forEach(r => {
       addDomIndex(r.name, 'name', { source:'nsfc_mgmt', label:'NSFC '+r.tier, tag:r.tier, domain:T('管理科学部','Management Science') });
