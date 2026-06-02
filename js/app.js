@@ -5955,12 +5955,13 @@
               ? `<img src="${escape(coverUrl)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.closest('.pick-cover').classList.add('cover-failed');this.remove()" />${coverFallback}`
               : coverFallback
           }</div>`;
+          const journalUrl = e.journalRec ? journalPublicPath(e.journalRec) : `#j/${encodeURIComponent(issnStr)}`;
 
           return `<div class="pick-card${cardZoneClass}" data-issn="${escape(issnStr)}">
             ${zoneColor ? `<div class="pick-zone-strip" ${zoneStripStyle}></div>` : ''}
             <div class="pick-card-main">
               ${topInfoHtml ? `<div class="pick-index-line">${topInfoHtml}</div>` : ''}
-              <h3><a href="#j/${escape(e.journalRec ? favId(e.journalRec) : issnStr)}">${escape(name)}</a></h3>
+              <h3><a href="${escape(journalUrl)}">${escape(name)}</a></h3>
               ${zoneTagsHtml ? `<div class="pick-zone-tags">${zoneTagsHtml}</div>` : ''}
               <div class="pick-head">
                 <span class="pick-count">${e.count}<small> ${T('个匹配信号','signals')}</small></span>
@@ -5987,14 +5988,15 @@
           </div>`;
         }).join('');
 
-        // Click to open journal drawer (only if we have our data)
+        // Click to open the normal journal details page.
         const pickEl = document.getElementById('pick-results');
         if (pickEl) {
           pickEl.querySelectorAll('.pick-card').forEach(card => {
-            card.addEventListener('click', () => {
+            card.addEventListener('click', (ev) => {
+              if (ev.target.closest('a')) return;
               const issn = card.dataset.issn;
               const rec = journals.find(r => r.issn === issn || r.eissn === issn);
-              if (rec) openDrawer(rec);
+              if (rec) location.href = journalPublicPath(rec);
             });
           });
         }
