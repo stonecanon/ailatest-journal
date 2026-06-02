@@ -781,7 +781,13 @@
 
   function lookupCover(r) {
     if (!coverMap) return null;
-    const keys = [r.issn, r.eissn].filter(Boolean).map(s => String(s).toUpperCase());
+    function coverKeys(s) {
+      const raw = String(s || '').trim().toUpperCase();
+      const compact = raw.replace(/[^0-9X]/g, '');
+      const hyphen = compact.length === 8 ? compact.slice(0, 4) + '-' + compact.slice(4) : '';
+      return [raw, compact, hyphen].filter(Boolean);
+    }
+    const keys = [...new Set([r.issn, r.eissn].flatMap(coverKeys))];
     for (const k of keys) {
       if (coverMap[k]) return coverMap[k];
     }
@@ -5670,6 +5676,7 @@
     }
     input?.addEventListener('input', updatePickCharCount);
     updatePickCharCount();
+    let pickLastQuery = '';
 
     async function doSearch() {
       const query = input.value.trim();
@@ -5857,10 +5864,19 @@
             return !cats.some(c => /multidisciplinary/i.test(c));
           });
         }
+        if (document.getElementById('pick-filter-free')?.checked) {
+          filtered = filtered.filter(e => e.journalRec?.free === true);
+        }
         filtered.sort((a, b) => b.score - a.score || (b.journalRec.if_2024 || 0) - (a.journalRec.if_2024 || 0));
-        filtered = filtered.slice(0, 30);
+        if (query !== pickLastQuery) {
+          pickLastQuery = query;
+          window.__pickShown = 30;
+        }
+        const allFiltered = filtered;
+        const shownLimit = Math.max(30, window.__pickShown || 30);
+        filtered = allFiltered.slice(0, shownLimit);
 
-        const maxScore = filtered.length > 0 ? filtered[0].score : 1;
+        const maxScore = allFiltered.length > 0 ? allFiltered[0].score : 1;
         filtered.forEach(e => e.score = maxScore > 0 ? e.score / maxScore : 0);
 
         if (!filtered.length) {
@@ -5884,14 +5900,12 @@
           let zoneColor = '';
           if (e.journalRec) {
             const r = e.journalRec;
-            const idxBadges = (e.indices||[]).map(idx => badgeIndex(idx)).join('');
+            const idxBadges = [...new Set(e.indices||[])].map(idx => badgeIndex(idx)).join('');
             const scBadge = badgeScopus(r.scopus);
-            const eiBdg = (r.indices || []).includes('EI') ? `<span class="badge b-ei">EI</span>` : '';
             const ifTxt = r.if_2024 != null && r.if_2024 !== ''
               ? `<span class="if-pill" title="${T('JCR 2024 影响因子','JCR 2024 Impact Factor')}">IF ${(+r.if_2024).toFixed(1)}</span>`
               : '';
-            const freeTxt = r.free ? freeBadgeCell(r) : '';
-            topInfoHtml = [idxBadges, scBadge, eiBdg, ifTxt, freeTxt].filter(Boolean).join('');
+            topInfoHtml = [idxBadges, scBadge].filter(Boolean).join('');
             // Warning & publisher flags
             const r2 = e.journalRec;
             if (r2) {
@@ -5927,7 +5941,7 @@
               ? `<span class="zone z${xrZone}" title="${T('中科院新锐 2026 分区','CAS Emerging 2026 tier')}">${T('新锐2026','Emerging 2026')} ${xrZone}${T('区','')}${r.cas_xr.top ? ' TOP' : ''}</span>`
               : '';
             const ccfTxt = r.ccf ? `<span class="badge b-ccf" title="${T('中国计算机学会推荐等级','CCF recommended ranking')}">CCF ${escape(r.ccf)}</span>` : '';
-            zoneTagsHtml = [zTag, jcrTag, xrTag, ccfTxt].filter(Boolean).join('');
+            zoneTagsHtml = [ifTxt, jcrTag, zTag, xrTag, ccfTxt].filter(Boolean).join('');
             // Zone strip color
             zoneColor = e.zone === '1' || e.zone === 1 ? '#1f3a5f'
               : e.zone === '2' || e.zone === 2 ? '#4f6f9b'
@@ -5973,35 +5987,44 @@
               ${flagsHtml ? `<div class="pick-flags">${flagsHtml}</div>` : ''}
               ${(function(){
                 const r2 = e.journalRec;
-                let txt = '📅 ' + T('审稿周期','Review cycle') + ': ';
+                const freeState = r2?.free ? freeBadgeCell(r2) : `<span class="badge b-paid">${T('非免费发表','Paid / not free')}</span>`;
                 const weeks = parseFloat(r2?.doaj?.review_weeks);
-                if (weeks > 0) {
-                  txt += (weeks / 4.33).toFixed(1) + T(' 个月 (投稿→出版,DOAJ)',' months (submission→pub.)');
-                } else {
-                  txt += T('≈4.0 个月 (DOAJ 平均)','≈4.0 months (DOAJ avg)');
-                }
-                return '<div class="pick-cycle">' + txt + '</div>';
+                const cycleMain = weeks > 0
+                  ? (weeks / 4.33).toFixed(1) + T(' 个月',' months')
+                  : T('约 4.0 个月','approx. 4.0 months');
+                const cycleSub = weeks > 0
+                  ? T('投稿到发表, DOAJ','submission to publication, DOAJ')
+                  : T('DOAJ 平均','DOAJ average');
+                return `<div class="pick-cycle">${freeState}<span class="pick-cycle-label">${T('审稿周期','Review cycle')}:</span><strong>${cycleMain}</strong><span class="pick-cycle-sub">${cycleSub}</span></div>`;
               })()}
               ${signalList ? `<div class="pick-papers">${signalList}</div>` : ''}
             </div>
             ${coverHtml}
           </div>`;
         }).join('');
+        if (allFiltered.length > filtered.length) {
+          results.innerHTML += `<button id="pick-more" class="pick-more" type="button">${T('再显示 30 本','Show 30 more')} <span>${allFiltered.length - filtered.length} ${T('本剩余','left')}</span></button>`;
+        }
+        document.getElementById('pick-more')?.addEventListener('click', () => {
+          window.__pickShown = Math.max(30, window.__pickShown || 30) + 30;
+          doSearch();
+        });
 
         // Click to open the normal journal details page.
         const pickEl = document.getElementById('pick-results');
         if (pickEl) {
           pickEl.querySelectorAll('.pick-card').forEach(card => {
             card.addEventListener('click', (ev) => {
-              if (ev.target.closest('a')) return;
+              if (ev.target.closest('a') && (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.button === 1)) return;
+              ev.preventDefault();
               const issn = card.dataset.issn;
               const rec = journals.find(r => r.issn === issn || r.eissn === issn);
-              if (rec) location.href = journalPublicPath(rec);
+              if (rec) openDrawer(rec, { pageMode: true });
             });
           });
         }
 
-        status.textContent = `${T('本地匹配','Local match')} ${entries.length} ${T('个候选期刊','candidate journals')}，${T('推荐','recommended')} ${filtered.length} ${T('个','')}`;
+        status.textContent = `${T('本地匹配','Local match')} ${entries.length} ${T('个候选期刊','candidate journals')}, ${T('显示','showing')} ${filtered.length}/${allFiltered.length}`;
         // ── Save to search history ──
         savePickHistory(query);
       } catch (e) {
@@ -6011,6 +6034,13 @@
     }
 
     input.addEventListener('keydown', (e) => { if (activeTab !== 'pick') return; if (e.key === 'Enter') { e.preventDefault(); doSearch(); } });
+    document.querySelectorAll('.pick-filter-bar input').forEach(el => {
+      el.addEventListener('change', () => {
+        if (!input.value.trim()) return;
+        window.__pickShown = 30;
+        doSearch();
+      });
+    });
 
     // ── Search history ──
     const HISTORY_KEY = 'ailatest.pick.history';
