@@ -2717,6 +2717,7 @@
   }
 
   function domSourceTabsHTML() {
+    if (activeTab !== 'dom') return '';
     const items = [
       ['cnki_major', T('中文期刊目录','Chinese Journal Directory')],
       ['nsfc_mgmt', T('国自然管理','NSFC Mgmt')],
@@ -2732,7 +2733,7 @@
   function domSectionHeader(title, subtitle = '') {
     return `<div class="dom-section-head">
       <div class="dom-section-copy">
-        <h1 class="section-title">${title}</h3>
+        <h1 class="section-title">${title}</h1>
         ${subtitle ? `<div class="section-subtitle">${subtitle}</div>` : ''}
       </div>
       ${domSourceTabsHTML()}
