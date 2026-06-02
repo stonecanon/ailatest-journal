@@ -117,14 +117,23 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <aside class="app-rail" aria-label="Primary navigation">
   <nav class="rail-top">
+    <button class="rail-close-mobile" id="rail-close-mobile" aria-label="Close navigation">×</button>
     <button class="rail-brand-mobile" data-tab="home" aria-label="知刊" title="回到首页" data-i18n="brand_zhikan">知刊</button>
     <button class="rail-nav-btn" data-tab="int" aria-label="国际期刊" title="国际期刊">
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 3.4 9A14 14 0 0 1 12 21a14 14 0 0 1-3.4-9A14 14 0 0 1 12 3Z"/></svg>
       <span data-i18n="rail_int">国际期刊</span>
     </button>
     <button class="rail-nav-btn" data-tab="dom" aria-label="中国期刊" title="中国期刊">
-      <span class="rail-flag" aria-hidden="true">🇨🇳</span>
+      <span class="rail-flag" aria-hidden="true">CN</span>
       <span data-i18n="rail_dom">中国期刊</span>
+    </button>
+    <button class="rail-nav-btn" data-tab="in" aria-label="India journals" title="India journals">
+      <span class="rail-flag" aria-hidden="true">IN</span>
+      <span data-i18n="rail_in">India</span>
+    </button>
+    <button class="rail-nav-btn" data-tab="kr" aria-label="Korea journals" title="Korea journals">
+      <span class="rail-flag" aria-hidden="true">KR</span>
+      <span data-i18n="rail_kr">Korea</span>
     </button>
     <button class="rail-nav-btn" id="fav-header-btn" data-tab="fav" aria-label="我的收藏" title="我的收藏">
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.7l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3.7z"/></svg>
@@ -156,7 +165,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </nav>
 
   <header class="topbar">
-    <button class="side-toggle" id="side-toggle" aria-label="Toggle filters / 打开筛选侧栏">☰</button>
+    <button class="side-toggle" id="side-toggle" aria-label="Open navigation">☰</button>
     <div class="search-wrap">
       <input id="q" type="text" maxlength="200" placeholder="Search: journal title / abbr / ISSN" autocomplete="off" spellcheck="false" />
       <div class="search-actions">
@@ -291,6 +300,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <!-- ─── Domestic tab ─── -->
   <section class="tab-panel" data-panel="dom" hidden>
     <div id="dom-content"></div>
+  </section>
+
+  <!-- ─── India tab ─── -->
+  <section class="tab-panel" data-panel="in" hidden>
+    <div id="india-content"></div>
+  </section>
+
+  <!-- ─── Korea tab ─── -->
+  <section class="tab-panel" data-panel="kr" hidden>
+    <div id="korea-content"></div>
   </section>
 
   <!-- ─── Favorites tab ─── -->
@@ -451,7 +470,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </section>
 
   <footer class="site-foot">
-    <p data-i18n="footer_data">数据来源：Clarivate WoS Core Collection (SCIE/SSCI/AHCI/ESCI) · JCR 2025 · ESI · EI Compendex · Scopus · DOAJ · 中科院文献情报中心分区表 2025 · ShowJCR (GPL-3.0) · CCF 2026 (A/B/C) · CCF-T 2025 · ABDC 2025 · ABS 2024 · 中国科协 2025 · CSSCI · 北大核心 · CNKI · 浙江大学 2024 · 高校自编目录 2023 · CrossRef · OpenAlex。© <a href="https://journal.ailatest.org">AILatest Journal</a></p>
+    <p data-i18n="footer_data">数据来源：Clarivate WoS Core Collection (SCIE/SSCI/AHCI/ESCI) · JCR 2025 · ESI · EI Compendex · Scopus · DOAJ · UGC-CARE India · 中科院文献情报中心分区表 2025 · ShowJCR (GPL-3.0) · CCF 2026 (A/B/C) · CCF-T 2025 · ABDC 2025 · ABS 2024 · 中国科协 2025 · CSSCI · 北大核心 · CNKI · 浙江大学 2024 · 高校自编目录 2023 · CrossRef · OpenAlex。© <a href="https://journal.ailatest.org">AILatest Journal</a></p>
   </footer>
 </main>
 
@@ -499,7 +518,7 @@ const __BUILD_VER = 'v20260530-79';
   }
 })();
 </script>
-<script src="/js/app.js?v=20260601-16" defer></script>
+<script src="/js/app.js?v=20260601-12" defer></script>
 <script>
   // Custom install prompt
   let __pwaPrompt = null;

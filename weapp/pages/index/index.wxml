@@ -49,6 +49,7 @@
     </view>
 
     <view class="filter-summary" wx:if="{{filterSummary}}">已筛选：{{filterSummary}}</view>
+    <view class="filter-summary local-status">{{dataStatus}}<text wx:if="{{searchPerf}}"> · {{searchPerf}}</text></view>
 
     <view class="list-head">
       <view>

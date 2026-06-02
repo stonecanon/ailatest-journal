@@ -1,7 +1,29 @@
 {
   "description": "分区速查微信小程序 - 期刊搜索工具",
+  "cloudfunctionRoot": "cloudfunctions/",
   "packOptions": {
-    "ignore": [],
+    "ignore": [
+      {
+        "value": "cloudbase_import",
+        "type": "folder"
+      },
+      {
+        "value": "cloudfunctions",
+        "type": "folder"
+      },
+      {
+        "value": "cloudrun",
+        "type": "folder"
+      },
+      {
+        "value": "static-data",
+        "type": "folder"
+      },
+      {
+        "value": "README.md",
+        "type": "file"
+      }
+    ],
     "include": []
   },
   "setting": {
@@ -47,7 +69,7 @@
     "disableSWC": true
   },
   "compileType": "miniprogram",
-  "libVersion": "3.7.9",
+  "libVersion": "3.16.1",
   "appid": "wxb509a63a349db5b0",
   "projectname": "journal-weapp",
   "condition": {},

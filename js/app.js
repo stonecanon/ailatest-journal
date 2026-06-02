@@ -41,9 +41,9 @@
       paid_label: '付费',
       drawer_kicker: '期刊详情',
       pwa_install: '📲 安装到主屏',
-      footer_data: '数据来源：Clarivate WoS Core Collection (SCIE/SSCI/AHCI/ESCI) · JCR 2025 · ESI · EI Compendex · Scopus · DOAJ · 中科院文献情报中心分区表 2025 · ShowJCR (GPL-3.0) · CCF 2026 (A/B/C) · CCF-T 2025 · ABDC 2025 · ABS 2024 · 中国科协 2025 · CSSCI · 北大核心 · CNKI · 浙江大学 2024 · 高校自编目录 2023 · CrossRef · OpenAlex。© <a href="https://journal.ailatest.org">AILatest Journal</a>',
+      footer_data: '数据来源：Clarivate WoS Core Collection (SCIE/SSCI/AHCI/ESCI) · JCR 2025 · ESI · EI Compendex · Scopus · DOAJ · UGC-CARE India · 中科院文献情报中心分区表 2025 · ShowJCR (GPL-3.0) · CCF 2026 (A/B/C) · CCF-T 2025 · ABDC 2025 · ABS 2024 · 中国科协 2025 · CSSCI · 北大核心 · CNKI · 浙江大学 2024 · 高校自编目录 2023 · CrossRef · OpenAlex。© <a href="https://journal.ailatest.org">AILatest Journal</a>',
       tab_home: '查刊', tab_int: '国际', tab_dom: '中国', tab_fav: '收藏', tab_pick: '荐刊',
-      rail_int: '国际期刊', rail_dom: '中国期刊', rail_fav: '我的收藏',
+      rail_int: 'global', rail_dom: 'cn', rail_in: 'in', rail_kr: 'kr', rail_fav: '收藏',
       loading: '加载中…',
       hero_title_int: 'SCI / SSCI 国际期刊检索',
       hero_body_int: '資料來源：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI）· 更新至 2026-05-18，並合併 <b>EI Compendex</b> 期刊目錄（2025-10-10）。',
@@ -80,6 +80,10 @@
       hero_title_dom: '国内学术期刊分级目录',
       hero_body_dom: '<b>中国科协 高质量科技期刊分级目录 (2025-12 修订)</b> 共 11,084 条 / 59 学科领域；<b>中文期刊目录</b> 共 7,755 条 / 10 大学科分类，CSSCI / 北大核心 / CCF 中文以徽章形式叠加；<b>浙江大学 2024 版</b> 与 <b>高校自编目录 2023</b>（付费解锁）。',
       hero_note_dom: 'CSSCI / 北大核心为扫描 PDF OCR 提取，可能存在个别错字。',
+      hero_title_in: '印度 UGC-CARE 期刊目录',
+      hero_body_in: '印度 UGC-CARE Group I 期刊正表，支持按题名、出版社、ISSN、学科检索。克隆/假冒期刊预警名单暂不展示。',
+      india_subject: '学科',
+      india_source_note: 'UGC-CARE 中央列表 2024 年 10 月后不再持续更新；本页仅作为历史目录与投稿核验线索。',
       search_int: '搜索：期刊全称 / 官方缩写 / 社群缩写 / ISSN / 中文刊名',
       search_dom: '搜索：刊名 / ISSN / CN 号（跨库搜索）',
       search_fav: '搜索收藏：期刊 / 缩写 / ISSN',
@@ -119,9 +123,9 @@
       paid_label: 'Paid',
       drawer_kicker: 'Journal Details',
       pwa_install: '📲 Install to Home',
-      footer_data: 'Sources: Clarivate WoS Core Collection (SCIE/SSCI/AHCI/ESCI) · JCR 2025 · ESI · EI Compendex · Scopus · DOAJ · CAS NSL Tiers 2025 · ShowJCR (GPL-3.0) · CCF 2026 (A/B/C) · CCF-T 2025 · ABDC 2025 · ABS 2024 · CAST 2025 · CSSCI · PKU Core · CNKI · ZJU 2024 · School A 2023 · CrossRef · OpenAlex. © <a href="https://journal.ailatest.org">AILatest Journal</a>',
+      footer_data: 'Sources: Clarivate WoS Core Collection (SCIE/SSCI/AHCI/ESCI) · JCR 2025 · ESI · EI Compendex · Scopus · DOAJ · UGC-CARE India · CAS NSL Tiers 2025 · ShowJCR (GPL-3.0) · CCF 2026 (A/B/C) · CCF-T 2025 · ABDC 2025 · ABS 2024 · CAST 2025 · CSSCI · PKU Core · CNKI · ZJU 2024 · School A 2023 · CrossRef · OpenAlex. © <a href="https://journal.ailatest.org">AILatest Journal</a>',
       tab_home: 'Journals', tab_int: 'International', tab_dom: 'China', tab_fav: 'Favorites', tab_pick: 'Recommend',
-      rail_int: 'International Journals', rail_dom: 'Chinese Journals', rail_fav: 'Favorites',
+      rail_int: 'global', rail_dom: 'cn', rail_in: 'in', rail_kr: 'kr', rail_fav: 'Favorites',
       loading: 'Loading…',
       hero_title_int: 'International SCI / SSCI Search',
       hero_body_int: 'Source: <b>Web of Science Core Collection</b> (SCIE / SSCI / AHCI / ESCI), updated 2026-05-18, merged with <b>EI Compendex</b> source list (2025-10-10).',
@@ -156,6 +160,10 @@
       hero_title_dom: 'Domestic Chinese Journal Directories',
       hero_body_dom: '<b>China Association for Science and Technology (CAST) High-Quality Sci-Tech Journal Tiered Directory (Dec 2025)</b> — 11,084 journals across 59 disciplines; <b>Chinese Journal Directory</b> — 7,755 journals across 10 subject categories, with CSSCI / PKU Core / CCF Chinese badges; <b>ZJU 2024</b>; <b>School A 2023</b> (paywalled).',
       hero_note_dom: 'CSSCI / PKU Core extracted via OCR from scanned PDF; minor typos possible.',
+      hero_title_in: 'India UGC-CARE Journal Directory',
+      hero_body_in: 'UGC-CARE Group I positive journal list for India. Search by title, publisher, ISSN, E-ISSN, or subject. Cloned / fake journal warning lists are intentionally not shown.',
+      india_subject: 'Subject',
+      india_source_note: 'UGC-CARE central list has not been updated after October 2024; use this page as historical directory and verification context.',
       search_int: 'Search: title / abbr / acronym / ISSN / Chinese name',
       search_dom: 'Search: title / ISSN / CN (cross-source)',
       search_fav: 'Search favorites: title / acronym / ISSN',
@@ -660,9 +668,11 @@
 
   let journals = [];
   let domestic = null;
+  let india = null;
   let esiCats = [];
   let meta = null;
   let oaMap = {};          // compact OpenAlex map: { "ISSN": {hp, l, oa, dj, apc, org, cn, w} }
+  let coverMap = {};       // compact cover map: { "ISSN": {u, s, c, h, t} }
   // review_cycles now read from embedded doaj.review_weeks in journals.json.gz
   const DEFAULT_JOURNAL_ALIASES = {
     BE: 'BUILDING AND ENVIRONMENT',
@@ -723,6 +733,7 @@
 
   // ── 国际期刊 ISSN/eISSN/标题反向索引（供 CAST 等国内源抽屉查国际信息）──
   const intIndex = { byIssn: Object.create(null), byName: Object.create(null) };
+  const indiaIndex = { byIssn: Object.create(null), byName: Object.create(null) };
   function buildIntIndex(arr) {
     for (const r of arr) {
       if (r.issn) intIndex.byIssn[String(r.issn).toUpperCase()] = r;
@@ -739,11 +750,42 @@
     return null;
   }
 
+  function buildIndiaIndex(d) {
+    indiaIndex.byIssn = Object.create(null);
+    indiaIndex.byName = Object.create(null);
+    for (const r of (d && d.records) || []) {
+      const rec = { ...r, __src: 'in' };
+      for (const key of [r.issn, r.eissn]) {
+        if (key && key !== 'NA') indiaIndex.byIssn[String(key).toUpperCase()] = rec;
+      }
+      const nk = normTitle(r.journal_title || r.name || '');
+      if (nk) indiaIndex.byName[nk] = rec;
+    }
+  }
+
+  function lookupIndia(r) {
+    for (const key of [r?.issn, r?.eissn].filter(Boolean)) {
+      const hit = indiaIndex.byIssn[String(key).toUpperCase()];
+      if (hit) return hit;
+    }
+    const nk = normTitle(r?.name || r?.journal_title || r?.en_name || '');
+    return nk ? indiaIndex.byName[nk] || null : null;
+  }
+
   function lookupOA(r) {
     if (!oaMap) return null;
     const keys = [r.issn, r.eissn].filter(Boolean).map(s => String(s).toUpperCase());
     for (const k of keys) {
       if (oaMap[k]) return oaMap[k];
+    }
+    return null;
+  }
+
+  function lookupCover(r) {
+    if (!coverMap) return null;
+    const keys = [r.issn, r.eissn].filter(Boolean).map(s => String(s).toUpperCase());
+    for (const k of keys) {
+      if (coverMap[k]) return coverMap[k];
     }
     return null;
   }
@@ -760,8 +802,8 @@
   }
 
   let activeTab = 'home';
-  const TAB_PATHS = { home: '/', int: '/international', dom: '/china', fav: '/favorites', pick: '/pick' };
-  const PATH_TABS = { '/': 'home', '/international': 'int', '/journals': 'int', '/china': 'dom', '/favorites': 'fav', '/pick': 'pick' };
+  const TAB_PATHS = { home: '/', int: '/global', dom: '/cn', in: '/in', kr: '/kr', fav: '/favorites', pick: '/pick' };
+  const PATH_TABS = { '/': 'home', '/global': 'int', '/international': 'int', '/journals': 'int', '/cn': 'dom', '/china': 'dom', '/in': 'in', '/india': 'in', '/kr': 'kr', '/korea': 'kr', '/favorites': 'fav', '/pick': 'pick' };
   const TAB_SEO = {
     home: {
       title: 'AILatest Journal — 期刊查询 · 荐刊推荐 · SCI期刊检索',
@@ -774,6 +816,14 @@
     dom: {
       title: '中国期刊目录查询 | CSSCI 北大核心 中国科协 - AILatest Journal',
       desc: '查询中文期刊目录、中国科协高质量期刊、CSSCI、北大核心、CCF 中文推荐、浙江大学目录等中国期刊分级数据。'
+    },
+    in: {
+      title: 'India UGC-CARE Journal Directory | AILatest Journal',
+      desc: 'Search India UGC-CARE Group I journals by title, publisher, ISSN, E-ISSN and subject.'
+    },
+    kr: {
+      title: 'Korea Journal Directory | AILatest Journal',
+      desc: 'Korea country journal directory placeholder in AILatest Journal.'
     },
     fav: {
       title: '期刊收藏清单 | Journal Favorites - AILatest Journal',
@@ -817,6 +867,7 @@
   let topicList = []; // [{name,count}] sorted A-Z, merged WoS + OA
   let activeQuery = '';
   let activeDom = 'cnki_major';   // 中文期刊目录
+  let activeIndiaSubject = '__all';
   let activeDomBadges = new Set(); // 默认不勾选 = 显示全部；勾选 = 只看有该徽章的
   const PAGE = 100;
   let shown = PAGE;
@@ -1109,7 +1160,9 @@
 
   // ───────── favorites (multi-list + drag sort) ─────────
   function favId(r) {
-    return r.issn || r.eissn || r.cn_code || ('t:' + normTitle(r.name || r.cn_name || ''));
+    const issn = r.issn && String(r.issn).toUpperCase() !== 'NA' ? r.issn : '';
+    const eissn = r.eissn && String(r.eissn).toUpperCase() !== 'NA' ? r.eissn : '';
+    return issn || eissn || r.cn_code || ('t:' + normTitle(r.name || r.cn_name || r.journal_title || ''));
   }
   function normTitle(s) {
     return String(s).toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]+/g, '');
@@ -2418,28 +2471,8 @@
         if (!panel) return;
         const wasOpen = panel.classList.contains('open');
         // 关闭所有其他面板
-        document.querySelectorAll('.th-dropdown-panel.open').forEach(p => {
-          p.classList.remove('open');
-          if (p.classList.contains('th-dropdown-panel-search')) {
-            p.style.position = '';
-            p.style.left = '';
-            p.style.top = '';
-            p.style.width = '';
-          }
-        });
-        if (!wasOpen) {
-          panel.classList.add('open');
-          // 对搜索型下拉面板使用 fixed 定位，避免被 table-wrap overflow 裁剪
-          if (panel.classList.contains('th-dropdown-panel-search')) {
-            const rect = btn.getBoundingClientRect();
-            const pw = Math.min(340, window.innerWidth - 16);
-            panel.style.position = 'fixed';
-            panel.style.left = Math.min(rect.left, window.innerWidth - pw - 8) + 'px';
-            panel.style.top = (rect.bottom + 4) + 'px';
-            panel.style.width = pw + 'px';
-            panel.style.maxHeight = Math.min(420, window.innerHeight - rect.bottom - 16) + 'px';
-          }
-        }
+        document.querySelectorAll('.th-dropdown-panel.open').forEach(p => p.classList.remove('open'));
+        if (!wasOpen) panel.classList.add('open');
       });
     });
     // 点击外部关闭所有面板
@@ -2822,6 +2855,88 @@
         <summary>${escape(s.title)} <span class="muted-cell">(${s.count})</span></summary>
         <div style="margin-top:10px">${s.html}</div>
       </details>`).join('')}
+    </div>`;
+  }
+
+  // ───────── India tab ─────────
+  function renderIndia() {
+    updateThStickyTop();
+    const box = $('#india-content');
+    if (!box) return;
+    if (!india || !Array.isArray(india.records)) {
+      box.innerHTML = `<div class="empty">${T('印度期刊数据缺失','India journal data missing')}</div>`;
+      return;
+    }
+    if (!window.__indiaShown) window.__indiaShown = 100;
+    const q = activeQuery.toLowerCase();
+    const subjects = (india.subjects || []).map(s => s.name).filter(Boolean);
+    const subjectOptions = subjects.map(s => `<option value="${escape(s)}"${activeIndiaSubject === s ? ' selected' : ''}>${escape(s)}</option>`).join('');
+    let filtered = india.records.filter(r => {
+      if (activeIndiaSubject !== '__all' && r.subject !== activeIndiaSubject) return false;
+      if (!q) return true;
+      const hay = [r.journal_title, r.publisher, r.issn, r.eissn, r.subject].filter(Boolean).join(' ').toLowerCase();
+      return hay.includes(q);
+    });
+    filtered.sort((a, b) => (a.journal_title || '').localeCompare(b.journal_title || '', 'en'));
+    const visible = filtered.slice(0, window.__indiaShown);
+    const total = filtered.length;
+    const rows = visible.map(r => {
+      const rec = { ...r, name: r.journal_title, __src: 'in' };
+      const fid = favId(rec);
+      rowRecordsByFid[fid] = rec;
+      const issnCell = [r.issn && r.issn !== 'NA' ? `ISSN ${escape(r.issn)}` : '', r.eissn && r.eissn !== 'NA' ? `eISSN ${escape(r.eissn)}` : ''].filter(Boolean).join('<br>');
+      return `<tr class="j-row clickable india-row" data-fid="${escape(fid)}" data-src="in">
+        <td class="col-fav" style="width:36px">${starBtn(rec, 'in')}</td>
+        <td class="col-name"><div class="jname">${escape(titleCase(r.journal_title || ''))}</div></td>
+        <td class="muted-cell">${escape(r.publisher || '—')}</td>
+        <td><span class="domsrc-pill ds-india">UGC-CARE</span></td>
+        <td class="muted-cell">${escape(r.subject || '—')}</td>
+        <td class="muted-cell" style="width:130px">${issnCell || '—'}</td>
+      </tr>`;
+    }).join('');
+    box.innerHTML = `<div class="section-block india-section">
+      ${domSectionHeader(
+        `${T('印度 UGC-CARE 期刊目录','India UGC-CARE Journal Directory')} <span class="muted-cell">(${india.records.length.toLocaleString()})</span>`,
+        T('印度国家级 UGC-CARE Group I 正表；本页不展示 cloned / fake journal warning list。','India national UGC-CARE Group I positive list; cloned / fake journal warning lists are not shown.'),
+      )}
+      <div class="india-toolbar">
+        <select id="india-subject-select" class="th-select">
+          <option value="__all">${T('全部学科','All subjects')}</option>
+          ${subjectOptions}
+        </select>
+        <span class="muted-cell">${T('显示','Showing')} ${visible.length.toLocaleString()} / ${total.toLocaleString()}</span>
+      </div>
+      <div class="table-wrap"><table class="journals india-table"><thead><tr>
+        <th style="width:36px" aria-label="Favorite"></th>
+        <th>${T('期刊名称','Journal')}</th>
+        <th>${T('出版社','Publisher')}</th>
+        <th>${T('来源','Source')}</th>
+        <th>${T('学科','Subject')}</th>
+        <th>ISSN / E-ISSN</th>
+      </tr></thead><tbody>
+        ${rows}
+        ${total === 0 ? `<tr><td colspan="6" class="empty">${T('未找到匹配的印度期刊','No matching India journals found')}</td></tr>` : ''}
+      </tbody></table></div>
+      ${total > window.__indiaShown ? `<div class="pager"><button id="india-more" class="more-btn">${T('加载更多','Load more')} (${total - window.__indiaShown} ${T('条剩余','remaining')})</button></div>` : ''}
+      <div class="source-note">${t('india_source_note')}</div>
+    </div>`;
+    $('#india-subject-select')?.addEventListener('change', e => {
+      activeIndiaSubject = e.target.value;
+      window.__indiaShown = 100;
+      renderIndia();
+    });
+    $('#india-more')?.addEventListener('click', () => {
+      window.__indiaShown += 100;
+      renderIndia();
+    });
+  }
+
+  function renderKorea() {
+    const box = $('#korea-content');
+    if (!box) return;
+    box.innerHTML = `<div class="section-block">
+      ${domSectionHeader('KR', T('韩国期刊数据入口预留中。','Korea journal directory will be added later.'))}
+      <div class="empty">${T('暂未接入韩国官方期刊列表。','No Korea official journal list has been connected yet.')}</div>
     </div>`;
   }
 
@@ -3382,6 +3497,10 @@
         if (rr) return rr;
       }
     }
+    if (india && Array.isArray(india.records)) {
+      const rr = findIn(india.records.map(r => ({ ...r, name: r.journal_title })), 'in');
+      if (rr) return rr;
+    }
     return null;
   }
   function applyHashRoute() {
@@ -3545,20 +3664,22 @@
             `${oaText}${apcText ? `; ${apcText}` : ''}${reviewText ? `; ${reviewText}` : ''}.`,
             `${topicList.length ? `Focus areas include ${topicList.join(', ')}. ` : ''}${indexText ? `Indexed in ${indexText}.` : ''}`,
           ].filter(Boolean).join(' ');
-      const coverUrl = r.cover_url || ir.cover_url || r.official_cover_url || ir.official_cover_url || '';
-      const cover = coverUrl
-        ? `<img class="journal-cover-img" src="${escape(coverUrl)}" alt="${escape(title)} cover" loading="lazy" />`
-        : `<div class="journal-cover-fallback" aria-hidden="true">
+      const coverRec = lookupCover(ir.issn || ir.eissn ? ir : r);
+      const coverUrl = r.cover_url || ir.cover_url || r.official_cover_url || ir.official_cover_url || coverRec?.u || '';
+      const fallbackCover = `<div class="journal-cover-fallback" aria-hidden="true">
              <div class="journal-cover-mark">${escape((title || 'J').split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase())}</div>
              <div class="journal-cover-name">${escape(title)}</div>
              ${r.publisher ? `<div class="journal-cover-pub">${escape(r.publisher)}</div>` : ''}
            </div>`;
+      const cover = coverUrl
+        ? `<img class="journal-cover-img" src="${escape(coverUrl)}" alt="${escape(title)} cover" loading="lazy" referrerpolicy="no-referrer" onerror="this.closest('.journal-cover').classList.add('cover-load-failed');this.remove()" />${fallbackCover}`
+        : fallbackCover;
       return `<div class="journal-overview">
         <div class="journal-overview-copy">
           <h4>${officialText ? T('官方介绍','Official Description') : T('期刊概览','Journal Overview')}</h4>
           <p>${officialText ? escape(officialText) : escape(fallbackText)}</p>
         </div>
-        <div class="journal-cover">${cover}</div>
+        <div class="journal-cover ${coverUrl ? 'has-remote-cover' : ''}">${cover}</div>
       </div>`;
     })();
 
@@ -3759,6 +3880,16 @@
          </div>`
       : '';
 
+    const indiaHit = src === 'in' ? { ...r, journal_title: r.journal_title || r.name } : lookupIndia(ir.issn || ir.eissn ? ir : r);
+    const indiaHTML = indiaHit ? `<div class="drawer-section india-detail-section">
+      <h4>${T('印度 UGC-CARE 收录','India UGC-CARE Listing')}</h4>
+      <div class="meta-row"><div class="meta-k">${T('状态','Status')}</div><div class="meta-v"><span class="domsrc-pill ds-india">UGC-CARE listed</span></div></div>
+      ${indiaHit.subject ? `<div class="meta-row"><div class="meta-k">${T('学科','Subject')}</div><div class="meta-v">${escape(indiaHit.subject)}</div></div>` : ''}
+      ${indiaHit.publisher ? `<div class="meta-row"><div class="meta-k">${T('出版社','Publisher')}</div><div class="meta-v">${escape(indiaHit.publisher)}</div></div>` : ''}
+      ${indiaHit.source_url ? `<div class="meta-row"><div class="meta-k">${T('来源','Source')}</div><div class="meta-v"><a href="${escape(indiaHit.source_url)}" target="_blank" rel="noopener nofollow">UGC-CARE PDF source</a></div></div>` : ''}
+      <div class="muted-cell" style="margin-top:6px;font-size:12px;line-height:1.6">${t('india_source_note')}</div>
+    </div>` : '';
+
     // 警示刊
     const warnHTML = (() => {
       const w = ir.warning;
@@ -3932,8 +4063,9 @@
 	        ${topicsHTML}
 		        ${warnHTML}
 		        ${cnkiHTML}
-		        ${metaHTML ? `<div class="meta-block">${metaHTML}</div>` : ''}
+	        ${metaHTML ? `<div class="meta-block">${metaHTML}</div>` : ''}
 	        ${cnkxHTML}
+	        ${indiaHTML}
 	        ${lockedSrcHTML}
 	        <div class="drawer-section rating-section" data-rating-key="${escape(favId(r))}">
 	          <h4>${T('我的评分','My Rating')}</h4>
@@ -4012,7 +4144,7 @@
       const SRC = {
         int: T('SCI / SSCI 国际期刊','International SCI / SSCI'), cssci: T('CSSCI 来源期刊','CSSCI Source Journals'), cssci_ext: T('CSSCI 扩展版','CSSCI Extended'),
         pku: T('北大核心','PKU Core'), cnkx: T('中国科协高质量目录','CAST Tiered Directory'), ccft: T('CCF 推荐中文科技期刊','CCF Recommended Chinese Journals'),
-        zju: T('浙江大学 2024','ZJU 2024'), school_a: T('高校自编目录 2023','In-house School Directory 2023'),
+        zju: T('浙江大学 2024','ZJU 2024'), school_a: T('高校自编目录 2023','In-house School Directory 2023'), in: 'India UGC-CARE',
       };
       kicker.textContent = SRC[src] || T('期刊详情','Journal Details');
     }
@@ -4697,7 +4829,7 @@
   function renderFavRow(r) {
     const fid = favId(r);
     rowRecordsByFid[fid] = r;
-    const rawName = r.name || r.cn_name || '';
+    const rawName = r.name || r.cn_name || r.journal_title || '';
     const nameHtml = `<div class="jname ${r.flagship ? 'jname-flagship' : ''}">${escape(titleCase(rawName.replace(/\*$/,'')))}${r.cn_name && r.cn_name !== rawName ? `<span class="jname-cn">${escape(r.cn_name)}</span>` : ''}${r.en_name && r.en_name !== rawName ? `<span class="jname-cn">${escape(titleCase(r.en_name))}</span>` : ''}${aliasHintHtml(r)}</div>`;
     // 索引行
     const indexBadges = r.__src === 'int' ? renderIndexBadges(r) : '';
@@ -4711,7 +4843,7 @@
     const SRC_LABEL = {
       int: T('国际','Int’l'), cssci: 'CSSCI', cssci_core: 'CSSCI', cssci_ext: T('CSSCI 扩展','CSSCI Ext'),
       pku: T('北大核心','PKU Core'), pku_core: T('北大核心','PKU Core'), cnkx: T('科协','CAST'), ccft: 'CCF-T',
-      zju: T('浙大','ZJU'), school_a: T('高校目录','In-house'),
+      zju: T('浙大','ZJU'), school_a: T('高校目录','In-house'), in: 'UGC-CARE',
     };
     const ifVal = (r.if_2024 != null) ? (+r.if_2024).toFixed(1) : '';
     const ifCell = ifVal ? `<span class="if-cell">${ifVal}</span>` : '<span class="muted-cell">—</span>';
@@ -4838,6 +4970,8 @@
         activeTab === 'int' ? renderInt()
           : activeTab === 'fav' ? renderFav()
           : activeTab === 'dom' ? renderDomestic()
+          : activeTab === 'in' ? renderIndia()
+          : activeTab === 'kr' ? renderKorea()
           : null;
       }
     });
@@ -5085,6 +5219,10 @@
           qEl.placeholder = T('输入你的论文标题和关键词，如：基于深度学习的室内人数预测', 'Enter your paper title and keywords, e.g.: Deep learning for indoor occupancy estimation');
         } else if (activeTab === 'home') {
           qEl.placeholder = t('search_home_ph');
+        } else if (activeTab === 'in') {
+          qEl.placeholder = T('搜索：印度期刊名 / 出版社 / ISSN / 学科', 'Search: India journal title / publisher / ISSN / subject');
+        } else if (activeTab === 'kr') {
+          qEl.placeholder = T('搜索韩国期刊', 'Search Korea journals');
         } else {
           qEl.placeholder = t(activeTab === 'dom' ? 'search_dom' : 'search_int');
         }
@@ -5110,6 +5248,8 @@
       if (activeTab === 'dom') renderDomestic();
       else if (activeTab === 'fav') renderFav();
       else if (activeTab === 'int') renderInt();
+      else if (activeTab === 'in') renderIndia();
+      else if (activeTab === 'kr') renderKorea();
       else if (activeTab === 'pick') initPickTool();
       // Home tab: if there's an active query, show results
       else if (activeTab === 'home' && activeQuery) {
@@ -5123,6 +5263,7 @@
       b.addEventListener('click', (e) => {
         e.preventDefault();
         activateTab(b.dataset.tab);
+        if (window.matchMedia('(max-width: 900px)').matches) closeSidebar();
       });
     });
     // Process any clicks that happened before boot() finished
@@ -5374,7 +5515,7 @@
     $('#drawer-close')?.addEventListener('click', () => {
       if (document.body.classList.contains('journal-route')) {
         const backTab = _drawerSourceTab || 'int';
-        const backPath = TAB_PATHS[backTab] || '/international';
+        const backPath = TAB_PATHS[backTab] || '/global';
         try { history.pushState({ tab: backTab }, '', backPath); } catch (_) {}
         closeDrawer(true);
         activateTab(backTab, { skipPath: true });
@@ -5398,17 +5539,24 @@
 
     function closeSidebar() {
       $('#sidebar').classList.remove('open');
+      $('.app-rail')?.classList.remove('mobile-open');
       $('#sidebar-scrim').classList.remove('on');
     }
 
     // 侧栏切换
     $('#side-toggle')?.addEventListener('click', () => {
-      $('#sidebar').classList.toggle('open');
+      if (window.matchMedia('(max-width: 900px)').matches) {
+        $('.app-rail')?.classList.toggle('mobile-open');
+      } else {
+        $('#sidebar').classList.toggle('open');
+      }
       $('#sidebar-scrim').classList.toggle('on');
       $('#sidebar-scrim').hidden = false;
     });
+    $('#rail-close-mobile')?.addEventListener('click', closeSidebar);
     $('#sidebar-scrim')?.addEventListener('click', () => {
       $('#sidebar').classList.remove('open');
+      $('.app-rail')?.classList.remove('mobile-open');
       $('#sidebar-scrim').classList.remove('on');
     });
   
@@ -6034,18 +6182,20 @@
     // 分享着陆页：/s/<id> 直接接管 main，不走主流程
     if (await maybeRenderShareLanding()) return;
     try {
-      const [j, d, m, esi, aliases, underReviewIssns, onHoldIssns, oa] = await Promise.all([
+      const [j, d, indiaData, m, esi, aliases, underReviewIssns, onHoldIssns, oa, covers] = await Promise.all([
         fetchJSON('data/journals.json.gz'),
         fetch('/data/domestic.json').then(r => r.json()).catch(() => null),
+        fetch('/data/india.json').then(r => r.json()).catch(() => null),
         fetch('/data/meta.json').then(r => r.json()).catch(() => null),
         fetch('/data/esi_categories.json').then(r => r.json()).catch(() => []),
         fetch('/data/journal_aliases.json').then(r => r.json()).catch(() => DEFAULT_JOURNAL_ALIASES),
         fetch('/data/under_review_issn.json').then(r => r.json()).catch(() => []),
         fetch('/data/on_hold_issn.json').then(r => r.json()).catch(() => []),
         fetchJSON('data/oa.json.gz').catch(() => ({})),
+        fetchJSON('data/journal_covers.json.gz').catch(() => ({})),
       ]);
       setJournalAliases(aliases);
-      journals = j; domestic = d; meta = m; esiCats = esi; oaMap = oa;
+      journals = j; domestic = d; india = indiaData; meta = m; esiCats = esi; oaMap = oa; coverMap = covers;
       // Build Under Review lookup set
       const underReviewSet = new Set((underReviewIssns||[]).filter(Boolean).map(s => s.replace(/[^0-9xX]/gi,'').toLowerCase()));
       journals.forEach(r => {
@@ -6067,6 +6217,7 @@
       journals.forEach(journalSearchMeta);
       buildDomIndex(domestic);
       buildIntIndex(journals);
+      buildIndiaIndex(india);
       // Refresh stale favsData with live international journal data
       (function refreshFavsData() {
         let dirty = false;
@@ -6089,9 +6240,19 @@
         }
         if (dirty) localStorage.setItem(STORAGE_PREFIX + 'favsData', JSON.stringify(favsData));
       })();
-      // 计算 topicList（仅 WoS 学科，不合并 OpenAlex subfield）
+      // 计算合并的 topicList（WoS 学科 + OpenAlex subfield）
       const _wc = Object.create(null);
       for (const r of journals) for (const c of (r.wos_categories||[])) _wc[c] = (_wc[c]||0)+1;
+      // Add OA subfield counts for topics not in WoS
+      const issnSet = new Set(journals.map(j => (j.issn || j.eissn || '').toUpperCase()).filter(Boolean));
+      for (const issn of issnSet) {
+        const rec = oaMap[issn];
+        if (rec && Array.isArray(rec.sf)) {
+          for (const s of rec.sf) {
+            if (s && !(s in _wc)) _wc[s] = (_wc[s]||0) + 1;
+          }
+        }
+      }
       topicList = Object.entries(_wc).map(([name,count])=>({name,count})).sort((a,b)=>a.name.localeCompare(b.name,'en'));
       if (meta?.total && $('#total')) $('#total').textContent = meta.total.toLocaleString();
       $('#hint').textContent = lang === 'zh'

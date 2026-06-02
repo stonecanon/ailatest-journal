@@ -9,11 +9,18 @@
     "pages/folder/folder",
     "pages/profile/profile"
   ],
+  "subpackages": [
+    {
+      "root": "static-data",
+      "name": "data",
+      "independent": true
+    }
+  ],
   "window": {
-    "navigationBarTitleText": "JournalAI分区速查",
-    "navigationBarBackgroundColor": "#FFF9F1",
+    "navigationBarTitleText": "Journal",
+    "navigationBarBackgroundColor": "#FAFBFD",
     "navigationBarTextStyle": "black",
-    "backgroundColor": "#FFF9F1"
+    "backgroundColor": "#FAFBFD"
   },
   "sitemapLocation": "sitemap.json",
   "lazyCodeLoading": "requiredComponents"

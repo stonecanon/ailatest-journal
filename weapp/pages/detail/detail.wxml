@@ -23,22 +23,17 @@
       <small>2025 年发布</small>
     </view>
     <view class="metric">
-      <text>JCR</text>
-      <strong>{{journal.jcr}}</strong>
+      <text>IF 排名</text>
+      <strong>{{journal.ifRank}}</strong>
       <small>{{journal.jcrCat}}</small>
-    </view>
-    <view class="metric">
-      <text>中科院分区</text>
-      <strong>{{journal.cas}}</strong>
-      <small>{{journal.casMajor}}</small>
     </view>
   </view>
 
-  <view class="mini-facts">
-    <text>新锐分区：{{journal.xinrui}}</text>
-    <text>科协分级：{{journal.cnkx}}</text>
-    <text>ABDC：{{journal.abdc}}</text>
-    <text>CCF：{{journal.ccf}}</text>
+  <view class="division-badges card">
+    <view class="division-title">分区等级</view>
+    <view class="division-row">
+      <text wx:for="{{journal.divisionBadges}}" wx:key="*this" class="division-badge {{index % 4 === 0 ? 'tone-rust' : index % 4 === 1 ? 'tone-brown' : index % 4 === 2 ? 'tone-plum' : 'tone-ink'}}">{{item}}</text>
+    </view>
   </view>
 
   <view class="section card">
@@ -100,9 +95,6 @@
 
   <view class="section card">
     <view class="section-title">评级与风险</view>
-    <view class="info-row"><text>ABDC</text><strong>{{journal.abdc}}</strong></view>
-    <view class="info-row"><text>ABS</text><strong>{{journal.abs || '-'}}</strong></view>
-    <view class="info-row"><text>CCF</text><strong>{{journal.ccf}}</strong></view>
     <view class="info-row"><text>中科院预警</text><strong>{{journal.warning}}</strong></view>
     <view class="info-row"><text>中信所预警</text><strong>{{journal.citicWarning}}</strong></view>
   </view>

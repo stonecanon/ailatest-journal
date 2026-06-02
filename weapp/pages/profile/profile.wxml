@@ -20,7 +20,18 @@
       <view class="menu-row" bindtap="goTab" data-url="/pages/favorites/favorites"><text>我的收藏</text><strong>查看</strong></view>
       <view class="menu-row"><text>浏览记录</text><strong>待同步</strong></view>
       <view class="menu-row"><text>荐刊记录</text><strong>待同步</strong></view>
+      <view class="menu-row" bindtap="toggleLanguagePanel"><text>语言</text><strong>{{languageLabel}} ›</strong></view>
       <view class="menu-row"><text>版本</text><strong>MVP 预览版</strong></view>
+    </view>
+
+    <view class="language-card card" wx:if="{{showLanguagePanel}}">
+      <view class="section-title">语言切换</view>
+      <view class="language-grid">
+        <view wx:for="{{languages}}" wx:key="code" class="language-option {{item.active ? 'active' : ''}}" bindtap="chooseLanguage" data-code="{{item.code}}">
+          <view class="language-label">{{item.label}}</view>
+          <view class="language-native">{{item.native}}</view>
+        </view>
+      </view>
     </view>
   </view>
 

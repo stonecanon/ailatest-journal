@@ -1,6 +1,6 @@
 App({
   globalData: {
-    apiBase: 'https://api.ailatest.org'
+    localDataReady: true
   },
 
   onLaunch() {

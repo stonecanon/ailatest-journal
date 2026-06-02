@@ -78,23 +78,32 @@
 
 .metric-card {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  padding: 26rpx 16rpx;
+  grid-template-columns: repeat(2, 1fr);
+  padding: 0;
   margin-bottom: 18rpx;
+  overflow: hidden;
 }
 
 .metric {
   min-width: 0;
+  min-height: 150rpx;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 6rpx;
   border-right: 1rpx solid #eee4d8;
+  border-bottom: 1rpx solid #eee4d8;
   text-align: center;
+  padding: 22rpx 10rpx;
 }
 
-.metric:last-child {
+.metric:nth-child(2n) {
   border-right: 0;
+}
+
+.metric:nth-last-child(-n + 2) {
+  border-bottom: 0;
 }
 
 .metric text {
@@ -114,17 +123,39 @@
   font-size: 20rpx;
 }
 
-.mini-facts {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12rpx 18rpx;
-  padding: 0 6rpx 18rpx;
+.division-badges {
+  padding: 24rpx;
+  margin-bottom: 18rpx;
 }
 
-.mini-facts text {
-  color: #3f3830;
+.division-title {
+  color: #625d56;
   font-size: 24rpx;
+  font-weight: 850;
 }
+
+.division-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 16rpx;
+}
+
+.division-badge {
+  min-height: 42rpx;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 14rpx;
+  border-radius: 7rpx;
+  color: #fff;
+  font-size: 21rpx;
+  font-weight: 850;
+}
+
+.tone-rust { background: #8c4214; }
+.tone-brown { background: #6f563e; }
+.tone-plum { background: #70465a; }
+.tone-ink { background: #2b4862; }
 
 .section {
   padding: 26rpx;

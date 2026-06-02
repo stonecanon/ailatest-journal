@@ -105,3 +105,50 @@
   font-weight: 700;
   text-align: right;
 }
+
+.language-card {
+  margin-top: 24rpx;
+  padding: 28rpx;
+}
+
+.section-title {
+  color: #171717;
+  font-size: 30rpx;
+  font-weight: 900;
+}
+
+.language-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16rpx;
+  margin-top: 22rpx;
+}
+
+.language-option {
+  min-width: 0;
+  padding: 20rpx;
+  border: 1rpx solid #eadfd2;
+  border-radius: 18rpx;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.language-option.active {
+  border-color: #f05a14;
+  background: #fff2e8;
+  box-shadow: inset 0 0 0 2rpx rgba(240, 90, 20, 0.12);
+}
+
+.language-label {
+  color: #171717;
+  font-size: 27rpx;
+  font-weight: 850;
+}
+
+.language-native {
+  margin-top: 6rpx;
+  color: #756d64;
+  font-size: 22rpx;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

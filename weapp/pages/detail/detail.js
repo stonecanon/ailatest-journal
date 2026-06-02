@@ -1,4 +1,5 @@
 const app = getApp()
+const localData = require('../../utils/localData')
 
 const DETAIL_MAP = {
   'applied-energy': {
@@ -202,10 +203,20 @@ function enrichDetail(item) {
   const eiSubjects = translateSubjects(item.eiSubjects || item.ei_subjects)
   const mainFields = asArray(item.mainFields || item.research_fields || item.openalex_topics || item.topics)
   const indexBadges = asArray(item.badges || item.indices || item.indexes)
+  const divisionBadges = [
+    item.jcr && item.jcr !== '-' ? `JCR ${item.jcr}` : '',
+    item.cas && item.cas !== '-' ? `中科院 ${item.cas}` : '',
+    item.xinrui && item.xinrui !== '-' ? `新锐 ${item.xinrui}` : '',
+    item.cnkx && item.cnkx !== '-' ? `科协 ${item.cnkx}` : '',
+    item.abdc && item.abdc !== '-' ? `ABDC ${item.abdc}` : '',
+    item.abs && item.abs !== '-' ? `ABS ${item.abs}` : '',
+    item.ccf && item.ccf !== '-' ? `CCF ${item.ccf}` : ''
+  ].filter(Boolean)
 
   return {
     ...item,
     indexBadges,
+    divisionBadges,
     jcrSubcategories,
     casSubcategories,
     wosSubjects,
@@ -214,6 +225,7 @@ function enrichDetail(item) {
     reviewCycle: toMonthCycle(firstValue(item, ['reviewCycle', 'review_cycle', 'review_time', 'sd_review_cycle', 'acceptance_time'], '审稿周期待查')),
     freeText: firstValue(item, ['freeText', 'free_label'], item.free ? '免费发表' : '付费发表'),
     website: firstValue(item, ['website', 'url', 'homepage', 'official_url'], '-'),
+    ifRank: firstValue(item, ['ifRank', 'if_rank'], '-'),
     scopusId: firstValue(item, ['scopusId', 'scopus_id'], '-'),
     publishedWorks: firstValue(item, ['publishedWorks', 'works_count', 'published_works'], '-'),
     esiSubject: firstValue(item, ['esiSubject', 'esi_subject'], '-'),
@@ -232,6 +244,7 @@ function normalizeDetail(row, slug) {
     ...row,
     title: row.title || row.name || base.title,
     ifText: String(row.ifText || row.if_2024 || row.if || base.ifText),
+    ifRank: row.ifRank || row.if_rank || base.ifRank,
     jcr: row.jcr || row.if_quartile || base.jcr,
     cas: row.cas || formatZone(row.cas_zone, row.cas_top, base.cas),
     xinrui: row.xinrui || row.xr || row.xr_zone_text || formatZone(row.xr_zone || row.xinrui_zone, row.xr_top || row.xinrui_top, base.xinrui),
@@ -251,15 +264,9 @@ Page({
   },
 
   fetchDetail(slug) {
-    wx.request({
-      url: `${app.globalData.apiBase}/journals/${encodeURIComponent(slug)}`,
-      method: 'GET',
-      success: (res) => {
-        if (res.data && !res.data.error) {
-          this.setData({ journal: normalizeDetail(res.data, slug) })
-        }
-      }
-    })
+    localData.getJournalDetail(slug)
+      .then((detail) => this.setData({ journal: normalizeDetail(detail, slug) }))
+      .catch(() => this.setData({ journal: normalizeDetail(null, slug) }))
   },
 
   onShareAppMessage() {

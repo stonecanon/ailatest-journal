@@ -1,4 +1,5 @@
 const app = getApp()
+const localData = require('../../utils/localData')
 
 const SAMPLE_JOURNALS = [
   {
@@ -147,6 +148,8 @@ Page({
     currentOptions: [],
     searched: false,
     loading: false,
+    dataStatus: '本地静态数据 demo',
+    searchPerf: '',
     total: SAMPLE_JOURNALS.length,
     journals: SAMPLE_JOURNALS,
     quickFilters: [
@@ -165,6 +168,8 @@ Page({
   },
 
   onLoad(options = {}) {
+    this.setData({ loading: true })
+
     if (options.filters) {
       try {
         const selectedFilters = JSON.parse(decodeURIComponent(options.filters))
@@ -177,7 +182,39 @@ Page({
         this.setData({ selectedFilters: {}, filterSummary: '' })
       }
     }
-    this.search('')
+    // 先预加载数据分包，再搜索
+    localData.preload().then(() => {
+      this.searchLocal('')
+    }).catch(() => {
+      this.searchLocal('')
+    })
+  },
+
+  searchLocal(q) {
+    this.setData({ loading: true })
+    localData.searchJournals({
+      q,
+      limit: 20,
+      filters: this.data.selectedFilters || {}
+    })
+      .then((result) => {
+        this.setData({
+          journals: result.items.map(normalizeItem),
+          total: result.total,
+          searchPerf: `${result.elapsed}ms` + (result.dataTotal ? ` · 共 ${result.dataTotal} 条` : ''),
+          dataStatus: '本地数据',
+          loading: false
+        })
+      })
+      .catch((err) => {
+        console.error('搜索失败', err)
+        this.setData({
+          journals: SAMPLE_JOURNALS,
+          total: SAMPLE_JOURNALS.length,
+          dataStatus: '数据加载失败，显示样例',
+          loading: false
+        })
+      })
   },
 
   switchMode(e) {
@@ -190,7 +227,7 @@ Page({
 
   useTag(e) {
     this.setData({ query: e.currentTarget.dataset.value, searched: true })
-    this.search(e.currentTarget.dataset.value)
+    this.searchLocal(e.currentTarget.dataset.value)
   },
 
   selectFilter(e) {
@@ -222,45 +259,17 @@ Page({
       currentOptions: decorateOptions(this.data.currentOptions, selectedFilters),
       searched: true
     })
-    this.search(this.data.query)
+    this.searchLocal(this.data.query)
   },
 
   runSearch() {
     this.setData({ searched: true })
-    this.search(this.data.query)
+    this.searchLocal(this.data.query)
   },
 
   shuffleFeatured() {
     const list = this.data.journals.slice().reverse()
     this.setData({ journals: list })
-  },
-
-  search(q) {
-    this.setData({ loading: true })
-    wx.request({
-      url: `${app.globalData.apiBase}/journals/search`,
-      method: 'GET',
-      data: {
-        q,
-        limit: 20,
-        filter: this.data.activeFilter,
-        filters: JSON.stringify(this.data.selectedFilters || {}),
-        mode: this.data.mode
-      },
-      success: (res) => {
-        const items = res.data && Array.isArray(res.data.items) ? res.data.items : null
-        if (items) {
-          this.setData({
-            journals: items.map(normalizeItem),
-            total: res.data.total || items.length,
-            loading: false
-          })
-          return
-        }
-        this.useFallback(q)
-      },
-      fail: () => this.useFallback(q)
-    })
   },
 
   useFallback(q) {

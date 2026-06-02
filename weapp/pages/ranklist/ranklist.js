@@ -1,4 +1,5 @@
 const app = getApp()
+const localData = require('../../utils/localData')
 
 function normalizeItem(row, idx) {
   const title = row.title || row.name || row.cn_name || 'Unknown Journal'
@@ -34,26 +35,34 @@ Page({
 
   fetchRank(type, slug) {
     this.setData({ loading: true, error: '' })
-    wx.request({
-      url: `${app.globalData.apiBase}/rankings/${encodeURIComponent(type)}/${encodeURIComponent(slug)}`,
-      method: 'GET',
-      data: { limit: 20 },
-      success: (res) => {
-        const items = res.data && Array.isArray(res.data.items) ? res.data.items : null
-        if (!items) {
-          this.setData({ journals: [], loading: false, error: '榜单接口待接入' })
-          return
-        }
+    if (app.globalData.cloudReady && wx.cloud) {
+      api.getRanking({ type, slug, limit: 20 }).then((result) => {
+        const items = Array.isArray(result.items) ? result.items : []
         this.setData({
           journals: items.slice(0, 20).map(normalizeItem),
           loading: false,
           error: ''
         })
-      },
-      fail: () => {
-        this.setData({ journals: [], loading: false, error: '榜单接口待接入' })
-      }
-    })
+      }).catch(() => {
+        this.fetchLocalRank(type, slug)
+      })
+      return
+    }
+    this.fetchLocalRank(type, slug)
+  },
+
+  fetchLocalRank(type, slug) {
+    localData.getRanking({ type, slug, limit: 20 })
+      .then((items) => {
+      this.setData({
+        journals: items.slice(0, 20).map(normalizeItem),
+        loading: false,
+        error: ''
+      })
+      })
+      .catch((err) => {
+      this.setData({ journals: [], loading: false, error: `榜单数据读取失败：${err && err.message ? err.message : '未知错误'}` })
+      })
   },
 
   openDetail(e) {
