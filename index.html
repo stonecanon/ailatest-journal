@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8" />
@@ -17,7 +17,7 @@
 <meta property="og:url" content="https://journal.ailatest.org/" />
 <meta property="og:title" content="AILatest Journal — Journal Finder · 期刊查询与荐刊推荐" />
 <meta property="og:description" content="Free journal finder &amp; search tool for researchers. SCI/SSCI/AHCI/ESCI/EI, JCR IF, CAS tiers, CCF, CSSCI, PKU Core, Scopus, DOAJ, review cycles, and smart journal recommendation." />
-<meta property="og:image" content="https://journal.ailatest.org/icons/og-image.png" />
+<meta property="og:image" content="https://journal.ailatest.org/icons/og-image.jpg" />
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image" />
@@ -107,6 +107,22 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 }
 </script>
 
+<script>
+// Mobile detection - redirect to mobile version on small screens
+(function() {
+  var isMobile = window.innerWidth < 769;
+  if (isMobile && !window.location.pathname.includes('/mobile')) {
+    window.location.href = '/mobile.html' + window.location.search;
+  }
+  // Allow switching back
+  window.addEventListener('resize', function() {
+    var w = window.innerWidth;
+    if (w >= 769 && window.location.pathname.includes('/mobile')) {
+      window.location.href = '/' + window.location.search;
+    }
+  });
+})();
+</script>
 </head>
 <body>
 <!-- Google Tag Manager (noscript) -->
@@ -542,7 +558,19 @@ const __BUILD_VER = 'v20260530-79';
     if (btn) btn.hidden = true;
   });
 </script>
+<button style="position:fixed;bottom:70px;right:10px;z-index:999;background:rgba(255,255,255,0.9);border:1px solid #eadfd2;border-radius:8px;padding:6px 10px;font-size:11px;color:#5f5a54;cursor:pointer;display:none;font-family:-apple-system,sans-serif;" id="switch-version" onclick="window.location.href=window.location.pathname.includes('mobile')?'/':'/mobile.html'">切换到手机版</button>
+<script>
+(function(){
+  var btn = document.getElementById('switch-version');
+  if (btn) {
+    var m = window.innerWidth < 769;
+    btn.style.display = 'block';
+    btn.textContent = m ? '桌面版' : '手机版';
+  }
+})();
+</script>
 </body>
 </html>
 
 trigger
+
