@@ -5709,29 +5709,31 @@
         const firstLine = lines.find(l => !/^keywords?:/i.test(l) && !/^关键词[：:]/.test(l) && !/^關鍵詞[：:]/.test(l)) || query;
         const bodyText = lines.filter(l => l !== firstLine && !/^keywords?:/i.test(l) && !/^关键词[：:]/.test(l) && !/^關鍵詞[：:]/.test(l)).join(' ');
 
-        const SYNONYM_MAP = {
-          occupancy: ['occupant','people counting','crowd estimation'],
-          occupied: ['occupancy','occupant'],
-          sensor: ['sensing','detector','sensor array'],
-          sensors: ['sensor','sensing'],
-          indoor: ['indoor environment','built environment','interior'],
-          building: ['built environment','architecture','construction'],
-          buildings: ['building','built environment','architecture'],
-          ambient: ['environmental','surrounding','background'],
-          explainable: ['interpretable','xai'],
-          prediction: ['forecasting','estimation','predictive'],
-          detection: ['recognition','classification','monitoring'],
-          'machine learning': ['deep learning','neural network','supervised learning'],
-          'deep learning': ['neural network','machine learning','convolutional neural network'],
-          thermal: ['temperature','thermal comfort'],
-          comfort: ['satisfaction','well-being'],
-          co2: ['carbon dioxide','co₂'],
-          ventilation: ['air exchange','airflow','hvac'],
-          particulate: ['pm','particle','aerosol'],
-          noise: ['sound level','acoustic'],
-          illumination: ['lighting','daylight','light intensity'],
-          air: ['iaq','air quality'],
-          quality: ['condition','comfort','environmental quality'],
+        // 研究方法/过程/抽象词：跨学科共通，是噪声，一律不参与打分（研究对象 > 研究方法）。
+        const GENERIC_TERMS = new Set((
+          'evolution evolutionary mechanism mechanisms spatiotemporal spatial temporal dynamics dynamic ' +
+          'analysis analyses framework frameworks model modeling modelling models method methods methodology ' +
+          'approach approaches characteristic characteristics influence influences impact impacts effect effects ' +
+          'factor factors optimization optimisation simulation simulations evaluation assessment prediction ' +
+          'predictions detection classification recognition system systems strategy strategies development ' +
+          'application applications research study studies investigation data based response responses behavior ' +
+          'behaviour performance structure structural process processes pattern patterns distribution variation ' +
+          'variations change changes relationship relationships correlation correlations multi-source multisource ' +
+          'role comparative comparison novel improved enhanced hybrid integrated review reviews survey theory ' +
+          'theoretical empirical case experimental numerical measurement measurements monitoring estimation ' +
+          'historical history'
+        ).split(/\s+/).filter(Boolean));
+
+        // 研究对象 → 领域锚点（出现在学科分类/主题里的通用词），用于补字面鸿沟（如“街道活力”≠“Urban Studies”）。
+        // 通用启发式，可按需继续扩充；不要塞单一领域的过拟合词。
+        const FIELD_ANCHORS = {
+          street:['urban'], streetscape:['urban'], streetscapes:['urban'], vitality:['urban'],
+          walkability:['urban'], walkable:['urban'], pedestrian:['urban','transport'],
+          neighborhood:['urban'], neighbourhood:['urban'], plaza:['urban'], placemaking:['urban'],
+          gentrification:['urban'], zoning:['urban'], sprawl:['urban'],
+          tumor:['oncology','cancer'], tumour:['oncology','cancer'], carcinoma:['oncology'],
+          gene:['genetics'], genome:['genetics','genomics'], protein:['biochemistry'],
+          battery:['energy'], batteries:['energy'], photovoltaic:['energy'], catalyst:['catalysis','chemistry'],
         };
         const stopWords = new Set(('the and are was for not non into onto from this that with from which were have been than into also their about '+
           'study show were used using based results method model data paper these between while where '+
@@ -5750,30 +5752,26 @@
           'performance evaluation values value results analysis prediction predictions').split(' '));
 
         const allText = [firstLine, bodyText, explicitKeywords.join(' ')].join(' ').toLowerCase();
-        const phraseTerms = [];
-        Object.keys(SYNONYM_MAP).forEach(p => {
-          if (p.includes(' ') && allText.includes(p)) phraseTerms.push(p);
-        });
         const allWords = allText.replace(/[^a-z0-9\u4e00-\u9fff\s-]/g, ' ')
           .split(/\s+/)
           .map(w => w.replace(/^-+|-+$/g, ''))
           .filter(w => w.length > 2 && !stopWords.has(w) && !/^\d+$/.test(w) && !w.startsWith('http'));
-        const uniqueWords = allWords.filter((w, i) => allWords.indexOf(w) === i);
-        const weightedTerms = new Map();
-        function addTerm(term, weight) {
+        // 只把「研究对象」词纳入打分；命中 GENERIC_TERMS 的方法/过程词一律忽略。
+        const objectTerms = new Map();
+        const seenObj = new Set();
+        function addObject(term, weight) {
           const s = String(term || '').toLowerCase().trim();
-          if (!s || s.length < 3 || stopWords.has(s)) return;
-          weightedTerms.set(s, Math.max(weightedTerms.get(s) || 0, weight));
+          if (!s || s.length < 3 || stopWords.has(s) || GENERIC_TERMS.has(s)) return;
+          objectTerms.set(s, Math.max(objectTerms.get(s) || 0, weight));
         }
-        explicitKeywords.forEach(k => addTerm(k, 5));
-        phraseTerms.forEach(k => addTerm(k, 4));
-        uniqueWords.forEach((w, i) => addTerm(w, i < 8 ? 3 : 1.6));
-        [...weightedTerms.keys()].forEach(w => {
-          (SYNONYM_MAP[w] || []).forEach(syn => addTerm(syn, Math.max(1.5, (weightedTerms.get(w) || 2) * 0.65)));
-        });
-        const terms = [...weightedTerms.entries()].sort((a, b) => b[1] - a[1]).slice(0, 28);
+        explicitKeywords.forEach(k => addObject(k, 5));   // 显式关键词权重最高
+        let _oi = 0;
+        allWords.forEach(w => { if (seenObj.has(w)) return; seenObj.add(w); addObject(w, _oi++ < 8 ? 3 : 2); });
+        // 研究对象 → 领域锚点扩展（如 street/vitality → urban），扩展词当作对象词、权重略低
+        [...objectTerms.keys()].forEach(w => (FIELD_ANCHORS[w] || []).forEach(a => addObject(a, 2.4)));
+        const terms = [...objectTerms.entries()].sort((a, b) => b[1] - a[1]).slice(0, 24);
         if (!terms.length) {
-          status.textContent = T('关键词太少，请输入题目或关键词','Please enter a title or keywords');
+          status.textContent = T('请输入更具体的研究对象关键词（避免只填“分析/机制/演化”等方法词）','Enter more specific research-topic keywords (not just method words like analysis/mechanism)');
           return;
         }
 
@@ -5787,46 +5785,32 @@
           }
           return [...new Set(topics)];
         }
-        function journalHaystack(r, topics) {
-          return [
-            r.name, r.cn_name, r.abbr20, r.publisher, r.country,
-            r.esi_category, r.cas_major_cn, r.jcr_cat, r.ccf_area,
-            ...(r.wos_categories || []),
-            ...(topics || []),
-          ].filter(Boolean).join(' ').toLowerCase();
-        }
 
         let entries = journals.map(r => {
           const topics = localTopicProfile(r);
-          const hay = journalHaystack(r, topics);
+          // 学科分类(WoS/ESI/中科院大类/JCR/CCF)定义期刊核心领域 → 命中权重最高
+          const catHay = [r.esi_category, r.cas_major_cn, r.jcr_cat, r.ccf_area, ...(r.wos_categories || [])]
+            .filter(Boolean).join(' ').toLowerCase();
+          const topicList = topics.map(t => String(t).toLowerCase());
           const nameHay = [r.name, r.cn_name, r.abbr20].filter(Boolean).join(' ').toLowerCase();
           let score = 0;
           const matched = [];
           for (const [term, weight] of terms) {
             const parts = term.split(/\s+/).filter(Boolean);
-            const hit = hay.includes(term) || (parts.length > 1 && parts.every(p => hay.includes(p)));
-            if (!hit) continue;
-            let boost = 1;
-            if (nameHay.includes(term)) boost += 0.55;
-            if ((r.wos_categories || []).join(' ').toLowerCase().includes(term)) boost += 0.45;
-            if (topics.join(' ').toLowerCase().includes(term)) boost += 0.35;
-            score += weight * boost;
-            matched.push(term);
+            const inCat = catHay.includes(term) || (parts.length > 1 && parts.every(p => catHay.includes(p)));
+            const topicCount = topicList.filter(tp => tp.includes(term) || (parts.length > 1 && parts.every(p => tp.includes(p)))).length;
+            const inName = nameHay.includes(term) || (parts.length > 1 && parts.every(p => nameHay.includes(p)));
+            let s = 0;
+            if (inCat) s += weight * 2.0;                                    // 学科分类命中：最强信号
+            if (topicCount) s += weight * Math.min(0.25 * topicCount, 1.0);  // 主题命中：按中心度
+            if (!s && inName) s += weight * 0.3;                             // 仅刊名命中：弱信号（防“Evolution”类劫持）
+            if (s > 0) { score += s; matched.push(term); }
           }
-          const buildingQuery = /(building|buildings|built environment|indoor|occupancy|occupant|hvac|ventilation|thermal comfort|sensor|sensing)/i.test(allText);
-          if (buildingQuery) {
-            const buildingProfile = /(building|built environment|indoor|construction|architecture|architectural|energy and comfort|ventilation|thermal comfort|urban|environmental)/i.test(hay);
-            const buildingName = /(building|built environment|indoor|construction|architecture|energy and buildings|building simulation)/i.test(nameHay);
-            if (buildingProfile) score *= 1.32;
-            if (buildingName) score *= 1.22;
-          }
-          const mlQuery = /(machine learning|deep learning|neural|algorithm|classification|prediction|detection)/i.test(allText);
-          if (mlQuery && /(machine learning|neural network|artificial intelligence|data mining|computer vision|pattern recognition)/i.test(hay)) {
-            score *= 1.08;
-          }
+          // 广度奖励：命中越多不同研究对象词越相关
+          score *= (1 + 0.4 * Math.max(0, matched.length - 1));
           const idx = r.indices || [];
-          if (idx.includes('SCIE') || idx.includes('SSCI') || idx.includes('AHCI')) score *= 1.12;
-          if (r.cas_zone === 1 || r.if_quartile === 'Q1') score *= 1.08;
+          if (idx.includes('SCIE') || idx.includes('SSCI') || idx.includes('AHCI')) score *= 1.10;
+          if (r.cas_zone === 1 || r.if_quartile === 'Q1') score *= 1.06;
           if (r.warning || r.citic_warning || r.on_hold || r.under_review) score *= 0.72;
           return {
             journalRec: r,
