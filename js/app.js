@@ -5875,7 +5875,7 @@
           const issnStr = e.issn;
           const signalList = [
             ...e.matched.map(t => `<span class="pick-topic">${escape(t)}</span>`),
-            ...e.topics.slice(0, 4).map(t => `<span class="pick-topic">${escape(t)}</span>`),
+            ...e.topics.slice(0, 3).map(t => `<span class="pick-topic">${escape(t)}</span>`),
           ].join('');
 
           let topInfoHtml = '';
@@ -5925,7 +5925,8 @@
               ? `<span class="zone z${xrZone}" title="${T('中科院新锐 2026 分区','CAS Emerging 2026 tier')}">${T('新锐2026','Emerging 2026')} ${xrZone}${T('区','')}${r.cas_xr.top ? ' TOP' : ''}</span>`
               : '';
             const ccfTxt = r.ccf ? `<span class="badge b-ccf" title="${T('中国计算机学会推荐等级','CCF recommended ranking')}">CCF ${escape(r.ccf)}</span>` : '';
-            zoneTagsHtml = [ifTxt, jcrTag, zTag, xrTag, ccfTxt].filter(Boolean).join('');
+            // 卡片只保留最核心的三档（IF / JCR / 中科院），新锐·CCF 收进详情页，减少徽章堆叠
+            zoneTagsHtml = [ifTxt, jcrTag, zTag].filter(Boolean).join('');
             // Zone strip color
             zoneColor = e.zone === '1' || e.zone === 1 ? '#1f3a5f'
               : e.zone === '2' || e.zone === 2 ? '#4f6f9b'
