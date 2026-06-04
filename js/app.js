@@ -5974,13 +5974,11 @@
                 const r2 = e.journalRec;
                 const freeState = r2?.free ? freeBadgeCell(r2) : `<span class="badge b-paid">${T('非免费发表','Paid / not free')}</span>`;
                 const weeks = parseFloat(r2?.doaj?.review_weeks);
-                const cycleMain = weeks > 0
-                  ? (weeks / 4.33).toFixed(1) + T(' 个月',' months')
-                  : T('约 4.0 个月','approx. 4.0 months');
-                const cycleSub = weeks > 0
-                  ? T('投稿到发表, DOAJ','submission to publication, DOAJ')
-                  : T('DOAJ 平均','DOAJ average');
-                return `<div class="pick-cycle">${freeState}<span class="pick-cycle-label">${T('审稿周期','Review cycle')}:</span><strong>${cycleMain}</strong><span class="pick-cycle-sub">${cycleSub}</span></div>`;
+                // 仅在有实际审稿周期数据时显示；无数据则不展示（不再用 DOAJ 平均值兜底）
+                const cycleHtml = weeks > 0
+                  ? `<span class="pick-cycle-label">${T('审稿周期','Review cycle')}:</span><strong>${(weeks / 4.33).toFixed(1)}${T(' 个月',' months')}</strong><span class="pick-cycle-sub">${T('投稿到发表, DOAJ','submission to publication, DOAJ')}</span>`
+                  : '';
+                return `<div class="pick-cycle">${freeState}${cycleHtml}</div>`;
               })()}
               ${signalList ? `<div class="pick-papers">${signalList}</div>` : ''}
             </div>
