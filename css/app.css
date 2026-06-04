@@ -4355,3 +4355,46 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   .tab-panel table.journals tbody tr.j-row { padding: 13px 14px; }
   .j-row .jname { font-size: 14.5px; }
 }
+
+/* ═══════════ 顶部筛选条：索引/分区 摊平为圆角矩形 chip 分组（其他/学科 仍下拉） ═══════════ */
+.tab-panel table.journals thead .col-free { order: 1; }
+.tab-panel table.journals thead .col-if   { order: 2; }
+.tab-panel table.journals thead .col-wos  { order: 3; }
+.tab-panel table.journals thead .col-badge {
+  order: 5; flex: 1 1 100%;
+  display: flex; flex-wrap: wrap; align-items: flex-start; gap: 9px 16px;
+  margin-top: 2px; padding-top: 8px; border-top: 1px solid var(--rule-soft);
+}
+/* 索引 / 分区 两组常开 */
+#idx-dropdown.th-dropdown, #tier-dropdown.th-dropdown {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 5px;
+}
+#idx-dropdown > .th-dropdown-btn, #tier-dropdown > .th-dropdown-btn {
+  pointer-events: none; border: 0; padding: 0 6px 0 0;
+  color: var(--ink-faint); font-size: 10.5px; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase;
+}
+#idx-dropdown > .th-dropdown-btn .dd-arrow, #tier-dropdown > .th-dropdown-btn .dd-arrow { display: none; }
+#idx-dropdown > .th-dropdown-panel, #tier-dropdown > .th-dropdown-panel {
+  display: flex !important; position: static; flex-wrap: wrap; gap: 5px;
+  min-width: 0; max-height: none; overflow: visible;
+  padding: 0; background: none; border: 0; box-shadow: none;
+}
+#idx-dropdown .th-chk, #tier-dropdown .th-chk {
+  padding: 3px 11px; border: 1px solid var(--rule); border-radius: 7px;
+  background: var(--paper); color: var(--ink-soft);
+  font-size: 11.5px; font-weight: 600; white-space: nowrap; transition: all .14s;
+}
+#idx-dropdown .th-chk:hover, #tier-dropdown .th-chk:hover { border-color: var(--deep); color: var(--ink); }
+#idx-dropdown .th-chk input, #tier-dropdown .th-chk input { display: none; }
+#idx-dropdown .th-chk:has(input:checked), #tier-dropdown .th-chk:has(input:checked) {
+  background: var(--deep); border-color: var(--deep); color: #fff; font-weight: 700;
+}
+/* dd-sep → 整行换行，把 JCR / 中科院 / 新锐 分成几个区 */
+#idx-dropdown .dd-sep, #tier-dropdown .dd-sep { flex-basis: 100%; height: 0; margin: 2px 0; background: none; border: 0; }
+
+/* ═══════════ 去掉期刊封面（详情页 + 荐刊卡片，很多无数据） ═══════════ */
+.journal-cover { display: none !important; }
+.journal-overview { display: block !important; }
+.journal-overview-copy { max-width: none !important; }
+.pick-cover { display: none !important; }
