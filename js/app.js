@@ -44,6 +44,7 @@
       pwa_install: '📲 安装到主屏',
       footer_data: '数据来源：Clarivate WoS Core Collection (SCIE/SSCI/AHCI/ESCI) · JCR 2025 · ESI · EI Compendex · Scopus · DOAJ · UGC-CARE India · 中科院文献情报中心分区表 2025 · ShowJCR (GPL-3.0) · CCF 2026 (A/B/C) · CCF-T 2025 · ABDC 2025 · ABS 2024 · 中国科协 2025 · CSSCI · 北大核心 · CNKI · 浙江大学 2024 · 高校自编目录 2023 · CrossRef · OpenAlex。© <a href="https://journal.ailatest.org">AILatest Journal</a>',
       tab_home: '查刊', tab_int: '国际', tab_dom: '中国', tab_fav: '收藏', tab_pick: '荐刊',
+      nav_index_rank: '索引排行榜', nav_subject_rank: '学科排行榜', nav_warn_rank: '预警排行榜',
       rail_int: 'global', rail_dom: 'cn', rail_in: 'in', rail_kr: 'kr', rail_fav: '收藏',
       loading: '加载中…',
       hero_title_int: 'SCI / SSCI 国际期刊检索',
@@ -125,6 +126,7 @@
       pwa_install: '📲 Install to Home',
       footer_data: 'Sources: Clarivate WoS Core Collection (SCIE/SSCI/AHCI/ESCI) · JCR 2025 · ESI · EI Compendex · Scopus · DOAJ · UGC-CARE India · CAS NSL Tiers 2025 · ShowJCR (GPL-3.0) · CCF 2026 (A/B/C) · CCF-T 2025 · ABDC 2025 · ABS 2024 · CAST 2025 · CSSCI · PKU Core · CNKI · ZJU 2024 · School A 2023 · CrossRef · OpenAlex. © <a href="https://journal.ailatest.org">AILatest Journal</a>',
       tab_home: 'Journals', tab_int: 'International', tab_dom: 'China', tab_fav: 'Favorites', tab_pick: 'Recommend',
+      nav_index_rank: 'Index Rankings', nav_subject_rank: 'Subject Rankings', nav_warn_rank: 'Warning List',
       rail_int: 'global', rail_dom: 'cn', rail_in: 'in', rail_kr: 'kr', rail_fav: 'Favorites',
       loading: 'Loading…',
       hero_title_int: 'International SCI / SSCI Search',
@@ -2419,7 +2421,9 @@
     if (activeQuery) {
       intIfSort = '';
     }
-    filtered = sortByIF(filtered, intIfSort);
+    // 不搜索时默认按影响因子倒序（=推荐期刊），而不是字母顺序
+    const effIntSort = intIfSort || (activeQuery ? '' : 'desc');
+    filtered = sortByIF(filtered, effIntSort);
     document.querySelector('th.col-if[data-if-sort="int"]')?.classList.toggle('sort-desc', intIfSort === 'desc');
     document.querySelector('th.col-if[data-if-sort="int"]')?.classList.toggle('sort-asc', intIfSort === 'asc');
     const intArrow = document.querySelector('th.col-if[data-if-sort="int"] .sort-arrow');
@@ -6215,6 +6219,18 @@
           } catch (_) {}
         }, 200);
       })();
+      // 预警排行榜：切到国际刊并只看预警期刊
+      document.getElementById('warn-rank-link')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        [activeIndices, activeJcr, activeZones, activeXr, activeAbdc, activeAbs, activeTopics, activeFeats].forEach(s => s.clear());
+        activeFeats.add('warning');
+        activeCat = '__all'; activeQuery = '';
+        const qEl = document.getElementById('q'); if (qEl) qEl.value = '';
+        shown = PAGE;
+        if (window.__activateJournalTab) window.__activateJournalTab('int');
+        renderInt(); syncThChkState();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
       if (renderJournalRoutePage()) {
         window.addEventListener('hashchange', applyHashRoute);
         if (user) await pullFavs();

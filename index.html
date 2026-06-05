@@ -38,7 +38,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- End Google Tag Manager -->
 <link rel="preload" href="/data/journals.json.gz" as="fetch" crossorigin="anonymous" />
 <link rel="preload" href="/data/journal_aliases.json" as="fetch" crossorigin="anonymous" />
-<link rel="stylesheet" href="/css/app.css?v=20260604-05" />
+<link rel="stylesheet" href="/css/app.css?v=20260604-07" />
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json" />
@@ -144,11 +144,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </nav>
   <div class="rail-bottom">
     <button class="auth-btn" id="auth-btn" aria-label="Sign in" data-i18n="login">登录</button>
-    <div class="lang-toggle-wrap">
-      <button class="lang-toggle" id="lang-toggle" aria-label="Switch language">中文</button>
-    </div>
   </div>
 </aside>
+<div class="lang-toggle-wrap">
+  <button class="lang-toggle" id="lang-toggle" aria-label="Switch language">中文</button>
+</div>
 
 <main class="main">
   <section class="home-hero" aria-label="AILatest Journal">
@@ -161,8 +161,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </section>
 
   <nav class="seo-nav" aria-label="Browse journals">
-    <a href="/indexes/" class="seo-nav-link">Indexes</a>
-    <a href="/subjects/" class="seo-nav-link">Subjects</a>
+    <a href="/indexes/" class="seo-nav-link" data-i18n="nav_index_rank">索引排行榜</a>
+    <a href="/subjects/" class="seo-nav-link" data-i18n="nav_subject_rank">学科排行榜</a>
+    <a href="#" class="seo-nav-link" id="warn-rank-link" data-i18n="nav_warn_rank">预警排行榜</a>
   </nav>
 
   <header class="topbar">
@@ -188,7 +189,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <a class="mobile-nav-brand" href="/" aria-label="AILatest Journal"><em data-i18n="brand_title">Journal</em><span>.ailatest</span></a>
   </div>
 
-  <div class="page-brand" id="page-brand" data-tab="home" title="回到首页" data-i18n="brand_zhikan">知刊</div>
 
   <!-- ─── Home tab ─── -->
   <section class="tab-panel" data-panel="home">
@@ -516,7 +516,7 @@ const __BUILD_VER = 'v20260530-79';
   }
 })();
 </script>
-<script src="/js/app.js?v=20260604-02" defer></script>
+<script src="/js/app.js?v=20260604-03" defer></script>
 <script>
   // Custom install prompt
   let __pwaPrompt = null;
