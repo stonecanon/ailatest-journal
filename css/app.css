@@ -4429,3 +4429,39 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   box-shadow: 0 2px 8px -3px rgba(60,48,36,.25); cursor: pointer;
 }
 .lang-toggle:hover { color: var(--ink); border-color: var(--accent); }
+
+/* ═══════ 卡片徽章配色统一（收录=冷蓝、分区=暖棕、预警=红、免费=绿），不再花 ═══════ */
+.j-row .col-badge .badge,
+.j-row .col-badge .zone,
+.j-row .col-badge .xr-pill,
+.j-row .col-badge .abdc-pill,
+.j-row .col-badge .abs-pill,
+.j-row .col-badge .warn-pill {
+  font-size: 10px; padding: 2px 7px; border-radius: 4px;
+  font-weight: 700; letter-spacing: .02em; line-height: 1.55; border: 0; box-shadow: none;
+}
+/* 收录：主索引深蓝，其余灰蓝 */
+.j-row .badges-idx .badge { background: #5b6b80 !important; color: #fff !important; }
+.j-row .badges-idx .badge.b-scie,
+.j-row .badges-idx .badge.b-ssci,
+.j-row .badges-idx .badge.b-ahci,
+.j-row .badges-idx .badge.b-medline { background: #1f3a5f !important; }
+/* 分区：统一暖棕，TOP/Q1 深一档 */
+.j-row .badges-rank .zone,
+.j-row .badges-rank .xr-pill,
+.j-row .badges-rank .abdc-pill,
+.j-row .badges-rank .abs-pill,
+.j-row .badges-rank .badge { background: #8a6440 !important; color: #fff !important; }
+.j-row .badges-rank .ztop,
+.j-row .badges-rank .jcr-q1,
+.j-row .badges-rank .xr-top { background: #6b4a28 !important; }
+/* 预警：红 */
+.j-row .badges-rank .warn-pill,
+.j-row .badges-rank .b-warn,
+.j-row .badges-rank .b-warn-high { background: #b23a3a !important; color: #fff !important; }
+
+/* 免费发表：小号绿色标，紧挨 IF */
+.j-row .col-free .badge.b-free {
+  background: #2d8a4e; color: #fff; font-size: 10px; padding: 2px 8px; border-radius: 999px; font-weight: 700;
+}
+.j-row .col-if { margin-left: 2px; }

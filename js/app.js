@@ -4577,7 +4577,8 @@
   // ───────── 单本期刊分享弹窗（含卡片预览 + 下载图片 + 复制链接） ─────────
   function showJournalShareModal(r) {
     const id = favId(r);
-    const url = `${location.origin}${location.pathname}#j/${encodeURIComponent(id)}`;
+    // 分享直链到期刊详情页（/journal/<slug>/），打开即是信息页，不再先进首页
+    const url = `${location.origin}${journalPublicPath(r)}`;
     const ir = r.__src === 'int' ? r : (lookupInt(r) || r);
     const title = titleCase((r.name || r.cn_name || '').replace(/\*$/,''));
     const cn = r.cn_name && r.cn_name !== title ? r.cn_name : '';
@@ -5931,14 +5932,14 @@
             const ccfTxt = r.ccf ? `<span class="badge b-ccf" title="${T('中国计算机学会推荐等级','CCF recommended ranking')}">CCF ${escape(r.ccf)}</span>` : '';
             // 卡片只保留最核心的三档（IF / JCR / 中科院），新锐·CCF 收进详情页，减少徽章堆叠
             zoneTagsHtml = [ifTxt, jcrTag, zTag].filter(Boolean).join('');
-            // Zone strip color
+            // Zone strip color（无分区数据时用中性色兜底，保证每张卡片都有左色条、不忽有忽无）
             zoneColor = e.zone === '1' || e.zone === 1 ? '#1f3a5f'
               : e.zone === '2' || e.zone === 2 ? '#4f6f9b'
               : e.zone === '3' || e.zone === 3 ? '#9eb1cb'
               : e.zone === '4' || e.zone === 4 ? '#d3dbe6'
               : jcrQ === 'Q1' ? '#7a2030'
               : jcrQ === 'Q2' ? '#a04a5a'
-              : '';
+              : '#cbbfa8';
           }
 
           // Compute score color for the score bar
