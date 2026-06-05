@@ -6185,6 +6185,36 @@
         : `${journals.length.toLocaleString()} journals loaded`;
       renderCatList();
       renderTopicList();
+      // ── 小程序收藏导入（方案A：/import?d=ISSN1,ISSN2…，无后端）──
+      (function importFromMiniProgram() {
+        if (location.pathname.replace(/\/+$/, '') !== '/import') return;
+        let raw = new URLSearchParams(location.search).get('d') || '';
+        if (!raw && location.hash) {
+          const m = location.hash.match(/[#&?]d=([^&]+)/);
+          if (m) raw = decodeURIComponent(m[1]);
+        }
+        const issns = (raw || '').split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
+        let added = 0, missing = 0;
+        for (const issn of issns) {
+          const r = journals.find(j => (j.issn || '').toUpperCase() === issn || (j.eissn || '').toUpperCase() === issn);
+          if (!r) { missing++; continue; }
+          if (!isFav(r)) { toggleFav(r, {}); added++; }
+        }
+        try { history.replaceState(null, '', '/favorites'); } catch (_) {}
+        const msg = issns.length
+          ? `${T('已导入', 'Imported')} ${added} ${T('本期刊到收藏', 'journals to favorites')}` + (missing ? `（${missing} ${T('本未匹配', 'unmatched')}）` : '')
+          : T('链接里没有可导入的期刊', 'No journals found in the link');
+        setTimeout(() => {
+          try {
+            const el = document.createElement('div');
+            el.className = 'import-toast';
+            el.textContent = msg;
+            el.style.cssText = 'position:fixed;left:50%;bottom:34px;transform:translateX(-50%);z-index:3000;background:#1f2c4c;color:#fff;padding:11px 20px;border-radius:10px;font-size:14px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.28);max-width:88vw;text-align:center';
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 4500);
+          } catch (_) {}
+        }, 200);
+      })();
       if (renderJournalRoutePage()) {
         window.addEventListener('hashchange', applyHashRoute);
         if (user) await pullFavs();
