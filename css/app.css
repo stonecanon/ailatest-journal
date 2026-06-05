@@ -4583,3 +4583,36 @@ body.journal-route .lang-toggle-wrap { display: none; }
   /* 导航交给底栏，隐藏 ☰（筛选已内联在国际刊页顶部） */
   .side-toggle { display: none !important; }
 }
+
+/* ═══════ 手机端：防止横向溢出（中文卡片过长会撑宽页面→底部标签栏被挤出屏幕）═══════ */
+@media (max-width: 900px) {
+  html, body { overflow-x: hidden; max-width: 100%; }
+  .main, .tab-panel, .tab-panel .results, .tab-panel .table-wrap { max-width: 100%; overflow-x: hidden; }
+  .tab-panel table.journals, .tab-panel table.journals tbody { max-width: 100%; }
+  .tab-panel table.journals tbody tr.j-row { max-width: 100%; overflow: hidden; }
+  .j-row td { max-width: 100%; min-width: 0; overflow-wrap: anywhere; }
+  .j-row td[style*="width"] { width: auto !important; max-width: 100%; }
+  .j-row .badges, .j-row .col-cross .badges { max-width: 100%; }
+}
+
+/* ═══════ 筛选：每个分类做成独立卡片；隐藏筛选区里的 IF 排序 ═══════ */
+.tab-panel[data-panel="int"] table.journals thead { background: none !important; border: 0 !important; padding: 0 !important; }
+.tab-panel[data-panel="int"] table.journals thead tr { background: none !important; border: 0 !important; padding: 0 !important; }
+.tab-panel[data-panel="int"] .th-dropdown {
+  border: 1px solid var(--rule); border-radius: 12px; padding: 11px 13px;
+  background: var(--paper); box-shadow: 0 1px 0 rgba(43,42,39,.03), 0 6px 16px -14px rgba(60,48,36,.2);
+}
+.tab-panel[data-panel="int"] thead .col-if { display: none !important; }
+.tab-panel[data-panel="int"] thead .col-free { width: 100%; }
+.tab-panel[data-panel="int"] thead .col-free .free-th-filter {
+  display: inline-flex; align-items: center; gap: 8px;
+  border: 1px solid var(--rule); border-radius: 12px; padding: 9px 14px; background: var(--paper);
+}
+@media (max-width: 900px) {
+  /* 手机端：分类卡片两列排布（索引/学科占整行） */
+  .tab-panel[data-panel="int"] table.journals thead tr { gap: 9px !important; }
+  .tab-panel[data-panel="int"] .th-dropdown { flex: 1 1 calc(50% - 6px); }
+  .tab-panel[data-panel="int"] #idx-dropdown,
+  .tab-panel[data-panel="int"] #topic-dropdown,
+  .tab-panel[data-panel="int"] thead .col-free { flex-basis: 100%; }
+}

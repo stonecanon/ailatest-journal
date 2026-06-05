@@ -45,7 +45,7 @@
       footer_data: '数据来源：Clarivate WoS Core Collection (SCIE/SSCI/AHCI/ESCI) · JCR 2025 · ESI · EI Compendex · Scopus · DOAJ · UGC-CARE India · 中科院文献情报中心分区表 2025 · ShowJCR (GPL-3.0) · CCF 2026 (A/B/C) · CCF-T 2025 · ABDC 2025 · ABS 2024 · 中国科协 2025 · CSSCI · 北大核心 · CNKI · 浙江大学 2024 · 高校自编目录 2023 · CrossRef · OpenAlex。© <a href="https://journal.ailatest.org">AILatest Journal</a>',
       tab_home: '查刊', tab_int: '国际', tab_dom: '中国', tab_fav: '收藏', tab_pick: '荐刊',
       nav_index_rank: '索引排行榜', nav_subject_rank: '学科排行榜', nav_warn_rank: '预警名单',
-      rail_int: 'global', rail_dom: 'cn', rail_in: 'in', rail_kr: 'kr', rail_fav: '收藏',
+      rail_int: '全球', rail_dom: '中国', rail_in: '印度', rail_kr: '韩国', rail_fav: '我的',
       loading: '加载中…',
       hero_title_int: 'SCI / SSCI 国际期刊检索',
       hero_body_int: '資料來源：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI）· 更新至 2026-05-18，並合併 <b>EI Compendex</b> 期刊目錄（2025-10-10）。',
@@ -127,7 +127,7 @@
       footer_data: 'Sources: Clarivate WoS Core Collection (SCIE/SSCI/AHCI/ESCI) · JCR 2025 · ESI · EI Compendex · Scopus · DOAJ · UGC-CARE India · CAS NSL Tiers 2025 · ShowJCR (GPL-3.0) · CCF 2026 (A/B/C) · CCF-T 2025 · ABDC 2025 · ABS 2024 · CAST 2025 · CSSCI · PKU Core · CNKI · ZJU 2024 · School A 2023 · CrossRef · OpenAlex. © <a href="https://journal.ailatest.org">AILatest Journal</a>',
       tab_home: 'Journals', tab_int: 'International', tab_dom: 'China', tab_fav: 'Favorites', tab_pick: 'Recommend',
       nav_index_rank: 'Index Rankings', nav_subject_rank: 'Subject Rankings', nav_warn_rank: 'Warning List',
-      rail_int: 'global', rail_dom: 'cn', rail_in: 'in', rail_kr: 'kr', rail_fav: 'Favorites',
+      rail_int: 'Global', rail_dom: 'China', rail_in: 'India', rail_kr: 'Korea', rail_fav: 'Me',
       loading: 'Loading…',
       hero_title_int: 'International SCI / SSCI Search',
       hero_body_int: 'Source: <b>Web of Science Core Collection</b> (SCIE / SSCI / AHCI / ESCI), updated 2026-05-18, merged with <b>EI Compendex</b> source list (2025-10-10).',
@@ -6221,16 +6221,20 @@
       // 计算合并的 topicList（WoS 学科 + OpenAlex subfield）
       const _wc = Object.create(null);
       for (const r of journals) for (const c of (r.wos_categories||[])) _wc[c] = (_wc[c]||0)+1;
-      // Add OA subfield counts for topics not in WoS
+      // Add OA subfield counts for topics not already in WoS（修复：之前 !(s in _wc) 守卫导致只计到 1）
+      const wosKeys = new Set(Object.keys(_wc));
       const issnSet = new Set(journals.map(j => (j.issn || j.eissn || '').toUpperCase()).filter(Boolean));
+      const oaCount = Object.create(null);
       for (const issn of issnSet) {
         const rec = oaMap[issn];
         if (rec && Array.isArray(rec.sf)) {
           for (const s of rec.sf) {
-            if (s && !(s in _wc)) _wc[s] = (_wc[s]||0) + 1;
+            if (!s || wosKeys.has(s)) continue;
+            oaCount[s] = (oaCount[s] || 0) + 1;
           }
         }
       }
+      for (const s in oaCount) _wc[s] = oaCount[s];
       topicList = Object.entries(_wc).map(([name,count])=>({name,count})).sort((a,b)=>a.name.localeCompare(b.name,'en'));
       if (meta?.total && $('#total')) $('#total').textContent = meta.total.toLocaleString();
       $('#hint').textContent = lang === 'zh'
