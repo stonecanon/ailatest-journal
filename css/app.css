@@ -4271,18 +4271,16 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .drawer-fav-select { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
 .drawer-fav-select select { padding: 5px 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 12.5px; background: #f8f8f8; }
 
-/* ═══════════ 期刊列表卡片网格（国际/中国/韩国/印度通用，由 table.journals 改造） ═══════════ */
+/* ═══════════ 期刊列表：左侧筛选栏 + 右侧卡片（暖色版式，参考整洁版） ═══════════ */
 .tab-panel .table-wrap { overflow: visible; }
 .tab-panel table.journals { display: block; width: 100%; border-collapse: separate; }
 .tab-panel table.journals > colgroup { display: none; }
 
-/* 表头 → 顶部筛选工具条 */
-.tab-panel table.journals thead { display: block; position: sticky; top: var(--th-sticky-top, 0); z-index: 6; }
+/* 默认（中国/韩国/印度/收藏）：表头=顶部工具条，卡片单列 */
+.tab-panel table.journals thead { display: block; }
 .tab-panel table.journals thead tr {
   display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px;
-  padding: 10px 2px; margin-bottom: 4px;
-  border-bottom: 1px solid var(--rule);
-  background: var(--paper);
+  padding: 6px 2px 12px; border-bottom: 1px solid var(--rule); background: var(--paper);
 }
 .tab-panel table.journals thead th {
   display: inline-flex; align-items: center; padding: 0; border: 0;
@@ -4292,109 +4290,133 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .tab-panel table.journals thead .col-name,
 .tab-panel table.journals thead .col-cycle { display: none; }
 
-/* 卡片网格 */
-.tab-panel table.journals tbody {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 14px; padding: 16px 0 0;
-}
+/* 卡片列表（单列大卡） */
+.tab-panel table.journals tbody { display: flex; flex-direction: column; gap: 10px; padding-top: 14px; }
 .tab-panel table.journals tbody tr.j-row {
-  display: flex; flex-wrap: wrap; align-items: center; gap: 7px 10px;
-  position: relative; padding: 15px 17px; min-width: 0;
+  position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 7px 10px;
+  padding: 16px 118px 16px 20px;
   background: var(--bg2); border: 1px solid var(--rule); border-radius: 12px;
-  box-shadow: 0 1px 0 rgba(43,42,39,.03), 0 10px 26px -16px rgba(60,48,36,.28);
-  cursor: pointer; transition: box-shadow .18s, transform .18s, border-color .18s;
+  box-shadow: 0 1px 0 rgba(43,42,39,.03), 0 8px 22px -16px rgba(60,48,36,.26);
+  cursor: pointer; transition: box-shadow .18s, border-color .18s, transform .18s;
 }
 .tab-panel table.journals tbody tr.j-row:hover {
-  border-color: #e7d8c4;
-  box-shadow: 0 1px 0 rgba(43,42,39,.04), 0 16px 38px -16px rgba(60,48,36,.34);
-  transform: translateY(-1px);
+  border-color: #e7d8c4; box-shadow: 0 1px 0 rgba(43,42,39,.04), 0 14px 32px -16px rgba(60,48,36,.32); transform: translateY(-1px);
 }
 .tab-panel table.journals tbody tr.row-flagship { border-left: 3px solid var(--accent); }
-/* 空状态 / 提示行：占满整行 */
-.tab-panel table.journals tbody tr:has(td[colspan]) { display: block; grid-column: 1 / -1; padding: 40px 0; text-align: center; color: var(--muted); background: none; border: 0; box-shadow: none; cursor: default; }
+.tab-panel table.journals tbody tr:has(td[colspan]) {
+  display: block; padding: 50px 0; text-align: center; color: var(--muted);
+  background: none; border: 0; box-shadow: none; cursor: default;
+}
 .tab-panel table.journals tbody td { display: block; border: 0; padding: 0; min-width: 0; }
 
-/* 单元格在卡片内的排布 */
-.j-row .col-name  { order: 2; flex: 1 1 100%; }
-.j-row .col-fav   { order: 0; position: absolute; top: 11px; right: 13px; }
+/* 卡片内排布：左主栏 + 右上书签 + 右侧大 IF */
+.j-row .col-fav   { order: 0; position: absolute; top: 12px; right: 14px; font-size: 17px; }
+.j-row .col-name  { order: 2; flex: 1 1 100%; padding-right: 4px; }
 .j-row .col-badge { order: 3; flex: 1 1 100%; }
 .j-row .col-free  { order: 4; }
-.j-row .col-if    { order: 5; }
-.j-row .col-cycle { order: 6; }
-.j-row .col-topic { order: 7; flex: 1 1 100%; }
+.j-row .col-cycle { order: 5; }
+.j-row .col-topic { order: 6; flex: 1 1 100%; }
+.j-row .col-if    { order: 1; position: absolute; right: 18px; top: 50%; transform: translateY(-50%); text-align: right; }
 
-/* 名称 */
-.j-row .col-name { padding-right: 30px; }
 .j-row .jname { font-size: 15.5px; font-weight: 700; line-height: 1.34; color: var(--ink); }
 .j-row .jname-cn { display: block; margin-top: 2px; font-size: 12px; font-weight: 500; color: var(--ink-faint); }
+.j-row .col-badge .badge-cell, .j-row .col-badge .badge-line { display: flex; flex-wrap: wrap; gap: 4px 5px; }
 
-/* 徽章区：两行索引/分区，紧凑 */
-.j-row .col-badge .badge-cell { display: flex; flex-wrap: wrap; gap: 4px 5px; }
-.j-row .col-badge .badge-line { display: flex; flex-wrap: wrap; gap: 4px 5px; }
-
-/* IF / 审稿 / 学科 改为带标签的小信息块；空值(—)隐藏 */
-.j-row .col-if:has(.muted-cell),
+/* 空值(—)隐藏 */
 .j-row .col-cycle:has(.muted-cell),
 .j-row .col-free:has(.muted-cell),
-.j-row .col-topic:has(.muted-cell) { display: none; }
-.j-row .col-if .if-cell {
-  font-variant-numeric: tabular-nums; font-weight: 800; color: var(--ink);
-  background: #eef1f6; border-radius: 999px; padding: 2px 9px; font-size: 12px;
-}
-.j-row .col-if .if-cell::before { content: "IF "; font-weight: 600; color: var(--deep); }
-.j-row .col-cycle {
-  font-size: 11.5px; color: var(--ink-soft); background: var(--paper-soft);
-  border: 1px solid var(--rule); border-radius: 999px; padding: 2px 10px;
-}
-.j-row .col-cycle::before { content: "⏱ "; }
-.j-row .col-topic { font-size: 11.5px; color: var(--ink-faint); line-height: 1.4; margin-top: 1px; }
-.j-row .col-topic::before { content: "学科 · "; color: var(--ink-faint); }
+.j-row .col-topic:has(.muted-cell),
+.j-row .col-if:has(.muted-cell) { display: none; }
 
+/* 右侧大 IF */
+.j-row .col-if .if-cell { font-variant-numeric: tabular-nums; font-weight: 800; color: var(--ink); font-size: 23px; line-height: 1.05; }
+.j-row .col-if .if-cell::after { content: "影响因子"; display: block; font-size: 9.5px; font-weight: 600; color: var(--ink-faint); margin-top: 2px; }
+.j-row .col-cycle { font-size: 11.5px; color: var(--ink-soft); background: var(--paper-soft); border: 1px solid var(--rule); border-radius: 999px; padding: 2px 10px; }
+.j-row .col-cycle::before { content: "⏱ "; }
+.j-row .col-topic { font-size: 11.5px; color: var(--ink-faint); line-height: 1.4; }
+.j-row .col-topic::before { content: "学科 · "; }
+
+/* ── 国际刊：表头 → 左侧筛选栏 ── */
+.tab-panel[data-panel="int"] table.journals { display: flex; align-items: flex-start; gap: 22px; }
+.tab-panel[data-panel="int"] table.journals thead {
+  flex: 0 0 230px; align-self: flex-start; position: sticky; top: var(--th-sticky-top, 64px);
+  background: var(--bg2); border: 1px solid var(--rule); border-radius: 14px;
+  padding: 14px 14px 16px; max-height: calc(100vh - 86px); overflow-y: auto;
+}
+.tab-panel[data-panel="int"] table.journals thead tr {
+  display: flex; flex-direction: column; align-items: stretch; gap: 15px;
+  padding: 0; margin: 0; border: 0; background: none;
+}
+.tab-panel[data-panel="int"] table.journals thead th { display: block; width: 100%; white-space: normal; }
+.tab-panel[data-panel="int"] table.journals thead .col-name,
+.tab-panel[data-panel="int"] table.journals thead .col-cycle,
+.tab-panel[data-panel="int"] table.journals thead .col-fav { display: none; }
+.tab-panel[data-panel="int"] table.journals tbody { flex: 1 1 auto; min-width: 0; padding-top: 0; }
+
+/* 左栏筛选组：标题 + 常开 chip（其他/学科也展开） */
+.tab-panel[data-panel="int"] .th-dropdown { display: block; position: static; }
+.tab-panel[data-panel="int"] .th-dropdown > .th-dropdown-btn {
+  pointer-events: none; width: 100%; justify-content: flex-start;
+  border: 0; padding: 0 0 8px; color: var(--ink); font-size: 12px; font-weight: 700; letter-spacing: .04em;
+}
+.tab-panel[data-panel="int"] .th-dropdown > .th-dropdown-btn .dd-arrow { display: none; }
+.tab-panel[data-panel="int"] .th-dropdown-panel {
+  display: flex !important; position: static; flex-wrap: wrap; gap: 6px;
+  min-width: 0; max-height: none; overflow: visible; padding: 0; background: none; border: 0; box-shadow: none;
+}
+.tab-panel[data-panel="int"] .th-chk {
+  padding: 4px 11px; border: 1px solid var(--rule); border-radius: 7px; background: var(--paper);
+  color: var(--ink-soft); font-size: 11.5px; font-weight: 600; white-space: nowrap; gap: 0;
+}
+.tab-panel[data-panel="int"] .th-chk:hover { border-color: var(--deep); color: var(--ink); }
+.tab-panel[data-panel="int"] .th-chk input { display: none; }
+.tab-panel[data-panel="int"] .th-chk:has(input:checked) { background: var(--deep); border-color: var(--deep); color: #fff; font-weight: 700; }
+.tab-panel[data-panel="int"] .dd-sep { flex-basis: 100%; height: 0; margin: 1px 0; background: none; border: 0; }
+/* 学科：搜索 + 列表 */
+.tab-panel[data-panel="int"] .th-dropdown-panel-search { display: block !important; }
+.tab-panel[data-panel="int"] #topic-dd-search {
+  width: 100%; box-sizing: border-box; margin-bottom: 8px; padding: 6px 10px;
+  border: 1px solid var(--rule); border-radius: 8px; background: var(--paper); font-size: 12px;
+}
+.tab-panel[data-panel="int"] #topic-dd-list { max-height: 200px; overflow: auto; }
+.tab-panel[data-panel="int"] thead .col-free { order: -1; }
+
+@media (max-width: 900px) {
+  /* 窄屏：国际刊筛选栏回到顶部横排 */
+  .tab-panel[data-panel="int"] table.journals { display: block; }
+  .tab-panel[data-panel="int"] table.journals thead {
+    position: static; max-height: none; flex: none; margin-bottom: 8px;
+  }
+  .tab-panel[data-panel="int"] table.journals thead tr { flex-direction: row; flex-wrap: wrap; gap: 8px 14px; }
+  .tab-panel[data-panel="int"] table.journals tbody { padding-top: 4px; }
+}
 @media (max-width: 600px) {
-  .tab-panel table.journals tbody { grid-template-columns: 1fr; gap: 11px; }
-  .tab-panel table.journals tbody tr.j-row { padding: 13px 14px; }
+  .tab-panel table.journals tbody tr.j-row { padding: 13px 92px 13px 14px; }
   .j-row .jname { font-size: 14.5px; }
 }
-
-/* ═══════════ 顶部筛选条：索引/分区 摊平为圆角矩形 chip 分组（其他/学科 仍下拉） ═══════════ */
-.tab-panel table.journals thead .col-free { order: 1; }
-.tab-panel table.journals thead .col-if   { order: 2; }
-.tab-panel table.journals thead .col-wos  { order: 3; }
-.tab-panel table.journals thead .col-badge {
-  order: 5; flex: 1 1 100%;
-  display: flex; flex-wrap: wrap; align-items: flex-start; gap: 9px 16px;
-  margin-top: 2px; padding-top: 8px; border-top: 1px solid var(--rule-soft);
-}
-/* 索引 / 分区 两组常开 */
-#idx-dropdown.th-dropdown, #tier-dropdown.th-dropdown {
-  display: flex; flex-wrap: wrap; align-items: center; gap: 5px;
-}
-#idx-dropdown > .th-dropdown-btn, #tier-dropdown > .th-dropdown-btn {
-  pointer-events: none; border: 0; padding: 0 6px 0 0;
-  color: var(--ink-faint); font-size: 10.5px; font-weight: 700;
-  letter-spacing: .08em; text-transform: uppercase;
-}
-#idx-dropdown > .th-dropdown-btn .dd-arrow, #tier-dropdown > .th-dropdown-btn .dd-arrow { display: none; }
-#idx-dropdown > .th-dropdown-panel, #tier-dropdown > .th-dropdown-panel {
-  display: flex !important; position: static; flex-wrap: wrap; gap: 5px;
-  min-width: 0; max-height: none; overflow: visible;
-  padding: 0; background: none; border: 0; box-shadow: none;
-}
-#idx-dropdown .th-chk, #tier-dropdown .th-chk {
-  padding: 3px 11px; border: 1px solid var(--rule); border-radius: 7px;
-  background: var(--paper); color: var(--ink-soft);
-  font-size: 11.5px; font-weight: 600; white-space: nowrap; transition: all .14s;
-}
-#idx-dropdown .th-chk:hover, #tier-dropdown .th-chk:hover { border-color: var(--deep); color: var(--ink); }
-#idx-dropdown .th-chk input, #tier-dropdown .th-chk input { display: none; }
-#idx-dropdown .th-chk:has(input:checked), #tier-dropdown .th-chk:has(input:checked) {
-  background: var(--deep); border-color: var(--deep); color: #fff; font-weight: 700;
-}
-/* dd-sep → 整行换行，把 JCR / 中科院 / 新锐 分成几个区 */
-#idx-dropdown .dd-sep, #tier-dropdown .dd-sep { flex-basis: 100%; height: 0; margin: 2px 0; background: none; border: 0; }
 
 /* ═══════════ 去掉期刊封面（详情页 + 荐刊卡片，很多无数据） ═══════════ */
 .journal-cover { display: none !important; }
 .journal-overview { display: block !important; }
 .journal-overview-copy { max-width: none !important; }
 .pick-cover { display: none !important; }
+
+/* ═══════ 国际刊移动端：覆盖旧版卡片规则，与新设计统一（须在文件末尾） ═══════ */
+@media (max-width: 768px) {
+  .tab-panel[data-panel="int"] table.journals tbody { display: flex; flex-direction: column; gap: 10px; }
+  .tab-panel[data-panel="int"] table.journals tr.j-row { padding-left: 16px; }
+  .tab-panel[data-panel="int"] table.journals .col-fav {
+    position: absolute; left: auto; right: 12px; top: 12px; width: auto;
+  }
+  .tab-panel[data-panel="int"] table.journals .col-if {
+    position: static; transform: none; display: inline-flex; align-items: center;
+    margin-top: 9px; margin-right: 12px;
+  }
+  .tab-panel[data-panel="int"] table.journals .col-if::before { content: "IF "; color: var(--ink-faint); font-weight: 700; }
+  .tab-panel[data-panel="int"] table.journals .col-if .if-cell { font-size: 13px; }
+  .tab-panel[data-panel="int"] table.journals .col-if .if-cell::after { content: none; }
+  .tab-panel[data-panel="int"] table.journals .col-if:has(.muted-cell),
+  .tab-panel[data-panel="int"] table.journals .col-cycle:has(.muted-cell),
+  .tab-panel[data-panel="int"] table.journals .col-topic:has(.muted-cell),
+  .tab-panel[data-panel="int"] table.journals .col-free:has(.muted-cell) { display: none; }
+}
