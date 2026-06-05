@@ -38,7 +38,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- End Google Tag Manager -->
 <link rel="preload" href="/data/journals.json.gz" as="fetch" crossorigin="anonymous" />
 <link rel="preload" href="/data/journal_aliases.json" as="fetch" crossorigin="anonymous" />
-<link rel="stylesheet" href="/css/app.css?v=20260604-09" />
+<link rel="stylesheet" href="/css/app.css?v=20260604-10" />
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json" />
@@ -230,45 +230,61 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <label class="th-chk" data-filter="feat" data-value="medline"><input type="checkbox"><span>MEDLINE</span></label>
                   </div>
                 </div>
-                <div class="th-dropdown" id="tier-dropdown">
-                  <button class="th-dropdown-btn"><span class="dd-label" data-i18n="filter_tier">分区</span><span class="dd-arrow">▼</span></button>
-                  <div class="th-dropdown-panel" id="tier-panel">
-                  <label class="th-chk" data-filter="jcr" data-value="Q1"><input type="checkbox"><span>JCR Q1</span></label>
-                  <label class="th-chk" data-filter="jcr" data-value="Q2"><input type="checkbox"><span>JCR Q2</span></label>
-                  <label class="th-chk" data-filter="jcr" data-value="Q3"><input type="checkbox"><span>JCR Q3</span></label>
-                  <label class="th-chk" data-filter="jcr" data-value="Q4"><input type="checkbox"><span>JCR Q4</span></label>
-                    <div class="dd-sep"></div>
-                    <label class="th-chk" data-filter="zone" data-value="1"><input type="checkbox"><span>中科院1区</span></label>
-                    <label class="th-chk" data-filter="zone" data-value="2"><input type="checkbox"><span>中科院2区</span></label>
-                    <label class="th-chk" data-filter="zone" data-value="3"><input type="checkbox"><span>中科院3区</span></label>
-                    <label class="th-chk" data-filter="zone" data-value="4"><input type="checkbox"><span>中科院4区</span></label>
-                    <label class="th-chk" data-filter="zone" data-value="top"><input type="checkbox"><span>中科院TOP</span></label>
-                    <div class="dd-sep"></div>
-                    <label class="th-chk" data-filter="xr" data-value="1"><input type="checkbox"><span>新锐1区</span></label>
-                    <label class="th-chk" data-filter="xr" data-value="2"><input type="checkbox"><span>新锐2区</span></label>
-                    <label class="th-chk" data-filter="xr" data-value="3"><input type="checkbox"><span>新锐3区</span></label>
-                    <label class="th-chk" data-filter="xr" data-value="4"><input type="checkbox"><span>新锐4区</span></label>
-                    <label class="th-chk" data-filter="xr" data-value="xr-top"><input type="checkbox"><span>新锐TOP</span></label>
+                <div class="th-dropdown" id="jcr-dropdown">
+                  <button class="th-dropdown-btn"><span class="dd-label" data-i18n="jcr_label">JCR 分区</span><span class="dd-arrow">▼</span></button>
+                  <div class="th-dropdown-panel" id="jcr-panel">
+                    <label class="th-chk" data-filter="jcr" data-value="Q1"><input type="checkbox"><span>Q1</span></label>
+                    <label class="th-chk" data-filter="jcr" data-value="Q2"><input type="checkbox"><span>Q2</span></label>
+                    <label class="th-chk" data-filter="jcr" data-value="Q3"><input type="checkbox"><span>Q3</span></label>
+                    <label class="th-chk" data-filter="jcr" data-value="Q4"><input type="checkbox"><span>Q4</span></label>
                   </div>
                 </div>
-                <div class="th-dropdown" id="extra-dropdown">
-                  <button class="th-dropdown-btn"><span class="dd-label" data-i18n="filter_extra">其他</span><span class="dd-arrow">▼</span></button>
-                  <div class="th-dropdown-panel" id="extra-panel">
-                  <label class="th-chk" data-filter="feat" data-value="warning"><input type="checkbox"><span>中科院预警</span></label>
-                  <label class="th-chk" data-filter="feat" data-value="citic_warning"><input type="checkbox"><span>中信所预警</span></label>
-                  <label class="th-chk" data-filter="feat" data-value="under_review"><input type="checkbox"><span>新锐 Under Review</span></label>
-                   <label class="th-chk" data-filter="feat" data-value="on_hold"><input type="checkbox"><span>WoS On Hold</span></label>
-                   <div class="dd-sep"></div>
-                    <label class="th-chk" data-filter="abdc" data-value="A*"><input type="checkbox"><span>ABDC A*</span></label>
-                    <label class="th-chk" data-filter="abdc" data-value="A"><input type="checkbox"><span>ABDC A</span></label>
-                    <label class="th-chk" data-filter="abdc" data-value="B"><input type="checkbox"><span>ABDC B</span></label>
-                    <label class="th-chk" data-filter="abdc" data-value="C"><input type="checkbox"><span>ABDC C</span></label>
-                    <div class="dd-sep"></div>
-                    <label class="th-chk" data-filter="abs" data-value="4*"><input type="checkbox"><span>ABS 4*</span></label>
-                    <label class="th-chk" data-filter="abs" data-value="4"><input type="checkbox"><span>ABS 4</span></label>
-                    <label class="th-chk" data-filter="abs" data-value="3"><input type="checkbox"><span>ABS 3</span></label>
-                    <label class="th-chk" data-filter="abs" data-value="2"><input type="checkbox"><span>ABS 2</span></label>
-                    <label class="th-chk" data-filter="abs" data-value="1"><input type="checkbox"><span>ABS 1</span></label>
+                <div class="th-dropdown" id="cas-dropdown">
+                  <button class="th-dropdown-btn"><span class="dd-label" data-i18n="cas_zone">中科院分区</span><span class="dd-arrow">▼</span></button>
+                  <div class="th-dropdown-panel" id="cas-panel">
+                    <label class="th-chk" data-filter="zone" data-value="1"><input type="checkbox"><span>1区</span></label>
+                    <label class="th-chk" data-filter="zone" data-value="2"><input type="checkbox"><span>2区</span></label>
+                    <label class="th-chk" data-filter="zone" data-value="3"><input type="checkbox"><span>3区</span></label>
+                    <label class="th-chk" data-filter="zone" data-value="4"><input type="checkbox"><span>4区</span></label>
+                    <label class="th-chk" data-filter="zone" data-value="top"><input type="checkbox"><span>TOP</span></label>
+                  </div>
+                </div>
+                <div class="th-dropdown" id="xr-dropdown">
+                  <button class="th-dropdown-btn"><span class="dd-label" data-i18n="filter_xinrui">新锐分区</span><span class="dd-arrow">▼</span></button>
+                  <div class="th-dropdown-panel" id="xr-panel">
+                    <label class="th-chk" data-filter="xr" data-value="1"><input type="checkbox"><span>1区</span></label>
+                    <label class="th-chk" data-filter="xr" data-value="2"><input type="checkbox"><span>2区</span></label>
+                    <label class="th-chk" data-filter="xr" data-value="3"><input type="checkbox"><span>3区</span></label>
+                    <label class="th-chk" data-filter="xr" data-value="4"><input type="checkbox"><span>4区</span></label>
+                    <label class="th-chk" data-filter="xr" data-value="xr-top"><input type="checkbox"><span>TOP</span></label>
+                  </div>
+                </div>
+                <div class="th-dropdown" id="abdc-dropdown">
+                  <button class="th-dropdown-btn"><span class="dd-label" data-i18n="abdc_label">ABDC</span><span class="dd-arrow">▼</span></button>
+                  <div class="th-dropdown-panel" id="abdc-panel">
+                    <label class="th-chk" data-filter="abdc" data-value="A*"><input type="checkbox"><span>A*</span></label>
+                    <label class="th-chk" data-filter="abdc" data-value="A"><input type="checkbox"><span>A</span></label>
+                    <label class="th-chk" data-filter="abdc" data-value="B"><input type="checkbox"><span>B</span></label>
+                    <label class="th-chk" data-filter="abdc" data-value="C"><input type="checkbox"><span>C</span></label>
+                  </div>
+                </div>
+                <div class="th-dropdown" id="abs-dropdown">
+                  <button class="th-dropdown-btn"><span class="dd-label" data-i18n="abs_label">ABS</span><span class="dd-arrow">▼</span></button>
+                  <div class="th-dropdown-panel" id="abs-panel">
+                    <label class="th-chk" data-filter="abs" data-value="4*"><input type="checkbox"><span>4*</span></label>
+                    <label class="th-chk" data-filter="abs" data-value="4"><input type="checkbox"><span>4</span></label>
+                    <label class="th-chk" data-filter="abs" data-value="3"><input type="checkbox"><span>3</span></label>
+                    <label class="th-chk" data-filter="abs" data-value="2"><input type="checkbox"><span>2</span></label>
+                    <label class="th-chk" data-filter="abs" data-value="1"><input type="checkbox"><span>1</span></label>
+                  </div>
+                </div>
+                <div class="th-dropdown" id="warn-dropdown">
+                  <button class="th-dropdown-btn"><span class="dd-label" data-i18n="filter_warning">预警名单</span><span class="dd-arrow">▼</span></button>
+                  <div class="th-dropdown-panel" id="warn-panel">
+                    <label class="th-chk" data-filter="feat" data-value="warning"><input type="checkbox"><span>中科院预警</span></label>
+                    <label class="th-chk" data-filter="feat" data-value="citic_warning"><input type="checkbox"><span>中信所预警</span></label>
+                    <label class="th-chk" data-filter="feat" data-value="under_review"><input type="checkbox"><span>新锐 Under Review</span></label>
+                    <label class="th-chk" data-filter="feat" data-value="on_hold"><input type="checkbox"><span>WoS On Hold</span></label>
                   </div>
                 </div>
               </th>
@@ -516,7 +532,7 @@ const __BUILD_VER = 'v20260530-79';
   }
 })();
 </script>
-<script src="/js/app.js?v=20260604-05" defer></script>
+<script src="/js/app.js?v=20260604-06" defer></script>
 <script>
   // Custom install prompt
   let __pwaPrompt = null;

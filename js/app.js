@@ -2404,6 +2404,41 @@
     else updateThStickyTop();
   }
 
+  // 统计每个筛选项对应的期刊数量，注入到左侧筛选栏的 chip 里（参考图那样）
+  function updateFilterCounts() {
+    if (!journals || !journals.length) return;
+    const counts = Object.create(null);
+    const inc = (f, v) => { const k = f + ':' + v; counts[k] = (counts[k] || 0) + 1; };
+    for (const r of journals) {
+      (r.indices || []).forEach(i => inc('index', i));
+      if (r.scopus && r.scopus.active) inc('feat', 'scopus');
+      if (r.oaj) inc('feat', 'oaj');
+      if (r.doaj) inc('feat', 'doaj');
+      if (r.medline) inc('feat', 'medline');
+      if (r.free) inc('feat', 'free');
+      if (r.warning) inc('feat', 'warning');
+      if (r.citic_warning) inc('feat', 'citic_warning');
+      if (r.under_review) inc('feat', 'under_review');
+      if (r.on_hold) inc('feat', 'on_hold');
+      const jq = String(r.if_quartile || '').toUpperCase();
+      if (/^Q[1-4]$/.test(jq)) inc('jcr', jq);
+      if (r.cas_zone) inc('zone', String(r.cas_zone));
+      if (r.cas_top) inc('zone', 'top');
+      if (r.cas_xr && r.cas_xr.zone) inc('xr', String(r.cas_xr.zone));
+      if (r.cas_xr && r.cas_xr.top) inc('xr', 'xr-top');
+      const abdc = String((r.abdc && r.abdc.rating) || '').toUpperCase().replace(/A[ -]STAR/, 'A*');
+      if (abdc) inc('abdc', abdc);
+      const abs = String((r.abs && r.abs.rating) || '').toUpperCase();
+      if (abs) inc('abs', abs);
+    }
+    document.querySelectorAll('.th-dropdown .th-chk[data-filter][data-value]').forEach(label => {
+      const n = counts[label.dataset.filter + ':' + label.dataset.value] || 0;
+      let badge = label.querySelector('.dd-count');
+      if (!badge) { badge = document.createElement('span'); badge.className = 'dd-count'; label.appendChild(badge); }
+      badge.textContent = n ? n.toLocaleString() : '';
+    });
+  }
+
   function renderInt() {
     updateThStickyTop();
     if (activeQuery) activeWarnList = false; // 搜索即退出预警名单
@@ -2565,7 +2600,7 @@
     // 同步题头复选框状态与 Sets 一致
     syncThChkState();
     // 题头下拉复选框筛选：事件委托（支持动态渲染的 checkbox）
-    ['idx-panel','tier-panel','extra-panel','topic-panel'].forEach(panelId => {
+    ['idx-panel','jcr-panel','cas-panel','xr-panel','abdc-panel','abs-panel','warn-panel','topic-panel'].forEach(panelId => {
       const pnl = $(`#${panelId}`);
       if (!pnl || pnl.__bound) return;
       pnl.__bound = true;
@@ -6157,6 +6192,7 @@
       journals.forEach(journalSearchMeta);
       buildDomIndex(domestic);
       buildIntIndex(journals);
+      updateFilterCounts();
       buildIndiaIndex(india);
       // Refresh stale favsData with live international journal data
       (function refreshFavsData() {

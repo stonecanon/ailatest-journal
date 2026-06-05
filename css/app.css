@@ -4494,3 +4494,17 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   /* 给顶部导航让位，避免和左上角按钮重叠 */
   .seo-nav { padding-left: 52px; }
 }
+
+/* ═══════ 左侧筛选栏：每个选项显示期刊数量 + 学科完整显示 ═══════ */
+.tab-panel[data-panel="int"] .th-chk { display: inline-flex; align-items: center; gap: 5px; }
+.tab-panel[data-panel="int"] .th-chk .dd-count {
+  font-size: 9.5px; font-weight: 600; opacity: .58; font-variant-numeric: tabular-nums;
+}
+.tab-panel[data-panel="int"] .th-chk:has(input:checked) .dd-count { opacity: .92; color: #fff; }
+/* 学科：搜索 + 完整显示列表（不截断） */
+.tab-panel[data-panel="int"] table.journals thead { flex-basis: 244px; }
+.tab-panel[data-panel="int"] #topic-dd-list .th-chk {
+  display: flex; width: 100%; gap: 6px; padding: 4px 4px; border-radius: 6px;
+  white-space: normal; font-size: 11.5px; line-height: 1.3;
+}
+.tab-panel[data-panel="int"] #topic-dd-list .th-chk .count { margin-left: auto; opacity: .55; font-size: 10px; }
