@@ -2335,13 +2335,13 @@ td.empty,
   .col-free { width: 58px; }
   .col-if { width: 44px; max-width: 44px; padding-right: 4px; }
   body.journal-route {
-    padding-top: 58px;
+    padding-top: 10px;
   }
   body.journal-route .j-drawer.journal-page {
     width: calc(100vw - 28px);
   }
   body.journal-route .drawer-head {
-    top: 58px;
+    top: 10px;
   }
   body.journal-route .drawer-body {
     padding: 26px 0 56px;
@@ -2748,14 +2748,14 @@ body.journal-route .journal-not-found {
 
 @media (max-width: 900px) {
   body.journal-route {
-    padding-top: 58px;
+    padding-top: 10px;
     overflow-x: hidden;
   }
   body.journal-route .j-drawer.journal-page {
     width: calc(100vw - 28px);
   }
   body.journal-route .drawer-head {
-    top: 58px;
+    top: 10px;
   }
   body.journal-route .drawer-body {
     padding: 26px 0 56px;
@@ -4412,7 +4412,7 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
     position: static; transform: none; display: inline-flex; align-items: center;
     margin-top: 9px; margin-right: 12px;
   }
-  .tab-panel[data-panel="int"] table.journals .col-if::before { content: "IF "; color: var(--ink-faint); font-weight: 700; }
+  .tab-panel[data-panel="int"] table.journals .col-if::before { content: none; }
   .tab-panel[data-panel="int"] table.journals .col-if .if-cell { font-size: 13px; }
   .tab-panel[data-panel="int"] table.journals .col-if .if-cell::after { content: none; }
   .tab-panel[data-panel="int"] table.journals .col-if:has(.muted-cell),
@@ -4508,3 +4508,33 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   white-space: normal; font-size: 11.5px; line-height: 1.3;
 }
 .tab-panel[data-panel="int"] #topic-dd-list .th-chk .count { margin-left: auto; opacity: .55; font-size: 10px; }
+
+/* ═══════ 卡片杂项修复 ═══════ */
+/* 1) 空值单元格(仅 —)直接隐藏，避免出现孤零零的横杠 */
+.j-row td:has(.muted-cell:only-child) { display: none; }
+/* 2) 左侧橙色条只给旗舰刊会"忽有忽无"，统一去掉，保持一致 */
+.tab-panel table.journals tbody tr.row-flagship { border-left: 1px solid var(--rule); }
+/* 3) 中国/印度卡片单元格排序，避免书签按钮遮住信息 */
+.j-row .col-name  { order: 2; }
+.j-row .col-tier  { order: 1; }
+.j-row .col-cross { order: 3; flex: 1 1 100%; }
+.j-row .col-cross .badges { display: flex; flex-wrap: wrap; gap: 4px 5px; }
+.j-row .col-name + td,
+.j-row .col-cross ~ td { order: 4; }
+/* 4) 详情页(journal-route)：手机端隐藏右上角语言切换，避免与内容重叠 */
+body.journal-route .lang-toggle-wrap { display: none; }
+
+/* ═══════ 手机端国际刊：把筛选分组显示出来（之前被隐藏，导致没有筛选按钮）═══════ */
+@media (max-width: 900px) {
+  .tab-panel[data-panel="int"] table.journals { display: block; }
+  .tab-panel[data-panel="int"] table.journals thead { display: block !important; position: static; max-height: none; flex: none; }
+  .tab-panel[data-panel="int"] table.journals thead tr {
+    flex-direction: row; flex-wrap: wrap; align-items: flex-start; gap: 8px 16px;
+    padding: 12px 14px; margin-bottom: 12px;
+    border: 1px solid var(--rule); border-radius: 12px; background: var(--bg2);
+  }
+  .tab-panel[data-panel="int"] table.journals thead th { width: auto; }
+  .tab-panel[data-panel="int"] .th-dropdown { min-width: 0; }
+  .tab-panel[data-panel="int"] #topic-dd-list { max-height: 140px; }
+  .tab-panel[data-panel="int"] table.journals tbody { padding-top: 0; }
+}

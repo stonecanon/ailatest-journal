@@ -943,6 +943,8 @@
     if (path === lastTrackedPageview) return;
     lastTrackedPageview = path;
     const payload = {
+      event_id: crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      event_ts: Math.floor(Date.now() / 1000),
       site: location.hostname,
       path,
       referrer: document.referrer || '',
@@ -2163,7 +2165,7 @@
     const tierBadge = showTier && tierValue ? badgeTier(tierValue) : '';
     return `<tr class="j-row clickable" data-fid="${escape(fid)}" data-src="${escape(src)}">
       <td class="col-fav">${starBtn(r, src)}</td>
-      ${showTier ? `<td style="width:60px">${tierBadge}</td>` : ''}
+      ${showTier ? `<td class="col-tier" style="width:60px">${tierBadge}</td>` : ''}
       <td class="col-name"><div class="jname" style="font-size:13.5px">${escape(titleCase(name.replace(/\*$/,'')))}${enName}</div></td>
       <td class="col-cross"><div class="badges">${extraBadges}${crossBadges}</div></td>
       ${extraCols}
