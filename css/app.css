@@ -4531,10 +4531,55 @@ body.journal-route .lang-toggle-wrap { display: none; }
   .tab-panel[data-panel="int"] table.journals thead tr {
     flex-direction: row; flex-wrap: wrap; align-items: flex-start; gap: 8px 16px;
     padding: 12px 14px; margin-bottom: 12px;
+    max-height: 230px; overflow-y: auto;
     border: 1px solid var(--rule); border-radius: 12px; background: var(--bg2);
+    -webkit-overflow-scrolling: touch;
   }
   .tab-panel[data-panel="int"] table.journals thead th { width: auto; }
   .tab-panel[data-panel="int"] .th-dropdown { min-width: 0; }
-  .tab-panel[data-panel="int"] #topic-dd-list { max-height: 140px; }
+  .tab-panel[data-panel="int"] #topic-dd-list { max-height: none; }
   .tab-panel[data-panel="int"] table.journals tbody { padding-top: 0; }
+}
+
+/* ═══════════ 手机端：iOS 风格底部标签栏 ═══════════ */
+@media (max-width: 900px) {
+  .app-rail {
+    left: 0; right: 0; top: auto; bottom: 0;
+    width: 100%; height: auto; min-height: 0;
+    flex-direction: row; align-items: stretch; justify-content: space-around;
+    padding: 5px 2px calc(4px + env(safe-area-inset-bottom));
+    transform: none !important;
+    border-right: 0; border-top: 1px solid rgba(39,35,31,.12);
+    box-shadow: 0 -8px 28px rgba(39,35,31,.08);
+    background: rgba(255,253,249,.9); -webkit-backdrop-filter: blur(22px); backdrop-filter: blur(22px);
+    z-index: 130;
+  }
+  .app-rail .rail-top {
+    flex-direction: row; align-items: stretch; justify-content: space-around;
+    gap: 0; width: 100%; padding: 0;
+  }
+  .app-rail .rail-bottom,
+  .app-rail .rail-close-mobile,
+  .app-rail .rail-brand-mobile { display: none !important; }
+  .rail-nav-btn {
+    position: relative; flex: 1 1 0; min-width: 0; min-height: 0; width: auto;
+    padding: 3px 0 1px; border-radius: 0; background: none !important;
+    flex-direction: column; justify-content: center; align-items: center; gap: 3px;
+    color: var(--ink-faint);
+  }
+  .rail-nav-btn svg { width: 23px; height: 23px; }
+  .rail-nav-btn span:not(.rail-flag):not(.fav-count-badge) {
+    display: inline; max-width: none; font-size: 10px; line-height: 1; white-space: nowrap; font-weight: 600;
+  }
+  .rail-nav-btn .rail-flag {
+    width: 23px; height: 19px; font-size: 11px; border-radius: 4px;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .rail-nav-btn.active { color: var(--accent); }
+  .rail-nav-btn .fav-count-badge { top: 0; right: 22%; }
+  /* 内容给底栏让位 */
+  main.main { padding-bottom: 68px; }
+  body { padding-left: 0; }
+  /* 导航交给底栏，隐藏 ☰（筛选已内联在国际刊页顶部） */
+  .side-toggle { display: none !important; }
 }
