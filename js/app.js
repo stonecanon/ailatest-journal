@@ -44,7 +44,7 @@
       pwa_install: '📲 安装到主屏',
       footer_data: '数据来源：Clarivate WoS Core Collection (SCIE/SSCI/AHCI/ESCI) · JCR 2025 · ESI · EI Compendex · Scopus · DOAJ · UGC-CARE India · 中科院文献情报中心分区表 2025 · ShowJCR (GPL-3.0) · CCF 2026 (A/B/C) · CCF-T 2025 · ABDC 2025 · ABS 2024 · 中国科协 2025 · CSSCI · 北大核心 · CNKI · 浙江大学 2024 · 高校自编目录 2023 · CrossRef · OpenAlex。© <a href="https://journal.ailatest.org">AILatest Journal</a>',
       tab_home: '查刊', tab_int: '国际', tab_dom: '中国', tab_fav: '收藏', tab_pick: '荐刊',
-      nav_index_rank: '索引排行榜', nav_subject_rank: '学科排行榜', nav_warn_rank: '预警排行榜',
+      nav_index_rank: '索引排行榜', nav_subject_rank: '学科排行榜', nav_warn_rank: '预警名单',
       rail_int: 'global', rail_dom: 'cn', rail_in: 'in', rail_kr: 'kr', rail_fav: '收藏',
       loading: '加载中…',
       hero_title_int: 'SCI / SSCI 国际期刊检索',
@@ -872,6 +872,7 @@
   let activeFeats = new Set();
   let topicList = []; // [{name,count}] sorted A-Z, merged WoS + OA
   let activeQuery = '';
+  let activeWarnList = false; // 预警名单：合并 中科院/中信所预警 + 新锐 under review / WoS on hold
   let activeDom = 'cnki_major';   // 中文期刊目录
   let activeIndiaSubject = '__all';
   let activeDomBadges = new Set(); // 默认不勾选 = 显示全部；勾选 = 只看有该徽章的
@@ -942,6 +943,7 @@
     if (path === lastTrackedPageview) return;
     lastTrackedPageview = path;
     const payload = {
+      site: location.hostname,
       path,
       referrer: document.referrer || '',
       visitor_id: getAnalyticsId('ailatest.analytics.visitor', localStorage),
@@ -2224,6 +2226,8 @@
 
   // ───────── filtering ─────────
   function matches(r) {
+    // 预警名单：合并所有预警信号（任意命中即可，OR 语义）
+    if (activeWarnList && !(r.warning || r.citic_warning || r.under_review || r.on_hold)) return false;
     // Index filter: exclude ESI from indices[] check (ESI stored as esi_category)
     // ESI adds another OR condition — journal with esi_category also shows
     const esiActive = activeIndices.has('ESI');
@@ -2389,9 +2393,12 @@
   }
 
   function updateStickySearchState() {
-    const shouldCompact = !document.body.classList.contains('journal-route')
-      && ['int', 'dom', 'fav'].includes(activeTab)
-      && window.scrollY > 96;
+    const enabled = !document.body.classList.contains('journal-route')
+      && ['int', 'dom', 'fav'].includes(activeTab);
+    // 迟滞（hysteresis）：进入 compact 用 130，退出用 60，中间留死区，避免临界点反复切换导致抖动
+    const isCompact = document.body.classList.contains('topbar-compact');
+    const y = window.scrollY;
+    const shouldCompact = enabled && (isCompact ? y > 60 : y > 130);
     const changed = document.body.classList.toggle('topbar-compact', shouldCompact);
     if (changed) requestAnimationFrame(updateThStickyTop);
     else updateThStickyTop();
@@ -2399,6 +2406,7 @@
 
   function renderInt() {
     updateThStickyTop();
+    if (activeQuery) activeWarnList = false; // 搜索即退出预警名单
     let filtered = journals.filter(matches);
     if (activeQuery) {
       // 按相关性排序
@@ -2593,6 +2601,7 @@
           if (cb.checked) activeTopics.add(val);
           else activeTopics.delete(val);
         }
+        activeWarnList = false; // 手动调筛选即退出预警名单
         shown = PAGE;
         renderInt();
       });
@@ -5274,6 +5283,7 @@
 
     function activateTab(tab, opts = {}) {
       if (!TAB_PATHS[tab]) tab = 'home';
+      if (!opts.keepWarnList) activeWarnList = false; // 切换标签默认退出预警名单
       if (document.body.classList.contains('journal-route')) {
         _drawerStack = [];
         closeDrawer(true);
@@ -6220,15 +6230,15 @@
           } catch (_) {}
         }, 200);
       })();
-      // 预警排行榜：切到国际刊并只看预警期刊
+      // 预警名单：切到国际刊，合并展示 中科院/中信所预警 + 新锐 under review / WoS on hold
       document.getElementById('warn-rank-link')?.addEventListener('click', (e) => {
         e.preventDefault();
         [activeIndices, activeJcr, activeZones, activeXr, activeAbdc, activeAbs, activeTopics, activeFeats].forEach(s => s.clear());
-        activeFeats.add('warning');
+        activeWarnList = true;
         activeCat = '__all'; activeQuery = '';
         const qEl = document.getElementById('q'); if (qEl) qEl.value = '';
         shown = PAGE;
-        if (window.__activateJournalTab) window.__activateJournalTab('int');
+        if (window.__activateJournalTab) window.__activateJournalTab('int', { keepWarnList: true });
         renderInt(); syncThChkState();
         window.scrollTo({ top: 0, behavior: 'smooth' });
       });
