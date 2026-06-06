@@ -4754,3 +4754,17 @@ body.journal-route .lang-toggle-wrap { display: none; }
   /* on phones the warning chip drops to its own row, fully visible */
   #warn-rank-link { margin-left: 0; }
 }
+
+/* ── fix: card meta chips overflow (free badge bleeding into IF), esp. EN ── */
+.j-row .col-free, .j-row .col-if, .j-row .col-cycle { width: auto !important; max-width: none !important; flex: 0 0 auto; }
+.j-row .col-free { margin-right: 8px; }
+.j-row .col-if { margin-right: 8px; }
+.j-row .col-cycle { margin-right: 8px; }
+.j-row .col-free .oa-chip, .j-row .col-free .badge { white-space: nowrap; }
+
+/* ── fix: FREE TO PUBLISH filter box matches the other filter cards ── */
+.tab-panel[data-panel="int"] thead .col-free .free-th-filter {
+  display: flex !important; width: 100%; box-sizing: border-box; justify-content: flex-start;
+  padding: 11px 13px; border-radius: 12px;
+  box-shadow: 0 1px 0 rgba(43,42,39,.03), 0 6px 16px -14px rgba(60,48,36,.2);
+}
