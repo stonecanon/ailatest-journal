@@ -2313,12 +2313,14 @@ td.empty,
     color: var(--ink-faint);
     font-weight: 700;
   }
+  html:not([lang|="zh"]) .tab-panel[data-panel="int"] table.journals .col-cycle::before { content: "Review"; }
 
   .tab-panel[data-panel="int"] table.journals .col-topic::before {
     content: "学科";
     color: var(--ink-faint);
     font-weight: 700;
   }
+  html:not([lang|="zh"]) .tab-panel[data-panel="int"] table.journals .col-topic::before { content: "Subject"; }
 
   .tab-panel[data-panel="int"] table.journals .empty {
     display: block;
@@ -4335,6 +4337,7 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .j-row .col-cycle::before { content: "⏱ "; }
 .j-row .col-topic { font-size: 11px; color: var(--ink-faint); line-height: 1.4; }
 .j-row .col-topic::before { content: "学科 · "; }
+html:not([lang|="zh"]) .j-row .col-topic::before { content: "Subject · "; }
 
 /* ── 国际刊：表头 → 左侧筛选栏 ── */
 .tab-panel[data-panel="int"] table.journals { display: flex; align-items: flex-start; gap: 22px; }

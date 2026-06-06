@@ -911,12 +911,23 @@
     return err.message || `${stage}${T('失败',' failed')}`;
   }
 
-  function getAnalyticsId(key, storage) {
+  function getAnalyticsId(key, storage, timeoutMs) {
     try {
       let id = storage.getItem(key);
+      let ts = 0;
+      if (timeoutMs) {
+        ts = parseInt(storage.getItem(key + '_ts') || '0', 10);
+        const now = Date.now();
+        if (id && (now - ts) > timeoutMs) {
+          id = null;
+        }
+      }
       if (!id) {
         id = (crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`);
         storage.setItem(key, id);
+      }
+      if (timeoutMs) {
+        storage.setItem(key + '_ts', String(Date.now()));
       }
       return id;
     } catch (_) {
@@ -952,9 +963,12 @@
       path,
       referrer: document.referrer || '',
       visitor_id: getAnalyticsId('ailatest.analytics.visitor', localStorage),
-      session_id: getAnalyticsId('ailatest.analytics.session', sessionStorage),
+      session_id: getAnalyticsId('ailatest.analytics.session', sessionStorage, 30 * 60 * 1000),
       client_timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || '',
       client_language: navigator.language || '',
+      user_agent: navigator.userAgent || '',
+      is_bot: !navigator.userAgent || !!navigator.userAgent.match(/(Googlebot|Bingbot|Bytespider|GPTBot|ClaudeBot|CCBot|curl|wget|HeadlessChrome|bot|spider|crawler)/i) ? 1 : 0,
+      screen_resolution: screen.width + 'x' + screen.height,
     };
     const body = JSON.stringify(payload);
     const url = `${API_BASE}/analytics/pageview`;
@@ -991,9 +1005,11 @@
       query: detail.query || '',
       result_count: Number.isFinite(Number(detail.result_count)) ? Number(detail.result_count) : null,
       visitor_id: getAnalyticsId('ailatest.analytics.visitor', localStorage),
-      session_id: getAnalyticsId('ailatest.analytics.session', sessionStorage),
+      session_id: getAnalyticsId('ailatest.analytics.session', sessionStorage, 30 * 60 * 1000),
       client_timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || '',
       client_language: navigator.language || '',
+      user_agent: navigator.userAgent || '',
+      is_bot: !navigator.userAgent || !!navigator.userAgent.match(/(Googlebot|Bingbot|Bytespider|GPTBot|ClaudeBot|CCBot|curl|wget|HeadlessChrome|bot|spider|crawler)/i) ? 1 : 0,
       metadata: detail.metadata || {},
     };
     const body = JSON.stringify(payload);
@@ -1935,8 +1951,12 @@
         body: JSON.stringify({
           journal_key: key,
           visitor_id: getAnalyticsId('ailatest.analytics.visitor', localStorage),
-          session_id: getAnalyticsId('ailatest.analytics.session', sessionStorage),
+          session_id: getAnalyticsId('ailatest.analytics.session', sessionStorage, 30 * 60 * 1000),
           path: analyticsPath(),
+          referrer: document.referrer || '',
+          user_agent: navigator.userAgent || '',
+          device: /iPad|iPhone|Android/.test(navigator.userAgent) ? 'mobile' : 'desktop',
+          browser: (navigator.userAgent.match(/(Chrome|Safari|Firefox|Edge|Opera)/i) || ['unknown'])[0],
         }),
       });
       const d = await r.json().catch(() => null);
@@ -2088,13 +2108,13 @@
         return `<span class="warn-pill">⚠ Warning</span>`;
       }
       function badgeUnderReview() {
-        return `<span class="under-review-pill">新锐 Under Review</span>`;
+        return `<span class="under-review-pill">${T('新锐','Emerging')} Under Review</span>`;
       }
       function badgeOnHold() {
         return `<span class="on-hold-pill">WoS On Hold</span>`;
       }
       function badgeCiticWarning() {
-        return `<span class="citic-warning-pill">中信所预警</span>`;
+        return `<span class="citic-warning-pill">${T('中信所预警','CITIC Warning')}</span>`;
       }
 
   // 统一标签组合：主页 / 收藏页 / 抽屉 / 分享卡片共用同一批 badge 函数与 CSS 类。
@@ -3724,6 +3744,17 @@
     }
     // 上报浏览（无需登录），结果回填进 cache
     reportJournalView(favId(r));
+    // GA4 虚拟浏览 — 期刊详情抽屉打开时通知 GA4（无需 GTM 配置）
+    try {
+      if (typeof gtag === 'function') {
+        var jvPath = '/journal/' + (favId(r) || '');
+        gtag('event', 'page_view', {
+          'page_title': (r.name || r.cn_name || '期刊详情').slice(0, 200),
+          'page_location': window.location.origin + jvPath,
+          'page_path': jvPath,
+        });
+      }
+    } catch(_) {}
     const src = r.__src || 'int';
     const titleRaw = r.name || r.cn_name || '';
     const title = titleCase(titleRaw);
