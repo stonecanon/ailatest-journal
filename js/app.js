@@ -45,6 +45,7 @@
       footer_data: '数据来源：Clarivate WoS Core Collection (SCIE/SSCI/AHCI/ESCI) · JCR 2025 · ESI · EI Compendex · Scopus · DOAJ · UGC-CARE India · 中科院文献情报中心分区表 2025 · ShowJCR (GPL-3.0) · CCF 2026 (A/B/C) · CCF-T 2025 · ABDC 2025 · ABS 2024 · 中国科协 2025 · CSSCI · 北大核心 · CNKI · 浙江大学 2024 · 高校自编目录 2023 · CrossRef · OpenAlex。© <a href="https://journal.ailatest.org">AILatest Journal</a>',
       tab_home: '查刊', tab_int: '国际', tab_dom: '中国', tab_fav: '收藏', tab_pick: '荐刊',
       nav_index_rank: '索引排行榜', nav_subject_rank: '学科排行榜', nav_warn_rank: '预警名单',
+      filter_if_range: '影响因子', if_any: '不限',
       rail_int: '全球', rail_dom: '中国', rail_in: '印度', rail_kr: '韩国', rail_fav: '我的',
       loading: '加载中…',
       hero_title_int: 'SCI / SSCI 国际期刊检索',
@@ -127,6 +128,7 @@
       footer_data: 'Sources: Clarivate WoS Core Collection (SCIE/SSCI/AHCI/ESCI) · JCR 2025 · ESI · EI Compendex · Scopus · DOAJ · UGC-CARE India · CAS NSL Tiers 2025 · ShowJCR (GPL-3.0) · CCF 2026 (A/B/C) · CCF-T 2025 · ABDC 2025 · ABS 2024 · CAST 2025 · CSSCI · PKU Core · CNKI · ZJU 2024 · School A 2023 · CrossRef · OpenAlex. © <a href="https://journal.ailatest.org">AILatest Journal</a>',
       tab_home: 'Journals', tab_int: 'International', tab_dom: 'China', tab_fav: 'Favorites', tab_pick: 'Recommend',
       nav_index_rank: 'Index Rankings', nav_subject_rank: 'Subject Rankings', nav_warn_rank: 'Warning List',
+      filter_if_range: 'Impact Factor', if_any: 'Any',
       rail_int: 'Global', rail_dom: 'China', rail_in: 'India', rail_kr: 'Korea', rail_fav: 'Me',
       loading: 'Loading…',
       hero_title_int: 'International SCI / SSCI Search',
@@ -873,6 +875,7 @@
   let topicList = []; // [{name,count}] sorted A-Z, merged WoS + OA
   let activeQuery = '';
   let activeWarnList = false; // 预警名单：合并 中科院/中信所预警 + 新锐 under review / WoS on hold
+  let activeIfMin = 0; // 影响因子滑块：只看 IF ≥ 此值
   let activeDom = 'cnki_major';   // 中文期刊目录
   let activeIndiaSubject = '__all';
   let activeDomBadges = new Set(); // 默认不勾选 = 显示全部；勾选 = 只看有该徽章的
@@ -972,6 +975,41 @@
   function scheduleRoutePageview() {
     clearTimeout(routeAnalyticsTimer);
     routeAnalyticsTimer = setTimeout(trackPageview, 80);
+  }
+
+  function trackInteraction(eventType, detail = {}) {
+    try {
+      if (localStorage.getItem('ailatest.analytics.ignore') === '1') return;
+    } catch (_) {}
+    const payload = {
+      event_id: crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      event_type: eventType,
+      event_ts: Math.floor(Date.now() / 1000),
+      site: location.hostname,
+      path: analyticsPath(),
+      tab: detail.tab || activeTab || '',
+      query: detail.query || '',
+      result_count: Number.isFinite(Number(detail.result_count)) ? Number(detail.result_count) : null,
+      visitor_id: getAnalyticsId('ailatest.analytics.visitor', localStorage),
+      session_id: getAnalyticsId('ailatest.analytics.session', sessionStorage),
+      client_timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || '',
+      client_language: navigator.language || '',
+      metadata: detail.metadata || {},
+    };
+    const body = JSON.stringify(payload);
+    const url = `${API_BASE}/analytics/interaction`;
+    try {
+      if (navigator.sendBeacon) {
+        const blob = new Blob([body], { type: 'application/json' });
+        if (navigator.sendBeacon(url, blob)) return;
+      }
+    } catch (_) {}
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body,
+      keepalive: true,
+    }).catch(() => {});
   }
 
   function installRouteAnalytics() {
@@ -1890,8 +1928,16 @@
     try {
       const r = await fetch(`${API_BASE}/journal-view`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ journal_key: key }),
+        headers: {
+          'Content-Type': 'application/json',
+          ...(user && user.token ? { 'Authorization': `Bearer ${user.token}` } : {}),
+        },
+        body: JSON.stringify({
+          journal_key: key,
+          visitor_id: getAnalyticsId('ailatest.analytics.visitor', localStorage),
+          session_id: getAnalyticsId('ailatest.analytics.session', sessionStorage),
+          path: analyticsPath(),
+        }),
       });
       const d = await r.json().catch(() => null);
       if (d && typeof d.count === 'number') {
@@ -2275,6 +2321,7 @@
       if (!abs || !activeAbs.has(abs)) return false;
     }
     if (activeFeats.has('if') && r.if_2024 == null) return false;
+    if (activeIfMin > 0 && (r.if_2024 == null || +r.if_2024 < activeIfMin)) return false;
     if (activeFeats.has('ccf') && !r.ccf) return false;
     if (activeFeats.has('cnkx') && !(Array.isArray(r.cnkx) && r.cnkx.length)) return false;
     if (activeFeats.has('xr') && !r.cas_xr) return false;
@@ -5116,6 +5163,7 @@
       activeQuery = e.currentTarget.value.trim();
       shown = PAGE;
       if (!activeQuery) return;
+      trackInteraction('journal_search', { tab: activeTab, query: activeQuery });
       if (activeTab === 'home') showHomeSearchResults();
       else if (activeTab === 'int') renderInt();
       else if (activeTab === 'fav') renderFav();
@@ -5133,10 +5181,11 @@
       if (activeTab === 'pick') {
         qEl.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
       } else if (activeTab === 'home') {
+        trackInteraction('journal_search', { tab: activeTab, query: activeQuery });
         showHomeSearchResults();
-      } else if (activeTab === 'int') renderInt();
-      else if (activeTab === 'fav') renderFav();
-      else if (activeTab === 'dom') renderDomestic();
+      } else if (activeTab === 'int') { trackInteraction('journal_search', { tab: activeTab, query: activeQuery }); renderInt(); }
+      else if (activeTab === 'fav') { trackInteraction('journal_search', { tab: activeTab, query: activeQuery }); renderFav(); }
+      else if (activeTab === 'dom') { trackInteraction('journal_search', { tab: activeTab, query: activeQuery }); renderDomestic(); }
     });
     $('#more').addEventListener('click', () => { shown += PAGE; renderInt(); });
 
@@ -6060,6 +6109,19 @@
         }
 
         status.textContent = `${T('本地匹配','Local match')} ${entries.length} ${T('个候选期刊','candidate journals')}, ${T('显示','showing')} ${filtered.length}/${allFiltered.length}`;
+        trackInteraction('journal_pick', {
+          tab: 'pick',
+          query,
+          result_count: allFiltered.length,
+          metadata: {
+            shown: filtered.length,
+            candidate_count: entries.length,
+            sci: !!document.getElementById('pick-filter-sci')?.checked,
+            ssci: !!document.getElementById('pick-filter-ssci')?.checked,
+            ahci: !!document.getElementById('pick-filter-ahci')?.checked,
+            exclude_comprehensive: !!document.getElementById('pick-filter-comprehensive')?.checked,
+          },
+        });
         // ── Save to search history ──
         savePickHistory(query);
       } catch (e) {
@@ -6284,6 +6346,22 @@
         renderInt(); syncThChkState();
         window.scrollTo({ top: 0, behavior: 'smooth' });
       });
+      // 影响因子滑块
+      (function initIfSlider() {
+        const slider = document.getElementById('if-slider');
+        const valEl = document.getElementById('if-slider-val');
+        if (!slider) return;
+        const max = +slider.max || 50;
+        const sync = () => {
+          activeIfMin = +slider.value;
+          if (valEl) valEl.textContent = activeIfMin > 0
+            ? `IF ≥ ${activeIfMin}${activeIfMin >= max ? '+' : ''}`
+            : T('不限', 'Any');
+          slider.style.setProperty('--pct', (activeIfMin / max * 100) + '%');
+        };
+        slider.addEventListener('input', () => { sync(); shown = PAGE; renderInt(); });
+        sync();
+      })();
       if (renderJournalRoutePage()) {
         window.addEventListener('hashchange', applyHashRoute);
         if (user) await pullFavs();

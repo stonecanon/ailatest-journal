@@ -38,7 +38,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- End Google Tag Manager -->
 <link rel="preload" href="/data/journals.json.gz" as="fetch" crossorigin="anonymous" />
 <link rel="preload" href="/data/journal_aliases.json" as="fetch" crossorigin="anonymous" />
-<link rel="stylesheet" href="/css/app.css?v=20260604-18" />
+<link rel="stylesheet" href="/css/app.css?v=20260604-19" />
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json" />
@@ -228,6 +228,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <label class="th-chk" data-filter="feat" data-value="oaj"><input type="checkbox"><span>OAJ</span></label>
                     <label class="th-chk" data-filter="feat" data-value="doaj"><input type="checkbox"><span>DOAJ</span></label>
                     <label class="th-chk" data-filter="feat" data-value="medline"><input type="checkbox"><span>MEDLINE</span></label>
+                  </div>
+                </div>
+                <div class="th-dropdown" id="if-dropdown">
+                  <button class="th-dropdown-btn"><span class="dd-label" data-i18n="filter_if_range">影响因子</span><span class="dd-arrow">▼</span></button>
+                  <div class="th-dropdown-panel" id="if-panel">
+                    <div class="if-slider-row">
+                      <span class="if-slider-val" id="if-slider-val" data-i18n="if_any">不限</span>
+                    </div>
+                    <input type="range" id="if-slider" min="0" max="50" step="0.5" value="0" aria-label="最低影响因子">
+                    <div class="if-slider-ticks"><span>0</span><span>10</span><span>20</span><span>30</span><span>40</span><span>50+</span></div>
                   </div>
                 </div>
                 <div class="th-dropdown" id="jcr-dropdown">
@@ -532,7 +542,7 @@ const __BUILD_VER = 'v20260530-79';
   }
 })();
 </script>
-<script src="/js/app.js?v=20260604-08" defer></script>
+<script src="/js/app.js?v=20260604-09" defer></script>
 <script>
   // Custom install prompt
   let __pwaPrompt = null;
