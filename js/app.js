@@ -913,10 +913,11 @@
 
   function getAnalyticsId(key, storage, timeoutMs) {
     try {
-      let id = storage.getItem(key);
+      const canonicalKey = key.includes('visitor') ? 'visitor_id' : (key.includes('session') ? 'session_id' : key);
+      let id = storage.getItem(canonicalKey) || storage.getItem(key);
       let ts = 0;
       if (timeoutMs) {
-        ts = parseInt(storage.getItem(key + '_ts') || '0', 10);
+        ts = parseInt(storage.getItem(canonicalKey + '_ts') || storage.getItem(key + '_ts') || '0', 10);
         const now = Date.now();
         if (id && (now - ts) > timeoutMs) {
           id = null;
@@ -924,9 +925,11 @@
       }
       if (!id) {
         id = (crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`);
+        storage.setItem(canonicalKey, id);
         storage.setItem(key, id);
       }
       if (timeoutMs) {
+        storage.setItem(canonicalKey + '_ts', String(Date.now()));
         storage.setItem(key + '_ts', String(Date.now()));
       }
       return id;
@@ -1205,7 +1208,11 @@
       $('#q').placeholder = t(search);
     }
     updateSearchSubmitLabel();
-    $('#lang-toggle').textContent = LANG_META[lang]?.label || '中文';
+    const langToggle = $('#lang-toggle');
+    if (langToggle) langToggle.textContent = LANG_META[lang]?.label || '中文';
+    $$('[data-lang-choice]').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.langChoice === lang);
+    });
     $('#auth-btn').textContent = user ? (user.name || user.login || t('logout')) : t('login');
     document.documentElement.lang = LANG_META[lang]?.html || 'zh-CN';
   }
@@ -1939,8 +1946,23 @@
     const display = n >= 1000 ? (n / 1000).toFixed(1) + 'k' : String(n);
     return `<span class="badge b-view" title="${T('累计浏览次数','Total views')}">👁 ${display}</span>`;
   }
-  async function reportJournalView(key) {
+  function journalOpenSource(opts = {}) {
+    if (opts.source) return opts.source;
+    if (opts.fromPath || opts.fromHash) return 'direct_link';
+    if (activeTab === 'pick') return 'recommendation';
+    if (activeTab === 'fav') return activeQuery ? 'favorites_search_results' : 'favorites';
+    if (activeQuery) return 'search_results';
+    if (activeTab === 'home') return 'home';
+    if (activeTab === 'dom') return 'domestic_list';
+    if (activeTab === 'in') return 'india_list';
+    return 'default_list';
+  }
+
+  async function reportJournalView(recOrKey, opts = {}) {
+    const key = typeof recOrKey === 'string' ? recOrKey : favId(recOrKey);
     if (!key) return;
+    const detailPath = typeof recOrKey === 'string' ? analyticsPath() : journalPublicPath(recOrKey);
+    const source = journalOpenSource(opts);
     try {
       const r = await fetch(`${API_BASE}/journal-view`, {
         method: 'POST',
@@ -1949,10 +1971,16 @@
           ...(user && user.token ? { 'Authorization': `Bearer ${user.token}` } : {}),
         },
         body: JSON.stringify({
+          event_id: crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+          event_time: Math.floor(Date.now() / 1000),
           journal_key: key,
+          journal_name: typeof recOrKey === 'string' ? '' : (recOrKey.name || recOrKey.cn_name || recOrKey.title || ''),
+          view_source: source,
+          tab: activeTab || '',
+          query: activeQuery || '',
           visitor_id: getAnalyticsId('ailatest.analytics.visitor', localStorage),
           session_id: getAnalyticsId('ailatest.analytics.session', sessionStorage, 30 * 60 * 1000),
-          path: analyticsPath(),
+          path: detailPath,
           referrer: document.referrer || '',
           user_agent: navigator.userAgent || '',
           device: /iPad|iPhone|Android/.test(navigator.userAgent) ? 'mobile' : 'desktop',
@@ -2536,6 +2564,18 @@
     // 不搜索时默认按影响因子倒序（=推荐期刊），而不是字母顺序
     const effIntSort = intIfSort || (activeQuery ? '' : 'desc');
     filtered = sortByIF(filtered, effIntSort);
+    // 按浏览历史推荐：纯默认视图下，把用户近期看过的学科领域的期刊上浮（组内仍按 IF）
+    if (!activeQuery && !intIfSort && !activeWarnList) {
+      const pref = getPreferredCats();
+      if (pref) {
+        const inPref = [], rest = [];
+        for (const r of filtered) {
+          const cats = Array.isArray(r.wos_categories) ? r.wos_categories : [];
+          (cats.some(c => pref.has(c)) ? inPref : rest).push(r);
+        }
+        if (inPref.length && rest.length) filtered = inPref.concat(rest);
+      }
+    }
     document.querySelector('th.col-if[data-if-sort="int"]')?.classList.toggle('sort-desc', intIfSort === 'desc');
     document.querySelector('th.col-if[data-if-sort="int"]')?.classList.toggle('sort-asc', intIfSort === 'asc');
     const intArrow = document.querySelector('th.col-if[data-if-sort="int"] .sort-arrow');
@@ -3731,6 +3771,7 @@
   }
   async function openDrawer(r, opts) {
     _currentDrawerRec = r;
+    recordView(r); // 记录浏览历史，用于学科推荐
     const pageMode = !!(opts && opts.pageMode);
     document.body.classList.toggle('journal-route', pageMode);
     // 记录抽屉打开时的 tab，关闭时回到原 tab
@@ -3743,7 +3784,7 @@
       catch(e) { oaMap = {}; }
     }
     // 上报浏览（无需登录），结果回填进 cache
-    reportJournalView(favId(r));
+    reportJournalView(r, opts || {});
     // GA4 虚拟浏览 — 期刊详情抽屉打开时通知 GA4（无需 GTM 配置）
     try {
       if (typeof gtag === 'function') {
@@ -4295,7 +4336,7 @@
         const rec = journals.find(j => favId(j) === fid) || favsData[fid];
         if (rec) {
           if (_currentDrawerRec) _drawerStack.push(_currentDrawerRec);
-          openDrawer(rec, { pageMode: document.body.classList.contains('journal-route') });
+          openDrawer(rec, { pageMode: document.body.classList.contains('journal-route'), source: 'related' });
         }
       });
     });
@@ -4450,11 +4491,184 @@
     return true;
   }
 
+  async function updatePublicPulse() {
+    const box = document.getElementById('public-pulse');
+    if (!box) return;
+    try {
+      const visitorId = getAnalyticsId('ailatest.analytics.visitor', localStorage);
+      const url = `${API_BASE}/analytics/public-summary?site=${encodeURIComponent(location.hostname)}&visitor_id=${encodeURIComponent(visitorId)}`;
+      const data = await fetch(url).then(r => r.json()).catch(() => null);
+      if (!data || !data.ok) return;
+      const rankEl = document.getElementById('visitor-rank-line');
+      const topEl = document.getElementById('top-journal-line');
+      if (rankEl && data.visitor_rank) {
+        rankEl.textContent = T(`自建统计第 ${Number(data.visitor_rank).toLocaleString()} 位访客`, `First-party visitor #${Number(data.visitor_rank).toLocaleString()}`);
+      }
+      const top = (data.top_journals || []).slice(0, 3).map(item => {
+        const rec = findRecByFid(item.journal_key) || journals.find(r => favId(r) === item.journal_key);
+        const name = rec ? (rec.name || rec.cn_name || rec.journal_title || item.journal_key) : item.journal_key;
+        const href = rec ? journalPublicPath(rec) : `/journal/${encodeURIComponent(item.journal_key)}/`;
+        const fid = rec ? favId(rec) : item.journal_key;
+        return `<a href="${escape(href)}" data-pulse-fid="${escape(fid)}">${escape(titleCase(name))}</a>`;
+      }).filter(Boolean);
+      if (topEl) {
+        topEl.innerHTML = top.length
+          ? `${T('最热期刊', 'Hottest journals')}: ${top.join(' / ')}`
+          : '';
+      }
+      box.hidden = !top.length;
+      box.querySelectorAll('[data-pulse-fid]').forEach(link => {
+        link.addEventListener('click', (e) => {
+          const fid = link.getAttribute('data-pulse-fid') || '';
+          const rec = findRecByFid(fid) || journals.find(r => favId(r) === fid);
+          if (!rec) return;
+          e.preventDefault();
+          openDrawer(rec, { pageMode: true, source: 'home_top_journal' });
+        });
+      });
+    } catch (_) {}
+  }
+
   // ───────── favorites tab ─────────
+  // ───────── customizable stations (bottom nav) ─────────
+  const STATIONS = [
+    { id: 'int', i18n: 'rail_int', zh: '全球', en: 'Global' },
+    { id: 'dom', i18n: 'rail_dom', zh: '中国', en: 'China' },
+    { id: 'in',  i18n: 'rail_in',  zh: '印度', en: 'India' },
+    { id: 'kr',  i18n: 'rail_kr',  zh: '韩国', en: 'Korea' },
+  ];
+  const STATION_IDS = STATIONS.map(s => s.id);
+  function getEnabledStations() {
+    try {
+      const s = JSON.parse(localStorage.getItem('ailatest.stations') || 'null');
+      if (Array.isArray(s)) {
+        const valid = s.filter(id => STATION_IDS.includes(id));
+        if (valid.length) return valid;
+      }
+    } catch (e) {}
+    return STATION_IDS.slice();
+  }
+  function setEnabledStations(ids) {
+    let valid = ids.filter(id => STATION_IDS.includes(id));
+    if (!valid.length) valid = ['int'];
+    localStorage.setItem('ailatest.stations', JSON.stringify(valid));
+    applyStations();
+    // if current tab was just hidden, fall back to the first enabled station
+    if (STATION_IDS.includes(activeTab) && !valid.includes(activeTab)
+        && window.__activateJournalTab) {
+      window.__activateJournalTab(valid[0]);
+    }
+  }
+  function applyStations() {
+    const enabled = getEnabledStations();
+    STATIONS.forEach((s) => {
+      const btn = document.querySelector(`.rail-nav-btn[data-tab="${s.id}"]`);
+      if (!btn) return;
+      const idx = enabled.indexOf(s.id);
+      if (idx === -1) {
+        btn.hidden = true;
+        btn.dataset.stationHidden = '1';
+        btn.style.order = '';
+      } else {
+        btn.hidden = false;
+        delete btn.dataset.stationHidden;
+        btn.style.order = String(idx);
+      }
+    });
+    const favBtn = document.querySelector('.rail-nav-btn[data-tab="fav"]');
+    if (favBtn) favBtn.style.order = '50';
+  }
+  function setUiLanguage(code) {
+    if (!LANG_META[code]) return;
+    lang = code;
+    localStorage.setItem('ailatest.lang', lang);
+    localizeDefaultFavListName();
+    persistFavLists(false);
+    applyI18n();
+    const wosSel2 = $('#wos-col-filter');
+    if (wosSel2) wosSel2.__bound = false;
+    renderCatList();
+    if (activeTab === 'dom') renderDomestic();
+    else if (activeTab === 'fav') renderFav();
+    else if (activeTab === 'int') renderInt();
+    else if (activeTab === 'pick') refreshPickI18n();
+    if (_currentDrawerRec) {
+      openDrawer(_currentDrawerRec, { pageMode: document.body.classList.contains('journal-route') });
+    }
+  }
+  function stationSettingsHtml() {
+    const enabled = getEnabledStations();
+    const langBtns = LANG_ORDER.map(code => {
+      const meta = LANG_META[code];
+      return `<button type="button" class="settings-chip lang-choice${code === lang ? ' active' : ''}" data-lang-choice="${escape(code)}">${meta?.label || escape(code)}</button>`;
+    }).join('');
+    const items = STATIONS.map(s => {
+      const on = enabled.includes(s.id);
+      const label = t(s.i18n) || T(s.zh, s.en);
+      return `<label class="station-opt${on ? ' on' : ''}">
+        <input type="checkbox" data-station="${s.id}"${on ? ' checked' : ''}>
+        <span>${escape(label)}</span></label>`;
+    }).join('');
+    return `<details class="station-settings">
+      <summary class="station-settings-head">${T('我的设置','My settings')}<small>${T('语言与底部导航','Language and bottom nav')}</small></summary>
+      <div class="my-settings-block">
+        <div class="my-settings-label">${T('语言','Language')}</div>
+        <div class="settings-chip-row">${langBtns}</div>
+      </div>
+      <div class="my-settings-block">
+        <div class="my-settings-label">${T('底部导航站点','Bottom nav stations')}</div>
+        <div class="station-opts">${items}</div>
+      </div>
+    </details>`;
+  }
+  function attachStationSettingsHandlers(scope) {
+    (scope || document).querySelectorAll('.station-opts input[data-station]').forEach(cb => {
+      cb.addEventListener('change', () => {
+        const root = cb.closest('.station-opts');
+        const ids = [...root.querySelectorAll('input[data-station]:checked')].map(x => x.dataset.station);
+        setEnabledStations(ids);
+        cb.closest('.station-opt')?.classList.toggle('on', cb.checked);
+      });
+    });
+    (scope || document).querySelectorAll('[data-lang-choice]').forEach(btn => {
+      btn.addEventListener('click', () => setUiLanguage(btn.dataset.langChoice));
+    });
+  }
+
+  // ───────── viewed-journal history → subject-aware default ranking ─────────
+  const VIEWHIST_KEY = 'ailatest.viewhist';
+  function recordView(r) {
+    if (!r) return;
+    const cats = Array.isArray(r.wos_categories) ? r.wos_categories.filter(Boolean) : [];
+    if (!cats.length) return; // only WoS-indexed (international) journals carry subjects
+    try {
+      let h = JSON.parse(localStorage.getItem(VIEWHIST_KEY) || '[]');
+      if (!Array.isArray(h)) h = [];
+      const key = r.issn || r.name || '';
+      h = h.filter(e => e && e.k !== key);
+      h.unshift({ k: key, c: cats.slice(0, 3), t: Date.now() });
+      if (h.length > 40) h = h.slice(0, 40);
+      localStorage.setItem(VIEWHIST_KEY, JSON.stringify(h));
+    } catch (e) {}
+  }
+  function getPreferredCats(maxCats = 6) {
+    try {
+      const h = JSON.parse(localStorage.getItem(VIEWHIST_KEY) || '[]');
+      if (!Array.isArray(h) || !h.length) return null;
+      const score = {};
+      h.slice(0, 25).forEach((e, i) => {
+        const w = 1 / (1 + i * 0.15); // recency-weighted
+        (e && e.c || []).forEach(c => { score[c] = (score[c] || 0) + w; });
+      });
+      const ranked = Object.keys(score).sort((a, b) => score[b] - score[a]).slice(0, maxCats);
+      return ranked.length ? new Set(ranked) : null;
+    } catch (e) { return null; }
+  }
+
   function renderFav() {
     const box = $('#fav-content');
     const list = getActiveList();
-    if (!list) { box.innerHTML = `<div class="empty" style="padding:60px 20px;text-align:center;color:var(--muted)">${T('还没有收藏。切到「国际 SCI/SSCI」点任意一行右边的 ★ 就能收藏。','No favorites yet. Go to "International" and click the ★ on any row.')}</div>`; return; }
+    if (!list) { box.innerHTML = stationSettingsHtml() + `<div class="empty" style="padding:60px 20px;text-align:center;color:var(--muted)">${T('还没有收藏。切到「国际 SCI/SSCI」点任意一行右边的 ★ 就能收藏。','No favorites yet. Go to "International" and click the ★ on any row.')}</div>`; attachStationSettingsHandlers(box); return; }
 
     // list 管理栏（全列表切换 + 新建/重命名/删除）
     const bar = favLists.map(l => `
@@ -4501,15 +4715,16 @@
     rows = sortByIF(rows, favIfSort);
 
     if (!rows.length) {
-      box.innerHTML = toolbar + `<div class="empty" style="padding:40px 0">${t('empty_fav')}</div>`;
+      box.innerHTML = stationSettingsHtml() + toolbar + `<div class="empty" style="padding:40px 0">${t('empty_fav')}</div>`;
       attachFavBarHandlers();
+      attachStationSettingsHandlers(box);
       return;
     }
 
     // 单一有序表格 + 拖动
     const tbody = rows.map(r => renderFavRow(r)).join('');
     const hint = activeQuery ? '' : `<div class="fav-drag-hint">${T('按住','Hold')} <span class="drag-ico">⋮⋮</span> ${T('拖动排序 · 长按手机端同样支持','to drag-reorder · long-press on mobile')}</div>`;
-    box.innerHTML = toolbar + hint + `
+    box.innerHTML = stationSettingsHtml() + toolbar + hint + `
       <div class="table-wrap" style="margin-top:10px">
         <table class="journals fav-table">
           <thead><tr>
@@ -4518,7 +4733,7 @@
             <th class="col-name">${T('期刊 Title','Journal Title')}</th>
             <th class="col-badge">${T('索引 / 分区','Indices / Tier')}</th>
             <th class="col-if sortable ${favIfSort === 'desc' ? 'sort-desc' : favIfSort === 'asc' ? 'sort-asc' : ''}" data-if-sort="fav">IF <span class="sort-arrow">${favIfSort === 'asc' ? '▲' : '▼'}</span></th>
-            <th class="col-cycle">审稿周期</th>
+            <th class="col-cycle">${T('审稿周期','Review')}</th>
             <th class="col-src" style="width:90px">${T('来源','Source')}</th>
           </tr></thead>
           <tbody id="fav-tbody">${tbody}</tbody>
@@ -4527,6 +4742,7 @@
       <div class="results-count" style="margin-top:18px">${t('showing')} ${rows.length} ${t('total_items')}</div>`;
 
     attachFavBarHandlers();
+    attachStationSettingsHandlers(box);
     // 拖动排序（只在无搜索时启用，搜索时顺序与真实顺序不一致）
     if (!activeQuery && window.Sortable) {
       const tb = document.getElementById('fav-tbody');
@@ -5530,7 +5746,9 @@
     // ─── 语言切换下拉菜单 ───
     (function initLangDropdown() {
       const btn = $('#lang-toggle');
+      if (!btn) return;
       const wrap = btn.closest('.lang-toggle-wrap');
+      if (!wrap) return;
       let dropdown;
 
       function buildDropdown() {
@@ -5544,22 +5762,7 @@
           if (code === lang) opt.classList.add('active');
           opt.addEventListener('click', (e) => {
             e.stopPropagation();
-            lang = code;
-            localStorage.setItem('ailatest.lang', lang);
-            localizeDefaultFavListName();
-            persistFavLists(false);
-            applyI18n();
-            // 重置列头下拉的__bound标记，使其下次用新语言重建
-            const wosSel2 = $('#wos-col-filter'); if (wosSel2) wosSel2.__bound = false;
-            renderCatList();
-            if (activeTab === 'dom') renderDomestic();
-            else if (activeTab === 'fav') renderFav();
-            else if (activeTab === 'int') renderInt();
-            else if (activeTab === 'pick') refreshPickI18n();
-            // 重绘打开的抽屉（如果有）
-            if (_currentDrawerRec) {
-              openDrawer(_currentDrawerRec, { pageMode: document.body.classList.contains('journal-route') });
-            }
+            setUiLanguage(code);
             closeDropdown();
           });
           dropdown.appendChild(opt);
@@ -5726,7 +5929,7 @@
       const row = e.target.closest('tr.j-row.clickable'); if (!row) return;
       const fid = row.dataset.fid;
       const rec = rowRecordsByFid[fid] || journals.find(r => favId(r) === fid) || favsData[fid];
-      if (rec) openDrawer(rec, { pageMode: true });
+      if (rec) openDrawer(rec, { pageMode: true, source: journalOpenSource() });
     });
     $('#drawer-close')?.addEventListener('click', () => {
       if (document.body.classList.contains('journal-route')) {
@@ -6134,7 +6337,7 @@
               ev.preventDefault();
               const issn = card.dataset.issn;
               const rec = journals.find(r => r.issn === issn || r.eissn === issn);
-              if (rec) openDrawer(rec, { pageMode: true });
+              if (rec) openDrawer(rec, { pageMode: true, source: 'recommendation' });
             });
           });
         }
@@ -6247,6 +6450,7 @@
     loadFavLists();
     bind();
     applyI18n();
+    applyStations();
     updateFavCount();
     await handleAuthCallback();
     // 分享着陆页：/s/<id> 直接接管 main，不走主流程
@@ -6335,6 +6539,7 @@
         : `${journals.length.toLocaleString()} journals loaded`;
       renderCatList();
       renderTopicList();
+      updatePublicPulse();
       // ── 小程序收藏导入（方案A：/import?d=ISSN1,ISSN2…，无后端）──
       (function importFromMiniProgram() {
         if (location.pathname.replace(/\/+$/, '') !== '/import') return;
