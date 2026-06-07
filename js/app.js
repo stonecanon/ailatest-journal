@@ -678,6 +678,7 @@
   let domestic = null;
   let india = null;
   let malaysia = null;
+  let malaysiaPromise = null;
   let esiCats = [];
   let meta = null;
   let oaMap = {};          // compact OpenAlex map: { "ISSN": {hp, l, oa, dj, apc, org, cn, w} }
@@ -779,6 +780,20 @@
     }
     const nk = normTitle(r?.name || r?.journal_title || r?.en_name || '');
     return nk ? indiaIndex.byName[nk] || null : null;
+  }
+
+  function loadMalaysiaData() {
+    if (malaysia) return Promise.resolve(malaysia);
+    if (!malaysiaPromise) {
+      malaysiaPromise = fetch('/data/malaysia.json')
+        .then(r => r.ok ? r.json() : null)
+        .then(d => {
+          malaysia = d;
+          return malaysia;
+        })
+        .catch(() => null);
+    }
+    return malaysiaPromise;
   }
 
   function lookupOA(r) {
@@ -1365,49 +1380,6 @@
   }
 
 
-  // ── Free-tier usage limits ──
-  const DAILY_VIEW_LIMIT = 5;
-  const DAILY_SEARCH_LIMIT = 2;
-  const LOCAL_FAV_LIMIT = 5;
-  const USAGE_KEY = 'ailatest.daily_usage';
-
-  function getDailyUsage() {
-    const today = new Date().toISOString().slice(0, 10);
-    try {
-      const raw = JSON.parse(localStorage.getItem(USAGE_KEY) || '{}');
-      if (raw.date !== today) return { date: today, views: 0, searches: 0 };
-      return raw;
-    } catch (e) { return { date: today, views: 0, searches: 0 }; }
-  }
-  function saveDailyUsage(u) {
-    try { localStorage.setItem(USAGE_KEY, JSON.stringify(u)); } catch (e) {}
-  }
-  function isOverLimit(type, limit) {
-    if (user) return false;
-    return getDailyUsage()[type] >= limit;
-  }
-  function incrementUsage(type) {
-    if (user) return;
-    const usage = getDailyUsage();
-    usage[type] = (usage[type] || 0) + 1;
-    saveDailyUsage(usage);
-  }
-  function requireLogin(msg) {
-    if (user) return true;
-    openLoginModal();
-    const card = document.querySelector('.login-card');
-    if (card) {
-      let el = document.getElementById('login-limit-msg');
-      if (!el) {
-        el = document.createElement('p');
-        el.id = 'login-limit-msg';
-        el.className = 'login-limit-msg';
-        card.prepend(el);
-      }
-      el.textContent = msg || T('免费次数已用完，请登录后继续使用','Free daily limit reached. Please sign in to continue.');
-    }
-    return false;
-  }
 
   // isFav = 在当前 active list 中
   function isFav(r) {
@@ -3287,7 +3259,12 @@
     const box = $('#malaysia-content');
     if (!box) return;
     if (!malaysia || !malaysia.records) {
-      box.innerHTML = `<div class="empty">${T('马来西亚期刊数据缺失','Malaysia journal data missing')}</div>`;
+      box.innerHTML = `<div class="empty">${t('loading')}</div>`;
+      loadMalaysiaData().then(d => {
+        if (activeTab !== 'my') return;
+        if (d && d.records) renderMalaysia();
+        else box.innerHTML = `<div class="empty">${T('马来西亚期刊数据缺失','Malaysia journal data missing')}</div>`;
+      });
       return;
     }
     if (!window.__malaysiaShown) window.__malaysiaShown = 100;
@@ -6731,11 +6708,10 @@
     // 分享着陆页：/s/<id> 直接接管 main，不走主流程
     if (await maybeRenderShareLanding()) return;
     try {
-      const [j, d, indiaData, malaysiaData, m, esi, aliases, underReviewIssns, onHoldIssns, oa, covers] = await Promise.all([
+      const [j, d, indiaData, m, esi, aliases, underReviewIssns, onHoldIssns, oa, covers] = await Promise.all([
         fetchJSON('data/journals.json.gz'),
         fetch('/data/domestic.json').then(r => r.json()).catch(() => null),
         fetch('/data/india.json').then(r => r.json()).catch(() => null),
-        fetch('/data/malaysia.json').then(r => r.json()).catch(() => null),
         fetch('/data/meta.json').then(r => r.json()).catch(() => null),
         fetch('/data/esi_categories.json').then(r => r.json()).catch(() => []),
         fetch('/data/journal_aliases.json').then(r => r.json()).catch(() => DEFAULT_JOURNAL_ALIASES),
@@ -6745,7 +6721,7 @@
         fetchJSON('data/journal_covers.json.gz').catch(() => ({})),
       ]);
       setJournalAliases(aliases);
-      journals = j; domestic = d; india = indiaData; malaysia = malaysiaData; meta = m; esiCats = esi; oaMap = oa; coverMap = covers;
+      journals = j; domestic = d; india = indiaData; meta = m; esiCats = esi; oaMap = oa; coverMap = covers;
       // Build Under Review lookup set
       const underReviewSet = new Set((underReviewIssns||[]).filter(Boolean).map(s => s.replace(/[^0-9xX]/gi,'').toLowerCase()));
       journals.forEach(r => {
