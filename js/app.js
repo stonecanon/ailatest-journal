@@ -1319,6 +1319,96 @@
   try { favsData = JSON.parse(localStorage.getItem(STORAGE_PREFIX + 'favsData') || '{}'); } catch(_){}
   let user = JSON.parse(localStorage.getItem('ailatest.user') || 'null');
 
+
+  // ── Free-tier usage limits ──
+  const DAILY_VIEW_LIMIT = 5;
+  const DAILY_SEARCH_LIMIT = 2;
+  const LOCAL_FAV_LIMIT = 5;
+  const USAGE_KEY = 'ailatest.daily_usage';
+
+  function getDailyUsage() {
+    const today = new Date().toISOString().slice(0, 10);
+    try {
+      const raw = JSON.parse(localStorage.getItem(USAGE_KEY) || '{}');
+      if (raw.date !== today) return { date: today, views: 0, searches: 0 };
+      return raw;
+    } catch (e) { return { date: today, views: 0, searches: 0 }; }
+  }
+  function saveDailyUsage(u) {
+    try { localStorage.setItem(USAGE_KEY, JSON.stringify(u)); } catch (e) {}
+  }
+  function isOverLimit(type, limit) {
+    if (user) return false;
+    return getDailyUsage()[type] >= limit;
+  }
+  function incrementUsage(type) {
+    if (user) return;
+    const usage = getDailyUsage();
+    usage[type] = (usage[type] || 0) + 1;
+    saveDailyUsage(usage);
+  }
+  function requireLogin(msg) {
+    if (user) return true;
+    openLoginModal();
+    const card = document.querySelector('.login-card');
+    if (card) {
+      let el = document.getElementById('login-limit-msg');
+      if (!el) {
+        el = document.createElement('p');
+        el.id = 'login-limit-msg';
+        el.className = 'login-limit-msg';
+        card.prepend(el);
+      }
+      el.textContent = msg || T('免费次数已用完，请登录后继续使用','Free daily limit reached. Please sign in to continue.');
+    }
+    return false;
+  }
+
+
+  // ── Free-tier usage limits ──
+  const DAILY_VIEW_LIMIT = 5;
+  const DAILY_SEARCH_LIMIT = 2;
+  const LOCAL_FAV_LIMIT = 5;
+  const USAGE_KEY = 'ailatest.daily_usage';
+
+  function getDailyUsage() {
+    const today = new Date().toISOString().slice(0, 10);
+    try {
+      const raw = JSON.parse(localStorage.getItem(USAGE_KEY) || '{}');
+      if (raw.date !== today) return { date: today, views: 0, searches: 0 };
+      return raw;
+    } catch (e) { return { date: today, views: 0, searches: 0 }; }
+  }
+  function saveDailyUsage(u) {
+    try { localStorage.setItem(USAGE_KEY, JSON.stringify(u)); } catch (e) {}
+  }
+  function isOverLimit(type, limit) {
+    if (user) return false;
+    return getDailyUsage()[type] >= limit;
+  }
+  function incrementUsage(type) {
+    if (user) return;
+    const usage = getDailyUsage();
+    usage[type] = (usage[type] || 0) + 1;
+    saveDailyUsage(usage);
+  }
+  function requireLogin(msg) {
+    if (user) return true;
+    openLoginModal();
+    const card = document.querySelector('.login-card');
+    if (card) {
+      let el = document.getElementById('login-limit-msg');
+      if (!el) {
+        el = document.createElement('p');
+        el.id = 'login-limit-msg';
+        el.className = 'login-limit-msg';
+        card.prepend(el);
+      }
+      el.textContent = msg || T('免费次数已用完，请登录后继续使用','Free daily limit reached. Please sign in to continue.');
+    }
+    return false;
+  }
+
   // isFav = 在当前 active list 中
   function isFav(r) {
     const id = favId(r);
@@ -1336,6 +1426,38 @@
       // 其他 list 都不含它 → 从 favsData 移除
       if (!favLists.some(l => l.ids.includes(id))) delete favsData[id];
     } else {
+    // Local-only favorite limit
+    if (!user && list.ids.length >= LOCAL_FAV_LIMIT) {
+            openLoginModal();
+            const card = document.querySelector('.login-card');
+            if (card) {
+              let el = document.getElementById('login-limit-msg');
+              if (!el) {
+                el = document.createElement('p');
+                el.id = 'login-limit-msg';
+                el.className = 'login-limit-msg';
+                card.prepend(el);
+              }
+              el.textContent = T('本地收藏上限 5 本，请登录后收藏更多','Local favorites limit (5) reached. Sign in to save more.');
+            }
+            return;
+    }
+    // Local-only favorite limit
+    if (!user && list.ids.length >= LOCAL_FAV_LIMIT) {
+            openLoginModal();
+            const card = document.querySelector('.login-card');
+            if (card) {
+              let el = document.getElementById('login-limit-msg');
+              if (!el) {
+                el = document.createElement('p');
+                el.id = 'login-limit-msg';
+                el.className = 'login-limit-msg';
+                card.prepend(el);
+              }
+              el.textContent = T('本地收藏上限 5 本，请登录后收藏更多','Local favorites limit (5) reached. Sign in to save more.');
+            }
+            return;
+    }
       list.ids.push(id);
       favsData[id] = { ...r, __src: meta.src || 'int', __savedAt: Date.now() };
     }
@@ -3896,6 +4018,12 @@
     if (r) openDrawer(r, { fromHash: true, pageMode: true });
   }
   async function openDrawer(r, opts) {
+  if (!requireLogin(T("今日免费浏览已达上限，请登录后继续查看","Daily free view limit reached. Sign in to continue."))) return;
+  incrementUsage("views");
+
+  if (!requireLogin(T("今日免费浏览已达上限，请登录后继续查看","Daily free view limit reached. Sign in to continue."))) return;
+  incrementUsage("views");
+
     _currentDrawerRec = r;
     recordView(r); // 记录浏览历史，用于学科推荐
     const pageMode = !!(opts && opts.pageMode);
@@ -6155,6 +6283,12 @@
     let pickLastQuery = '';
 
     async function doSearch() {
+  if (!requireLogin(T("今日免费荐刊搜索已达上限，请登录后继续使用","Daily free search limit reached. Sign in to continue."))) return;
+  incrementUsage("searches");
+
+  if (!requireLogin(T("今日免费荐刊搜索已达上限，请登录后继续使用","Daily free search limit reached. Sign in to continue."))) return;
+  incrementUsage("searches");
+
       const query = input.value.trim();
       if (!query) { status.textContent = T('请输入内容','Please enter a query'); return; }
 
