@@ -46,7 +46,7 @@
       tab_home: '查刊', tab_int: '国际', tab_dom: '中国', tab_fav: '收藏', tab_pick: '荐刊',
       nav_index_rank: '索引排行榜', nav_subject_rank: '学科排行榜', nav_warn_rank: '预警名单',
       filter_if_range: '影响因子', if_any: '不限',
-      rail_int: '全球', rail_dom: '中国', rail_in: '印度', rail_kr: '韩国', rail_fav: '我的',
+      rail_int: '全球', rail_dom: '中国', rail_in: '印度', rail_my: '马来西亚', rail_kr: '韩国', rail_fav: '我的',
       loading: '加载中…',
       hero_title_int: 'SCI / SSCI 国际期刊检索',
       hero_body_int: '資料來源：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI）· 更新至 2026-05-18，並合併 <b>EI Compendex</b> 期刊目錄（2025-10-10）。',
@@ -85,6 +85,9 @@
       hero_body_in: '印度 UGC-CARE Group I 期刊正表，支持按题名、出版社、ISSN、学科检索。克隆/假冒期刊预警名单暂不展示。',
       india_subject: '学科',
       india_source_note: 'UGC-CARE 中央列表 2024 年 10 月后不再持续更新；本页仅作为历史目录与投稿核验线索。',
+      hero_title_my: '马来西亚 MyCite / ERA 期刊目录',
+      hero_body_my: '默认显示 MyCite 2025 记录；正式判断马来西亚官方认可资格时，请优先以 MyCite 2025 官方 PDF 为准。ERA 目前使用 2023 Submitted Journal List。',
+      malaysia_source_note: 'MyCite 在线库包含 2014-2025 历史记录；MyJurnal 采集时不可连接，暂未接入。',
       search_int: '搜索：期刊全称 / 官方缩写 / 社群缩写 / ISSN / 中文刊名',
       search_dom: '搜索：刊名 / ISSN / CN 号（跨库搜索）',
       search_fav: '搜索收藏：期刊 / 缩写 / ISSN',
@@ -129,7 +132,7 @@
       tab_home: 'Journals', tab_int: 'International', tab_dom: 'China', tab_fav: 'Favorites', tab_pick: 'Recommend',
       nav_index_rank: 'Index Rankings', nav_subject_rank: 'Subject Rankings', nav_warn_rank: 'Warning List',
       filter_if_range: 'Impact Factor', if_any: 'Any',
-      rail_int: 'Global', rail_dom: 'China', rail_in: 'India', rail_kr: 'Korea', rail_fav: 'Me',
+      rail_int: 'Global', rail_dom: 'China', rail_in: 'India', rail_my: 'Malaysia', rail_kr: 'Korea', rail_fav: 'Me',
       loading: 'Loading…',
       hero_title_int: 'International SCI / SSCI Search',
       hero_body_int: 'Source: <b>Web of Science Core Collection</b> (SCIE / SSCI / AHCI / ESCI), updated 2026-05-18, merged with <b>EI Compendex</b> source list (2025-10-10).',
@@ -166,6 +169,9 @@
       hero_body_in: 'UGC-CARE Group I positive journal list for India. Search by title, publisher, ISSN, E-ISSN, or subject. Cloned / fake journal warning lists are intentionally not shown.',
       india_subject: 'Subject',
       india_source_note: 'UGC-CARE central list has not been updated after October 2024; use this page as historical directory and verification context.',
+      hero_title_my: 'Malaysia MyCite / ERA Journal Directory',
+      hero_body_my: 'MyCite 2025 records are shown by default. For formal Malaysia recognition decisions, use the official MyCite 2025 PDF as primary evidence. ERA currently uses the 2023 Submitted Journal List.',
+      malaysia_source_note: 'The MyCite online database includes historical records from 2014-2025. MyJurnal was unreachable during collection and is not included.',
       search_int: 'Search: title / abbr / acronym / ISSN / Chinese name',
       search_dom: 'Search: title / ISSN / CN (cross-source)',
       search_fav: 'Search favorites: title / acronym / ISSN',
@@ -671,6 +677,7 @@
   let journals = [];
   let domestic = null;
   let india = null;
+  let malaysia = null;
   let esiCats = [];
   let meta = null;
   let oaMap = {};          // compact OpenAlex map: { "ISSN": {hp, l, oa, dj, apc, org, cn, w} }
@@ -810,8 +817,8 @@
   }
 
   let activeTab = 'home';
-  const TAB_PATHS = { home: '/', int: '/global', dom: '/cn', in: '/in', kr: '/kr', fav: '/favorites', pick: '/pick' };
-  const PATH_TABS = { '/': 'home', '/global': 'int', '/international': 'int', '/journals': 'int', '/cn': 'dom', '/china': 'dom', '/in': 'in', '/india': 'in', '/kr': 'kr', '/korea': 'kr', '/favorites': 'fav', '/pick': 'pick' };
+  const TAB_PATHS = { home: '/', int: '/global', dom: '/cn', in: '/in', my: '/my', kr: '/kr', fav: '/favorites', pick: '/pick' };
+  const PATH_TABS = { '/': 'home', '/global': 'int', '/international': 'int', '/journals': 'int', '/cn': 'dom', '/china': 'dom', '/in': 'in', '/india': 'in', '/my': 'my', '/malaysia': 'my', '/kr': 'kr', '/korea': 'kr', '/favorites': 'fav', '/pick': 'pick' };
   const TAB_SEO = {
     home: {
       title: 'AILatest Journal — 期刊查询 · 荐刊推荐 · SCI期刊检索',
@@ -828,6 +835,10 @@
     in: {
       title: 'India UGC-CARE Journal Directory | AILatest Journal',
       desc: 'Search India UGC-CARE Group I journals by title, publisher, ISSN, E-ISSN and subject.'
+    },
+    my: {
+      title: 'Malaysia MyCite Journal Directory | ERA 2023 - AILatest Journal',
+      desc: 'Search Malaysia MyCite 2025, MyCite online historical indexed journals, and ERA 2023 Submitted Journal List records.'
     },
     kr: {
       title: 'Korea Journal Directory | AILatest Journal',
@@ -878,6 +889,7 @@
   let activeIfMin = 0; // 影响因子滑块：只看 IF ≥ 此值
   let activeDom = 'cnki_major';   // 中文期刊目录
   let activeIndiaSubject = '__all';
+  let activeMalaysiaSource = 'mycite_2025';
   let activeDomBadges = new Set(); // 默认不勾选 = 显示全部；勾选 = 只看有该徽章的
   const PAGE = 100;
   let shown = PAGE;
@@ -2903,6 +2915,15 @@
     </div>`;
   }
 
+  function countrySectionHeader(title, subtitle = '') {
+    return `<div class="dom-section-head">
+      <div class="dom-section-copy">
+        <h1 class="section-title">${title}</h1>
+        ${subtitle ? `<div class="section-subtitle">${subtitle}</div>` : ''}
+      </div>
+    </div>`;
+  }
+
   // ───────── domestic unified search (query 时聚合所有库) ─────────
   function renderDomesticUnified(box, q) {
     const sections = [];
@@ -3094,7 +3115,7 @@
       </tr>`;
     }).join('');
     box.innerHTML = `<div class="section-block india-section">
-      ${domSectionHeader(
+      ${countrySectionHeader(
         `${T('印度 UGC-CARE 期刊目录','India UGC-CARE Journal Directory')} <span class="muted-cell">(${india.records.length.toLocaleString()})</span>`,
         T('印度国家级 UGC-CARE Group I 正表；本页不展示 cloned / fake journal warning list。','India national UGC-CARE Group I positive list; cloned / fake journal warning lists are not shown.'),
       )}
@@ -3130,11 +3151,116 @@
     });
   }
 
+  // ───────── Malaysia tab ─────────
+  function malaysiaSourceLabel(key) {
+    return ({
+      mycite_2025: 'MyCite 2025',
+      mycite_online: 'MyCite Online 2014-2025',
+      era_2023: 'ERA 2023',
+    })[key] || key;
+  }
+
+  function renderMalaysia() {
+    updateThStickyTop();
+    const box = $('#malaysia-content');
+    if (!box) return;
+    if (!malaysia || !malaysia.records) {
+      box.innerHTML = `<div class="empty">${T('马来西亚期刊数据缺失','Malaysia journal data missing')}</div>`;
+      return;
+    }
+    if (!window.__malaysiaShown) window.__malaysiaShown = 100;
+    const sourceKey = malaysia.records[activeMalaysiaSource] ? activeMalaysiaSource : 'mycite_2025';
+    const sourceRecords = malaysia.records[sourceKey] || [];
+    const q = activeQuery.toLowerCase();
+    let filtered = sourceRecords.filter(r => {
+      if (!q) return true;
+      const hay = [
+        r.journal_title, r.foreign_title, r.publisher, r.issn, r.eissn,
+        r.indexed_year, r.for_subjects, r.era_year, r.journal_id,
+      ].filter(Boolean).join(' ').toLowerCase();
+      return hay.includes(q);
+    });
+    filtered.sort((a, b) => (a.journal_title || '').localeCompare(b.journal_title || '', 'en'));
+    const visible = filtered.slice(0, window.__malaysiaShown);
+    const total = filtered.length;
+    const sourceButtons = ['mycite_2025', 'mycite_online', 'era_2023'].map(key => {
+      const count = malaysia.counts?.[key] || (malaysia.records[key] || []).length;
+      return `<button type="button" class="dom-source-tab ${sourceKey === key ? 'active' : ''}" data-malaysia-source="${key}">
+        ${escape(malaysiaSourceLabel(key))} <span class="muted-cell">(${Number(count).toLocaleString()})</span>
+      </button>`;
+    }).join('');
+    const rows = visible.map(r => {
+      const rec = { ...r, name: r.journal_title, __src: 'my' };
+      const fid = favId(rec);
+      rowRecordsByFid[fid] = rec;
+      const issnCell = [
+        r.issn ? `ISSN ${escape(r.issn)}` : '',
+        r.eissn ? `eISSN ${escape(r.eissn)}` : '',
+      ].filter(Boolean).join('<br>');
+      const detailCell = sourceKey === 'era_2023'
+        ? escape(r.for_subjects || r.foreign_title || '—')
+        : escape(r.publisher || '—');
+      const yearCell = sourceKey === 'era_2023'
+        ? escape(r.era_year || '2023')
+        : escape(r.indexed_year || '—');
+      return `<tr class="j-row clickable malaysia-row" data-fid="${escape(fid)}" data-src="my">
+        <td class="col-fav" style="width:36px">${starBtn(rec, 'my')}</td>
+        <td class="col-name"><div class="jname">${escape(titleCase(r.journal_title || ''))}</div></td>
+        <td class="muted-cell">${detailCell}</td>
+        <td><span class="domsrc-pill ds-malaysia">${escape(malaysiaSourceLabel(sourceKey))}</span></td>
+        <td class="muted-cell">${yearCell}</td>
+        <td class="muted-cell" style="width:150px">${issnCell || '—'}</td>
+      </tr>`;
+    }).join('');
+    const yearCounts = malaysia.counts?.mycite_online_years || {};
+    const years = Object.keys(yearCounts).length
+      ? `<div class="source-note">${T('MyCite 在线库年份分布：','MyCite online year distribution: ')}${Object.entries(yearCounts).map(([y, c]) => `${escape(y)}: ${Number(c).toLocaleString()}`).join(' · ')}</div>`
+      : '';
+    box.innerHTML = `<div class="section-block malaysia-section">
+      ${countrySectionHeader(
+        `${t('hero_title_my')} <span class="muted-cell">(${Number(malaysia.counts?.mycite_2025 || 0).toLocaleString()} / ${Number(malaysia.counts?.era_2023 || 0).toLocaleString()})</span>`,
+        t('hero_body_my'),
+      )}
+      <div class="dom-source-tabs country-source-tabs" role="tablist" aria-label="Malaysia directory source">
+        ${sourceButtons}
+      </div>
+      <div class="india-toolbar">
+        <span class="muted-cell">${T('显示','Showing')} ${visible.length.toLocaleString()} / ${total.toLocaleString()}</span>
+        ${malaysia.official_pdf?.url ? `<a class="source-link" href="${escape(malaysia.official_pdf.url)}" target="_blank" rel="noopener nofollow">MyCite 2025 PDF</a>` : ''}
+      </div>
+      <div class="table-wrap"><table class="journals malaysia-table"><thead><tr>
+        <th style="width:36px" aria-label="Favorite"></th>
+        <th>${T('期刊名称','Journal')}</th>
+        <th>${sourceKey === 'era_2023' ? T('FoR 学科','FoR Subjects') : T('出版社','Publisher')}</th>
+        <th>${T('来源','Source')}</th>
+        <th>${T('年份','Year')}</th>
+        <th>ISSN / E-ISSN</th>
+      </tr></thead><tbody>
+        ${rows}
+        ${total === 0 ? `<tr><td colspan="6" class="empty">${T('未找到匹配的马来西亚/ERA 期刊','No matching Malaysia / ERA journals found')}</td></tr>` : ''}
+      </tbody></table></div>
+      ${total > window.__malaysiaShown ? `<div class="pager"><button id="malaysia-more" class="more-btn">${T('加载更多','Load more')} (${total - window.__malaysiaShown} ${T('条剩余','remaining')})</button></div>` : ''}
+      <div class="source-note">${t('malaysia_source_note')}</div>
+      ${years}
+    </div>`;
+    box.querySelectorAll('[data-malaysia-source]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeMalaysiaSource = btn.dataset.malaysiaSource || 'mycite_2025';
+        window.__malaysiaShown = 100;
+        renderMalaysia();
+      });
+    });
+    $('#malaysia-more')?.addEventListener('click', () => {
+      window.__malaysiaShown += 100;
+      renderMalaysia();
+    });
+  }
+
   function renderKorea() {
     const box = $('#korea-content');
     if (!box) return;
     box.innerHTML = `<div class="section-block">
-      ${domSectionHeader('KR', T('韩国期刊数据入口预留中。','Korea journal directory will be added later.'))}
+      ${countrySectionHeader('KR', T('韩国期刊数据入口预留中。','Korea journal directory will be added later.'))}
       <div class="empty">${T('暂未接入韩国官方期刊列表。','No Korea official journal list has been connected yet.')}</div>
     </div>`;
   }
@@ -4140,6 +4266,17 @@
       <div class="muted-cell" style="margin-top:6px;font-size:12px;line-height:1.6">${t('india_source_note')}</div>
     </div>` : '';
 
+    const malaysiaHTML = src === 'my' ? `<div class="drawer-section malaysia-detail-section">
+      <h4>${T('马来西亚 / ERA 来源','Malaysia / ERA Source')}</h4>
+      <div class="meta-row"><div class="meta-k">${T('来源','Source')}</div><div class="meta-v"><span class="domsrc-pill ds-malaysia">${escape(r.source || 'MyCite / ERA')}</span></div></div>
+      ${r.publisher ? `<div class="meta-row"><div class="meta-k">${T('出版社','Publisher')}</div><div class="meta-v">${escape(r.publisher)}</div></div>` : ''}
+      ${r.indexed_year ? `<div class="meta-row"><div class="meta-k">${T('MyCite 年份','MyCite Year')}</div><div class="meta-v">${escape(r.indexed_year)}</div></div>` : ''}
+      ${r.era_year ? `<div class="meta-row"><div class="meta-k">ERA</div><div class="meta-v">${escape(r.era_year)}</div></div>` : ''}
+      ${r.for_subjects ? `<div class="meta-row"><div class="meta-k">${T('FoR 学科','FoR Subjects')}</div><div class="meta-v">${escape(r.for_subjects)}</div></div>` : ''}
+      ${malaysia?.official_pdf?.url ? `<div class="meta-row"><div class="meta-k">MyCite PDF</div><div class="meta-v"><a href="${escape(malaysia.official_pdf.url)}" target="_blank" rel="noopener nofollow">MyCite 2025 RASMI</a></div></div>` : ''}
+      <div class="muted-cell" style="margin-top:6px;font-size:12px;line-height:1.6">${t('malaysia_source_note')}</div>
+    </div>` : '';
+
     // 警示刊
     const warnHTML = (() => {
       const w = ir.warning;
@@ -4313,10 +4450,11 @@
 	        ${topicsHTML}
 		        ${warnHTML}
 		        ${cnkiHTML}
-	        ${metaHTML ? `<div class="meta-block">${metaHTML}</div>` : ''}
-	        ${cnkxHTML}
-	        ${indiaHTML}
-	        ${lockedSrcHTML}
+        ${metaHTML ? `<div class="meta-block">${metaHTML}</div>` : ''}
+        ${cnkxHTML}
+        ${indiaHTML}
+        ${malaysiaHTML}
+        ${lockedSrcHTML}
 	        <div class="drawer-section rating-section" data-rating-key="${escape(favId(r))}">
 	          <h4>${T('我的评分','My Rating')}</h4>
 	          <div class="rating-my-wrap">
@@ -4535,6 +4673,7 @@
     { id: 'int', i18n: 'rail_int', zh: '全球', en: 'Global' },
     { id: 'dom', i18n: 'rail_dom', zh: '中国', en: 'China' },
     { id: 'in',  i18n: 'rail_in',  zh: '印度', en: 'India' },
+    { id: 'my',  i18n: 'rail_my',  zh: '马来西亚', en: 'Malaysia' },
     { id: 'kr',  i18n: 'rail_kr',  zh: '韩国', en: 'Korea' },
   ];
   const STATION_IDS = STATIONS.map(s => s.id);
@@ -5272,7 +5411,7 @@
     const SRC_LABEL = {
       int: T('国际','Int’l'), cssci: 'CSSCI', cssci_core: 'CSSCI', cssci_ext: T('CSSCI 扩展','CSSCI Ext'),
       pku: T('北大核心','PKU Core'), pku_core: T('北大核心','PKU Core'), cnkx: T('科协','CAST'), ccft: 'CCF-T',
-      zju: T('浙大','ZJU'), school_a: T('高校目录','In-house'), nsfc_mgmt: T('国自然','NSFC'), in: 'UGC-CARE',
+      zju: T('浙大','ZJU'), school_a: T('高校目录','In-house'), nsfc_mgmt: T('国自然','NSFC'), in: 'UGC-CARE', my: 'MyCite / ERA',
     };
     const ifVal = (r.if_2024 != null) ? (+r.if_2024).toFixed(1) : '';
     const ifCell = ifVal ? `<span class="if-cell">${ifVal}</span>` : '<span class="muted-cell">—</span>';
@@ -5400,6 +5539,7 @@
           : activeTab === 'fav' ? renderFav()
           : activeTab === 'dom' ? renderDomestic()
           : activeTab === 'in' ? renderIndia()
+          : activeTab === 'my' ? renderMalaysia()
           : activeTab === 'kr' ? renderKorea()
           : null;
       }
@@ -5681,6 +5821,7 @@
       else if (activeTab === 'fav') renderFav();
       else if (activeTab === 'int') renderInt();
       else if (activeTab === 'in') renderIndia();
+      else if (activeTab === 'my') renderMalaysia();
       else if (activeTab === 'kr') renderKorea();
       else if (activeTab === 'pick') initPickTool();
       // Home tab: if there's an active query, show results
@@ -6456,10 +6597,11 @@
     // 分享着陆页：/s/<id> 直接接管 main，不走主流程
     if (await maybeRenderShareLanding()) return;
     try {
-      const [j, d, indiaData, m, esi, aliases, underReviewIssns, onHoldIssns, oa, covers] = await Promise.all([
+      const [j, d, indiaData, malaysiaData, m, esi, aliases, underReviewIssns, onHoldIssns, oa, covers] = await Promise.all([
         fetchJSON('data/journals.json.gz'),
         fetch('/data/domestic.json').then(r => r.json()).catch(() => null),
         fetch('/data/india.json').then(r => r.json()).catch(() => null),
+        fetch('/data/malaysia.json').then(r => r.json()).catch(() => null),
         fetch('/data/meta.json').then(r => r.json()).catch(() => null),
         fetch('/data/esi_categories.json').then(r => r.json()).catch(() => []),
         fetch('/data/journal_aliases.json').then(r => r.json()).catch(() => DEFAULT_JOURNAL_ALIASES),
@@ -6469,7 +6611,7 @@
         fetchJSON('data/journal_covers.json.gz').catch(() => ({})),
       ]);
       setJournalAliases(aliases);
-      journals = j; domestic = d; india = indiaData; meta = m; esiCats = esi; oaMap = oa; coverMap = covers;
+      journals = j; domestic = d; india = indiaData; malaysia = malaysiaData; meta = m; esiCats = esi; oaMap = oa; coverMap = covers;
       // Build Under Review lookup set
       const underReviewSet = new Set((underReviewIssns||[]).filter(Boolean).map(s => s.replace(/[^0-9xX]/gi,'').toLowerCase()));
       journals.forEach(r => {

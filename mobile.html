@@ -88,6 +88,7 @@ body{margin:0;padding:0;background:#fff8ef;color:#171717;font-family:-apple-syst
       <button class="ni" data-nav="cn"><span class="nf">CN</span><span>中国</span></button>
       <button class="ni" data-nav="global"><span class="nf">GL</span><span>Global</span></button>
       <button class="ni" data-nav="in"><span class="nf">IN</span><span>印度</span></button>
+      <button class="ni" data-nav="my"><span class="nf">MY</span><span>马来西亚</span></button>
       <button class="ni" data-nav="kr"><span class="nf">KR</span><span>韩国</span></button>
     </nav>
     <div class="nr">
@@ -117,7 +118,7 @@ function fv(n){F.has(n)?F.delete(n):F.add(n);sv();h()}
 function no(){var n=$("#nav-sheet");if(n){n.classList.add("o");n.setAttribute("aria-hidden","false")}}
 function nc(){var n=$("#nav-sheet");if(n){n.classList.remove("o");n.setAttribute("aria-hidden","true")}}
 function na(){var m=Mode=="p"?"pick":T=="home"?"search":T;$$(".ni").forEach(function(b){b.classList.toggle("a",b.dataset.nav==m)})}
-function ng(k){nc();if(k=="global"){location.href="/international";return}if(k=="cn"){location.href="/china";return}if(k=="in"){location.href="/in";return}if(k=="kr"){location.href="/kr";return}if(k=="search"||k=="home"){T="home";Mode="s";Searched=false;h();return}if(k=="pick"){T="home";Mode="p";Searched=false;h();return}if(k=="rank"||k=="fav"||k=="profile"){T=k;h()}}
+function ng(k){nc();if(k=="global"){location.href="/international";return}if(k=="cn"){location.href="/china";return}if(k=="in"){location.href="/in";return}if(k=="my"){location.href="/my";return}if(k=="kr"){location.href="/kr";return}if(k=="search"||k=="home"){T="home";Mode="s";Searched=false;h();return}if(k=="pick"){T="home";Mode="p";Searched=false;h();return}if(k=="rank"||k=="fav"||k=="profile"){T=k;h()}}
 function jc(j,i){
  var n=j.issn||j.eissn||j.slug||"",b=bd(j),rv0=rv(j.crossref);
  return'<div class=jc data-s="'+j.slug+'"><div class=j0 '+to(i)+'>'+es(in2(j.name))+'</div><div class=j1><div class=j2><div class=j3>'+es(j.name)+'</div><span class=j4'+(F.has(n)?" fv":"")+' data-n="'+n+'">'+(F.has(n)?"★":"☆")+'</span></div><div class=j5>ISSN '+es(n||"-")+(j.publisher?" | "+es(j.publisher):"")+'</div><div class=mr><div class=m0><t>IF</t><b>'+o(j.if_2024,"-")+'</b></div><div class=m0><t>JCR</t><b>'+o(j.if_quartile,"-")+'</b></div><div class=m0><t>中科院</t><b>'+(j.cas_zone?cz(j.cas_zone)+(j.cas_top?" TOP":""):"-")+'</b></div><div class=m0><t>新锐</t><b>'+(j.cas_xr?cz(j.cas_xr.zone)+(j.cas_xr.top?" TOP":""):"-")+'</b></div></div>'+(rv0?'<div class=j6><span class=j7>'+es(rv0)+'</span></div>':'')+'<div class=ba>'+b.map(function(b,i){return'<span class=bd '+["bb","bg","br","bw","bl"][i%5]+'>'+es(b)+"</span>"}).join("")+'</div></div></div>'
