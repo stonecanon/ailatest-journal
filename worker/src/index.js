@@ -34,6 +34,7 @@
 import { buildDashboardPayload } from './dashboard.js';
 import { handleChat } from './chat.js';
 import { handlePick } from './pick.js';
+import { renderSitesDashboard } from './sites-dashboard.js';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -1216,15 +1217,18 @@ async function routeDashboard(req, env) {
   if (!u) return err('login required', 401);
   if (!isOwnerUser(u)) return err('forbidden', 403);
 
+  const url = new URL(req.url);
+  const rawDays = Number(url.searchParams.get('days') || '30');
+  const days = [1, 7, 30].includes(rawDays) ? rawDays : 30;
   const cache = caches.default;
-  const cacheKey = new Request('https://cache.internal/analytics/dashboard', { method: 'GET' });
-  const nocache = new URL(req.url).searchParams.get('nocache') === '1';
+  const cacheKey = new Request(`https://cache.internal/analytics/dashboard?days=${days}`, { method: 'GET' });
+  const nocache = url.searchParams.get('nocache') === '1';
   if (!nocache) {
     const hit = await cache.match(cacheKey);
     if (hit) return new Response(hit.body, { status: 200, headers: { 'Content-Type': 'application/json', ...CORS } });
   }
 
-  const payload = await buildDashboardPayload(env);
+  const payload = await buildDashboardPayload(env, { days });
   const bodyText = JSON.stringify(payload);
   // Store under a stable, auth-free key so the cache is reusable; never served without auth
   // because this is the only place that writes it and the route itself is owner-gated.
@@ -1232,6 +1236,16 @@ async function routeDashboard(req, env) {
     headers: { 'Content-Type': 'application/json', 'Cache-Control': 'max-age=300' },
   }));
   return new Response(bodyText, { status: 200, headers: { 'Content-Type': 'application/json', ...CORS } });
+}
+
+function routeSitesDashboard(site = 'overview') {
+  return new Response(renderSitesDashboard({ initialSite: site || 'overview' }), {
+    status: 200,
+    headers: {
+      'Content-Type': 'text/html; charset=utf-8',
+      'Cache-Control': 'no-store',
+    },
+  });
 }
 
 export default {
@@ -1251,6 +1265,9 @@ export default {
       if (p === '/auth/google/callback'&& req.method === 'GET')  return routeGoogleCallback(req, env);
       if (p === '/analytics/pageview' && req.method === 'POST')  return routePageview(req, env);
       if (p === '/analytics/dashboard' && req.method === 'GET')  return routeDashboard(req, env);
+      if ((p === '/analytics/sites' || p === '/analytics/sites/') && req.method === 'GET') return routeSitesDashboard('overview');
+      const mAnalyticsSite = p.match(/^\/analytics\/sites\/([a-z0-9_-]+)\/?$/i);
+      if (mAnalyticsSite && req.method === 'GET') return routeSitesDashboard(mAnalyticsSite[1]);
       if (p === '/analytics/journal-view-trend' && req.method === 'GET') return routeJournalViewTrend(req, env);
       if (p === '/analytics/site-traffic-trend' && req.method === 'GET') return routeSiteTrafficTrend(req, env);
       if (p === '/me'                  && req.method === 'GET')  return routeMe(req, env);

@@ -28,13 +28,147 @@ function num(v) {
   const n = Number(v || 0);
   return Number.isFinite(n) ? n : 0;
 }
-async function q(env, sql) {
-  const r = await env.DB.prepare(sql).all();
+async function q(env, sql, binds = []) {
+  const stmt = env.DB.prepare(sql);
+  const r = binds.length ? await stmt.bind(...binds).all() : await stmt.all();
   return r.results || [];
 }
 function scalar(row, key, fallback = 0) {
   const v = row?.[key];
   return v == null ? fallback : v;
+}
+function siteDefs() {
+  return [
+    { id: 'journal', label: 'Journal', host: 'journal.ailatest.org' },
+    { id: 'grant', label: 'Grant', host: 'grant.ailatest.org' },
+    { id: 'ailatest', label: 'AILatest', host: 'ailatest.org' },
+  ];
+}
+function dayKeyFromNow(daysBack) {
+  const d = new Date();
+  d.setUTCDate(d.getUTCDate() - daysBack);
+  return d.toISOString().slice(0, 10);
+}
+function parseListJson(value) {
+  try {
+    const parsed = JSON.parse(value || '[]');
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (_) {
+    return [];
+  }
+}
+function mergeRankedJson(rows, jsonKey, idKey) {
+  const map = new Map();
+  for (const row of rows || []) {
+    for (const item of parseListJson(row[jsonKey])) {
+      const key = item[idKey] || (idKey === 'country' ? 'unknown' : '/');
+      const prev = map.get(key) || { [idKey]: key, pageviews: 0, visitors: 0, sessions: 0 };
+      prev.pageviews += num(item.pageviews);
+      prev.visitors += num(item.visitors);
+      prev.sessions += num(item.sessions);
+      map.set(key, prev);
+    }
+  }
+  return [...map.values()].sort((a, b) => b.pageviews - a.pageviews).slice(0, 20);
+}
+function firstPartyFromRows(site, rows, days) {
+  const sum = key => (rows || []).reduce((total, row) => total + num(row[key]), 0);
+  const trafficMix = {
+    human: sum('human_pv'),
+    search_engine_bot: sum('search_engine_pv'),
+    ai_agent: sum('ai_agent_pv'),
+    scraper: sum('scraper_pv'),
+    suspected_bot: sum('suspected_bot_pv'),
+    unknown: sum('unknown_pv'),
+    all: sum('all_pv'),
+  };
+  const totals = {
+    pageviews: sum('pageviews'),
+    visitors: sum('visitors'),
+    sessions: sum('sessions'),
+    bot_events: sum('bot_events'),
+    all_pv: trafficMix.all,
+  };
+  return {
+    ...site,
+    status: rows?.length ? 'ok' : 'empty',
+    totals,
+    series: days === 1 ? [] : (rows || []).map(row => ({
+      day: row.day_utc,
+      pageviews: num(row.pageviews),
+      visitors: num(row.visitors),
+      sessions: num(row.sessions),
+    })),
+    hourly: days === 1 ? (rows || []).map(row => ({
+      hour_start_utc: row.hour_start_utc,
+      pageviews: num(row.pageviews),
+      visitors: num(row.visitors),
+      sessions: num(row.sessions),
+    })) : [],
+    traffic_mix: trafficMix,
+    topPaths: mergeRankedJson(rows, 'top_paths_json', 'path'),
+    topCountries: mergeRankedJson(rows, 'countries_json', 'country'),
+  };
+}
+async function buildSiteMonitoring(env, options = {}) {
+  const days = [1, 7, 30].includes(Number(options.days)) ? Number(options.days) : 30;
+  const sites = siteDefs();
+  const tableRows = await q(env, "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name");
+  const tables = new Set(tableRows.map(row => row.name));
+  const hasStats = days === 1 ? tables.has('hourly_stats') : tables.has('daily_stats');
+  const firstParty = {};
+  const sourceComparison = {};
+  if (hasStats) {
+    const siteHosts = sites.map(site => site.host);
+    const placeholders = siteHosts.map(() => '?').join(',');
+    const rows = days === 1
+      ? await q(
+        env,
+        `SELECT * FROM hourly_stats
+         WHERE site IN (${placeholders}) AND hour_start_utc >= ?
+         ORDER BY site ASC, hour_start_utc ASC`,
+        [...siteHosts, new Date(Date.now() - 24 * 3600 * 1000).toISOString().slice(0, 13) + ':00:00Z']
+      )
+      : await q(
+        env,
+        `SELECT * FROM daily_stats
+         WHERE site IN (${placeholders}) AND day_utc >= ?
+         ORDER BY site ASC, day_utc ASC`,
+        [...siteHosts, dayKeyFromNow(days - 1)]
+      );
+    for (const site of sites) {
+      const siteRows = rows.filter(row => row.site === site.host);
+      const fp = firstPartyFromRows(site, siteRows, days);
+      firstParty[site.id] = fp;
+      sourceComparison[site.id] = {
+        first_party: {
+          pageviews: fp.totals.pageviews,
+          visitors: fp.totals.visitors,
+          sessions: fp.totals.sessions,
+        },
+        cloudflare: { status: 'not_split' },
+        google_analytics: { status: 'not_split' },
+      };
+    }
+  } else {
+    for (const site of sites) {
+      const fp = firstPartyFromRows(site, [], days);
+      firstParty[site.id] = fp;
+      sourceComparison[site.id] = {
+        first_party: { pageviews: 0, visitors: 0, sessions: 0 },
+        cloudflare: { status: 'not_split' },
+        google_analytics: { status: 'not_split' },
+      };
+    }
+  }
+  return {
+    days,
+    sites,
+    first_party: firstParty,
+    cloudflare: { source: 'Cloudflare Analytics', status: 'not_split', sites: {} },
+    google_analytics: { source: 'Google Analytics 4', status: 'not_split', sites: {} },
+    source_comparison: sourceComparison,
+  };
 }
 
 // ───────── 1. D1 (first-party) ─────────
@@ -407,11 +541,18 @@ async function buildGoogleAnalytics(env) {
 }
 
 // ───────── top-level ─────────
-export async function buildDashboardPayload(env) {
-  const [d1, cloudflare, ga] = await Promise.all([
+export async function buildDashboardPayload(env, options = {}) {
+  const [d1, cloudflare, ga, siteMonitoring] = await Promise.all([
     buildD1(env),
     buildCloudflare(env).catch(e => ({ source: 'Cloudflare Analytics', status: 'error', reason: e.message })),
     buildGoogleAnalytics(env).catch(e => ({ source: 'Google Analytics 4', status: 'error', reason: e.message })),
+    buildSiteMonitoring(env, options).catch(e => ({
+      status: 'error',
+      reason: e.message || String(e),
+      sites: siteDefs(),
+      first_party: {},
+      source_comparison: {},
+    })),
   ]);
 
   return {
@@ -427,5 +568,6 @@ export async function buildDashboardPayload(env) {
     ...d1,
     cloudflare,
     google_analytics: ga,
+    site_monitoring: siteMonitoring,
   };
 }
