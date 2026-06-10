@@ -6063,6 +6063,86 @@
       return `${n} B`;
     }
 
+    function updateTextList(value) {
+      if (Array.isArray(value)) {
+        return value.map(v => String(v || '').trim()).filter(Boolean);
+      }
+      const text = String(value || '').trim();
+      return text ? [text] : [];
+    }
+
+    function renderUpdateArticle(article) {
+      if (!article || typeof article !== 'object') return '';
+      const intro = updateTextList(article.intro);
+      const stats = Array.isArray(article.stats) ? article.stats : [];
+      const sections = Array.isArray(article.sections) ? article.sections : [];
+      const questions = Array.isArray(article.questions) ? article.questions : [];
+      const takeaways = updateTextList(article.takeaways);
+      const note = String(article.note || '').trim();
+
+      const statsHtml = stats
+        .map(stat => {
+          if (!stat || typeof stat !== 'object') return '';
+          const label = String(stat.label || '').trim();
+          const value = String(stat.value || '').trim();
+          const noteText = String(stat.note || '').trim();
+          if (!label && !value && !noteText) return '';
+          return `<div class="update-stat">
+            ${value ? `<strong>${escape(value)}</strong>` : ''}
+            ${label ? `<span>${escape(label)}</span>` : ''}
+            ${noteText ? `<p>${escape(noteText)}</p>` : ''}
+          </div>`;
+        })
+        .filter(Boolean)
+        .join('');
+
+      const sectionsHtml = sections
+        .map(section => {
+          if (!section || typeof section !== 'object') return '';
+          const heading = String(section.heading || '').trim();
+          const body = updateTextList(section.body);
+          const bullets = updateTextList(section.bullets);
+          if (!heading && !body.length && !bullets.length) return '';
+          return `<section class="update-article-section">
+            ${heading ? `<h2>${escape(heading)}</h2>` : ''}
+            ${body.map(p => `<p>${escape(p)}</p>`).join('')}
+            ${bullets.length ? `<ul>${bullets.map(p => `<li>${escape(p)}</li>`).join('')}</ul>` : ''}
+          </section>`;
+        })
+        .filter(Boolean)
+        .join('');
+
+      const questionsHtml = questions
+        .map(q => {
+          if (!q || typeof q !== 'object') return '';
+          const question = String(q.question || '').trim();
+          const answer = updateTextList(q.answer);
+          if (!question && !answer.length) return '';
+          return `<article class="update-question">
+            ${question ? `<h3>${escape(question)}</h3>` : ''}
+            ${answer.map(p => `<p>${escape(p)}</p>`).join('')}
+          </article>`;
+        })
+        .filter(Boolean)
+        .join('');
+
+      if (!intro.length && !statsHtml && !sectionsHtml && !questionsHtml && !takeaways.length) return '';
+      return `<div class="update-article">
+        ${note ? `<p class="update-article-note">${escape(note)}</p>` : ''}
+        ${intro.length ? `<section class="update-article-lead">${intro.map(p => `<p>${escape(p)}</p>`).join('')}</section>` : ''}
+        ${statsHtml ? `<section class="update-stats" aria-label="报告关键数据">${statsHtml}</section>` : ''}
+        ${sectionsHtml}
+        ${questionsHtml ? `<section class="update-article-section update-question-section">
+          <h2>${escape(article.questions_heading || '十问导览')}</h2>
+          <div class="update-question-list">${questionsHtml}</div>
+        </section>` : ''}
+        ${takeaways.length ? `<section class="update-article-section update-takeaways">
+          <h2>给选刊用户的启发</h2>
+          <ul>${takeaways.map(p => `<li>${escape(p)}</li>`).join('')}</ul>
+        </section>` : ''}
+      </div>`;
+    }
+
     function renderJournalUpdateDetail(item) {
       const box = $('#journal-updates');
       if (!box) return;
@@ -6072,6 +6152,7 @@
       const tags = (item.tags || []).map(tag => `<span class="update-tag">${escape(tag)}</span>`).join('');
       const points = Array.isArray(detail.key_points) ? detail.key_points : [];
       const sections = Array.isArray(detail.sections) ? detail.sections : [];
+      const articleHtml = renderUpdateArticle(detail.article);
       const reportUrl = report.file_detail_url || report.view_url || report.pdf_url || item.source_url || '';
       const pdfUrl = report.pdf_url || report.download_url || report.view_url || '';
       box.innerHTML = `
@@ -6090,19 +6171,21 @@
               <span class="update-tags">${tags}</span>
             </div>
           </header>
-          ${detail.lead ? `<section class="update-detail-section"><p>${escape(detail.lead)}</p></section>` : ''}
-          ${points.length ? `<section class="update-detail-section"><h2>要点</h2><ul>${points.map(p => `<li>${escape(p)}</li>`).join('')}</ul></section>` : ''}
-          ${sections.map(section => `
-            <section class="update-detail-section">
-              <h2>${escape(section.heading || '')}</h2>
-              <p>${escape(section.body || '')}</p>
-            </section>`).join('')}
+          ${articleHtml || `
+            ${detail.lead ? `<section class="update-detail-section"><p>${escape(detail.lead)}</p></section>` : ''}
+            ${points.length ? `<section class="update-detail-section"><h2>要点</h2><ul>${points.map(p => `<li>${escape(p)}</li>`).join('')}</ul></section>` : ''}
+            ${sections.map(section => `
+              <section class="update-detail-section">
+                <h2>${escape(section.heading || '')}</h2>
+                <p>${escape(section.body || '')}</p>
+              </section>`).join('')}
+          `}
           ${reportUrl ? `
             <section class="update-report">
               <div class="update-report-info">
                 ${report.cover_image ? `<img src="${escape(report.cover_image)}" alt="${escape(report.title || item.title)}" loading="lazy">` : ''}
                 <div>
-                  <p class="updates-kicker">PDF / Report</p>
+                  <p class="updates-kicker">报告来源</p>
                   <h2>${escape(report.title || item.title)}</h2>
                   <p>${[
                     report.pages ? `${report.pages} 页` : '',
@@ -6111,14 +6194,11 @@
                   ].filter(Boolean).map(escape).join(' · ')}</p>
                   ${report.source_note ? `<p class="muted-note">${escape(report.source_note)}</p>` : ''}
                   <div class="update-report-actions">
-                    ${pdfUrl ? `<a href="${escape(pdfUrl)}" target="_blank" rel="noopener">打开 PDF</a>` : ''}
-                    ${report.download_url ? `<a href="${escape(report.download_url)}" target="_blank" rel="noopener">下载原文件</a>` : ''}
+                    ${pdfUrl ? `<a href="${escape(pdfUrl)}" target="_blank" rel="noopener">查看原 PDF</a>` : ''}
+                    ${report.download_url ? `<a href="${escape(report.download_url)}" target="_blank" rel="noopener">下载 PDF</a>` : ''}
                     ${report.file_detail_url ? `<a href="${escape(report.file_detail_url)}" target="_blank" rel="noopener">官方文件页</a>` : ''}
                   </div>
                 </div>
-              </div>
-              <div class="update-pdf-frame">
-                <iframe src="${escape(reportUrl)}" title="${escape(report.title || item.title)}" loading="lazy"></iframe>
               </div>
             </section>` : ''}
         </article>`;
@@ -6196,6 +6276,7 @@
     function renderJournalUpdates() {
       const box = $('#journal-updates');
       if (!box) return;
+      document.body.classList.add('update-reading-mode');
       const detailItem = updateDetailItemFromPath();
       if (detailItem) {
         renderJournalUpdateDetail(detailItem);
@@ -6272,6 +6353,7 @@
 
       $$('[data-tab]').forEach(x => x.classList.toggle('active', x.dataset.tab === tab));
       activeTab = tab;
+      document.body.classList.toggle('update-reading-mode', activeTab === 'updates');
       updateSearchSubmitLabel();
       $$('.tab-panel').forEach(p => p.hidden = p.dataset.panel !== activeTab);
       $$('[data-international]').forEach(el => el.hidden = activeTab !== 'int');
