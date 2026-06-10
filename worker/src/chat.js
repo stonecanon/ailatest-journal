@@ -7,8 +7,8 @@
  *  3. Results → DeepSeek → natural language response
  */
 
-// DeepSeek API config — set via wrangler secret put DEEPSEEK_API_KEY
-const DEEPSEEK_BASE = 'https://api.deepseek.com/v1';
+// DeepSeek API key — set via wrangler secret put DEEPSEEK_API_KEY
+import { json, deepseekChat as dsChat, loadJournals } from './deepseek-common.js';
 
 // Journal data — loaded at cold start
 let journals = null;         // full array
@@ -141,44 +141,9 @@ function applyFilters(journals, filters) {
   return results;
 }
 
-// Call DeepSeek API
-async function deepseekChat(apiKey, messages, tools = null) {
-  const body = {
-    model: 'deepseek-chat',
-    messages,
-    temperature: 0.1,
-  };
-  if (tools) {
-    body.tools = tools;
-    body.tool_choice = 'auto';
-  }
-  
-  const res = await fetch(`${DEEPSEEK_BASE}/chat/completions`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify(body),
-  });
-  
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`DeepSeek API error ${res.status}: ${err}`);
-  }
-  
-  return res.json();
-}
-
-function json(data, status = 200) {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Headers': 'Content-Type',
-    },
-  });
+// Call DeepSeek API (shared client, keeps the old (apiKey, messages, tools) shape)
+function deepseekChat(apiKey, messages, tools = null) {
+  return dsChat(apiKey, messages, tools ? { tools } : {});
 }
 
 // ─── Main chat handler ───
@@ -218,23 +183,7 @@ export async function handleChat(req, env) {
   // ─── Load journals on first request ───
   if (!journals) {
     try {
-      // Load from R2 or fetch from origin
-      const gzUrl = 'https://journal.ailatest.org/data/journals.json.gz';
-      const gzRes = await fetch(gzUrl);
-      if (!gzRes.ok) throw new Error(`Failed to load data: ${gzRes.status}`);
-      
-      const compressed = await gzRes.arrayBuffer();
-      const ds = new DecompressionStream('gzip');
-      const writer = new WritableStream({
-        write(chunk) { /* collected below */ }
-      });
-      
-      // Decompress manually
-      const blob = await new Response(
-        gzRes.body.pipeThrough(new DecompressionStream('gzip'))
-      ).text();
-      
-      journals = JSON.parse(blob);
+      journals = await loadJournals(env);
       journalTextIndex = journals.map(buildJournalText);
       console.log(`Loaded ${journals.length} journals`);
     } catch (e) {

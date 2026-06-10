@@ -1,28 +1,19 @@
 /**
  * /pick — semantic journal recommendation via DeepSeek + local journals.json.gz.
  *
- * DeepSeek only extracts a structured research profile. Ranking is computed
- * against the local journal database so results stay auditable and clickable.
+ * Step 1: DeepSeek extracts a structured research profile (no heuristic fallback —
+ *         if the AI call fails we refund the quota and tell the client to use
+ *         local matching instead).
+ * Step 2: Ranking runs against the local journal database (stemmed matching via
+ *         the shared pick-match module) so results stay auditable and clickable.
+ * Step 3: DeepSeek turns the top candidates into a tiered recommendation report
+ *         (best-effort: ranking results are returned even if this step fails).
  */
 
-const DEEPSEEK_BASE = 'https://api.deepseek.com/v1';
-const DEFAULT_JOURNALS_URL = 'https://journal.ailatest.org/data/journals.json.gz';
+import { CORS, json, deepseekChat, loadJournals } from './deepseek-common.js';
+import PickMatch from '../../js/pick-match.js';
 
-let journalsCache = null;
-let journalsLoadPromise = null;
-
-const CORS = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'Authorization, Content-Type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-};
-
-function json(data, status = 200) {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: { 'Content-Type': 'application/json', ...CORS },
-  });
-}
+const { makeHay, hitHay } = PickMatch;
 
 function cleanText(value, max = 4000) {
   return typeof value === 'string' ? value.trim().slice(0, max) : '';
@@ -38,34 +29,12 @@ function asArray(value) {
   return [String(value).trim()].filter(Boolean);
 }
 
-function norm(value) {
-  return String(value || '')
-    .toLowerCase()
-    .normalize('NFKD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/&/g, ' and ')
-    .replace(/[^a-z0-9\u4e00-\u9fff]+/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
-const TERM_STOPS = new Set('and of the for in on to with by from studies study science sciences research journal journals'.split(' '));
-
-function termHit(haystack, term) {
-  const hay = norm(haystack);
-  const t = norm(term);
-  if (!hay || !t || t.length < 3) return false;
-  if (hay.includes(t)) return true;
-  const words = t.split(' ').filter(w => w.length > 2 && !TERM_STOPS.has(w));
-  return words.length > 1 && words.every(w => hay.includes(w));
-}
-
 function unique(values, max = 24) {
   const out = [];
   const seen = new Set();
   for (const value of values || []) {
     const raw = String(value || '').trim();
-    const key = norm(raw);
+    const key = PickMatch.norm(raw);
     if (!key || seen.has(key)) continue;
     seen.add(key);
     out.push(raw);
@@ -96,43 +65,21 @@ function journalNameParts(j) {
   return [j.name, j.cn_name, j.abbr20, j.publisher, j.country].filter(Boolean);
 }
 
-async function loadJournals(env) {
-  if (journalsCache) return journalsCache;
-  if (!journalsLoadPromise) {
-    journalsLoadPromise = (async () => {
-      const url = env.JOURNALS_URL || DEFAULT_JOURNALS_URL;
-      const res = await fetch(url);
-      if (!res.ok) throw new Error(`journal data ${res.status}`);
-      const text = await new Response(res.body.pipeThrough(new DecompressionStream('gzip'))).text();
-      const data = JSON.parse(text);
-      if (!Array.isArray(data)) throw new Error('journal data is not an array');
-      journalsCache = data;
-      return journalsCache;
-    })();
+// Per-isolate haystack cache keyed on the journal object itself.
+const HAYS = new WeakMap();
+function journalHays(j) {
+  let hays = HAYS.get(j);
+  if (!hays) {
+    hays = {
+      subject: makeHay(journalSubjectParts(j)),
+      name: makeHay(journalNameParts(j)),
+    };
+    HAYS.set(j, hays);
   }
-  return journalsLoadPromise;
+  return hays;
 }
 
-async function deepseekChat(apiKey, messages, tools) {
-  const body = {
-    model: 'deepseek-chat',
-    messages,
-    temperature: 0.05,
-    max_tokens: 900,
-    tools,
-    tool_choice: 'auto',
-  };
-  const res = await fetch(`${DEEPSEEK_BASE}/chat/completions`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify(body),
-  });
-  if (!res.ok) throw new Error(`DeepSeek ${res.status}: ${(await res.text()).slice(0, 240)}`);
-  return res.json();
-}
+// ─── Step 1: semantic profile extraction ───
 
 function semanticTool() {
   return {
@@ -179,124 +126,75 @@ function semanticTool() {
   };
 }
 
-function heuristicProfile(query) {
-  const q = norm(query);
-  const fields = [];
-  const wos = [];
-  const keywords = [];
-  const negatives = [];
-
-  if (q.includes('low altitude') || q.includes('低空')) {
-    fields.push('economic geography', 'transportation economics', 'regional science', 'urban and regional planning');
-    wos.push('Geography', 'Transportation', 'Regional & Urban Planning', 'Economics', 'Urban Studies', 'Planning & Development');
-    keywords.push('low-altitude economy', 'regional economy', 'transportation', 'spatial structure', 'regional network');
-  }
-  if (q.includes('econom') || q.includes('经济')) {
-    fields.push('economics', 'regional economics');
-    wos.push('Economics', 'Business', 'Management');
-    keywords.push('economy', 'economic development');
-  }
-  if (q.includes('network') && (q.includes('econom') || q.includes('regional') || q.includes('geograph'))) {
-    negatives.push('computer network', 'wireless communications', 'telecommunications', 'ad hoc network', 'sensor network');
-  }
-  if (q.includes('urban') || q.includes('city') || q.includes('城市')) {
-    fields.push('urban studies', 'urban planning');
-    wos.push('Urban Studies', 'Regional & Urban Planning', 'Geography');
-    keywords.push('urban', 'city', 'planning');
-  }
-  return {
-    research_fields: unique(fields.length ? fields : ['interdisciplinary research']),
-    wos_categories: unique(wos),
-    target_indices: unique(q.includes('social') || q.includes('econom') || q.includes('urban') ? ['SSCI', 'SCIE', 'ESCI'] : ['SCIE', 'SSCI', 'ESCI']),
-    domain_keywords: unique(keywords.length ? keywords : q.split(' ').filter(w => w.length > 3).slice(0, 8)),
-    negative_keywords: unique(negatives),
-    explanation: '已使用启发式语义画像作为 AI 解析兜底。',
-  };
-}
-
-function normalizeProfile(profile, query) {
-  const base = profile && typeof profile === 'object' ? profile : heuristicProfile(query);
+function normalizeProfile(profile) {
+  if (!profile || typeof profile !== 'object') return null;
   const out = {
-    research_fields: unique(asArray(base.research_fields)),
-    wos_categories: unique(asArray(base.wos_categories)),
-    target_indices: unique(asArray(base.target_indices).map(s => s.toUpperCase()).filter(s => ['SCIE', 'SSCI', 'ESCI', 'AHCI'].includes(s))),
-    domain_keywords: unique(asArray(base.domain_keywords)),
-    negative_keywords: unique(asArray(base.negative_keywords)),
-    explanation: cleanText(base.explanation || '', 300),
+    research_fields: unique(asArray(profile.research_fields)),
+    wos_categories: unique(asArray(profile.wos_categories)),
+    target_indices: unique(asArray(profile.target_indices).map(s => s.toUpperCase()).filter(s => ['SCIE', 'SSCI', 'ESCI', 'AHCI'].includes(s))),
+    domain_keywords: unique(asArray(profile.domain_keywords)),
+    negative_keywords: unique(asArray(profile.negative_keywords)),
+    explanation: cleanText(profile.explanation || '', 300),
   };
-  const q = norm(query);
-  if (q.includes('network') && (q.includes('econom') || q.includes('regional') || q.includes('geograph'))) {
-    out.negative_keywords = unique([
-      ...out.negative_keywords,
-      'computer network',
-      'wireless communications',
-      'telecommunications',
-      'ad hoc network',
-      'sensor network',
-    ]);
-  }
-  if (!out.research_fields.length && !out.wos_categories.length && !out.domain_keywords.length) {
-    return heuristicProfile(query);
-  }
+  if (!out.research_fields.length && !out.wos_categories.length && !out.domain_keywords.length) return null;
   return out;
 }
 
 async function extractProfile(apiKey, query) {
-  try {
-    const res = await deepseekChat(apiKey, [
-      {
-        role: 'system',
-        content: `你是学术期刊荐刊系统的语义解析器。请把论文标题/摘要转成期刊匹配画像，而不是做普通关键词抽取。
+  const res = await deepseekChat(apiKey, [
+    {
+      role: 'system',
+      content: `你是学术期刊荐刊系统的语义解析器。请把论文标题/摘要转成期刊匹配画像，而不是做普通关键词抽取。
 
 关键要求：
-- 识别研究对象和学科语境，过滤掉 formation、mechanism、structure、network 等通用/歧义词的错误含义。
-- domain_keywords 要使用能匹配期刊学科的词，如 economic geography、regional science、transportation economics。
-- negative_keywords 用于排除歧义方向。
-- 如果标题是 "China's Low-Altitude Economy Network: A Study on Structural Characteristics and Formation Mechanisms"，network 指区域/经济空间网络，不是 computer networks / wireless communications；应推荐 Geography、Transportation、Regional & Urban Planning、Economics、Urban Studies 等方向，并把 computer network、telecommunications、wireless communications 放入 negative_keywords。
+- 先识别研究对象和学科语境，再决定关键词。network、system、model、mechanism、structure 等词必须按语境消歧：
+  例如经济/区域语境下的 "network" 指经济空间网络，应排除 computer networks、telecommunications 等错误方向（放入 negative_keywords）。
+- domain_keywords 要使用能匹配期刊学科分类的词（如 economic geography、regional science、transportation economics），
+  不要输出 formation、mechanism、analysis 这类跨学科通用方法词。
+- wos_categories 给出最可能的 Web of Science 学科类目。
+- 交叉学科论文请覆盖所有相关方向（如同时给出地理、交通、经济类目）。
 - 只调用函数，不要输出普通文本。`,
-      },
-      { role: 'user', content: query },
-    ], [semanticTool()]);
-    const msg = res?.choices?.[0]?.message;
-    const call = msg?.tool_calls?.[0];
-    if (call?.function?.name === 'extract_journal_recommendation_profile') {
-      return normalizeProfile(JSON.parse(call.function.arguments || '{}'), query);
-    }
-  } catch (e) {
-    console.warn('pick semantic extraction fallback:', e?.message || e);
+    },
+    { role: 'user', content: query },
+  ], { tools: [semanticTool()], temperature: 0.05, maxTokens: 900 });
+  const msg = res?.choices?.[0]?.message;
+  const call = msg?.tool_calls?.[0];
+  if (call?.function?.name === 'extract_journal_recommendation_profile') {
+    return normalizeProfile(JSON.parse(call.function.arguments || '{}'));
   }
-  return heuristicProfile(query);
+  return null;
 }
 
+// ─── Step 2: local ranking against the profile ───
+
 function scoreJournal(j, profile) {
-  const subjectText = journalSubjectParts(j).join(' | ');
-  const nameText = journalNameParts(j).join(' | ');
+  const hays = journalHays(j);
   let score = 0;
   const matched = [];
 
   for (const cat of profile.wos_categories || []) {
-    if (termHit(subjectText, cat)) {
+    if (hitHay(hays.subject, cat)) {
       score += 24;
       matched.push(cat);
-    } else if (termHit(nameText, cat)) {
+    } else if (hitHay(hays.name, cat)) {
       score += 8;
       matched.push(cat);
     }
   }
   for (const field of profile.research_fields || []) {
-    if (termHit(subjectText, field)) {
+    if (hitHay(hays.subject, field)) {
       score += 18;
       matched.push(field);
-    } else if (termHit(nameText, field)) {
+    } else if (hitHay(hays.name, field)) {
       score += 9;
       matched.push(field);
     }
   }
   for (const kw of profile.domain_keywords || []) {
-    if (termHit(subjectText, kw)) {
+    if (hitHay(hays.subject, kw)) {
       score += 10;
       matched.push(kw);
-    } else if (termHit(nameText, kw)) {
+    } else if (hitHay(hays.name, kw)) {
       score += 5;
       matched.push(kw);
     }
@@ -304,7 +202,7 @@ function scoreJournal(j, profile) {
 
   const negHits = [];
   for (const neg of profile.negative_keywords || []) {
-    if (termHit(subjectText, neg) || termHit(nameText, neg)) {
+    if (hitHay(hays.subject, neg) || hitHay(hays.name, neg)) {
       score -= 32;
       negHits.push(neg);
     }
@@ -372,6 +270,92 @@ function rankJournals(journals, profile, filters, limit) {
   });
 }
 
+// ─── Step 3: tiered recommendation report ───
+
+function candidateLine(r, i) {
+  const apc = r.doaj
+    ? (String(r.doaj.apc || '').toLowerCase() === 'no' ? '免费' : '有APC')
+    : '未知';
+  return [
+    `${i + 1}. ${r.name}`,
+    `IF=${r.if_2024 ?? '-'}`,
+    r.if_quartile || '-',
+    r.cas_zone ? `中科院${r.cas_zone}区${r.cas_top ? 'TOP' : ''}` : '-',
+    (r.indices || []).join('/') || '-',
+    r.publisher || '-',
+    `APC:${apc}`,
+    r.warning ? '⚠预警' : '',
+  ].filter(Boolean).join(' | ');
+}
+
+function sanitizeReportItems(items, max) {
+  if (!Array.isArray(items)) return [];
+  return items.slice(0, max).map(it => ({
+    name: cleanText(it?.name || '', 160),
+    reason: cleanText(it?.reason || '', 160),
+  })).filter(it => it.name);
+}
+
+function sanitizeReport(raw) {
+  if (!raw || typeof raw !== 'object') return null;
+  const tiers = (Array.isArray(raw.tiers) ? raw.tiers : []).map(t => ({
+    id: cleanText(t?.id || '', 24) || 'tier',
+    label: cleanText(t?.label || '', 40) || '推荐',
+    items: sanitizeReportItems(t?.items, 10),
+  })).filter(t => t.items.length).slice(0, 4);
+  const chinese = sanitizeReportItems(raw.chinese, 8);
+  const strategy = (Array.isArray(raw.strategy) ? raw.strategy : [])
+    .map(s => cleanText(s, 200)).filter(Boolean).slice(0, 5);
+  if (!tiers.length && !chinese.length) return null;
+  return {
+    intro: cleanText(raw.intro || '', 300),
+    tiers,
+    chinese,
+    strategy,
+  };
+}
+
+async function generateReport(apiKey, query, profile, ranked) {
+  const lines = ranked.slice(0, 40).map(candidateLine).join('\n');
+  const res = await deepseekChat(apiKey, [
+    {
+      role: 'system',
+      content: `你是专业的学术期刊投稿顾问。根据用户论文与候选期刊列表，输出 JSON 推荐报告。
+
+输出格式（严格 JSON）：
+{
+  "intro": "一两句话解读论文的学科定位",
+  "tiers": [
+    {"id": "primary", "label": "优先主投", "items": [{"name": "期刊名", "reason": "≤40字推荐理由"}]},
+    {"id": "backup", "label": "稳妥备选", "items": [...]}
+  ],
+  "chinese": [{"name": "中文期刊名", "reason": "≤40字理由"}],
+  "strategy": ["投稿策略建议1", "建议2", "建议3"]
+}
+
+要求：
+- tiers 共两档：primary 3-5 本、backup 4-8 本，主要从候选列表中选择（用候选列表中的精确期刊名）。
+- 如果你确信某本不在候选列表的英文期刊高度对口，最多可补充 3 本，理由中注明"候选外补充"。
+- chinese：如论文主题适合中文发表，推荐 3-6 本对口的中文核心期刊（如 CSSCI/北大核心），否则给空数组。
+- reason 简洁说明为什么对口（学科方向、定位），不要复述 IF/分区等指标——指标由系统数据补全。
+- strategy 给 2-4 条具体投稿策略（梯度、叙事侧重、风险提示）。
+- 候选列表中标 ⚠预警 的期刊不要放进 primary。
+- 全部用中文。只输出 JSON。`,
+    },
+    {
+      role: 'user',
+      content: `论文: ${query}\n\n学科画像: ${JSON.stringify({
+        research_fields: profile.research_fields,
+        wos_categories: profile.wos_categories,
+      })}\n\n候选期刊(按匹配度排序):\n${lines}`,
+    },
+  ], { temperature: 0.2, maxTokens: 1800, jsonOutput: true });
+  const content = res?.choices?.[0]?.message?.content || '';
+  return sanitizeReport(JSON.parse(content));
+}
+
+// ─── handler ───
+
 export async function handlePick(req, env, opts = {}) {
   if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS });
   if (req.method !== 'POST') return json({ ok: false, error: 'POST only' }, 405);
@@ -397,22 +381,45 @@ export async function handlePick(req, env, opts = {}) {
   }
 
   let quota = null;
+  let refund = null;
   if (typeof opts.consumeQuota === 'function') {
     const q = await opts.consumeQuota();
     if (!q.ok) return q.response;
     quota = q.quota;
+    refund = typeof q.refund === 'function' ? q.refund : null;
+  }
+
+  let profile = null;
+  try {
+    profile = await extractProfile(apiKey, query);
+  } catch (e) {
+    console.warn('pick semantic extraction failed:', e?.message || e);
+  }
+  if (!profile) {
+    // AI unavailable → give the credit back and let the client fall back to local matching.
+    if (refund) await refund();
+    return json({ ok: false, error: 'ai_unavailable', fallback: 'local' }, 502);
   }
 
   const limit = clamp(body?.limit || 120, 20, 160);
-  const profile = await extractProfile(apiKey, query);
   const filters = body?.filters && typeof body.filters === 'object' ? body.filters : {};
   const results = rankJournals(journals, profile, filters, limit);
+
+  let report = null;
+  if (results.length) {
+    try {
+      report = await generateReport(apiKey, query, profile, results);
+    } catch (e) {
+      console.warn('pick report generation failed:', e?.message || e);
+    }
+  }
 
   return json({
     ok: true,
     mode: 'ai',
     profile,
     results,
+    report,
     total: results.length,
     shown: results.length,
     quota,

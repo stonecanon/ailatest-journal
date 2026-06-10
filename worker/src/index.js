@@ -354,7 +354,20 @@ async function consumePickQuotaForRequest(req, env) {
   if (!u) return { ok: false, response: err('login required', 401) };
   const quota = await consumePickQuotaForUser(env, u);
   if (!quota.allowed) return { ok: false, response: json(quota, 429) };
-  return { ok: true, quota, user: u };
+  return { ok: true, quota, user: u, refund: () => refundPickQuota(env, { ...quota, user_id: u.id }) };
+}
+
+// Give back one pick credit (used when the AI call fails after the quota was consumed).
+async function refundPickQuota(env, quota) {
+  if (!quota || quota.unlimited || !quota.period_key) return;
+  try {
+    await env.DB.prepare(
+      `UPDATE pick_usage SET used = MAX(used - 1, 0), updated_at = ?
+       WHERE user_id = ? AND period = ? AND period_key = ?`
+    ).bind(nowSec(), quota.user_id, quota.period, quota.period_key).run();
+  } catch (e) {
+    console.warn('pick quota refund failed:', e?.message || e);
+  }
 }
 
 async function routeEmailRequest(req, env) {
@@ -1296,7 +1309,6 @@ export default {
       if (p === '/journal-view-total'    && req.method === 'GET')    return routeGetJournalViewTotal(req, env);
 
       if (p === '/chat'                     && req.method === 'POST')  return handleChat(req, env);
-      if (p === '/chat'                     && req.method === 'OPTIONS') return handleChat(req, env);
 
       return err('not found', 404);
     } catch (e) {

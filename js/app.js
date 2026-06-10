@@ -268,11 +268,11 @@
     update_cat_report: '重要报告',
     pick_ai_toggle: 'AI 推荐',
     pick_ai_hint: '语义增强，默认开启',
-    pick_ai_login: 'AI 推荐需要登录；关闭 AI 推荐可使用本地匹配。登录后可使用每日 5 次免费额度。',
+    pick_ai_login: 'AI 推荐需要登录（每日 5 次免费额度），本次已自动改用本地匹配。',
     pick_ai_running: '正在用 AI 解析研究语境…',
-    pick_ai_unavailable: 'AI 推荐暂不可用，未自动改用本地匹配。请稍后重试，或关闭 AI 推荐后再用本地匹配。',
-    pick_ai_auth_error: 'AI 推荐登录已失效，请重新登录后再试；也可以关闭 AI 推荐使用本地匹配。',
-    pick_ai_quota_error: '今日 AI 推荐免费额度已用完；关闭 AI 推荐可使用本地匹配。',
+    pick_ai_unavailable: 'AI 推荐暂不可用，已自动改用本地匹配；该次不扣 AI 额度，可稍后重试。',
+    pick_ai_auth_error: 'AI 推荐登录已失效，请重新登录；本次已自动改用本地匹配。',
+    pick_ai_quota_error: '今日 AI 推荐免费额度已用完，已自动改用本地匹配。',
     pick_ai_config_error: 'AI 推荐接口还没有正确读取 DeepSeek 密钥，请重新部署 Worker 后再试。',
     pick_mode_ai: 'AI 语义匹配',
     pick_mode_local: '本地匹配',
@@ -299,11 +299,11 @@
     update_cat_report: '重要報告',
     pick_ai_toggle: 'AI 推薦',
     pick_ai_hint: '語義增強，預設開啟',
-    pick_ai_login: 'AI 推薦需要登入；關閉 AI 推薦可使用本地匹配。登入後可使用每日 5 次免費額度。',
+    pick_ai_login: 'AI 推薦需要登入（每日 5 次免費額度），本次已自動改用本地匹配。',
     pick_ai_running: '正在用 AI 解析研究語境…',
-    pick_ai_unavailable: 'AI 推薦暫不可用，未自動改用本地匹配。請稍後重試，或關閉 AI 推薦後再用本地匹配。',
-    pick_ai_auth_error: 'AI 推薦登入已失效，請重新登入後再試；也可以關閉 AI 推薦使用本地匹配。',
-    pick_ai_quota_error: '今日 AI 推薦免費額度已用完；關閉 AI 推薦可使用本地匹配。',
+    pick_ai_unavailable: 'AI 推薦暫不可用，已自動改用本地匹配；該次不扣 AI 額度，可稍後重試。',
+    pick_ai_auth_error: 'AI 推薦登入已失效，請重新登入；本次已自動改用本地匹配。',
+    pick_ai_quota_error: '今日 AI 推薦免費額度已用完，已自動改用本地匹配。',
     pick_ai_config_error: 'AI 推薦接口還沒有正確讀取 DeepSeek 密鑰，請重新部署 Worker 後再試。',
     pick_mode_ai: 'AI 語義匹配',
     pick_mode_local: '本地匹配',
@@ -330,11 +330,11 @@
     update_cat_report: 'Reports',
     pick_ai_toggle: 'AI Match',
     pick_ai_hint: 'Semantic mode, on by default',
-    pick_ai_login: 'AI Match requires sign-in; turn off AI Match to use local matching. Sign in for 5 free uses per day.',
+    pick_ai_login: 'AI Match requires sign-in (5 free uses per day); switched to local matching for this search.',
     pick_ai_running: 'Analyzing research context with AI…',
-    pick_ai_unavailable: 'AI Match is unavailable. Local matching was not used automatically; retry later or turn off AI Match to use local matching.',
-    pick_ai_auth_error: 'Your AI Match sign-in has expired. Sign in again, or turn off AI Match to use local matching.',
-    pick_ai_quota_error: 'Today’s free AI Match quota is used up; turn off AI Match to use local matching.',
+    pick_ai_unavailable: 'AI Match is temporarily unavailable; switched to local matching. No AI credit was used — retry later.',
+    pick_ai_auth_error: 'Your AI Match sign-in has expired. Sign in again; switched to local matching for this search.',
+    pick_ai_quota_error: 'Today’s free AI Match quota is used up; switched to local matching.',
     pick_ai_config_error: 'AI Match cannot read the DeepSeek key yet. Redeploy the Worker and try again.',
     pick_mode_ai: 'AI semantic match',
     pick_mode_local: 'Local match',
@@ -6852,11 +6852,14 @@
         return t('pick_ai_auth_error');
       }
       if (error?.status === 429) return t('pick_ai_quota_error');
-      if (error?.status === 503 || /deepseek|api[_ -]?key|secret/i.test(error?.message || '')) {
+      if (error?.status === 503 || /api[_ -]?key|secret|not configured/i.test(error?.message || '')) {
         return t('pick_ai_config_error');
       }
-      const msg = error?.message ? `：${error.message}` : '';
-      return t('pick_ai_unavailable') + msg;
+      // fetch 本身失败（断网/代理/被墙）→ TypeError: Failed to fetch
+      if (error instanceof TypeError && /fetch|network/i.test(error?.message || '')) {
+        return T('AI 推荐网络请求失败（请检查网络或代理），已自动改用本地匹配。','AI request failed at network level (check connection/proxy); switched to local matching.');
+      }
+      return t('pick_ai_unavailable');
     }
 
     function pickNormText(value) {
@@ -6916,162 +6919,6 @@
       return /^no$/i.test(String(r?.doaj?.apc || '').trim());
     }
 
-    function pickEntryKey(e) {
-      const r = e?.journalRec || {};
-      return favId(r) || e?.issn || e?.srcName || r.name || '';
-    }
-
-    function pickEntryText(e) {
-      const r = e?.journalRec || {};
-      return pickNormText([
-        r.name, r.cn_name, r.publisher, r.esi_category, r.cas_major_cn, r.cas_major_cat,
-        ...(r.wos_categories || []), ...(r.jcr_cats || []), ...(r.ei_subjects || []),
-        ...(e?.topics || []), ...(e?.matched || []),
-      ].filter(Boolean).join(' '));
-    }
-
-    function pickSelectRows(source, predicate, limit, used) {
-      const out = [];
-      for (const e of source || []) {
-        if (!e?.journalRec || (predicate && !predicate(e))) continue;
-        const key = pickEntryKey(e);
-        if (!key || used.has(key)) continue;
-        used.add(key);
-        out.push(e);
-        if (out.length >= limit) break;
-      }
-      return out;
-    }
-
-    function pickDirectionConfigs() {
-      return [
-        { id:'regional', label:T('区域/地理','Regional / geography'), patterns:['regional','geograph','spatial','urban studies','planning','development','区域','地理','空间','城市','规划'] },
-        { id:'transport', label:T('交通运输','Transport'), patterns:['transport','transportation','mobility','aviation','air transport','low altitude','交通','运输','航空','低空'] },
-        { id:'economy', label:T('经济/管理','Economics / management'), patterns:['economy','economic','economics','business','management','policy','industrial','经济','产业','管理','政策'] },
-        { id:'network', label:T('网络方法','Network methods'), patterns:['network','complex network','social network','spatial network','systems','网络','系统'] },
-        { id:'environment', label:T('环境/可持续','Environment / sustainability'), patterns:['environment','sustainability','ecology','climate','resource','环境','生态','可持续','资源'] },
-        { id:'engineering', label:T('工程/技术','Engineering / technology'), patterns:['engineering','technology','materials','energy','computer','information','工程','技术','材料','能源','计算机','信息'] },
-        { id:'health', label:T('医学/生命科学','Health / life sciences'), patterns:['medicine','health','clinical','biology','biomedical','public health','医学','健康','生命科学','临床'] },
-        { id:'education', label:T('教育/心理','Education / psychology'), patterns:['education','psychology','learning','behavior','教育','心理','学习','行为'] },
-      ];
-    }
-
-    function pickEntryDirections(e, limit = 2) {
-      const text = pickEntryText(e);
-      const labels = pickDirectionConfigs()
-        .filter(cfg => cfg.patterns.some(p => text.includes(pickNormText(p))))
-        .map(cfg => cfg.label);
-      const r = e?.journalRec || {};
-      return pickUnique(labels.length ? labels : (r.wos_categories || e?.topics || []), limit);
-    }
-
-    function pickRecommendationPosition(e, rank = 0) {
-      const r = e?.journalRec || {};
-      const score = Number(e?.score || 0);
-      const idx = r.indices || [];
-      const strongTier = r.if_quartile === 'Q1' || Number(r.cas_zone) <= 2 || r.cas_top;
-      if (r.warning || r.citic_warning || r.on_hold || r.under_review) return T('谨慎核查','Check carefully');
-      if (rank < 4 && score >= 0.72 && strongTier) return T('优先主投','Priority target');
-      if (score >= 0.56 && (strongTier || idx.includes('SSCI') || idx.includes('SCIE'))) return T('稳妥备选','Solid backup');
-      if (pickDoajApcText(r)) return T('费用可查','APC known');
-      return T('补充观察','Watchlist');
-    }
-
-    function renderPickReportTable(title, rows, desc, opts = {}) {
-      if (!rows || !rows.length) return '';
-      return `<section class="pick-report-section">
-        <div class="pick-report-section-head">
-          <h3>${escape(title)}</h3>
-          ${desc ? `<p>${escape(desc)}</p>` : ''}
-        </div>
-        <div class="pick-report-table-wrap">
-          <table class="pick-report-table">
-            <thead><tr>
-              <th>#</th><th>${T('期刊','Journal')}</th><th>${T('定位 / 方向','Position / direction')}</th><th>IF</th><th>JCR</th><th>${T('中科院','CAS')}</th><th>${T('匹配','Match')}</th><th>DOAJ APC</th>
-            </tr></thead>
-            <tbody>
-              ${rows.map((e, i) => {
-                const r = e.journalRec || {};
-                const fid = favId(r);
-                if (fid) rowRecordsByFid[fid] = { ...r, __src: 'int' };
-                const idxText = (r.indices || []).join(' / ');
-                const meta = pickUnique([idxText, r.publisher].filter(Boolean), 3).join(' · ');
-                const directions = pickEntryDirections(e, 2);
-                const score = Math.round((e.score || 0) * 100);
-                const apcText = pickDoajApcText(r);
-                const position = opts.position ? opts.position(e, i) : pickRecommendationPosition(e, i);
-                return `<tr>
-                  <td>${i + 1}</td>
-                  <td>
-                    <a href="#j/${escape(fid)}" data-pick-report-fid="${escape(fid)}">${escape(titleCase(r.name || e.srcName || ''))}</a>
-                    ${meta ? `<span class="pick-report-meta">${escape(meta)}</span>` : ''}
-                  </td>
-                  <td>
-                    <span class="pick-report-position">${escape(position)}</span>
-                    ${directions.length ? `<span class="pick-report-tags">${directions.map(d => `<em>${escape(d)}</em>`).join('')}</span>` : ''}
-                  </td>
-                  <td>${pickMetricIf(r) || '<span class="muted-cell">&mdash;</span>'}</td>
-                  <td>${escape(r.if_quartile || '') || '<span class="muted-cell">&mdash;</span>'}</td>
-                  <td>${pickMetricCas(r) ? escape(pickMetricCas(r)) : '<span class="muted-cell">&mdash;</span>'}</td>
-                  <td>${score}% <span class="pick-report-meta">(${e.count || 0}${T('信号',' signals')})</span></td>
-                  <td>${apcText ? escape(apcText) : '<span class="muted-cell">&mdash;</span>'}</td>
-                </tr>`;
-              }).join('')}
-            </tbody>
-          </table>
-        </div>
-      </section>`;
-    }
-
-    function renderPickDynamicBranches(allRows, primaryRows) {
-      const primaryKeys = new Set((primaryRows || []).map(pickEntryKey));
-      const branches = pickDirectionConfigs().map(cfg => {
-        const rows = [];
-        for (const e of allRows || []) {
-          const key = pickEntryKey(e);
-          if (!key || primaryKeys.has(key)) continue;
-          const text = pickEntryText(e);
-          if (!cfg.patterns.some(p => text.includes(pickNormText(p)))) continue;
-          rows.push(e);
-          if (rows.length >= 4) break;
-        }
-        return { ...cfg, rows };
-      }).filter(branch => branch.rows.length >= 2)
-        .sort((a, b) => b.rows.length - a.rows.length || (b.rows[0]?.score || 0) - (a.rows[0]?.score || 0))
-        .slice(0, 3);
-      if (!branches.length) return '';
-      return `<section class="pick-report-section">
-        <div class="pick-report-section-head">
-          <h3>${T('相关方向补充','Additional directions')}</h3>
-          <p>${T('仅在匹配结果中出现清晰分支时展示，用来区分不同投稿叙事。','Shown only when the matched results reveal clear alternative submission narratives.')}</p>
-        </div>
-        <div class="pick-report-branch-grid">
-          ${branches.map(branch => {
-            return `<div class="pick-report-branch">
-              <h4>${escape(branch.label)}</h4>
-              <div class="pick-report-list">
-                ${branch.rows.map(e => {
-                  const r = e.journalRec || {};
-                  const fid = favId(r);
-                  if (fid) rowRecordsByFid[fid] = { ...r, __src: 'int' };
-                  const chips = [
-                    (r.indices || []).join('/'),
-                    r.if_quartile || '',
-                    pickMetricCas(r),
-                    pickDoajApcText(r),
-                  ].filter(Boolean).slice(0, 4);
-                  return `<a class="pick-report-list-item" href="#j/${escape(fid)}" data-pick-report-fid="${escape(fid)}">
-                    <strong>${escape(titleCase(r.name || e.srcName || ''))}</strong>
-                    <span>${chips.map(c => escape(c)).join(' · ')}</span>
-                  </a>`;
-                }).join('')}
-              </div>
-            </div>`;
-          }).join('')}
-        </div>
-      </section>`;
-    }
-
     function pickDomesticSources() {
       if (!domestic) return [];
       const out = [];
@@ -7094,163 +6941,146 @@
       return String(value || '').replace(/[＊*☆★]/g, '').replace(/\s+/g, '').trim();
     }
 
-    function pickAreaHit(text, area) {
-      const patterns = {
-        geography: ['geography', 'geographic', 'spatial', 'regional science', 'regional', '地理', '区域', '空间'],
-        transport: ['transport', 'transportation', 'mobility', 'aviation', 'air transport', 'low altitude', '低空', '交通', '运输', '航空'],
-        urban: ['urban', 'city', 'planning', 'development', '城市', '规划'],
-        economy: ['economy', 'economic', 'economics', 'industrial', 'management', 'regional economy', '经济', '产业', '管理'],
-        network: ['network', 'complex network', 'social network', 'spatial network', '网络'],
-        innovation: ['innovation', 'science policy', 'technology', '科研', '科学学', '创新'],
-      };
-      return (patterns[area] || [area]).some(p => text.includes(pickNormText(p)));
-    }
-
-    function pickDomesticRecommendations(query, profile) {
+    // Resolve an AI-suggested Chinese journal name against the domestic catalogs.
+    function resolveDomesticByName(name) {
+      const clean = pickCleanDomesticName(name);
+      if (!clean) return null;
       const sourceRows = pickDomesticSources();
-      if (!sourceRows.length) return [];
-      const profileText = pickNormText([
-        query,
-        ...(profile?.research_fields || []),
-        ...(profile?.wos_categories || []),
-        ...(profile?.domain_keywords || []),
-      ].join(' '));
-      const targets = [
-        { name:'经济地理', areas:['geography','economy','regional'], reason:'经济地理 / 区域经济网络最直接对口', priority:1 },
-        { name:'地理学报', areas:['geography','regional'], reason:'地理学综合顶刊，适合理论贡献很强的版本', priority:2 },
-        { name:'地理科学', areas:['geography','regional'], reason:'区域结构、空间格局与机制分析方向', priority:3 },
-        { name:'地理研究', areas:['geography','regional'], reason:'区域发展与人文地理机制研究', priority:3 },
-        { name:'地理科学进展', areas:['geography','regional'], reason:'新兴议题综述、进展与机制框架', priority:4 },
-        { name:'城市规划', areas:['urban','planning','transport'], reason:'低空经济与城市空间治理 / 规划政策视角', priority:4 },
-        { name:'城市发展研究', areas:['urban','economy'], reason:'城市经济、空间发展与政策分析', priority:5 },
-        { name:'中国工业经济', areas:['economy','innovation'], reason:'产业经济与政策机制，门槛较高', priority:6 },
-        { name:'管理世界', areas:['economy','management'], reason:'管理与政策顶刊，适合理论和识别策略很强的版本', priority:7 },
-        { name:'科研管理', areas:['innovation','management','network'], reason:'创新网络、科技政策与产业组织视角', priority:6 },
-        { name:'科学学研究', areas:['innovation','management','network'], reason:'创新系统、知识网络与科技治理视角', priority:6 },
-        { name:'交通运输工程学报', areas:['transport'], reason:'交通运输工程和系统分析视角', priority:5 },
-        { name:'交通运输系统工程与信息', areas:['transport','network'], reason:'交通网络、系统工程与运输信息方向', priority:5 },
-      ];
+      if (!sourceRows.length) return null;
+      const exact = sourceRows.filter(({ record }) => pickCleanDomesticName(record.name || record.cn_name || record.title) === clean);
+      const loose = exact.length ? [] : sourceRows.filter(({ record }) => pickCleanDomesticName(record.name || record.cn_name || record.title).includes(clean));
+      const hits = exact.length ? exact : loose;
+      if (!hits.length) return null;
       const sourceWeight = { cnki_major:80, zju:70, nsfc_mgmt:65, cnkx:60, cssci_core:55, pku_core:50, cssci_ext:45 };
-      const recommendations = [];
-      const seen = new Set();
-      for (const target of targets) {
-        const areaHits = target.areas.filter(area => pickAreaHit(profileText, area));
-        if (!areaHits.length) continue;
-        const exact = sourceRows.filter(({ record }) => pickCleanDomesticName(record.name || record.cn_name || record.title) === target.name);
-        const loose = exact.length ? [] : sourceRows.filter(({ record }) => pickCleanDomesticName(record.name || record.cn_name || record.title).includes(target.name));
-        const hits = exact.length ? exact : loose;
-        if (!hits.length || seen.has(target.name)) continue;
-        seen.add(target.name);
-        hits.sort((a, b) => {
-          const ar = a.record, br = b.record;
-          const as = (sourceWeight[a.source] || 0) + (ar.issn ? 12 : 0) + (ar.cn_code ? 8 : 0);
-          const bs = (sourceWeight[b.source] || 0) + (br.issn ? 12 : 0) + (br.cn_code ? 8 : 0);
-          return bs - as;
-        });
-        const best = hits[0];
-        const cnki = hits.find(h => h.source === 'cnki_major')?.record || null;
-        const rec = { ...best.record, name: target.name, __src: best.source };
-        recommendations.push({
-          name: target.name,
-          record: rec,
-          source: best.source,
-          hits,
-          cnki,
-          reason: target.reason,
-          score: areaHits.length * 20 - target.priority,
-        });
+      hits.sort((a, b) => {
+        const ar = a.record, br = b.record;
+        const as = (sourceWeight[a.source] || 0) + (ar.issn ? 12 : 0) + (ar.cn_code ? 8 : 0);
+        const bs = (sourceWeight[b.source] || 0) + (br.issn ? 12 : 0) + (br.cn_code ? 8 : 0);
+        return bs - as;
+      });
+      const best = hits[0];
+      return {
+        record: { ...best.record, name: clean, __src: best.source },
+        source: best.source,
+        cnki: hits.find(h => h.source === 'cnki_major')?.record || null,
+      };
+    }
+
+    // One English-journal row in the AI report: AI gives name+reason,
+    // all metrics are resolved from site data; unresolved names are flagged.
+    function renderPickReportEnRow(item, i) {
+      const rec = resolvePickJournal({ name: item.name });
+      const reason = item.reason || '';
+      if (!rec) {
+        return `<tr>
+          <td>${i + 1}</td>
+          <td>${escape(titleCase(item.name))} <span class="pick-report-meta">${T('站内未收录','not in site data')}</span></td>
+          <td colspan="4"><span class="muted-cell">&mdash;</span></td>
+          <td>${escape(reason)}</td>
+        </tr>`;
       }
-      return recommendations.sort((a, b) => b.score - a.score).slice(0, 10);
+      const fid = favId(rec);
+      if (fid) rowRecordsByFid[fid] = { ...rec, __src: 'int' };
+      const idxText = (rec.indices || []).join(' / ');
+      const apcText = pickDoajApcText(rec);
+      const warnText = (rec.warning || rec.citic_warning || rec.on_hold || rec.under_review) ? ' ⚠' : '';
+      return `<tr>
+        <td>${i + 1}</td>
+        <td>
+          <a href="#j/${escape(fid)}" data-pick-report-fid="${escape(fid)}">${escape(titleCase(rec.name || item.name))}</a>${warnText}
+          ${idxText ? `<span class="pick-report-meta">${escape(idxText)}</span>` : ''}
+        </td>
+        <td>${pickMetricIf(rec) || '<span class="muted-cell">&mdash;</span>'}</td>
+        <td>${escape(rec.if_quartile || '') || '<span class="muted-cell">&mdash;</span>'}</td>
+        <td>${pickMetricCas(rec) ? escape(pickMetricCas(rec)) : '<span class="muted-cell">&mdash;</span>'}</td>
+        <td>${apcText ? escape(apcText) : '<span class="muted-cell">&mdash;</span>'}</td>
+        <td>${escape(reason)}</td>
+      </tr>`;
     }
 
-    function renderPickDomesticReport(query, profile) {
-      const rows = pickDomesticRecommendations(query, profile);
-      if (!rows.length) return '';
-      return `<section class="pick-report-section">
-        <div class="pick-report-section-head">
-          <h3>${T('中文期刊推荐','Chinese journal options')}</h3>
-          <p>${T('基于站内 CSSCI、北大核心、中国科协、CNKI、浙大目录等数据交叉展示。','Cross-checked with the site data such as CSSCI, PKU Core, CAST, CNKI and ZJU lists.')}</p>
-        </div>
-        <div class="pick-report-table-wrap">
-          <table class="pick-report-table pick-report-dom-table">
-            <thead><tr><th>#</th><th>${T('期刊','Journal')}</th><th>${T('站内数据','Site data')}</th><th>${T('建议定位','Positioning')}</th></tr></thead>
-            <tbody>
-              ${rows.map((item, i) => {
-                const r = item.record || {};
-                const fid = favId(r);
-                if (fid) rowRecordsByFid[fid] = { ...r, __src: r.__src || item.source };
-                const badges = [
-                  renderDomCrossBadges({ name:item.name, issn:r.issn, cn_code:r.cn_code }),
-                  item.cnki?.compound_if ? `<span class="domsrc-pill">CNKI ${T('复合IF','compound IF')} ${escape(item.cnki.compound_if)}</span>` : '',
-                  item.cnki?.comprehensive_if ? `<span class="domsrc-pill">CNKI ${T('综合IF','comprehensive IF')} ${escape(item.cnki.comprehensive_if)}</span>` : '',
-                ].filter(Boolean).join('');
-                return `<tr>
-                  <td>${i + 1}</td>
-                  <td><a href="#j/${escape(fid)}" data-pick-report-fid="${escape(fid)}">${escape(item.name)}</a></td>
-                  <td><div class="pick-report-badges">${badges || '<span class="muted-cell">&mdash;</span>'}</div></td>
-                  <td>${escape(item.reason)}</td>
-                </tr>`;
-              }).join('')}
-            </tbody>
-          </table>
-        </div>
-      </section>`;
+    function renderPickReportCnRow(item, i) {
+      const hit = resolveDomesticByName(item.name);
+      if (!hit) {
+        return `<tr>
+          <td>${i + 1}</td>
+          <td>${escape(item.name)} <span class="pick-report-meta">${T('站内未收录','not in site data')}</span></td>
+          <td><span class="muted-cell">&mdash;</span></td>
+          <td>${escape(item.reason || '')}</td>
+        </tr>`;
+      }
+      const r = hit.record;
+      const fid = favId(r);
+      if (fid) rowRecordsByFid[fid] = { ...r, __src: r.__src || hit.source };
+      const badges = [
+        renderDomCrossBadges({ name: r.name, issn: r.issn, cn_code: r.cn_code }),
+        hit.cnki?.compound_if ? `<span class="domsrc-pill">CNKI ${T('复合IF','compound IF')} ${escape(hit.cnki.compound_if)}</span>` : '',
+        hit.cnki?.comprehensive_if ? `<span class="domsrc-pill">CNKI ${T('综合IF','comprehensive IF')} ${escape(hit.cnki.comprehensive_if)}</span>` : '',
+      ].filter(Boolean).join('');
+      return `<tr>
+        <td>${i + 1}</td>
+        <td><a href="#j/${escape(fid)}" data-pick-report-fid="${escape(fid)}">${escape(r.name)}</a></td>
+        <td><div class="pick-report-badges">${badges || '<span class="muted-cell">&mdash;</span>'}</div></td>
+        <td>${escape(item.reason || '')}</td>
+      </tr>`;
     }
 
-    function renderPickStrategyDynamic(primaryRows, hasBranches, hasDomestic) {
-      const top = primaryRows?.[0]?.journalRec?.name || '';
-      const topText = top
-        ? `${T('首投优先看','Prioritize')} ${titleCase(top)}：${T('它在当前语义画像下的匹配度和站内分区/索引信号最靠前。','it has the strongest combined semantic fit and site-data signals for this profile.')}`
-        : T('先从匹配度、学科分区、索引类型和期刊定位同时较好的候选开始筛。','Start with candidates that balance semantic fit, quartile/tier, index type and journal positioning.');
-      const tips = [
-        topText,
-        hasBranches
-          ? T('补充方向只在结果中形成清晰分支时展示，可用于决定摘要和标题要突出哪条投稿叙事。','Additional directions appear only when results form clear branches; use them to decide which submission narrative to emphasize in title and abstract.')
-          : T('当前结果没有拆出稳定的第二方向，建议优先围绕主表候选优化论文叙事。','The current results do not form a stable second direction; focus the manuscript narrative around the main table candidates.'),
-        hasDomestic
-          ? T('中文期刊推荐来自站内国内目录交叉数据，适合准备中文版本或作为保底投稿池。','Chinese journal options come from cross-checked domestic site data and can support a Chinese version or backup pool.')
-          : T('中文期刊只有在站内目录能匹配到相关主题时才展示。','Chinese options are shown only when the site data can match the topic.'),
-        T('DOAJ APC 列只使用 DOAJ 公开数据；空白表示本站暂无公开 APC 金额或状态，不代表免费或收费。','The DOAJ APC column uses only public DOAJ data; blank cells mean no public APC amount/status in the site data, not free or paid.'),
-      ];
-      return `<section class="pick-report-section">
-        <div class="pick-report-section-head"><h3>${T('投稿策略建议','Submission strategy')}</h3></div>
-        <ul class="pick-report-strategy">${tips.map(tip => `<li>${escape(tip)}</li>`).join('')}</ul>
-      </section>`;
-    }
-
-    function renderPickReportDynamic(query, allRows, profile) {
-      const rows = (allRows || []).filter(e => e?.journalRec);
-      if (!rows.length) return '';
-      const primary = rows.slice(0, Math.min(10, rows.length));
+    // AI recommendation report: the AI picks tiers/reasons/strategy, every
+    // metric shown comes from site data (clickable into the journal page).
+    function renderPickAiReport(report, profile) {
+      if (!report || (!(report.tiers || []).length && !(report.chinese || []).length)) return '';
       const fields = pickUnique([
         ...(profile?.research_fields || []),
         ...(profile?.wos_categories || []),
-        ...(profile?.domain_keywords || []),
       ], 10);
-      const branchesHtml = renderPickDynamicBranches(rows, primary);
-      const domesticHtml = renderPickDomesticReport(query, profile);
-      const intro = profile?.explanation
-        || T('AI 先判断论文语境，再调用站内期刊数据排序，避免把歧义词直接当关键词匹配。','AI first interprets the manuscript context, then ranks journals with site data to avoid ambiguous keyword matching.');
+      const intro = report.intro || profile?.explanation || '';
+      const tiersHtml = (report.tiers || []).map(tier => `<section class="pick-report-section">
+        <div class="pick-report-section-head"><h3>${escape(tier.label)}</h3></div>
+        <div class="pick-report-table-wrap">
+          <table class="pick-report-table">
+            <thead><tr><th>#</th><th>${T('期刊','Journal')}</th><th>IF</th><th>JCR</th><th>${T('中科院','CAS')}</th><th>DOAJ APC</th><th>${T('推荐理由','Why')}</th></tr></thead>
+            <tbody>${(tier.items || []).map((item, i) => renderPickReportEnRow(item, i)).join('')}</tbody>
+          </table>
+        </div>
+      </section>`).join('');
+      const chineseHtml = (report.chinese || []).length ? `<section class="pick-report-section">
+        <div class="pick-report-section-head">
+          <h3>${T('中文期刊推荐','Chinese journal options')}</h3>
+          <p>${T('期刊由 AI 按论文主题推荐，收录与分级信息来自站内 CSSCI、北大核心、中国科协、CNKI 等目录。','Journals suggested by AI for this topic; list/tier info comes from the site CSSCI, PKU Core, CAST and CNKI catalogs.')}</p>
+        </div>
+        <div class="pick-report-table-wrap">
+          <table class="pick-report-table pick-report-dom-table">
+            <thead><tr><th>#</th><th>${T('期刊','Journal')}</th><th>${T('站内数据','Site data')}</th><th>${T('推荐理由','Why')}</th></tr></thead>
+            <tbody>${report.chinese.map((item, i) => renderPickReportCnRow(item, i)).join('')}</tbody>
+          </table>
+        </div>
+      </section>` : '';
+      const strategyTips = (report.strategy || []).concat([
+        T('DOAJ APC 列只使用 DOAJ 公开数据；空白表示本站暂无公开 APC 金额或状态，不代表免费或收费。','The DOAJ APC column uses only public DOAJ data; blank cells mean no public APC amount/status in the site data, not free or paid.'),
+      ]);
+      const strategyHtml = `<section class="pick-report-section">
+        <div class="pick-report-section-head"><h3>${T('投稿策略建议','Submission strategy')}</h3></div>
+        <ul class="pick-report-strategy">${strategyTips.map(tip => `<li>${escape(tip)}</li>`).join('')}</ul>
+      </section>`;
       return `<div class="pick-report">
         <div class="pick-report-head">
           <div>
             <div class="pick-report-kicker">${T('AI 综合荐刊','AI recommendation report')}</div>
             <h2>${T('荐刊综合建议','Comprehensive journal recommendation')}</h2>
           </div>
-          <span class="pick-report-source">${T('站内数据：IF / JCR / 中科院 / 索引 / DOAJ APC','Site data: IF / JCR / CAS / indexes / DOAJ APC')}</span>
+          <span class="pick-report-source">${T('AI 给出梯队与理由，指标数据全部来自站内：IF / JCR / 中科院 / 索引 / DOAJ APC','AI picks tiers and reasons; all metrics come from site data: IF / JCR / CAS / indexes / DOAJ APC')}</span>
         </div>
-        <p class="pick-report-intro">${escape(intro)}</p>
+        ${intro ? `<p class="pick-report-intro">${escape(intro)}</p>` : ''}
         ${fields.length ? `<div class="pick-report-fields">${fields.map(f => `<span>${escape(f)}</span>`).join('')}</div>` : ''}
-        ${renderPickReportTable(T('英文期刊推荐','English journal recommendations'), primary, T('按语义匹配和站内期刊数据综合排序，定位列用于区分主投、备选和观察候选。','Ranked by semantic fit and site data; the position column separates priority targets, backups and watchlist journals.'))}
-        ${branchesHtml}
-        ${domesticHtml}
-        ${renderPickStrategyDynamic(primary, !!branchesHtml, !!domesticHtml)}
+        ${tiersHtml}
+        ${chineseHtml}
+        ${strategyHtml}
       </div>`;
     }
 
     async function doSearch() {
-  if (!requireLogin(T("今日免费荐刊搜索已达上限，请登录后继续使用","Daily free search limit reached. Sign in to continue."))) return;
-  incrementUsage("searches");
+      // 未登录用户可用本地匹配（每日限次）；登录后不限本地次数，AI 推荐另有服务端额度。
+      if (isOverLimit('searches', 10) && !requireLogin(T('今日免费荐刊搜索已达上限，请登录后继续使用','Daily free search limit reached. Sign in to continue.'))) return;
+      incrementUsage('searches');
 
       const query = input.value.trim();
       if (!query) { status.textContent = T('请输入内容','Please enter a query'); return; }
@@ -7269,12 +7099,12 @@
         let pickMode = 'local';
         let quotaInfo = null;
         let statusNotice = '';
+        let aiReport = null;
+        let aiProfile = null;
         const useAi = !!document.getElementById('pick-ai-toggle')?.checked;
         if (useAi && !(user && user.token)) {
+          // AI 需要登录：提示后自动改用本地匹配，而不是直接中断。
           statusNotice = t('pick_ai_login');
-          status.textContent = statusNotice;
-          results.innerHTML = `<div class="pick-no-results">${escape(statusNotice)}</div>`;
-          return;
         } else if (useAi) {
           try {
             status.textContent = t('pick_ai_running');
@@ -7282,150 +7112,64 @@
             entries = aiEntriesFromResults(aiData);
             pickMode = 'ai';
             quotaInfo = aiData.quota || null;
+            aiReport = aiData.report || null;
+            aiProfile = aiData.profile || null;
           } catch (e) {
+            // AI 失败（网络/额度/配置）→ 自动回退本地匹配，并在状态栏说明原因。
             statusNotice = pickAiErrorMessage(e);
             status.textContent = statusNotice;
-            results.innerHTML = `<div class="pick-no-results">${escape(statusNotice)}</div>`;
-            return;
           }
         }
 
         if (!entries) {
-        const lines = query.split('\n').filter(l => l.trim());
-        let explicitKeywords = [];
-
-        for (const line of lines) {
-          const trimmed = line.trim();
-
-          // Detect keywords line (English/Chinese markers)
-          if (/^keywords?:/i.test(trimmed) || /^关键词[：:]/.test(trimmed) || /^關鍵詞[：:]/.test(trimmed)) {
-            const kwStr = trimmed.replace(/^keywords?:/i, '').replace(/^关键词[：:]/, '').replace(/^關鍵詞[：:]/, '').trim();
-            explicitKeywords = kwStr.split(/[,;，；、\/]/).map(s => s.trim()).filter(s => s.length > 2);
-            continue;
+          // 本地匹配：词干化 + 标题短语 + 歧义词消歧 + 领域锚点，逻辑在 js/pick-match.js（与 Worker 共用）。
+          const PM = window.PickMatch;
+          if (!PM) {
+            status.textContent = T('本地匹配模块加载失败，请刷新页面重试','Local matching module failed to load. Please refresh.');
+            return;
           }
-        }
-
-        const firstLine = lines.find(l => !/^keywords?:/i.test(l) && !/^关键词[：:]/.test(l) && !/^關鍵詞[：:]/.test(l)) || query;
-        const bodyText = lines.filter(l => l !== firstLine && !/^keywords?:/i.test(l) && !/^关键词[：:]/.test(l) && !/^關鍵詞[：:]/.test(l)).join(' ');
-
-        // 研究方法/过程/抽象词：跨学科共通，是噪声，一律不参与打分（研究对象 > 研究方法）。
-        const GENERIC_TERMS = new Set((
-          'evolution evolutionary mechanism mechanisms spatiotemporal spatial temporal dynamics dynamic ' +
-          'analysis analyses framework frameworks model modeling modelling models method methods methodology ' +
-          'approach approaches characteristic characteristics influence influences impact impacts effect effects ' +
-          'factor factors optimization optimisation simulation simulations evaluation assessment prediction ' +
-          'predictions detection classification recognition system systems strategy strategies development ' +
-          'application applications research study studies investigation data based response responses behavior ' +
-          'behaviour performance structure structural process processes pattern patterns distribution variation ' +
-          'variations change changes relationship relationships correlation correlations multi-source multisource ' +
-          'role comparative comparison novel improved enhanced hybrid integrated review reviews survey theory ' +
-          'theoretical empirical case experimental numerical measurement measurements monitoring estimation ' +
-          'historical history'
-        ).split(/\s+/).filter(Boolean));
-
-        // 研究对象 → 领域锚点（出现在学科分类/主题里的通用词），用于补字面鸿沟（如“街道活力”≠“Urban Studies”）。
-        // 通用启发式，可按需继续扩充；不要塞单一领域的过拟合词。
-        const FIELD_ANCHORS = {
-          street:['urban'], streetscape:['urban'], streetscapes:['urban'], vitality:['urban'],
-          walkability:['urban'], walkable:['urban'], pedestrian:['urban','transport'],
-          neighborhood:['urban'], neighbourhood:['urban'], plaza:['urban'], placemaking:['urban'],
-          gentrification:['urban'], zoning:['urban'], sprawl:['urban'],
-          tumor:['oncology','cancer'], tumour:['oncology','cancer'], carcinoma:['oncology'],
-          gene:['genetics'], genome:['genetics','genomics'], protein:['biochemistry'],
-          battery:['energy'], batteries:['energy'], photovoltaic:['energy'], catalyst:['catalysis','chemistry'],
-        };
-        const stopWords = new Set(('the and are was for not non into onto from this that with from which were have been than into also their about '+
-          'study show were used using based results method model data paper these between while where '+
-          'after before other there analysis approach process system research above during well such '+
-          'each both more most some than very just also although however therefore because without '+
-          'within across among through before after below under over upon could should would may might '+
-          'shall can will does did has had been being made make made made using used based related '+
-          'review reviews nature '+
-          'five summer cross scenario scenarios invasive '+
-          'cross-scenario non-invasive explainable '+
-          'significant different important various multiple including following providing performing '+
-          'proposes presents demonstrates investigates examines explores develops describes reports '+
-          'shows found test tests testing methods models datasets dataset experiments experimental '+
-          'proposed presented demonstrated investigated examined explored developed described reported '+
-          'tested showed found approach techniques algorithm algorithms features feature accuracy '+
-          'performance evaluation values value results analysis prediction predictions').split(' '));
-
-        const allText = [firstLine, bodyText, explicitKeywords.join(' ')].join(' ').toLowerCase();
-        const allWords = allText.replace(/[^a-z0-9\u4e00-\u9fff\s-]/g, ' ')
-          .split(/\s+/)
-          .map(w => w.replace(/^-+|-+$/g, ''))
-          .filter(w => w.length > 2 && !stopWords.has(w) && !/^\d+$/.test(w) && !w.startsWith('http'));
-        // 只把「研究对象」词纳入打分；命中 GENERIC_TERMS 的方法/过程词一律忽略。
-        const objectTerms = new Map();
-        const seenObj = new Set();
-        function addObject(term, weight) {
-          const s = String(term || '').toLowerCase().trim();
-          if (!s || s.length < 3 || stopWords.has(s) || GENERIC_TERMS.has(s)) return;
-          objectTerms.set(s, Math.max(objectTerms.get(s) || 0, weight));
-        }
-        explicitKeywords.forEach(k => addObject(k, 5));   // 显式关键词权重最高
-        let _oi = 0;
-        allWords.forEach(w => { if (seenObj.has(w)) return; seenObj.add(w); addObject(w, _oi++ < 8 ? 3 : 2); });
-        // 研究对象 → 领域锚点扩展（如 street/vitality → urban），扩展词当作对象词、权重略低
-        [...objectTerms.keys()].forEach(w => (FIELD_ANCHORS[w] || []).forEach(a => addObject(a, 2.4)));
-        const terms = [...objectTerms.entries()].sort((a, b) => b[1] - a[1]).slice(0, 24);
-        if (!terms.length) {
-          status.textContent = T('请输入更具体的研究对象关键词（避免只填“分析/机制/演化”等方法词）','Enter more specific research-topic keywords (not just method words like analysis/mechanism)');
-          return;
-        }
-
-        function localTopicProfile(r) {
-          const issns = [r.issn, r.eissn].filter(Boolean).map(x => String(x).toUpperCase());
-          const topics = [];
-          for (const k of issns) {
-            const rec = oaMap && oaMap[k];
-            if (!rec) continue;
-            (rec.tp || []).forEach(t => topics.push(t));
+          const localProfile = PM.buildLocalProfile(query);
+          if (!localProfile.terms.length) {
+            status.textContent = T('请输入更具体的研究对象关键词（避免只填“分析/机制/演化”等方法词）','Enter more specific research-topic keywords (not just method words like analysis/mechanism)');
+            return;
           }
-          return [...new Set(topics)];
-        }
 
-        entries = journals.map(r => {
-          const topics = localTopicProfile(r);
-          // 学科分类(WoS/ESI/中科院大类/JCR/CCF)定义期刊核心领域 → 命中权重最高
-          const catHay = [r.esi_category, r.cas_major_cn, r.jcr_cat, r.ccf_area, ...(r.wos_categories || [])]
-            .filter(Boolean).join(' ').toLowerCase();
-          const topicList = topics.map(t => String(t).toLowerCase());
-          const nameHay = [r.name, r.cn_name, r.abbr20].filter(Boolean).join(' ').toLowerCase();
-          let score = 0;
-          const matched = [];
-          for (const [term, weight] of terms) {
-            const parts = term.split(/\s+/).filter(Boolean);
-            const inCat = catHay.includes(term) || (parts.length > 1 && parts.every(p => catHay.includes(p)));
-            const topicCount = topicList.filter(tp => tp.includes(term) || (parts.length > 1 && parts.every(p => tp.includes(p)))).length;
-            const inName = nameHay.includes(term) || (parts.length > 1 && parts.every(p => nameHay.includes(p)));
-            let s = 0;
-            if (inCat) s += weight * 2.0;                                    // 学科分类命中：最强信号
-            if (topicCount) s += weight * Math.min(0.25 * topicCount, 1.0);  // 主题命中：按中心度
-            if (!s && inName) s += weight * 0.3;                             // 仅刊名命中：弱信号（防“Evolution”类劫持）
-            if (s > 0) { score += s; matched.push(term); }
+          function localTopicProfile(r) {
+            const issns = [r.issn, r.eissn].filter(Boolean).map(x => String(x).toUpperCase());
+            const topics = [];
+            for (const k of issns) {
+              const rec = oaMap && oaMap[k];
+              if (!rec) continue;
+              (rec.tp || []).forEach(t => topics.push(t));
+            }
+            return [...new Set(topics)];
           }
-          // 广度奖励：命中越多不同研究对象词越相关
-          score *= (1 + 0.4 * Math.max(0, matched.length - 1));
-          const idx = r.indices || [];
-          if (idx.includes('SCIE') || idx.includes('SSCI') || idx.includes('AHCI') || idx.includes('ESCI')) score *= 1.10;
-          if (r.cas_zone === 1 || r.if_quartile === 'Q1') score *= 1.06;
-          if (r.warning || r.citic_warning || r.on_hold || r.under_review) score *= 0.72;
-          return {
-            journalRec: r,
-            issn: r.issn || r.eissn || favId(r),
-            zone: r.cas_zone,
-            top: r.cas_top,
-            jcr_q: r.if_quartile,
-            indices: idx,
-            wos_categories: r.wos_categories || [],
-            topics: topics.slice(0, 6),
-            matched: [...new Set(matched)].slice(0, 8),
-            count: matched.length,
-            score,
-            srcName: r.name,
-          };
-        }).filter(e => e.score > 0 && e.count > 0);
+
+          entries = [];
+          for (const r of journals) {
+            const topics = localTopicProfile(r);
+            const res = PM.scoreLocal(r, localProfile, topics);
+            if (!PM.passesLocalThreshold(res, localProfile)) continue;
+            let score = res.score;
+            const idx = r.indices || [];
+            if (idx.includes('SCIE') || idx.includes('SSCI') || idx.includes('AHCI') || idx.includes('ESCI')) score *= 1.10;
+            if (r.cas_zone === 1 || r.if_quartile === 'Q1') score *= 1.06;
+            if (r.warning || r.citic_warning || r.on_hold || r.under_review) score *= 0.72;
+            entries.push({
+              journalRec: r,
+              issn: r.issn || r.eissn || favId(r),
+              zone: r.cas_zone,
+              top: r.cas_top,
+              jcr_q: r.if_quartile,
+              indices: idx,
+              wos_categories: r.wos_categories || [],
+              topics: topics.slice(0, 6),
+              matched: [...new Set(res.matched)].slice(0, 8),
+              count: res.matched.length,
+              score,
+              srcName: r.name,
+            });
+          }
         }
 
         let filtered = entries;
@@ -7473,7 +7217,7 @@
         }
 
         const reportHtml = pickMode === 'ai'
-          ? renderPickReportDynamic(query, filtered, entries[0]?.semanticProfile || {})
+          ? renderPickAiReport(aiReport, aiProfile || entries[0]?.semanticProfile || {})
           : '';
         results.innerHTML = reportHtml + filtered.map(e => {
           const scorePct = Math.round(e.score * 100);
