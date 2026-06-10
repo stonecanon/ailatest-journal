@@ -110,6 +110,123 @@ function firstPartyFromRows(site, rows, days) {
     topCountries: mergeRankedJson(rows, 'countries_json', 'country'),
   };
 }
+function splitExternalByFirstParty(source, firstParty, kind) {
+  const sites = siteDefs();
+  if (!source || source.status !== 'ok') {
+    const sitesOut = {};
+    for (const site of sites) {
+      sitesOut[site.id] = {
+        ...site,
+        source: source?.source || (kind === 'ga' ? 'Google Analytics 4' : 'Cloudflare Analytics'),
+        status: source?.status || 'disabled',
+        reason: source?.reason || '',
+        totals: {},
+        series: [],
+      };
+    }
+    return {
+      source: source?.source || (kind === 'ga' ? 'Google Analytics 4' : 'Cloudflare Analytics'),
+      status: source?.status || 'disabled',
+      reason: source?.reason || '',
+      sites: sitesOut,
+    };
+  }
+
+  const firstPartyTotal = sites.reduce((sum, site) => sum + num(firstParty?.[site.id]?.totals?.pageviews), 0);
+  const scale = (value, share) => Math.round(num(value) * share);
+  const numericKeys = new Set();
+  for (const row of source.series || []) {
+    for (const [key, value] of Object.entries(row)) {
+      if (key !== 'day' && Number.isFinite(Number(value))) numericKeys.add(key);
+    }
+  }
+  for (const [key, value] of Object.entries(source.totals || {})) {
+    if (Number.isFinite(Number(value))) numericKeys.add(key);
+  }
+
+  const sitesOut = {};
+  for (const site of sites) {
+    const fp = firstParty?.[site.id] || {};
+    const share = firstPartyTotal ? num(fp.totals?.pageviews) / firstPartyTotal : 0;
+    const totals = {};
+    for (const key of numericKeys) totals[key] = scale(source.totals?.[key], share);
+    if (kind === 'cf') {
+      totals.resource_requests = totals.resource_requests || totals.requests || 0;
+      totals.visitors = totals.visitors || scale(source.totals?.users || source.totals?.visitors, share);
+    } else {
+      totals.users = totals.users || scale(source.totals?.visitors || source.totals?.users, share);
+    }
+    const series = (source.series || []).map(row => {
+      const out = { day: row.day };
+      for (const key of numericKeys) out[key] = scale(row[key], share);
+      if (kind === 'cf') {
+        out.resource_requests = out.resource_requests || out.requests || 0;
+        out.visitors = out.visitors || scale(row.users || row.visitors, share);
+      } else {
+        out.users = out.users || scale(row.visitors || row.users, share);
+      }
+      return out;
+    });
+    const topPages = (source.topPages || source.topPaths || []).map(row => {
+      const metric = kind === 'cf' ? 'requests' : 'pageviews';
+      return { ...row, [metric]: scale(row[metric], share), users: scale(row.users, share), visitors: scale(row.visitors, share) };
+    }).filter(row => num(row.requests || row.pageviews)).slice(0, 15);
+    sitesOut[site.id] = {
+      ...site,
+      source: source.source,
+      status: 'ok',
+      reason: 'Estimated from first-party site share; source API is zone/property level.',
+      filter_note: 'Estimated from first-party site share; use as a reference, not exact host-level split.',
+      totals,
+      series,
+      topPages,
+      topPaths: kind === 'cf' ? topPages : [],
+      topCountries: source.topCountries || [],
+    };
+  }
+  return {
+    ...source,
+    sites: sitesOut,
+  };
+}
+function attachExternalSiteMonitoring(siteMonitoring, cloudflare, ga) {
+  const firstParty = siteMonitoring?.first_party || {};
+  const cf = splitExternalByFirstParty(cloudflare, firstParty, 'cf');
+  const google = splitExternalByFirstParty(ga, firstParty, 'ga');
+  const sourceComparison = {};
+  for (const site of siteDefs()) {
+    const fp = firstParty[site.id] || firstPartyFromRows(site, [], siteMonitoring?.days || 30);
+    const cfSite = cf.sites?.[site.id] || {};
+    const gaSite = google.sites?.[site.id] || {};
+    sourceComparison[site.id] = {
+      first_party: {
+        pageviews: fp.totals?.pageviews || 0,
+        visitors: fp.totals?.visitors || 0,
+        sessions: fp.totals?.sessions || 0,
+      },
+      cloudflare: {
+        status: cfSite.status || cf.status || 'disabled',
+        reason: cfSite.reason || cf.reason || '',
+        requests: cfSite.totals?.requests || 0,
+        pageviews: cfSite.totals?.pageviews || cfSite.totals?.requests || 0,
+        visitors: cfSite.totals?.visitors || 0,
+      },
+      google_analytics: {
+        status: gaSite.status || google.status || 'disabled',
+        reason: gaSite.reason || google.reason || '',
+        pageviews: gaSite.totals?.pageviews || 0,
+        users: gaSite.totals?.users || 0,
+        sessions: gaSite.totals?.sessions || 0,
+      },
+    };
+  }
+  return {
+    ...siteMonitoring,
+    cloudflare: cf,
+    google_analytics: google,
+    source_comparison: sourceComparison,
+  };
+}
 async function buildSiteMonitoring(env, options = {}) {
   const days = [1, 7, 30].includes(Number(options.days)) ? Number(options.days) : 30;
   const sites = siteDefs();
@@ -165,9 +282,227 @@ async function buildSiteMonitoring(env, options = {}) {
     days,
     sites,
     first_party: firstParty,
-    cloudflare: { source: 'Cloudflare Analytics', status: 'not_split', sites: {} },
-    google_analytics: { source: 'Google Analytics 4', status: 'not_split', sites: {} },
+    cloudflare: { source: 'Cloudflare Analytics', status: 'pending', sites: {} },
+    google_analytics: { source: 'Google Analytics 4', status: 'pending', sites: {} },
     source_comparison: sourceComparison,
+  };
+}
+
+function normalizeDays(options = {}) {
+  const days = Number(options.days);
+  return [1, 7, 30].includes(days) ? days : 30;
+}
+function startSecForDays(days) {
+  return Math.floor(Date.now() / 1000) - (days === 1 ? 24 * 3600 : days * 24 * 3600);
+}
+function maskEmail(email) {
+  return email ? String(email).replace(/^(.{2}).*(@.*)$/, '$1***$2') : '';
+}
+function withUser(row) {
+  const out = { ...row };
+  out.user = {
+    id: out.user_id,
+    email: maskEmail(out.email),
+    login: out.login,
+    name: out.name,
+  };
+  delete out.email;
+  delete out.login;
+  delete out.name;
+  return out;
+}
+function sumRows(rows, key) {
+  return (rows || []).reduce((total, row) => total + num(row[key]), 0);
+}
+function humanTrafficExpr() {
+  return "COALESCE(traffic_type, CASE WHEN is_bot=1 THEN 'scraper' ELSE 'human' END) = 'human'";
+}
+async function buildSiteBusiness(env, options = {}) {
+  const days = normalizeDays(options);
+  const startSec = startSecForDays(days);
+  const tableRows = await q(env, "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name");
+  const tables = new Set(tableRows.map(row => row.name));
+  const has = name => tables.has(name);
+  const run = (name, sql, binds = []) => (has(name) ? q(env, sql, binds) : Promise.resolve([]));
+  const jvColumns = has('journal_view_events')
+    ? new Set((await q(env, "PRAGMA table_info(journal_view_events)")).map(row => row.name))
+    : new Set();
+  const jvSelect = name => (jvColumns.has(name) ? name : `NULL AS ${name}`);
+  const jvAgg = name => (jvColumns.has(name) ? `MAX(${name})` : 'NULL');
+
+  const [
+    usersSummary, loginSummary, favoriteSummary, ratingSummary, listSummary,
+    recentUsers, topFavorites, topRated, topJournalViews, journalViewPeriodSummary,
+    recentJournalViews, periodTopJournalViews, jvSourceSummary, jvHourlySeries,
+    interactionSummary, interactionByTab, recentInteractions,
+    recentFavorites, recentRatings, topLists, pickUsageByDay,
+    grantSummary, grantTopSearchQueries, grantZeroResultSearches, grantRecentInteractions,
+    grantRecentPageviews, grantInteractionByDay,
+    ailatestRecentPageviews,
+  ] = await Promise.all([
+    run('users', `SELECT COUNT(*) AS total_users FROM users`),
+    run('login_events', `SELECT COUNT(*) AS total_login_events FROM login_events`),
+    run('favorites', `SELECT COUNT(*) AS favorite_rows FROM favorites`),
+    run('ratings', `SELECT COUNT(*) AS rating_rows FROM ratings`),
+    run('fav_lists', `SELECT COUNT(*) AS lists FROM fav_lists`),
+    run('users', `SELECT id, provider, email, login, name, created_at, updated_at
+      FROM users ORDER BY created_at DESC LIMIT 20`),
+    run('favorites', `SELECT journal_key, COUNT(*) AS favorites
+      FROM favorites GROUP BY journal_key ORDER BY favorites DESC, journal_key ASC LIMIT 40`),
+    run('ratings', `SELECT journal_key, COUNT(*) AS ratings, ROUND(AVG(rating),2) AS avg_rating
+      FROM ratings GROUP BY journal_key ORDER BY ratings DESC, avg_rating DESC, journal_key ASC LIMIT 40`),
+    run('journal_views', `SELECT journal_key, count AS views, updated_at
+      FROM journal_views ORDER BY count DESC, updated_at DESC, journal_key ASC LIMIT 40`),
+    run('journal_view_events', `SELECT COUNT(*) AS total_journal_views, COUNT(DISTINCT journal_key) AS viewed_journals,
+        MAX(COALESCE(NULLIF(event_time,0), viewed_at)) AS latest_journal_view_at
+      FROM journal_view_events
+      WHERE viewed_at >= ? AND ${humanTrafficExpr()}`, [startSec]),
+    run('journal_view_events', `SELECT journal_key, ${jvSelect('journal_name')}, ${jvSelect('journal_issn')}, user_id, visitor_id, session_id,
+        path, viewed_at, referrer, user_agent, country, ip_hash, device, browser, event_time,
+        view_source, query, tab, traffic_type, bot_reason
+      FROM journal_view_events
+      WHERE viewed_at >= ?
+      ORDER BY COALESCE(NULLIF(event_time,0), viewed_at) DESC LIMIT 120`, [startSec]),
+    run('journal_view_events', `SELECT journal_key, ${jvAgg('journal_name')} AS journal_name, ${jvAgg('journal_issn')} AS journal_issn,
+        COUNT(*) AS views, COUNT(DISTINCT visitor_id) AS visitors,
+        MAX(COALESCE(NULLIF(event_time,0), viewed_at)) AS latest_viewed
+      FROM journal_view_events
+      WHERE viewed_at >= ? AND ${humanTrafficExpr()}
+      GROUP BY journal_key ORDER BY views DESC, latest_viewed DESC LIMIT 40`, [startSec]),
+    run('journal_view_events', `SELECT COALESCE(view_source,'unknown') AS view_source, COALESCE(tab,'unknown') AS tab,
+        COUNT(*) AS views, COUNT(DISTINCT visitor_id) AS visitors
+      FROM journal_view_events
+      WHERE viewed_at >= ? AND ${humanTrafficExpr()}
+      GROUP BY COALESCE(view_source,'unknown'), COALESCE(tab,'unknown')
+      ORDER BY views DESC LIMIT 40`, [startSec]),
+    run('journal_view_events', `SELECT ${days === 1 ? "strftime('%Y-%m-%dT%H:00:00Z', viewed_at, 'unixepoch')" : "date(viewed_at, 'unixepoch')"} AS hour,
+        COUNT(*) AS views, COUNT(DISTINCT visitor_id) AS visitors
+      FROM journal_view_events
+      WHERE viewed_at >= ? AND ${humanTrafficExpr()}
+      GROUP BY hour ORDER BY hour ASC`, [startSec]),
+    run('interaction_events', `SELECT event_type, COUNT(*) AS events, COUNT(DISTINCT visitor_id) AS visitors,
+        COUNT(DISTINCT session_id) AS sessions, ROUND(AVG(result_count),1) AS avg_results
+      FROM interaction_events
+      WHERE site = 'journal.ailatest.org' AND event_ts >= ?
+      GROUP BY event_type ORDER BY events DESC`, [startSec]),
+    run('interaction_events', `SELECT event_type, COALESCE(tab,'unknown') AS tab, COUNT(*) AS events,
+        ROUND(AVG(result_count),1) AS avg_results
+      FROM interaction_events
+      WHERE site = 'journal.ailatest.org' AND event_ts >= ?
+      GROUP BY event_type, COALESCE(tab,'unknown') ORDER BY events DESC LIMIT 40`, [startSec]),
+    run('interaction_events', `SELECT event_type, site, path, tab, query, result_count, visitor_id, session_id,
+        event_ts, traffic_type, bot_reason
+      FROM interaction_events
+      WHERE site = 'journal.ailatest.org' AND event_ts >= ?
+      ORDER BY event_ts DESC LIMIT 60`, [startSec]),
+    run('favorites', `SELECT f.journal_key, f.created_at, u.id AS user_id, u.email, u.login, u.name
+      FROM favorites f LEFT JOIN users u ON u.id = f.user_id
+      ORDER BY f.created_at DESC LIMIT 40`),
+    run('ratings', `SELECT r.journal_key, r.rating, r.created_at, r.updated_at, u.id AS user_id, u.email, u.login, u.name
+      FROM ratings r LEFT JOIN users u ON u.id = r.user_id
+      ORDER BY COALESCE(r.updated_at, r.created_at) DESC LIMIT 40`),
+    run('fav_lists', `SELECT l.name, json_array_length(l.ids_json) AS items, l.created_at, l.updated_at,
+        u.id AS user_id, u.email, u.login, u.name
+      FROM fav_lists l LEFT JOIN users u ON u.id = l.user_id
+      ORDER BY l.updated_at DESC LIMIT 40`),
+    run('pick_usage', `SELECT period_key AS day, SUM(used) AS used, COUNT(DISTINCT user_id) AS users
+      FROM pick_usage WHERE period = 'day'
+      GROUP BY period_key ORDER BY period_key ASC`),
+    run('interaction_events', `SELECT COUNT(*) AS search_events, COUNT(DISTINCT visitor_id) AS search_visitors,
+        COUNT(DISTINCT session_id) AS search_sessions,
+        SUM(CASE WHEN result_count = 0 THEN 1 ELSE 0 END) AS zero_result_searches
+      FROM interaction_events
+      WHERE site = 'grant.ailatest.org' AND event_ts >= ?`, [startSec]),
+    run('interaction_events', `SELECT query, COUNT(*) AS events, COUNT(DISTINCT visitor_id) AS visitors,
+        ROUND(AVG(result_count),1) AS avg_results
+      FROM interaction_events
+      WHERE site = 'grant.ailatest.org' AND event_ts >= ?
+      GROUP BY query ORDER BY events DESC LIMIT 40`, [startSec]),
+    run('interaction_events', `SELECT query, COUNT(*) AS events
+      FROM interaction_events
+      WHERE site = 'grant.ailatest.org' AND event_ts >= ? AND result_count = 0
+      GROUP BY query ORDER BY events DESC LIMIT 40`, [startSec]),
+    run('interaction_events', `SELECT event_type, site, path, tab, query, result_count, visitor_id, session_id,
+        event_ts, traffic_type, bot_reason
+      FROM interaction_events
+      WHERE site = 'grant.ailatest.org' AND event_ts >= ?
+      ORDER BY event_ts DESC LIMIT 60`, [startSec]),
+    run('raw_events', `SELECT event_ts, received_at, visitor_id, session_id, path, referrer, country,
+        client_language, ip_hash, traffic_type, bot_reason
+      FROM raw_events
+      WHERE site = 'grant.ailatest.org' AND event_ts >= ?
+      ORDER BY event_ts DESC LIMIT 120`, [startSec]),
+    run('interaction_events', `SELECT date(event_ts,'unixepoch') AS day, COUNT(*) AS events
+      FROM interaction_events
+      WHERE site = 'grant.ailatest.org' AND event_ts >= ?
+      GROUP BY day ORDER BY day ASC`, [startSec]),
+    run('raw_events', `SELECT event_ts, received_at, visitor_id, session_id, path, referrer, country,
+        client_language, ip_hash, traffic_type, bot_reason
+      FROM raw_events
+      WHERE site = 'ailatest.org' AND event_ts >= ?
+      ORDER BY event_ts DESC LIMIT 120`, [startSec]),
+  ]);
+
+  const interactionEvents = rows => sumRows(rows, 'events');
+  const journalPickRows = (interactionSummary || []).filter(row => row.event_type === 'journal_pick');
+  const journalSearchRows = (interactionSummary || []).filter(row => row.event_type === 'journal_search');
+
+  return {
+    journal: {
+      status: has('journal_view_events') || has('interaction_events') ? 'ok' : 'empty',
+      kpis: {
+        total_users: scalar(usersSummary[0], 'total_users'),
+        total_login_events: scalar(loginSummary[0], 'total_login_events'),
+        total_journal_views: scalar(journalViewPeriodSummary[0], 'total_journal_views'),
+        viewed_journals: scalar(journalViewPeriodSummary[0], 'viewed_journals'),
+        latest_journal_view_at: scalar(journalViewPeriodSummary[0], 'latest_journal_view_at', null),
+        search_events: interactionEvents(journalSearchRows),
+        pick_events: interactionEvents(journalPickRows),
+        pick_consumed: sumRows(pickUsageByDay, 'used'),
+        favorite_rows: scalar(favoriteSummary[0], 'favorite_rows'),
+        lists: scalar(listSummary[0], 'lists'),
+        rating_rows: scalar(ratingSummary[0], 'rating_rows'),
+      },
+      tables: {
+        recentUsers: recentUsers.map(user => ({ ...user, email: maskEmail(user.email) })),
+        topFavorites,
+        topRated,
+        topJournalViews,
+        recentJournalViews,
+        periodTopJournalViews,
+        jvSourceSummary,
+        jvHourlySeries,
+        interactionSummary,
+        interactionByTab,
+        recentInteractions,
+        recentFavorites: recentFavorites.map(withUser),
+        recentRatings: recentRatings.map(withUser),
+        topLists: topLists.map(withUser),
+        pickUsageByDay,
+      },
+    },
+    grant: {
+      status: has('interaction_events') || has('raw_events') ? 'ok' : 'empty',
+      kpis: {
+        search_events: scalar(grantSummary[0], 'search_events'),
+        search_visitors: scalar(grantSummary[0], 'search_visitors'),
+        search_sessions: scalar(grantSummary[0], 'search_sessions'),
+        zero_result_searches: scalar(grantSummary[0], 'zero_result_searches'),
+      },
+      tables: {
+        topSearchQueries: grantTopSearchQueries,
+        zeroResultSearches: grantZeroResultSearches,
+        recentInteractions: grantRecentInteractions,
+        recentPageviews: grantRecentPageviews,
+        interactionByDay: grantInteractionByDay,
+      },
+    },
+    ailatest: {
+      status: has('raw_events') ? 'ok' : 'empty',
+      tables: {
+        recentPageviews: ailatestRecentPageviews,
+      },
+    },
   };
 }
 
@@ -542,7 +877,7 @@ async function buildGoogleAnalytics(env) {
 
 // ───────── top-level ─────────
 export async function buildDashboardPayload(env, options = {}) {
-  const [d1, cloudflare, ga, siteMonitoring] = await Promise.all([
+  const [d1, cloudflare, ga, siteMonitoring, siteBusiness] = await Promise.all([
     buildD1(env),
     buildCloudflare(env).catch(e => ({ source: 'Cloudflare Analytics', status: 'error', reason: e.message })),
     buildGoogleAnalytics(env).catch(e => ({ source: 'Google Analytics 4', status: 'error', reason: e.message })),
@@ -553,7 +888,13 @@ export async function buildDashboardPayload(env, options = {}) {
       first_party: {},
       source_comparison: {},
     })),
+    buildSiteBusiness(env, options).catch(e => ({
+      journal: { status: 'error', reason: e.message || String(e) },
+      grant: { status: 'error', reason: e.message || String(e) },
+      ailatest: { status: 'error', reason: e.message || String(e) },
+    })),
   ]);
+  const siteMonitoringWithSources = attachExternalSiteMonitoring(siteMonitoring, cloudflare, ga);
 
   return {
     generated_at: new Date().toISOString(),
@@ -568,6 +909,7 @@ export async function buildDashboardPayload(env, options = {}) {
     ...d1,
     cloudflare,
     google_analytics: ga,
-    site_monitoring: siteMonitoring,
+    site_monitoring: siteMonitoringWithSources,
+    site_business: siteBusiness,
   };
 }

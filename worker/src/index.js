@@ -1221,7 +1221,7 @@ async function routeDashboard(req, env) {
   const rawDays = Number(url.searchParams.get('days') || '30');
   const days = [1, 7, 30].includes(rawDays) ? rawDays : 30;
   const cache = caches.default;
-  const cacheKey = new Request(`https://cache.internal/analytics/dashboard?days=${days}`, { method: 'GET' });
+  const cacheKey = new Request(`https://cache.internal/analytics/dashboard-v2?days=${days}`, { method: 'GET' });
   const nocache = url.searchParams.get('nocache') === '1';
   if (!nocache) {
     const hit = await cache.match(cacheKey);
