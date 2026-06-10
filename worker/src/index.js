@@ -32,6 +32,8 @@
  */
 
 import { buildDashboardPayload } from './dashboard.js';
+import { handleChat } from './chat.js';
+import { handlePick } from './pick.js';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -301,13 +303,10 @@ async function ensurePickQuotaTables(env) {
   ]);
 }
 
-async function routeConsumePickQuota(req, env) {
-  const u = await getUser(req, env);
-  if (!u) return err('login required', 401);
-
+async function consumePickQuotaForUser(env, u) {
   const now = nowSec();
   if (isOwnerUser(u)) {
-    return json({ ok: true, allowed: true, plan: 'owner', unlimited: true, used: 0, limit: null, remaining: null, period: 'none', period_key: '', reset_at: null });
+    return { ok: true, allowed: true, plan: 'owner', unlimited: true, used: 0, limit: null, remaining: null, period: 'none', period_key: '', reset_at: null };
   }
 
   await ensurePickQuotaTables(env);
@@ -330,7 +329,7 @@ async function routeConsumePickQuota(req, env) {
   ).bind(u.id, period, periodKey).first();
   const used = Number(usage?.used || 0);
   if (used >= limit) {
-    return json({ ok: false, allowed: false, plan: hasPaid ? quota.plan : 'free', used, limit, remaining: 0, period, period_key: periodKey, reset_at: resetAt, error: 'quota exceeded' }, 429);
+    return { ok: false, allowed: false, plan: hasPaid ? quota.plan : 'free', used, limit, remaining: 0, period, period_key: periodKey, reset_at: resetAt, error: 'quota exceeded' };
   }
 
   await env.DB.prepare(
@@ -339,7 +338,22 @@ async function routeConsumePickQuota(req, env) {
   ).bind(now, u.id, period, periodKey).run();
 
   const nextUsed = used + 1;
-  return json({ ok: true, allowed: true, plan: hasPaid ? quota.plan : 'free', used: nextUsed, limit, remaining: Math.max(0, limit - nextUsed), period, period_key: periodKey, reset_at: resetAt });
+  return { ok: true, allowed: true, plan: hasPaid ? quota.plan : 'free', used: nextUsed, limit, remaining: Math.max(0, limit - nextUsed), period, period_key: periodKey, reset_at: resetAt };
+}
+
+async function routeConsumePickQuota(req, env) {
+  const u = await getUser(req, env);
+  if (!u) return err('login required', 401);
+  const quota = await consumePickQuotaForUser(env, u);
+  return json(quota, quota.allowed ? 200 : 429);
+}
+
+async function consumePickQuotaForRequest(req, env) {
+  const u = await getUser(req, env);
+  if (!u) return { ok: false, response: err('login required', 401) };
+  const quota = await consumePickQuotaForUser(env, u);
+  if (!quota.allowed) return { ok: false, response: json(quota, 429) };
+  return { ok: true, quota, user: u };
 }
 
 async function routeEmailRequest(req, env) {
@@ -873,6 +887,7 @@ async function routeGetShare(req, env, id) {
   const row = await env.DB.prepare(
     'SELECT owner_uid, owner_name, name, items_json, view_count, expires_at, created_at FROM shares WHERE id = ?'
   ).bind(id).first();
+
   if (!row) return err('not found', 404);
 
   const expired = row.expires_at && row.expires_at < nowSec();
@@ -918,6 +933,7 @@ async function routeImportShare(req, env, id) {
   const row = await env.DB.prepare(
     'SELECT owner_name, name, items_json, expires_at FROM shares WHERE id = ?'
   ).bind(id).first();
+
   if (!row) return err('not found', 404);
   if (row.expires_at && row.expires_at < nowSec()) return err('expired', 410);
 
@@ -979,6 +995,7 @@ async function routeDeleteShare(req, env, id) {
   const u = await getUser(req, env);
   if (!u) return err('unauthorized', 401);
   const row = await env.DB.prepare('SELECT owner_uid FROM shares WHERE id = ?').bind(id).first();
+
   if (!row) return err('not found', 404);
   if (row.owner_uid !== u.id) return err('forbidden', 403);
   await env.DB.prepare('DELETE FROM shares WHERE id = ?').bind(id).run();
@@ -1023,6 +1040,175 @@ async function routeGetJournalViews(req, env) {
   return json({ views: out });
 }
 
+// GET /journal-view-total  (公开总量，不含用户明细)
+async function routeGetJournalViewTotal(req, env) {
+  const row = await env.DB.prepare(
+    `SELECT COUNT(*) AS viewed_journals,
+      COALESCE(SUM(count),0) AS total_journal_views,
+      MAX(updated_at) AS latest_journal_view_at
+     FROM journal_views`
+  ).first();
+  return json({
+    ok: true,
+    viewed_journals: Number(row?.viewed_journals || 0),
+    total_journal_views: Number(row?.total_journal_views || 0),
+    latest_journal_view_at: row?.latest_journal_view_at || null,
+  });
+}
+
+// GET /analytics/journal-view-trend  (owner only) → lightweight chart payload
+async function routeJournalViewTrend(req, env) {
+  const u = await getUser(req, env);
+  if (!u) return err('login required', 401);
+  if (!isOwnerUser(u)) return err('forbidden', 403);
+
+  const url = new URL(req.url);
+  const rawDays = Number(url.searchParams.get('days') || '7');
+  const days = [1, 7, 30].includes(rawDays) ? rawDays : 7;
+  const now = Math.floor(Date.now() / 1000);
+  const startSec = now - (days > 1 ? days * 86400 : 86400);
+  const bucketExpr = days > 1
+    ? "date(viewed_at, 'unixepoch')"
+    : "strftime('%Y-%m-%dT%H:00:00Z', viewed_at, 'unixepoch')";
+  const humanTrafficSql = "COALESCE(traffic_type, CASE WHEN is_bot=1 THEN 'scraper' ELSE 'human' END) = 'human'";
+
+  const ownerRows = await env.DB.prepare(
+    `SELECT id FROM users
+     WHERE lower(email) = 'jiantaoweng@gmail.com'
+        OR lower(login) = 'jiantaoweng@gmail.com'
+        OR login IN ('arc_wjt','stonecanon')
+        OR name IN ('arc_wjt','stonecanon','H&S一心菌 (石头小石头)')`
+  ).all().then(r => r.results || []).catch(() => []);
+  const ownerIds = ownerRows.map(r => Number(r.id)).filter(Number.isFinite);
+  const ownerExcludeSql = ownerIds.length ? ` AND (user_id IS NULL OR user_id NOT IN (${ownerIds.join(',')}))` : '';
+
+  const [summary, cumulative, series] = await Promise.all([
+    env.DB.prepare(
+      `SELECT COUNT(*) AS total_journal_views,
+        COUNT(DISTINCT journal_key) AS viewed_journals,
+        MAX(viewed_at) AS latest_journal_view_at
+       FROM journal_view_events
+       WHERE viewed_at >= ?${ownerExcludeSql} AND ${humanTrafficSql}`
+    ).bind(startSec).first(),
+    env.DB.prepare(`SELECT COALESCE(SUM(count),0) AS cumulative_journal_views FROM journal_views`).first(),
+    env.DB.prepare(
+      `SELECT ${bucketExpr} AS hour,
+        COUNT(*) AS views,
+        COUNT(DISTINCT visitor_id) AS visitors
+       FROM journal_view_events
+       WHERE viewed_at >= ?${ownerExcludeSql} AND ${humanTrafficSql}
+       GROUP BY hour ORDER BY hour ASC`
+    ).bind(startSec).all(),
+  ]);
+
+  return json({
+    ok: true,
+    days,
+    kpis: {
+      total_journal_views: Number(summary?.total_journal_views || 0),
+      viewed_journals: Number(summary?.viewed_journals || 0),
+      latest_journal_view_at: summary?.latest_journal_view_at || null,
+      cumulative_journal_views: Number(cumulative?.cumulative_journal_views || 0),
+    },
+    series: (series.results || []).map(r => ({
+      hour: r.hour,
+      views: Number(r.views || 0),
+      visitors: Number(r.visitors || 0),
+    })),
+  });
+}
+
+// GET /analytics/site-traffic-trend  (owner only) → lightweight first-party traffic card
+async function routeSiteTrafficTrend(req, env) {
+  const u = await getUser(req, env);
+  if (!u) return err('login required', 401);
+  if (!isOwnerUser(u)) return err('forbidden', 403);
+
+  const sites = {
+    journal: { id: 'journal', label: 'Journal', host: 'journal.ailatest.org' },
+    grant: { id: 'grant', label: 'Grant', host: 'grant.ailatest.org' },
+    ailatest: { id: 'ailatest', label: 'AILatest', host: 'ailatest.org' },
+  };
+  const url = new URL(req.url);
+  const siteId = url.searchParams.get('site') || 'journal';
+  const site = sites[siteId];
+  if (!site) return err('unknown site', 400);
+  const rawDays = Number(url.searchParams.get('days') || '7');
+  const days = [1, 7, 30].includes(rawDays) ? rawDays : 7;
+
+  const dayKey = (n) => {
+    const d = new Date();
+    d.setUTCDate(d.getUTCDate() - n);
+    return d.toISOString().slice(0, 10);
+  };
+  const rows = days === 1
+    ? await env.DB.prepare(
+      `SELECT * FROM hourly_stats WHERE site = ? AND hour_start_utc >= ? ORDER BY hour_start_utc ASC`
+    ).bind(site.host, new Date(Date.now() - 24 * 3600 * 1000).toISOString().slice(0, 13) + ':00:00Z').all().then(r => r.results || [])
+    : await env.DB.prepare(
+      `SELECT * FROM daily_stats WHERE site = ? AND day_utc >= ? ORDER BY day_utc ASC`
+    ).bind(site.host, dayKey(days - 1)).all().then(r => r.results || []);
+
+  const sumBy = (key) => rows.reduce((s, r) => s + Number(r[key] || 0), 0);
+  const mergeRanked = (jsonKey, idKey) => {
+    const map = new Map();
+    for (const row of rows) {
+      let items = [];
+      try { items = JSON.parse(row[jsonKey] || '[]'); } catch (_) { items = []; }
+      for (const item of Array.isArray(items) ? items : []) {
+        const key = item[idKey] || (idKey === 'country' ? 'unknown' : '/');
+        const prev = map.get(key) || { [idKey]: key, pageviews: 0, visitors: 0, sessions: 0 };
+        prev.pageviews += Number(item.pageviews || 0);
+        prev.visitors += Number(item.visitors || 0);
+        prev.sessions += Number(item.sessions || 0);
+        map.set(key, prev);
+      }
+    }
+    return [...map.values()].sort((a, b) => b.pageviews - a.pageviews).slice(0, 15);
+  };
+  const trafficMix = {
+    human: sumBy('human_pv'),
+    search_engine_bot: sumBy('search_engine_pv'),
+    ai_agent: sumBy('ai_agent_pv'),
+    scraper: sumBy('scraper_pv'),
+    suspected_bot: sumBy('suspected_bot_pv'),
+    unknown: sumBy('unknown_pv'),
+    all: sumBy('all_pv'),
+  };
+
+  return json({
+    ok: true,
+    days,
+    site: siteId,
+    first_party: {
+      ...site,
+      status: rows.length ? 'ok' : 'empty',
+      totals: {
+        pageviews: sumBy('pageviews'),
+        visitors: sumBy('visitors'),
+        sessions: sumBy('sessions'),
+        bot_events: sumBy('bot_events'),
+        all_pv: trafficMix.all,
+      },
+      series: days === 1 ? [] : rows.map(r => ({
+        day: r.day_utc,
+        pageviews: Number(r.pageviews || 0),
+        visitors: Number(r.visitors || 0),
+        sessions: Number(r.sessions || 0),
+      })),
+      hourly: days === 1 ? rows.map(r => ({
+        hour_start_utc: r.hour_start_utc,
+        pageviews: Number(r.pageviews || 0),
+        visitors: Number(r.visitors || 0),
+        sessions: Number(r.sessions || 0),
+      })) : [],
+      traffic_mix: trafficMix,
+      topPaths: mergeRanked('top_paths_json', 'path'),
+      topCountries: mergeRanked('countries_json', 'country'),
+    },
+  });
+}
+
 // ───────── dispatcher ─────────
 // GET /analytics/dashboard  (owner only) → full dashboard payload, edge-cached ~5min
 async function routeDashboard(req, env) {
@@ -1065,7 +1251,10 @@ export default {
       if (p === '/auth/google/callback'&& req.method === 'GET')  return routeGoogleCallback(req, env);
       if (p === '/analytics/pageview' && req.method === 'POST')  return routePageview(req, env);
       if (p === '/analytics/dashboard' && req.method === 'GET')  return routeDashboard(req, env);
+      if (p === '/analytics/journal-view-trend' && req.method === 'GET') return routeJournalViewTrend(req, env);
+      if (p === '/analytics/site-traffic-trend' && req.method === 'GET') return routeSiteTrafficTrend(req, env);
       if (p === '/me'                  && req.method === 'GET')  return routeMe(req, env);
+      if (p === '/pick'                && req.method === 'POST') return handlePick(req, env, { consumeQuota: () => consumePickQuotaForRequest(req, env) });
       if (p === '/pick/quota/consume'  && req.method === 'POST') return routeConsumePickQuota(req, env);
       if (p === '/favorites'           && req.method === 'GET')  return routeGetFavs(req, env);
       if (p === '/favorites'           && req.method === 'PUT')  return routePutFavs(req, env);
@@ -1087,6 +1276,10 @@ export default {
       // journal views (浏览计数)
       if (p === '/journal-view'          && req.method === 'POST')   return routeJournalView(req, env);
       if (p === '/journal-views'         && req.method === 'GET')    return routeGetJournalViews(req, env);
+      if (p === '/journal-view-total'    && req.method === 'GET')    return routeGetJournalViewTotal(req, env);
+
+      if (p === '/chat'                     && req.method === 'POST')  return handleChat(req, env);
+      if (p === '/chat'                     && req.method === 'OPTIONS') return handleChat(req, env);
 
       return err('not found', 404);
     } catch (e) {

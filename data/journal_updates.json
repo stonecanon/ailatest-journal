@@ -1,0 +1,70 @@
+{
+  "updated_at": "2026-06-10T00:00:00+08:00",
+  "items": [
+    {
+      "id": "nature-health-sensors-2026-launch",
+      "published_at": "2025-05-02",
+      "category": "new_journal",
+      "title": "Nature Health 和 Nature Sensors 将于 2026 年创刊",
+      "summary": "Springer Nature 宣布 Nature Portfolio 将在 2026 年新增 Nature Health 与 Nature Sensors，分别面向健康研究和传感器相关应用科学领域，适合提前关注投稿范围、开放获取政策和首批栏目设置。",
+      "source_name": "Springer Nature",
+      "source_url": "https://group.springernature.com/gp/group/media/press-releases/nature-health-and-nature-sensors-announcement/27775448",
+      "publisher": "Springer Nature",
+      "journals": ["Nature Health", "Nature Sensors"],
+      "tags": ["Nature Portfolio", "新刊", "2026"],
+      "priority": 5
+    },
+    {
+      "id": "nature-portfolio-2026-new-launches",
+      "published_at": "2026-01-01",
+      "category": "new_journal",
+      "title": "Nature Portfolio 2026 新刊页面已列出年度新增期刊",
+      "summary": "Springer Nature 面向图书馆的 Nature Portfolio new launches 页面列出 2026 年新增期刊入口，可作为核对 Nature 系列新刊、ISSN、开放获取状态和馆藏订阅沟通的稳定来源。",
+      "source_name": "Springer Nature",
+      "source_url": "https://www.springernature.com/gp/librarians/products/journals/nature-research-journals/nature-portfolio-new-launches",
+      "publisher": "Springer Nature",
+      "journals": ["Nature Health", "Nature Sensors"],
+      "tags": ["Nature Portfolio", "新刊目录", "图书馆"],
+      "priority": 4
+    },
+    {
+      "id": "nature-reviews-2025-clean-tech-biodiversity",
+      "published_at": "2024-03-27",
+      "category": "new_journal",
+      "title": "Nature Reviews Clean Technology 与 Nature Reviews Biodiversity 2025 年推出",
+      "summary": "Nature Portfolio 在 2025 年新增两本综述类期刊，覆盖清洁技术与生物多样性方向，适合关注可持续技术、生态保护和跨学科综述投稿机会的研究者跟进。",
+      "source_name": "Springer Nature",
+      "source_url": "https://group.springernature.com/gp/group/media/press-releases/new-nature-review-journals/26893970",
+      "publisher": "Springer Nature",
+      "journals": ["Nature Reviews Clean Technology", "Nature Reviews Biodiversity"],
+      "tags": ["Nature Reviews", "新刊", "综述"],
+      "priority": 4
+    },
+    {
+      "id": "scopus-source-list-monthly-updates",
+      "published_at": "2026-06-10",
+      "category": "index_change",
+      "title": "Scopus 来源期刊列表和停刊列表按月更新",
+      "summary": "Elsevier 的 Scopus content 页面说明 Source title list 与 discontinued sources list 会定期更新。选刊时建议同步核对最新来源表，尤其关注新增收录、停刊和题名变更。",
+      "source_name": "Elsevier Scopus",
+      "source_url": "https://www.elsevier.com/products/scopus/content",
+      "publisher": "Elsevier",
+      "journals": [],
+      "tags": ["Scopus", "收录变化", "月度更新"],
+      "priority": 3
+    },
+    {
+      "id": "clarivate-master-journal-list-monthly",
+      "published_at": "2026-06-10",
+      "category": "index_change",
+      "title": "Web of Science Master Journal List 是覆盖状态核对的官方入口",
+      "summary": "Clarivate 支持页面说明 Master Journal List 按月更新。涉及 SCIE、SSCI、AHCI、ESCI 覆盖状态、题名变化和期刊信息核验时，应优先以 MJL 为官方核对来源。",
+      "source_name": "Clarivate",
+      "source_url": "https://support.clarivate.com/ScientificandAcademicResearch/s/article/Web-of-Science-Master-Journal-List",
+      "publisher": "Clarivate",
+      "journals": [],
+      "tags": ["Web of Science", "MJL", "收录变化"],
+      "priority": 3
+    }
+  ]
+}

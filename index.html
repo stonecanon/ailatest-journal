@@ -38,7 +38,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- End Google Tag Manager -->
 <link rel="preload" href="/data/journals.json.gz" as="fetch" crossorigin="anonymous" />
 <link rel="preload" href="/data/journal_aliases.json" as="fetch" crossorigin="anonymous" />
-<link rel="stylesheet" href="/css/app.css?v=20260604-27" />
+<link rel="stylesheet" href="/css/app.css?v=20260609-1" />
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json" />
@@ -128,6 +128,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <span class="rail-flag" aria-hidden="true">CN</span>
       <span data-i18n="rail_dom">中国期刊</span>
     </button>
+    <button class="rail-nav-btn" data-tab="updates" aria-label="期刊动态" title="期刊动态" data-i18n-aria="rail_updates" data-i18n-title="rail_updates">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h10"/><path d="M4 12h7"/><path d="M4 17h9"/><path d="M16 7a5 5 0 0 1 0 10"/><path d="M19 4a9 9 0 0 1 0 16"/></svg>
+      <span data-i18n="rail_updates">动态</span>
+    </button>
     <button class="rail-nav-btn" data-tab="in" aria-label="India journals" title="India journals" data-i18n-aria="rail_in" data-i18n-title="rail_in">
       <span class="rail-flag" aria-hidden="true">IN</span>
       <span data-i18n="rail_in">India</span>
@@ -187,6 +191,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <a class="tab active" data-tab="home" href="/">
       <span class="tab-label" data-i18n="tab_home">查刊</span>
     </a>
+    <a class="tab" data-tab="updates" href="/updates">
+      <span class="tab-label" data-i18n="tab_updates">动态</span>
+    </a>
     <a class="tab" data-tab="pick" href="/pick">
       <span class="tab-label" data-i18n="tab_pick">荐刊</span>
     </a>
@@ -197,6 +204,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <!-- ─── Home tab ─── -->
   <section class="tab-panel" data-panel="home">
     <div id="home-results" class="home-results" hidden></div>
+    <section id="home-updates-preview" class="updates-preview" aria-label="期刊动态" hidden></section>
+  </section>
+
+  <!-- ─── Journal updates tab ─── -->
+  <section class="tab-panel" data-panel="updates" hidden>
+    <section id="journal-updates" class="updates-page" aria-label="期刊动态"></section>
   </section>
 
   <!-- ─── International tab ─── -->
@@ -357,10 +370,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </div>
       <div class="pick-filter-bar">
         <div class="pick-filter-group">
+          <label class="pick-opt pick-ai-opt"><input type="checkbox" id="pick-ai-toggle" checked> <span data-i18n="pick_ai_toggle">AI 推荐</span><small data-i18n="pick_ai_hint">语义增强，默认开启</small></label>
           <label class="pick-opt"><input type="checkbox" id="pick-filter-sci" checked> <span data-i18n="pick_filter_sci">SCIE</span></label>
           <label class="pick-opt"><input type="checkbox" id="pick-filter-ssci" checked> <span data-i18n="pick_filter_ssci">SSCI</span></label>
           <label class="pick-opt"><input type="checkbox" id="pick-filter-ahci" checked> <span data-i18n="pick_filter_ahci">AHCI</span></label>
+          <label class="pick-opt"><input type="checkbox" id="pick-filter-esci" checked> <span data-i18n="pick_filter_esci">ESCI</span></label>
           <label class="pick-opt"><input type="checkbox" id="pick-filter-comprehensive"> <span data-i18n="pick_filter_compre">排除综合刊</span></label>
+          <label class="pick-opt"><input type="checkbox" id="pick-filter-free"> <span data-i18n="pick_filter_free_doaj">免费（DOAJ）</span></label>
         </div>
       </div>
       <div id="pick-history" class="pick-history" style="display:none">
@@ -504,6 +520,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
   <footer class="site-foot">
     <p data-i18n="footer_data">数据来源：Clarivate WoS Core Collection (SCIE/SSCI/AHCI/ESCI) · JCR 2025 · ESI · EI Compendex · Scopus · DOAJ · UGC-CARE India · 中科院文献情报中心分区表 2025 · ShowJCR (GPL-3.0) · CCF 2026 (A/B/C) · CCF-T 2025 · ABDC 2025 · ABS 2024 · 中国科协 2025 · CSSCI · 北大核心 · CNKI · 浙江大学 2024 · 高校自编目录 2023 · CrossRef · OpenAlex。© <a href="https://journal.ailatest.org">AILatest Journal</a></p>
+    <p id="journal-view-total" class="visitor-footnote" hidden></p>
   </footer>
 </main>
 
@@ -551,7 +568,7 @@ const __BUILD_VER = 'v20260530-79';
   }
 })();
 </script>
-<script src="/js/app.js?v=20260604-12" defer></script>
+<script src="/js/app.js?v=20260609-1" defer></script>
 <script>
   // Custom install prompt
   let __pwaPrompt = null;

@@ -248,6 +248,90 @@
       tagline: '<b>AILatest Journal</b> — outil de recherche de revues et d’aide au choix de soumission pour les chercheurs.', indices: 'Index', cas_zone: 'CAS 2025', filters: 'Filtres', all: 'Tout', filter_xinrui: 'Émergent', filter_warning: 'Alerte', domestic_sources: 'Sources chinoises', tab_home: 'Revues', tab_int: 'International', tab_dom: 'Chine', tab_fav: 'Favoris', tab_pick: 'M’aider à choisir', loading: 'Chargement…', hero_title_int: 'Recherche internationale SCI / SSCI', hero_body_int: 'Source : <b>Web of Science Core Collection</b> (2026-05-18) avec <b>EI Compendex</b> (2025-10-10). Intègre <b>JCR 2025</b>, <b>ESI</b>, <b>CAS 2025</b> et <b>ShowJCR</b> version JCR 2025 · métriques 2024 (IF / quartiles / rangs), CCF 2026 et listes d’alerte. Total : <b id="total">—</b> revues.', hero_note: 'Légende des badges : <b>SCIE/SSCI/AHCI/ESCI/EI</b> indices de couverture · <b>CAS</b> Catégorisation CAS 2025 par grandes disciplines (1-4, marque TOP) · <b>JCR Q</b> Quartile (Q1-Q4) · <b>Emerging</b> Édition Émergente CAS 2026 · <b>CCF</b> Recommandation CCF 2026 (A/B/C) · <b>ABDC</b> Classement australien des revues de gestion (A*/A/B/C) · <b>ABS</b> Chartered ABS Academic Journal Guide 2024 (4*/4/3/2/1, commerce et gestion uniquement) · <b>T1/T2/T3</b> Classement CAST 2025 des revues de haute qualité · <b>⚠ Warning</b> Liste d’alerte des revues internationales.', hero_title_dom: 'Répertoires chinois', hero_title_fav: 'Favoris', hero_title_pick: 'M’aider à choisir', hero_body_pick: 'Bientôt disponible. Recommandations selon thème, IF, délai de revue, APC et index.', pick_coming_title: 'Bientôt disponible', pick_coming_desc: 'Mise à jour future', results_all: 'Toutes les revues', load_more: 'Charger plus', col_name: 'Revue Title', col_free: 'GRATUIT', col_abbr: 'Abrév. Abbr', col_badges: 'Index / niveau', search_int: 'Chercher : titre / abréviation / ISSN / nom chinois', search_dom: 'Chercher : nom chinois / anglais / ISSN / CN', search_fav: 'Chercher favoris', showing: 'Affichage', of: 'sur', total_items: '', empty: 'Aucun résultat', login: 'Connexion', logout: 'Déconnexion', wos_subjects: 'Sujets WoS', wos_search_ph: 'Filtrer les sujets (A-Z)…'
     }
   });
+  Object.assign(I18N.zh, {
+    tab_updates: '动态',
+    rail_updates: '动态',
+    search_updates_ph: '搜索期刊动态、来源、标签…',
+    updates_title: '期刊动态',
+    updates_intro: '跟踪新刊/子刊、收录变化、预警、投稿政策和重要出版报告。',
+    updates_latest: '最新动态',
+    updates_view_all: '查看全部动态',
+    updates_source: '来源',
+    updates_featured: '重点关注',
+    updates_updated_at: '数据更新时间',
+    updates_empty: '暂无匹配的期刊动态',
+    update_cat_all: '全部',
+    update_cat_new_journal: '新刊/子刊',
+    update_cat_index_change: '收录变化',
+    update_cat_warning: '预警',
+    update_cat_policy: '投稿政策',
+    update_cat_report: '重要报告',
+    pick_ai_toggle: 'AI 推荐',
+    pick_ai_hint: '语义增强，默认开启',
+    pick_ai_login: 'AI 推荐需要登录；关闭 AI 推荐可使用本地匹配。登录后可使用每日 5 次免费额度。',
+    pick_ai_running: '正在用 AI 解析研究语境…',
+    pick_ai_fallback: 'AI 推荐暂不可用，已使用本地匹配：',
+    pick_mode_ai: 'AI 语义匹配',
+    pick_mode_local: '本地匹配',
+    pick_filter_esci: 'ESCI',
+    pick_filter_free_doaj: '免费（DOAJ）'
+  });
+  Object.assign(I18N['zh-TW'], {
+    tab_updates: '動態',
+    rail_updates: '動態',
+    search_updates_ph: '搜尋期刊動態、來源、標籤…',
+    updates_title: '期刊動態',
+    updates_intro: '追蹤新刊/子刊、收錄變化、預警、投稿政策和重要出版報告。',
+    updates_latest: '最新動態',
+    updates_view_all: '查看全部動態',
+    updates_source: '來源',
+    updates_featured: '重點關注',
+    updates_updated_at: '資料更新時間',
+    updates_empty: '暫無匹配的期刊動態',
+    update_cat_all: '全部',
+    update_cat_new_journal: '新刊/子刊',
+    update_cat_index_change: '收錄變化',
+    update_cat_warning: '預警',
+    update_cat_policy: '投稿政策',
+    update_cat_report: '重要報告',
+    pick_ai_toggle: 'AI 推薦',
+    pick_ai_hint: '語義增強，預設開啟',
+    pick_ai_login: 'AI 推薦需要登入；關閉 AI 推薦可使用本地匹配。登入後可使用每日 5 次免費額度。',
+    pick_ai_running: '正在用 AI 解析研究語境…',
+    pick_ai_fallback: 'AI 推薦暫不可用，已使用本地匹配：',
+    pick_mode_ai: 'AI 語義匹配',
+    pick_mode_local: '本地匹配',
+    pick_filter_esci: 'ESCI',
+    pick_filter_free_doaj: '免費（DOAJ）'
+  });
+  Object.assign(I18N.en, {
+    tab_updates: 'Updates',
+    rail_updates: 'Updates',
+    search_updates_ph: 'Search journal updates, sources, tags…',
+    updates_title: 'Journal Updates',
+    updates_intro: 'Track new journals, indexing changes, alerts, submission policies, and publishing reports.',
+    updates_latest: 'Latest Updates',
+    updates_view_all: 'View all updates',
+    updates_source: 'Source',
+    updates_featured: 'Featured',
+    updates_updated_at: 'Data updated',
+    updates_empty: 'No matching journal updates.',
+    update_cat_all: 'All',
+    update_cat_new_journal: 'New journals',
+    update_cat_index_change: 'Index changes',
+    update_cat_warning: 'Alerts',
+    update_cat_policy: 'Policies',
+    update_cat_report: 'Reports',
+    pick_ai_toggle: 'AI Match',
+    pick_ai_hint: 'Semantic mode, on by default',
+    pick_ai_login: 'AI Match requires sign-in; turn off AI Match to use local matching. Sign in for 5 free uses per day.',
+    pick_ai_running: 'Analyzing research context with AI…',
+    pick_ai_fallback: 'AI Match is unavailable; using local matching: ',
+    pick_mode_ai: 'AI semantic match',
+    pick_mode_local: 'Local match',
+    pick_filter_esci: 'ESCI',
+    pick_filter_free_doaj: 'Free (DOAJ)'
+  });
   const LANG_ORDER = ['zh-CN', 'zh-TW', 'ja', 'ko', 'en', 'es', 'pt', 'fr'];
   const LANG_META = {
     'zh-CN': { label: '中文', html: 'zh-CN' }, 'zh-TW': { label: '繁中', html: 'zh-TW' },
@@ -683,6 +767,7 @@
   let meta = null;
   let oaMap = {};          // compact OpenAlex map: { "ISSN": {hp, l, oa, dj, apc, org, cn, w} }
   let coverMap = {};       // compact cover map: { "ISSN": {u, s, c, h, t} }
+  let journalUpdates = { updated_at: '', items: [] };
   // review_cycles now read from embedded doaj.review_weeks in journals.json.gz
   const DEFAULT_JOURNAL_ALIASES = {
     BE: 'BUILDING AND ENVIRONMENT',
@@ -832,8 +917,8 @@
   }
 
   let activeTab = 'home';
-  const TAB_PATHS = { home: '/', int: '/global', dom: '/cn', in: '/in', my: '/my', kr: '/kr', fav: '/favorites', pick: '/pick' };
-  const PATH_TABS = { '/': 'home', '/global': 'int', '/international': 'int', '/journals': 'int', '/cn': 'dom', '/china': 'dom', '/in': 'in', '/india': 'in', '/my': 'my', '/malaysia': 'my', '/kr': 'kr', '/korea': 'kr', '/favorites': 'fav', '/pick': 'pick' };
+  const TAB_PATHS = { home: '/', int: '/global', dom: '/cn', updates: '/updates', in: '/in', my: '/my', kr: '/kr', fav: '/favorites', pick: '/pick' };
+  const PATH_TABS = { '/': 'home', '/global': 'int', '/international': 'int', '/journals': 'int', '/cn': 'dom', '/china': 'dom', '/updates': 'updates', '/in': 'in', '/india': 'in', '/my': 'my', '/malaysia': 'my', '/kr': 'kr', '/korea': 'kr', '/favorites': 'fav', '/pick': 'pick' };
   const TAB_SEO = {
     home: {
       title: 'AILatest Journal — 期刊查询 · 荐刊推荐 · SCI期刊检索',
@@ -846,6 +931,10 @@
     dom: {
       title: '中国期刊目录查询 | CSSCI 北大核心 中国科协 - AILatest Journal',
       desc: '查询中文期刊目录、中国科协高质量期刊、CSSCI、北大核心、CCF 中文推荐、浙江大学目录等中国期刊分级数据。'
+    },
+    updates: {
+      title: '期刊动态 | 新刊 子刊 收录变化 出版报告 - AILatest Journal',
+      desc: '追踪期刊出版动态，包括新刊与子刊、Web of Science 和 Scopus 收录变化、预警名单、投稿政策和重要出版报告。'
     },
     in: {
       title: 'India UGC-CARE Journal Directory | AILatest Journal',
@@ -906,6 +995,7 @@
   let activeIndiaSubject = '__all';
   let activeMalaysiaSource = 'mycite_2025';
   let activeDomBadges = new Set(); // 默认不勾选 = 显示全部；勾选 = 只看有该徽章的
+  let activeUpdateCategory = 'all';
   const PAGE = 100;
   let shown = PAGE;
   let intIfSort = null; // null | 'desc' | 'asc'
@@ -1231,6 +1321,7 @@
       const search = activeTab === 'home' ? 'search_home_ph'
                     : activeTab === 'int' ? 'search_int'
                     : activeTab === 'fav' ? 'search_fav'
+                    : activeTab === 'updates' ? 'search_updates_ph'
                     : 'search_dom';
       $('#q').placeholder = t(search);
     }
@@ -4836,6 +4927,9 @@
     else if (activeTab === 'fav') renderFav();
     else if (activeTab === 'int') renderInt();
     else if (activeTab === 'pick') refreshPickI18n();
+    else if ((activeTab === 'updates' || activeTab === 'home') && window.__activateJournalTab) {
+      window.__activateJournalTab(activeTab, { skipPath: true });
+    }
     if (_currentDrawerRec) {
       openDrawer(_currentDrawerRec, { pageMode: document.body.classList.contains('journal-route') });
     }
@@ -5542,6 +5636,40 @@
     </tr>`;
   }
 
+  const UPDATE_CATEGORY_KEYS = ['all', 'new_journal', 'index_change', 'warning', 'policy', 'report'];
+
+  function normalizeJournalUpdates(payload) {
+    const rawItems = Array.isArray(payload?.items) ? payload.items : [];
+    const items = rawItems
+      .map(item => {
+        const src = item || {};
+        return {
+          id: String(src.id || src.source_url || src.title || '').trim(),
+          published_at: String(src.published_at || '').trim(),
+          category: UPDATE_CATEGORY_KEYS.includes(src.category) ? src.category : 'report',
+          title: String(src.title || '').trim(),
+          summary: String(src.summary || '').trim(),
+          source_name: String(src.source_name || src.publisher || '').trim(),
+          source_url: String(src.source_url || '').trim(),
+          publisher: String(src.publisher || '').trim(),
+          journals: Array.isArray(src.journals) ? src.journals.filter(Boolean).map(String) : [],
+          tags: Array.isArray(src.tags) ? src.tags.filter(Boolean).map(String) : [],
+          priority: Number.isFinite(Number(src.priority)) ? Number(src.priority) : 0
+        };
+      })
+      .filter(item => item.id && item.title)
+      .sort((a, b) => {
+        const da = Date.parse(a.published_at) || 0;
+        const db = Date.parse(b.published_at) || 0;
+        if (db !== da) return db - da;
+        return (b.priority || 0) - (a.priority || 0);
+      });
+    return {
+      updated_at: String(payload?.updated_at || '').trim(),
+      items
+    };
+  }
+
   // ───────── bindings ─────────
   function bind() {
     $('#index-toggles').addEventListener('change', () => {
@@ -5646,6 +5774,7 @@
           : activeTab === 'in' ? renderIndia()
           : activeTab === 'my' ? renderMalaysia()
           : activeTab === 'kr' ? renderKorea()
+          : activeTab === 'updates' ? renderJournalUpdates()
           : null;
       }
     });
@@ -5660,6 +5789,7 @@
       else if (activeTab === 'int') renderInt();
       else if (activeTab === 'fav') renderFav();
       else if (activeTab === 'dom') renderDomestic();
+      else if (activeTab === 'updates') renderJournalUpdates();
     });
     $('#search-submit')?.addEventListener('click', () => {
       const qEl = $('#q');
@@ -5678,6 +5808,7 @@
       } else if (activeTab === 'int') { trackInteraction('journal_search', { tab: activeTab, query: activeQuery }); renderInt(); }
       else if (activeTab === 'fav') { trackInteraction('journal_search', { tab: activeTab, query: activeQuery }); renderFav(); }
       else if (activeTab === 'dom') { trackInteraction('journal_search', { tab: activeTab, query: activeQuery }); renderDomestic(); }
+      else if (activeTab === 'updates') { trackInteraction('journal_search', { tab: activeTab, query: activeQuery }); renderJournalUpdates(); }
     });
     $('#more').addEventListener('click', () => { shown += PAGE; renderInt(); });
 
@@ -5698,13 +5829,16 @@
     /* ───────── Home tab: auto-detect search ───────── */
     const homeResults = $('#home-results');
     const homePanel = $('.tab-panel[data-panel="home"]');
+    const homeUpdatesPreview = $('#home-updates-preview');
 
     function showHomeSearchResults() {
       if (!activeQuery) {
         if (homeResults) homeResults.hidden = true;
         if (homePanel) homePanel.classList.remove('home-tab-has-results');
+        renderJournalUpdatesPreview();
         return;
       }
+      if (homeUpdatesPreview) homeUpdatesPreview.hidden = true;
       if (homePanel) homePanel.classList.add('home-tab-has-results');
       if (homeResults) homeResults.hidden = false;
       renderHomeIntResults();
@@ -5855,6 +5989,141 @@
       });
     }
 
+    function updateCategoryLabel(category) {
+      if (category === 'all') return t('update_cat_all');
+      return t(`update_cat_${category}`) || category;
+    }
+
+    function formatUpdateDate(value) {
+      if (!value) return '';
+      const text = String(value);
+      const m = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (m) {
+        return lang === 'en' ? `${m[1]}-${m[2]}-${m[3]}` : `${m[1]}.${m[2]}.${m[3]}`;
+      }
+      const d = new Date(text);
+      if (Number.isNaN(d.getTime())) return text;
+      return d.toLocaleDateString(lang === 'en' ? 'en-US' : 'zh-CN', { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+
+    function journalUpdateMatches(item, query = activeQuery, category = activeUpdateCategory) {
+      if (category && category !== 'all' && item.category !== category) return false;
+      const q = String(query || '').trim().toLowerCase();
+      if (!q) return true;
+      return [
+        item.title,
+        item.summary,
+        item.source_name,
+        item.publisher,
+        updateCategoryLabel(item.category),
+        ...(item.journals || []),
+        ...(item.tags || [])
+      ].join(' ').toLowerCase().includes(q);
+    }
+
+    function renderUpdateCard(item, options = {}) {
+      const tagHtml = (item.tags || []).slice(0, 5).map(tag => `<span class="update-tag">${escape(tag)}</span>`).join('');
+      const journalsHtml = (item.journals || []).length
+        ? `<div class="update-journals">${item.journals.slice(0, 4).map(j => `<span>${escape(j)}</span>`).join('')}</div>`
+        : '';
+      const dateHtml = item.published_at ? `<time datetime="${escape(item.published_at)}">${escape(formatUpdateDate(item.published_at))}</time>` : '';
+      const sourceName = item.source_name || item.publisher || t('updates_source');
+      const body = `
+        <div class="update-card-top">
+          <span class="update-category">${escape(updateCategoryLabel(item.category))}</span>
+          ${dateHtml}
+        </div>
+        <h3>${escape(item.title)}</h3>
+        <p>${escape(item.summary)}</p>
+        ${journalsHtml}
+        <div class="update-card-bottom">
+          <span class="update-source">${escape(t('updates_source'))}: ${escape(sourceName)}</span>
+          <span class="update-tags">${tagHtml}</span>
+        </div>`;
+      const cls = `update-card${options.featured ? ' featured' : ''}${options.compact ? ' compact' : ''}`;
+      if (item.source_url) {
+        return `<a class="${cls}" href="${escape(item.source_url)}" target="_blank" rel="noopener">${body}</a>`;
+      }
+      return `<article class="${cls}">${body}</article>`;
+    }
+
+    function attachUpdatesViewAll(root) {
+      root?.querySelector('[data-updates-view-all]')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        activateTab('updates');
+      });
+    }
+
+    function renderJournalUpdatesPreview() {
+      if (!homeUpdatesPreview) return;
+      if (activeQuery) {
+        homeUpdatesPreview.hidden = true;
+        return;
+      }
+      const items = (journalUpdates.items || []).slice(0, 3);
+      if (!items.length) {
+        homeUpdatesPreview.hidden = true;
+        return;
+      }
+      homeUpdatesPreview.hidden = false;
+      homeUpdatesPreview.innerHTML = `
+        <div class="updates-preview-head">
+          <div>
+            <p class="updates-kicker">${escape(t('updates_latest'))}</p>
+            <h2>${escape(t('updates_title'))}</h2>
+          </div>
+          <a href="/updates" class="updates-view-all" data-updates-view-all>${escape(t('updates_view_all'))}</a>
+        </div>
+        <div class="updates-preview-grid">
+          ${items.map(item => renderUpdateCard(item, { compact: true })).join('')}
+        </div>`;
+      attachUpdatesViewAll(homeUpdatesPreview);
+    }
+
+    function renderJournalUpdates() {
+      const box = $('#journal-updates');
+      if (!box) return;
+      const allItems = journalUpdates.items || [];
+      const filtered = allItems.filter(item => journalUpdateMatches(item));
+      const featured = filtered.find(item => Number(item.priority) >= 4) || filtered[0] || null;
+      const rest = featured ? filtered.filter(item => item.id !== featured.id) : filtered;
+      const chipHtml = UPDATE_CATEGORY_KEYS.map(key => {
+        const count = key === 'all' ? allItems.length : allItems.filter(item => item.category === key).length;
+        return `<button class="update-chip ${activeUpdateCategory === key ? 'active' : ''}" type="button" data-update-category="${escape(key)}">
+          <span>${escape(updateCategoryLabel(key))}</span><em>${count}</em>
+        </button>`;
+      }).join('');
+      const updatedAt = journalUpdates.updated_at
+        ? `<span>${escape(t('updates_updated_at'))}: ${escape(formatUpdateDate(journalUpdates.updated_at))}</span>`
+        : '';
+      box.innerHTML = `
+        <div class="updates-page-head">
+          <div>
+            <h1>${escape(t('updates_title'))}</h1>
+            <p>${escape(t('updates_intro'))}</p>
+          </div>
+          <div class="updates-page-meta">${updatedAt}</div>
+        </div>
+        <div class="update-chips" aria-label="${escape(t('updates_title'))}">
+          ${chipHtml}
+        </div>
+        ${filtered.length ? `
+          <section class="updates-featured" aria-label="${escape(t('updates_featured'))}">
+            <p class="updates-kicker">${escape(t('updates_featured'))}</p>
+            ${renderUpdateCard(featured, { featured: true })}
+          </section>
+          <section class="updates-list" aria-label="${escape(t('updates_latest'))}">
+            ${rest.map(item => renderUpdateCard(item)).join('')}
+          </section>
+        ` : `<div class="updates-empty">${escape(t('updates_empty'))}</div>`}`;
+      box.querySelectorAll('[data-update-category]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          activeUpdateCategory = btn.dataset.updateCategory || 'all';
+          renderJournalUpdates();
+        });
+      });
+    }
+
     // Also sync topbar search when on home tab
     const origSearchHandler = $('#q')?.addEventListener;
     // (the existing #q listener already handles this for int/dom/fav)
@@ -5896,6 +6165,8 @@
           qEl.placeholder = T('输入你的论文标题和关键词，如：基于深度学习的室内人数预测', 'Enter your paper title and keywords, e.g.: Deep learning for indoor occupancy estimation');
         } else if (activeTab === 'home') {
           qEl.placeholder = t('search_home_ph');
+        } else if (activeTab === 'updates') {
+          qEl.placeholder = t('search_updates_ph');
         } else if (activeTab === 'in') {
           qEl.placeholder = T('搜索：印度期刊名 / 出版社 / ISSN / 学科', 'Search: India journal title / publisher / ISSN / subject');
         } else if (activeTab === 'kr') {
@@ -5909,8 +6180,10 @@
         const results = $('#home-results');
         const subtabs = $('#home-subtabs');
         const hero = $('.home-hero');
+        const preview = $('#home-updates-preview');
         if (results) results.hidden = true;
         if (subtabs) subtabs.hidden = true;
+        if (preview) preview.hidden = true;
         if (hero) hero.closest('.tab-panel')?.classList.remove('home-tab-has-results');
       }
       if (!opts.skipPath) {
@@ -5928,9 +6201,12 @@
       else if (activeTab === 'in') renderIndia();
       else if (activeTab === 'my') renderMalaysia();
       else if (activeTab === 'kr') renderKorea();
+      else if (activeTab === 'updates') renderJournalUpdates();
       else if (activeTab === 'pick') initPickTool();
       // Home tab: if there's an active query, show results
       else if (activeTab === 'home' && activeQuery) {
+        showHomeSearchResults();
+      } else if (activeTab === 'home') {
         showHomeSearchResults();
       }
       updateStickySearchState();
@@ -6258,6 +6534,496 @@
     input?.addEventListener('input', updatePickCharCount);
     updatePickCharCount();
     let pickLastQuery = '';
+    let pickJournalLookup = null;
+
+    function pickFiltersPayload() {
+      const indices = [];
+      if (document.getElementById('pick-filter-sci')?.checked) indices.push('SCIE');
+      if (document.getElementById('pick-filter-ssci')?.checked) indices.push('SSCI');
+      if (document.getElementById('pick-filter-ahci')?.checked) indices.push('AHCI');
+      if (document.getElementById('pick-filter-esci')?.checked) indices.push('ESCI');
+      return {
+        indices,
+        exclude_multidisciplinary: !!document.getElementById('pick-filter-comprehensive')?.checked,
+        free: !!document.getElementById('pick-filter-free')?.checked,
+      };
+    }
+
+    function ensurePickJournalLookup() {
+      if (pickJournalLookup) return pickJournalLookup;
+      const map = new Map();
+      for (const r of journals || []) {
+        [r.issn, r.eissn, r.slug, favId(r), r.name].filter(Boolean).forEach(v => {
+          map.set(String(v).toLowerCase(), r);
+          const compact = compactIssnKey(v);
+          if (compact) map.set(compact.toLowerCase(), r);
+        });
+      }
+      pickJournalLookup = map;
+      return map;
+    }
+
+    function resolvePickJournal(item) {
+      const map = ensurePickJournalLookup();
+      const keys = [item.issn, item.eissn, item.slug, item.name].filter(Boolean);
+      for (const key of keys) {
+        const direct = map.get(String(key).toLowerCase());
+        if (direct) return direct;
+        const compact = compactIssnKey(key);
+        if (compact && map.get(compact.toLowerCase())) return map.get(compact.toLowerCase());
+      }
+      return null;
+    }
+
+    async function fetchAiPick(query) {
+      const res = await fetch(`${API_BASE}/pick`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(user && user.token ? { 'Authorization': `Bearer ${user.token}` } : {}),
+        },
+        body: JSON.stringify({
+          query,
+          filters: pickFiltersPayload(),
+          limit: 120,
+        }),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok || !data || data.ok === false) {
+        const msg = data?.error || data?.message || `HTTP ${res.status}`;
+        const error = new Error(msg);
+        error.status = res.status;
+        error.data = data;
+        throw error;
+      }
+      return data;
+    }
+
+    function aiEntriesFromResults(data) {
+      const profile = data?.profile || {};
+      return (data?.results || []).map(item => {
+        const r = resolvePickJournal(item);
+        const rec = r || {
+          name: item.name,
+          issn: item.issn,
+          eissn: item.eissn,
+          slug: item.slug,
+          if_2024: item.if_2024,
+          if_quartile: item.if_quartile,
+          cas_zone: item.cas_zone,
+          cas_top: item.cas_top,
+          indices: item.indices || [],
+          publisher: item.publisher || '',
+          wos_categories: item.topics || [],
+          doaj: item.doaj || null,
+        };
+        const issn = rec.issn || rec.eissn || item.issn || item.eissn || item.slug || item.name;
+        return {
+          journalRec: rec,
+          issn,
+          zone: rec.cas_zone || item.cas_zone,
+          top: !!(rec.cas_top || item.cas_top),
+          jcr_q: rec.if_quartile || item.if_quartile,
+          indices: rec.indices || item.indices || [],
+          wos_categories: rec.wos_categories || item.topics || [],
+          topics: item.topics || profile.wos_categories || [],
+          matched: item.matched || profile.domain_keywords || [],
+          count: Math.max(1, (item.matched || []).length || (profile.domain_keywords || []).length || 1),
+          score: Math.max(0.01, Number(item.score || 1) / 100),
+          srcName: rec.name || item.name,
+          semanticProfile: profile,
+        };
+      });
+    }
+
+    function pickNormText(value) {
+      return String(value || '')
+        .toLowerCase()
+        .normalize('NFKD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/&/g, ' and ')
+        .replace(/[^a-z0-9\u4e00-\u9fff]+/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function pickUnique(values, max = 16) {
+      const out = [];
+      const seen = new Set();
+      for (const value of values || []) {
+        const raw = String(value || '').trim();
+        const key = pickNormText(raw);
+        if (!key || seen.has(key)) continue;
+        seen.add(key);
+        out.push(raw);
+        if (out.length >= max) break;
+      }
+      return out;
+    }
+
+    function pickMetricIf(r) {
+      return r && r.if_2024 != null && r.if_2024 !== '' ? (+r.if_2024).toFixed(1) : '';
+    }
+
+    function pickMetricCas(r) {
+      if (!r || !r.cas_zone) return '';
+      return `${r.cas_zone}${T('区','')}${r.cas_top ? ' TOP' : ''}`;
+    }
+
+    function pickDoajApcText(r) {
+      const doaj = r && typeof r.doaj === 'object' ? r.doaj : null;
+      if (!doaj) return '';
+      const apc = String(doaj.apc || '').trim();
+      const fee = String(doaj.fee || '').trim();
+      if (!apc && !fee) return '';
+      if (/^no$/i.test(apc)) return T('免费（DOAJ）','Free (DOAJ)');
+      if (fee) return fee;
+      if (/^yes$/i.test(apc)) return T('有 APC（DOAJ）','APC listed (DOAJ)');
+      return apc;
+    }
+
+    function pickDoajApcBadge(r) {
+      const text = pickDoajApcText(r);
+      if (!text) return '';
+      const noApc = /^no$/i.test(String(r?.doaj?.apc || '').trim());
+      return `<span class="pick-apc ${noApc ? 'pick-apc-free' : 'pick-apc-paid'}" title="${T('DOAJ 公开 APC 数据','Public APC data from DOAJ')}">${escape(text)}</span>`;
+    }
+
+    function pickIsDoajNoApc(r) {
+      return /^no$/i.test(String(r?.doaj?.apc || '').trim());
+    }
+
+    function pickEntryKey(e) {
+      const r = e?.journalRec || {};
+      return favId(r) || e?.issn || e?.srcName || r.name || '';
+    }
+
+    function pickEntryText(e) {
+      const r = e?.journalRec || {};
+      return pickNormText([
+        r.name, r.cn_name, r.publisher, r.esi_category, r.cas_major_cn, r.cas_major_cat,
+        ...(r.wos_categories || []), ...(r.jcr_cats || []), ...(r.ei_subjects || []),
+        ...(e?.topics || []), ...(e?.matched || []),
+      ].filter(Boolean).join(' '));
+    }
+
+    function pickSelectRows(source, predicate, limit, used) {
+      const out = [];
+      for (const e of source || []) {
+        if (!e?.journalRec || (predicate && !predicate(e))) continue;
+        const key = pickEntryKey(e);
+        if (!key || used.has(key)) continue;
+        used.add(key);
+        out.push(e);
+        if (out.length >= limit) break;
+      }
+      return out;
+    }
+
+    function pickDirectionConfigs() {
+      return [
+        { id:'regional', label:T('区域/地理','Regional / geography'), patterns:['regional','geograph','spatial','urban studies','planning','development','区域','地理','空间','城市','规划'] },
+        { id:'transport', label:T('交通运输','Transport'), patterns:['transport','transportation','mobility','aviation','air transport','low altitude','交通','运输','航空','低空'] },
+        { id:'economy', label:T('经济/管理','Economics / management'), patterns:['economy','economic','economics','business','management','policy','industrial','经济','产业','管理','政策'] },
+        { id:'network', label:T('网络方法','Network methods'), patterns:['network','complex network','social network','spatial network','systems','网络','系统'] },
+        { id:'environment', label:T('环境/可持续','Environment / sustainability'), patterns:['environment','sustainability','ecology','climate','resource','环境','生态','可持续','资源'] },
+        { id:'engineering', label:T('工程/技术','Engineering / technology'), patterns:['engineering','technology','materials','energy','computer','information','工程','技术','材料','能源','计算机','信息'] },
+        { id:'health', label:T('医学/生命科学','Health / life sciences'), patterns:['medicine','health','clinical','biology','biomedical','public health','医学','健康','生命科学','临床'] },
+        { id:'education', label:T('教育/心理','Education / psychology'), patterns:['education','psychology','learning','behavior','教育','心理','学习','行为'] },
+      ];
+    }
+
+    function pickEntryDirections(e, limit = 2) {
+      const text = pickEntryText(e);
+      const labels = pickDirectionConfigs()
+        .filter(cfg => cfg.patterns.some(p => text.includes(pickNormText(p))))
+        .map(cfg => cfg.label);
+      const r = e?.journalRec || {};
+      return pickUnique(labels.length ? labels : (r.wos_categories || e?.topics || []), limit);
+    }
+
+    function pickRecommendationPosition(e, rank = 0) {
+      const r = e?.journalRec || {};
+      const score = Number(e?.score || 0);
+      const idx = r.indices || [];
+      const strongTier = r.if_quartile === 'Q1' || Number(r.cas_zone) <= 2 || r.cas_top;
+      if (r.warning || r.citic_warning || r.on_hold || r.under_review) return T('谨慎核查','Check carefully');
+      if (rank < 4 && score >= 0.72 && strongTier) return T('优先主投','Priority target');
+      if (score >= 0.56 && (strongTier || idx.includes('SSCI') || idx.includes('SCIE'))) return T('稳妥备选','Solid backup');
+      if (pickDoajApcText(r)) return T('费用可查','APC known');
+      return T('补充观察','Watchlist');
+    }
+
+    function renderPickReportTable(title, rows, desc, opts = {}) {
+      if (!rows || !rows.length) return '';
+      return `<section class="pick-report-section">
+        <div class="pick-report-section-head">
+          <h3>${escape(title)}</h3>
+          ${desc ? `<p>${escape(desc)}</p>` : ''}
+        </div>
+        <div class="pick-report-table-wrap">
+          <table class="pick-report-table">
+            <thead><tr>
+              <th>#</th><th>${T('期刊','Journal')}</th><th>${T('定位 / 方向','Position / direction')}</th><th>IF</th><th>JCR</th><th>${T('中科院','CAS')}</th><th>${T('匹配','Match')}</th><th>DOAJ APC</th>
+            </tr></thead>
+            <tbody>
+              ${rows.map((e, i) => {
+                const r = e.journalRec || {};
+                const fid = favId(r);
+                if (fid) rowRecordsByFid[fid] = { ...r, __src: 'int' };
+                const idxText = (r.indices || []).join(' / ');
+                const meta = pickUnique([idxText, r.publisher].filter(Boolean), 3).join(' · ');
+                const directions = pickEntryDirections(e, 2);
+                const score = Math.round((e.score || 0) * 100);
+                const apcText = pickDoajApcText(r);
+                const position = opts.position ? opts.position(e, i) : pickRecommendationPosition(e, i);
+                return `<tr>
+                  <td>${i + 1}</td>
+                  <td>
+                    <a href="#j/${escape(fid)}" data-pick-report-fid="${escape(fid)}">${escape(titleCase(r.name || e.srcName || ''))}</a>
+                    ${meta ? `<span class="pick-report-meta">${escape(meta)}</span>` : ''}
+                  </td>
+                  <td>
+                    <span class="pick-report-position">${escape(position)}</span>
+                    ${directions.length ? `<span class="pick-report-tags">${directions.map(d => `<em>${escape(d)}</em>`).join('')}</span>` : ''}
+                  </td>
+                  <td>${pickMetricIf(r) || '<span class="muted-cell">&mdash;</span>'}</td>
+                  <td>${escape(r.if_quartile || '') || '<span class="muted-cell">&mdash;</span>'}</td>
+                  <td>${pickMetricCas(r) ? escape(pickMetricCas(r)) : '<span class="muted-cell">&mdash;</span>'}</td>
+                  <td>${score}% <span class="pick-report-meta">(${e.count || 0}${T('信号',' signals')})</span></td>
+                  <td>${apcText ? escape(apcText) : '<span class="muted-cell">&mdash;</span>'}</td>
+                </tr>`;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      </section>`;
+    }
+
+    function renderPickDynamicBranches(allRows, primaryRows) {
+      const primaryKeys = new Set((primaryRows || []).map(pickEntryKey));
+      const branches = pickDirectionConfigs().map(cfg => {
+        const rows = [];
+        for (const e of allRows || []) {
+          const key = pickEntryKey(e);
+          if (!key || primaryKeys.has(key)) continue;
+          const text = pickEntryText(e);
+          if (!cfg.patterns.some(p => text.includes(pickNormText(p)))) continue;
+          rows.push(e);
+          if (rows.length >= 4) break;
+        }
+        return { ...cfg, rows };
+      }).filter(branch => branch.rows.length >= 2)
+        .sort((a, b) => b.rows.length - a.rows.length || (b.rows[0]?.score || 0) - (a.rows[0]?.score || 0))
+        .slice(0, 3);
+      if (!branches.length) return '';
+      return `<section class="pick-report-section">
+        <div class="pick-report-section-head">
+          <h3>${T('相关方向补充','Additional directions')}</h3>
+          <p>${T('仅在匹配结果中出现清晰分支时展示，用来区分不同投稿叙事。','Shown only when the matched results reveal clear alternative submission narratives.')}</p>
+        </div>
+        <div class="pick-report-branch-grid">
+          ${branches.map(branch => {
+            return `<div class="pick-report-branch">
+              <h4>${escape(branch.label)}</h4>
+              <div class="pick-report-list">
+                ${branch.rows.map(e => {
+                  const r = e.journalRec || {};
+                  const fid = favId(r);
+                  if (fid) rowRecordsByFid[fid] = { ...r, __src: 'int' };
+                  const chips = [
+                    (r.indices || []).join('/'),
+                    r.if_quartile || '',
+                    pickMetricCas(r),
+                    pickDoajApcText(r),
+                  ].filter(Boolean).slice(0, 4);
+                  return `<a class="pick-report-list-item" href="#j/${escape(fid)}" data-pick-report-fid="${escape(fid)}">
+                    <strong>${escape(titleCase(r.name || e.srcName || ''))}</strong>
+                    <span>${chips.map(c => escape(c)).join(' · ')}</span>
+                  </a>`;
+                }).join('')}
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+      </section>`;
+    }
+
+    function pickDomesticSources() {
+      if (!domestic) return [];
+      const out = [];
+      const add = (source, records) => {
+        (records || []).forEach(record => {
+          if (record && (record.name || record.cn_name || record.title)) out.push({ source, record });
+        });
+      };
+      add('cnki_major', domestic.cnki_major?.records);
+      add('zju', domestic.zju?.records);
+      add('nsfc_mgmt', domestic.nsfc_mgmt?.records);
+      add('cnkx', domestic.cnkx?.records);
+      add('cssci_core', domestic.cssci_core);
+      add('cssci_ext', domestic.cssci_ext);
+      add('pku_core', domestic.pku_core);
+      return out;
+    }
+
+    function pickCleanDomesticName(value) {
+      return String(value || '').replace(/[＊*☆★]/g, '').replace(/\s+/g, '').trim();
+    }
+
+    function pickAreaHit(text, area) {
+      const patterns = {
+        geography: ['geography', 'geographic', 'spatial', 'regional science', 'regional', '地理', '区域', '空间'],
+        transport: ['transport', 'transportation', 'mobility', 'aviation', 'air transport', 'low altitude', '低空', '交通', '运输', '航空'],
+        urban: ['urban', 'city', 'planning', 'development', '城市', '规划'],
+        economy: ['economy', 'economic', 'economics', 'industrial', 'management', 'regional economy', '经济', '产业', '管理'],
+        network: ['network', 'complex network', 'social network', 'spatial network', '网络'],
+        innovation: ['innovation', 'science policy', 'technology', '科研', '科学学', '创新'],
+      };
+      return (patterns[area] || [area]).some(p => text.includes(pickNormText(p)));
+    }
+
+    function pickDomesticRecommendations(query, profile) {
+      const sourceRows = pickDomesticSources();
+      if (!sourceRows.length) return [];
+      const profileText = pickNormText([
+        query,
+        ...(profile?.research_fields || []),
+        ...(profile?.wos_categories || []),
+        ...(profile?.domain_keywords || []),
+      ].join(' '));
+      const targets = [
+        { name:'经济地理', areas:['geography','economy','regional'], reason:'经济地理 / 区域经济网络最直接对口', priority:1 },
+        { name:'地理学报', areas:['geography','regional'], reason:'地理学综合顶刊，适合理论贡献很强的版本', priority:2 },
+        { name:'地理科学', areas:['geography','regional'], reason:'区域结构、空间格局与机制分析方向', priority:3 },
+        { name:'地理研究', areas:['geography','regional'], reason:'区域发展与人文地理机制研究', priority:3 },
+        { name:'地理科学进展', areas:['geography','regional'], reason:'新兴议题综述、进展与机制框架', priority:4 },
+        { name:'城市规划', areas:['urban','planning','transport'], reason:'低空经济与城市空间治理 / 规划政策视角', priority:4 },
+        { name:'城市发展研究', areas:['urban','economy'], reason:'城市经济、空间发展与政策分析', priority:5 },
+        { name:'中国工业经济', areas:['economy','innovation'], reason:'产业经济与政策机制，门槛较高', priority:6 },
+        { name:'管理世界', areas:['economy','management'], reason:'管理与政策顶刊，适合理论和识别策略很强的版本', priority:7 },
+        { name:'科研管理', areas:['innovation','management','network'], reason:'创新网络、科技政策与产业组织视角', priority:6 },
+        { name:'科学学研究', areas:['innovation','management','network'], reason:'创新系统、知识网络与科技治理视角', priority:6 },
+        { name:'交通运输工程学报', areas:['transport'], reason:'交通运输工程和系统分析视角', priority:5 },
+        { name:'交通运输系统工程与信息', areas:['transport','network'], reason:'交通网络、系统工程与运输信息方向', priority:5 },
+      ];
+      const sourceWeight = { cnki_major:80, zju:70, nsfc_mgmt:65, cnkx:60, cssci_core:55, pku_core:50, cssci_ext:45 };
+      const recommendations = [];
+      const seen = new Set();
+      for (const target of targets) {
+        const areaHits = target.areas.filter(area => pickAreaHit(profileText, area));
+        if (!areaHits.length) continue;
+        const exact = sourceRows.filter(({ record }) => pickCleanDomesticName(record.name || record.cn_name || record.title) === target.name);
+        const loose = exact.length ? [] : sourceRows.filter(({ record }) => pickCleanDomesticName(record.name || record.cn_name || record.title).includes(target.name));
+        const hits = exact.length ? exact : loose;
+        if (!hits.length || seen.has(target.name)) continue;
+        seen.add(target.name);
+        hits.sort((a, b) => {
+          const ar = a.record, br = b.record;
+          const as = (sourceWeight[a.source] || 0) + (ar.issn ? 12 : 0) + (ar.cn_code ? 8 : 0);
+          const bs = (sourceWeight[b.source] || 0) + (br.issn ? 12 : 0) + (br.cn_code ? 8 : 0);
+          return bs - as;
+        });
+        const best = hits[0];
+        const cnki = hits.find(h => h.source === 'cnki_major')?.record || null;
+        const rec = { ...best.record, name: target.name, __src: best.source };
+        recommendations.push({
+          name: target.name,
+          record: rec,
+          source: best.source,
+          hits,
+          cnki,
+          reason: target.reason,
+          score: areaHits.length * 20 - target.priority,
+        });
+      }
+      return recommendations.sort((a, b) => b.score - a.score).slice(0, 10);
+    }
+
+    function renderPickDomesticReport(query, profile) {
+      const rows = pickDomesticRecommendations(query, profile);
+      if (!rows.length) return '';
+      return `<section class="pick-report-section">
+        <div class="pick-report-section-head">
+          <h3>${T('中文期刊推荐','Chinese journal options')}</h3>
+          <p>${T('基于站内 CSSCI、北大核心、中国科协、CNKI、浙大目录等数据交叉展示。','Cross-checked with the site data such as CSSCI, PKU Core, CAST, CNKI and ZJU lists.')}</p>
+        </div>
+        <div class="pick-report-table-wrap">
+          <table class="pick-report-table pick-report-dom-table">
+            <thead><tr><th>#</th><th>${T('期刊','Journal')}</th><th>${T('站内数据','Site data')}</th><th>${T('建议定位','Positioning')}</th></tr></thead>
+            <tbody>
+              ${rows.map((item, i) => {
+                const r = item.record || {};
+                const fid = favId(r);
+                if (fid) rowRecordsByFid[fid] = { ...r, __src: r.__src || item.source };
+                const badges = [
+                  renderDomCrossBadges({ name:item.name, issn:r.issn, cn_code:r.cn_code }),
+                  item.cnki?.compound_if ? `<span class="domsrc-pill">CNKI ${T('复合IF','compound IF')} ${escape(item.cnki.compound_if)}</span>` : '',
+                  item.cnki?.comprehensive_if ? `<span class="domsrc-pill">CNKI ${T('综合IF','comprehensive IF')} ${escape(item.cnki.comprehensive_if)}</span>` : '',
+                ].filter(Boolean).join('');
+                return `<tr>
+                  <td>${i + 1}</td>
+                  <td><a href="#j/${escape(fid)}" data-pick-report-fid="${escape(fid)}">${escape(item.name)}</a></td>
+                  <td><div class="pick-report-badges">${badges || '<span class="muted-cell">&mdash;</span>'}</div></td>
+                  <td>${escape(item.reason)}</td>
+                </tr>`;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      </section>`;
+    }
+
+    function renderPickStrategyDynamic(primaryRows, hasBranches, hasDomestic) {
+      const top = primaryRows?.[0]?.journalRec?.name || '';
+      const topText = top
+        ? `${T('首投优先看','Prioritize')} ${titleCase(top)}：${T('它在当前语义画像下的匹配度和站内分区/索引信号最靠前。','it has the strongest combined semantic fit and site-data signals for this profile.')}`
+        : T('先从匹配度、学科分区、索引类型和期刊定位同时较好的候选开始筛。','Start with candidates that balance semantic fit, quartile/tier, index type and journal positioning.');
+      const tips = [
+        topText,
+        hasBranches
+          ? T('补充方向只在结果中形成清晰分支时展示，可用于决定摘要和标题要突出哪条投稿叙事。','Additional directions appear only when results form clear branches; use them to decide which submission narrative to emphasize in title and abstract.')
+          : T('当前结果没有拆出稳定的第二方向，建议优先围绕主表候选优化论文叙事。','The current results do not form a stable second direction; focus the manuscript narrative around the main table candidates.'),
+        hasDomestic
+          ? T('中文期刊推荐来自站内国内目录交叉数据，适合准备中文版本或作为保底投稿池。','Chinese journal options come from cross-checked domestic site data and can support a Chinese version or backup pool.')
+          : T('中文期刊只有在站内目录能匹配到相关主题时才展示。','Chinese options are shown only when the site data can match the topic.'),
+        T('DOAJ APC 列只使用 DOAJ 公开数据；空白表示本站暂无公开 APC 金额或状态，不代表免费或收费。','The DOAJ APC column uses only public DOAJ data; blank cells mean no public APC amount/status in the site data, not free or paid.'),
+      ];
+      return `<section class="pick-report-section">
+        <div class="pick-report-section-head"><h3>${T('投稿策略建议','Submission strategy')}</h3></div>
+        <ul class="pick-report-strategy">${tips.map(tip => `<li>${escape(tip)}</li>`).join('')}</ul>
+      </section>`;
+    }
+
+    function renderPickReportDynamic(query, allRows, profile) {
+      const rows = (allRows || []).filter(e => e?.journalRec);
+      if (!rows.length) return '';
+      const primary = rows.slice(0, Math.min(10, rows.length));
+      const fields = pickUnique([
+        ...(profile?.research_fields || []),
+        ...(profile?.wos_categories || []),
+        ...(profile?.domain_keywords || []),
+      ], 10);
+      const branchesHtml = renderPickDynamicBranches(rows, primary);
+      const domesticHtml = renderPickDomesticReport(query, profile);
+      const intro = profile?.explanation
+        || T('AI 先判断论文语境，再调用站内期刊数据排序，避免把歧义词直接当关键词匹配。','AI first interprets the manuscript context, then ranks journals with site data to avoid ambiguous keyword matching.');
+      return `<div class="pick-report">
+        <div class="pick-report-head">
+          <div>
+            <div class="pick-report-kicker">${T('AI 综合荐刊','AI recommendation report')}</div>
+            <h2>${T('荐刊综合建议','Comprehensive journal recommendation')}</h2>
+          </div>
+          <span class="pick-report-source">${T('站内数据：IF / JCR / 中科院 / 索引 / DOAJ APC','Site data: IF / JCR / CAS / indexes / DOAJ APC')}</span>
+        </div>
+        <p class="pick-report-intro">${escape(intro)}</p>
+        ${fields.length ? `<div class="pick-report-fields">${fields.map(f => `<span>${escape(f)}</span>`).join('')}</div>` : ''}
+        ${renderPickReportTable(T('英文期刊推荐','English journal recommendations'), primary, T('按语义匹配和站内期刊数据综合排序，定位列用于区分主投、备选和观察候选。','Ranked by semantic fit and site data; the position column separates priority targets, backups and watchlist journals.'))}
+        ${branchesHtml}
+        ${domesticHtml}
+        ${renderPickStrategyDynamic(primary, !!branchesHtml, !!domesticHtml)}
+      </div>`;
+    }
 
     async function doSearch() {
   if (!requireLogin(T("今日免费荐刊搜索已达上限，请登录后继续使用","Daily free search limit reached. Sign in to continue."))) return;
@@ -6279,6 +7045,30 @@
           catch(e) { oaMap = {}; }
         }
 
+        let entries = null;
+        let pickMode = 'local';
+        let quotaInfo = null;
+        let statusNotice = '';
+        const useAi = !!document.getElementById('pick-ai-toggle')?.checked;
+        if (useAi && !(user && user.token)) {
+          statusNotice = t('pick_ai_login');
+          status.textContent = statusNotice;
+          results.innerHTML = `<div class="pick-no-results">${escape(statusNotice)}</div>`;
+          return;
+        } else if (useAi) {
+          try {
+            status.textContent = t('pick_ai_running');
+            const aiData = await fetchAiPick(query);
+            entries = aiEntriesFromResults(aiData);
+            pickMode = 'ai';
+            quotaInfo = aiData.quota || null;
+          } catch (e) {
+            statusNotice = t('pick_ai_fallback') + (e.message || e);
+            status.textContent = statusNotice;
+          }
+        }
+
+        if (!entries) {
         const lines = query.split('\n').filter(l => l.trim());
         let explicitKeywords = [];
 
@@ -6373,7 +7163,7 @@
           return [...new Set(topics)];
         }
 
-        let entries = journals.map(r => {
+        entries = journals.map(r => {
           const topics = localTopicProfile(r);
           // 学科分类(WoS/ESI/中科院大类/JCR/CCF)定义期刊核心领域 → 命中权重最高
           const catHay = [r.esi_category, r.cas_major_cn, r.jcr_cat, r.ccf_area, ...(r.wos_categories || [])]
@@ -6396,7 +7186,7 @@
           // 广度奖励：命中越多不同研究对象词越相关
           score *= (1 + 0.4 * Math.max(0, matched.length - 1));
           const idx = r.indices || [];
-          if (idx.includes('SCIE') || idx.includes('SSCI') || idx.includes('AHCI')) score *= 1.10;
+          if (idx.includes('SCIE') || idx.includes('SSCI') || idx.includes('AHCI') || idx.includes('ESCI')) score *= 1.10;
           if (r.cas_zone === 1 || r.if_quartile === 'Q1') score *= 1.06;
           if (r.warning || r.citic_warning || r.on_hold || r.under_review) score *= 0.72;
           return {
@@ -6414,18 +7204,21 @@
             srcName: r.name,
           };
         }).filter(e => e.score > 0 && e.count > 0);
+        }
 
         let filtered = entries;
         const wantSci = document.getElementById('pick-filter-sci')?.checked;
         const wantSsci = document.getElementById('pick-filter-ssci')?.checked;
         const wantAhci = document.getElementById('pick-filter-ahci')?.checked;
-        if (wantSci || wantSsci || wantAhci) {
+        const wantEsci = document.getElementById('pick-filter-esci')?.checked;
+        if (wantSci || wantSsci || wantAhci || wantEsci) {
           filtered = filtered.filter(e => {
             const idx = e.journalRec?.indices || [];
             if (!idx.length) return false;
             if (wantSci && idx.includes('SCIE')) return true;
             if (wantSsci && idx.includes('SSCI')) return true;
             if (wantAhci && idx.includes('AHCI')) return true;
+            if (wantEsci && idx.includes('ESCI')) return true;
             return false;
           });
         }
@@ -6436,7 +7229,7 @@
           });
         }
         if (document.getElementById('pick-filter-free')?.checked) {
-          filtered = filtered.filter(e => e.journalRec?.free === true);
+          filtered = filtered.filter(e => pickIsDoajNoApc(e.journalRec));
         }
         filtered.sort((a, b) => b.score - a.score || (b.journalRec.if_2024 || 0) - (a.journalRec.if_2024 || 0));
         if (query !== pickLastQuery) {
@@ -6444,19 +7237,23 @@
           window.__pickShown = 30;
         }
         const allFiltered = filtered;
+        const maxScore = allFiltered.length > 0 ? allFiltered[0].score : 1;
+        allFiltered.forEach(e => e.score = maxScore > 0 ? e.score / maxScore : 0);
         const shownLimit = Math.max(30, window.__pickShown || 30);
         filtered = allFiltered.slice(0, shownLimit);
 
-        const maxScore = allFiltered.length > 0 ? allFiltered[0].score : 1;
-        filtered.forEach(e => e.score = maxScore > 0 ? e.score / maxScore : 0);
-
         if (!filtered.length) {
           results.innerHTML = `<div class="pick-no-results">${T('没有符合筛选条件的期刊推荐','No journals match your filters')}</div>`;
-          status.textContent = T('没有匹配到本地期刊画像，请换成更具体的英文关键词','No local journal profiles matched. Try more specific English keywords.');
+          status.textContent = pickMode === 'ai'
+            ? T('AI 语义匹配没有符合当前筛选条件的期刊，请放宽索引或综合刊筛选','AI semantic matching found no journals under the current filters. Try relaxing index or multidisciplinary filters.')
+            : T('没有匹配到本地期刊画像，请换成更具体的英文关键词','No local journal profiles matched. Try more specific English keywords.');
           return;
         }
 
-        results.innerHTML = filtered.map(e => {
+        const reportHtml = pickMode === 'ai'
+          ? renderPickReportDynamic(query, filtered, entries[0]?.semanticProfile || {})
+          : '';
+        results.innerHTML = reportHtml + filtered.map(e => {
           const scorePct = Math.round(e.score * 100);
           const name = e.journalRec?.name || e.srcName || e.issn;
           const issnStr = e.issn;
@@ -6559,13 +7356,13 @@
               ${flagsHtml ? `<div class="pick-flags">${flagsHtml}</div>` : ''}
               ${(function(){
                 const r2 = e.journalRec;
-                const freeState = r2?.free ? freeBadgeCell(r2) : `<span class="badge b-paid">${T('非免费发表','Paid / not free')}</span>`;
+                const apcState = pickDoajApcBadge(r2);
                 const weeks = parseFloat(r2?.doaj?.review_weeks);
                 // 仅在有实际审稿周期数据时显示；无数据则不展示（不再用 DOAJ 平均值兜底）
                 const cycleHtml = weeks > 0
                   ? `<span class="pick-cycle-label">${T('审稿周期','Review cycle')}:</span><strong>${(weeks / 4.33).toFixed(1)}${T(' 个月',' months')}</strong><span class="pick-cycle-sub">${T('投稿到发表, DOAJ','submission to publication, DOAJ')}</span>`
                   : '';
-                return `<div class="pick-cycle">${freeState}${cycleHtml}</div>`;
+                return (apcState || cycleHtml) ? `<div class="pick-cycle">${apcState}${cycleHtml}</div>` : '';
               })()}
               ${signalList ? `<div class="pick-papers">${signalList}</div>` : ''}
             </div>
@@ -6588,23 +7385,30 @@
               if (ev.target.closest('a') && (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.button === 1)) return;
               ev.preventDefault();
               const issn = card.dataset.issn;
-              const rec = journals.find(r => r.issn === issn || r.eissn === issn);
+              const rec = journals.find(r => r.issn === issn || r.eissn === issn) || resolvePickJournal({ issn, slug: issn, name: issn });
               if (rec) openDrawer(rec, { pageMode: true, source: 'recommendation' });
             });
           });
         }
 
-        status.textContent = `${T('本地匹配','Local match')} ${entries.length} ${T('个候选期刊','candidate journals')}, ${T('显示','showing')} ${filtered.length}/${allFiltered.length}`;
+        const quotaText = pickMode === 'ai' && quotaInfo && quotaInfo.remaining != null
+          ? ` · ${T('今日剩余','remaining today')} ${quotaInfo.remaining}/${quotaInfo.limit}`
+          : '';
+        const modeText = pickMode === 'ai' ? t('pick_mode_ai') : t('pick_mode_local');
+        status.textContent = `${statusNotice ? statusNotice + ' · ' : ''}${modeText} ${entries.length} ${T('个候选期刊','candidate journals')}, ${T('显示','showing')} ${filtered.length}/${allFiltered.length}${quotaText}`;
         trackInteraction('journal_pick', {
           tab: 'pick',
           query,
           result_count: allFiltered.length,
           metadata: {
+            mode: pickMode,
             shown: filtered.length,
             candidate_count: entries.length,
+            quota_remaining: quotaInfo?.remaining ?? null,
             sci: !!document.getElementById('pick-filter-sci')?.checked,
             ssci: !!document.getElementById('pick-filter-ssci')?.checked,
             ahci: !!document.getElementById('pick-filter-ahci')?.checked,
+            esci: !!document.getElementById('pick-filter-esci')?.checked,
             exclude_comprehensive: !!document.getElementById('pick-filter-comprehensive')?.checked,
           },
         });
@@ -6708,7 +7512,7 @@
     // 分享着陆页：/s/<id> 直接接管 main，不走主流程
     if (await maybeRenderShareLanding()) return;
     try {
-      const [j, d, indiaData, m, esi, aliases, underReviewIssns, onHoldIssns, oa, covers] = await Promise.all([
+      const [j, d, indiaData, m, esi, aliases, underReviewIssns, onHoldIssns, oa, covers, updates] = await Promise.all([
         fetchJSON('data/journals.json.gz'),
         fetch('/data/domestic.json').then(r => r.json()).catch(() => null),
         fetch('/data/india.json').then(r => r.json()).catch(() => null),
@@ -6719,9 +7523,11 @@
         fetch('/data/on_hold_issn.json').then(r => r.json()).catch(() => []),
         fetchJSON('data/oa.json.gz').catch(() => ({})),
         fetchJSON('data/journal_covers.json.gz').catch(() => ({})),
+        fetch('/data/journal_updates.json').then(r => r.json()).catch(() => ({ updated_at: '', items: [] })),
       ]);
       setJournalAliases(aliases);
       journals = j; domestic = d; india = indiaData; meta = m; esiCats = esi; oaMap = oa; coverMap = covers;
+      journalUpdates = normalizeJournalUpdates(updates);
       // Build Under Review lookup set
       const underReviewSet = new Set((underReviewIssns||[]).filter(Boolean).map(s => s.replace(/[^0-9xX]/gi,'').toLowerCase()));
       journals.forEach(r => {
@@ -6884,6 +7690,20 @@
     // data-i18n and data-i18n-placeholder are handled by applyI18n()
   }
 
+  async function loadJournalViewTotalFootnote() {
+    const el = document.getElementById('journal-view-total');
+    if (!el) return;
+    try {
+      const resp = await fetch(`${API_BASE}/journal-view-total`, { cache: 'no-store' });
+      const data = await readJsonResponse(resp, 'Journal view total failed');
+      const total = Number(data.total_journal_views || 0);
+      const journals = Number(data.viewed_journals || 0);
+      if (!total) return;
+      el.innerHTML = `${T('期刊浏览总量','Total journal views')}：<strong>${total.toLocaleString()}</strong>${journals ? ` · ${T('覆盖期刊','Journals viewed')} ${journals.toLocaleString()}` : ''}`;
+      el.hidden = false;
+    } catch (_) {}
+  }
+
   // CNKX 复选面板切换（动态生成，不经过 initThDropdowns）
   window.toggleCnkxDropdown = function(panelId) {
     const panel = document.getElementById(panelId);
@@ -6893,5 +7713,6 @@
     if (!wasOpen) panel.classList.add('open');
   };
 
+  loadJournalViewTotalFootnote();
   boot();
 })();
