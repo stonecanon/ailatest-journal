@@ -270,7 +270,10 @@
     pick_ai_hint: '语义增强，默认开启',
     pick_ai_login: 'AI 推荐需要登录；关闭 AI 推荐可使用本地匹配。登录后可使用每日 5 次免费额度。',
     pick_ai_running: '正在用 AI 解析研究语境…',
-    pick_ai_fallback: 'AI 推荐暂不可用，已使用本地匹配：',
+    pick_ai_unavailable: 'AI 推荐暂不可用，未自动改用本地匹配。请稍后重试，或关闭 AI 推荐后再用本地匹配。',
+    pick_ai_auth_error: 'AI 推荐登录已失效，请重新登录后再试；也可以关闭 AI 推荐使用本地匹配。',
+    pick_ai_quota_error: '今日 AI 推荐免费额度已用完；关闭 AI 推荐可使用本地匹配。',
+    pick_ai_config_error: 'AI 推荐接口还没有正确读取 DeepSeek 密钥，请重新部署 Worker 后再试。',
     pick_mode_ai: 'AI 语义匹配',
     pick_mode_local: '本地匹配',
     pick_filter_esci: 'ESCI',
@@ -298,7 +301,10 @@
     pick_ai_hint: '語義增強，預設開啟',
     pick_ai_login: 'AI 推薦需要登入；關閉 AI 推薦可使用本地匹配。登入後可使用每日 5 次免費額度。',
     pick_ai_running: '正在用 AI 解析研究語境…',
-    pick_ai_fallback: 'AI 推薦暫不可用，已使用本地匹配：',
+    pick_ai_unavailable: 'AI 推薦暫不可用，未自動改用本地匹配。請稍後重試，或關閉 AI 推薦後再用本地匹配。',
+    pick_ai_auth_error: 'AI 推薦登入已失效，請重新登入後再試；也可以關閉 AI 推薦使用本地匹配。',
+    pick_ai_quota_error: '今日 AI 推薦免費額度已用完；關閉 AI 推薦可使用本地匹配。',
+    pick_ai_config_error: 'AI 推薦接口還沒有正確讀取 DeepSeek 密鑰，請重新部署 Worker 後再試。',
     pick_mode_ai: 'AI 語義匹配',
     pick_mode_local: '本地匹配',
     pick_filter_esci: 'ESCI',
@@ -326,7 +332,10 @@
     pick_ai_hint: 'Semantic mode, on by default',
     pick_ai_login: 'AI Match requires sign-in; turn off AI Match to use local matching. Sign in for 5 free uses per day.',
     pick_ai_running: 'Analyzing research context with AI…',
-    pick_ai_fallback: 'AI Match is unavailable; using local matching: ',
+    pick_ai_unavailable: 'AI Match is unavailable. Local matching was not used automatically; retry later or turn off AI Match to use local matching.',
+    pick_ai_auth_error: 'Your AI Match sign-in has expired. Sign in again, or turn off AI Match to use local matching.',
+    pick_ai_quota_error: 'Today’s free AI Match quota is used up; turn off AI Match to use local matching.',
+    pick_ai_config_error: 'AI Match cannot read the DeepSeek key yet. Redeploy the Worker and try again.',
     pick_mode_ai: 'AI semantic match',
     pick_mode_local: 'Local match',
     pick_filter_esci: 'ESCI',
@@ -6636,6 +6645,19 @@
       });
     }
 
+    function pickAiErrorMessage(error) {
+      if (error?.status === 401 || error?.status === 403) {
+        doLogout();
+        return t('pick_ai_auth_error');
+      }
+      if (error?.status === 429) return t('pick_ai_quota_error');
+      if (error?.status === 503 || /deepseek|api[_ -]?key|secret/i.test(error?.message || '')) {
+        return t('pick_ai_config_error');
+      }
+      const msg = error?.message ? `：${error.message}` : '';
+      return t('pick_ai_unavailable') + msg;
+    }
+
     function pickNormText(value) {
       return String(value || '')
         .toLowerCase()
@@ -7029,9 +7051,6 @@
   if (!requireLogin(T("今日免费荐刊搜索已达上限，请登录后继续使用","Daily free search limit reached. Sign in to continue."))) return;
   incrementUsage("searches");
 
-  if (!requireLogin(T("今日免费荐刊搜索已达上限，请登录后继续使用","Daily free search limit reached. Sign in to continue."))) return;
-  incrementUsage("searches");
-
       const query = input.value.trim();
       if (!query) { status.textContent = T('请输入内容','Please enter a query'); return; }
 
@@ -7063,8 +7082,10 @@
             pickMode = 'ai';
             quotaInfo = aiData.quota || null;
           } catch (e) {
-            statusNotice = t('pick_ai_fallback') + (e.message || e);
+            statusNotice = pickAiErrorMessage(e);
             status.textContent = statusNotice;
+            results.innerHTML = `<div class="pick-no-results">${escape(statusNotice)}</div>`;
+            return;
           }
         }
 
