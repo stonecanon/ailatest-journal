@@ -968,6 +968,7 @@
   };
   function tabFromPath(pathname = location.pathname) {
     const clean = pathname.replace(/\/+$/, '') || '/';
+    if (clean.startsWith('/updates/')) return 'updates';
     return PATH_TABS[clean] || 'home';
   }
   function updatePageSeo(tab = activeTab) {
@@ -5663,7 +5664,9 @@
           publisher: String(src.publisher || '').trim(),
           journals: Array.isArray(src.journals) ? src.journals.filter(Boolean).map(String) : [],
           tags: Array.isArray(src.tags) ? src.tags.filter(Boolean).map(String) : [],
-          priority: Number.isFinite(Number(src.priority)) ? Number(src.priority) : 0
+          priority: Number.isFinite(Number(src.priority)) ? Number(src.priority) : 0,
+          detail_path: String(src.detail_path || '').trim(),
+          detail: src.detail && typeof src.detail === 'object' ? src.detail : null
         };
       })
       .filter(item => item.id && item.title)
@@ -6030,6 +6033,103 @@
       ].join(' ').toLowerCase().includes(q);
     }
 
+    function updateDetailSlugFromPath(pathname = location.pathname) {
+      const clean = pathname.replace(/\/+$/, '') || '/';
+      if (!clean.startsWith('/updates/')) return '';
+      try { return decodeURIComponent(clean.split('/').filter(Boolean).slice(1).join('/')); }
+      catch (_) { return clean.split('/').filter(Boolean).slice(1).join('/'); }
+    }
+
+    function updateDetailPath(item) {
+      if (item.detail_path) return item.detail_path;
+      return item.detail && item.id ? `/updates/${encodeURIComponent(item.id)}` : '';
+    }
+
+    function updateDetailItemFromPath() {
+      const slug = updateDetailSlugFromPath();
+      if (!slug) return null;
+      const path = `/updates/${slug}`;
+      return (journalUpdates.items || []).find(item => {
+        const itemPath = (item.detail_path || '').replace(/\/+$/, '');
+        return item.id === slug || itemPath === path;
+      }) || null;
+    }
+
+    function formatFileSize(bytes) {
+      const n = Number(bytes || 0);
+      if (!n) return '';
+      if (n >= 1024 * 1024) return `${(n / 1024 / 1024).toFixed(1)} MB`;
+      if (n >= 1024) return `${Math.round(n / 1024)} KB`;
+      return `${n} B`;
+    }
+
+    function renderJournalUpdateDetail(item) {
+      const box = $('#journal-updates');
+      if (!box) return;
+      const detail = item.detail || {};
+      const report = detail.report || {};
+      const sourceName = item.source_name || item.publisher || t('updates_source');
+      const tags = (item.tags || []).map(tag => `<span class="update-tag">${escape(tag)}</span>`).join('');
+      const points = Array.isArray(detail.key_points) ? detail.key_points : [];
+      const sections = Array.isArray(detail.sections) ? detail.sections : [];
+      const reportUrl = report.file_detail_url || report.view_url || report.pdf_url || item.source_url || '';
+      const pdfUrl = report.pdf_url || report.download_url || report.view_url || '';
+      box.innerHTML = `
+        <article class="update-detail">
+          <a class="updates-back" href="/updates" data-updates-back>← ${escape(t('updates_view_all'))}</a>
+          <header class="update-detail-head">
+            <div class="update-card-top">
+              <span class="update-category">${escape(updateCategoryLabel(item.category))}</span>
+              ${item.published_at ? `<time datetime="${escape(item.published_at)}">${escape(formatUpdateDate(item.published_at))}</time>` : ''}
+            </div>
+            <h1>${escape(item.title)}</h1>
+            ${detail.dek ? `<p class="update-detail-dek">${escape(detail.dek)}</p>` : ''}
+            <div class="update-detail-meta">
+              <span>${escape(t('updates_source'))}: <a href="${escape(item.source_url)}" target="_blank" rel="noopener">${escape(sourceName)}</a></span>
+              ${item.publisher ? `<span>${escape(item.publisher)}</span>` : ''}
+              <span class="update-tags">${tags}</span>
+            </div>
+          </header>
+          ${detail.lead ? `<section class="update-detail-section"><p>${escape(detail.lead)}</p></section>` : ''}
+          ${points.length ? `<section class="update-detail-section"><h2>要点</h2><ul>${points.map(p => `<li>${escape(p)}</li>`).join('')}</ul></section>` : ''}
+          ${sections.map(section => `
+            <section class="update-detail-section">
+              <h2>${escape(section.heading || '')}</h2>
+              <p>${escape(section.body || '')}</p>
+            </section>`).join('')}
+          ${reportUrl ? `
+            <section class="update-report">
+              <div class="update-report-info">
+                ${report.cover_image ? `<img src="${escape(report.cover_image)}" alt="${escape(report.title || item.title)}" loading="lazy">` : ''}
+                <div>
+                  <p class="updates-kicker">PDF / Report</p>
+                  <h2>${escape(report.title || item.title)}</h2>
+                  <p>${[
+                    report.pages ? `${report.pages} 页` : '',
+                    formatFileSize(report.size_bytes),
+                    report.file_id ? `File ID ${report.file_id}` : ''
+                  ].filter(Boolean).map(escape).join(' · ')}</p>
+                  ${report.source_note ? `<p class="muted-note">${escape(report.source_note)}</p>` : ''}
+                  <div class="update-report-actions">
+                    ${pdfUrl ? `<a href="${escape(pdfUrl)}" target="_blank" rel="noopener">打开 PDF</a>` : ''}
+                    ${report.download_url ? `<a href="${escape(report.download_url)}" target="_blank" rel="noopener">下载原文件</a>` : ''}
+                    ${report.file_detail_url ? `<a href="${escape(report.file_detail_url)}" target="_blank" rel="noopener">官方文件页</a>` : ''}
+                  </div>
+                </div>
+              </div>
+              <div class="update-pdf-frame">
+                <iframe src="${escape(reportUrl)}" title="${escape(report.title || item.title)}" loading="lazy"></iframe>
+              </div>
+            </section>` : ''}
+        </article>`;
+      box.querySelector('[data-updates-back]')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        history.pushState({ tab: 'updates' }, '', '/updates');
+        renderJournalUpdates();
+        updatePageSeo('updates');
+      });
+    }
+
     function renderUpdateCard(item, options = {}) {
       const tagHtml = (item.tags || []).slice(0, 5).map(tag => `<span class="update-tag">${escape(tag)}</span>`).join('');
       const journalsHtml = (item.journals || []).length
@@ -6050,6 +6150,10 @@
           <span class="update-tags">${tagHtml}</span>
         </div>`;
       const cls = `update-card${options.featured ? ' featured' : ''}${options.compact ? ' compact' : ''}`;
+      const detailPath = updateDetailPath(item);
+      if (detailPath) {
+        return `<a class="${cls}" href="${escape(detailPath)}" data-update-detail="${escape(item.id)}">${body}</a>`;
+      }
       if (item.source_url) {
         return `<a class="${cls}" href="${escape(item.source_url)}" target="_blank" rel="noopener">${body}</a>`;
       }
@@ -6092,6 +6196,11 @@
     function renderJournalUpdates() {
       const box = $('#journal-updates');
       if (!box) return;
+      const detailItem = updateDetailItemFromPath();
+      if (detailItem) {
+        renderJournalUpdateDetail(detailItem);
+        return;
+      }
       const allItems = journalUpdates.items || [];
       const filtered = allItems.filter(item => journalUpdateMatches(item));
       const featured = filtered.find(item => Number(item.priority) >= 4) || filtered[0] || null;
@@ -6129,6 +6238,16 @@
         btn.addEventListener('click', () => {
           activeUpdateCategory = btn.dataset.updateCategory || 'all';
           renderJournalUpdates();
+        });
+      });
+      box.querySelectorAll('[data-update-detail]').forEach(link => {
+        link.addEventListener('click', (e) => {
+          const href = link.getAttribute('href');
+          if (!href || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+          e.preventDefault();
+          history.pushState({ tab: 'updates' }, '', href);
+          renderJournalUpdates();
+          updatePageSeo('updates');
         });
       });
     }

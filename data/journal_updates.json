@@ -1,6 +1,55 @@
 {
-  "updated_at": "2026-06-10T18:30:00+08:00",
+  "updated_at": "2026-06-10T16:52:00+08:00",
   "items": [
+    {
+      "id": "global-oa-publishing-ten-questions-2026",
+      "published_at": "2026-06-10",
+      "category": "report",
+      "title": "《全球OA学术出版十问》报告开放下载",
+      "summary": "科学观澜发布 Wiley-中国科学院文献情报中心科技期刊创新联合实验室报告入口，聚焦全球 OA 出版趋势、质量治理、Mega Journal、LLM 影响与未来治理路径。",
+      "source_name": "科学观澜",
+      "source_url": "https://mp.weixin.qq.com/s/4Y3l1evKT1Y7rVO4w7egzw",
+      "publisher": "Wiley / 中国科学院文献情报中心",
+      "journals": [],
+      "tags": ["OA", "出版报告", "Wiley", "Web of Science"],
+      "priority": 5,
+      "detail_path": "/updates/global-oa-publishing-ten-questions-2026",
+      "detail": {
+        "dek": "这是一份面向开放获取出版生态的报告型动态，适合放入期刊动态的“出版报告 / OA 治理”栏目。",
+        "lead": "报告围绕开放获取学术出版的规模化发展、质量治理和未来走向展开。根据原文说明，报告文献数据来自 Web of Science，统计范围为 2015-2024 年的 Article 与 Review，OA 类型采用 Web of Science 的 OA 标记；问卷面向科研人员、科研管理人员和出版从业者，回收 3439 份，其中有效问卷 2005 份。",
+        "key_points": [
+          "可作为判断 OA 出版趋势、学科差异和国家差异的背景材料。",
+          "对 Mega Journal、低质量论文风险、AI/大语言模型影响等争议问题有专章讨论。",
+          "对投稿选刊的启发主要在于：OA 不只是“是否收费”，还涉及出版质量控制、政策环境、学科接受度和长期影响力。"
+        ],
+        "sections": [
+          {
+            "heading": "为什么放进期刊动态",
+            "body": "它不是单一期刊新闻，而是覆盖 OA 出版结构变化的报告。对 journal.ailatest.org 来说，这类内容可以帮助用户理解 OA、APC、期刊质量治理和开放出版政策之间的关系。"
+          },
+          {
+            "heading": "报告关注的主题",
+            "body": "报告的主题可以概括为三组：一是 OA 论文增长、国家与学科差异、影响力表现；二是质量争议、Mega Journal、AI 对写作与评审的影响、政策差异；三是未来 OA 出版的价值框架与全流程治理。"
+          },
+          {
+            "heading": "给选刊用户的提示",
+            "body": "使用 OA 期刊时，建议同时核对 DOAJ、Web of Science / Scopus 收录状态、JCR/CAS 分区、审稿周期、APC 来源和出版社政策。单纯看到 OA 或免费开放下载，并不能直接等同于适合投稿。"
+          }
+        ],
+        "report": {
+          "title": "《全球OA学术出版十问》2026年版本",
+          "pages": 56,
+          "size_bytes": 10298077,
+          "file_id": "1762925",
+          "file_detail_url": "https://f.sinobase.cn/s/template/hRZx3c/?accKey=5fcefa0aa0498e894b29473998ebe983#/pc/fileDetail?fileId=1762925&version=2.0",
+          "pdf_url": "https://file.smarket.net.cn/saas/sFile/tenantId2913/2026-06-09/document/%E3%80%8A%E5%85%A8%E7%90%83OA%E5%AD%A6%E6%9C%AF%E5%87%BA%E7%89%88%E5%8D%81%E9%97%AE%E3%80%8B2026%E5%B9%B4%E7%89%88%E6%9C%AC_16969155.pdf",
+          "view_url": "https://s2-content.smarket.net.cn/index.php?mappingId=fba4c97db549eec4a1d2e90fd8ece832&isPreview=1",
+          "download_url": "https://s2-content.smarket.net.cn/index.php?mappingId=fba4c97db549eec4a1d2e90fd8ece832&type=download&isPreview=0",
+          "cover_image": "https://mmbiz.qpic.cn/mmbiz_png/NIdGicf9xeBKINY2jGewpeVMXk6jD4LjcHTgCXvXPKsHG4VawRmIsQUQria1J7ibJJrNe3XrNE2IBTY2ubnibZpOLURtYrfqwic0M121ibwFnzAG4/640?wx_fmt=png&from=appmsg",
+          "source_note": "PDF 文件信息来自 Smarket 文件详情页，原始入口由科学观澜公众号文章给出。"
+        }
+      }
+    },
     {
       "id": "doaj-ambassador-programme-10-years-2026",
       "published_at": "2026-06-10",
