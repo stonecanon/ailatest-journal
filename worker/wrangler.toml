@@ -4,7 +4,10 @@ compatibility_date = "2024-11-01"
 account_id = "e7dbf2ec3ab60aa5557cc2364a7a2f26"
 
 routes = [
-  { pattern = "api.ailatest.org", custom_domain = true }
+  { pattern = "api.ailatest.org", custom_domain = true },
+  # Same-origin API path on the main site: immune to proxy/DNS rules that
+  # break the api.* subdomain in some users' browsers, and needs no CORS.
+  { pattern = "journal.ailatest.org/api/*", zone_id = "435525fb783ba7bf4c686a9734e26124" }
 ]
 
 [vars]

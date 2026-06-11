@@ -1018,8 +1018,15 @@
     const raw = localStorage.getItem('ailatest.unlocked');
     if (raw) Object.assign(unlockedCache, JSON.parse(raw));
   } catch (_) {}
-  const API_BASE = (window.AILATEST_API_BASE
+  // OAuth 跳转必须用 api 域名（第三方回调地址注册在 api.ailatest.org）。
+  const AUTH_BASE = (window.AILATEST_API_BASE
     || (location.hostname === 'localhost' ? 'http://localhost:8787' : 'https://api.ailatest.org'));
+  // 数据请求优先走同域 /api（Worker 路由 journal.ailatest.org/api/*）：
+  // 与加载网页同一链路，免疫代理/DNS 对 api.* 子域的拦截，也无需 CORS 预检。
+  const API_BASE = (window.AILATEST_API_BASE
+    || (location.hostname === 'localhost' ? 'http://localhost:8787'
+      : /(^|\.)ailatest\.org$/.test(location.hostname) ? '/api'
+      : 'https://api.ailatest.org'));
 
   async function readJsonResponse(resp, fallback) {
     let data = null;
@@ -2075,7 +2082,7 @@
           const state = Math.random().toString(36).slice(2);
           sessionStorage.setItem('ailatest.oauth_state', state);
           const redirect = encodeURIComponent(location.origin + location.pathname);
-          location.href = `${API_BASE}/auth/${p}?state=${state}&redirect=${redirect}`;
+          location.href = `${AUTH_BASE}/auth/${p}?state=${state}&redirect=${redirect}`;
         });
       });
     }

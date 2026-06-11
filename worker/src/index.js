@@ -1267,7 +1267,10 @@ export default {
       return new Response(null, { status: 204, headers: CORS });
     }
     const u = new URL(req.url);
-    const p = u.pathname;
+    let p = u.pathname;
+    // Same-origin entry: journal.ailatest.org/api/* routes here too — strip the prefix.
+    if (p === '/api' || p === '/api/') p = '/';
+    else if (p.startsWith('/api/')) p = p.slice(4);
     try {
       if (p === '/')                                             return json({ name: 'ailatest-journal-api', ok: true, v: 2 });
       if (p === '/auth/email/request'  && req.method === 'POST') return routeEmailRequest(req, env);
