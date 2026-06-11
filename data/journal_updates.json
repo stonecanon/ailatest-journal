@@ -1,6 +1,52 @@
 {
-  "updated_at": "2026-06-10T18:20:00+08:00",
+  "updated_at": "2026-06-11T09:55:00+08:00",
   "items": [
+    {
+      "id": "elsevier-advanced-biosensors-launch-2026",
+      "published_at": "2026-06-11",
+      "category": "new_journal",
+      "title": "Elsevier 新刊 Advanced Biosensors 上线并开放投稿",
+      "summary": "爱思唯尔科研出版服务发布生物传感器领域新刊 Advanced Biosensors。该刊为同行评审国际开放获取期刊，聚焦生物传感器研究、设计、开发与应用；2027 年底前投稿并被接收的稿件免除 APC。",
+      "source_name": "爱思唯尔科研出版服务",
+      "source_url": "https://mp.weixin.qq.com/s/fwAGc1NjQnHsZtXbkuPmyA",
+      "publisher": "Elsevier",
+      "journals": ["Advanced Biosensors"],
+      "tags": ["Elsevier", "新刊", "OA", "APC限免", "生物传感器"],
+      "priority": 5
+    },
+    {
+      "id": "doaj-new-journals-2026-06-10",
+      "published_at": "2026-06-11",
+      "category": "index_change",
+      "title": "DOAJ 近 24 小时新增一批开放获取期刊",
+      "summary": "DOAJ 最新新增记录集中出现医学、人文社科、生态、物理等方向期刊，包括 Retrospektive、Przegląd Lekarski Jagiellonian Medical Review、Child Neurology、Research Connections 等；多本期刊标注无 APC，OUP 的 Research Connections 在 DOAJ 记录中显示 APC 最高 2150 USD。",
+      "source_name": "DOAJ",
+      "source_url": "https://doaj.org/feed",
+      "publisher": "DOAJ",
+      "journals": [
+        "Retrospektive",
+        "Przegląd Lekarski Jagiellonian Medical Review",
+        "Child Neurology",
+        "Research Connections",
+        "Acta Scientiarum Polonorum. Oeconomia",
+        "Rocznik Administracji Publicznej"
+      ],
+      "tags": ["DOAJ", "新增收录", "OA", "APC公开数据"],
+      "priority": 4
+    },
+    {
+      "id": "scholarly-kitchen-scholar-ready-ai-2026",
+      "published_at": "2026-06-10",
+      "category": "report",
+      "title": "The Scholarly Kitchen 讨论“面向学者的 AI”与出版基础设施",
+      "summary": "The Scholarly Kitchen 访谈讨论学术内容在 AI 检索、问答和研究工作流中的来源可信、权威内容供给与出版商基础设施角色。该动态适合作为 AI 与学术出版平台关系的背景材料。",
+      "source_name": "The Scholarly Kitchen",
+      "source_url": "https://scholarlykitchen.sspnet.org/2026/06/10/building-scholar-ready-ai/",
+      "publisher": "Society for Scholarly Publishing",
+      "journals": [],
+      "tags": ["AI", "学术出版", "出版基础设施", "研究工作流"],
+      "priority": 3
+    },
     {
       "id": "global-oa-publishing-ten-questions-2026",
       "published_at": "2026-06-10",

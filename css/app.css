@@ -757,6 +757,37 @@ main.main {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   margin-top: 12px;
 }
+@media (max-width: 720px) {
+  .updates-preview,
+  .updates-page {
+    width: 100%;
+    margin-top: 14px;
+  }
+  .updates-preview-head,
+  .updates-page-head {
+    display: block;
+  }
+  .updates-page-meta {
+    margin-top: 6px;
+    white-space: normal;
+  }
+  .updates-preview-grid,
+  .updates-list {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .update-card,
+  .update-card.compact {
+    min-height: 0;
+  }
+  .update-card-bottom {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .update-tags {
+    justify-content: flex-start;
+  }
+}
 .updates-featured {
   margin-top: 14px;
 }
@@ -4362,6 +4393,20 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .pick-report-tier-table tbody tr:hover td,
 .pick-report-dom-table tbody tr:hover td { background:var(--bg2); }
 .pick-report-dom-table { min-width:560px; }
+/* AI badge on the 荐刊 tab */
+.tab .tab-ai-badge {
+  display:inline-block;
+  margin-left:5px;
+  padding:1px 5px;
+  border-radius:4px;
+  background:var(--accent, #7a2030);
+  color:#fff;
+  font-size:9.5px;
+  font-weight:800;
+  letter-spacing:.05em;
+  line-height:1.45;
+  vertical-align:2px;
+}
 .pick-cover { flex-basis:74px; width:74px; border-radius:7px }
   .pick-card h3 { font-size:15px }
   .pick-card .pick-count { font-size:16px }
