@@ -6973,10 +6973,10 @@
       const reason = item.reason || '';
       if (!rec) {
         return `<tr>
-          <td>${i + 1}</td>
-          <td>${escape(titleCase(item.name))} <span class="pick-report-meta">${T('站内未收录','not in site data')}</span></td>
+          <td class="pick-report-num">${i + 1}</td>
+          <td>${escape(titleCase(item.name))} <span class="pick-report-missing">${T('站内未收录','not in site data')}</span></td>
           <td colspan="4"><span class="muted-cell">&mdash;</span></td>
-          <td>${escape(reason)}</td>
+          <td class="pick-report-reason">${escape(reason)}</td>
         </tr>`;
       }
       const fid = favId(rec);
@@ -6985,7 +6985,7 @@
       const apcText = pickDoajApcText(rec);
       const warnText = (rec.warning || rec.citic_warning || rec.on_hold || rec.under_review) ? ' ⚠' : '';
       return `<tr>
-        <td>${i + 1}</td>
+        <td class="pick-report-num">${i + 1}</td>
         <td>
           <a href="#j/${escape(fid)}" data-pick-report-fid="${escape(fid)}">${escape(titleCase(rec.name || item.name))}</a>${warnText}
           ${idxText ? `<span class="pick-report-meta">${escape(idxText)}</span>` : ''}
@@ -6994,7 +6994,7 @@
         <td>${escape(rec.if_quartile || '') || '<span class="muted-cell">&mdash;</span>'}</td>
         <td>${pickMetricCas(rec) ? escape(pickMetricCas(rec)) : '<span class="muted-cell">&mdash;</span>'}</td>
         <td>${apcText ? escape(apcText) : '<span class="muted-cell">&mdash;</span>'}</td>
-        <td>${escape(reason)}</td>
+        <td class="pick-report-reason">${escape(reason)}</td>
       </tr>`;
     }
 
@@ -7002,10 +7002,10 @@
       const hit = resolveDomesticByName(item.name);
       if (!hit) {
         return `<tr>
-          <td>${i + 1}</td>
-          <td>${escape(item.name)} <span class="pick-report-meta">${T('站内未收录','not in site data')}</span></td>
+          <td class="pick-report-num">${i + 1}</td>
+          <td>${escape(item.name)} <span class="pick-report-missing">${T('站内未收录','not in site data')}</span></td>
           <td><span class="muted-cell">&mdash;</span></td>
-          <td>${escape(item.reason || '')}</td>
+          <td class="pick-report-reason">${escape(item.reason || '')}</td>
         </tr>`;
       }
       const r = hit.record;
@@ -7017,10 +7017,10 @@
         hit.cnki?.comprehensive_if ? `<span class="domsrc-pill">CNKI ${T('综合IF','comprehensive IF')} ${escape(hit.cnki.comprehensive_if)}</span>` : '',
       ].filter(Boolean).join('');
       return `<tr>
-        <td>${i + 1}</td>
+        <td class="pick-report-num">${i + 1}</td>
         <td><a href="#j/${escape(fid)}" data-pick-report-fid="${escape(fid)}">${escape(r.name)}</a></td>
         <td><div class="pick-report-badges">${badges || '<span class="muted-cell">&mdash;</span>'}</div></td>
-        <td>${escape(item.reason || '')}</td>
+        <td class="pick-report-reason">${escape(item.reason || '')}</td>
       </tr>`;
     }
 
@@ -7033,18 +7033,20 @@
         ...(profile?.wos_categories || []),
       ], 10);
       const intro = report.intro || profile?.explanation || '';
-      const tiersHtml = (report.tiers || []).map(tier => `<section class="pick-report-section">
-        <div class="pick-report-section-head"><h3>${escape(tier.label)}</h3></div>
+      const tiersHtml = (report.tiers || []).map(tier => `<section class="pick-report-section pick-tier-${escape(tier.id || 'tier')}">
+        <div class="pick-report-section-head">
+          <h3><span class="pick-tier-dot" aria-hidden="true"></span>${escape(tier.label)}<span class="pick-tier-count">${tier.items.length} ${T('本','journals')}</span></h3>
+        </div>
         <div class="pick-report-table-wrap">
-          <table class="pick-report-table">
+          <table class="pick-report-table pick-report-tier-table">
             <thead><tr><th>#</th><th>${T('期刊','Journal')}</th><th>IF</th><th>JCR</th><th>${T('中科院','CAS')}</th><th>DOAJ APC</th><th>${T('推荐理由','Why')}</th></tr></thead>
             <tbody>${(tier.items || []).map((item, i) => renderPickReportEnRow(item, i)).join('')}</tbody>
           </table>
         </div>
       </section>`).join('');
-      const chineseHtml = (report.chinese || []).length ? `<section class="pick-report-section">
+      const chineseHtml = (report.chinese || []).length ? `<section class="pick-report-section pick-tier-chinese">
         <div class="pick-report-section-head">
-          <h3>${T('中文期刊推荐','Chinese journal options')}</h3>
+          <h3><span class="pick-tier-dot" aria-hidden="true"></span>${T('中文期刊推荐','Chinese journal options')}<span class="pick-tier-count">${report.chinese.length} ${T('本','journals')}</span></h3>
           <p>${T('期刊由 AI 按论文主题推荐，收录与分级信息来自站内 CSSCI、北大核心、中国科协、CNKI 等目录。','Journals suggested by AI for this topic; list/tier info comes from the site CSSCI, PKU Core, CAST and CNKI catalogs.')}</p>
         </div>
         <div class="pick-report-table-wrap">
@@ -7070,7 +7072,7 @@
           <span class="pick-report-source">${T('AI 给出梯队与理由，指标数据全部来自站内：IF / JCR / 中科院 / 索引 / DOAJ APC','AI picks tiers and reasons; all metrics come from site data: IF / JCR / CAS / indexes / DOAJ APC')}</span>
         </div>
         ${intro ? `<p class="pick-report-intro">${escape(intro)}</p>` : ''}
-        ${fields.length ? `<div class="pick-report-fields">${fields.map(f => `<span>${escape(f)}</span>`).join('')}</div>` : ''}
+        ${fields.length ? `<div class="pick-report-fields"><span class="pick-report-fields-label">${T('匹配方向','Matched fields')}</span>${fields.map(f => `<span>${escape(f)}</span>`).join('')}</div>` : ''}
         ${tiersHtml}
         ${chineseHtml}
         ${strategyHtml}
