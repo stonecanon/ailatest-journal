@@ -6919,6 +6919,14 @@
       return /^no$/i.test(String(r?.doaj?.apc || '').trim());
     }
 
+    // Fee info combined: site "free to publish" flag first, then public DOAJ APC data.
+    function pickFeeBadge(r) {
+      if (r?.free) {
+        return `<span class="pick-apc pick-apc-free" title="${T('提供 OA 发表选项（含 Diamond/Gold/Hybrid）','Offers OA publishing option (Diamond/Gold/Hybrid)')}">${T('免费发表','Free to publish')}</span>`;
+      }
+      return pickDoajApcBadge(r);
+    }
+
     function pickDomesticSources() {
       if (!domestic) return [];
       const out = [];
@@ -6982,7 +6990,7 @@
       const fid = favId(rec);
       if (fid) rowRecordsByFid[fid] = { ...rec, __src: 'int' };
       const idxText = (rec.indices || []).join(' / ');
-      const apcText = pickDoajApcText(rec);
+      const feeHtml = pickFeeBadge(rec);
       const warnText = (rec.warning || rec.citic_warning || rec.on_hold || rec.under_review) ? ' ⚠' : '';
       return `<tr>
         <td class="pick-report-num">${i + 1}</td>
@@ -6993,7 +7001,7 @@
         <td>${pickMetricIf(rec) || '<span class="muted-cell">&mdash;</span>'}</td>
         <td>${escape(rec.if_quartile || '') || '<span class="muted-cell">&mdash;</span>'}</td>
         <td>${pickMetricCas(rec) ? escape(pickMetricCas(rec)) : '<span class="muted-cell">&mdash;</span>'}</td>
-        <td>${apcText ? escape(apcText) : '<span class="muted-cell">&mdash;</span>'}</td>
+        <td>${feeHtml || '<span class="muted-cell">&mdash;</span>'}</td>
         <td class="pick-report-reason">${escape(reason)}</td>
       </tr>`;
     }
@@ -7039,7 +7047,7 @@
         </div>
         <div class="pick-report-table-wrap">
           <table class="pick-report-table pick-report-tier-table">
-            <thead><tr><th>#</th><th>${T('期刊','Journal')}</th><th>IF</th><th>JCR</th><th>${T('中科院','CAS')}</th><th>DOAJ APC</th><th>${T('推荐理由','Why')}</th></tr></thead>
+            <thead><tr><th>#</th><th>${T('期刊','Journal')}</th><th>IF</th><th>JCR</th><th>${T('中科院','CAS')}</th><th>${T('费用','Fees')}</th><th>${T('推荐理由','Why')}</th></tr></thead>
             <tbody>${(tier.items || []).map((item, i) => renderPickReportEnRow(item, i)).join('')}</tbody>
           </table>
         </div>
@@ -7057,7 +7065,7 @@
         </div>
       </section>` : '';
       const strategyTips = (report.strategy || []).concat([
-        T('DOAJ APC 列只使用 DOAJ 公开数据；空白表示本站暂无公开 APC 金额或状态，不代表免费或收费。','The DOAJ APC column uses only public DOAJ data; blank cells mean no public APC amount/status in the site data, not free or paid.'),
+        T('费用列综合站内「免费发表」标记（含 Diamond/Gold/Hybrid OA 选项）与 DOAJ 公开 APC 数据；空白表示暂无公开费用信息，不代表免费或收费。','The fees column combines the site "free to publish" flag (Diamond/Gold/Hybrid OA options) with public DOAJ APC data; blank cells mean no public fee info, not free or paid.'),
       ]);
       const strategyHtml = `<section class="pick-report-section">
         <div class="pick-report-section-head"><h3>${T('投稿策略建议','Submission strategy')}</h3></div>
@@ -7069,7 +7077,7 @@
             <div class="pick-report-kicker">${T('AI 综合荐刊','AI recommendation report')}</div>
             <h2>${T('荐刊综合建议','Comprehensive journal recommendation')}</h2>
           </div>
-          <span class="pick-report-source">${T('AI 给出梯队与理由，指标数据全部来自站内：IF / JCR / 中科院 / 索引 / DOAJ APC','AI picks tiers and reasons; all metrics come from site data: IF / JCR / CAS / indexes / DOAJ APC')}</span>
+          <span class="pick-report-source">${T('AI 给出梯队与理由，指标数据全部来自站内：IF / JCR / 中科院 / 索引 / 费用','AI picks tiers and reasons; all metrics come from site data: IF / JCR / CAS / indexes / fees')}</span>
         </div>
         ${intro ? `<p class="pick-report-intro">${escape(intro)}</p>` : ''}
         ${fields.length ? `<div class="pick-report-fields"><span class="pick-report-fields-label">${T('匹配方向','Matched fields')}</span>${fields.map(f => `<span>${escape(f)}</span>`).join('')}</div>` : ''}
@@ -7324,7 +7332,7 @@
               ${flagsHtml ? `<div class="pick-flags">${flagsHtml}</div>` : ''}
               ${(function(){
                 const r2 = e.journalRec;
-                const apcState = pickDoajApcBadge(r2);
+                const apcState = pickFeeBadge(r2);
                 const weeks = parseFloat(r2?.doaj?.review_weeks);
                 // 仅在有实际审稿周期数据时显示；无数据则不展示（不再用 DOAJ 平均值兜底）
                 const cycleHtml = weeks > 0
