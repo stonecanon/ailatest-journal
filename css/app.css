@@ -817,6 +817,11 @@ main.main {
   background: #fffdfa;
   border-left: 4px solid var(--accent);
 }
+/* Featured card spans full width, so the 16:7 banner gets too tall — cap it. */
+.update-card.featured .update-card-image {
+  aspect-ratio: auto;
+  height: clamp(160px, 22vw, 240px);
+}
 .update-card.compact {
   min-height: 154px;
   padding: 12px 13px;

@@ -6202,7 +6202,7 @@
         <article class="update-detail">
           <a class="updates-back" href="/updates" data-updates-back>← ${escape(t('updates_view_all'))}</a>
           <header class="update-detail-head">
-            ${imageUrl ? `<img class="update-detail-image" src="${escape(imageUrl)}" alt="${escape(item.title)}" loading="lazy">` : ''}
+            ${imageUrl ? `<img class="update-detail-image" src="${escape(imageUrl)}" alt="${escape(item.title)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : ''}
             <div class="update-card-top">
               <span class="update-category">${escape(updateCategoryLabel(item.category))}</span>
               ${item.published_at ? `<time datetime="${escape(item.published_at)}">${escape(formatUpdateDate(item.published_at))}</time>` : ''}
@@ -6265,7 +6265,7 @@
       const sourceName = item.source_name || item.publisher || t('updates_source');
       const imageUrl = item.image_url || item.detail?.image_url || '';
       const body = `
-        ${imageUrl ? `<div class="update-card-image"><img src="${escape(imageUrl)}" alt="" loading="lazy"></div>` : ''}
+        ${imageUrl ? `<div class="update-card-image"><img src="${escape(imageUrl)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.closest('.update-card-image').remove()"></div>` : ''}
         <div class="update-card-top">
           <span class="update-category">${escape(updateCategoryLabel(item.category))}</span>
           ${dateHtml}
