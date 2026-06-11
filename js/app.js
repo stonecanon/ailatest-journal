@@ -6256,6 +6256,26 @@
       });
     }
 
+    // Monogram for the no-image banner: leading letters of an ASCII source, else first CJK chars.
+    function updateBannerMark(item) {
+      const name = String(item.source_name || item.publisher || item.category || '').trim();
+      const ascii = name.match(/[A-Za-z0-9]+/);
+      if (ascii) return ascii[0].slice(0, 4).toUpperCase();
+      return name ? name.replace(/\s+/g, '').slice(0, 2) : '◆';
+    }
+
+    // Top banner shared by all cards so imaged and image-less cards align.
+    // The placeholder lives inside the same box and is revealed if the image
+    // is missing or fails to load (WeChat hotlink, dead URL, etc.).
+    function updateCardBanner(item, imageUrl, sourceName) {
+      const ph = `<div class="update-card-ph"><span class="update-card-ph-mark">${escape(updateBannerMark(item))}</span><b>${escape(sourceName)}</b></div>`;
+      const cat = item.category ? ` data-cat="${escape(item.category)}"` : '';
+      if (imageUrl) {
+        return `<div class="update-card-image"${cat}><img src="${escape(imageUrl)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.closest('.update-card-image').classList.add('ph');this.remove()">${ph}</div>`;
+      }
+      return `<div class="update-card-image ph"${cat}>${ph}</div>`;
+    }
+
     function renderUpdateCard(item, options = {}) {
       const tagHtml = (item.tags || []).slice(0, 5).map(tag => `<span class="update-tag">${escape(tag)}</span>`).join('');
       const journalsHtml = (item.journals || []).length
@@ -6265,7 +6285,7 @@
       const sourceName = item.source_name || item.publisher || t('updates_source');
       const imageUrl = item.image_url || item.detail?.image_url || '';
       const body = `
-        ${imageUrl ? `<div class="update-card-image"><img src="${escape(imageUrl)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.closest('.update-card-image').remove()"></div>` : ''}
+        ${updateCardBanner(item, imageUrl, sourceName)}
         <div class="update-card-top">
           <span class="update-category">${escape(updateCategoryLabel(item.category))}</span>
           ${dateHtml}

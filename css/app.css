@@ -842,6 +842,46 @@ main.main {
   height: 100%;
   object-fit: cover;
 }
+/* Placeholder banner for cards without an image, so all cards align. */
+.update-card-ph { display: none; }
+.update-card-image.ph {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f6f1e8 0%, #efe7da 55%, #e7ddcc 100%);
+}
+.update-card-image.ph .update-card-ph {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px;
+  max-width: 100%;
+}
+.update-card-ph-mark {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 38px;
+  height: 38px;
+  padding: 0 8px;
+  border-radius: 9px;
+  background: var(--accent, #c2410c);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: .02em;
+}
+.update-card-ph b {
+  color: #6b5d49;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.3;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
 .update-card-top,
 .update-card-bottom {
   display: flex;
