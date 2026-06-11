@@ -5665,6 +5665,7 @@
           journals: Array.isArray(src.journals) ? src.journals.filter(Boolean).map(String) : [],
           tags: Array.isArray(src.tags) ? src.tags.filter(Boolean).map(String) : [],
           priority: Number.isFinite(Number(src.priority)) ? Number(src.priority) : 0,
+          image_url: String(src.image_url || src.image || src.cover_image || '').trim(),
           detail_path: String(src.detail_path || '').trim(),
           detail: src.detail && typeof src.detail === 'object' ? src.detail : null
         };
@@ -6042,7 +6043,7 @@
 
     function updateDetailPath(item) {
       if (item.detail_path) return item.detail_path;
-      return item.detail && item.id ? `/updates/${encodeURIComponent(item.id)}` : '';
+      return item.id ? `/updates/${encodeURIComponent(item.id)}` : '';
     }
 
     function updateDetailItemFromPath() {
@@ -6071,6 +6072,33 @@
       return text ? [text] : [];
     }
 
+    function updateLinkList(value) {
+      if (!Array.isArray(value)) return [];
+      return value
+        .map(link => {
+          if (!link || typeof link !== 'object') return null;
+          const label = String(link.label || link.title || link.name || '').trim();
+          const url = String(link.url || link.href || '').trim();
+          if (!label || !url) return null;
+          return {
+            label,
+            url,
+            note: String(link.note || '').trim(),
+            external: /^https?:\/\//i.test(url)
+          };
+        })
+        .filter(Boolean);
+    }
+
+    function renderUpdateLinks(links, cls = 'update-link-list') {
+      if (!links.length) return '';
+      return `<div class="${cls}">
+        ${links.map(link => `<a href="${escape(link.url)}"${link.external ? ' target="_blank" rel="noopener"' : ''}>
+          <span>${escape(link.label)}</span>${link.note ? `<em>${escape(link.note)}</em>` : ''}
+        </a>`).join('')}
+      </div>`;
+    }
+
     function renderUpdateArticle(article) {
       if (!article || typeof article !== 'object') return '';
       const intro = updateTextList(article.intro);
@@ -6078,6 +6106,7 @@
       const sections = Array.isArray(article.sections) ? article.sections : [];
       const questions = Array.isArray(article.questions) ? article.questions : [];
       const takeaways = updateTextList(article.takeaways);
+      const links = updateLinkList(article.links);
       const note = String(article.note || '').trim();
 
       const statsHtml = stats
@@ -6126,7 +6155,7 @@
         .filter(Boolean)
         .join('');
 
-      if (!intro.length && !statsHtml && !sectionsHtml && !questionsHtml && !takeaways.length) return '';
+      if (!intro.length && !statsHtml && !sectionsHtml && !questionsHtml && !takeaways.length && !links.length) return '';
       return `<div class="update-article">
         ${note ? `<p class="update-article-note">${escape(note)}</p>` : ''}
         ${intro.length ? `<section class="update-article-lead">${intro.map(p => `<p>${escape(p)}</p>`).join('')}</section>` : ''}
@@ -6140,6 +6169,7 @@
           <h2>给选刊用户的启发</h2>
           <ul>${takeaways.map(p => `<li>${escape(p)}</li>`).join('')}</ul>
         </section>` : ''}
+        ${links.length ? `<section class="update-article-section"><h2>相关链接</h2>${renderUpdateLinks(links)}</section>` : ''}
       </div>`;
     }
 
@@ -6153,26 +6183,35 @@
       const points = Array.isArray(detail.key_points) ? detail.key_points : [];
       const sections = Array.isArray(detail.sections) ? detail.sections : [];
       const articleHtml = renderUpdateArticle(detail.article);
-      const reportUrl = report.file_detail_url || report.view_url || report.pdf_url || item.source_url || '';
+      const imageUrl = String(detail.image_url || item.image_url || report.cover_image || '').trim();
+      const sourceLinks = updateLinkList([
+        item.source_url ? { label: '原始来源', url: item.source_url, note: sourceName } : null,
+        ...(Array.isArray(detail.source_links) ? detail.source_links : []),
+      ].filter(Boolean));
+      const journalLinks = updateLinkList(detail.journal_links || []);
+      const reportUrl = report.file_detail_url || report.view_url || report.pdf_url || '';
       const pdfUrl = report.pdf_url || report.download_url || report.view_url || '';
       box.innerHTML = `
         <article class="update-detail">
           <a class="updates-back" href="/updates" data-updates-back>← ${escape(t('updates_view_all'))}</a>
           <header class="update-detail-head">
+            ${imageUrl ? `<img class="update-detail-image" src="${escape(imageUrl)}" alt="${escape(item.title)}" loading="lazy">` : ''}
             <div class="update-card-top">
               <span class="update-category">${escape(updateCategoryLabel(item.category))}</span>
               ${item.published_at ? `<time datetime="${escape(item.published_at)}">${escape(formatUpdateDate(item.published_at))}</time>` : ''}
             </div>
             <h1>${escape(item.title)}</h1>
-            ${detail.dek ? `<p class="update-detail-dek">${escape(detail.dek)}</p>` : ''}
+            <p class="update-detail-dek">${escape(detail.dek || item.summary || '')}</p>
             <div class="update-detail-meta">
-              <span>${escape(t('updates_source'))}: <a href="${escape(item.source_url)}" target="_blank" rel="noopener">${escape(sourceName)}</a></span>
+              <span>${escape(t('updates_source'))}: ${escape(sourceName)}</span>
               ${item.publisher ? `<span>${escape(item.publisher)}</span>` : ''}
               <span class="update-tags">${tags}</span>
             </div>
+            ${sourceLinks.length ? renderUpdateLinks(sourceLinks, 'update-source-actions') : ''}
           </header>
+          ${journalLinks.length ? `<section class="update-detail-section"><h2>相关期刊</h2>${renderUpdateLinks(journalLinks)}</section>` : ''}
           ${articleHtml || `
-            ${detail.lead ? `<section class="update-detail-section"><p>${escape(detail.lead)}</p></section>` : ''}
+            ${(detail.lead || item.summary) ? `<section class="update-detail-section"><p>${escape(detail.lead || item.summary)}</p></section>` : ''}
             ${points.length ? `<section class="update-detail-section"><h2>要点</h2><ul>${points.map(p => `<li>${escape(p)}</li>`).join('')}</ul></section>` : ''}
             ${sections.map(section => `
               <section class="update-detail-section">
@@ -6217,7 +6256,9 @@
         : '';
       const dateHtml = item.published_at ? `<time datetime="${escape(item.published_at)}">${escape(formatUpdateDate(item.published_at))}</time>` : '';
       const sourceName = item.source_name || item.publisher || t('updates_source');
+      const imageUrl = item.image_url || item.detail?.image_url || '';
       const body = `
+        ${imageUrl ? `<div class="update-card-image"><img src="${escape(imageUrl)}" alt="" loading="lazy"></div>` : ''}
         <div class="update-card-top">
           <span class="update-category">${escape(updateCategoryLabel(item.category))}</span>
           ${dateHtml}

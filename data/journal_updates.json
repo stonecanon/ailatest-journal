@@ -1,25 +1,76 @@
 {
-  "updated_at": "2026-06-11T09:55:00+08:00",
+  "updated_at": "2026-06-11T11:45:00+08:00",
   "items": [
     {
       "id": "elsevier-advanced-biosensors-launch-2026",
       "published_at": "2026-06-11",
       "category": "new_journal",
-      "title": "Elsevier 新刊 Advanced Biosensors 上线并开放投稿",
-      "summary": "爱思唯尔科研出版服务发布生物传感器领域新刊 Advanced Biosensors。该刊为同行评审国际开放获取期刊，聚焦生物传感器研究、设计、开发与应用；2027 年底前投稿并被接收的稿件免除 APC。",
+      "title": "Elsevier 新刊 Advanced Biosensors 上线",
+      "summary": "Elsevier 上线开放获取新刊 Advanced Biosensors，聚焦生物传感器研究、设计、开发与应用。原文称 2027 年底前投稿并接收的稿件免 APC。",
       "source_name": "爱思唯尔科研出版服务",
       "source_url": "https://mp.weixin.qq.com/s/fwAGc1NjQnHsZtXbkuPmyA",
       "publisher": "Elsevier",
-      "journals": ["Advanced Biosensors"],
-      "tags": ["Elsevier", "新刊", "OA", "APC限免", "生物传感器"],
-      "priority": 5
+      "journals": [
+        "Advanced Biosensors"
+      ],
+      "tags": [
+        "Elsevier",
+        "新刊",
+        "OA",
+        "APC限免",
+        "生物传感器"
+      ],
+      "priority": 5,
+      "image_url": "https://mmecoa.qpic.cn/sz_mmecoa_jpg/yS9OeiaHSLnXRbFZJqqnia264ick2YjU1AmkRst3ia8NTVngrs7GWgWcx460YqhzqhDUrxy95vf0qZWVNZJG7k9NKUMEfmujFfjgXxt5mZMAG2I/0?wx_fmt=jpeg",
+      "detail": {
+        "image_url": "https://mmecoa.qpic.cn/sz_mmecoa_jpg/yS9OeiaHSLnXRbFZJqqnia264ick2YjU1AmkRst3ia8NTVngrs7GWgWcx460YqhzqhDUrxy95vf0qZWVNZJG7k9NKUMEfmujFfjgXxt5mZMAG2I/0?wx_fmt=jpeg",
+        "dek": "一条新刊上线与征稿信息，适合关注生物传感、材料、分析化学和生物医学工程方向的作者查看。",
+        "journal_links": [
+          {
+            "label": "Advanced Biosensors",
+            "url": "/journal/advanced-biosensors/",
+            "note": "站内期刊页"
+          }
+        ],
+        "source_links": [
+          {
+            "label": "ScienceDirect 期刊页",
+            "url": "https://www.sciencedirect.com/journal/advanced-biosensors"
+          }
+        ],
+        "article": {
+          "intro": [
+            "Advanced Biosensors 为 Elsevier 的开放获取新刊，期刊介绍称其覆盖生物传感器的研究、设计、开发和应用。",
+            "原文列出的方向包括分子识别、探针技术、信号转导与放大、传感界面、功能材料、AI 赋能生物传感、细胞传感器及生物医学应用等。"
+          ],
+          "sections": [
+            {
+              "heading": "关键信息",
+              "bullets": [
+                "ISSN: 3117-9339",
+                "主编：李根喜教授，南京大学生命科学学院",
+                "原文称 2027 年底前投稿并接收的稿件免 APC",
+                "期刊主页已在 ScienceDirect 上线"
+              ]
+            }
+          ],
+          "links": [
+            {
+              "label": "Advanced Biosensors 站内页",
+              "url": "/journal/advanced-biosensors/",
+              "note": "查看期刊数据"
+            }
+          ]
+        }
+      },
+      "detail_path": "/updates/elsevier-advanced-biosensors-launch-2026"
     },
     {
       "id": "doaj-new-journals-2026-06-10",
       "published_at": "2026-06-11",
       "category": "index_change",
-      "title": "DOAJ 近 24 小时新增一批开放获取期刊",
-      "summary": "DOAJ 最新新增记录集中出现医学、人文社科、生态、物理等方向期刊，包括 Retrospektive、Przegląd Lekarski Jagiellonian Medical Review、Child Neurology、Research Connections 等；多本期刊标注无 APC，OUP 的 Research Connections 在 DOAJ 记录中显示 APC 最高 2150 USD。",
+      "title": "DOAJ 新增一批开放获取期刊记录",
+      "summary": "DOAJ 6 月 10 日新增多本开放获取期刊记录，覆盖医学、人文社科、公共行政、经济与金融等方向。站内已同步这些期刊的 DOAJ 公开字段，包括许可证、APC、同行评议和审稿周数。",
       "source_name": "DOAJ",
       "source_url": "https://doaj.org/feed",
       "publisher": "DOAJ",
@@ -31,21 +82,155 @@
         "Acta Scientiarum Polonorum. Oeconomia",
         "Rocznik Administracji Publicznej"
       ],
-      "tags": ["DOAJ", "新增收录", "OA", "APC公开数据"],
-      "priority": 4
+      "tags": [
+        "DOAJ",
+        "新增收录",
+        "OA",
+        "APC公开数据"
+      ],
+      "priority": 4,
+      "detail": {
+        "dek": "这是一条收录变化汇总，不拆分为多个卡片。费用和同行评议信息以 DOAJ API 公开记录为准。",
+        "journal_links": [
+          {
+            "label": "Retrospektive",
+            "url": "/journal/retrospektive/",
+            "note": "DOAJ: 无 APC"
+          },
+          {
+            "label": "Przegląd Lekarski Jagiellonian Medical Review",
+            "url": "/journal/przeglad-lekarski-jagiellonian-medical-review/",
+            "note": "DOAJ: 无 APC"
+          },
+          {
+            "label": "Child Neurology",
+            "url": "/journal/child-neurology/",
+            "note": "DOAJ: 无 APC"
+          },
+          {
+            "label": "Research Connections",
+            "url": "/journal/research-connections/",
+            "note": "DOAJ: APC 2150 USD"
+          },
+          {
+            "label": "Acta Scientiarum Polonorum. Oeconomia",
+            "url": "/journal/acta-scientiarum-polonorum-oeconomia/",
+            "note": "DOAJ: APC 1500 PLN"
+          },
+          {
+            "label": "Rocznik Administracji Publicznej",
+            "url": "/journal/rocznik-administracji-publicznej/",
+            "note": "DOAJ: 无 APC"
+          }
+        ],
+        "source_links": [
+          {
+            "label": "DOAJ Recent Journals Added",
+            "url": "https://doaj.org/feed"
+          },
+          {
+            "label": "DOAJ API",
+            "url": "https://doaj.org/api/search/journals/*?page=1&pageSize=10&sort=created_date:desc"
+          }
+        ],
+        "article": {
+          "intro": [
+            "本次更新合并呈现 DOAJ 新增记录。站内已新增或更新对应期刊条目，避免用户只看到新闻而无法查询期刊详情。"
+          ],
+          "sections": [
+            {
+              "heading": "本次同步的期刊",
+              "bullets": [
+                "Retrospektive：History (General) and history of Europe；APC No",
+                "Przegląd Lekarski Jagiellonian Medical Review：Internal medicine；APC No",
+                "Child Neurology：Neurology. Diseases of the nervous system；APC No",
+                "Research Connections：Medicine (General)；APC 2150 USD",
+                "Acta Scientiarum Polonorum. Oeconomia：Economic growth, development, planning / Finance；APC 1500 PLN",
+                "Rocznik Administracji Publicznej：Political institutions and public administration (General)；APC No"
+              ]
+            },
+            {
+              "heading": "使用说明",
+              "bullets": [
+                "DOAJ 记录代表开放获取目录收录，不等同于 Web of Science、Scopus 或 JCR 收录。",
+                "APC、许可证、同行评议和审稿周数显示来自 DOAJ 公开字段；无公开字段时不补写。"
+              ]
+            }
+          ],
+          "links": [
+            {
+              "label": "Retrospektive",
+              "url": "/journal/retrospektive/",
+              "note": "站内期刊页"
+            },
+            {
+              "label": "Przegląd Lekarski Jagiellonian Medical Review",
+              "url": "/journal/przeglad-lekarski-jagiellonian-medical-review/",
+              "note": "站内期刊页"
+            },
+            {
+              "label": "Child Neurology",
+              "url": "/journal/child-neurology/",
+              "note": "站内期刊页"
+            },
+            {
+              "label": "Research Connections",
+              "url": "/journal/research-connections/",
+              "note": "站内期刊页"
+            },
+            {
+              "label": "Acta Scientiarum Polonorum. Oeconomia",
+              "url": "/journal/acta-scientiarum-polonorum-oeconomia/",
+              "note": "站内期刊页"
+            },
+            {
+              "label": "Rocznik Administracji Publicznej",
+              "url": "/journal/rocznik-administracji-publicznej/",
+              "note": "站内期刊页"
+            }
+          ]
+        }
+      },
+      "detail_path": "/updates/doaj-new-journals-2026-06-10"
     },
     {
       "id": "scholarly-kitchen-scholar-ready-ai-2026",
       "published_at": "2026-06-10",
       "category": "report",
-      "title": "The Scholarly Kitchen 讨论“面向学者的 AI”与出版基础设施",
-      "summary": "The Scholarly Kitchen 访谈讨论学术内容在 AI 检索、问答和研究工作流中的来源可信、权威内容供给与出版商基础设施角色。该动态适合作为 AI 与学术出版平台关系的背景材料。",
+      "title": "The Scholarly Kitchen 讨论学术出版中的 AI 检索基础设施",
+      "summary": "The Scholarly Kitchen 访谈讨论 AI 检索、来源可信度和学术出版基础设施。重点在于权威内容如何进入 AI 驱动的研究工作流。",
       "source_name": "The Scholarly Kitchen",
       "source_url": "https://scholarlykitchen.sspnet.org/2026/06/10/building-scholar-ready-ai/",
       "publisher": "Society for Scholarly Publishing",
       "journals": [],
-      "tags": ["AI", "学术出版", "出版基础设施", "研究工作流"],
-      "priority": 3
+      "tags": [
+        "AI",
+        "学术出版",
+        "出版基础设施",
+        "研究工作流"
+      ],
+      "priority": 3,
+      "image_url": "https://scholarlykitchen.sspnet.org/wp-content/uploads/2026/06/iStock-1161949872.jpg",
+      "detail": {
+        "image_url": "https://scholarlykitchen.sspnet.org/wp-content/uploads/2026/06/iStock-1161949872.jpg",
+        "dek": "一条关于 AI 与学术出版基础设施的行业观察，适合作为期刊平台和内容可信度议题的背景材料。",
+        "article": {
+          "intro": [
+            "访谈围绕 AI 检索、来源出处、权威内容供给和出版商基础设施展开。对期刊平台而言，核心问题是如何让经过编辑、同行评议和元数据整理的内容在 AI 工作流中保持可追溯。"
+          ],
+          "sections": [
+            {
+              "heading": "关键点",
+              "bullets": [
+                "AI 检索需要可靠来源和清晰出处。",
+                "出版社与平台的角色不只是发布 PDF，还包括维护元数据、许可、内容结构和可信访问。",
+                "对作者和读者而言，未来的发现路径可能更多发生在 AI 辅助工具中。"
+              ]
+            }
+          ]
+        }
+      },
+      "detail_path": "/updates/scholarly-kitchen-scholar-ready-ai-2026"
     },
     {
       "id": "global-oa-publishing-ten-questions-2026",
@@ -57,7 +242,12 @@
       "source_url": "https://mp.weixin.qq.com/s/4Y3l1evKT1Y7rVO4w7egzw",
       "publisher": "Wiley / 中国科学院文献情报中心",
       "journals": [],
-      "tags": ["OA", "出版报告", "Wiley", "Web of Science"],
+      "tags": [
+        "OA",
+        "出版报告",
+        "Wiley",
+        "Web of Science"
+      ],
       "priority": 5,
       "detail_path": "/updates/global-oa-publishing-ten-questions-2026",
       "detail": {
@@ -198,7 +388,8 @@
           "cover_image": "https://mmbiz.qpic.cn/mmbiz_png/NIdGicf9xeBKINY2jGewpeVMXk6jD4LjcHTgCXvXPKsHG4VawRmIsQUQria1J7ibJJrNe3XrNE2IBTY2ubnibZpOLURtYrfqwic0M121ibwFnzAG4/640?wx_fmt=png&from=appmsg",
           "source_note": "PDF 文件信息来自 Smarket 文件详情页，原始入口由科学观澜公众号文章给出。"
         }
-      }
+      },
+      "image_url": "https://mmbiz.qpic.cn/mmbiz_png/NIdGicf9xeBKINY2jGewpeVMXk6jD4LjcHTgCXvXPKsHG4VawRmIsQUQria1J7ibJJrNe3XrNE2IBTY2ubnibZpOLURtYrfqwic0M121ibwFnzAG4/640?wx_fmt=png&from=appmsg"
     },
     {
       "id": "doaj-ambassador-programme-10-years-2026",
@@ -210,8 +401,36 @@
       "source_url": "https://blog.doaj.org/2026/06/10/ten-years-of-learning-connecting-and-growing-with-doaj/",
       "publisher": "DOAJ",
       "journals": [],
-      "tags": ["DOAJ", "开放获取", "质量标准"],
-      "priority": 4
+      "tags": [
+        "DOAJ",
+        "开放获取",
+        "质量标准"
+      ],
+      "priority": 4,
+      "detail_path": "/updates/doaj-ambassador-programme-10-years-2026",
+      "detail": {
+        "dek": "DOAJ 对 Ambassador Programme 十周年的回顾，主要涉及开放获取期刊质量标准、区域传播和作者教育。",
+        "source_links": [
+          {
+            "label": "DOAJ 博文",
+            "url": "https://blog.doaj.org/2026/06/10/ten-years-of-learning-connecting-and-growing-with-doaj/"
+          }
+        ],
+        "article": {
+          "intro": [
+            "DOAJ 回顾 Ambassador Programme 十周年。该计划关注开放获取期刊质量标准、区域社群建设和作者教育。"
+          ],
+          "sections": [
+            {
+              "heading": "为什么关注",
+              "bullets": [
+                "DOAJ 仍是核对 OA 期刊和 APC 信息的重要公开来源。",
+                "对选刊工具而言，DOAJ 数据适合用于补充许可证、APC、评审流程等基础字段。"
+              ]
+            }
+          ]
+        }
+      }
     },
     {
       "id": "springer-nature-society-partner-newsletter-epic-2026",
@@ -223,8 +442,36 @@
       "source_url": "https://www.springernature.com/gp/group/media/press-releases/society-partner-community-newsletter-wins-2026/52523800",
       "publisher": "Springer Nature",
       "journals": [],
-      "tags": ["学会期刊", "开放获取", "出版政策"],
-      "priority": 3
+      "tags": [
+        "学会期刊",
+        "开放获取",
+        "出版政策"
+      ],
+      "priority": 3,
+      "detail_path": "/updates/springer-nature-society-partner-newsletter-epic-2026",
+      "detail": {
+        "dek": "Springer Nature 学会伙伴通讯获奖，反映出版社与学会期刊之间的沟通和服务建设。",
+        "source_links": [
+          {
+            "label": "Springer Nature 新闻稿",
+            "url": "https://www.springernature.com/gp/group/media/press-releases/society-partner-community-newsletter-wins-2026/52523800"
+          }
+        ],
+        "article": {
+          "intro": [
+            "Springer Nature 称其 Society Partner Community Newsletter 获 2026 Gold EPIC Award。该通讯服务学会伙伴，内容覆盖出版创新、研究政策和开放获取。"
+          ],
+          "sections": [
+            {
+              "heading": "关键点",
+              "bullets": [
+                "这是学会期刊服务和出版沟通渠道的动态。",
+                "对作者的直接投稿影响有限，但可作为观察学会期刊政策变化的补充渠道。"
+              ]
+            }
+          ]
+        }
+      }
     },
     {
       "id": "nature-registered-reports-all-disciplines-2026",
@@ -235,9 +482,53 @@
       "source_name": "Springer Nature",
       "source_url": "https://www.springernature.com/gp/group/media/press-releases/nature-expands-registered-reports/52506282",
       "publisher": "Springer Nature",
-      "journals": ["Nature"],
-      "tags": ["Nature", "Registered Reports", "投稿政策"],
-      "priority": 5
+      "journals": [
+        "Nature"
+      ],
+      "tags": [
+        "Nature",
+        "Registered Reports",
+        "投稿政策"
+      ],
+      "priority": 5,
+      "detail_path": "/updates/nature-registered-reports-all-disciplines-2026",
+      "detail": {
+        "dek": "Nature 将 Registered Reports 扩展到全部学科，影响强调研究设计、预注册和可重复性的投稿。",
+        "journal_links": [
+          {
+            "label": "Nature",
+            "url": "/journal/nature/",
+            "note": "站内期刊页"
+          }
+        ],
+        "source_links": [
+          {
+            "label": "Springer Nature 新闻稿",
+            "url": "https://www.springernature.com/gp/group/media/press-releases/nature-expands-registered-reports/52506282"
+          }
+        ],
+        "article": {
+          "intro": [
+            "Nature 宣布将 Registered Reports 投稿格式扩展至全部覆盖学科。该格式通常先评审研究问题和方法，再根据结果完成论文。"
+          ],
+          "sections": [
+            {
+              "heading": "投稿提示",
+              "bullets": [
+                "适合强调研究设计、预注册和可重复性的研究。",
+                "准备投稿前应先确认期刊对应栏目、阶段性评审要求和数据/方法开放要求。"
+              ]
+            }
+          ],
+          "links": [
+            {
+              "label": "Nature 站内页",
+              "url": "/journal/nature/",
+              "note": "查看期刊数据"
+            }
+          ]
+        }
+      }
     },
     {
       "id": "wiley-acquires-emerald-2026",
@@ -249,8 +540,38 @@
       "source_url": "https://www.emeraldgrouppublishing.com/news-and-press-releases/wiley-acquires-emerald-expanding-research-scale-and-deepening-proprietary",
       "publisher": "Wiley / Emerald",
       "journals": [],
-      "tags": ["Wiley", "Emerald", "社科期刊"],
-      "priority": 4
+      "tags": [
+        "Wiley",
+        "Emerald",
+        "社科期刊"
+      ],
+      "priority": 4,
+      "detail_path": "/updates/wiley-acquires-emerald-2026",
+      "detail": {
+        "image_url": "https://www.emeraldgrouppublishing.com/sites/default/files/image/Emerald-social.jpg",
+        "dek": "Wiley 收购 Emerald 的出版行业动态，可能影响社科、管理、商业和金融方向期刊组合。",
+        "source_links": [
+          {
+            "label": "Emerald 新闻稿",
+            "url": "https://www.emeraldgrouppublishing.com/news-and-press-releases/wiley-acquires-emerald-expanding-research-scale-and-deepening-proprietary"
+          }
+        ],
+        "article": {
+          "intro": [
+            "Wiley 宣布收购 Emerald Publishing。新闻稿称交易将扩展 Wiley 的期刊组合，并加强社会科学、商业、金融和管理领域内容。"
+          ],
+          "sections": [
+            {
+              "heading": "观察点",
+              "bullets": [
+                "短期内作者主要关注投稿平台、开放获取政策和期刊品牌是否发生调整。",
+                "该交易属于出版集团层面的组合变化，不代表单本期刊立即改变收录或分区。"
+              ]
+            }
+          ]
+        }
+      },
+      "image_url": "https://www.emeraldgrouppublishing.com/sites/default/files/image/Emerald-social.jpg"
     }
   ]
 }
