@@ -86,6 +86,8 @@ DOAJ_FILE    = LIST_DIR / 'doaj_journals.csv'
 CNKX_JSON    = DATA_DIR / 'cnkx_tiers.json'
 CNKX_RECORDS = DATA_DIR / 'cnkx_records.json'
 CNKX_DOMAINS = DATA_DIR / 'cnkx_domains_59.json'
+CSCD_JSON    = DATA_DIR / 'cscd_journals.json'
+CSTPCD_JSON  = DATA_DIR / 'cstpcd_journals.json'
 ZJU_JSON     = DATA_DIR / 'zju_tiers.json'
 SCHOOL_A_JSON= DATA_DIR / 'school_a_tiers.json'
 CSSCI_CORE_JSON = ROOT / 'generated' / 'cssci_core.json'
@@ -1059,6 +1061,50 @@ def merge_cnkx_to_main(by_issn, by_title):
     return hits
 
 
+def merge_cscd_to_main(by_issn, by_title):
+    if not CSCD_JSON.exists(): return 0
+    data = json.loads(CSCD_JSON.read_text(encoding='utf-8'))
+    rows = data.get('records', []) if isinstance(data, dict) else data
+    hits = 0
+    for r in rows:
+        issn = clean_issn(r.get('issn') or '')
+        nt = norm_title(r.get('name') or '')
+        rec = (issn and by_issn.get(issn)) or by_title.get(nt)
+        if rec is None:
+            continue
+        rec['cscd'] = {
+            'database': r.get('database') or '',
+            'database_label': r.get('database_label') or '',
+            'source': 'CSCD',
+        }
+        hits += 1
+    return hits
+
+
+def cstpcd_label(kind: str) -> str:
+    return '科技核心·科普' if kind == 'popular_science' else '科技核心'
+
+
+def merge_cstpcd_to_main(by_title):
+    if not CSTPCD_JSON.exists(): return 0
+    data = json.loads(CSTPCD_JSON.read_text(encoding='utf-8'))
+    rows = data.get('records', []) if isinstance(data, dict) else data
+    hits = 0
+    for r in rows:
+        nt = norm_title(r.get('name') or '')
+        rec = by_title.get(nt)
+        if rec is None:
+            continue
+        rec['cstpcd'] = {
+            'kind': r.get('kind') or 'core',
+            'code': r.get('code') or '',
+            'label': cstpcd_label(r.get('kind') or 'core'),
+            'source': 'CSTPCD',
+        }
+        hits += 1
+    return hits
+
+
 # ───────────────────────── OAJ 全球开放获取期刊索引 ─────────────────────────
 
 def parse_oaj(path, by_title, by_issn, store=None):
@@ -1177,7 +1223,10 @@ def main():
         for r in store.values():
             for k in (r.get('issn'), r.get('eissn')):
                 if k: by_issn.setdefault(k, r)
-            by_title.setdefault(norm_title(r['name']), r)
+            for title_key in (r.get('name'), r.get('cn_name'), r.get('en_name')):
+                nt = norm_title(title_key or '')
+                if nt:
+                    by_title.setdefault(nt, r)
         return by_issn, by_title
 
     by_issn, by_title = rebuild_lookups()
@@ -1256,6 +1305,14 @@ def main():
     print('== 中国科协 merge ==')
     h = merge_cnkx_to_main(by_issn, by_title)
     print(f'  CNKX merged: {h}')
+
+    print('== CSCD 来源期刊目录 merge ==')
+    h = merge_cscd_to_main(by_issn, by_title)
+    print(f'  CSCD merged: {h}')
+
+    print('== 中国科技核心期刊目录 merge ==')
+    h = merge_cstpcd_to_main(by_title)
+    print(f'  CSTPCD merged: {h}')
 
     print('== OAJ 全球开放获取期刊索引 ==')
     h, s = parse_oaj(OAJ_FILE, by_title, by_issn, store=store)
@@ -1405,7 +1462,7 @@ def main():
     for r in journals:
         for i in r['indices']: idx_c[i] += 1
     cas_c = Counter(); cas_top = 0
-    if_count = 0; warning_count = 0; cn_name_count = 0; ccf_count = 0; abdc_count = 0; abs_count = 0; ft50_count = 0; utd24_count = 0; cnkx_count = 0; scopus_count = 0; ei_count = 0; oaj_count = 0; doaj_count = 0; medline_count = 0; pubmed_count = 0; pmc_count = 0
+    if_count = 0; warning_count = 0; cn_name_count = 0; ccf_count = 0; abdc_count = 0; abs_count = 0; ft50_count = 0; utd24_count = 0; cnkx_count = 0; cscd_count = 0; cstpcd_count = 0; cstpcd_popular_count = 0; scopus_count = 0; ei_count = 0; oaj_count = 0; doaj_count = 0; medline_count = 0; pubmed_count = 0; pmc_count = 0
     for r in journals:
         z = r.get('cas_zone')
         if z: cas_c[z] += 1
@@ -1419,6 +1476,11 @@ def main():
         if r.get('ft50'): ft50_count += 1
         if r.get('utd24'): utd24_count += 1
         if r.get('cnkx'): cnkx_count += 1
+        if r.get('cscd'): cscd_count += 1
+        if r.get('cstpcd'):
+            cstpcd_count += 1
+            if r.get('cstpcd', {}).get('kind') == 'popular_science':
+                cstpcd_popular_count += 1
         if r.get('scopus') and r.get('scopus', {}).get('active') is not False: scopus_count += 1
         if 'EI' in r.get('indices', []): ei_count += 1
         if r.get('oaj'): oaj_count += 1
@@ -1431,7 +1493,7 @@ def main():
     print(f'  total: {len(journals)}')
     print(f'  indices: {dict(idx_c)}')
     print(f'  CAS zones: {dict(cas_c)} Top={cas_top}')
-    print(f'  IF: {if_count}  warning: {warning_count}  中文刊名: {cn_name_count}  CCF: {ccf_count}  ABDC: {abdc_count}  ABS: {abs_count}  FT50: {ft50_count}  UTD24: {utd24_count}  CNKX: {cnkx_count}  Scopus: {scopus_count}  EI: {ei_count}  OAJ: {oaj_count}  DOAJ: {doaj_count}  MEDLINE: {medline_count}  PubMed: {pubmed_count}  PMC: {pmc_count}')
+    print(f'  IF: {if_count}  warning: {warning_count}  中文刊名: {cn_name_count}  CCF: {ccf_count}  ABDC: {abdc_count}  ABS: {abs_count}  FT50: {ft50_count}  UTD24: {utd24_count}  CNKX: {cnkx_count}  CSCD: {cscd_count}  CSTPCD: {cstpcd_count}  Scopus: {scopus_count}  EI: {ei_count}  OAJ: {oaj_count}  DOAJ: {doaj_count}  MEDLINE: {medline_count}  PubMed: {pubmed_count}  PMC: {pmc_count}')
 
     # Strip large non-essential fields to stay under CF Pages 25 MB limit
     for r in journals:
@@ -1489,6 +1551,8 @@ def main():
         'zju': None,
         'school_a': None,
         'nsfc_mgmt': None,
+        'cscd': None,
+        'cstpcd': None,
         'ccft': [],
         'cssci_core': [],
         'cssci_ext': [],
@@ -1506,6 +1570,10 @@ def main():
         domestic['school_a'] = json.loads(SCHOOL_A_JSON.read_text(encoding='utf-8'))
     if NSFC_MGMT_JSON.exists():
         domestic['nsfc_mgmt'] = json.loads(NSFC_MGMT_JSON.read_text(encoding='utf-8'))
+    if CSCD_JSON.exists():
+        domestic['cscd'] = json.loads(CSCD_JSON.read_text(encoding='utf-8'))
+    if CSTPCD_JSON.exists():
+        domestic['cstpcd'] = json.loads(CSTPCD_JSON.read_text(encoding='utf-8'))
     if CSSCI_CORE_JSON.exists():
         domestic['cssci_core'] = json.loads(CSSCI_CORE_JSON.read_text(encoding='utf-8'))
     if CSSCI_EXT_JSON.exists():
@@ -1591,7 +1659,7 @@ def main():
 
     # meta
     meta = {
-        'source': 'WoS Core + JCR 2025 + ESI + 中科院 2025 + 长江大学 + ShowJCR (JCR/FQB/XR/CCF/Warning) + Scopus (auto-updated) + EI Compendex Oct. 2025 + ABDC optional + ABS AJG + 中国科协 + OAJ 2025 + DOAJ Journal CSV',
+        'source': 'WoS Core + JCR 2025 + ESI + 中科院 2025 + 长江大学 + ShowJCR (JCR/FQB/XR/CCF/Warning) + Scopus (auto-updated) + EI Compendex Oct. 2025 + ABDC optional + ABS AJG + 中国科协 + CSCD + 中国科技核心 + OAJ 2025 + DOAJ Journal CSV',
         'last_updated_source': 'WoS Core 2026-04-20',
         'total': len(journals),
         'indices': dict(idx_c),
@@ -1608,6 +1676,9 @@ def main():
         'with_oaj': oaj_count,
         'with_doaj': doaj_count,
         'with_cnkx': cnkx_count,
+        'with_cscd': cscd_count,
+        'with_cstpcd': cstpcd_count,
+        'with_cstpcd_popular': cstpcd_popular_count,
         'with_scopus': scopus_count,
         'with_ei': ei_count,
         'wos_categories': len(wos_c),

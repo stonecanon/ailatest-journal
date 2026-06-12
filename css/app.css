@@ -462,6 +462,8 @@ main.main {
 .chip.ds-chip-cssci-ext:has(input:checked) { background: #b33c6e; border-color: #b33c6e; opacity: 0.75; }
 .chip.ds-chip-pku:has(input:checked) { background: #c7442d; border-color: #c7442d; }
 .chip.ds-chip-ccft:has(input:checked) { background: #2e6a8a; border-color: #2e6a8a; }
+.chip.ds-chip-cscd:has(input:checked) { background: #4f6f7c; border-color: #4f6f7c; }
+.chip.ds-chip-cstpcd:has(input:checked) { background: #6b5a3a; border-color: #6b5a3a; }
 
 /* cat 列表：书页目录感 */
 .nav { display: flex; flex-direction: column; gap: 1px; }
@@ -1893,6 +1895,8 @@ table.journals tr:last-child td { border-bottom: 0; }
 .badge.b-oaj { background: #5a7a7a; }                 /* 低饱和青 — 次要收录 */
 .badge.b-doaj { background: #6a8a6a; }                /* 低饱和绿 — 次要收录 */
 .badge.b-nature-index { background: #3f3a2f; }
+.badge.b-cscd { background: #4f6f7c; }
+.badge.b-cstpcd { background: #6b5a3a; }
 .badge.b-view { color: #6b5d52; background: #e9dfc8; font-variant-numeric: tabular-nums; opacity: 0.9; }
 .badge.b-mdpi     { background: #b82a4a; color: #fff; }
 .badge.b-frontiers { background: #1a6b3c; color: #fff; }
@@ -4862,6 +4866,8 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .src-tag.src-pku, .src-tag.src-pku_core { color: #fff; background: #a33a2a; }
 .src-tag.src-school_a { color: #fff; background: #4a6b2a; }
 .src-tag.src-zju { color: #fff; background: #1f5f5a; }
+.src-tag.src-cscd { color: #fff; background: #4f6f7c; }
+.src-tag.src-cstpcd { color: #fff; background: #6b5a3a; }
 .src-tag.src-ccft { color: #fff; background: #7a2030; }
 
 @media (max-width: 640px) {
@@ -4894,9 +4900,20 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .domsrc-pill.ds-zju      { background: #1f5f5a; color: #fff; }
 .domsrc-pill.ds-school_a { background: #4a6b2a; color: #fff; }
 .domsrc-pill.ds-nsfc_mgmt { background: #0f766e; color: #fff; }
+.domsrc-pill.ds-cscd     { background: #4f6f7c; color: #fff; }
+.domsrc-pill.ds-cstpcd   { background: #6b5a3a; color: #fff; }
 .domsrc-pill.ds-ccf      { background: #7a2030; color: #fff; }
 .domsrc-pill.ds-ccft     { background: #7a2030; color: #fff; }
 .domsrc-pill.ds-cnki_major { background: #2a6b8a; color: #fff; }
+.domsrc-dot {
+  display: inline-flex;
+  align-items: center;
+  color: #8b8176;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  margin: 0 -1px;
+}
 
 /* ───────── 单本期刊分享名片（jcard） ───────── */
 .jcard-modal { max-width: min(680px, calc(100vw - 36px)); }
@@ -5525,6 +5542,8 @@ html:not([lang|="zh"]) .j-row .col-topic::before { content: "Subject · "; }
 .j-row .badges-idx .badge.b-ahci,
 .j-row .badges-idx .badge.b-medline { background: #1f3a5f !important; }
 .j-row .badges-idx .badge.b-nature-index { background: #3f3a2f !important; }
+.j-row .badges-idx .badge.b-cscd { background: #4f6f7c !important; }
+.j-row .badges-idx .badge.b-cstpcd { background: #6b5a3a !important; }
 /* 分区：统一暖棕，TOP/Q1 深一档 */
 .j-row .badges-rank .zone,
 .j-row .badges-rank .xr-pill,

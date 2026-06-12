@@ -38,7 +38,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- End Google Tag Manager -->
 <link rel="preload" href="/data/journals.json.gz" as="fetch" crossorigin="anonymous" />
 <link rel="preload" href="/data/journal_aliases.json" as="fetch" crossorigin="anonymous" />
-<link rel="stylesheet" href="/css/app.css?v=20260609-1" />
+<link rel="stylesheet" href="/css/app.css?v=20260612-cscd-cstpcd1" />
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json" />
@@ -242,6 +242,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <label class="th-chk" data-filter="feat" data-value="oaj"><input type="checkbox"><span>OAJ</span></label>
                     <label class="th-chk" data-filter="feat" data-value="doaj"><input type="checkbox"><span>DOAJ</span></label>
                     <label class="th-chk" data-filter="feat" data-value="medline"><input type="checkbox"><span>MEDLINE</span></label>
+                    <label class="th-chk" data-filter="feat" data-value="cscd"><input type="checkbox"><span>CSCD</span></label>
+                    <label class="th-chk" data-filter="feat" data-value="cstpcd"><input type="checkbox"><span>科技核心</span></label>
                   </div>
                 </div>
                 <div class="th-dropdown" id="if-dropdown">
@@ -466,6 +468,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <label class="chip"><input type="checkbox" value="oaj" data-feat>OAJ</label>
         <label class="chip"><input type="checkbox" value="doaj" data-feat>DOAJ</label>
         <label class="chip"><input type="checkbox" value="medline" data-feat>MEDLINE</label>
+        <label class="chip"><input type="checkbox" value="cscd" data-feat>CSCD</label>
+        <label class="chip"><input type="checkbox" value="cstpcd" data-feat>科技核心</label>
         <label class="chip"><input type="checkbox" value="free" data-feat><span data-i18n="filter_free">免费发表</span></label>
         <label class="chip"><input type="checkbox" value="warning" data-feat><span data-i18n="filter_warning">预警</span></label>
       </div>
@@ -490,6 +494,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <label class="chip ds-chip-cssci-ext"><input type="checkbox" value="cssci_ext">CSSCI 扩展</label>
         <label class="chip ds-chip-pku"><input type="checkbox" value="pku">北大核心</label>
         <label class="chip ds-chip-ccft"><input type="checkbox" value="ccft">CCF 中文</label>
+        <label class="chip ds-chip-cscd"><input type="checkbox" value="cscd">CSCD</label>
+        <label class="chip ds-chip-cstpcd"><input type="checkbox" value="cstpcd">科技核心</label>
       </div>
     </div>
 
@@ -497,6 +503,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <nav class="nav">
         <button class="nav-item active" data-dom="cnki_major"><span data-i18n="src_cnki_major">中文期刊目录</span></button>
         <button class="nav-item" data-dom="nsfc_mgmt"><span data-i18n="src_nsfc_mgmt">国自然管理科学部</span></button>
+        <button class="nav-item" data-dom="cscd"><span>CSCD 来源期刊</span></button>
+        <button class="nav-item" data-dom="cstpcd"><span>中国科技核心期刊</span></button>
         <button class="nav-item" data-dom="cnkx"><span data-i18n="src_cnkx">中国科协高质量目录</span></button>
       </nav>
       <div class="nav-divider" style="margin:8px 0"></div>
@@ -516,7 +524,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </section>
 
   <footer class="site-foot">
-    <p data-i18n="footer_data">数据来源：Clarivate WoS Core Collection (SCIE/SSCI/AHCI/ESCI) · JCR 2025 · ESI · EI Compendex · Scopus · DOAJ · UGC-CARE India · 中科院文献情报中心分区表 2025 · ShowJCR (GPL-3.0) · CCF 2026 (A/B/C) · CCF-T 2025 · ABDC 2025 · ABS 2024 · 中国科协 2025 · CSSCI · 北大核心 · CNKI · 浙江大学 2024 · 高校自编目录 2023 · CrossRef · OpenAlex。© <a href="https://journal.ailatest.org">AILatest Journal</a></p>
+    <p data-i18n="footer_data">数据来源：Clarivate WoS Core Collection (SCIE/SSCI/AHCI/ESCI) · JCR 2025 · ESI · EI Compendex · Scopus · DOAJ · CSCD · 中国科技核心 · UGC-CARE India · 中科院文献情报中心分区表 2025 · ShowJCR (GPL-3.0) · CCF 2026 (A/B/C) · CCF-T 2025 · ABDC 2025 · ABS 2024 · 中国科协 2025 · CSSCI · 北大核心 · CNKI · 浙江大学 2024 · 高校自编目录 2023 · CrossRef · OpenAlex。© <a href="https://journal.ailatest.org">AILatest Journal</a></p>
     <p id="journal-view-total" class="visitor-footnote" hidden></p>
   </footer>
 </main>
@@ -566,7 +574,7 @@ const __BUILD_VER = 'v20260530-79';
 })();
 </script>
 <script src="/js/pick-match.js?v=20260611-2" defer></script>
-<script src="/js/app.js?v=20260611-2" defer></script>
+<script src="/js/app.js?v=20260612-cscd-cstpcd1" defer></script>
 <script>
   // Custom install prompt
   let __pwaPrompt = null;
@@ -593,5 +601,3 @@ const __BUILD_VER = 'v20260530-79';
 
 </body>
 </html>
-
-trigger

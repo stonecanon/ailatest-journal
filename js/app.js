@@ -42,7 +42,7 @@
       paid_label: '付费',
       drawer_kicker: '期刊详情',
       pwa_install: '📲 安装到主屏',
-      footer_data: '数据来源：Clarivate WoS Core Collection (SCIE/SSCI/AHCI/ESCI) · JCR 2025 · ESI · EI Compendex · Scopus · DOAJ · UGC-CARE India · 中科院文献情报中心分区表 2025 · ShowJCR (GPL-3.0) · CCF 2026 (A/B/C) · CCF-T 2025 · ABDC 2025 · ABS 2024 · 中国科协 2025 · CSSCI · 北大核心 · CNKI · 浙江大学 2024 · 高校自编目录 2023 · CrossRef · OpenAlex。© <a href="https://journal.ailatest.org">AILatest Journal</a>',
+      footer_data: '数据来源：Clarivate WoS Core Collection (SCIE/SSCI/AHCI/ESCI) · JCR 2025 · ESI · EI Compendex · Scopus · DOAJ · CSCD · 中国科技核心 · UGC-CARE India · 中科院文献情报中心分区表 2025 · ShowJCR (GPL-3.0) · CCF 2026 (A/B/C) · CCF-T 2025 · ABDC 2025 · ABS 2024 · 中国科协 2025 · CSSCI · 北大核心 · CNKI · 浙江大学 2024 · 高校自编目录 2023 · CrossRef · OpenAlex。© <a href="https://journal.ailatest.org">AILatest Journal</a>',
       tab_home: '查刊', tab_int: '国际', tab_dom: '中国', tab_fav: '收藏', tab_pick: '荐刊',
       nav_index_rank: '索引排行榜', nav_subject_rank: '学科排行榜', nav_warn_rank: '预警名单',
       filter_if_range: '影响因子', if_any: '不限',
@@ -128,7 +128,7 @@
       paid_label: 'Paid',
       drawer_kicker: 'Journal Details',
       pwa_install: '📲 Install to Home',
-      footer_data: 'Sources: Clarivate WoS Core Collection (SCIE/SSCI/AHCI/ESCI) · JCR 2025 · ESI · EI Compendex · Scopus · DOAJ · UGC-CARE India · CAS NSL Tiers 2025 · ShowJCR (GPL-3.0) · CCF 2026 (A/B/C) · CCF-T 2025 · ABDC 2025 · ABS 2024 · CAST 2025 · CSSCI · PKU Core · CNKI · ZJU 2024 · School A 2023 · CrossRef · OpenAlex. © <a href="https://journal.ailatest.org">AILatest Journal</a>',
+      footer_data: 'Sources: Clarivate WoS Core Collection (SCIE/SSCI/AHCI/ESCI) · JCR 2025 · ESI · EI Compendex · Scopus · DOAJ · CSCD · CSTPCD · UGC-CARE India · CAS NSL Tiers 2025 · ShowJCR (GPL-3.0) · CCF 2026 (A/B/C) · CCF-T 2025 · ABDC 2025 · ABS 2024 · CAST 2025 · CSSCI · PKU Core · CNKI · ZJU 2024 · School A 2023 · CrossRef · OpenAlex. © <a href="https://journal.ailatest.org">AILatest Journal</a>',
       tab_home: 'Journals', tab_int: 'International', tab_dom: 'China', tab_fav: 'Favorites', tab_pick: 'Recommend',
       nav_index_rank: 'Index Rankings', nav_subject_rank: 'Subject Rankings', nav_warn_rank: 'Warning List',
       filter_if_range: 'Impact Factor', if_any: 'Any',
@@ -2148,6 +2148,20 @@
   function badgeNatureIndex() {
     return `<span class="badge b-nature-index" title="${T('Nature Index 追踪出版物','Tracked by Nature Index')}">Nature Index</span>`;
   }
+  function badgeCSCD(cscd) {
+    if (!cscd) return '';
+    const code = String(cscd.database || '').toUpperCase();
+    const label = code === 'C' ? 'CSCD-C' : (code === 'E' ? 'CSCD-E' : 'CSCD');
+    const tip = code === 'C' ? T('CSCD 核心库','CSCD Core') : (code === 'E' ? T('CSCD 扩展库','CSCD Extended') : 'CSCD');
+    return `<span class="badge b-cscd" title="${escape(tip)}">${label}</span>`;
+  }
+  function badgeCSTPCD(cstpcd) {
+    if (!cstpcd) return '';
+    const isPopular = cstpcd.kind === 'popular_science';
+    const label = isPopular ? T('科技核心·科普','CSTPCD Popular') : T('科技核心','CSTPCD');
+    const tip = isPopular ? T('中国科技核心期刊目录（科普卷）','Chinese Science and Technology Core Journals (Popular Science)') : T('中国科技核心期刊目录','Chinese Science and Technology Core Journals');
+    return `<span class="badge b-cstpcd" title="${escape(tip)}">${label}</span>`;
+  }
   function badgeMEDLINE(m) {
     if (!m) return '';
     return `<span class="badge b-medline" title="${T('MEDLINE 数据库收录（NLM 精选索引）','Indexed in MEDLINE (NLM curated)')}">MEDLINE</span>`;
@@ -2368,6 +2382,8 @@
     return [
       badgeFlagship(r.flagship),
       r.nature_index ? badgeNatureIndex() : '',
+      r.cscd ? badgeCSCD(r.cscd) : '',
+      r.cstpcd ? badgeCSTPCD(r.cstpcd) : '',
       ...((r.indices) || []).map(badgeIndex),
       badgeScopus(r.scopus),
 	      badgeOAJ(r.oaj),
@@ -2448,6 +2464,19 @@
       addDomIndex(r.name, 'name', { source:'cnkx', label:cnkxLabel, tag:r.tier, domain:r.domain });
       if (r.issn) addDomIndex(r.issn, 'issn', { source:'cnkx', label:cnkxLabel, tag:r.tier, domain:r.domain });
     });
+    ((d.cscd && d.cscd.records)||[]).forEach(r => {
+      const code = String(r.database || '').toUpperCase();
+      const label = code === 'C' ? 'CSCD-C' : (code === 'E' ? 'CSCD-E' : 'CSCD');
+      const payload = { source:'cscd', label, tag:code, domain:r.database_label || '' };
+      addDomIndex(r.name, 'name', payload);
+      if (r.issn) addDomIndex(r.issn, 'issn', payload);
+      if (r.cn_code) addDomIndex(r.cn_code, 'issn', payload);
+    });
+    ((d.cstpcd && d.cstpcd.records)||[]).forEach(r => {
+      const isPopular = r.kind === 'popular_science';
+      const label = isPopular ? T('科技核心·科普','CSTPCD Popular') : T('科技核心','CSTPCD');
+      addDomIndex(r.name, 'name', { source:'cstpcd', label, tag:r.kind || 'core', domain:r.code || '' });
+    });
     ((d.nsfc_mgmt && d.nsfc_mgmt.records)||[]).forEach(r => {
       addDomIndex(r.name, 'name', { source:'nsfc_mgmt', label:'NSFC '+r.tier, tag:r.tier, domain:T('管理科学部','Management Science') });
       if (r.issn) addDomIndex(r.issn, 'issn', { source:'nsfc_mgmt', label:'NSFC '+r.tier, tag:r.tier, domain:T('管理科学部','Management Science') });
@@ -2481,8 +2510,7 @@
       if (h.source === 'cnkx') { castHits.push(h); continue; }
       out.push(`<span class="domsrc-pill ds-${h.source}" title="${escape(h.domain||h.discipline||h.category||h.org||'')}">${escape(h.label)}</span>`);
     }
-    // CAST: label by discipline (科协建筑) instead of bare tier (科协 T1); cap to keep rows tidy.
-    const CAST_MAX = 3;
+    // CAST: label by discipline (科协建筑) instead of bare tier (科协 T1).
     const castSeen = new Set();
     const castShown = [];
     for (const h of castHits) {
@@ -2491,14 +2519,11 @@
       castSeen.add(label);
       castShown.push({ label, tier: h.tag || '', domain: tn(h.domain, 'domain') || '' });
     }
-    castShown.slice(0, CAST_MAX).forEach(c => {
+    castShown.forEach((c, index) => {
       const title = `${T('中国科协','CAST')}${c.tier ? ' ' + c.tier : ''}${c.domain ? ' · ' + c.domain : ''}`;
+      if (index) out.push('<span class="domsrc-dot" aria-hidden="true">·</span>');
       out.push(`<span class="domsrc-pill ds-cnkx" title="${escape(title)}">${escape(c.label)}</span>`);
     });
-    if (castShown.length > CAST_MAX) {
-      const rest = castShown.slice(CAST_MAX).map(c => c.label.replace(new RegExp('^' + T('科协','CAST') + '\\s?'), '')).join('、');
-      out.push(`<span class="domsrc-pill ds-cnkx" title="${escape(T('中国科协还收录于：','Also in CAST: ') + rest)}">${T('科协','CAST')}+${castShown.length - CAST_MAX}</span>`);
-    }
     return out.join('');
   }
 
@@ -2588,6 +2613,8 @@
       // index filter (allows pure directory-journals without WoS/EI indices to show)
       if (!((activeFeats.has('oaj') && r.oaj) || (activeFeats.has('doaj') && r.doaj) ||
             (activeFeats.has('medline') && r.medline) ||
+            (activeFeats.has('cscd') && r.cscd) ||
+            (activeFeats.has('cstpcd') && r.cstpcd) ||
             (activeFeats.has('free') && r.free) ||
             (activeFeats.has('warning') && r.warning) ||
             (activeFeats.has('citic_warning') && r.citic_warning) ||
@@ -2632,6 +2659,8 @@
     if (activeFeats.has('oaj') && !r.oaj) return false;
     if (activeFeats.has('doaj') && !r.doaj) return false;
     if (activeFeats.has('medline') && !r.medline) return false;
+    if (activeFeats.has('cscd') && !r.cscd) return false;
+    if (activeFeats.has('cstpcd') && !r.cstpcd) return false;
     if (activeFeats.has('free') && !r.free) return false;
     if (activeFeats.has('warning') && !r.warning) return false;
     if (activeFeats.has('citic_warning') && !r.citic_warning) return false;
@@ -3138,6 +3167,8 @@
     const items = [
       ['cnki_major', T('中文期刊目录','Chinese Journal Directory')],
       ['nsfc_mgmt', T('国自然管理','NSFC Mgmt')],
+      ['cscd', 'CSCD'],
+      ['cstpcd', T('科技核心','CSTPCD')],
       ['cnkx', T('中国科协','CAST')],
       ['zju_zju', T('浙江大学 2024','ZJU 2024')],
       ['school_a', T('学校 A · 2023','School A · 2023')],
@@ -3213,6 +3244,68 @@
       }
     }
 
+    // 1c) CSCD 来源期刊
+    if (domestic.cscd && domestic.cscd.records) {
+      const recs = domestic.cscd.records.filter(r =>
+        matchTxt(r.name, r.issn, r.cn_code, r.database, r.database_label)
+      );
+      if (recs.length) {
+        sections.push({
+          title: 'CSCD 来源期刊目录',
+          count: recs.length,
+          html: `<div class="table-wrap"><table class="journals"><thead><tr>
+            <th class="col-fav" aria-label="Favorite"></th><th class="col-name">${T('期刊','Journal')}</th><th>${T('收录索引','Indices')}</th><th style="width:110px">ISSN</th><th style="width:110px">CN</th>
+          </tr></thead><tbody>
+          ${recs.slice(0, 200).map(r => {
+            const fid = favId(r);
+            rowRecordsByFid[fid] = { ...r, __src: 'cscd' };
+            const code = String(r.database || '').toUpperCase();
+            const label = code === 'C' ? 'CSCD-C' : (code === 'E' ? 'CSCD-E' : 'CSCD');
+            const crossBadges = renderDomCrossBadges(r, 'cscd');
+            return `<tr class="j-row clickable" data-fid="${escape(fid)}" data-src="cscd">
+              <td style="width:36px">${starBtn(r, 'cscd')}</td>
+              <td class="jname" style="font-size:13.5px">${escape(r.name||'')}</td>
+              <td class="col-cross"><div class="badges"><span class="domsrc-pill ds-cscd">${label}</span>${crossBadges}</div></td>
+              <td class="muted-cell" style="width:110px">${escape(r.issn||'—')}</td>
+              <td class="muted-cell" style="width:110px">${escape(r.cn_code||'—')}</td>
+            </tr>`;
+          }).join('')}
+          ${recs.length > 200 ? `<tr><td colspan="5" class="empty">${T('仅显示前 200 条','First 200 only')}</td></tr>` : ''}
+          </tbody></table></div>`
+        });
+      }
+    }
+
+    // 1d) 中国科技核心期刊
+    if (domestic.cstpcd && domestic.cstpcd.records) {
+      const recs = domestic.cstpcd.records.filter(r =>
+        matchTxt(r.name, r.code, r.kind)
+      );
+      if (recs.length) {
+        sections.push({
+          title: T('中国科技核心期刊目录','Chinese Science and Technology Core Journals'),
+          count: recs.length,
+          html: `<div class="table-wrap"><table class="journals"><thead><tr>
+            <th class="col-fav" aria-label="Favorite"></th><th class="col-name">${T('期刊','Journal')}</th><th>${T('收录索引','Indices')}</th><th style="width:110px">${T('期刊代码','Code')}</th>
+          </tr></thead><tbody>
+          ${recs.slice(0, 200).map(r => {
+            const fid = favId(r);
+            rowRecordsByFid[fid] = { ...r, __src: 'cstpcd' };
+            const label = r.kind === 'popular_science' ? T('科技核心·科普','CSTPCD Popular') : T('科技核心','CSTPCD');
+            const crossBadges = renderDomCrossBadges(r, 'cstpcd');
+            return `<tr class="j-row clickable" data-fid="${escape(fid)}" data-src="cstpcd">
+              <td style="width:36px">${starBtn(r, 'cstpcd')}</td>
+              <td class="jname" style="font-size:13.5px">${escape(r.name||'')}</td>
+              <td class="col-cross"><div class="badges"><span class="domsrc-pill ds-cstpcd">${label}</span>${crossBadges}</div></td>
+              <td class="muted-cell" style="width:110px">${escape(r.code||'—')}</td>
+            </tr>`;
+          }).join('')}
+          ${recs.length > 200 ? `<tr><td colspan="4" class="empty">${T('仅显示前 200 条','First 200 only')}</td></tr>` : ''}
+          </tbody></table></div>`
+        });
+      }
+    }
+
     // 2) 中文期刊目录 (CNKI Major)
     if (domestic.cnki_major && domestic.cnki_major.records) {
       const list = domestic.cnki_major.records.filter(r =>
@@ -3235,6 +3328,8 @@
               ...hits.filter(h => h.source === 'zju').map(h => `<span class="domsrc-pill ds-zju">${escape(h.label)}</span>`),
               ...hits.filter(h => h.source === 'school_a').map(h => `<span class="domsrc-pill ds-school-a">${escape(h.label)}</span>`),
               ...hits.filter(h => h.source === 'nsfc_mgmt').map(h => `<span class="domsrc-pill ds-nsfc_mgmt">${escape(h.label)}</span>`),
+              ...hits.filter(h => h.source === 'cscd').map(h => `<span class="domsrc-pill ds-cscd">${escape(h.label)}</span>`),
+              ...hits.filter(h => h.source === 'cstpcd').map(h => `<span class="domsrc-pill ds-cstpcd">${escape(h.label)}</span>`),
               ...hits.filter(h => h.source.startsWith('cnkx')).map(h => `<span class="domsrc-pill ds-cnkx">${escape(h.label)}</span>`),
             ].filter(Boolean).join('');
             return `<tr class="j-row clickable" data-fid="${escape(favId(r))}" data-src="cnki_major">
@@ -3552,6 +3647,85 @@
       return;
     }
 
+    if (activeDom === 'cscd') {
+      const d = domestic.cscd;
+      if (!d) { box.innerHTML = `<div class="empty">${T('CSCD 数据缺失','CSCD data missing')}</div>`; return; }
+      if (!window.__cscdShown) window.__cscdShown = 100;
+      const all = d.records || [];
+      const visible = all.slice(0, window.__cscdShown);
+      const rows = visible.map(r => {
+        const fid = favId(r);
+        rowRecordsByFid[fid] = { ...r, __src: 'cscd' };
+        const code = String(r.database || '').toUpperCase();
+        const label = code === 'C' ? 'CSCD-C' : (code === 'E' ? 'CSCD-E' : 'CSCD');
+        const crossBadges = renderDomCrossBadges(r, 'cscd');
+        return `<tr class="j-row clickable" data-fid="${escape(fid)}" data-src="cscd">
+          <td class="col-fav" style="width:36px">${starBtn(r, 'cscd')}</td>
+          <td class="jname" style="font-size:13.5px">${escape(r.name||'')}</td>
+          <td class="col-cross"><div class="badges"><span class="domsrc-pill ds-cscd">${label}</span>${crossBadges}</div></td>
+          <td style="width:110px"><span class="jissn">${escape(r.issn||'—')}</span></td>
+          <td class="muted-cell" style="width:110px">${escape(r.cn_code||'—')}</td>
+        </tr>`;
+      }).join('');
+      box.innerHTML = `<div class="section-block">
+        ${domSectionHeader(
+          'CSCD 来源期刊目录',
+          `${(d.count || all.length).toLocaleString()} ${T('种期刊；C 为核心库，E 为扩展库。','journals; C is Core, E is Extended.')} ${d.source_url ? `<a class="source-link" href="${escape(d.source_url)}" target="_blank" rel="noopener nofollow">sciencechina.cn/select</a>` : ''}`,
+        )}
+        <div class="table-wrap"><table class="journals"><thead><tr>
+          <th class="col-fav" aria-label="Favorite"></th>
+          <th class="col-name">${T('期刊','Journal')}</th>
+          <th>${T('收录索引','Indices')}</th>
+          <th style="width:110px">ISSN</th>
+          <th style="width:110px">CN</th>
+        </tr></thead><tbody>${rows}</tbody></table></div>
+        ${all.length > window.__cscdShown ? `<div class="pager"><button id="cscd-more" class="more-btn" style="margin-top:12px;padding:8px 20px;border:1px solid var(--rule);background:var(--paper);color:var(--ink-soft);border-radius:2px;cursor:pointer">${T('加载更多','Load more')} (${all.length - window.__cscdShown} ${T('条剩余','remaining')})</button></div>` : ''}
+      </div>`;
+      document.getElementById('cscd-more')?.addEventListener('click', () => {
+        window.__cscdShown += 100;
+        renderDomestic();
+      });
+      return;
+    }
+
+    if (activeDom === 'cstpcd') {
+      const d = domestic.cstpcd;
+      if (!d) { box.innerHTML = `<div class="empty">${T('科技核心数据缺失','CSTPCD data missing')}</div>`; return; }
+      if (!window.__cstpcdShown) window.__cstpcdShown = 100;
+      const all = d.records || [];
+      const visible = all.slice(0, window.__cstpcdShown);
+      const rows = visible.map(r => {
+        const fid = favId(r);
+        rowRecordsByFid[fid] = { ...r, __src: 'cstpcd' };
+        const label = r.kind === 'popular_science' ? T('科技核心·科普','CSTPCD Popular') : T('科技核心','CSTPCD');
+        const crossBadges = renderDomCrossBadges(r, 'cstpcd');
+        return `<tr class="j-row clickable" data-fid="${escape(fid)}" data-src="cstpcd">
+          <td class="col-fav" style="width:36px">${starBtn(r, 'cstpcd')}</td>
+          <td class="jname" style="font-size:13.5px">${escape(r.name||'')}</td>
+          <td class="col-cross"><div class="badges"><span class="domsrc-pill ds-cstpcd">${label}</span>${crossBadges}</div></td>
+          <td class="muted-cell" style="width:110px">${escape(r.code||'—')}</td>
+        </tr>`;
+      }).join('');
+      box.innerHTML = `<div class="section-block">
+        ${domSectionHeader(
+          T('中国科技核心期刊目录','Chinese Science and Technology Core Journals'),
+          `${(d.count || all.length).toLocaleString()} ${T('种期刊；含核心卷与科普卷。','journals; includes core and popular-science volumes.')} ${d.core_source_url ? `<a class="source-link" href="${escape(d.core_source_url)}" target="_blank" rel="noopener nofollow">${T('核心 PDF','Core PDF')}</a>` : ''} ${d.popular_science_source_url ? `<a class="source-link" href="${escape(d.popular_science_source_url)}" target="_blank" rel="noopener nofollow">${T('科普 PDF','Popular PDF')}</a>` : ''}`,
+        )}
+        <div class="table-wrap"><table class="journals"><thead><tr>
+          <th class="col-fav" aria-label="Favorite"></th>
+          <th class="col-name">${T('期刊','Journal')}</th>
+          <th>${T('收录索引','Indices')}</th>
+          <th style="width:110px">${T('期刊代码','Code')}</th>
+        </tr></thead><tbody>${rows}</tbody></table></div>
+        ${all.length > window.__cstpcdShown ? `<div class="pager"><button id="cstpcd-more" class="more-btn" style="margin-top:12px;padding:8px 20px;border:1px solid var(--rule);background:var(--paper);color:var(--ink-soft);border-radius:2px;cursor:pointer">${T('加载更多','Load more')} (${all.length - window.__cstpcdShown} ${T('条剩余','remaining')})</button></div>` : ''}
+      </div>`;
+      document.getElementById('cstpcd-more')?.addEventListener('click', () => {
+        window.__cstpcdShown += 100;
+        renderDomestic();
+      });
+      return;
+    }
+
     if (activeDom === 'cnkx') {
       const d = domestic.cnkx;
       if (!d) { box.innerHTML = `<div class="empty">${T('中国科协数据缺失','CAST data missing')}</div>`; return; }
@@ -3617,6 +3791,8 @@
           ...hits.filter(h => h.source === 'pku').map(() => `<span class="domsrc-pill ds-pku">${T('北大核心','PKU Core')}</span>`),
           ...hits.filter(h => h.source === 'ccft').map(h => `<span class="domsrc-pill ds-ccft">CCF-${h.tag||'T'}</span>`),
           ...hits.filter(h => h.source === 'nsfc_mgmt').map(h => `<span class="domsrc-pill ds-nsfc_mgmt">${escape(h.label)}</span>`),
+          ...hits.filter(h => h.source === 'cscd').map(h => `<span class="domsrc-pill ds-cscd">${escape(h.label)}</span>`),
+          ...hits.filter(h => h.source === 'cstpcd').map(h => `<span class="domsrc-pill ds-cstpcd">${escape(h.label)}</span>`),
         ].filter(Boolean).join('');
         const subVal = r.subdomain ? tn(r.subdomain, 'sub') : '—';
         return `<tr class="j-row clickable" data-fid="${escape(fid)}" data-src="cnkx">
@@ -3744,11 +3920,15 @@
           const hasCssciExt = hits.some(h => h.source === 'cssci_ext');
           const hasPku = hits.some(h => h.source === 'pku');
           const hasCcf = hits.some(h => h.source === 'ccft');
+          const hasCscd = hits.some(h => h.source === 'cscd');
+          const hasCstpcd = hits.some(h => h.source === 'cstpcd');
           // AND logic: 勾选的徽章，期刊必须全部拥有
           if (activeDomBadges.has('cssci') && !hasCssci) return false;
           if (activeDomBadges.has('cssci_ext') && !hasCssciExt) return false;
           if (activeDomBadges.has('pku') && !hasPku) return false;
           if (activeDomBadges.has('ccft') && !hasCcf) return false;
+          if (activeDomBadges.has('cscd') && !hasCscd) return false;
+          if (activeDomBadges.has('cstpcd') && !hasCstpcd) return false;
         }
         return true;
       });
@@ -3763,6 +3943,8 @@
         ['cssci_ext', T('CSSCI 扩展','CSSCI Ext')],
         ['pku', T('北大核心','PKU Core')],
         ['ccft', T('CCF 中文','CCF Chinese')],
+        ['cscd', 'CSCD'],
+        ['cstpcd', T('科技核心','CSTPCD')],
         ['cnkx', T('中国科协','CAST')],
         ['zju', T('浙江大学','ZJU')],
       ].map(([value, label]) => `<option value="${escape(value)}"${window.__cnkiIndex === value ? ' selected' : ''}>${escape(label)}</option>`).join('');
@@ -3788,6 +3970,8 @@
           ...hits.filter(h => h.source === 'zju').map(h => `<span class="domsrc-pill ds-zju">${escape(h.label)}</span>`),
           ...hits.filter(h => h.source === 'school_a').map(h => `<span class="domsrc-pill ds-school-a">${escape(h.label)}</span>`),
           ...hits.filter(h => h.source === 'nsfc_mgmt').map(h => `<span class="domsrc-pill ds-nsfc_mgmt">${escape(h.label)}</span>`),
+          ...hits.filter(h => h.source === 'cscd').map(h => `<span class="domsrc-pill ds-cscd">${escape(h.label)}</span>`),
+          ...hits.filter(h => h.source === 'cstpcd').map(h => `<span class="domsrc-pill ds-cstpcd">${escape(h.label)}</span>`),
           ...hits.filter(h => h.source.startsWith('cnkx')).map(h => `<span class="domsrc-pill ds-cnkx">${escape(h.label)}</span>`),
         ].filter(Boolean).join('');
         const name = r.name || '';
@@ -4093,6 +4277,8 @@
         ['cssci', domestic.cssci_core || []],
         ['cssci_ext', domestic.cssci_ext || []],
         ['pku', domestic.pku_core || []],
+        ['cscd', (domestic.cscd && domestic.cscd.records) || []],
+        ['cstpcd', (domestic.cstpcd && domestic.cstpcd.records) || []],
         ['cnkx', (domestic.cnkx && domestic.cnkx.records) || []],
         ['nsfc_mgmt', (domestic.nsfc_mgmt && domestic.nsfc_mgmt.records) || []],
         ['zju', (domestic.zju && domestic.zju.records) || []],
@@ -5092,6 +5278,8 @@
         const src = favsData[id]?.__src || 'cnki_major';
         const domRecs = [
           ...(domestic.cnkx?.records || []).map(r => ({ ...r, __src: 'cnkx' })),
+          ...(domestic.cscd?.records || []).map(r => ({ ...r, __src: 'cscd' })),
+          ...(domestic.cstpcd?.records || []).map(r => ({ ...r, __src: 'cstpcd' })),
           ...(domestic.nsfc_mgmt?.records || []).map(r => ({ ...r, __src: 'nsfc_mgmt' })),
           ...(domestic.cnki_major?.records || []).map(r => ({ ...r, __src: 'cnki_major' })),
         ];
@@ -5666,7 +5854,7 @@
     const badgeCell = renderBadgeCell(indexBadges, [rankBadges, otherBadges].filter(Boolean).join(''));
     const SRC_LABEL = {
       int: T('国际','Int’l'), cssci: 'CSSCI', cssci_core: 'CSSCI', cssci_ext: T('CSSCI 扩展','CSSCI Ext'),
-      pku: T('北大核心','PKU Core'), pku_core: T('北大核心','PKU Core'), cnkx: T('科协','CAST'), ccft: 'CCF-T',
+      pku: T('北大核心','PKU Core'), pku_core: T('北大核心','PKU Core'), cscd: 'CSCD', cstpcd: T('科技核心','CSTPCD'), cnkx: T('科协','CAST'), ccft: 'CCF-T',
       zju: T('浙大','ZJU'), school_a: T('高校目录','In-house'), nsfc_mgmt: T('国自然','NSFC'), in: 'UGC-CARE', my: 'MyCite / ERA',
     };
     const ifVal = (r.if_2024 != null) ? (+r.if_2024).toFixed(1) : '';
@@ -6561,6 +6749,8 @@
       activeDom = btn.dataset.domSwitch;
       window.__cnkiShown = 100;
       window.__cnkxShown = 100;
+      window.__cscdShown = 100;
+      window.__cstpcdShown = 100;
       renderDomestic();
     });
 
@@ -6569,6 +6759,8 @@
         $$('[data-domestic] .nav-item').forEach(n => n.classList.remove('active'));
         btn.classList.add('active');
         activeDom = btn.dataset.dom;
+        window.__cscdShown = 100;
+        window.__cstpcdShown = 100;
         renderDomestic();
       });
     });
@@ -7046,6 +7238,8 @@
       add('cnki_major', domestic.cnki_major?.records);
       add('zju', domestic.zju?.records);
       add('nsfc_mgmt', domestic.nsfc_mgmt?.records);
+      add('cscd', domestic.cscd?.records);
+      add('cstpcd', domestic.cstpcd?.records);
       add('cnkx', domestic.cnkx?.records);
       add('cssci_core', domestic.cssci_core);
       add('cssci_ext', domestic.cssci_ext);
@@ -7067,7 +7261,7 @@
       const loose = exact.length ? [] : sourceRows.filter(({ record }) => pickCleanDomesticName(record.name || record.cn_name || record.title).includes(clean));
       const hits = exact.length ? exact : loose;
       if (!hits.length) return null;
-      const sourceWeight = { cnki_major:80, zju:70, nsfc_mgmt:65, cnkx:60, cssci_core:55, pku_core:50, cssci_ext:45 };
+      const sourceWeight = { cnki_major:80, zju:70, nsfc_mgmt:65, cstpcd:63, cscd:62, cnkx:60, cssci_core:55, pku_core:50, cssci_ext:45 };
       hits.sort((a, b) => {
         const ar = a.record, br = b.record;
         const as = (sourceWeight[a.source] || 0) + (ar.issn ? 12 : 0) + (ar.cn_code ? 8 : 0);
