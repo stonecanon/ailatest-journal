@@ -34,6 +34,7 @@
 import { buildDashboardPayload } from './dashboard.js';
 import { handleChat } from './chat.js';
 import { handlePick } from './pick.js';
+import { handleExtLookup } from './ext-lookup.js';
 import { renderSitesDashboard } from './sites-dashboard.js';
 
 const CORS = {
@@ -1289,6 +1290,7 @@ export default {
       if (p === '/me'                  && req.method === 'GET')  return routeMe(req, env);
       if (p === '/pick'                && req.method === 'POST') return handlePick(req, env, { consumeQuota: () => consumePickQuotaForRequest(req, env) });
       if (p === '/pick/quota/consume'  && req.method === 'POST') return routeConsumePickQuota(req, env);
+      if (p === '/ext/lookup')                                   return handleExtLookup(req, env);
       if (p === '/favorites'           && req.method === 'GET')  return routeGetFavs(req, env);
       if (p === '/favorites'           && req.method === 'PUT')  return routePutFavs(req, env);
       if (p === '/lists'               && req.method === 'GET')  return routeGetLists(req, env);
