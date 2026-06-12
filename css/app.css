@@ -1871,7 +1871,16 @@ table.journals tr:last-child td { border-bottom: 0; }
   border-top: 1px dashed var(--rule-soft);
   gap: 4px;
 }
+.col-badge-split .badges-access,
+.col-badge-split .badges-risk {
+  margin-top: 5px;
+  padding-top: 5px;
+  border-top: 1px dashed var(--rule-soft);
+  gap: 4px;
+}
 .col-badge-split .badges-rank:first-child { border-top: 0; margin-top: 0; padding-top: 0; }
+.col-badge-split .badges-access:first-child,
+.col-badge-split .badges-risk:first-child { border-top: 0; margin-top: 0; padding-top: 0; }
 .badge {
   display: inline-flex; align-items: center;
   padding: 2px 7px;
@@ -1897,6 +1906,14 @@ table.journals tr:last-child td { border-bottom: 0; }
 .badge.b-nature-index { background: #3f3a2f; }
 .badge.b-cscd { background: #4f6f7c; }
 .badge.b-cstpcd { background: #6b5a3a; }
+.badge.b-scd { background: #4e6f52; }
+.badge.b-pubmed { background: #285f7a; }
+.badge.b-pmc { background: #2f6f68; }
+.zone.fms-tier { background: #7b4f24; color: #fff; }
+.zone.vhb-tier { background: #624a82; color: #fff; }
+.zone.cnrs-tier { background: #5f6470; color: #fff; }
+.zone.ami-tier { background: #7a3f55; color: #fff; }
+.retraction-pill { background: #9f3d35; color: #fff; }
 .badge.b-view { color: #6b5d52; background: #e9dfc8; font-variant-numeric: tabular-nums; opacity: 0.9; }
 .badge.b-mdpi     { background: #b82a4a; color: #fff; }
 .badge.b-frontiers { background: #1a6b3c; color: #fff; }
@@ -4902,6 +4919,10 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .domsrc-pill.ds-nsfc_mgmt { background: #0f766e; color: #fff; }
 .domsrc-pill.ds-cscd     { background: #4f6f7c; color: #fff; }
 .domsrc-pill.ds-cstpcd   { background: #6b5a3a; color: #fff; }
+.domsrc-pill.ds-scd      { background: #4e6f52; color: #fff; }
+.domsrc-pill.ds-ami      { background: #7a3f55; color: #fff; }
+.domsrc-pill.ds-vhb      { background: #624a82; color: #fff; }
+.domsrc-pill.ds-cnrs     { background: #5f6470; color: #fff; }
 .domsrc-pill.ds-ccf      { background: #7a2030; color: #fff; }
 .domsrc-pill.ds-ccft     { background: #7a2030; color: #fff; }
 .domsrc-pill.ds-cnki_major { background: #2a6b8a; color: #fff; }
@@ -5544,6 +5565,9 @@ html:not([lang|="zh"]) .j-row .col-topic::before { content: "Subject · "; }
 .j-row .badges-idx .badge.b-nature-index { background: #3f3a2f !important; }
 .j-row .badges-idx .badge.b-cscd { background: #4f6f7c !important; }
 .j-row .badges-idx .badge.b-cstpcd { background: #6b5a3a !important; }
+.j-row .badges-idx .badge.b-scd { background: #4e6f52 !important; }
+.j-row .badges-idx .badge.b-pubmed,
+.j-row .badges-idx .badge.b-pmc { background: #285f7a !important; }
 /* 分区：统一暖棕，TOP/Q1 深一档 */
 .j-row .badges-rank .zone,
 .j-row .badges-rank .xr-pill,
@@ -5559,6 +5583,14 @@ html:not([lang|="zh"]) .j-row .col-topic::before { content: "Subject · "; }
 .j-row .badges-rank .b-warn-high { background: #b23a3a !important; color: #fff !important; }
 .j-row .badges-rank .on-hold-pill { background: #d94a1e !important; color: #fff !important; }
 .j-row .badges-rank .citic-warning-pill { background: #6f665d !important; color: #fff !important; }
+.j-row .badges-access .badge { background: #2d8a4e !important; color: #fff !important; }
+.j-row .badges-access .badge.b-doaj,
+.j-row .badges-access .badge.b-oaj { background: #4f7f6a !important; }
+.j-row .badges-risk .warn-pill,
+.j-row .badges-risk .b-warn,
+.j-row .badges-risk .b-warn-high { background: #b23a3a !important; color: #fff !important; }
+.j-row .badges-risk .on-hold-pill { background: #d94a1e !important; color: #fff !important; }
+.j-row .badges-risk .citic-warning-pill { background: #6f665d !important; color: #fff !important; }
 
 /* 免费发表：小号绿色标，紧挨 IF */
 .j-row .col-free .badge.b-free {

@@ -42,7 +42,7 @@
       paid_label: '付费',
       drawer_kicker: '期刊详情',
       pwa_install: '📲 安装到主屏',
-      footer_data: '数据来源：Clarivate WoS Core Collection (SCIE/SSCI/AHCI/ESCI) · JCR 2025 · ESI · EI Compendex · Scopus · DOAJ · CSCD · 中国科技核心 · UGC-CARE India · 中科院文献情报中心分区表 2025 · ShowJCR (GPL-3.0) · CCF 2026 (A/B/C) · CCF-T 2025 · ABDC 2025 · ABS 2024 · 中国科协 2025 · CSSCI · 北大核心 · CNKI · 浙江大学 2024 · 高校自编目录 2023 · CrossRef · OpenAlex。© <a href="https://journal.ailatest.org">AILatest Journal</a>',
+      footer_data: '数据来源：Clarivate WoS Core Collection (SCIE/SSCI/AHCI/ESCI) · JCR 2025 · ESI · EI Compendex · Scopus · DOAJ · CSCD · 中国科技核心 · SCD · AMI · FMS · VHB 2024 · CNRS Section 37 · UGC-CARE India · 中科院文献情报中心分区表 2025 · ShowJCR (GPL-3.0) · CCF 2026 (A/B/C) · CCF-T 2025 · ABDC 2025 · ABS 2024 · 中国科协 2025 · CSSCI · 北大核心 · CNKI · 浙江大学 2024 · Crossref Retraction Watch · OpenAlex。© <a href="https://journal.ailatest.org">AILatest Journal</a>',
       tab_home: '查刊', tab_int: '国际', tab_dom: '中国', tab_fav: '收藏', tab_pick: '荐刊',
       nav_index_rank: '索引排行榜', nav_subject_rank: '学科排行榜', nav_warn_rank: '预警名单',
       filter_if_range: '影响因子', if_any: '不限',
@@ -52,7 +52,7 @@
       hero_body_int: '資料來源：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI）· 更新至 2026-05-18，並合併 <b>EI Compendex</b> 期刊目錄（2025-10-10）。',
       src_cnkx: '中国科协高质量目录',
       src_cnki_major: '中文期刊目录',
-      hero_note: '徽章语义：<b>SCIE/SSCI/AHCI/ESCI/EI</b> 索引收录 · <b>中科院</b> 中科院 2025 大类分区（1-4 区，TOP 标志） · <b>JCR Q</b> Quartile（Q1-Q4） · <b>新锐</b> 中科院 2026 新锐版分区 · <b>CCF</b> 中国计算机学会 2026 推荐（A/B/C） · <b>ABDC</b> 澳洲经管期刊分级（A*/A/B/C） · <b>ABS</b> 英国 Chartered ABS Academic Journal Guide 2024（4*/4/3/2/1，仅经管商科） · <b>T1/T2/T3</b> 中国科协 2025 高质量期刊分级 · <b>⚠ Warning</b> 国际期刊预警名单。',
+      hero_note: '徽章语义：<b>收录</b> 显示 SCIE/SSCI/AHCI/ESCI/EI、Scopus、MEDLINE、CSCD、SCD 等数据库覆盖 · <b>等级</b> 显示中科院/JCR/新锐/CCF/ABDC/ABS/FMS/VHB/CNRS/AMI 等评价级别 · <b>开放费用</b> 显示 FREE/OAJ/DOAJ · <b>风险</b> 显示预警、WoS On Hold 与 Retraction Watch 撤稿记录。',
       hero_title_fav: '我的收藏',
       hero_body_fav: '点击任意期刊右侧的 <b>★</b> 可加入收藏。未登录时保存在本机 localStorage；登录后自动同步到云端，可跨设备访问。',
       hero_title_pick: '智能荐刊',
@@ -128,7 +128,7 @@
       paid_label: 'Paid',
       drawer_kicker: 'Journal Details',
       pwa_install: '📲 Install to Home',
-      footer_data: 'Sources: Clarivate WoS Core Collection (SCIE/SSCI/AHCI/ESCI) · JCR 2025 · ESI · EI Compendex · Scopus · DOAJ · CSCD · CSTPCD · UGC-CARE India · CAS NSL Tiers 2025 · ShowJCR (GPL-3.0) · CCF 2026 (A/B/C) · CCF-T 2025 · ABDC 2025 · ABS 2024 · CAST 2025 · CSSCI · PKU Core · CNKI · ZJU 2024 · School A 2023 · CrossRef · OpenAlex. © <a href="https://journal.ailatest.org">AILatest Journal</a>',
+      footer_data: 'Sources: Clarivate WoS Core Collection (SCIE/SSCI/AHCI/ESCI) · JCR 2025 · ESI · EI Compendex · Scopus · DOAJ · CSCD · CSTPCD · SCD · AMI · FMS · VHB 2024 · CNRS Section 37 · UGC-CARE India · CAS NSL Tiers 2025 · ShowJCR (GPL-3.0) · CCF 2026 (A/B/C) · CCF-T 2025 · ABDC 2025 · ABS 2024 · CAST 2025 · CSSCI · PKU Core · CNKI · ZJU 2024 · Crossref Retraction Watch · OpenAlex. © <a href="https://journal.ailatest.org">AILatest Journal</a>',
       tab_home: 'Journals', tab_int: 'International', tab_dom: 'China', tab_fav: 'Favorites', tab_pick: 'Recommend',
       nav_index_rank: 'Index Rankings', nav_subject_rank: 'Subject Rankings', nav_warn_rank: 'Warning List',
       filter_if_range: 'Impact Factor', if_any: 'Any',
@@ -136,7 +136,7 @@
       loading: 'Loading…',
       hero_title_int: 'International SCI / SSCI Search',
       hero_body_int: 'Source: <b>Web of Science Core Collection</b> (SCIE / SSCI / AHCI / ESCI), updated 2026-05-18, merged with <b>EI Compendex</b> source list (2025-10-10).',
-      hero_note: 'Badge legend: <b>SCIE/SSCI/AHCI/ESCI/EI</b> indices · <b>CAS</b> CAS 2025 major tier (1-4, TOP) · <b>JCR Q</b> Quartile · <b>Emerging</b> CAS 2026 Emerging Edition · <b>CCF</b> CCF 2026 (A/B/C) · <b>ABDC</b> Australian Business Deans’ list (A*/A/B/C) · <b>ABS</b> Chartered ABS Academic Journal Guide 2024 (4*/4/3/2/1, business/management only) · <b>T1/T2/T3</b> CAST 2025 · <b>⚠ Warning</b> Int’l journal warning list.',
+      hero_note: 'Badge legend: <b>Indexed</b> covers SCIE/SSCI/AHCI/ESCI/EI, Scopus, MEDLINE, CSCD, SCD and related databases · <b>Ranking</b> covers CAS/JCR/Emerging/CCF/ABDC/ABS/FMS/VHB/CNRS/AMI tiers · <b>Access & Fees</b> covers FREE/OAJ/DOAJ · <b>Caution</b> covers warning lists, WoS On Hold and Retraction Watch records.',
       hero_title_fav: 'My Favorites',
       hero_body_fav: 'Click the <b>★</b> on any row to bookmark. Saved locally when signed-out; syncs to the cloud when signed-in.',
       hero_title_pick: 'Pick for me',
@@ -2162,6 +2162,53 @@
     const tip = isPopular ? T('中国科技核心期刊目录（科普卷）','Chinese Science and Technology Core Journals (Popular Science)') : T('中国科技核心期刊目录','Chinese Science and Technology Core Journals');
     return `<span class="badge b-cstpcd" title="${escape(tip)}">${label}</span>`;
   }
+  function badgeSCD(scd) {
+    if (!scd) return '';
+    const year = scd.year || 2026;
+    const cat = scd.category ? ` · ${escape(scd.category)}` : '';
+    const added = scd.newly_added ? ` · ${T('新入选','newly added')}` : '';
+    return `<span class="badge b-scd" title="SCD ${year}${cat}${added}">SCD</span>`;
+  }
+  function badgeAMI(ami) {
+    if (!ami) return '';
+    const tier = ami.tier || '';
+    const disc = ami.discipline ? ` · ${escape(ami.discipline)}` : '';
+    return `<span class="zone ami-tier" title="${T('AMI 综合评价','AMI Journal Evaluation')} ${ami.year || 2022}${disc}">AMI${tier ? ' ' + escape(tier) : ''}</span>`;
+  }
+  function badgeFMS(fms) {
+    if (!fms || !fms.tier) return '';
+    const type = fms.type === 'chinese' ? T('中文','Chinese') : T('国际','International');
+    return `<span class="zone fms-tier" title="${T('FMS 管理科学高质量期刊','FMS High-quality Management Journals')} ${fms.year || 2025} · ${type}">FMS ${escape(fms.tier)}</span>`;
+  }
+  function bestVhbRating(vhb) {
+    const arr = Array.isArray(vhb) ? vhb : [];
+    const order = {'A+': 5, A: 4, B: 3, C: 2, D: 1};
+    return arr.reduce((best, x) => (!best || (order[x.rating] || 0) > (order[best.rating] || 0)) ? x : best, null);
+  }
+  function badgeVHB(vhb) {
+    const best = bestVhbRating(vhb);
+    if (!best) return '';
+    const count = Array.isArray(vhb) ? vhb.length : 1;
+    const area = best.area_code || best.area || '';
+    return `<span class="zone vhb-tier" title="${T('VHB Rating 2024，按领域评级','VHB Rating 2024, area rating')}${area ? ' · ' + escape(area) : ''}${count > 1 ? ` · ${count}${T(' 个领域',' areas')}` : ''}">VHB ${escape(best.rating)}</span>`;
+  }
+  function badgeCNRS(cnrs) {
+    const arr = Array.isArray(cnrs) ? cnrs : [];
+    const first = arr[0];
+    if (!first) return '';
+    return `<span class="zone cnrs-tier" title="${T('CNRS Section 37 2020 历史参考','CNRS Section 37 2020 historical reference')}${first.domain ? ' · ' + escape(first.domain) : ''}">CNRS ${escape(first.category || '')}</span>`;
+  }
+  function badgeRetraction(ret) {
+    if (!ret || !ret.retractions_total) return '';
+    const rate = ret.rate_per_1000_10y != null ? `${ret.rate_per_1000_10y}/1000` : '';
+    return `<span class="warn-pill retraction-pill" title="${T('Retraction Watch 撤稿记录；用于风险提示，不作排名','Retraction Watch records; caution metric, not ranking')}${rate ? ' · 10y ' + rate : ''}">RW ${escape(ret.retractions_total)}</span>`;
+  }
+  function badgePubMed(pubmed) {
+    return pubmed ? `<span class="badge b-pubmed" title="${T('PubMed 可检索','Searchable in PubMed')}">PubMed</span>` : '';
+  }
+  function badgePMC(pmc) {
+    return pmc ? `<span class="badge b-pmc" title="${T('PubMed Central 全文档案','Full text archived in PubMed Central')}">PMC</span>` : '';
+  }
   function badgeMEDLINE(m) {
     if (!m) return '';
     return `<span class="badge b-medline" title="${T('MEDLINE 数据库收录（NLM 精选索引）','Indexed in MEDLINE (NLM curated)')}">MEDLINE</span>`;
@@ -2416,6 +2463,71 @@
     ].filter(Boolean).join('') || '<span class="muted-cell">—</span>';
   }
 
+  function renderCoverageBadges(r) {
+    if (!r) return '';
+    return [
+      badgeFlagship(r.flagship),
+      r.nature_index ? badgeNatureIndex() : '',
+      r.cscd ? badgeCSCD(r.cscd) : '',
+      r.cstpcd ? badgeCSTPCD(r.cstpcd) : '',
+      r.scd ? badgeSCD(r.scd) : '',
+      ...((r.indices) || []).map(badgeIndex),
+      badgeScopus(r.scopus),
+      badgeMEDLINE(r.medline),
+      badgePubMed(r.pubmed),
+      badgePMC(r.pmc),
+    ].filter(Boolean).join('');
+  }
+  function renderAccessBadges(r) {
+    if (!r) return '';
+    return [
+      badgeFree(r.free),
+      badgeOAJ(r.oaj),
+      badgeDOAJ(r.doaj),
+    ].filter(Boolean).join('');
+  }
+  function renderRiskBadges(r) {
+    if (!r) return '';
+    return [
+      r.warning ? badgeWarn(r.warning, true) : '',
+      r.under_review ? badgeUnderReview() : '',
+      r.on_hold ? badgeOnHold() : '',
+      r.citic_warning ? badgeCiticWarning() : '',
+      badgeRetraction(r.retraction),
+    ].filter(Boolean).join('');
+  }
+  function renderLevelBadges(r) {
+    if (!r) return '';
+    return [
+      badgeJCR(r.if_quartile),
+      badgeCAS(r.cas_zone, r.cas_top),
+      badgeXR(r.cas_xr),
+      badgeCCF(r.ccf),
+      badgeABDC(r.abdc),
+      badgeABS(r.abs),
+      badgeFT50(r.ft50),
+      badgeUTD24(r.utd24),
+      badgeFMS(r.fms),
+      badgeVHB(r.vhb),
+      badgeCNRS(r.cnrs),
+      badgeAMI(r.ami),
+    ].filter(Boolean).join('');
+  }
+  function renderIndexBadges(r) {
+    return renderCoverageBadges(r);
+  }
+  function renderRankBadges(r) {
+    return [renderLevelBadges(r), renderRiskBadges(r)].filter(Boolean).join('');
+  }
+  function renderBadgeCell(indexBadges, rankBadges, accessBadges, riskBadges) {
+    return [
+      indexBadges ? `<div class="badges badges-idx">${indexBadges}</div>` : '',
+      rankBadges  ? `<div class="badges badges-rank">${rankBadges}</div>`  : '',
+      accessBadges ? `<div class="badges badges-access">${accessBadges}</div>` : '',
+      riskBadges ? `<div class="badges badges-risk">${riskBadges}</div>` : '',
+    ].filter(Boolean).join('') || '<span class="muted-cell">鈥?/span>';
+  }
+
   function starBtn(r, src = 'int') {
     const on = isFav(r);
     return `<button class="fav-star ${on?'on':''}" data-fav="${escape(favId(r))}" data-fav-src="${escape(src)}" aria-label="toggle favorite" title="${on?t('fav_removed'):t('fav_added')}">${on?'★':'☆'}</button>`;
@@ -2447,6 +2559,32 @@
   }
   function buildDomIndex(d) {
     if (!d) return;
+    ((d.scd && d.scd.records)||[]).forEach(r => {
+      const label = r.newly_added ? 'SCD+' : 'SCD';
+      const payload = { source:'scd', label, tag:r.newly_added ? 'new' : 'core', domain:r.category || '' };
+      addDomIndex(r.name, 'name', payload);
+      if (r.issn) addDomIndex(r.issn, 'issn', payload);
+      if (r.cn_code) addDomIndex(r.cn_code, 'issn', payload);
+    });
+    ((d.ami && d.ami.records)||[]).forEach(r => {
+      const tier = r.tier || '';
+      const payload = { source:'ami', label:`AMI${tier ? ' ' + tier : ''}`, tag:tier, domain:r.discipline || '' };
+      addDomIndex(r.name, 'name', payload);
+      if (r.issn) addDomIndex(r.issn, 'issn', payload);
+      if (r.cn_code) addDomIndex(r.cn_code, 'issn', payload);
+    });
+    ((d.vhb && d.vhb.records)||[]).forEach(r => {
+      const rating = r.rating || '';
+      const payload = { source:'vhb', label:`VHB ${rating}`.trim(), tag:rating, domain:r.area_code || r.area || '' };
+      addDomIndex(r.title, 'name', payload);
+      if (r.issn) addDomIndex(r.issn, 'issn', payload);
+    });
+    ((d.cnrs && d.cnrs.records)||[]).forEach(r => {
+      const category = r.category || '';
+      const payload = { source:'cnrs', label:`CNRS ${category}`.trim(), tag:category, domain:r.domain || '' };
+      addDomIndex(r.title, 'name', payload);
+      if (r.issn) addDomIndex(r.issn, 'issn', payload);
+    });
     // CSSCI
     (d.cssci_core||[]).forEach(r => {
       addDomIndex(r.name, 'name', { source:'cssci', label:'CSSCI', tag:'', discipline:r.discipline });
@@ -2551,10 +2689,12 @@
     const nameHtml = `<div class="jname ${r.flagship ? 'jname-flagship' : ''}">${escape(titleCase(r.name))}${r.cn_name ? `<span class="jname-cn">${escape(r.cn_name)}</span>` : ''}${aliasHintHtml(r)}</div>`;
     const crossBadges = renderDomCrossBadges(r, 'int');
     // 第一行：索引（SCIE/SSCI/AHCI/ESCI/EI）— 回答"这本被哪些数据库收录"
-    const indexBadges = renderIndexBadges(r);
+    const indexBadges = renderCoverageBadges(r);
     // 第二行：分区/等级/预警 — 回答"这本的等级和影响力"（IF 已移到独立列）
-    const rankBadges = [renderRankBadges(r), crossBadges].filter(Boolean).join('');
-    const badgeCell = renderBadgeCell(indexBadges, rankBadges);
+    const rankBadges = [renderLevelBadges(r), crossBadges].filter(Boolean).join('');
+    const accessBadges = renderAccessBadges(r);
+    const riskBadges = renderRiskBadges(r);
+    const badgeCell = renderBadgeCell(indexBadges, rankBadges, accessBadges, riskBadges);
     const casVal = (lang === 'zh-CN' || lang === 'zh-TW') ? (r.cas_major_cn || '') : tn(r.cas_major_cn || '', 'domain');
     const esiVal = r.esi_category || '';
     const wosVals = Array.isArray(r.wos_categories) ? r.wos_categories.filter(Boolean) : [];
@@ -4381,6 +4521,10 @@
 	    const tierBadge = r.tier && /^T[123]$/.test(r.tier) ? badgeTier(r.tier)
                     : r.tier ? `<span class="tier-pill t3">${escape(tn(r.tier, "tier"))}</span>` : '';
     const crossBadges = renderDomCrossBadges(r, src);
+    const drawerCoverageBadges = (src === 'int' || intRec) ? renderCoverageBadges(ir) : '';
+    const drawerLevelBadges = (src === 'int' || intRec) ? renderLevelBadges(ir) : '';
+    const drawerAccessBadges = (src === 'int' || intRec) ? renderAccessBadges(ir) : ((r.free) ? badgeFree(true) : '');
+    const drawerRiskBadges = (src === 'int' || intRec) ? renderRiskBadges(ir) : '';
 
     // 基础元信息（真实字段）
     const meta = [];
@@ -4867,9 +5011,11 @@
 	          <span class="drawer-views" id="drawer-views" data-fid="${escape(favId(r))}"></span>
 	        </div>
 	        ${journalIntroHTML}
-	        ${(drawerIndexBadges || drawerRankBadges || tierBadge || crossBadges) ? `<div class="hero-badge-grid">
-	          ${drawerIndexBadges ? `<div class="drawer-section badges-section"><h4>${T('索引收录','Index Coverage')}</h4><div class="badges">${drawerIndexBadges}</div></div>` : ''}
-	          ${(drawerRankBadges || tierBadge || crossBadges) ? `<div class="drawer-section badges-section"><h4>${T('分区等级','Tier & Ranking')}</h4><div class="badges">${drawerRankBadges}${tierBadge}${crossBadges}</div></div>` : ''}
+	        ${(drawerCoverageBadges || drawerLevelBadges || tierBadge || crossBadges || drawerAccessBadges || drawerRiskBadges) ? `<div class="hero-badge-grid">
+	          ${drawerCoverageBadges ? `<div class="drawer-section badges-section"><h4>${T('收录','Indexed')}</h4><div class="badges">${drawerCoverageBadges}</div></div>` : ''}
+	          ${(drawerLevelBadges || tierBadge || crossBadges) ? `<div class="drawer-section badges-section"><h4>${T('等级','Ranking')}</h4><div class="badges">${drawerLevelBadges}${tierBadge}${crossBadges}</div></div>` : ''}
+	          ${drawerAccessBadges ? `<div class="drawer-section badges-section"><h4>${T('开放费用','Access & Fees')}</h4><div class="badges">${drawerAccessBadges}</div></div>` : ''}
+	          ${drawerRiskBadges ? `<div class="drawer-section badges-section"><h4>${T('风险提示','Caution')}</h4><div class="badges">${drawerRiskBadges}</div></div>` : ''}
 	        </div>` : ''}
 	      </div>
 	      ${statsHTML}

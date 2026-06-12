@@ -1,7 +1,7 @@
 {
-  "source": "WoS Core + JCR 2025 + ESI + 中科院 2025 + 长江大学 + ShowJCR (JCR/FQB/XR/CCF/Warning) + Scopus (auto-updated) + EI Compendex Oct. 2025 + ABDC optional + ABS AJG + 中国科协 + OAJ 2025 + DOAJ Journal CSV + CSCD + 中国科技核心",
+  "source": "WoS Core + JCR 2025 + ESI + 中科院 2025 + 长江大学 + ShowJCR (JCR/FQB/XR/CCF/Warning) + Scopus (auto-updated) + EI Compendex Oct. 2025 + ABDC optional + ABS AJG + 中国科协 + CSCD + 中国科技核心 + OAJ 2025 + DOAJ Journal CSV",
   "last_updated_source": "WoS Core 2026-04-20",
-  "total": 44853,
+  "total": 45120,
   "indices": {
     "ESCI": 9449,
     "AHCI": 1819,
@@ -19,29 +19,39 @@
   "with_abs": 1822,
   "with_ft50": 50,
   "with_utd24": 24,
+  "with_fms": 1273,
+  "with_vhb": 1039,
+  "with_cnrs": 839,
+  "with_cas_mega": 76,
   "with_oaj": 765,
-  "with_doaj": 21395,
-  "with_cnkx": 5952,
-  "with_scopus": 29817,
+  "with_doaj": 21398,
+  "with_cnkx": 6038,
+  "with_cscd": 1072,
+  "with_cstpcd": 259,
+  "with_cstpcd_popular": 0,
+  "with_scd": 571,
+  "with_ami": 32,
+  "with_scopus": 29887,
   "with_ei": 4503,
   "wos_categories": 259,
   "esi_categories": 22,
   "oa_enriched": true,
   "oa_source": "OpenAlex snapshot 2026-05",
   "oa_stats": {
-    "matched_issns": 67902,
-    "has_homepage": 53337,
-    "has_apc": 17261,
+    "matched_issns": 67933,
+    "has_homepage": 53348,
+    "has_apc": 17263,
     "labels": {
-      "subscription_paid_read": 22906,
-      "gold_apc": 11978,
-      "hybrid": 9960,
-      "diamond": 23058
+      "diamond": 23075,
+      "subscription_paid_read": 22922,
+      "gold_apc": 11974,
+      "hybrid": 9962
     },
-    "is_oa": 35036,
-    "in_doaj": 30206
+    "is_oa": 35049,
+    "in_doaj": 30223,
+    "annual_outputs": 41604
   },
-  "with_cscd": 1077,
-  "with_cstpcd": 438,
-  "with_cstpcd_popular": 0
+  "annual_outputs_source": "OpenAlex sources counts_by_year",
+  "annual_outputs_count": 41604,
+  "with_retraction": 5228
 }

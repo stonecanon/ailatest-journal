@@ -18,6 +18,8 @@ ROOT = Path(__file__).resolve().parent.parent
 JOURNALS = ROOT / "data" / "journals.json"
 CACHE = ROOT / "data" / "openalex_cache.json"
 OUT = ROOT / "data" / "oa.json"
+ANNUAL_OUT = ROOT / "data" / "annual_outputs.json"
+ANNUAL_GZ = ROOT / "data" / "annual_outputs.json.gz"
 META = ROOT / "data" / "meta.json"
 
 
@@ -59,9 +61,10 @@ def main():
                 wanted.add(v)
 
     out_map = {}
+    annual_map = {}
     stats = {
         "matched_issns": 0, "has_homepage": 0, "has_apc": 0,
-        "labels": {}, "is_oa": 0, "in_doaj": 0,
+        "labels": {}, "is_oa": 0, "in_doaj": 0, "annual_outputs": 0,
     }
     for issn in wanted:
         rec = by_issn_cache.get(issn)
@@ -101,6 +104,16 @@ def main():
         # but re-attach label always
         row["l"] = label
         out_map[issn] = row
+        counts_by_year = rec.get("counts_by_year") or []
+        annual = {}
+        for item in counts_by_year:
+            year = item.get("year")
+            count = item.get("works_count")
+            if year and count is not None:
+                annual[str(year)] = count
+        if annual:
+            annual_map[issn] = annual
+            stats["annual_outputs"] += 1
         stats["matched_issns"] += 1
         if row.get("hp"): stats["has_homepage"] += 1
         if row.get("apc"): stats["has_apc"] += 1
@@ -113,8 +126,14 @@ def main():
     # But JSON can't represent refs, so leave as-is; gzip will collapse them.
 
     OUT.write_text(json.dumps(out_map, ensure_ascii=False, separators=(',', ':')), encoding="utf-8")
+    ANNUAL_OUT.write_text(json.dumps(annual_map, ensure_ascii=False, separators=(',', ':')), encoding="utf-8")
+    import gzip
+    with gzip.open(ANNUAL_GZ, "wt", encoding="utf-8", compresslevel=9) as f:
+        json.dump(annual_map, f, ensure_ascii=False, separators=(',', ':'))
     size_kb = OUT.stat().st_size / 1024
+    annual_size_kb = ANNUAL_OUT.stat().st_size / 1024
     print(f"oa.json written: {len(out_map):,} ISSN keys, {size_kb:.0f} KB")
+    print(f"annual_outputs.json written: {len(annual_map):,} ISSN keys, {annual_size_kb:.0f} KB")
     print(f"  homepage: {stats['has_homepage']:,}")
     print(f"  apc_usd:  {stats['has_apc']:,}")
     print(f"  is_oa:    {stats['is_oa']:,}")
@@ -126,6 +145,8 @@ def main():
     m["oa_enriched"] = True
     m["oa_source"] = "OpenAlex snapshot 2026-05"
     m["oa_stats"] = stats
+    m["annual_outputs_source"] = "OpenAlex sources counts_by_year"
+    m["annual_outputs_count"] = len(annual_map)
     META.write_text(json.dumps(m, ensure_ascii=False, indent=2), encoding="utf-8")
 
 

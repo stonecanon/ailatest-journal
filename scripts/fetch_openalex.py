@@ -5,7 +5,7 @@ Saves to data/openalex_cache.json. Resumable — skips ISSNs already cached.
 
 Fields pulled per source:
   homepage_url, is_oa, is_in_doaj, apc_usd, apc_prices, oa_status(derived),
-  type, country_code, host_organization_name, works_count
+  type, country_code, host_organization_name, works_count, counts_by_year
 
 OpenAlex allows filter ids.issn:A|B|C... up to ~50 per page. We batch 40.
 Polite mailto + <10 req/s. Expected ~580 requests, ~8-12 min total.
@@ -23,30 +23,30 @@ ROOT = Path(__file__).resolve().parent.parent
 JOURNALS = ROOT / "data" / "journals.json"
 CACHE = ROOT / "data" / "openalex_cache.json"
 MAILTO = "ailatest@security-contact.local"
-BATCH = 40           # ISSNs per request
+BATCH = 50           # ISSNs per request
 SLEEP = 0.12         # ~8 req/s
-SAVE_EVERY = 20      # flush cache to disk every N batches
+SAVE_EVERY = 200     # flush cache to disk every N batches
 
 SELECT = ",".join([
     "id", "display_name", "issn_l", "issn",
     "homepage_url", "is_oa", "is_in_doaj",
     "apc_usd", "apc_prices", "type", "country_code",
     "host_organization_name", "works_count",
-    "topics",
+    "counts_by_year", "topics",
 ])
 
 
 def load_cache():
     if CACHE.exists():
         try:
-            return json.loads(CACHE.read_text())
+            return json.loads(CACHE.read_text(encoding="utf-8"))
         except Exception:
             pass
     return {"by_issn": {}, "fetched_issns": []}
 
 
 def save_cache(cache):
-    CACHE.write_text(json.dumps(cache, ensure_ascii=False, indent=2))
+    CACHE.write_text(json.dumps(cache, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
 
 
 def fetch_batch(issns):
@@ -87,7 +87,7 @@ def normalize_issn(s):
 
 
 def main():
-    journals = json.loads(JOURNALS.read_text())
+    journals = json.loads(JOURNALS.read_text(encoding="utf-8"))
     print(f"Loaded {len(journals)} journals")
 
     # Collect unique ISSNs (both issn and eissn)
@@ -104,15 +104,22 @@ def main():
     fetched = set(cache.get("fetched_issns", []))
     by_issn = cache.setdefault("by_issn", {})
 
-    # Re-fetch records that are missing 'topics' (schema upgrade)
+    # Re-fetch records that are missing newer compact fields (schema upgrades).
     missing_topics = set()
+    missing_counts_by_year = set()
     for k, v in by_issn.items():
         if "topics" not in v:
             fetched.discard(k)
             missing_topics.add(k)
+        if "counts_by_year" not in v:
+            fetched.discard(k)
+            missing_counts_by_year.add(k)
 
     todo = [i for i in all_issns if i not in fetched]
-    print(f"Already cached: {len(fetched)}; missing topics: {len(missing_topics)}; remaining: {len(todo)}")
+    print(
+        f"Already cached: {len(fetched)}; missing topics: {len(missing_topics)}; "
+        f"missing counts_by_year: {len(missing_counts_by_year)}; remaining: {len(todo)}"
+    )
 
     t0 = time.time()
     saved_count = 0
@@ -153,6 +160,7 @@ def main():
                 "country": r.get("country_code"),
                 "host_org": r.get("host_organization_name"),
                 "works_count": r.get("works_count"),
+                "counts_by_year": r.get("counts_by_year") or [],
                 "topics": r.get("topics", []),
             }
             for issn in issns:

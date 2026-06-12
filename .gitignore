@@ -11,8 +11,11 @@ __pycache__/
 
 # 数据备份
 data/*.bak
+data/sources/
 data/journals.json
 data/oa.json
+data/annual_outputs.json
+data/retraction_metrics.json
 data/openalex_cache.json
 
 # 本地工具文件

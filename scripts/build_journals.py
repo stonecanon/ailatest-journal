@@ -27,6 +27,7 @@ import re
 import shutil
 import subprocess
 import sys
+import unicodedata
 from collections import Counter, defaultdict
 from pathlib import Path
 
@@ -78,6 +79,12 @@ ABS_CANDIDATES = [
 FT50_JSON    = DATA_DIR / 'ft50.json'
 UTD24_JSON   = DATA_DIR / 'utd24.json'
 NSFC_MGMT_JSON = DATA_DIR / 'nsfc_management.json'
+FMS_JSON     = DATA_DIR / 'fms_journals.json'
+VHB_JSON     = DATA_DIR / 'vhb_journals.json'
+CNRS_JSON    = DATA_DIR / 'cnrs_journals.json'
+SCD_JSON     = DATA_DIR / 'scd_journals.json'
+AMI_JSON     = DATA_DIR / 'ami_journals.json'
+RETRACTION_METRICS_JSON = DATA_DIR / 'retraction_metrics.json.gz'
 SCOPUS_FILE  = LIST_DIR / 'scopus_source_list.xlsx'
 EI_FILE      = LIST_DIR / 'CPXSourceList_102025.xlsx'
 OAJ_FILE     = LIST_DIR / 'oaj_journals.json'
@@ -106,6 +113,12 @@ def norm_title(s: str) -> str:
     s = re.sub(r'[^A-Z0-9]+', '', s)
     return s
 
+def norm_domestic_title(s: str) -> str:
+    if not s:
+        return ''
+    s = unicodedata.normalize('NFKC', str(s)).upper()
+    return re.sub(r'[^A-Z0-9\u4e00-\u9fff]+', '', s)
+
 def clean_issn(s) -> str:
     if s is None: return ''
     s = str(s).strip().upper()
@@ -119,6 +132,41 @@ def split_issn_pair(s):
     issns = [clean_issn(p) for p in parts if clean_issn(p)]
     return (issns[0] if issns else '',
             issns[1] if len(issns) > 1 else '')
+
+def write_journals_bundle(journals):
+    with open(DATA_DIR / 'journals.json', 'w', encoding='utf-8') as f:
+        json.dump(journals, f, ensure_ascii=False, separators=(',', ':'))
+    with open(DATA_DIR / 'journals.json', 'rb') as fin:
+        with gzip.open(DATA_DIR / 'journals.json.gz', 'wb', compresslevel=9) as fout:
+            shutil.copyfileobj(fin, fout)
+
+def attach_retraction_metrics(journals):
+    if not RETRACTION_METRICS_JSON.exists():
+        return 0
+    with gzip.open(RETRACTION_METRICS_JSON, 'rt', encoding='utf-8') as f:
+        metrics = json.load(f)
+    if isinstance(metrics, dict) and isinstance(metrics.get('metrics'), dict):
+        metrics = metrics['metrics']
+    attached = 0
+    for rec in journals:
+        candidates = [
+            clean_issn(rec.get('issn')),
+            clean_issn(rec.get('eissn')),
+            norm_title(rec.get('name') or rec.get('cn_name') or ''),
+        ]
+        metric = next((metrics.get(k) for k in candidates if k and metrics.get(k)), None)
+        if not metric:
+            continue
+        rec['retraction'] = {
+            'retractions_total': metric.get('retractions_total') or 0,
+            'r5': metric.get('retractions_5y') or 0,
+            'r10': metric.get('retractions_10y') or 0,
+            'rate_per_1000_5y': metric.get('rate_per_1000_5y'),
+            'rate_per_1000_10y': metric.get('rate_per_1000_10y'),
+            'matched_by': metric.get('matched_by') or '',
+        }
+        attached += 1
+    return attached
 
 def first_existing(paths):
     for p in paths:
@@ -441,6 +489,11 @@ def parse_showjcr_fqb(path, by_title, by_issn):
                     except ValueError: pass
             if is_top and not rec.get('cas_top'):
                 rec['cas_top'] = True
+            mark = (row.get('标注') or '').strip()
+            if mark:
+                rec['cas_mark'] = mark
+                if 'Mega' in mark:
+                    rec['cas_mega'] = True
 
             subs = []
             for i in range(1, 7):
@@ -861,6 +914,148 @@ def parse_management_json(path, by_title, store=None, field='', label=''):
 
 # ───────────────────────── Scopus Source List ─────────────────────────
 
+def parse_fms_json(path, by_title, by_issn, store=None):
+    if not path.exists():
+        return 0, 0
+    data = json.loads(path.read_text(encoding='utf-8'))
+    records = data.get('records') or []
+    matched = standalone = 0
+    for row in records:
+        title = (row.get('name') or '').strip()
+        if not title:
+            continue
+        issn = clean_issn(row.get('issn'))
+        rec = (issn and by_issn.get(issn)) or title_lookup(by_title, title)
+        payload = {
+            'year': str(row.get('year') or '2025'),
+            'tier': (row.get('tier') or '').strip(),
+            'type': (row.get('type') or '').strip(),
+            'discipline': (row.get('discipline') or '').strip(),
+            'source': row.get('source') or 'FMS管理科学高质量期刊推荐列表2025',
+            'source_url': row.get('source_url') or 'https://www.fms-journal.net/',
+        }
+        for src in ('jcr_rank', 'sjr_rank', 'snip_rank', 'sponsor'):
+            if row.get(src) not in (None, ''):
+                payload[src] = str(row.get(src)).strip()
+        if rec is None and store is not None:
+            key = 'fms:' + (issn or norm_title(title))
+            rec = store.get(key)
+            if rec is None:
+                rec = {
+                    'name': title, 'issn': issn, 'eissn': '',
+                    'publisher': row.get('sponsor') or '',
+                    'address': '', 'languages': '',
+                    'wos_categories': [], 'esi_category': '',
+                    'abbr20': '', 'country': '', 'indices': [],
+                    'fms_only': True,
+                }
+                store[key] = rec
+                for title_key in management_title_keys(title):
+                    by_title.setdefault(title_key, rec)
+                if issn:
+                    by_issn.setdefault(issn, rec)
+                standalone += 1
+        if rec is not None:
+            rec['fms'] = payload
+            matched += 1
+    return matched, standalone
+
+
+def parse_vhb_json(path, by_title, by_issn, store=None):
+    if not path.exists():
+        return 0, 0
+    data = json.loads(path.read_text(encoding='utf-8'))
+    rows = data.get('records', []) if isinstance(data, dict) else data
+    grouped = defaultdict(list)
+    titles = {}
+    for row in rows:
+        issn = clean_issn(row.get('issn') or '')
+        if not issn:
+            continue
+        grouped[issn].append({
+            'year': data.get('year') or 2024,
+            'area': row.get('area') or '',
+            'area_code': row.get('area_code') or '',
+            'rating': row.get('rating') or '',
+            'votes_ge_rating_percent': row.get('votes_ge_rating_percent'),
+            'source': 'VHB Publication Media Rating 2024',
+        })
+        titles.setdefault(issn, row.get('title') or '')
+
+    matched = standalone = 0
+    for issn, ratings in grouped.items():
+        title = titles.get(issn) or ''
+        rec = by_issn.get(issn) or title_lookup(by_title, title)
+        if rec is None and store is not None:
+            key = 'vhb:' + issn
+            rec = store.get(key)
+            if rec is None:
+                rec = {
+                    'name': title, 'issn': issn, 'eissn': '',
+                    'publisher': '', 'address': '', 'languages': '',
+                    'wos_categories': [], 'esi_category': '',
+                    'abbr20': '', 'country': '', 'indices': [],
+                    'vhb_only': True,
+                }
+                store[key] = rec
+                nt = norm_title(title)
+                if nt:
+                    by_title.setdefault(nt, rec)
+                by_issn.setdefault(issn, rec)
+                standalone += 1
+        if rec is not None:
+            rec['vhb'] = ratings
+            matched += 1
+    return matched, standalone
+
+
+def parse_cnrs_json(path, by_title, by_issn, store=None):
+    if not path.exists():
+        return 0, 0
+    data = json.loads(path.read_text(encoding='utf-8'))
+    rows = data.get('records', []) if isinstance(data, dict) else data
+    grouped = defaultdict(list)
+    titles = {}
+    for row in rows:
+        issn = clean_issn(row.get('issn') or '')
+        if not issn:
+            continue
+        grouped[issn].append({
+            'year': data.get('year') or 2020,
+            'domain': row.get('domain') or '',
+            'category': row.get('category') or '',
+            'historical': True,
+            'source': 'CNRS Section 37',
+        })
+        titles.setdefault(issn, row.get('title') or '')
+
+    matched = standalone = 0
+    for issn, categories in grouped.items():
+        title = titles.get(issn) or ''
+        rec = by_issn.get(issn) or title_lookup(by_title, title)
+        if rec is None and store is not None:
+            key = 'cnrs:' + issn
+            rec = store.get(key)
+            if rec is None:
+                rec = {
+                    'name': title, 'issn': issn, 'eissn': '',
+                    'publisher': '', 'address': '', 'languages': '',
+                    'wos_categories': [], 'esi_category': '',
+                    'abbr20': '', 'country': '', 'indices': [],
+                    'cnrs_only': True,
+                }
+                store[key] = rec
+                nt = norm_title(title)
+                if nt:
+                    by_title.setdefault(nt, rec)
+                by_issn.setdefault(issn, rec)
+                standalone += 1
+        if rec is not None:
+            rec['cnrs'] = categories
+            matched += 1
+    return matched, standalone
+
+
 def parse_scopus(path, by_title, by_issn, store=None):
     """Scopus Source List (Mar. 2026).
 
@@ -915,11 +1110,19 @@ def parse_scopus(path, by_title, by_issn, store=None):
         payload = {
             'id': cell(raw, 'Sourcerecord ID'),
             'active': active,
+            'status': status,
             'coverage': cell(raw, 'Coverage'),
+            'discontinued': bool(cell(raw, 'Titles Discontinued by Scopus')),
+            'source_type': cell(raw, 'Source Type'),
             'asjc': asjc,
             'asjc_top': asjc_top,
             'source': 'Scopus Source List (auto-updated)',
         }
+        added_key = next((h for h in col if h.startswith('Added to List')), '')
+        if added_key:
+            added = cell(raw, added_key)
+            if added:
+                payload['added_to_list'] = added
         rec = (issn and by_issn.get(issn)) or (eissn and by_issn.get(eissn)) or by_title.get(nt)
         if rec is not None:
             rec['scopus'] = payload
@@ -1106,6 +1309,58 @@ def merge_cstpcd_to_main(by_title):
 
 
 # ───────────────────────── OAJ 全球开放获取期刊索引 ─────────────────────────
+
+def domestic_name_lookup(store):
+    lookup = {}
+    for rec in store.values():
+        for title in (rec.get('cn_name'), rec.get('name'), rec.get('en_name')):
+            key = norm_domestic_title(title or '')
+            if key:
+                lookup.setdefault(key, rec)
+    return lookup
+
+
+def merge_scd_to_main(by_issn, store):
+    if not SCD_JSON.exists(): return 0
+    data = json.loads(SCD_JSON.read_text(encoding='utf-8'))
+    rows = data.get('records', []) if isinstance(data, dict) else data
+    by_name = domestic_name_lookup(store)
+    hits = 0
+    for r in rows:
+        issn = clean_issn(r.get('issn') or '')
+        rec = (issn and by_issn.get(issn)) or by_name.get(norm_domestic_title(r.get('name') or ''))
+        if rec is None:
+            continue
+        rec['scd'] = {
+            'year': data.get('year') or 2026,
+            'category': r.get('category') or '',
+            'cn_code': r.get('cn_code') or '',
+            'newly_added': bool(r.get('newly_added')),
+            'source': 'SCD',
+        }
+        hits += 1
+    return hits
+
+
+def merge_ami_to_main(store):
+    if not AMI_JSON.exists(): return 0
+    data = json.loads(AMI_JSON.read_text(encoding='utf-8'))
+    rows = data.get('records', []) if isinstance(data, dict) else data
+    by_name = domestic_name_lookup(store)
+    hits = 0
+    for r in rows:
+        rec = by_name.get(norm_domestic_title(r.get('name') or ''))
+        if rec is None:
+            continue
+        rec['ami'] = {
+            'year': r.get('year') or data.get('year') or 2022,
+            'tier': r.get('tier') or '',
+            'discipline': r.get('discipline') or '',
+            'source': 'AMI',
+        }
+        hits += 1
+    return hits
+
 
 def parse_oaj(path, by_title, by_issn, store=None):
     """读取 OAJ 开放获取期刊索引 JSON，匹配到现有记录或新增."""
@@ -1300,6 +1555,12 @@ def main():
     print(f'  FT50 matched: {h}  standalone: +{s}')
     h, s = parse_management_json(UTD24_JSON, by_title, store=store, field='utd24', label='UT Dallas Top 24 Business Journals')
     print(f'  UTD24 matched: {h}  standalone: +{s}')
+    h, s = parse_fms_json(FMS_JSON, by_title, by_issn, store=store)
+    print(f'  FMS matched: {h}  standalone: +{s}')
+    h, s = parse_vhb_json(VHB_JSON, by_title, by_issn, store=store)
+    print(f'  VHB matched: {h}  standalone: +{s}')
+    h, s = parse_cnrs_json(CNRS_JSON, by_title, by_issn, store=store)
+    print(f'  CNRS matched: {h}  standalone: +{s}')
     by_issn, by_title = rebuild_lookups()
 
     print('== 中国科协 merge ==')
@@ -1313,6 +1574,14 @@ def main():
     print('== 中国科技核心期刊目录 merge ==')
     h = merge_cstpcd_to_main(by_title)
     print(f'  CSTPCD merged: {h}')
+
+    print('== SCD 2026 merge ==')
+    h = merge_scd_to_main(by_issn, store)
+    print(f'  SCD merged: {h}')
+
+    print('== AMI 2022 merge ==')
+    h = merge_ami_to_main(store)
+    print(f'  AMI merged: {h}')
 
     print('== OAJ 全球开放获取期刊索引 ==')
     h, s = parse_oaj(OAJ_FILE, by_title, by_issn, store=store)
@@ -1462,7 +1731,7 @@ def main():
     for r in journals:
         for i in r['indices']: idx_c[i] += 1
     cas_c = Counter(); cas_top = 0
-    if_count = 0; warning_count = 0; cn_name_count = 0; ccf_count = 0; abdc_count = 0; abs_count = 0; ft50_count = 0; utd24_count = 0; cnkx_count = 0; cscd_count = 0; cstpcd_count = 0; cstpcd_popular_count = 0; scopus_count = 0; ei_count = 0; oaj_count = 0; doaj_count = 0; medline_count = 0; pubmed_count = 0; pmc_count = 0
+    if_count = 0; warning_count = 0; cn_name_count = 0; ccf_count = 0; abdc_count = 0; abs_count = 0; ft50_count = 0; utd24_count = 0; fms_count = 0; vhb_count = 0; cnrs_count = 0; cas_mega_count = 0; cnkx_count = 0; cscd_count = 0; cstpcd_count = 0; cstpcd_popular_count = 0; scd_count = 0; ami_count = 0; scopus_count = 0; ei_count = 0; oaj_count = 0; doaj_count = 0; medline_count = 0; pubmed_count = 0; pmc_count = 0
     for r in journals:
         z = r.get('cas_zone')
         if z: cas_c[z] += 1
@@ -1475,12 +1744,18 @@ def main():
         if r.get('abs'): abs_count += 1
         if r.get('ft50'): ft50_count += 1
         if r.get('utd24'): utd24_count += 1
+        if r.get('fms'): fms_count += 1
+        if r.get('vhb'): vhb_count += 1
+        if r.get('cnrs'): cnrs_count += 1
+        if r.get('cas_mega'): cas_mega_count += 1
         if r.get('cnkx'): cnkx_count += 1
         if r.get('cscd'): cscd_count += 1
         if r.get('cstpcd'):
             cstpcd_count += 1
             if r.get('cstpcd', {}).get('kind') == 'popular_science':
                 cstpcd_popular_count += 1
+        if r.get('scd'): scd_count += 1
+        if r.get('ami'): ami_count += 1
         if r.get('scopus') and r.get('scopus', {}).get('active') is not False: scopus_count += 1
         if 'EI' in r.get('indices', []): ei_count += 1
         if r.get('oaj'): oaj_count += 1
@@ -1493,7 +1768,7 @@ def main():
     print(f'  total: {len(journals)}')
     print(f'  indices: {dict(idx_c)}')
     print(f'  CAS zones: {dict(cas_c)} Top={cas_top}')
-    print(f'  IF: {if_count}  warning: {warning_count}  中文刊名: {cn_name_count}  CCF: {ccf_count}  ABDC: {abdc_count}  ABS: {abs_count}  FT50: {ft50_count}  UTD24: {utd24_count}  CNKX: {cnkx_count}  CSCD: {cscd_count}  CSTPCD: {cstpcd_count}  Scopus: {scopus_count}  EI: {ei_count}  OAJ: {oaj_count}  DOAJ: {doaj_count}  MEDLINE: {medline_count}  PubMed: {pubmed_count}  PMC: {pmc_count}')
+    print(f'  IF: {if_count}  warning: {warning_count}  中文刊名: {cn_name_count}  CCF: {ccf_count}  ABDC: {abdc_count}  ABS: {abs_count}  FT50: {ft50_count}  UTD24: {utd24_count}  FMS: {fms_count}  VHB: {vhb_count}  CNRS: {cnrs_count}  CAS Mega: {cas_mega_count}  CNKX: {cnkx_count}  CSCD: {cscd_count}  CSTPCD: {cstpcd_count}  SCD: {scd_count}  AMI: {ami_count}  Scopus: {scopus_count}  EI: {ei_count}  OAJ: {oaj_count}  DOAJ: {doaj_count}  MEDLINE: {medline_count}  PubMed: {pubmed_count}  PMC: {pmc_count}')
 
     # Strip large non-essential fields to stay under CF Pages 25 MB limit
     for r in journals:
@@ -1551,8 +1826,13 @@ def main():
         'zju': None,
         'school_a': None,
         'nsfc_mgmt': None,
+        'fms': None,
+        'vhb': None,
+        'cnrs': None,
         'cscd': None,
         'cstpcd': None,
+        'scd': None,
+        'ami': None,
         'ccft': [],
         'cssci_core': [],
         'cssci_ext': [],
@@ -1570,10 +1850,20 @@ def main():
         domestic['school_a'] = json.loads(SCHOOL_A_JSON.read_text(encoding='utf-8'))
     if NSFC_MGMT_JSON.exists():
         domestic['nsfc_mgmt'] = json.loads(NSFC_MGMT_JSON.read_text(encoding='utf-8'))
+    if FMS_JSON.exists():
+        domestic['fms'] = json.loads(FMS_JSON.read_text(encoding='utf-8'))
+    if VHB_JSON.exists():
+        domestic['vhb'] = json.loads(VHB_JSON.read_text(encoding='utf-8'))
+    if CNRS_JSON.exists():
+        domestic['cnrs'] = json.loads(CNRS_JSON.read_text(encoding='utf-8'))
     if CSCD_JSON.exists():
         domestic['cscd'] = json.loads(CSCD_JSON.read_text(encoding='utf-8'))
     if CSTPCD_JSON.exists():
         domestic['cstpcd'] = json.loads(CSTPCD_JSON.read_text(encoding='utf-8'))
+    if SCD_JSON.exists():
+        domestic['scd'] = json.loads(SCD_JSON.read_text(encoding='utf-8'))
+    if AMI_JSON.exists():
+        domestic['ami'] = json.loads(AMI_JSON.read_text(encoding='utf-8'))
     if CSSCI_CORE_JSON.exists():
         domestic['cssci_core'] = json.loads(CSSCI_CORE_JSON.read_text(encoding='utf-8'))
     if CSSCI_EXT_JSON.exists():
@@ -1673,12 +1963,18 @@ def main():
         'with_abs': abs_count,
         'with_ft50': ft50_count,
         'with_utd24': utd24_count,
+        'with_fms': fms_count,
+        'with_vhb': vhb_count,
+        'with_cnrs': cnrs_count,
+        'with_cas_mega': cas_mega_count,
         'with_oaj': oaj_count,
         'with_doaj': doaj_count,
         'with_cnkx': cnkx_count,
         'with_cscd': cscd_count,
         'with_cstpcd': cstpcd_count,
         'with_cstpcd_popular': cstpcd_popular_count,
+        'with_scd': scd_count,
+        'with_ami': ami_count,
         'with_scopus': scopus_count,
         'with_ei': ei_count,
         'wos_categories': len(wos_c),
@@ -1734,6 +2030,21 @@ def main():
                 with gzip.open(DATA_DIR / 'journals.json.gz', 'wb', compresslevel=9) as fout:
                     shutil.copyfileobj(fin, fout)
             print(f'  Free-to-publish flag: {free_count} journals (author-free: subscription/hybrid/diamond)')
+
+        metrics_script = ROOT / 'scripts' / 'build_retraction_metrics.py'
+        if metrics_script.exists() and (DATA_DIR / 'annual_outputs.json').exists() and (DATA_DIR / 'retraction_watch_journals.json').exists():
+            print('== Retraction Metrics ==')
+            r = subprocess.run(
+                [sys.executable, str(metrics_script)],
+                cwd=ROOT, capture_output=True, text=True, timeout=180)
+            print(r.stdout)
+            if r.returncode != 0:
+                print(f'  WARN: build_retraction_metrics.py exited {r.returncode}: {r.stderr.strip()}')
+            else:
+                attached = attach_retraction_metrics(journals)
+                if attached:
+                    write_journals_bundle(journals)
+                print(f'  Retraction metrics embedded: {attached} journals')
     else:
         print('  skip: merge_openalex.py or openalex_cache.json not found')
     return 0
