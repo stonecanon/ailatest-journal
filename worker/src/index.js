@@ -14,8 +14,9 @@
  *   GET  /auth/google            ?state=&redirect=         → 302 to Google
  *   GET  /auth/google/callback   ?code=&state=             → 302 back with ?token=
  *   GET  /me                     (Bearer)                  → user profile
+ *   GET  /me/entitlements        (Bearer)                  → tier/试用/限额快照（≤24h，见 entitlements.js）
  *   GET  /favorites              (Bearer)                  → favorite ids
- *   PUT  /favorites              (Bearer) { favs: [...] }
+ *   PUT  /favorites              (Bearer) { favs: [...] }   （tier 限额校验）
  *   POST /analytics/pageview      { path, referrer, session_id, visitor_id, client_timezone, client_language }
  *
  * Required secrets:
@@ -32,10 +33,18 @@
  */
 
 import { buildDashboardPayload } from './dashboard.js';
+import { aggregateRecentStats, recalibrateYesterday } from './analytics-rollups.js';
 import { handleChat } from './chat.js';
 import { handlePick } from './pick.js';
 import { handleExtLookup } from './ext-lookup.js';
 import { renderSitesDashboard } from './sites-dashboard.js';
+import { classifyRequestTraffic } from './traffic-classifier.js';
+import {
+  getEntitlements,
+  activateTrialForNewUser,
+  enforceFavoritesWrite,
+  enforceListsWrite,
+} from './entitlements.js';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -105,8 +114,45 @@ function dayFromSec(sec) {
   return new Date(sec * 1000).toISOString().slice(0, 10);
 }
 
+function authCallbackUrl(req, provider) {
+  const u = new URL(req.url);
+  const prefix = u.pathname.startsWith('/api/') ? '/api' : '';
+  return `${u.origin}${prefix}/auth/${provider}/callback`;
+}
+
 function cleanText(value, max = 200) {
   return typeof value === 'string' ? value.trim().slice(0, max) : '';
+}
+
+function clampEventTs(value, fallback = nowSec()) {
+  const n = Number(value || 0);
+  const now = nowSec();
+  if (!Number.isFinite(n) || n <= 0) return fallback;
+  if (n > now + 300) return now;
+  if (n < now - 120 * 86400) return fallback;
+  return Math.floor(n);
+}
+
+function eventHourUtc(sec) {
+  return new Date(Math.floor(sec / 3600) * 3600 * 1000).toISOString().slice(0, 13) + ':00:00Z';
+}
+
+function visitorHash(ipHash, visitorId) {
+  return `vh_${String(ipHash || '').slice(0, 18)}_${String(visitorId || '').slice(0, 18)}`.slice(0, 80);
+}
+
+function metadataJson(value) {
+  try {
+    return JSON.stringify(value && typeof value === 'object' ? value : {});
+  } catch (_) {
+    return '{}';
+  }
+}
+
+async function requestIpHash(req, env) {
+  const ip = req.headers.get('CF-Connecting-IP') || req.headers.get('x-forwarded-for') || '';
+  if (!ip) return '';
+  return sha256Hex(`${ip}|${env.CODE_PEPPER || env.JWT_SECRET || ''}`);
 }
 
 function isEmail(s) {
@@ -179,7 +225,10 @@ async function upsertEmailUser(env, email) {
     `INSERT INTO users (email, login, name, provider, created_at, updated_at)
      VALUES (?, ?, ?, 'email', ?, ?)`
   ).bind(email, email.split('@')[0], email.split('@')[0], now, now).run();
-  return res.meta.last_row_id;
+  const uid = res.meta.last_row_id;
+  // 新注册自动激活一次性 7 天 trial（spec: tiers.trial；注册不送 credits）
+  await activateTrialForNewUser(env, uid).catch((e) => console.warn('trial activation skipped:', e?.message || e));
+  return uid;
 }
 
 async function recordLoginEvent(env, userId, provider) {
@@ -200,30 +249,152 @@ async function safeRecordLoginEvent(env, userId, provider) {
 async function routePageview(req, env) {
   const body = await req.json().catch(() => null);
   const now = nowSec();
+  const eventTs = clampEventTs(body?.event_ts, now);
   const path = cleanText(body?.path || '/', 240) || '/';
   const referrer = cleanText(body?.referrer || '', 300);
   const sessionId = cleanText(body?.session_id || '', 80);
   const visitorId = cleanText(body?.visitor_id || '', 80);
   const clientTimezone = cleanText(body?.client_timezone || '', 80);
   const clientLanguage = cleanText(body?.client_language || '', 80);
+  const userAgent = cleanText(body?.user_agent || req.headers.get('user-agent') || '', 500);
+  const screenResolution = cleanText(body?.screen_resolution || '', 40);
   const cf = req.cf || {};
+  const country = cleanText(cf.country || '', 16);
+  const colo = cleanText(cf.colo || '', 16);
+  const ipHash = await requestIpHash(req, env);
+  const vHash = visitorHash(ipHash, visitorId);
+  const traffic = await classifyRequestTraffic(env, req, {
+    ua: userAgent,
+    ipHash,
+    visitorHash: vHash,
+    referrer,
+    country,
+  }).catch(() => ({
+    traffic_type: body?.is_bot ? 'scraper' : 'human',
+    is_bot: body?.is_bot ? 1 : 0,
+    bot_reason: body?.is_bot ? 'client_bot_hint' : '',
+  }));
 
   await env.DB.prepare(
     `INSERT INTO page_events
        (day, event_at, path, referrer, session_id, visitor_id, country, colo, client_timezone, client_language)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
   ).bind(
-    dayFromSec(now),
-    now,
+    dayFromSec(eventTs),
+    eventTs,
     path,
     referrer,
     sessionId,
     visitorId,
-    cleanText(cf.country || '', 16),
-    cleanText(cf.colo || '', 16),
+    country,
+    colo,
     clientTimezone,
     clientLanguage,
   ).run();
+
+  await env.DB.prepare(
+    `INSERT OR IGNORE INTO raw_events (
+      event_id, event_type, site, path, referrer, visitor_id, session_id,
+      event_ts, received_at, event_hour_utc, event_day_utc,
+      client_timezone, client_language, user_agent, ip_hash, country, colo,
+      is_bot, bot_reason, metadata_json, traffic_type, visitor_hash, screen_resolution
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+  ).bind(
+    cleanText(body?.event_id || crypto.randomUUID(), 80),
+    cleanText(body?.event_type || 'page_view', 60) || 'page_view',
+    cleanText(body?.site || new URL(req.url).hostname, 120) || 'journal.ailatest.org',
+    path,
+    referrer,
+    visitorId,
+    sessionId,
+    eventTs,
+    now,
+    eventHourUtc(eventTs),
+    dayFromSec(eventTs),
+    clientTimezone,
+    clientLanguage,
+    userAgent,
+    ipHash,
+    country,
+    colo,
+    Number(traffic.is_bot || 0),
+    cleanText(traffic.bot_reason || '', 240),
+    metadataJson(body?.metadata),
+    cleanText(traffic.traffic_type || 'human', 40),
+    vHash,
+    screenResolution,
+  ).run();
+
+  return json({ ok: true });
+}
+
+async function routeInteraction(req, env) {
+  const body = await req.json().catch(() => null);
+  if (!body) return err('invalid json');
+  const now = nowSec();
+  const eventTs = clampEventTs(body.event_ts, now);
+  const site = cleanText(body.site || new URL(req.url).hostname, 120) || 'journal.ailatest.org';
+  const eventType = cleanText(body.event_type || 'interaction', 80) || 'interaction';
+  const path = cleanText(body.path || '/', 240) || '/';
+  const referrer = cleanText(body.referrer || '', 300);
+  const visitorId = cleanText(body.visitor_id || '', 80);
+  const sessionId = cleanText(body.session_id || '', 80);
+  const userAgent = cleanText(body.user_agent || req.headers.get('user-agent') || '', 500);
+  const cf = req.cf || {};
+  const country = cleanText(cf.country || '', 16);
+  const ipHash = await requestIpHash(req, env);
+  const vHash = visitorHash(ipHash, visitorId);
+  const traffic = await classifyRequestTraffic(env, req, {
+    ua: userAgent,
+    ipHash,
+    visitorHash: vHash,
+    referrer,
+    viewSource: cleanText(body.view_source || '', 80),
+    country,
+  }).catch(() => ({
+    traffic_type: body?.is_bot ? 'scraper' : 'human',
+    is_bot: body?.is_bot ? 1 : 0,
+    bot_reason: body?.is_bot ? 'client_bot_hint' : '',
+  }));
+  const u = await getUser(req, env).catch(() => null);
+
+  await env.DB.prepare(
+    `INSERT OR IGNORE INTO interaction_events (
+      event_id, event_type, site, path, tab, query, result_count, visitor_id,
+      session_id, user_id, event_ts, received_at, event_day_utc,
+      client_timezone, client_language, metadata_json, user_agent, is_bot,
+      journal_key, journal_name, journal_issn, traffic_type, bot_reason, visitor_hash
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+  ).bind(
+    cleanText(body.event_id || crypto.randomUUID(), 80),
+    eventType,
+    site,
+    path,
+    cleanText(body.tab || '', 80),
+    cleanText(body.query || '', 240),
+    Number.isFinite(Number(body.result_count)) ? Number(body.result_count) : null,
+    visitorId,
+    sessionId,
+    u?.id || null,
+    eventTs,
+    now,
+    dayFromSec(eventTs),
+    cleanText(body.client_timezone || '', 80),
+    cleanText(body.client_language || '', 80),
+    metadataJson(body.metadata),
+    userAgent,
+    Number(traffic.is_bot || 0),
+    cleanText(body.journal_key || '', 200),
+    cleanText(body.journal_name || '', 300),
+    cleanText(body.journal_issn || '', 80),
+    cleanText(traffic.traffic_type || 'human', 40),
+    cleanText(traffic.bot_reason || '', 240),
+    vHash,
+  ).run();
+
+  if (eventType === 'journal_view' && body.journal_key) {
+    await recordJournalViewEvent(req, env, body, { now, eventTs, user: u, traffic, ipHash, visitorHash: vHash, country });
+  }
 
   return json({ ok: true });
 }
@@ -444,7 +615,7 @@ async function routeAuthStart(req, env) {
   const u = new URL(req.url);
   const state = u.searchParams.get('state') || '';
   const redirect = u.searchParams.get('redirect') || env.SITE_URL;
-  const callback = `${u.origin}/auth/github/callback`;
+  const callback = authCallbackUrl(req, 'github');
   const ghState = btoa(JSON.stringify({ s: state, r: redirect }));
   const gh = new URL('https://github.com/login/oauth/authorize');
   gh.searchParams.set('client_id', env.GITHUB_CLIENT_ID);
@@ -501,6 +672,7 @@ async function routeAuthCallback(req, env) {
        VALUES (?, ?, ?, ?, 'github', ?, ?)`
     ).bind(gh.id, gh.login, gh.name || gh.login, gh.avatar_url || '', now, now).run();
     uid = res.meta.last_row_id;
+    await activateTrialForNewUser(env, uid).catch((e) => console.warn('trial activation skipped:', e?.message || e));
   }
 
   await safeRecordLoginEvent(env, uid, 'github');
@@ -524,7 +696,7 @@ async function routeGoogleStart(req, env) {
   const u = new URL(req.url);
   const state = u.searchParams.get('state') || '';
   const redirect = u.searchParams.get('redirect') || env.SITE_URL;
-  const callback = `${u.origin}/auth/google/callback`;
+  const callback = authCallbackUrl(req, 'google');
   const ggState = btoa(JSON.stringify({ s: state, r: redirect }));
   const gg = new URL('https://accounts.google.com/o/oauth2/v2/auth');
   gg.searchParams.set('client_id', env.GOOGLE_CLIENT_ID);
@@ -547,7 +719,7 @@ async function routeGoogleCallback(req, env) {
     if (!code || !ggState) return err('missing code/state');
     let redirect = env.SITE_URL;
     try { redirect = JSON.parse(atob(ggState)).r || redirect; } catch {}
-    const callback = `${u.origin}/auth/google/callback`;
+    const callback = authCallbackUrl(req, 'google');
 
     const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
@@ -615,6 +787,7 @@ async function routeGoogleCallback(req, env) {
          VALUES (?, ?, ?, ?, ?, 'google', ?, ?)`
       ).bind(gg.sub, email || null, email ? email.split('@')[0] : gg.sub, gg.name || '', gg.picture || '', now, now).run();
       uid = res.meta.last_row_id;
+      await activateTrialForNewUser(env, uid).catch((e) => console.warn('trial activation skipped:', e?.message || e));
     }
 
     await safeRecordLoginEvent(env, uid, 'google');
@@ -635,6 +808,13 @@ async function routeMe(req, env) {
   return json(publicUser(u));
 }
 
+// GET /me/entitlements — 客户端 UI 渲染用快照（≤24h），写入仍由服务端逐次校验
+async function routeMeEntitlements(req, env) {
+  const u = await getUser(req, env);
+  if (!u) return err('unauthorized', 401);
+  return json(await getEntitlements(env, u, isOwnerUser(u)));
+}
+
 async function routeGetFavs(req, env) {
   const u = await getUser(req, env);
   if (!u) return err('unauthorized', 401);
@@ -650,6 +830,10 @@ async function routePutFavs(req, env) {
   const body = await req.json().catch(() => null);
   if (!body || !Array.isArray(body.favs)) return err('invalid body');
   const favs = body.favs.filter(x => typeof x === 'string' && x.length <= 200).slice(0, 5000);
+
+  // tier 限额：free 30 本；超限后冻结（可删可排序，不可新增）。spec enforcement 规则 1。
+  const gate = await enforceFavoritesWrite(env, u, isOwnerUser(u), favs);
+  if (!gate.ok) return json(gate.body, gate.status);
 
   const now = nowSec();
   await env.DB.batch([
@@ -698,6 +882,10 @@ async function routePutLists(req, env) {
       : [];
     clean.push({ id, name, ids });
   }
+
+  // tier 限额：free 2 个清单 / 收藏并集 30 本；超限清单只读（可整单删除）。spec enforcement 规则 1。
+  const gate = await enforceListsWrite(env, u, isOwnerUser(u), clean);
+  if (!gate.ok) return json(gate.body, gate.status);
 
   const now = nowSec();
   const stmts = [
@@ -1018,6 +1206,63 @@ async function routeDeleteShare(req, env, id) {
 }
 
 // ───────── routes: journal_views (期刊浏览计数) ─────────
+async function recordJournalViewEvent(req, env, body, context = {}) {
+  const now = context.now || nowSec();
+  const eventTs = context.eventTs || clampEventTs(body?.event_time || body?.event_ts, now);
+  const visitorId = cleanText(body?.visitor_id || '', 80);
+  const sessionId = cleanText(body?.session_id || '', 80);
+  const referrer = cleanText(body?.referrer || '', 300);
+  const userAgent = cleanText(body?.user_agent || req.headers.get('user-agent') || '', 500);
+  const cf = req.cf || {};
+  const country = cleanText(context.country || cf.country || '', 16);
+  const ipHash = context.ipHash ?? await requestIpHash(req, env);
+  const vHash = context.visitorHash || visitorHash(ipHash, visitorId);
+  const traffic = context.traffic || await classifyRequestTraffic(env, req, {
+    ua: userAgent,
+    ipHash,
+    visitorHash: vHash,
+    referrer,
+    viewSource: cleanText(body?.view_source || '', 80),
+    country,
+  }).catch(() => ({
+    traffic_type: body?.is_bot ? 'scraper' : 'human',
+    is_bot: body?.is_bot ? 1 : 0,
+    bot_reason: body?.is_bot ? 'client_bot_hint' : '',
+  }));
+  const u = context.user || await getUser(req, env).catch(() => null);
+
+  await env.DB.prepare(
+    `INSERT INTO journal_view_events (
+      journal_key, user_id, visitor_id, session_id, path, viewed_at,
+      referrer, user_agent, is_bot, country, ip_hash, device, browser, event_time,
+      traffic_type, bot_reason, visitor_hash, journal_name, journal_issn,
+      view_source, query, tab
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+  ).bind(
+    normalizeJournalKey(body?.journal_key),
+    u?.id || null,
+    visitorId,
+    sessionId,
+    cleanText(body?.path || '/', 240) || '/',
+    eventTs,
+    referrer,
+    userAgent,
+    Number(traffic.is_bot || 0),
+    country,
+    ipHash,
+    cleanText(body?.device || '', 40),
+    cleanText(body?.browser || '', 60),
+    eventTs,
+    cleanText(traffic.traffic_type || 'human', 40),
+    cleanText(traffic.bot_reason || '', 240),
+    vHash,
+    cleanText(body?.journal_name || '', 300),
+    cleanText(body?.journal_issn || '', 80),
+    cleanText(body?.view_source || '', 80),
+    cleanText(body?.query || '', 240),
+    cleanText(body?.tab || '', 80),
+  ).run();
+}
 
 // POST /journal-view  body { journal_key }   (无需登录)
 async function routeJournalView(req, env) {
@@ -1025,13 +1270,15 @@ async function routeJournalView(req, env) {
   const key = normalizeJournalKey(body?.journal_key);
   if (!key) return err('invalid journal_key');
   const now = nowSec();
+  const eventTs = clampEventTs(body?.event_time || body?.event_ts, now);
   await env.DB.prepare(
     `INSERT INTO journal_views (journal_key, count, updated_at)
      VALUES (?, 1, ?)
      ON CONFLICT(journal_key) DO UPDATE SET
        count = count + 1,
        updated_at = excluded.updated_at`
-  ).bind(key, now).run();
+  ).bind(key, eventTs).run();
+  await recordJournalViewEvent(req, env, { ...body, journal_key: key }, { now, eventTs });
   const row = await env.DB.prepare(
     'SELECT count FROM journal_views WHERE journal_key = ?'
   ).bind(key).first();
@@ -1235,7 +1482,7 @@ async function routeDashboard(req, env) {
   const rawDays = Number(url.searchParams.get('days') || '30');
   const days = [1, 7, 30].includes(rawDays) ? rawDays : 30;
   const cache = caches.default;
-  const cacheKey = new Request(`https://cache.internal/analytics/dashboard-v2?days=${days}`, { method: 'GET' });
+  const cacheKey = new Request(`https://cache.internal/analytics/dashboard-v3?days=${days}`, { method: 'GET' });
   const nocache = url.searchParams.get('nocache') === '1';
   if (!nocache) {
     const hit = await cache.match(cacheKey);
@@ -1281,6 +1528,7 @@ export default {
       if (p === '/auth/google'         && req.method === 'GET')  return routeGoogleStart(req, env);
       if (p === '/auth/google/callback'&& req.method === 'GET')  return routeGoogleCallback(req, env);
       if (p === '/analytics/pageview' && req.method === 'POST')  return routePageview(req, env);
+      if (p === '/analytics/interaction' && req.method === 'POST') return routeInteraction(req, env);
       if (p === '/analytics/dashboard' && req.method === 'GET')  return routeDashboard(req, env);
       if ((p === '/analytics/sites' || p === '/analytics/sites/') && req.method === 'GET') return routeSitesDashboard('overview');
       const mAnalyticsSite = p.match(/^\/analytics\/sites\/([a-z0-9_-]+)\/?$/i);
@@ -1288,6 +1536,7 @@ export default {
       if (p === '/analytics/journal-view-trend' && req.method === 'GET') return routeJournalViewTrend(req, env);
       if (p === '/analytics/site-traffic-trend' && req.method === 'GET') return routeSiteTrafficTrend(req, env);
       if (p === '/me'                  && req.method === 'GET')  return routeMe(req, env);
+      if (p === '/me/entitlements'     && req.method === 'GET')  return routeMeEntitlements(req, env);
       if (p === '/pick'                && req.method === 'POST') return handlePick(req, env, { consumeQuota: () => consumePickQuotaForRequest(req, env) });
       if (p === '/pick/quota/consume'  && req.method === 'POST') return routeConsumePickQuota(req, env);
       if (p === '/ext/lookup')                                   return handleExtLookup(req, env);
@@ -1319,5 +1568,17 @@ export default {
     } catch (e) {
       return err('server error: ' + e.message, 500);
     }
+  },
+  async scheduled(event, env, ctx) {
+    const run = async () => {
+      const now = nowSec();
+      const result = await aggregateRecentStats(env, now);
+      if (event.cron === '12 16 * * *') {
+        const finalized = await recalibrateYesterday(env, now);
+        return { ...result, finalized };
+      }
+      return result;
+    };
+    ctx.waitUntil(run().catch(e => console.error('analytics rollup failed:', e?.stack || e?.message || e)));
   },
 };

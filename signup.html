@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>注册 / 登录 | AILatest Journal</title>
+<meta name="description" content="注册 AILatest Journal：邮箱验证码或 GitHub / Google 一键登录，注册即享 7 天 Pro 试用。" />
+<link rel="canonical" href="https://journal.ailatest.org/signup.html" />
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
+<link rel="stylesheet" href="/css/static.css" />
+<meta name="robots" content="noindex" />
+</head>
+<body>
+<header class="page-head">
+  <a class="brand" href="/">AILatest <span>Journal</span></a>
+  <nav>
+    <a href="/about.html">关于</a>
+    <a href="/pricing.html">订阅</a>
+    <a href="/contact.html">联系</a>
+  </nav>
+</header>
+<main class="narrow" style="max-width:480px">
+  <h1>注册 / 登录</h1>
+  <p class="sub">新邮箱即注册，老邮箱即登录。注册即享 <b>7 天 Pro 试用</b>。</p>
+
+  <div class="card" id="auth-card">
+    <form id="email-form" novalidate>
+      <div class="form-row">
+        <label for="email">邮箱 Email</label>
+        <input type="email" id="email" name="email" required autocomplete="email" placeholder="you@university.edu.cn" />
+      </div>
+      <div class="form-row" id="code-row" hidden>
+        <label for="code">验证码（已发送至上方邮箱，10 分钟内有效）</label>
+        <input type="text" id="code" name="code" inputmode="numeric" pattern="\d{6}" maxlength="6" placeholder="6 位数字" autocomplete="one-time-code" />
+      </div>
+      <button class="btn" type="submit" id="submit-btn" data-step="request">发送验证码</button>
+      <p class="form-msg" id="form-msg"></p>
+    </form>
+
+    <div class="divider">或使用第三方账号</div>
+    <div class="oauth-row">
+      <button class="btn ghost" type="button" data-provider="github">
+        <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.42 7.42 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+        GitHub
+      </button>
+      <button class="btn ghost" type="button" data-provider="google">
+        <svg viewBox="0 0 48 48" width="16" height="16" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3c-1.6 4.7-6.1 8-11.3 8a12 12 0 010-24c3 0 5.8 1.1 7.9 3L37.6 9.3A20 20 0 004 24a20 20 0 0040 0c0-1.3-.1-2.6-.4-3.9z"/><path fill="#FF3D00" d="M6.3 14.1l6.6 4.8A12 12 0 0124 16c3 0 5.8 1.1 7.9 3L37.6 9.3A20 20 0 006.3 14.1z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2A12 12 0 0124 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5A20 20 0 0024 44z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.3-2.2 4.2-4.1 5.6l6.2 5.2c-.4.4 6.6-4.8 6.6-14.8 0-1.3-.1-2.6-.4-3.9z"/></svg>
+        Google
+      </button>
+    </div>
+    <p class="small muted" style="margin-bottom:0">注册即表示同意 <a href="/terms.html">Terms of Service</a> 与 <a href="/privacy.html">Privacy Policy</a>。</p>
+  </div>
+
+  <div class="card" id="done-card" hidden>
+    <h3 style="margin-top:0">✅ 登录成功</h3>
+    <p id="done-msg">正在返回首页…</p>
+  </div>
+</main>
+<footer class="page-foot">
+  <p>© 2026 AILatest Journal ·
+    <a href="/about.html">关于</a> ·
+    <a href="/pricing.html">订阅</a> ·
+    <a href="/contact.html">联系</a> ·
+    <a href="/terms.html">Terms</a> ·
+    <a href="/privacy.html">Privacy</a> ·
+    <a href="/refund.html">Refund</a></p>
+</footer>
+
+<script>
+(function () {
+  // 与 js/app.js 保持一致：API 和 OAuth 都使用 api.ailatest.org。
+  const API_BASE = location.hostname === 'localhost' ? 'http://localhost:8787' : 'https://api.ailatest.org';
+  const AUTH_BASE = API_BASE;
+
+  const params   = new URLSearchParams(location.search);
+  const fromExt  = params.get('ext') === '1';
+  const redirect = params.get('redirect') || '/';
+
+  const form   = document.getElementById('email-form');
+  const btn    = document.getElementById('submit-btn');
+  const msg    = document.getElementById('form-msg');
+  const emailEl = document.getElementById('email');
+  const codeEl  = document.getElementById('code');
+
+  function showDone(user) {
+    document.getElementById('auth-card').hidden = true;
+    const done = document.getElementById('done-card');
+    done.hidden = false;
+    const who = user && (user.name || user.email || user.login) || '';
+    if (fromExt) {
+      document.getElementById('done-msg').textContent =
+        `${who} 已登录。现在回到浏览器插件弹窗即可（插件会自动同步登录状态），本页可关闭。`;
+    } else {
+      document.getElementById('done-msg').textContent = `${who} 已登录，正在返回…`;
+      setTimeout(() => { location.href = redirect; }, 1200);
+    }
+  }
+
+  function finishLogin(token, user) {
+    // 与 SPA 共用同一份本地登录态
+    localStorage.setItem('ailatest.user', JSON.stringify({ ...(user || {}), token }));
+    showDone(user);
+  }
+
+  async function readJson(resp, fallback) {
+    let d = null;
+    try { d = await resp.json(); } catch (_) {}
+    if (!resp.ok || (d && d.error)) throw new Error((d && d.error) || fallback);
+    return d;
+  }
+
+  // OAuth 回跳：?token=xxx
+  const tokenParam = params.get('token');
+  if (tokenParam) {
+    fetch(`${API_BASE}/me`, { headers: { Authorization: `Bearer ${tokenParam}` } })
+      .then((r) => readJson(r, '登录信息获取失败'))
+      .then((me) => finishLogin(tokenParam, me))
+      .catch((e) => { msg.textContent = e.message; msg.className = 'form-msg err'; });
+  }
+
+  // 已登录则直接显示完成态
+  try {
+    const saved = JSON.parse(localStorage.getItem('ailatest.user') || 'null');
+    if (!tokenParam && saved && saved.token) showDone(saved);
+  } catch (_) {}
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const step = btn.dataset.step;
+    const email = (form.dataset.email || emailEl.value).trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      msg.textContent = '请输入有效邮箱'; msg.className = 'form-msg err'; return;
+    }
+    btn.disabled = true; msg.textContent = ''; msg.className = 'form-msg';
+    try {
+      if (step === 'request') {
+        const r = await fetch(`${API_BASE}/auth/email/request`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        });
+        await readJson(r, '发送验证码失败');
+        form.dataset.email = email;
+        emailEl.readOnly = true;
+        document.getElementById('code-row').hidden = false;
+        codeEl.required = true; codeEl.focus();
+        btn.dataset.step = 'verify'; btn.textContent = '登录 / 注册';
+        msg.textContent = '验证码已发送，10 分钟内有效'; msg.className = 'form-msg ok';
+      } else {
+        const r = await fetch(`${API_BASE}/auth/email/verify`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, code: codeEl.value.trim() }),
+        });
+        const d = await readJson(r, '验证码验证失败');
+        if (!d.token) throw new Error('验证失败：未收到登录凭证');
+        finishLogin(d.token, d.user);
+      }
+    } catch (err) {
+      msg.textContent = err.message; msg.className = 'form-msg err';
+      if (step === 'verify' && /请先请求验证码|验证码已过期/.test(err.message || '')) {
+        btn.dataset.step = 'request'; btn.textContent = '发送验证码';
+        codeEl.required = false; codeEl.value = '';
+        document.getElementById('code-row').hidden = true;
+        emailEl.readOnly = false; delete form.dataset.email;
+      }
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  // OAuth：回跳到本页以便处理 ?token=（同时保留 ext 标记）
+  document.querySelectorAll('.oauth-row button').forEach((b) => {
+    b.addEventListener('click', () => {
+      const back = new URL(location.origin + '/signup.html');
+      if (fromExt) back.searchParams.set('ext', '1');
+      if (redirect !== '/') back.searchParams.set('redirect', redirect);
+      const state = Math.random().toString(36).slice(2);
+      location.href = `${AUTH_BASE}/auth/${b.dataset.provider}?state=${state}&redirect=${encodeURIComponent(back.toString())}`;
+    });
+  });
+})();
+</script>
+</body>
+</html>

@@ -1018,15 +1018,10 @@
     const raw = localStorage.getItem('ailatest.unlocked');
     if (raw) Object.assign(unlockedCache, JSON.parse(raw));
   } catch (_) {}
-  // OAuth 跳转必须用 api 域名（第三方回调地址注册在 api.ailatest.org）。
-  const AUTH_BASE = (window.AILATEST_API_BASE
-    || (location.hostname === 'localhost' ? 'http://localhost:8787' : 'https://api.ailatest.org'));
-  // 数据请求优先走同域 /api（Worker 路由 journal.ailatest.org/api/*）：
-  // 与加载网页同一链路，免疫代理/DNS 对 api.* 子域的拦截，也无需 CORS 预检。
+  // API 和 OAuth 都继续使用 api.ailatest.org；Google/GitHub callback 已登记在这个域名。
   const API_BASE = (window.AILATEST_API_BASE
-    || (location.hostname === 'localhost' ? 'http://localhost:8787'
-      : /(^|\.)ailatest\.org$/.test(location.hostname) ? '/api'
-      : 'https://api.ailatest.org'));
+    || (location.hostname === 'localhost' ? 'http://localhost:8787' : 'https://api.ailatest.org'));
+  const AUTH_BASE = API_BASE;
 
   async function readJsonResponse(resp, fallback) {
     let data = null;

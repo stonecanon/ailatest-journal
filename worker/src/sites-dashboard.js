@@ -56,6 +56,7 @@ button.active,.btn.active{background:var(--accent);border-color:var(--accent);co
 <script>
 (function(){
   var API = location.origin;
+  var SITES_BASE = API + '/analytics/sites';
   var TOKEN_KEY='ailatest.dashboard.token';
   var app = document.getElementById('app');
   var logout = document.getElementById('logout');
@@ -511,12 +512,12 @@ button.active,.btn.active{background:var(--accent);border-color:var(--accent);co
     var sm = payload.site_monitoring || {};
     var sites = sm.sites || [];
     app.className = '';
-    app.innerHTML = '<div class="tabs">'+sites.map(function(s){return '<a class="btn" href="/analytics/sites/'+esc(s.id)+'?days='+activeDays+'">'+esc(s.label)+' · '+esc(s.host)+'</a>';}).join('')+'</div>'+
+    app.innerHTML = '<div class="tabs">'+sites.map(function(s){return '<a class="btn" href="'+SITES_BASE+'/'+esc(s.id)+'?days='+activeDays+'">'+esc(s.label)+' · '+esc(s.host)+'</a>';}).join('')+'</div>'+
       '<div class="banner">每个网站现在是独立运营页；默认只统计真人流量，Bot / AI / 搜索引擎可在站点页切换查看。</div>'+
       '<div class="grid">'+sites.map(function(s){
         var fp = (sm.first_party || {})[s.id] || {};
         var mix = fp.traffic_mix || {};
-        return '<a class="card" style="text-decoration:none;color:inherit" href="/analytics/sites/'+esc(s.id)+'?days='+activeDays+'">'+
+        return '<a class="card" style="text-decoration:none;color:inherit" href="'+SITES_BASE+'/'+esc(s.id)+'?days='+activeDays+'">'+
           '<div class="label">'+esc(s.host)+'</div><h2>'+esc(s.label)+'</h2>'+
           '<div class="metric">'+n((fp.totals || {}).pageviews)+'</div><div class="muted">真人 PV · '+n((fp.totals || {}).visitors)+' 访客 · '+n(mix.ai_agent || 0)+' AI Agent</div></a>';
       }).join('')+'</div>';
@@ -529,7 +530,7 @@ button.active,.btn.active{background:var(--accent);border-color:var(--accent);co
     var fp = (sm.first_party || {})[site.id] || {};
     var cf = ((sm.cloudflare || {}).sites || {})[site.id] || {};
     var ga = ((sm.google_analytics || {}).sites || {})[site.id] || {};
-    var tabs = '<a class="btn" href="/analytics/sites?days='+activeDays+'">总入口</a>'+sites.map(function(s){return '<a class="btn '+(s.id===activeSite?'active':'')+'" href="/analytics/sites/'+esc(s.id)+'?days='+activeDays+'&traffic='+encodeURIComponent(activeTraffic)+'">'+esc(s.label)+' · '+esc(s.host)+'</a>';}).join('');
+    var tabs = '<a class="btn" href="'+SITES_BASE+'?days='+activeDays+'">总入口</a>'+sites.map(function(s){return '<a class="btn '+(s.id===activeSite?'active':'')+'" href="'+SITES_BASE+'/'+esc(s.id)+'?days='+activeDays+'&traffic='+encodeURIComponent(activeTraffic)+'">'+esc(s.label)+' · '+esc(s.host)+'</a>';}).join('');
     var fpRows = (activeDays === 1 && fp.hourly && fp.hourly.length)
       ? fp.hourly.map(function(r){return { hour: r.hour_start_utc, pageviews:r.pageviews, visitors:r.visitors, sessions:r.sessions };})
       : fp.series || [];

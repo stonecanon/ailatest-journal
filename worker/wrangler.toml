@@ -10,6 +10,13 @@ routes = [
   { pattern = "journal.ailatest.org/api/*", zone_id = "435525fb783ba7bf4c686a9734e26124" }
 ]
 
+[triggers]
+crons = [
+  "*/15 * * * *",
+  # 00:12 Asia/Shanghai: finalize yesterday after GA/edge data has had time to settle.
+  "12 16 * * *"
+]
+
 [vars]
 GITHUB_CLIENT_ID = "Ov23liKY2We6M23yTMJV"
 GOOGLE_CLIENT_ID = "393406357932-4sqvlnbm296o5pj68o60i8o8k2ujgfov.apps.googleusercontent.com"
