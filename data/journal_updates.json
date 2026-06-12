@@ -1,6 +1,294 @@
 {
-  "updated_at": "2026-06-11T11:45:00+08:00",
+  "updated_at": "2026-06-12",
   "items": [
+    {
+      "id": "wos-on-hold-four-journals-2026-06-10",
+      "published_at": "2026-06-12",
+      "category": "warning",
+      "title": "4 本期刊新增标记为 WoS On Hold",
+      "summary": "LetPub 6 月 10 日文章整理了最新 On Hold 风险名单，其中正文明确列出 4 本新增标记期刊。站内已把这 4 本期刊加入 On Hold 列表。",
+      "source_name": "LetPub 微信公众号",
+      "source_url": "https://mp.weixin.qq.com/s/TzsmJKd-RfvYNz9lNW-0bw",
+      "publisher": "LetPub",
+      "journals": [
+        "Alexandria Engineering Journal",
+        "Applied and Computational Mathematics",
+        "Revue Roumaine des Sciences Techniques-Serie Electrotechnique et Energetique",
+        "TWMS Journal of Pure and Applied Mathematics"
+      ],
+      "tags": [
+        "On Hold",
+        "WoS风险",
+        "投稿风险",
+        "期刊预警"
+      ],
+      "priority": 5,
+      "image_url": "/icons/updates/wos-on-hold-four-journals-2026-06-10.jpg",
+      "detail_path": "/updates/wos-on-hold-four-journals-2026-06-10",
+      "detail": {
+        "image_url": "/icons/updates/wos-on-hold-four-journals-2026-06-10.jpg",
+        "dek": "这是一条投稿风险提醒。On Hold 表示期刊处于进一步审查或观察状态，不等同于已被剔除，但投稿前需要额外核查。",
+        "journal_links": [
+          {
+            "label": "Alexandria Engineering Journal",
+            "url": "/journal/alexandria-engineering-journal/",
+            "note": "已标记 On Hold"
+          },
+          {
+            "label": "Applied and Computational Mathematics",
+            "url": "/journal/applied-and-computational-mathematics/",
+            "note": "已标记 On Hold"
+          },
+          {
+            "label": "Revue Roumaine des Sciences Techniques-Serie Electrotechnique et Energetique",
+            "url": "/journal/revue-roumaine-des-sciences-techniques-serie-electrotechniqu/",
+            "note": "已标记 On Hold"
+          },
+          {
+            "label": "TWMS Journal of Pure and Applied Mathematics",
+            "url": "/journal/twms-journal-of-pure-and-applied-mathematics/",
+            "note": "已标记 On Hold"
+          }
+        ],
+        "source_links": [
+          {
+            "label": "微信原文（LetPub）",
+            "url": "https://mp.weixin.qq.com/s/TzsmJKd-RfvYNz9lNW-0bw"
+          },
+          {
+            "label": "Web of Science Master Journal List",
+            "url": "https://mjl.clarivate.com/"
+          }
+        ],
+        "article": {
+          "intro": [
+            "LetPub 6 月 10 日文章整理了仍处于 On Hold 状态的 SCI 等期刊名单，并在正文中列出 4 本新增标记期刊。站内已按这 4 本新增项更新 On Hold 列表。",
+            "需要注意，On Hold 完整名单通常不是 Clarivate 以一张公开总表直接发布。站内把该信息作为风险信号展示，投稿前仍建议到 Web of Science / Master Journal List、期刊官网和近期收录状态做二次核验。"
+          ],
+          "sections": [
+            {
+              "heading": "本次新增标记",
+              "bullets": [
+                "Alexandria Engineering Journal（1110-0168 / 2090-2670）",
+                "Applied and Computational Mathematics（1683-3511 / 1683-6154）",
+                "Revue Roumaine des Sciences Techniques-Serie Electrotechnique et Energetique（0035-4066）",
+                "TWMS Journal of Pure and Applied Mathematics（2076-2585 / 2219-1259）"
+              ]
+            },
+            {
+              "heading": "投稿建议",
+              "bullets": [
+                "短期内谨慎新投，尤其是对毕业、职称或项目结题有明确收录要求的稿件",
+                "若已投稿或已接收，应保留检索截图、期刊沟通记录和学校/单位认定规则",
+                "On Hold 不等同于正式剔除，后续可能恢复、继续观察或被移除，需要持续跟踪"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "journal-of-research-on-research-launch-2026",
+      "published_at": "2026-06-12",
+      "category": "new_journal",
+      "title": "Journal of Research on Research 正式启动",
+      "summary": "Taylor & Francis 组合中新上线 Journal of Research on Research，面向元研究、科研评价、研究治理和开放科学实践；Radboud 页面称期刊已开放投稿，前两年无 APC。",
+      "source_name": "Radboud University / Taylor & Francis",
+      "source_url": "https://www.ru.nl/en/about-us/news/launch-of-the-journal-of-research-on-research",
+      "publisher": "Taylor & Francis",
+      "journals": [
+        "Journal of Research on Research"
+      ],
+      "tags": [
+        "新刊",
+        "开放获取",
+        "元研究",
+        "科研评价"
+      ],
+      "priority": 5,
+      "image_url": "https://www.ru.nl/sites/default/files/styles/open_graph_image/public/2026-06/j-ror.png?itok=Ar938KxR",
+      "detail_path": "/updates/journal-of-research-on-research-launch-2026",
+      "detail": {
+        "image_url": "https://www.ru.nl/sites/default/files/styles/open_graph_image/public/2026-06/j-ror.png?itok=Ar938KxR",
+        "dek": "这是一条新刊启动信息，适合关注科研评价、元研究、研究治理和开放科学的作者查看。",
+        "journal_links": [
+          {
+            "label": "Journal of Research on Research",
+            "url": "/journal/journal-of-research-on-research/",
+            "note": "站内期刊页"
+          }
+        ],
+        "source_links": [
+          {
+            "label": "Radboud University 新闻",
+            "url": "https://www.ru.nl/en/about-us/news/launch-of-the-journal-of-research-on-research"
+          },
+          {
+            "label": "Taylor & Francis 期刊页",
+            "url": "https://www.tandfonline.com/journals/rror20/about-this-journal"
+          },
+          {
+            "label": "开刊社论 DOI",
+            "url": "https://doi.org/10.1080/30700485.2026.2523528"
+          }
+        ],
+        "article": {
+          "intro": [
+            "Journal of Research on Research（J·ROR）由 Taylor & Francis 出版，定位于研究过程、研究系统、科研文化、管理、治理和实践等主题。",
+            "Radboud University 的介绍称，该刊已开放投稿，知识产权由新成立的 Research on Research Association（RORATION）持有；期刊也将把开放同行评议作为实践实验的一部分。"
+          ],
+          "sections": [
+            {
+              "heading": "投稿相关信息",
+              "bullets": [
+                "Online ISSN: 3070-0485",
+                "期刊为开放获取连续出版模式",
+                "Radboud 页面称前两年不收取 APC；站内期刊数据暂不写版面费，后续以 DOAJ 或期刊公开字段复核",
+                "主题覆盖 scientometrics、STS、图书情报、高等教育、评价研究、元科学等方向"
+              ]
+            },
+            {
+              "heading": "使用提示",
+              "bullets": [
+                "这是新刊启动信息，不代表已被 Web of Science、Scopus 或 DOAJ 收录",
+                "适合作为元研究、科研评价和开放科学方向作者的备选关注对象"
+              ]
+            }
+          ],
+          "links": [
+            {
+              "label": "J·ROR 站内页",
+              "url": "/journal/journal-of-research-on-research/",
+              "note": "查看期刊数据"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "clarivate-2026-jcr-edition-webinar",
+      "published_at": "2026-06-12",
+      "category": "report",
+      "title": "Clarivate 预告 2026 Journal Citation Reports 更新",
+      "summary": "Clarivate 发布 2026 Journal Citation Reports webinar 页面，称将介绍 2026 版 JCR 的指标更新、期刊覆盖范围、出版与引用模式，以及 JIF 的负责任使用。",
+      "source_name": "Clarivate",
+      "source_url": "https://clarivate.com/academia-government/events/2026-journal-citation-reports-edition-mea/",
+      "publisher": "Clarivate",
+      "journals": [],
+      "tags": [
+        "JCR",
+        "Journal Citation Reports",
+        "影响因子",
+        "期刊指标"
+      ],
+      "priority": 4,
+      "detail_path": "/updates/clarivate-2026-jcr-edition-webinar",
+      "detail": {
+        "dek": "这不是 JCR 数据正式发布本身，而是 Clarivate 对 2026 版 JCR 的公开说明和培训预告。",
+        "source_links": [
+          {
+            "label": "Clarivate webinar 页面",
+            "url": "https://clarivate.com/academia-government/events/2026-journal-citation-reports-edition-mea/"
+          },
+          {
+            "label": "Journal Citation Reports 产品页",
+            "url": "https://clarivate.com/academia-government/scientific-and-academic-research/research-funding-analytics/journal-citation-reports/"
+          }
+        ],
+        "article": {
+          "intro": [
+            "Clarivate 页面显示，2026 Journal Citation Reports webinar 将于 2026 年 6 月 30 日举行，主题包括 2026 版 JCR 的关键指标更新、期刊覆盖范围，以及出版和引用模式变化。",
+            "页面同时强调，JCR 支持作者、编辑、图书馆员和科研管理人员进行期刊层面判断，并会涉及 Journal Impact Factor、开放获取信息和贡献者信息的负责任使用。"
+          ],
+          "sections": [
+            {
+              "heading": "站内处理建议",
+              "bullets": [
+                "当前作为“预告/观察”动态发布，不替代正式 JCR 数据更新",
+                "等 JCR 2026 数据正式可查后，再同步影响因子、分区或相关指标字段",
+                "选刊时仍应结合学科、收录状态、审稿周期、APC 和风险标签，而不是只看 JIF"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "nature-index-2026-research-leaders",
+      "published_at": "2026-06-11",
+      "category": "report",
+      "title": "自然指数再扩容：2026 科研领导者榜单发布",
+      "summary": "施普林格·自然 6 月 10 日升级自然指数（Nature Index）：扩大学科覆盖、改用按单篇文章的学科分类，并发布 2026 科研领导者榜单（基于 2025 全年数据）。新增 17 种应用科学期刊、1 种会议论文集与 15 种社会科学期刊，目前追踪 7 大学科领域 177 种期刊。中国继续居全球第一。",
+      "source_name": "施普林格自然集团",
+      "source_url": "https://mp.weixin.qq.com/s/Wz2bOiqSmnTV9RRkSJfIsA",
+      "publisher": "Springer Nature",
+      "journals": [],
+      "tags": [
+        "自然指数",
+        "Nature Index",
+        "科研领导者榜单",
+        "2026",
+        "施普林格自然"
+      ],
+      "priority": 6,
+      "image_url": "/icons/updates/nature-index-2026-leaders.jpg",
+      "detail": {
+        "image_url": "/icons/updates/nature-index-2026-leaders.jpg",
+        "dek": "自然指数扩容 + 编制方法升级，2026 科研领导者榜单出炉：中国继续居全球第一，东亚整体增速领先欧美。",
+        "source_links": [
+          {
+            "label": "微信原文（施普林格自然集团）",
+            "url": "https://mp.weixin.qq.com/s/Wz2bOiqSmnTV9RRkSJfIsA"
+          },
+          {
+            "label": "Nature Index 官方榜单",
+            "url": "https://www.nature.com/nature-index/research-leaders/"
+          },
+          {
+            "label": "Nature Index FAQ",
+            "url": "https://www.nature.com/nature-index/faq"
+          }
+        ],
+        "article": {
+          "intro": [
+            "施普林格·自然于 6 月 10 日对自然指数（Nature Index）进行升级：扩大学科覆盖范围、完善编制方法，并发布 2026 科研领导者榜单（Research Leaders，基于 2025 全年数据）。这是该数据库自 2014 年推出以来的又一次重要扩展。",
+            "本次首次纳入 17 种应用科学期刊、1 种会议论文集与 15 种社会科学期刊（通过对 4000 多名科研人员的全球调查选出）。目前自然指数追踪 7 大学科领域共 177 种期刊与 1 种会议论文集，其中约 84% 非由施普林格·自然出版。方法上改为按单篇文章做学科分类，而非按期刊整体领域划分。"
+          ],
+          "sections": [
+            {
+              "heading": "国家 / 地区",
+              "bullets": [
+                "中国继续位居全球第一，2024→2025 科研产出增长 22.4%，是全球十强中唯一两位数增长的国家",
+                "全球十强：中国、美国、德国、英国、日本、法国、韩国、印度、加拿大、意大利",
+                "中国在 7 大领域中 5 个排第一（物理、化学、生物科学、应用科学、地球与环境科学）；美国在健康科学与社会科学居首",
+                "东亚整体增速超过欧洲与北美，日本、韩国增幅均接近 10%"
+              ]
+            },
+            {
+              "heading": "机构",
+              "bullets": [
+                "中国科学院整体排名第一；全球十强机构中 9 家来自中国，浙江大学升至全球第 2",
+                "全球十强机构：中国科学院、浙江大学、哈佛大学、清华大学、上海交通大学、中国科学技术大学、北京大学、中国科学院大学、南京大学、四川大学"
+              ]
+            },
+            {
+              "heading": "AILatest 点评",
+              "bullets": [
+                "自然指数官方亦提示：不应单独使用其指标评估机构或个人，需结合数据、软件、知识产权等多维产出综合判断。",
+                "对单篇投稿选刊的直接参考有限——它衡量的是「高质量产出规模」，与单刊的影响因子 / 分区是不同维度。"
+              ]
+            }
+          ],
+          "links": [
+            {
+              "label": "Nature Index 科研领导者榜单",
+              "url": "https://www.nature.com/nature-index/research-leaders/"
+            }
+          ]
+        }
+      },
+      "detail_path": "/updates/nature-index-2026-research-leaders"
+    },
     {
       "id": "elsevier-advanced-biosensors-launch-2026",
       "published_at": "2026-06-11",
@@ -192,45 +480,6 @@
         }
       },
       "detail_path": "/updates/doaj-new-journals-2026-06-10"
-    },
-    {
-      "id": "scholarly-kitchen-scholar-ready-ai-2026",
-      "published_at": "2026-06-10",
-      "category": "report",
-      "title": "The Scholarly Kitchen 讨论学术出版中的 AI 检索基础设施",
-      "summary": "The Scholarly Kitchen 访谈讨论 AI 检索、来源可信度和学术出版基础设施。重点在于权威内容如何进入 AI 驱动的研究工作流。",
-      "source_name": "The Scholarly Kitchen",
-      "source_url": "https://scholarlykitchen.sspnet.org/2026/06/10/building-scholar-ready-ai/",
-      "publisher": "Society for Scholarly Publishing",
-      "journals": [],
-      "tags": [
-        "AI",
-        "学术出版",
-        "出版基础设施",
-        "研究工作流"
-      ],
-      "priority": 3,
-      "image_url": "https://scholarlykitchen.sspnet.org/wp-content/uploads/2026/06/iStock-1161949872.jpg",
-      "detail": {
-        "image_url": "https://scholarlykitchen.sspnet.org/wp-content/uploads/2026/06/iStock-1161949872.jpg",
-        "dek": "一条关于 AI 与学术出版基础设施的行业观察，适合作为期刊平台和内容可信度议题的背景材料。",
-        "article": {
-          "intro": [
-            "访谈围绕 AI 检索、来源出处、权威内容供给和出版商基础设施展开。对期刊平台而言，核心问题是如何让经过编辑、同行评议和元数据整理的内容在 AI 工作流中保持可追溯。"
-          ],
-          "sections": [
-            {
-              "heading": "关键点",
-              "bullets": [
-                "AI 检索需要可靠来源和清晰出处。",
-                "出版社与平台的角色不只是发布 PDF，还包括维护元数据、许可、内容结构和可信访问。",
-                "对作者和读者而言，未来的发现路径可能更多发生在 AI 辅助工具中。"
-              ]
-            }
-          ]
-        }
-      },
-      "detail_path": "/updates/scholarly-kitchen-scholar-ready-ai-2026"
     },
     {
       "id": "global-oa-publishing-ten-questions-2026",
@@ -431,6 +680,45 @@
           ]
         }
       }
+    },
+    {
+      "id": "scholarly-kitchen-scholar-ready-ai-2026",
+      "published_at": "2026-06-10",
+      "category": "report",
+      "title": "The Scholarly Kitchen 讨论学术出版中的 AI 检索基础设施",
+      "summary": "The Scholarly Kitchen 访谈讨论 AI 检索、来源可信度和学术出版基础设施。重点在于权威内容如何进入 AI 驱动的研究工作流。",
+      "source_name": "The Scholarly Kitchen",
+      "source_url": "https://scholarlykitchen.sspnet.org/2026/06/10/building-scholar-ready-ai/",
+      "publisher": "Society for Scholarly Publishing",
+      "journals": [],
+      "tags": [
+        "AI",
+        "学术出版",
+        "出版基础设施",
+        "研究工作流"
+      ],
+      "priority": 3,
+      "image_url": "https://scholarlykitchen.sspnet.org/wp-content/uploads/2026/06/iStock-1161949872.jpg",
+      "detail": {
+        "image_url": "https://scholarlykitchen.sspnet.org/wp-content/uploads/2026/06/iStock-1161949872.jpg",
+        "dek": "一条关于 AI 与学术出版基础设施的行业观察，适合作为期刊平台和内容可信度议题的背景材料。",
+        "article": {
+          "intro": [
+            "访谈围绕 AI 检索、来源出处、权威内容供给和出版商基础设施展开。对期刊平台而言，核心问题是如何让经过编辑、同行评议和元数据整理的内容在 AI 工作流中保持可追溯。"
+          ],
+          "sections": [
+            {
+              "heading": "关键点",
+              "bullets": [
+                "AI 检索需要可靠来源和清晰出处。",
+                "出版社与平台的角色不只是发布 PDF，还包括维护元数据、许可、内容结构和可信访问。",
+                "对作者和读者而言，未来的发现路径可能更多发生在 AI 辅助工具中。"
+              ]
+            }
+          ]
+        }
+      },
+      "detail_path": "/updates/scholarly-kitchen-scholar-ready-ai-2026"
     },
     {
       "id": "springer-nature-society-partner-newsletter-epic-2026",
