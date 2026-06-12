@@ -2145,6 +2145,9 @@
     const license = doaj.lic || doaj.license || '';
     return `<span class="badge b-doaj" title="${T('DOAJ 开放获取期刊目录','Directory of Open Access Journals')}${license ? ' · ' + escape(license) : ''}">DOAJ</span>`;
   }
+  function badgeNatureIndex() {
+    return `<span class="badge b-nature-index" title="${T('Nature Index 追踪出版物','Tracked by Nature Index')}">Nature Index</span>`;
+  }
   function badgeMEDLINE(m) {
     if (!m) return '';
     return `<span class="badge b-medline" title="${T('MEDLINE 数据库收录（NLM 精选索引）','Indexed in MEDLINE (NLM curated)')}">MEDLINE</span>`;
@@ -2364,6 +2367,7 @@
     if (!r) return '';
     return [
       badgeFlagship(r.flagship),
+      r.nature_index ? badgeNatureIndex() : '',
       ...((r.indices) || []).map(badgeIndex),
       badgeScopus(r.scopus),
 	      badgeOAJ(r.oaj),
@@ -2420,9 +2424,10 @@
     if (nk && domIndex.byName[nk]) hits.push(...domIndex.byName[nk]);
     const ik = (r.issn || r.cn_code || '').toUpperCase();
     if (ik && domIndex.byIssn[ik]) hits.push(...domIndex.byIssn[ik]);
-    // dedupe by source
+    // dedupe by source + discipline (CAST journals span multiple disciplines;
+    // keep each distinct discipline so badges read e.g. 科协建筑 / 科协机械).
     const seen = new Set();
-    return hits.filter(h => { const k = h.source + ':' + (h.tag||''); if (seen.has(k)) return false; seen.add(k); return true; });
+    return hits.filter(h => { const k = h.source + ':' + (h.domain || h.tag || ''); if (seen.has(k)) return false; seen.add(k); return true; });
   }
   function buildDomIndex(d) {
     if (!d) return;
@@ -2439,8 +2444,9 @@
     // 中国科协 高质量科技期刊分级目录 (2025-12 修订, 11084 条)
     ((d.cnkx && d.cnkx.records)||[]).forEach(r => {
       if (!r.tier || !/^T[123]$/.test(r.tier)) return;
-      addDomIndex(r.name, 'name', { source:'cnkx', label:T('科协','CAST')+' '+r.tier, tag:r.tier, domain:r.domain });
-      if (r.issn) addDomIndex(r.issn, 'issn', { source:'cnkx', label:T('科协','CAST')+' '+r.tier, tag:r.tier, domain:r.domain });
+      const cnkxLabel = castLabel(r.domain, r.tier);
+      addDomIndex(r.name, 'name', { source:'cnkx', label:cnkxLabel, tag:r.tier, domain:r.domain });
+      if (r.issn) addDomIndex(r.issn, 'issn', { source:'cnkx', label:cnkxLabel, tag:r.tier, domain:r.domain });
     });
     ((d.nsfc_mgmt && d.nsfc_mgmt.records)||[]).forEach(r => {
       addDomIndex(r.name, 'name', { source:'nsfc_mgmt', label:'NSFC '+r.tier, tag:r.tier, domain:T('管理科学部','Management Science') });
@@ -2456,10 +2462,44 @@
     });
     // Note: cnki_major（中文期刊目录）是基础库，不参与交叉收录徽章
   }
+  // CAST discipline shown on the badge, e.g. 建筑领域 → 建筑, 临床医学 → 临床医学.
+  function castDiscipline(domain) {
+    const d = tn(domain, 'domain') || '';
+    return d.replace(/领域$/, '').replace(/\s*(field|area)$/i, '').trim();
+  }
+  // Badge label: 科协 + discipline (falls back to 科协 + tier if no discipline).
+  function castLabel(domain, tier) {
+    const disc = castDiscipline(domain);
+    return disc ? `${T('科协','CAST')}${lang === 'en' ? ' ' : ''}${disc}` : `${T('科协','CAST')} ${tier || ''}`.trim();
+  }
   function renderDomCrossBadges(r, excludeSource) {
     const hits = lookupDom(r).filter(h => h.source !== excludeSource);
     if (!hits.length) return '';
-    return hits.map(h => `<span class="domsrc-pill ds-${h.source}" title="${escape(h.domain||h.discipline||h.category||h.org||'')}">${escape(h.label)}</span>`).join('');
+    const out = [];
+    const castHits = [];
+    for (const h of hits) {
+      if (h.source === 'cnkx') { castHits.push(h); continue; }
+      out.push(`<span class="domsrc-pill ds-${h.source}" title="${escape(h.domain||h.discipline||h.category||h.org||'')}">${escape(h.label)}</span>`);
+    }
+    // CAST: label by discipline (科协建筑) instead of bare tier (科协 T1); cap to keep rows tidy.
+    const CAST_MAX = 3;
+    const castSeen = new Set();
+    const castShown = [];
+    for (const h of castHits) {
+      const label = h.label || castLabel(h.domain, h.tag);
+      if (castSeen.has(label)) continue;
+      castSeen.add(label);
+      castShown.push({ label, tier: h.tag || '', domain: tn(h.domain, 'domain') || '' });
+    }
+    castShown.slice(0, CAST_MAX).forEach(c => {
+      const title = `${T('中国科协','CAST')}${c.tier ? ' ' + c.tier : ''}${c.domain ? ' · ' + c.domain : ''}`;
+      out.push(`<span class="domsrc-pill ds-cnkx" title="${escape(title)}">${escape(c.label)}</span>`);
+    });
+    if (castShown.length > CAST_MAX) {
+      const rest = castShown.slice(CAST_MAX).map(c => c.label.replace(new RegExp('^' + T('科协','CAST') + '\\s?'), '')).join('、');
+      out.push(`<span class="domsrc-pill ds-cnkx" title="${escape(T('中国科协还收录于：','Also in CAST: ') + rest)}">${T('科协','CAST')}+${castShown.length - CAST_MAX}</span>`);
+    }
+    return out.join('');
   }
 
   // 通用中文期刊行渲染
@@ -7607,7 +7647,7 @@
               favsData[id] = { ...favsData[id], name: newName, cn_name: live.cn_name,
                 en_name: live.en_name, abbr20: live.abbr20, if_2024: live.if_2024,
                 cas_zone: live.cas_zone, cas_top: live.cas_top, indices: live.indices,
-                flagship: live.flagship, esi_category: live.esi_category,
+                flagship: live.flagship, nature_index: live.nature_index, esi_category: live.esi_category,
                 if_quartile: live.if_quartile, publisher: live.publisher, ccf: live.ccf,
                 scopus: live.scopus, warning: live.warning, under_review: live.under_review, on_hold: live.on_hold, citic_warning: live.citic_warning,
               };
