@@ -43,6 +43,12 @@ def load(name):
         return json.load(f)
 
 
+def source_generated_at():
+    sources = [DATA / "journals.json", DATA / "domestic.json", DATA / "cscd_journals.json"]
+    latest = max(p.stat().st_mtime for p in sources if p.exists())
+    return datetime.fromtimestamp(latest, timezone.utc).isoformat()
+
+
 def records(obj):
     if isinstance(obj, list):
         return obj
@@ -174,13 +180,14 @@ def main():
             arr.append({"tier": tier, "domain": r.get("domain", "")})
 
     payload = {
-        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_at": source_generated_at(),
         "count": len(out),
         "journals": out,
     }
     raw = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
-    with gzip.open(OUT, "wb") as f:
-        f.write(raw)
+    with open(OUT, "wb") as raw_out:
+        with gzip.GzipFile(filename="", mode="wb", fileobj=raw_out, mtime=0) as f:
+            f.write(raw)
     print(f"wrote {OUT} — {len(out)} journals, {OUT.stat().st_size/1024/1024:.1f} MB gz")
     # quick stats
     def cnt(k):

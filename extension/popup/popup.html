@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AILatest</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <main class="panel">
+    <header>
+      <img src="../assets/icon-48.png" alt="" width="32" height="32">
+      <div>
+        <h1>AILatest</h1>
+        <p>期刊徽章</p>
+      </div>
+    </header>
+
+    <section class="settings" aria-label="徽章显示设置">
+      <label><input type="checkbox" data-setting="showCas"> 中科院分区</label>
+      <label><input type="checkbox" data-setting="showJcr"> JCR 分区</label>
+      <label><input type="checkbox" data-setting="showIf"> 影响因子</label>
+      <label><input type="checkbox" data-setting="showCcf"> CCF</label>
+      <label><input type="checkbox" data-setting="showBusiness"> ABS / ABDC</label>
+      <label><input type="checkbox" data-setting="showDomestic"> 国内目录</label>
+      <label><input type="checkbox" data-setting="showIndex"> 收录索引</label>
+      <label><input type="checkbox" data-setting="showWarnings"> 预警状态</label>
+      <label><input type="checkbox" data-setting="showFree"> 免费发表</label>
+    </section>
+
+    <footer>
+      <a href="https://journal.ailatest.org/" target="_blank" rel="noopener noreferrer">打开 AILatest Journal</a>
+    </footer>
+  </main>
+  <script src="../src/norm.js"></script>
+  <script src="../src/lookup.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+{
+  "manifest_version": 3,
+  "name": "AILatest Journal Badges",
+  "description": "Show AILatest journal ranking badges on academic search and detail pages.",
+  "version": "0.1.0",
+  "icons": {
+    "16": "assets/icon-16.png",
+    "48": "assets/icon-48.png",
+    "128": "assets/icon-128.png"
+  },
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://journal.ailatest.org/*",
+    "https://api.ailatest.org/*"
+  ],
+  "action": {
+    "default_title": "AILatest",
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "assets/icon-16.png",
+      "48": "assets/icon-48.png",
+      "128": "assets/icon-128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.cnki.net/*",
+        "http://*.cnki.net/*",
+        "https://scholar.google.com/*",
+        "https://scholar.google.com.hk/*",
+        "https://scholar.google.co.jp/*",
+        "https://scholar.google.co.uk/*",
+        "https://scholar.google.de/*"
+      ],
+      "js": [
+        "src/norm.js",
+        "src/lookup.js",
+        "src/badges.js",
+        "src/adapters/cnki.js",
+        "src/adapters/googleScholar.js",
+        "src/adapters/index.js",
+        "src/content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}
