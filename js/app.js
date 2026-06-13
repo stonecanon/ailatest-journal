@@ -2185,18 +2185,36 @@
     if (!best) return '';
     const count = Array.isArray(vhb) ? vhb.length : 1;
     const area = best.area_code || best.area || '';
-    return `<span class="zone vhb-tier" title="${T('VHB Rating 2024，按领域评级','VHB Rating 2024, area rating')}${area ? ' · ' + escape(area) : ''}${count > 1 ? ` · ${count}${T(' 个领域',' areas')}` : ''}">VHB ${escape(best.rating)}</span>`;
+    const title = [
+      T('VHB-JOURQUAL 2024 德语区商科/管理期刊分级；B = 良好/认可级','VHB-JOURQUAL 2024 business/management journal rating; B = good/recognized tier'),
+      area,
+      count > 1 ? `${count}${T(' 个领域命中，已合并显示最高等级',' matched areas, merged to the best rating')}` : '',
+    ].filter(Boolean).join(' · ');
+    return `<span class="zone vhb-tier" title="${escape(title)}">VHB ${escape(best.rating)}</span>`;
   }
   function badgeCNRS(cnrs) {
     const arr = Array.isArray(cnrs) ? cnrs : [];
     const first = arr[0];
     if (!first) return '';
-    return `<span class="zone cnrs-tier" title="${T('CNRS Section 37 2020 历史参考','CNRS Section 37 2020 historical reference')}${first.domain ? ' · ' + escape(first.domain) : ''}">CNRS ${escape(first.category || '')}</span>`;
+    const cat = first.category || '';
+    const title = [
+      T('法国 CNRS Section 37 经济/管理期刊分级，2020 历史参考；1 = 高等级','French CNRS Section 37 economics/management journal rating, 2020 historical reference; 1 = high tier'),
+      first.domain || '',
+    ].filter(Boolean).join(' · ');
+    return `<span class="zone cnrs-tier" title="${escape(title)}">${T('CNRS ','CNRS ')}${escape(cat)}${lang === 'en' ? '' : '级'}</span>`;
   }
   function badgeRetraction(ret) {
     if (!ret || !ret.retractions_total) return '';
-    const rate = ret.rate_per_1000_10y != null ? `${ret.rate_per_1000_10y}/1000` : '';
-    return `<span class="warn-pill retraction-pill" title="${T('Retraction Watch 撤稿记录；用于风险提示，不作排名','Retraction Watch records; caution metric, not ranking')}${rate ? ' · 10y ' + rate : ''}">RW ${escape(ret.retractions_total)}</span>`;
+    const total = Number(ret.retractions_total || 0);
+    const recent = Number(ret.retractions_10y || ret.retractions_last_10y || 0);
+    const rate = ret.rate_per_1000_10y != null ? Number(ret.rate_per_1000_10y) : null;
+    const rateText = Number.isFinite(rate) ? `${rate}/1000` : '';
+    const detail = [
+      T('Retraction Watch 撤稿记录；风险提示，不作排名','Retraction Watch records; caution metric, not ranking'),
+      recent ? T(`近10年 ${recent} 篇`,`last 10y ${recent}`) : '',
+      rateText ? T(`近10年每千篇约 ${rateText}`,`last 10y about ${rateText}`) : '',
+    ].filter(Boolean).join(' · ');
+    return `<span class="warn-pill retraction-pill" title="${escape(detail)}">${T('撤稿','Retracted')} ${escape(total)}</span>`;
   }
   function badgePubMed(pubmed) {
     return pubmed ? `<span class="badge b-pubmed" title="${T('PubMed 可检索','Searchable in PubMed')}">PubMed</span>` : '';
@@ -2234,7 +2252,7 @@
   async function reportJournalView(recOrKey, opts = {}) {
     const key = typeof recOrKey === 'string' ? recOrKey : favId(recOrKey);
     if (!key) return;
-    const detailPath = typeof recOrKey === 'string' ? analyticsPath() : journalPublicPath(recOrKey);
+    const detailPath = opts.path || (typeof recOrKey === 'string' ? analyticsPath() : journalPublicPath(recOrKey));
     const source = journalOpenSource(opts);
     try {
       const r = await fetch(`${API_BASE}/journal-view`, {
@@ -2247,9 +2265,9 @@
           event_id: crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`,
           event_time: Math.floor(Date.now() / 1000),
           journal_key: key,
-          journal_name: typeof recOrKey === 'string' ? '' : (recOrKey.name || recOrKey.cn_name || recOrKey.title || ''),
+          journal_name: opts.journal_name || (typeof recOrKey === 'string' ? '' : (recOrKey.name || recOrKey.cn_name || recOrKey.title || '')),
           view_source: source,
-          tab: activeTab || '',
+          tab: opts.tab || activeTab || '',
           query: activeQuery || '',
           visitor_id: getAnalyticsId('ailatest.analytics.visitor', localStorage),
           session_id: getAnalyticsId('ailatest.analytics.session', sessionStorage, 30 * 60 * 1000),
@@ -2270,6 +2288,9 @@
           const txt = n >= 1000 ? (n/1000).toFixed(1) + 'k' : String(n);
           el.textContent = (lang === 'en' ? '👁 ' : '👁 ') + txt + (lang === 'en' ? ' views' : ' 次浏览');
         }
+        document.querySelectorAll(`[data-update-views="${cssAttrValue(key)}"]`).forEach(node => {
+          node.textContent = formatViewText(d.count);
+        });
       }
     } catch (_) {}
   }
@@ -2281,6 +2302,15 @@
       const d = await r.json().catch(() => null);
       if (d && d.views) for (const k in d.views) viewsCache[k] = d.views[k];
     } catch (_) {}
+  }
+  function formatViewText(n) {
+    const v = Number(n || 0);
+    const txt = v >= 1000 ? (v / 1000).toFixed(1) + 'k' : String(v);
+    return lang === 'en' ? `👁 ${txt} views` : `👁 ${txt} 次浏览`;
+  }
+  function cssAttrValue(value) {
+    if (window.CSS && typeof CSS.escape === 'function') return CSS.escape(value);
+    return String(value).replace(/["\\]/g, '\\$&');
   }
   const ASJC_TOP_CN = {
     'Life Sciences': '生命科学',
@@ -2547,10 +2577,15 @@
     if (nk && domIndex.byName[nk]) hits.push(...domIndex.byName[nk]);
     const ik = (r.issn || r.cn_code || '').toUpperCase();
     if (ik && domIndex.byIssn[ik]) hits.push(...domIndex.byIssn[ik]);
-    // dedupe by source + discipline (CAST journals span multiple disciplines;
-    // keep each distinct discipline so badges read e.g. 科协建筑 / 科协机械).
+    // Dedupe by source + visible label. CAST journals span multiple disciplines,
+    // and VHB/CNRS can match several areas with the same visible rating.
     const seen = new Set();
-    return hits.filter(h => { const k = h.source + ':' + (h.domain || h.tag || ''); if (seen.has(k)) return false; seen.add(k); return true; });
+    return hits.filter(h => {
+      const k = [h.source, h.label || h.tag || '', h.domain || h.discipline || h.category || h.org || ''].join(':');
+      if (seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    });
   }
   function buildDomIndex(d) {
     if (!d) return;
@@ -2632,18 +2667,34 @@
   // Badge label: 科协 + discipline (falls back to 科协 + tier if no discipline).
   function castLabel(domain, tier) {
     const disc = castDiscipline(domain);
-    return disc ? `${T('科协','CAST')}${lang === 'en' ? ' ' : ''}${disc}` : `${T('科协','CAST')} ${tier || ''}`.trim();
+    const parts = [T('科协','CAST')];
+    if (disc) parts.push(disc);
+    if (tier) parts.push(tier);
+    return parts.join(lang === 'en' ? ' ' : ' ');
   }
   function renderDomCrossBadges(r, excludeSource) {
     const hits = lookupDom(r).filter(h => h.source !== excludeSource);
     if (!hits.length) return '';
     const out = [];
     const castHits = [];
+    const visible = new Map();
     for (const h of hits) {
       if (h.source === 'cnkx') { castHits.push(h); continue; }
-      out.push(`<span class="domsrc-pill ds-${h.source}" title="${escape(h.domain||h.discipline||h.category||h.org||'')}">${escape(h.label)}</span>`);
+      const label = h.label || '';
+      if (!label) continue;
+      const key = h.source + ':' + label;
+      const note = h.domain || h.discipline || h.category || h.org || '';
+      if (!visible.has(key)) {
+        visible.set(key, { source: h.source, label, notes: [] });
+      }
+      if (note && !visible.get(key).notes.includes(note)) visible.get(key).notes.push(note);
     }
-    // CAST: label by discipline (科协建筑) instead of bare tier (科协 T1).
+    visible.forEach(item => {
+      const suffix = item.notes.length > 1 ? ` · ${item.notes.length}${T(' 个领域',' areas')}` : '';
+      const title = item.notes.join(' · ') + suffix;
+      out.push(`<span class="domsrc-pill ds-${item.source}" title="${escape(title)}">${escape(item.label)}</span>`);
+    });
+    // CAST: keep discipline and tier visible, e.g. 科协 地理资源 T1.
     const castSeen = new Set();
     const castShown = [];
     for (const h of castHits) {
@@ -3454,19 +3505,7 @@
             <th class="col-fav" aria-label="Favorite"></th><th class="col-name">${T('期刊名称','Journal')}</th><th>${T('收录索引','Indices')}</th><th style="width:110px">ISSN</th><th style="width:100px">CN</th><th style="width:110px">${T('学科分类','Category')}</th>
           </tr></thead><tbody>
           ${list.slice(0, 200).map(r => {
-            const hits = lookupDom(r);
-            const badges = [
-              ...hits.filter(h => h.source === 'cssci').map(() => `<span class="domsrc-pill ds-cssci">CSSCI</span>`),
-              ...hits.filter(h => h.source === 'cssci_ext').map(() => `<span class="domsrc-pill ds-cssci-ext">${T('CSSCI 扩展','CSSCI Ext')}</span>`),
-              ...hits.filter(h => h.source === 'pku').map(() => `<span class="domsrc-pill ds-pku">${T('北大核心','PKU Core')}</span>`),
-              ...hits.filter(h => h.source === 'ccft').map(h => `<span class="domsrc-pill ds-ccft">CCF-${h.tag||'T'}</span>`),
-              ...hits.filter(h => h.source === 'zju').map(h => `<span class="domsrc-pill ds-zju">${escape(h.label)}</span>`),
-              ...hits.filter(h => h.source === 'school_a').map(h => `<span class="domsrc-pill ds-school-a">${escape(h.label)}</span>`),
-              ...hits.filter(h => h.source === 'nsfc_mgmt').map(h => `<span class="domsrc-pill ds-nsfc_mgmt">${escape(h.label)}</span>`),
-              ...hits.filter(h => h.source === 'cscd').map(h => `<span class="domsrc-pill ds-cscd">${escape(h.label)}</span>`),
-              ...hits.filter(h => h.source === 'cstpcd').map(h => `<span class="domsrc-pill ds-cstpcd">${escape(h.label)}</span>`),
-              ...hits.filter(h => h.source.startsWith('cnkx')).map(h => `<span class="domsrc-pill ds-cnkx">${escape(h.label)}</span>`),
-            ].filter(Boolean).join('');
+            const badges = renderDomCrossBadges(r);
             return `<tr class="j-row clickable" data-fid="${escape(favId(r))}" data-src="cnki_major">
               <td style="width:36px">${starBtn(r, 'cnki_major')}</td>
               <td class="jname" style="font-size:13.5px">${escape(r.name||'')}</td>
@@ -3919,16 +3958,7 @@
       const rows = visible.map(r => {
         const fid = favId(r);
         rowRecordsByFid[fid] = { ...r, __src: 'cnkx' };
-        const hits = lookupDom(r);
-        const badges = [
-          ...hits.filter(h => h.source.startsWith('cnkx')).map(h => `<span class="domsrc-pill ds-cnkx">${escape(h.label)}</span>`),
-          ...hits.filter(h => h.source === 'cssci').map(() => `<span class="domsrc-pill ds-cssci">CSSCI</span>`),
-          ...hits.filter(h => h.source === 'pku').map(() => `<span class="domsrc-pill ds-pku">${T('北大核心','PKU Core')}</span>`),
-          ...hits.filter(h => h.source === 'ccft').map(h => `<span class="domsrc-pill ds-ccft">CCF-${h.tag||'T'}</span>`),
-          ...hits.filter(h => h.source === 'nsfc_mgmt').map(h => `<span class="domsrc-pill ds-nsfc_mgmt">${escape(h.label)}</span>`),
-          ...hits.filter(h => h.source === 'cscd').map(h => `<span class="domsrc-pill ds-cscd">${escape(h.label)}</span>`),
-          ...hits.filter(h => h.source === 'cstpcd').map(h => `<span class="domsrc-pill ds-cstpcd">${escape(h.label)}</span>`),
-        ].filter(Boolean).join('');
+        const badges = renderDomCrossBadges(r);
         const subVal = r.subdomain ? tn(r.subdomain, 'sub') : '—';
         return `<tr class="j-row clickable" data-fid="${escape(fid)}" data-src="cnkx">
           <td class="col-fav" style="width:36px">${starBtn(r, 'cnkx')}</td>
@@ -4095,20 +4125,7 @@
       const rows = visible.map(r => {
         const fid = favId(r);
         rowRecordsByFid[fid] = { ...r, __src: 'cnki_major' };
-        // 查询交叉收录徽章（CSSCI/北大核心/CCF）
-        const hits = lookupDom(r);
-        const badges = [
-          ...hits.filter(h => h.source === 'cssci').map(() => `<span class="domsrc-pill ds-cssci">CSSCI</span>`),
-          ...hits.filter(h => h.source === 'cssci_ext').map(() => `<span class="domsrc-pill ds-cssci-ext">${T('CSSCI 扩展','CSSCI Ext')}</span>`),
-          ...hits.filter(h => h.source === 'pku').map(() => `<span class="domsrc-pill ds-pku">${T('北大核心','PKU Core')}</span>`),
-          ...hits.filter(h => h.source === 'ccft').map(h => `<span class="domsrc-pill ds-ccft" title="${escape(h.org||'')}">CCF-${h.tag||'T'}</span>`),
-          ...hits.filter(h => h.source === 'zju').map(h => `<span class="domsrc-pill ds-zju">${escape(h.label)}</span>`),
-          ...hits.filter(h => h.source === 'school_a').map(h => `<span class="domsrc-pill ds-school-a">${escape(h.label)}</span>`),
-          ...hits.filter(h => h.source === 'nsfc_mgmt').map(h => `<span class="domsrc-pill ds-nsfc_mgmt">${escape(h.label)}</span>`),
-          ...hits.filter(h => h.source === 'cscd').map(h => `<span class="domsrc-pill ds-cscd">${escape(h.label)}</span>`),
-          ...hits.filter(h => h.source === 'cstpcd').map(h => `<span class="domsrc-pill ds-cstpcd">${escape(h.label)}</span>`),
-          ...hits.filter(h => h.source.startsWith('cnkx')).map(h => `<span class="domsrc-pill ds-cnkx">${escape(h.label)}</span>`),
-        ].filter(Boolean).join('');
+        const badges = renderDomCrossBadges(r);
         const name = r.name || '';
         const isnCell = r.issn ? `<span class="jissn">${escape(r.issn)}</span>` : (r.cn_code ? `<span class="jissn">${escape(r.cn_code)}</span>` : '<span class="muted-cell">—</span>');
         const displayCats = (r.major_categories || []).length ? r.major_categories : (r.categories || []);
@@ -6422,6 +6439,22 @@
       return item.id ? `/updates/${encodeURIComponent(item.id)}` : '';
     }
 
+    function updateViewKey(item) {
+      const id = String(item && (item.id || item.detail_path || item.title) || '').trim();
+      return id ? `update:${id}` : '';
+    }
+
+    async function hydrateUpdateViews(items) {
+      const keys = (items || []).map(updateViewKey).filter(Boolean);
+      if (!keys.length) return;
+      await fetchJournalViews(keys);
+      keys.forEach(key => {
+        document.querySelectorAll(`[data-update-views="${cssAttrValue(key)}"]`).forEach(node => {
+          node.textContent = formatViewText(viewsCache[key] || 0);
+        });
+      });
+    }
+
     function updateDetailItemFromPath() {
       const slug = updateDetailSlugFromPath();
       if (!slug) return null;
@@ -6567,6 +6600,8 @@
       const journalLinks = updateLinkList(detail.journal_links || []);
       const reportUrl = report.file_detail_url || report.view_url || report.pdf_url || '';
       const pdfUrl = report.pdf_url || report.download_url || report.view_url || '';
+      const viewKey = updateViewKey(item);
+      const viewText = formatViewText(viewsCache[viewKey] || 0);
       box.innerHTML = `
         <article class="update-detail">
           <a class="updates-back" href="/updates" data-updates-back>← ${escape(t('updates_view_all'))}</a>
@@ -6581,6 +6616,7 @@
             <div class="update-detail-meta">
               <span>${escape(t('updates_source'))}: ${escape(sourceName)}</span>
               ${item.publisher ? `<span>${escape(item.publisher)}</span>` : ''}
+              ${viewKey ? `<span data-update-views="${escape(viewKey)}">${escape(viewText)}</span>` : ''}
               <span class="update-tags">${tags}</span>
             </div>
             ${sourceLinks.length ? renderUpdateLinks(sourceLinks, 'update-source-actions') : ''}
@@ -6623,6 +6659,14 @@
         renderJournalUpdates();
         updatePageSeo('updates');
       });
+      if (viewKey) {
+        reportJournalView(viewKey, {
+          source: 'journal_update_detail',
+          path: updateDetailPath(item),
+          journal_name: item.title || '',
+          tab: 'updates',
+        });
+      }
     }
 
     // Monogram for the no-image banner: leading letters of an ASCII source, else first CJK chars.
@@ -6653,6 +6697,8 @@
       const dateHtml = item.published_at ? `<time datetime="${escape(item.published_at)}">${escape(formatUpdateDate(item.published_at))}</time>` : '';
       const sourceName = item.source_name || item.publisher || t('updates_source');
       const imageUrl = item.image_url || item.detail?.image_url || '';
+      const viewKey = updateViewKey(item);
+      const viewText = formatViewText(viewsCache[viewKey] || 0);
       const body = `
         ${updateCardBanner(item, imageUrl, sourceName)}
         <div class="update-card-top">
@@ -6664,6 +6710,7 @@
         ${journalsHtml}
         <div class="update-card-bottom">
           <span class="update-source">${escape(t('updates_source'))}: ${escape(sourceName)}</span>
+          ${viewKey ? `<span class="update-source" data-update-views="${escape(viewKey)}">${escape(viewText)}</span>` : ''}
           <span class="update-tags">${tagHtml}</span>
         </div>`;
       const cls = `update-card${options.featured ? ' featured' : ''}${options.compact ? ' compact' : ''}`;
@@ -6717,6 +6764,7 @@
       const detailItem = updateDetailItemFromPath();
       if (detailItem) {
         renderJournalUpdateDetail(detailItem);
+        hydrateUpdateViews([detailItem]);
         return;
       }
       const allItems = journalUpdates.items || [];
@@ -6768,6 +6816,7 @@
           updatePageSeo('updates');
         });
       });
+      hydrateUpdateViews(filtered);
     }
 
     // Also sync topbar search when on home tab

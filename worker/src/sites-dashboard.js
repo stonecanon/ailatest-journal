@@ -172,7 +172,9 @@ button.active,.btn.active{background:var(--accent);border-color:var(--accent);co
     var keys = opts.keys || ['pageviews','visitors','sessions'];
     var dateHeads = opts.dateHeads || ['日期','PV','访客','会话'];
     var topMetricLabel = opts.topMetricLabel || 'PV';
+    var reason = data.reason || data.detail_reason || '';
     return '<section class="card"><div class="source-title"><strong>'+esc(title)+'</strong><span class="status">'+esc(data.status || 'empty')+'</span></div>'+
+      (reason ? '<div class="alert" style="font-size:12px;margin:-4px 0 8px">'+esc(reason)+'</div>' : '')+
       '<div class="grid"><div><div class="label">'+esc(labels[0])+'</div><div class="metric">'+total(data,keys[0])+'</div></div><div><div class="label">'+esc(labels[1])+'</div><div class="metric">'+total(data,keys[1])+'</div></div><div><div class="label">'+esc(labels[2])+'</div><div class="metric">'+total(data,keys[2])+'</div></div></div>'+
       lineChart(opts.chartRows || data.series || [], opts.chartX || 'day', opts.chartY || keys[0], {
         title: title + ' 趋势',
@@ -680,7 +682,7 @@ button.active,.btn.active{background:var(--accent);border-color:var(--accent);co
     if (!token) return showLogin();
     logout.style.display = 'inline-flex';
     try {
-      var res = await fetch(API + '/analytics/dashboard?days=' + encodeURIComponent(activeDays), { headers: { Authorization: 'Bearer ' + token } });
+      var res = await fetch(API + '/analytics/dashboard?days=' + encodeURIComponent(activeDays) + '&nocache=1', { headers: { Authorization: 'Bearer ' + token } });
       if (res.status === 401) { localStorage.removeItem(TOKEN_KEY); return showLogin('登录已失效，请重新登录。'); }
       if (res.status === 403) { localStorage.removeItem(TOKEN_KEY); return showLogin('当前账号无权限。'); }
       if (!res.ok) throw new Error('HTTP ' + res.status);
