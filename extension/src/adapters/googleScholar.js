@@ -8,6 +8,18 @@
     return el ? (el.textContent || '').replace(/\s+/g, ' ').trim() : '';
   }
 
+  const SCHOLAR_SOURCE_ALIASES = new Map([
+    ['hum soc sci commun', 'Humanities & Social Sciences Communications'],
+    ['humanit soc sci commun', 'Humanities & Social Sciences Communications'],
+    ['humanities social sciences commun', 'Humanities & Social Sciences Communications'],
+    ['hssc', 'Humanities & Social Sciences Communications'],
+  ]);
+
+  function expandScholarSourceAlias(value) {
+    const key = ns.norm(value);
+    return SCHOLAR_SOURCE_ALIASES.get(key) || '';
+  }
+
   function cleanScholarSource(value) {
     const raw = String(value || '').replace(/\s+/g, ' ').trim();
     if (!raw) return '';
@@ -26,6 +38,7 @@
       .trim();
 
       source = ns.cleanJournalName(source);
+      source = expandScholarSourceAlias(source) || source;
       if (!source || !ns.likelyJournalName(source)) continue;
       if (/^(?:citations?|related articles|all versions|library search)$/i.test(source)) continue;
       return source;

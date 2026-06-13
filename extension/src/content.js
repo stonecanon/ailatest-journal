@@ -60,10 +60,12 @@
       unique.forEach((group, index) => {
         const journal = results[index];
         group.entries.forEach((entry) => {
-          mark(entry.anchorEl);
           if (adapter.afterLookup) adapter.afterLookup(entry, journal || null);
           if (adapter.insertOpenAccessButton) adapter.insertOpenAccessButton(entry, journal || null);
-          if (!journal) return;
+          if (!journal) {
+            return;
+          }
+          mark(entry.anchorEl);
           const badgeNode = ns.badges.renderBadges(journal, settings);
           adapter.insert(entry.anchorEl, badgeNode, entry);
         });
@@ -83,6 +85,7 @@
   }
 
   scheduleScan(50);
+  [800, 1800, 3500, 7000].forEach((delay) => setTimeout(() => scheduleScan(0), delay));
 
   const observer = new MutationObserver(() => scheduleScan(700));
   observer.observe(document.documentElement || document.body, {
