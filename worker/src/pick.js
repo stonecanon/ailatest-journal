@@ -511,16 +511,18 @@ async function generateReport(apiKey, query, profile, ranked, context) {
   "intro": "一两句话解读论文的学科定位",
   "tiers": [
     {"id": "primary", "label": "优先主投", "items": [{"name": "期刊名", "reason": "≤40字推荐理由"}]},
-    {"id": "backup", "label": "稳妥备选", "items": [...]}
+    {"id": "backup", "label": "稳妥备选", "items": [...]},
+    {"id": "fallback", "label": "保底期刊", "items": [...]}
   ],
   "chinese": [{"name": "中文期刊名", "reason": "≤40字理由"}],
   "strategy": ["投稿策略建议1", "建议2", "建议3"]
 }
 
 要求：
-- tiers 共两档：primary 3-5 本、backup 4-8 本，主要从候选列表中选择（用候选列表中的精确期刊名）。
+- tiers 共三档：primary 4-6 本、backup 6-10 本、fallback 3-5 本，主要从候选列表中选择（用候选列表中的精确期刊名）。推荐量比保守模式多约 30%，但不要重复。
+- fallback 是更稳妥的保底期刊：匹配度可以略低，但接收范围更宽、定位更稳，不要选预警期刊。
 - 如果你确信某本不在候选列表的英文期刊高度对口，最多可补充 3 本，理由中注明"候选外补充"。
-- chinese：如论文主题适合中文发表，推荐 3-6 本对口的中文核心期刊（如 CSSCI/北大核心），否则给空数组。
+- chinese：如论文主题适合中文发表，推荐 4-8 本对口的中文核心期刊（如 CSSCI/北大核心），否则给空数组。
 - reason 简洁说明为什么对口（学科方向、定位），不要复述 IF/分区等指标——指标由系统数据补全。
 - strategy 给 2-4 条具体投稿策略（梯度、叙事侧重、风险提示）。
 - 候选列表中标 ⚠预警 的期刊不要放进 primary。
