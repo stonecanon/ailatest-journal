@@ -14,19 +14,50 @@
     return { anchorEl, journalName };
   }
 
+  function issnFromText(value) {
+    const m = String(value || '').match(/\b\d{4}-\d{3}[\dXx]\b/);
+    return m ? m[0] : '';
+  }
+
+  function journalFromLabeledText(value) {
+    const raw = String(value || '').replace(/\s+/g, ' ').trim();
+    const patterns = [
+      /(?:来源|刊名|出处|期刊|Source|Journal)\s*[:：]\s*《?([^》,，;；|]{2,60})/i,
+      /《([^》]{2,60})》/,
+    ];
+    for (const re of patterns) {
+      const m = raw.match(re);
+      if (!m) continue;
+      const name = ns.cleanJournalName(m[1]);
+      if (ns.likelyJournalName(name)) return name;
+    }
+    return '';
+  }
+
+  function pushEntry(out, anchorEl, rawName, extra = {}) {
+    if (!anchorEl) return;
+    const hit = entry(anchorEl, rawName);
+    if (!hit && !extra.issn) return;
+    out.push({ anchorEl, journalName: hit ? hit.journalName : '', issn: extra.issn || '' });
+  }
+
   function detailEntries() {
     const out = [];
     const selectors = [
       'a[href*="navi.cnki.net/knavi/journals"]',
       'a[href*="knavi.cnki.net/knavi/journals"]',
       'a[href*="dbcode=CJFD"]',
+      'a[href*="dbcode=CCND"]',
+      'a[href*="Journal"]',
+      'a[href*="journal"]',
       '.sourinfo a',
       '.wxBaseinfo a',
-      '.top-tip a'
+      '.top-tip a',
+      '.source a',
+      '[class*="source"] a'
     ];
     document.querySelectorAll(selectors.join(',')).forEach((a) => {
-      const hit = entry(a, textOf(a));
-      if (hit) out.push(hit);
+      pushEntry(out, a, textOf(a), { issn: issnFromText(a.href || '') });
     });
     return out;
   }
@@ -36,17 +67,32 @@
 
     document.querySelectorAll('tr').forEach((tr) => {
       const cells = Array.from(tr.cells || []);
-      if (cells.length < 4) return;
-      const sourceCell = cells[3];
-      const sourceAnchor = sourceCell.querySelector('a') || sourceCell;
-      const hit = entry(sourceAnchor, textOf(sourceAnchor));
-      if (hit) out.push(hit);
+      if (!cells.length) return;
+      const rowText = textOf(tr);
+      const issn = issnFromText(rowText);
+      const labeled = journalFromLabeledText(rowText);
+      if (labeled) {
+        const sourceAnchor = Array.from(tr.querySelectorAll('a')).find((a) => textOf(a).includes(labeled)) || tr;
+        pushEntry(out, sourceAnchor, labeled, { issn });
+        return;
+      }
+      const anchors = Array.from(tr.querySelectorAll('a'));
+      const sourceAnchor = anchors.find((a) => /(?:knavi|journals|dbcode=CJFD|dbcode=CCND|source|journal)/i.test(a.href || ''));
+      if (sourceAnchor) {
+        pushEntry(out, sourceAnchor, textOf(sourceAnchor), { issn });
+        return;
+      }
+      const likelyCell = cells.find((td) => /(?:来源|刊名|出处|期刊|ISSN|CN\s*\d+)/i.test(textOf(td)));
+      if (likelyCell) {
+        const name = journalFromLabeledText(textOf(likelyCell));
+        if (name || issn) pushEntry(out, likelyCell.querySelector('a') || likelyCell, name || textOf(likelyCell), { issn });
+      }
     });
 
-    document.querySelectorAll('.source, [class*="source"], .result-source').forEach((el) => {
+    document.querySelectorAll('.source, [class*="source"], .result-source, .result-item, .list-item, .fz14').forEach((el) => {
       const anchor = el.querySelector('a') || el;
-      const hit = entry(anchor, textOf(anchor));
-      if (hit) out.push(hit);
+      const name = journalFromLabeledText(textOf(el)) || textOf(anchor);
+      pushEntry(out, anchor, name, { issn: issnFromText(textOf(el)) });
     });
 
     return out;

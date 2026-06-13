@@ -61,11 +61,14 @@
         const journal = results[index];
         group.entries.forEach((entry) => {
           mark(entry.anchorEl);
+          if (adapter.afterLookup) adapter.afterLookup(entry, journal || null);
+          if (adapter.insertOpenAccessButton) adapter.insertOpenAccessButton(entry, journal || null);
           if (!journal) return;
           const badgeNode = ns.badges.renderBadges(journal, settings);
           adapter.insert(entry.anchorEl, badgeNode, entry);
         });
       });
+      if (adapter.ensureTools) adapter.ensureTools();
     } catch (e) {
       console.debug('[AILatest] badge scan skipped:', e && e.message ? e.message : e);
     } finally {

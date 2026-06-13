@@ -30,7 +30,7 @@
       .replace(/\s+/g, ' ')
       .trim();
 
-    s = s.replace(/^(?:in|from|source|journal|刊名|来源|出处)[:：\s]+/i, '').trim();
+    s = s.replace(/^(?:in|from|source|刊名|来源|出处)[:：\s]+/i, '').trim();
     return s;
   }
 

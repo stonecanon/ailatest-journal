@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "AILatest Journal Badges",
-  "description": "Show AILatest journal ranking badges on academic search and detail pages.",
-  "version": "0.1.0",
+  "name": "AILatest Journal — 期刊分区影响因子助手",
+  "version": "0.2.0",
+  "description": "在 Google Scholar、PubMed、知网页面自动显示期刊影响因子、中科院分区、JCR 分区、收录与国内目录等评级徽章。数据来自 journal.ailatest.org。",
   "icons": {
     "16": "assets/icon-16.png",
     "48": "assets/icon-48.png",
@@ -13,10 +13,10 @@
   ],
   "host_permissions": [
     "https://journal.ailatest.org/*",
-    "https://api.ailatest.org/*"
+    "https://api.openalex.org/*"
   ],
   "action": {
-    "default_title": "AILatest",
+    "default_title": "AILatest Journal",
     "default_popup": "popup/popup.html",
     "default_icon": {
       "16": "assets/icon-16.png",
@@ -31,18 +31,41 @@
         "http://*.cnki.net/*",
         "https://scholar.google.com/*",
         "https://scholar.google.com.hk/*",
+        "https://scholar.google.com.tw/*",
         "https://scholar.google.co.jp/*",
         "https://scholar.google.co.uk/*",
-        "https://scholar.google.de/*"
+        "https://scholar.google.de/*",
+        "https://scholar.google.fr/*",
+        "https://scholar.google.ca/*",
+        "https://scholar.google.com.au/*",
+        "https://scholar.google.co.in/*",
+        "https://scholar.google.com.sg/*",
+        "https://scholar.google.es/*",
+        "https://scholar.google.it/*",
+        "https://scholar.google.nl/*",
+        "https://scholar.google.se/*",
+        "https://scholar.google.ch/*",
+        "https://pubmed.ncbi.nlm.nih.gov/*"
       ],
       "js": [
         "src/norm.js",
         "src/lookup.js",
         "src/badges.js",
-        "src/adapters/cnki.js",
-        "src/adapters/googleScholar.js",
         "src/adapters/index.js",
+        "src/adapters/googleScholar.js",
+        "src/adapters/pubmed.js",
+        "src/adapters/cnki.js",
         "src/content.js"
+      ],
+      "all_frames": true,
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://journal.ailatest.org/*"
+      ],
+      "js": [
+        "src/bridge.js"
       ],
       "run_at": "document_idle"
     }
