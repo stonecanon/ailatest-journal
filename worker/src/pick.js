@@ -14,9 +14,31 @@ import { CORS, json, deepseekChat, loadJournals } from './deepseek-common.js';
 import PickMatch from '../../js/pick-match.js';
 
 const { makeHay, hitHay } = PickMatch;
+const DEFAULT_PICK_MODEL = 'deepseek-chat';
+const DEFAULT_DEEPSEEK_CNY_PER_M_TOKEN = {
+  input_cache_hit: 0.5,
+  input_cache_miss: 2,
+  output: 8,
+};
 
 function cleanText(value, max = 4000) {
   return typeof value === 'string' ? value.trim().slice(0, max) : '';
+}
+
+function nowSec() {
+  return Math.floor(Date.now() / 1000);
+}
+
+function dayFromSec(sec) {
+  return new Date(sec * 1000).toISOString().slice(0, 10);
+}
+
+function metadataJson(value) {
+  try {
+    return JSON.stringify(value && typeof value === 'object' ? value : {});
+  } catch (_) {
+    return '{}';
+  }
 }
 
 function clamp(n, min, max) {
@@ -41,6 +63,168 @@ function unique(values, max = 24) {
     if (out.length >= max) break;
   }
   return out;
+}
+
+let aiUsageTableReady = false;
+async function ensureAiUsageTable(env) {
+  if (aiUsageTableReady || !env?.DB) return;
+  await env.DB.prepare(
+    `CREATE TABLE IF NOT EXISTS ai_usage_events (
+      id                INTEGER PRIMARY KEY AUTOINCREMENT,
+      created_at        INTEGER NOT NULL,
+      day               TEXT NOT NULL,
+      user_id           INTEGER,
+      app               TEXT,
+      feature           TEXT,
+      provider          TEXT,
+      model             TEXT,
+      range_label       TEXT,
+      query_chars       INTEGER DEFAULT 0,
+      terms_count       INTEGER DEFAULT 0,
+      evidence_count    INTEGER DEFAULT 0,
+      prompt_tokens     INTEGER DEFAULT 0,
+      completion_tokens INTEGER DEFAULT 0,
+      total_tokens      INTEGER DEFAULT 0,
+      cache_hit_tokens  INTEGER DEFAULT 0,
+      cache_miss_tokens INTEGER DEFAULT 0,
+      input_cny         REAL DEFAULT 0,
+      output_cny        REAL DEFAULT 0,
+      total_cny         REAL DEFAULT 0,
+      input_usd         REAL DEFAULT 0,
+      output_usd        REAL DEFAULT 0,
+      total_usd         REAL DEFAULT 0,
+      latency_ms        INTEGER DEFAULT 0,
+      success           INTEGER DEFAULT 1,
+      error             TEXT DEFAULT '',
+      metadata_json     TEXT DEFAULT '{}'
+    )`
+  ).run();
+  const columns = [
+    ['user_id', 'INTEGER'],
+    ['input_cny', 'REAL DEFAULT 0'],
+    ['output_cny', 'REAL DEFAULT 0'],
+    ['total_cny', 'REAL DEFAULT 0'],
+    ['success', 'INTEGER DEFAULT 1'],
+    ['error', "TEXT DEFAULT ''"],
+  ];
+  for (const [name, ddl] of columns) {
+    try { await env.DB.prepare(`ALTER TABLE ai_usage_events ADD COLUMN ${name} ${ddl}`).run(); } catch (_) {}
+  }
+  await env.DB.batch([
+    env.DB.prepare('CREATE INDEX IF NOT EXISTS idx_ai_usage_events_day ON ai_usage_events(day)'),
+    env.DB.prepare('CREATE INDEX IF NOT EXISTS idx_ai_usage_events_app_day ON ai_usage_events(app, day)'),
+    env.DB.prepare('CREATE INDEX IF NOT EXISTS idx_ai_usage_events_feature_day ON ai_usage_events(feature, day)'),
+    env.DB.prepare('CREATE INDEX IF NOT EXISTS idx_ai_usage_events_user_day ON ai_usage_events(user_id, day)'),
+  ]);
+  aiUsageTableReady = true;
+}
+
+function deepseekPricing(env) {
+  const read = (key, fallback) => {
+    const n = Number(env?.[key]);
+    return Number.isFinite(n) && n >= 0 ? n : fallback;
+  };
+  return {
+    input_cache_hit: read('DEEPSEEK_INPUT_CACHE_HIT_CNY_PER_M', DEFAULT_DEEPSEEK_CNY_PER_M_TOKEN.input_cache_hit),
+    input_cache_miss: read('DEEPSEEK_INPUT_CACHE_MISS_CNY_PER_M', DEFAULT_DEEPSEEK_CNY_PER_M_TOKEN.input_cache_miss),
+    output: read('DEEPSEEK_OUTPUT_CNY_PER_M', DEFAULT_DEEPSEEK_CNY_PER_M_TOKEN.output),
+  };
+}
+
+function calcDeepseekCostCny(usage, pricing) {
+  usage = usage || {};
+  const prompt = Number(usage.prompt_tokens || 0);
+  const completion = Number(usage.completion_tokens || 0);
+  const cacheHit = Number(usage.prompt_cache_hit_tokens || usage.prompt_tokens_details?.cached_tokens || 0);
+  const cacheMiss = Number(usage.prompt_cache_miss_tokens || Math.max(0, prompt - cacheHit));
+  const inputCny = (cacheHit * pricing.input_cache_hit + cacheMiss * pricing.input_cache_miss) / 1000000;
+  const outputCny = completion * pricing.output / 1000000;
+  return {
+    prompt,
+    completion,
+    total: Number(usage.total_tokens || (prompt + completion) || 0),
+    cacheHit,
+    cacheMiss,
+    inputCny,
+    outputCny,
+    totalCny: inputCny + outputCny,
+  };
+}
+
+async function recordAiUsage(env, data = {}) {
+  if (!env?.DB) return;
+  try {
+    await ensureAiUsageTable(env);
+    const now = nowSec();
+    const usage = data.usage || {};
+    const pricing = data.pricing || deepseekPricing(env);
+    const cost = calcDeepseekCostCny(usage, pricing);
+    await env.DB.prepare(
+      `INSERT INTO ai_usage_events (
+        created_at, day, user_id, app, feature, provider, model, range_label,
+        query_chars, terms_count, evidence_count,
+        prompt_tokens, completion_tokens, total_tokens,
+        cache_hit_tokens, cache_miss_tokens,
+        input_cny, output_cny, total_cny,
+        input_usd, output_usd, total_usd,
+        latency_ms, success, error, metadata_json
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    ).bind(
+      now,
+      dayFromSec(now),
+      data.userId || null,
+      cleanText(data.app || 'journal', 80),
+      cleanText(data.feature || 'pick', 80),
+      cleanText(data.provider || 'deepseek', 40),
+      cleanText(data.model || '', 80),
+      cleanText(data.rangeLabel || '', 40),
+      Number(data.queryChars || 0),
+      Number(data.termsCount || 0),
+      Number(data.evidenceCount || 0),
+      cost.prompt,
+      cost.completion,
+      cost.total,
+      cost.cacheHit,
+      cost.cacheMiss,
+      cost.inputCny,
+      cost.outputCny,
+      cost.totalCny,
+      0,
+      0,
+      0,
+      Number(data.latencyMs || 0),
+      data.success === false ? 0 : 1,
+      cleanText(data.error || '', 240),
+      metadataJson({ usage, pricing, step: data.step || '', quota: data.quota || null }),
+    ).run();
+  } catch (e) {
+    console.warn('ai usage record failed:', e?.message || e);
+  }
+}
+
+async function trackedDeepseekChat(apiKey, messages, opts = {}, context = {}) {
+  const started = Date.now();
+  try {
+    const res = await deepseekChat(apiKey, messages, opts);
+    await recordAiUsage(context.env, {
+      ...context,
+      usage: res?.usage || {},
+      model: res?.model || opts.model || context.model || DEFAULT_PICK_MODEL,
+      latencyMs: Date.now() - started,
+      success: true,
+    });
+    return res;
+  } catch (e) {
+    await recordAiUsage(context.env, {
+      ...context,
+      usage: {},
+      model: opts.model || context.model || DEFAULT_PICK_MODEL,
+      latencyMs: Date.now() - started,
+      success: false,
+      error: e?.message || String(e),
+    });
+    throw e;
+  }
 }
 
 function journalSubjectParts(j) {
@@ -140,8 +324,8 @@ function normalizeProfile(profile) {
   return out;
 }
 
-async function extractProfile(apiKey, query) {
-  const res = await deepseekChat(apiKey, [
+async function extractProfile(apiKey, query, context) {
+  const res = await trackedDeepseekChat(apiKey, [
     {
       role: 'system',
       content: `你是学术期刊荐刊系统的语义解析器。请把论文标题/摘要转成期刊匹配画像，而不是做普通关键词抽取。
@@ -156,7 +340,7 @@ async function extractProfile(apiKey, query) {
 - 只调用函数，不要输出普通文本。`,
     },
     { role: 'user', content: query },
-  ], { tools: [semanticTool()], temperature: 0.05, maxTokens: 900 });
+  ], { tools: [semanticTool()], temperature: 0.05, maxTokens: 900, model: context.model }, { ...context, step: 'profile', feature: 'pick_profile' });
   const msg = res?.choices?.[0]?.message;
   const call = msg?.tool_calls?.[0];
   if (call?.function?.name === 'extract_journal_recommendation_profile') {
@@ -315,9 +499,9 @@ function sanitizeReport(raw) {
   };
 }
 
-async function generateReport(apiKey, query, profile, ranked) {
+async function generateReport(apiKey, query, profile, ranked, context) {
   const lines = ranked.slice(0, 40).map(candidateLine).join('\n');
-  const res = await deepseekChat(apiKey, [
+  const res = await trackedDeepseekChat(apiKey, [
     {
       role: 'system',
       content: `你是专业的学术期刊投稿顾问。根据用户论文与候选期刊列表，输出 JSON 推荐报告。
@@ -349,7 +533,7 @@ async function generateReport(apiKey, query, profile, ranked) {
         wos_categories: profile.wos_categories,
       })}\n\n候选期刊(按匹配度排序):\n${lines}`,
     },
-  ], { temperature: 0.2, maxTokens: 1800, jsonOutput: true });
+  ], { temperature: 0.2, maxTokens: 1800, jsonOutput: true, model: context.model }, { ...context, step: 'report', feature: 'pick_report', evidenceCount: ranked.length });
   const content = res?.choices?.[0]?.message?.content || '';
   return sanitizeReport(JSON.parse(content));
 }
@@ -362,6 +546,7 @@ export async function handlePick(req, env, opts = {}) {
 
   const apiKey = env.DEEPSEEK_API_KEY;
   if (!apiKey) return json({ ok: false, error: 'AI service not configured' }, 503);
+  const model = cleanText(env.DEEPSEEK_PICK_MODEL || env.DEEPSEEK_MODEL || DEFAULT_PICK_MODEL, 80) || DEFAULT_PICK_MODEL;
 
   let body;
   try {
@@ -382,16 +567,30 @@ export async function handlePick(req, env, opts = {}) {
 
   let quota = null;
   let refund = null;
+  let quotaUser = null;
   if (typeof opts.consumeQuota === 'function') {
     const q = await opts.consumeQuota();
     if (!q.ok) return q.response;
     quota = q.quota;
+    quotaUser = q.user || null;
     refund = typeof q.refund === 'function' ? q.refund : null;
   }
 
+  const usageContext = {
+    env,
+    userId: quotaUser?.id || null,
+    app: 'journal',
+    provider: 'deepseek',
+    model,
+    rangeLabel: 'flash',
+    queryChars: query.length,
+    quota,
+    pricing: deepseekPricing(env),
+  };
+
   let profile = null;
   try {
-    profile = await extractProfile(apiKey, query);
+    profile = await extractProfile(apiKey, query, usageContext);
   } catch (e) {
     console.warn('pick semantic extraction failed:', e?.message || e);
   }
@@ -408,7 +607,10 @@ export async function handlePick(req, env, opts = {}) {
   let report = null;
   if (results.length) {
     try {
-      report = await generateReport(apiKey, query, profile, results);
+      report = await generateReport(apiKey, query, profile, results, {
+        ...usageContext,
+        termsCount: (profile.research_fields || []).length + (profile.wos_categories || []).length + (profile.domain_keywords || []).length,
+      });
     } catch (e) {
       console.warn('pick report generation failed:', e?.message || e);
     }

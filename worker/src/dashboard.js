@@ -329,6 +329,12 @@ async function buildSiteBusiness(env, options = {}) {
     : new Set();
   const jvSelect = name => (jvColumns.has(name) ? name : `NULL AS ${name}`);
   const jvAgg = name => (jvColumns.has(name) ? `MAX(${name})` : 'NULL');
+  const aiColumns = has('ai_usage_events')
+    ? new Set((await q(env, "PRAGMA table_info(ai_usage_events)")).map(row => row.name))
+    : new Set();
+  const aiSum = name => (aiColumns.has(name) ? `SUM(${name})` : '0');
+  const aiAvg = name => (aiColumns.has(name) ? `AVG(${name})` : '0');
+  const aiSelect = name => (aiColumns.has(name) ? name : `NULL AS ${name}`);
 
   const [
     usersSummary, loginSummary, favoriteSummary, ratingSummary, listSummary,
@@ -336,6 +342,7 @@ async function buildSiteBusiness(env, options = {}) {
     recentJournalViews, periodTopJournalViews, jvSourceSummary, jvHourlySeries,
     interactionSummary, interactionByTab, recentInteractions,
     recentFavorites, recentRatings, topLists, pickUsageByDay,
+    aiUsageSummary, aiUsageByDay, aiUsageByFeature, aiUsageByModel, recentAiUsage,
     grantSummary, grantTopSearchQueries, grantZeroResultSearches, grantRecentInteractions,
     grantRecentPageviews, grantInteractionByDay,
     ailatestRecentPageviews,
@@ -408,6 +415,57 @@ async function buildSiteBusiness(env, options = {}) {
     run('pick_usage', `SELECT period_key AS day, SUM(used) AS used, COUNT(DISTINCT user_id) AS users
       FROM pick_usage WHERE period = 'day'
       GROUP BY period_key ORDER BY period_key ASC`),
+    run('ai_usage_events', `SELECT COUNT(*) AS requests, COUNT(DISTINCT user_id) AS users,
+        ${aiSum('prompt_tokens')} AS prompt_tokens,
+        ${aiSum('completion_tokens')} AS completion_tokens,
+        ${aiSum('total_tokens')} AS total_tokens,
+        ${aiSum('cache_hit_tokens')} AS cache_hit_tokens,
+        ${aiSum('cache_miss_tokens')} AS cache_miss_tokens,
+        ${aiSum('input_cny')} AS input_cny,
+        ${aiSum('output_cny')} AS output_cny,
+        ${aiSum('total_cny')} AS total_cny,
+        SUM(CASE WHEN ${aiColumns.has('success') ? 'success' : '1'} = 0 THEN 1 ELSE 0 END) AS failed_requests,
+        ${aiAvg('latency_ms')} AS avg_latency_ms
+      FROM ai_usage_events
+      WHERE created_at >= ? AND COALESCE(app,'journal') = 'journal'`, [startSec]),
+    run('ai_usage_events', `SELECT day, COUNT(*) AS requests, COUNT(DISTINCT user_id) AS users,
+        ${aiSum('prompt_tokens')} AS prompt_tokens,
+        ${aiSum('completion_tokens')} AS completion_tokens,
+        ${aiSum('total_tokens')} AS total_tokens,
+        ${aiSum('total_cny')} AS total_cny
+      FROM ai_usage_events
+      WHERE created_at >= ? AND COALESCE(app,'journal') = 'journal'
+      GROUP BY day ORDER BY day ASC`, [startSec]),
+    run('ai_usage_events', `SELECT COALESCE(feature,'unknown') AS feature, COUNT(*) AS requests, COUNT(DISTINCT user_id) AS users,
+        ${aiSum('prompt_tokens')} AS prompt_tokens,
+        ${aiSum('completion_tokens')} AS completion_tokens,
+        ${aiSum('total_tokens')} AS total_tokens,
+        ${aiSum('total_cny')} AS total_cny,
+        ${aiAvg('latency_ms')} AS avg_latency_ms
+      FROM ai_usage_events
+      WHERE created_at >= ? AND COALESCE(app,'journal') = 'journal'
+      GROUP BY COALESCE(feature,'unknown') ORDER BY requests DESC`, [startSec]),
+    run('ai_usage_events', `SELECT COALESCE(provider,'unknown') AS provider, COALESCE(model,'unknown') AS model,
+        COUNT(*) AS requests, COUNT(DISTINCT user_id) AS users,
+        ${aiSum('prompt_tokens')} AS prompt_tokens,
+        ${aiSum('completion_tokens')} AS completion_tokens,
+        ${aiSum('total_tokens')} AS total_tokens,
+        ${aiSum('total_cny')} AS total_cny
+      FROM ai_usage_events
+      WHERE created_at >= ? AND COALESCE(app,'journal') = 'journal'
+      GROUP BY COALESCE(provider,'unknown'), COALESCE(model,'unknown')
+      ORDER BY requests DESC`, [startSec]),
+    run('ai_usage_events', `SELECT a.created_at, ${aiSelect('user_id')}, u.email, u.login, u.name,
+        COALESCE(a.feature,'') AS feature, COALESCE(a.provider,'') AS provider, COALESCE(a.model,'') AS model,
+        ${aiSelect('range_label')}, ${aiSelect('query_chars')}, ${aiSelect('prompt_tokens')},
+        ${aiSelect('completion_tokens')}, ${aiSelect('total_tokens')},
+        ${aiSelect('cache_hit_tokens')}, ${aiSelect('cache_miss_tokens')},
+        ${aiSelect('total_cny')}, ${aiSelect('latency_ms')},
+        ${aiColumns.has('success') ? 'success' : '1 AS success'},
+        ${aiColumns.has('error') ? 'error' : "'' AS error"}
+      FROM ai_usage_events a LEFT JOIN users u ON u.id = a.user_id
+      WHERE a.created_at >= ? AND COALESCE(a.app,'journal') = 'journal'
+      ORDER BY a.created_at DESC LIMIT 80`, [startSec]),
     run('interaction_events', `SELECT COUNT(*) AS search_events, COUNT(DISTINCT visitor_id) AS search_visitors,
         COUNT(DISTINCT session_id) AS search_sessions,
         SUM(CASE WHEN result_count = 0 THEN 1 ELSE 0 END) AS zero_result_searches
@@ -459,6 +517,14 @@ async function buildSiteBusiness(env, options = {}) {
         search_events: interactionEvents(journalSearchRows),
         pick_events: interactionEvents(journalPickRows),
         pick_consumed: sumRows(pickUsageByDay, 'used'),
+        ai_requests: scalar(aiUsageSummary[0], 'requests'),
+        ai_users: scalar(aiUsageSummary[0], 'users'),
+        ai_total_tokens: scalar(aiUsageSummary[0], 'total_tokens'),
+        ai_prompt_tokens: scalar(aiUsageSummary[0], 'prompt_tokens'),
+        ai_completion_tokens: scalar(aiUsageSummary[0], 'completion_tokens'),
+        ai_total_cny: scalar(aiUsageSummary[0], 'total_cny'),
+        ai_failed_requests: scalar(aiUsageSummary[0], 'failed_requests'),
+        ai_avg_latency_ms: scalar(aiUsageSummary[0], 'avg_latency_ms'),
         favorite_rows: scalar(favoriteSummary[0], 'favorite_rows'),
         lists: scalar(listSummary[0], 'lists'),
         rating_rows: scalar(ratingSummary[0], 'rating_rows'),
@@ -479,6 +545,11 @@ async function buildSiteBusiness(env, options = {}) {
         recentRatings: recentRatings.map(withUser),
         topLists: topLists.map(withUser),
         pickUsageByDay,
+        aiUsageSummary: aiUsageSummary[0] || {},
+        aiUsageByDay,
+        aiUsageByFeature,
+        aiUsageByModel,
+        recentAiUsage: recentAiUsage.map(withUser),
       },
     },
     grant: {

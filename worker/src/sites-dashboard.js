@@ -364,6 +364,18 @@ button.active,.btn.active{background:var(--accent);border-color:var(--accent);co
   function visitorLabel(r){
     return userLabel(r.user) || (r.visitor_id ? '访客 '+String(r.visitor_id).slice(0,8) : 'anonymous');
   }
+  function moneyCny(v){
+    var x = Number(v || 0);
+    if (!isFinite(x) || !x) return '¥0.0000';
+    return '¥' + x.toFixed(x < 0.01 ? 6 : 4);
+  }
+  function tokenShort(v){
+    var x = Number(v || 0);
+    if (!isFinite(x) || !x) return '0';
+    if (x >= 1000000) return (x / 1000000).toFixed(2) + 'M';
+    if (x >= 1000) return (x / 1000).toFixed(1) + 'k';
+    return n(x);
+  }
   function miniTable(title, rows, nameKey, metricKey, metricLabel){
     return '<section class="card"><strong>'+esc(title)+'</strong><table class="table"><thead><tr><th>维度</th><th>'+esc(metricLabel || 'PV')+'</th><th>用户/访客</th></tr></thead><tbody>'+
       rowsFrom((rows || []).slice(0,12), [
@@ -404,6 +416,7 @@ button.active,.btn.active{background:var(--accent);border-color:var(--accent);co
       ['注册用户', k.total_users],['登录事件', k.total_login_events],
       ['期刊浏览', k.total_journal_views],['搜索期刊', k.search_events],
       ['荐刊运行', k.pick_events],['荐刊扣次', k.pick_consumed],
+      ['AI 请求', k.ai_requests],['AI Token', tokenShort(k.ai_total_tokens)],['AI 费用', moneyCny(k.ai_total_cny)],
       ['收藏记录', k.favorite_rows],['收藏清单', k.lists],['评分记录', k.rating_rows]
     ]);
     var recentViews = (t.recentJournalViews || []).filter(matchesTraffic).slice(0,50);
@@ -453,6 +466,42 @@ button.active,.btn.active{background:var(--accent);border-color:var(--accent);co
           rowsFrom((t.recentInteractions || []).slice(0,24), [{f:function(r){return secTs(r.event_ts);}},{k:'event_type'},{k:'tab'},{k:'query',cls:'path-cell'},{f:function(r){return r.result_count==null?'':n(r.result_count);}}])+'</tbody></table></section>'+
         '<section class="card"><strong>荐刊扣次（日）</strong><table class="table"><thead><tr><th>日期</th><th>扣次</th><th>用户</th></tr></thead><tbody>'+
           rowsFrom((t.pickUsageByDay || []).slice(-18).reverse(), [{k:'day'},{f:function(r){return n(r.used);}},{f:function(r){return n(r.users);}}])+'</tbody></table></section>'+
+        '<section class="card priority-search"><strong>DeepSeek Flash 用量总览</strong><div class="traffic-row">'+
+          '<div class="traffic-chip"><span>请求</span><strong>'+n(k.ai_requests)+'</strong><div class="muted">'+n(k.ai_users)+' 用户 · 失败 '+n(k.ai_failed_requests)+'</div></div>'+
+          '<div class="traffic-chip"><span>总 Token</span><strong>'+tokenShort(k.ai_total_tokens)+'</strong><div class="muted">输入 '+tokenShort(k.ai_prompt_tokens)+' · 输出 '+tokenShort(k.ai_completion_tokens)+'</div></div>'+
+          '<div class="traffic-chip"><span>费用</span><strong>'+moneyCny(k.ai_total_cny)+'</strong><div class="muted">按 DeepSeek 官方 CNY 单价估算</div></div>'+
+          '<div class="traffic-chip"><span>平均耗时</span><strong>'+Math.round(Number(k.ai_avg_latency_ms || 0))+' ms</strong><div class="muted">画像解析 + 报告生成</div></div>'+
+        '</div></section>'+
+        '<section class="card"><strong>AI 按模型统计</strong><table class="table"><thead><tr><th>模型</th><th>请求</th><th>用户</th><th>Token</th><th>费用</th></tr></thead><tbody>'+
+          rowsFrom((t.aiUsageByModel || []).slice(0,18), [
+            {f:function(r){return (r.provider||'')+' / '+(r.model||'');},cls:'path-cell'},
+            {f:function(r){return n(r.requests);}},{f:function(r){return n(r.users);}},
+            {f:function(r){return tokenShort(r.total_tokens);}},{f:function(r){return moneyCny(r.total_cny);}}
+          ])+'</tbody></table></section>'+
+        '<section class="card"><strong>AI 按步骤统计</strong><table class="table"><thead><tr><th>步骤</th><th>请求</th><th>Token</th><th>费用</th><th>平均耗时</th></tr></thead><tbody>'+
+          rowsFrom((t.aiUsageByFeature || []).slice(0,18), [
+            {k:'feature'},{f:function(r){return n(r.requests);}},
+            {f:function(r){return tokenShort(r.total_tokens);}},{f:function(r){return moneyCny(r.total_cny);}},
+            {f:function(r){return Math.round(Number(r.avg_latency_ms || 0))+' ms';}}
+          ])+'</tbody></table></section>'+
+        '<section class="card"><strong>AI 用量（日）</strong><table class="table"><thead><tr><th>日期</th><th>请求</th><th>用户</th><th>Token</th><th>费用</th></tr></thead><tbody>'+
+          rowsFrom((t.aiUsageByDay || []).slice(-18).reverse(), [
+            {k:'day'},{f:function(r){return n(r.requests);}},{f:function(r){return n(r.users);}},
+            {f:function(r){return tokenShort(r.total_tokens);}},{f:function(r){return moneyCny(r.total_cny);}}
+          ])+'</tbody></table></section>'+
+        '<section class="card"><strong>最近 AI 荐刊调用</strong><div class="scroll tall"><table class="table"><thead><tr><th>时间</th><th>用户</th><th>步骤</th><th>模型</th><th>查询字数</th><th>输入</th><th>输出</th><th>总Token</th><th>费用</th><th>耗时</th><th>状态</th><th>错误</th></tr></thead><tbody>'+
+          rowsFrom((t.recentAiUsage || []).slice(0,40), [
+            {f:function(r){return secTs(r.created_at);}},{f:function(r){return userLabel(r.user);}},
+            {k:'feature'},{f:function(r){return (r.provider||'')+' / '+(r.model||'');},cls:'path-cell'},
+            {f:function(r){return n(r.query_chars);}},
+            {f:function(r){return tokenShort(r.prompt_tokens);}},
+            {f:function(r){return tokenShort(r.completion_tokens);}},
+            {f:function(r){return tokenShort(r.total_tokens);}},
+            {f:function(r){return moneyCny(r.total_cny);}},
+            {f:function(r){return Math.round(Number(r.latency_ms || 0))+' ms';}},
+            {f:function(r){return Number(r.success) === 0 ? '失败' : '成功';}},
+            {k:'error',cls:'path-cell'}
+          ])+'</tbody></table></div></section>'+
       '</div>';
   }
   function grantBusinessSection(gb){
