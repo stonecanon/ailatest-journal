@@ -17,7 +17,7 @@
     <a href="/pricing.html">订阅</a>
     <a href="/extension.html">插件</a>
     <a href="/contact.html">联系</a>
-    <a class="cta" href="/signup.html">注册 / 登录</a>
+    <a class="cta" id="auth-link" href="/signup.html">注册 / 登录</a>
   </nav>
 </header>
 <main>
@@ -30,6 +30,31 @@
     <p><a class="btn" href="/downloads/ailatest-journal-extension-v0.2.0.zip" download>下载插件 ZIP</a></p>
     <p class="small muted">插件 lookup API 使用 https://api.ailatest.org；开放全文按钮仅查找 Scholar 已有 PDF 和 OpenAlex 公开 OA 来源。</p>
   </div>
+
+  <div class="card" id="account-card">
+    <h2 style="margin-top:0">账号状态</h2>
+    <p id="account-status">正在读取登录状态...</p>
+    <p class="small muted">登录后网站会把账号同步给插件，用于提高查询额度和后续同步收藏。当前 Free 版本云端收藏上限为 5 本。</p>
+  </div>
+
+  <h2>插件会显示哪些信息</h2>
+  <table>
+    <tr><th>类别</th><th>显示内容</th></tr>
+    <tr><td>影响力指标</td><td>2024 Impact Factor、JCR Q1-Q4、中科院分区、TOP、新锐分区</td></tr>
+    <tr><td>索引收录</td><td>SCIE、SSCI、AHCI、ESCI、EI、Scopus、MEDLINE、DOAJ 等</td></tr>
+    <tr><td>国内目录</td><td>北大核心、CSSCI、CSSCI 扩展、CSCD、中国科技核心、SCD、AMI、中国科协 T1/T2/T3、CCF 中文目录等</td></tr>
+    <tr><td>学科与分级</td><td>CCF A/B/C、ABDC、ABS、FMS、VHB、CNRS、NSFC 管理科学部、浙大目录等</td></tr>
+    <tr><td>风险提示</td><td>预警名单、撤稿记录、停收 / On Hold / Under Review 等状态</td></tr>
+    <tr><td>全文入口</td><td>Google Scholar 已有 PDF 链接，或通过 DOI 查询 OpenAlex 公开 OA 全文</td></tr>
+  </table>
+
+  <h2>支持页面</h2>
+  <table>
+    <tr><th>网站</th><th>支持能力</th></tr>
+    <tr><td>Google Scholar</td><td>结果页期刊徽章、当前页按 IF 排序、按引用量排序、公开全文按钮</td></tr>
+    <tr><td>知网 CNKI</td><td>搜索结果和详情页识别来源期刊，显示国内外评级徽章</td></tr>
+    <tr><td>PubMed</td><td>搜索结果和详情页识别期刊，显示 IF、分区和索引徽章</td></tr>
+  </table>
 
   <h2>安装方法</h2>
   <ol>
@@ -61,5 +86,50 @@
     <a href="/privacy.html">Privacy</a> ·
     <a href="/refund.html">Refund</a></p>
 </footer>
+<script>
+(function () {
+  const authLink = document.getElementById('auth-link');
+  const status = document.getElementById('account-status');
+
+  function userLabel(user) {
+    return user && (user.name || user.email || user.login) || '';
+  }
+
+  function render(user, entitlements) {
+    const label = userLabel(user);
+    if (!user || !user.token) {
+      status.innerHTML = '当前未登录。<a href="/signup.html?redirect=/extension">登录 Free 账号</a> 后可同步收藏和插件查询额度。';
+      if (authLink) authLink.textContent = '注册 / 登录';
+      return;
+    }
+    const tier = entitlements && entitlements.tier ? entitlements.tier : 'free';
+    const proStatus = entitlements && entitlements.pro_status === 'coming_soon' ? ' · Pro 即将开放' : '';
+    status.textContent = `${label} 已登录 · 当前版本 ${tier.toUpperCase()}${proStatus}`;
+    if (authLink) {
+      authLink.textContent = label || '已登录';
+      authLink.href = '/';
+    }
+  }
+
+  async function init() {
+    let user = null;
+    try { user = JSON.parse(localStorage.getItem('ailatest.user') || 'null'); } catch (_) {}
+    render(user, null);
+    if (!user || !user.token) return;
+    try {
+      const r = await fetch('https://api.ailatest.org/me/entitlements', {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      const entitlements = r.ok ? await r.json() : null;
+      render(user, entitlements);
+    } catch (_) {}
+  }
+
+  init();
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'ailatest.user') init();
+  });
+})();
+</script>
 </body>
 </html>
