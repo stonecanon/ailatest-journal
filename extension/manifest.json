@@ -13,6 +13,7 @@
   ],
   "host_permissions": [
     "https://journal.ailatest.org/*",
+    "https://api.ailatest.org/*",
     "https://api.openalex.org/*"
   ],
   "action": {
