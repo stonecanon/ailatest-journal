@@ -399,6 +399,94 @@ async function routeInteraction(req, env) {
   return json({ ok: true });
 }
 
+async function routeAiUsageIngest(req, env) {
+  const expected = env.AI_USAGE_INGEST_TOKEN || '';
+  if (expected) {
+    const token = (req.headers.get('authorization') || '').replace(/^Bearer\s+/i, '');
+    if (token !== expected) return err('unauthorized', 401);
+  }
+  const body = await req.json().catch(() => null);
+  if (!body) return err('invalid json');
+  const now = nowSec();
+  const usage = body.usage || {};
+  const cost = body.cost || {};
+
+  await env.DB.prepare(
+    `INSERT INTO ai_usage_events (
+      created_at, day, app, feature, provider, model, range_label,
+      query_chars, terms_count, evidence_count,
+      prompt_tokens, completion_tokens, total_tokens,
+      cache_hit_tokens, cache_miss_tokens,
+      input_usd, output_usd, total_usd, latency_ms, metadata_json
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+  ).bind(
+    now,
+    dayFromSec(now),
+    cleanText(body.app || '', 120),
+    cleanText(body.feature || '', 80),
+    cleanText(body.provider || '', 40),
+    cleanText(body.model || '', 80),
+    cleanText(body.rangeLabel || '', 40),
+    Number(body.queryChars || 0),
+    Number(body.termsCount || 0),
+    Number(body.evidenceCount || 0),
+    Number(usage.prompt_tokens || 0),
+    Number(usage.completion_tokens || 0),
+    Number(usage.total_tokens || 0),
+    Number(usage.prompt_cache_hit_tokens || usage.prompt_tokens_details?.cached_tokens || 0),
+    Number(usage.prompt_cache_miss_tokens || 0),
+    Number(cost.inputUsd || 0),
+    Number(cost.outputUsd || 0),
+    Number(cost.totalUsd || 0),
+    Number(body.latencyMs || 0),
+    metadataJson({
+      usage,
+      cost,
+      pricing: cost.pricing || null,
+    }),
+  ).run();
+
+  return json({ ok: true });
+}
+
+async function routeAiUsageSummary(req, env) {
+  const u = await getUser(req, env);
+  if (!u) return err('login required', 401);
+  if (!isOwnerUser(u)) return err('forbidden', 403);
+  const url = new URL(req.url);
+  const days = Math.min(90, Math.max(1, Number(url.searchParams.get('days') || 30)));
+  const since = dayFromSec(nowSec() - (days - 1) * 86400);
+  const rows = await env.DB.prepare(
+    `SELECT day, app, feature, provider, model,
+            COUNT(*) AS requests,
+            SUM(prompt_tokens) AS prompt_tokens,
+            SUM(completion_tokens) AS completion_tokens,
+            SUM(total_tokens) AS total_tokens,
+            SUM(total_usd) AS total_usd,
+            AVG(latency_ms) AS avg_latency_ms
+       FROM ai_usage_events
+      WHERE day >= ?
+      GROUP BY day, app, feature, provider, model
+      ORDER BY day DESC, requests DESC`
+  ).bind(since).all();
+  const totals = await env.DB.prepare(
+    `SELECT COUNT(*) AS requests,
+            SUM(prompt_tokens) AS prompt_tokens,
+            SUM(completion_tokens) AS completion_tokens,
+            SUM(total_tokens) AS total_tokens,
+            SUM(total_usd) AS total_usd
+       FROM ai_usage_events
+      WHERE day >= ?`
+  ).bind(since).first();
+  return json({
+    ok: true,
+    days,
+    since,
+    totals: totals || {},
+    rows: rows.results || [],
+  });
+}
+
 async function getUserById(env, id) {
   return env.DB.prepare(
     'SELECT id, email, github_id, google_id, login, name, avatar_url, provider FROM users WHERE id = ?'
@@ -831,7 +919,7 @@ async function routePutFavs(req, env) {
   if (!body || !Array.isArray(body.favs)) return err('invalid body');
   const favs = body.favs.filter(x => typeof x === 'string' && x.length <= 200).slice(0, 5000);
 
-  // tier 限额：free 30 本；超限后冻结（可删可排序，不可新增）。spec enforcement 规则 1。
+  // tier 限额：free 5 本；超限后冻结（可删可排序，不可新增）。spec enforcement 规则 1。
   const gate = await enforceFavoritesWrite(env, u, isOwnerUser(u), favs);
   if (!gate.ok) return json(gate.body, gate.status);
 
@@ -883,7 +971,7 @@ async function routePutLists(req, env) {
     clean.push({ id, name, ids });
   }
 
-  // tier 限额：free 2 个清单 / 收藏并集 30 本；超限清单只读（可整单删除）。spec enforcement 规则 1。
+  // tier 限额：free 2 个清单 / 收藏并集 5 本；超限清单只读（可整单删除）。spec enforcement 规则 1。
   const gate = await enforceListsWrite(env, u, isOwnerUser(u), clean);
   if (!gate.ok) return json(gate.body, gate.status);
 
@@ -1529,6 +1617,8 @@ export default {
       if (p === '/auth/google/callback'&& req.method === 'GET')  return routeGoogleCallback(req, env);
       if (p === '/analytics/pageview' && req.method === 'POST')  return routePageview(req, env);
       if (p === '/analytics/interaction' && req.method === 'POST') return routeInteraction(req, env);
+      if (p === '/grant/deepseek-usage' && req.method === 'POST') return routeAiUsageIngest(req, env);
+      if (p === '/grant/deepseek-usage' && req.method === 'GET') return routeAiUsageSummary(req, env);
       if (p === '/analytics/dashboard' && req.method === 'GET')  return routeDashboard(req, env);
       if ((p === '/analytics/sites' || p === '/analytics/sites/') && req.method === 'GET') return routeSitesDashboard('overview');
       const mAnalyticsSite = p.match(/^\/analytics\/sites\/([a-z0-9_-]+)\/?$/i);
@@ -1539,7 +1629,7 @@ export default {
       if (p === '/me/entitlements'     && req.method === 'GET')  return routeMeEntitlements(req, env);
       if (p === '/pick'                && req.method === 'POST') return handlePick(req, env, { consumeQuota: () => consumePickQuotaForRequest(req, env) });
       if (p === '/pick/quota/consume'  && req.method === 'POST') return routeConsumePickQuota(req, env);
-      if (p === '/ext/lookup')                                   return handleExtLookup(req, env);
+      if (p === '/ext/lookup') { const exU = await getUser(req, env).catch(() => null); return handleExtLookup(req, env, exU); }
       if (p === '/favorites'           && req.method === 'GET')  return routeGetFavs(req, env);
       if (p === '/favorites'           && req.method === 'PUT')  return routePutFavs(req, env);
       if (p === '/lists'               && req.method === 'GET')  return routeGetLists(req, env);

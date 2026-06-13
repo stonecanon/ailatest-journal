@@ -1,0 +1,247 @@
+{
+  "$schema_note": "AILatest Journal 插件/网站共用权限配置。服务端为唯一权威来源，客户端只读不判权。版本号变更时客户端需重新拉取。",
+  "version": "2026-06-13.1",
+  "status": "pro_coming_soon",
+  "tiers": {
+    "anonymous": {
+      "note": "插件安装后未登录状态，仅限安装后 24 小时内（计时存 chrome.storage.local，服务端不追踪）",
+      "duration_hours": 24,
+      "features": {
+        "badge_display": true,
+        "journal_detail": true,
+        "favorites": {
+          "enabled": true,
+          "storage": "local",
+          "max_items": 5,
+          "max_lists": 1
+        },
+        "cloud_sync": false,
+        "tags": false,
+        "notes": false,
+        "submission_history": false,
+        "export": false,
+        "integrations": false,
+        "ai": false
+      },
+      "on_expire": "registration_wall",
+      "on_register": "merge_local_favorites_to_cloud"
+    },
+    "free": {
+      "note": "注册用户基础档（试用结束后的默认归属）",
+      "features": {
+        "badge_display": true,
+        "journal_detail": true,
+        "favorites": {
+          "enabled": true,
+          "storage": "cloud",
+          "max_items": 5,
+          "max_lists": 2
+        },
+        "cloud_sync": true,
+        "tags": false,
+        "notes": false,
+        "submission_history": false,
+        "export": false,
+        "integrations": false,
+        "ai": false
+      }
+    },
+    "trial": {
+      "note": "付费通道上线后启用。当前阶段新注册不自动激活 trial，统一进入 Free。",
+      "duration_days": 7,
+      "inherits": "pro",
+      "overrides": {
+        "ai": {
+          "enabled": false,
+          "ui": "visible_locked",
+          "locked_hint": "AI 选刊为 Pro 功能，订阅后每月含 50 credits"
+        }
+      },
+      "on_expire": {
+        "downgrade_to": "free",
+        "data_policy": "freeze_not_delete",
+        "freeze_rules": {
+          "favorites_over_limit": "read_write_existing, no_new_adds",
+          "tags_and_notes": "read_only",
+          "lists_over_limit": "read_only"
+        },
+        "conversion_offer": {
+          "price_id": "pro_annual_flash",
+          "window_hours": 24
+        }
+      }
+    },
+    "pro": {
+      "features": {
+        "badge_display": true,
+        "journal_detail": true,
+        "favorites": {
+          "enabled": true,
+          "storage": "cloud",
+          "max_items": null,
+          "max_lists": null
+        },
+        "cloud_sync": true,
+        "tags": true,
+        "notes": true,
+        "submission_history": true,
+        "drag_sort": true,
+        "advanced_filters": true,
+        "export": {
+          "formats": [
+            "csv",
+            "ris",
+            "bibtex",
+            "xlsx"
+          ]
+        },
+        "integrations": [
+          "zotero",
+          "notion",
+          "endnote",
+          "obsidian"
+        ],
+        "ai": {
+          "enabled": true,
+          "monthly_credits": 50,
+          "credits_rollover": false
+        }
+      }
+    }
+  },
+  "pricing": {
+    "currency": "CNY",
+    "plans": [
+      {
+        "id": "pro_monthly",
+        "label": "月付（价格锚点）",
+        "price": 15,
+        "period": "month",
+        "note": "仅原价，无折扣；×12=180 衬托年付"
+      },
+      {
+        "id": "pro_annual",
+        "label": "年付原价",
+        "price": 148,
+        "period": "year"
+      },
+      {
+        "id": "pro_annual_flash",
+        "label": "试用到期限时价",
+        "price": 99,
+        "period": "year",
+        "condition": "trial 到期后 24h 内，且未通过教育认证",
+        "discount_note": "33% off，折扣深度控制在 30-45% 以保锚点可信"
+      },
+      {
+        "id": "pro_annual_edu",
+        "label": "教育认证价",
+        "price": 79,
+        "period": "year",
+        "condition": "edu 邮箱验证通过；续费时需重新验证"
+      }
+    ],
+    "stacking": "不可叠加，结算时自动取用户可享的最低价；限时窗口内已认证教育用户直接显示 79",
+    "edu_verification": {
+      "method": "邮箱验证码",
+      "domain_whitelist": [
+        ".edu.cn",
+        ".edu",
+        ".ac.uk",
+        ".ac.jp",
+        ".ac.kr",
+        ".edu.au",
+        ".edu.sg",
+        ".edu.hk",
+        ".edu.mo",
+        ".edu.tw"
+      ],
+      "reverify_on_renewal": true
+    },
+    "payment_channel": {
+      "decision": "不办营业执照，全部走 Merchant of Record 国际收单",
+      "primary": "Lemon Squeezy（支持支付宝/微信支付/银行卡，个人可签，代缴全球税务）",
+      "fallback": "Paddle",
+      "payout": "PayPal 或 Payoneer → 国内银行卡，综合成本约 7%",
+      "prerequisites": [
+        "网站 Terms of Service / Privacy Policy / Refund Policy 三个英文静态页（审核必查）",
+        "Chrome Web Store 开发者账号 $5"
+      ],
+      "future": "年收入上量后可注册个体户接微信/支付宝直连（费率 0.6%），仅替换收银台链接，价格体系不变"
+    }
+  },
+  "credits": {
+    "packs": [
+      {
+        "id": "credits_300",
+        "price": 30,
+        "amount": 300,
+        "expires": false
+      },
+      {
+        "id": "credits_1000",
+        "price": 90,
+        "amount": 1000,
+        "expires": false
+      }
+    ],
+    "monthly_pro_allowance": {
+      "amount": 50,
+      "rollover": false,
+      "note": "Pro 订阅按月发放，月底清零；加油包永不过期；消耗顺序：先扣月度额度，再扣加油包"
+    },
+    "data_contribution_reward": {
+      "amount_range": [
+        10,
+        20
+      ],
+      "condition": "提交投稿记录（期刊/投稿日期/审稿周期/结果）且通过验证后发放"
+    },
+    "costs": {
+      "fact_query": 0,
+      "db_filter": 0,
+      "journal_compare_template": 0,
+      "ai_journal_match": 10,
+      "ai_abstract_analysis": 10,
+      "ai_cover_letter": 15,
+      "ai_response_letter": 15,
+      "_note": "0 成本项走 Router 的数据库/SQL 分支，不调 LLM；定价按 LLM 实际成本 5-8 倍毛利核算，模型成本变动时只改此表"
+    }
+  },
+  "enforcement": {
+    "rules": [
+      "所有限额（收藏数、清单数、credits）由服务端在写入/调用时校验并拒绝超限，客户端仅做 UI 降级与升级提示",
+      "trial_expires_at、tier、edu_verified 均为服务端字段，客户端通过 JWT 携带的 entitlements 快照渲染 UI，快照过期时间 ≤ 24h",
+      "匿名 24h 计时为纯客户端宽限期，重装可重置，不做指纹对抗",
+      "AI 接口按账号限频（建议 10 次/分钟），credits 扣减与 LLM 调用同事务"
+    ]
+  },
+  "funnel_events": {
+    "_note": "GTM/自建埋点统一事件名，用于监控各环节转化率",
+    "events": [
+      "ext_installed",
+      "anon_first_badge_view",
+      "anon_first_favorite",
+      "registration_wall_shown",
+      "registered",
+      "local_favorites_merged",
+      "trial_activated",
+      "trial_day5_reminder",
+      "trial_expired",
+      "freeze_prompt_shown",
+      "flash_offer_shown",
+      "checkout_started",
+      "edu_verify_started",
+      "edu_verified",
+      "purchased",
+      "credits_pack_purchased",
+      "submission_record_submitted",
+      "submission_record_verified"
+    ],
+    "health_benchmarks": {
+      "install_to_register": "≥ 40%",
+      "register_to_paid": "2-4%",
+      "trial_to_paid": "8-15%"
+    }
+  }
+}

@@ -11,20 +11,21 @@
  *  4. credits 扣减与调用同事务 → spendCredits 单语句条件更新（调用方失败时 refundCredits）
  */
 
-export const SPEC_VERSION = '2026-06-12.4';
+export const SPEC_VERSION = '2026-06-13.1';
 
 const TRIAL_DAYS = 7;
 const SNAPSHOT_TTL_SEC = 24 * 3600;
 const FLASH_OFFER_WINDOW_SEC = 24 * 3600;
 const PRO_MONTHLY_CREDITS = 50;
 const UPGRADE_URL = 'https://journal.ailatest.org/pricing.html';
+const PRO_COMING_SOON = true;
 
 // tier → 功能面。favorites 限额由服务端强制，其余开关下发给客户端渲染 UI。
 const TIERS = {
   free: {
     badge_display: true,
     journal_detail: true,
-    favorites: { max_items: 30, max_lists: 2 },
+    favorites: { max_items: 5, max_lists: 2 },
     cloud_sync: true,
     tags: false,
     notes: false,
@@ -117,6 +118,14 @@ export async function ensureEntitlementsTables(env) {
 export async function activateTrialForNewUser(env, userId) {
   await ensureEntitlementsTables(env);
   const now = nowSec();
+  if (PRO_COMING_SOON) {
+    await env.DB.prepare(
+      `INSERT OR IGNORE INTO user_entitlements
+         (user_id, tier, trial_started_at, trial_expires_at, trial_used, edu_verified, updated_at)
+       VALUES (?, 'free', NULL, NULL, 0, 0, ?)`
+    ).bind(userId, now).run();
+    return;
+  }
   await env.DB.prepare(
     `INSERT OR IGNORE INTO user_entitlements
        (user_id, tier, trial_started_at, trial_expires_at, trial_used, edu_verified, updated_at)
@@ -134,6 +143,7 @@ async function getOrCreateRow(env, userId) {
 /** trial 到期 → 降级 free（数据冻结不删除，由写入路径的 enforce 实现） */
 async function effectiveTier(env, userId, row) {
   const now = nowSec();
+  if (PRO_COMING_SOON && row.tier !== 'pro') return 'free';
   if (row.tier === 'trial' && row.trial_expires_at && now > row.trial_expires_at) {
     await env.DB.prepare(
       "UPDATE user_entitlements SET tier='free', updated_at=? WHERE user_id=? AND tier='trial'"
@@ -197,6 +207,7 @@ export async function getEntitlements(env, user, isOwner = false) {
   const snapshot = {
     spec_version: SPEC_VERSION,
     tier,
+    pro_status: PRO_COMING_SOON ? 'coming_soon' : 'active',
     trial_expires_at: row.trial_expires_at || null,
     edu_verified: !!row.edu_verified,
     features: TIERS[tier],
