@@ -124,12 +124,37 @@
     const bar = document.createElement('div');
     bar.id = 'ailatest-scholar-tools';
     bar.style.cssText = 'display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:8px 0 10px;padding:8px 10px;border:1px solid #e5ded3;border-radius:6px;background:#fffdf8;color:#4b4032;font:12px -apple-system,BlinkMacSystemFont,Segoe UI,Arial,sans-serif;';
-    bar.innerHTML = '<b style="font-size:12px">AILatest 排序</b><button data-aj-sort="if">按 IF</button><button data-aj-sort="cites">按引用量</button><button data-aj-sort="original">恢复原顺序</button><span style="color:#8a7d6a">仅排序当前页结果</span>';
+    bar.innerHTML = '<b style="font-size:12px">AILatest 排序</b><button data-aj-sort="if">按 IF</button><button data-aj-sort="cites">按引用量</button><button data-aj-sort="original">恢复原顺序</button><span id="ailatest-scholar-status" style="color:#8a7d6a">已加载，正在识别期刊...</span>';
     bar.querySelectorAll('button').forEach((btn) => {
       btn.style.cssText = 'border:1px solid #d8cbb9;background:#fff;border-radius:5px;padding:3px 8px;cursor:pointer;color:#6b3f18;font-weight:700;';
       btn.addEventListener('click', () => sortScholar(btn.dataset.ajSort));
     });
     container.insertAdjacentElement('beforebegin', bar);
+  }
+
+  function updateStatus(info = {}) {
+    ensureScholarTools();
+    const el = document.getElementById('ailatest-scholar-status');
+    if (!el) return;
+    if (info.phase === 'loaded') {
+      el.textContent = '已加载，正在识别期刊...';
+      return;
+    }
+    if (info.phase === 'empty') {
+      el.textContent = '已加载，但未识别到期刊来源；请等页面加载完成或刷新';
+      return;
+    }
+    if (info.phase === 'lookup') {
+      el.textContent = `识别到 ${info.total || 0} 本，正在查询：${(info.names || []).join('；')}`;
+      return;
+    }
+    if (info.phase === 'done') {
+      el.textContent = `识别到 ${info.total || 0} 本，命中 ${info.hits || 0} 本${info.hits ? '' : `；已试：${(info.names || []).join('；')}`}`;
+      return;
+    }
+    if (info.phase === 'error') {
+      el.textContent = `查询失败：${info.message || 'unknown error'}`;
+    }
   }
 
   function sortScholar(mode) {
@@ -196,6 +221,7 @@
     insert,
     afterLookup,
     ensureTools: ensureScholarTools,
+    updateStatus,
     insertOpenAccessButton,
   });
 })(globalThis);

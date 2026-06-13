@@ -10,6 +10,9 @@
 
   if (!adapter) return;
 
+  if (adapter.ensureTools) adapter.ensureTools();
+  if (adapter.updateStatus) adapter.updateStatus({ phase: 'loaded' });
+
   function mark(anchorEl) {
     if (anchorEl) processed.add(anchorEl);
   }
@@ -54,11 +57,21 @@
       });
 
       const unique = Array.from(groups.values());
-      if (!unique.length) return;
+      if (!unique.length) {
+        if (adapter.updateStatus) adapter.updateStatus({ phase: 'empty' });
+        return;
+      }
+      if (adapter.updateStatus) adapter.updateStatus({
+        phase: 'lookup',
+        total: unique.length,
+        names: unique.map((group) => group.item.name || group.item.issn).filter(Boolean).slice(0, 5)
+      });
 
       const results = await ns.lookup.batchLookup(unique.map((group) => group.item));
+      let hitCount = 0;
       unique.forEach((group, index) => {
         const journal = results[index];
+        if (journal) hitCount += 1;
         group.entries.forEach((entry) => {
           if (adapter.afterLookup) adapter.afterLookup(entry, journal || null);
           if (adapter.insertOpenAccessButton) adapter.insertOpenAccessButton(entry, journal || null);
@@ -71,7 +84,14 @@
         });
       });
       if (adapter.ensureTools) adapter.ensureTools();
+      if (adapter.updateStatus) adapter.updateStatus({
+        phase: 'done',
+        total: unique.length,
+        hits: hitCount,
+        names: unique.map((group) => group.item.name || group.item.issn).filter(Boolean).slice(0, 5)
+      });
     } catch (e) {
+      if (adapter.updateStatus) adapter.updateStatus({ phase: 'error', message: e && e.message ? e.message : String(e) });
       console.debug('[AILatest] badge scan skipped:', e && e.message ? e.message : e);
     } finally {
       running = false;
