@@ -21,3 +21,8 @@
 /updates/ /index.html 200
 /updates/* /index.html 200
 /import /index.html 200
+
+/downloads/ailatest-journal-extension-v0.2.0.zip /extension 302
+/downloads/ailatest-journal-extension-v0.2.1.zip /extension 302
+/downloads/ailatest-journal-extension-v0.2.2.zip /extension 302
+/downloads/ailatest-journal-extension-v0.2.3.zip /extension 302
