@@ -32,6 +32,7 @@
     if (!anchorEl || !badgeNode) return;
     const span = document.createElement('span');
     span.className = 'ailatest-badge-line';
+    span.dataset.ailatestUi = '1';
     span.style.display = 'inline-flex';
     span.style.alignItems = 'center';
     span.style.flexWrap = 'wrap';

@@ -3,7 +3,7 @@
 
   const ns = root.AILatestExt = root.AILatestExt || {};
   const adapter = ns.getAdapter && ns.getAdapter(location.hostname);
-  const processed = new WeakSet();
+  const processed = new WeakMap();
   let scanTimer = 0;
   let running = false;
   let pending = false;
@@ -13,12 +13,12 @@
   if (adapter.ensureTools) adapter.ensureTools();
   if (adapter.updateStatus) adapter.updateStatus({ phase: 'loaded' });
 
-  function mark(anchorEl) {
-    if (anchorEl) processed.add(anchorEl);
+  function mark(anchorEl, key) {
+    if (anchorEl && key) processed.set(anchorEl, key);
   }
 
-  function isMarked(anchorEl) {
-    return !anchorEl || processed.has(anchorEl);
+  function isMarked(anchorEl, key) {
+    return !anchorEl || (key && processed.get(anchorEl) === key);
   }
 
   function buildItem(entry) {
@@ -42,7 +42,11 @@
       const entries = (adapter.findEntries() || [])
         .filter((entry) => entry && entry.anchorEl && (entry.issn || entry.journalName))
         .filter((entry) => {
-          if (isMarked(entry.anchorEl) || seenAnchors.has(entry.anchorEl)) return false;
+          const item = buildItem(entry);
+          const key = ns.lookup.queryKey(item);
+          if (!key) return false;
+          entry.lookupKey = key;
+          if (isMarked(entry.anchorEl, key) || seenAnchors.has(entry.anchorEl)) return false;
           seenAnchors.add(entry.anchorEl);
           return true;
         });
@@ -50,7 +54,7 @@
       const groups = new Map();
       entries.forEach((entry) => {
         const item = buildItem(entry);
-        const key = ns.lookup.queryKey(item);
+        const key = entry.lookupKey || ns.lookup.queryKey(item);
         if (!key) return;
         if (!groups.has(key)) groups.set(key, { item, entries: [] });
         groups.get(key).entries.push(entry);
@@ -76,9 +80,10 @@
           if (adapter.afterLookup) adapter.afterLookup(entry, journal || null);
           if (adapter.insertOpenAccessButton) adapter.insertOpenAccessButton(entry, journal || null);
           if (!journal) {
+            mark(entry.anchorEl, group.item && ns.lookup.queryKey(group.item));
             return;
           }
-          mark(entry.anchorEl);
+          mark(entry.anchorEl, group.item && ns.lookup.queryKey(group.item));
           const badgeNode = ns.badges.renderBadges(journal, settings);
           adapter.insert(entry.anchorEl, badgeNode, entry);
         });
@@ -107,7 +112,22 @@
   scheduleScan(50);
   [800, 1800, 3500, 7000].forEach((delay) => setTimeout(() => scheduleScan(0), delay));
 
-  const observer = new MutationObserver(() => scheduleScan(700));
+  function isOwnNode(node) {
+    if (!node || node.nodeType !== 1) return false;
+    if (node.dataset && node.dataset.ailatestUi === '1') return true;
+    if (node.closest && node.closest('[data-ailatest-ui="1"], .ailatest-badge-block, .ailatest-oa-btn')) return true;
+    return false;
+  }
+
+  const observer = new MutationObserver((mutations) => {
+    const onlyOwnChanges = mutations.every((m) => {
+      if (isOwnNode(m.target)) return true;
+      const added = Array.from(m.addedNodes || []);
+      const removed = Array.from(m.removedNodes || []);
+      return (added.length || removed.length) && [...added, ...removed].every(isOwnNode);
+    });
+    if (!onlyOwnChanges) scheduleScan(700);
+  });
   observer.observe(document.documentElement || document.body, {
     childList: true,
     subtree: true

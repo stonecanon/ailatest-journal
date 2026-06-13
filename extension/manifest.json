@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "AILatest Journal — 期刊分区影响因子助手",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "在 Google Scholar、PubMed、知网页面自动显示期刊影响因子、中科院分区、JCR 分区、收录与国内目录等评级徽章。数据来自 journal.ailatest.org。",
   "icons": {
     "16": "assets/icon-16.png",

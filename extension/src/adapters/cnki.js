@@ -102,6 +102,7 @@
     if (!anchorEl || !badgeNode) return;
     const container = document.createElement('span');
     container.className = 'ailatest-badge-line';
+    container.dataset.ailatestUi = '1';
     container.style.display = 'inline-flex';
     container.style.alignItems = 'center';
     container.style.flexWrap = 'wrap';
@@ -114,6 +115,7 @@
     } else {
       const line = document.createElement('div');
       line.className = 'ailatest-badge-block';
+      line.dataset.ailatestUi = '1';
       line.style.margin = '4px 0 6px';
       line.appendChild(badgeNode);
       anchorEl.insertAdjacentElement('afterend', line);
