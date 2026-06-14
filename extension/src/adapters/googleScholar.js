@@ -74,8 +74,13 @@
     return pdf ? pdf.href : '';
   }
 
+  function hasResultList() {
+    return !!document.querySelector('#gs_res_ccl_mid .gs_r, #gs_bdy_ccl .gs_r, .gs_r .gs_ri');
+  }
+
   function findEntries() {
     const out = [];
+    if (!hasResultList()) return out;
     document.querySelectorAll('.gs_r').forEach((row, index) => {
       const body = row.querySelector('.gs_ri') || row;
       const meta = body.querySelector('.gs_a');
@@ -119,8 +124,9 @@
   }
 
   function ensureScholarTools() {
+    if (!hasResultList()) return;
     if (document.getElementById('ailatest-scholar-tools')) return;
-    const container = document.querySelector('#gs_res_ccl_mid') || document.querySelector('#gs_bdy_ccl') || document.body;
+    const container = document.querySelector('#gs_res_ccl_mid') || document.querySelector('#gs_bdy_ccl');
     if (!container) return;
     const bar = document.createElement('div');
     bar.id = 'ailatest-scholar-tools';

@@ -8,7 +8,7 @@ const DEFAULT_JOURNALS_URL = 'https://journal.ailatest.org/data/journals.json.gz
 
 export const CORS = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'Authorization, Content-Type',
+  'Access-Control-Allow-Headers': 'Authorization, Content-Type, X-AJ-Install',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
