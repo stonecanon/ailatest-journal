@@ -10,8 +10,8 @@
       footer_pricing: '订阅',
       footer_contact: '联系',
       lang_toggle: 'English',
-      pricing_title: '订阅与定价 | AILatest Journal',
-      pricing_desc: 'AILatest Journal 订阅与定价：核心检索、基础徽章与浏览器插件基础额度免费可用。Plus 提供高额度插件查询，Pro 增加 AI 荐刊额度。',
+      pricing_title: '订阅即将开放 | AILatest Journal',
+      pricing_desc: 'AILatest Journal 订阅功能即将开放。当前主推浏览器插件内测版，可在 Google Scholar、PubMed、知网等页面显示期刊徽章。',
       extension_title: '浏览器插件内测版下载 | AILatest Journal',
       extension_desc: '下载 AILatest Journal 浏览器插件内测版，在 Google Scholar、PubMed、知网等页面试用期刊影响因子、中科院分区、JCR 分区和收录评级徽章。'
     },
@@ -25,8 +25,8 @@
       footer_pricing: 'Subscribe',
       footer_contact: 'Contact',
       lang_toggle: '中文',
-      pricing_title: 'Subscription & Pricing | AILatest Journal',
-      pricing_desc: 'AILatest Journal subscription and pricing: core search, basic badges and browser extension starter quota are free. Plus raises extension quota, and Pro adds AI journal recommendation credits.',
+      pricing_title: 'Subscription Coming Soon | AILatest Journal',
+      pricing_desc: 'AILatest Journal subscription is coming soon. For now, try the browser extension beta for journal badges on Google Scholar, PubMed, CNKI and more.',
       extension_title: 'Browser Extension Beta Download | AILatest Journal',
       extension_desc: 'Download the AILatest Journal browser extension beta to show IF, CAS tiers, JCR quartiles, indexed databases and domestic ranking badges on Google Scholar, PubMed, CNKI and more.'
     }
