@@ -6339,6 +6339,66 @@
       renderHomeIntResults();
     }
 
+    function domesticSearchKeys(r) {
+      const keys = [];
+      const add = (prefix, value) => {
+        const raw = String(value || '').trim();
+        if (!raw || raw.toUpperCase() === 'NA') return;
+        const normalized = prefix === 'name'
+          ? normTitle(raw.replace(/\*$/, ''))
+          : raw.toUpperCase().replace(/\s+/g, '');
+        if (normalized) keys.push(`${prefix}:${normalized}`);
+      };
+      add('issn', r.issn);
+      add('issn', r.eissn);
+      add('cn', r.cn_code);
+      add('name', r.name || r.cn_name || r.journal_title);
+      return [...new Set(keys)];
+    }
+
+    function domesticRepresentativeScore(r) {
+      const sourceRank = { cnki_major: 50, zju: 40, cnkx: 30, nsfc_mgmt: 20, cscd: 15, cstpcd: 10 };
+      return (sourceRank[r.__src] || 0)
+        + (r.issn ? 8 : 0)
+        + (r.cn_code ? 6 : 0)
+        + (r.en_name ? 4 : 0)
+        + (r.category || r.domain || r.discipline ? 2 : 0);
+    }
+
+    function mergeDomesticSearchRows(rows) {
+      const groups = [];
+      const keyToGroup = new Map();
+      for (const r of rows) {
+        const keys = domesticSearchKeys(r);
+        let group = keys.map(k => keyToGroup.get(k)).find(Boolean);
+        if (!group) {
+          group = { records: [], keys: new Set(), best: null };
+          groups.push(group);
+        }
+        group.records.push(r);
+        keys.forEach(k => {
+          group.keys.add(k);
+          keyToGroup.set(k, group);
+        });
+        if (!group.best || domesticRepresentativeScore(r) > domesticRepresentativeScore(group.best)) {
+          group.best = r;
+        }
+      }
+      return groups.map(group => {
+        const merged = { ...(group.best || group.records[0]) };
+        const sources = [...new Set(group.records.map(r => r.__src).filter(Boolean))];
+        merged.__src = merged.__src || sources[0] || 'cnki_major';
+        merged.__sources = sources;
+        for (const key of ['issn', 'eissn', 'cn_code', 'en_name', 'category', 'domain', 'discipline']) {
+          if (!merged[key]) {
+            const hit = group.records.find(r => r[key]);
+            if (hit) merged[key] = hit[key];
+          }
+        }
+        return merged;
+      });
+    }
+
     function renderHomeIntResults() {
       if (!homeResults) return;
       const q = activeQuery ? activeQuery.toLowerCase() : '';
@@ -6388,10 +6448,12 @@
         nsfc_mgmt: T('国自然管理','NSFC Management'),
         cnki_major: T('中文期刊目录','Chinese Journal Directory'),
         zju: T('浙大目录','ZJU'),
+        cscd: 'CSCD',
+        cstpcd: T('中国科技核心','CSTPCD'),
       };
       if (domestic) {
         const allDomestic = [];
-        for (const key of ['cnkx', 'nsfc_mgmt', 'cnki_major', 'zju']) {
+        for (const key of ['cnkx', 'nsfc_mgmt', 'cnki_major', 'zju', 'cscd', 'cstpcd']) {
           const src = domestic[key];
           if (src && src.records) {
             for (const r of src.records) {
@@ -6401,34 +6463,24 @@
             }
           }
         }
-        const sourceRank = { cnki_major: 4, zju: 3, nsfc_mgmt: 2, cnkx: 1 };
-        const dedupedDomestic = [];
-        const byDomesticKey = new Map();
-        allDomestic.forEach((r) => {
-          const key = (r.issn || r.cn_code || pickCleanDomesticName(r.name || r.cn_name || '')).toUpperCase();
-          if (!key) return;
-          const prev = byDomesticKey.get(key);
-          if (!prev || (sourceRank[r.__src] || 0) > (sourceRank[prev.__src] || 0)) {
-            byDomesticKey.set(key, r);
-          }
-        });
-        byDomesticKey.forEach((r) => dedupedDomestic.push(r));
-        domCount = dedupedDomestic.length;
+        const mergedDomestic = mergeDomesticSearchRows(allDomestic);
+        domCount = mergedDomestic.length;
         if (domCount) {
-          domHtml = dedupedDomestic.slice(0, domLimit).map(r => {
+          domHtml = mergedDomestic.slice(0, domLimit).map(r => {
             const fid = favId(r);
             rowRecordsByFid[fid] = { ...r, __src: r.__src };
             const name = r.name || r.cn_name || '';
             const cnName = r.en_name ? `<span class="jname-cn">${escape(titleCase(r.en_name))}</span>` : '';
-            const crossBadges = renderDomCrossBadges({ name, issn: r.issn, cn_code: r.cn_code }, r.__src);
+            const crossBadges = renderDomCrossBadges({ name, issn: r.issn, cn_code: r.cn_code });
             const categoryType = r.domain ? 'domain' : (r.category ? 'pku' : 'cssci');
             const category = tn(r.domain || r.category || r.discipline || '', categoryType);
             const codeLine = [r.issn ? `ISSN ${r.issn}` : '', r.cn_code ? `CN ${r.cn_code}` : ''].filter(Boolean).join(' · ');
+            const sourceText = (r.__sources || [r.__src]).map(src => domSourceLabel[src] || src).join(' · ');
             return `<tr data-fid="${escape(fid)}" class="j-row clickable home-dom-row" data-src="${escape(r.__src)}">
               <td class="col-fav">${starBtn(r, r.__src)}</td>
               <td class="col-name"><div class="jname">${escape(titleCase(name.replace(/\*$/,'')))}${cnName}</div>${codeLine ? `<div class="home-dom-meta">${escape(codeLine)}</div>` : ''}</td>
               <td class="col-cross"><div class="badges">${crossBadges}</div></td>
-              <td class="home-dom-source"><span>${escape(domSourceLabel[r.__src] || r.__src)}</span>${category ? `<em>${escape(category)}</em>` : ''}</td>
+              <td class="home-dom-source"><span>${escape(sourceText)}</span>${category ? `<em>${escape(category)}</em>` : ''}</td>
             </tr>`;
           }).join('');
         }
