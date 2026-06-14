@@ -2657,7 +2657,10 @@
   function castLabel(domain, tier) {
     const disc = castDiscipline(domain);
     const needsSpace = !(lang === 'zh-CN' || lang === 'zh-TW' || lang === 'ja' || lang === 'ko');
-    return disc ? `${T('科协','CAST')}${needsSpace ? ' ' : ''}${disc}` : `${T('科协','CAST')} ${tier || ''}`.trim();
+    const tierText = tier ? String(tier).trim().toUpperCase() : '';
+    return disc
+      ? `${T('科协','CAST')}${needsSpace ? ' ' : '·'}${disc}${tierText ? ' ' + tierText : ''}`
+      : `${T('科协','CAST')} ${tierText}`.trim();
   }
   function renderDomCrossBadges(r, excludeSource) {
     const hits = lookupDom(r).filter(h => h.source !== excludeSource);
@@ -6701,10 +6704,8 @@
     function updateCardBanner(item, sourceName) {
       const cat = item.category ? ` data-cat="${escape(item.category)}"` : '';
       const mark = updateBannerMark(item);
-      const date = item.published_at ? formatUpdateDate(item.published_at) : '';
       return `<div class="update-card-image update-card-generated"${cat}>
-        <div class="update-cover-main"><span class="update-card-ph-mark">${escape(mark)}</span><b>${escape(shortUpdateText(sourceName, 30))}</b></div>
-        ${date ? `<div class="update-cover-meta">${escape(date)}</div>` : ''}
+        <div class="update-cover-main"><span class="update-card-ph-mark">${escape(mark)}</span><b>${escape(shortUpdateText(sourceName, 34))}</b></div>
       </div>`;
     }
 

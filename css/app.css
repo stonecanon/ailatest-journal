@@ -842,7 +842,7 @@ main.main {
   padding: 12px 13px;
 }
 .update-card.home-compact {
-  min-height: 188px;
+  min-height: 214px;
   padding: 12px 13px;
 }
 .update-card.brief {
@@ -873,8 +873,8 @@ main.main {
 .update-card.home-compact .update-card-image {
   margin: -12px -13px 10px;
   aspect-ratio: auto;
-  height: 72px;
-  max-height: 72px;
+  height: 56px;
+  max-height: 56px;
 }
 .update-card.home-compact.brief .update-card-image {
   height: 48px;
@@ -890,12 +890,12 @@ main.main {
   position: relative;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 10px;
   padding: 10px 13px;
   background:
-    radial-gradient(circle at 18% 22%, rgba(255,255,255,.82), rgba(255,255,255,0) 30%),
-    linear-gradient(135deg, #f7f0e6 0%, #ece2d5 58%, #e5dccf 100%);
+    radial-gradient(circle at 18% 22%, rgba(255,255,255,.86), rgba(255,255,255,0) 34%),
+    linear-gradient(135deg, #fbf7ef 0%, #f2eadf 58%, #eee5d9 100%);
 }
 .update-cover-main {
   display: flex;
@@ -910,9 +910,11 @@ main.main {
   font-size: 12px;
   font-weight: 740;
   line-height: 1.25;
-  white-space: nowrap;
+  white-space: normal;
   overflow: hidden;
-  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 .update-cover-meta {
   flex: 0 0 auto;
@@ -1011,7 +1013,9 @@ main.main {
   margin: 8px 0 0;
   font-size: 13.8px;
   line-height: 1.34;
-  -webkit-line-clamp: 2;
+  display: block;
+  -webkit-line-clamp: unset;
+  overflow: visible;
 }
 .update-card p {
   margin: 0;
@@ -1027,7 +1031,7 @@ main.main {
   margin-top: 5px;
   font-size: 12px;
   line-height: 1.42;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 3;
 }
 .update-journals {
   display: flex;
@@ -6085,24 +6089,20 @@ body.journal-route .lang-toggle-wrap { display: none; }
   .tab-panel[data-panel="int"] thead .col-badge { gap: 10px; }
 }
 
-/* ── header: pull 预警名单 out as a distinct warning chip ── */
+/* ── header links: keep Warning List and plugin entry in the same nav flow ── */
 #warn-rank-link {
-  margin-left: 0 !important;
-  color: var(--ink-faint) !important;
-  display: inline-flex !important;
+  margin-left: 0;
+  color: var(--ink-faint);
+  display: inline-flex;
   align-items: center;
-  padding: 2px 0 !important;
-  border: 0 !important;
-  border-bottom: 1px solid transparent !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  box-shadow: none !important;
+  padding: 2px 0;
+  border-bottom: 1px solid transparent;
   line-height: 1.4;
 }
 #warn-rank-link::before { content: ""; }
 #warn-rank-link:hover { color: var(--accent); border-color: var(--accent); }
 #extension-beta-link {
-  margin-left: 0 !important;
+  margin-left: 0;
   display: inline-flex;
   align-items: center;
   gap: 4px;
