@@ -10,17 +10,18 @@
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
 <link rel="stylesheet" href="/css/static.css" />
 </head>
-<body>
+<body data-static-page="extension">
 <header class="page-head">
   <a class="brand" href="/">AILatest <span>Journal</span></a>
   <nav>
-    <a href="/about.html">关于</a>
-    <a href="/pricing.html">订阅</a>
-    <a href="/contact.html">联系</a>
-    <a class="cta" href="/signup.html">注册 / 登录</a>
+    <a href="/about.html" data-static-i18n="nav_about">关于</a>
+    <a href="/pricing.html" data-static-i18n="nav_pricing">订阅</a>
+    <a href="/contact.html" data-static-i18n="nav_contact">联系</a>
+    <a class="cta" href="/signup.html" data-static-i18n="nav_login">注册 / 登录</a>
+    <button class="static-lang-toggle" type="button" data-static-lang-toggle>English</button>
   </nav>
 </header>
-<main>
+<main data-lang-panel="zh-CN">
   <h1>浏览器插件内测版</h1>
   <p class="sub">用于小范围试用和兼容性反馈。在 Google Scholar、PubMed、知网等论文页面直接显示期刊影响因子、中科院分区、JCR 分区、收录索引和国内目录评级。</p>
 
@@ -53,14 +54,48 @@
     内测 ZIP 不会自动更新。正式版后续会以上架 Chrome Web Store 为准；商店版发布后，用户会通过浏览器自动更新。内测期间若某些站点没有识别出期刊，请下载本页新版或把页面链接发给我们。
   </div>
 </main>
+<main data-lang-panel="en">
+  <h1>Browser Extension Beta</h1>
+  <p class="sub">A small beta release for compatibility testing and feedback. On Google Scholar, PubMed, CNKI and other literature pages, it shows journal IF, CAS tiers, JCR quartiles, indexed databases and domestic ranking badges directly beside each result.</p>
+
+  <div class="card">
+    <h2 style="margin-top:0">AILatest Journal Extension beta v0.2.9</h2>
+    <p>The current release is a manual Chrome / Edge installation package. It is not the final Chrome Web Store version yet, so it is intended for early testing, compatibility feedback and journal recognition fixes.</p>
+    <p>Download and unzip the package, enable Developer mode in the browser extension page, then load the unzipped folder.</p>
+    <p><a class="btn" href="/downloads/ailatest-journal-extension-latest.zip" download>Download extension ZIP</a></p>
+    <p class="small muted">File size is about 43KB. The extension queries journal.ailatest.org for journal data. Anonymous trial quota is limited; signing in provides a higher quota.</p>
+  </div>
+
+  <div class="card">
+    <h2 style="margin-top:0">Stable, safe and no traffic hijacking</h2>
+    <p>AILatest is designed as a research productivity tool. Core lookup uses our cloud API and local cache to make high-frequency journal recognition more stable when third-party pages or interfaces change.</p>
+    <p>The extension only requests the fields needed for journal recognition. It does not upload browsing history, search keywords or reading content. It does not inject ads, rewrite links, hijack coupons or sell anonymous traffic data. When the Chrome Web Store version is released, we will publish complete Privacy Practices disclosures.</p>
+  </div>
+
+  <div class="card">
+    <h2 style="margin-top:0">How to install</h2>
+    <ol>
+      <li>Download the ZIP and unzip it to a local folder.</li>
+      <li>Open the extension management page in Chrome or Edge.</li>
+      <li>Turn on Developer mode.</li>
+      <li>Click "Load unpacked" and choose the unzipped folder.</li>
+      <li>Open Google Scholar, PubMed or CNKI to check the journal badges.</li>
+    </ol>
+  </div>
+
+  <div class="note">
+    The beta ZIP does not update automatically. The final release will be published through the Chrome Web Store, where the browser can update it automatically. During beta testing, if a site or journal is not recognized, download the latest version here or send us the page link.
+  </div>
+</main>
 <footer class="page-foot">
   <p>© 2026 AILatest Journal ·
-    <a href="/about.html">关于</a> ·
-    <a href="/pricing.html">订阅</a> ·
-    <a href="/contact.html">联系</a> ·
+    <a href="/about.html" data-static-i18n="footer_about">关于</a> ·
+    <a href="/pricing.html" data-static-i18n="footer_pricing">订阅</a> ·
+    <a href="/contact.html" data-static-i18n="footer_contact">联系</a> ·
     <a href="/terms.html">Terms</a> ·
     <a href="/privacy.html">Privacy</a> ·
     <a href="/refund.html">Refund</a></p>
 </footer>
+<script src="/js/static-i18n.js" defer></script>
 </body>
 </html>

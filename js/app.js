@@ -44,7 +44,7 @@
       pwa_install: '📲 安装到主屏',
       footer_data: '数据来源：Clarivate WoS Core Collection (SCIE/SSCI/AHCI/ESCI) · JCR 2025 · ESI · EI Compendex · Scopus · DOAJ · CSCD · 中国科技核心 · SCD · AMI · FMS · VHB 2024 · CNRS Section 37 · UGC-CARE India · 中科院文献情报中心分区表 2025 · ShowJCR (GPL-3.0) · CCF 2026 (A/B/C) · CCF-T 2025 · ABDC 2025 · ABS 2024 · 中国科协 2025 · CSSCI · 北大核心 · CNKI · 浙江大学 2024 · Crossref Retraction Watch · OpenAlex。© <a href="https://journal.ailatest.org">AILatest Journal</a>',
       tab_home: '查刊', tab_int: '国际', tab_dom: '中国', tab_fav: '收藏', tab_pick: '荐刊',
-      nav_index_rank: '索引排行榜', nav_subject_rank: '学科排行榜', nav_warn_rank: '预警名单',
+      nav_index_rank: '索引排行榜', nav_subject_rank: '学科排行榜', nav_warn_rank: '预警名单', nav_extension_beta: '插件内测', nav_subscription: '订阅',
       filter_if_range: '影响因子', if_any: '不限',
       rail_int: '全球', rail_dom: '中国', rail_in: '印度', rail_my: '马来西亚', rail_kr: '韩国', rail_fav: '我的',
       loading: '加载中…',
@@ -131,7 +131,7 @@
       pwa_install: '📲 Install to Home',
       footer_data: 'Sources: Clarivate WoS Core Collection (SCIE/SSCI/AHCI/ESCI) · JCR 2025 · ESI · EI Compendex · Scopus · DOAJ · CSCD · CSTPCD · SCD · AMI · FMS · VHB 2024 · CNRS Section 37 · UGC-CARE India · CAS NSL Tiers 2025 · ShowJCR (GPL-3.0) · CCF 2026 (A/B/C) · CCF-T 2025 · ABDC 2025 · ABS 2024 · CAST 2025 · CSSCI · PKU Core · CNKI · ZJU 2024 · Crossref Retraction Watch · OpenAlex. © <a href="https://journal.ailatest.org">AILatest Journal</a>',
       tab_home: 'Journals', tab_int: 'International', tab_dom: 'China', tab_fav: 'Favorites', tab_pick: 'Recommend',
-      nav_index_rank: 'Index Rankings', nav_subject_rank: 'Subject Rankings', nav_warn_rank: 'Warning List',
+      nav_index_rank: 'Index Rankings', nav_subject_rank: 'Subject Rankings', nav_warn_rank: 'Warning List', nav_extension_beta: 'Extension beta', nav_subscription: 'Subscribe',
       filter_if_range: 'Impact Factor', if_any: 'Any',
       rail_int: 'Global', rail_dom: 'China', rail_in: 'India', rail_my: 'Malaysia', rail_kr: 'Korea', rail_fav: 'Me',
       loading: 'Loading…',
@@ -2258,10 +2258,7 @@
   async function reportJournalView(recOrKey, opts = {}) {
     const key = typeof recOrKey === 'string' ? recOrKey : favId(recOrKey);
     if (!key) return;
-    try {
-      if (localStorage.getItem('ailatest.analytics.ignore') === '1') return;
-    } catch (_) {}
-    const detailPath = opts.path || (typeof recOrKey === 'string' ? analyticsPath() : journalPublicPath(recOrKey));
+    const detailPath = typeof recOrKey === 'string' ? analyticsPath() : journalPublicPath(recOrKey);
     const source = journalOpenSource(opts);
     try {
       const r = await fetch(`${API_BASE}/journal-view`, {
