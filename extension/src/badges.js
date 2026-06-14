@@ -33,15 +33,15 @@
       text-overflow: ellipsis;
       box-sizing: border-box;
     }
-    .zone, .if, .xr, .flagship { background: #735a3e; }
+    .zone, .cas, .jcr, .if, .xr, .flagship { background: #735a3e; }
     .ccf { background: #72728d; }
     .biz { background: #724a58; }
     .tier { background: #72849b; }
-    .index { background: #526b86; }
+    .index, .idx { background: #526b86; }
     .free { background: #1d6f42; }
     .warning { background: #b23a3a; }
     .onhold { background: #d94a1e; }
-    .citic { background: #6f665d; }
+    .citic, .warnsoft { background: #6f665d; }
     .cssci { background: #6a3a8b; }
     .cssci-ext { background: #8a5aa6; }
     .pku { background: #a33a2a; }
@@ -155,10 +155,11 @@
     if (journal && journal.slug) {
       const link = document.createElement('a');
       link.className = 'pill index';
-      link.href = `https://journal.ailatest.org/#j/${encodeURIComponent(journal.slug)}`;
+      link.href = `https://journal.ailatest.org/journal/${encodeURIComponent(journal.slug)}`;
       link.target = '_blank';
       link.rel = 'noopener noreferrer';
       link.textContent = 'AILatest';
+      link.title = '查看期刊详情 — AILatest Journal';
       wrap.appendChild(link);
     }
 

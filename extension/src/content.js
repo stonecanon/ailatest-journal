@@ -28,6 +28,38 @@
     };
   }
 
+  async function retryMissesWithResolvedNames(unique, results) {
+    if (!adapter.resolveJournalName) return results;
+    const retryItems = [];
+    const retryPositions = [];
+    for (let i = 0; i < unique.length; i += 1) {
+      if (results[i]) continue;
+      const entry = unique[i].entries && unique[i].entries[0];
+      if (!entry) continue;
+      let resolved = null;
+      try {
+        resolved = await adapter.resolveJournalName(entry);
+      } catch (_) {
+        resolved = null;
+      }
+      const item = {
+        issn: resolved && resolved.issn || '',
+        name: resolved && resolved.name || ''
+      };
+      const key = ns.lookup.queryKey(item);
+      if (!key || key === (unique[i].item && ns.lookup.queryKey(unique[i].item))) continue;
+      retryItems.push(item);
+      retryPositions.push(i);
+      unique[i].item = item;
+    }
+    if (!retryItems.length) return results;
+    const retryResults = await ns.lookup.batchLookup(retryItems);
+    retryPositions.forEach((pos, index) => {
+      if (retryResults[index]) results[pos] = retryResults[index];
+    });
+    return results;
+  }
+
   async function scan() {
     if (running) {
       pending = true;
@@ -71,7 +103,8 @@
         names: unique.map((group) => group.item.name || group.item.issn).filter(Boolean).slice(0, 5)
       });
 
-      const results = await ns.lookup.batchLookup(unique.map((group) => group.item));
+      let results = await ns.lookup.batchLookup(unique.map((group) => group.item));
+      results = await retryMissesWithResolvedNames(unique, results);
       let hitCount = 0;
       unique.forEach((group, index) => {
         const journal = results[index];

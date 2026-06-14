@@ -212,6 +212,39 @@
     return '';
   }
 
+  function journalFromOpenAlexWork(work) {
+    const source = work && (work.primary_location && work.primary_location.source
+      || work.host_venue
+      || work.best_oa_location && work.best_oa_location.source);
+    if (!source) return null;
+    const name = source.display_name || source.display_name_alternatives && source.display_name_alternatives[0] || '';
+    const issn = source.issn_l || Array.isArray(source.issn) && source.issn[0] || '';
+    return name ? { name, issn } : null;
+  }
+
+  async function resolveJournalName(entry) {
+    if (!entry) return null;
+    if (entry.doi) {
+      const res = await fetch(`https://api.openalex.org/works/doi:${encodeURIComponent(entry.doi)}`);
+      if (res.ok) {
+        const hit = journalFromOpenAlexWork(await res.json());
+        if (hit) return hit;
+      }
+    }
+    const title = String(entry.paperTitle || '').trim();
+    if (!title) return null;
+    const params = new URLSearchParams({ search: title, per_page: '3' });
+    const res = await fetch(`https://api.openalex.org/works?${params.toString()}`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    const works = Array.isArray(data.results) ? data.results : [];
+    for (const work of works) {
+      const hit = journalFromOpenAlexWork(work);
+      if (hit) return hit;
+    }
+    return null;
+  }
+
   function insertOpenAccessButton(entry) {
     if (!entry || !entry.rowEl || entry.rowEl.querySelector('.ailatest-oa-btn')) return;
     const actions = entry.rowEl.querySelector('.gs_fl') || entry.anchorEl;
@@ -245,12 +278,13 @@
 
   ns.adapters.push({
     id: 'google-scholar',
-    match: (host) => /^scholar\.google\./i.test(host),
+    match: (host) => /^scholar\.google\./i.test(host) || /^(xs2\.dailyheadlines\.cc|scholar\.lanfanshu\.cn)$/i.test(host),
     findEntries,
     insert,
     afterLookup,
     ensureTools: ensureScholarTools,
     updateStatus,
     insertOpenAccessButton,
+    resolveJournalName,
   });
 })(globalThis);

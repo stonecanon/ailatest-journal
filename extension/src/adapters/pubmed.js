@@ -30,6 +30,8 @@
 
   function insert(anchorEl, badgeNode) {
     if (!anchorEl || !badgeNode) return;
+    const scope = anchorEl.closest('.docsum-content, .full-view, .docsum, article') || anchorEl.parentElement || document;
+    scope.querySelectorAll('.ailatest-badge-line').forEach((el) => el.remove());
     const span = document.createElement('span');
     span.className = 'ailatest-badge-line';
     span.dataset.ailatestUi = '1';
