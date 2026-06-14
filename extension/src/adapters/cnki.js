@@ -100,6 +100,8 @@
 
   function insert(anchorEl, badgeNode) {
     if (!anchorEl || !badgeNode) return;
+    const scope = anchorEl.closest('tr, .result-item, .list-item, [class*="result"], [class*="item"]') || anchorEl.parentElement || document;
+    scope.querySelectorAll('.ailatest-badge-line, .ailatest-badge-block').forEach((el) => el.remove());
     const container = document.createElement('span');
     container.className = 'ailatest-badge-line';
     container.dataset.ailatestUi = '1';
@@ -107,7 +109,8 @@
     container.style.alignItems = 'center';
     container.style.flexWrap = 'wrap';
     container.style.gap = '4px';
-    container.style.marginLeft = '6px';
+    container.style.marginLeft = '0';
+    container.style.textAlign = 'left';
     container.appendChild(badgeNode);
 
     if (anchorEl.closest('td')) {
@@ -116,7 +119,11 @@
       const line = document.createElement('div');
       line.className = 'ailatest-badge-block';
       line.dataset.ailatestUi = '1';
-      line.style.margin = '4px 0 6px';
+      line.style.display = 'flex';
+      line.style.justifyContent = 'flex-start';
+      line.style.alignItems = 'flex-start';
+      line.style.textAlign = 'left';
+      line.style.margin = '4px 0 6px 0';
       line.appendChild(badgeNode);
       anchorEl.insertAdjacentElement('afterend', line);
     }

@@ -111,6 +111,8 @@
   }
 
   function insert(anchorEl, badgeNode) {
+    const row = anchorEl && anchorEl.closest ? anchorEl.closest('.gs_r') : null;
+    if (row) row.querySelectorAll('.ailatest-badge-block').forEach((el) => el.remove());
     const line = document.createElement('div');
     line.className = 'ailatest-badge-block';
     line.dataset.ailatestUi = '1';
