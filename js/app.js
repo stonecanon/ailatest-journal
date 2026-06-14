@@ -350,7 +350,13 @@
   const normalizeLang = (code) => code === 'zh' ? 'zh-CN' : (I18N[code] ? code : 'zh-CN');
 
   // ───────── state ─────────
-  let lang = normalizeLang(localStorage.getItem('ailatest.lang') || 'zh-CN');
+  function initialLangFromPath() {
+    const path = location.pathname.replace(/\/+$/, '') || '/';
+    if (path === '/zh' || path.startsWith('/zh/')) return 'zh-CN';
+    if (path === '/' || path === '/en' || path.startsWith('/en/')) return 'en';
+    return localStorage.getItem('ailatest.lang') || 'zh-CN';
+  }
+  let lang = normalizeLang(initialLangFromPath());
   const T = (zh_, en_) => lang === 'zh-CN' || lang === 'zh-TW' ? zh_ : en_;
   // ── Domestic field-value translations (CAST domains, CSSCI/PKU disciplines, ZJU tiers) ──
   const DOM_I18N = {
@@ -927,10 +933,14 @@
 
   let activeTab = 'home';
   const TAB_PATHS = { home: '/', int: '/global', dom: '/cn', updates: '/updates', in: '/in', my: '/my', kr: '/kr', fav: '/favorites', pick: '/pick' };
-  const PATH_TABS = { '/': 'home', '/global': 'int', '/international': 'int', '/journals': 'int', '/cn': 'dom', '/china': 'dom', '/updates': 'updates', '/in': 'in', '/india': 'in', '/my': 'my', '/malaysia': 'my', '/kr': 'kr', '/korea': 'kr', '/favorites': 'fav', '/pick': 'pick' };
+  const PATH_TABS = { '/': 'home', '/en': 'home', '/zh': 'home', '/global': 'int', '/international': 'int', '/journals': 'int', '/cn': 'dom', '/china': 'dom', '/updates': 'updates', '/in': 'in', '/india': 'in', '/my': 'my', '/malaysia': 'my', '/kr': 'kr', '/korea': 'kr', '/favorites': 'fav', '/pick': 'pick' };
   const TAB_SEO = {
     home: {
-      title: 'AILatest Journal — 期刊查询 · 荐刊推荐 · SCI期刊检索',
+      title: 'AILatest Journal - Journal Finder, Rankings & Impact Factors',
+      desc: 'AILatest Journal helps researchers search 40,000+ academic journals, compare impact factors, JCR quartiles, CAS tiers, indexing databases, review cycles, and AI-powered submission matches.'
+    },
+    homeZh: {
+      title: 'AILatest Journal - 期刊查询 · 荐刊推荐 · SCI期刊检索',
       desc: 'AILatest Journal 是面向科研人员的免费期刊查询与荐刊推荐工具。聚合 SCI/SSCI/AHCI、JCR 影响因子、中科院分区、CCF、CSSCI 等数据，支持期刊搜索、荐刊推荐、收藏同步。'
     },
     int: {
@@ -972,9 +982,13 @@
     return PATH_TABS[clean] || 'home';
   }
   function updatePageSeo(tab = activeTab) {
-    const seo = TAB_SEO[tab] || TAB_SEO.int;
+    const isZhHome = tab === 'home' && (location.pathname.replace(/\/+$/, '') === '/zh' || lang === 'zh-CN' || lang === 'zh-TW');
+    const seo = isZhHome ? TAB_SEO.homeZh : (TAB_SEO[tab] || TAB_SEO.int);
     document.title = seo.title;
-    const canonicalPath = (tab === 'home' || (tab === 'int' && (location.pathname === '/' || location.pathname === ''))) ? '/' : (TAB_PATHS[tab] || '/');
+    const currentPath = location.pathname.replace(/\/+$/, '') || '/';
+    const canonicalPath = tab === 'home'
+      ? (currentPath === '/zh' ? '/zh' : currentPath === '/en' ? '/en' : '/')
+      : ((tab === 'int' && (location.pathname === '/' || location.pathname === '')) ? '/' : (TAB_PATHS[tab] || '/'));
     const desc = document.querySelector('meta[name="description"]');
     if (desc) desc.setAttribute('content', seo.desc);
     const canonical = document.querySelector('link[rel="canonical"]');

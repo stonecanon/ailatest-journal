@@ -67,6 +67,56 @@ function replaceMeta(html, selector, replacement) {
 </head>`);
 }
 
+function stripAlternateLinks(html) {
+  return html.replace(/<link\s+rel="alternate"[^>]*hreflang="[^"]*"[^>]*>\s*/gi, '');
+}
+
+function localizedHomeSeo(path, origin) {
+  const isZh = path.replace(/\/+$/, '') === '/zh';
+  const url = `${origin}${isZh ? '/zh' : path.replace(/\/+$/, '') === '/en' ? '/en' : ''}`;
+  if (isZh) {
+    return {
+      lang: 'zh-CN',
+      title: 'AILatest Journal - 期刊查询 · 荐刊推荐 · SCI期刊检索',
+      desc: 'AILatest Journal 是面向科研人员的免费期刊查询与荐刊推荐工具。聚合 SCI/SSCI/AHCI、JCR 影响因子、中科院分区、CCF、CSSCI、北大核心、Scopus、DOAJ 等数据。',
+      url,
+      ogTitle: 'AILatest Journal - 期刊查询与荐刊推荐',
+    };
+  }
+  return {
+    lang: 'en',
+    title: 'AILatest Journal - Journal Finder, Rankings & Impact Factors',
+    desc: 'AILatest Journal helps researchers search 40,000+ academic journals, compare impact factors, JCR quartiles, CAS tiers, indexing databases, review cycles, and AI-powered submission matches.',
+    url,
+    ogTitle: 'AILatest Journal - Journal Finder, Rankings & Submission Insights',
+  };
+}
+
+async function localizedHomePage(ctx, path, origin) {
+  const seo = localizedHomeSeo(path, origin);
+  let html = await loadAppShell(ctx);
+  html = html.replace(/<html\s+lang="[^"]*"/i, `<html lang="${esc(seo.lang)}"`);
+  html = html.replace(/<title>[\s\S]*?<\/title>/i, `<title>${esc(seo.title)}</title>`);
+  html = replaceMeta(html, /<meta name="description" content="[^"]*"\s*\/?>/i, `<meta name="description" content="${esc(seo.desc)}" />`);
+  html = replaceMeta(html, /<link rel="canonical" href="[^"]*"\s*\/?>/i, `<link rel="canonical" href="${esc(seo.url)}" />`);
+  html = stripAlternateLinks(html);
+  html = html.replace('</head>',
+    `<link rel="alternate" href="${origin}/" hreflang="en" />
+<link rel="alternate" href="${origin}/en" hreflang="en" />
+<link rel="alternate" href="${origin}/zh" hreflang="zh-CN" />
+<link rel="alternate" href="${origin}/" hreflang="x-default" />
+</head>`);
+  html = replaceMeta(html, /<meta property="og:url" content="[^"]*"\s*\/?>/i, `<meta property="og:url" content="${esc(seo.url)}" />`);
+  html = replaceMeta(html, /<meta property="og:title" content="[^"]*"\s*\/?>/i, `<meta property="og:title" content="${esc(seo.ogTitle)}" />`);
+  html = replaceMeta(html, /<meta property="og:description" content="[^"]*"\s*\/?>/i, `<meta property="og:description" content="${esc(seo.desc)}" />`);
+  html = replaceMeta(html, /<meta name="twitter:title" content="[^"]*"\s*\/?>/i, `<meta name="twitter:title" content="${esc(seo.ogTitle)}" />`);
+  html = replaceMeta(html, /<meta name="twitter:description" content="[^"]*"\s*\/?>/i, `<meta name="twitter:description" content="${esc(seo.desc)}" />`);
+  if (!/<meta name="robots"/i.test(html)) {
+    html = html.replace('</head>', '<meta name="robots" content="index,follow" />\n</head>');
+  }
+  return html;
+}
+
 function journalSeo(j, slug, origin) {
   const name = titleCaseName(j.n || 'Journal');
   const ifVal = j.f;
@@ -312,6 +362,12 @@ export async function onRequest(ctx) {
   const path = url.pathname;
 
   try {
+    if (path === '/' || path === '/en' || path === '/en/' || path === '/zh' || path === '/zh/') {
+      const html = await localizedHomePage(ctx, path, url.origin);
+      return new Response(html, { status: 200,
+        headers: { 'Content-Type': 'text/html;charset=utf-8', 'Cache-Control': 'no-store, no-cache, must-revalidate' } });
+    }
+
     // Handle /journal/<slug>/
     if (path.startsWith('/journal/')) {
       const rawSlug = path.replace('/journal/', '').replace(/\/$/, '');

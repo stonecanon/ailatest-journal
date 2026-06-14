@@ -6,6 +6,10 @@
 /sitemap-journals.xml /sitemap.xml 302
 /sitemap-main.xml /sitemap.xml 302
 /data/journal_pages.json / 302
+/en /index.html 200
+/en/ /index.html 200
+/zh /index.html 200
+/zh/ /index.html 200
 /international /index.html 200
 /global /index.html 200
 /china /index.html 200
