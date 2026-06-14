@@ -144,6 +144,52 @@
     }
   }
 
+  function button(label) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = label;
+    btn.style.cssText = 'border:1px solid #d8cbb9;background:#fffdf8;border-radius:4px;padding:2px 7px;color:#6b3f18;font-weight:700;cursor:pointer;';
+    return btn;
+  }
+
+  function select(options) {
+    const sel = document.createElement('select');
+    sel.style.cssText = 'border:1px solid #d8cbb9;background:#fff;border-radius:4px;padding:2px 6px;color:#4b4032;font-weight:700;';
+    options.forEach(([value, label]) => {
+      const opt = document.createElement('option');
+      opt.value = value;
+      opt.textContent = label;
+      sel.appendChild(opt);
+    });
+    return sel;
+  }
+
+  function formatPayload(data, fmt) {
+    if (fmt === 'ris') return { filename: `${citationKey(data)}.ris`, text: ris(data), mode: 'download' };
+    if (fmt === 'bib') return { filename: `${citationKey(data)}.bib`, text: bibtex(data), mode: 'download' };
+    if (fmt === 'enw') return { filename: `${citationKey(data)}.enw`, text: enw(data), mode: 'download' };
+    if (fmt === 'apa') return { text: apa(data), mode: 'copy' };
+    if (fmt === 'ama') return { text: numbered(data), mode: 'copy' };
+    if (fmt === 'acs') return { text: numbered(data), mode: 'copy' };
+    if (fmt === 'gbt') return { text: gbt(data), mode: 'copy' };
+    return null;
+  }
+
+  async function saveCitation(data) {
+    const item = { ...data, savedAt: Date.now(), key: citationKey(data) };
+    if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+      const current = await chrome.storage.local.get('ajCitationLibrary');
+      const list = Array.isArray(current.ajCitationLibrary) ? current.ajCitationLibrary : [];
+      const next = [item, ...list.filter((x) => (x.doi || x.url) !== (item.doi || item.url))].slice(0, 500);
+      await chrome.storage.local.set({ ajCitationLibrary: next });
+      return true;
+    }
+    const key = 'ailatest.citationLibrary';
+    const list = JSON.parse(localStorage.getItem(key) || '[]');
+    localStorage.setItem(key, JSON.stringify([item, ...list].slice(0, 500)));
+    return true;
+  }
+
   function renderTools(extra = {}) {
     const data = fromDocument(extra);
     if (!data.title && !data.doi) return null;
@@ -151,24 +197,44 @@
     bar.className = 'ailatest-citation-tools';
     bar.dataset.ailatestUi = '1';
     bar.style.cssText = 'display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:8px 0 10px;font:12px -apple-system,BlinkMacSystemFont,Segoe UI,Arial,sans-serif;';
-    const buttons = [
-      ['RIS', () => download(`${citationKey(data)}.ris`, ris(data))],
-      ['BibTeX', () => download(`${citationKey(data)}.bib`, bibtex(data))],
-      ['EndNote', () => download(`${citationKey(data)}.enw`, enw(data))],
-      ['APA', () => copy(apa(data))],
-      ['AMA', () => copy(numbered(data))],
-      ['ACS', () => copy(numbered(data))],
-      ['GB/T 7714', () => copy(gbt(data))],
-      ['Mendeley', () => window.open(`https://www.mendeley.com/import/?url=${encodeURIComponent(data.url || location.href)}`, '_blank', 'noopener')],
-    ];
-    buttons.forEach(([label, action]) => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.textContent = label;
-      btn.style.cssText = 'border:1px solid #d8cbb9;background:#fffdf8;border-radius:4px;padding:2px 7px;color:#6b3f18;font-weight:700;cursor:pointer;';
-      btn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); action(); });
-      bar.appendChild(btn);
+    const fmt = select([
+      ['ris', 'RIS'],
+      ['bib', 'BibTeX'],
+      ['enw', 'EndNote'],
+      ['apa', 'APA'],
+      ['ama', 'AMA'],
+      ['acs', 'ACS'],
+      ['gbt', 'GB/T 7714'],
+    ]);
+    const exportBtn = button('导出');
+    exportBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const payload = formatPayload(data, fmt.value);
+      if (!payload) return;
+      if (payload.mode === 'download') download(payload.filename, payload.text);
+      else {
+        await copy(payload.text);
+        exportBtn.textContent = '已复制';
+        setTimeout(() => { exportBtn.textContent = '导出'; }, 1200);
+      }
     });
+    const saveBtn = button('保存');
+    saveBtn.title = '保存到插件文献库；登录云同步通道接入后会自动同步';
+    saveBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      await saveCitation(data);
+      saveBtn.textContent = '已保存';
+      setTimeout(() => { saveBtn.textContent = '保存'; }, 1200);
+    });
+    const mendeleyBtn = button('Mendeley');
+    mendeleyBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      window.open(`https://www.mendeley.com/import/?url=${encodeURIComponent(data.url || location.href)}`, '_blank', 'noopener');
+    });
+    bar.append(fmt, exportBtn, saveBtn, mendeleyBtn);
     return bar;
   }
 
@@ -199,22 +265,42 @@
     const box = document.createElement('div');
     box.className = 'ailatest-citation-counts';
     box.dataset.ailatestUi = '1';
-    box.style.cssText = 'display:flex;flex-wrap:wrap;gap:4px;margin:4px 0 8px;font:12px -apple-system,BlinkMacSystemFont,Segoe UI,Arial,sans-serif;color:#46546a;';
-    counts.forEach((item) => {
-      const span = document.createElement('span');
-      span.textContent = `${item.source} ${item.count}`;
-      span.style.cssText = 'border:1px solid #d8dee8;background:#f8fafc;border-radius:4px;padding:2px 6px;font-weight:700;';
-      box.appendChild(span);
+    box.style.cssText = 'display:inline-flex;position:relative;margin:4px 0 8px;font:12px -apple-system,BlinkMacSystemFont,Segoe UI,Arial,sans-serif;color:#46546a;';
+    const total = Math.max(...counts.map((x) => Number(x.count) || 0));
+    const btn = button(`引用 ${total}`);
+    btn.style.borderColor = '#d8dee8';
+    btn.style.background = '#f8fafc';
+    btn.style.color = '#46546a';
+    const detail = document.createElement('div');
+    detail.hidden = true;
+    detail.style.cssText = 'position:absolute;z-index:2147483647;top:26px;left:0;min-width:180px;background:#fff;border:1px solid #d8dee8;border-radius:6px;box-shadow:0 8px 24px rgba(15,23,42,.12);padding:6px;color:#334155;';
+    detail.innerHTML = counts.map((item) => `<div style="display:flex;justify-content:space-between;gap:18px;padding:3px 4px"><b>${item.source}</b><span>${item.count}</span></div>`).join('');
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      detail.hidden = !detail.hidden;
     });
+    box.append(btn, detail);
     return box;
   }
 
-  function renderSourceLinks(extra = {}) {
-    const data = fromDocument(extra);
+  async function resolveOpenAccessUrl(data) {
+    if (data.pdfUrl) return data.pdfUrl;
+    if (data.doi) {
+      try {
+        const oa = await fetch(`https://api.openalex.org/works/doi:${encodeURIComponent(data.doi)}`).then(r => r.ok ? r.json() : null);
+        const locs = [oa && oa.best_oa_location, ...(Array.isArray(oa && oa.oa_locations) ? oa.oa_locations : [])].filter(Boolean);
+        const hit = locs.find((x) => x && (x.pdf_url || x.landing_page_url));
+        if (hit) return hit.pdf_url || hit.landing_page_url;
+      } catch (_) {}
+    }
+    return '';
+  }
+
+  function sourceCandidates(data) {
     const doi = clean(data.doi);
     const title = clean(data.title);
-    if (!doi && !title) return null;
-    const links = [
+    return [
       ['OpenAlex', doi ? `https://openalex.org/doi/${encodeURIComponent(doi)}` : `https://openalex.org/works?search=${encodeURIComponent(title)}`],
       ['Unpaywall', doi ? `https://unpaywall.org/doi/${encodeURIComponent(doi)}` : ''],
       ['Semantic Scholar', doi ? `https://www.semanticscholar.org/search?q=${encodeURIComponent(doi)}` : `https://www.semanticscholar.org/search?q=${encodeURIComponent(title)}`],
@@ -223,19 +309,48 @@
       ['PubMed', doi ? `https://pubmed.ncbi.nlm.nih.gov/?term=${encodeURIComponent(doi)}` : `https://pubmed.ncbi.nlm.nih.gov/?term=${encodeURIComponent(title)}`],
       ['ResearchGate', title ? `https://www.researchgate.net/search/publication?q=${encodeURIComponent(title)}` : ''],
     ].filter(([, url]) => url);
+  }
+
+  function renderSourceLinks(extra = {}) {
+    const data = fromDocument(extra);
+    const links = sourceCandidates(data);
+    if (!links.length && !data.pdfUrl) return null;
     const bar = document.createElement('div');
     bar.className = 'ailatest-source-links';
     bar.dataset.ailatestUi = '1';
-    bar.style.cssText = 'display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:6px 0 10px;font:12px -apple-system,BlinkMacSystemFont,Segoe UI,Arial,sans-serif;';
+    bar.style.cssText = 'display:inline-flex;position:relative;align-items:center;gap:6px;margin:6px 0 10px;font:12px -apple-system,BlinkMacSystemFont,Segoe UI,Arial,sans-serif;';
+    const openBtn = button('全文');
+    const menuBtn = button('来源');
+    const menu = document.createElement('div');
+    menu.hidden = true;
+    menu.style.cssText = 'position:absolute;z-index:2147483647;top:28px;left:58px;min-width:180px;background:#fff;border:1px solid #d8cbb9;border-radius:6px;box-shadow:0 8px 24px rgba(15,23,42,.12);padding:6px;';
     links.forEach(([label, url]) => {
       const a = document.createElement('a');
       a.href = url;
       a.target = '_blank';
       a.rel = 'noopener noreferrer';
       a.textContent = label;
-      a.style.cssText = 'border:1px solid #d8cbb9;background:#fff;border-radius:4px;padding:2px 7px;color:#6b3f18;font-weight:700;text-decoration:none;';
-      bar.appendChild(a);
+      a.style.cssText = 'display:block;padding:4px 6px;color:#6b3f18;font-weight:700;text-decoration:none;border-radius:4px;';
+      a.addEventListener('mouseenter', () => { a.style.background = '#fff7ed'; });
+      a.addEventListener('mouseleave', () => { a.style.background = 'transparent'; });
+      menu.appendChild(a);
     });
+    openBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const old = openBtn.textContent;
+      openBtn.textContent = '查找中';
+      const url = await resolveOpenAccessUrl(data);
+      openBtn.textContent = old;
+      if (url) window.open(url, '_blank', 'noopener');
+      else menu.hidden = false;
+    });
+    menuBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      menu.hidden = !menu.hidden;
+    });
+    bar.append(openBtn, menuBtn, menu);
     return bar;
   }
 

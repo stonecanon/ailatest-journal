@@ -53,6 +53,12 @@
     .nsfc { background: #0f766e; }
     a.pill { color: #fff; text-decoration: none; cursor: pointer; }
     a.pill:hover { filter: brightness(1.08); }
+    .detail-link {
+      display: inline-flex; align-items: center;
+      color: #2457a6; font-size: 12px; font-weight: 700;
+      text-decoration: underline; text-underline-offset: 2px;
+      line-height: 1.45; white-space: nowrap;
+    }
   `;
 
   function add(out, enabled, text, className, title) {
@@ -154,11 +160,11 @@
 
     if (journal && journal.slug) {
       const link = document.createElement('a');
-      link.className = 'pill index';
-      link.href = `https://journal.ailatest.org/journal/${encodeURIComponent(journal.slug)}`;
+      link.className = 'detail-link';
+      link.href = `https://journal.ailatest.org/journal/${encodeURIComponent(journal.slug)}/`;
       link.target = '_blank';
       link.rel = 'noopener noreferrer';
-      link.textContent = 'AILatest';
+      link.textContent = 'AILatest 详情页';
       link.title = '查看期刊详情 — AILatest Journal';
       wrap.appendChild(link);
     }
