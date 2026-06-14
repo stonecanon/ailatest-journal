@@ -70,6 +70,7 @@
       results_all: '全部期刊', load_more: '加载更多',
       col_name: '期刊 Title', col_free: '免费', col_abbr: '缩写 Abbr', col_badges: '索引 / 分区',
       col_if: 'IF', col_cycle: '审稿周期',
+      col_index: '索引收录', col_cas: '学科分区',
       filter_idx: '索引', filter_tier: '分区', filter_extra: '其他',
       filter_topic: '学科',
       filter_free: '免费发表', filter_nsc: 'Nature/Science/Cell',
@@ -154,6 +155,7 @@
       results_all: 'All journals', load_more: 'Load more',
       col_name: 'Journal Title', col_free: 'FREE TO PUBLISH', col_abbr: 'Abbr', col_badges: 'Indices / Tier',
       col_if: 'IF', col_cycle: 'Review Cycle',
+      col_index: 'Indexed', col_cas: 'Categories',
       filter_idx: 'Index', filter_tier: 'Tier', filter_extra: 'More',
       filter_topic: 'Topics',
       filter_free: 'FREE to Publish', filter_nsc: 'Nature/Science/Cell',
@@ -1013,6 +1015,7 @@
   let activeFeats = new Set();
   let topicList = []; // [{name,count}] sorted A-Z, merged WoS + OA
   let activeQuery = '';
+  let activeUpdateQuery = '';
   let activeWarnList = false; // 预警名单：合并 中科院/中信所预警 + 新锐 under review / WoS on hold
   let activeIfMin = 0; // 影响因子滑块：只看 IF ≥ 此值
   let activeDom = 'cnki_major';   // 中文期刊目录
@@ -1032,10 +1035,15 @@
     const raw = localStorage.getItem('ailatest.unlocked');
     if (raw) Object.assign(unlockedCache, JSON.parse(raw));
   } catch (_) {}
-  // API 和 OAuth 都继续使用 api.ailatest.org；Google/GitHub callback 已登记在这个域名。
-  const API_BASE = (window.AILATEST_API_BASE
+  // OAuth 跳转必须用 api 域名（第三方回调地址注册在 api.ailatest.org）。
+  const AUTH_BASE = (window.AILATEST_API_BASE
     || (location.hostname === 'localhost' ? 'http://localhost:8787' : 'https://api.ailatest.org'));
-  const AUTH_BASE = API_BASE;
+  // 数据请求优先走同域 /api（Worker 路由 journal.ailatest.org/api/*）：
+  // 与加载网页同一链路，免疫代理/DNS 对 api.* 子域的拦截，也无需 CORS 预检。
+  const API_BASE = (window.AILATEST_API_BASE
+    || (location.hostname === 'localhost' ? 'http://localhost:8787'
+      : /(^|\.)ailatest\.org$/.test(location.hostname) ? '/api'
+      : 'https://api.ailatest.org'));
 
   async function readJsonResponse(resp, fallback) {
     let data = null;
@@ -1577,27 +1585,6 @@
     document.body.appendChild(t);
     requestAnimationFrame(() => t.classList.add('show'));
     setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 1800);
-  }
-
-  function showBadgeInfo(label, info) {
-    if (!info) return;
-    let modal = document.getElementById('badge-info-modal');
-    if (!modal) {
-      modal = document.createElement('div');
-      modal.id = 'badge-info-modal';
-      modal.className = 'badge-info-modal';
-      document.body.appendChild(modal);
-      modal.addEventListener('click', (e) => {
-        if (e.target === modal || e.target.closest('[data-badge-info-close]')) modal.classList.remove('open');
-      });
-    }
-    modal.innerHTML = `<div class="badge-info-card" role="dialog" aria-modal="true" aria-label="${escape(label || T('标签说明','Badge info'))}">
-      <button class="badge-info-close" type="button" data-badge-info-close aria-label="${T('关闭','Close')}">×</button>
-      <p class="badge-info-kicker">${T('标签说明','Badge info')}</p>
-      <h3>${escape(label || T('标签','Badge'))}</h3>
-      <p>${escape(info)}</p>
-    </div>`;
-    modal.classList.add('open');
   }
 
   // list 管理
@@ -2158,32 +2145,12 @@
   }
 
   // ───────── render helpers ─────────
-  function badgeInfoAttrs(label, info) {
-    const text = String(info || label || '').trim();
-    if (!text) return '';
-    return ` role="button" tabindex="0" data-badge-label="${escape(label || T('标签','Badge'))}" data-badge-info="${escape(text)}"`;
-  }
   function badgeIndex(idx) {
-    const info = T(`${idx} 是 Web of Science Core Collection 的索引收录标签。`, `${idx} is a Web of Science Core Collection index coverage badge.`);
-    return `<span class="badge b-${idx.toLowerCase()}"${badgeInfoAttrs(idx, info)}>${idx}</span>`;
-  }
-  function orderedIndices(indices) {
-    const arr = [...new Set((indices || []).filter(Boolean).map(x => String(x).toUpperCase()))];
-    const order = { SCI: 0, SCIE: 1, SSCI: 2, AHCI: 3, 'A&HCI': 3, ESCI: 4 };
-    return arr.sort((a, b) => (order[a] ?? 99) - (order[b] ?? 99) || a.localeCompare(b));
-  }
-  function badgeEI(r) {
-    if (!r) return '';
-    const hasEi = r.ei === true || r.ei_compendex === true || (Array.isArray(r.ei_subjects) && r.ei_subjects.length);
-    if (!hasEi) return '';
-    const subjects = Array.isArray(r.ei_subjects) && r.ei_subjects.length ? ` · ${escape(r.ei_subjects.slice(0, 3).join(' · '))}` : '';
-    const info = T('EI Compendex 工程索引收录。', 'Indexed by EI Compendex.');
-    return `<span class="badge b-ei" title="${T('EI Compendex 收录','Indexed by EI Compendex')}${subjects}"${badgeInfoAttrs('EI', info)}>EI</span>`;
+    return `<span class="badge b-${idx.toLowerCase()}">${idx}</span>`;
   }
   function badgeScopus(sc) {
     if (!sc || sc.active === false) return '';
-    const info = T('Scopus Source List 收录状态，表示该刊在 Scopus 来源列表中处于收录状态。', 'Scopus Source List coverage; the journal is active in the Scopus source list.');
-    return `<span class="badge b-scopus" title="${T('Scopus 收录 (Source List Mar.2026)','Indexed by Scopus (Source List Mar.2026)')}"${badgeInfoAttrs('Scopus', info)}>Scopus</span>`;
+    return `<span class="badge b-scopus" title="${T('Scopus 收录 (Source List Mar.2026)','Indexed by Scopus (Source List Mar.2026)')}">Scopus</span>`;
   }
   function badgeOAJ(oaj) {
     if (!oaj) return '';
@@ -2209,14 +2176,8 @@
     if (!cstpcd) return '';
     const isPopular = cstpcd.kind === 'popular_science';
     const label = isPopular ? T('中国科技核心·科普','CSTPCD Popular') : T('中国科技核心','CSTPCD');
-    const tip = isPopular
-      ? T('中国科技论文统计源期刊（中国科技核心，科普卷）','CSTPCD: Chinese Science and Technology Paper and Citation Database (Popular Science)')
-      : T('中国科技论文统计源期刊（中国科技核心，ISTIC 每年遴选发布）','CSTPCD: Chinese Science and Technology Paper and Citation Database, selected and published annually by ISTIC');
-    return `<span class="badge b-cstpcd" title="${escape(tip)}"${badgeInfoAttrs(label, tip)}>${label}</span>`;
-  }
-  function badgeAuthority() {
-    const info = T('人文社科权威级期刊标注。', 'Authoritative humanities and social sciences journal.');
-    return `<span class="authority-pill" title="${escape(info)}"${badgeInfoAttrs(T('权威','Authority'), info)}>${T('权威','Authority')}</span>`;
+    const tip = isPopular ? T('中国科技核心期刊目录（科普卷）','Chinese Science and Technology Core Journals (Popular Science)') : T('中国科技核心期刊目录','Chinese Science and Technology Core Journals');
+    return `<span class="badge b-cstpcd" title="${escape(tip)}">${label}</span>`;
   }
   function badgeSCD(scd) {
     if (!scd) return '';
@@ -2246,37 +2207,18 @@
     if (!best) return '';
     const count = Array.isArray(vhb) ? vhb.length : 1;
     const area = best.area_code || best.area || '';
-    const title = [
-      T('VHB-JOURQUAL 2024 德语区商科/管理期刊分级；B = 良好/认可级','VHB-JOURQUAL 2024 business/management journal rating; B = good/recognized tier'),
-      area,
-      count > 1 ? `${count}${T(' 个领域命中，已合并显示最高等级',' matched areas, merged to the best rating')}` : '',
-    ].filter(Boolean).join(' · ');
-    return `<span class="zone vhb-tier" title="${escape(title)}"${badgeInfoAttrs(`VHB ${best.rating}`, title)}>VHB ${escape(best.rating)}</span>`;
+    return `<span class="zone vhb-tier" title="${T('VHB Rating 2024，按领域评级','VHB Rating 2024, area rating')}${area ? ' · ' + escape(area) : ''}${count > 1 ? ` · ${count}${T(' 个领域',' areas')}` : ''}">VHB ${escape(best.rating)}</span>`;
   }
   function badgeCNRS(cnrs) {
     const arr = Array.isArray(cnrs) ? cnrs : [];
     const first = arr[0];
     if (!first) return '';
-    const cat = first.category || '';
-    const title = [
-      T('法国 CNRS Section 37 经济/管理期刊分级，2020 历史参考；1 = 高等级','French CNRS Section 37 economics/management journal rating, 2020 historical reference; 1 = high tier'),
-      first.domain || '',
-    ].filter(Boolean).join(' · ');
-    const label = `${T('CNRS ','CNRS ')}${cat}${lang === 'en' ? '' : '级'}`;
-    return `<span class="zone cnrs-tier" title="${escape(title)}"${badgeInfoAttrs(label, title)}>${escape(label)}</span>`;
+    return `<span class="zone cnrs-tier" title="${T('CNRS Section 37 2020 历史参考','CNRS Section 37 2020 historical reference')}${first.domain ? ' · ' + escape(first.domain) : ''}">CNRS ${escape(first.category || '')}</span>`;
   }
   function badgeRetraction(ret) {
     if (!ret || !ret.retractions_total) return '';
-    const total = Number(ret.retractions_total || 0);
-    const recent = Number(ret.retractions_10y || ret.retractions_last_10y || 0);
-    const rate = ret.rate_per_1000_10y != null ? Number(ret.rate_per_1000_10y) : null;
-    const rateText = Number.isFinite(rate) ? `${rate}/1000` : '';
-    const detail = [
-      T(`Retraction Watch 撤稿记录总数 ${total} 篇；风险提示，不作排名`, `Retraction Watch records: ${total} total retractions; caution metric, not ranking`),
-      recent ? T(`近10年 ${recent} 篇`,`last 10y ${recent}`) : '',
-      rateText ? T(`近10年每千篇约 ${rateText}`,`last 10y about ${rateText}`) : '',
-    ].filter(Boolean).join(' · ');
-    return `<span class="warn-pill retraction-pill" title="${escape(detail)}"${badgeInfoAttrs(`${T('撤稿记录','Retractions')} ${total}`, detail)}>${T('撤稿记录','Retractions')} ${escape(total)}</span>`;
+    const rate = ret.rate_per_1000_10y != null ? `${ret.rate_per_1000_10y}/1000` : '';
+    return `<span class="warn-pill retraction-pill" title="${T('Retraction Watch 撤稿记录；用于风险提示，不作排名','Retraction Watch records; caution metric, not ranking')}${rate ? ' · 10y ' + rate : ''}">RW ${escape(ret.retractions_total)}</span>`;
   }
   function badgePubMed(pubmed) {
     return pubmed ? `<span class="badge b-pubmed" title="${T('PubMed 可检索','Searchable in PubMed')}">PubMed</span>` : '';
@@ -2314,7 +2256,7 @@
   async function reportJournalView(recOrKey, opts = {}) {
     const key = typeof recOrKey === 'string' ? recOrKey : favId(recOrKey);
     if (!key) return;
-    const detailPath = opts.path || (typeof recOrKey === 'string' ? analyticsPath() : journalPublicPath(recOrKey));
+    const detailPath = typeof recOrKey === 'string' ? analyticsPath() : journalPublicPath(recOrKey);
     const source = journalOpenSource(opts);
     try {
       const r = await fetch(`${API_BASE}/journal-view`, {
@@ -2327,9 +2269,9 @@
           event_id: crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`,
           event_time: Math.floor(Date.now() / 1000),
           journal_key: key,
-          journal_name: opts.journal_name || (typeof recOrKey === 'string' ? '' : (recOrKey.name || recOrKey.cn_name || recOrKey.title || '')),
+          journal_name: typeof recOrKey === 'string' ? '' : (recOrKey.name || recOrKey.cn_name || recOrKey.title || ''),
           view_source: source,
-          tab: opts.tab || activeTab || '',
+          tab: activeTab || '',
           query: activeQuery || '',
           visitor_id: getAnalyticsId('ailatest.analytics.visitor', localStorage),
           session_id: getAnalyticsId('ailatest.analytics.session', sessionStorage, 30 * 60 * 1000),
@@ -2350,9 +2292,6 @@
           const txt = n >= 1000 ? (n/1000).toFixed(1) + 'k' : String(n);
           el.textContent = (lang === 'en' ? '👁 ' : '👁 ') + txt + (lang === 'en' ? ' views' : ' 次浏览');
         }
-        document.querySelectorAll(`[data-update-views="${cssAttrValue(key)}"]`).forEach(node => {
-          node.textContent = formatViewText(d.count);
-        });
       }
     } catch (_) {}
   }
@@ -2364,15 +2303,6 @@
       const d = await r.json().catch(() => null);
       if (d && d.views) for (const k in d.views) viewsCache[k] = d.views[k];
     } catch (_) {}
-  }
-  function formatViewText(n) {
-    const v = Number(n || 0);
-    const txt = v >= 1000 ? (v / 1000).toFixed(1) + 'k' : String(v);
-    return lang === 'en' ? `👁 ${txt} views` : `👁 ${txt} 次浏览`;
-  }
-  function cssAttrValue(value) {
-    if (window.CSS && typeof CSS.escape === 'function') return CSS.escape(value);
-    return String(value).replace(/["\\]/g, '\\$&');
   }
   const ASJC_TOP_CN = {
     'Life Sciences': '生命科学',
@@ -2498,10 +2428,10 @@
             return `<span class="warn-pill">⚠ ${escape(label)}</span>`;
           }
         }
-        return `<span class="warn-pill">⚠ Warning</span>`;
+        return `<span class="warn-pill">⚠ ${T('预警','Warning')}</span>`;
       }
       function badgeUnderReview() {
-        return `<span class="under-review-pill">${T('新锐','Emerging')} Under Review</span>`;
+        return `<span class="under-review-pill">${T('新锐审查中','Emerging Under Review')}</span>`;
       }
       function badgeOnHold() {
         return `<span class="on-hold-pill">WoS On Hold</span>`;
@@ -2514,18 +2444,17 @@
   function renderIndexBadges(r) {
     if (!r) return '';
     return [
-      ...orderedIndices(r.indices).map(badgeIndex),
-      badgeEI(r),
-      badgeScopus(r.scopus),
-      badgeMEDLINE(r.medline),
-      r.nature_index ? badgeNatureIndex() : '',
       badgeFlagship(r.flagship),
+      r.nature_index ? badgeNatureIndex() : '',
       r.cscd ? badgeCSCD(r.cscd) : '',
       r.cstpcd ? badgeCSTPCD(r.cstpcd) : '',
-      badgeOAJ(r.oaj),
-      badgeDOAJ(r.doaj),
-    ].filter(Boolean).join('');
-  }
+      ...((r.indices) || []).map(badgeIndex),
+      badgeScopus(r.scopus),
+	      badgeOAJ(r.oaj),
+	      badgeDOAJ(r.doaj),
+	      badgeMEDLINE(r.medline),
+	    ].filter(Boolean).join('');
+	  }
   function renderRankBadges(r) {
     if (!r) return '';
     return [
@@ -2554,17 +2483,16 @@
   function renderCoverageBadges(r) {
     if (!r) return '';
     return [
-      ...orderedIndices(r.indices).map(badgeIndex),
-      badgeEI(r),
+      badgeFlagship(r.flagship),
+      r.nature_index ? badgeNatureIndex() : '',
+      r.cscd ? badgeCSCD(r.cscd) : '',
+      r.cstpcd ? badgeCSTPCD(r.cstpcd) : '',
+      r.scd ? badgeSCD(r.scd) : '',
+      ...((r.indices) || []).map(badgeIndex),
       badgeScopus(r.scopus),
       badgeMEDLINE(r.medline),
       badgePubMed(r.pubmed),
       badgePMC(r.pmc),
-      r.nature_index ? badgeNatureIndex() : '',
-      badgeFlagship(r.flagship),
-      r.cscd ? badgeCSCD(r.cscd) : '',
-      r.cstpcd ? badgeCSTPCD(r.cstpcd) : '',
-      r.scd ? badgeSCD(r.scd) : '',
     ].filter(Boolean).join('');
   }
   function renderAccessBadges(r) {
@@ -2614,7 +2542,7 @@
       rankBadges  ? `<div class="badges badges-rank">${rankBadges}</div>`  : '',
       accessBadges ? `<div class="badges badges-access">${accessBadges}</div>` : '',
       riskBadges ? `<div class="badges badges-risk">${riskBadges}</div>` : '',
-    ].filter(Boolean).join('') || '<span class="muted-cell">鈥?/span>';
+    ].filter(Boolean).join('') || '<span class="muted-cell">—</span>';
   }
 
   function starBtn(r, src = 'int') {
@@ -2641,18 +2569,15 @@
     if (nk && domIndex.byName[nk]) hits.push(...domIndex.byName[nk]);
     const ik = (r.issn || r.cn_code || '').toUpperCase();
     if (ik && domIndex.byIssn[ik]) hits.push(...domIndex.byIssn[ik]);
-    // Dedupe by source + visible label. CAST journals span multiple disciplines,
-    // and VHB/CNRS can match several areas with the same visible rating.
+    // dedupe by source + discipline (CAST journals span multiple disciplines;
+    // keep each distinct discipline so badges read e.g. 科协建筑 / 科协机械).
     const seen = new Set();
-    return hits.filter(h => {
-      const k = [h.source, h.label || h.tag || '', h.domain || h.discipline || h.category || h.org || ''].join(':');
-      if (seen.has(k)) return false;
-      seen.add(k);
-      return true;
-    });
+    return hits.filter(h => { const k = h.source + ':' + (h.domain || h.tag || ''); if (seen.has(k)) return false; seen.add(k); return true; });
   }
   function buildDomIndex(d) {
     if (!d) return;
+    domIndex.byName = Object.create(null);
+    domIndex.byIssn = Object.create(null);
     ((d.scd && d.scd.records)||[]).forEach(r => {
       const label = r.newly_added ? 'SCD+' : 'SCD';
       const payload = { source:'scd', label, tag:r.newly_added ? 'new' : 'core', domain:r.category || '' };
@@ -2731,42 +2656,19 @@
   // Badge label: 科协 + discipline (falls back to 科协 + tier if no discipline).
   function castLabel(domain, tier) {
     const disc = castDiscipline(domain);
-    const parts = [T('科协','CAST')];
-    if (disc) parts.push(disc);
-    if (tier) parts.push(tier);
-    return parts.join(lang === 'en' ? ' ' : ' ');
+    const needsSpace = !(lang === 'zh-CN' || lang === 'zh-TW' || lang === 'ja' || lang === 'ko');
+    return disc ? `${T('科协','CAST')}${needsSpace ? ' ' : ''}${disc}` : `${T('科协','CAST')} ${tier || ''}`.trim();
   }
-  function representedCrossSources(r) {
-    const s = new Set();
-    if (Array.isArray(r?.vhb) && r.vhb.length) s.add('vhb');
-    if (Array.isArray(r?.cnrs) && r.cnrs.length) s.add('cnrs');
-    if (r?.ami) s.add('ami');
-    return s;
-  }
-  function renderDomCrossBadges(r, excludeSource, representedRecord) {
-    const represented = representedCrossSources(representedRecord || r);
-    const hits = lookupDom(r).filter(h => h.source !== excludeSource && !represented.has(h.source));
+  function renderDomCrossBadges(r, excludeSource) {
+    const hits = lookupDom(r).filter(h => h.source !== excludeSource);
     if (!hits.length) return '';
     const out = [];
     const castHits = [];
-    const visible = new Map();
     for (const h of hits) {
       if (h.source === 'cnkx') { castHits.push(h); continue; }
-      const label = h.label || '';
-      if (!label) continue;
-      const key = h.source + ':' + label;
-      const note = h.domain || h.discipline || h.category || h.org || '';
-      if (!visible.has(key)) {
-        visible.set(key, { source: h.source, label, notes: [] });
-      }
-      if (note && !visible.get(key).notes.includes(note)) visible.get(key).notes.push(note);
+      out.push(`<span class="domsrc-pill ds-${h.source}" title="${escape(h.domain||h.discipline||h.category||h.org||'')}">${escape(h.label)}</span>`);
     }
-    visible.forEach(item => {
-      const suffix = item.notes.length > 1 ? ` · ${item.notes.length}${T(' 个领域',' areas')}` : '';
-      const title = item.notes.join(' · ') + suffix;
-      out.push(`<span class="domsrc-pill ds-${item.source}" title="${escape(title)}"${badgeInfoAttrs(item.label, title)}>${escape(item.label)}</span>`);
-    });
-    // CAST: keep discipline and tier visible, e.g. 科协 地理资源 T1.
+    // CAST: label by discipline (科协建筑) instead of bare tier (科协 T1).
     const castSeen = new Set();
     const castShown = [];
     for (const h of castHits) {
@@ -2778,7 +2680,7 @@
     castShown.forEach((c, index) => {
       const title = `${T('中国科协','CAST')}${c.tier ? ' ' + c.tier : ''}${c.domain ? ' · ' + c.domain : ''}`;
       if (index) out.push('<span class="domsrc-dot" aria-hidden="true">·</span>');
-      out.push(`<span class="domsrc-pill ds-cnkx" title="${escape(title)}"${badgeInfoAttrs(c.label, title)}>${escape(c.label)}</span>`);
+      out.push(`<span class="domsrc-pill ds-cnkx" title="${escape(title)}">${escape(c.label)}</span>`);
     });
     return out.join('');
   }
@@ -3426,7 +3328,7 @@
       ['cnki_major', T('中文期刊目录','Chinese Journal Directory')],
       ['nsfc_mgmt', T('国自然管理','NSFC Mgmt')],
       ['cscd', 'CSCD'],
-      ['cstpcd', T('科技核心','CSTPCD')],
+      ['cstpcd', T('中国科技核心','CSTPCD')],
       ['cnkx', T('中国科协','CAST')],
       ['zju_zju', T('浙江大学 2024','ZJU 2024')],
       ['school_a', T('学校 A · 2023','School A · 2023')],
@@ -3577,7 +3479,19 @@
             <th class="col-fav" aria-label="Favorite"></th><th class="col-name">${T('期刊名称','Journal')}</th><th>${T('收录索引','Indices')}</th><th style="width:110px">ISSN</th><th style="width:100px">CN</th><th style="width:110px">${T('学科分类','Category')}</th>
           </tr></thead><tbody>
           ${list.slice(0, 200).map(r => {
-            const badges = renderDomCrossBadges(r);
+            const hits = lookupDom(r);
+            const badges = [
+              ...hits.filter(h => h.source === 'cssci').map(() => `<span class="domsrc-pill ds-cssci">CSSCI</span>`),
+              ...hits.filter(h => h.source === 'cssci_ext').map(() => `<span class="domsrc-pill ds-cssci-ext">${T('CSSCI 扩展','CSSCI Ext')}</span>`),
+              ...hits.filter(h => h.source === 'pku').map(() => `<span class="domsrc-pill ds-pku">${T('北大核心','PKU Core')}</span>`),
+              ...hits.filter(h => h.source === 'ccft').map(h => `<span class="domsrc-pill ds-ccft">CCF-${h.tag||'T'}</span>`),
+              ...hits.filter(h => h.source === 'zju').map(h => `<span class="domsrc-pill ds-zju">${escape(h.label)}</span>`),
+              ...hits.filter(h => h.source === 'school_a').map(h => `<span class="domsrc-pill ds-school-a">${escape(h.label)}</span>`),
+              ...hits.filter(h => h.source === 'nsfc_mgmt').map(h => `<span class="domsrc-pill ds-nsfc_mgmt">${escape(h.label)}</span>`),
+              ...hits.filter(h => h.source === 'cscd').map(h => `<span class="domsrc-pill ds-cscd">${escape(h.label)}</span>`),
+              ...hits.filter(h => h.source === 'cstpcd').map(h => `<span class="domsrc-pill ds-cstpcd">${escape(h.label)}</span>`),
+              ...hits.filter(h => h.source.startsWith('cnkx')).map(h => `<span class="domsrc-pill ds-cnkx">${escape(h.label)}</span>`),
+            ].filter(Boolean).join('');
             return `<tr class="j-row clickable" data-fid="${escape(favId(r))}" data-src="cnki_major">
               <td style="width:36px">${starBtn(r, 'cnki_major')}</td>
               <td class="jname" style="font-size:13.5px">${escape(r.name||'')}</td>
@@ -3605,7 +3519,7 @@
             <th style="width:36px" aria-label="Favorite"></th><th style="width:70px">${T('级别','Tier')}</th><th>${T('期刊','Journal')}</th><th>${T('交叉收录','Also In')}</th><th style="width:110px">ISSN / CN</th><th style="width:150px">${T('备注','Note')}</th>
           </tr></thead><tbody>
           ${list.slice(0, 200).map(r => {
-            const tierBadge = `<span class="tier-pill ${tierClass[r.tier]||'t3'}">${escape(tn(r.tier, 'tier'))}</span>${(r.name||'').includes('*') ? ' ' + badgeAuthority() : ''}`;
+            const tierBadge = `<span class="tier-pill ${tierClass[r.tier]||'t3'}">${escape(tn(r.tier, 'tier'))}</span>${(r.name||'').includes('*') ? ' <span class="warn-pill" style="background:var(--gold);color:#fff">★</span>' : ''}`;
             return renderDomRow(
               { ...r, name: (r.name||'').replace(/\*$/,'') },
               { src: 'zju', extraCols: `<td class="muted-cell" style="width:150px">${escape(r.note||'')}</td>` }
@@ -3943,7 +3857,7 @@
       const rows = visible.map(r => {
         const fid = favId(r);
         rowRecordsByFid[fid] = { ...r, __src: 'cstpcd' };
-        const label = r.kind === 'popular_science' ? T('科技核心·科普','CSTPCD Popular') : T('科技核心','CSTPCD');
+        const label = r.kind === 'popular_science' ? T('中国科技核心·科普','CSTPCD Popular') : T('中国科技核心','CSTPCD');
         const crossBadges = renderDomCrossBadges(r, 'cstpcd');
         return `<tr class="j-row clickable" data-fid="${escape(fid)}" data-src="cstpcd">
           <td class="col-fav" style="width:36px">${starBtn(r, 'cstpcd')}</td>
@@ -4030,7 +3944,16 @@
       const rows = visible.map(r => {
         const fid = favId(r);
         rowRecordsByFid[fid] = { ...r, __src: 'cnkx' };
-        const badges = renderDomCrossBadges(r);
+        const hits = lookupDom(r);
+        const badges = [
+          ...hits.filter(h => h.source.startsWith('cnkx')).map(h => `<span class="domsrc-pill ds-cnkx">${escape(h.label)}</span>`),
+          ...hits.filter(h => h.source === 'cssci').map(() => `<span class="domsrc-pill ds-cssci">CSSCI</span>`),
+          ...hits.filter(h => h.source === 'pku').map(() => `<span class="domsrc-pill ds-pku">${T('北大核心','PKU Core')}</span>`),
+          ...hits.filter(h => h.source === 'ccft').map(h => `<span class="domsrc-pill ds-ccft">CCF-${h.tag||'T'}</span>`),
+          ...hits.filter(h => h.source === 'nsfc_mgmt').map(h => `<span class="domsrc-pill ds-nsfc_mgmt">${escape(h.label)}</span>`),
+          ...hits.filter(h => h.source === 'cscd').map(h => `<span class="domsrc-pill ds-cscd">${escape(h.label)}</span>`),
+          ...hits.filter(h => h.source === 'cstpcd').map(h => `<span class="domsrc-pill ds-cstpcd">${escape(h.label)}</span>`),
+        ].filter(Boolean).join('');
         const subVal = r.subdomain ? tn(r.subdomain, 'sub') : '—';
         return `<tr class="j-row clickable" data-fid="${escape(fid)}" data-src="cnkx">
           <td class="col-fav" style="width:36px">${starBtn(r, 'cnkx')}</td>
@@ -4181,7 +4104,7 @@
         ['pku', T('北大核心','PKU Core')],
         ['ccft', T('CCF 中文','CCF Chinese')],
         ['cscd', 'CSCD'],
-        ['cstpcd', T('科技核心','CSTPCD')],
+        ['cstpcd', T('中国科技核心','CSTPCD')],
         ['cnkx', T('中国科协','CAST')],
         ['zju', T('浙江大学','ZJU')],
       ].map(([value, label]) => `<option value="${escape(value)}"${window.__cnkiIndex === value ? ' selected' : ''}>${escape(label)}</option>`).join('');
@@ -4197,7 +4120,20 @@
       const rows = visible.map(r => {
         const fid = favId(r);
         rowRecordsByFid[fid] = { ...r, __src: 'cnki_major' };
-        const badges = renderDomCrossBadges(r);
+        // 查询交叉收录徽章（CSSCI/北大核心/CCF）
+        const hits = lookupDom(r);
+        const badges = [
+          ...hits.filter(h => h.source === 'cssci').map(() => `<span class="domsrc-pill ds-cssci">CSSCI</span>`),
+          ...hits.filter(h => h.source === 'cssci_ext').map(() => `<span class="domsrc-pill ds-cssci-ext">${T('CSSCI 扩展','CSSCI Ext')}</span>`),
+          ...hits.filter(h => h.source === 'pku').map(() => `<span class="domsrc-pill ds-pku">${T('北大核心','PKU Core')}</span>`),
+          ...hits.filter(h => h.source === 'ccft').map(h => `<span class="domsrc-pill ds-ccft" title="${escape(h.org||'')}">CCF-${h.tag||'T'}</span>`),
+          ...hits.filter(h => h.source === 'zju').map(h => `<span class="domsrc-pill ds-zju">${escape(h.label)}</span>`),
+          ...hits.filter(h => h.source === 'school_a').map(h => `<span class="domsrc-pill ds-school-a">${escape(h.label)}</span>`),
+          ...hits.filter(h => h.source === 'nsfc_mgmt').map(h => `<span class="domsrc-pill ds-nsfc_mgmt">${escape(h.label)}</span>`),
+          ...hits.filter(h => h.source === 'cscd').map(h => `<span class="domsrc-pill ds-cscd">${escape(h.label)}</span>`),
+          ...hits.filter(h => h.source === 'cstpcd').map(h => `<span class="domsrc-pill ds-cstpcd">${escape(h.label)}</span>`),
+          ...hits.filter(h => h.source.startsWith('cnkx')).map(h => `<span class="domsrc-pill ds-cnkx">${escape(h.label)}</span>`),
+        ].filter(Boolean).join('');
         const name = r.name || '';
         const isnCell = r.issn ? `<span class="jissn">${escape(r.issn)}</span>` : (r.cn_code ? `<span class="jissn">${escape(r.cn_code)}</span>` : '<span class="muted-cell">—</span>');
         const displayCats = (r.major_categories || []).length ? r.major_categories : (r.categories || []);
@@ -4276,7 +4212,7 @@
       const html = [`<div class="section-block">
         ${domSectionHeader(
           escape(lang==='en' ? T('浙江大学 2024 期刊分级','ZJU 2024 Journal Tiers') : (src.source || '浙江大学 2024 期刊分级')),
-          `${T('共','Total ')} ${list.length.toLocaleString()} ${T('条；“权威”为人文社科权威级期刊（一级内）',' · “Authority” marks authoritative humanities & social sciences journals (within Tier 1)')}`,
+          `${T('共','Total ')} ${list.length.toLocaleString()} ${T('条；带 ★ 为人文社科权威级期刊（一级内）',' · ★ marks authoritative humanities & social sciences journals (within Tier 1)')}`,
         )}`];
       for (const tier of tierOrder) {
         const recs = byTier[tier]; if (!recs || !recs.length) continue;
@@ -4286,7 +4222,7 @@
             <th style="width:70px">${T('级别','Tier')}</th><th>${T('期刊','Journal')}</th><th style="width:110px">ISSN / CN</th><th style="width:150px">${T('备注','Note')}</th><th>${T('交叉收录','Also In')}</th><th style="width:40px"></th>
           </tr></thead><tbody>
           ${recs.slice(0, 1500).map(r => {
-            const tierBadge = `<span class="tier-pill ${tierClass[r.tier]||'t3'}">${escape(tn(r.tier, "tier"))}</span>${r.name.includes('*') ? ' ' + badgeAuthority() : ''}`;
+            const tierBadge = `<span class="tier-pill ${tierClass[r.tier]||'t3'}">${escape(tn(r.tier, "tier"))}</span>${r.name.includes('*') ? ' <span class="warn-pill" style="background:var(--gold);color:#fff">★</span>' : ''}`;
             return renderDomRow(
               { ...r, name: r.name.replace(/\*$/,'') },
               {
@@ -4329,7 +4265,7 @@
         const html = [`<div class="section-block">
           ${domSectionHeader(
             `${escape(lang==='en' ? T('高校自编目录 · 2023 期刊分级','In-house School Directory · 2023 Journal Tiers') : (src.source || '高校自编目录 · 2023 期刊分级'))} <span class="unlocked-pill">✓ ${T('已解锁','Unlocked')}</span> <button class="tiny-btn" id="lock-again">${T('锁回','Lock again')}</button>`,
-            `${T('共','Total ')} ${list.length.toLocaleString()} ${T('条；“权威”为人文社科权威级期刊',' · “Authority” marks authoritative humanities & social sciences journals')}`,
+            `${T('共','Total ')} ${list.length.toLocaleString()} ${T('条；带 ★ 为人文社科权威级期刊',' · ★ marks authoritative humanities & social sciences journals')}`,
           )}`];
         for (const tier of tierOrder) {
           const recs = byTier[tier]; if (!recs || !recs.length) continue;
@@ -4339,7 +4275,7 @@
               <th style="width:70px">${T('级别','Tier')}</th><th>${T('期刊','Journal')}</th><th style="width:110px">ISSN / CN</th><th style="width:150px">${T('备注','Note')}</th><th>${T('交叉收录','Also In')}</th><th style="width:40px"></th>
             </tr></thead><tbody>
             ${recs.slice(0, 1500).map(r => {
-              const tierBadge = `<span class="tier-pill ${tierClass[r.tier]||'t3'}">${escape(tn(r.tier, "tier"))}</span>${r.name.includes('*') ? ' ' + badgeAuthority() : ''}`;
+              const tierBadge = `<span class="tier-pill ${tierClass[r.tier]||'t3'}">${escape(tn(r.tier, "tier"))}</span>${r.name.includes('*') ? ' <span class="warn-pill" style="background:var(--gold);color:#fff">★</span>' : ''}`;
               return renderDomRow(
                 { ...r, name: r.name.replace(/\*$/,'') },
                 { src: 'school_a', extraCols: `<td class="muted-cell" style="width:150px">${escape(r.note||'')}</td>` }
@@ -4556,9 +4492,6 @@
   if (!requireLogin(T("今日免费浏览已达上限，请登录后继续查看","Daily free view limit reached. Sign in to continue."))) return;
   incrementUsage("views");
 
-  if (!requireLogin(T("今日免费浏览已达上限，请登录后继续查看","Daily free view limit reached. Sign in to continue."))) return;
-  incrementUsage("views");
-
     _currentDrawerRec = r;
     recordView(r); // 记录浏览历史，用于学科推荐
     const pageMode = !!(opts && opts.pageMode);
@@ -4604,7 +4537,7 @@
 	    const titleFeatureBadges = (ir.free || r.free) ? badgeFree(true) : '';
 	    const tierBadge = r.tier && /^T[123]$/.test(r.tier) ? badgeTier(r.tier)
                     : r.tier ? `<span class="tier-pill t3">${escape(tn(r.tier, "tier"))}</span>` : '';
-    const crossBadges = renderDomCrossBadges(r, src, ir);
+    const crossBadges = renderDomCrossBadges(r, src);
     const drawerCoverageBadges = (src === 'int' || intRec) ? renderCoverageBadges(ir) : '';
     const drawerLevelBadges = (src === 'int' || intRec) ? renderLevelBadges(ir) : '';
     const drawerAccessBadges = (src === 'int' || intRec) ? renderAccessBadges(ir) : ((r.free) ? badgeFree(true) : '');
@@ -5393,6 +5326,7 @@
     localizeDefaultFavListName();
     persistFavLists(false);
     applyI18n();
+    if (domestic) buildDomIndex(domestic);
     const wosSel2 = $('#wos-col-filter');
     if (wosSel2) wosSel2.__bound = false;
     renderCatList();
@@ -5400,9 +5334,8 @@
     else if (activeTab === 'fav') renderFav();
     else if (activeTab === 'int') renderInt();
     else if (activeTab === 'pick') refreshPickI18n();
-    else if ((activeTab === 'updates' || activeTab === 'home') && window.__activateJournalTab) {
-      window.__activateJournalTab(activeTab, { skipPath: true });
-    }
+    else if (activeTab === 'home') showHomeSearchResults();
+    else if (activeTab === 'updates') renderJournalUpdates();
     if (_currentDrawerRec) {
       openDrawer(_currentDrawerRec, { pageMode: document.body.classList.contains('journal-route') });
     }
@@ -6240,7 +6173,8 @@
       shown = PAGE; renderInt();
     });
     $('#q').addEventListener('input', (e) => {
-      activeQuery = e.target.value.trim();
+      if (activeTab === 'updates') activeUpdateQuery = e.target.value.trim();
+      else activeQuery = e.target.value.trim();
       shown = PAGE;
       if (activeTab === 'pick') return; // pick tab uses Enter
       if (activeTab === 'home') {
@@ -6259,10 +6193,12 @@
     $('#q').addEventListener('keydown', (e) => {
       if (e.key !== 'Enter' || activeTab === 'pick') return;
       e.preventDefault();
-      activeQuery = e.currentTarget.value.trim();
+      if (activeTab === 'updates') activeUpdateQuery = e.currentTarget.value.trim();
+      else activeQuery = e.currentTarget.value.trim();
       shown = PAGE;
-      if (!activeQuery) return;
-      trackInteraction('journal_search', { tab: activeTab, query: activeQuery });
+      const currentQuery = activeTab === 'updates' ? activeUpdateQuery : activeQuery;
+      if (!currentQuery) return;
+      trackInteraction('journal_search', { tab: activeTab, query: currentQuery });
       if (activeTab === 'home') showHomeSearchResults();
       else if (activeTab === 'int') renderInt();
       else if (activeTab === 'fav') renderFav();
@@ -6272,9 +6208,11 @@
     $('#search-submit')?.addEventListener('click', () => {
       const qEl = $('#q');
       if (!qEl) return;
-      activeQuery = qEl.value.trim();
+      if (activeTab === 'updates') activeUpdateQuery = qEl.value.trim();
+      else activeQuery = qEl.value.trim();
       shown = PAGE;
-      if (!activeQuery) {
+      const currentQuery = activeTab === 'updates' ? activeUpdateQuery : activeQuery;
+      if (!currentQuery) {
         qEl.focus();
         return;
       }
@@ -6286,26 +6224,9 @@
       } else if (activeTab === 'int') { trackInteraction('journal_search', { tab: activeTab, query: activeQuery }); renderInt(); }
       else if (activeTab === 'fav') { trackInteraction('journal_search', { tab: activeTab, query: activeQuery }); renderFav(); }
       else if (activeTab === 'dom') { trackInteraction('journal_search', { tab: activeTab, query: activeQuery }); renderDomestic(); }
-      else if (activeTab === 'updates') { trackInteraction('journal_search', { tab: activeTab, query: activeQuery }); renderJournalUpdates(); }
+      else if (activeTab === 'updates') { trackInteraction('journal_search', { tab: activeTab, query: activeUpdateQuery }); renderJournalUpdates(); }
     });
     $('#more').addEventListener('click', () => { shown += PAGE; renderInt(); });
-
-    document.addEventListener('click', (e) => {
-      const badge = e.target.closest('[data-badge-info]');
-      if (badge) {
-        e.preventDefault();
-        e.stopPropagation();
-        showBadgeInfo(badge.dataset.badgeLabel || badge.textContent.trim(), badge.dataset.badgeInfo || badge.title || '');
-        return;
-      }
-    });
-    document.addEventListener('keydown', (e) => {
-      const badge = e.target.closest?.('[data-badge-info]');
-      if (!badge || (e.key !== 'Enter' && e.key !== ' ')) return;
-      e.preventDefault();
-      e.stopPropagation();
-      showBadgeInfo(badge.dataset.badgeLabel || badge.textContent.trim(), badge.dataset.badgeInfo || badge.title || '');
-    });
 
     document.addEventListener('click', (e) => {
       const th = e.target.closest('th.col-if[data-if-sort]');
@@ -6339,66 +6260,6 @@
       renderHomeIntResults();
     }
 
-    function domesticSearchKeys(r) {
-      const keys = [];
-      const add = (prefix, value) => {
-        const raw = String(value || '').trim();
-        if (!raw || raw.toUpperCase() === 'NA') return;
-        const normalized = prefix === 'name'
-          ? normTitle(raw.replace(/\*$/, ''))
-          : raw.toUpperCase().replace(/\s+/g, '');
-        if (normalized) keys.push(`${prefix}:${normalized}`);
-      };
-      add('issn', r.issn);
-      add('issn', r.eissn);
-      add('cn', r.cn_code);
-      add('name', r.name || r.cn_name || r.journal_title);
-      return [...new Set(keys)];
-    }
-
-    function domesticRepresentativeScore(r) {
-      const sourceRank = { cnki_major: 50, zju: 40, cnkx: 30, nsfc_mgmt: 20, cscd: 15, cstpcd: 10 };
-      return (sourceRank[r.__src] || 0)
-        + (r.issn ? 8 : 0)
-        + (r.cn_code ? 6 : 0)
-        + (r.en_name ? 4 : 0)
-        + (r.category || r.domain || r.discipline ? 2 : 0);
-    }
-
-    function mergeDomesticSearchRows(rows) {
-      const groups = [];
-      const keyToGroup = new Map();
-      for (const r of rows) {
-        const keys = domesticSearchKeys(r);
-        let group = keys.map(k => keyToGroup.get(k)).find(Boolean);
-        if (!group) {
-          group = { records: [], keys: new Set(), best: null };
-          groups.push(group);
-        }
-        group.records.push(r);
-        keys.forEach(k => {
-          group.keys.add(k);
-          keyToGroup.set(k, group);
-        });
-        if (!group.best || domesticRepresentativeScore(r) > domesticRepresentativeScore(group.best)) {
-          group.best = r;
-        }
-      }
-      return groups.map(group => {
-        const merged = { ...(group.best || group.records[0]) };
-        const sources = [...new Set(group.records.map(r => r.__src).filter(Boolean))];
-        merged.__src = merged.__src || sources[0] || 'cnki_major';
-        merged.__sources = sources;
-        for (const key of ['issn', 'eissn', 'cn_code', 'en_name', 'category', 'domain', 'discipline']) {
-          if (!merged[key]) {
-            const hit = group.records.find(r => r[key]);
-            if (hit) merged[key] = hit[key];
-          }
-        }
-        return merged;
-      });
-    }
-
     function renderHomeIntResults() {
       if (!homeResults) return;
       const q = activeQuery ? activeQuery.toLowerCase() : '';
@@ -6408,7 +6269,8 @@
       // Auto-detect: if query has Chinese characters, prioritize domestic
       const hasChinese = /[\u4e00-\u9fff]/.test(q);
       const intLimit = hasChinese ? 15 : 30;
-      const domLimit = hasChinese ? 30 : 10;
+      const looksLikeId = /\b\d{4}-?\d{3}[\dXx]\b|CN\s*\d{2}-\d+/i.test(activeQuery);
+      const domLimit = hasChinese || looksLikeId ? 30 : 0;
 
       let totalCount = 0;
       let sections = [];
@@ -6433,6 +6295,7 @@
 
       if (intCount) {
         sections.push({
+          kind: 'int',
           label: T('国际期刊','International Journals'),
           html: intFiltered.slice(0, intLimit).map(renderRow).join(''),
           count: intCount
@@ -6443,44 +6306,60 @@
       // ── Domestic results ──
       let domCount = 0;
       let domHtml = '';
-      const domSourceLabel = {
-        cnkx: T('中国科协','CAST'),
-        nsfc_mgmt: T('国自然管理','NSFC Management'),
-        cnki_major: T('中文期刊目录','Chinese Journal Directory'),
-        zju: T('浙大目录','ZJU'),
-        cscd: 'CSCD',
-        cstpcd: T('中国科技核心','CSTPCD'),
-      };
-      if (domestic) {
+      if (domestic && domLimit > 0) {
         const allDomestic = [];
-        for (const key of ['cnkx', 'nsfc_mgmt', 'cnki_major', 'zju', 'cscd', 'cstpcd']) {
+        for (const key of ['cnki_major', 'cnkx', 'nsfc_mgmt', 'zju', 'cscd', 'cstpcd', 'cssci_core', 'cssci_ext', 'pku_core']) {
           const src = domestic[key];
-          if (src && src.records) {
-            for (const r of src.records) {
-              if (matchTxt(r.name, r.issn, r.cn_code, r.en_name)) {
+          const rows = Array.isArray(src) ? src : ((src && src.records) || []);
+          if (rows.length) {
+            for (const r of rows) {
+              if (matchTxt(
+                r.name, r.cn_name, r.title, r.issn, r.cn_code, r.en_name,
+                r.sponsor, r.publisher, r.category, r.category_code, r.domain, r.subdomain,
+                r.database, r.database_label, r.tier, r.frequency, r.code, r.kind,
+                ...(r.major_categories || []), ...(r.categories || [])
+              )) {
                 allDomestic.push({ ...r, __src: key });
               }
             }
           }
         }
-        const mergedDomestic = mergeDomesticSearchRows(allDomestic);
-        domCount = mergedDomestic.length;
+        const sourceRank = { cnki_major: 9, cnkx: 8, nsfc_mgmt: 7, zju: 6, cscd: 5, cstpcd: 4, cssci_core: 3, pku_core: 2, cssci_ext: 1 };
+        const dedupedDomestic = [];
+        const byDomesticKey = new Map();
+        allDomestic.forEach((r) => {
+          const key = (r.issn || r.cn_code || pickCleanDomesticName(r.name || r.cn_name || '')).toUpperCase();
+          if (!key) return;
+          const prev = byDomesticKey.get(key);
+          if (!prev || (sourceRank[r.__src] || 0) > (sourceRank[prev.__src] || 0)) {
+            byDomesticKey.set(key, r);
+          }
+        });
+        byDomesticKey.forEach((r) => dedupedDomestic.push(r));
+        domCount = dedupedDomestic.length;
         if (domCount) {
-          domHtml = mergedDomestic.slice(0, domLimit).map(r => {
+          domHtml = dedupedDomestic.slice(0, domLimit).map(r => {
             const fid = favId(r);
             rowRecordsByFid[fid] = { ...r, __src: r.__src };
-            const name = r.name || r.cn_name || '';
+            const name = r.name || r.cn_name || r.title || '';
             const cnName = r.en_name ? `<span class="jname-cn">${escape(titleCase(r.en_name))}</span>` : '';
-            const crossBadges = renderDomCrossBadges({ name, issn: r.issn, cn_code: r.cn_code });
-            const categoryType = r.domain ? 'domain' : (r.category ? 'pku' : 'cssci');
-            const category = tn(r.domain || r.category || r.discipline || '', categoryType);
-            const codeLine = [r.issn ? `ISSN ${r.issn}` : '', r.cn_code ? `CN ${r.cn_code}` : ''].filter(Boolean).join(' · ');
-            const sourceText = (r.__sources || [r.__src]).map(src => domSourceLabel[src] || src).join(' · ');
-            return `<tr data-fid="${escape(fid)}" class="j-row clickable home-dom-row" data-src="${escape(r.__src)}">
+            const crossBadges = renderDomCrossBadges({ name, issn: r.issn, cn_code: r.cn_code }, r.__src);
+            const sourceLabel = {
+              cnki_major: T('中文期刊目录','Chinese Journal Directory'),
+              cnkx: T('中国科协','CAST'),
+              nsfc_mgmt: T('国自然管理科学部','NSFC Management'),
+              zju: T('浙大目录','ZJU'),
+              cscd: 'CSCD',
+              cstpcd: T('中国科技核心','CSTPCD'),
+              cssci_core: 'CSSCI',
+              cssci_ext: T('CSSCI 扩展','CSSCI Ext'),
+              pku_core: T('北大核心','PKU Core')
+            }[r.__src] || T('国内来源','Domestic Source');
+            return `<tr data-fid="${escape(fid)}" class="j-row clickable" data-src="${escape(r.__src)}">
               <td class="col-fav">${starBtn(r, r.__src)}</td>
-              <td class="col-name"><div class="jname">${escape(titleCase(name.replace(/\*$/,'')))}${cnName}</div>${codeLine ? `<div class="home-dom-meta">${escape(codeLine)}</div>` : ''}</td>
+              <td class="col-name"><div class="jname">${escape(titleCase(name.replace(/\*$/,'')))}${cnName}</div></td>
               <td class="col-cross"><div class="badges">${crossBadges}</div></td>
-              <td class="home-dom-source"><span>${escape(sourceText)}</span>${category ? `<em>${escape(category)}</em>` : ''}</td>
+              <td class="col-topic"><span class="muted-cell">${escape(sourceLabel)}</span></td>
             </tr>`;
           }).join('');
         }
@@ -6490,6 +6369,7 @@
       if (hasChinese) {
         if (domCount) {
           sections.unshift({
+            kind: 'dom',
             label: T('国内期刊','Domestic Journals'),
             html: domHtml,
             count: domCount
@@ -6499,6 +6379,7 @@
       } else {
         if (domCount) {
           sections.push({
+            kind: 'dom',
             label: T('国内期刊','Domestic Journals'),
             html: domHtml,
             count: domCount
@@ -6516,17 +6397,16 @@
         <span class="results-count">${T('找到','Found')} ${totalCount.toLocaleString()} ${T('个结果','results')}</span>
       </div>`;
       for (const sec of sections) {
-        const limit = hasChinese ? (sec.label.includes('国际') ? 15 : 30) : (sec.label.includes('国际') ? 30 : 10);
-        const tabTarget = sec.label.includes('国际') ? 'int' : 'dom';
+        const limit = sec.kind === 'int' ? intLimit : domLimit;
+        const tabTarget = sec.kind === 'int' ? 'int' : 'dom';
         const more = sec.count > limit
           ? `<div style="padding:4px 0 10px;display:flex;justify-content:space-between;align-items:center">
               <span class="muted-cell" style="font-size:12px">${T('已显示前','Showing first')} ${limit} ${T('条','')}</span>
               <button class="home-viewall-btn" data-viewall-tab="${tabTarget}" style="font-size:12px;color:var(--accent,#b4531f);background:none;border:none;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:2px">${T('查看全部','View all')} ${sec.count} →</button>
             </div>`
           : '';
-        const sectionClass = tabTarget === 'dom' ? ' home-dom-results' : '';
         html += `<div class="home-section-label">${sec.label}</div>
-          <div class="table-wrap${sectionClass}"><table class="journals"><thead><tr>
+          <div class="table-wrap home-results-wrap"><table class="journals home-journals" data-home-kind="${sec.kind}"><thead><tr>
             <th class="col-fav"></th>
             <th class="col-name">${t('col_name')}</th>
             <th class="col-badge">${t('col_index')}</th>
@@ -6575,7 +6455,7 @@
       return d.toLocaleDateString(lang === 'en' ? 'en-US' : 'zh-CN', { year: 'numeric', month: 'short', day: 'numeric' });
     }
 
-    function journalUpdateMatches(item, query = activeQuery, category = activeUpdateCategory) {
+    function journalUpdateMatches(item, query = activeUpdateQuery, category = activeUpdateCategory) {
       if (category && category !== 'all' && item.category !== category) return false;
       const q = String(query || '').trim().toLowerCase();
       if (!q) return true;
@@ -6600,22 +6480,6 @@
     function updateDetailPath(item) {
       if (item.detail_path) return item.detail_path;
       return item.id ? `/updates/${encodeURIComponent(item.id)}` : '';
-    }
-
-    function updateViewKey(item) {
-      const id = String(item && (item.id || item.detail_path || item.title) || '').trim();
-      return id ? `update:${id}` : '';
-    }
-
-    async function hydrateUpdateViews(items) {
-      const keys = (items || []).map(updateViewKey).filter(Boolean);
-      if (!keys.length) return;
-      await fetchJournalViews(keys);
-      keys.forEach(key => {
-        document.querySelectorAll(`[data-update-views="${cssAttrValue(key)}"]`).forEach(node => {
-          node.textContent = formatViewText(viewsCache[key] || 0);
-        });
-      });
     }
 
     function updateDetailItemFromPath() {
@@ -6755,6 +6619,7 @@
       const points = Array.isArray(detail.key_points) ? detail.key_points : [];
       const sections = Array.isArray(detail.sections) ? detail.sections : [];
       const articleHtml = renderUpdateArticle(detail.article);
+      const imageUrl = String(detail.image_url || item.image_url || report.cover_image || '').trim();
       const sourceLinks = updateLinkList([
         item.source_url ? { label: '原始来源', url: item.source_url, note: sourceName } : null,
         ...(Array.isArray(detail.source_links) ? detail.source_links : []),
@@ -6762,13 +6627,11 @@
       const journalLinks = updateLinkList(detail.journal_links || []);
       const reportUrl = report.file_detail_url || report.view_url || report.pdf_url || '';
       const pdfUrl = report.pdf_url || report.download_url || report.view_url || '';
-      const viewKey = updateViewKey(item);
-      const viewText = formatViewText(viewsCache[viewKey] || 0);
       box.innerHTML = `
         <article class="update-detail">
           <a class="updates-back" href="/updates" data-updates-back>← ${escape(t('updates_view_all'))}</a>
           <header class="update-detail-head">
-            ${updateCardBanner(item, sourceName).replace('update-card-image', 'update-card-image update-detail-generated-image')}
+            ${imageUrl ? `<img class="update-detail-image" src="${escape(imageUrl)}" alt="${escape(item.title)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : ''}
             <div class="update-card-top">
               <span class="update-category">${escape(updateCategoryLabel(item.category))}</span>
               ${item.published_at ? `<time datetime="${escape(item.published_at)}">${escape(formatUpdateDate(item.published_at))}</time>` : ''}
@@ -6778,7 +6641,6 @@
             <div class="update-detail-meta">
               <span>${escape(t('updates_source'))}: ${escape(sourceName)}</span>
               ${item.publisher ? `<span>${escape(item.publisher)}</span>` : ''}
-              ${viewKey ? `<span data-update-views="${escape(viewKey)}">${escape(viewText)}</span>` : ''}
               <span class="update-tags">${tags}</span>
             </div>
             ${sourceLinks.length ? renderUpdateLinks(sourceLinks, 'update-source-actions') : ''}
@@ -6821,64 +6683,56 @@
         renderJournalUpdates();
         updatePageSeo('updates');
       });
-      if (viewKey) {
-        reportJournalView(viewKey, {
-          source: 'journal_update_detail',
-          path: updateDetailPath(item),
-          journal_name: item.title || '',
-          tab: 'updates',
-        });
-      }
     }
 
     // Monogram for the no-image banner: leading letters of an ASCII source, else first CJK chars.
     function updateBannerMark(item) {
       const name = String(item.source_name || item.publisher || item.category || '').trim();
       const ascii = name.match(/[A-Za-z0-9]+/);
-      if (ascii) return ascii[0].slice(0, 4).toUpperCase();
-      return name ? name.replace(/\s+/g, '').slice(0, 2) : '◆';
+      if (ascii) return ascii[0][0].toUpperCase();
+      return name ? name.replace(/\s+/g, '')[0] : '•';
     }
 
-    function updateCardTheme(item) {
-      const themes = ['slate', 'sage', 'ochre', 'clay', 'indigo'];
-      const seed = String(item.category || item.source_name || item.title || '');
-      let n = 0;
-      for (let i = 0; i < seed.length; i++) n = (n + seed.charCodeAt(i) * (i + 1)) % themes.length;
-      return themes[n];
+    function shortUpdateText(value, max = 72) {
+      const text = String(value || '').replace(/\s+/g, ' ').trim();
+      return text.length > max ? `${text.slice(0, max).replace(/[，。,.;；、\s]+$/g, '')}…` : text;
     }
 
-    // Unified academic banner. We intentionally ignore remote images here:
-    // third-party article thumbnails are visually noisy and may be copyrighted.
     function updateCardBanner(item, sourceName) {
-      const ph = `<div class="update-card-ph"><span class="update-card-ph-mark">${escape(updateBannerMark(item))}</span><b>${escape(sourceName)}</b></div>`;
       const cat = item.category ? ` data-cat="${escape(item.category)}"` : '';
-      return `<div class="update-card-image ph update-card-theme-${escape(updateCardTheme(item))}"${cat}>${ph}</div>`;
+      const mark = updateBannerMark(item);
+      const date = item.published_at ? formatUpdateDate(item.published_at) : '';
+      return `<div class="update-card-image update-card-generated"${cat}>
+        <div class="update-cover-main"><span class="update-card-ph-mark">${escape(mark)}</span><b>${escape(shortUpdateText(sourceName, 30))}</b></div>
+        ${date ? `<div class="update-cover-meta">${escape(date)}</div>` : ''}
+      </div>`;
     }
 
     function renderUpdateCard(item, options = {}) {
-      const tagHtml = (item.tags || []).slice(0, 5).map(tag => `<span class="update-tag">${escape(tag)}</span>`).join('');
-      const journalsHtml = (item.journals || []).length
-        ? `<div class="update-journals">${item.journals.slice(0, 4).map(j => `<span>${escape(j)}</span>`).join('')}</div>`
+      const isHome = !!options.home;
+      const tagHtml = !isHome ? (item.tags || []).slice(0, 2).map(tag => `<span class="update-tag">${escape(tag)}</span>`).join('') : '';
+      const isBrief = !!options.brief;
+      const journalsHtml = !isBrief && (item.journals || []).length
+        ? `<div class="update-journals">${item.journals.slice(0, 2).map(j => `<span>${escape(shortUpdateText(j, 34))}</span>`).join('')}</div>`
         : '';
       const dateHtml = item.published_at ? `<time datetime="${escape(item.published_at)}">${escape(formatUpdateDate(item.published_at))}</time>` : '';
       const sourceName = item.source_name || item.publisher || t('updates_source');
-      const viewKey = updateViewKey(item);
-      const viewText = formatViewText(viewsCache[viewKey] || 0);
-      const body = `
-        ${updateCardBanner(item, sourceName)}
-        <div class="update-card-top">
-          <span class="update-category">${escape(updateCategoryLabel(item.category))}</span>
-          ${dateHtml}
-        </div>
-        <h3>${escape(item.title)}</h3>
-        <p>${escape(item.summary)}</p>
-        ${journalsHtml}
+      const bottomHtml = !isBrief ? `
         <div class="update-card-bottom">
           <span class="update-source">${escape(t('updates_source'))}: ${escape(sourceName)}</span>
-          ${viewKey ? `<span class="update-source" data-update-views="${escape(viewKey)}">${escape(viewText)}</span>` : ''}
           <span class="update-tags">${tagHtml}</span>
-        </div>`;
-      const cls = `update-card${options.compact ? ' compact' : ''}`;
+        </div>` : '';
+      const body = `
+        ${updateCardBanner(item, sourceName)}
+        ${!isBrief ? `<div class="update-card-top">
+          <span class="update-category">${escape(updateCategoryLabel(item.category))}</span>
+          ${dateHtml}
+        </div>` : ''}
+        <h3>${escape(shortUpdateText(item.title, isBrief ? 58 : 96))}</h3>
+        ${!isBrief ? `<p>${escape(shortUpdateText(item.summary, isHome ? 118 : (options.featured ? 128 : 96)))}</p>` : ''}
+        ${journalsHtml}
+        ${bottomHtml}`;
+      const cls = `update-card${options.featured ? ' featured' : ''}${options.compact ? ' compact' : ''}${isHome ? ' home-compact' : ''}${isBrief ? ' brief' : ''}`;
       const detailPath = updateDetailPath(item);
       if (detailPath) {
         return `<a class="${cls}" href="${escape(detailPath)}" data-update-detail="${escape(item.id)}">${body}</a>`;
@@ -6910,14 +6764,10 @@
       homeUpdatesPreview.hidden = false;
       homeUpdatesPreview.innerHTML = `
         <div class="updates-preview-head">
-          <div>
-            <p class="updates-kicker">${escape(t('updates_latest'))}</p>
-            <h2>${escape(t('updates_title'))}</h2>
-          </div>
           <a href="/updates" class="updates-view-all" data-updates-view-all>${escape(t('updates_view_all'))}</a>
         </div>
         <div class="updates-preview-grid">
-          ${items.map(item => renderUpdateCard(item, { compact: true })).join('')}
+          ${items.map(item => renderUpdateCard(item, { compact: true, home: true })).join('')}
         </div>`;
       attachUpdatesViewAll(homeUpdatesPreview);
     }
@@ -6929,7 +6779,6 @@
       const detailItem = updateDetailItemFromPath();
       if (detailItem) {
         renderJournalUpdateDetail(detailItem);
-        hydrateUpdateViews([detailItem]);
         return;
       }
       const allItems = journalUpdates.items || [];
@@ -6956,7 +6805,7 @@
         </div>
         ${filtered.length ? `
           <section class="updates-list" aria-label="${escape(t('updates_latest'))}">
-            ${filtered.map(item => renderUpdateCard(item)).join('')}
+            ${filtered.map(item => renderUpdateCard(item, { compact: true })).join('')}
           </section>
         ` : `<div class="updates-empty">${escape(t('updates_empty'))}</div>`}`;
       box.querySelectorAll('[data-update-category]').forEach(btn => {
@@ -6975,7 +6824,6 @@
           updatePageSeo('updates');
         });
       });
-      hydrateUpdateViews(filtered);
     }
 
     // Also sync topbar search when on home tab
@@ -6993,7 +6841,10 @@
       const prevTab = activeTab;
       if (prevTab !== 'pick') {
         const qEl = $('#q');
-        if (qEl) activeQuery = qEl.value;
+        if (qEl) {
+          if (prevTab === 'updates') activeUpdateQuery = qEl.value.trim();
+          else activeQuery = qEl.value.trim();
+        }
       }
 
       $$('[data-tab]').forEach(x => x.classList.toggle('active', x.dataset.tab === tab));
@@ -7012,6 +6863,8 @@
         // 选刊tab：清空内容，独立于其他tab
         if (activeTab === 'pick') {
           qEl.value = '';
+        } else if (activeTab === 'updates') {
+          qEl.value = activeUpdateQuery || '';
         } else {
           qEl.value = activeQuery || '';
         }
@@ -7380,7 +7233,18 @@
     const input = $('#q');
     const results = $('#pick-results');
     const status = $('#pick-status');
+    const progress = $('#pick-progress');
+    const progressBar = $('#pick-progress-bar');
+    const progressPct = $('#pick-progress-pct');
     const charCount = $('#pick-char-count');
+
+    function setPickProgress(text, pct = 0, visible = true) {
+      if (progress) progress.hidden = !visible;
+      if (status) status.textContent = text || '';
+      const n = Math.max(0, Math.min(100, Math.round(pct || 0)));
+      if (progressBar) progressBar.style.width = `${n}%`;
+      if (progressPct) progressPct.textContent = `${n}%`;
+    }
 
     function updatePickCharCount() {
       if (!input || !charCount) return;
@@ -7435,7 +7299,7 @@
     }
 
     async function fetchAiPick(query) {
-      const res = await fetch(`${API_BASE}/pick`, {
+      const request = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -7446,7 +7310,15 @@
           filters: pickFiltersPayload(),
           limit: 120,
         }),
-      });
+      };
+      let res;
+      try {
+        res = await fetch(`${API_BASE}/pick`, request);
+      } catch (err) {
+        const fallbackBase = 'https://api.ailatest.org';
+        if (API_BASE === fallbackBase) throw err;
+        res = await fetch(`${fallbackBase}/pick`, request);
+      }
       const data = await res.json().catch(() => null);
       if (!res.ok || !data || data.ok === false) {
         const msg = data?.error || data?.message || `HTTP ${res.status}`;
@@ -7631,40 +7503,41 @@
       const rec = resolvePickJournal({ name: item.name });
       const reason = item.reason || '';
       if (!rec) {
-        return `<article class="pick-report-card">
-          <div class="pick-report-card-top"><span class="pick-report-num">${i + 1}</span><h4>${escape(titleCase(item.name))}</h4><span class="pick-report-missing">${T('站内未收录','not in site data')}</span></div>
-          <p class="pick-report-reason">${escape(reason)}</p>
-        </article>`;
+        return `<tr>
+          <td class="pick-report-num">${i + 1}</td>
+          <td>${escape(titleCase(item.name))} <span class="pick-report-missing">${T('站内未收录','not in site data')}</span></td>
+          <td colspan="4"><span class="muted-cell">&mdash;</span></td>
+          <td class="pick-report-reason">${escape(reason)}</td>
+        </tr>`;
       }
       const fid = favId(rec);
       if (fid) rowRecordsByFid[fid] = { ...rec, __src: 'int' };
       const idxText = (rec.indices || []).join(' / ');
       const feeHtml = pickFeeBadge(rec);
       const warnText = (rec.warning || rec.citic_warning || rec.on_hold || rec.under_review) ? ' ⚠' : '';
-      const metrics = [
-        pickMetricIf(rec) ? `<span><b>IF</b>${escape(pickMetricIf(rec))}</span>` : '',
-        rec.if_quartile ? `<span><b>JCR</b>${escape(rec.if_quartile)}</span>` : '',
-        pickMetricCas(rec) ? `<span><b>${T('中科院','CAS')}</b>${escape(pickMetricCas(rec))}</span>` : '',
-        feeHtml ? `<span class="pick-report-fee"><b>${T('费用','Fee')}</b>${feeHtml}</span>` : '',
-      ].filter(Boolean).join('');
-      return `<article class="pick-report-card">
-        <div class="pick-report-card-top">
-          <span class="pick-report-num">${i + 1}</span>
-          <h4><a href="#j/${escape(fid)}" data-pick-report-fid="${escape(fid)}">${escape(titleCase(rec.name || item.name))}</a>${warnText}</h4>
-        </div>
-        ${idxText ? `<div class="pick-report-meta">${escape(idxText)}</div>` : ''}
-        ${metrics ? `<div class="pick-report-metrics">${metrics}</div>` : ''}
-        <p class="pick-report-reason">${escape(reason)}</p>
-      </article>`;
+      return `<tr>
+        <td class="pick-report-num">${i + 1}</td>
+        <td>
+          <a href="#j/${escape(fid)}" data-pick-report-fid="${escape(fid)}">${escape(titleCase(rec.name || item.name))}</a>${warnText}
+          ${idxText ? `<span class="pick-report-meta">${escape(idxText)}</span>` : ''}
+        </td>
+        <td>${pickMetricIf(rec) || '<span class="muted-cell">&mdash;</span>'}</td>
+        <td>${escape(rec.if_quartile || '') || '<span class="muted-cell">&mdash;</span>'}</td>
+        <td>${pickMetricCas(rec) ? escape(pickMetricCas(rec)) : '<span class="muted-cell">&mdash;</span>'}</td>
+        <td>${feeHtml || '<span class="muted-cell">&mdash;</span>'}</td>
+        <td class="pick-report-reason">${escape(reason)}</td>
+      </tr>`;
     }
 
     function renderPickReportCnRow(item, i) {
       const hit = resolveDomesticByName(item.name);
       if (!hit) {
-        return `<article class="pick-report-card">
-          <div class="pick-report-card-top"><span class="pick-report-num">${i + 1}</span><h4>${escape(item.name)}</h4><span class="pick-report-missing">${T('站内未收录','not in site data')}</span></div>
-          <p class="pick-report-reason">${escape(item.reason || '')}</p>
-        </article>`;
+        return `<tr>
+          <td class="pick-report-num">${i + 1}</td>
+          <td>${escape(item.name)} <span class="pick-report-missing">${T('站内未收录','not in site data')}</span></td>
+          <td><span class="muted-cell">&mdash;</span></td>
+          <td class="pick-report-reason">${escape(item.reason || '')}</td>
+        </tr>`;
       }
       const r = hit.record;
       const fid = favId(r);
@@ -7674,11 +7547,12 @@
         hit.cnki?.compound_if ? `<span class="domsrc-pill">CNKI ${T('复合IF','compound IF')} ${escape(hit.cnki.compound_if)}</span>` : '',
         hit.cnki?.comprehensive_if ? `<span class="domsrc-pill">CNKI ${T('综合IF','comprehensive IF')} ${escape(hit.cnki.comprehensive_if)}</span>` : '',
       ].filter(Boolean).join('');
-      return `<article class="pick-report-card">
-        <div class="pick-report-card-top"><span class="pick-report-num">${i + 1}</span><h4><a href="#j/${escape(fid)}" data-pick-report-fid="${escape(fid)}">${escape(r.name)}</a></h4></div>
-        <div class="pick-report-badges">${badges || '<span class="muted-cell">&mdash;</span>'}</div>
-        <p class="pick-report-reason">${escape(item.reason || '')}</p>
-      </article>`;
+      return `<tr>
+        <td class="pick-report-num">${i + 1}</td>
+        <td><a href="#j/${escape(fid)}" data-pick-report-fid="${escape(fid)}">${escape(r.name)}</a></td>
+        <td><div class="pick-report-badges">${badges || '<span class="muted-cell">&mdash;</span>'}</div></td>
+        <td class="pick-report-reason">${escape(item.reason || '')}</td>
+      </tr>`;
     }
 
     // AI recommendation report: the AI picks tiers/reasons/strategy, every
@@ -7694,14 +7568,24 @@
         <div class="pick-report-section-head">
           <h3><span class="pick-tier-dot" aria-hidden="true"></span>${escape(tier.label)}<span class="pick-tier-count">${tier.items.length} ${T('本','journals')}</span></h3>
         </div>
-        <div class="pick-report-card-grid">${(tier.items || []).map((item, i) => renderPickReportEnRow(item, i)).join('')}</div>
+        <div class="pick-report-table-wrap">
+          <table class="pick-report-table pick-report-tier-table">
+            <thead><tr><th>#</th><th>${T('期刊','Journal')}</th><th>IF</th><th>JCR</th><th>${T('中科院','CAS')}</th><th>${T('费用','Fees')}</th><th>${T('推荐理由','Why')}</th></tr></thead>
+            <tbody>${(tier.items || []).map((item, i) => renderPickReportEnRow(item, i)).join('')}</tbody>
+          </table>
+        </div>
       </section>`).join('');
       const chineseHtml = (report.chinese || []).length ? `<section class="pick-report-section pick-tier-chinese">
         <div class="pick-report-section-head">
           <h3><span class="pick-tier-dot" aria-hidden="true"></span>${T('中文期刊推荐','Chinese journal options')}<span class="pick-tier-count">${report.chinese.length} ${T('本','journals')}</span></h3>
           <p>${T('期刊由 AI 按论文主题推荐，收录与分级信息来自站内 CSSCI、北大核心、中国科协、CNKI 等目录。','Journals suggested by AI for this topic; list/tier info comes from the site CSSCI, PKU Core, CAST and CNKI catalogs.')}</p>
         </div>
-        <div class="pick-report-card-grid pick-report-cn-grid">${report.chinese.map((item, i) => renderPickReportCnRow(item, i)).join('')}</div>
+        <div class="pick-report-table-wrap">
+          <table class="pick-report-table pick-report-dom-table">
+            <thead><tr><th>#</th><th>${T('期刊','Journal')}</th><th>${T('站内数据','Site data')}</th><th>${T('推荐理由','Why')}</th></tr></thead>
+            <tbody>${report.chinese.map((item, i) => renderPickReportCnRow(item, i)).join('')}</tbody>
+          </table>
+        </div>
       </section>` : '';
       const strategyTips = (report.strategy || []).concat([
         T('费用列综合站内「免费发表」标记（含 Diamond/Gold/Hybrid OA 选项）与 DOAJ 公开 APC 数据；空白表示暂无公开费用信息，不代表免费或收费。','The fees column combines the site "free to publish" flag (Diamond/Gold/Hybrid OA options) with public DOAJ APC data; blank cells mean no public fee info, not free or paid.'),
@@ -7732,14 +7616,15 @@
       incrementUsage('searches');
 
       const query = input.value.trim();
-      if (!query) { status.textContent = T('请输入内容','Please enter a query'); return; }
+      if (!query) { setPickProgress(T('请输入内容','Please enter a query'), 0); return; }
 
-      status.textContent = T('正在匹配本地期刊库…','Matching local journal profiles…');
+      setPickProgress(T('准备研究主题与筛选条件…','Preparing topic and filters…'), 8);
       results.innerHTML = '';
 
       try {
         // Lazy-load local topic snapshot for richer journal profiles. No live API calls.
         if (!oaMap) {
+          setPickProgress(T('加载本地期刊画像…','Loading local journal profiles…'), 18);
           try { oaMap = await fetchJSON('data/oa.json.gz'); }
           catch(e) { oaMap = {}; }
         }
@@ -7756,8 +7641,9 @@
           statusNotice = t('pick_ai_login');
         } else if (useAi) {
           try {
-            status.textContent = t('pick_ai_running');
+            setPickProgress(T('AI 正在分析研究语义…','AI is analyzing research context…'), 34);
             const aiData = await fetchAiPick(query);
+            setPickProgress(T('整理 AI 推荐梯队…','Organizing AI recommendation tiers…'), 72);
             entries = aiEntriesFromResults(aiData);
             pickMode = 'ai';
             quotaInfo = aiData.quota || null;
@@ -7766,20 +7652,21 @@
           } catch (e) {
             // AI 失败（网络/额度/配置）→ 自动回退本地匹配，并在状态栏说明原因。
             statusNotice = pickAiErrorMessage(e);
-            status.textContent = statusNotice;
+            setPickProgress(statusNotice, 42);
           }
         }
 
         if (!entries) {
+          setPickProgress(T('匹配本地候选期刊…','Matching local candidate journals…'), 45);
           // 本地匹配：词干化 + 标题短语 + 歧义词消歧 + 领域锚点，逻辑在 js/pick-match.js（与 Worker 共用）。
           const PM = window.PickMatch;
           if (!PM) {
-            status.textContent = T('本地匹配模块加载失败，请刷新页面重试','Local matching module failed to load. Please refresh.');
+            setPickProgress(T('本地匹配模块加载失败，请刷新页面重试','Local matching module failed to load. Please refresh.'), 0);
             return;
           }
           const localProfile = PM.buildLocalProfile(query);
           if (!localProfile.terms.length) {
-            status.textContent = T('请输入更具体的研究对象关键词（避免只填“分析/机制/演化”等方法词）','Enter more specific research-topic keywords (not just method words like analysis/mechanism)');
+            setPickProgress(T('请输入更具体的研究对象关键词（避免只填“分析/机制/演化”等方法词）','Enter more specific research-topic keywords (not just method words like analysis/mechanism)'), 0);
             return;
           }
 
@@ -7821,6 +7708,7 @@
           }
         }
 
+        setPickProgress(T('应用索引与费用筛选…','Applying index and fee filters…'), 82);
         let filtered = entries;
         const wantSci = document.getElementById('pick-filter-sci')?.checked;
         const wantSsci = document.getElementById('pick-filter-ssci')?.checked;
@@ -7849,22 +7737,27 @@
         filtered.sort((a, b) => b.score - a.score || (b.journalRec.if_2024 || 0) - (a.journalRec.if_2024 || 0));
         if (query !== pickLastQuery) {
           pickLastQuery = query;
-          window.__pickShown = 40;
+          window.__pickShown = 30;
         }
         const allFiltered = filtered;
         const maxScore = allFiltered.length > 0 ? allFiltered[0].score : 1;
         allFiltered.forEach(e => e.score = maxScore > 0 ? e.score / maxScore : 0);
-        const shownLimit = Math.max(40, window.__pickShown || 40);
+        const shownLimit = Math.max(30, window.__pickShown || 30);
         filtered = allFiltered.slice(0, shownLimit);
 
         if (!filtered.length) {
           results.innerHTML = `<div class="pick-no-results">${T('没有符合筛选条件的期刊推荐','No journals match your filters')}</div>`;
-          status.textContent = pickMode === 'ai'
+          setPickProgress(entries.length
+            ? T('已匹配到候选期刊，但当前索引/综合刊/费用筛选把结果过滤完了，请放宽筛选条件。',
+                'Local candidates were found, but the current index / multidisciplinary / fee filters removed them all. Try relaxing filters.')
+            : pickMode === 'ai'
             ? T('AI 语义匹配没有符合当前筛选条件的期刊，请放宽索引或综合刊筛选','AI semantic matching found no journals under the current filters. Try relaxing index or multidisciplinary filters.')
-            : T('没有匹配到本地期刊画像，请换成更具体的英文关键词','No local journal profiles matched. Try more specific English keywords.');
+            : T('没有匹配到本地期刊画像。中文题目建议补充 2-5 个研究对象或学科关键词；英文题目建议补充具体领域词。',
+                'No local journal profiles matched. Add 2-5 concrete research objects or field keywords.'), 100);
           return;
         }
 
+        setPickProgress(T('渲染推荐结果…','Rendering recommendations…'), 92);
         const reportHtml = pickMode === 'ai'
           ? renderPickAiReport(aiReport, aiProfile || entries[0]?.semanticProfile || {})
           : '';
@@ -7903,7 +7796,7 @@
                   const label = yearStr ? `${yearStr}${levelStr ? '/'+levelStr : ''}` : (levelStr || '⚠');
                   flagsHtml += `<span class="badge b-warn">⚠ ${escape(label)}</span>`;
                 } else {
-                  flagsHtml += `<span class="badge b-warn">⚠ Warning</span>`;
+                  flagsHtml += `<span class="badge b-warn">⚠ ${T('预警','Warning')}</span>`;
                 }
               }
               // OA publisher badges (MDPI / Frontiers / Hindawi)
@@ -7985,10 +7878,10 @@
           </div>`;
         }).join('');
         if (allFiltered.length > filtered.length) {
-          results.innerHTML += `<button id="pick-more" class="pick-more" type="button">${T('再显示 40 本','Show 40 more')} <span>${allFiltered.length - filtered.length} ${T('本剩余','left')}</span></button>`;
+          results.innerHTML += `<button id="pick-more" class="pick-more" type="button">${T('再显示 30 本','Show 30 more')} <span>${allFiltered.length - filtered.length} ${T('本剩余','left')}</span></button>`;
         }
         document.getElementById('pick-more')?.addEventListener('click', () => {
-          window.__pickShown = Math.max(40, window.__pickShown || 40) + 40;
+          window.__pickShown = Math.max(30, window.__pickShown || 30) + 30;
           doSearch();
         });
 
@@ -8010,7 +7903,7 @@
           ? ` · ${T('今日剩余','remaining today')} ${quotaInfo.remaining}/${quotaInfo.limit}`
           : '';
         const modeText = pickMode === 'ai' ? t('pick_mode_ai') : t('pick_mode_local');
-        status.textContent = `${statusNotice ? statusNotice + ' · ' : ''}${modeText} ${entries.length} ${T('个候选期刊','candidate journals')}, ${T('显示','showing')} ${filtered.length}/${allFiltered.length}${quotaText}`;
+        setPickProgress(`${statusNotice ? statusNotice + ' · ' : ''}${modeText} ${entries.length} ${T('个候选期刊','candidate journals')}, ${T('显示','showing')} ${filtered.length}/${allFiltered.length}${quotaText}`, 100);
         trackInteraction('journal_pick', {
           tab: 'pick',
           query,
@@ -8030,7 +7923,7 @@
         // ── Save to search history ──
         savePickHistory(query);
       } catch (e) {
-        status.textContent = T('检索失败：','Search failed: ') + e.message;
+        setPickProgress(T('检索失败：','Search failed: ') + e.message, 100);
         console.error(e);
       }
     }
@@ -8039,7 +7932,7 @@
     document.querySelectorAll('.pick-filter-bar input').forEach(el => {
       el.addEventListener('change', () => {
         if (!input.value.trim()) return;
-        window.__pickShown = 40;
+        window.__pickShown = 30;
         doSearch();
       });
     });
