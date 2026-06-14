@@ -2258,7 +2258,10 @@
   async function reportJournalView(recOrKey, opts = {}) {
     const key = typeof recOrKey === 'string' ? recOrKey : favId(recOrKey);
     if (!key) return;
-    const detailPath = typeof recOrKey === 'string' ? analyticsPath() : journalPublicPath(recOrKey);
+    try {
+      if (localStorage.getItem('ailatest.analytics.ignore') === '1') return;
+    } catch (_) {}
+    const detailPath = opts.path || (typeof recOrKey === 'string' ? analyticsPath() : journalPublicPath(recOrKey));
     const source = journalOpenSource(opts);
     try {
       const r = await fetch(`${API_BASE}/journal-view`, {

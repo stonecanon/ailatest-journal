@@ -317,6 +317,20 @@ function sumRows(rows, key) {
 function humanTrafficExpr() {
   return "COALESCE(traffic_type, CASE WHEN is_bot=1 THEN 'scraper' ELSE 'human' END) = 'human'";
 }
+const INTERNAL_ANALYTICS_VISITOR_MARKERS = ['000cad16'];
+function internalVisitorExpr(column = 'visitor_id') {
+  const checks = INTERNAL_ANALYTICS_VISITOR_MARKERS.flatMap(marker => {
+    const safe = marker.replace(/'/g, "''").toLowerCase();
+    return [
+      `LOWER(COALESCE(${column},'')) <> '${safe}'`,
+      `LOWER(COALESCE(${column},'')) NOT LIKE '%${safe}%'`,
+    ];
+  });
+  return `(COALESCE(${column},'') = '' OR (${checks.join(' AND ')}))`;
+}
+function humanAnalyticsExpr(column = 'visitor_id') {
+  return `${humanTrafficExpr()} AND ${internalVisitorExpr(column)}`;
+}
 async function buildSiteBusiness(env, options = {}) {
   const days = normalizeDays(options);
   const startSec = startSecForDays(days);
@@ -358,49 +372,52 @@ async function buildSiteBusiness(env, options = {}) {
       FROM favorites GROUP BY journal_key ORDER BY favorites DESC, journal_key ASC LIMIT 40`),
     run('ratings', `SELECT journal_key, COUNT(*) AS ratings, ROUND(AVG(rating),2) AS avg_rating
       FROM ratings GROUP BY journal_key ORDER BY ratings DESC, avg_rating DESC, journal_key ASC LIMIT 40`),
-    run('journal_views', `SELECT journal_key, count AS views, updated_at
-      FROM journal_views ORDER BY count DESC, updated_at DESC, journal_key ASC LIMIT 40`),
+    run('journal_view_events', `SELECT journal_key, ${jvAgg('journal_name')} AS journal_name, ${jvAgg('journal_issn')} AS journal_issn,
+        COUNT(*) AS views, MAX(COALESCE(NULLIF(event_time,0), viewed_at)) AS updated_at
+      FROM journal_view_events
+      WHERE ${humanAnalyticsExpr()}
+      GROUP BY journal_key ORDER BY views DESC, updated_at DESC, journal_key ASC LIMIT 40`),
     run('journal_view_events', `SELECT COUNT(*) AS total_journal_views, COUNT(DISTINCT journal_key) AS viewed_journals,
         MAX(COALESCE(NULLIF(event_time,0), viewed_at)) AS latest_journal_view_at
       FROM journal_view_events
-      WHERE viewed_at >= ? AND ${humanTrafficExpr()}`, [startSec]),
+      WHERE viewed_at >= ? AND ${humanAnalyticsExpr()}`, [startSec]),
     run('journal_view_events', `SELECT journal_key, ${jvSelect('journal_name')}, ${jvSelect('journal_issn')}, user_id, visitor_id, session_id,
         path, viewed_at, referrer, user_agent, country, ip_hash, device, browser, event_time,
         view_source, query, tab, traffic_type, bot_reason
       FROM journal_view_events
-      WHERE viewed_at >= ?
+      WHERE viewed_at >= ? AND ${humanAnalyticsExpr()}
       ORDER BY COALESCE(NULLIF(event_time,0), viewed_at) DESC LIMIT 120`, [startSec]),
     run('journal_view_events', `SELECT journal_key, ${jvAgg('journal_name')} AS journal_name, ${jvAgg('journal_issn')} AS journal_issn,
         COUNT(*) AS views, COUNT(DISTINCT visitor_id) AS visitors,
         MAX(COALESCE(NULLIF(event_time,0), viewed_at)) AS latest_viewed
       FROM journal_view_events
-      WHERE viewed_at >= ? AND ${humanTrafficExpr()}
+      WHERE viewed_at >= ? AND ${humanAnalyticsExpr()}
       GROUP BY journal_key ORDER BY views DESC, latest_viewed DESC LIMIT 40`, [startSec]),
     run('journal_view_events', `SELECT COALESCE(view_source,'unknown') AS view_source, COALESCE(tab,'unknown') AS tab,
         COUNT(*) AS views, COUNT(DISTINCT visitor_id) AS visitors
       FROM journal_view_events
-      WHERE viewed_at >= ? AND ${humanTrafficExpr()}
+      WHERE viewed_at >= ? AND ${humanAnalyticsExpr()}
       GROUP BY COALESCE(view_source,'unknown'), COALESCE(tab,'unknown')
       ORDER BY views DESC LIMIT 40`, [startSec]),
     run('journal_view_events', `SELECT ${days === 1 ? "strftime('%Y-%m-%dT%H:00:00Z', viewed_at, 'unixepoch')" : "date(viewed_at, 'unixepoch')"} AS hour,
         COUNT(*) AS views, COUNT(DISTINCT visitor_id) AS visitors
       FROM journal_view_events
-      WHERE viewed_at >= ? AND ${humanTrafficExpr()}
+      WHERE viewed_at >= ? AND ${humanAnalyticsExpr()}
       GROUP BY hour ORDER BY hour ASC`, [startSec]),
     run('interaction_events', `SELECT event_type, COUNT(*) AS events, COUNT(DISTINCT visitor_id) AS visitors,
         COUNT(DISTINCT session_id) AS sessions, ROUND(AVG(result_count),1) AS avg_results
       FROM interaction_events
-      WHERE site = 'journal.ailatest.org' AND event_ts >= ?
+      WHERE site = 'journal.ailatest.org' AND event_ts >= ? AND ${humanAnalyticsExpr()}
       GROUP BY event_type ORDER BY events DESC`, [startSec]),
     run('interaction_events', `SELECT event_type, COALESCE(tab,'unknown') AS tab, COUNT(*) AS events,
         ROUND(AVG(result_count),1) AS avg_results
       FROM interaction_events
-      WHERE site = 'journal.ailatest.org' AND event_ts >= ?
+      WHERE site = 'journal.ailatest.org' AND event_ts >= ? AND ${humanAnalyticsExpr()}
       GROUP BY event_type, COALESCE(tab,'unknown') ORDER BY events DESC LIMIT 40`, [startSec]),
     run('interaction_events', `SELECT event_type, site, path, tab, query, result_count, visitor_id, session_id,
         event_ts, traffic_type, bot_reason
       FROM interaction_events
-      WHERE site = 'journal.ailatest.org' AND event_ts >= ?
+      WHERE site = 'journal.ailatest.org' AND event_ts >= ? AND ${humanAnalyticsExpr()}
       ORDER BY event_ts DESC LIMIT 60`, [startSec]),
     run('favorites', `SELECT f.journal_key, f.created_at, u.id AS user_id, u.email, u.login, u.name
       FROM favorites f LEFT JOIN users u ON u.id = f.user_id
@@ -470,34 +487,34 @@ async function buildSiteBusiness(env, options = {}) {
         COUNT(DISTINCT session_id) AS search_sessions,
         SUM(CASE WHEN result_count = 0 THEN 1 ELSE 0 END) AS zero_result_searches
       FROM interaction_events
-      WHERE site = 'grant.ailatest.org' AND event_ts >= ?`, [startSec]),
+      WHERE site = 'grant.ailatest.org' AND event_ts >= ? AND ${humanAnalyticsExpr()}`, [startSec]),
     run('interaction_events', `SELECT query, COUNT(*) AS events, COUNT(DISTINCT visitor_id) AS visitors,
         ROUND(AVG(result_count),1) AS avg_results
       FROM interaction_events
-      WHERE site = 'grant.ailatest.org' AND event_ts >= ?
+      WHERE site = 'grant.ailatest.org' AND event_ts >= ? AND ${humanAnalyticsExpr()}
       GROUP BY query ORDER BY events DESC LIMIT 40`, [startSec]),
     run('interaction_events', `SELECT query, COUNT(*) AS events
       FROM interaction_events
-      WHERE site = 'grant.ailatest.org' AND event_ts >= ? AND result_count = 0
+      WHERE site = 'grant.ailatest.org' AND event_ts >= ? AND result_count = 0 AND ${humanAnalyticsExpr()}
       GROUP BY query ORDER BY events DESC LIMIT 40`, [startSec]),
     run('interaction_events', `SELECT event_type, site, path, tab, query, result_count, visitor_id, session_id,
         event_ts, traffic_type, bot_reason
       FROM interaction_events
-      WHERE site = 'grant.ailatest.org' AND event_ts >= ?
+      WHERE site = 'grant.ailatest.org' AND event_ts >= ? AND ${humanAnalyticsExpr()}
       ORDER BY event_ts DESC LIMIT 60`, [startSec]),
     run('raw_events', `SELECT event_ts, received_at, visitor_id, session_id, path, referrer, country,
         client_language, ip_hash, traffic_type, bot_reason
       FROM raw_events
-      WHERE site = 'grant.ailatest.org' AND event_ts >= ?
+      WHERE site = 'grant.ailatest.org' AND event_ts >= ? AND ${humanAnalyticsExpr()}
       ORDER BY event_ts DESC LIMIT 120`, [startSec]),
     run('interaction_events', `SELECT date(event_ts,'unixepoch') AS day, COUNT(*) AS events
       FROM interaction_events
-      WHERE site = 'grant.ailatest.org' AND event_ts >= ?
+      WHERE site = 'grant.ailatest.org' AND event_ts >= ? AND ${humanAnalyticsExpr()}
       GROUP BY day ORDER BY day ASC`, [startSec]),
     run('raw_events', `SELECT event_ts, received_at, visitor_id, session_id, path, referrer, country,
         client_language, ip_hash, traffic_type, bot_reason
       FROM raw_events
-      WHERE site = 'ailatest.org' AND event_ts >= ?
+      WHERE site = 'ailatest.org' AND event_ts >= ? AND ${humanAnalyticsExpr()}
       ORDER BY event_ts DESC LIMIT 120`, [startSec]),
   ]);
 
@@ -617,25 +634,33 @@ async function buildD1(env) {
         ROUND(AVG(json_array_length(ids_json)),2) AS avg_items_per_list,
         MAX(json_array_length(ids_json)) AS max_items_in_list
       FROM fav_lists`),
-    maybe('journal_views', `SELECT COUNT(*) AS viewed_journals, COALESCE(SUM(count),0) AS total_journal_views,
-        MAX(count) AS max_journal_views, MAX(updated_at) AS latest_journal_view_at
-      FROM journal_views`),
-    maybe('journal_views', `SELECT journal_key, count AS views, updated_at
-      FROM journal_views ORDER BY count DESC, updated_at DESC, journal_key ASC LIMIT 30`),
+    maybe('journal_view_events', `SELECT COUNT(*) AS viewed_journals, COALESCE(SUM(views),0) AS total_journal_views,
+        MAX(views) AS max_journal_views, MAX(updated_at) AS latest_journal_view_at
+      FROM (
+        SELECT journal_key, COUNT(*) AS views, MAX(COALESCE(NULLIF(event_time,0), viewed_at)) AS updated_at
+        FROM journal_view_events
+        WHERE ${humanAnalyticsExpr()}
+        GROUP BY journal_key
+      )`),
+    maybe('journal_view_events', `SELECT journal_key, COUNT(*) AS views, MAX(COALESCE(NULLIF(event_time,0), viewed_at)) AS updated_at
+      FROM journal_view_events
+      WHERE ${humanAnalyticsExpr()}
+      GROUP BY journal_key ORDER BY views DESC, updated_at DESC, journal_key ASC LIMIT 30`),
     maybe('login_events', `SELECT day, COUNT(*) AS login_events, COUNT(DISTINCT user_id) AS login_users
       FROM login_events GROUP BY day ORDER BY day`),
     maybe('login_events', `SELECT COALESCE(provider,'unknown') AS provider, COUNT(*) AS login_events,
         COUNT(DISTINCT user_id) AS login_users
       FROM login_events GROUP BY COALESCE(provider,'unknown') ORDER BY login_events DESC`),
-    maybe('page_events', `SELECT MAX(event_at) AS latest_pageview_at FROM page_events`),
+    maybe('page_events', `SELECT MAX(event_at) AS latest_pageview_at FROM page_events
+      WHERE ${internalVisitorExpr()}`),
     maybe('page_events', `SELECT day, COUNT(*) AS pageviews, COUNT(DISTINCT session_id) AS sessions,
         COUNT(DISTINCT visitor_id) AS visitors,
         SUM(CASE WHEN client_timezone='Asia/Shanghai' OR client_language LIKE 'zh%' THEN 1 ELSE 0 END) AS cn_hint_events,
         COUNT(DISTINCT CASE WHEN client_timezone='Asia/Shanghai' OR client_language LIKE 'zh%' THEN visitor_id END) AS cn_hint_visitors,
         COUNT(DISTINCT CASE WHEN client_timezone='Asia/Shanghai' OR client_language LIKE 'zh%' THEN session_id END) AS cn_hint_sessions
-      FROM page_events GROUP BY day ORDER BY day`),
+      FROM page_events WHERE ${internalVisitorExpr()} GROUP BY day ORDER BY day`),
     maybe('page_events', `SELECT COALESCE(path,'/') AS path, COUNT(*) AS pageviews, COUNT(DISTINCT visitor_id) AS visitors
-      FROM page_events GROUP BY COALESCE(path,'/') ORDER BY pageviews DESC LIMIT 20`),
+      FROM page_events WHERE ${internalVisitorExpr()} GROUP BY COALESCE(path,'/') ORDER BY pageviews DESC LIMIT 20`),
     maybe('page_events', `SELECT COALESCE(country,'unknown') AS country, COUNT(*) AS pageviews,
         COUNT(DISTINCT visitor_id) AS visitors, COUNT(DISTINCT session_id) AS sessions,
         SUM(CASE WHEN client_timezone='Asia/Shanghai' OR client_language LIKE 'zh%' THEN 1 ELSE 0 END) AS cn_hint_events,
@@ -643,7 +668,7 @@ async function buildD1(env) {
         COUNT(DISTINCT CASE WHEN client_timezone='Asia/Shanghai' OR client_language LIKE 'zh%' THEN session_id END) AS cn_hint_sessions,
         GROUP_CONCAT(DISTINCT colo) AS colos, GROUP_CONCAT(DISTINCT client_timezone) AS client_timezones,
         GROUP_CONCAT(DISTINCT client_language) AS client_languages
-      FROM page_events GROUP BY COALESCE(country,'unknown') ORDER BY pageviews DESC LIMIT 20`),
+      FROM page_events WHERE ${internalVisitorExpr()} GROUP BY COALESCE(country,'unknown') ORDER BY pageviews DESC LIMIT 20`),
     q(env, `SELECT id, provider, email, login, name, created_at, updated_at
       FROM users ORDER BY created_at DESC LIMIT 20`),
   ]);
@@ -881,39 +906,71 @@ async function buildGoogleAnalytics(env) {
   const propertyId = env.GA4_PROPERTY_ID;
   const raw = env.GA4_SA_KEY;
   if (!propertyId || !raw) {
-    return { source: 'Google Analytics 4', status: 'disabled', reason: '未配置 GA4_SA_KEY / GA4_PROPERTY_ID' };
+    return {
+      source: 'Google Analytics 4',
+      status: 'disabled',
+      reason: '未配置 GA4_SA_KEY / GA4_PROPERTY_ID',
+      configured: { property_id: !!propertyId, service_account_key: !!raw },
+    };
   }
   let sa;
   try {
     sa = typeof raw === 'string' ? JSON.parse(raw) : raw;
   } catch (e) {
-    return { source: 'Google Analytics 4', status: 'error', reason: 'GA4_SA_KEY 不是合法 JSON' };
+    return { source: 'Google Analytics 4', status: 'error', reason: 'GA4_SA_KEY 不是合法 JSON', property_id: propertyId };
   }
-  const token = await getGoogleAccessToken(sa);
+  const serviceAccountEmail = sa?.client_email || '';
+  let token;
+  try {
+    token = await getGoogleAccessToken(sa);
+  } catch (e) {
+    return {
+      source: 'Google Analytics 4',
+      status: 'error',
+      reason: `服务账号换取 access token 失败：${e.message || e}`,
+      property_id: propertyId,
+      service_account_email: serviceAccountEmail,
+      fix_hint: '请确认 GA4_SA_KEY 是完整 service-account JSON，且 private_key 保留换行。',
+    };
+  }
   const range = [{ startDate: '13daysAgo', endDate: 'today' }];
 
-  const [daily, pages, countries] = await Promise.all([
-    ga4Report(propertyId, token, {
-      dateRanges: range,
-      dimensions: [{ name: 'date' }],
-      metrics: [{ name: 'sessions' }, { name: 'totalUsers' }, { name: 'screenPageViews' }],
-      orderBys: [{ dimension: { dimensionName: 'date' } }],
-    }),
-    ga4Report(propertyId, token, {
-      dateRanges: range,
-      dimensions: [{ name: 'pagePath' }],
-      metrics: [{ name: 'screenPageViews' }, { name: 'totalUsers' }],
-      orderBys: [{ metric: { metricName: 'screenPageViews' }, desc: true }],
-      limit: 15,
-    }),
-    ga4Report(propertyId, token, {
-      dateRanges: range,
-      dimensions: [{ name: 'country' }],
-      metrics: [{ name: 'totalUsers' }, { name: 'sessions' }],
-      orderBys: [{ metric: { metricName: 'totalUsers' }, desc: true }],
-      limit: 15,
-    }),
-  ]);
+  let daily;
+  let pages;
+  let countries;
+  try {
+    [daily, pages, countries] = await Promise.all([
+      ga4Report(propertyId, token, {
+        dateRanges: range,
+        dimensions: [{ name: 'date' }],
+        metrics: [{ name: 'sessions' }, { name: 'totalUsers' }, { name: 'screenPageViews' }],
+        orderBys: [{ dimension: { dimensionName: 'date' } }],
+      }),
+      ga4Report(propertyId, token, {
+        dateRanges: range,
+        dimensions: [{ name: 'pagePath' }],
+        metrics: [{ name: 'screenPageViews' }, { name: 'totalUsers' }],
+        orderBys: [{ metric: { metricName: 'screenPageViews' }, desc: true }],
+        limit: 15,
+      }),
+      ga4Report(propertyId, token, {
+        dateRanges: range,
+        dimensions: [{ name: 'country' }],
+        metrics: [{ name: 'totalUsers' }, { name: 'sessions' }],
+        orderBys: [{ metric: { metricName: 'totalUsers' }, desc: true }],
+        limit: 15,
+      }),
+    ]);
+  } catch (e) {
+    return {
+      source: 'Google Analytics 4',
+      status: 'error',
+      reason: `GA4 Data API 查询失败：${e.message || e}`,
+      property_id: propertyId,
+      service_account_email: serviceAccountEmail,
+      fix_hint: '请确认该 service account 已加入 GA4 property 537014253，并至少拥有 Viewer/Analyst 权限；同时确认 Analytics Data API 已启用。',
+    };
+  }
 
   const dRows = daily.rows || [];
   const fmtDay = s => (s && s.length === 8 ? `${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)}` : s);
@@ -930,6 +987,7 @@ async function buildGoogleAnalytics(env) {
     status: 'ok',
     reason: '',
     property_id: propertyId,
+    service_account_email: serviceAccountEmail,
     today: series[series.length - 1] || null,
     totals: { sessions: sum('sessions'), users: sum('users'), pageviews: sum('pageviews') },
     series,

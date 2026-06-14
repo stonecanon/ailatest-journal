@@ -141,6 +141,13 @@ function visitorHash(ipHash, visitorId) {
   return `vh_${String(ipHash || '').slice(0, 18)}_${String(visitorId || '').slice(0, 18)}`.slice(0, 80);
 }
 
+const INTERNAL_ANALYTICS_VISITOR_MARKERS = ['000cad16'];
+
+function isInternalAnalyticsVisitor(visitorId) {
+  const id = String(visitorId || '').trim().toLowerCase();
+  return !!id && INTERNAL_ANALYTICS_VISITOR_MARKERS.some(marker => id === marker || id.includes(marker));
+}
+
 function metadataJson(value) {
   try {
     return JSON.stringify(value && typeof value === 'object' ? value : {});
@@ -254,6 +261,9 @@ async function routePageview(req, env) {
   const referrer = cleanText(body?.referrer || '', 300);
   const sessionId = cleanText(body?.session_id || '', 80);
   const visitorId = cleanText(body?.visitor_id || '', 80);
+  if (isInternalAnalyticsVisitor(visitorId)) {
+    return json({ ok: true, ignored: true, reason: 'internal_visitor' });
+  }
   const clientTimezone = cleanText(body?.client_timezone || '', 80);
   const clientLanguage = cleanText(body?.client_language || '', 80);
   const userAgent = cleanText(body?.user_agent || req.headers.get('user-agent') || '', 500);
@@ -338,6 +348,9 @@ async function routeInteraction(req, env) {
   const path = cleanText(body.path || '/', 240) || '/';
   const referrer = cleanText(body.referrer || '', 300);
   const visitorId = cleanText(body.visitor_id || '', 80);
+  if (isInternalAnalyticsVisitor(visitorId)) {
+    return json({ ok: true, ignored: true, reason: 'internal_visitor' });
+  }
   const sessionId = cleanText(body.session_id || '', 80);
   const userAgent = cleanText(body.user_agent || req.headers.get('user-agent') || '', 500);
   const cf = req.cf || {};
@@ -1359,6 +1372,12 @@ async function routeJournalView(req, env) {
   if (!key) return err('invalid journal_key');
   const now = nowSec();
   const eventTs = clampEventTs(body?.event_time || body?.event_ts, now);
+  if (isInternalAnalyticsVisitor(body?.visitor_id)) {
+    const row = await env.DB.prepare(
+      'SELECT count FROM journal_views WHERE journal_key = ?'
+    ).bind(key).first().catch(() => null);
+    return json({ ok: true, ignored: true, reason: 'internal_visitor', journal_key: key, count: row ? row.count : 0 });
+  }
   await env.DB.prepare(
     `INSERT INTO journal_views (journal_key, count, updated_at)
      VALUES (?, 1, ?)
@@ -1570,7 +1589,7 @@ async function routeDashboard(req, env) {
   const rawDays = Number(url.searchParams.get('days') || '30');
   const days = [1, 7, 30].includes(rawDays) ? rawDays : 30;
   const cache = caches.default;
-  const cacheKey = new Request(`https://cache.internal/analytics/dashboard-v3?days=${days}`, { method: 'GET' });
+  const cacheKey = new Request(`https://cache.internal/analytics/dashboard-v4?days=${days}`, { method: 'GET' });
   const nocache = url.searchParams.get('nocache') === '1';
   if (!nocache) {
     const hit = await cache.match(cacheKey);
