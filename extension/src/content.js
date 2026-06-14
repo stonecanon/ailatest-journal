@@ -70,6 +70,7 @@
 
     try {
       const settings = await ns.lookup.getSettings();
+      if (ns.setLang) ns.setLang(settings.lang || 'auto');
       const seenAnchors = new Set();
       const entries = (adapter.findEntries() || [])
         .filter((entry) => entry && entry.anchorEl && (entry.issn || entry.journalName))
@@ -111,14 +112,15 @@
         if (journal) hitCount += 1;
         group.entries.forEach((entry) => {
           if (adapter.afterLookup) adapter.afterLookup(entry, journal || null);
-          if (adapter.insertOpenAccessButton) adapter.insertOpenAccessButton(entry, journal || null);
           if (!journal) {
+            if (adapter.insertOpenAccessButton) adapter.insertOpenAccessButton(entry, journal || null);
             mark(entry.anchorEl, group.item && ns.lookup.queryKey(group.item));
             return;
           }
           mark(entry.anchorEl, group.item && ns.lookup.queryKey(group.item));
           const badgeNode = ns.badges.renderBadges(journal, settings);
           adapter.insert(entry.anchorEl, badgeNode, entry);
+          if (adapter.insertOpenAccessButton) adapter.insertOpenAccessButton(entry, journal || null);
         });
       });
       if (adapter.ensureTools) adapter.ensureTools();

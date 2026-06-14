@@ -80,9 +80,11 @@
   const themeRow = $('theme-row');
   const toggles = $('toggles');
   const colorsBox = $('colors');
+  const langSelect = $('lang-select');
 
   async function loadSettings() {
     const s = await ns.lookup.getSettings();
+    if (langSelect) langSelect.value = s.lang || 'auto';
     const theme = ['site', 'light', 'dark'].includes(s.theme) ? s.theme : 'site';
     themeRow.querySelectorAll('input[type=radio]').forEach((r) => { r.checked = r.value === theme; });
     toggles.querySelectorAll('input[type=checkbox]').forEach((cb) => { cb.checked = s[cb.dataset.setting] !== false; });
@@ -93,6 +95,7 @@
 
   async function saveSettings() {
     const next = { theme: 'site', colors: {} };
+    next.lang = langSelect?.value || 'auto';
     next.theme = themeRow.querySelector('input[type=radio]:checked')?.value || 'site';
     toggles.querySelectorAll('input[type=checkbox]').forEach((cb) => { next[cb.dataset.setting] = cb.checked; });
     colorsBox.querySelectorAll('input[type=color]').forEach((ci) => {
@@ -102,6 +105,7 @@
   }
 
   themeRow.addEventListener('change', saveSettings);
+  langSelect?.addEventListener('change', saveSettings);
   toggles.addEventListener('change', saveSettings);
   colorsBox.addEventListener('change', saveSettings);
   $('reset-settings').addEventListener('click', async () => {

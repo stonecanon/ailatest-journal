@@ -143,7 +143,7 @@
     bar.id = 'ailatest-scholar-tools';
     bar.dataset.ailatestUi = '1';
     bar.style.cssText = 'display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:8px 0 10px;padding:8px 10px;border:1px solid #e5ded3;border-radius:6px;background:#fffdf8;color:#4b4032;font:12px -apple-system,BlinkMacSystemFont,Segoe UI,Arial,sans-serif;';
-    bar.innerHTML = '<b style="font-size:12px">AILatest 排序</b><button data-aj-sort="if">按 IF</button><button data-aj-sort="cites">按引用量</button><button data-aj-sort="original">恢复原顺序</button><span id="ailatest-scholar-status" style="color:#8a7d6a">已加载，正在识别期刊...</span>';
+    bar.innerHTML = `<b style="font-size:12px">${ns.t ? ns.t('sort.title') : 'AILatest sort'}</b><button data-aj-sort="if">${ns.t ? ns.t('sort.if') : 'By IF'}</button><button data-aj-sort="cites">${ns.t ? ns.t('sort.cites') : 'By citations'}</button><button data-aj-sort="original">${ns.t ? ns.t('sort.original') : 'Original order'}</button><span id="ailatest-scholar-status" style="color:#8a7d6a">${ns.t ? ns.t('status.loaded') : 'Loaded, identifying journals...'}</span>`;
     bar.querySelectorAll('button').forEach((btn) => {
       btn.style.cssText = 'border:1px solid #d8cbb9;background:#fff;border-radius:5px;padding:3px 8px;cursor:pointer;color:#6b3f18;font-weight:700;';
       btn.addEventListener('click', () => sortScholar(btn.dataset.ajSort));
@@ -157,30 +157,36 @@
     if (!el) return;
     let text = '';
     if (info.phase === 'loaded') {
-      text = '已加载，正在识别期刊...';
+      text = ns.t ? ns.t('status.loaded') : 'Loaded, identifying journals...';
     } else if (info.phase === 'empty') {
-      text = '已加载，但未识别到期刊来源；请等页面加载完成或刷新';
+      text = ns.t ? ns.t('status.empty') : 'Loaded, but no journal source was detected.';
     } else if (info.phase === 'lookup') {
-      text = `识别到 ${info.total || 0} 本，正在查询：${(info.names || []).join('；')}`;
+      text = ns.t ? ns.t('status.lookup', { total: info.total || 0, names: (info.names || []).join('；') }) : `Found ${info.total || 0} sources`;
     } else if (info.phase === 'done') {
-      text = `识别到 ${info.total || 0} 本，命中 ${info.hits || 0} 本${info.hits ? '' : `；已试：${(info.names || []).join('；')}`}`;
+      const suffix = info.hits ? '' : (ns.t ? ns.t('status.tried', { names: (info.names || []).join('；') }) : `; tried: ${(info.names || []).join('; ')}`);
+      text = ns.t ? ns.t('status.done', { total: info.total || 0, hits: info.hits || 0, suffix }) : `Found ${info.total || 0} sources, matched ${info.hits || 0}${suffix}`;
     } else if (info.phase === 'error') {
-      text = `查询失败：${info.message || 'unknown error'}`;
+      text = ns.t ? ns.t('status.error', { message: info.message || 'unknown error' }) : `Lookup failed: ${info.message || 'unknown error'}`;
     }
     if (text && el.textContent !== text) el.textContent = text;
   }
 
   function sortScholar(mode) {
-    const rows = Array.from(document.querySelectorAll('.gs_r')).filter((row) => row.parentElement);
+    const rows = Array.from(document.querySelectorAll('.gs_r'))
+      .filter((row) => row.parentElement && Object.prototype.hasOwnProperty.call(row.dataset, 'ailatestOriginalIndex'));
     if (!rows.length) return;
-    const parent = rows[0].parentElement;
+    const parents = Array.from(new Set(rows.map((row) => row.parentElement)));
     const value = (row) => {
       if (mode === 'if') return Number(row.dataset.ailatestIf || 0);
       if (mode === 'cites') return Number(row.dataset.ailatestCites || 0);
       return -Number(row.dataset.ailatestOriginalIndex || 0);
     };
-    rows.sort((a, b) => value(b) - value(a));
-    rows.forEach((row) => parent.appendChild(row));
+    parents.forEach((parent) => {
+      const slots = Array.from(parent.children)
+        .filter((child) => child.matches && child.matches('.gs_r') && Object.prototype.hasOwnProperty.call(child.dataset, 'ailatestOriginalIndex'));
+      const sorted = slots.slice().sort((a, b) => value(b) - value(a));
+      slots.forEach((slot, index) => parent.insertBefore(sorted[index], slot));
+    });
   }
 
   function openAccessUrlFromWork(data) {
@@ -226,6 +232,11 @@
 
   async function resolveJournalName(entry) {
     if (!entry) return null;
+    // Google Scholar result rows already expose a source string. If that source
+    // is not in our journal index, do not use title search to guess a journal:
+    // title-only OpenAlex matches can point at a different paper/journal and
+    // produce false SCI/JCR badges for ordinary or Chinese sources.
+    if (entry.journalName) return null;
     if (entry.doi) {
       const res = await fetch(`https://api.openalex.org/works/doi:${encodeURIComponent(entry.doi)}`);
       if (res.ok) {
@@ -233,49 +244,29 @@
         if (hit) return hit;
       }
     }
-    const title = String(entry.paperTitle || '').trim();
-    if (!title) return null;
-    const params = new URLSearchParams({ search: title, per_page: '3' });
-    const res = await fetch(`https://api.openalex.org/works?${params.toString()}`);
-    if (!res.ok) return null;
-    const data = await res.json();
-    const works = Array.isArray(data.results) ? data.results : [];
-    for (const work of works) {
-      const hit = journalFromOpenAlexWork(work);
-      if (hit) return hit;
-    }
     return null;
   }
 
   function insertOpenAccessButton(entry) {
-    if (!entry || !entry.rowEl || entry.rowEl.querySelector('.ailatest-oa-btn')) return;
-    const actions = entry.rowEl.querySelector('.gs_fl') || entry.anchorEl;
-    if (!actions) return;
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'ailatest-oa-btn';
-    btn.dataset.ailatestUi = '1';
-    btn.textContent = entry.pdfUrl ? 'OA PDF' : '开放全文';
-    btn.title = '仅查找合法开放获取全文；不接入 Sci-Hub';
-    btn.style.cssText = 'margin-left:8px;border:1px solid #d8cbb9;background:#fffdf8;border-radius:4px;padding:1px 6px;color:#6b3f18;font-size:12px;cursor:pointer;';
-    btn.addEventListener('click', async (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      const old = btn.textContent;
-      btn.textContent = '查找中...';
-      btn.disabled = true;
-      try {
-        const oaUrl = await findOpenAccessUrl(entry);
-        if (!oaUrl) throw new Error('no_open_access_url');
-        window.open(oaUrl, '_blank', 'noopener');
-      } catch (_) {
-        alert('没有找到公开 OA 全文链接。插件只使用 Google Scholar 页面已有 PDF 和 OpenAlex 公开来源。');
-      } finally {
-        btn.textContent = old;
-        btn.disabled = false;
-      }
-    });
-    actions.appendChild(btn);
+    if (!entry || !entry.rowEl || entry.rowEl.querySelector('.ailatest-scholar-inline-tools')) return;
+    const line = entry.rowEl.querySelector('.ailatest-badge-block');
+    if (!line) return;
+    const data = {
+      doi: entry.doi,
+      title: entry.paperTitle,
+      journal: entry.journalName,
+      url: entry.rowEl.querySelector('.gs_rt a[href]')?.href || location.href,
+      pdfUrl: entry.pdfUrl,
+    };
+    const wrap = document.createElement('span');
+    wrap.className = 'ailatest-scholar-inline-tools';
+    wrap.dataset.ailatestUi = '1';
+    wrap.style.cssText = 'display:inline-flex;align-items:center;flex-wrap:wrap;gap:4px;margin-left:2px;';
+    const sources = ns.citations && ns.citations.renderSourceLinks ? ns.citations.renderSourceLinks(data) : null;
+    const tools = ns.citations && ns.citations.renderTools ? ns.citations.renderTools(data) : null;
+    if (sources) wrap.appendChild(sources);
+    if (tools) wrap.appendChild(tools);
+    if (wrap.childNodes.length) line.appendChild(wrap);
   }
 
   ns.adapters.push({

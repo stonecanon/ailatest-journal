@@ -27,6 +27,7 @@
   // 显示开关按四大类组织：收录 / 分级 / 免费开放 / 预警
   const DEFAULT_SETTINGS = {
     theme: 'site',
+    lang: 'auto',
     // 收录
     showIndex: true,      // 国际索引 SCIE/SSCI/AHCI/ESCI/EI/Scopus
     showCnIndex: true,    // 国内来源目录 北大核心/CSSCI/CSCD

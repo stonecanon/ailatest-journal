@@ -80,10 +80,21 @@ function mergeFallbackData(journals, dom, cscd, cstpcd) {
 
   function findOrCreate({ name = '', issn = '', eissn = '' } = {}) {
     for (const k of [issnKey(issn), issnKey(eissn)]) {
-      if (k && byIssn.has(k)) return byIssn.get(k);
+      if (k && byIssn.has(k)) {
+        const b = byIssn.get(k);
+        const nk = PickMatch.norm(name);
+        if (nk && !byName.has(nk)) byName.set(nk, b);
+        if (/[\u4e00-\u9fff]/.test(String(name || '')) && !b.cn_name) b.cn_name = name;
+        return b;
+      }
     }
     const nk = PickMatch.norm(name);
-    if (nk && byName.has(nk)) return byName.get(nk);
+    if (nk && byName.has(nk)) {
+      const b = byName.get(nk);
+      if (issn && !b.issn) b.issn = issn;
+      if (eissn && !b.eissn) b.eissn = eissn;
+      return b;
+    }
     return newBadge(name, issn, eissn);
   }
 

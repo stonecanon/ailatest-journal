@@ -60,6 +60,21 @@ input {
   accent-color: #735a3e;
 }
 
+.select-row {
+  justify-content: space-between;
+  font-weight: 700;
+}
+
+select {
+  max-width: 170px;
+  border: 1px solid #d8cbb9;
+  border-radius: 5px;
+  padding: 3px 6px;
+  color: #3f3428;
+  background: #fff;
+  font: inherit;
+}
+
 footer {
   padding-top: 10px;
   border-top: 1px solid #e8dfd2;

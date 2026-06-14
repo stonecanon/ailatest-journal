@@ -164,8 +164,8 @@
       link.href = `https://journal.ailatest.org/journal/${encodeURIComponent(journal.slug)}/`;
       link.target = '_blank';
       link.rel = 'noopener noreferrer';
-      link.textContent = 'AILatest 详情页';
-      link.title = '查看期刊详情 — AILatest Journal';
+      link.textContent = ns.t ? ns.t('detail.link') : 'AILatest details';
+      link.title = ns.t ? ns.t('detail.title') : 'View journal details - AILatest Journal';
       wrap.appendChild(link);
     }
 

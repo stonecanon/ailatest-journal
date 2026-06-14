@@ -208,6 +208,88 @@ function buildPeriodicalJsonLd(j) {
   return pd;
 }
 
+function metric(label, value) {
+  if (value == null || value === '' || (Array.isArray(value) && !value.length)) return '';
+  const body = Array.isArray(value) ? value.join(', ') : String(value);
+  return `<div class="metric"><dt>${esc(label)}</dt><dd>${esc(body)}</dd></div>`;
+}
+
+function badgeList(values) {
+  const arr = Array.isArray(values) ? values : [values];
+  return arr.filter(Boolean).map(v => `<span class="badge">${esc(v)}</span>`).join('');
+}
+
+function standaloneJournalHtml(j, slug, seo, jsonldHtml) {
+  const name = titleCaseName(j.n || 'Journal');
+  const indices = Array.isArray(j.ix) ? j.ix : [];
+  const badges = [
+    ...indices,
+    j.q ? `JCR ${String(j.q).toUpperCase()}` : '',
+    j.z != null ? `中科院 ${j.z}区` : '',
+    j.f != null ? `IF ${j.f}` : '',
+  ].filter(Boolean);
+  const metrics = [
+    metric('Journal', name),
+    metric('Publisher', j.p),
+    metric('ISSN', j.i),
+    metric('E-ISSN', j.is),
+    metric('Impact Factor', j.f),
+    metric('JCR Quartile', j.q ? String(j.q).toUpperCase() : ''),
+    metric('CAS Tier', j.z != null ? `${j.z}区` : ''),
+    metric('Indexing', indices),
+    metric('ESI Category', j.es),
+  ].join('');
+  const summary = buildAiSummary(j);
+  return `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>${esc(seo.title)}</title>
+<meta name="description" content="${esc(seo.desc)}" />
+<link rel="canonical" href="${esc(seo.url)}" />
+<meta name="robots" content="index,follow" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="${esc(seo.url)}" />
+<meta property="og:title" content="${esc(seo.title)}" />
+<meta property="og:description" content="${esc(seo.desc)}" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="${esc(seo.title)}" />
+<meta name="twitter:description" content="${esc(seo.desc)}" />
+${jsonldHtml}
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f7f4ec;color:#211f1a;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC",Arial,sans-serif;line-height:1.6}.site-header{border-bottom:1px solid #e4d8c5;background:#fffaf1}.bar{max-width:1040px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px}.brand{font-weight:800;color:#2f4c6f;text-decoration:none}.nav{display:flex;gap:12px;flex-wrap:wrap}.nav a{color:#5f4a32;text-decoration:none;font-size:14px}.page{max-width:1040px;margin:0 auto;padding:30px 20px 48px}.kicker{color:#80613e;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}h1{font-size:clamp(30px,5vw,56px);line-height:1.08;margin:8px 0 14px;letter-spacing:0}.lead{max-width:760px;color:#554c42;font-size:17px;margin:0 0 18px}.badges{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 28px}.badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:3px;background:#24496f;color:#fff;font-size:12px;font-weight:800;line-height:1.35}.badge:nth-child(n+4){background:#735a3e}.grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:26px;align-items:start}.panel{background:#fff;border:1px solid #e7dccb;border-radius:8px;padding:22px}.panel h2{font-size:20px;margin:0 0 14px}.metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.metric{border-top:1px solid #eee4d5;padding-top:10px}.metric dt{font-size:12px;font-weight:800;color:#80613e;text-transform:uppercase;letter-spacing:.04em}.metric dd{margin:3px 0 0;font-weight:650;color:#25211c;overflow-wrap:anywhere}.faq-item{border-top:1px solid #eee4d5;padding:14px 0}.faq-item h3{font-size:16px;margin:0 0 6px}.side-list{display:grid;gap:10px}.action{display:inline-flex;justify-content:center;align-items:center;border:1px solid #cdbb9f;border-radius:6px;padding:10px 12px;color:#49351f;text-decoration:none;font-weight:750;background:#fffaf1}.foot{margin-top:28px;color:#756b60;font-size:13px}@media(max-width:780px){.grid{grid-template-columns:1fr}.metrics{grid-template-columns:1fr}.bar{align-items:flex-start;flex-direction:column}h1{font-size:34px}}
+</style>
+</head>
+<body>
+<header class="site-header"><div class="bar"><a class="brand" href="/">AILatest Journal</a><nav class="nav"><a href="/global">Journal Finder</a><a href="/pick">AI Recommendation</a><a href="/updates">Updates</a></nav></div></header>
+<main class="page">
+  <div class="kicker">AILatest Journal Detail</div>
+  <h1>${esc(name)}</h1>
+  <p class="lead">${esc(summary)}</p>
+  <div class="badges">${badgeList(badges)}</div>
+  <div class="grid">
+    <article class="panel">
+      <h2>Journal Overview</h2>
+      <p>${esc(seo.desc)}</p>
+      <dl class="metrics">${metrics}</dl>
+    </article>
+    <aside class="panel">
+      <h2>Actions</h2>
+      <div class="side-list">
+        <a class="action" href="/">Search Journals</a>
+        <a class="action" href="/pick">Find Matching Journals</a>
+      </div>
+    </aside>
+  </div>
+  ${buildAboutHtml(j)}
+  ${buildFAQHtml(j)}
+  <p class="foot">Data page: <a href="${esc(seo.url)}">${esc(seo.url)}</a></p>
+</main>
+</body>
+</html>`;
+}
+
 // ───────── AI Summary & About ─────────
 function buildAiSummary(j) {
   const name = j.n || 'this journal';
@@ -240,35 +322,12 @@ function buildAboutHtml(j) {
 // ───────── Journal page SSR ─────────
 async function journalPage(ctx, j, slug, origin) {
   const seo = journalSeo(j, slug, origin);
-  let html = await loadAppShell(ctx);
-
-  html = html.replace(/<title>[\s\S]*?<\/title>/i, `<title>${esc(seo.title)}</title>`);
-  html = replaceMeta(html, /<meta name="description" content="[^"]*"\s*\/?>/i, `<meta name="description" content="${esc(seo.desc)}" />`);
-  html = replaceMeta(html, /<link rel="canonical" href="[^"]*"\s*\/?>/i, `<link rel="canonical" href="${esc(seo.url)}" />`);
-  html = replaceMeta(html, /<meta property="og:url" content="[^"]*"\s*\/?>/i, `<meta property="og:url" content="${esc(seo.url)}" />`);
-  html = replaceMeta(html, /<meta property="og:title" content="[^"]*"\s*\/?>/i, `<meta property="og:title" content="${esc(seo.title)}" />`);
-  html = replaceMeta(html, /<meta property="og:description" content="[^"]*"\s*\/?>/i, `<meta property="og:description" content="${esc(seo.desc)}" />`);
-  html = replaceMeta(html, /<meta name="twitter:title" content="[^"]*"\s*\/?>/i, `<meta name="twitter:title" content="${esc(seo.title)}" />`);
-  html = replaceMeta(html, /<meta name="twitter:description" content="[^"]*"\s*\/?>/i, `<meta name="twitter:description" content="${esc(seo.desc)}" />`);
-  if (!/<meta name="robots"/i.test(html)) {
-    html = html.replace('</head>', '<meta name="robots" content="index,follow" />\n</head>');
-  }
-
-  const index = await loadIndex(ctx);
   const jsonldBlocks = [
     buildWebPageJsonLd(j, seo), buildBreadcrumbJsonLd(j, seo),
     buildFAQJsonLd(j), buildPeriodicalJsonLd(j),
   ];
   const jsonldHtml = jsonldBlocks.map(b => `<script type="application/ld+json">\n${JSON.stringify(b, null, 2)}\n</script>`).join('\n');
-  html = html.replace('</head>', jsonldHtml + '\n</head>');
-
-  const seoContent = `<div id="seo-content" style="display:none">`
-    + buildAboutHtml(j)
-    + `<section class="journal-ai-summary"><h2>AI Summary</h2><p>${esc(buildAiSummary(j))}</p></section>`
-    + buildFAQHtml(j)
-    + `</div>`;
-  html = html.replace('</body>', seoContent + '\n</body>');
-  return html;
+  return standaloneJournalHtml(j, slug, seo, jsonldHtml);
 }
 
 // ───────── Compare page ─────────

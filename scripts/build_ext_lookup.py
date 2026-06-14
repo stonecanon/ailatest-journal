@@ -103,10 +103,23 @@ def main():
     def find_or_create(name="", issn="", eissn="", cn_code=""):
         for k in (issn_key(issn), issn_key(eissn)):
             if k and k in by_issn:
-                return by_issn[k]
+                b = by_issn[k]
+                nk = norm(name)
+                if nk:
+                    by_name.setdefault(nk, b)
+                    if re.search(r"[\u4e00-\u9fff]", str(name)) and not b.get("cn_name"):
+                        b["cn_name"] = name
+                return b
         nk = norm(name)
         if nk and nk in by_name:
-            return by_name[nk]
+            b = by_name[nk]
+            if issn and not b.get("issn"):
+                b["issn"] = issn
+                by_issn.setdefault(issn_key(issn), b)
+            if eissn and not b.get("eissn"):
+                b["eissn"] = eissn
+                by_issn.setdefault(issn_key(eissn), b)
+            return b
         return new_badge(name=name, issn=issn, eissn=eissn)
 
     def retraction_for(issn="", eissn="", name=""):
@@ -260,6 +273,12 @@ def main():
             continue
         b = find_or_create(name=r["name"], issn=r.get("issn", ""))
         b["cscd"] = r.get("database_label") or r.get("database") or "CSCD"
+
+    for r in records(dom.get("cstpcd")):
+        if not r.get("name"):
+            continue
+        b = find_or_create(name=r["name"], issn=r.get("issn", ""))
+        b["cstpcd"] = True
 
     for r in records(dom.get("scd")):
         if not r.get("name"):

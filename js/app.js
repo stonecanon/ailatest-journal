@@ -6401,9 +6401,21 @@
             }
           }
         }
-        domCount = allDomestic.length;
+        const sourceRank = { cnki_major: 4, zju: 3, nsfc_mgmt: 2, cnkx: 1 };
+        const dedupedDomestic = [];
+        const byDomesticKey = new Map();
+        allDomestic.forEach((r) => {
+          const key = (r.issn || r.cn_code || pickCleanDomesticName(r.name || r.cn_name || '')).toUpperCase();
+          if (!key) return;
+          const prev = byDomesticKey.get(key);
+          if (!prev || (sourceRank[r.__src] || 0) > (sourceRank[prev.__src] || 0)) {
+            byDomesticKey.set(key, r);
+          }
+        });
+        byDomesticKey.forEach((r) => dedupedDomestic.push(r));
+        domCount = dedupedDomestic.length;
         if (domCount) {
-          domHtml = allDomestic.slice(0, domLimit).map(r => {
+          domHtml = dedupedDomestic.slice(0, domLimit).map(r => {
             const fid = favId(r);
             rowRecordsByFid[fid] = { ...r, __src: r.__src };
             const name = r.name || r.cn_name || '';

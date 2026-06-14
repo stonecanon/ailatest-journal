@@ -148,13 +148,13 @@
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.textContent = label;
-    btn.style.cssText = 'border:1px solid #d8cbb9;background:#fffdf8;border-radius:4px;padding:2px 7px;color:#6b3f18;font-weight:700;cursor:pointer;';
+    btn.style.cssText = 'width:auto!important;min-width:0!important;border:1px solid #d8cbb9;background:#fffdf8;border-radius:4px;padding:1px 6px;color:#6b3f18;font-weight:700;cursor:pointer;font-size:12px;line-height:1.45;';
     return btn;
   }
 
   function select(options) {
     const sel = document.createElement('select');
-    sel.style.cssText = 'border:1px solid #d8cbb9;background:#fff;border-radius:4px;padding:2px 6px;color:#4b4032;font-weight:700;';
+    sel.style.cssText = 'width:auto!important;min-width:54px!important;max-width:96px!important;height:auto!important;border:1px solid #d8cbb9;background:#fff;border-radius:4px;padding:1px 20px 1px 6px;color:#4b4032;font-weight:700;font-size:12px;line-height:1.45;';
     options.forEach(([value, label]) => {
       const opt = document.createElement('option');
       opt.value = value;
@@ -196,7 +196,7 @@
     const bar = document.createElement('div');
     bar.className = 'ailatest-citation-tools';
     bar.dataset.ailatestUi = '1';
-    bar.style.cssText = 'display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:8px 0 10px;font:12px -apple-system,BlinkMacSystemFont,Segoe UI,Arial,sans-serif;';
+    bar.style.cssText = 'display:inline-flex;flex-wrap:wrap;align-items:center;gap:4px;margin:0 0 0 4px;font:12px -apple-system,BlinkMacSystemFont,Segoe UI,Arial,sans-serif;vertical-align:middle;';
     const fmt = select([
       ['ris', 'RIS'],
       ['bib', 'BibTeX'],
@@ -206,7 +206,7 @@
       ['acs', 'ACS'],
       ['gbt', 'GB/T 7714'],
     ]);
-    const exportBtn = button('导出');
+    const exportBtn = button(ns.t ? ns.t('citation.export') : 'Export');
     exportBtn.addEventListener('click', async (e) => {
       e.preventDefault();
       e.stopPropagation();
@@ -215,18 +215,18 @@
       if (payload.mode === 'download') download(payload.filename, payload.text);
       else {
         await copy(payload.text);
-        exportBtn.textContent = '已复制';
-        setTimeout(() => { exportBtn.textContent = '导出'; }, 1200);
+        exportBtn.textContent = ns.t ? ns.t('citation.copied') : 'Copied';
+        setTimeout(() => { exportBtn.textContent = ns.t ? ns.t('citation.export') : 'Export'; }, 1200);
       }
     });
-    const saveBtn = button('保存');
-    saveBtn.title = '保存到插件文献库；登录云同步通道接入后会自动同步';
+    const saveBtn = button(ns.t ? ns.t('citation.save') : 'Save');
+    saveBtn.title = ns.t ? ns.t('citation.saveTitle') : 'Save to the extension library';
     saveBtn.addEventListener('click', async (e) => {
       e.preventDefault();
       e.stopPropagation();
       await saveCitation(data);
-      saveBtn.textContent = '已保存';
-      setTimeout(() => { saveBtn.textContent = '保存'; }, 1200);
+      saveBtn.textContent = ns.t ? ns.t('citation.saved') : 'Saved';
+      setTimeout(() => { saveBtn.textContent = ns.t ? ns.t('citation.save') : 'Save'; }, 1200);
     });
     const mendeleyBtn = button('Mendeley');
     mendeleyBtn.addEventListener('click', (e) => {
@@ -267,7 +267,7 @@
     box.dataset.ailatestUi = '1';
     box.style.cssText = 'display:inline-flex;position:relative;margin:4px 0 8px;font:12px -apple-system,BlinkMacSystemFont,Segoe UI,Arial,sans-serif;color:#46546a;';
     const total = Math.max(...counts.map((x) => Number(x.count) || 0));
-    const btn = button(`引用 ${total}`);
+    const btn = button(ns.t ? ns.t('citation.count', { count: total }) : `Citations ${total}`);
     btn.style.borderColor = '#d8dee8';
     btn.style.background = '#f8fafc';
     btn.style.color = '#46546a';
@@ -318,9 +318,9 @@
     const bar = document.createElement('div');
     bar.className = 'ailatest-source-links';
     bar.dataset.ailatestUi = '1';
-    bar.style.cssText = 'display:inline-flex;position:relative;align-items:center;gap:6px;margin:6px 0 10px;font:12px -apple-system,BlinkMacSystemFont,Segoe UI,Arial,sans-serif;';
-    const openBtn = button('全文');
-    const menuBtn = button('来源');
+    bar.style.cssText = 'display:inline-flex;position:relative;align-items:center;gap:4px;margin:0 0 0 4px;font:12px -apple-system,BlinkMacSystemFont,Segoe UI,Arial,sans-serif;vertical-align:middle;';
+    const openBtn = button(ns.t ? ns.t('source.fulltext') : 'Full text');
+    const menuBtn = button(ns.t ? ns.t('source.sources') : 'Sources');
     const menu = document.createElement('div');
     menu.hidden = true;
     menu.style.cssText = 'position:absolute;z-index:2147483647;top:28px;left:58px;min-width:180px;background:#fff;border:1px solid #d8cbb9;border-radius:6px;box-shadow:0 8px 24px rgba(15,23,42,.12);padding:6px;';
@@ -339,7 +339,7 @@
       e.preventDefault();
       e.stopPropagation();
       const old = openBtn.textContent;
-      openBtn.textContent = '查找中';
+      openBtn.textContent = ns.t ? ns.t('source.finding') : 'Finding';
       const url = await resolveOpenAccessUrl(data);
       openBtn.textContent = old;
       if (url) window.open(url, '_blank', 'noopener');

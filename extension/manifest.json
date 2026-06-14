@@ -79,6 +79,7 @@
       ],
       "js": [
         "src/norm.js",
+        "src/i18n.js",
         "src/lookup.js",
         "src/badges.js",
         "src/citations.js",
