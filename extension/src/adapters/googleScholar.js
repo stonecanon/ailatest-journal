@@ -68,6 +68,14 @@
     return '';
   }
 
+  function paperTitleFromRow(row) {
+    const title = row && row.querySelector('.gs_rt');
+    if (!title) return '';
+    const clone = title.cloneNode(true);
+    clone.querySelectorAll('.gs_ctu, .gs_ctc, .gs_ct1, .gs_ct2').forEach((el) => el.remove());
+    return textOf(clone).replace(/^\[[^\]]+\]\s*/, '').trim();
+  }
+
   function pdfUrlFromRow(row) {
     const links = Array.from(row.querySelectorAll('a[href]'));
     const pdf = links.find((a) => /\.pdf(?:[?#]|$)/i.test(a.href || '') || /\[\s*PDF\s*\]/i.test(textOf(a)));
@@ -93,6 +101,7 @@
           journalName,
           citationCount: citationCount(row),
           doi: doiFromRow(row),
+          paperTitle: paperTitleFromRow(row),
           pdfUrl: pdfUrlFromRow(row),
           originalIndex: index,
         });
@@ -172,6 +181,37 @@
     rows.forEach((row) => parent.appendChild(row));
   }
 
+  function openAccessUrlFromWork(data) {
+    const locs = [data && data.best_oa_location, ...(Array.isArray(data && data.oa_locations) ? data.oa_locations : [])].filter(Boolean);
+    const hit = locs.find((x) => x && (x.pdf_url || x.landing_page_url)) || null;
+    return hit && (hit.pdf_url || hit.landing_page_url) || '';
+  }
+
+  async function findOpenAccessUrl(entry) {
+    if (entry.pdfUrl) return entry.pdfUrl;
+    if (entry.doi) {
+      const res = await fetch(`https://api.openalex.org/works/doi:${encodeURIComponent(entry.doi)}`);
+      if (res.ok) {
+        const url = openAccessUrlFromWork(await res.json());
+        if (url) return url;
+      }
+    }
+    const title = String(entry.paperTitle || '').trim();
+    if (title) {
+      const params = new URLSearchParams({ search: title, per_page: '3' });
+      const res = await fetch(`https://api.openalex.org/works?${params.toString()}`);
+      if (res.ok) {
+        const data = await res.json();
+        const works = Array.isArray(data.results) ? data.results : [];
+        for (const work of works) {
+          const url = openAccessUrlFromWork(work);
+          if (url) return url;
+        }
+      }
+    }
+    return '';
+  }
+
   function insertOpenAccessButton(entry) {
     if (!entry || !entry.rowEl || entry.rowEl.querySelector('.ailatest-oa-btn')) return;
     const actions = entry.rowEl.querySelector('.gs_fl') || entry.anchorEl;
@@ -186,29 +226,15 @@
     btn.addEventListener('click', async (e) => {
       e.preventDefault();
       e.stopPropagation();
-      if (entry.pdfUrl) {
-        window.open(entry.pdfUrl, '_blank', 'noopener');
-        return;
-      }
-      if (!entry.doi) {
-        alert('没有在当前结果里识别到 DOI，暂时无法自动查找公开全文。');
-        return;
-      }
       const old = btn.textContent;
       btn.textContent = '查找中...';
       btn.disabled = true;
       try {
-        const url = `https://api.openalex.org/works/doi:${encodeURIComponent(entry.doi)}`;
-        const res = await fetch(url);
-        if (!res.ok) throw new Error(`OpenAlex ${res.status}`);
-        const data = await res.json();
-        const locs = [data.best_oa_location, ...(Array.isArray(data.oa_locations) ? data.oa_locations : [])].filter(Boolean);
-        const hit = locs.find((x) => x.pdf_url || x.landing_page_url) || null;
-        const oaUrl = hit && (hit.pdf_url || hit.landing_page_url);
+        const oaUrl = await findOpenAccessUrl(entry);
         if (!oaUrl) throw new Error('no_open_access_url');
         window.open(oaUrl, '_blank', 'noopener');
       } catch (_) {
-        alert('没有找到公开可下载全文。插件不会跳转 Sci-Hub，只支持公开 OA 来源。');
+        alert('没有找到公开 OA 全文链接。插件只使用 Google Scholar 页面已有 PDF 和 OpenAlex 公开来源。');
       } finally {
         btn.textContent = old;
         btn.disabled = false;

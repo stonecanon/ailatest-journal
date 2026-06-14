@@ -47,6 +47,8 @@
     .pku { background: #a33a2a; }
     .zju { background: #1f5f5a; }
     .cscd { background: #4f6f7c; }
+    .cstpcd { background: #4f6f7c; }
+    .scd, .ami { background: #5a6b3a; }
     .ccft { background: #7a2030; }
     .nsfc { background: #0f766e; }
     a.pill { color: #fff; text-decoration: none; cursor: pointer; }
@@ -78,6 +80,23 @@
   function makeBadges(journal, settings) {
     const j = journal || {};
     const s = settings || {};
+    if (Array.isArray(j.display_badges) && j.display_badges.length) {
+      const enabled = (badge) => {
+        if (badge.group === 'index') return s.showIndex !== false && s.showDomestic !== false;
+        if (badge.group === 'rating') return s.showCas !== false || s.showJcr !== false || s.showIf !== false || s.showBusiness !== false || s.showDomestic !== false;
+        if (badge.group === 'access') return s.showFree !== false;
+        if (badge.group === 'risk') return s.showWarnings !== false;
+        return true;
+      };
+      return j.display_badges
+        .filter(enabled)
+        .map((badge) => ({
+          text: badge.text,
+          className: `pill ${badge.className || badge.group || 'index'}`,
+          title: badge.title || '',
+        }));
+    }
+
     const out = [];
 
     add(out, s.showCas, j.cas_zone ? `中科院 ${j.cas_zone}区${j.cas_top ? ' TOP' : ''}` : '', 'pill zone');
