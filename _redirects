@@ -24,7 +24,3 @@
 /updates/ /index.html 200
 /updates/* /index.html 200
 /import /index.html 200
-/pricing /pricing.html 200
-/pricing/ /pricing.html 200
-/subscribe /pricing.html 200
-/subscribe/ /pricing.html 200
