@@ -179,6 +179,7 @@ function buildAboutHtml(j) {
   const z = j.z != null ? `. In the CAS ranking system, it is classified as ${j.z}区` : '';
   const indices = j.ix || [];
   const idxStr = indices.length ? `. It is indexed in ${indices.join(', ')}` : '';
+  const esi = j.es ? `. ESI category: ${j.es}` : '';
   
   let text = `${name} is a scholarly journal ${pub}${ifVal}${q}${z}${idxStr}${esi}.`;
   if (!ifVal && !pub) text = `${name}. Detailed journal information is available in the database.`;
