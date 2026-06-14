@@ -14,7 +14,7 @@
 import { CORS, json } from './deepseek-common.js';
 import PickMatch from '../../js/pick-match.js';
 
-const DEFAULT_URL = 'https://journal.ailatest.org/data/ext_lookup.json.gz?v=20260612-lookup';
+const DEFAULT_URL = 'https://journal.ailatest.org/data/ext_lookup.json.gz?v=20260614-geo-merge';
 const FALLBACK_BASE = 'https://journal.ailatest.org/data';
 
 let indexCache = null;       // { byIssn: Map, byName: Map }
