@@ -28,8 +28,9 @@
     <h2 style="margin-top:0">AILatest Journal 插件内测版 v0.2.9</h2>
     <p>当前提供 Chrome / Edge 手动安装包。此版本不是 Chrome 商店正式版，适合先体验功能、反馈识别问题和站点兼容性。</p>
     <p>下载后解压，在浏览器扩展管理页开启开发者模式，并选择解压后的文件夹。</p>
-    <p><a class="btn" href="/downloads/ailatest-journal-extension-latest.zip" download>下载插件 ZIP</a></p>
+    <p><a class="btn" href="/api/extension/download?asset=latest&source=extension-page" data-extension-download-link download="ailatest-journal-extension-latest.zip">下载插件 ZIP</a></p>
     <p class="small muted">文件大小约 43KB。插件会请求 journal.ailatest.org 的期刊数据接口；匿名试用额度有限，登录后可获得更高查询额度。</p>
+    <p class="small muted download-stats" aria-live="polite">累计下载 <b data-extension-download-count>—</b> 次 · 实时更新</p>
   </div>
 
   <div class="card">
@@ -61,8 +62,9 @@
     <h2 style="margin-top:0">AILatest Journal Extension beta v0.2.9</h2>
     <p>The current release is a manual Chrome / Edge installation package. It is not the final Chrome Web Store version yet, so it is intended for early testing, compatibility feedback and journal recognition fixes.</p>
     <p>Download and unzip the package, enable Developer mode in the browser extension page, then load the unzipped folder.</p>
-    <p><a class="btn" href="/downloads/ailatest-journal-extension-latest.zip" download>Download extension ZIP</a></p>
+    <p><a class="btn" href="/api/extension/download?asset=latest&source=extension-page" data-extension-download-link download="ailatest-journal-extension-latest.zip">Download extension ZIP</a></p>
     <p class="small muted">File size is about 43KB. The extension queries journal.ailatest.org for journal data. Anonymous trial quota is limited; signing in provides a higher quota.</p>
+    <p class="small muted download-stats" aria-live="polite">Downloads <b data-extension-download-count>—</b> · updates live</p>
   </div>
 
   <div class="card">
@@ -95,5 +97,6 @@
     <a href="/refund.html">Refund</a></p>
 </footer>
 <script src="/js/static-i18n.js" defer></script>
+<script src="/js/extension-downloads.js" defer></script>
 </body>
 </html>

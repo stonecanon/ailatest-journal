@@ -338,6 +338,124 @@ async function routePageview(req, env) {
   return json({ ok: true });
 }
 
+
+let extensionDownloadsReady = false;
+async function ensureExtensionDownloadsTables(env) {
+  if (extensionDownloadsReady || !env?.DB) return;
+  await env.DB.batch([
+    env.DB.prepare(
+      `CREATE TABLE IF NOT EXISTS extension_download_events (
+        id              INTEGER PRIMARY KEY AUTOINCREMENT,
+        asset           TEXT NOT NULL,
+        event_at        INTEGER NOT NULL,
+        day             TEXT NOT NULL,
+        visitor_id      TEXT DEFAULT '',
+        session_id      TEXT DEFAULT '',
+        referrer        TEXT DEFAULT '',
+        user_agent      TEXT DEFAULT '',
+        ip_hash         TEXT DEFAULT '',
+        country         TEXT DEFAULT '',
+        client_language TEXT DEFAULT '',
+        source_path     TEXT DEFAULT ''
+      )`
+    ),
+    env.DB.prepare(
+      `CREATE TABLE IF NOT EXISTS extension_download_stats (
+        asset     TEXT PRIMARY KEY,
+        total     INTEGER NOT NULL DEFAULT 0,
+        latest_at INTEGER
+      )`
+    ),
+    env.DB.prepare('CREATE INDEX IF NOT EXISTS idx_extension_download_events_asset_time ON extension_download_events(asset, event_at)'),
+    env.DB.prepare('CREATE INDEX IF NOT EXISTS idx_extension_download_events_day ON extension_download_events(day)'),
+  ]);
+  extensionDownloadsReady = true;
+}
+
+function extensionAssetFromUrl(req) {
+  const url = new URL(req.url);
+  const raw = cleanText(url.searchParams.get('asset') || 'latest', 120).toLowerCase();
+  if (!raw || raw === 'latest' || raw === 'ailatest-journal-extension-latest.zip') {
+    return {
+      key: 'ailatest-journal-extension-latest.zip',
+      path: '/downloads/ailatest-journal-extension-latest.zip',
+    };
+  }
+  return null;
+}
+
+async function routeExtensionDownloadStats(req, env) {
+  const asset = extensionAssetFromUrl(req);
+  if (!asset) return err('unknown asset', 400);
+  await ensureExtensionDownloadsTables(env);
+  const row = await env.DB.prepare(
+    'SELECT total, latest_at FROM extension_download_stats WHERE asset = ?'
+  ).bind(asset.key).first();
+  let total = Number(row?.total || 0);
+  let latestAt = row?.latest_at || null;
+  if (!row) {
+    const fallback = await env.DB.prepare(
+      'SELECT COUNT(*) AS total, MAX(event_at) AS latest_at FROM extension_download_events WHERE asset = ?'
+    ).bind(asset.key).first().catch(() => null);
+    total = Number(fallback?.total || 0);
+    latestAt = fallback?.latest_at || null;
+  }
+  return json(
+    { ok: true, asset: asset.key, total, latest_at: latestAt },
+    200,
+    { 'Cache-Control': 'no-store' },
+  );
+}
+
+async function routeExtensionDownload(req, env) {
+  const asset = extensionAssetFromUrl(req);
+  if (!asset) return err('unknown asset', 400);
+  await ensureExtensionDownloadsTables(env);
+  const url = new URL(req.url);
+  const now = nowSec();
+  const visitorId = cleanText(url.searchParams.get('visitor_id') || '', 80);
+  const sessionId = cleanText(url.searchParams.get('session_id') || '', 80);
+  const ua = cleanText(req.headers.get('user-agent') || '', 500);
+  const cf = req.cf || {};
+  const ipHash = await requestIpHash(req, env);
+  await env.DB.batch([
+    env.DB.prepare(
+      `INSERT INTO extension_download_events (
+        asset, event_at, day, visitor_id, session_id, referrer, user_agent,
+        ip_hash, country, client_language, source_path
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    ).bind(
+      asset.key,
+      now,
+      dayFromSec(now),
+      visitorId,
+      sessionId,
+      cleanText(req.headers.get('referer') || '', 300),
+      ua,
+      ipHash,
+      cleanText(cf.country || '', 16),
+      cleanText(req.headers.get('accept-language') || '', 120),
+      cleanText(url.searchParams.get('source') || '/extension.html', 240),
+    ),
+    env.DB.prepare(
+      `INSERT INTO extension_download_stats (asset, total, latest_at)
+       VALUES (?, 1, ?)
+       ON CONFLICT(asset) DO UPDATE SET
+         total = total + 1,
+         latest_at = excluded.latest_at`
+    ).bind(asset.key, now),
+  ]);
+  const target = new URL(asset.path, env.SITE_URL || 'https://journal.ailatest.org');
+  return new Response(null, {
+    status: 302,
+    headers: {
+      Location: target.toString(),
+      'Cache-Control': 'no-store',
+      ...CORS,
+    },
+  });
+}
+
 async function routeInteraction(req, env) {
   const body = await req.json().catch(() => null);
   if (!body) return err('invalid json');
@@ -1644,6 +1762,8 @@ export default {
       if (mAnalyticsSite && req.method === 'GET') return routeSitesDashboard(mAnalyticsSite[1]);
       if (p === '/analytics/journal-view-trend' && req.method === 'GET') return routeJournalViewTrend(req, env);
       if (p === '/analytics/site-traffic-trend' && req.method === 'GET') return routeSiteTrafficTrend(req, env);
+      if (p === '/extension/download-stats' && req.method === 'GET') return routeExtensionDownloadStats(req, env);
+      if (p === '/extension/download'       && req.method === 'GET') return routeExtensionDownload(req, env);
       if (p === '/me'                  && req.method === 'GET')  return routeMe(req, env);
       if (p === '/me/entitlements'     && req.method === 'GET')  return routeMeEntitlements(req, env);
       if (p === '/pick'                && req.method === 'POST') return handlePick(req, env, { consumeQuota: () => consumePickQuotaForRequest(req, env) });
