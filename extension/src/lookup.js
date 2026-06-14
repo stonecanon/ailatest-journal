@@ -4,7 +4,7 @@
   const ns = root.AILatestExt = root.AILatestExt || {};
   const API_URL = 'https://api.ailatest.org/ext/lookup';
   const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
-  const CACHE_PREFIX = 'lookup:v2:';
+  const CACHE_PREFIX = 'lookup:v3:';
 
   function storageArea(areaName) {
     return typeof chrome !== 'undefined' && chrome.storage && chrome.storage[areaName] ? chrome.storage[areaName] : null;
