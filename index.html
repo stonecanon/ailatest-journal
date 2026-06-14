@@ -32,7 +32,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- End Google Tag Manager -->
 <link rel="preload" href="/data/journals.json.gz" as="fetch" crossorigin="anonymous" />
 <link rel="preload" href="/data/journal_aliases.json" as="fetch" crossorigin="anonymous" />
-<link rel="stylesheet" href="/css/app.css?v=20260612-data-badges2" />
+<link rel="stylesheet" href="/css/app.css?v=20260614-pick-progress-card-tidy" />
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json" />
@@ -182,7 +182,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <a href="/indexes/" class="seo-nav-link" data-i18n="nav_index_rank">索引排行榜</a>
     <a href="/subjects/" class="seo-nav-link" data-i18n="nav_subject_rank">学科排行榜</a>
     <a href="#" class="seo-nav-link" id="warn-rank-link" data-i18n="nav_warn_rank">预警名单</a>
-    <a href="/pricing" class="seo-nav-link">订阅</a>
+    <a href="/extension.html" class="seo-nav-link" id="extension-beta-link">插件内测<span class="new-badge">NEW</span></a>
+    <a href="/pricing.html" class="seo-nav-link" id="plus-link">Plus</a>
   </nav>
 
   <header class="topbar">
@@ -376,7 +377,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <section class="tab-panel" data-panel="pick" hidden>
     <div class="pick-tool">
       <div class="pick-action-row">
-        <span id="pick-status" class="pick-status muted-cell"></span>
+        <div class="pick-progress" id="pick-progress" hidden>
+          <div class="pick-progress-head">
+            <span id="pick-status" class="pick-status muted-cell"></span>
+            <span id="pick-progress-pct" class="pick-progress-pct">0%</span>
+          </div>
+          <div class="pick-progress-track" aria-hidden="true"><span id="pick-progress-bar"></span></div>
+        </div>
       </div>
       <div class="pick-filter-bar">
         <div class="pick-filter-group">
@@ -571,7 +578,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <button id="pwa-install" class="pwa-install" hidden data-i18n="pwa_install">📲 安装到主屏</button>
 <script>
 // Build version for cache busting data files
-const __BUILD_VER = 'v20260530-79';
+const __BUILD_VER = 'v20260614-pick-progress-card-tidy';
 // Service Worker 清理 — 必须在 app.js 加载前运行
 (function() {
   if ('serviceWorker' in navigator) {
@@ -584,8 +591,8 @@ const __BUILD_VER = 'v20260530-79';
   }
 })();
 </script>
-<script src="/js/pick-match.js?v=20260611-2" defer></script>
-<script src="/js/app.js?v=20260612-data-badges2" defer></script>
+<script src="/js/pick-match.js?v=20260614-pick-progress-card-tidy" defer></script>
+<script src="/js/app.js?v=20260614-pick-progress-card-tidy" defer></script>
 <script>
   // Custom install prompt
   let __pwaPrompt = null;

@@ -6142,6 +6142,20 @@ body.journal-route .lang-toggle-wrap { display: none; }
   color: var(--accent);
   border-color: var(--accent);
 }
+#plus-link {
+  margin-left: 0;
+  display: inline-flex;
+  align-items: center;
+  color: var(--ink-faint);
+  padding: 2px 0;
+  border-bottom: 1px solid transparent;
+  line-height: 1.4;
+  font-weight: 700;
+}
+#plus-link:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
 #extension-beta-link .new-badge {
   display: inline-flex;
   align-items: center;
@@ -6160,6 +6174,7 @@ body.journal-route .lang-toggle-wrap { display: none; }
 @media (max-width: 600px) {
   /* on phones the chips wrap without hiding under the fixed language button */
   #extension-beta-link,
+  #plus-link,
   #warn-rank-link { margin-left: 0; }
 }
 
