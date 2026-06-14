@@ -355,8 +355,10 @@
   function initialLangFromPath() {
     const path = location.pathname.replace(/\/+$/, '') || '/';
     if (path === '/zh' || path.startsWith('/zh/')) return 'zh-CN';
-    if (path === '/' || path === '/en' || path.startsWith('/en/')) return 'en';
-    return localStorage.getItem('ailatest.lang') || 'zh-CN';
+    if (path === '/en' || path.startsWith('/en/')) return 'en';
+    const saved = localStorage.getItem('ailatest.lang');
+    if (saved) return saved;
+    return /^zh/i.test(navigator.language || '') ? 'zh-CN' : 'en';
   }
   let lang = normalizeLang(initialLangFromPath());
   const T = (zh_, en_) => lang === 'zh-CN' || lang === 'zh-TW' ? zh_ : en_;
@@ -5337,8 +5339,8 @@
     else if (activeTab === 'fav') renderFav();
     else if (activeTab === 'int') renderInt();
     else if (activeTab === 'pick') refreshPickI18n();
-    else if (activeTab === 'home') showHomeSearchResults();
     else if (activeTab === 'updates') renderJournalUpdates();
+    window.dispatchEvent(new CustomEvent('ailatest:langchange'));
     if (_currentDrawerRec) {
       openDrawer(_currentDrawerRec, { pageMode: document.body.classList.contains('journal-route') });
     }
@@ -6048,6 +6050,68 @@
   }
 
   const UPDATE_CATEGORY_KEYS = ['all', 'new_journal', 'index_change', 'warning', 'policy', 'report'];
+  const UPDATE_EN = {
+    'wos-on-hold-four-journals-2026-06-10': {
+      title: 'Four journals newly marked as WoS On Hold',
+      summary: 'LetPub summarized the latest On Hold risk signals and listed four newly marked journals. AILatest has added them to the On Hold watch list.',
+      dek: 'A submission-risk reminder. On Hold means a journal is under further review or observation, not necessarily removed, but authors should verify status before submission.'
+    },
+    'journal-of-research-on-research-launch-2026': {
+      title: 'Journal of Research on Research launches',
+      summary: 'Taylor & Francis has launched Journal of Research on Research for meta-research, research evaluation, governance, and open science. The journal is open for submissions with no APC in the first two years.',
+      dek: 'A new-journal launch for authors working on research evaluation, meta-research, research governance, and open science.'
+    },
+    'clarivate-2026-jcr-edition-webinar': {
+      title: 'Clarivate previews 2026 Journal Citation Reports updates',
+      summary: 'Clarivate announced a webinar for the 2026 Journal Citation Reports, covering metric updates, journal coverage, publishing and citation patterns, and responsible JIF use.',
+      dek: 'This is not the formal JCR data release; it is Clarivate’s public preview and training notice for the 2026 edition.'
+    },
+    'nature-index-2026-research-leaders': {
+      title: 'Nature Index expands coverage and releases 2026 Research Leaders',
+      summary: 'Springer Nature expanded Nature Index coverage, updated article-level subject classification, and released the 2026 Research Leaders list based on 2025 data.',
+      dek: 'Nature Index expanded its journal coverage and methodology while releasing the 2026 Research Leaders list.'
+    },
+    'elsevier-advanced-biosensors-launch-2026': {
+      title: 'Elsevier launches Advanced Biosensors',
+      summary: 'Elsevier launched the open-access journal Advanced Biosensors, covering biosensor research, design, development, and applications. Accepted submissions are APC-free until the end of 2027.',
+      dek: 'A new open-access journal launch relevant to biosensing, materials, analytical chemistry, and biomedical engineering.'
+    },
+    'doaj-new-journals-2026-06-10': {
+      title: 'DOAJ adds new open-access journal records',
+      summary: 'DOAJ added new OA journal records across medicine, humanities and social sciences, public administration, economics, and finance. AILatest has synced the public DOAJ fields.',
+      dek: 'An indexing-change roundup based on DOAJ public records, including license, APC, peer review, and review-week fields.'
+    },
+    'global-oa-publishing-ten-questions-2026': {
+      title: 'Global OA Publishing: Ten Questions report is available',
+      summary: 'The report discusses global OA publishing trends, quality governance, Mega Journals, LLM impact, and future governance paths.',
+      dek: 'A report-style update on the open-access publishing ecosystem, useful for tracking OA governance and publishing strategy.'
+    },
+    'doaj-ambassador-programme-10-years-2026': {
+      title: 'DOAJ reviews ten years of the Ambassador Programme',
+      summary: 'DOAJ highlighted open-access journal quality standards, regional outreach, and author education in its ten-year programme review.',
+      dek: 'A DOAJ programme update focused on OA quality standards, regional outreach, and author education.'
+    },
+    'scholarly-kitchen-scholar-ready-ai-2026': {
+      title: 'The Scholarly Kitchen discusses AI-ready publishing infrastructure',
+      summary: 'The interview covers AI search, source trust, and publishing infrastructure, with a focus on how authoritative content enters AI-driven research workflows.',
+      dek: 'An industry observation on AI and scholarly publishing infrastructure.'
+    },
+    'springer-nature-society-partner-newsletter-epic-2026': {
+      title: 'Springer Nature society-partner newsletter wins 2026 Gold EPIC Award',
+      summary: 'Springer Nature says the newsletter connects more than 900 society partners in 48 countries and covers publishing innovation, research policy, and open access.',
+      dek: 'A publishing-service update reflecting communication and support for society journals.'
+    },
+    'nature-registered-reports-all-disciplines-2026': {
+      title: 'Nature expands Registered Reports to all disciplines',
+      summary: 'Nature expanded the Registered Reports format across natural sciences, social sciences, clinical sciences, engineering, and public health.',
+      dek: 'A submission-policy update for papers emphasizing study design, preregistration, and reproducibility.'
+    },
+    'wiley-acquires-emerald-2026': {
+      title: 'Wiley acquires Emerald and expands its social-science portfolio',
+      summary: 'Wiley announced the acquisition of Emerald Publishing, expanding its portfolio to roughly 2,500 journals and strengthening business, finance, economics, and social science coverage.',
+      dek: 'A publishing-industry update that may affect social science, management, business, and finance journal portfolios.'
+    }
+  };
 
   function normalizeJournalUpdates(payload) {
     const rawItems = Array.isArray(payload?.items) ? payload.items : [];
@@ -6445,6 +6509,20 @@
       if (category === 'all') return t('update_cat_all');
       return t(`update_cat_${category}`) || category;
     }
+    function updateIsZh() {
+      return lang === 'zh-CN' || lang === 'zh-TW';
+    }
+    function updateTitle(item) {
+      return updateIsZh() ? item.title : (UPDATE_EN[item.id] && UPDATE_EN[item.id].title) || item.title;
+    }
+    function updateSummary(item) {
+      return updateIsZh() ? item.summary : (UPDATE_EN[item.id] && UPDATE_EN[item.id].summary) || item.summary;
+    }
+    function updateDek(item) {
+      const detail = item.detail || {};
+      if (!updateIsZh() && UPDATE_EN[item.id] && UPDATE_EN[item.id].dek) return UPDATE_EN[item.id].dek;
+      return detail.dek || detail.lead || item.summary || '';
+    }
 
     function formatUpdateDate(value) {
       if (!value) return '';
@@ -6463,8 +6541,8 @@
       const q = String(query || '').trim().toLowerCase();
       if (!q) return true;
       return [
-        item.title,
-        item.summary,
+        updateTitle(item),
+        updateSummary(item),
         item.source_name,
         item.publisher,
         updateCategoryLabel(item.category),
@@ -6618,67 +6696,64 @@
       const detail = item.detail || {};
       const report = detail.report || {};
       const sourceName = item.source_name || item.publisher || t('updates_source');
-      const tags = (item.tags || []).map(tag => `<span class="update-tag">${escape(tag)}</span>`).join('');
       const points = Array.isArray(detail.key_points) ? detail.key_points : [];
       const sections = Array.isArray(detail.sections) ? detail.sections : [];
-      const articleHtml = renderUpdateArticle(detail.article);
-      const imageUrl = String(detail.image_url || item.image_url || report.cover_image || '').trim();
+      const articleHtml = updateIsZh() ? renderUpdateArticle(detail.article) : '';
       const sourceLinks = updateLinkList([
-        item.source_url ? { label: '原始来源', url: item.source_url, note: sourceName } : null,
+        item.source_url ? { label: T('原始来源','Original source'), url: item.source_url, note: sourceName } : null,
         ...(Array.isArray(detail.source_links) ? detail.source_links : []),
       ].filter(Boolean));
       const journalLinks = updateLinkList(detail.journal_links || []);
       const reportUrl = report.file_detail_url || report.view_url || report.pdf_url || '';
       const pdfUrl = report.pdf_url || report.download_url || report.view_url || '';
+      const detailTitle = updateTitle(item);
+      const detailDek = updateDek(item);
       box.innerHTML = `
         <article class="update-detail">
           <a class="updates-back" href="/updates" data-updates-back>← ${escape(t('updates_view_all'))}</a>
           <header class="update-detail-head">
-            ${imageUrl ? `<img class="update-detail-image" src="${escape(imageUrl)}" alt="${escape(item.title)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : ''}
             <div class="update-card-top">
               <span class="update-category">${escape(updateCategoryLabel(item.category))}</span>
               ${item.published_at ? `<time datetime="${escape(item.published_at)}">${escape(formatUpdateDate(item.published_at))}</time>` : ''}
             </div>
-            <h1>${escape(item.title)}</h1>
-            <p class="update-detail-dek">${escape(detail.dek || item.summary || '')}</p>
+            <h1>${escape(detailTitle)}</h1>
+            <p class="update-detail-dek">${escape(detailDek)}</p>
             <div class="update-detail-meta">
               <span>${escape(t('updates_source'))}: ${escape(sourceName)}</span>
               ${item.publisher ? `<span>${escape(item.publisher)}</span>` : ''}
-              <span class="update-tags">${tags}</span>
             </div>
             ${sourceLinks.length ? renderUpdateLinks(sourceLinks, 'update-source-actions') : ''}
           </header>
-          ${journalLinks.length ? `<section class="update-detail-section"><h2>相关期刊</h2>${renderUpdateLinks(journalLinks)}</section>` : ''}
           ${articleHtml || `
-            ${(detail.lead || item.summary) ? `<section class="update-detail-section"><p>${escape(detail.lead || item.summary)}</p></section>` : ''}
-            ${points.length ? `<section class="update-detail-section"><h2>要点</h2><ul>${points.map(p => `<li>${escape(p)}</li>`).join('')}</ul></section>` : ''}
-            ${sections.map(section => `
+            ${(detail.lead || item.summary) ? `<section class="update-detail-section"><p>${escape(updateIsZh() ? (detail.lead || item.summary) : updateSummary(item))}</p></section>` : ''}
+            ${updateIsZh() && points.length ? `<section class="update-detail-section"><h2>${T('要点','Key points')}</h2><ul>${points.map(p => `<li>${escape(p)}</li>`).join('')}</ul></section>` : ''}
+            ${updateIsZh() ? sections.map(section => `
               <section class="update-detail-section">
                 <h2>${escape(section.heading || '')}</h2>
                 <p>${escape(section.body || '')}</p>
-              </section>`).join('')}
+              </section>`).join('') : ''}
           `}
           ${reportUrl ? `
             <section class="update-report">
               <div class="update-report-info">
-                ${report.cover_image ? `<img src="${escape(report.cover_image)}" alt="${escape(report.title || item.title)}" loading="lazy">` : ''}
                 <div>
-                  <p class="updates-kicker">报告来源</p>
-                  <h2>${escape(report.title || item.title)}</h2>
+                  <p class="updates-kicker">${T('报告来源','Report source')}</p>
+                  <h2>${escape(report.title || detailTitle)}</h2>
                   <p>${[
-                    report.pages ? `${report.pages} 页` : '',
+                    report.pages ? `${report.pages} ${T('页','pages')}` : '',
                     formatFileSize(report.size_bytes),
                     report.file_id ? `File ID ${report.file_id}` : ''
                   ].filter(Boolean).map(escape).join(' · ')}</p>
                   ${report.source_note ? `<p class="muted-note">${escape(report.source_note)}</p>` : ''}
                   <div class="update-report-actions">
-                    ${pdfUrl ? `<a href="${escape(pdfUrl)}" target="_blank" rel="noopener">查看原 PDF</a>` : ''}
-                    ${report.download_url ? `<a href="${escape(report.download_url)}" target="_blank" rel="noopener">下载 PDF</a>` : ''}
-                    ${report.file_detail_url ? `<a href="${escape(report.file_detail_url)}" target="_blank" rel="noopener">官方文件页</a>` : ''}
+                    ${pdfUrl ? `<a href="${escape(pdfUrl)}" target="_blank" rel="noopener">${T('查看原 PDF','View PDF')}</a>` : ''}
+                    ${report.download_url ? `<a href="${escape(report.download_url)}" target="_blank" rel="noopener">${T('下载 PDF','Download PDF')}</a>` : ''}
+                    ${report.file_detail_url ? `<a href="${escape(report.file_detail_url)}" target="_blank" rel="noopener">${T('官方文件页','Official file page')}</a>` : ''}
                   </div>
                 </div>
               </div>
             </section>` : ''}
+          ${journalLinks.length ? `<section class="update-detail-section update-related-section"><h2>${T('相关期刊','Related journals')}</h2>${renderUpdateLinks(journalLinks)}</section>` : ''}
         </article>`;
       box.querySelector('[data-updates-back]')?.addEventListener('click', (e) => {
         e.preventDefault();
@@ -6705,34 +6780,20 @@
       const cat = item.category ? ` data-cat="${escape(item.category)}"` : '';
       const mark = updateBannerMark(item);
       return `<div class="update-card-image update-card-generated"${cat}>
-        <div class="update-cover-main"><span class="update-card-ph-mark">${escape(mark)}</span><b>${escape(shortUpdateText(sourceName, 34))}</b></div>
+        <div class="update-cover-main"><span class="update-card-ph-mark">${escape(mark)}</span><b>${escape(updateTitle(item))}</b></div>
       </div>`;
     }
 
     function renderUpdateCard(item, options = {}) {
       const isHome = !!options.home;
-      const tagHtml = !isHome ? (item.tags || []).slice(0, 2).map(tag => `<span class="update-tag">${escape(tag)}</span>`).join('') : '';
       const isBrief = !!options.brief;
-      const journalsHtml = !isBrief && (item.journals || []).length
-        ? `<div class="update-journals">${item.journals.slice(0, 2).map(j => `<span>${escape(shortUpdateText(j, 34))}</span>`).join('')}</div>`
-        : '';
       const dateHtml = item.published_at ? `<time datetime="${escape(item.published_at)}">${escape(formatUpdateDate(item.published_at))}</time>` : '';
       const sourceName = item.source_name || item.publisher || t('updates_source');
-      const bottomHtml = !isBrief ? `
-        <div class="update-card-bottom">
-          <span class="update-source">${escape(t('updates_source'))}: ${escape(sourceName)}</span>
-          <span class="update-tags">${tagHtml}</span>
-        </div>` : '';
+      const summary = updateSummary(item);
       const body = `
         ${updateCardBanner(item, sourceName)}
-        ${!isBrief ? `<div class="update-card-top">
-          <span class="update-category">${escape(updateCategoryLabel(item.category))}</span>
-          ${dateHtml}
-        </div>` : ''}
-        <h3>${escape(shortUpdateText(item.title, isBrief ? 58 : 96))}</h3>
-        ${!isBrief ? `<p>${escape(shortUpdateText(item.summary, isHome ? 118 : (options.featured ? 128 : 96)))}</p>` : ''}
-        ${journalsHtml}
-        ${bottomHtml}`;
+        ${!isBrief ? `<p class="update-card-summary">${escape(summary)}</p>` : ''}
+        ${!isBrief ? `<div class="update-card-simple-meta">${dateHtml}<span>${escape(updateCategoryLabel(item.category))}</span></div>` : ''}`;
       const cls = `update-card${options.featured ? ' featured' : ''}${options.compact ? ' compact' : ''}${isHome ? ' home-compact' : ''}${isBrief ? ' brief' : ''}`;
       const detailPath = updateDetailPath(item);
       if (detailPath) {
@@ -6826,6 +6887,15 @@
         });
       });
     }
+
+    window.addEventListener('ailatest:langchange', () => {
+      if (activeTab === 'home') {
+        if (activeQuery) renderHomeIntResults();
+        else renderJournalUpdatesPreview();
+      } else if (activeTab === 'updates') {
+        renderJournalUpdates();
+      }
+    });
 
     // Also sync topbar search when on home tab
     const origSearchHandler = $('#q')?.addEventListener;
