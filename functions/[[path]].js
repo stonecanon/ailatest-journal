@@ -357,11 +357,11 @@ a{color:inherit}.site-header{position:sticky;top:0;z-index:20;background:rgba(25
   <nav class="breadcrumb"><a href="${origin}/">Home</a> / <a href="${origin}/">AI Journals</a> / ${esc(name)}</nav>
   <section class="hero">
     <div>
-      <div class="kicker">Journal SEO Landing Page</div>
+      <div class="kicker">Journal Details</div>
       <h1>${esc(name)}</h1>
       <p class="sub">${esc([j.a ? `Abbreviation: ${j.a}` : '', j.p ? `Publisher: ${j.p}` : '', issnLine].filter(Boolean).join(' · '))}</p>
       ${badgeHtml(j)}
-      <div class="cta-row">${officialCta}<a class="btn secondary" href="${esc(appUrl)}">View / Save in AILatest</a></div>
+      <div class="cta-row">${officialCta}<a class="btn secondary" href="${esc(appUrl)}">Open in AILatest</a></div>
     </div>
     <aside class="fact-panel">
       <div class="fact"><span>Impact Factor</span><strong>${esc(fmt(j.f))}</strong></div>
