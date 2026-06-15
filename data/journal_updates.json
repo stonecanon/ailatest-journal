@@ -5,47 +5,51 @@
       "id": "wechat-research-update-x3jp33-2026-06-15",
       "published_at": "2026-06-15",
       "category": "report",
-      "title": "微信公众号精选：科研出版与期刊评价动态",
-      "summary": "今日收录一篇微信公众号科研出版动态，作为期刊评价、科研数据库和投稿政策信息的跟踪入口。读者可从来源链接查看原文，AILatest 将持续补充相关期刊、收录状态和指标变化。",
+      "title": "自然指数2025-2026：全球微生物学研究机构Top 30发布",
+      "summary": "微信公众号文章关注 Nature Index 微生物学机构榜单。Nature Index 同步提供 Microbiology 主题机构表，按 2025-02-01 至 2026-01-31 时间窗统计机构在自然指数期刊中的科研产出，可作为观察微生物学高水平研究机构分布的参考。",
       "source_name": "微信公众号",
       "source_url": "https://mp.weixin.qq.com/s/x3jP33omeNC-41aaozeGjw",
-      "publisher": "WeChat",
+      "publisher": "Nature Index / WeChat",
       "journals": [],
       "tags": [
-        "微信公众号",
-        "科研出版",
-        "期刊评价"
+        "Nature Index",
+        "微生物学",
+        "机构排名"
       ],
       "priority": 3,
       "detail_path": "/updates/wechat-research-update-x3jp33-2026-06-15",
       "detail": {
-        "dek": "这条动态用于跟踪微信公众号中的科研出版、期刊评价和数据库更新信息。AILatest 将把重要变化同步到期刊检索、收录标签和风险提示中。",
+        "dek": "这条动态关注 Nature Index 微生物学研究机构榜单。对需要判断学科强势机构、合作网络和高水平论文产出格局的研究者有参考价值。",
         "source_links": [
           {
             "label": "微信公众号原文",
             "url": "https://mp.weixin.qq.com/s/x3jP33omeNC-41aaozeGjw"
+          },
+          {
+            "label": "Nature Index Microbiology institutions",
+            "url": "https://www.nature.com/nature-index/topics/institution-tables/global/all/microbiology"
           }
         ],
         "article": {
           "intro": [
-            "微信公众号是国内科研作者获取期刊收录、指标更新、投稿政策和出版动态的重要渠道。AILatest 将其中与期刊选择、投稿风险和数据库变化相关的信息整理为站内动态，方便后续检索和回看。",
-            "如果动态涉及具体期刊或数据库，建议结合期刊官网、Web of Science Master Journal List、Scopus Source List、DOAJ、PubMed/NLM 等官方来源交叉确认，再用于投稿决策。"
+            "Nature Index 的 Microbiology 主题机构表按研究产出对全球机构进行排序。当前公开页面标注的统计时间窗为 2025 年 2 月 1 日至 2026 年 1 月 31 日，指标基于自然指数追踪期刊中的论文产出。",
+            "这类榜单不等同于期刊分区或论文质量评价，但适合用来观察微生物学方向的高活跃机构、潜在合作对象和区域科研格局。对微生物学、宏基因组、感染与环境微生物等方向的作者，榜单可以作为选题、合作和投稿判断的背景信息。"
           ],
           "sections": [
             {
-              "heading": "关注重点",
+              "heading": "站内解读",
               "bullets": [
-                "期刊是否出现新增收录、暂停收录、剔除或观察状态",
-                "JCR、CiteScore、CAS 分区、OA/APC 等指标是否更新",
-                "是否涉及撤稿、出版伦理、投稿政策或风险预警"
+                "榜单反映的是机构在 Nature Index 追踪期刊中的微生物学相关产出",
+                "可用于观察微生物学高水平研究力量分布，但不应替代 JCR、CiteScore、CAS 分区等期刊指标",
+                "如果用于选刊或合作判断，建议结合具体论文、通讯作者团队、期刊方向和近年研究主题再分析"
               ]
             },
             {
               "heading": "使用建议",
               "bullets": [
-                "点击来源链接查看公众号原文",
-                "涉及投稿决策时优先以官方数据库和期刊官网为准",
-                "站内后续会把可结构化的信息同步到具体期刊标签和详情页"
+                "查看 Nature Index 官方主题表确认最新排名与统计口径",
+                "关注榜单中机构常发期刊，结合站内期刊详情页查看 IF、JCR、CAS、Scopus、OA/APC 等信息",
+                "不要把机构榜单直接等同为投稿推荐，仍需匹配论文主题和期刊 scope"
               ]
             }
           ]
@@ -55,48 +59,61 @@
     {
       "id": "wechat-research-update-atawclt-2026-06-15",
       "published_at": "2026-06-15",
-      "category": "report",
-      "title": "微信公众号精选：期刊收录与投稿信息动态",
-      "summary": "今日收录一篇微信公众号期刊信息动态，作为收录变化、指标更新、投稿政策和出版风险的跟踪入口。读者可从来源链接查看原文，站内后续会同步可结构化的期刊数据。",
+      "category": "policy",
+      "title": "免费投稿iMeta！印度政府为作者统一支付版面费",
+      "summary": "微信公众号文章关注 iMeta 的 APC 支付支持信息：印度作者投稿 iMeta 时，版面费可由政府相关机制统一支付。该信息提示开放获取 APC 正在更多地与国家级订阅、机构协议和出版商支付支持机制绑定。",
       "source_name": "微信公众号",
       "source_url": "https://mp.weixin.qq.com/s/AtAwCLTcnorLYR7NISpmTQ",
-      "publisher": "WeChat",
-      "journals": [],
+      "publisher": "iMeta / Wiley / WeChat",
+      "journals": [
+        "iMeta"
+      ],
       "tags": [
-        "微信公众号",
-        "期刊收录",
-        "投稿信息"
+        "iMeta",
+        "APC",
+        "开放获取"
       ],
       "priority": 3,
       "detail_path": "/updates/wechat-research-update-atawclt-2026-06-15",
       "detail": {
-        "dek": "这条动态用于跟踪微信公众号中的期刊收录、投稿信息和科研数据库变化。AILatest 会优先把可验证、可结构化的信息沉淀到站内期刊数据。",
+        "dek": "这条动态关注 iMeta 面向印度作者的版面费支付支持。对开放获取期刊投稿、APC 报销和国家级出版协议有参考意义。",
+        "journal_links": [
+          {
+            "label": "iMeta",
+            "url": "/journal/imeta/",
+            "note": "站内期刊页"
+          }
+        ],
         "source_links": [
           {
             "label": "微信公众号原文",
             "url": "https://mp.weixin.qq.com/s/AtAwCLTcnorLYR7NISpmTQ"
+          },
+          {
+            "label": "iMeta - Wiley",
+            "url": "https://www.wiley.com/en-us/journals/iMeta-p-b2770596X"
           }
         ],
         "article": {
           "intro": [
-            "期刊收录与投稿信息变化会直接影响作者选刊、毕业与职称认定、项目结题和论文传播。AILatest 将相关公众号动态纳入更新流，帮助用户及时发现值得进一步确认的信息。",
-            "站内动态主要用于提示和导航；涉及具体投稿选择时，还应结合学校/单位认定规则、期刊官网、数据库官方目录和近期检索状态综合判断。"
+            "iMeta 是 Wiley 合作出版的开放获取期刊，方向覆盖生物信息学、宏基因组、微生物组等交叉领域。公众号文章标题显示，印度政府将为作者统一支付 iMeta 版面费，这类信息对关注 APC 成本和开放获取发表路径的作者值得留意。",
+            "APC 支付支持通常与作者所在国家、机构、基金或出版协议有关，适用范围会受到身份、通讯作者单位、投稿时间和出版商政策影响。作者投稿前仍应以 Wiley、期刊官网或机构图书馆/科研管理部门的正式说明为准。"
           ],
           "sections": [
             {
-              "heading": "关注重点",
+              "heading": "站内解读",
               "bullets": [
-                "是否涉及 SCI/SSCI/ESCI、Scopus、DOAJ、PubMed、EI 等数据库变化",
-                "是否出现 On Hold、Under Review、撤稿或出版伦理风险信号",
-                "是否包含新刊、停刊、改名、转 OA、APC 调整或审稿周期变化"
+                "这不是期刊收录变化，而是开放获取 APC 支付/资助机制变化",
+                "对印度作者或与印度机构合作的通讯作者，可能降低 iMeta 投稿的直接费用压力",
+                "对其他国家作者也有参考意义：选刊时需要同时看期刊质量、收录状态、APC 和机构支付协议"
               ]
             },
             {
               "heading": "使用建议",
               "bullets": [
-                "点击来源链接查看公众号原文",
-                "把公众号信息作为线索，不替代官方数据库检索",
-                "AILatest 会把明确可验证的变化继续同步到期刊详情页和筛选标签"
+                "投稿前查看 Wiley/iMeta 官方页面确认 APC、豁免和机构支付规则",
+                "向所在单位图书馆或科研管理部门确认是否有开放获取出版协议",
+                "站内后续会继续补充 iMeta 的 APC、OA、Scopus/DOAJ/PubMed 等结构化字段"
               ]
             }
           ]
