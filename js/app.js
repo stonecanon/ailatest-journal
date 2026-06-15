@@ -8275,12 +8275,14 @@
     const el = document.getElementById('journal-view-total');
     if (!el) return;
     try {
-      const resp = await fetch(`${API_BASE}/journal-view-total`, { cache: 'no-store' });
-      const data = await readJsonResponse(resp, 'Journal view total failed');
+      const resp = await fetch(`${API_BASE}/analytics/public-total?site=${encodeURIComponent(location.hostname)}`, { cache: 'no-store' });
+      const data = await readJsonResponse(resp, 'Public traffic total failed');
+      const pageviews = Number(data.total_pageviews || 0);
+      const visitors = Number(data.total_visitors || 0);
       const total = Number(data.total_journal_views || 0);
       const journals = Number(data.viewed_journals || 0);
-      if (!total) return;
-      el.innerHTML = `${T('期刊浏览总量','Total journal views')}：<strong>${total.toLocaleString()}</strong>${journals ? ` · ${T('覆盖期刊','Journals viewed')} ${journals.toLocaleString()}` : ''}`;
+      if (!pageviews && !total) return;
+      el.innerHTML = `${T('全站浏览量','Total site views')}：<strong>${pageviews.toLocaleString()}</strong>${visitors ? ` · ${T('访客','Visitors')} ${visitors.toLocaleString()}` : ''}${total ? ` · ${T('期刊详情浏览','Journal detail views')} ${total.toLocaleString()}` : ''}${journals ? ` · ${T('覆盖期刊','Journals viewed')} ${journals.toLocaleString()}` : ''}`;
       el.hidden = false;
     } catch (_) {}
   }

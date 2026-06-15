@@ -1543,6 +1543,54 @@ async function routeGetJournalViewTotal(req, env) {
   });
 }
 
+// GET /analytics/public-total  (public aggregate, no user-level detail)
+async function routePublicTrafficTotal(req, env) {
+  const page = await env.DB.prepare(
+    `SELECT COUNT(*) AS total_pageviews,
+      COUNT(DISTINCT visitor_id) AS total_visitors,
+      COUNT(DISTINCT session_id) AS total_sessions,
+      MIN(event_at) AS first_pageview_at,
+      MAX(event_at) AS latest_pageview_at
+     FROM page_events`
+  ).first();
+  const journal = await env.DB.prepare(
+    `SELECT COUNT(*) AS viewed_journals,
+      COALESCE(SUM(count),0) AS total_journal_views,
+      MAX(updated_at) AS latest_journal_view_at
+     FROM journal_views`
+  ).first();
+
+  let raw = null;
+  try {
+    const url = new URL(req.url);
+    const site = cleanText(url.searchParams.get('site') || 'journal.ailatest.org', 120) || 'journal.ailatest.org';
+    raw = await env.DB.prepare(
+      `SELECT COUNT(*) AS raw_pageviews,
+        COUNT(DISTINCT visitor_id) AS raw_visitors,
+        COUNT(DISTINCT session_id) AS raw_sessions,
+        SUM(CASE WHEN is_bot=1 THEN 1 ELSE 0 END) AS raw_bot_pageviews
+       FROM raw_events
+       WHERE site = ? AND event_type IN ('pageview','page_view')`
+    ).bind(site).first();
+  } catch (e) {
+    raw = null;
+  }
+
+  return json({
+    ok: true,
+    total_pageviews: Number(page?.total_pageviews || raw?.raw_pageviews || 0),
+    total_visitors: Number(page?.total_visitors || raw?.raw_visitors || 0),
+    total_sessions: Number(page?.total_sessions || raw?.raw_sessions || 0),
+    first_pageview_at: page?.first_pageview_at || null,
+    latest_pageview_at: page?.latest_pageview_at || null,
+    viewed_journals: Number(journal?.viewed_journals || 0),
+    total_journal_views: Number(journal?.total_journal_views || 0),
+    latest_journal_view_at: journal?.latest_journal_view_at || null,
+    raw_pageviews: raw ? Number(raw.raw_pageviews || 0) : null,
+    raw_bot_pageviews: raw ? Number(raw.raw_bot_pageviews || 0) : null,
+  }, 200, { 'Cache-Control': 'public, max-age=300' });
+}
+
 // GET /analytics/journal-view-trend  (owner only) → lightweight chart payload
 async function routeJournalViewTrend(req, env) {
   const u = await getUser(req, env);
@@ -1762,6 +1810,7 @@ export default {
       if (mAnalyticsSite && req.method === 'GET') return routeSitesDashboard(mAnalyticsSite[1]);
       if (p === '/analytics/journal-view-trend' && req.method === 'GET') return routeJournalViewTrend(req, env);
       if (p === '/analytics/site-traffic-trend' && req.method === 'GET') return routeSiteTrafficTrend(req, env);
+      if (p === '/analytics/public-total' && req.method === 'GET') return routePublicTrafficTotal(req, env);
       if (p === '/extension/download-stats' && req.method === 'GET') return routeExtensionDownloadStats(req, env);
       if (p === '/extension/download'       && req.method === 'GET') return routeExtensionDownload(req, env);
       if (p === '/me'                  && req.method === 'GET')  return routeMe(req, env);
