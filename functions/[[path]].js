@@ -1,94 +1,395 @@
-// Cloudflare Pages Function — root catch-all
-// - /journal/<name-slug>/  → SSR SEO detail pages with FAQ + JSON-LD + Related Journals
-// - /journal/<issn>/       → 301 redirects to name-slug
-// - /compare/<a>-vs-<b>/   → SSR comparison page
-// - All other routes       → static assets
+// Cloudflare Pages Function root catch-all.
+// - /journal/<name-slug>/ renders a standalone SEO landing page.
+// - /journal/<issn>/ redirects to the canonical name slug.
+// - /compare/<a>-vs-<b>/ renders a lightweight comparison page.
+// - All other routes are served from static assets.
 
 let indexCache = null;
 
 async function loadIndex(ctx) {
   if (indexCache) return indexCache;
-  try {
-    const req = new Request('https://journal.ailatest.org/data/journal_index.json');
-    const resp = await ctx.env.ASSETS.fetch(req);
-    if (!resp.ok) throw new Error(`Index fetch: ${resp.status}`);
-    indexCache = await resp.json();
-    return indexCache;
-  } catch (e) {
-    throw new Error(`loadIndex: ${e.message}`);
-  }
-}
-
-function esc(s) {
-  if (s == null) return '';
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-function escJson(s) {
-  if (s == null) return '';
-  return String(s).replace(/\\/g,'\\\\').replace(/"/g,'\\"').replace(/\n/g,'\\n').replace(/\r/g,'\\r').replace(/\t/g,'\\t');
-}
-
-function titleCaseName(s) {
-  return String(s || '').toLowerCase().replace(/\b([a-z])/g, (_, c) => c.toUpperCase());
-}
-
-function decodeRoutePart(s) {
-  let out = String(s || '').trim();
-  for (let i = 0; i < 2; i++) {
-    try { const next = decodeURIComponent(out); if (next === out) break; out = next; } catch (_) { break; }
-  }
-  return out;
-}
-
-function normalizeJournalSlug(s, stripAccents = true) {
-  let out = decodeRoutePart(s).toLowerCase();
-  if (stripAccents) out = out.normalize('NFKD').replace(/[\u0300-\u036f]/g, '');
-  return out.replace(/^\/?(?:journal|compare)\//, '').replace(/\/+$/, '')
-    .replace(/[^a-z0-9\u4e00-\u9fff-]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
-}
-
-function journalSlugCandidates(rawSlug) {
-  const raw = decodeRoutePart(rawSlug).replace(/^\/?(?:journal|compare)\//, '').replace(/\/+$/, '');
-  const compactIssn = raw.replace(/[^0-9Xx]/g, '').toUpperCase();
-  return Array.from(new Set([raw, raw.toLowerCase(), normalizeJournalSlug(raw, false),
-    normalizeJournalSlug(raw), raw.replace(/-/g, ''), compactIssn.length >= 7 ? compactIssn : ''].filter(Boolean)));
+  const req = new Request('https://journal.ailatest.org/data/journal_index.json');
+  const resp = await ctx.env.ASSETS.fetch(req);
+  if (!resp.ok) throw new Error(`journal_index.json fetch failed: ${resp.status}`);
+  indexCache = await resp.json();
+  return indexCache;
 }
 
 async function loadAppShell(ctx) {
   const req = new Request('https://journal.ailatest.org/index.html');
   const resp = await ctx.env.ASSETS.fetch(req);
-  if (!resp.ok) throw new Error(`App shell fetch: ${resp.status}`);
+  if (!resp.ok) throw new Error(`index.html fetch failed: ${resp.status}`);
   return resp.text();
+}
+
+function esc(value) {
+  if (value == null) return '';
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function titleCaseName(value) {
+  const keep = new Set(['AI', 'IEEE', 'ACM', 'ACS', 'JAMA', 'BMJ', 'PNAS', 'PLOS', 'DNA', 'RNA']);
+  return String(value || '')
+    .toLowerCase()
+    .replace(/\b([a-z][a-z0-9&'-]*)/g, (word) => {
+      const upper = word.toUpperCase();
+      if (keep.has(upper)) return upper;
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    });
+}
+
+function decodeRoutePart(value) {
+  let out = String(value || '').trim();
+  for (let i = 0; i < 2; i += 1) {
+    try {
+      const next = decodeURIComponent(out);
+      if (next === out) break;
+      out = next;
+    } catch (_) {
+      break;
+    }
+  }
+  return out;
+}
+
+function normalizeJournalSlug(value, stripAccents = true) {
+  let out = decodeRoutePart(value).toLowerCase();
+  if (stripAccents) out = out.normalize('NFKD').replace(/[\u0300-\u036f]/g, '');
+  return out
+    .replace(/^\/?(?:journal|compare)\//, '')
+    .replace(/\/+$/, '')
+    .replace(/[^a-z0-9\u4e00-\u9fff-]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+function journalSlugCandidates(rawSlug) {
+  const raw = decodeRoutePart(rawSlug).replace(/^\/?(?:journal|compare)\//, '').replace(/\/+$/, '');
+  const compactIssn = raw.replace(/[^0-9Xx]/g, '').toUpperCase();
+  return Array.from(new Set([
+    raw,
+    raw.toLowerCase(),
+    normalizeJournalSlug(raw, false),
+    normalizeJournalSlug(raw),
+    raw.replace(/-/g, ''),
+    compactIssn.length >= 7 ? compactIssn : '',
+  ].filter(Boolean)));
 }
 
 function replaceMeta(html, selector, replacement) {
   if (selector && selector.test(html)) return html.replace(selector, replacement);
-  return html.replace('</head>', `${replacement}
-</head>`);
+  return html.replace('</head>', `${replacement}\n</head>`);
 }
 
 function stripAlternateLinks(html) {
   return html.replace(/<link\s+rel="alternate"[^>]*hreflang="[^"]*"[^>]*>\s*/gi, '');
 }
 
+function canonicalUrl(origin, slug) {
+  return `${origin}/journal/${encodeURIComponent(slug)}/`;
+}
+
+function journalName(j) {
+  return titleCaseName(j.n || j.e || j.c || 'Journal');
+}
+
+function fmt(value, empty = '-') {
+  return value == null || value === '' ? empty : String(value);
+}
+
+function fmtMoney(value) {
+  if (value == null || value === '') return '';
+  const n = Number(value);
+  if (!Number.isFinite(n)) return String(value);
+  return `$${n.toLocaleString('en-US')}`;
+}
+
+function oaText(j) {
+  const label = String(j.oa || '').replace(/_/g, ' ');
+  if (label) return label.replace(/\b\w/g, (c) => c.toUpperCase());
+  if (j.doaj) return 'DOAJ open access';
+  return '';
+}
+
+function subjectText(j) {
+  const subjects = [...(j.wos || []), j.es].filter(Boolean);
+  return Array.from(new Set(subjects)).slice(0, 8);
+}
+
+function coverageBadges(j) {
+  const out = [];
+  out.push(...(j.ix || []));
+  if (j.sc) out.push('Scopus');
+  if (j.med) out.push('MEDLINE');
+  if (j.pm) out.push('PubMed');
+  if (j.pmc) out.push('PMC');
+  if (j.doaj) out.push('DOAJ');
+  return Array.from(new Set(out.filter(Boolean))).slice(0, 10);
+}
+
+function journalSeo(j, slug, origin) {
+  const name = journalName(j);
+  const titleParts = [name];
+  if (j.f != null) titleParts.push(`IF ${j.f}`);
+  if (j.z != null) titleParts.push(`CAS ${j.z}`);
+  if (j.q) titleParts.push(String(j.q).toUpperCase());
+  if (j.ix && j.ix.length) titleParts.push(j.ix.slice(0, 2).join('/'));
+  titleParts.push('AILatest Journal');
+
+  const descParts = [`${name} journal information`];
+  if (j.f != null) descParts.push(`Impact Factor ${j.f}`);
+  if (j.q) descParts.push(`JCR ${String(j.q).toUpperCase()}`);
+  if (j.z != null) descParts.push(`CAS ${j.z}`);
+  if (j.ix && j.ix.length) descParts.push(`indexed in ${j.ix.join(', ')}`);
+  if (j.p) descParts.push(`published by ${j.p}`);
+  if (j.i) descParts.push(`ISSN ${j.i}`);
+
+  let desc = descParts.join(', ') + '.';
+  if (desc.length > 300) desc = desc.slice(0, 297) + '...';
+  return { title: titleParts.join(' | '), desc, url: canonicalUrl(origin, slug) };
+}
+
+function metaTags(seo) {
+  return [
+    `<title>${esc(seo.title)}</title>`,
+    `<meta name="description" content="${esc(seo.desc)}" />`,
+    `<link rel="canonical" href="${esc(seo.url)}" />`,
+    '<meta name="robots" content="index,follow" />',
+    '<meta property="og:type" content="website" />',
+    `<meta property="og:url" content="${esc(seo.url)}" />`,
+    `<meta property="og:title" content="${esc(seo.title)}" />`,
+    `<meta property="og:description" content="${esc(seo.desc)}" />`,
+    '<meta name="twitter:card" content="summary_large_image" />',
+    `<meta name="twitter:title" content="${esc(seo.title)}" />`,
+    `<meta name="twitter:description" content="${esc(seo.desc)}" />`,
+  ].join('\n');
+}
+
+function buildFAQ(j) {
+  const name = journalName(j);
+  const oa = oaText(j);
+  const apc = fmtMoney(j.apc);
+  const annual = (j.ann || [])[0];
+  return [
+    {
+      q: `What is the Impact Factor of ${name}?`,
+      a: j.f != null ? `The latest Impact Factor recorded by AILatest Journal for ${name} is ${j.f}.` : `AILatest Journal does not currently have a verified Impact Factor for ${name}.`,
+    },
+    {
+      q: `Is ${name} open access?`,
+      a: oa ? `${name} is marked as ${oa}.` : `AILatest Journal does not currently show a verified open access status for ${name}.`,
+    },
+    {
+      q: `What databases index ${name}?`,
+      a: coverageBadges(j).length ? `${name} is marked with these coverage badges: ${coverageBadges(j).join(', ')}.` : `No indexing badges are currently available for ${name}.`,
+    },
+    {
+      q: `What is the APC for ${name}?`,
+      a: apc ? `The available APC estimate is ${apc}. Always confirm the final fee on the journal website.` : `AILatest Journal does not currently have a verified APC value for ${name}.`,
+    },
+    {
+      q: `How many papers does ${name} publish each year?`,
+      a: annual ? `The latest OpenAlex annual output in this database is ${annual.c} works in ${annual.y}.` : `Annual output data is not currently available for ${name}.`,
+    },
+  ];
+}
+
+function buildFAQHtml(j) {
+  return `<section class="section faq">
+    <h2>Frequently Asked Questions</h2>
+    ${buildFAQ(j).map((item) => `<details><summary>${esc(item.q)}</summary><p>${esc(item.a)}</p></details>`).join('')}
+  </section>`;
+}
+
+function jsonLdBlocks(j, slug, seo, origin) {
+  const name = journalName(j);
+  const faq = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: buildFAQ(j).map((item) => ({
+      '@type': 'Question',
+      name: item.q,
+      acceptedAnswer: { '@type': 'Answer', text: item.a },
+    })),
+  };
+  const breadcrumb = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: `${origin}/` },
+      { '@type': 'ListItem', position: 2, name: 'AI Journals', item: `${origin}/` },
+      { '@type': 'ListItem', position: 3, name, item: seo.url },
+    ],
+  };
+  const periodical = {
+    '@context': 'https://schema.org',
+    '@type': 'Periodical',
+    name,
+    url: seo.url,
+    issn: j.i || undefined,
+    eissn: j.is || undefined,
+    publisher: j.p ? { '@type': 'Organization', name: j.p } : undefined,
+    description: seo.desc,
+  };
+  const webpage = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: seo.title,
+    description: seo.desc,
+    url: seo.url,
+    isPartOf: { '@type': 'WebSite', name: 'AILatest Journal', url: `${origin}/` },
+    about: { '@type': 'Thing', name, additionalType: 'https://schema.org/Periodical' },
+  };
+  return [webpage, breadcrumb, periodical, faq]
+    .map((obj) => JSON.parse(JSON.stringify(obj)))
+    .map((obj) => `<script type="application/ld+json">${JSON.stringify(obj)}</script>`)
+    .join('\n');
+}
+
+function metricCards(j) {
+  const cards = [];
+  if (j.f != null) cards.push(['Impact Factor', j.f, 'JCR 2025 / 2024 metric']);
+  if (j.q) cards.push(['JCR Quartile', String(j.q).toUpperCase(), 'Journal Citation Reports']);
+  if (j.z != null) cards.push(['CAS Zone', `${j.z}${j.zt ? ' Top' : ''}`, 'CAS major tier']);
+  if (j.sc) cards.push(['Scopus', 'Indexed', 'Active source list record']);
+  if (oaText(j)) cards.push(['Open Access', oaText(j), j.doaj ? 'DOAJ/OpenAlex' : 'OpenAlex']);
+  if (j.apc) cards.push(['APC', fmtMoney(j.apc), 'OpenAlex estimate']);
+  if (j.ann && j.ann.length) cards.push(['Annual Output', `${j.ann[0].c}`, `${j.ann[0].y} works, OpenAlex`]);
+  if (j.rt && j.rt.total) cards.push(['Retractions', j.rt.total, j.rt.rate10 != null ? `${j.rt.rate10}/1000 works, 10y` : 'Retraction Watch']);
+  return cards.map(([label, value, note]) => `<div class="metric-card"><span>${esc(label)}</span><strong>${esc(value)}</strong><small>${esc(note)}</small></div>`).join('');
+}
+
+function badgeHtml(j) {
+  const badges = coverageBadges(j);
+  if (!badges.length && !j.tier) return '';
+  return `<div class="badge-row">${badges.map((b) => `<span>${esc(b)}</span>`).join('')}${j.tier ? `<span>${esc(j.tier)}</span>` : ''}</div>`;
+}
+
+function summaryHtml(j) {
+  const name = journalName(j);
+  const subjects = subjectText(j);
+  const subjectPhrase = subjects.length ? subjects.slice(0, 5).join(', ') : (j.es || 'its scholarly field');
+  const publisher = j.p ? ` It is published by ${j.p}.` : '';
+  const badges = coverageBadges(j);
+  const indexing = badges.length ? ` The journal is currently tagged in AILatest with ${badges.join(', ')} coverage information.` : '';
+  const metrics = [
+    j.f != null ? `Impact Factor ${j.f}` : '',
+    j.q ? `JCR ${String(j.q).toUpperCase()}` : '',
+    j.z != null ? `CAS Zone ${j.z}` : '',
+    oaText(j) ? oaText(j) : '',
+  ].filter(Boolean).join(', ');
+  const metricsText = metrics ? ` Key decision signals include ${metrics}.` : '';
+  const apc = j.apc ? ` The available APC estimate is ${fmtMoney(j.apc)}, but authors should confirm final fees and waiver policies on the journal website.` : '';
+  const annual = j.ann && j.ann.length ? ` Recent publication volume is available from OpenAlex; the latest record in this database shows ${j.ann[0].c} works in ${j.ann[0].y}.` : '';
+  const caution = j.rt && j.rt.total ? ` Retraction Watch-linked records are also shown as a caution signal, with ${j.rt.total} total records matched in the current database.` : '';
+  return `<section class="section summary">
+    <h2>AI Journal Overview</h2>
+    <p>${esc(`${name} is a scholarly journal connected with research in ${subjectPhrase}.${publisher}${indexing}${metricsText} Researchers can use this page to review indexing coverage, ranking signals, open access information, publication volume, risk signals, and similar journals before deciding whether to explore the journal further.${apc}${annual}${caution} The information is intended as a starting point for journal discovery and should be checked against the journal's official instructions before submission.`)}</p>
+  </section>`;
+}
+
+function relatedHtml(j, index, origin) {
+  const rel = (j.rel || []).map((slug) => [slug, index[slug]]).filter(([, item]) => item && !item._r).slice(0, 12);
+  if (!rel.length) return '';
+  return `<section class="section related">
+    <h2>Similar Journals</h2>
+    <div class="related-grid">
+      ${rel.map(([slug, item]) => {
+        const name = journalName(item);
+        const meta = [item.f != null ? `IF ${item.f}` : '', item.q ? String(item.q).toUpperCase() : '', item.z != null ? `CAS ${item.z}` : '', (item.ix || [])[0] || ''].filter(Boolean).join(' · ');
+        return `<a class="related-card" href="${origin}/journal/${encodeURIComponent(slug)}/"><strong>${esc(name)}</strong><span>${esc(meta || item.p || 'Journal details')}</span></a>`;
+      }).join('')}
+    </div>
+  </section>`;
+}
+
+function topicsHtml(j, origin) {
+  const links = [];
+  const knownIndexes = new Set(['scopus', 'scie', 'ssci', 'ei', 'medline', 'esci', 'ahci', 'on-hold', 'under-review', 'warning', 'citic-warning']);
+  for (const idx of j.ix || []) {
+    const key = String(idx).toLowerCase();
+    if (knownIndexes.has(key)) links.push([`${origin}/indexes/${key}/`, `${idx} indexed journals`]);
+  }
+  links.push([`${origin}/subjects/`, 'Browse journals by subject']);
+  links.push([`${origin}/indexes/`, 'Browse journals by index']);
+  return `<section class="section topics"><h2>Explore More</h2><div class="topic-row">${links.slice(0, 6).map(([href, label]) => `<a href="${esc(href)}">${esc(label)}</a>`).join('')}</div></section>`;
+}
+
+function journalPageHtml(j, slug, index, origin) {
+  const seo = journalSeo(j, slug, origin);
+  const name = journalName(j);
+  const officialUrl = j.hp || '';
+  const appUrl = `${origin}/#j/${encodeURIComponent(j.i || j.is || slug)}`;
+  const officialCta = officialUrl
+    ? `<a class="btn primary" href="${esc(officialUrl)}" target="_blank" rel="noopener nofollow">Journal Website / Submit</a>`
+    : `<span class="btn disabled" aria-disabled="true">Official Website Unavailable</span>`;
+  const issnLine = [j.i ? `ISSN ${j.i}` : '', j.is ? `eISSN ${j.is}` : ''].filter(Boolean).join(' · ');
+
+  return `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+${metaTags(seo)}
+${jsonLdBlocks(j, slug, seo, origin)}
+<style>
+:root{--bg:#f7f5f0;--paper:#fff;--ink:#1f1b16;--muted:#6f675d;--rule:#e4ddd0;--accent:#9a4f1f;--accent-dark:#733915;--blue:#24445f;--green:#2f7048;--red:#9f3d35;--shadow:0 10px 30px rgba(57,44,28,.08)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.6}
+a{color:inherit}.site-header{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.94);border-bottom:1px solid var(--rule);backdrop-filter:blur(10px)}
+.header-inner{max-width:1120px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;gap:22px}.brand{font-weight:800;text-decoration:none;letter-spacing:.01em}.nav{display:flex;gap:16px;margin-left:auto}.nav a{font-size:14px;color:var(--muted);text-decoration:none}.search-link{border:1px solid var(--rule);padding:7px 12px;border-radius:6px;background:#faf8f3}
+.wrap{max-width:1120px;margin:0 auto;padding:22px 20px 44px}.breadcrumb{font-size:13px;color:var(--muted);margin-bottom:14px}.breadcrumb a{color:var(--accent);text-decoration:none}
+.hero{background:var(--paper);border:1px solid var(--rule);border-radius:10px;box-shadow:var(--shadow);padding:26px;display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:24px}.kicker{color:var(--accent);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}.hero h1{font-size:34px;line-height:1.12;margin:7px 0 10px}.sub{color:var(--muted);font-size:15px}.badge-row{display:flex;flex-wrap:wrap;gap:6px;margin:16px 0}.badge-row span{font-size:12px;font-weight:800;color:#fff;background:var(--blue);border-radius:4px;padding:4px 8px}.cta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}.btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:9px 14px;border-radius:7px;text-decoration:none;font-weight:800;border:1px solid var(--rule)}.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}.btn.secondary{background:#fff;color:var(--accent-dark)}.btn.disabled{color:var(--muted);background:#f0ece4}
+.fact-panel{background:#fbfaf7;border:1px solid var(--rule);border-radius:8px;padding:16px}.fact{padding:9px 0;border-bottom:1px solid var(--rule)}.fact:last-child{border-bottom:0}.fact span{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;font-weight:800}.fact strong{font-size:14px}
+.section{margin-top:18px;background:var(--paper);border:1px solid var(--rule);border-radius:10px;box-shadow:var(--shadow);padding:22px}.section h2{font-size:20px;margin:0 0 12px}.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}.metric-card{border:1px solid var(--rule);border-radius:8px;padding:13px;background:#fbfaf7}.metric-card span{font-size:12px;color:var(--muted);font-weight:800}.metric-card strong{display:block;font-size:22px;line-height:1.2;margin:4px 0}.metric-card small{color:var(--muted)}
+.related-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}.related-card{display:block;text-decoration:none;border:1px solid var(--rule);border-radius:8px;padding:13px;background:#fbfaf7}.related-card strong{display:block}.related-card span{display:block;color:var(--muted);font-size:13px;margin-top:4px}.topic-row{display:flex;flex-wrap:wrap;gap:8px}.topic-row a{border:1px solid var(--rule);border-radius:999px;padding:7px 11px;text-decoration:none;background:#fbfaf7;color:var(--accent-dark);font-weight:700;font-size:13px}
+.faq details{border-top:1px solid var(--rule);padding:12px 0}.faq details:first-of-type{border-top:0}.faq summary{cursor:pointer;font-weight:800}.faq p{color:var(--muted);margin:8px 0 0}.site-footer{max-width:1120px;margin:0 auto;padding:24px 20px 40px;color:var(--muted);font-size:13px}.site-footer a{color:var(--accent);text-decoration:none}
+@media (max-width:760px){.header-inner{align-items:flex-start;flex-direction:column;gap:10px}.nav{margin-left:0;flex-wrap:wrap}.hero{grid-template-columns:1fr;padding:20px}.hero h1{font-size:27px}.wrap{padding:16px 12px 32px}}
+</style>
+</head>
+<body>
+<header class="site-header"><div class="header-inner"><a class="brand" href="${origin}/">AILatest Journal</a><nav class="nav"><a href="${origin}/">Journal</a><a href="https://grant.ailatest.org/">Grant</a><a href="${origin}/pick">AI Recommend</a><a class="search-link" href="${origin}/">Search journals</a></nav></div></header>
+<main class="wrap">
+  <nav class="breadcrumb"><a href="${origin}/">Home</a> / <a href="${origin}/">AI Journals</a> / ${esc(name)}</nav>
+  <section class="hero">
+    <div>
+      <div class="kicker">Journal SEO Landing Page</div>
+      <h1>${esc(name)}</h1>
+      <p class="sub">${esc([j.a ? `Abbreviation: ${j.a}` : '', j.p ? `Publisher: ${j.p}` : '', issnLine].filter(Boolean).join(' · '))}</p>
+      ${badgeHtml(j)}
+      <div class="cta-row">${officialCta}<a class="btn secondary" href="${esc(appUrl)}">View / Save in AILatest</a></div>
+    </div>
+    <aside class="fact-panel">
+      <div class="fact"><span>Impact Factor</span><strong>${esc(fmt(j.f))}</strong></div>
+      <div class="fact"><span>JCR Quartile</span><strong>${esc(j.q ? String(j.q).toUpperCase() : '-')}</strong></div>
+      <div class="fact"><span>CAS Zone</span><strong>${esc(j.z != null ? `${j.z}${j.zt ? ' Top' : ''}` : '-')}</strong></div>
+      <div class="fact"><span>Open Access</span><strong>${esc(oaText(j) || '-')}</strong></div>
+      <div class="fact"><span>APC</span><strong>${esc(fmtMoney(j.apc) || '-')}</strong></div>
+    </aside>
+  </section>
+  ${summaryHtml(j)}
+  <section class="section"><h2>Journal Metrics</h2><div class="metrics">${metricCards(j)}</div></section>
+  ${relatedHtml(j, index, origin)}
+  ${topicsHtml(j, origin)}
+  ${buildFAQHtml(j)}
+</main>
+<footer class="site-footer">AILatest Journal helps researchers evaluate journals, grants, rankings, indexing coverage, open access information, and submission choices. <a href="${origin}/">Search more journals</a>.</footer>
+</body>
+</html>`;
+}
+
 function localizedHomeSeo(path, origin) {
   const isZh = path.replace(/\/+$/, '') === '/zh';
-  const url = `${origin}${isZh ? '/zh' : path.replace(/\/+$/, '') === '/en' ? '/en' : ''}`;
-  if (isZh) {
-    return {
-      lang: 'zh-CN',
-      title: 'AILatest Journal - 期刊查询 · 荐刊推荐 · SCI期刊检索',
-      desc: 'AILatest Journal 是面向科研人员的免费期刊查询与荐刊推荐工具。聚合 SCI/SSCI/AHCI、JCR 影响因子、中科院分区、CCF、CSSCI、北大核心、Scopus、DOAJ 等数据。',
-      url,
-      ogTitle: 'AILatest Journal - 期刊查询与荐刊推荐',
-    };
-  }
+  const isEn = path.replace(/\/+$/, '') === '/en';
   return {
-    lang: 'en',
-    title: 'AILatest Journal - Journal Finder, Rankings & Impact Factors',
-    desc: 'AILatest Journal helps researchers search 40,000+ academic journals, compare impact factors, JCR quartiles, CAS tiers, indexing databases, review cycles, and AI-powered submission matches.',
-    url,
-    ogTitle: 'AILatest Journal - Journal Finder, Rankings & Submission Insights',
+    lang: isZh ? 'zh-CN' : 'en',
+    title: isZh ? 'AILatest Journal - Journal Finder for Researchers' : 'AILatest Journal - Journal Finder, Rankings & Impact Factors',
+    desc: 'AILatest Journal helps researchers search academic journals, compare impact factors, JCR quartiles, CAS tiers, indexing databases, open access signals, and AI-powered submission matches.',
+    url: `${origin}${isZh ? '/zh' : isEn ? '/en' : ''}`,
   };
 }
 
@@ -100,321 +401,45 @@ async function localizedHomePage(ctx, path, origin) {
   html = replaceMeta(html, /<meta name="description" content="[^"]*"\s*\/?>/i, `<meta name="description" content="${esc(seo.desc)}" />`);
   html = replaceMeta(html, /<link rel="canonical" href="[^"]*"\s*\/?>/i, `<link rel="canonical" href="${esc(seo.url)}" />`);
   html = stripAlternateLinks(html);
-  html = html.replace('</head>',
-    `<link rel="alternate" href="${origin}/" hreflang="en" />
-<link rel="alternate" href="${origin}/en" hreflang="en" />
-<link rel="alternate" href="${origin}/zh" hreflang="zh-CN" />
-<link rel="alternate" href="${origin}/" hreflang="x-default" />
-</head>`);
-  html = replaceMeta(html, /<meta property="og:url" content="[^"]*"\s*\/?>/i, `<meta property="og:url" content="${esc(seo.url)}" />`);
-  html = replaceMeta(html, /<meta property="og:title" content="[^"]*"\s*\/?>/i, `<meta property="og:title" content="${esc(seo.ogTitle)}" />`);
-  html = replaceMeta(html, /<meta property="og:description" content="[^"]*"\s*\/?>/i, `<meta property="og:description" content="${esc(seo.desc)}" />`);
-  html = replaceMeta(html, /<meta name="twitter:title" content="[^"]*"\s*\/?>/i, `<meta name="twitter:title" content="${esc(seo.ogTitle)}" />`);
-  html = replaceMeta(html, /<meta name="twitter:description" content="[^"]*"\s*\/?>/i, `<meta name="twitter:description" content="${esc(seo.desc)}" />`);
-  if (!/<meta name="robots"/i.test(html)) {
-    html = html.replace('</head>', '<meta name="robots" content="index,follow" />\n</head>');
-  }
+  html = html.replace('</head>', `<link rel="alternate" href="${origin}/en" hreflang="en" />\n<link rel="alternate" href="${origin}/zh" hreflang="zh-CN" />\n<link rel="alternate" href="${origin}/" hreflang="x-default" />\n</head>`);
   return html;
 }
 
-function journalSeo(j, slug, origin) {
-  const name = titleCaseName(j.n || 'Journal');
-  const ifVal = j.f;
-  const quartile = j.q;
-  const indices = j.ix || [];
-  const issn = j.i || slug;
-  const titleParts = [name];
-  if (ifVal != null) titleParts.push(`IF ${ifVal}`);
-  if (j.z != null) titleParts.push(`CAS ${j.z}区`);
-  if (quartile) titleParts.push(quartile.toUpperCase());
-  if (indices.length) titleParts.push(indices.slice(0, 2).join('/'));
-  titleParts.push('AILatest Journal');
-  const title = titleParts.join(' | ');
-  let desc = `${name}`;
-  if (ifVal != null) desc += `: impact factor ${ifVal}`;
-  if (j.z != null) desc += `, CAS ${j.z}区`;
-  if (quartile) desc += `, JCR ${quartile.toUpperCase()}`;
-  if (indices.length) desc += `, indexed in ${indices.join('/')}`;
-  if (j.p) desc += `. Published by ${j.p}`;
-  desc += `. ISSN: ${issn}.`;
-  if (desc.length > 300) desc = desc.slice(0, 297) + '...';
-  return { title, desc, url: `${origin}/journal/${slug}/` };
-}
-
-// ───────── FAQ generation ─────────
-function buildFAQ(j) {
-  const name = j.n || 'Journal';
-  const qa = [];
-  qa.push({ q: `What is the Impact Factor of ${escJson(name)}?`,
-    a: j.f != null ? `The Impact Factor of ${escJson(name)} is ${j.f}.` : 'Not available in the current database.' });
-  qa.push({ q: `What is the JCR Quartile of ${escJson(name)}?`,
-    a: j.q ? `${escJson(name)} has a JCR quartile of ${j.q.toUpperCase()}.` : 'Not available in the current database.' });
-  if (j.z != null) {
-    qa.push({ q: `What is the CAS Ranking of ${escJson(name)}?`, a: `${escJson(name)} is ranked CAS ${j.z}区.` });
-  } else {
-    qa.push({ q: `What is the CAS Ranking of ${escJson(name)}?`, a: 'Not available in the current database.' });
-  }
-  const allIdx = j.ix || [];
-  const idxParts = allIdx.filter(Boolean);
-  qa.push({ q: `Is ${escJson(name)} indexed in SCI, SSCI, AHCI, ESCI, Scopus, PubMed, MEDLINE or PMC?`,
-    a: idxParts.length ? `Yes, ${escJson(name)} is indexed in: ${idxParts.join(', ')}.` : 'Not available in the current database.' });
-  qa.push({ q: `Where can I submit to ${escJson(name)}?`,
-    a: `You can submit manuscripts to ${escJson(name)} via its official website or editorial system. Visit the journal's homepage for submission guidelines.` });
-  return qa;
-}
-
-function buildFAQHtml(j) {
-  const qa = buildFAQ(j);
-  const items = qa.map((item) =>
-    `<div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">`
-    + `<h3 itemprop="name">${esc(item.q)}</h3>`
-    + `<div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer"><div itemprop="text">${esc(item.a)}</div></div></div>`
-  ).join('\n');
-  return `<section class="journal-faq"><h2>Frequently Asked Questions</h2>${items}</section>`;
-}
-
-function buildFAQJsonLd(j) {
-  const qa = buildFAQ(j);
-  return { '@context': 'https://schema.org', '@type': 'FAQPage',
-    mainEntity: qa.map(item => ({ '@type': 'Question', name: item.q,
-      acceptedAnswer: { '@type': 'Answer', text: item.a } })) };
-}
-
-function buildWebPageJsonLd(j, seo) {
-  return { '@context': 'https://schema.org', '@type': 'WebPage',
-    name: seo.title, description: seo.desc, url: seo.url,
-    isPartOf: { '@type': 'WebSite', name: 'AILatest Journal', url: 'https://journal.ailatest.org/' },
-    about: { '@type': 'Thing', name: j.n || 'Journal', additionalType: 'https://schema.org/Periodical' } };
-}
-
-function buildBreadcrumbJsonLd(j, seo) {
-  return { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://journal.ailatest.org/' },
-      { '@type': 'ListItem', position: 2, name: 'Journals', item: 'https://journal.ailatest.org/' },
-      { '@type': 'ListItem', position: 3, name: j.n || 'Journal', item: seo.url } ] };
-}
-
-function buildPeriodicalJsonLd(j) {
-  const pd = { '@context': 'https://schema.org', '@type': 'Periodical', name: j.n || 'Journal' };
-  const issn = j.i || '';
-  if (issn) pd.issn = issn.replace(/(\d{4})(\d{3}[\dX])/, '$1-$2');
-  const eissn = j.is || '';
-  if (eissn) pd.eissn = eissn.replace(/(\d{4})(\d{3}[\dX])/, '$1-$2');
-  const allIdx = j.ix || [];
-  if (allIdx.length) pd.description = `Indexed in ${allIdx.join(', ')}.`;
-  if (j.p) pd.publisher = { '@type': 'Organization', name: j.p };
-  if (j.f != null) pd.impactFactor = j.f;
-  return pd;
-}
-
-function metric(label, value) {
-  if (value == null || value === '' || (Array.isArray(value) && !value.length)) return '';
-  const body = Array.isArray(value) ? value.join(', ') : String(value);
-  return `<div class="metric"><dt>${esc(label)}</dt><dd>${esc(body)}</dd></div>`;
-}
-
-function badgeList(values) {
-  const arr = Array.isArray(values) ? values : [values];
-  return arr.filter(Boolean).map(v => `<span class="badge">${esc(v)}</span>`).join('');
-}
-
-function standaloneJournalHtml(j, slug, seo, jsonldHtml) {
-  const name = titleCaseName(j.n || 'Journal');
-  const indices = Array.isArray(j.ix) ? j.ix : [];
-  const badges = [
-    ...indices,
-    j.q ? `JCR ${String(j.q).toUpperCase()}` : '',
-    j.z != null ? `中科院 ${j.z}区` : '',
-    j.f != null ? `IF ${j.f}` : '',
-  ].filter(Boolean);
-  const metrics = [
-    metric('Journal', name),
-    metric('Publisher', j.p),
-    metric('ISSN', j.i),
-    metric('E-ISSN', j.is),
-    metric('Impact Factor', j.f),
-    metric('JCR Quartile', j.q ? String(j.q).toUpperCase() : ''),
-    metric('CAS Tier', j.z != null ? `${j.z}区` : ''),
-    metric('Indexing', indices),
-    metric('ESI Category', j.es),
-  ].join('');
-  const summary = buildAiSummary(j);
-  return `<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>${esc(seo.title)}</title>
-<meta name="description" content="${esc(seo.desc)}" />
-<link rel="canonical" href="${esc(seo.url)}" />
-<meta name="robots" content="index,follow" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="${esc(seo.url)}" />
-<meta property="og:title" content="${esc(seo.title)}" />
-<meta property="og:description" content="${esc(seo.desc)}" />
-<meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="${esc(seo.title)}" />
-<meta name="twitter:description" content="${esc(seo.desc)}" />
-${jsonldHtml}
-<style>
-*{box-sizing:border-box}body{margin:0;background:#f7f4ec;color:#211f1a;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC",Arial,sans-serif;line-height:1.6}.site-header{border-bottom:1px solid #e4d8c5;background:#fffaf1}.bar{max-width:1040px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px}.brand{font-weight:800;color:#2f4c6f;text-decoration:none}.nav{display:flex;gap:12px;flex-wrap:wrap}.nav a{color:#5f4a32;text-decoration:none;font-size:14px}.page{max-width:1040px;margin:0 auto;padding:30px 20px 48px}.kicker{color:#80613e;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}h1{font-size:clamp(30px,5vw,56px);line-height:1.08;margin:8px 0 14px;letter-spacing:0}.lead{max-width:760px;color:#554c42;font-size:17px;margin:0 0 18px}.badges{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 28px}.badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:3px;background:#24496f;color:#fff;font-size:12px;font-weight:800;line-height:1.35}.badge:nth-child(n+4){background:#735a3e}.grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:26px;align-items:start}.panel{background:#fff;border:1px solid #e7dccb;border-radius:8px;padding:22px}.panel h2{font-size:20px;margin:0 0 14px}.metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.metric{border-top:1px solid #eee4d5;padding-top:10px}.metric dt{font-size:12px;font-weight:800;color:#80613e;text-transform:uppercase;letter-spacing:.04em}.metric dd{margin:3px 0 0;font-weight:650;color:#25211c;overflow-wrap:anywhere}.faq-item{border-top:1px solid #eee4d5;padding:14px 0}.faq-item h3{font-size:16px;margin:0 0 6px}.side-list{display:grid;gap:10px}.action{display:inline-flex;justify-content:center;align-items:center;border:1px solid #cdbb9f;border-radius:6px;padding:10px 12px;color:#49351f;text-decoration:none;font-weight:750;background:#fffaf1}.foot{margin-top:28px;color:#756b60;font-size:13px}@media(max-width:780px){.grid{grid-template-columns:1fr}.metrics{grid-template-columns:1fr}.bar{align-items:flex-start;flex-direction:column}h1{font-size:34px}}
-</style>
-</head>
-<body>
-<header class="site-header"><div class="bar"><a class="brand" href="/">AILatest Journal</a><nav class="nav"><a href="/global">Journal Finder</a><a href="/pick">AI Recommendation</a><a href="/updates">Updates</a></nav></div></header>
-<main class="page">
-  <div class="kicker">AILatest Journal Detail</div>
-  <h1>${esc(name)}</h1>
-  <p class="lead">${esc(summary)}</p>
-  <div class="badges">${badgeList(badges)}</div>
-  <div class="grid">
-    <article class="panel">
-      <h2>Journal Overview</h2>
-      <p>${esc(seo.desc)}</p>
-      <dl class="metrics">${metrics}</dl>
-    </article>
-    <aside class="panel">
-      <h2>Actions</h2>
-      <div class="side-list">
-        <a class="action" href="/">Search Journals</a>
-        <a class="action" href="/pick">Find Matching Journals</a>
-      </div>
-    </aside>
-  </div>
-  ${buildAboutHtml(j)}
-  ${buildFAQHtml(j)}
-  <p class="foot">Data page: <a href="${esc(seo.url)}">${esc(seo.url)}</a></p>
-</main>
-</body>
-</html>`;
-}
-
-// ───────── AI Summary & About ─────────
-function buildAiSummary(j) {
-  const name = j.n || 'this journal';
-  const pub = j.p ? `published by ${j.p}` : '';
-  const ifVal = j.f != null ? `Impact Factor of ${j.f}` : '';
-  const q = j.q ? `, JCR ${j.q.toUpperCase()}` : '';
-  const z = j.z != null ? `, and CAS ${j.z}区` : '';
-  const indices = j.ix || [];
-  const idxStr = indices.length ? `Indexed in ${indices.join(', ')}` : '';
-  const parts = [name, pub, ifVal, q, z, idxStr].filter(Boolean);
-  return `${parts.join('. ')}.`;
-}
-
-function buildAboutHtml(j) {
-  const name = j.n || 'this journal';
-  const pub = j.p ? `published by ${j.p}` : '';
-  const ifVal = j.f != null ? `It has a JCR Impact Factor of ${j.f}` : '';
-  const q = j.q ? ` and is ranked ${j.q.toUpperCase()} in JCR quartile` : '';
-  const z = j.z != null ? `. In the CAS ranking system, it is classified as ${j.z}区` : '';
-  const indices = j.ix || [];
-  const idxStr = indices.length ? `. It is indexed in ${indices.join(', ')}` : '';
-  const esi = j.es ? `. ESI category: ${j.es}` : '';
-  
-  let text = `${name} is a scholarly journal ${pub}${ifVal}${q}${z}${idxStr}${esi}.`;
-  if (!ifVal && !pub) text = `${name}. Detailed journal information is available in the database.`;
-  if (text.length > 300) text = text.slice(0, 297) + '...';
-  return `<section class="journal-about"><h2>About ${esc(name)}</h2><p>${esc(text)}</p></section>`;
-}
-
-// ───────── Journal page SSR ─────────
-async function journalPage(ctx, j, slug, origin) {
-  const seo = journalSeo(j, slug, origin);
-  const jsonldBlocks = [
-    buildWebPageJsonLd(j, seo), buildBreadcrumbJsonLd(j, seo),
-    buildFAQJsonLd(j), buildPeriodicalJsonLd(j),
-  ];
-  const jsonldHtml = jsonldBlocks.map(b => `<script type="application/ld+json">\n${JSON.stringify(b, null, 2)}\n</script>`).join('\n');
-  return standaloneJournalHtml(j, slug, seo, jsonldHtml);
-}
-
-// ───────── Compare page ─────────
 function compareSeo(j1, j2, slug1, slug2, origin) {
-  const n1 = titleCaseName(j1.n || 'Journal A');
-  const n2 = titleCaseName(j2.n || 'Journal B');
-  const title = `${n1} vs ${n2} | Impact Factor, Quartile & Journal Comparison | AILatest Journal`;
-  const desc = `Compare ${n1} and ${n2} journal rankings, impact factors, quartiles, indexing databases and submission information.`;
-  return { title, desc, url: `${origin}/compare/${slug1}-vs-${slug2}/` };
+  const n1 = journalName(j1);
+  const n2 = journalName(j2);
+  return {
+    title: `${n1} vs ${n2} | Journal Comparison | AILatest Journal`,
+    desc: `Compare ${n1} and ${n2} by impact factor, quartile, CAS tier, indexing, open access and publisher information.`,
+    url: `${origin}/compare/${encodeURIComponent(slug1)}-vs-${encodeURIComponent(slug2)}/`,
+  };
 }
 
 function compareCell(label, v1, v2) {
-  const fmt1 = v1 != null ? String(v1) : '—';
-  const fmt2 = v2 != null ? String(v2) : '—';
-  return `<tr><td style="font-weight:600;padding:10px 12px;border-bottom:1px solid #eee;white-space:nowrap">${esc(label)}</td>`
-    + `<td style="padding:10px 12px;border-bottom:1px solid #eee">${esc(fmt1)}</td>`
-    + `<td style="padding:10px 12px;border-bottom:1px solid #eee">${esc(fmt2)}</td></tr>`;
+  return `<tr><th>${esc(label)}</th><td>${esc(fmt(v1))}</td><td>${esc(fmt(v2))}</td></tr>`;
 }
 
-async function comparePage(ctx, j1, j2, slug1, slug2, origin) {
+function comparePageHtml(j1, j2, slug1, slug2, origin) {
   const seo = compareSeo(j1, j2, slug1, slug2, origin);
-  const n1 = titleCaseName(j1.n || 'Journal A');
-  const n2 = titleCaseName(j2.n || 'Journal B');
-
-  // Build comparison table
-  const rows = [];
-  const fmtIdx = (j) => { const a = j.ix || []; return a.length ? a.join(', ') : '—'; };
-  const fmtOA = () => '—';
-  rows.push(compareCell('Publisher', j1.p, j2.p));
-  rows.push(compareCell('ISSN', j1.i || '—', j2.i || '—'));
-  rows.push(compareCell('Impact Factor', j1.f, j2.f));
-  rows.push(compareCell('JCR Quartile', j1.q ? j1.q.toUpperCase() : '—', j2.q ? j2.q.toUpperCase() : '—'));
-  rows.push(compareCell('CAS Zone', j1.z != null ? `${j1.z}区` : '—', j2.z != null ? `${j2.z}区` : '—'));
-  rows.push(compareCell('Indexing', fmtIdx(j1), fmtIdx(j2)));
-  rows.push(compareCell('Open Access', fmtOA(j1), fmtOA(j2)));
-  rows.push(compareCell('Subject (ESI)', j1.es || '—', j2.es || '—'));
-
-  let html = await loadAppShell(ctx);
-  html = html.replace(/<title>[\s\S]*?<\/title>/i, `<title>${esc(seo.title)}</title>`);
-  html = replaceMeta(html, /<meta name="description" content="[^"]*"\s*\/?>/i, `<meta name="description" content="${esc(seo.desc)}" />`);
-  html = replaceMeta(html, /<link rel="canonical" href="[^"]*"\s*\/?>/i, `<link rel="canonical" href="${esc(seo.url)}" />`);
-  if (!/<meta name="robots"/i.test(html)) {
-    html = html.replace('</head>', '<meta name="robots" content="index,follow" />\n</head>');
-  }
-
-  const jsonld = {
-    '@context': 'https://schema.org',
-    '@type': 'WebPage',
-    name: seo.title, description: seo.desc, url: seo.url,
-    isPartOf: { '@type': 'WebSite', name: 'AILatest Journal', url: 'https://journal.ailatest.org/' },
-    about: [
-      { '@type': 'Periodical', name: n1, url: `${origin}/journal/${slug1}/` },
-      { '@type': 'Periodical', name: n2, url: `${origin}/journal/${slug2}/` },
-    ],
-  };
-  html = html.replace('</head>', `<script type="application/ld+json">\n${JSON.stringify(jsonld, null, 2)}\n</script>\n</head>`);
-
-  const style = 'body{font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,sans-serif;margin:0;padding:20px;background:#fafafa;color:#222;line-height:1.6}';
-  const wrap = 'max-width:800px;margin:0 auto;background:#fff;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.08);padding:24px';
-  const compHTML = `<div style="${style}"><div style="${wrap}">
-    <h1 style="font-size:20px;margin:0 0 4px">${esc(n1)} vs ${esc(n2)}</h1>
-    <p style="color:#666;margin-bottom:16px">${esc(seo.desc)}</p>
-    <table style="width:100%;border-collapse:collapse;font-size:14px">
-      <thead><tr style="background:#f5f5f5">
-        <th style="padding:10px 12px;text-align:left;border-bottom:2px solid #ddd">Metric</th>
-        <th style="padding:10px 12px;text-align:left;border-bottom:2px solid #ddd"><a href="${origin}/journal/${slug1}/">${esc(n1)}</a></th>
-        <th style="padding:10px 12px;text-align:left;border-bottom:2px solid #ddd"><a href="${origin}/journal/${slug2}/">${esc(n2)}</a></th>
-      </tr></thead>
-      <tbody>${rows.join('\n')}</tbody>
-    </table>
-    <p style="margin-top:20px;font-size:13px"><a href="${origin}/">← Back to Journal Search</a></p>
-  </div></div>`;
-
-  html = html.replace('</body>', compHTML + '\n</body>');
-  return html;
+  const n1 = journalName(j1);
+  const n2 = journalName(j2);
+  const rows = [
+    compareCell('Publisher', j1.p, j2.p),
+    compareCell('ISSN', j1.i, j2.i),
+    compareCell('Impact Factor', j1.f, j2.f),
+    compareCell('JCR Quartile', j1.q ? String(j1.q).toUpperCase() : '', j2.q ? String(j2.q).toUpperCase() : ''),
+    compareCell('CAS Zone', j1.z, j2.z),
+    compareCell('Indexing', coverageBadges(j1).join(', '), coverageBadges(j2).join(', ')),
+    compareCell('Open Access', oaText(j1), oaText(j2)),
+  ].join('');
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">${metaTags(seo)}<style>body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:#f7f5f0;color:#1f1b16;margin:0;padding:24px}.wrap{max-width:900px;margin:0 auto;background:#fff;border:1px solid #e4ddd0;border-radius:10px;padding:24px}a{color:#9a4f1f}table{width:100%;border-collapse:collapse}th,td{border-bottom:1px solid #eee;padding:10px;text-align:left}thead th{background:#faf8f3}</style></head><body><main class="wrap"><p><a href="${origin}/">AILatest Journal</a></p><h1>${esc(n1)} vs ${esc(n2)}</h1><p>${esc(seo.desc)}</p><table><thead><tr><th>Metric</th><th><a href="${origin}/journal/${encodeURIComponent(slug1)}/">${esc(n1)}</a></th><th><a href="${origin}/journal/${encodeURIComponent(slug2)}/">${esc(n2)}</a></th></tr></thead><tbody>${rows}</tbody></table></main></body></html>`;
 }
 
-// ───────── 404 page ─────────
-function notFound(msg = 'Journal not found.') {
-  const html = `<!doctype html><html><head><meta charset="utf-8"><title>404 - Not Found | AILatest Journal</title>
-<meta name="robots" content="noindex,follow" />
-<style>body{font-family:sans-serif;padding:40px;text-align:center}h1{font-size:48px;color:#ccc;margin:0}p{color:#666}a{color:#2563eb}</style>
-</head><body><h1>404</h1><p>${esc(msg)}</p><p><a href="https://journal.ailatest.org/">← Back to Journal Search</a></p></body></html>`;
+function notFound(message = 'Journal not found.') {
+  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>404 - Not Found | AILatest Journal</title><meta name="robots" content="noindex,follow"><style>body{font-family:sans-serif;padding:40px;text-align:center}a{color:#9a4f1f}</style></head><body><h1>404</h1><p>${esc(message)}</p><p><a href="https://journal.ailatest.org/">Back to AILatest Journal</a></p></body></html>`;
   return new Response(html, { status: 404, headers: { 'Content-Type': 'text/html;charset=utf-8' } });
 }
 
-// ───────── Main handler ─────────
 export async function onRequest(ctx) {
   const { request } = ctx;
   const url = new URL(request.url);
@@ -423,57 +448,41 @@ export async function onRequest(ctx) {
   try {
     if (path === '/' || path === '/en' || path === '/en/' || path === '/zh' || path === '/zh/') {
       const html = await localizedHomePage(ctx, path, url.origin);
-      return new Response(html, { status: 200,
-        headers: { 'Content-Type': 'text/html;charset=utf-8', 'Cache-Control': 'no-store, no-cache, must-revalidate' } });
+      return new Response(html, { status: 200, headers: { 'Content-Type': 'text/html;charset=utf-8', 'Cache-Control': 'no-store, no-cache, must-revalidate' } });
     }
 
-    // Handle /journal/<slug>/
     if (path.startsWith('/journal/')) {
       const rawSlug = path.replace('/journal/', '').replace(/\/$/, '');
-      if (!rawSlug) return Response.redirect(url.origin + '/', 302);
+      if (!rawSlug) return Response.redirect(`${url.origin}/`, 302);
       const index = await loadIndex(ctx);
-      const candidates = journalSlugCandidates(rawSlug);
-      const slug = candidates.find(s => index[s]);
-      let j = slug ? index[slug] : null;
-      if (!j) return notFound();
-      if (j._r) return Response.redirect(url.origin + '/journal/' + j._r + '/', 301);
-      const html = await journalPage(ctx, j, slug, url.origin);
-      return new Response(html, { status: 200,
-        headers: { 'Content-Type': 'text/html;charset=utf-8', 'Cache-Control': 'no-store, no-cache, must-revalidate' } });
+      const slug = journalSlugCandidates(rawSlug).find((candidate) => index[candidate]);
+      const entry = slug ? index[slug] : null;
+      if (!entry) return notFound();
+      if (entry._r) return Response.redirect(`${url.origin}/journal/${entry._r}/`, 301);
+      const html = journalPageHtml(entry, slug, index, url.origin);
+      return new Response(html, { status: 200, headers: { 'Content-Type': 'text/html;charset=utf-8', 'Cache-Control': 'no-store, no-cache, must-revalidate' } });
     }
 
-    // Handle /compare/<a>-vs-<b>/
     if (path.startsWith('/compare/')) {
       const raw = path.replace('/compare/', '').replace(/\/$/, '');
-      if (!raw) return Response.redirect(url.origin + '/', 302);
-      // Split on LAST occurrence of -vs- to handle slugs containing "vs"
       const vsIdx = raw.lastIndexOf('-vs-');
-      if (vsIdx < 1) return notFound('Invalid compare URL. Use /compare/journal-a-vs-journal-b/');
-      const rawA = raw.slice(0, vsIdx);
-      const rawB = raw.slice(vsIdx + 4);
-
+      if (vsIdx < 1) return notFound('Invalid compare URL.');
       const index = await loadIndex(ctx);
-      const ca = journalSlugCandidates(rawA);
-      let slugA = ca.find(s => index[s]);
-      const cb = journalSlugCandidates(rawB);
-      let slugB = cb.find(s => index[s]);
-      if (!slugA || !slugB) return notFound('One or both journals not found.');
-      let jA = slugA ? index[slugA] : null;
-      let jB = slugB ? index[slugB] : null;
-      if (jA && jA._r) { slugA = jA._r; jA = index[slugA]; }
-      if (jB && jB._r) { slugB = jB._r; jB = index[slugB]; }
-      if (!jA || !jB) return notFound('One or both journals not found.');
-
-      const html = await comparePage(ctx, jA, jB, slugA, slugB, url.origin);
-      return new Response(html, { status: 200,
-        headers: { 'Content-Type': 'text/html;charset=utf-8', 'Cache-Control': 'no-store, no-cache, must-revalidate' } });
+      let slug1 = journalSlugCandidates(raw.slice(0, vsIdx)).find((candidate) => index[candidate]);
+      let slug2 = journalSlugCandidates(raw.slice(vsIdx + 4)).find((candidate) => index[candidate]);
+      if (!slug1 || !slug2) return notFound('One or both journals were not found.');
+      if (index[slug1]._r) slug1 = index[slug1]._r;
+      if (index[slug2]._r) slug2 = index[slug2]._r;
+      const html = comparePageHtml(index[slug1], index[slug2], slug1, slug2, url.origin);
+      return new Response(html, { status: 200, headers: { 'Content-Type': 'text/html;charset=utf-8', 'Cache-Control': 'no-store, no-cache, must-revalidate' } });
     }
 
-    // All other routes: serve static assets
     return ctx.env.ASSETS.fetch(request);
-
-  } catch (e) {
-    try { return await ctx.env.ASSETS.fetch(request); } catch(_) {}
-    return new Response(`Error: ${e.message}`, { status: 500, headers: { 'Content-Type': 'text/plain' } });
+  } catch (error) {
+    try {
+      return await ctx.env.ASSETS.fetch(request);
+    } catch (_) {
+      return new Response(`Error: ${error.message}`, { status: 500, headers: { 'Content-Type': 'text/plain;charset=utf-8' } });
+    }
   }
 }
