@@ -2665,7 +2665,8 @@
       : `${T('科协','CAST')} ${tierText}`.trim();
   }
   function renderDomCrossBadges(r, excludeSource) {
-    const hits = lookupDom(r).filter(h => h.source !== excludeSource);
+    const rankSources = new Set(['vhb', 'cnrs', 'fms', 'abdc', 'abs', 'ft50', 'utd24']);
+    const hits = lookupDom(r).filter(h => h.source !== excludeSource && !rankSources.has(h.source));
     if (!hits.length) return '';
     const out = [];
     const castHits = [];
