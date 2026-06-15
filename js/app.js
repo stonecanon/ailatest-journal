@@ -1463,7 +1463,7 @@
 
 
   // ── Free-tier usage limits ──
-  const DAILY_VIEW_LIMIT = 5;
+  const DAILY_VIEW_LIMIT = 300;
   const DAILY_SEARCH_LIMIT = 2;
   const LOCAL_FAV_LIMIT = 5;
   const USAGE_KEY = 'ailatest.daily_usage';
@@ -4494,8 +4494,9 @@
     if (r) openDrawer(r, { fromHash: true, pageMode: true });
   }
   async function openDrawer(r, opts) {
-  if (!requireLogin(T("今日免费浏览已达上限，请登录后继续查看","Daily free view limit reached. Sign in to continue."))) return;
-  incrementUsage("views");
+    // Journal browsing should stay generous for anonymous visitors; login is only
+    // needed for cloud sync and paid/pro features.
+    incrementUsage("views");
 
     _currentDrawerRec = r;
     recordView(r); // 记录浏览历史，用于学科推荐
