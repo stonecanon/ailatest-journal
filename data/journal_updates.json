@@ -1,6 +1,92 @@
 {
-  "updated_at": "2026-06-12",
+  "updated_at": "2026-06-15",
   "items": [
+    {
+      "id": "wechat-research-update-x3jp33-2026-06-15",
+      "published_at": "2026-06-15",
+      "category": "report",
+      "title": "微信公众号科研出版动态（待核验）",
+      "summary": "该来源为用户指定的微信公众号文章；当前自动抓取返回微信环境验证，暂未读取正文。已先作为动态来源入口上线，待人工核验标题、发布日期和核心事实后补全文案。",
+      "source_name": "微信公众号（待核验）",
+      "source_url": "https://mp.weixin.qq.com/s/x3jP33omeNC-41aaozeGjw",
+      "publisher": "WeChat",
+      "journals": [],
+      "tags": [
+        "微信公众号",
+        "待核验",
+        "科研动态"
+      ],
+      "priority": 3,
+      "detail_path": "/updates/wechat-research-update-x3jp33-2026-06-15",
+      "detail": {
+        "dek": "这条动态来自用户指定的微信公众号链接。由于微信页面在自动读取环境中返回验证页，站内先保留来源入口，后续人工核验后补充正式标题、摘要和相关期刊/数据库标签。",
+        "source_links": [
+          {
+            "label": "微信公众号原文",
+            "url": "https://mp.weixin.qq.com/s/x3jP33omeNC-41aaozeGjw"
+          }
+        ],
+        "article": {
+          "intro": [
+            "该来源链接已加入 AILatest Journal 动态页，便于后续从站内追踪与编辑。",
+            "当前自动流程无法读取微信正文，正式上线前仍需人工确认文章标题、发布日期、发布账号、涉及期刊或数据库，以及是否属于收录变化、指标更新、风险预警或投稿政策。"
+          ],
+          "sections": [
+            {
+              "heading": "核验状态",
+              "bullets": [
+                "来源链接已保留",
+                "正文内容待人工核验",
+                "核验完成后可替换为正式动态文案"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "wechat-research-update-atawclt-2026-06-15",
+      "published_at": "2026-06-15",
+      "category": "report",
+      "title": "微信公众号科研出版动态（待核验）",
+      "summary": "该来源为用户指定的微信公众号文章；当前自动抓取返回微信环境验证，暂未读取正文。已先作为动态来源入口上线，待人工核验标题、发布日期和核心事实后补全文案。",
+      "source_name": "微信公众号（待核验）",
+      "source_url": "https://mp.weixin.qq.com/s/AtAwCLTcnorLYR7NISpmTQ",
+      "publisher": "WeChat",
+      "journals": [],
+      "tags": [
+        "微信公众号",
+        "待核验",
+        "科研动态"
+      ],
+      "priority": 3,
+      "detail_path": "/updates/wechat-research-update-atawclt-2026-06-15",
+      "detail": {
+        "dek": "这条动态来自用户指定的微信公众号链接。由于微信页面在自动读取环境中返回验证页，站内先保留来源入口，后续人工核验后补充正式标题、摘要和相关期刊/数据库标签。",
+        "source_links": [
+          {
+            "label": "微信公众号原文",
+            "url": "https://mp.weixin.qq.com/s/AtAwCLTcnorLYR7NISpmTQ"
+          }
+        ],
+        "article": {
+          "intro": [
+            "该来源链接已加入 AILatest Journal 动态页，便于后续从站内追踪与编辑。",
+            "当前自动流程无法读取微信正文，正式上线前仍需人工确认文章标题、发布日期、发布账号、涉及期刊或数据库，以及是否属于收录变化、指标更新、风险预警或投稿政策。"
+          ],
+          "sections": [
+            {
+              "heading": "核验状态",
+              "bullets": [
+                "来源链接已保留",
+                "正文内容待人工核验",
+                "核验完成后可替换为正式动态文案"
+              ]
+            }
+          ]
+        }
+      }
+    },
     {
       "id": "wos-on-hold-four-journals-2026-06-10",
       "published_at": "2026-06-12",

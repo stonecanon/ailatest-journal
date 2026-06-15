@@ -1,42 +1,5 @@
 {
-  "generated_at": "2026-06-15T05:30:18+00:00",
+  "generated_at": "2026-06-15T05:41:55+00:00",
   "review_note": "Candidates only. Manually verify source facts, rewrite Chinese summaries, and copy approved items into data/journal_updates.json.",
-  "items": [
-    {
-      "id": "0dade9df",
-      "published_at": "2026-06-15",
-      "category": "report",
-      "title": "微信公众号文章（待核验）",
-      "summary": "来源页面返回访问验证/环境异常，自动流程无法读取正文。请人工打开核验标题、发布日期、来源账号和核心事实后再上线。",
-      "source_name": "微信公众号（待核验）",
-      "source_url": "https://mp.weixin.qq.com/s/x3jP33omeNC-41aaozeGjw",
-      "publisher": "WeChat",
-      "journals": [],
-      "tags": [
-        "WeChat",
-        "manual WeChat review"
-      ],
-      "priority": 4,
-      "status": "needs_review",
-      "verification": "blocked_by_source"
-    },
-    {
-      "id": "b5505471",
-      "published_at": "2026-06-15",
-      "category": "report",
-      "title": "微信公众号文章（待核验）",
-      "summary": "来源页面返回访问验证/环境异常，自动流程无法读取正文。请人工打开核验标题、发布日期、来源账号和核心事实后再上线。",
-      "source_name": "微信公众号（待核验）",
-      "source_url": "https://mp.weixin.qq.com/s/AtAwCLTcnorLYR7NISpmTQ",
-      "publisher": "WeChat",
-      "journals": [],
-      "tags": [
-        "WeChat",
-        "manual WeChat review"
-      ],
-      "priority": 4,
-      "status": "needs_review",
-      "verification": "blocked_by_source"
-    }
-  ]
+  "items": []
 }
