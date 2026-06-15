@@ -1,5 +1,5 @@
 // Cloudflare Pages Function root catch-all.
-// - /journal/<name-slug>/ renders a standalone SEO landing page.
+// - /journal/<name-slug>/ renders the app shell with a server-visible journal detail page.
 // - /journal/<issn>/ redirects to the canonical name slug.
 // - /compare/<a>-vs-<b>/ renders a lightweight comparison page.
 // - All other routes are served from static assets.
@@ -382,6 +382,135 @@ a{color:inherit}.site-header{position:sticky;top:0;z-index:20;background:rgba(25
 </html>`;
 }
 
+function pill(text, cls = 'zone') {
+  return text ? `<span class="${cls}">${esc(text)}</span>` : '';
+}
+
+function appCoverageBadges(j) {
+  return [
+    ...(j.ix || []).map((x) => pill(x, `badge b-${String(x).toLowerCase()}`)),
+    j.sc ? pill('Scopus', 'badge b-scopus') : '',
+    j.med ? pill('MEDLINE', 'badge b-medline') : '',
+    j.pm ? pill('PubMed', 'badge b-pubmed') : '',
+    j.pmc ? pill('PMC', 'badge b-pmc') : '',
+  ].filter(Boolean).join('');
+}
+
+function appLevelBadges(j) {
+  return [
+    j.q ? pill(`JCR ${String(j.q).toUpperCase()}`, `zone jcr-${String(j.q).toLowerCase()}`) : '',
+    j.z != null ? pill(`中科院 ${j.z}区${j.zt ? '·TOP' : ''}`, `zone zone-${j.z}`) : '',
+    j.tier ? pill(j.tier, 'zone') : '',
+  ].filter(Boolean).join('');
+}
+
+function appAccessBadges(j) {
+  return [
+    oaText(j) ? pill(oaText(j), 'free-pill') : '',
+    j.doaj ? pill('DOAJ', 'badge b-doaj') : '',
+  ].filter(Boolean).join('');
+}
+
+function appRiskBadges(j) {
+  return j.rt && j.rt.total
+    ? pill(`RW ${j.rt.total}`, 'warn-pill retraction-pill')
+    : '';
+}
+
+function appStatsHtml(j) {
+  const rows = [];
+  if (j.f != null) rows.push(['IF', j.f, 'Impact Factor']);
+  if (j.q) rows.push(['JCR', String(j.q).toUpperCase(), 'Quartile']);
+  if (j.z != null) rows.push(['CAS', `${j.z}${j.zt ? ' TOP' : ''}`, 'CAS Zone']);
+  if (j.ann && j.ann.length) rows.push(['Annual Output', j.ann[0].c, `${j.ann[0].y} works`]);
+  if (j.apc) rows.push(['APC', fmtMoney(j.apc), 'Estimate']);
+  if (j.sc) rows.push(['Scopus', 'Indexed', 'Active']);
+  if (!rows.length) return '';
+  return `<div class="stats-grid stats-count-${Math.min(rows.length, 4)}">${rows.map(([k, v, note]) => `
+    <div class="stat"><span>${esc(k)}</span><b class="stat-v">${esc(v)}</b><small>${esc(note)}</small></div>
+  `).join('')}</div>`;
+}
+
+function appRelatedHtml(j, index, origin) {
+  const rel = (j.rel || []).map((s) => [s, index[s]]).filter(([, item]) => item && !item._r).slice(0, 8);
+  if (!rel.length) return '';
+  return `<div class="drawer-section related-section">
+    <h4>Similar Journals</h4>
+    <div class="related-grid">${rel.map(([s, item]) => {
+      const meta = [item.f != null ? `IF ${item.f}` : '', item.q ? String(item.q).toUpperCase() : '', item.z != null ? `CAS ${item.z}` : '', (item.ix || [])[0] || ''].filter(Boolean).join(' · ');
+      return `<a class="related-card" href="${origin}/journal/${encodeURIComponent(s)}/"><strong>${esc(journalName(item))}</strong><span>${esc(meta || item.p || 'Journal details')}</span></a>`;
+    }).join('')}</div>
+  </div>`;
+}
+
+function appDrawerBodyHtml(j, slug, index, origin) {
+  const name = journalName(j);
+  const fid = j.i || j.is || slug;
+  const issnLine = [j.i ? `ISSN ${j.i}` : '', j.is ? `eISSN ${j.is}` : ''].filter(Boolean).join(' · ');
+  const coverage = appCoverageBadges(j);
+  const levels = appLevelBadges(j);
+  const access = appAccessBadges(j);
+  const risk = appRiskBadges(j);
+  const official = j.hp
+    ? `<a class="big-btn primary" href="${esc(j.hp)}" target="_blank" rel="noopener nofollow">Journal Website / Submit</a>`
+    : '';
+  const summary = summaryHtml(j)
+    .replace('<section class="section summary">', '<div class="journal-overview"><div class="journal-overview-copy">')
+    .replace('<h2>AI Journal Overview</h2>', '<h4>Journal Overview</h4>')
+    .replace('</section>', '</div></div>');
+  const faq = buildFAQHtml(j)
+    .replace('<section class="section faq">', '<div class="drawer-section faq">')
+    .replace('<h2>Frequently Asked Questions</h2>', '<h4>Frequently Asked Questions</h4>')
+    .replace('</section>', '</div>');
+  return `
+    <div class="drawer-hero">
+      <div class="drawer-titlebar">
+        <div class="drawer-title-main">
+          <div class="drawer-title-line"><h1 class="drawer-title">${esc(name)}</h1></div>
+          ${j.c && j.c !== name ? `<div class="drawer-sub">${esc(j.c)}</div>` : ''}
+        </div>
+        <div class="drawer-actions">
+          ${official}
+          <button class="big-btn ghost" id="drawer-fav-big">☆ Add to favorites</button>
+        </div>
+      </div>
+      <div class="drawer-issn">${esc([j.p ? `Publisher: ${j.p}` : '', issnLine].filter(Boolean).join(' · '))}<span class="drawer-views" id="drawer-views" data-fid="${esc(fid)}"></span></div>
+      ${summary}
+      ${(coverage || levels || access || risk) ? `<div class="hero-badge-grid">
+        ${coverage ? `<div class="drawer-section badges-section"><h4>Indexed</h4><div class="badges">${coverage}</div></div>` : ''}
+        ${levels ? `<div class="drawer-section badges-section"><h4>Ranking</h4><div class="badges">${levels}</div></div>` : ''}
+        ${access ? `<div class="drawer-section badges-section"><h4>Access & Fees</h4><div class="badges">${access}</div></div>` : ''}
+        ${risk ? `<div class="drawer-section badges-section"><h4>Caution</h4><div class="badges">${risk}</div></div>` : ''}
+      </div>` : ''}
+    </div>
+    ${appStatsHtml(j)}
+    <div class="journal-detail-masonry">
+      ${topicsHtml(j, origin).replace('<section class="section topics">', '<div class="drawer-section topics">').replace('<h2>Explore More</h2>', '<h4>Explore More</h4>').replace('</section>', '</div>')}
+      ${faq}
+    </div>
+    ${appRelatedHtml(j, index, origin)}
+  `;
+}
+
+async function journalAppShellHtml(ctx, j, slug, index, origin) {
+  const seo = journalSeo(j, slug, origin);
+  let html = await loadAppShell(ctx);
+  html = html.replace(/<html\s+lang="[^"]*"/i, '<html lang="en"');
+  html = html.replace(/<title>[\s\S]*?<\/title>/i, `<title>${esc(seo.title)}</title>`);
+  html = replaceMeta(html, /<meta name="description" content="[^"]*"\s*\/?>/i, `<meta name="description" content="${esc(seo.desc)}" />`);
+  html = replaceMeta(html, /<link rel="canonical" href="[^"]*"\s*\/?>/i, `<link rel="canonical" href="${esc(seo.url)}" />`);
+  html = replaceMeta(html, /<meta property="og:url" content="[^"]*"\s*\/?>/i, `<meta property="og:url" content="${esc(seo.url)}" />`);
+  html = replaceMeta(html, /<meta property="og:title" content="[^"]*"\s*\/?>/i, `<meta property="og:title" content="${esc(seo.title)}" />`);
+  html = replaceMeta(html, /<meta property="og:description" content="[^"]*"\s*\/?>/i, `<meta property="og:description" content="${esc(seo.desc)}" />`);
+  html = stripAlternateLinks(html);
+  html = html.replace('</head>', `${jsonLdBlocks(j, slug, seo, origin)}\n</head>`);
+  html = html.replace(/<body([^>]*)>/i, '<body$1 class="journal-route">');
+  html = html.replace('<div id="drawer-scrim" class="drawer-scrim" hidden></div>', '<div id="drawer-scrim" class="drawer-scrim" hidden></div>');
+  html = html.replace('<aside id="j-drawer" class="j-drawer" aria-hidden="true">', '<aside id="j-drawer" class="j-drawer open journal-page" aria-hidden="false">');
+  html = html.replace('<div id="drawer-body" class="drawer-body"></div>', `<div id="drawer-body" class="drawer-body">${appDrawerBodyHtml(j, slug, index, origin)}</div>`);
+  return html;
+}
+
 function localizedHomeSeo(path, origin) {
   const isZh = path.replace(/\/+$/, '') === '/zh';
   const isEn = path.replace(/\/+$/, '') === '/en';
@@ -459,7 +588,7 @@ export async function onRequest(ctx) {
       const entry = slug ? index[slug] : null;
       if (!entry) return notFound();
       if (entry._r) return Response.redirect(`${url.origin}/journal/${entry._r}/`, 301);
-      const html = journalPageHtml(entry, slug, index, url.origin);
+      const html = await journalAppShellHtml(ctx, entry, slug, index, url.origin);
       return new Response(html, { status: 200, headers: { 'Content-Type': 'text/html;charset=utf-8', 'Cache-Control': 'no-store, no-cache, must-revalidate' } });
     }
 
