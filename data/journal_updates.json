@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-15",
+  "updated_at": "2026-06-16",
   "items": [
     {
       "id": "wechat-research-update-x3jp33-2026-06-15",
@@ -979,6 +979,66 @@
         }
       },
       "image_url": "https://www.emeraldgrouppublishing.com/sites/default/files/image/Emerald-social.jpg"
+    },
+    {
+      "id": "nature-index-major-changes-2026-06-10",
+      "published_at": "2026-06-10",
+      "category": "index_change",
+      "title": "Nature Index 2026 expands coverage and changes subject assignment",
+      "summary": "Nature Index added applied-science and social-science sources and switched subject classification from journal-level to article-level assignment.",
+      "source_name": "Nature Index",
+      "source_url": "https://www.nature.com/nature-index/news/major-changes-nature-index",
+      "publisher": "Springer Nature",
+      "journals": [],
+      "tags": [
+        "Nature Index",
+        "index change",
+        "applied sciences",
+        "social sciences",
+        "methodology"
+      ],
+      "priority": 5,
+      "detail_path": "/updates/nature-index-major-changes-2026-06-10",
+      "detail": {
+        "dek": "Nature Index broadened database coverage and revised its subject-classification method, making 2026 a methodology-change year for users comparing rankings and disciplinary output.",
+        "source_links": [
+          {
+            "label": "Nature Index announcement",
+            "url": "https://www.nature.com/nature-index/news/major-changes-nature-index"
+          }
+        ],
+        "article": {
+          "intro": [
+            "Nature Index announced two major changes on June 10, 2026: the addition of applied-science and social-science publication venues, and a shift from journal-level subject assignment to article-level subject assignment.",
+            "This changes both database coverage and the way subject output is counted, so year-over-year comparisons need to account for the expanded source base and revised methodology."
+          ],
+          "sections": [
+            {
+              "heading": "What changed",
+              "bullets": [
+                "17 applied-science journals and 1 conference were fully integrated into the database",
+                "15 social-science journals were added to broaden disciplinary coverage",
+                "All publication venues are now effectively treated as multidisciplinary for subject assignment, with classification done at the article level"
+              ]
+            },
+            {
+              "heading": "Why it matters",
+              "bullets": [
+                "Users tracking institutional or national performance should treat 2026 as a methodology-change year",
+                "The update improves visibility for applied and social sciences in a database previously centered more heavily on natural sciences",
+                "Historical comparisons remain possible, but interpretation now depends more on when subject areas and venues entered coverage"
+              ]
+            }
+          ]
+        }
+      },
+      "title_zh": "Nature Index 2026 扩大覆盖并改按文章分配学科",
+      "summary_zh": "Nature Index 宣布新增应用科学与社会科学来源，并把学科归类从按期刊改为按文章，属于数据库覆盖范围与方法学层面的重要调整。",
+      "title_en": "Nature Index 2026 expands coverage and changes subject assignment",
+      "summary_en": "Nature Index added applied-science and social-science sources and moved subject classification from journal-level to article-level assignment.",
+      "detail_en": {
+        "dek": "A significant database-coverage and methodology update for users of Nature Index rankings and subject-level output."
+      }
     }
   ]
 }
