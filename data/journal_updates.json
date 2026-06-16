@@ -6,10 +6,10 @@
       "published_at": "2026-06-15",
       "category": "report",
       "title": "自然指数2025-2026：全球微生物学研究机构Top 30发布",
-      "summary": "微信公众号文章关注 Nature Index 微生物学机构榜单。Nature Index 同步提供 Microbiology 主题机构表，按 2025-02-01 至 2026-01-31 时间窗统计机构在自然指数期刊中的科研产出，可作为观察微生物学高水平研究机构分布的参考。",
-      "source_name": "微信公众号",
-      "source_url": "https://mp.weixin.qq.com/s/x3jP33omeNC-41aaozeGjw",
-      "publisher": "Nature Index / WeChat",
+      "summary": "Nature Index 发布 Microbiology 主题机构榜单，页面可直接查看 2025-2026 统计窗口下的全球 Top 30 名单。",
+      "source_name": "Nature Index",
+      "source_url": "https://www.nature.com/nature-index/topics/institution-tables/global/all/microbiology",
+      "publisher": "Nature Index",
       "journals": [],
       "tags": [
         "Nature Index",
@@ -19,12 +19,8 @@
       "priority": 3,
       "detail_path": "/updates/wechat-research-update-x3jp33-2026-06-15",
       "detail": {
-        "dek": "这条动态关注 Nature Index 微生物学研究机构榜单。对需要判断学科强势机构、合作网络和高水平论文产出格局的研究者有参考价值。",
+        "dek": "Nature Index 公布了 Microbiology 主题机构榜单。",
         "source_links": [
-          {
-            "label": "微信公众号原文",
-            "url": "https://mp.weixin.qq.com/s/x3jP33omeNC-41aaozeGjw"
-          },
           {
             "label": "Nature Index Microbiology institutions",
             "url": "https://www.nature.com/nature-index/topics/institution-tables/global/all/microbiology"
@@ -32,24 +28,15 @@
         ],
         "article": {
           "intro": [
-            "Nature Index 的 Microbiology 主题机构表按研究产出对全球机构进行排序。当前公开页面标注的统计时间窗为 2025 年 2 月 1 日至 2026 年 1 月 31 日，指标基于自然指数追踪期刊中的论文产出。",
-            "这类榜单不等同于期刊分区或论文质量评价，但适合用来观察微生物学方向的高活跃机构、潜在合作对象和区域科研格局。对微生物学、宏基因组、感染与环境微生物等方向的作者，榜单可以作为选题、合作和投稿判断的背景信息。"
+            "Nature Index 的 Microbiology 主题机构表已更新，页面可直接查看全球 Top 30 机构名单。",
+            "当前页面标注的统计时间窗为 2025 年 2 月 1 日至 2026 年 1 月 31 日，统计基础为 Nature Index 追踪期刊中的论文产出。"
           ],
           "sections": [
             {
-              "heading": "站内解读",
+              "heading": "榜单说明",
               "bullets": [
-                "榜单反映的是机构在 Nature Index 追踪期刊中的微生物学相关产出",
-                "可用于观察微生物学高水平研究力量分布，但不应替代 JCR、CiteScore、CAS 分区等期刊指标",
-                "如果用于选刊或合作判断，建议结合具体论文、通讯作者团队、期刊方向和近年研究主题再分析"
-              ]
-            },
-            {
-              "heading": "使用建议",
-              "bullets": [
-                "查看 Nature Index 官方主题表确认最新排名与统计口径",
-                "关注榜单中机构常发期刊，结合站内期刊详情页查看 IF、JCR、CAS、Scopus、OA/APC 等信息",
-                "不要把机构榜单直接等同为投稿推荐，仍需匹配论文主题和期刊 scope"
+                "榜单页面直接列出全球 Microbiology Top 30 机构。",
+                "统计时间窗：2025-02-01 至 2026-01-31。"
               ]
             }
           ]
