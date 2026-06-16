@@ -6902,6 +6902,164 @@
       </div>`;
     }
 
+    const updateDatasetCache = new Map();
+
+    function uniqueUpdateLinks(links) {
+      const seen = new Set();
+      return links.filter(link => {
+        const cleanUrl = String(link.url || '').replace(/\/+$/, '');
+        const key = cleanUrl || String(link.label || '').toLowerCase();
+        if (!key || seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+    }
+
+    function renderNatureIndexRankingsShell(detail) {
+      const dataset = String(detail.rankings_dataset || '').trim();
+      if (!dataset) return '';
+      const defaultTopic = String(detail.rankings_default_topic || 'microbiology').trim();
+      return `<section class="update-topic-rankings" data-nature-index-rankings data-dataset="${escape(dataset)}" data-default-topic="${escape(defaultTopic)}">
+        <div class="nature-rankings-loading">正在加载 Nature Index 学科排行…</div>
+      </section>`;
+    }
+
+    async function loadUpdateDataset(url) {
+      if (!updateDatasetCache.has(url)) {
+        updateDatasetCache.set(url, fetchJSON(url));
+      }
+      return updateDatasetCache.get(url);
+    }
+
+    function natureTopicOptions(topics, activeSlug) {
+      const groups = new Map();
+      topics.forEach(topic => {
+        const group = topic.group || 'Topics';
+        if (!groups.has(group)) groups.set(group, []);
+        groups.get(group).push(topic);
+      });
+      return [...groups.entries()].map(([group, rows]) => `<optgroup label="${escape(group)}">
+        ${rows.map(topic => `<option value="${escape(topic.slug)}"${topic.slug === activeSlug ? ' selected' : ''}>${escape(topic.label)}</option>`).join('')}
+      </optgroup>`).join('');
+    }
+
+    function natureShare(value) {
+      const n = Number(value);
+      return Number.isFinite(n) ? n.toFixed(2) : '';
+    }
+
+    function renderNatureRankingsTable(topic) {
+      if (!topic) {
+        return `<div class="nature-rankings-empty">没有匹配的学科。</div>`;
+      }
+      const rows = Array.isArray(topic.rows) ? topic.rows : [];
+      return `<div class="nature-topic-table-head">
+        <div>
+          <p class="updates-kicker">Nature Index Topic</p>
+          <h2>${escape(topic.label)}</h2>
+        </div>
+        <span>Top ${rows.length}</span>
+      </div>
+      <div class="nature-topic-table-wrap">
+        <table class="nature-topic-table">
+          <thead>
+            <tr>
+              <th>排名</th>
+              <th>机构</th>
+              <th>国家/地区</th>
+              <th>Count</th>
+              <th>Share</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.map(row => `<tr>
+              <td>${escape(row.rank)}</td>
+              <td>${escape(row.institution)}</td>
+              <td>${escape(row.country)}</td>
+              <td>${escape(row.count)}</td>
+              <td>${escape(natureShare(row.share))}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>`;
+    }
+
+    async function hydrateNatureIndexRankings(root, detail) {
+      const box = root.querySelector('[data-nature-index-rankings]');
+      if (!box) return;
+      const datasetUrl = box.dataset.dataset || detail.rankings_dataset || '';
+      const defaultTopic = box.dataset.defaultTopic || detail.rankings_default_topic || 'microbiology';
+      try {
+        const data = await loadUpdateDataset(datasetUrl);
+        const topics = Array.isArray(data.topics) ? data.topics : [];
+        if (!topics.length) throw new Error('No Nature Index topics in dataset');
+        let activeSlug = topics.some(topic => topic.slug === defaultTopic) ? defaultTopic : topics[0].slug;
+        const sourceUrl = data.source && data.source.page_url ? data.source.page_url : 'https://www.nature.com/nature-index/topics/institution-tables/global/all/';
+        const license = data.source && data.source.license ? data.source.license : {};
+
+        box.innerHTML = `<div class="nature-rankings-head">
+          <div>
+            <p class="updates-kicker">Topic Rankings</p>
+            <h2>Nature Index 学科机构 Top 30</h2>
+            <p>${escape(data.topic_count || topics.length)} 个学科 · Global / All sectors · ${escape(data.time_frame?.label || '')}</p>
+          </div>
+          <a href="${escape(sourceUrl)}" target="_blank" rel="noopener">Nature Index 来源</a>
+        </div>
+        <div class="nature-rankings-controls">
+          <label>
+            <span>搜索学科</span>
+            <input type="search" data-nature-topic-search placeholder="输入 topic，例如 Microbiology / Machine Learning">
+          </label>
+          <label>
+            <span>选择学科</span>
+            <select data-nature-topic-select></select>
+          </label>
+        </div>
+        <div data-nature-topic-table></div>
+        <p class="nature-rankings-license">数值表格来源于 Nature Index；表格数值按 <a href="${escape(license.url || 'https://creativecommons.org/licenses/by-nc-sa/4.0/')}" target="_blank" rel="noopener">${escape(license.label || 'CC BY-NC-SA 4.0')}</a> 标注。</p>`;
+
+        const search = box.querySelector('[data-nature-topic-search]');
+        const select = box.querySelector('[data-nature-topic-select]');
+        const table = box.querySelector('[data-nature-topic-table]');
+
+        const renderTable = () => {
+          const topic = topics.find(x => x.slug === activeSlug) || topics[0];
+          table.innerHTML = renderNatureRankingsTable(topic);
+        };
+        const applyOptions = (list) => {
+          select.innerHTML = natureTopicOptions(list, activeSlug);
+        };
+
+        applyOptions(topics);
+        renderTable();
+
+        search.addEventListener('input', () => {
+          const q = search.value.trim().toLowerCase();
+          const filtered = q
+            ? topics.filter(topic => `${topic.label} ${topic.group} ${topic.slug}`.toLowerCase().includes(q))
+            : topics;
+          if (!filtered.length) {
+            applyOptions([]);
+            table.innerHTML = renderNatureRankingsTable(null);
+            return;
+          }
+          if (!filtered.some(topic => topic.slug === activeSlug)) {
+            activeSlug = filtered[0].slug;
+          }
+          applyOptions(filtered);
+          renderTable();
+        });
+
+        select.addEventListener('change', () => {
+          activeSlug = select.value || activeSlug;
+          renderTable();
+        });
+      } catch (err) {
+        box.innerHTML = `<div class="nature-rankings-empty">Nature Index 排行数据加载失败，请刷新页面重试。</div>`;
+        console.error(err);
+      }
+    }
+
     function renderJournalUpdateDetail(item) {
       const box = $('#journal-updates');
       if (!box) return;
@@ -6911,10 +7069,10 @@
       const points = Array.isArray(detail.key_points) ? detail.key_points : [];
       const sections = Array.isArray(detail.sections) ? detail.sections : [];
       const articleHtml = updateIsZh() ? renderUpdateArticle(detail.article) : '';
-      const sourceLinks = updateLinkList([
+      const sourceLinks = uniqueUpdateLinks(updateLinkList([
         item.source_url ? { label: T('原始来源','Original source'), url: item.source_url, note: sourceName } : null,
         ...(Array.isArray(detail.source_links) ? detail.source_links : []),
-      ].filter(Boolean));
+      ].filter(Boolean)));
       const journalLinks = updateLinkList(detail.journal_links || []);
       const reportUrl = report.file_detail_url || report.view_url || report.pdf_url || '';
       const pdfUrl = report.pdf_url || report.download_url || report.view_url || '';
@@ -6945,6 +7103,7 @@
                 <p>${escape(section.body || '')}</p>
               </section>`).join('') : ''}
           `}
+          ${renderNatureIndexRankingsShell(detail)}
           ${reportUrl ? `
             <section class="update-report">
               <div class="update-report-info">
@@ -6973,6 +7132,7 @@
         renderJournalUpdates();
         updatePageSeo('updates');
       });
+      hydrateNatureIndexRankings(box, detail);
     }
 
     // Monogram for the no-image banner: leading letters of an ASCII source, else first CJK chars.

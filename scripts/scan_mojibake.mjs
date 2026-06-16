@@ -14,6 +14,7 @@ const fragments = [
   ['mojibake punctuation marker', '\u951b'],
   ['emoji mojibake marker', '\u9983'],
   ['observed Chinese-title mojibake', '\u5be4\u8679\u74da'],
+  ['question-mark replacement run', '?'.repeat(4)],
 ];
 
 const files = process.argv.slice(2).length ? process.argv.slice(2) : defaultFiles;
