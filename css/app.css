@@ -1099,8 +1099,7 @@ main.main {
 body.update-reading-mode .home-hero,
 body.update-reading-mode .seo-nav,
 body.update-reading-mode .topbar,
-body.update-reading-mode #mode-tabs,
-body.update-reading-mode .lang-toggle-wrap {
+body.update-reading-mode #mode-tabs {
   display: none !important;
 }
 body.update-reading-mode main.main {

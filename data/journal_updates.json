@@ -7,6 +7,8 @@
       "category": "report",
       "title": "Nature Index 2025-2026：全球学科机构 Top 30 排行汇总",
       "summary": "Nature Index 按 87 个研究主题发布全球机构 Top 30 表，本站已整理为可切换查询的学科机构排行。",
+      "title_en": "Nature Index 2025-2026: Global topic institution Top 30 rankings",
+      "summary_en": "Nature Index has published global Top 30 institution tables across 87 research topics; AILatest has organized them into searchable topic rankings.",
       "source_name": "Nature Index",
       "source_url": "https://www.nature.com/nature-index/topics/institution-tables/global/all/",
       "publisher": "Nature Index",
@@ -44,6 +46,25 @@
         },
         "rankings_dataset": "/data/nature_index_topic_institutions.json",
         "rankings_default_topic": "microbiology"
+      },
+      "detail_en": {
+        "dek": "Nature Index Leading institutions by topic has been organized into searchable in-page Top 30 rankings for 87 research topics.",
+        "article": {
+          "intro": [
+            "Nature Index lists global institution rankings by research topic for the window from 1 February 2025 to 31 January 2026.",
+            "AILatest keeps each topic's global Top 30 institutions with country or region, Count, and Share, so the rankings can be queried directly on this page."
+          ],
+          "sections": [
+            {
+              "heading": "Data notes",
+              "bullets": [
+                "Scope: Global / All sectors.",
+                "Fields: Position, Institution, Count, Share.",
+                "Numerical tables are sourced from Nature Index and attributed under CC BY-NC-SA 4.0."
+              ]
+            }
+          ]
+        }
       }
     },
     {

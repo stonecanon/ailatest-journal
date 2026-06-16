@@ -5382,12 +5382,12 @@
     else if (activeTab === 'fav') renderFav();
     else if (activeTab === 'int') renderInt();
     else if (activeTab === 'pick') refreshPickI18n();
-    else if (activeTab === 'updates') renderJournalUpdates();
     window.dispatchEvent(new CustomEvent('ailatest:langchange'));
     if (_currentDrawerRec) {
       openDrawer(_currentDrawerRec, { pageMode: document.body.classList.contains('journal-route') });
     }
   }
+  window.__setJournalLanguage = setUiLanguage;
   function stationSettingsHtml() {
     const enabled = getEnabledStations();
     const langBtns = LANG_ORDER.map(code => {
@@ -6168,14 +6168,21 @@
           title: String(src.title || '').trim(),
           summary: String(src.summary || '').trim(),
           source_name: String(src.source_name || src.publisher || '').trim(),
+          source_name_en: String(src.source_name_en || src.en?.source_name || src.translations?.en?.source_name || '').trim(),
           source_url: String(src.source_url || '').trim(),
           publisher: String(src.publisher || '').trim(),
+          publisher_en: String(src.publisher_en || src.en?.publisher || src.translations?.en?.publisher || '').trim(),
           journals: Array.isArray(src.journals) ? src.journals.filter(Boolean).map(String) : [],
           tags: Array.isArray(src.tags) ? src.tags.filter(Boolean).map(String) : [],
           priority: Number.isFinite(Number(src.priority)) ? Number(src.priority) : 0,
           image_url: String(src.image_url || src.image || src.cover_image || '').trim(),
           detail_path: String(src.detail_path || '').trim(),
-          detail: src.detail && typeof src.detail === 'object' ? src.detail : null
+          title_en: String(src.title_en || src.en?.title || src.translations?.en?.title || '').trim(),
+          summary_en: String(src.summary_en || src.en?.summary || src.translations?.en?.summary || '').trim(),
+          detail: src.detail && typeof src.detail === 'object' ? src.detail : null,
+          detail_en: src.detail_en && typeof src.detail_en === 'object' ? src.detail_en : null,
+          en: src.en && typeof src.en === 'object' ? src.en : null,
+          translations: src.translations && typeof src.translations === 'object' ? src.translations : null
         };
       })
       .filter(item => item.id && item.title)
@@ -6724,15 +6731,142 @@
     function updateIsZh() {
       return lang === 'zh-CN' || lang === 'zh-TW';
     }
+    function updatePlainObject(value) {
+      return value && typeof value === 'object' && !Array.isArray(value);
+    }
+    function updateFirstText(...values) {
+      for (const value of values) {
+        const text = String(value || '').replace(/\s+/g, ' ').trim();
+        if (text) return text;
+      }
+      return '';
+    }
+    function updateHasCjk(value) {
+      if (typeof value === 'string') return /[\u3400-\u9fff\uf900-\ufaff]/.test(value);
+      if (Array.isArray(value)) return value.some(updateHasCjk);
+      if (updatePlainObject(value)) return Object.values(value).some(updateHasCjk);
+      return false;
+    }
+    function updateEnglishText(value) {
+      const text = String(value || '').replace(/\s+/g, ' ').trim();
+      if (!text || updateHasCjk(text) || !/[A-Za-z0-9]/.test(text)) return '';
+      return text;
+    }
+    function updateEnglishPayload(item) {
+      const direct = updatePlainObject(item.en) ? item.en : {};
+      const translated = updatePlainObject(item.translations?.en) ? item.translations.en : {};
+      const legacy = UPDATE_EN[item.id] || {};
+      const detail =
+        updatePlainObject(item.detail_en) ? item.detail_en :
+        updatePlainObject(direct.detail) ? direct.detail :
+        updatePlainObject(translated.detail) ? translated.detail :
+        legacy.dek ? { dek: legacy.dek } : {};
+      return {
+        title: updateFirstText(item.title_en, direct.title, translated.title, legacy.title),
+        summary: updateFirstText(item.summary_en, direct.summary, translated.summary, legacy.summary),
+        source_name: updateFirstText(item.source_name_en, direct.source_name, translated.source_name),
+        publisher: updateFirstText(item.publisher_en, direct.publisher, translated.publisher),
+        detail
+      };
+    }
+    function updateCategoryLabelEn(category) {
+      return {
+        new_journal: 'New journal',
+        index_change: 'Indexing change',
+        warning: 'Risk alert',
+        policy: 'Publishing policy',
+        report: 'Report'
+      }[category] || 'Journal update';
+    }
+    function updateEnglishSubject(item) {
+      const values = [
+        ...(item.journals || []),
+        item.publisher_en,
+        item.source_name_en,
+        item.publisher,
+        item.source_name,
+        ...(item.tags || [])
+      ].map(updateEnglishText).filter(Boolean);
+      return values[0] || '';
+    }
+    function autoEnglishUpdateTitle(item) {
+      if (!updateHasCjk(item.title)) return item.title || updateCategoryLabelEn(item.category);
+      const subject = updateEnglishSubject(item);
+      return subject ? `${updateCategoryLabelEn(item.category)}: ${subject}` : `${updateCategoryLabelEn(item.category)} update`;
+    }
+    function autoEnglishUpdateSummary(item) {
+      if (item.summary && !updateHasCjk(item.summary)) return item.summary;
+      const category = updateCategoryLabelEn(item.category).toLowerCase();
+      const subject = updateEnglishSubject(item) || 'a scholarly-publishing development';
+      const source = updateEnglishText(item.publisher_en) || updateEnglishText(item.publisher) || updateEnglishText(item.source_name_en) || updateEnglishText(item.source_name) || 'the original source';
+      const journals = (item.journals || []).map(updateEnglishText).filter(Boolean).slice(0, 4).join(', ');
+      const tags = (item.tags || []).map(updateEnglishText).filter(Boolean).slice(0, 4).join(', ');
+      const parts = [`This ${category} update tracks ${subject} from ${source}.`];
+      if (journals) parts.push(`Related journal(s): ${journals}.`);
+      if (tags) parts.push(`Key tags: ${tags}.`);
+      parts.push('The original source link remains the verification basis.');
+      return parts.join(' ');
+    }
+    function autoEnglishUpdateArticle(item) {
+      const source = updateSourceName(item);
+      const journals = (item.journals || []).map(updateEnglishText).filter(Boolean).slice(0, 6);
+      const tags = (item.tags || []).map(updateEnglishText).filter(Boolean).slice(0, 6);
+      const context = [
+        `Type: ${updateCategoryLabelEn(item.category)}.`,
+        source ? `Source: ${source}.` : '',
+        item.published_at ? `Published or logged: ${formatUpdateDate(item.published_at)}.` : '',
+        journals.length ? `Related journal(s): ${journals.join(', ')}.` : '',
+        tags.length ? `Key tags: ${tags.join(', ')}.` : ''
+      ].filter(Boolean);
+      return {
+        intro: [updateSummary(item)],
+        sections: [
+          {
+            heading: 'Structured context',
+            bullets: context
+          },
+          {
+            heading: 'Verification',
+            bullets: ['Original-source details should be checked before using this item for submission, indexing, or ranking decisions.']
+          }
+        ]
+      };
+    }
+    function updateLocalizedDetail(item) {
+      const detail = item.detail || {};
+      if (updateIsZh()) return detail;
+      const enDetail = updateEnglishPayload(item).detail || {};
+      const article = updatePlainObject(enDetail.article)
+        ? enDetail.article
+        : updatePlainObject(detail.article) && !updateHasCjk(detail.article)
+          ? detail.article
+          : autoEnglishUpdateArticle(item);
+      return { ...detail, ...enDetail, article };
+    }
+    function updateSourceName(item) {
+      const raw = item.source_name || item.publisher || t('updates_source');
+      if (updateIsZh()) return raw;
+      const en = updateEnglishPayload(item);
+      const explicit = updateFirstText(en.source_name, en.publisher);
+      if (explicit) return explicit;
+      if (/微信/.test(raw)) return 'WeChat Official Account';
+      if (updateHasCjk(raw)) return updateEnglishText(item.publisher) || t('updates_source');
+      return raw;
+    }
     function updateTitle(item) {
-      return updateIsZh() ? item.title : (UPDATE_EN[item.id] && UPDATE_EN[item.id].title) || item.title;
+      if (updateIsZh()) return item.title;
+      return updateEnglishPayload(item).title || autoEnglishUpdateTitle(item);
     }
     function updateSummary(item) {
-      return updateIsZh() ? item.summary : (UPDATE_EN[item.id] && UPDATE_EN[item.id].summary) || item.summary;
+      if (updateIsZh()) return item.summary;
+      return updateEnglishPayload(item).summary || autoEnglishUpdateSummary(item);
     }
     function updateDek(item) {
       const detail = item.detail || {};
-      if (!updateIsZh() && UPDATE_EN[item.id] && UPDATE_EN[item.id].dek) return UPDATE_EN[item.id].dek;
+      if (!updateIsZh()) {
+        const enDetail = updateEnglishPayload(item).detail || {};
+        return updateFirstText(enDetail.dek, enDetail.lead, updateSummary(item));
+      }
       return detail.dek || detail.lead || item.summary || '';
     }
 
@@ -6761,6 +6895,11 @@
         ...(item.journals || []),
         ...(item.tags || [])
       ].join(' ').toLowerCase().includes(q);
+    }
+
+    function updatePathIsUpdates(pathname = location.pathname) {
+      const clean = pathname.replace(/\/+$/, '') || '/';
+      return clean === '/updates' || clean.startsWith('/updates/');
     }
 
     function updateDetailSlugFromPath(pathname = location.pathname) {
@@ -6888,17 +7027,17 @@
       return `<div class="update-article">
         ${note ? `<p class="update-article-note">${escape(note)}</p>` : ''}
         ${intro.length ? `<section class="update-article-lead">${intro.map(p => `<p>${escape(p)}</p>`).join('')}</section>` : ''}
-        ${statsHtml ? `<section class="update-stats" aria-label="报告关键数据">${statsHtml}</section>` : ''}
+        ${statsHtml ? `<section class="update-stats" aria-label="${escape(T('报告关键数据','Report key data'))}">${statsHtml}</section>` : ''}
         ${sectionsHtml}
         ${questionsHtml ? `<section class="update-article-section update-question-section">
-          <h2>${escape(article.questions_heading || '十问导览')}</h2>
+          <h2>${escape(article.questions_heading || T('十问导览','Question guide'))}</h2>
           <div class="update-question-list">${questionsHtml}</div>
         </section>` : ''}
         ${takeaways.length ? `<section class="update-article-section update-takeaways">
-          <h2>给选刊用户的启发</h2>
+          <h2>${T('给选刊用户的启发','Implications for journal selection')}</h2>
           <ul>${takeaways.map(p => `<li>${escape(p)}</li>`).join('')}</ul>
         </section>` : ''}
-        ${links.length ? `<section class="update-article-section"><h2>相关链接</h2>${renderUpdateLinks(links)}</section>` : ''}
+        ${links.length ? `<section class="update-article-section"><h2>${T('相关链接','Related links')}</h2>${renderUpdateLinks(links)}</section>` : ''}
       </div>`;
     }
 
@@ -6920,7 +7059,7 @@
       if (!dataset) return '';
       const defaultTopic = String(detail.rankings_default_topic || 'microbiology').trim();
       return `<section class="update-topic-rankings" data-nature-index-rankings data-dataset="${escape(dataset)}" data-default-topic="${escape(defaultTopic)}">
-        <div class="nature-rankings-loading">正在加载 Nature Index 学科排行…</div>
+        <div class="nature-rankings-loading">${T('正在加载 Nature Index 学科排行…','Loading Nature Index topic rankings...')}</div>
       </section>`;
     }
 
@@ -6950,7 +7089,7 @@
 
     function renderNatureRankingsTable(topic) {
       if (!topic) {
-        return `<div class="nature-rankings-empty">没有匹配的学科。</div>`;
+        return `<div class="nature-rankings-empty">${T('没有匹配的学科。','No matching topic.')}</div>`;
       }
       const rows = Array.isArray(topic.rows) ? topic.rows : [];
       return `<div class="nature-topic-table-head">
@@ -6964,9 +7103,9 @@
         <table class="nature-topic-table">
           <thead>
             <tr>
-              <th>排名</th>
-              <th>机构</th>
-              <th>国家/地区</th>
+              <th>${T('排名','Rank')}</th>
+              <th>${T('机构','Institution')}</th>
+              <th>${T('国家/地区','Country/region')}</th>
               <th>Count</th>
               <th>Share</th>
             </tr>
@@ -7000,23 +7139,23 @@
         box.innerHTML = `<div class="nature-rankings-head">
           <div>
             <p class="updates-kicker">Topic Rankings</p>
-            <h2>Nature Index 学科机构 Top 30</h2>
-            <p>${escape(data.topic_count || topics.length)} 个学科 · Global / All sectors · ${escape(data.time_frame?.label || '')}</p>
+            <h2>${T('Nature Index 学科机构 Top 30','Nature Index topic institution Top 30')}</h2>
+            <p>${escape(data.topic_count || topics.length)} ${T('个学科','topics')} · Global / All sectors · ${escape(data.time_frame?.label || '')}</p>
           </div>
-          <a href="${escape(sourceUrl)}" target="_blank" rel="noopener">Nature Index 来源</a>
+          <a href="${escape(sourceUrl)}" target="_blank" rel="noopener">${T('Nature Index 来源','Nature Index source')}</a>
         </div>
         <div class="nature-rankings-controls">
           <label>
-            <span>搜索学科</span>
-            <input type="search" data-nature-topic-search placeholder="输入 topic，例如 Microbiology / Machine Learning">
+            <span>${T('搜索学科','Search topic')}</span>
+            <input type="search" data-nature-topic-search placeholder="${T('输入 topic，例如 Microbiology / Machine Learning','Enter a topic, e.g. Microbiology / Machine Learning')}">
           </label>
           <label>
-            <span>选择学科</span>
+            <span>${T('选择学科','Select topic')}</span>
             <select data-nature-topic-select></select>
           </label>
         </div>
         <div data-nature-topic-table></div>
-        <p class="nature-rankings-license">数值表格来源于 Nature Index；表格数值按 <a href="${escape(license.url || 'https://creativecommons.org/licenses/by-nc-sa/4.0/')}" target="_blank" rel="noopener">${escape(license.label || 'CC BY-NC-SA 4.0')}</a> 标注。</p>`;
+        <p class="nature-rankings-license">${T('数值表格来源于 Nature Index；表格数值按','Numerical tables are sourced from Nature Index and attributed under')} <a href="${escape(license.url || 'https://creativecommons.org/licenses/by-nc-sa/4.0/')}" target="_blank" rel="noopener">${escape(license.label || 'CC BY-NC-SA 4.0')}</a>${T(' 标注。','.')}</p>`;
 
         const search = box.querySelector('[data-nature-topic-search]');
         const select = box.querySelector('[data-nature-topic-select]');
@@ -7055,7 +7194,7 @@
           renderTable();
         });
       } catch (err) {
-        box.innerHTML = `<div class="nature-rankings-empty">Nature Index 排行数据加载失败，请刷新页面重试。</div>`;
+        box.innerHTML = `<div class="nature-rankings-empty">${T('Nature Index 排行数据加载失败，请刷新页面重试。','Nature Index ranking data failed to load. Refresh the page and try again.')}</div>`;
         console.error(err);
       }
     }
@@ -7063,12 +7202,12 @@
     function renderJournalUpdateDetail(item) {
       const box = $('#journal-updates');
       if (!box) return;
-      const detail = item.detail || {};
+      const detail = updateLocalizedDetail(item);
       const report = detail.report || {};
-      const sourceName = item.source_name || item.publisher || t('updates_source');
+      const sourceName = updateSourceName(item);
       const points = Array.isArray(detail.key_points) ? detail.key_points : [];
       const sections = Array.isArray(detail.sections) ? detail.sections : [];
-      const articleHtml = updateIsZh() ? renderUpdateArticle(detail.article) : '';
+      const articleHtml = renderUpdateArticle(detail.article);
       const sourceLinks = uniqueUpdateLinks(updateLinkList([
         item.source_url ? { label: T('原始来源','Original source'), url: item.source_url, note: sourceName } : null,
         ...(Array.isArray(detail.source_links) ? detail.source_links : []),
@@ -7090,18 +7229,18 @@
             <p class="update-detail-dek">${escape(detailDek)}</p>
             <div class="update-detail-meta">
               <span>${escape(t('updates_source'))}: ${escape(sourceName)}</span>
-              ${item.publisher ? `<span>${escape(item.publisher)}</span>` : ''}
+              ${item.publisher ? `<span>${escape(updateIsZh() ? item.publisher : (updateFirstText(item.publisher_en, updateEnglishText(item.publisher), item.publisher)))}</span>` : ''}
             </div>
             ${sourceLinks.length ? renderUpdateLinks(sourceLinks, 'update-source-actions') : ''}
           </header>
           ${articleHtml || `
             ${(detail.lead || item.summary) ? `<section class="update-detail-section"><p>${escape(updateIsZh() ? (detail.lead || item.summary) : updateSummary(item))}</p></section>` : ''}
-            ${updateIsZh() && points.length ? `<section class="update-detail-section"><h2>${T('要点','Key points')}</h2><ul>${points.map(p => `<li>${escape(p)}</li>`).join('')}</ul></section>` : ''}
-            ${updateIsZh() ? sections.map(section => `
+            ${points.length ? `<section class="update-detail-section"><h2>${T('要点','Key points')}</h2><ul>${points.map(p => `<li>${escape(p)}</li>`).join('')}</ul></section>` : ''}
+            ${sections.map(section => `
               <section class="update-detail-section">
                 <h2>${escape(section.heading || '')}</h2>
                 <p>${escape(section.body || '')}</p>
-              </section>`).join('') : ''}
+              </section>`).join('')}
           `}
           ${renderNatureIndexRankingsShell(detail)}
           ${reportUrl ? `
@@ -7137,7 +7276,7 @@
 
     // Monogram for the no-image banner: leading letters of an ASCII source, else first CJK chars.
     function updateBannerMark(item) {
-      const name = String(item.source_name || item.publisher || item.category || '').trim();
+      const name = String(updateSourceName(item) || item.category || '').trim();
       const ascii = name.match(/[A-Za-z0-9]+/);
       if (ascii) return ascii[0][0].toUpperCase();
       return name ? name.replace(/\s+/g, '')[0] : '•';
@@ -7160,7 +7299,7 @@
       const isHome = !!options.home;
       const isBrief = !!options.brief;
       const dateHtml = item.published_at ? `<time datetime="${escape(item.published_at)}">${escape(formatUpdateDate(item.published_at))}</time>` : '';
-      const sourceName = item.source_name || item.publisher || t('updates_source');
+      const sourceName = updateSourceName(item);
       const summary = updateSummary(item);
       const body = `
         ${updateCardBanner(item, sourceName)}
@@ -7264,7 +7403,7 @@
       if (activeTab === 'home') {
         if (activeQuery) renderHomeIntResults();
         else renderJournalUpdatesPreview();
-      } else if (activeTab === 'updates') {
+      } else if (activeTab === 'updates' || updatePathIsUpdates()) {
         renderJournalUpdates();
       }
     });
