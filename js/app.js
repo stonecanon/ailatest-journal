@@ -7844,6 +7844,21 @@
     updatePickCharCount();
     let pickLastQuery = '';
     let pickJournalLookup = null;
+    let pickLastReportState = null;
+
+    function refreshRenderedPickReport() {
+      if (!results || !pickLastReportState) return;
+      const html = renderPickAiReport(
+        pickLastReportState.report,
+        pickLastReportState.profile,
+        pickLastReportState.fallbackEntries
+      );
+      const current = results.querySelector('.pick-report');
+      if (current && html) current.outerHTML = html;
+      else if (current) current.remove();
+      else if (html) results.insertAdjacentHTML('afterbegin', html);
+    }
+    window.__refreshPickReportI18n = refreshRenderedPickReport;
 
     function pickFiltersPayload() {
       const indices = [];
@@ -7895,6 +7910,8 @@
           query,
           filters: pickFiltersPayload(),
           limit: 120,
+          language: pickReportLang(),
+          locale: lang,
         }),
       };
       let res;
@@ -7994,6 +8011,24 @@
       return out;
     }
 
+    function pickIsZhLang() {
+      return lang === 'zh-CN' || lang === 'zh-TW';
+    }
+
+    function pickReportLang() {
+      return pickIsZhLang() ? 'zh' : 'en';
+    }
+
+    function pickHasCjk(value) {
+      return /[\u3400-\u9fff\uf900-\ufaff]/.test(String(value || ''));
+    }
+
+    function pickReadableField(value) {
+      const raw = String(value || '').replace(/\s+/g, ' ').trim();
+      if (!raw || pickIsZhLang() || pickHasCjk(raw)) return raw;
+      return raw.replace(/\b([a-z])/g, m => m.toUpperCase());
+    }
+
     function pickMetricIf(r) {
       return r && r.if_2024 != null && r.if_2024 !== '' ? (+r.if_2024).toFixed(1) : '';
     }
@@ -8083,11 +8118,104 @@
       };
     }
 
-    // One English-journal row in the AI report: AI gives name+reason,
+    function pickReportFallbackReason(source) {
+      const rec = source?.journalRec || source || {};
+      const parts = pickUnique([
+        ...(source?.matched || []),
+        ...(source?.topics || []),
+        ...(source?.wos_categories || []),
+        ...(rec.wos_categories || []),
+        rec.esi_category,
+        rec.cas_major_cn,
+        rec.cas_major_cat,
+      ].filter(Boolean), 3).map(pickReadableField).filter(Boolean);
+      if (pickIsZhLang()) {
+        return parts.length ? `与${parts.join('、')}方向匹配，站内指标可核验。` : '与论文主题匹配，站内指标可核验。';
+      }
+      return parts.length ? `Matches ${parts.join(', ')}; site metrics are available.` : 'Matches the topic; site metrics are available.';
+    }
+
+    function pickReportReason(value, source) {
+      const text = String(value || '').replace(/\s+/g, ' ').trim();
+      if (text && (pickIsZhLang() ? pickHasCjk(text) : !pickHasCjk(text))) return text;
+      return pickReportFallbackReason(source);
+    }
+
+    function pickFallbackReport(profile, entries = []) {
+      const defs = pickIsZhLang()
+        ? [
+            ['primary', '优先主投', 0, 6],
+            ['backup', '稳妥备选', 6, 14],
+            ['fallback', '保底期刊', 14, 20],
+          ]
+        : [
+            ['primary', 'Primary targets', 0, 6],
+            ['backup', 'Solid alternatives', 6, 14],
+            ['fallback', 'Safer fallbacks', 14, 20],
+          ];
+      const fields = pickUnique([...(profile?.research_fields || []), ...(profile?.wos_categories || [])], 4)
+        .map(pickReadableField).filter(Boolean);
+      return {
+        intro: pickIsZhLang()
+          ? `该论文主要落在${fields.join('、') || '相关交叉学科'}方向，以下推荐按主题匹配度与站内期刊指标分层。`
+          : `This paper is positioned around ${fields.join(', ') || 'the identified research field'}; recommendations are tiered by topic fit and site metrics.`,
+        tiers: defs.map(([id, label, start, end]) => ({
+          id,
+          label,
+          items: entries.slice(start, end).map(e => ({
+            name: e.journalRec?.name || e.srcName || e.issn || '',
+            reason: pickReportFallbackReason(e),
+          })).filter(x => x.name),
+        })).filter(t => t.items.length),
+        chinese: [],
+        strategy: pickIsZhLang()
+          ? ['优先选择主题贴合且分区稳定的期刊。', '保底期刊用于覆盖审稿风险，不建议把预警期刊放入主投。']
+          : ['Prioritize journals with strong topic fit and stable rankings.', 'Use fallback journals to manage review risk; avoid warning-list journals as primary targets.'],
+      };
+    }
+
+    function pickLocalizedReport(report) {
+      if (!report || typeof report !== 'object') return null;
+      const key = pickReportLang();
+      const i18n = report.i18n && typeof report.i18n === 'object' ? report.i18n : null;
+      const localized = i18n?.[key] && typeof i18n[key] === 'object' ? i18n[key] : report;
+      return {
+        intro: localized.intro || '',
+        tiers: Array.isArray(localized.tiers) ? localized.tiers : [],
+        chinese: Array.isArray(localized.chinese) ? localized.chinese : [],
+        strategy: Array.isArray(localized.strategy) ? localized.strategy : [],
+      };
+    }
+
+    function pickEnsureReport(report, profile, fallbackEntries) {
+      const localized = pickLocalizedReport(report);
+      const fallback = pickFallbackReport(profile, fallbackEntries);
+      const out = localized ? { ...fallback, ...localized } : fallback;
+      if (!Array.isArray(out.tiers) || !out.tiers.length) out.tiers = fallback.tiers;
+      if (!Array.isArray(out.chinese)) out.chinese = [];
+      const intro = String(out.intro || '').trim();
+      if (!intro || (pickIsZhLang() ? !pickHasCjk(intro) : pickHasCjk(intro))) out.intro = fallback.intro;
+      const strategy = (out.strategy || []).map(s => String(s || '').replace(/\s+/g, ' ').trim())
+        .filter(s => s && (pickIsZhLang() ? pickHasCjk(s) : !pickHasCjk(s)));
+      out.strategy = strategy.length ? strategy : fallback.strategy;
+      return out;
+    }
+
+    function pickTierLabel(tier) {
+      const id = String(tier?.id || '').toLowerCase();
+      const zh = { primary:'优先主投', backup:'稳妥备选', fallback:'保底期刊', tier:'推荐期刊' };
+      const en = { primary:'Primary targets', backup:'Solid alternatives', fallback:'Safer fallbacks', tier:'Recommended journals' };
+      const map = pickIsZhLang() ? zh : en;
+      const label = String(tier?.label || '').trim();
+      if (!label || (pickIsZhLang() ? !pickHasCjk(label) : pickHasCjk(label))) return map[id] || map.tier;
+      return label;
+    }
+
+    // One international-journal row in the AI report: AI gives name+reason,
     // all metrics are resolved from site data; unresolved names are flagged.
     function renderPickReportEnRow(item, i) {
       const rec = resolvePickJournal({ name: item.name });
-      const reason = item.reason || '';
+      const reason = pickReportReason(item.reason, rec || item);
       if (!rec) {
         return `<tr>
           <td class="pick-report-num">${i + 1}</td>
@@ -8117,67 +8245,91 @@
 
     function renderPickReportCnRow(item, i) {
       const hit = resolveDomesticByName(item.name);
+      const unresolvedReason = pickReportReason(item.reason, item);
       if (!hit) {
         return `<tr>
           <td class="pick-report-num">${i + 1}</td>
           <td>${escape(item.name)} <span class="pick-report-missing">${T('站内未收录','not in site data')}</span></td>
           <td><span class="muted-cell">&mdash;</span></td>
-          <td class="pick-report-reason">${escape(item.reason || '')}</td>
+          <td class="pick-report-reason">${escape(unresolvedReason)}</td>
         </tr>`;
       }
       const r = hit.record;
       const fid = favId(r);
       if (fid) rowRecordsByFid[fid] = { ...r, __src: r.__src || hit.source };
-      const badges = [
-        renderDomCrossBadges({ name: r.name, issn: r.issn, cn_code: r.cn_code }),
+      const crossBadges = renderDomCrossBadges({ name: r.name, issn: r.issn, cn_code: r.cn_code });
+      const metrics = [
         hit.cnki?.compound_if ? `<span class="domsrc-pill">CNKI ${T('复合IF','compound IF')} ${escape(hit.cnki.compound_if)}</span>` : '',
         hit.cnki?.comprehensive_if ? `<span class="domsrc-pill">CNKI ${T('综合IF','comprehensive IF')} ${escape(hit.cnki.comprehensive_if)}</span>` : '',
       ].filter(Boolean).join('');
+      const dataHtml = `${crossBadges ? `<div class="pick-report-badges pick-report-dom-badges">${crossBadges}</div>` : '<span class="muted-cell">&mdash;</span>'}${metrics ? `<div class="pick-report-dom-metrics">${metrics}</div>` : ''}`;
+      const reason = pickReportReason(item.reason, r);
       return `<tr>
         <td class="pick-report-num">${i + 1}</td>
         <td><a href="#j/${escape(fid)}" data-pick-report-fid="${escape(fid)}">${escape(r.name)}</a></td>
-        <td><div class="pick-report-badges">${badges || '<span class="muted-cell">&mdash;</span>'}</div></td>
-        <td class="pick-report-reason">${escape(item.reason || '')}</td>
+        <td>${dataHtml}</td>
+        <td class="pick-report-reason">${escape(reason)}</td>
       </tr>`;
     }
 
     // AI recommendation report: the AI picks tiers/reasons/strategy, every
     // metric shown comes from site data (clickable into the journal page).
-    function renderPickAiReport(report, profile) {
-      if (!report || (!(report.tiers || []).length && !(report.chinese || []).length)) return '';
+    function renderPickAiReport(report, profile, fallbackEntries = []) {
+      if (!report && !fallbackEntries.length) return '';
+      const activeReport = pickEnsureReport(report, profile, fallbackEntries);
+      if (!activeReport || (!(activeReport.tiers || []).length && !(activeReport.chinese || []).length)) return '';
       const fields = pickUnique([
         ...(profile?.research_fields || []),
         ...(profile?.wos_categories || []),
-      ], 10);
-      const intro = report.intro || profile?.explanation || '';
-      const tiersHtml = (report.tiers || []).map(tier => `<section class="pick-report-section pick-tier-${escape(tier.id || 'tier')}">
+      ], 10).map(pickReadableField).filter(Boolean);
+      const fieldsText = fields.join(' · ');
+      const intro = activeReport.intro || '';
+      const tiersHtml = (activeReport.tiers || []).map(tier => {
+        const items = Array.isArray(tier.items) ? tier.items : [];
+        if (!items.length) return '';
+        return `<section class="pick-report-section pick-tier-${escape(tier.id || 'tier')}">
         <div class="pick-report-section-head">
-          <h3><span class="pick-tier-dot" aria-hidden="true"></span>${escape(tier.label)}<span class="pick-tier-count">${tier.items.length} ${T('本','journals')}</span></h3>
+          <h3><span class="pick-tier-dot" aria-hidden="true"></span>${escape(pickTierLabel(tier))}<span class="pick-tier-count">${items.length} ${T('本','journals')}</span></h3>
         </div>
         <div class="pick-report-table-wrap">
           <table class="pick-report-table pick-report-tier-table">
             <thead><tr><th>#</th><th>${T('期刊','Journal')}</th><th>IF</th><th>JCR</th><th>${T('中科院','CAS')}</th><th>${T('费用','Fees')}</th><th>${T('推荐理由','Why')}</th></tr></thead>
-            <tbody>${(tier.items || []).map((item, i) => renderPickReportEnRow(item, i)).join('')}</tbody>
+            <tbody>${items.map((item, i) => renderPickReportEnRow(item, i)).join('')}</tbody>
           </table>
         </div>
-      </section>`).join('');
-      const chineseHtml = (report.chinese || []).length ? `<section class="pick-report-section pick-tier-chinese">
-        <div class="pick-report-section-head">
-          <h3><span class="pick-tier-dot" aria-hidden="true"></span>${T('中文期刊推荐','Chinese journal options')}<span class="pick-tier-count">${report.chinese.length} ${T('本','journals')}</span></h3>
-          <p>${T('期刊由 AI 按论文主题推荐，收录与分级信息来自站内 CSSCI、北大核心、中国科协、CNKI 等目录。','Journals suggested by AI for this topic; list/tier info comes from the site CSSCI, PKU Core, CAST and CNKI catalogs.')}</p>
-        </div>
-        <div class="pick-report-table-wrap">
+      </section>`;
+      }).join('');
+      const chineseItems = activeReport.chinese || [];
+      const chineseNote = T(
+        '期刊由 AI 按论文主题推荐，收录与分级信息来自站内 CSSCI、北大核心、中国科协、CNKI 等目录。',
+        'Chinese-language options suggested by AI; catalog and tier data come from site CSSCI, PKU Core, CAST and CNKI records.'
+      );
+      const chineseHead = chineseItems.length ? `<div class="pick-report-section-head">
+          <h3><span class="pick-tier-dot" aria-hidden="true"></span>${T('中文期刊推荐','Chinese journal appendix')}<span class="pick-tier-count">${chineseItems.length} ${T('本','journals')}</span></h3>
+          <p>${chineseNote}</p>
+        </div>` : '';
+      const chineseBody = chineseItems.length ? `<div class="pick-report-table-wrap">
           <table class="pick-report-table pick-report-dom-table">
             <thead><tr><th>#</th><th>${T('期刊','Journal')}</th><th>${T('站内数据','Site data')}</th><th>${T('推荐理由','Why')}</th></tr></thead>
-            <tbody>${report.chinese.map((item, i) => renderPickReportCnRow(item, i)).join('')}</tbody>
+            <tbody>${chineseItems.map((item, i) => renderPickReportCnRow(item, i)).join('')}</tbody>
           </table>
-        </div>
-      </section>` : '';
-      const strategyTips = (report.strategy || []).concat([
+        </div>` : '';
+      const chineseHtml = chineseItems.length
+        ? pickIsZhLang()
+          ? `<section class="pick-report-section pick-tier-chinese">${chineseHead}${chineseBody}</section>`
+          : `<details class="pick-report-section pick-tier-chinese pick-report-appendix">
+              <summary><span class="pick-tier-dot" aria-hidden="true"></span>${T('中文期刊推荐','Chinese journal appendix')}<span class="pick-tier-count">${chineseItems.length} ${T('本','journals')}</span></summary>
+              <p class="pick-report-appendix-note">${chineseNote}</p>
+              ${chineseBody}
+            </details>`
+        : '';
+      const strategyTips = (activeReport.strategy || []).concat([
         T('费用列综合站内「免费发表」标记（含 Diamond/Gold/Hybrid OA 选项）与 DOAJ 公开 APC 数据；空白表示暂无公开费用信息，不代表免费或收费。','The fees column combines the site "free to publish" flag (Diamond/Gold/Hybrid OA options) with public DOAJ APC data; blank cells mean no public fee info, not free or paid.'),
       ]);
       const strategyHtml = `<section class="pick-report-section">
-        <div class="pick-report-section-head"><h3>${T('投稿策略建议','Submission strategy')}</h3></div>
+        <div class="pick-report-section-head">
+          <h3>${T('投稿策略建议','Submission strategy')}</h3>
+        </div>
         <ul class="pick-report-strategy">${strategyTips.map(tip => `<li>${escape(tip)}</li>`).join('')}</ul>
       </section>`;
       return `<div class="pick-report">
@@ -8189,7 +8341,7 @@
           <span class="pick-report-source">${T('AI 给出梯队与理由，指标数据全部来自站内：IF / JCR / 中科院 / 索引 / 费用','AI picks tiers and reasons; all metrics come from site data: IF / JCR / CAS / indexes / fees')}</span>
         </div>
         ${intro ? `<p class="pick-report-intro">${escape(intro)}</p>` : ''}
-        ${fields.length ? `<div class="pick-report-fields"><span class="pick-report-fields-label">${T('匹配方向','Matched fields')}</span>${fields.map(f => `<span>${escape(f)}</span>`).join('')}</div>` : ''}
+        ${fieldsText ? `<div class="pick-report-fields"><span class="pick-report-fields-label">${T('匹配方向','Matched fields')}</span><b class="pick-report-fields-text">${escape(fieldsText)}</b></div>` : ''}
         ${tiersHtml}
         ${chineseHtml}
         ${strategyHtml}
@@ -8344,8 +8496,11 @@
         }
 
         setPickProgress(T('渲染推荐结果…','Rendering recommendations…'), 92);
-        const reportHtml = pickMode === 'ai'
-          ? renderPickAiReport(aiReport, aiProfile || entries[0]?.semanticProfile || {})
+        pickLastReportState = pickMode === 'ai'
+          ? { report: aiReport, profile: aiProfile || entries[0]?.semanticProfile || {}, fallbackEntries: allFiltered }
+          : null;
+        const reportHtml = pickLastReportState
+          ? renderPickAiReport(pickLastReportState.report, pickLastReportState.profile, pickLastReportState.fallbackEntries)
           : '';
         results.innerHTML = reportHtml + filtered.map(e => {
           const scorePct = Math.round(e.score * 100);
@@ -8782,6 +8937,7 @@
 
   function refreshPickI18n() {
     // data-i18n and data-i18n-placeholder are handled by applyI18n()
+    if (typeof window.__refreshPickReportI18n === 'function') window.__refreshPickReportI18n();
   }
 
   async function loadJournalViewTotalFootnote() {

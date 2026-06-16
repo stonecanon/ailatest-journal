@@ -456,19 +456,23 @@ function rankJournals(journals, profile, filters, limit) {
 
 // ─── Step 3: tiered recommendation report ───
 
+function reportLang(value) {
+  return /^zh/i.test(String(value || '')) ? 'zh' : 'en';
+}
+
 function candidateLine(r, i) {
   const apc = r.doaj
-    ? (String(r.doaj.apc || '').toLowerCase() === 'no' ? '免费' : '有APC')
-    : '未知';
+    ? (String(r.doaj.apc || '').toLowerCase() === 'no' ? 'free' : 'APC listed')
+    : 'unknown';
   return [
     `${i + 1}. ${r.name}`,
     `IF=${r.if_2024 ?? '-'}`,
     r.if_quartile || '-',
-    r.cas_zone ? `中科院${r.cas_zone}区${r.cas_top ? 'TOP' : ''}` : '-',
+    r.cas_zone ? `CAS tier ${r.cas_zone}${r.cas_top ? ' TOP' : ''}` : '-',
     (r.indices || []).join('/') || '-',
     r.publisher || '-',
     `APC:${apc}`,
-    r.warning ? '⚠预警' : '',
+    r.warning ? 'warning' : '',
   ].filter(Boolean).join(' | ');
 }
 
@@ -480,7 +484,7 @@ function sanitizeReportItems(items, max) {
   })).filter(it => it.name);
 }
 
-function sanitizeReport(raw) {
+function sanitizeReportShape(raw) {
   if (!raw || typeof raw !== 'object') return null;
   const tiers = (Array.isArray(raw.tiers) ? raw.tiers : []).map(t => ({
     id: cleanText(t?.id || '', 24) || 'tier',
@@ -499,45 +503,120 @@ function sanitizeReport(raw) {
   };
 }
 
+function fallbackReason(row, lang) {
+  const matched = unique([...(row.matched || []), ...(row.topics || [])].filter(Boolean), 3).join(lang === 'zh' ? '、' : ', ');
+  if (lang === 'zh') {
+    return matched ? `与${matched}方向匹配，站内指标可核验。` : '与论文主题匹配，站内指标可核验。';
+  }
+  return matched ? `Matches ${matched}; site metrics are available.` : 'Matches the topic; site metrics are available.';
+}
+
+function fallbackTieredReport(profile, ranked, lang) {
+  const labels = lang === 'zh'
+    ? [
+        ['primary', '优先主投', 0, 6],
+        ['backup', '稳妥备选', 6, 14],
+        ['fallback', '保底期刊', 14, 20],
+      ]
+    : [
+        ['primary', 'Primary targets', 0, 6],
+        ['backup', 'Solid alternatives', 6, 14],
+        ['fallback', 'Safer fallbacks', 14, 20],
+      ];
+  const fields = unique([...(profile?.research_fields || []), ...(profile?.wos_categories || [])], 4);
+  const intro = lang === 'zh'
+    ? `该论文主要落在${fields.join('、') || '相关交叉学科'}方向，以下推荐按主题匹配度与站内期刊指标分层。`
+    : `This paper is positioned around ${fields.join(', ') || 'the identified research field'}; the recommendations are tiered by topic fit and site metrics.`;
+  return {
+    intro,
+    tiers: labels.map(([id, label, start, end]) => ({
+      id,
+      label,
+      items: ranked.slice(start, end).map(row => ({ name: row.name, reason: fallbackReason(row, lang) })),
+    })).filter(t => t.items.length),
+    chinese: [],
+    strategy: lang === 'zh'
+      ? ['优先选择主题贴合且分区稳定的期刊。', '保底期刊用于覆盖审稿风险，不建议把预警期刊放入主投。']
+      : ['Prioritize journals with strong topic fit and stable rankings.', 'Use fallback journals to manage review risk; avoid warning-list journals as primary targets.'],
+  };
+}
+
+function ensureReportI18n(raw, profile, ranked) {
+  const direct = sanitizeReportShape(raw);
+  const fromI18n = raw && typeof raw === 'object' && raw.i18n && typeof raw.i18n === 'object' ? raw.i18n : {};
+  const zhFallback = fallbackTieredReport(profile, ranked, 'zh');
+  const enFallback = fallbackTieredReport(profile, ranked, 'en');
+  const zh = sanitizeReportShape(fromI18n.zh) || sanitizeReportShape(raw?.zh) || direct || zhFallback;
+  const en = sanitizeReportShape(fromI18n.en) || sanitizeReportShape(raw?.en) || enFallback;
+
+  if (!zh.tiers.length) zh.tiers = zhFallback.tiers;
+  if (!en.tiers.length) en.tiers = enFallback.tiers;
+  if (!zh.intro) zh.intro = zhFallback.intro;
+  if (!en.intro) en.intro = enFallback.intro;
+  if (!zh.strategy.length) zh.strategy = zhFallback.strategy;
+  if (!en.strategy.length) en.strategy = enFallback.strategy;
+
+  return { ...zh, i18n: { zh, en } };
+}
+
+function localizeReport(report, lang) {
+  const selected = report?.i18n?.[lang] || report;
+  return { ...selected, i18n: report?.i18n || { [lang]: selected } };
+}
+
 async function generateReport(apiKey, query, profile, ranked, context) {
   const lines = ranked.slice(0, 40).map(candidateLine).join('\n');
   const res = await trackedDeepseekChat(apiKey, [
     {
       role: 'system',
-      content: `你是专业的学术期刊投稿顾问。根据用户论文与候选期刊列表，输出 JSON 推荐报告。
+      content: `You are a professional academic journal submission advisor. Based on the user's paper and the candidate journal list, output a strict bilingual JSON recommendation report.
 
-输出格式（严格 JSON）：
+Output format (strict JSON):
 {
-  "intro": "一两句话解读论文的学科定位",
-  "tiers": [
-    {"id": "primary", "label": "优先主投", "items": [{"name": "期刊名", "reason": "≤40字推荐理由"}]},
-    {"id": "backup", "label": "稳妥备选", "items": [...]},
-    {"id": "fallback", "label": "保底期刊", "items": [...]}
-  ],
-  "chinese": [{"name": "中文期刊名", "reason": "≤40字理由"}],
-  "strategy": ["投稿策略建议1", "建议2", "建议3"]
+  "i18n": {
+    "zh": {
+      "intro": "一两句话解读论文的学科定位",
+      "tiers": [
+        {"id": "primary", "label": "优先主投", "items": [{"name": "期刊名", "reason": "≤40字中文推荐理由"}]},
+        {"id": "backup", "label": "稳妥备选", "items": [...]},
+        {"id": "fallback", "label": "保底期刊", "items": [...]}
+      ],
+      "chinese": [{"name": "中文期刊名", "reason": "≤40字中文理由"}],
+      "strategy": ["投稿策略建议1", "建议2", "建议3"]
+    },
+    "en": {
+      "intro": "One or two English sentences interpreting the paper's field positioning",
+      "tiers": [
+        {"id": "primary", "label": "Primary targets", "items": [{"name": "exact journal name", "reason": "≤20 English words"}]},
+        {"id": "backup", "label": "Solid alternatives", "items": [...]},
+        {"id": "fallback", "label": "Safer fallbacks", "items": [...]}
+      ],
+      "chinese": [{"name": "中文期刊名", "reason": "≤20 English words"}],
+      "strategy": ["English strategy 1", "English strategy 2", "English strategy 3"]
+    }
+  }
 }
 
-要求：
-- tiers 共三档：primary 4-6 本、backup 6-10 本、fallback 3-5 本，主要从候选列表中选择（用候选列表中的精确期刊名）。推荐量比保守模式多约 30%，但不要重复。
-- fallback 是更稳妥的保底期刊：匹配度可以略低，但接收范围更宽、定位更稳，不要选预警期刊。
-- 如果你确信某本不在候选列表的英文期刊高度对口，最多可补充 3 本，理由中注明"候选外补充"。
-- chinese：如论文主题适合中文发表，推荐 4-8 本对口的中文核心期刊（如 CSSCI/北大核心），否则给空数组。
-- reason 简洁说明为什么对口（学科方向、定位），不要复述 IF/分区等指标——指标由系统数据补全。
-- strategy 给 2-4 条具体投稿策略（梯度、叙事侧重、风险提示）。
-- 候选列表中标 ⚠预警 的期刊不要放进 primary。
-- 全部用中文。只输出 JSON。`,
+Requirements:
+- Produce both i18n.zh and i18n.en. English fields must use English prose only; Chinese journal names may remain in Chinese.
+- tiers must have three groups: primary 4-6 journals, backup 6-10 journals, fallback 3-5 journals. Choose mainly from candidates and use exact candidate journal names. Do not repeat journals.
+- fallback journals should be safer choices with broader scope; do not select warning-list journals for primary.
+- If a non-candidate English journal is clearly relevant, add at most 3 and mention it in the reason.
+- chinese: recommend 4-8 relevant Chinese core journals if the topic is suitable for Chinese-language submission; otherwise use an empty array.
+- Reasons should explain topic fit and positioning. Do not repeat IF/JCR/CAS metrics because site data fills those fields.
+- Strategy should include 2-4 practical submission suggestions.
+- Return JSON only. No markdown.`,
     },
     {
       role: 'user',
-      content: `论文: ${query}\n\n学科画像: ${JSON.stringify({
+      content: `Paper: ${query}\n\nSemantic profile: ${JSON.stringify({
         research_fields: profile.research_fields,
         wos_categories: profile.wos_categories,
-      })}\n\n候选期刊(按匹配度排序):\n${lines}`,
+      })}\n\nCandidate journals ranked by match:\n${lines}`,
     },
-  ], { temperature: 0.2, maxTokens: 1800, jsonOutput: true, model: context.model }, { ...context, step: 'report', feature: 'pick_report', evidenceCount: ranked.length });
+  ], { temperature: 0.2, maxTokens: 2800, jsonOutput: true, model: context.model }, { ...context, step: 'report', feature: 'pick_report', evidenceCount: ranked.length });
   const content = res?.choices?.[0]?.message?.content || '';
-  return sanitizeReport(JSON.parse(content));
+  return ensureReportI18n(JSON.parse(content), profile, ranked);
 }
 
 // ─── handler ───
@@ -559,6 +638,7 @@ export async function handlePick(req, env, opts = {}) {
 
   const query = cleanText(body?.query || body?.title || '', 4000);
   if (!query || query.length < 6) return json({ ok: false, error: 'Query required' }, 400);
+  const language = reportLang(body?.language || body?.lang || body?.locale || 'en');
 
   let journals;
   try {
@@ -617,13 +697,14 @@ export async function handlePick(req, env, opts = {}) {
       console.warn('pick report generation failed:', e?.message || e);
     }
   }
+  if (results.length) report = ensureReportI18n(report, profile, results);
 
   return json({
     ok: true,
     mode: 'ai',
     profile,
     results,
-    report,
+    report: report ? localizeReport(report, language) : null,
     total: results.length,
     shown: results.length,
     quota,
