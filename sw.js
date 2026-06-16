@@ -5,7 +5,7 @@
    - data JSON: network-first, cache fallback (so updates win, offline still works)
    - everything else: network only
 */
-const VERSION = '20260616-home-search-cards';
+const VERSION = '20260616-badge-order';
 const SHELL_CACHE = `shell-${VERSION}`;
 const DATA_CACHE = `data-${VERSION}`;
 

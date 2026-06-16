@@ -2471,15 +2471,15 @@
     return [
       badgeFlagship(r.flagship),
       r.nature_index ? badgeNatureIndex() : '',
-      r.cscd ? badgeCSCD(r.cscd) : '',
-      r.cstpcd ? badgeCSTPCD(r.cstpcd) : '',
       ...((r.indices) || []).map(badgeIndex),
       badgeScopus(r.scopus),
-	      badgeOAJ(r.oaj),
-	      badgeDOAJ(r.doaj),
-	      badgeMEDLINE(r.medline),
-	    ].filter(Boolean).join('');
-	  }
+      badgeOAJ(r.oaj),
+      badgeDOAJ(r.doaj),
+      badgeMEDLINE(r.medline),
+      r.cscd ? badgeCSCD(r.cscd) : '',
+      r.cstpcd ? badgeCSTPCD(r.cstpcd) : '',
+    ].filter(Boolean).join('');
+  }
   function renderRankBadges(r) {
     if (!r) return '';
     return [
@@ -2510,14 +2510,14 @@
     return [
       badgeFlagship(r.flagship),
       r.nature_index ? badgeNatureIndex() : '',
-      r.cscd ? badgeCSCD(r.cscd) : '',
-      r.cstpcd ? badgeCSTPCD(r.cstpcd) : '',
-      r.scd ? badgeSCD(r.scd) : '',
       ...((r.indices) || []).map(badgeIndex),
       badgeScopus(r.scopus),
       badgeMEDLINE(r.medline),
       badgePubMed(r.pubmed),
       badgePMC(r.pmc),
+      r.cscd ? badgeCSCD(r.cscd) : '',
+      r.cstpcd ? badgeCSTPCD(r.cstpcd) : '',
+      r.scd ? badgeSCD(r.scd) : '',
     ].filter(Boolean).join('');
   }
   function renderAccessBadges(r) {
