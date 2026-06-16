@@ -2207,9 +2207,32 @@
   function badgeVHB(vhb) {
     const best = bestVhbRating(vhb);
     if (!best) return '';
-    const count = Array.isArray(vhb) ? vhb.length : 1;
+    const rows = Array.isArray(vhb) ? vhb.filter(Boolean) : [best];
+    const count = rows.length;
     const area = best.area_code || best.area || '';
-    return `<span class="zone vhb-tier" title="${T('VHB Rating 2024，按领域评级','VHB Rating 2024, area rating')}${area ? ' · ' + escape(area) : ''}${count > 1 ? ` · ${count}${T(' 个领域',' areas')}` : ''}">VHB ${escape(best.rating)}</span>`;
+    const title = `${T('VHB Rating 2024，按领域评级','VHB Rating 2024, area rating')}${area ? ' · ' + escape(area) : ''}${count > 1 ? ` · ${count}${T(' 个领域',' areas')}` : ''}`;
+    const label = `VHB ${escape(best.rating)}${count > 1 ? ` x${count}` : ''}`;
+    if (count <= 1) {
+      return `<span class="zone vhb-tier" title="${title}">${label}</span>`;
+    }
+    const detailRows = rows.map(x => {
+      const areaText = [x.area_code, x.area].filter(Boolean).join(' · ') || 'Unspecified area';
+      const vote = x.votes_ge_rating_percent != null && x.votes_ge_rating_percent !== ''
+        ? `<span class="vhb-detail-vote">Votes &gt;= rating: ${escape(x.votes_ge_rating_percent)}%</span>`
+        : '';
+      return `<div class="vhb-detail-row">
+        <span class="vhb-detail-area">${escape(areaText)}</span>
+        <span class="vhb-detail-rating">${escape(x.rating || '')}</span>
+        ${vote}
+      </div>`;
+    }).join('');
+    return `<details class="vhb-details">
+      <summary class="zone vhb-tier" title="${title}">${label}</summary>
+      <div class="vhb-detail-popover" role="list">
+        <div class="vhb-detail-title">VHB Publication Media Rating ${escape(best.year || 2024)}</div>
+        ${detailRows}
+      </div>
+    </details>`;
   }
   function badgeCNRS(cnrs) {
     const arr = Array.isArray(cnrs) ? cnrs : [];
@@ -2670,9 +2693,27 @@
     if (!hits.length) return '';
     const out = [];
     const castHits = [];
+    const vhbHits = [];
+    const hasEmbeddedVhb = Array.isArray(r.vhb) && r.vhb.length;
     for (const h of hits) {
       if (h.source === 'cnkx') { castHits.push(h); continue; }
+      if (h.source === 'vhb') {
+        if (!hasEmbeddedVhb) vhbHits.push(h);
+        continue;
+      }
       out.push(`<span class="domsrc-pill ds-${h.source}" title="${escape(h.domain||h.discipline||h.category||h.org||'')}">${escape(h.label)}</span>`);
+    }
+    if (vhbHits.length) {
+      const seenVhb = new Set();
+      const rows = [];
+      for (const h of vhbHits) {
+        const key = `${h.tag || ''}|${h.domain || ''}`;
+        if (seenVhb.has(key)) continue;
+        seenVhb.add(key);
+        rows.push({ year: 2024, rating: h.tag || String(h.label || '').replace(/^VHB\s*/i, ''), area: h.domain || '', area_code: '' });
+      }
+      const vhbBadge = badgeVHB(rows);
+      if (vhbBadge) out.push(vhbBadge);
     }
     // CAST: label by discipline (科协建筑) instead of bare tier (科协 T1).
     const castSeen = new Set();
@@ -6267,6 +6308,7 @@
       shown = PAGE;
       const currentQuery = activeTab === 'updates' ? activeUpdateQuery : activeQuery;
       if (!currentQuery) return;
+      if (activeTab === 'home') saveHomeSearchHistory(currentQuery);
       trackInteraction('journal_search', { tab: activeTab, query: currentQuery });
       if (activeTab === 'home') showHomeSearchResults();
       else if (activeTab === 'int') renderInt();
@@ -6288,6 +6330,7 @@
       if (activeTab === 'pick') {
         qEl.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
       } else if (activeTab === 'home') {
+        saveHomeSearchHistory(activeQuery);
         trackInteraction('journal_search', { tab: activeTab, query: activeQuery });
         showHomeSearchResults();
       } else if (activeTab === 'int') { trackInteraction('journal_search', { tab: activeTab, query: activeQuery }); renderInt(); }
@@ -6315,18 +6358,214 @@
     const homeResults = $('#home-results');
     const homePanel = $('.tab-panel[data-panel="home"]');
     const homeUpdatesPreview = $('#home-updates-preview');
+    const HOME_SEARCH_HISTORY_KEY = 'ailatest.home.search.history';
+    const HOME_SEARCH_SUGGESTIONS = ['Science', 'Nature', 'Cell', 'The Lancet', 'IEEE Access', '建筑学报', '城市规划'];
+
+    function getHomeSearchHistory() {
+      try {
+        const raw = JSON.parse(localStorage.getItem(HOME_SEARCH_HISTORY_KEY) || '[]');
+        return Array.isArray(raw) ? raw.filter(Boolean).map(String).slice(0, 6) : [];
+      } catch (_) {
+        return [];
+      }
+    }
+
+    function saveHomeSearchHistory(term) {
+      const clean = String(term || '').trim();
+      if (!clean) return;
+      const seen = new Set();
+      const next = [clean, ...getHomeSearchHistory()]
+        .filter(x => {
+          const key = x.toLowerCase();
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        })
+        .slice(0, 8);
+      try { localStorage.setItem(HOME_SEARCH_HISTORY_KEY, JSON.stringify(next)); } catch (_) {}
+      renderHomeSearchChips();
+    }
+
+    function renderHomeSearchChips() {
+      const box = $('#home-search-chips');
+      if (!box) return;
+      if (activeTab !== 'home') {
+        box.hidden = true;
+        return;
+      }
+      const seen = new Set();
+      const terms = [...getHomeSearchHistory(), ...HOME_SEARCH_SUGGESTIONS]
+        .map(x => String(x || '').trim())
+        .filter(x => {
+          if (!x) return false;
+          const key = x.toLowerCase();
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        })
+        .slice(0, 8);
+      if (!terms.length) {
+        box.hidden = true;
+        return;
+      }
+      box.hidden = false;
+      const current = (activeQuery || '').trim().toLowerCase();
+      box.innerHTML = terms.map(term => {
+        const active = current && term.toLowerCase() === current ? ' active' : '';
+        return `<button class="home-search-chip${active}" type="button" data-home-search-term="${escape(term)}">${escape(term)}</button>`;
+      }).join('');
+      box.querySelectorAll('[data-home-search-term]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const term = btn.dataset.homeSearchTerm || '';
+          const qEl = $('#q');
+          activeQuery = term;
+          if (qEl) qEl.value = term;
+          saveHomeSearchHistory(term);
+          trackInteraction('journal_search', { tab: 'home', query: term, source: 'chip' });
+          showHomeSearchResults();
+        });
+      });
+    }
 
     function showHomeSearchResults() {
       if (!activeQuery) {
         if (homeResults) homeResults.hidden = true;
         if (homePanel) homePanel.classList.remove('home-tab-has-results');
+        renderHomeSearchChips();
         renderJournalUpdatesPreview();
         return;
       }
       if (homeUpdatesPreview) homeUpdatesPreview.hidden = true;
       if (homePanel) homePanel.classList.add('home-tab-has-results');
       if (homeResults) homeResults.hidden = false;
+      renderHomeSearchChips();
       renderHomeIntResults();
+    }
+
+    function homeCycleText(r) {
+      const cr = r.crossref;
+      const doaj = r.doaj;
+      let cycleDays = null;
+      if (cr && cr.median_days) cycleDays = +cr.median_days;
+      else if (doaj && typeof doaj === 'object' && doaj.review_weeks) cycleDays = +doaj.review_weeks * 7;
+      return cycleDays ? `${Math.round(cycleDays / 30.4)}${T('个月','mo')}` : '';
+    }
+
+    function homeTopicText(r) {
+      const wosVals = Array.isArray(r.wos_categories) ? r.wos_categories.filter(Boolean) : [];
+      if (wosVals.length) return wosVals.slice(0, 2).join(' / ');
+      return r.esi_category || r.cas_major_cn || '';
+    }
+
+    const HOME_INDEX_BADGE_CLASSES = [
+      'b-scie', 'b-ssci', 'b-ahci', 'b-esci', 'b-ei',
+      'b-scopus', 'b-medline', 'b-pubmed', 'b-pmc',
+      'b-nature-index', 'b-cscd', 'b-cstpcd', 'b-scd'
+    ];
+
+    function homeBadgeItems(html) {
+      const raw = String(html || '').trim();
+      if (!raw || typeof document === 'undefined') return [];
+      const tpl = document.createElement('template');
+      tpl.innerHTML = raw;
+      return [...tpl.content.children].filter(el => String(el.textContent || '').trim());
+    }
+
+    function homeBadgeOuterHtml(el) {
+      if (el.matches && el.matches('details')) {
+        const summary = el.querySelector('summary');
+        if (summary) return summary.outerHTML;
+      }
+      return el.outerHTML;
+    }
+
+    function compactHomeBadges(html, { limit = 4, includeClasses = [] } = {}) {
+      const items = homeBadgeItems(html);
+      if (!items.length) return '';
+      const filtered = includeClasses.length
+        ? items.filter(el => includeClasses.some(cls => el.classList && el.classList.contains(cls)))
+        : items;
+      const usable = filtered.length ? filtered : items;
+      const shown = usable.slice(0, limit).map(homeBadgeOuterHtml).join('');
+      const extra = usable.length - limit;
+      if (extra <= 0) return shown;
+      const extraTitle = usable.slice(limit)
+        .map(el => String(el.textContent || '').replace(/\s+/g, ' ').trim())
+        .filter(Boolean)
+        .join(' / ');
+      return `${shown}<span class="home-more-badge" title="${escape(extraTitle)}">+${extra}</span>`;
+    }
+
+    function renderHomeBadgeLine(html, cls = '', options = {}) {
+      const compact = compactHomeBadges(html, options);
+      return compact ? `<div class="home-card-badges ${cls}">${compact}</div>` : '';
+    }
+
+    function renderHomeJournalCard(r) {
+      const fid = favId(r);
+      rowRecordsByFid[fid] = { ...r, __src: 'int' };
+      const title = titleCase((r.name || '').replace(/\*$/,''));
+      const alias = r.abbr20 && r.abbr20 !== r.name ? r.abbr20 : '';
+      const crossBadges = renderDomCrossBadges(r, 'int');
+      const indexBadges = renderCoverageBadges(r);
+      const rankBadges = [renderLevelBadges(r), crossBadges].filter(Boolean).join('');
+      const riskBadges = renderRiskBadges(r);
+      const ifVal = r.if_2024 != null ? (+r.if_2024).toFixed(1) : '';
+      const cycle = homeCycleText(r);
+      const topic = homeTopicText(r);
+      const metrics = [
+        ifVal ? `<span class="home-metric home-if">IF ${escape(ifVal)}</span>` : '',
+        cycle ? `<span class="home-metric">${escape(cycle)}</span>` : '',
+        topic ? `<span class="home-card-topic">${escape(topic)}</span>` : '',
+      ].filter(Boolean).join('');
+      return `<article class="home-journal-card j-row clickable ${r.flagship ? 'row-flagship' : ''}" data-fid="${escape(fid)}" data-src="int">
+        <div class="home-card-head">
+          <div class="home-card-title-wrap">
+            <h3 class="home-card-title">${escape(title)}</h3>
+            ${alias ? `<div class="home-card-alias">aka: ${escape(alias)}</div>` : ''}
+            ${r.cn_name ? `<div class="home-card-alias">${escape(r.cn_name)}</div>` : ''}
+          </div>
+          <div class="home-card-fav">${starBtn(r, 'int')}</div>
+        </div>
+        ${renderHomeBadgeLine(indexBadges, 'home-card-indexes', { limit: 5, includeClasses: HOME_INDEX_BADGE_CLASSES })}
+        ${renderHomeBadgeLine(rankBadges, 'home-card-ranks', { limit: 3 })}
+        ${renderHomeBadgeLine(riskBadges, 'home-card-risks', { limit: 2 })}
+        ${metrics ? `<div class="home-card-meta">${metrics}</div>` : ''}
+      </article>`;
+    }
+
+    function renderHomeDomesticCard(r) {
+      const fid = favId(r);
+      rowRecordsByFid[fid] = { ...r, __src: r.__src };
+      const name = r.name || r.cn_name || r.title || '';
+      const cnName = r.en_name ? titleCase(r.en_name) : '';
+      const crossBadges = renderDomCrossBadges({ name, issn: r.issn, cn_code: r.cn_code }, r.__src);
+      const sourceLabel = {
+        cnki_major: T('中文期刊目录','Chinese Journal Directory'),
+        cnkx: T('中国科协','CAST'),
+        nsfc_mgmt: T('国自然管理科学部','NSFC Management'),
+        zju: T('浙大目录','ZJU'),
+        cscd: 'CSCD',
+        cstpcd: T('中国科技核心','CSTPCD'),
+        cssci_core: 'CSSCI',
+        cssci_ext: T('CSSCI 扩展','CSSCI Ext'),
+        pku_core: T('北大核心','PKU Core')
+      }[r.__src] || T('国内来源','Domestic Source');
+      const tierText = r.tier ? `<span class="home-metric">${escape(r.tier)}</span>` : '';
+      return `<article class="home-journal-card home-domestic-card j-row clickable" data-fid="${escape(fid)}" data-src="${escape(r.__src)}">
+        <div class="home-card-head">
+          <div class="home-card-title-wrap">
+            <h3 class="home-card-title">${escape(titleCase(name.replace(/\*$/,'')))}</h3>
+            ${cnName ? `<div class="home-card-alias">${escape(cnName)}</div>` : ''}
+          </div>
+          <div class="home-card-fav">${starBtn(r, r.__src)}</div>
+        </div>
+        ${renderHomeBadgeLine(crossBadges, 'home-card-ranks', { limit: 3 })}
+        <div class="home-card-meta">
+          <span class="home-card-topic">${escape(sourceLabel)}</span>
+          ${tierText}
+        </div>
+      </article>`;
     }
 
     function renderHomeIntResults() {
@@ -6366,7 +6605,7 @@
         sections.push({
           kind: 'int',
           label: T('国际期刊','International Journals'),
-          html: intFiltered.slice(0, intLimit).map(renderRow).join(''),
+          html: intFiltered.slice(0, intLimit).map(renderHomeJournalCard).join(''),
           count: intCount
         });
         totalCount += intCount;
@@ -6407,30 +6646,7 @@
         byDomesticKey.forEach((r) => dedupedDomestic.push(r));
         domCount = dedupedDomestic.length;
         if (domCount) {
-          domHtml = dedupedDomestic.slice(0, domLimit).map(r => {
-            const fid = favId(r);
-            rowRecordsByFid[fid] = { ...r, __src: r.__src };
-            const name = r.name || r.cn_name || r.title || '';
-            const cnName = r.en_name ? `<span class="jname-cn">${escape(titleCase(r.en_name))}</span>` : '';
-            const crossBadges = renderDomCrossBadges({ name, issn: r.issn, cn_code: r.cn_code }, r.__src);
-            const sourceLabel = {
-              cnki_major: T('中文期刊目录','Chinese Journal Directory'),
-              cnkx: T('中国科协','CAST'),
-              nsfc_mgmt: T('国自然管理科学部','NSFC Management'),
-              zju: T('浙大目录','ZJU'),
-              cscd: 'CSCD',
-              cstpcd: T('中国科技核心','CSTPCD'),
-              cssci_core: 'CSSCI',
-              cssci_ext: T('CSSCI 扩展','CSSCI Ext'),
-              pku_core: T('北大核心','PKU Core')
-            }[r.__src] || T('国内来源','Domestic Source');
-            return `<tr data-fid="${escape(fid)}" class="j-row clickable" data-src="${escape(r.__src)}">
-              <td class="col-fav">${starBtn(r, r.__src)}</td>
-              <td class="col-name"><div class="jname">${escape(titleCase(name.replace(/\*$/,'')))}${cnName}</div></td>
-              <td class="col-cross"><div class="badges">${crossBadges}</div></td>
-              <td class="col-topic"><span class="muted-cell">${escape(sourceLabel)}</span></td>
-            </tr>`;
-          }).join('');
+          domHtml = dedupedDomestic.slice(0, domLimit).map(renderHomeDomesticCard).join('');
         }
       }
 
@@ -6475,13 +6691,7 @@
             </div>`
           : '';
         html += `<div class="home-section-label">${sec.label}</div>
-          <div class="table-wrap home-results-wrap"><table class="journals home-journals" data-home-kind="${sec.kind}"><thead><tr>
-            <th class="col-fav"></th>
-            <th class="col-name">${t('col_name')}</th>
-            <th class="col-badge">${t('col_index')}</th>
-            <th class="col-if">IF <span class="sort-arrow">▼</span></th>
-            <th class="col-cas">${t('col_cas')}</th>
-          </tr></thead><tbody>${sec.html}</tbody></table></div>${more}`;
+          <div class="home-results-wrap"><div class="home-card-grid" data-home-kind="${sec.kind}">${sec.html}</div></div>${more}`;
       }
       if (totalCount > intLimit + domLimit) {
         html += `<div class="pager"><button class="big-btn primary" id="home-more-btn" data-i18n="load_more">${t('load_more')}</button></div>`;
@@ -6962,9 +7172,11 @@
         const subtabs = $('#home-subtabs');
         const hero = $('.home-hero');
         const preview = $('#home-updates-preview');
+        const chips = $('#home-search-chips');
         if (results) results.hidden = true;
         if (subtabs) subtabs.hidden = true;
         if (preview) preview.hidden = true;
+        if (chips) chips.hidden = true;
         if (hero) hero.closest('.tab-panel')?.classList.remove('home-tab-has-results');
       }
       if (!opts.skipPath) {
@@ -6990,6 +7202,7 @@
       } else if (activeTab === 'home') {
         showHomeSearchResults();
       }
+      renderHomeSearchChips();
       updateStickySearchState();
     }
     window.__activateJournalTab = activateTab;
@@ -7233,7 +7446,8 @@
     document.addEventListener('click', (e) => {
       if (e.target.closest('.fav-star')) return;
       if (e.target.closest('.drag-handle')) return;
-      const row = e.target.closest('tr.j-row.clickable'); if (!row) return;
+      if (e.target.closest('.vhb-details')) return;
+      const row = e.target.closest('.j-row.clickable'); if (!row) return;
       const fid = row.dataset.fid;
       const rec = rowRecordsByFid[fid] || journals.find(r => favId(r) === fid) || favsData[fid];
       if (rec) openDrawer(rec, { pageMode: true, source: journalOpenSource() });
