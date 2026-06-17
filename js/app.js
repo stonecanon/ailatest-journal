@@ -93,6 +93,7 @@
       search_dom: '搜索：刊名 / ISSN / CN 号（跨库搜索）',
       search_fav: '搜索收藏：期刊 / 缩写 / ISSN',
       search_home_ph: '搜索期刊名、ISSN…',
+      home_if_updated: '最新版 IF 已更新：JCR 2026 发布 · 2025 指标',
       search_submit_hint: '搜索',
       search_button: 'Search',
       home_subtitle: '全球期刊检索与推荐平台',
@@ -178,6 +179,7 @@
       search_dom: 'Search: title / ISSN / CN (cross-source)',
       search_fav: 'Search favorites: title / acronym / ISSN',
       search_home_ph: 'Search journal name, ISSN…',
+      home_if_updated: 'Latest IF updated: JCR 2026 release · 2025 metrics',
       search_submit_hint: 'search',
       search_button: 'Search',
       home_subtitle: 'Journal search & submission decision tool for researchers',
@@ -217,6 +219,7 @@
     pick_coming_title: '敬請期待', pick_coming_desc: '未來更新', results_all: '全部期刊', load_more: '載入更多',
     col_name: '期刊 Title', col_free: '免費', col_abbr: '縮寫 Abbr', col_badges: '索引 / 分區', search_int: '搜尋：期刊全稱 / 官方縮寫 / ISSN / 中文刊名', search_dom: '搜尋：中文刊名 / 英文刊名 / ISSN / CN 號', search_fav: '搜尋收藏：期刊 / 縮寫 / ISSN',
       search_home_ph: '搜尋期刊名、ISSN…',
+      home_if_updated: '最新版 IF 已更新：JCR 2026 發布 · 2025 指標',
       home_subtitle: '面向科研人員的期刊檢索與投稿決策工具', showing: '顯示', of: '條 / 共', total_items: '條', empty: '未找到匹配的期刊', login: '登入', logout: '登出', fav_added: '已收藏', fav_removed: '已移除', syncing: '同步中…', synced: '已同步', wos_subjects: 'WoS 細分學科', wos_search_ph: '篩選學科（A-Z）…', cnkx_domain: '學科領域', cnkx_sub: '細分學科', wos_clear_title: '清空選擇', filter_free_only: '只看免費發表'
   };
   Object.assign(I18N, {
@@ -907,6 +910,14 @@
       if (oaMap[k]) return oaMap[k];
     }
     return null;
+  }
+
+  function isFreeToPublish(r) {
+    if (!r) return false;
+    if (r.free) return true;
+    const oa = lookupOA(r);
+    const label = String(oa?.l || oa?.label || '').toLowerCase();
+    return label === 'diamond' || label === 'hybrid' || label === 'subscription_paid_read';
   }
 
   function lookupCover(r) {
@@ -2257,7 +2268,7 @@
   }
   function badgeFree(f) {
     if (!f) return '';
-    return `<span class="badge b-free" title="${T('提供 OA 发表选项（含 Diamond/Gold/Hybrid）','Offers OA publishing option (Diamond/Gold/Hybrid)')}">${T('免费发表','FREE TO PUBLISH')}</span>`;
+    return `<span class="badge b-free" title="${T('作者可选择免费发表路径（Diamond / Hybrid / 订阅制等）','Author-free publishing path available (Diamond / Hybrid / subscription, etc.)')}">${T('免费发表','FREE TO PUBLISH')}</span>`;
   }
   // 期刊浏览量缓存（journal_key → count）
   const viewsCache = {};
@@ -2523,7 +2534,7 @@
   function renderAccessBadges(r) {
     if (!r) return '';
     return [
-      badgeFree(r.free),
+      badgeFree(isFreeToPublish(r)),
       badgeOAJ(r.oaj),
       badgeDOAJ(r.doaj),
     ].filter(Boolean).join('');
@@ -2796,8 +2807,8 @@
 
   /* ───────── FREE badge helper ───────── */
   function freeBadgeCell(r) {
-    return r.free
-      ? `<span class="badge b-free" title="${T('提供 OA 发表选项（含 Diamond/Gold/Hybrid）','Offers OA publishing option (Diamond/Gold/Hybrid)')}">${T('免费发表','FREE TO PUBLISH')}</span>`
+    return isFreeToPublish(r)
+      ? `<span class="badge b-free" title="${T('作者可选择免费发表路径（Diamond / Hybrid / 订阅制等）','Author-free publishing path available (Diamond / Hybrid / subscription, etc.)')}">${T('免费发表','FREE TO PUBLISH')}</span>`
       : '<span class="muted-cell">&mdash;</span>';
   }
 
@@ -2822,7 +2833,7 @@
             (activeFeats.has('medline') && r.medline) ||
             (activeFeats.has('cscd') && r.cscd) ||
             (activeFeats.has('cstpcd') && r.cstpcd) ||
-            (activeFeats.has('free') && r.free) ||
+            (activeFeats.has('free') && isFreeToPublish(r)) ||
             (activeFeats.has('warning') && r.warning) ||
             (activeFeats.has('citic_warning') && r.citic_warning) ||
             (activeFeats.has('under_review') && r.under_review) ||
@@ -2868,7 +2879,7 @@
     if (activeFeats.has('medline') && !r.medline) return false;
     if (activeFeats.has('cscd') && !r.cscd) return false;
     if (activeFeats.has('cstpcd') && !r.cstpcd) return false;
-    if (activeFeats.has('free') && !r.free) return false;
+    if (activeFeats.has('free') && !isFreeToPublish(r)) return false;
     if (activeFeats.has('warning') && !r.warning) return false;
     if (activeFeats.has('citic_warning') && !r.citic_warning) return false;
     if (activeFeats.has('under_review') && !r.under_review) return false;
@@ -3002,7 +3013,9 @@
       if (r.oaj) inc('feat', 'oaj');
       if (r.doaj) inc('feat', 'doaj');
       if (r.medline) inc('feat', 'medline');
-      if (r.free) inc('feat', 'free');
+      if (r.cscd) inc('feat', 'cscd');
+      if (r.cstpcd) inc('feat', 'cstpcd');
+      if (isFreeToPublish(r)) inc('feat', 'free');
       if (r.warning) inc('feat', 'warning');
       if (r.citic_warning) inc('feat', 'citic_warning');
       if (r.under_review) inc('feat', 'under_review');
@@ -4582,13 +4595,13 @@
     // 徽章块 — 分两行：索引收录 / 分区等级
 	    const drawerIndexBadges = (src === 'int' || intRec) ? renderIndexBadges(ir) : '';
 	    const drawerRankBadges = (src === 'int' || intRec) ? renderRankBadges(ir) : '';
-	    const titleFeatureBadges = (ir.free || r.free) ? badgeFree(true) : '';
+	    const titleFeatureBadges = isFreeToPublish(ir) || isFreeToPublish(r) ? badgeFree(true) : '';
 	    const tierBadge = r.tier && /^T[123]$/.test(r.tier) ? badgeTier(r.tier)
                     : r.tier ? `<span class="tier-pill t3">${escape(tn(r.tier, "tier"))}</span>` : '';
     const crossBadges = renderDomCrossBadges(r, src);
     const drawerCoverageBadges = (src === 'int' || intRec) ? renderCoverageBadges(ir) : '';
     const drawerLevelBadges = (src === 'int' || intRec) ? renderLevelBadges(ir) : '';
-    const drawerAccessBadges = (src === 'int' || intRec) ? renderAccessBadges(ir) : ((r.free) ? badgeFree(true) : '');
+    const drawerAccessBadges = (src === 'int' || intRec) ? renderAccessBadges(ir) : (isFreeToPublish(r) ? badgeFree(true) : '');
     const drawerRiskBadges = (src === 'int' || intRec) ? renderRiskBadges(ir) : '';
 
     // 基础元信息（真实字段）
@@ -4787,10 +4800,107 @@
         stats.push([T('已发表论文','Published Works'), oaWorks.toLocaleString()]);
       }
     }
-    const ifNote = ir.if_2024 != null ? T('JCR 2025发布 · 2024指标','JCR 2025 rel. · 2024 metric') : '';
+    const latestIfYear = Number(ir.if_latest_year || ir.jcr_year || 2025);
+    const latestReleaseYear = Number(ir.jcr_release_year || (latestIfYear + 1));
+    const ifNote = ir.if_2024 != null
+      ? T(`JCR ${latestReleaseYear}发布 · ${latestIfYear}指标`, `JCR ${latestReleaseYear} rel. · ${latestIfYear} metric`)
+      : '';
     const statsHTML = stats.length ? `<div class="stats-grid stats-count-${Math.min(stats.length, 4)}">${stats.map(([k,v,sub]) =>
       `<div class="stat"><div class="stat-v">${escape(String(v))}</div><div class="stat-k">${k}</div>${sub?`<div class="stat-sub">${sub}</div>`:''}</div>`
     ).join('')}</div>${ifNote ? `<div class="stats-sub">${ifNote}</div>` : ''}` : '';
+
+    const trendsHTML = (() => {
+      const toPointList = (input, valueKey) => {
+        if (!input) return [];
+        if (Array.isArray(input)) {
+          return input.map(x => ({
+            year: Number(x.year),
+            value: Number(x[valueKey] ?? x.value ?? x.count),
+          })).filter(x => Number.isFinite(x.year) && Number.isFinite(x.value));
+        }
+        if (typeof input === 'object') {
+          return Object.entries(input).map(([year, value]) => ({
+            year: Number(year),
+            value: Number(value),
+          })).filter(x => Number.isFinite(x.year) && Number.isFinite(x.value));
+        }
+        return [];
+      };
+      const chart = (points, titleText, unitText, cls, options = {}) => {
+        const partialYear = Number(options.partialYear || 0);
+        const data = points.slice().sort((a, b) => a.year - b.year).map(p => ({
+          ...p,
+          partial: partialYear && Number(p.year) >= partialYear,
+        }));
+        if (!data.length) return '';
+        const lineData = data.filter(p => !p.partial);
+        const drawable = lineData.length ? lineData : data;
+        const w = 320, h = 146, padL = 38, padR = 16, padT = 18, padB = 30;
+        const xs = data.map(x => x.year);
+        const ys = data.map(x => x.value);
+        const minX = Math.min(...xs), maxX = Math.max(...xs);
+        const minY = 0;
+        let maxY = Math.max(...ys, 1);
+        const magnitude = Math.pow(10, Math.max(0, Math.floor(Math.log10(maxY)) - 1));
+        maxY = Math.ceil(maxY / magnitude) * magnitude;
+        const xScale = (year) => padL + ((year - minX) / Math.max(1, maxX - minX)) * (w - padL - padR);
+        const yScale = (value) => padT + (1 - ((value - minY) / Math.max(1, maxY - minY))) * (h - padT - padB);
+        const path = drawable.map((p, i) => `${i ? 'L' : 'M'}${xScale(p.year).toFixed(1)} ${yScale(p.value).toFixed(1)}`).join(' ');
+        const first = drawable[0];
+        const last = drawable[drawable.length - 1];
+        const partialDots = data.filter(p => p.partial);
+        const dots = data.map(p => `<circle class="trend-point ${p.partial ? 'trend-dot-partial' : 'trend-dot'}" cx="${xScale(p.year).toFixed(1)}" cy="${yScale(p.value).toFixed(1)}" r="${p.partial ? 4.2 : 3.4}" tabindex="0" role="button" data-year="${p.year}" data-value="${escape(String(p.value))}" data-partial="${p.partial ? '1' : ''}"><title>${p.year}: ${p.value}${p.partial ? ' (YTD)' : ''}</title></circle>`).join('');
+        const delta = drawable.length > 1 ? last.value - first.value : null;
+        const deltaText = delta == null
+          ? ''
+          : `${delta >= 0 ? '+' : ''}${Math.abs(delta) >= 10 ? delta.toFixed(0) : delta.toFixed(1)}`;
+        const endTick = partialDots.length ? partialDots[partialDots.length - 1] : last;
+        const ticks = [first, endTick].filter((p, i, arr) => i === 0 || p.year !== arr[0].year);
+        const gridVals = [0, maxY * 0.5, maxY];
+        const grid = gridVals.map(v => `<line class="trend-gridline" x1="${padL}" y1="${yScale(v).toFixed(1)}" x2="${w - padR}" y2="${yScale(v).toFixed(1)}"></line>`).join('');
+        const fill = drawable.length > 1
+          ? `<path class="trend-fill" d="${path} L${xScale(last.year).toFixed(1)} ${h - padB} L${xScale(first.year).toFixed(1)} ${h - padB} Z"></path>`
+          : '';
+        const partialGuides = partialDots.map(p => `<line class="trend-partial-guide" x1="${xScale(p.year).toFixed(1)}" y1="${padT}" x2="${xScale(p.year).toFixed(1)}" y2="${h - padB}"></line>`).join('');
+        const defaultReadout = `${last.year}: ${escape(String(last.value))}`;
+        const defaultX = Math.min(w - 72, Math.max(padL + 4, xScale(last.year) + 8));
+        const defaultY = Math.max(padT + 2, yScale(last.value) - 28);
+        return `<div class="trend-card ${cls}">
+          <div class="trend-head">
+            <div><div class="trend-title">${escape(titleText)}</div><div class="trend-unit">${escape(unitText)}</div></div>
+            ${deltaText ? `<div class="trend-delta ${delta >= 0 ? 'up' : 'down'}">${escape(deltaText)}</div>` : ''}
+          </div>
+          <svg class="trend-svg" viewBox="0 0 ${w} ${h}" role="img" aria-label="${escape(titleText)}">
+            ${grid}
+            ${partialGuides}
+            <line class="trend-axis" x1="${padL}" y1="${h - padB}" x2="${w - padR}" y2="${h - padB}"></line>
+            <line class="trend-axis" x1="${padL}" y1="${padT}" x2="${padL}" y2="${h - padB}"></line>
+            ${fill}
+            ${drawable.length > 1 ? `<path class="trend-line" d="${path}"></path>` : ''}
+            ${dots}
+            <g class="trend-readout" transform="translate(${defaultX.toFixed(1)} ${defaultY.toFixed(1)})" data-default="${defaultReadout}">
+              <rect width="64" height="24" rx="12"></rect>
+              <text x="32" y="16" text-anchor="middle">${defaultReadout}</text>
+            </g>
+            ${ticks.map(p => `<text class="trend-year" x="${xScale(p.year).toFixed(1)}" y="${h - 8}" text-anchor="${p === first ? 'start' : 'end'}">${p.year}</text>`).join('')}
+            <text class="trend-y max" x="4" y="${padT + 4}">${escape(String(maxY))}</text>
+            <text class="trend-y min" x="4" y="${h - padB + 4}">0</text>
+          </svg>
+        </div>`;
+      };
+      const ifPoints = toPointList(ir.if_history, 'value');
+      const pubPoints = toPointList(ir.publication_history || r.publication_history, 'count');
+      const cards = [
+        chart(ifPoints, T('影响因子年度变化','Impact Factor Trend'), T('JIF by metric year','JIF by metric year'), 'if-trend'),
+        chart(pubPoints, T('逐年发文量变化','Annual Publication Output'), T('OpenAlex 年度作品数','OpenAlex yearly works'), 'pub-trend', { partialYear: 2026 }),
+      ].filter(Boolean);
+      if (!cards.length) return '';
+      return `<div class="drawer-section trends-section">
+        <h4>${T('指标趋势','Metric Trends')}</h4>
+        <div class="trend-grid">${cards.join('')}</div>
+        <div class="muted-cell trend-note">${T('2026 年发文量为当前快照累计值，非全年最终数。','2026 publication output is a snapshot-to-date value, not a full-year final count.')}</div>
+      </div>`;
+    })();
 
     const jcrHTML = (() => {
       const q = ir.if_quartile ? String(ir.if_quartile).toUpperCase() : '';
@@ -4976,7 +5086,7 @@
       const apcText = (ir.doaj?.apc === 'Yes' && doajFee) ? doajFee : (ir.doaj?.apc === 'Yes' ? T('有 APC','Has APC') : '');
       const doajBadge = doaj ? `<span class="oa-chip oa-doaj">&check; ${T('收录 DOAJ','In DOAJ')}</span>` : '';
       const isoaBadge = isoa ? '<span class="oa-chip oa-isoa">Open Access</span>' : '';
-      const freeBadge = r.free ? `<span class="oa-chip oa-free" title="${T('提供 OA 发表选项（含 Diamond/Gold/Hybrid）','Offers OA publishing option (Diamond/Gold/Hybrid)')}">${T('✓ 免费发表','✓ FREE TO PUBLISH')}</span>` : '';
+      const freeBadge = isFreeToPublish(ir) || isFreeToPublish(r) ? `<span class="oa-chip oa-free" title="${T('作者可选择免费发表路径（Diamond / Hybrid / 订阅制等）','Author-free publishing path available (Diamond / Hybrid / subscription, etc.)')}">${T('✓ 免费发表','✓ FREE TO PUBLISH')}</span>` : '';
       const rows = [];
       if (homepage) rows.push([T('官网','Website'), `<a href="${escape(homepage)}" target="_blank" rel="noopener nofollow">${escape(homepage.replace(/^https?:\/\//,'').replace(/\/$/,''))}</a>`]);
       if (apcText) rows.push([T('版面费 (APC)','APC'), escape(apcText)]);
@@ -5085,6 +5195,7 @@
 	      </div>
 	      ${statsHTML}
 	      <div class="journal-detail-masonry">
+	        ${trendsHTML}
 	        ${jcrHTML}
 	        ${casHTML}
 	        ${xrHTML}
@@ -5117,6 +5228,39 @@
 	    `;
     // init rating widget
     setTimeout(() => initRatingWidget(favId(r)), 0);
+    body.querySelectorAll('.trend-point').forEach(point => {
+      const activate = () => {
+        const card = point.closest('.trend-card');
+        const readout = card?.querySelector('.trend-readout');
+        if (!readout) return;
+        card.querySelectorAll('.trend-point.is-active').forEach(p => p.classList.remove('is-active'));
+        point.classList.add('is-active');
+        const suffix = point.dataset.partial ? T('（当前快照）',' (snapshot)') : '';
+        const label = `${point.dataset.year}${suffix}: ${point.dataset.value}`;
+        const svg = point.closest('svg');
+        const vb = svg?.viewBox?.baseVal;
+        const cx = Number(point.getAttribute('cx') || 0);
+        const cy = Number(point.getAttribute('cy') || 0);
+        const boxWidth = Math.max(64, Math.min(124, 26 + label.length * 6.2));
+        const x = Math.min((vb?.width || 320) - boxWidth - 4, Math.max(4, cx + 8));
+        const y = Math.max(4, cy - 30);
+        const rect = readout.querySelector('rect');
+        const text = readout.querySelector('text');
+        readout.setAttribute('transform', `translate(${x.toFixed(1)} ${y.toFixed(1)})`);
+        if (rect) rect.setAttribute('width', boxWidth.toFixed(1));
+        if (text) {
+          text.setAttribute('x', (boxWidth / 2).toFixed(1));
+          text.textContent = label;
+        }
+      };
+      point.addEventListener('click', activate);
+      point.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Enter' || ev.key === ' ') {
+          ev.preventDefault();
+          activate();
+        }
+      });
+    });
     // related journal cards → click to open that journal's drawer
     body.querySelectorAll('.related-card').forEach(card => {
       card.addEventListener('click', () => {
@@ -6366,7 +6510,25 @@
     const homePanel = $('.tab-panel[data-panel="home"]');
     const homeUpdatesPreview = $('#home-updates-preview');
     const HOME_SEARCH_HISTORY_KEY = 'ailatest.home.search.history';
-    const HOME_SEARCH_SUGGESTIONS = ['Science', 'Nature', 'Cell', 'The Lancet', 'IEEE Access', '建筑学报', '城市规划'];
+    const HOME_SEARCH_FALLBACK_SUGGESTIONS = [
+      'CA-A Cancer Journal for Clinicians',
+      'Nature Reviews Molecular Cell Biology',
+      'The Lancet',
+      'New England Journal of Medicine',
+      'JAMA',
+      'Nature',
+      'Science',
+      'Cell',
+    ];
+
+    function latestHighImpactSuggestions() {
+      if (!Array.isArray(journals) || !journals.length) return HOME_SEARCH_FALLBACK_SUGGESTIONS;
+      return journals
+        .filter(r => Number.isFinite(Number(r.if_latest ?? r.if_2025 ?? r.if_2024)) && r.name)
+        .sort((a, b) => Number(b.if_latest ?? b.if_2025 ?? b.if_2024) - Number(a.if_latest ?? a.if_2025 ?? a.if_2024))
+        .slice(0, 3)
+        .map(r => r.name);
+    }
 
     function getHomeSearchHistory() {
       try {
@@ -6395,13 +6557,18 @@
 
     function renderHomeSearchChips() {
       const box = $('#home-search-chips');
+      const note = $('#home-data-note');
       if (!box) return;
       if (activeTab !== 'home') {
         box.hidden = true;
+        if (note) note.hidden = true;
         return;
       }
+      if (note) note.hidden = false;
       const seen = new Set();
-      const terms = [...getHomeSearchHistory(), ...HOME_SEARCH_SUGGESTIONS]
+      const history = getHomeSearchHistory().slice(0, 3);
+      const suggestions = latestHighImpactSuggestions().slice(0, Math.max(0, 3 - history.length));
+      const terms = [...history, ...suggestions]
         .map(x => String(x || '').trim())
         .filter(x => {
           if (!x) return false;
@@ -6410,7 +6577,7 @@
           seen.add(key);
           return true;
         })
-        .slice(0, 8);
+        .slice(0, 3);
       if (!terms.length) {
         box.hidden = true;
         return;
@@ -7472,10 +7639,12 @@
         const hero = $('.home-hero');
         const preview = $('#home-updates-preview');
         const chips = $('#home-search-chips');
+        const dataNote = $('#home-data-note');
         if (results) results.hidden = true;
         if (subtabs) subtabs.hidden = true;
         if (preview) preview.hidden = true;
         if (chips) chips.hidden = true;
+        if (dataNote) dataNote.hidden = true;
         if (hero) hero.closest('.tab-panel')?.classList.remove('home-tab-has-results');
       }
       if (!opts.skipPath) {

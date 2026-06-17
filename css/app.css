@@ -1739,6 +1739,16 @@ body.update-reading-mode .updates-page {
   gap: 6px 8px;
 }
 .home-search-chips[hidden] { display: none !important; }
+.home-data-note {
+  width: min(670px, 100%);
+  margin: -14px auto 18px;
+  color: var(--ink-faint);
+  font-size: 12px;
+  font-weight: 650;
+  text-align: center;
+  letter-spacing: 0;
+}
+.home-data-note[hidden] { display: none !important; }
 .home-search-chip {
   appearance: none;
   border: 1px solid rgba(117,111,104,.20);
@@ -1944,19 +1954,32 @@ body.topbar-compact .results-head {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 8px;
   cursor: pointer;
   user-select: none;
 }
 .free-th-filter input {
-  width: 13px;
-  height: 13px;
-  margin: 0;
-  accent-color: var(--accent);
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.free-th-filter span::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 7px;
+  border-radius: 50%;
+  background: rgba(117,111,104,.28);
+  vertical-align: 1px;
 }
 .free-th-filter:has(input:checked) {
-  color: var(--accent);
+  color: #166534;
   font-weight: 800;
+}
+.free-th-filter:has(input:checked) span::before {
+  background: #22a35a;
+  box-shadow: 0 0 0 4px rgba(34,163,90,.13);
 }
 .col-name {
   width: 30%;
@@ -3867,6 +3890,159 @@ body.journal-route .related-section {
   grid-column: 1 / -1;
 }
 
+body.journal-route .trends-section {
+  grid-column: 1 / -1;
+}
+
+body.journal-route .trend-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+body.journal-route .trend-card {
+  min-width: 0;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.58);
+  border: 1px solid var(--rule-soft);
+  border-radius: 12px;
+}
+
+body.journal-route .trend-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+body.journal-route .trend-title {
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+body.journal-route .trend-unit,
+body.journal-route .trend-note {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+body.journal-route .trend-note {
+  margin-top: 10px;
+}
+
+body.journal-route .trend-delta {
+  flex: 0 0 auto;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+body.journal-route .trend-delta.up {
+  color: #1f6d48;
+  background: rgba(70, 157, 104, 0.14);
+}
+
+body.journal-route .trend-delta.down {
+  color: #9b3a34;
+  background: rgba(190, 72, 62, 0.13);
+}
+
+body.journal-route .trend-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+body.journal-route .trend-axis {
+  stroke: rgba(69, 55, 38, 0.2);
+  stroke-width: 1;
+}
+
+body.journal-route .trend-gridline {
+  stroke: rgba(69, 55, 38, 0.08);
+  stroke-width: 1;
+}
+
+body.journal-route .trend-partial-guide {
+  stroke: rgba(69, 55, 38, 0.16);
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+}
+
+body.journal-route .trend-line {
+  fill: none;
+  stroke: #2c6c8f;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+body.journal-route .pub-trend .trend-line {
+  stroke: #7a5a24;
+}
+
+body.journal-route .trend-fill {
+  fill: rgba(44, 108, 143, 0.1);
+}
+
+body.journal-route .pub-trend .trend-fill {
+  fill: rgba(122, 90, 36, 0.12);
+}
+
+body.journal-route .trend-svg circle {
+  fill: #fff;
+  stroke: #2c6c8f;
+  stroke-width: 2;
+  cursor: pointer;
+  transition: r .15s, stroke-width .15s, filter .15s;
+}
+
+body.journal-route .pub-trend .trend-svg circle {
+  stroke: #7a5a24;
+}
+
+body.journal-route .trend-svg circle:hover,
+body.journal-route .trend-svg circle:focus,
+body.journal-route .trend-svg circle.is-active {
+  stroke-width: 3;
+  filter: drop-shadow(0 3px 6px rgba(39, 35, 31, 0.18));
+  outline: none;
+}
+
+body.journal-route .trend-svg .trend-dot-partial {
+  fill: #fff;
+  stroke: rgba(69, 55, 38, 0.38);
+  stroke-width: 2;
+  stroke-dasharray: 2 2;
+}
+
+body.journal-route .trend-year,
+body.journal-route .trend-y {
+  fill: var(--muted);
+  font-size: 10px;
+}
+
+body.journal-route .trend-readout {
+  pointer-events: none;
+}
+
+body.journal-route .trend-readout rect {
+  fill: rgba(255, 255, 255, 0.9);
+  stroke: rgba(117, 111, 104, 0.2);
+  filter: drop-shadow(0 4px 8px rgba(39, 35, 31, 0.12));
+}
+
+body.journal-route .trend-readout text {
+  fill: var(--ink-soft);
+  font-size: 10.5px;
+  font-weight: 760;
+}
+
 body.journal-route .related-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -3940,6 +4116,9 @@ body.journal-route .journal-not-found {
   body.journal-route .journal-detail-masonry {
     grid-template-columns: 1fr;
     gap: 12px;
+  }
+  body.journal-route .trend-grid {
+    grid-template-columns: 1fr;
   }
   body.journal-route .journal-detail-masonry > .drawer-section,
   body.journal-route .journal-detail-masonry > .meta-block,
@@ -6640,4 +6819,8 @@ body.journal-route .lang-toggle-wrap { display: none; }
   display: flex !important; width: 100%; box-sizing: border-box; justify-content: flex-start;
   padding: 11px 13px; border-radius: 12px;
   box-shadow: 0 1px 0 rgba(43,42,39,.03), 0 6px 16px -14px rgba(60,48,36,.2);
+}
+.tab-panel[data-panel="int"] thead .col-free .free-th-filter:has(input:checked) {
+  background: #f0fbf4;
+  border-color: rgba(34, 163, 90, .32);
 }
