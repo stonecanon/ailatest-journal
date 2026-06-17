@@ -2,14 +2,7 @@
 (() => {
   const $ = (s, r=document) => r.querySelector(s);
   const $$ = (s, r=document) => [...r.querySelectorAll(s)];
-
-  // Early stub: if user clicks ★ before boot(), queue it
-  window.__activateJournalTab = function(tab) {
-    if (!window.__journalTabQueue) window.__journalTabQueue = [];
-    window.__journalTabQueue.push(tab);
-  };
   const fetchJSON = async (url) => {
-    if (typeof url === 'string' && url.startsWith('data/')) url = '/' + url;
     const resp = await fetch(url);
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
     if (url.endsWith('.gz')) {
@@ -23,13 +16,11 @@
   const I18N = {
     zh: {
       tagline: '<b>AILatest Journal</b> — 面向科研人员的期刊检索与投稿决策工具，聚合 SCI/SSCI、中科院分区、JCR、ESI、CSSCI、北大核心、浙大目录等数据，支持收藏、评分与跨设备同步。',
-      brand_title: 'Journal',
       indices: '索引', cas_zone: '中科院 2025 分区', filters: '附加筛选',
       esi: 'ESI 学科大类', all: '全部',
       z1: '1 区', z2: '2 区', z3: '3 区', z4: '4 区',
       filter_xinrui: '新锐分区', filter_warning: '预警',
       domestic_sources: '国内分级来源',
-      src_nsfc_mgmt: '国自然管理科学部',
       src_cnkx: '中国科协高质量目录',
       src_cssci_core: 'CSSCI 来源期刊',
       src_cssci_ext: 'CSSCI 扩展版',
@@ -42,60 +33,36 @@
       paid_label: '付费',
       drawer_kicker: '期刊详情',
       pwa_install: '📲 安装到主屏',
-      footer_data: '数据来源：Clarivate WoS Core Collection (SCIE/SSCI/AHCI/ESCI) · JCR 2025 · ESI · EI Compendex · Scopus · DOAJ · CSCD · 中国科技核心 · SCD · AMI · FMS · VHB 2024 · CNRS Section 37 · UGC-CARE India · 中科院文献情报中心分区表 2025 · ShowJCR (GPL-3.0) · CCF 2026 (A/B/C) · CCF-T 2025 · ABDC 2025 · ABS 2024 · 中国科协 2025 · CSSCI · 北大核心 · CNKI · 浙江大学 2024 · Crossref Retraction Watch · OpenAlex。© <a href="https://journal.ailatest.org">AILatest Journal</a>',
-      tab_home: '查刊', tab_int: '国际', tab_dom: '中国', tab_fav: '收藏', tab_pick: '荐刊',
-      nav_index_rank: '索引排行榜', nav_subject_rank: '学科排行榜', nav_warn_rank: '预警名单', nav_extension_beta: '插件内测', nav_subscription: '订阅',
-      filter_if_range: '影响因子', if_any: '不限',
-      rail_int: '全球', rail_dom: '中国', rail_in: '印度', rail_my: '马来西亚', rail_kr: '韩国', rail_fav: '我的',
+      footer_data: '数据来源：Clarivate WoS Core Collection · JCR 2025 · ESI · 中科院文献情报中心分区表 2025 · ShowJCR (GPL-3.0) · 中国科协 2025 · 浙江大学 2024 · 高校自编目录 2023。© <a href="https://journal.ailatest.org">AILatest Journal</a>',
+      tab_int: '国际', tab_dom: '中国', tab_fav: '我的收藏', tab_pick: '帮我选刊',
       loading: '加载中…',
       hero_title_int: 'SCI / SSCI 国际期刊检索',
-      hero_body_int: '資料來源：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI）· 更新至 2026-05-18，並合併 <b>EI Compendex</b> 期刊目錄（2025-10-10）。',
+      hero_body_int: '数据源：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI）· 更新至 2026-05-18，并合并 <b>EI Compendex</b> 期刊目录（2025-10-10）。合并 <b>JCR 2026</b> 发布版（承载 2025 指标）、<b>ESI</b> 22 大学科分类、<b>中科院 2025 大类分区</b>、新锐版、CCF 2026 推荐与国际期刊预警名单。共收录 <b id="total">—</b> 本。',
       src_cnkx: '中国科协高质量目录',
       src_cnki_major: '中文期刊目录',
-      hero_note: '徽章语义：<b>收录</b> 显示 SCIE/SSCI/AHCI/ESCI/EI、Scopus、MEDLINE、CSCD、SCD 等数据库覆盖 · <b>等级</b> 显示中科院/JCR/新锐/CCF/ABDC/ABS/FMS/VHB/CNRS/AMI 等评价级别 · <b>开放费用</b> 显示 FREE/OAJ/DOAJ · <b>风险</b> 显示预警、WoS On Hold 与 Retraction Watch 撤稿记录。',
+      hero_note: '徽章语义：<b>SCIE/SSCI/AHCI/ESCI/EI</b> 索引收录 · <b>中科院</b> 中科院 2025 大类分区（1-4 区，TOP 标志） · <b>JCR Q</b> Quartile（Q1-Q4） · <b>新锐</b> 中科院 2026 新锐版分区 · <b>CCF</b> 中国计算机学会 2026 推荐（A/B/C） · <b>ABDC</b> 澳洲经管期刊分级（A*/A/B/C） · <b>ABS</b> 英国 Chartered ABS Academic Journal Guide 2024（4*/4/3/2/1，仅经管商科） · <b>T1/T2/T3</b> 中国科协 2025 高质量期刊分级 · <b>⚠ Warning</b> 国际期刊预警名单。<b>IF</b> 当前显示为 JCR 2026 发布的 2025 指标。',
+      if_update_notice: '2025 影响因子已更新，当前显示为 JCR 2026 发布的 2025 指标。',
       hero_title_fav: '我的收藏',
       hero_body_fav: '点击任意期刊右侧的 <b>★</b> 可加入收藏。未登录时保存在本机 localStorage；登录后自动同步到云端，可跨设备访问。',
-      hero_title_pick: '智能荐刊',
+      hero_title_pick: '帮我选刊',
       hero_body_pick: '采用自研大模型算法，深度分析你的研究主题与海量期刊数据的匹配度，智能推荐最合适的目标期刊。每人每天免费使用 5 次。',
-      pick_placeholder: '建议输入标题 + 关键词，最多 200 字符',
+      pick_placeholder: '输入论文标题、摘要或关键词… 例如：indoor air quality occupancy estimation machine learning',
       pick_search_btn: '开始推荐',
       pick_filter_topics: '匹配研究领域 (Topics)',
       pick_filter_if: '限 IF >',
       pick_filter_zone: '中科院分区',
-      pick_filter_sci: 'SCIE',
-      pick_filter_ssci: 'SSCI',
-      pick_filter_ahci: 'AHCI',
+      pick_filter_scopus: '仅 Scopus 收录',
       pick_filter_compre: '排除综合性期刊',
       pick_history: '搜索历史', pick_history_clear: '清空',
       results_all: '全部期刊', load_more: '加载更多',
-      col_name: '期刊 Title', col_free: '免费', col_abbr: '缩写 Abbr', col_badges: '索引 / 分区',
-      col_if: 'IF', col_cycle: '审稿周期',
-      col_index: '索引收录', col_cas: '学科分区',
-      filter_idx: '索引', filter_tier: '分区', filter_extra: '其他',
-      filter_topic: '学科',
-      filter_free: '免费发表', filter_nsc: 'Nature/Science/Cell',
-      jcr_label: 'JCR 分区', abdc_label: 'ABDC', abs_label: 'ABS',
-      zone_top: 'TOP', xinrui_top: 'TOP',
-      oa_sf_label: '研究主题', oa_sf_ph: '筛选主题…', oa_sf_clear: '清空选择',
-      brand_zhikan: '知刊',
+      col_name: '期刊 Title', col_abbr: '缩写 Abbr', col_badges: '索引 / 分区',
       col_cat: 'ESI / 中科院大类',
       hero_title_dom: '国内学术期刊分级目录',
       hero_body_dom: '<b>中国科协 高质量科技期刊分级目录 (2025-12 修订)</b> 共 11,084 条 / 59 学科领域；<b>中文期刊目录</b> 共 7,755 条 / 10 大学科分类，CSSCI / 北大核心 / CCF 中文以徽章形式叠加；<b>浙江大学 2024 版</b> 与 <b>高校自编目录 2023</b>（付费解锁）。',
       hero_note_dom: 'CSSCI / 北大核心为扫描 PDF OCR 提取，可能存在个别错字。',
-      hero_title_in: '印度 UGC-CARE 期刊目录',
-      hero_body_in: '印度 UGC-CARE Group I 期刊正表，支持按题名、出版社、ISSN、学科检索。克隆/假冒期刊预警名单暂不展示。',
-      india_subject: '学科',
-      india_source_note: 'UGC-CARE 中央列表 2024 年 10 月后不再持续更新；本页仅作为历史目录与投稿核验线索。',
-      hero_title_my: '马来西亚 MyCite / ERA 期刊目录',
-      hero_body_my: '默认显示 MyCite 2025 记录；正式判断马来西亚官方认可资格时，请优先以 MyCite 2025 官方 PDF 为准。ERA 目前使用 2023 Submitted Journal List。',
-      malaysia_source_note: 'MyCite 在线库包含 2014-2025 历史记录；MyJurnal 采集时不可连接，暂未接入。',
       search_int: '搜索：期刊全称 / 官方缩写 / 社群缩写 / ISSN / 中文刊名',
       search_dom: '搜索：刊名 / ISSN / CN 号（跨库搜索）',
       search_fav: '搜索收藏：期刊 / 缩写 / ISSN',
-      search_home_ph: '搜索期刊名、ISSN…',
-      search_submit_hint: '搜索',
-      search_button: 'Search',
-      home_subtitle: '全球期刊检索与推荐平台',
       showing: '显示', of: '条 / 共', total_items: '条',
       empty: '未找到匹配的期刊',
       empty_fav: '还没有收藏。切到「国际 SCI/SSCI」点任意一行右边的 ★ 就能收藏。',
@@ -104,18 +71,15 @@
       syncing: '同步中…', synced: '已同步',
       wos_subjects: 'WoS 细分学科',
       wos_search_ph: '筛选学科（A-Z）…',
-      cnkx_domain: '学科领域', cnkx_sub: '细分学科',
-      filter_free_only: '只看免费发表', wos_clear_title: '清空选择',
+      wos_clear_title: '清空选择',
     },
     en: {
       tagline: '<b>AILatest Journal</b> — Journal search & submission decision tool for researchers. Aggregates SCI/SSCI, CAS tiers, JCR, ESI, CSSCI, PKU Core, ZJU directory and more. Favorites, ratings, cross-device sync.',
-      brand_title: 'Journal',
       indices: 'Indices', cas_zone: 'CAS 2025 Tier', filters: 'Filters',
       esi: 'ESI Categories', all: 'All',
       z1: 'T1', z2: 'T2', z3: 'T3', z4: 'T4',
       filter_xinrui: 'Emerging Tier', filter_warning: 'Warning List',
       domestic_sources: 'Domestic Sources',
-      src_nsfc_mgmt: 'NSFC Management',
       src_cnkx: 'CAST Tiered Directory',
       src_cnki_major: 'Chinese Journal Directory',
       src_cssci_core: 'CSSCI Core',
@@ -129,58 +93,34 @@
       paid_label: 'Paid',
       drawer_kicker: 'Journal Details',
       pwa_install: '📲 Install to Home',
-      footer_data: 'Sources: Clarivate WoS Core Collection (SCIE/SSCI/AHCI/ESCI) · JCR 2025 · ESI · EI Compendex · Scopus · DOAJ · CSCD · CSTPCD · SCD · AMI · FMS · VHB 2024 · CNRS Section 37 · UGC-CARE India · CAS NSL Tiers 2025 · ShowJCR (GPL-3.0) · CCF 2026 (A/B/C) · CCF-T 2025 · ABDC 2025 · ABS 2024 · CAST 2025 · CSSCI · PKU Core · CNKI · ZJU 2024 · Crossref Retraction Watch · OpenAlex. © <a href="https://journal.ailatest.org">AILatest Journal</a>',
-      tab_home: 'Journals', tab_int: 'International', tab_dom: 'China', tab_fav: 'Favorites', tab_pick: 'Recommend',
-      nav_index_rank: 'Index Rankings', nav_subject_rank: 'Subject Rankings', nav_warn_rank: 'Warning List', nav_extension_beta: 'Extension beta', nav_subscription: 'Subscribe',
-      filter_if_range: 'Impact Factor', if_any: 'Any',
-      rail_int: 'Global', rail_dom: 'China', rail_in: 'India', rail_my: 'Malaysia', rail_kr: 'Korea', rail_fav: 'Me',
+      footer_data: 'Sources: Clarivate WoS Core Collection · JCR 2025 · ESI · CAS NSL Tiers 2025 · ShowJCR (GPL-3.0) · CAST 2025 · ZJU 2024 · School A 2023. © <a href="https://journal.ailatest.org">AILatest Journal</a>',
+      tab_int: 'International', tab_dom: 'China', tab_fav: 'My Favorites', tab_pick: 'Pick for me',
       loading: 'Loading…',
       hero_title_int: 'International SCI / SSCI Search',
-      hero_body_int: 'Source: <b>Web of Science Core Collection</b> (SCIE / SSCI / AHCI / ESCI), updated 2026-05-18, merged with <b>EI Compendex</b> source list (2025-10-10).',
-      hero_note: 'Badge legend: <b>Indexed</b> covers SCIE/SSCI/AHCI/ESCI/EI, Scopus, MEDLINE, CSCD, SCD and related databases · <b>Ranking</b> covers CAS/JCR/Emerging/CCF/ABDC/ABS/FMS/VHB/CNRS/AMI tiers · <b>Access & Fees</b> covers FREE/OAJ/DOAJ · <b>Caution</b> covers warning lists, WoS On Hold and Retraction Watch records.',
+      hero_body_int: 'Source: <b>Web of Science Core Collection</b> (SCIE / SSCI / AHCI / ESCI), updated 2026-05-18, merged with <b>EI Compendex</b> source list (2025-10-10). Enriched with the <b>JCR 2026</b> release carrying 2025 metrics, <b>ESI</b> 22 subject categories, <b>CAS 2025</b> tiers, emerging edition, CCF 2026, and <b>China Association for Science and Technology (CAST)</b> High-Quality Sci-Tech Journal Tiered Directory (T1/T2/T3) plus international warning list. Total: <b id="total">—</b> journals.',
+      hero_note: 'Badge legend: <b>SCIE/SSCI/AHCI/ESCI/EI</b> indices · <b>CAS</b> CAS 2025 major tier (1-4, TOP) · <b>JCR Q</b> Quartile · <b>Emerging</b> CAS 2026 Emerging Edition · <b>CCF</b> CCF 2026 (A/B/C) · <b>ABDC</b> Australian Business Deans’ list (A*/A/B/C) · <b>ABS</b> Chartered ABS Academic Journal Guide 2024 (4*/4/3/2/1, business/management only) · <b>T1/T2/T3</b> CAST 2025 · <b>⚠ Warning</b> Int’l journal warning list. <b>IF</b> now shows the JCR 2026 release carrying 2025 metrics.',
+      if_update_notice: '2025 impact factors are now live; current values use the JCR 2026 release carrying 2025 metrics.',
       hero_title_fav: 'My Favorites',
       hero_body_fav: 'Click the <b>★</b> on any row to bookmark. Saved locally when signed-out; syncs to the cloud when signed-in.',
       hero_title_pick: 'Pick for me',
       hero_body_pick: 'Powered by proprietary large-model algorithm — intelligently matches your research topic against millions of journal data points to recommend the best target journals. 5 free searches per day per user.',
-      pick_placeholder: 'Enter title + keywords, max 200 characters',
+      pick_placeholder: 'Enter paper title, abstract or keywords... e.g. indoor air quality occupancy estimation machine learning',
       pick_search_btn: 'Start',
       pick_filter_topics: 'Match Topics',
       pick_filter_if: 'IF >',
       pick_filter_zone: 'CAS Zone',
-      pick_filter_sci: 'SCIE',
-      pick_filter_ssci: 'SSCI',
-      pick_filter_ahci: 'AHCI',
+      pick_filter_scopus: 'Scopus only',
       pick_filter_compre: 'Exclude multidisciplinary',
       pick_history: 'Search History', pick_history_clear: 'Clear',
       results_all: 'All journals', load_more: 'Load more',
-      col_name: 'Journal Title', col_free: 'FREE TO PUBLISH', col_abbr: 'Abbr', col_badges: 'Indices / Tier',
-      col_if: 'IF', col_cycle: 'Review Cycle',
-      col_index: 'Indexed', col_cas: 'Categories',
-      filter_idx: 'Index', filter_tier: 'Tier', filter_extra: 'More',
-      filter_topic: 'Topics',
-      filter_free: 'FREE to Publish', filter_nsc: 'Nature/Science/Cell',
-      jcr_label: 'JCR Quartile', abdc_label: 'ABDC', abs_label: 'ABS',
-      zone_top: 'TOP', xinrui_top: 'TOP',
-      oa_sf_label: 'Research Topics', oa_sf_ph: 'Filter topics…', oa_sf_clear: 'Clear selection',
-      brand_zhikan: '',
+      col_name: 'Journal Title', col_abbr: 'Abbr', col_badges: 'Index / Tier',
       col_cat: 'ESI / CAS Major',
       hero_title_dom: 'Domestic Chinese Journal Directories',
       hero_body_dom: '<b>China Association for Science and Technology (CAST) High-Quality Sci-Tech Journal Tiered Directory (Dec 2025)</b> — 11,084 journals across 59 disciplines; <b>Chinese Journal Directory</b> — 7,755 journals across 10 subject categories, with CSSCI / PKU Core / CCF Chinese badges; <b>ZJU 2024</b>; <b>School A 2023</b> (paywalled).',
       hero_note_dom: 'CSSCI / PKU Core extracted via OCR from scanned PDF; minor typos possible.',
-      hero_title_in: 'India UGC-CARE Journal Directory',
-      hero_body_in: 'UGC-CARE Group I positive journal list for India. Search by title, publisher, ISSN, E-ISSN, or subject. Cloned / fake journal warning lists are intentionally not shown.',
-      india_subject: 'Subject',
-      india_source_note: 'UGC-CARE central list has not been updated after October 2024; use this page as historical directory and verification context.',
-      hero_title_my: 'Malaysia MyCite / ERA Journal Directory',
-      hero_body_my: 'MyCite 2025 records are shown by default. For formal Malaysia recognition decisions, use the official MyCite 2025 PDF as primary evidence. ERA currently uses the 2023 Submitted Journal List.',
-      malaysia_source_note: 'The MyCite online database includes historical records from 2014-2025. MyJurnal was unreachable during collection and is not included.',
       search_int: 'Search: title / abbr / acronym / ISSN / Chinese name',
       search_dom: 'Search: title / ISSN / CN (cross-source)',
       search_fav: 'Search favorites: title / acronym / ISSN',
-      search_home_ph: 'Search journal name, ISSN…',
-      search_submit_hint: 'search',
-      search_button: 'Search',
-      home_subtitle: 'Journal search & submission decision tool for researchers',
       showing: 'Showing', of: 'of', total_items: '',
       empty: 'No journals match.',
       empty_fav: 'No favorites yet. Switch to Int’l SCI/SSCI and click ★ on any row to bookmark.',
@@ -188,9 +128,8 @@
       fav_added: 'Saved', fav_removed: 'Removed',
       syncing: 'Syncing…', synced: 'Synced',
       wos_subjects: 'WoS Subjects',
-      cnkx_domain: 'Domain', cnkx_sub: 'Sub-field',
       wos_search_ph: 'Filter subjects (A-Z)…',
-      filter_free_only: 'FREE only', wos_clear_title: 'Clear selection',
+      wos_clear_title: 'Clear selection',
     },
   };
 
@@ -201,166 +140,58 @@
   I18N['zh-TW'] = {
     ...I18N.zh,
     tagline: '<b>AILatest Journal</b> — 面向科研人員的期刊檢索與投稿決策工具，聚合 SCI/SSCI、中科院分區、JCR、ESI、CSSCI、北大核心、浙大目錄等資料，支援收藏、評分與跨裝置同步。',
- brand_title: 'Journal',
     indices: '索引', cas_zone: '中科院 2025 分區', filters: '附加篩選', all: '全部',
     filter_xinrui: '新銳分區', filter_warning: '預警', domestic_sources: '中國分級來源',
     src_cnkx: '中國科協高品質目錄', src_cssci_core: 'CSSCI 來源期刊', src_cssci_ext: 'CSSCI 擴展版', src_pku: '北大核心 (2023)', src_zju: '浙江大學 2024', src_ccft: 'CCF 中文 T 分區', nav_sub_inhouse: '院校自編目錄', paid_label: '付費', drawer_kicker: '期刊詳情',
-        tab_home: '查刊', tab_int: '國際', tab_dom: '中國', tab_fav: '收藏', tab_pick: '薦刊',
-    rail_int: '國際期刊', rail_dom: '中國期刊', rail_fav: '我的收藏',
-    loading: '載入中…',
+    tab_int: '國際', tab_dom: '中國', tab_fav: '我的收藏', tab_pick: '幫我選刊', loading: '載入中…',
     hero_title_int: 'SCI / SSCI 國際期刊檢索',
-    hero_body_int: '資料來源：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI）· 更新至 2026-05-18，並合併 <b>EI Compendex</b> 期刊目錄（2025-10-10）。',
+    hero_body_int: '資料來源：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI）· 更新至 2026-05-18，並合併 <b>EI Compendex</b> 期刊目錄（2025-10-10）。合併 <b>JCR 2025</b> 歸屬標記、<b>ESI</b> 22 大學科分類、<b>中科院 2025 大類分區</b>、<b>ShowJCR</b> JCR 2025 發布版 · 2024 指標（IF / 小類分區 / 排名）、新銳版、CCF 2026 推薦與國際期刊預警名單。共收錄 <b id="total">—</b> 本。',
     hero_note: '徽章語義：<b>SCIE/SSCI/AHCI/ESCI/EI</b> 索引收錄 · <b>中科院</b> 2025 大類分區（1-4 區，TOP 標誌） · <b>JCR Q</b> Quartile（Q1-Q4） · <b>新銳</b> 2026 新銳版分區 · <b>CCF</b> 中國計算機學會 2026 推薦（A/B/C） · <b>ABDC</b> 澳洲經管期刊分級（A*/A/B/C） · <b>ABS</b> 英國 Chartered ABS Academic Journal Guide 2024（4*/4/3/2/1，僅經管商科） · <b>T1/T2/T3</b> 中國科協 2025 高質量期刊分級 · <b>⚠ Warning</b> 國際期刊預警名單。',
     hero_title_dom: '中國學術期刊分級目錄', hero_title_fav: '我的收藏', hero_title_pick: '幫我選刊',
     hero_body_fav: '點擊任一期刊右側的 <b>★</b> 可加入收藏。未登入時保存在本機 localStorage；登入後自動同步到雲端。',
     hero_body_pick: '敬請期待。這裡將根據你的研究主題、影響因子區間、審稿週期、版面費、收錄索引等條件推薦目標期刊。未來更新。',
     pick_coming_title: '敬請期待', pick_coming_desc: '未來更新', results_all: '全部期刊', load_more: '載入更多',
-    col_name: '期刊 Title', col_free: '免費', col_abbr: '縮寫 Abbr', col_badges: '索引 / 分區', search_int: '搜尋：期刊全稱 / 官方縮寫 / ISSN / 中文刊名', search_dom: '搜尋：中文刊名 / 英文刊名 / ISSN / CN 號', search_fav: '搜尋收藏：期刊 / 縮寫 / ISSN',
-      search_home_ph: '搜尋期刊名、ISSN…',
-      home_subtitle: '面向科研人員的期刊檢索與投稿決策工具', showing: '顯示', of: '條 / 共', total_items: '條', empty: '未找到匹配的期刊', login: '登入', logout: '登出', fav_added: '已收藏', fav_removed: '已移除', syncing: '同步中…', synced: '已同步', wos_subjects: 'WoS 細分學科', wos_search_ph: '篩選學科（A-Z）…', cnkx_domain: '學科領域', cnkx_sub: '細分學科', wos_clear_title: '清空選擇', filter_free_only: '只看免費發表'
+    col_name: '期刊 Title', col_abbr: '縮寫 Abbr', col_badges: '索引 / 分區', search_int: '搜尋：期刊全稱 / 官方縮寫 / ISSN / 中文刊名', search_dom: '搜尋：中文刊名 / 英文刊名 / ISSN / CN 號', search_fav: '搜尋收藏：期刊 / 縮寫 / ISSN', showing: '顯示', of: '條 / 共', total_items: '條', empty: '未找到匹配的期刊', login: '登入', logout: '登出', fav_added: '已收藏', fav_removed: '已移除', syncing: '同步中…', synced: '已同步', wos_subjects: 'WoS 細分學科', wos_search_ph: '篩選學科（A-Z）…', wos_clear_title: '清空選擇'
   };
   Object.assign(I18N, {
     ja: {
       ...I18N.en,
       tagline: '<b>AILatest Journal</b> — 研究者向けのジャーナル検索・投稿判断ツール。SCI/SSCI、CAS区分、JCR、ESI、CSSCI、PKU Core、ZJU などを統合。',
-      brand_title: 'Journal',
-      brand_zhikan: '知刊',
       indices: '索引', cas_zone: 'CAS 2025 区分', filters: 'フィルター', all: 'すべて', filter_xinrui: 'Emerging 区分', filter_warning: '警告リスト', domestic_sources: '中国国内ソース',
-      tab_home: 'ジャーナル', tab_int: '国際', tab_dom: '中国', tab_fav: 'お気に入り', tab_pick: '投稿先を選ぶ', loading: '読み込み中…',
+      tab_int: '国際', tab_dom: '中国', tab_fav: 'お気に入り', tab_pick: '投稿先を選ぶ', loading: '読み込み中…',
       hero_title_int: 'SCI / SSCI 国際ジャーナル検索',
       hero_body_int: 'データソース：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI、2026-05-18更新）に <b>EI Compendex</b>（2025-10-10）を統合。<b>JCR 2025</b> 索引、<b>ESI</b> 22分野、<b>CAS 2025</b> 区分、<b>ShowJCR</b> JCR 2025リリース・2024指標（IF / 区分 / ランク）、Emerging、CCF 2026、警告リストを収録。合計 <b id="total">—</b> 誌。',
       hero_note: 'バッジ凡例：<b>SCIE/SSCI/AHCI/ESCI/EI</b> 索引収録 · <b>CAS</b> CAS 2025 大区分（1-4区、TOP表示） · <b>JCR Q</b> Quartile（Q1-Q4） · <b>Emerging</b> CAS 2026 新興版区分 · <b>CCF</b> CCF 2026 推薦（A/B/C） · <b>ABDC</b> 豪州経営ジャーナルランキング（A*/A/B/C） · <b>ABS</b> Chartered ABS Academic Journal Guide 2024（4*/4/3/2/1、経営・商学のみ） · <b>T1/T2/T3</b> 中国科协 2025 高品質ジャーナル区分 · <b>⚠ Warning</b> 国際ジャーナル警告リスト。',
-      hero_title_dom: '中国学術ジャーナル区分', hero_title_fav: 'お気に入り', hero_title_pick: '投稿先を選ぶ', hero_body_fav: '<b>★</b> でお気に入りに追加できます。', hero_body_pick: '近日公開。研究テーマ、IF範囲、査読期間、APC、索引条件から投稿候補を推薦します。', pick_coming_title: '近日公開', pick_coming_desc: '今後更新予定', results_all: 'すべてのジャーナル', load_more: 'さらに読み込む', col_name: 'ジャーナル Title', col_free: '無料', col_abbr: '略称 Abbr', col_badges: '索引 / 区分', search_int: '検索：タイトル / 略称 / ISSN / 中国語名', search_dom: '検索：中国語名 / 英語名 / ISSN / CN', search_fav: 'お気に入りを検索', showing: '表示', of: '/', total_items: '件', empty: '一致するジャーナルがありません', login: 'ログイン', logout: 'ログアウト', wos_subjects: 'WoS 分野', wos_search_ph: '分野を絞り込み（A-Z）…', cnkx_domain: '学問分野', cnkx_sub: '細分分野'
+      hero_title_dom: '中国学術ジャーナル区分', hero_title_fav: 'お気に入り', hero_title_pick: '投稿先を選ぶ', hero_body_fav: '<b>★</b> でお気に入りに追加できます。', hero_body_pick: '近日公開。研究テーマ、IF範囲、査読期間、APC、索引条件から投稿候補を推薦します。', pick_coming_title: '近日公開', pick_coming_desc: '今後更新予定', results_all: 'すべてのジャーナル', load_more: 'さらに読み込む', col_name: 'ジャーナル Title', col_abbr: '略称 Abbr', col_badges: '索引 / 区分', search_int: '検索：タイトル / 略称 / ISSN / 中国語名', search_dom: '検索：中国語名 / 英語名 / ISSN / CN', search_fav: 'お気に入りを検索', showing: '表示', of: '/', total_items: '件', empty: '一致するジャーナルがありません', login: 'ログイン', logout: 'ログアウト', wos_subjects: 'WoS 分野', wos_search_ph: '分野を絞り込み（A-Z）…'
     },
     ko: {
       ...I18N.en,
-      tagline: '<b>AILatest Journal</b> — 연구자를 위한 저널 검색 및 투고 의사결정 도구입니다.', brand_title: 'Journal', brand_zhikan: '知刊', indices: '색인', cas_zone: 'CAS 2025 등급', filters: '필터', all: '전체', filter_xinrui: '신예 등급', filter_warning: '경고 목록', domestic_sources: '중국 국내 목록', tab_home: '저널', tab_int: '국제', tab_dom: '중국', tab_fav: '즐겨찾기', tab_pick: '저널 추천', loading: '불러오는 중…',
-      hero_title_int: 'SCI / SSCI 국제 저널 검색', hero_body_int: '데이터: <b>Web of Science Core Collection</b>(2026-05-18) 및 <b>EI Compendex</b>(2025-10-10). <b>JCR 2025</b> 색인, <b>ESI</b>, <b>CAS 2025</b>, <b>ShowJCR</b> JCR 2025 릴리스 · 2024 지표(IF/분야/순위), CCF 2026, 경고 목록을 통합했습니다. 총 <b id="total">—</b> 종.', hero_note: '배지 범례: <b>SCIE/SSCI/AHCI/ESCI/EI</b> 색인 수록 · <b>CAS</b> CAS 2025 대분류(1-4구, TOP표시) · <b>JCR Q</b> Quartile(Q1-Q4) · <b>Emerging</b> CAS 2026 신흥판 구분 · <b>CCF</b> CCF 2026 추천(A/B/C) · <b>ABDC</b> 호주 경영저널 등급(A*/A/B/C) · <b>ABS</b> Chartered ABS Academic Journal Guide 2024(4*/4/3/2/1, 경영·상학만) · <b>T1/T2/T3</b> 중국과학기협 2025 고품질 학술지 등급 · <b>⚠ Warning</b> 국제 학술지 경고 목록.', hero_title_dom: '중국 학술지 등급 목록', hero_title_fav: '즐겨찾기', hero_title_pick: '저널 추천', hero_body_pick: '곧 제공됩니다. 연구 주제, IF 범위, 심사 기간, APC, 색인 조건으로 추천합니다.', pick_coming_title: '준비 중', pick_coming_desc: '향후 업데이트', results_all: '전체 저널', load_more: '더 보기', col_name: '저널 Title', col_free: '무료', col_abbr: '약어 Abbr', col_badges: '색인 / 등급', search_int: '검색: 제목 / 약어 / ISSN / 중국어명', search_dom: '검색: 중국어명 / 영어명 / ISSN / CN', search_fav: '즐겨찾기 검색', showing: '표시', of: '/', total_items: '개', empty: '일치하는 저널이 없습니다', login: '로그인', logout: '로그아웃', wos_subjects: 'WoS 세부분야', wos_search_ph: '분야 필터(A-Z)…'
+      tagline: '<b>AILatest Journal</b> — 연구자를 위한 저널 검색 및 투고 의사결정 도구입니다.', indices: '색인', cas_zone: 'CAS 2025 등급', filters: '필터', all: '전체', filter_xinrui: '신예 등급', filter_warning: '경고 목록', domestic_sources: '중국 국내 목록', tab_int: '국제', tab_dom: '중국', tab_fav: '즐겨찾기', tab_pick: '저널 추천', loading: '불러오는 중…',
+      hero_title_int: 'SCI / SSCI 국제 저널 검색', hero_body_int: '데이터: <b>Web of Science Core Collection</b>(2026-05-18) 및 <b>EI Compendex</b>(2025-10-10). <b>JCR 2025</b> 색인, <b>ESI</b>, <b>CAS 2025</b>, <b>ShowJCR</b> JCR 2025 릴리스 · 2024 지표(IF/분야/순위), CCF 2026, 경고 목록을 통합했습니다. 총 <b id="total">—</b> 종.', hero_note: '배지 범례: <b>SCIE/SSCI/AHCI/ESCI/EI</b> 색인 수록 · <b>CAS</b> CAS 2025 대분류(1-4구, TOP표시) · <b>JCR Q</b> Quartile(Q1-Q4) · <b>Emerging</b> CAS 2026 신흥판 구분 · <b>CCF</b> CCF 2026 추천(A/B/C) · <b>ABDC</b> 호주 경영저널 등급(A*/A/B/C) · <b>ABS</b> Chartered ABS Academic Journal Guide 2024(4*/4/3/2/1, 경영·상학만) · <b>T1/T2/T3</b> 중국과학기협 2025 고품질 학술지 등급 · <b>⚠ Warning</b> 국제 학술지 경고 목록.', hero_title_dom: '중국 학술지 등급 목록', hero_title_fav: '즐겨찾기', hero_title_pick: '저널 추천', hero_body_pick: '곧 제공됩니다. 연구 주제, IF 범위, 심사 기간, APC, 색인 조건으로 추천합니다.', pick_coming_title: '준비 중', pick_coming_desc: '향후 업데이트', results_all: '전체 저널', load_more: '더 보기', col_name: '저널 Title', col_abbr: '약어 Abbr', col_badges: '색인 / 등급', search_int: '검색: 제목 / 약어 / ISSN / 중국어명', search_dom: '검색: 중국어명 / 영어명 / ISSN / CN', search_fav: '즐겨찾기 검색', showing: '표시', of: '/', total_items: '개', empty: '일치하는 저널이 없습니다', login: '로그인', logout: '로그아웃', wos_subjects: 'WoS 세부분야', wos_search_ph: '분야 필터(A-Z)…'
     },
     es: {
       ...I18N.en,
-      tagline: '<b>AILatest Journal</b> — buscador de revistas y herramienta de decisión para investigadores.', indices: 'Índices', cas_zone: 'CAS 2025', filters: 'Filtros', all: 'Todo', filter_xinrui: 'Emergente', filter_warning: 'Advertencia', domestic_sources: 'Fuentes de China', tab_home: 'Revistas', tab_int: 'Internacional', tab_dom: 'China', tab_fav: 'Favoritos', tab_pick: 'Ayúdame a elegir', loading: 'Cargando…', hero_title_int: 'Búsqueda internacional SCI / SSCI', hero_body_int: 'Fuente: <b>Web of Science Core Collection</b> (actualizado 2026-05-18) con <b>EI Compendex</b> (2025-10-10). Integra <b>JCR 2025</b>, <b>ESI</b>, <b>CAS 2025</b> y <b>ShowJCR</b> versión JCR 2025 · métricas 2024 (IF / cuartiles / rangos), CCF 2026 y listas de advertencia. Total: <b id="total">—</b> revistas.', hero_note: 'Leyenda de insignias: <b>SCIE/SSCI/AHCI/ESCI/EI</b> índices de cobertura · <b>CAS</b> Categorización CAS 2025 por áreas principales (1-4, marca TOP) · <b>JCR Q</b> Cuartil (Q1-Q4) · <b>Emerging</b> Edición Emergente CAS 2026 · <b>CCF</b> Recomendación CCF 2026 (A/B/C) · <b>ABDC</b> Clasificación australiana de revistas de gestión empresarial (A*/A/B/C) · <b>ABS</b> Chartered ABS Academic Journal Guide 2024 (4*/4/3/2/1, solo negocios y gestión) · <b>T1/T2/T3</b> Clasificación CAST 2025 de revistas de alta calidad · <b>⚠ Warning</b> Lista de advertencia de revistas internacionales.', hero_title_dom: 'Directorios de revistas chinas', hero_title_fav: 'Favoritos', hero_title_pick: 'Ayúdame a elegir', hero_body_pick: 'Próximamente. Recomendará revistas según tema, rango de IF, revisión, APC e índices.', pick_coming_title: 'Próximamente', pick_coming_desc: 'Actualización futura', results_all: 'Todas las revistas', load_more: 'Cargar más', col_name: 'Revista Title', col_free: 'GRATIS', col_abbr: 'Abrev. Abbr', col_badges: 'Índice / nivel', search_int: 'Buscar: título / abreviatura / ISSN / nombre chino', search_dom: 'Buscar: nombre chino / inglés / ISSN / CN', search_fav: 'Buscar favoritos', showing: 'Mostrando', of: 'de', total_items: '', empty: 'No hay coincidencias', login: 'Iniciar sesión', logout: 'Salir', wos_subjects: 'Materias WoS', wos_search_ph: 'Filtrar materias (A-Z)…'
+      tagline: '<b>AILatest Journal</b> — buscador de revistas y herramienta de decisión para investigadores.', indices: 'Índices', cas_zone: 'CAS 2025', filters: 'Filtros', all: 'Todo', filter_xinrui: 'Emergente', filter_warning: 'Advertencia', domestic_sources: 'Fuentes de China', tab_int: 'Internacional', tab_dom: 'China', tab_fav: 'Favoritos', tab_pick: 'Ayúdame a elegir', loading: 'Cargando…', hero_title_int: 'Búsqueda internacional SCI / SSCI', hero_body_int: 'Fuente: <b>Web of Science Core Collection</b> (actualizado 2026-05-18) con <b>EI Compendex</b> (2025-10-10). Integra <b>JCR 2025</b>, <b>ESI</b>, <b>CAS 2025</b> y <b>ShowJCR</b> versión JCR 2025 · métricas 2024 (IF / cuartiles / rangos), CCF 2026 y listas de advertencia. Total: <b id="total">—</b> revistas.', hero_note: 'Leyenda de insignias: <b>SCIE/SSCI/AHCI/ESCI/EI</b> índices de cobertura · <b>CAS</b> Categorización CAS 2025 por áreas principales (1-4, marca TOP) · <b>JCR Q</b> Cuartil (Q1-Q4) · <b>Emerging</b> Edición Emergente CAS 2026 · <b>CCF</b> Recomendación CCF 2026 (A/B/C) · <b>ABDC</b> Clasificación australiana de revistas de gestión empresarial (A*/A/B/C) · <b>ABS</b> Chartered ABS Academic Journal Guide 2024 (4*/4/3/2/1, solo negocios y gestión) · <b>T1/T2/T3</b> Clasificación CAST 2025 de revistas de alta calidad · <b>⚠ Warning</b> Lista de advertencia de revistas internacionales.', hero_title_dom: 'Directorios de revistas chinas', hero_title_fav: 'Favoritos', hero_title_pick: 'Ayúdame a elegir', hero_body_pick: 'Próximamente. Recomendará revistas según tema, rango de IF, revisión, APC e índices.', pick_coming_title: 'Próximamente', pick_coming_desc: 'Actualización futura', results_all: 'Todas las revistas', load_more: 'Cargar más', col_name: 'Revista Title', col_abbr: 'Abrev. Abbr', col_badges: 'Índice / nivel', search_int: 'Buscar: título / abreviatura / ISSN / nombre chino', search_dom: 'Buscar: nombre chino / inglés / ISSN / CN', search_fav: 'Buscar favoritos', showing: 'Mostrando', of: 'de', total_items: '', empty: 'No hay coincidencias', login: 'Iniciar sesión', logout: 'Salir', wos_subjects: 'Materias WoS', wos_search_ph: 'Filtrar materias (A-Z)…'
     },
     pt: {
       ...I18N.en,
-      tagline: '<b>AILatest Journal</b> — ferramenta de busca de periódicos e decisão de submissão para pesquisadores.', indices: 'Índices', cas_zone: 'CAS 2025', filters: 'Filtros', all: 'Tudo', filter_xinrui: 'Emergente', filter_warning: 'Alerta', domestic_sources: 'Fontes chinesas', tab_home: 'Periódicos', tab_int: 'Internacional', tab_dom: 'China', tab_fav: 'Favoritos', tab_pick: 'Escolher periódico', loading: 'Carregando…', hero_title_int: 'Busca internacional SCI / SSCI', hero_body_int: 'Fonte: <b>Web of Science Core Collection</b> (2026-05-18) com <b>EI Compendex</b> (2025-10-10). Integra <b>JCR 2025</b>, <b>ESI</b>, <b>CAS 2025</b> e <b>ShowJCR</b> versão JCR 2025 · métricas 2024 (IF / quartis / rankings), CCF 2026 e listas de alerta. Total: <b id="total">—</b> periódicos.', hero_note: 'Legenda de emblemas: <b>SCIE/SSCI/AHCI/ESCI/EI</b> índices de cobertura · <b>CAS</b> Categorização CAS 2025 por grandes áreas (1-4, marca TOP) · <b>JCR Q</b> Quartil (Q1-Q4) · <b>Emerging</b> Edição Emergente CAS 2026 · <b>CCF</b> Recomendação CCF 2026 (A/B/C) · <b>ABDC</b> Classificação australiana de periódicos de gestão (A*/A/B/C) · <b>ABS</b> Chartered ABS Academic Journal Guide 2024 (4*/4/3/2/1, apenas negócios e gestão) · <b>T1/T2/T3</b> Classificação CAST 2025 de periódicos de alta qualidade · <b>⚠ Warning</b> Lista de alerta de periódicos internacionais.', hero_title_dom: 'Diretórios chineses', hero_title_fav: 'Favoritos', hero_title_pick: 'Escolher periódico', hero_body_pick: 'Em breve. Recomendará periódicos por tema, faixa de IF, revisão, APC e índices.', pick_coming_title: 'Em breve', pick_coming_desc: 'Atualização futura', results_all: 'Todos os periódicos', load_more: 'Carregar mais', col_name: 'Periódico Title', col_free: 'GRÁTIS', col_abbr: 'Abrev. Abbr', col_badges: 'Índice / nível', search_int: 'Buscar: título / abreviação / ISSN / nome chinês', search_dom: 'Buscar: nome chinês / inglês / ISSN / CN', search_fav: 'Buscar favoritos', showing: 'Mostrando', of: 'de', total_items: '', empty: 'Nenhum resultado', login: 'Entrar', logout: 'Sair', wos_subjects: 'Assuntos WoS', wos_search_ph: 'Filtrar assuntos (A-Z)…'
+      tagline: '<b>AILatest Journal</b> — ferramenta de busca de periódicos e decisão de submissão para pesquisadores.', indices: 'Índices', cas_zone: 'CAS 2025', filters: 'Filtros', all: 'Tudo', filter_xinrui: 'Emergente', filter_warning: 'Alerta', domestic_sources: 'Fontes chinesas', tab_int: 'Internacional', tab_dom: 'China', tab_fav: 'Favoritos', tab_pick: 'Escolher periódico', loading: 'Carregando…', hero_title_int: 'Busca internacional SCI / SSCI', hero_body_int: 'Fonte: <b>Web of Science Core Collection</b> (2026-05-18) com <b>EI Compendex</b> (2025-10-10). Integra <b>JCR 2025</b>, <b>ESI</b>, <b>CAS 2025</b> e <b>ShowJCR</b> versão JCR 2025 · métricas 2024 (IF / quartis / rankings), CCF 2026 e listas de alerta. Total: <b id="total">—</b> periódicos.', hero_note: 'Legenda de emblemas: <b>SCIE/SSCI/AHCI/ESCI/EI</b> índices de cobertura · <b>CAS</b> Categorização CAS 2025 por grandes áreas (1-4, marca TOP) · <b>JCR Q</b> Quartil (Q1-Q4) · <b>Emerging</b> Edição Emergente CAS 2026 · <b>CCF</b> Recomendação CCF 2026 (A/B/C) · <b>ABDC</b> Classificação australiana de periódicos de gestão (A*/A/B/C) · <b>ABS</b> Chartered ABS Academic Journal Guide 2024 (4*/4/3/2/1, apenas negócios e gestão) · <b>T1/T2/T3</b> Classificação CAST 2025 de periódicos de alta qualidade · <b>⚠ Warning</b> Lista de alerta de periódicos internacionais.', hero_title_dom: 'Diretórios chineses', hero_title_fav: 'Favoritos', hero_title_pick: 'Escolher periódico', hero_body_pick: 'Em breve. Recomendará periódicos por tema, faixa de IF, revisão, APC e índices.', pick_coming_title: 'Em breve', pick_coming_desc: 'Atualização futura', results_all: 'Todos os periódicos', load_more: 'Carregar mais', col_name: 'Periódico Title', col_abbr: 'Abrev. Abbr', col_badges: 'Índice / nível', search_int: 'Buscar: título / abreviação / ISSN / nome chinês', search_dom: 'Buscar: nome chinês / inglês / ISSN / CN', search_fav: 'Buscar favoritos', showing: 'Mostrando', of: 'de', total_items: '', empty: 'Nenhum resultado', login: 'Entrar', logout: 'Sair', wos_subjects: 'Assuntos WoS', wos_search_ph: 'Filtrar assuntos (A-Z)…'
     },
     fr: {
       ...I18N.en,
-      tagline: '<b>AILatest Journal</b> — outil de recherche de revues et d’aide au choix de soumission pour les chercheurs.', indices: 'Index', cas_zone: 'CAS 2025', filters: 'Filtres', all: 'Tout', filter_xinrui: 'Émergent', filter_warning: 'Alerte', domestic_sources: 'Sources chinoises', tab_home: 'Revues', tab_int: 'International', tab_dom: 'Chine', tab_fav: 'Favoris', tab_pick: 'M’aider à choisir', loading: 'Chargement…', hero_title_int: 'Recherche internationale SCI / SSCI', hero_body_int: 'Source : <b>Web of Science Core Collection</b> (2026-05-18) avec <b>EI Compendex</b> (2025-10-10). Intègre <b>JCR 2025</b>, <b>ESI</b>, <b>CAS 2025</b> et <b>ShowJCR</b> version JCR 2025 · métriques 2024 (IF / quartiles / rangs), CCF 2026 et listes d’alerte. Total : <b id="total">—</b> revues.', hero_note: 'Légende des badges : <b>SCIE/SSCI/AHCI/ESCI/EI</b> indices de couverture · <b>CAS</b> Catégorisation CAS 2025 par grandes disciplines (1-4, marque TOP) · <b>JCR Q</b> Quartile (Q1-Q4) · <b>Emerging</b> Édition Émergente CAS 2026 · <b>CCF</b> Recommandation CCF 2026 (A/B/C) · <b>ABDC</b> Classement australien des revues de gestion (A*/A/B/C) · <b>ABS</b> Chartered ABS Academic Journal Guide 2024 (4*/4/3/2/1, commerce et gestion uniquement) · <b>T1/T2/T3</b> Classement CAST 2025 des revues de haute qualité · <b>⚠ Warning</b> Liste d’alerte des revues internationales.', hero_title_dom: 'Répertoires chinois', hero_title_fav: 'Favoris', hero_title_pick: 'M’aider à choisir', hero_body_pick: 'Bientôt disponible. Recommandations selon thème, IF, délai de revue, APC et index.', pick_coming_title: 'Bientôt disponible', pick_coming_desc: 'Mise à jour future', results_all: 'Toutes les revues', load_more: 'Charger plus', col_name: 'Revue Title', col_free: 'GRATUIT', col_abbr: 'Abrév. Abbr', col_badges: 'Index / niveau', search_int: 'Chercher : titre / abréviation / ISSN / nom chinois', search_dom: 'Chercher : nom chinois / anglais / ISSN / CN', search_fav: 'Chercher favoris', showing: 'Affichage', of: 'sur', total_items: '', empty: 'Aucun résultat', login: 'Connexion', logout: 'Déconnexion', wos_subjects: 'Sujets WoS', wos_search_ph: 'Filtrer les sujets (A-Z)…'
+      tagline: '<b>AILatest Journal</b> — outil de recherche de revues et d’aide au choix de soumission pour les chercheurs.', indices: 'Index', cas_zone: 'CAS 2025', filters: 'Filtres', all: 'Tout', filter_xinrui: 'Émergent', filter_warning: 'Alerte', domestic_sources: 'Sources chinoises', tab_int: 'International', tab_dom: 'Chine', tab_fav: 'Favoris', tab_pick: 'M’aider à choisir', loading: 'Chargement…', hero_title_int: 'Recherche internationale SCI / SSCI', hero_body_int: 'Source : <b>Web of Science Core Collection</b> (2026-05-18) avec <b>EI Compendex</b> (2025-10-10). Intègre <b>JCR 2025</b>, <b>ESI</b>, <b>CAS 2025</b> et <b>ShowJCR</b> version JCR 2025 · métriques 2024 (IF / quartiles / rangs), CCF 2026 et listes d’alerte. Total : <b id="total">—</b> revues.', hero_note: 'Légende des badges : <b>SCIE/SSCI/AHCI/ESCI/EI</b> indices de couverture · <b>CAS</b> Catégorisation CAS 2025 par grandes disciplines (1-4, marque TOP) · <b>JCR Q</b> Quartile (Q1-Q4) · <b>Emerging</b> Édition Émergente CAS 2026 · <b>CCF</b> Recommandation CCF 2026 (A/B/C) · <b>ABDC</b> Classement australien des revues de gestion (A*/A/B/C) · <b>ABS</b> Chartered ABS Academic Journal Guide 2024 (4*/4/3/2/1, commerce et gestion uniquement) · <b>T1/T2/T3</b> Classement CAST 2025 des revues de haute qualité · <b>⚠ Warning</b> Liste d’alerte des revues internationales.', hero_title_dom: 'Répertoires chinois', hero_title_fav: 'Favoris', hero_title_pick: 'M’aider à choisir', hero_body_pick: 'Bientôt disponible. Recommandations selon thème, IF, délai de revue, APC et index.', pick_coming_title: 'Bientôt disponible', pick_coming_desc: 'Mise à jour future', results_all: 'Toutes les revues', load_more: 'Charger plus', col_name: 'Revue Title', col_abbr: 'Abrév. Abbr', col_badges: 'Index / niveau', search_int: 'Chercher : titre / abréviation / ISSN / nom chinois', search_dom: 'Chercher : nom chinois / anglais / ISSN / CN', search_fav: 'Chercher favoris', showing: 'Affichage', of: 'sur', total_items: '', empty: 'Aucun résultat', login: 'Connexion', logout: 'Déconnexion', wos_subjects: 'Sujets WoS', wos_search_ph: 'Filtrer les sujets (A-Z)…'
     }
-  });
-  Object.assign(I18N.zh, {
-    tab_updates: '动态',
-    rail_updates: '动态',
-    search_updates_ph: '搜索期刊动态、来源、标签…',
-    updates_title: '期刊动态',
-    updates_intro: '跟踪新刊/子刊、收录变化、预警、投稿政策和重要出版报告。',
-    updates_latest: '最新动态',
-    updates_view_all: '查看全部动态',
-    updates_source: '来源',
-    updates_featured: '重点关注',
-    updates_updated_at: '数据更新时间',
-    updates_empty: '暂无匹配的期刊动态',
-    update_cat_all: '全部',
-    update_cat_new_journal: '新刊/子刊',
-    update_cat_index_change: '收录变化',
-    update_cat_warning: '预警',
-    update_cat_policy: '投稿政策',
-    update_cat_report: '重要报告',
-    pick_ai_toggle: 'AI 推荐',
-    pick_ai_hint: '语义增强，默认开启',
-    pick_ai_login: 'AI 推荐需要登录（每日 5 次免费额度），本次已自动改用本地匹配。',
-    pick_ai_running: '正在用 AI 解析研究语境…',
-    pick_ai_unavailable: 'AI 推荐暂不可用，已自动改用本地匹配；该次不扣 AI 额度，可稍后重试。',
-    pick_ai_auth_error: 'AI 推荐登录已失效，请重新登录；本次已自动改用本地匹配。',
-    pick_ai_quota_error: '今日 AI 推荐免费额度已用完，已自动改用本地匹配。',
-    pick_ai_config_error: 'AI 推荐接口还没有正确读取 DeepSeek 密钥，请重新部署 Worker 后再试。',
-    pick_mode_ai: 'AI 语义匹配',
-    pick_mode_local: '本地匹配',
-    pick_filter_esci: 'ESCI',
-    pick_filter_free_doaj: '免费（DOAJ）'
-  });
-  Object.assign(I18N['zh-TW'], {
-    tab_updates: '動態',
-    rail_updates: '動態',
-    search_updates_ph: '搜尋期刊動態、來源、標籤…',
-    updates_title: '期刊動態',
-    updates_intro: '追蹤新刊/子刊、收錄變化、預警、投稿政策和重要出版報告。',
-    updates_latest: '最新動態',
-    updates_view_all: '查看全部動態',
-    updates_source: '來源',
-    updates_featured: '重點關注',
-    updates_updated_at: '資料更新時間',
-    updates_empty: '暫無匹配的期刊動態',
-    update_cat_all: '全部',
-    update_cat_new_journal: '新刊/子刊',
-    update_cat_index_change: '收錄變化',
-    update_cat_warning: '預警',
-    update_cat_policy: '投稿政策',
-    update_cat_report: '重要報告',
-    pick_ai_toggle: 'AI 推薦',
-    pick_ai_hint: '語義增強，預設開啟',
-    pick_ai_login: 'AI 推薦需要登入（每日 5 次免費額度），本次已自動改用本地匹配。',
-    pick_ai_running: '正在用 AI 解析研究語境…',
-    pick_ai_unavailable: 'AI 推薦暫不可用，已自動改用本地匹配；該次不扣 AI 額度，可稍後重試。',
-    pick_ai_auth_error: 'AI 推薦登入已失效，請重新登入；本次已自動改用本地匹配。',
-    pick_ai_quota_error: '今日 AI 推薦免費額度已用完，已自動改用本地匹配。',
-    pick_ai_config_error: 'AI 推薦接口還沒有正確讀取 DeepSeek 密鑰，請重新部署 Worker 後再試。',
-    pick_mode_ai: 'AI 語義匹配',
-    pick_mode_local: '本地匹配',
-    pick_filter_esci: 'ESCI',
-    pick_filter_free_doaj: '免費（DOAJ）'
-  });
-  Object.assign(I18N.en, {
-    tab_updates: 'Updates',
-    rail_updates: 'Updates',
-    search_updates_ph: 'Search journal updates, sources, tags…',
-    updates_title: 'Journal Updates',
-    updates_intro: 'Track new journals, indexing changes, alerts, submission policies, and publishing reports.',
-    updates_latest: 'Latest Updates',
-    updates_view_all: 'View all updates',
-    updates_source: 'Source',
-    updates_featured: 'Featured',
-    updates_updated_at: 'Data updated',
-    updates_empty: 'No matching journal updates.',
-    update_cat_all: 'All',
-    update_cat_new_journal: 'New journals',
-    update_cat_index_change: 'Index changes',
-    update_cat_warning: 'Alerts',
-    update_cat_policy: 'Policies',
-    update_cat_report: 'Reports',
-    pick_ai_toggle: 'AI Match',
-    pick_ai_hint: 'Semantic mode, on by default',
-    pick_ai_login: 'AI Match requires sign-in (5 free uses per day); switched to local matching for this search.',
-    pick_ai_running: 'Analyzing research context with AI…',
-    pick_ai_unavailable: 'AI Match is temporarily unavailable; switched to local matching. No AI credit was used — retry later.',
-    pick_ai_auth_error: 'Your AI Match sign-in has expired. Sign in again; switched to local matching for this search.',
-    pick_ai_quota_error: 'Today’s free AI Match quota is used up; switched to local matching.',
-    pick_ai_config_error: 'AI Match cannot read the DeepSeek key yet. Redeploy the Worker and try again.',
-    pick_mode_ai: 'AI semantic match',
-    pick_mode_local: 'Local match',
-    pick_filter_esci: 'ESCI',
-    pick_filter_free_doaj: 'Free (DOAJ)'
   });
   const LANG_ORDER = ['zh-CN', 'zh-TW', 'ja', 'ko', 'en', 'es', 'pt', 'fr'];
   const LANG_META = {
-    'zh-CN': { label: '中文', html: 'zh-CN' }, 'zh-TW': { label: '繁中', html: 'zh-TW' },
+    'zh-CN': { label: '简体中文', html: 'zh-CN' }, 'zh-TW': { label: '繁體中文', html: 'zh-TW' },
     ja: { label: '日本語', html: 'ja' }, ko: { label: '한국어', html: 'ko' }, en: { label: 'English', html: 'en' },
     es: { label: 'Español', html: 'es' }, pt: { label: 'Português', html: 'pt' }, fr: { label: 'Français', html: 'fr' }
   };
   const normalizeLang = (code) => code === 'zh' ? 'zh-CN' : (I18N[code] ? code : 'zh-CN');
 
   // ───────── state ─────────
-  function initialLangFromPath() {
-    const path = location.pathname.replace(/\/+$/, '') || '/';
-    if (path === '/zh' || path.startsWith('/zh/')) return 'zh-CN';
-    if (path === '/en' || path.startsWith('/en/')) return 'en';
-    const saved = localStorage.getItem('ailatest.lang');
-    if (saved) return saved;
-    return /^zh/i.test(navigator.language || '') ? 'zh-CN' : 'en';
-  }
-  let lang = normalizeLang(initialLangFromPath());
+  let lang = normalizeLang(localStorage.getItem('ailatest.lang') || 'zh-CN');
   const T = (zh_, en_) => lang === 'zh-CN' || lang === 'zh-TW' ? zh_ : en_;
   // ── Domestic field-value translations (CAST domains, CSSCI/PKU disciplines, ZJU tiers) ──
   const DOM_I18N = {
@@ -777,16 +608,15 @@
     return (m && m[val]) || val;
   };
 
+  let theme = localStorage.getItem('ailatest.theme') || 'light';
+  document.documentElement.dataset.theme = theme;
+
   let journals = [];
   let domestic = null;
-  let india = null;
-  let malaysia = null;
-  let malaysiaPromise = null;
   let esiCats = [];
   let meta = null;
   let oaMap = {};          // compact OpenAlex map: { "ISSN": {hp, l, oa, dj, apc, org, cn, w} }
-  let coverMap = {};       // compact cover map: { "ISSN": {u, s, c, h, t} }
-  let journalUpdates = { updated_at: '', items: [] };
+  let annualOutputsCache = Object.create(null);
   // review_cycles now read from embedded doaj.review_weeks in journals.json.gz
   const DEFAULT_JOURNAL_ALIASES = {
     BE: 'BUILDING AND ENVIRONMENT',
@@ -847,7 +677,6 @@
 
   // ── 国际期刊 ISSN/eISSN/标题反向索引（供 CAST 等国内源抽屉查国际信息）──
   const intIndex = { byIssn: Object.create(null), byName: Object.create(null) };
-  const indiaIndex = { byIssn: Object.create(null), byName: Object.create(null) };
   function buildIntIndex(arr) {
     for (const r of arr) {
       if (r.issn) intIndex.byIssn[String(r.issn).toUpperCase()] = r;
@@ -864,40 +693,59 @@
     return null;
   }
 
-  function buildIndiaIndex(d) {
-    indiaIndex.byIssn = Object.create(null);
-    indiaIndex.byName = Object.create(null);
-    for (const r of (d && d.records) || []) {
-      const rec = { ...r, __src: 'in' };
-      for (const key of [r.issn, r.eissn]) {
-        if (key && key !== 'NA') indiaIndex.byIssn[String(key).toUpperCase()] = rec;
-      }
-      const nk = normTitle(r.journal_title || r.name || '');
-      if (nk) indiaIndex.byName[nk] = rec;
-    }
+  function currentIfValue(r) {
+    if (!r) return null;
+    const val = r.if_2025 != null && r.if_2025 !== '' ? +r.if_2025
+      : r.if_2024 != null && r.if_2024 !== '' ? +r.if_2024
+      : null;
+    return Number.isFinite(val) ? val : null;
   }
 
-  function lookupIndia(r) {
-    for (const key of [r?.issn, r?.eissn].filter(Boolean)) {
-      const hit = indiaIndex.byIssn[String(key).toUpperCase()];
-      if (hit) return hit;
-    }
-    const nk = normTitle(r?.name || r?.journal_title || r?.en_name || '');
-    return nk ? indiaIndex.byName[nk] || null : null;
+  function currentIfText(r, digits = 1) {
+    const val = currentIfValue(r);
+    return val == null ? '' : val.toFixed(digits);
   }
 
-  function loadMalaysiaData() {
-    if (malaysia) return Promise.resolve(malaysia);
-    if (!malaysiaPromise) {
-      malaysiaPromise = fetch('/data/malaysia.json')
-        .then(r => r.ok ? r.json() : null)
-        .then(d => {
-          malaysia = d;
-          return malaysia;
-        })
-        .catch(() => null);
+  function ifHistoryPoints(r) {
+    const raw = Array.isArray(r?.if_history) ? r.if_history : [];
+    const points = raw
+      .map(item => ({
+        year: Number(item?.year),
+        value: Number(item?.value),
+      }))
+      .filter(item => Number.isFinite(item.year) && Number.isFinite(item.value))
+      .sort((a, b) => a.year - b.year);
+    if (points.length) return points;
+    const fallback = [];
+    if (r?.if_2024 != null && r.if_2024 !== '') fallback.push({ year: 2024, value: Number(r.if_2024) });
+    if (r?.if_2025 != null && r.if_2025 !== '') fallback.push({ year: 2025, value: Number(r.if_2025) });
+    return fallback.filter(item => Number.isFinite(item.value));
+  }
+
+  async function loadAnnualOutputsSeries(r) {
+    const keys = [r?.issn, r?.eissn].filter(Boolean).map(v => String(v).toUpperCase());
+    for (const key of keys) {
+      if (annualOutputsCache[key]) return annualOutputsCache[key];
     }
-    return malaysiaPromise;
+    const issn = keys[0];
+    if (!issn) return [];
+    try {
+      const url = `/api/openalex/sources?filter=issn:${encodeURIComponent(issn)}&per-page=1&mailto=jiantaoweng@gmail.com`;
+      const resp = await fetch(url);
+      if (!resp.ok) return [];
+      const data = await resp.json();
+      const src = Array.isArray(data?.results) ? data.results[0] : null;
+      const series = Array.isArray(src?.counts_by_year)
+        ? src.counts_by_year
+            .map(item => ({ year: Number(item?.year), value: Number(item?.works_count) }))
+            .filter(item => Number.isFinite(item.year) && Number.isFinite(item.value) && item.year < 2026)
+            .sort((a, b) => a.year - b.year)
+        : [];
+      for (const key of keys) annualOutputsCache[key] = series;
+      return series;
+    } catch (_) {
+      return [];
+    }
   }
 
   function lookupOA(r) {
@@ -909,122 +757,21 @@
     return null;
   }
 
-  function lookupCover(r) {
-    if (!coverMap) return null;
-    function coverKeys(s) {
-      const raw = String(s || '').trim().toUpperCase();
-      const compact = raw.replace(/[^0-9X]/g, '');
-      const hyphen = compact.length === 8 ? compact.slice(0, 4) + '-' + compact.slice(4) : '';
-      return [raw, compact, hyphen].filter(Boolean);
-    }
-    const keys = [...new Set([r.issn, r.eissn].flatMap(coverKeys))];
-    for (const k of keys) {
-      if (coverMap[k]) return coverMap[k];
-    }
-    return null;
-  }
-
-  function journalPathSlug(pathname = location.pathname) {
-    const m = pathname.match(/^\/journal\/([^/?#]+)\/?$/);
-    if (!m) return '';
-    return decodeRoutePart(m[1]);
-  }
-
-  function journalPublicPath(r) {
-    const slug = r?.slug || favId(r);
-    return slug ? `/journal/${encodeURIComponent(slug)}/` : '/';
-  }
-
-  let activeTab = 'home';
-  const TAB_PATHS = { home: '/', int: '/global', dom: '/cn', updates: '/updates', in: '/in', my: '/my', kr: '/kr', fav: '/favorites', pick: '/pick' };
-  const PATH_TABS = { '/': 'home', '/en': 'home', '/zh': 'home', '/global': 'int', '/international': 'int', '/journals': 'int', '/cn': 'dom', '/china': 'dom', '/updates': 'updates', '/in': 'in', '/india': 'in', '/my': 'my', '/malaysia': 'my', '/kr': 'kr', '/korea': 'kr', '/favorites': 'fav', '/pick': 'pick' };
-  const TAB_SEO = {
-    home: {
-      title: 'AILatest Journal - Journal Finder, Rankings & Impact Factors',
-      desc: 'AILatest Journal helps researchers search 40,000+ academic journals, compare impact factors, JCR quartiles, CAS tiers, indexing databases, review cycles, and AI-powered submission matches.'
-    },
-    homeZh: {
-      title: 'AILatest Journal - 期刊查询 · 荐刊推荐 · SCI期刊检索',
-      desc: 'AILatest Journal 是面向科研人员的免费期刊查询与荐刊推荐工具。聚合 SCI/SSCI/AHCI、JCR 影响因子、中科院分区、CCF、CSSCI 等数据，支持期刊搜索、荐刊推荐、收藏同步。'
-    },
-    int: {
-      title: 'International Journal Search | SCI SSCI JCR IF CAS Tiers - AILatest Journal',
-      desc: 'Search international journals by SCI, SSCI, AHCI, ESCI, EI, JCR impact factor, CAS tiers, Web of Science subjects, Scopus, DOAJ and warning lists.'
-    },
-    dom: {
-      title: '中国期刊目录查询 | CSSCI 北大核心 中国科协 - AILatest Journal',
-      desc: '查询中文期刊目录、中国科协高质量期刊、CSSCI、北大核心、CCF 中文推荐、浙江大学目录等中国期刊分级数据。'
-    },
-    updates: {
-      title: '期刊动态 | 新刊 子刊 收录变化 出版报告 - AILatest Journal',
-      desc: '追踪期刊出版动态，包括新刊与子刊、Web of Science 和 Scopus 收录变化、预警名单、投稿政策和重要出版报告。'
-    },
-    in: {
-      title: 'India UGC-CARE Journal Directory | AILatest Journal',
-      desc: 'Search India UGC-CARE Group I journals by title, publisher, ISSN, E-ISSN and subject.'
-    },
-    my: {
-      title: 'Malaysia MyCite Journal Directory | ERA 2023 - AILatest Journal',
-      desc: 'Search Malaysia MyCite 2025, MyCite online historical indexed journals, and ERA 2023 Submitted Journal List records.'
-    },
-    kr: {
-      title: 'Korea Journal Directory | AILatest Journal',
-      desc: 'Korea country journal directory placeholder in AILatest Journal.'
-    },
-    fav: {
-      title: '期刊收藏清单 | Journal Favorites - AILatest Journal',
-      desc: '保存、同步、排序并分享你的目标期刊清单，支持跨设备收藏和期刊清单分享。'
-    },
-    pick: {
-      title: '荐刊推荐工具 | Journal Finder for Paper Title and Keywords - AILatest Journal',
-      desc: '输入论文题目、摘要或关键词，智能匹配研究主题、SCI/SSCI/EI 收录、JCR 分区、中科院分区、Scopus 与影响因子，推荐适合投稿的目标期刊。'
-    }
-  };
-  function tabFromPath(pathname = location.pathname) {
-    const clean = pathname.replace(/\/+$/, '') || '/';
-    if (clean.startsWith('/updates/')) return 'updates';
-    return PATH_TABS[clean] || 'home';
-  }
-  function updatePageSeo(tab = activeTab) {
-    const isZhHome = tab === 'home' && (location.pathname.replace(/\/+$/, '') === '/zh' || lang === 'zh-CN' || lang === 'zh-TW');
-    const seo = isZhHome ? TAB_SEO.homeZh : (TAB_SEO[tab] || TAB_SEO.int);
-    document.title = seo.title;
-    const currentPath = location.pathname.replace(/\/+$/, '') || '/';
-    const canonicalPath = tab === 'home'
-      ? (currentPath === '/zh' ? '/zh' : currentPath === '/en' ? '/en' : '/')
-      : ((tab === 'int' && (location.pathname === '/' || location.pathname === '')) ? '/' : (TAB_PATHS[tab] || '/'));
-    const desc = document.querySelector('meta[name="description"]');
-    if (desc) desc.setAttribute('content', seo.desc);
-    const canonical = document.querySelector('link[rel="canonical"]');
-    if (canonical) canonical.setAttribute('href', 'https://journal.ailatest.org' + canonicalPath);
-    const ogUrl = document.querySelector('meta[property="og:url"]');
-    if (ogUrl) ogUrl.setAttribute('content', 'https://journal.ailatest.org' + canonicalPath);
-    const ogTitle = document.querySelector('meta[property="og:title"]');
-    if (ogTitle) ogTitle.setAttribute('content', seo.title);
-    const ogDesc = document.querySelector('meta[property="og:description"]');
-    if (ogDesc) ogDesc.setAttribute('content', seo.desc);
-  }
-  let activeTopics = new Set();
+  let activeTab = 'int';
   let activeCat = '__all';   // ESI subject filter (legacy name)
   let activeCasMajor = '__all'; // CAS 大类 filter
-  /* column header checkbox groups replaced the old single-value filters */
-  let activeIndices = new Set(); // 默认全不勾选
+  let activeIndices = new Set(['SCIE','SSCI','AHCI','ESCI','EI']);
   let activeZones = new Set();
   let activeJcr = new Set();
   let activeXr = new Set();
   let activeAbdc = new Set();
   let activeAbs = new Set();
   let activeFeats = new Set();
-  let topicList = []; // [{name,count}] sorted A-Z, merged WoS + OA
+  let activeWos = new Set();
+  let wosCats = [];   // [{name,count}] sorted A-Z
   let activeQuery = '';
-  let activeUpdateQuery = '';
-  let activeWarnList = false; // 预警名单：合并 中科院/中信所预警 + 新锐 under review / WoS on hold
-  let activeIfMin = 0; // 影响因子滑块：只看 IF ≥ 此值
   let activeDom = 'cnki_major';   // 中文期刊目录
-  let activeIndiaSubject = '__all';
-  let activeMalaysiaSource = 'mycite_2025';
   let activeDomBadges = new Set(); // 默认不勾选 = 显示全部；勾选 = 只看有该徽章的
-  let activeUpdateCategory = 'all';
   const PAGE = 100;
   let shown = PAGE;
   let intIfSort = null; // null | 'desc' | 'asc'
@@ -1037,15 +784,8 @@
     const raw = localStorage.getItem('ailatest.unlocked');
     if (raw) Object.assign(unlockedCache, JSON.parse(raw));
   } catch (_) {}
-  // OAuth 跳转必须用 api 域名（第三方回调地址注册在 api.ailatest.org）。
-  const AUTH_BASE = (window.AILATEST_API_BASE
-    || (location.hostname === 'localhost' ? 'http://localhost:8787' : 'https://api.ailatest.org'));
-  // 数据请求优先走同域 /api（Worker 路由 journal.ailatest.org/api/*）：
-  // 与加载网页同一链路，免疫代理/DNS 对 api.* 子域的拦截，也无需 CORS 预检。
   const API_BASE = (window.AILATEST_API_BASE
-    || (location.hostname === 'localhost' ? 'http://localhost:8787'
-      : /(^|\.)ailatest\.org$/.test(location.hostname) ? '/api'
-      : 'https://api.ailatest.org'));
+    || (location.hostname === 'localhost' ? 'http://localhost:8787' : 'https://api.ailatest.org'));
 
   async function readJsonResponse(resp, fallback) {
     let data = null;
@@ -1064,42 +804,17 @@
     return err.message || `${stage}${T('失败',' failed')}`;
   }
 
-  function getAnalyticsId(key, storage, timeoutMs) {
+  function getAnalyticsId(key, storage) {
     try {
-      const canonicalKey = key.includes('visitor') ? 'visitor_id' : (key.includes('session') ? 'session_id' : key);
-      let id = storage.getItem(canonicalKey) || storage.getItem(key);
-      let ts = 0;
-      if (timeoutMs) {
-        ts = parseInt(storage.getItem(canonicalKey + '_ts') || storage.getItem(key + '_ts') || '0', 10);
-        const now = Date.now();
-        if (id && (now - ts) > timeoutMs) {
-          id = null;
-        }
-      }
+      let id = storage.getItem(key);
       if (!id) {
         id = (crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`);
-        storage.setItem(canonicalKey, id);
         storage.setItem(key, id);
-      }
-      if (timeoutMs) {
-        storage.setItem(canonicalKey + '_ts', String(Date.now()));
-        storage.setItem(key + '_ts', String(Date.now()));
       }
       return id;
     } catch (_) {
       return '';
     }
-  }
-
-  let lastTrackedPageview = '';
-  let routeAnalyticsTimer = 0;
-
-  function analyticsPath() {
-    const trackedUrl = new URL(location.href);
-    trackedUrl.searchParams.delete('token');
-    trackedUrl.searchParams.delete('state');
-    trackedUrl.searchParams.delete('code');
-    return `${trackedUrl.pathname}${trackedUrl.search ? trackedUrl.search.slice(0, 180) : ''}${trackedUrl.hash ? trackedUrl.hash.slice(0, 80) : ''}`;
   }
 
   function trackPageview() {
@@ -1109,22 +824,17 @@
       }
       if (localStorage.getItem('ailatest.analytics.ignore') === '1') return;
     } catch (_) {}
-    const path = analyticsPath();
-    if (path === lastTrackedPageview) return;
-    lastTrackedPageview = path;
+    const trackedUrl = new URL(location.href);
+    trackedUrl.searchParams.delete('token');
+    trackedUrl.searchParams.delete('state');
+    trackedUrl.searchParams.delete('code');
     const payload = {
-      event_id: crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`,
-      event_ts: Math.floor(Date.now() / 1000),
-      site: location.hostname,
-      path,
+      path: `${trackedUrl.pathname}${trackedUrl.search ? trackedUrl.search.slice(0, 180) : ''}`,
       referrer: document.referrer || '',
       visitor_id: getAnalyticsId('ailatest.analytics.visitor', localStorage),
-      session_id: getAnalyticsId('ailatest.analytics.session', sessionStorage, 30 * 60 * 1000),
+      session_id: getAnalyticsId('ailatest.analytics.session', sessionStorage),
       client_timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || '',
       client_language: navigator.language || '',
-      user_agent: navigator.userAgent || '',
-      is_bot: !navigator.userAgent || !!navigator.userAgent.match(/(Googlebot|Bingbot|Bytespider|GPTBot|ClaudeBot|CCBot|curl|wget|HeadlessChrome|bot|spider|crawler)/i) ? 1 : 0,
-      screen_resolution: screen.width + 'x' + screen.height,
     };
     const body = JSON.stringify(payload);
     const url = `${API_BASE}/analytics/pageview`;
@@ -1142,122 +852,10 @@
     }).catch(() => {});
   }
 
-  function scheduleRoutePageview() {
-    clearTimeout(routeAnalyticsTimer);
-    routeAnalyticsTimer = setTimeout(trackPageview, 80);
-  }
-
-  function trackInteraction(eventType, detail = {}) {
-    try {
-      if (localStorage.getItem('ailatest.analytics.ignore') === '1') return;
-    } catch (_) {}
-    const payload = {
-      event_id: crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`,
-      event_type: eventType,
-      event_ts: Math.floor(Date.now() / 1000),
-      site: location.hostname,
-      path: analyticsPath(),
-      tab: detail.tab || activeTab || '',
-      query: detail.query || '',
-      result_count: Number.isFinite(Number(detail.result_count)) ? Number(detail.result_count) : null,
-      visitor_id: getAnalyticsId('ailatest.analytics.visitor', localStorage),
-      session_id: getAnalyticsId('ailatest.analytics.session', sessionStorage, 30 * 60 * 1000),
-      client_timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || '',
-      client_language: navigator.language || '',
-      user_agent: navigator.userAgent || '',
-      is_bot: !navigator.userAgent || !!navigator.userAgent.match(/(Googlebot|Bingbot|Bytespider|GPTBot|ClaudeBot|CCBot|curl|wget|HeadlessChrome|bot|spider|crawler)/i) ? 1 : 0,
-      metadata: detail.metadata || {},
-    };
-    const body = JSON.stringify(payload);
-    const url = `${API_BASE}/analytics/interaction`;
-    try {
-      if (navigator.sendBeacon) {
-        const blob = new Blob([body], { type: 'application/json' });
-        if (navigator.sendBeacon(url, blob)) return;
-      }
-    } catch (_) {}
-    fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body,
-      keepalive: true,
-    }).catch(() => {});
-  }
-
-  function installRouteAnalytics() {
-    if (window.__ailatestRouteAnalyticsInstalled) return;
-    window.__ailatestRouteAnalyticsInstalled = true;
-    for (const method of ['pushState', 'replaceState']) {
-      const original = history[method];
-      history[method] = function(...args) {
-        const result = original.apply(this, args);
-        scheduleRoutePageview();
-        return result;
-      };
-    }
-    window.addEventListener('popstate', scheduleRoutePageview);
-    window.addEventListener('hashchange', scheduleRoutePageview);
-  }
-
   function t(k) { return (I18N[lang] && I18N[lang][k]) ?? I18N.en[k] ?? I18N['zh-CN'][k] ?? k; }
 
   function canonicalTitle(s) {
     return String(s || '').trim().replace(/\s+/g, ' ').toUpperCase();
-  }
-
-  function decodeRoutePart(s) {
-    let out = String(s || '').trim();
-    for (let i = 0; i < 2; i++) {
-      try {
-        const next = decodeURIComponent(out);
-        if (next === out) break;
-        out = next;
-      } catch (_) {
-        break;
-      }
-    }
-    return out;
-  }
-
-  function normalizeJournalSlug(s, stripAccents = true) {
-    let out = decodeRoutePart(s).toLowerCase();
-    if (stripAccents) out = out.normalize('NFKD').replace(/[\u0300-\u036f]/g, '');
-    return out
-      .replace(/^\/?journal\//, '')
-      .replace(/\/+$/, '')
-      .replace(/[^a-z0-9\u4e00-\u9fff-]+/g, '-')
-      .replace(/-+/g, '-')
-      .replace(/^-|-$/g, '');
-  }
-
-  function compactIssnKey(s) {
-    const out = String(s || '').replace(/[^0-9Xx]/g, '').toUpperCase();
-    return out.length >= 7 ? out : '';
-  }
-
-  function journalRouteKeyList(value) {
-    const raw = decodeRoutePart(value).replace(/^\/?journal\//, '').replace(/\/+$/, '');
-    return Array.from(new Set([
-      raw,
-      raw.toLowerCase(),
-      normalizeJournalSlug(raw, false),
-      normalizeJournalSlug(raw),
-      compactIssnKey(raw),
-    ].filter(Boolean)));
-  }
-
-  function journalRouteKeys(value) {
-    return new Set(journalRouteKeyList(value));
-  }
-
-  function recordRouteKeys(r) {
-    const keys = new Set();
-    [r?.slug, favId(r), r?.issn, r?.eissn, r?.cn_code].filter(Boolean).forEach(v => {
-      journalRouteKeys(v).forEach(k => keys.add(k));
-      const compact = compactIssnKey(v);
-      if (compact) keys.add(compact);
-    });
-    return keys;
   }
 
   function normalizeAliasKey(s) {
@@ -1349,43 +947,18 @@
       const k = el.dataset.i18nTitle;
       const v = t(k); if (v) el.title = v;
     });
-    $$('[data-i18n-aria]').forEach(el => {
-      const k = el.dataset.i18nAria;
-      const v = t(k); if (v) el.setAttribute('aria-label', v);
-    });
-    if (activeTab !== 'pick') {
-      const search = activeTab === 'home' ? 'search_home_ph'
-                    : activeTab === 'int' ? 'search_int'
-                    : activeTab === 'fav' ? 'search_fav'
-                    : activeTab === 'updates' ? 'search_updates_ph'
-                    : 'search_dom';
-      $('#q').placeholder = t(search);
-    }
-    updateSearchSubmitLabel();
-    const langToggle = $('#lang-toggle');
-    if (langToggle) langToggle.textContent = LANG_META[lang]?.label || '中文';
-    $$('[data-lang-choice]').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.langChoice === lang);
-    });
+    const search = activeTab === 'int' ? 'search_int'
+                  : activeTab === 'fav' ? 'search_fav'
+                  : 'search_dom';
+    $('#q').placeholder = t(search);
+    $('#lang-toggle').textContent = LANG_ORDER.map(code => LANG_META[code].label).join(' · ');
     $('#auth-btn').textContent = user ? (user.name || user.login || t('logout')) : t('login');
     document.documentElement.lang = LANG_META[lang]?.html || 'zh-CN';
   }
 
-  function updateSearchSubmitLabel() {
-    const btn = $('#search-submit');
-    const label = $('#search-submit [data-i18n]');
-    if (!label) return;
-    const key = activeTab === 'pick' ? 'pick_search_btn' : 'search_button';
-    label.dataset.i18n = key;
-    label.textContent = t(key);
-    btn?.setAttribute('aria-label', t(key));
-  }
-
   // ───────── favorites (multi-list + drag sort) ─────────
   function favId(r) {
-    const issn = r.issn && String(r.issn).toUpperCase() !== 'NA' ? r.issn : '';
-    const eissn = r.eissn && String(r.eissn).toUpperCase() !== 'NA' ? r.eissn : '';
-    return issn || eissn || r.cn_code || ('t:' + normTitle(r.name || r.cn_name || r.journal_title || ''));
+    return r.issn || r.eissn || r.cn_code || ('t:' + normTitle(r.name || r.cn_name || ''));
   }
   function normTitle(s) {
     return String(s).toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]+/g, '');
@@ -1445,7 +1018,6 @@
   }
 
   function getActiveList() {
-    if (!favLists.length) return null;
     return favLists.find(l => l.id === activeListId) || favLists[0];
   }
   function allFavIds() {
@@ -1460,53 +1032,6 @@
   let favsData = {};
   try { favsData = JSON.parse(localStorage.getItem(STORAGE_PREFIX + 'favsData') || '{}'); } catch(_){}
   let user = JSON.parse(localStorage.getItem('ailatest.user') || 'null');
-
-
-  // ── Free-tier usage limits ──
-  const DAILY_VIEW_LIMIT = 300;
-  const DAILY_SEARCH_LIMIT = 2;
-  const LOCAL_FAV_LIMIT = 5;
-  const USAGE_KEY = 'ailatest.daily_usage';
-
-  function getDailyUsage() {
-    const today = new Date().toISOString().slice(0, 10);
-    try {
-      const raw = JSON.parse(localStorage.getItem(USAGE_KEY) || '{}');
-      if (raw.date !== today) return { date: today, views: 0, searches: 0 };
-      return raw;
-    } catch (e) { return { date: today, views: 0, searches: 0 }; }
-  }
-  function saveDailyUsage(u) {
-    try { localStorage.setItem(USAGE_KEY, JSON.stringify(u)); } catch (e) {}
-  }
-  function isOverLimit(type, limit) {
-    if (user) return false;
-    return getDailyUsage()[type] >= limit;
-  }
-  function incrementUsage(type) {
-    if (user) return;
-    const usage = getDailyUsage();
-    usage[type] = (usage[type] || 0) + 1;
-    saveDailyUsage(usage);
-  }
-  function requireLogin(msg) {
-    if (user) return true;
-    openLoginModal();
-    const card = document.querySelector('.login-card');
-    if (card) {
-      let el = document.getElementById('login-limit-msg');
-      if (!el) {
-        el = document.createElement('p');
-        el.id = 'login-limit-msg';
-        el.className = 'login-limit-msg';
-        card.prepend(el);
-      }
-      el.textContent = msg || T('免费次数已用完，请登录后继续使用','Free daily limit reached. Please sign in to continue.');
-    }
-    return false;
-  }
-
-
 
   // isFav = 在当前 active list 中
   function isFav(r) {
@@ -1525,38 +1050,6 @@
       // 其他 list 都不含它 → 从 favsData 移除
       if (!favLists.some(l => l.ids.includes(id))) delete favsData[id];
     } else {
-    // Local-only favorite limit
-    if (!user && list.ids.length >= LOCAL_FAV_LIMIT) {
-            openLoginModal();
-            const card = document.querySelector('.login-card');
-            if (card) {
-              let el = document.getElementById('login-limit-msg');
-              if (!el) {
-                el = document.createElement('p');
-                el.id = 'login-limit-msg';
-                el.className = 'login-limit-msg';
-                card.prepend(el);
-              }
-              el.textContent = T('本地收藏上限 5 本，请登录后收藏更多','Local favorites limit (5) reached. Sign in to save more.');
-            }
-            return;
-    }
-    // Local-only favorite limit
-    if (!user && list.ids.length >= LOCAL_FAV_LIMIT) {
-            openLoginModal();
-            const card = document.querySelector('.login-card');
-            if (card) {
-              let el = document.getElementById('login-limit-msg');
-              if (!el) {
-                el = document.createElement('p');
-                el.id = 'login-limit-msg';
-                el.className = 'login-limit-msg';
-                card.prepend(el);
-              }
-              el.textContent = T('本地收藏上限 5 本，请登录后收藏更多','Local favorites limit (5) reached. Sign in to save more.');
-            }
-            return;
-    }
       list.ids.push(id);
       favsData[id] = { ...r, __src: meta.src || 'int', __savedAt: Date.now() };
     }
@@ -1567,26 +1060,8 @@
 
   function updateFavCount() {
     const total = allFavIds().size;
-    const badge = $('#fav-count-badge');
-    if (badge) {
-      if (total > 0) {
-        badge.textContent = total > 99 ? '99+' : String(total);
-        badge.style.display = 'inline-flex';
-      } else {
-        badge.style.display = 'none';
-      }
-    }
-  }
-
-  function showFavToast(msg) {
-    const old = document.querySelector('.fav-toast');
-    if (old) old.remove();
-    const t = document.createElement('div');
-    t.className = 'fav-toast';
-    t.textContent = msg;
-    document.body.appendChild(t);
-    requestAnimationFrame(() => t.classList.add('show'));
-    setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 1800);
+    const el = $('#fav-count');
+    if (el) el.textContent = total;
   }
 
   // list 管理
@@ -1965,7 +1440,7 @@
   function lockedPrompt(sourceKey, sourceLabel, recordCount) {
     return `
       <div class="section-block locked-block">
-        <h1 class="section-title">${escape(sourceLabel)} <span class="lock-pill">🔒 ${T('付费解锁','Paid unlock')}</span></h3>
+        <h3 class="section-title">${escape(sourceLabel)} <span class="lock-pill">🔒 ${T('付费解锁','Paid unlock')}</span></h3>
         <div class="section-subtitle">${T('此学校自编目录为付费内容，共','This in-house directory is paid content,')} ${recordCount} ${T('条记录。输入解锁码后自动保存在本机浏览器，下次免输。','records. Enter your unlock code; it will be saved on this device for next time.')}</div>
         <form class="unlock-form" data-src="${escape(sourceKey)}">
           <input class="unlock-input" type="text" autocomplete="off" spellcheck="false" placeholder="${T('解锁码（如 school-a-xxxxxxxx）','Unlock code (e.g. school-a-xxxxxxxx)')}" />
@@ -2101,7 +1576,7 @@
           const state = Math.random().toString(36).slice(2);
           sessionStorage.setItem('ailatest.oauth_state', state);
           const redirect = encodeURIComponent(location.origin + location.pathname);
-          location.href = `${AUTH_BASE}/auth/${p}?state=${state}&redirect=${redirect}`;
+          location.href = `${API_BASE}/auth/${p}?state=${state}&redirect=${redirect}`;
         });
       });
     }
@@ -2164,101 +1639,6 @@
     const license = doaj.lic || doaj.license || '';
     return `<span class="badge b-doaj" title="${T('DOAJ 开放获取期刊目录','Directory of Open Access Journals')}${license ? ' · ' + escape(license) : ''}">DOAJ</span>`;
   }
-  function badgeNatureIndex() {
-    return `<span class="badge b-nature-index" title="${T('Nature Index 追踪出版物','Tracked by Nature Index')}">Nature Index</span>`;
-  }
-  function badgeCSCD(cscd) {
-    if (!cscd) return '';
-    const code = String(cscd.database || '').toUpperCase();
-    const label = code === 'C' ? 'CSCD-C' : (code === 'E' ? 'CSCD-E' : 'CSCD');
-    const tip = code === 'C' ? T('CSCD 核心库','CSCD Core') : (code === 'E' ? T('CSCD 扩展库','CSCD Extended') : 'CSCD');
-    return `<span class="badge b-cscd" title="${escape(tip)}">${label}</span>`;
-  }
-  function badgeCSTPCD(cstpcd) {
-    if (!cstpcd) return '';
-    const isPopular = cstpcd.kind === 'popular_science';
-    const label = isPopular ? T('中国科技核心·科普','CSTPCD Popular') : T('中国科技核心','CSTPCD');
-    const tip = isPopular ? T('中国科技核心期刊目录（科普卷）','Chinese Science and Technology Core Journals (Popular Science)') : T('中国科技核心期刊目录','Chinese Science and Technology Core Journals');
-    return `<span class="badge b-cstpcd" title="${escape(tip)}">${label}</span>`;
-  }
-  function badgeSCD(scd) {
-    if (!scd) return '';
-    const year = scd.year || 2026;
-    const cat = scd.category ? ` · ${escape(scd.category)}` : '';
-    const added = scd.newly_added ? ` · ${T('新入选','newly added')}` : '';
-    return `<span class="badge b-scd" title="SCD ${year}${cat}${added}">SCD</span>`;
-  }
-  function badgeAMI(ami) {
-    if (!ami) return '';
-    const tier = ami.tier || '';
-    const disc = ami.discipline ? ` · ${escape(ami.discipline)}` : '';
-    return `<span class="zone ami-tier" title="${T('AMI 综合评价','AMI Journal Evaluation')} ${ami.year || 2022}${disc}">AMI${tier ? ' ' + escape(tier) : ''}</span>`;
-  }
-  function badgeFMS(fms) {
-    if (!fms || !fms.tier) return '';
-    const type = fms.type === 'chinese' ? T('中文','Chinese') : T('国际','International');
-    return `<span class="zone fms-tier" title="${T('FMS 管理科学高质量期刊','FMS High-quality Management Journals')} ${fms.year || 2025} · ${type}">FMS ${escape(fms.tier)}</span>`;
-  }
-  function bestVhbRating(vhb) {
-    const arr = Array.isArray(vhb) ? vhb : [];
-    const order = {'A+': 5, A: 4, B: 3, C: 2, D: 1};
-    return arr.reduce((best, x) => (!best || (order[x.rating] || 0) > (order[best.rating] || 0)) ? x : best, null);
-  }
-  function badgeVHB(vhb) {
-    const best = bestVhbRating(vhb);
-    if (!best) return '';
-    const rows = Array.isArray(vhb) ? vhb.filter(Boolean) : [best];
-    const count = rows.length;
-    const area = best.area_code || best.area || '';
-    const title = `${T('VHB Rating 2024，按领域评级','VHB Rating 2024, area rating')}${area ? ' · ' + escape(area) : ''}${count > 1 ? ` · ${count}${T(' 个领域',' areas')}` : ''}`;
-    const label = `VHB ${escape(best.rating)}${count > 1 ? ` x${count}` : ''}`;
-    if (count <= 1) {
-      return `<span class="zone vhb-tier" title="${title}">${label}</span>`;
-    }
-    const detailRows = rows.map(x => {
-      const areaText = [x.area_code, x.area].filter(Boolean).join(' · ') || 'Unspecified area';
-      const vote = x.votes_ge_rating_percent != null && x.votes_ge_rating_percent !== ''
-        ? `<span class="vhb-detail-vote">Votes &gt;= rating: ${escape(x.votes_ge_rating_percent)}%</span>`
-        : '';
-      return `<div class="vhb-detail-row">
-        <span class="vhb-detail-area">${escape(areaText)}</span>
-        <span class="vhb-detail-rating">${escape(x.rating || '')}</span>
-        ${vote}
-      </div>`;
-    }).join('');
-    return `<details class="vhb-details">
-      <summary class="zone vhb-tier" title="${title}">${label}</summary>
-      <div class="vhb-detail-popover" role="list">
-        <div class="vhb-detail-title">VHB Publication Media Rating ${escape(best.year || 2024)}</div>
-        ${detailRows}
-      </div>
-    </details>`;
-  }
-  function badgeCNRS(cnrs) {
-    const arr = Array.isArray(cnrs) ? cnrs : [];
-    const first = arr[0];
-    if (!first) return '';
-    return `<span class="zone cnrs-tier" title="${T('CNRS Section 37 2020 历史参考','CNRS Section 37 2020 historical reference')}${first.domain ? ' · ' + escape(first.domain) : ''}">CNRS ${escape(first.category || '')}</span>`;
-  }
-  function badgeRetraction(ret) {
-    if (!ret || !ret.retractions_total) return '';
-    const rate = ret.rate_per_1000_10y != null ? `${ret.rate_per_1000_10y}/1000` : '';
-    return `<span class="warn-pill retraction-pill" title="${T('Retraction Watch 撤稿记录；用于风险提示，不作排名','Retraction Watch records; caution metric, not ranking')}${rate ? ' · 10y ' + rate : ''}">RW ${escape(ret.retractions_total)}</span>`;
-  }
-  function badgePubMed(pubmed) {
-    return pubmed ? `<span class="badge b-pubmed" title="${T('PubMed 可检索','Searchable in PubMed')}">PubMed</span>` : '';
-  }
-  function badgePMC(pmc) {
-    return pmc ? `<span class="badge b-pmc" title="${T('PubMed Central 全文档案','Full text archived in PubMed Central')}">PMC</span>` : '';
-  }
-  function badgeMEDLINE(m) {
-    if (!m) return '';
-    return `<span class="badge b-medline" title="${T('MEDLINE 数据库收录（NLM 精选索引）','Indexed in MEDLINE (NLM curated)')}">MEDLINE</span>`;
-  }
-  function badgeFree(f) {
-    if (!f) return '';
-    return `<span class="badge b-free" title="${T('提供 OA 发表选项（含 Diamond/Gold/Hybrid）','Offers OA publishing option (Diamond/Gold/Hybrid)')}">${T('免费发表','FREE TO PUBLISH')}</span>`;
-  }
   // 期刊浏览量缓存（journal_key → count）
   const viewsCache = {};
   function badgeView(key) {
@@ -2266,46 +1646,13 @@
     const display = n >= 1000 ? (n / 1000).toFixed(1) + 'k' : String(n);
     return `<span class="badge b-view" title="${T('累计浏览次数','Total views')}">👁 ${display}</span>`;
   }
-  function journalOpenSource(opts = {}) {
-    if (opts.source) return opts.source;
-    if (opts.fromPath || opts.fromHash) return 'direct_link';
-    if (activeTab === 'pick') return 'recommendation';
-    if (activeTab === 'fav') return activeQuery ? 'favorites_search_results' : 'favorites';
-    if (activeQuery) return 'search_results';
-    if (activeTab === 'home') return 'home';
-    if (activeTab === 'dom') return 'domestic_list';
-    if (activeTab === 'in') return 'india_list';
-    return 'default_list';
-  }
-
-  async function reportJournalView(recOrKey, opts = {}) {
-    const key = typeof recOrKey === 'string' ? recOrKey : favId(recOrKey);
+  async function reportJournalView(key) {
     if (!key) return;
-    const detailPath = typeof recOrKey === 'string' ? analyticsPath() : journalPublicPath(recOrKey);
-    const source = journalOpenSource(opts);
     try {
       const r = await fetch(`${API_BASE}/journal-view`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(user && user.token ? { 'Authorization': `Bearer ${user.token}` } : {}),
-        },
-        body: JSON.stringify({
-          event_id: crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`,
-          event_time: Math.floor(Date.now() / 1000),
-          journal_key: key,
-          journal_name: typeof recOrKey === 'string' ? '' : (recOrKey.name || recOrKey.cn_name || recOrKey.title || ''),
-          view_source: source,
-          tab: activeTab || '',
-          query: activeQuery || '',
-          visitor_id: getAnalyticsId('ailatest.analytics.visitor', localStorage),
-          session_id: getAnalyticsId('ailatest.analytics.session', sessionStorage, 30 * 60 * 1000),
-          path: detailPath,
-          referrer: document.referrer || '',
-          user_agent: navigator.userAgent || '',
-          device: /iPad|iPhone|Android/.test(navigator.userAgent) ? 'mobile' : 'desktop',
-          browser: (navigator.userAgent.match(/(Chrome|Safari|Firefox|Edge|Opera)/i) || ['unknown'])[0],
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ journal_key: key }),
       });
       const d = await r.json().catch(() => null);
       if (d && typeof d.count === 'number') {
@@ -2363,7 +1710,7 @@
   // 国内来源交叉徽章
   function badgeDomSrc(tag) {
     const map = {
-      cssci: 'CSSCI', cssci_ext: T('CSSCI 扩展','CSSCI Ext'), pku: T('北大核心','PKU Core'),
+      cssci: 'CSSCI', cssci_ext: T('CSSCI 扩','CSSCI Ext'), pku: T('北大核心','PKU Core'),
       cnkx_T1: T('科协 T1','CAST T1'), cnkx_T2: T('科协 T2','CAST T2'), cnkx_T3: T('科协 T3','CAST T3'),
       ccft_T1: 'CCF-T1', ccft_T2: 'CCF-T2', ccft_T3: 'CCF-T3',
       zju: T('浙大目录','ZJU'), school_a: T('学校 A','School A'),
@@ -2394,18 +1741,6 @@
     const source = (abs && abs.source) || 'Chartered ABS AJG 2024';
     return `<span class="zone ${cls}" title="${escape(source)}">ABS ${escape(label)}</span>`;
   }
-  function badgeFT50(ft50) {
-    if (!ft50) return '';
-    const source = (ft50 && ft50.source) || 'Financial Times Top 50 Journals';
-    const order = ft50 && ft50.order ? ` #${ft50.order}` : '';
-    return `<span class="zone ft50" title="${escape(source)}">FT50${escape(order)}</span>`;
-  }
-  function badgeUTD24(utd24) {
-    if (!utd24) return '';
-    const source = (utd24 && utd24.source) || 'UT Dallas Top 24 Business Journals';
-    const order = utd24 && utd24.order ? ` #${utd24.order}` : '';
-    return `<span class="zone utd24" title="${escape(source)}">UTD24${escape(order)}</span>`;
-  }
       function badgeTier(tier) {
         if (!tier) return '';
         const raw = String(tier).trim().toUpperCase();
@@ -2429,16 +1764,11 @@
         };
         const m = map[kind];
         if (!m) return '';
-        return `<span class="flagship-pill ${m[1]}" title="${m[0]}">${m[0]}</span>`;
+        return `<span class="flagship-pill ${m[1]}" title="${m[0]}">★ ${m[0]}</span>`;
       }
-      function badgeXR(xr) {
-        if (!xr) return '';
-        const z = typeof xr === 'object' ? xr.zone : xr;
-        const top = typeof xr === 'object' && xr.top;
+      function badgeXR(z) {
         if (!z) return '';
-        const cls = top ? 'xr-top' : `xr-${z}`;
-        const label = `${T('新锐','Emerging')} ${z}${T('区','')}${top ? '·TOP' : ''}`;
-        return `<span class="xr-pill ${cls}" title="${T('中科院 2026 新锐版分区','CAS Emerging Edition 2026')}">${label}</span>`;
+        return `<span class="xr-pill xr-${z}" title="${T('中科院 2026 新锐版分区','CAS Emerging Edition 2026')}">${T('新锐','Emerging')} ${z}${T('区','')}</span>`;
       }
       function badgeWarn(w, isCard) {
         if (!w) return '';
@@ -2453,16 +1783,7 @@
             return `<span class="warn-pill">⚠ ${escape(label)}</span>`;
           }
         }
-        return `<span class="warn-pill">⚠ ${T('预警','Warning')}</span>`;
-      }
-      function badgeUnderReview() {
-        return `<span class="under-review-pill">${T('新锐审查中','Emerging Under Review')}</span>`;
-      }
-      function badgeOnHold() {
-        return `<span class="on-hold-pill">WoS On Hold</span>`;
-      }
-      function badgeCiticWarning() {
-        return `<span class="citic-warning-pill">${T('中信所预警','CITIC Warning')}</span>`;
+        return `<span class="warn-pill">⚠ Warning</span>`;
       }
 
   // 统一标签组合：主页 / 收藏页 / 抽屉 / 分享卡片共用同一批 badge 函数与 CSS 类。
@@ -2470,14 +1791,10 @@
     if (!r) return '';
     return [
       badgeFlagship(r.flagship),
-      r.nature_index ? badgeNatureIndex() : '',
       ...((r.indices) || []).map(badgeIndex),
       badgeScopus(r.scopus),
       badgeOAJ(r.oaj),
       badgeDOAJ(r.doaj),
-      badgeMEDLINE(r.medline),
-      r.cscd ? badgeCSCD(r.cscd) : '',
-      r.cstpcd ? badgeCSTPCD(r.cstpcd) : '',
     ].filter(Boolean).join('');
   }
   function renderRankBadges(r) {
@@ -2485,88 +1802,18 @@
     return [
       badgeJCR(r.if_quartile),
       badgeCAS(r.cas_zone, r.cas_top),
-      badgeXR(r.cas_xr),
+      badgeXR(r.cas_xr && r.cas_xr.zone),
       badgeCCF(r.ccf),
       badgeABDC(r.abdc),
       badgeABS(r.abs),
-      badgeFT50(r.ft50),
-      badgeUTD24(r.utd24),
         // cnkx tier badges removed — now handled by renderDomCrossBadges via domIndex
       r.warning ? badgeWarn(r.warning, true) : '',
-      r.under_review ? badgeUnderReview() : '',
-      r.on_hold ? badgeOnHold() : '',
-      r.citic_warning ? badgeCiticWarning() : '',
     ].filter(Boolean).join('');
   }
   function renderBadgeCell(indexBadges, rankBadges) {
     return [
       indexBadges ? `<div class="badges badges-idx">${indexBadges}</div>` : '',
       rankBadges  ? `<div class="badges badges-rank">${rankBadges}</div>`  : '',
-    ].filter(Boolean).join('') || '<span class="muted-cell">—</span>';
-  }
-
-  function renderCoverageBadges(r) {
-    if (!r) return '';
-    return [
-      badgeFlagship(r.flagship),
-      r.nature_index ? badgeNatureIndex() : '',
-      ...((r.indices) || []).map(badgeIndex),
-      badgeScopus(r.scopus),
-      badgeMEDLINE(r.medline),
-      badgePubMed(r.pubmed),
-      badgePMC(r.pmc),
-      r.cscd ? badgeCSCD(r.cscd) : '',
-      r.cstpcd ? badgeCSTPCD(r.cstpcd) : '',
-      r.scd ? badgeSCD(r.scd) : '',
-    ].filter(Boolean).join('');
-  }
-  function renderAccessBadges(r) {
-    if (!r) return '';
-    return [
-      badgeFree(r.free),
-      badgeOAJ(r.oaj),
-      badgeDOAJ(r.doaj),
-    ].filter(Boolean).join('');
-  }
-  function renderRiskBadges(r) {
-    if (!r) return '';
-    return [
-      r.warning ? badgeWarn(r.warning, true) : '',
-      r.under_review ? badgeUnderReview() : '',
-      r.on_hold ? badgeOnHold() : '',
-      r.citic_warning ? badgeCiticWarning() : '',
-      badgeRetraction(r.retraction),
-    ].filter(Boolean).join('');
-  }
-  function renderLevelBadges(r) {
-    if (!r) return '';
-    return [
-      badgeJCR(r.if_quartile),
-      badgeCAS(r.cas_zone, r.cas_top),
-      badgeXR(r.cas_xr),
-      badgeCCF(r.ccf),
-      badgeABDC(r.abdc),
-      badgeABS(r.abs),
-      badgeFT50(r.ft50),
-      badgeUTD24(r.utd24),
-      badgeFMS(r.fms),
-      badgeVHB(r.vhb),
-      badgeCNRS(r.cnrs),
-      badgeAMI(r.ami),
-    ].filter(Boolean).join('');
-  }
-  function renderIndexBadges(r) {
-    return renderCoverageBadges(r);
-  }
-  function renderRankBadges(r) {
-    return [renderLevelBadges(r), renderRiskBadges(r)].filter(Boolean).join('');
-  }
-  function renderBadgeCell(indexBadges, rankBadges, accessBadges, riskBadges) {
-    return [
-      indexBadges ? `<div class="badges badges-idx">${indexBadges}</div>` : '',
-      rankBadges  ? `<div class="badges badges-rank">${rankBadges}</div>`  : '',
-      accessBadges ? `<div class="badges badges-access">${accessBadges}</div>` : '',
-      riskBadges ? `<div class="badges badges-risk">${riskBadges}</div>` : '',
     ].filter(Boolean).join('') || '<span class="muted-cell">—</span>';
   }
 
@@ -2594,47 +1841,18 @@
     if (nk && domIndex.byName[nk]) hits.push(...domIndex.byName[nk]);
     const ik = (r.issn || r.cn_code || '').toUpperCase();
     if (ik && domIndex.byIssn[ik]) hits.push(...domIndex.byIssn[ik]);
-    // dedupe by source + discipline (CAST journals span multiple disciplines;
-    // keep each distinct discipline so badges read e.g. 科协建筑 / 科协机械).
+    // dedupe by source
     const seen = new Set();
-    return hits.filter(h => { const k = h.source + ':' + (h.domain || h.tag || ''); if (seen.has(k)) return false; seen.add(k); return true; });
+    return hits.filter(h => { const k = h.source + ':' + (h.tag||''); if (seen.has(k)) return false; seen.add(k); return true; });
   }
   function buildDomIndex(d) {
     if (!d) return;
-    domIndex.byName = Object.create(null);
-    domIndex.byIssn = Object.create(null);
-    ((d.scd && d.scd.records)||[]).forEach(r => {
-      const label = r.newly_added ? 'SCD+' : 'SCD';
-      const payload = { source:'scd', label, tag:r.newly_added ? 'new' : 'core', domain:r.category || '' };
-      addDomIndex(r.name, 'name', payload);
-      if (r.issn) addDomIndex(r.issn, 'issn', payload);
-      if (r.cn_code) addDomIndex(r.cn_code, 'issn', payload);
-    });
-    ((d.ami && d.ami.records)||[]).forEach(r => {
-      const tier = r.tier || '';
-      const payload = { source:'ami', label:`AMI${tier ? ' ' + tier : ''}`, tag:tier, domain:r.discipline || '' };
-      addDomIndex(r.name, 'name', payload);
-      if (r.issn) addDomIndex(r.issn, 'issn', payload);
-      if (r.cn_code) addDomIndex(r.cn_code, 'issn', payload);
-    });
-    ((d.vhb && d.vhb.records)||[]).forEach(r => {
-      const rating = r.rating || '';
-      const payload = { source:'vhb', label:`VHB ${rating}`.trim(), tag:rating, domain:r.area_code || r.area || '' };
-      addDomIndex(r.title, 'name', payload);
-      if (r.issn) addDomIndex(r.issn, 'issn', payload);
-    });
-    ((d.cnrs && d.cnrs.records)||[]).forEach(r => {
-      const category = r.category || '';
-      const payload = { source:'cnrs', label:`CNRS ${category}`.trim(), tag:category, domain:r.domain || '' };
-      addDomIndex(r.title, 'name', payload);
-      if (r.issn) addDomIndex(r.issn, 'issn', payload);
-    });
     // CSSCI
     (d.cssci_core||[]).forEach(r => {
       addDomIndex(r.name, 'name', { source:'cssci', label:'CSSCI', tag:'', discipline:r.discipline });
     });
     (d.cssci_ext||[]).forEach(r => {
-      addDomIndex(r.name, 'name', { source:'cssci_ext', label:T('CSSCI 扩展','CSSCI Ext'), tag:'', discipline:r.discipline });
+      addDomIndex(r.name, 'name', { source:'cssci_ext', label:T('CSSCI 扩','CSSCI Ext'), tag:'', discipline:r.discipline });
     });
     (d.pku_core||[]).forEach(r => {
       addDomIndex(r.name, 'name', { source:'pku', label:T('北大核心','PKU Core'), tag:'', category:r.category });
@@ -2642,26 +1860,8 @@
     // 中国科协 高质量科技期刊分级目录 (2025-12 修订, 11084 条)
     ((d.cnkx && d.cnkx.records)||[]).forEach(r => {
       if (!r.tier || !/^T[123]$/.test(r.tier)) return;
-      const cnkxLabel = castLabel(r.domain, r.tier);
-      addDomIndex(r.name, 'name', { source:'cnkx', label:cnkxLabel, tag:r.tier, domain:r.domain });
-      if (r.issn) addDomIndex(r.issn, 'issn', { source:'cnkx', label:cnkxLabel, tag:r.tier, domain:r.domain });
-    });
-    ((d.cscd && d.cscd.records)||[]).forEach(r => {
-      const code = String(r.database || '').toUpperCase();
-      const label = code === 'C' ? 'CSCD-C' : (code === 'E' ? 'CSCD-E' : 'CSCD');
-      const payload = { source:'cscd', label, tag:code, domain:r.database_label || '' };
-      addDomIndex(r.name, 'name', payload);
-      if (r.issn) addDomIndex(r.issn, 'issn', payload);
-      if (r.cn_code) addDomIndex(r.cn_code, 'issn', payload);
-    });
-    ((d.cstpcd && d.cstpcd.records)||[]).forEach(r => {
-      const isPopular = r.kind === 'popular_science';
-      const label = isPopular ? T('中国科技核心·科普','CSTPCD Popular') : T('中国科技核心','CSTPCD');
-      addDomIndex(r.name, 'name', { source:'cstpcd', label, tag:r.kind || 'core', domain:r.code || '' });
-    });
-    ((d.nsfc_mgmt && d.nsfc_mgmt.records)||[]).forEach(r => {
-      addDomIndex(r.name, 'name', { source:'nsfc_mgmt', label:'NSFC '+r.tier, tag:r.tier, domain:T('管理科学部','Management Science') });
-      if (r.issn) addDomIndex(r.issn, 'issn', { source:'nsfc_mgmt', label:'NSFC '+r.tier, tag:r.tier, domain:T('管理科学部','Management Science') });
+      addDomIndex(r.name, 'name', { source:'cnkx', label:T('科协','CAST')+' '+r.tier, tag:r.tier, domain:r.domain });
+      if (r.issn) addDomIndex(r.issn, 'issn', { source:'cnkx', label:T('科协','CAST')+' '+r.tier, tag:r.tier, domain:r.domain });
     });
     (d.ccft||[]).forEach(r => {
       addDomIndex(r.cn_name, 'name', { source:'ccft', label:'CCF-'+r.tier, tag:r.tier, org:r.org });
@@ -2673,63 +1873,10 @@
     });
     // Note: cnki_major（中文期刊目录）是基础库，不参与交叉收录徽章
   }
-  // CAST discipline shown on the badge, e.g. 建筑领域 → 建筑, 临床医学 → 临床医学.
-  function castDiscipline(domain) {
-    const d = tn(domain, 'domain') || '';
-    return d.replace(/领域$/, '').replace(/\s*(field|area)$/i, '').trim();
-  }
-  // Badge label: 科协 + discipline (falls back to 科协 + tier if no discipline).
-  function castLabel(domain, tier) {
-    const disc = castDiscipline(domain);
-    const needsSpace = !(lang === 'zh-CN' || lang === 'zh-TW' || lang === 'ja' || lang === 'ko');
-    const tierText = tier ? String(tier).trim().toUpperCase() : '';
-    return disc
-      ? `${T('科协','CAST')}${needsSpace ? ' ' : '·'}${disc}${tierText ? ' ' + tierText : ''}`
-      : `${T('科协','CAST')} ${tierText}`.trim();
-  }
   function renderDomCrossBadges(r, excludeSource) {
-    const rankSources = new Set(['vhb', 'cnrs', 'fms', 'abdc', 'abs', 'ft50', 'utd24']);
-    const hits = lookupDom(r).filter(h => h.source !== excludeSource && !rankSources.has(h.source));
+    const hits = lookupDom(r).filter(h => h.source !== excludeSource);
     if (!hits.length) return '';
-    const out = [];
-    const castHits = [];
-    const vhbHits = [];
-    const hasEmbeddedVhb = Array.isArray(r.vhb) && r.vhb.length;
-    for (const h of hits) {
-      if (h.source === 'cnkx') { castHits.push(h); continue; }
-      if (h.source === 'vhb') {
-        if (!hasEmbeddedVhb) vhbHits.push(h);
-        continue;
-      }
-      out.push(`<span class="domsrc-pill ds-${h.source}" title="${escape(h.domain||h.discipline||h.category||h.org||'')}">${escape(h.label)}</span>`);
-    }
-    if (vhbHits.length) {
-      const seenVhb = new Set();
-      const rows = [];
-      for (const h of vhbHits) {
-        const key = `${h.tag || ''}|${h.domain || ''}`;
-        if (seenVhb.has(key)) continue;
-        seenVhb.add(key);
-        rows.push({ year: 2024, rating: h.tag || String(h.label || '').replace(/^VHB\s*/i, ''), area: h.domain || '', area_code: '' });
-      }
-      const vhbBadge = badgeVHB(rows);
-      if (vhbBadge) out.push(vhbBadge);
-    }
-    // CAST: label by discipline (科协建筑) instead of bare tier (科协 T1).
-    const castSeen = new Set();
-    const castShown = [];
-    for (const h of castHits) {
-      const label = h.label || castLabel(h.domain, h.tag);
-      if (castSeen.has(label)) continue;
-      castSeen.add(label);
-      castShown.push({ label, tier: h.tag || '', domain: tn(h.domain, 'domain') || '' });
-    }
-    castShown.forEach((c, index) => {
-      const title = `${T('中国科协','CAST')}${c.tier ? ' ' + c.tier : ''}${c.domain ? ' · ' + c.domain : ''}`;
-      if (index) out.push('<span class="domsrc-dot" aria-hidden="true">·</span>');
-      out.push(`<span class="domsrc-pill ds-cnkx" title="${escape(title)}">${escape(c.label)}</span>`);
-    });
-    return out.join('');
+    return hits.map(h => `<span class="domsrc-pill ds-${h.source}" title="${escape(h.domain||h.discipline||h.category||h.org||'')}">${escape(h.label)}</span>`).join('');
   }
 
   // 通用中文期刊行渲染
@@ -2739,13 +1886,17 @@
     rowRecordsByFid[fid] = { ...r, __src: src };
     const name = r.name || r.cn_name || '';
     const enName = r.en_name ? `<span class="jname-cn">${escape(titleCase(r.en_name))}</span>` : '';
+    const isnCell = r.issn || r.cn_code
+      ? `<span class="jissn">${escape(r.issn || r.cn_code)}</span>`
+      : '<span class="muted-cell">—</span>';
     const crossBadges = renderDomCrossBadges({ name, issn: r.issn, cn_code: r.cn_code }, src);
     const tierBadge = showTier && tierValue ? badgeTier(tierValue) : '';
     return `<tr class="j-row clickable" data-fid="${escape(fid)}" data-src="${escape(src)}">
-      <td class="col-fav">${starBtn(r, src)}</td>
-      ${showTier ? `<td class="col-tier" style="width:60px">${tierBadge}</td>` : ''}
-      <td class="col-name"><div class="jname" style="font-size:13.5px">${escape(titleCase(name.replace(/\*$/,'')))}${enName}</div></td>
+      <td class="col-fav" style="width:36px">${starBtn(r, src)}</td>
+      ${showTier ? `<td style="width:60px">${tierBadge}</td>` : ''}
+      <td class="jname" style="font-size:13.5px">${escape(titleCase(name.replace(/\*$/,'')))}${enName}</td>
       <td class="col-cross"><div class="badges">${extraBadges}${crossBadges}</div></td>
+      <td class="col-issn" style="width:130px">${isnCell}</td>
       ${extraCols}
     </tr>`;
   }
@@ -2753,52 +1904,34 @@
   function renderRow(r) {
     const fid = favId(r);
     rowRecordsByFid[fid] = { ...r, __src: 'int' };
-    const nameHtml = `<div class="jname ${r.flagship ? 'jname-flagship' : ''}">${escape(titleCase(r.name))}${r.cn_name ? `<span class="jname-cn">${escape(r.cn_name)}</span>` : ''}${aliasHintHtml(r)}</div>`;
+    const flagshipHtml = r.flagship ? `<span class="flagship-star fs-${r.flagship}" title="${r.flagship.replace('_',' ')}">★</span>` : '';
+    const nameHtml = `<div class="jname">${flagshipHtml}${escape(titleCase(r.name))}${r.cn_name ? `<span class="jname-cn">${escape(r.cn_name)}</span>` : ''}${aliasHintHtml(r)}</div>`;
+    const abbr = r.abbr20 ? `<span class="jabbr">${escape(r.abbr20)}</span>` : '';
+    const issn = r.issn || r.eissn
+      ? `<span class="jissn">${r.issn||''}${r.eissn ? ` <span class="eissn">e:${r.eissn}</span>` : ''}</span>`
+      : '<span class="muted-cell">—</span>';
     const crossBadges = renderDomCrossBadges(r, 'int');
     // 第一行：索引（SCIE/SSCI/AHCI/ESCI/EI）— 回答"这本被哪些数据库收录"
-    const indexBadges = renderCoverageBadges(r);
+    const indexBadges = renderIndexBadges(r);
     // 第二行：分区/等级/预警 — 回答"这本的等级和影响力"（IF 已移到独立列）
-    const rankBadges = [renderLevelBadges(r), crossBadges].filter(Boolean).join('');
-    const accessBadges = renderAccessBadges(r);
-    const riskBadges = renderRiskBadges(r);
-    const badgeCell = renderBadgeCell(indexBadges, rankBadges, accessBadges, riskBadges);
+    const rankBadges = [renderRankBadges(r), crossBadges].filter(Boolean).join('');
+    const badgeCell = renderBadgeCell(indexBadges, rankBadges);
     const casVal = (lang === 'zh-CN' || lang === 'zh-TW') ? (r.cas_major_cn || '') : tn(r.cas_major_cn || '', 'domain');
     const esiVal = r.esi_category || '';
-    const wosVals = Array.isArray(r.wos_categories) ? r.wos_categories.filter(Boolean) : [];
-    const wosShown = wosVals.slice(0, 2).join(' / ');
-    const wosCell = wosVals.length
-      ? `<span title="${escape(wosVals.join(' / '))}">${escape(wosShown)}${wosVals.length > 2 ? ` <span class="muted-cell">+${wosVals.length - 2}</span>` : ''}</span>`
-      : '<span class="muted-cell">—</span>';
-    const ifVal = (r.if_2024 != null) ? (+r.if_2024).toFixed(1) : '';
+    const casCell = casVal ? escape(casVal) : '<span class="muted-cell">—</span>';
+    const esiCell = esiVal ? escape(esiVal) : '<span class="muted-cell">—</span>';
+    const ifVal = currentIfText(r);
     const ifCell = ifVal ? `<span class="if-cell">${ifVal}</span>` : '<span class="muted-cell">—</span>';
-    const cr = r.crossref;
-    const doaj = r.doaj;
-    // Review cycle: CrossRef median_days → DOAJ review_weeks → —
-    let cycleDays = null;
-    if (cr && cr.median_days) {
-      cycleDays = +cr.median_days;
-    } else if (doaj && typeof doaj === 'object' && doaj.review_weeks) {
-      cycleDays = +doaj.review_weeks * 7;
-    }
-    const cycleCell = cycleDays
-      ? `${Math.round(cycleDays / 30.4)}${T('个月','mo')}`
-      : '<span class="muted-cell">—</span>';
     return `<tr data-fid="${escape(fid)}" class="j-row clickable ${r.flagship ? 'row-flagship' : ''}" data-src="int">
       <td class="col-fav">${starBtn(r, 'int')}</td>
       <td class="col-name">${nameHtml}</td>
-      <td class="col-free">${freeBadgeCell(r)}</td>
       <td class="col-badge col-badge-split">${badgeCell}</td>
       <td class="col-if">${ifCell}</td>
-      <td class="col-cycle">${cycleCell}</td>
-      <td class="col-topic">${wosCell}</td>
+      <td class="col-cas">${casCell}</td>
+      <td class="col-esi">${esiCell}</td>
+      <td class="col-abbr">${abbr || '<span class="muted-cell">—</span>'}</td>
+      <td class="col-issn">${issn}</td>
     </tr>`;
-  }
-
-  /* ───────── FREE badge helper ───────── */
-  function freeBadgeCell(r) {
-    return r.free
-      ? `<span class="badge b-free" title="${T('提供 OA 发表选项（含 Diamond/Gold/Hybrid）','Offers OA publishing option (Diamond/Gold/Hybrid)')}">${T('免费发表','FREE TO PUBLISH')}</span>`
-      : '<span class="muted-cell">&mdash;</span>';
   }
 
   function escape(s) {
@@ -2808,25 +1941,10 @@
 
   // ───────── filtering ─────────
   function matches(r) {
-    // 预警名单：合并所有预警信号（任意命中即可，OR 语义）
-    if (activeWarnList && !(r.warning || r.citic_warning || r.under_review || r.on_hold)) return false;
-    // Index filter: exclude ESI from indices[] check (ESI stored as esi_category)
-    // ESI adds another OR condition — journal with esi_category also shows
-    const esiActive = activeIndices.has('ESI');
-    const idxOnly = new Set([...activeIndices].filter(v => v !== 'ESI'));
-    const matchesAny = !idxOnly.size || (r.indices || []).some(i => idxOnly.has(i));
-    if (!matchesAny && !(esiActive && r.esi_category)) {
-      // When OAJ / DOAJ / MEDLINE / PubMed / PMC is checked, those journals bypass the
-      // index filter (allows pure directory-journals without WoS/EI indices to show)
-      if (!((activeFeats.has('oaj') && r.oaj) || (activeFeats.has('doaj') && r.doaj) ||
-            (activeFeats.has('medline') && r.medline) ||
-            (activeFeats.has('cscd') && r.cscd) ||
-            (activeFeats.has('cstpcd') && r.cstpcd) ||
-            (activeFeats.has('free') && r.free) ||
-            (activeFeats.has('warning') && r.warning) ||
-            (activeFeats.has('citic_warning') && r.citic_warning) ||
-            (activeFeats.has('under_review') && r.under_review) ||
-            (activeFeats.has('on_hold') && r.on_hold))) return false;
+    if (activeIndices.size && !(r.indices || []).some(i => activeIndices.has(i))) {
+      // When OAJ / DOAJ is checked, OA directory journals bypass the index filter
+      // (allows pure OA directory journals without WoS/EI indices to show)
+      if (!((activeFeats.has('oaj') && r.oaj) || (activeFeats.has('doaj') && r.doaj))) return false;
     }
     if (activeZones.size) {
       const zones = new Set();
@@ -2841,12 +1959,8 @@
       if (!jcr || !activeJcr.has(jcr)) return false;
     }
     if (activeXr.size) {
-      const xrZones = new Set();
-      if (r.cas_xr && r.cas_xr.zone) xrZones.add(String(r.cas_xr.zone));
-      if (r.cas_xr && r.cas_xr.top) xrZones.add('xr-top');
-      let ok = false;
-      for (const z of activeXr) if (xrZones.has(z)) { ok = true; break; }
-      if (!ok) return false;
+      const xr = r.cas_xr != null ? String(r.cas_xr) : '';
+      if (!xr || !activeXr.has(xr)) return false;
     }
     if (activeAbdc.size) {
       const abdc = r.abdc && r.abdc.rating ? r.abdc.rating : '';
@@ -2856,8 +1970,7 @@
       const abs = r.abs && r.abs.rating ? r.abs.rating : '';
       if (!abs || !activeAbs.has(abs)) return false;
     }
-    if (activeFeats.has('if') && r.if_2024 == null) return false;
-    if (activeIfMin > 0 && (r.if_2024 == null || +r.if_2024 < activeIfMin)) return false;
+    if (activeFeats.has('if') && currentIfValue(r) == null) return false;
     if (activeFeats.has('ccf') && !r.ccf) return false;
     if (activeFeats.has('cnkx') && !(Array.isArray(r.cnkx) && r.cnkx.length)) return false;
     if (activeFeats.has('xr') && !r.cas_xr) return false;
@@ -2865,28 +1978,15 @@
     if (activeFeats.has('scopus') && !(r.scopus && r.scopus.active)) return false;
     if (activeFeats.has('oaj') && !r.oaj) return false;
     if (activeFeats.has('doaj') && !r.doaj) return false;
-    if (activeFeats.has('medline') && !r.medline) return false;
-    if (activeFeats.has('cscd') && !r.cscd) return false;
-    if (activeFeats.has('cstpcd') && !r.cstpcd) return false;
-    if (activeFeats.has('free') && !r.free) return false;
     if (activeFeats.has('warning') && !r.warning) return false;
-    if (activeFeats.has('citic_warning') && !r.citic_warning) return false;
-    if (activeFeats.has('under_review') && !r.under_review) return false;
-    if (activeFeats.has('on_hold') && !r.on_hold) return false;
     if (activeFeats.has('abdc') && !(r.abdc && r.abdc.rating)) return false;
     if (activeFeats.has('abs')  && !(r.abs  && r.abs.rating))  return false;
     if (activeCat !== '__all' && r.esi_category !== activeCat) return false;
-    if (activeTopics.size) {
+    if (activeCasMajor !== '__all' && (r.cas_major_cn || '') !== activeCasMajor) return false;
+    if (activeWos.size) {
       const wc = r.wos_categories || [];
       let ok = false;
-      for (const c of wc) if (activeTopics.has(c)) { ok = true; break; }
-      if (!ok) {
-        // Also check OpenAlex subfields
-        const issn = (r.issn || r.eissn || '').toUpperCase();
-        const rec = oaMap[issn];
-        const sf = (rec && Array.isArray(rec.sf)) ? rec.sf : [];
-        for (const s of sf) if (activeTopics.has(s)) { ok = true; break; }
-      }
+      for (const c of wc) if (activeWos.has(c)) { ok = true; break; }
       if (!ok) return false;
     }
     if (activeQuery) {
@@ -2958,77 +2058,18 @@
     if (!dir) return rows;
     const sign = dir === 'asc' ? 1 : -1;
     return [...rows].sort((a, b) => {
-      const hasA = Number.isFinite(+a.if_2024);
-      const hasB = Number.isFinite(+b.if_2024);
+      const hasA = currentIfValue(a) != null;
+      const hasB = currentIfValue(b) != null;
       // 缺失 IF 永远放末尾；升序时从最低 IF 开始，不让“—”顶到前面。
       if (hasA !== hasB) return hasA ? -1 : 1;
-      const av = hasA ? +a.if_2024 : 0;
-      const bv = hasB ? +b.if_2024 : 0;
+      const av = hasA ? currentIfValue(a) : 0;
+      const bv = hasB ? currentIfValue(b) : 0;
       if (av !== bv) return sign * (av - bv);
       return (a.name || a.en_name || '').localeCompare(b.name || b.en_name || '');
     });
   }
 
-  /* ───────── Update thead sticky top to clear the search bar ───────── */
-  function updateThStickyTop() {
-    const topbar = $('.topbar');
-    if (topbar) {
-      const h = topbar.getBoundingClientRect().height;
-      const top = parseFloat(getComputedStyle(topbar).top) || 0;
-      document.documentElement.style.setProperty('--th-sticky-top', Math.ceil(top + h) + 'px');
-    }
-  }
-
-  function updateStickySearchState() {
-    const enabled = !document.body.classList.contains('journal-route')
-      && ['int', 'dom', 'fav'].includes(activeTab);
-    // 迟滞（hysteresis）：进入 compact 用 130，退出用 60，中间留死区，避免临界点反复切换导致抖动
-    const isCompact = document.body.classList.contains('topbar-compact');
-    const y = window.scrollY;
-    const shouldCompact = enabled && (isCompact ? y > 60 : y > 130);
-    const changed = document.body.classList.toggle('topbar-compact', shouldCompact);
-    if (changed) requestAnimationFrame(updateThStickyTop);
-    else updateThStickyTop();
-  }
-
-  // 统计每个筛选项对应的期刊数量，注入到左侧筛选栏的 chip 里（参考图那样）
-  function updateFilterCounts() {
-    if (!journals || !journals.length) return;
-    const counts = Object.create(null);
-    const inc = (f, v) => { const k = f + ':' + v; counts[k] = (counts[k] || 0) + 1; };
-    for (const r of journals) {
-      (r.indices || []).forEach(i => inc('index', i));
-      if (r.scopus && r.scopus.active) inc('feat', 'scopus');
-      if (r.oaj) inc('feat', 'oaj');
-      if (r.doaj) inc('feat', 'doaj');
-      if (r.medline) inc('feat', 'medline');
-      if (r.free) inc('feat', 'free');
-      if (r.warning) inc('feat', 'warning');
-      if (r.citic_warning) inc('feat', 'citic_warning');
-      if (r.under_review) inc('feat', 'under_review');
-      if (r.on_hold) inc('feat', 'on_hold');
-      const jq = String(r.if_quartile || '').toUpperCase();
-      if (/^Q[1-4]$/.test(jq)) inc('jcr', jq);
-      if (r.cas_zone) inc('zone', String(r.cas_zone));
-      if (r.cas_top) inc('zone', 'top');
-      if (r.cas_xr && r.cas_xr.zone) inc('xr', String(r.cas_xr.zone));
-      if (r.cas_xr && r.cas_xr.top) inc('xr', 'xr-top');
-      const abdc = String((r.abdc && r.abdc.rating) || '').toUpperCase().replace(/A[ -]STAR/, 'A*');
-      if (abdc) inc('abdc', abdc);
-      const abs = String((r.abs && r.abs.rating) || '').toUpperCase();
-      if (abs) inc('abs', abs);
-    }
-    document.querySelectorAll('.th-dropdown .th-chk[data-filter][data-value]').forEach(label => {
-      const n = counts[label.dataset.filter + ':' + label.dataset.value] || 0;
-      let badge = label.querySelector('.dd-count');
-      if (!badge) { badge = document.createElement('span'); badge.className = 'dd-count'; label.appendChild(badge); }
-      badge.textContent = n ? n.toLocaleString() : '';
-    });
-  }
-
   function renderInt() {
-    updateThStickyTop();
-    if (activeQuery) activeWarnList = false; // 搜索即退出预警名单
     let filtered = journals.filter(matches);
     if (activeQuery) {
       // 按相关性排序
@@ -3041,31 +2082,14 @@
           const fa = a.r.flagship ? 1 : 0;
           const fb = b.r.flagship ? 1 : 0;
           if (fa !== fb) return fb - fa;
-          const ifa = a.r.if_2024 ?? -1;
-          const ifb = b.r.if_2024 ?? -1;
+          const ifa = currentIfValue(a.r) ?? -1;
+          const ifb = currentIfValue(b.r) ?? -1;
           if (ifa !== ifb) return ifb - ifa;
           return (a.r.name||'').localeCompare(b.r.name||'');
         })
         .map(x => x.r);
     }
-    if (activeQuery) {
-      intIfSort = '';
-    }
-    // 不搜索时默认按影响因子倒序（=推荐期刊），而不是字母顺序
-    const effIntSort = intIfSort || (activeQuery ? '' : 'desc');
-    filtered = sortByIF(filtered, effIntSort);
-    // 按浏览历史推荐：纯默认视图下，把用户近期看过的学科领域的期刊上浮（组内仍按 IF）
-    if (!activeQuery && !intIfSort && !activeWarnList) {
-      const pref = getPreferredCats();
-      if (pref) {
-        const inPref = [], rest = [];
-        for (const r of filtered) {
-          const cats = Array.isArray(r.wos_categories) ? r.wos_categories : [];
-          (cats.some(c => pref.has(c)) ? inPref : rest).push(r);
-        }
-        if (inPref.length && rest.length) filtered = inPref.concat(rest);
-      }
-    }
+    filtered = sortByIF(filtered, intIfSort);
     document.querySelector('th.col-if[data-if-sort="int"]')?.classList.toggle('sort-desc', intIfSort === 'desc');
     document.querySelector('th.col-if[data-if-sort="int"]')?.classList.toggle('sort-asc', intIfSort === 'asc');
     const intArrow = document.querySelector('th.col-if[data-if-sort="int"] .sort-arrow');
@@ -3075,171 +2099,65 @@
     const visible = filtered.slice(0, shown);
     const tbody = $('#tbody');
     if (!visible.length) {
-      tbody.innerHTML = `<tr><td colspan="7" class="empty">${t('empty')}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="6" class="empty">${t('empty')}</td></tr>`;
     } else {
       tbody.innerHTML = visible.map(renderRow).join('');
     }
     $('#results-count').textContent = `${t('showing')} ${visible.length} ${t('of')} ${filtered.length.toLocaleString()} ${t('total_items')}`;
     const more = $('#more');
     more.hidden = filtered.length <= shown;
-    syncThChkState();
   }
 
-  // 同步题头复选框状态 + 更新按钮标签
-  function syncThChkState() {
-    document.querySelectorAll('.th-dropdown-panel .th-chk').forEach(label => {
-      const cb = label.querySelector('input[type=checkbox]');
-      if (!cb) return;
-      const filter = label.dataset.filter;
-      const val = label.dataset.value;
-      let checked = false;
-      if (filter === 'index') checked = activeIndices.has(val);
-      else if (filter === 'feat') checked = activeFeats.has(val);
-      else if (filter === 'jcr') checked = activeJcr.has(val);
-      else if (filter === 'zone') checked = activeZones.has(val);
-      else if (filter === 'xr') checked = activeXr.has(val);
-      else if (filter === 'abdc') checked = activeAbdc.has(val);
-      else if (filter === 'abs') checked = activeAbs.has(val);
-      cb.checked = checked;
-    });
-    // 更新按钮标签（显示选中数量）
-    document.querySelectorAll('.th-dropdown').forEach(dd => {
-      const btn = dd.querySelector('.th-dropdown-btn');
-      const panel = dd.querySelector('.th-dropdown-panel');
-      if (!btn || !panel) return;
-      const checkedCount = panel.querySelectorAll('.th-chk input[type=checkbox]:checked').length;
-      const totalCount = panel.querySelectorAll('.th-chk input[type=checkbox]').length;
-      const labelEl = btn.querySelector('.dd-label');
-      if (!labelEl) return;
-      const baseLabel = labelEl.textContent.replace(/\s*\(\d+\)\s*$/, '');
-      if (checkedCount > 0 && checkedCount < totalCount) {
-        labelEl.textContent = baseLabel + ' (' + checkedCount + ')';
-        btn.classList.add('active');
-      } else if (checkedCount === totalCount) {
-        labelEl.textContent = baseLabel;
-        btn.classList.remove('active');
-      } else {
-        labelEl.textContent = baseLabel;
-        btn.classList.remove('active');
-      }
-    });
-  }
-
-  // 初始化题头下拉菜单（打开/关闭 + 点击外部关闭）
-  function initThDropdowns() {
-    // 按钮点击切换面板
-    document.querySelectorAll('.th-dropdown-btn').forEach(btn => {
-      if (btn.__ddBound) return;
-      btn.__ddBound = true;
-      btn.addEventListener('click', e => {
-        e.stopPropagation();
-        const panel = btn.parentElement.querySelector('.th-dropdown-panel');
-        if (!panel) return;
-        const wasOpen = panel.classList.contains('open');
-        // 关闭所有其他面板
-        document.querySelectorAll('.th-dropdown-panel.open').forEach(p => p.classList.remove('open'));
-        if (!wasOpen) panel.classList.add('open');
-      });
-    });
-    // 点击外部关闭所有面板
-    document.addEventListener('click', () => {
-      document.querySelectorAll('.th-dropdown-panel.open').forEach(p => p.classList.remove('open'));
-    });
-    // 点击面板内部不冒泡（防止点击复选框时关闭面板）
-    document.querySelectorAll('.th-dropdown-panel').forEach(p => {
-      p.addEventListener('click', e => e.stopPropagation());
-    });
-  }
-
-  // ───────── category nav ─────────
+  // ───────── category nav (ESI sidebar removed; only "全部" reset button remains) ─────────
   function renderCatList() {
-    initThDropdowns();
-    const total = $('#count-topic');
-    if (total) total.textContent = topicList.length.toLocaleString();
-    const allBtn = $('#topic-all-btn');
+    const total = $('#count-all');
+    if (total) total.textContent = journals.length.toLocaleString();
+    const allBtn = $('#wos-all-btn');
     if (allBtn && !allBtn.__bound) {
       allBtn.__bound = true;
       allBtn.addEventListener('click', () => {
-        activeTopics.clear();
+        activeWos.clear();
         $$('.wos-item').forEach(el => el.classList.remove('on'));
-        $$('#topic-list input[type=checkbox]').forEach(cb => cb.checked = false);
-        const inp = $('#topic-search'); if (inp) inp.value = '';
-        renderTopicList();
+        $$('#wos-list input[type=checkbox]').forEach(cb => cb.checked = false);
+        const inp = $('#wos-search'); if (inp) inp.value = '';
+        renderWosList();
         activeCat = '__all';
         shown = PAGE;
         renderInt();
       });
     }
-    const clearBtn = $('#topic-clear');
-    if (clearBtn && !clearBtn.__bound) {
-      clearBtn.__bound = true;
-      clearBtn.addEventListener('click', () => {
-        activeTopics.clear();
-        renderTopicList();
+    // 大类列下拉切换：CAS / ESI（v30 移除：现已拆为独立两列）
+    // v31: 表头两个下拉填充 distinct 学科 + 触发筛选
+    const casSel = $('#cas-col-filter');
+    if (casSel && !casSel.__bound) {
+      casSel.__bound = true;
+      const casSet = new Set();
+      journals.forEach(j => { if (j.cas_major_cn) casSet.add(j.cas_major_cn); });
+      const casList = [...casSet].sort((a,b) => a.localeCompare(b, 'zh'));
+      casSel.innerHTML = `<option value="__all">中科院大类</option>` +
+        casList.map(v => `<option value="${escape(v)}">${escape(v)}</option>`).join('');
+      casSel.value = activeCasMajor;
+      casSel.addEventListener('change', () => {
+        activeCasMajor = casSel.value;
         shown = PAGE;
         renderInt();
       });
     }
-    // 表头学科复选面板：渲染 topicList 复选列表（支持中英文搜索）
-    const topicPanel = $('#topic-dd-list');
-    if (topicPanel) {
-      const raw = ($('#topic-dd-search')?.value || '').trim().toLowerCase();
-      const tokens = expandWosQuery(raw);
-      const filtered = !tokens.length
-        ? topicList
-        : topicList.filter(t => tokens.some(tok => t.name.toLowerCase().includes(tok)));
-      topicPanel.innerHTML = filtered.map(t =>
-        `<label class="th-chk" data-filter="topic" data-value="${escape(t.name)}">
-           <input type="checkbox" ${activeTopics.has(t.name) ? 'checked' : ''}>
-           <span>${escape(t.name)}</span>
-           <span class="count">${t.count.toLocaleString()}</span>
-         </label>`
-      ).join('');
-    }
-    // 同步题头复选框状态与 Sets 一致
-    syncThChkState();
-    // 题头下拉复选框筛选：事件委托（支持动态渲染的 checkbox）
-    ['idx-panel','jcr-panel','cas-panel','xr-panel','abdc-panel','abs-panel','warn-panel','topic-panel'].forEach(panelId => {
-      const pnl = $(`#${panelId}`);
-      if (!pnl || pnl.__bound) return;
-      pnl.__bound = true;
-      pnl.addEventListener('change', (e) => {
-        const cb = e.target;
-        if (cb.tagName !== 'INPUT' || cb.type !== 'checkbox') return;
-        const label = cb.closest('label.th-chk');
-        if (!label) return;
-        const filter = label.dataset.filter;
-        const val = label.dataset.value;
-        if (filter === 'index') {
-          if (cb.checked) activeIndices.add(val);
-          else activeIndices.delete(val);
-        } else if (filter === 'feat') {
-          if (cb.checked) activeFeats.add(val);
-          else activeFeats.delete(val);
-        } else if (filter === 'jcr') {
-          if (cb.checked) activeJcr.add(val);
-          else activeJcr.delete(val);
-        } else if (filter === 'zone') {
-          if (cb.checked) activeZones.add(val);
-          else activeZones.delete(val);
-        } else if (filter === 'xr') {
-          if (cb.checked) activeXr.add(val);
-          else activeXr.delete(val);
-        } else if (filter === 'abdc') {
-          if (cb.checked) activeAbdc.add(val);
-          else activeAbdc.delete(val);
-        } else if (filter === 'abs') {
-          if (cb.checked) activeAbs.add(val);
-          else activeAbs.delete(val);
-        } else if (filter === 'topic') {
-          if (cb.checked) activeTopics.add(val);
-          else activeTopics.delete(val);
-        }
-        activeWarnList = false; // 手动调筛选即退出预警名单
+    const esiSel = $('#esi-col-filter');
+    if (esiSel && !esiSel.__bound) {
+      esiSel.__bound = true;
+      const esiSet = new Set();
+      journals.forEach(j => { if (j.esi_category) esiSet.add(j.esi_category); });
+      const esiList = [...esiSet].sort();
+      esiSel.innerHTML = `<option value="__all">ESI Subject</option>` +
+        esiList.map(v => `<option value="${escape(v)}">${escape(v)}</option>`).join('');
+      esiSel.value = activeCat;
+      esiSel.addEventListener('change', () => {
+        activeCat = esiSel.value;
         shown = PAGE;
         renderInt();
       });
-    });
+    }
   }
 
 
@@ -3337,23 +2255,20 @@
     return [...expanded];
   }
 
-  function renderTopicList() {
-    const box = $('#topic-list');
-    if (!box || !topicList.length) return;
-    const raw = ($('#topic-search')?.value || '').trim().toLowerCase();
+  function renderWosList() {
+    const box = $('#wos-list');
+    if (!box || !wosCats.length) return;
+    const raw = ($('#wos-search')?.value || '').trim().toLowerCase();
     const tokens = expandWosQuery(raw);
     const filtered = !tokens.length
-      ? topicList
-      : topicList.filter(c => {
+      ? wosCats
+      : wosCats.filter(c => {
           const name = c.name.toLowerCase();
           return tokens.some(t => name.includes(t));
         });
-    const total = topicList.length;
-    const totalEl = $('#count-topic');
-    if (totalEl) totalEl.textContent = total.toLocaleString();
     box.innerHTML = filtered.map(c =>
-      `<label class="wos-item${activeTopics.has(c.name) ? ' on' : ''}">
-         <input type="checkbox" value="${escape(c.name)}" ${activeTopics.has(c.name) ? 'checked' : ''}>
+      `<label class="wos-item${activeWos.has(c.name) ? ' on' : ''}">
+         <input type="checkbox" value="${escape(c.name)}" ${activeWos.has(c.name) ? 'checked' : ''}>
          <span class="wos-name">${escape(c.name)}</span>
          <span class="wos-count">${c.count}</span>
        </label>`
@@ -3361,47 +2276,12 @@
     // bind change
     box.querySelectorAll('input[type=checkbox]').forEach(cb => {
       cb.addEventListener('change', () => {
-        if (cb.checked) activeTopics.add(cb.value); else activeTopics.delete(cb.value);
+        if (cb.checked) activeWos.add(cb.value); else activeWos.delete(cb.value);
         cb.closest('.wos-item').classList.toggle('on', cb.checked);
         shown = PAGE;
         renderInt();
       });
     });
-  }
-
-  function domSourceTabsHTML() {
-    if (activeTab !== 'dom') return '';
-    const items = [
-      ['cnki_major', T('中文期刊目录','Chinese Journal Directory')],
-      ['nsfc_mgmt', T('国自然管理','NSFC Mgmt')],
-      ['cscd', 'CSCD'],
-      ['cstpcd', T('中国科技核心','CSTPCD')],
-      ['cnkx', T('中国科协','CAST')],
-      ['zju_zju', T('浙江大学 2024','ZJU 2024')],
-      ['school_a', T('学校 A · 2023','School A · 2023')],
-    ];
-    return `<div class="dom-source-tabs" role="tablist" aria-label="${T('国内目录切换','Domestic directory switcher')}">
-      ${items.map(([key, label]) => `<button type="button" class="dom-source-tab ${activeDom === key ? 'active' : ''}" data-dom-switch="${key}">${escape(label)}</button>`).join('')}
-    </div>`;
-  }
-
-  function domSectionHeader(title, subtitle = '') {
-    return `<div class="dom-section-head">
-      <div class="dom-section-copy">
-        <h1 class="section-title">${title}</h1>
-        ${subtitle ? `<div class="section-subtitle">${subtitle}</div>` : ''}
-      </div>
-      ${domSourceTabsHTML()}
-    </div>`;
-  }
-
-  function countrySectionHeader(title, subtitle = '') {
-    return `<div class="dom-section-head">
-      <div class="dom-section-copy">
-        <h1 class="section-title">${title}</h1>
-        ${subtitle ? `<div class="section-subtitle">${subtitle}</div>` : ''}
-      </div>
-    </div>`;
   }
 
   // ───────── domestic unified search (query 时聚合所有库) ─────────
@@ -3420,94 +2300,13 @@
           title: T('中国科协高质量目录','CAST Tiered Directory'),
           count: recs.length,
           html: `<div class="table-wrap"><table class="journals"><thead><tr>
-            <th class="col-fav" aria-label="Favorite"></th><th style="width:60px">${T('T级','Tier')}</th><th class="col-name">${T('期刊','Journal')}</th><th>${T('交叉收录','Also In')}</th><th style="width:100px">ISSN</th><th style="width:110px">${T('学科 / 细分','Domain / Sub')}</th>
+            <th style="width:36px" aria-label="Favorite"></th><th style="width:60px">${T('T级','Tier')}</th><th>${T('期刊','Journal')}</th><th>${T('交叉收录','Also In')}</th><th style="width:120px">ISSN</th><th style="width:160px">${T('学科 / 细分','Domain / Sub')}</th>
           </tr></thead><tbody>
           ${recs.slice(0, 200).map(r => renderDomRow(r, {
             src: 'cnkx', showTier: true, tierValue: r.tier,
-            extraCols: `<td class="muted-cell" style="width:110px">${escape(tn(r.domain || '', 'domain'))}${r.subdomain ? ' · '+escape(tn(r.subdomain,'sub')) : ''}</td>`,
+            extraCols: `<td class="muted-cell" style="width:160px">${escape(tn(r.domain || '', 'domain'))}${r.subdomain ? ' · '+escape(tn(r.subdomain,'sub')) : ''}</td>`,
           })).join('')}
           ${recs.length > 200 ? `<tr><td colspan="6" class="empty">${T('仅显示前 200 条','First 200 only')}</td></tr>` : ''}
-          </tbody></table></div>`
-        });
-      }
-    }
-
-    // 1b) 国家自然科学基金委管理科学部 A/B 类
-    if (domestic.nsfc_mgmt && domestic.nsfc_mgmt.records) {
-      const recs = domestic.nsfc_mgmt.records.filter(r => matchTxt(r.name, r.tier, r.frequency));
-      if (recs.length) {
-        sections.push({
-          title: T('国自然管理科学部期刊目录','NSFC Management Science Journal List'),
-          count: recs.length,
-          html: `<div class="table-wrap"><table class="journals"><thead><tr>
-            <th class="col-fav" aria-label="Favorite"></th><th style="width:60px">${T('级别','Tier')}</th><th class="col-name">${T('期刊','Journal')}</th><th>${T('交叉收录','Also In')}</th><th style="width:110px">${T('刊期','Frequency')}</th>
-          </tr></thead><tbody>
-          ${recs.slice(0, 200).map(r => renderDomRow(r, {
-            src: 'nsfc_mgmt', showTier: true, tierValue: r.tier,
-            extraCols: `<td class="muted-cell" style="width:110px">${escape(r.frequency||'—')}</td>`,
-          })).join('')}
-          </tbody></table></div>`
-        });
-      }
-    }
-
-    // 1c) CSCD 来源期刊
-    if (domestic.cscd && domestic.cscd.records) {
-      const recs = domestic.cscd.records.filter(r =>
-        matchTxt(r.name, r.issn, r.cn_code, r.database, r.database_label)
-      );
-      if (recs.length) {
-        sections.push({
-          title: 'CSCD 来源期刊目录',
-          count: recs.length,
-          html: `<div class="table-wrap"><table class="journals"><thead><tr>
-            <th class="col-fav" aria-label="Favorite"></th><th class="col-name">${T('期刊','Journal')}</th><th>${T('收录索引','Indices')}</th><th style="width:110px">ISSN</th><th style="width:110px">CN</th>
-          </tr></thead><tbody>
-          ${recs.slice(0, 200).map(r => {
-            const fid = favId(r);
-            rowRecordsByFid[fid] = { ...r, __src: 'cscd' };
-            const code = String(r.database || '').toUpperCase();
-            const label = code === 'C' ? 'CSCD-C' : (code === 'E' ? 'CSCD-E' : 'CSCD');
-            const crossBadges = renderDomCrossBadges(r, 'cscd');
-            return `<tr class="j-row clickable" data-fid="${escape(fid)}" data-src="cscd">
-              <td style="width:36px">${starBtn(r, 'cscd')}</td>
-              <td class="jname" style="font-size:13.5px">${escape(r.name||'')}</td>
-              <td class="col-cross"><div class="badges"><span class="domsrc-pill ds-cscd">${label}</span>${crossBadges}</div></td>
-              <td class="muted-cell" style="width:110px">${escape(r.issn||'—')}</td>
-              <td class="muted-cell" style="width:110px">${escape(r.cn_code||'—')}</td>
-            </tr>`;
-          }).join('')}
-          ${recs.length > 200 ? `<tr><td colspan="5" class="empty">${T('仅显示前 200 条','First 200 only')}</td></tr>` : ''}
-          </tbody></table></div>`
-        });
-      }
-    }
-
-    // 1d) 中国科技核心期刊
-    if (domestic.cstpcd && domestic.cstpcd.records) {
-      const recs = domestic.cstpcd.records.filter(r =>
-        matchTxt(r.name, r.code, r.kind)
-      );
-      if (recs.length) {
-        sections.push({
-          title: T('中国科技核心期刊目录','Chinese Science and Technology Core Journals'),
-          count: recs.length,
-          html: `<div class="table-wrap"><table class="journals"><thead><tr>
-            <th class="col-fav" aria-label="Favorite"></th><th class="col-name">${T('期刊','Journal')}</th><th>${T('收录索引','Indices')}</th><th style="width:110px">${T('期刊代码','Code')}</th>
-          </tr></thead><tbody>
-          ${recs.slice(0, 200).map(r => {
-            const fid = favId(r);
-            rowRecordsByFid[fid] = { ...r, __src: 'cstpcd' };
-            const label = r.kind === 'popular_science' ? T('中国科技核心·科普','CSTPCD Popular') : T('中国科技核心','CSTPCD');
-            const crossBadges = renderDomCrossBadges(r, 'cstpcd');
-            return `<tr class="j-row clickable" data-fid="${escape(fid)}" data-src="cstpcd">
-              <td style="width:36px">${starBtn(r, 'cstpcd')}</td>
-              <td class="jname" style="font-size:13.5px">${escape(r.name||'')}</td>
-              <td class="col-cross"><div class="badges"><span class="domsrc-pill ds-cstpcd">${label}</span>${crossBadges}</div></td>
-              <td class="muted-cell" style="width:110px">${escape(r.code||'—')}</td>
-            </tr>`;
-          }).join('')}
-          ${recs.length > 200 ? `<tr><td colspan="4" class="empty">${T('仅显示前 200 条','First 200 only')}</td></tr>` : ''}
           </tbody></table></div>`
         });
       }
@@ -3516,36 +2315,33 @@
     // 2) 中文期刊目录 (CNKI Major)
     if (domestic.cnki_major && domestic.cnki_major.records) {
       const list = domestic.cnki_major.records.filter(r =>
-        matchTxt(r.name, r.issn, r.cn_code, r.sponsor, r.category, r.category_code, ...(r.major_categories||[]), ...(r.categories||[]))
+        matchTxt(r.name, r.issn, r.cn_code, r.sponsor, ...(r.major_categories||[]))
       );
       if (list.length) {
         sections.push({
           title: T('中文期刊目录','Chinese Journal Directory'),
           count: list.length,
           html: `<div class="table-wrap"><table class="journals"><thead><tr>
-            <th class="col-fav" aria-label="Favorite"></th><th class="col-name">${T('期刊名称','Journal')}</th><th>${T('收录索引','Indices')}</th><th style="width:110px">ISSN</th><th style="width:100px">CN</th><th style="width:110px">${T('学科分类','Category')}</th>
+            <th style="width:36px" aria-label="Favorite"></th><th>${T('期刊名称','Journal')}</th><th>${T('收录索引','Indices')}</th><th style="width:130px">ISSN</th><th style="width:120px">CN</th><th style="width:160px">${T('学科分类','Category')}</th>
           </tr></thead><tbody>
           ${list.slice(0, 200).map(r => {
             const hits = lookupDom(r);
             const badges = [
               ...hits.filter(h => h.source === 'cssci').map(() => `<span class="domsrc-pill ds-cssci">CSSCI</span>`),
-              ...hits.filter(h => h.source === 'cssci_ext').map(() => `<span class="domsrc-pill ds-cssci-ext">${T('CSSCI 扩展','CSSCI Ext')}</span>`),
+              ...hits.filter(h => h.source === 'cssci_ext').map(() => `<span class="domsrc-pill ds-cssci-ext">${T('CSSCI 扩','CSSCI Ext')}</span>`),
               ...hits.filter(h => h.source === 'pku').map(() => `<span class="domsrc-pill ds-pku">${T('北大核心','PKU Core')}</span>`),
               ...hits.filter(h => h.source === 'ccft').map(h => `<span class="domsrc-pill ds-ccft">CCF-${h.tag||'T'}</span>`),
               ...hits.filter(h => h.source === 'zju').map(h => `<span class="domsrc-pill ds-zju">${escape(h.label)}</span>`),
               ...hits.filter(h => h.source === 'school_a').map(h => `<span class="domsrc-pill ds-school-a">${escape(h.label)}</span>`),
-              ...hits.filter(h => h.source === 'nsfc_mgmt').map(h => `<span class="domsrc-pill ds-nsfc_mgmt">${escape(h.label)}</span>`),
-              ...hits.filter(h => h.source === 'cscd').map(h => `<span class="domsrc-pill ds-cscd">${escape(h.label)}</span>`),
-              ...hits.filter(h => h.source === 'cstpcd').map(h => `<span class="domsrc-pill ds-cstpcd">${escape(h.label)}</span>`),
               ...hits.filter(h => h.source.startsWith('cnkx')).map(h => `<span class="domsrc-pill ds-cnkx">${escape(h.label)}</span>`),
             ].filter(Boolean).join('');
             return `<tr class="j-row clickable" data-fid="${escape(favId(r))}" data-src="cnki_major">
               <td style="width:36px">${starBtn(r, 'cnki_major')}</td>
               <td class="jname" style="font-size:13.5px">${escape(r.name||'')}</td>
               <td class="col-cross"><div class="badges">${badges || '<span class="muted-cell">—</span>'}</div></td>
-              <td class="muted-cell" style="width:110px">${escape(r.issn||'—')}</td>
-              <td class="muted-cell" style="width:100px">${escape(r.cn_code||'—')}</td>
-              <td class="muted-cell" style="width:110px">${escape(((r.major_categories||[]).length ? r.major_categories : (r.categories||[])).join(' · ') || '—')}</td>
+              <td class="muted-cell" style="width:130px">${escape(r.issn||'—')}</td>
+              <td class="muted-cell" style="width:120px">${escape(r.cn_code||'—')}</td>
+              <td class="muted-cell" style="width:160px">${escape((r.major_categories||[]).join(' · '))}</td>
             </tr>`;
           }).join('')}
           ${list.length > 200 ? `<tr><td colspan="6" class="empty">${T('仅显示前 200 条','First 200 only')}</td></tr>` : ''}
@@ -3563,13 +2359,13 @@
           title: T('浙江大学 2024 期刊分级','ZJU 2024 Journal Tiers'),
           count: list.length,
           html: `<div class="table-wrap"><table class="journals"><thead><tr>
-            <th style="width:36px" aria-label="Favorite"></th><th style="width:70px">${T('级别','Tier')}</th><th>${T('期刊','Journal')}</th><th>${T('交叉收录','Also In')}</th><th style="width:110px">ISSN / CN</th><th style="width:150px">${T('备注','Note')}</th>
+            <th style="width:36px" aria-label="Favorite"></th><th style="width:70px">${T('级别','Tier')}</th><th>${T('期刊','Journal')}</th><th>${T('交叉收录','Also In')}</th><th style="width:130px">ISSN / CN</th><th style="width:180px">${T('备注','Note')}</th>
           </tr></thead><tbody>
           ${list.slice(0, 200).map(r => {
             const tierBadge = `<span class="tier-pill ${tierClass[r.tier]||'t3'}">${escape(tn(r.tier, 'tier'))}</span>${(r.name||'').includes('*') ? ' <span class="warn-pill" style="background:var(--gold);color:#fff">★</span>' : ''}`;
             return renderDomRow(
               { ...r, name: (r.name||'').replace(/\*$/,'') },
-              { src: 'zju', extraCols: `<td class="muted-cell" style="width:150px">${escape(r.note||'')}</td>` }
+              { src: 'zju', extraCols: `<td class="muted-cell" style="width:180px">${escape(r.note||'')}</td>` }
             ).replace(
               /(<td class="col-fav"[^>]*>.*?<\/td>)/,
               `$1<td style="width:70px">${tierBadge}</td>`
@@ -3591,7 +2387,7 @@
           title: T('高校自编目录 · 2023','School A · 2023'),
           count: f.length,
           html: `<div class="table-wrap"><table class="journals"><thead><tr>
-            <th style="width:36px" aria-label="Favorite"></th><th style="width:70px">${T('级别','Tier')}</th><th>${T('期刊','Journal')}</th><th>${T('交叉收录','Also In')}</th><th style="width:110px">ISSN / CN</th>
+            <th style="width:36px" aria-label="Favorite"></th><th style="width:70px">${T('级别','Tier')}</th><th>${T('期刊','Journal')}</th><th>${T('交叉收录','Also In')}</th><th style="width:130px">ISSN / CN</th>
           </tr></thead><tbody>
           ${f.slice(0, 200).map(r => {
             const tierBadge = `<span class="tier-pill ${tierClass[r.tier]||'t3'}">${escape(tn(r.tier, 'tier'))}</span>`;
@@ -3611,10 +2407,8 @@
       return;
     }
     box.innerHTML = `<div class="section-block">
-      ${domSectionHeader(
-        `${T('中文期刊统一搜索','Chinese Journals · Unified Search')} <span class="muted-cell">(${total})</span>`,
-        T('已跨库聚合：科协 / 中文期刊目录 / 浙大 / 学校 A。CSSCI、北大核心、CCF 中文以徽章形式展示。清空搜索框可返回单库浏览。','Aggregated across CAST / Chinese Journal Directory / ZJU / School A. CSSCI, PKU Core, CCF Chinese shown as badges. Clear the search box to return to per-source view.'),
-      )}
+      <h3 class="section-title">${T('中文期刊统一搜索','Chinese Journals · Unified Search')} <span class="muted-cell">(${total})</span></h3>
+      <div class="section-subtitle">${T('已跨库聚合：科协 / 中文期刊目录 / 浙大 / 学校 A。CSSCI、北大核心、CCF 中文以徽章形式展示。清空搜索框可返回单库浏览。','Aggregated across CAST / Chinese Journal Directory / ZJU / School A. CSSCI, PKU Core, CCF Chinese shown as badges. Clear the search box to return to per-source view.')}</div>
       ${sections.map(s => `<details class="section-block" style="margin-top:14px" open>
         <summary>${escape(s.title)} <span class="muted-cell">(${s.count})</span></summary>
         <div style="margin-top:10px">${s.html}</div>
@@ -3622,316 +2416,14 @@
     </div>`;
   }
 
-  // ───────── India tab ─────────
-  function renderIndia() {
-    updateThStickyTop();
-    const box = $('#india-content');
-    if (!box) return;
-    if (!india || !Array.isArray(india.records)) {
-      box.innerHTML = `<div class="empty">${T('印度期刊数据缺失','India journal data missing')}</div>`;
-      return;
-    }
-    if (!window.__indiaShown) window.__indiaShown = 100;
-    const q = activeQuery.toLowerCase();
-    const subjects = (india.subjects || []).map(s => s.name).filter(Boolean);
-    const subjectOptions = subjects.map(s => `<option value="${escape(s)}"${activeIndiaSubject === s ? ' selected' : ''}>${escape(s)}</option>`).join('');
-    let filtered = india.records.filter(r => {
-      if (activeIndiaSubject !== '__all' && r.subject !== activeIndiaSubject) return false;
-      if (!q) return true;
-      const hay = [r.journal_title, r.publisher, r.issn, r.eissn, r.subject].filter(Boolean).join(' ').toLowerCase();
-      return hay.includes(q);
-    });
-    filtered.sort((a, b) => (a.journal_title || '').localeCompare(b.journal_title || '', 'en'));
-    const visible = filtered.slice(0, window.__indiaShown);
-    const total = filtered.length;
-    const rows = visible.map(r => {
-      const rec = { ...r, name: r.journal_title, __src: 'in' };
-      const fid = favId(rec);
-      rowRecordsByFid[fid] = rec;
-      const issnCell = [r.issn && r.issn !== 'NA' ? `ISSN ${escape(r.issn)}` : '', r.eissn && r.eissn !== 'NA' ? `eISSN ${escape(r.eissn)}` : ''].filter(Boolean).join('<br>');
-      return `<tr class="j-row clickable india-row" data-fid="${escape(fid)}" data-src="in">
-        <td class="col-fav" style="width:36px">${starBtn(rec, 'in')}</td>
-        <td class="col-name"><div class="jname">${escape(titleCase(r.journal_title || ''))}</div></td>
-        <td class="muted-cell">${escape(r.publisher || '—')}</td>
-        <td><span class="domsrc-pill ds-india">UGC-CARE</span></td>
-        <td class="muted-cell">${escape(r.subject || '—')}</td>
-        <td class="muted-cell" style="width:130px">${issnCell || '—'}</td>
-      </tr>`;
-    }).join('');
-    box.innerHTML = `<div class="section-block india-section">
-      ${countrySectionHeader(
-        `${T('印度 UGC-CARE 期刊目录','India UGC-CARE Journal Directory')} <span class="muted-cell">(${india.records.length.toLocaleString()})</span>`,
-        T('印度国家级 UGC-CARE Group I 正表；本页不展示 cloned / fake journal warning list。','India national UGC-CARE Group I positive list; cloned / fake journal warning lists are not shown.'),
-      )}
-      <div class="india-toolbar">
-        <select id="india-subject-select" class="th-select">
-          <option value="__all">${T('全部学科','All subjects')}</option>
-          ${subjectOptions}
-        </select>
-        <span class="muted-cell">${T('显示','Showing')} ${visible.length.toLocaleString()} / ${total.toLocaleString()}</span>
-      </div>
-      <div class="table-wrap"><table class="journals india-table"><thead><tr>
-        <th style="width:36px" aria-label="Favorite"></th>
-        <th>${T('期刊名称','Journal')}</th>
-        <th>${T('出版社','Publisher')}</th>
-        <th>${T('来源','Source')}</th>
-        <th>${T('学科','Subject')}</th>
-        <th>ISSN / E-ISSN</th>
-      </tr></thead><tbody>
-        ${rows}
-        ${total === 0 ? `<tr><td colspan="6" class="empty">${T('未找到匹配的印度期刊','No matching India journals found')}</td></tr>` : ''}
-      </tbody></table></div>
-      ${total > window.__indiaShown ? `<div class="pager"><button id="india-more" class="more-btn">${T('加载更多','Load more')} (${total - window.__indiaShown} ${T('条剩余','remaining')})</button></div>` : ''}
-      <div class="source-note">${t('india_source_note')}</div>
-    </div>`;
-    $('#india-subject-select')?.addEventListener('change', e => {
-      activeIndiaSubject = e.target.value;
-      window.__indiaShown = 100;
-      renderIndia();
-    });
-    $('#india-more')?.addEventListener('click', () => {
-      window.__indiaShown += 100;
-      renderIndia();
-    });
-  }
-
-  // ───────── Malaysia tab ─────────
-  function malaysiaSourceLabel(key) {
-    return ({
-      mycite_2025: 'MyCite 2025',
-      mycite_online: 'MyCite Online 2014-2025',
-      era_2023: 'ERA 2023',
-    })[key] || key;
-  }
-
-  function renderMalaysia() {
-    updateThStickyTop();
-    const box = $('#malaysia-content');
-    if (!box) return;
-    if (!malaysia || !malaysia.records) {
-      box.innerHTML = `<div class="empty">${t('loading')}</div>`;
-      loadMalaysiaData().then(d => {
-        if (activeTab !== 'my') return;
-        if (d && d.records) renderMalaysia();
-        else box.innerHTML = `<div class="empty">${T('马来西亚期刊数据缺失','Malaysia journal data missing')}</div>`;
-      });
-      return;
-    }
-    if (!window.__malaysiaShown) window.__malaysiaShown = 100;
-    const sourceKey = malaysia.records[activeMalaysiaSource] ? activeMalaysiaSource : 'mycite_2025';
-    const sourceRecords = malaysia.records[sourceKey] || [];
-    const q = activeQuery.toLowerCase();
-    let filtered = sourceRecords.filter(r => {
-      if (!q) return true;
-      const hay = [
-        r.journal_title, r.foreign_title, r.publisher, r.issn, r.eissn,
-        r.indexed_year, r.for_subjects, r.era_year, r.journal_id,
-      ].filter(Boolean).join(' ').toLowerCase();
-      return hay.includes(q);
-    });
-    filtered.sort((a, b) => (a.journal_title || '').localeCompare(b.journal_title || '', 'en'));
-    const visible = filtered.slice(0, window.__malaysiaShown);
-    const total = filtered.length;
-    const sourceButtons = ['mycite_2025', 'mycite_online', 'era_2023'].map(key => {
-      const count = malaysia.counts?.[key] || (malaysia.records[key] || []).length;
-      return `<button type="button" class="dom-source-tab ${sourceKey === key ? 'active' : ''}" data-malaysia-source="${key}">
-        ${escape(malaysiaSourceLabel(key))} <span class="muted-cell">(${Number(count).toLocaleString()})</span>
-      </button>`;
-    }).join('');
-    const rows = visible.map(r => {
-      const rec = { ...r, name: r.journal_title, __src: 'my' };
-      const fid = favId(rec);
-      rowRecordsByFid[fid] = rec;
-      const issnCell = [
-        r.issn ? `ISSN ${escape(r.issn)}` : '',
-        r.eissn ? `eISSN ${escape(r.eissn)}` : '',
-      ].filter(Boolean).join('<br>');
-      const detailCell = sourceKey === 'era_2023'
-        ? escape(r.for_subjects || r.foreign_title || '—')
-        : escape(r.publisher || '—');
-      const yearCell = sourceKey === 'era_2023'
-        ? escape(r.era_year || '2023')
-        : escape(r.indexed_year || '—');
-      return `<tr class="j-row clickable malaysia-row" data-fid="${escape(fid)}" data-src="my">
-        <td class="col-fav" style="width:36px">${starBtn(rec, 'my')}</td>
-        <td class="col-name"><div class="jname">${escape(titleCase(r.journal_title || ''))}</div></td>
-        <td class="muted-cell">${detailCell}</td>
-        <td><span class="domsrc-pill ds-malaysia">${escape(malaysiaSourceLabel(sourceKey))}</span></td>
-        <td class="muted-cell">${yearCell}</td>
-        <td class="muted-cell" style="width:150px">${issnCell || '—'}</td>
-      </tr>`;
-    }).join('');
-    const yearCounts = malaysia.counts?.mycite_online_years || {};
-    const years = Object.keys(yearCounts).length
-      ? `<div class="source-note">${T('MyCite 在线库年份分布：','MyCite online year distribution: ')}${Object.entries(yearCounts).map(([y, c]) => `${escape(y)}: ${Number(c).toLocaleString()}`).join(' · ')}</div>`
-      : '';
-    box.innerHTML = `<div class="section-block malaysia-section">
-      ${countrySectionHeader(
-        `${t('hero_title_my')} <span class="muted-cell">(${Number(malaysia.counts?.mycite_2025 || 0).toLocaleString()} / ${Number(malaysia.counts?.era_2023 || 0).toLocaleString()})</span>`,
-        t('hero_body_my'),
-      )}
-      <div class="dom-source-tabs country-source-tabs" role="tablist" aria-label="Malaysia directory source">
-        ${sourceButtons}
-      </div>
-      <div class="india-toolbar">
-        <span class="muted-cell">${T('显示','Showing')} ${visible.length.toLocaleString()} / ${total.toLocaleString()}</span>
-        ${malaysia.official_pdf?.url ? `<a class="source-link" href="${escape(malaysia.official_pdf.url)}" target="_blank" rel="noopener nofollow">MyCite 2025 PDF</a>` : ''}
-      </div>
-      <div class="table-wrap"><table class="journals malaysia-table"><thead><tr>
-        <th style="width:36px" aria-label="Favorite"></th>
-        <th>${T('期刊名称','Journal')}</th>
-        <th>${sourceKey === 'era_2023' ? T('FoR 学科','FoR Subjects') : T('出版社','Publisher')}</th>
-        <th>${T('来源','Source')}</th>
-        <th>${T('年份','Year')}</th>
-        <th>ISSN / E-ISSN</th>
-      </tr></thead><tbody>
-        ${rows}
-        ${total === 0 ? `<tr><td colspan="6" class="empty">${T('未找到匹配的马来西亚/ERA 期刊','No matching Malaysia / ERA journals found')}</td></tr>` : ''}
-      </tbody></table></div>
-      ${total > window.__malaysiaShown ? `<div class="pager"><button id="malaysia-more" class="more-btn">${T('加载更多','Load more')} (${total - window.__malaysiaShown} ${T('条剩余','remaining')})</button></div>` : ''}
-      <div class="source-note">${t('malaysia_source_note')}</div>
-      ${years}
-    </div>`;
-    box.querySelectorAll('[data-malaysia-source]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        activeMalaysiaSource = btn.dataset.malaysiaSource || 'mycite_2025';
-        window.__malaysiaShown = 100;
-        renderMalaysia();
-      });
-    });
-    $('#malaysia-more')?.addEventListener('click', () => {
-      window.__malaysiaShown += 100;
-      renderMalaysia();
-    });
-  }
-
-  function renderKorea() {
-    const box = $('#korea-content');
-    if (!box) return;
-    box.innerHTML = `<div class="section-block">
-      ${countrySectionHeader('KR', T('韩国期刊数据入口预留中。','Korea journal directory will be added later.'))}
-      <div class="empty">${T('暂未接入韩国官方期刊列表。','No Korea official journal list has been connected yet.')}</div>
-    </div>`;
-  }
-
   // ───────── domestic tab ─────────
   function renderDomestic() {
-    updateThStickyTop();
     const box = $('#dom-content');
     if (!domestic) { box.innerHTML = `<div class="empty">${T('无数据','No data')}</div>`; return; }
     const q = activeQuery.toLowerCase();
 
     // ===== 统一搜索：只要有搜索词就跨库聚合，忽略当前库选择 =====
     if (q) return renderDomesticUnified(box, q);
-
-    if (activeDom === 'nsfc_mgmt') {
-      const d = domestic.nsfc_mgmt;
-      if (!d) { box.innerHTML = `<div class="empty">${T('国自然管理目录缺失','NSFC Management data missing')}</div>`; return; }
-      const all = (d.records || []).slice().sort((a, b) => {
-        const ta = a.tier === 'A' ? 0 : 1;
-        const tb = b.tier === 'A' ? 0 : 1;
-        return ta - tb || (a.order || 0) - (b.order || 0);
-      });
-      const rows = all.map(r => renderDomRow(r, {
-        src: 'nsfc_mgmt',
-        showTier: true,
-        tierValue: r.tier,
-        extraCols: `<td class="muted-cell" style="width:110px">${escape(r.frequency||'—')}</td>`,
-      })).join('');
-      box.innerHTML = `<div class="section-block">
-        ${domSectionHeader(
-          T('国家自然科学基金委管理科学部期刊目录','NSFC Management Science Journal List'),
-          `${all.length.toLocaleString()} ${T('种期刊；A 类 / B 类按原目录顺序展示。','journals; A/B tiers shown in source order.')}`,
-        )}
-        <div class="table-wrap"><table class="journals"><thead><tr>
-          <th class="col-fav" aria-label="Favorite"></th>
-          <th style="width:60px">${T('级别','Tier')}</th>
-          <th class="col-name">${T('期刊','Journal')}</th>
-          <th>${T('交叉收录','Also In')}</th>
-          <th style="width:110px">${T('刊期','Frequency')}</th>
-        </tr></thead><tbody>${rows}</tbody></table></div>
-      </div>`;
-      return;
-    }
-
-    if (activeDom === 'cscd') {
-      const d = domestic.cscd;
-      if (!d) { box.innerHTML = `<div class="empty">${T('CSCD 数据缺失','CSCD data missing')}</div>`; return; }
-      if (!window.__cscdShown) window.__cscdShown = 100;
-      const all = d.records || [];
-      const visible = all.slice(0, window.__cscdShown);
-      const rows = visible.map(r => {
-        const fid = favId(r);
-        rowRecordsByFid[fid] = { ...r, __src: 'cscd' };
-        const code = String(r.database || '').toUpperCase();
-        const label = code === 'C' ? 'CSCD-C' : (code === 'E' ? 'CSCD-E' : 'CSCD');
-        const crossBadges = renderDomCrossBadges(r, 'cscd');
-        return `<tr class="j-row clickable" data-fid="${escape(fid)}" data-src="cscd">
-          <td class="col-fav" style="width:36px">${starBtn(r, 'cscd')}</td>
-          <td class="jname" style="font-size:13.5px">${escape(r.name||'')}</td>
-          <td class="col-cross"><div class="badges"><span class="domsrc-pill ds-cscd">${label}</span>${crossBadges}</div></td>
-          <td style="width:110px"><span class="jissn">${escape(r.issn||'—')}</span></td>
-          <td class="muted-cell" style="width:110px">${escape(r.cn_code||'—')}</td>
-        </tr>`;
-      }).join('');
-      box.innerHTML = `<div class="section-block">
-        ${domSectionHeader(
-          'CSCD 来源期刊目录',
-          `${(d.count || all.length).toLocaleString()} ${T('种期刊；C 为核心库，E 为扩展库。','journals; C is Core, E is Extended.')} ${d.source_url ? `<a class="source-link" href="${escape(d.source_url)}" target="_blank" rel="noopener nofollow">sciencechina.cn/select</a>` : ''}`,
-        )}
-        <div class="table-wrap"><table class="journals"><thead><tr>
-          <th class="col-fav" aria-label="Favorite"></th>
-          <th class="col-name">${T('期刊','Journal')}</th>
-          <th>${T('收录索引','Indices')}</th>
-          <th style="width:110px">ISSN</th>
-          <th style="width:110px">CN</th>
-        </tr></thead><tbody>${rows}</tbody></table></div>
-        ${all.length > window.__cscdShown ? `<div class="pager"><button id="cscd-more" class="more-btn" style="margin-top:12px;padding:8px 20px;border:1px solid var(--rule);background:var(--paper);color:var(--ink-soft);border-radius:2px;cursor:pointer">${T('加载更多','Load more')} (${all.length - window.__cscdShown} ${T('条剩余','remaining')})</button></div>` : ''}
-      </div>`;
-      document.getElementById('cscd-more')?.addEventListener('click', () => {
-        window.__cscdShown += 100;
-        renderDomestic();
-      });
-      return;
-    }
-
-    if (activeDom === 'cstpcd') {
-      const d = domestic.cstpcd;
-      if (!d) { box.innerHTML = `<div class="empty">${T('科技核心数据缺失','CSTPCD data missing')}</div>`; return; }
-      if (!window.__cstpcdShown) window.__cstpcdShown = 100;
-      const all = d.records || [];
-      const visible = all.slice(0, window.__cstpcdShown);
-      const rows = visible.map(r => {
-        const fid = favId(r);
-        rowRecordsByFid[fid] = { ...r, __src: 'cstpcd' };
-        const label = r.kind === 'popular_science' ? T('中国科技核心·科普','CSTPCD Popular') : T('中国科技核心','CSTPCD');
-        const crossBadges = renderDomCrossBadges(r, 'cstpcd');
-        return `<tr class="j-row clickable" data-fid="${escape(fid)}" data-src="cstpcd">
-          <td class="col-fav" style="width:36px">${starBtn(r, 'cstpcd')}</td>
-          <td class="jname" style="font-size:13.5px">${escape(r.name||'')}</td>
-          <td class="col-cross"><div class="badges"><span class="domsrc-pill ds-cstpcd">${label}</span>${crossBadges}</div></td>
-          <td class="muted-cell" style="width:110px">${escape(r.code||'—')}</td>
-        </tr>`;
-      }).join('');
-      box.innerHTML = `<div class="section-block">
-        ${domSectionHeader(
-          T('中国科技核心期刊目录','Chinese Science and Technology Core Journals'),
-          `${(d.count || all.length).toLocaleString()} ${T('种期刊；含核心卷与科普卷。','journals; includes core and popular-science volumes.')} ${d.core_source_url ? `<a class="source-link" href="${escape(d.core_source_url)}" target="_blank" rel="noopener nofollow">${T('核心 PDF','Core PDF')}</a>` : ''} ${d.popular_science_source_url ? `<a class="source-link" href="${escape(d.popular_science_source_url)}" target="_blank" rel="noopener nofollow">${T('科普 PDF','Popular PDF')}</a>` : ''}`,
-        )}
-        <div class="table-wrap"><table class="journals"><thead><tr>
-          <th class="col-fav" aria-label="Favorite"></th>
-          <th class="col-name">${T('期刊','Journal')}</th>
-          <th>${T('收录索引','Indices')}</th>
-          <th style="width:110px">${T('期刊代码','Code')}</th>
-        </tr></thead><tbody>${rows}</tbody></table></div>
-        ${all.length > window.__cstpcdShown ? `<div class="pager"><button id="cstpcd-more" class="more-btn" style="margin-top:12px;padding:8px 20px;border:1px solid var(--rule);background:var(--paper);color:var(--ink-soft);border-radius:2px;cursor:pointer">${T('加载更多','Load more')} (${all.length - window.__cstpcdShown} ${T('条剩余','remaining')})</button></div>` : ''}
-      </div>`;
-      document.getElementById('cstpcd-more')?.addEventListener('click', () => {
-        window.__cstpcdShown += 100;
-        renderDomestic();
-      });
-      return;
-    }
 
     if (activeDom === 'cnkx') {
       const d = domestic.cnkx;
@@ -3945,11 +2437,11 @@
       // 细分学科列表
       const subdomainSet = new Set();
       all.forEach(r => { if (r.subdomain) subdomainSet.add(r.subdomain); });
-      const subdomainList = [...subdomainSet];
+      const subdomainList = [...subdomainSet].sort((a,b) => a.localeCompare(b, 'zh'));
 
-      // 筛选状态 — 改用 Sets（多选）
-      if (!window.__cnkxDomains) window.__cnkxDomains = new Set();
-      if (!window.__cnkxSubs) window.__cnkxSubs = new Set();
+      // 筛选状态
+      if (!window.__cnkxDomain) window.__cnkxDomain = '__all';
+      if (!window.__cnkxSub) window.__cnkxSub = '__all';
       if (!window.__cnkxShown) window.__cnkxShown = 100;
 
       // 筛选
@@ -3958,34 +2450,25 @@
           const hay = (r.name + ' ' + (r.issn||'') + ' ' + (r.domain||'') + ' ' + (r.subdomain||'')).toLowerCase();
           if (!hay.includes(q)) return false;
         }
-        if (window.__cnkxDomains.size && !window.__cnkxDomains.has(r.domain)) return false;
-        if (window.__cnkxSubs.size && !window.__cnkxSubs.has(r.subdomain)) return false;
+        if (window.__cnkxDomain !== '__all' && r.domain !== window.__cnkxDomain) return false;
+        if (window.__cnkxSub !== '__all' && r.subdomain !== window.__cnkxSub) return false;
         return true;
       });
 
-      // 保留中国科协原始目录顺序：学科领域 / 细分学科 / T级 / 来源表内顺序。
+      // 按刊名排序
+      filtered.sort((a, b) => (a.name||'').localeCompare(b.name||'', 'zh'));
 
       // 分页
       const visible = filtered.slice(0, window.__cnkxShown);
       const total = filtered.length;
 
-      // 复选面板辅助：渲染 checkbox panel 内容
-      function renderCnkxPanel(panelId, items, activeSet, searchId, i18nType) {
-        const panel = document.getElementById(panelId);
-        if (!panel) return;
-        const raw = (document.getElementById(searchId)?.value || '').trim().toLowerCase();
-        const tokens = expandWosQuery(raw);
-        const filtered = !tokens.length ? items : items.filter(it => {
-          const display = (tn(it, i18nType) || it).toLowerCase();
-          return tokens.some(tok => display.includes(tok) || it.toLowerCase().includes(tok));
-        });
-        panel.innerHTML = filtered.map(it =>
-          `<label class="th-chk" data-filter="cnkx" data-value="${escape(it)}">
-             <input type="checkbox" ${activeSet.has(it) ? 'checked' : ''}>
-             <span>${escape(tn(it, i18nType))}</span>
-           </label>`
-        ).join('');
-      }
+      // 下拉选项
+      const domainOpts = domainList.map(d =>
+        `<option value="${escape(d)}"${window.__cnkxDomain === d ? ' selected' : ''}>${escape(tn(d, 'domain'))}</option>`
+      ).join('');
+      const subOpts = subdomainList.map(s =>
+        `<option value="${escape(s)}"${window.__cnkxSub === s ? ' selected' : ''}>${escape(tn(s, 'sub'))}</option>`
+      ).join('');
 
       // 行渲染
       const rows = visible.map(r => {
@@ -3997,9 +2480,6 @@
           ...hits.filter(h => h.source === 'cssci').map(() => `<span class="domsrc-pill ds-cssci">CSSCI</span>`),
           ...hits.filter(h => h.source === 'pku').map(() => `<span class="domsrc-pill ds-pku">${T('北大核心','PKU Core')}</span>`),
           ...hits.filter(h => h.source === 'ccft').map(h => `<span class="domsrc-pill ds-ccft">CCF-${h.tag||'T'}</span>`),
-          ...hits.filter(h => h.source === 'nsfc_mgmt').map(h => `<span class="domsrc-pill ds-nsfc_mgmt">${escape(h.label)}</span>`),
-          ...hits.filter(h => h.source === 'cscd').map(h => `<span class="domsrc-pill ds-cscd">${escape(h.label)}</span>`),
-          ...hits.filter(h => h.source === 'cstpcd').map(h => `<span class="domsrc-pill ds-cstpcd">${escape(h.label)}</span>`),
         ].filter(Boolean).join('');
         const subVal = r.subdomain ? tn(r.subdomain, 'sub') : '—';
         return `<tr class="j-row clickable" data-fid="${escape(fid)}" data-src="cnkx">
@@ -4007,45 +2487,23 @@
           <td style="width:60px">${badgeTier(r.tier)}</td>
           <td class="jname" style="font-size:13.5px">${escape(r.name||'')}</td>
           <td class="col-cross"><div class="badges">${badges || '<span class="muted-cell">—</span>'}</div></td>
-          <td class="muted-cell" style="width:110px">${escape(tn(r.domain||'', 'domain'))}</td>
-          <td class="muted-cell" style="width:110px">${escape(subVal)}</td>
-          <td style="width:110px"><span class="jissn">${escape(r.issn||'—')}</span></td>
+          <td class="muted-cell" style="width:160px">${escape(tn(r.domain||'', 'domain'))}</td>
+          <td class="muted-cell" style="width:160px">${escape(subVal)}</td>
+          <td style="width:130px"><span class="jissn">${escape(r.issn||'—')}</span></td>
         </tr>`;
       }).join('');
 
       box.innerHTML = `<div class="section-block">
-        ${domSectionHeader(
-          T('中国科协高质量科技期刊分级目录 (2025-12)','CAST High-Quality Sci-Tech Journal Tiered Directory (Dec 2025)'),
-          `${T('T1 / T2 / T3 三级；','T1 / T2 / T3 tiers · ')}${domainList.length} ${T('个官方学科领域','official disciplines')} · ${all.length.toLocaleString()} ${T('条带分级记录','tiered records')}${q ? T(' · 搜索: ',' · Search: ')+escape(q) : ''}`,
-        )}
+        <h3 class="section-title">${T('中国科协高质量科技期刊分级目录 (2025-12)','CAST High-Quality Sci-Tech Journal Tiered Directory (Dec 2025)')}</h3>
+        <div class="section-subtitle">${T('T1 / T2 / T3 三级；','T1 / T2 / T3 tiers · ')}${domainList.length} ${T('个官方学科领域','official disciplines')} · ${all.length.toLocaleString()} ${T('条带分级记录','tiered records')}${q ? T(' · 搜索: ',' · Search: ')+escape(q) : ''}</div>
         <div class="table-wrap"><table class="journals"><thead><tr>
           <th style="width:36px" aria-label="Favorite"></th>
           <th style="width:60px">${T('T级','Tier')}</th>
           <th>${T('期刊全称','Journal')}</th>
           <th>${T('交叉收录','Also In')}</th>
-          <th style="width:160px;padding:0 4px">
-            <div class="th-dropdown">
-              <button class="th-dropdown-btn" onclick="event.stopPropagation();toggleCnkxDropdown('cnkx-domain-panel')">
-                <span data-i18n="cnkx_domain" class="dd-label">${T('学科领域','Domain')}</span><span class="dd-arrow">▼</span>
-              </button>
-              <div class="th-dropdown-panel th-dropdown-panel-search" id="cnkx-domain-panel">
-                <div class="dd-search-wrap"><input type="search" id="cnkx-domain-search" class="dd-search" placeholder="${T('搜索…','Search…')}" autocomplete="off" spellcheck="false"></div>
-                <div class="dd-check-list" id="cnkx-domain-list"></div>
-              </div>
-            </div>
-          </th>
-          <th style="width:160px;padding:0 4px">
-            <div class="th-dropdown">
-              <button class="th-dropdown-btn" onclick="event.stopPropagation();toggleCnkxDropdown('cnkx-sub-panel')">
-                <span data-i18n="cnkx_sub" class="dd-label">${T('细分学科','Sub-field')}</span><span class="dd-arrow">▼</span>
-              </button>
-              <div class="th-dropdown-panel th-dropdown-panel-search" id="cnkx-sub-panel">
-                <div class="dd-search-wrap"><input type="search" id="cnkx-sub-search" class="dd-search" placeholder="${T('搜索…','Search…')}" autocomplete="off" spellcheck="false"></div>
-                <div class="dd-check-list" id="cnkx-sub-list"></div>
-              </div>
-            </div>
-          </th>
-          <th style="width:110px">ISSN</th>
+          <th style="width:160px;padding:0 4px"><select id="cnkx-domain-select" class="th-select"><option value="__all">${T('学科领域','Domain')}</option>${domainOpts}</select></th>
+          <th style="width:160px;padding:0 4px"><select id="cnkx-sub-select" class="th-select"><option value="__all">${T('细分学科','Sub-field')}</option>${subOpts}</select></th>
+          <th style="width:130px">ISSN</th>
         </tr></thead><tbody>
           ${rows}
           ${total === 0 ? `<tr><td colspan="7" class="empty">${T('未找到匹配的期刊','No matching journals found')}</td></tr>` : ''}
@@ -4053,35 +2511,11 @@
         ${total > window.__cnkxShown ? `<div class="pager"><button id="cnkx-more" class="more-btn" style="margin-top:12px;padding:8px 20px;border:1px solid var(--rule);background:var(--paper);color:var(--ink-soft);border-radius:2px;cursor:pointer">${T('加载更多','Load more')} (${total - window.__cnkxShown} ${T('条剩余','remaining')})</button></div>` : ''}
       </div>`;
 
-      // 渲染复选面板并绑定搜索
-      renderCnkxPanel('cnkx-domain-list', domainList, window.__cnkxDomains, 'cnkx-domain-search', 'domain');
-      renderCnkxPanel('cnkx-sub-list', subdomainList, window.__cnkxSubs, 'cnkx-sub-search', 'sub');
-      // 绑定搜索输入
-      ['cnkx-domain-search','cnkx-sub-search'].forEach(id => {
-        const inp = document.getElementById(id);
-        if (inp && !inp.__cnkxBound) {
-          inp.__cnkxBound = true;
-          inp.addEventListener('input', () => {
-            if (id === 'cnkx-domain-search') renderCnkxPanel('cnkx-domain-list', domainList, window.__cnkxDomains, 'cnkx-domain-search', 'domain');
-            else renderCnkxPanel('cnkx-sub-list', subdomainList, window.__cnkxSubs, 'cnkx-sub-search', 'sub');
-          });
-        }
-      });
-      // 绑定复选框
-      document.querySelectorAll('#cnkx-domain-panel label.th-chk, #cnkx-sub-panel label.th-chk').forEach(label => {
-        if (label.__cnkxBound) return;
-        label.__cnkxBound = true;
-        const cb = label.querySelector('input[type=checkbox]');
-        if (!cb) return;
-        cb.addEventListener('change', () => {
-          const val = label.dataset.value;
-          const isDomain = label.closest('#cnkx-domain-panel');
-          const set = isDomain ? window.__cnkxDomains : window.__cnkxSubs;
-          if (cb.checked) set.add(val); else set.delete(val);
-          window.__cnkxShown = 100;
-          renderDomestic();
-        });
-      });
+      // 绑定筛选下拉
+      const domSel = document.getElementById('cnkx-domain-select');
+      if (domSel) domSel.addEventListener('change', () => { window.__cnkxDomain = domSel.value; window.__cnkxShown = 100; renderDomestic(); });
+      const subSel = document.getElementById('cnkx-sub-select');
+      if (subSel) subSel.addEventListener('change', () => { window.__cnkxSub = subSel.value; window.__cnkxShown = 100; renderDomestic(); });
       const moreBtn = document.getElementById('cnkx-more');
       if (moreBtn) moreBtn.addEventListener('click', () => { window.__cnkxShown += 100; renderDomestic(); });
       return;
@@ -4097,15 +2531,13 @@
       // 从URL hash或存储取当前选中分类（默认全部）
       // 使用内存变量跟踪
       if (!window.__cnkiCat) window.__cnkiCat = '__all';
-      if (!window.__cnkiIndex) window.__cnkiIndex = '__all';
       activeCat = window.__cnkiCat;
 
       // 筛选逻辑
       let filtered = all.filter(r => {
-        const hits = lookupDom(r);
         // 搜索过滤
         if (q) {
-          const hay = (r.name + ' ' + (r.issn||'') + ' ' + (r.cn_code||'') + ' ' + (r.sponsor||'') + ' ' + (r.category||'') + ' ' + (r.category_code||'') + ' ' + (r.major_categories||[]).join(' ') + ' ' + (r.categories||[]).join(' ')).toLowerCase();
+          const hay = (r.name + ' ' + (r.issn||'') + ' ' + (r.cn_code||'') + ' ' + (r.sponsor||'') + ' ' + (r.major_categories||[]).join(' ')).toLowerCase();
           if (!hay.includes(q)) return false;
         }
         // 学科分类过滤
@@ -4113,29 +2545,18 @@
           const cats = r.major_categories || [];
           if (!cats.includes(activeCat)) return false;
         }
-        if (window.__cnkiIndex !== '__all') {
-          const hasIndex = hits.some(h => {
-            if (window.__cnkiIndex === 'cnkx') return h.source && h.source.startsWith('cnkx');
-            if (window.__cnkiIndex === 'zju') return h.source === 'zju';
-            return h.source === window.__cnkiIndex;
-          });
-          if (!hasIndex) return false;
-        }
         // 徽章过滤（CSSCI/北大核心/CCF）— include mode: 勾选 = 只看有该徽章的
         if (activeDomBadges.size > 0) { // 有任意徽章被勾选时
+          const hits = lookupDom(r);
           const hasCssci = hits.some(h => h.source === 'cssci');
           const hasCssciExt = hits.some(h => h.source === 'cssci_ext');
           const hasPku = hits.some(h => h.source === 'pku');
           const hasCcf = hits.some(h => h.source === 'ccft');
-          const hasCscd = hits.some(h => h.source === 'cscd');
-          const hasCstpcd = hits.some(h => h.source === 'cstpcd');
           // AND logic: 勾选的徽章，期刊必须全部拥有
           if (activeDomBadges.has('cssci') && !hasCssci) return false;
           if (activeDomBadges.has('cssci_ext') && !hasCssciExt) return false;
           if (activeDomBadges.has('pku') && !hasPku) return false;
           if (activeDomBadges.has('ccft') && !hasCcf) return false;
-          if (activeDomBadges.has('cscd') && !hasCscd) return false;
-          if (activeDomBadges.has('cstpcd') && !hasCstpcd) return false;
         }
         return true;
       });
@@ -4145,16 +2566,6 @@
         const count = all.filter(r => (r.major_categories||[]).includes(c)).length;
         return `<option value="${escape(c)}"${activeCat === c ? ' selected' : ''}>${escape(c)}</option>`;
       }).join('');
-      const indexOptions = [
-        ['cssci', 'CSSCI'],
-        ['cssci_ext', T('CSSCI 扩展','CSSCI Ext')],
-        ['pku', T('北大核心','PKU Core')],
-        ['ccft', T('CCF 中文','CCF Chinese')],
-        ['cscd', 'CSCD'],
-        ['cstpcd', T('中国科技核心','CSTPCD')],
-        ['cnkx', T('中国科协','CAST')],
-        ['zju', T('浙江大学','ZJU')],
-      ].map(([value, label]) => `<option value="${escape(value)}"${window.__cnkiIndex === value ? ' selected' : ''}>${escape(label)}</option>`).join('');
 
       // 按刊名字母排序
       filtered.sort((a, b) => (a.name||'').localeCompare(b.name||'', 'zh'));
@@ -4171,42 +2582,36 @@
         const hits = lookupDom(r);
         const badges = [
           ...hits.filter(h => h.source === 'cssci').map(() => `<span class="domsrc-pill ds-cssci">CSSCI</span>`),
-          ...hits.filter(h => h.source === 'cssci_ext').map(() => `<span class="domsrc-pill ds-cssci-ext">${T('CSSCI 扩展','CSSCI Ext')}</span>`),
+          ...hits.filter(h => h.source === 'cssci_ext').map(() => `<span class="domsrc-pill ds-cssci-ext">${T('CSSCI 扩','CSSCI Ext')}</span>`),
           ...hits.filter(h => h.source === 'pku').map(() => `<span class="domsrc-pill ds-pku">${T('北大核心','PKU Core')}</span>`),
           ...hits.filter(h => h.source === 'ccft').map(h => `<span class="domsrc-pill ds-ccft" title="${escape(h.org||'')}">CCF-${h.tag||'T'}</span>`),
           ...hits.filter(h => h.source === 'zju').map(h => `<span class="domsrc-pill ds-zju">${escape(h.label)}</span>`),
           ...hits.filter(h => h.source === 'school_a').map(h => `<span class="domsrc-pill ds-school-a">${escape(h.label)}</span>`),
-          ...hits.filter(h => h.source === 'nsfc_mgmt').map(h => `<span class="domsrc-pill ds-nsfc_mgmt">${escape(h.label)}</span>`),
-          ...hits.filter(h => h.source === 'cscd').map(h => `<span class="domsrc-pill ds-cscd">${escape(h.label)}</span>`),
-          ...hits.filter(h => h.source === 'cstpcd').map(h => `<span class="domsrc-pill ds-cstpcd">${escape(h.label)}</span>`),
           ...hits.filter(h => h.source.startsWith('cnkx')).map(h => `<span class="domsrc-pill ds-cnkx">${escape(h.label)}</span>`),
         ].filter(Boolean).join('');
         const name = r.name || '';
         const isnCell = r.issn ? `<span class="jissn">${escape(r.issn)}</span>` : (r.cn_code ? `<span class="jissn">${escape(r.cn_code)}</span>` : '<span class="muted-cell">—</span>');
-        const displayCats = (r.major_categories || []).length ? r.major_categories : (r.categories || []);
-        const catCell = displayCats.length ? displayCats.map(c => `<span class="cat-inline">${escape(c)}</span>`).join('') : '<span class="muted-cell">—</span>';
-        return `<tr class="j-row clickable cnki-row" data-fid="${escape(fid)}" data-src="cnki_major">
+        const catCell = (r.major_categories||[]).length ? r.major_categories.map(c => `<span class="cat-inline">${escape(c)}</span>`).join('') : '<span class="muted-cell">—</span>';
+        return `<tr class="j-row clickable" data-fid="${escape(fid)}" data-src="cnki_major">
           <td class="col-fav" style="width:36px">${starBtn(r, 'cnki_major')}</td>
-          <td class="jname cnki-name">${escape(name)}</td>
+          <td class="jname" style="font-size:13.5px">${escape(name)}</td>
           <td class="col-cross"><div class="badges">${badges || '<span class="muted-cell">—</span>'}</div></td>
-          <td class="muted-cell" style="width:110px">${catCell}</td>
-          <td style="width:110px">${isnCell}</td>
-          <td class="muted-cell" style="width:100px">${escape(r.cn_code||'—')}</td>
+          <td class="muted-cell" style="width:160px">${catCell}</td>
+          <td style="width:130px">${isnCell}</td>
+          <td class="muted-cell" style="width:120px">${escape(r.cn_code||'—')}</td>
         </tr>`;
       }).join('');
 
       box.innerHTML = `<div class="section-block">
-        ${domSectionHeader(
-          T('中文期刊目录','Chinese Journal Directory'),
-          `${T('共收录','Total ')} ${all.length.toLocaleString()} ${T('种中文期刊',' Chinese journals')}${q ? T(' · 搜索: ',' · Search: ')+escape(q) : ''}`,
-        )}
-        <div class="table-wrap cnki-table-wrap"><table class="journals cnki-table"><thead><tr>
+        <h3 class="section-title">${T('中文期刊目录','Chinese Journal Directory')}</h3>
+        <div class="section-subtitle">${T('共收录','Total ')} ${all.length.toLocaleString()} ${T('种中文期刊',' Chinese journals')}${q ? T(' · 搜索: ',' · Search: ')+escape(q) : ''}</div>
+        <div class="table-wrap"><table class="journals"><thead><tr>
           <th style="width:36px" aria-label="Favorite"></th>
           <th>${T('期刊名称','Journal')}</th>
-          <th style="min-width:180px;padding:0 4px"><select id="cnki-index-select" class="th-select"><option value="__all">${T('收录索引','Indices')}</option>${indexOptions}</select></th>
+          <th>${T('收录索引','Indices')}</th>
           <th style="width:160px;padding:0 4px"><select id="cnki-cat-select" class="th-select"><option value="__all">${T('学科分类','Category')}</option>${catOptions}</select></th>
-          <th style="width:110px">ISSN</th>
-          <th style="width:100px">CN</th>
+          <th style="width:130px">ISSN</th>
+          <th style="width:120px">CN</th>
         </tr></thead><tbody>
           ${rows}
           ${total === 0 ? `<tr><td colspan="6" class="empty">${T('未找到匹配的期刊','No matching journals found')}</td></tr>` : ''}
@@ -4215,14 +2620,6 @@
       </div>`;
 
       // 绑定分类下拉
-      const indexSelect = document.getElementById('cnki-index-select');
-      if (indexSelect) {
-        indexSelect.addEventListener('change', () => {
-          window.__cnkiIndex = indexSelect.value;
-          window.__cnkiShown = 100;
-          renderDomestic();
-        });
-      }
       const catSelect = document.getElementById('cnki-cat-select');
       if (catSelect) {
         catSelect.addEventListener('change', () => {
@@ -4257,16 +2654,14 @@
       const tierOrder = ['一级', '核心', '其他'];
       const tierClass = {'一级':'t1','核心':'t2','其他':'t3'};
       const html = [`<div class="section-block">
-        ${domSectionHeader(
-          escape(lang==='en' ? T('浙江大学 2024 期刊分级','ZJU 2024 Journal Tiers') : (src.source || '浙江大学 2024 期刊分级')),
-          `${T('共','Total ')} ${list.length.toLocaleString()} ${T('条；带 ★ 为人文社科权威级期刊（一级内）',' · ★ marks authoritative humanities & social sciences journals (within Tier 1)')}`,
-        )}`];
+        <h3 class="section-title">${escape(lang==='en' ? T('浙江大学 2024 期刊分级','ZJU 2024 Journal Tiers') : (src.source || '浙江大学 2024 期刊分级'))}</h3>
+        <div class="section-subtitle">${T('共','Total ')} ${list.length.toLocaleString()} ${T('条；带 ★ 为人文社科权威级期刊（一级内）',' · ★ marks authoritative humanities & social sciences journals (within Tier 1)')}</div>`];
       for (const tier of tierOrder) {
         const recs = byTier[tier]; if (!recs || !recs.length) continue;
         html.push(`<details class="section-block" style="margin-top:14px" ${q?'open':(tier==='一级'?'open':'')}>
           <summary>${T('国内','Domestic ')}${escape(tn(tier, "tier"))}${T('学术期刊',' Journals')} <span class="muted-cell">(${recs.length})</span></summary>
           <div class="table-wrap" style="margin-top:10px"><table class="journals"><thead><tr>
-            <th style="width:70px">${T('级别','Tier')}</th><th>${T('期刊','Journal')}</th><th style="width:110px">ISSN / CN</th><th style="width:150px">${T('备注','Note')}</th><th>${T('交叉收录','Also In')}</th><th style="width:40px"></th>
+            <th style="width:70px">${T('级别','Tier')}</th><th>${T('期刊','Journal')}</th><th style="width:130px">ISSN / CN</th><th style="width:180px">${T('备注','Note')}</th><th>${T('交叉收录','Also In')}</th><th style="width:40px"></th>
           </tr></thead><tbody>
           ${recs.slice(0, 1500).map(r => {
             const tierBadge = `<span class="tier-pill ${tierClass[r.tier]||'t3'}">${escape(tn(r.tier, "tier"))}</span>${r.name.includes('*') ? ' <span class="warn-pill" style="background:var(--gold);color:#fff">★</span>' : ''}`;
@@ -4274,7 +2669,7 @@
               { ...r, name: r.name.replace(/\*$/,'') },
               {
                 src: 'zju',
-                extraCols: `<td class="muted-cell" style="width:150px">${escape(r.note||'')}</td>`,
+                extraCols: `<td class="muted-cell" style="width:180px">${escape(r.note||'')}</td>`,
                 extraBadges: '',
               }
             ).replace(
@@ -4310,22 +2705,22 @@
         const tierOrder = ['一级', '核心', '其他'];
         const tierClass = {'一级':'t1','核心':'t2','其他':'t3'};
         const html = [`<div class="section-block">
-          ${domSectionHeader(
-            `${escape(lang==='en' ? T('高校自编目录 · 2023 期刊分级','In-house School Directory · 2023 Journal Tiers') : (src.source || '高校自编目录 · 2023 期刊分级'))} <span class="unlocked-pill">✓ ${T('已解锁','Unlocked')}</span> <button class="tiny-btn" id="lock-again">${T('锁回','Lock again')}</button>`,
-            `${T('共','Total ')} ${list.length.toLocaleString()} ${T('条；带 ★ 为人文社科权威级期刊',' · ★ marks authoritative humanities & social sciences journals')}`,
-          )}`];
+          <h3 class="section-title">${escape(lang==='en' ? T('高校自编目录 · 2023 期刊分级','In-house School Directory · 2023 Journal Tiers') : (src.source || '高校自编目录 · 2023 期刊分级'))} <span class="unlocked-pill">✓ ${T('已解锁','Unlocked')}</span>
+            <button class="tiny-btn" id="lock-again" style="float:right">${T('锁回','Lock again')}</button>
+          </h3>
+          <div class="section-subtitle">${T('共','Total ')} ${list.length.toLocaleString()} ${T('条；带 ★ 为人文社科权威级期刊',' · ★ marks authoritative humanities & social sciences journals')}</div>`];
         for (const tier of tierOrder) {
           const recs = byTier[tier]; if (!recs || !recs.length) continue;
           html.push(`<details class="section-block" style="margin-top:14px" ${q?'open':(tier==='一级'?'open':'')}>
             <summary>${T('国内','Domestic ')}${escape(tn(tier, "tier"))}${T('学术期刊',' Journals')} <span class="muted-cell">(${recs.length})</span></summary>
             <div class="table-wrap" style="margin-top:10px"><table class="journals"><thead><tr>
-              <th style="width:70px">${T('级别','Tier')}</th><th>${T('期刊','Journal')}</th><th style="width:110px">ISSN / CN</th><th style="width:150px">${T('备注','Note')}</th><th>${T('交叉收录','Also In')}</th><th style="width:40px"></th>
+              <th style="width:70px">${T('级别','Tier')}</th><th>${T('期刊','Journal')}</th><th style="width:130px">ISSN / CN</th><th style="width:180px">${T('备注','Note')}</th><th>${T('交叉收录','Also In')}</th><th style="width:40px"></th>
             </tr></thead><tbody>
             ${recs.slice(0, 1500).map(r => {
               const tierBadge = `<span class="tier-pill ${tierClass[r.tier]||'t3'}">${escape(tn(r.tier, "tier"))}</span>${r.name.includes('*') ? ' <span class="warn-pill" style="background:var(--gold);color:#fff">★</span>' : ''}`;
               return renderDomRow(
                 { ...r, name: r.name.replace(/\*$/,'') },
-                { src: 'school_a', extraCols: `<td class="muted-cell" style="width:150px">${escape(r.note||'')}</td>` }
+                { src: 'school_a', extraCols: `<td class="muted-cell" style="width:180px">${escape(r.note||'')}</td>` }
               ).replace(
                 /<tr class="j-row clickable" (data-fid=[^>]+)>/,
                 `<tr class="j-row clickable" $1><td style="width:70px">${tierBadge}</td>`
@@ -4343,7 +2738,6 @@
       }
       // 未解锁 → 付费着陆页
       box.innerHTML = `
-        ${domSectionHeader(T('高校自编目录','In-house School Directory'), T('需要解锁后查看完整条目','Unlock required to view full records'))}
         <div class="locked-landing">
           <div class="locked-hero">
             <div class="locked-badge">🔒 ${T('高校自编目录','In-house School Directory')}</div>
@@ -4394,7 +2788,7 @@
   function getRelatedJournals(r, limit = 3) {
     if (!journals.length) return [];
     const selfId = favId(r);
-    const selfIF = parseFloat(r.if_2024) || 0;
+    const selfIF = currentIfValue(r) || 0;
     const selfCats = Array.isArray(r.wos_categories) ? r.wos_categories : [];
     const selfCAS = r.cas_zone || '';
     const selfJCR = r.if_quartile || '';
@@ -4414,7 +2808,7 @@
         catScore = union > 0 ? inter / union : 0;
       }
       // IF proximity (weight 0.25)
-      const jIF = parseFloat(j.if_2024) || 0;
+      const jIF = currentIfValue(j) || 0;
       let ifScore = 0;
       if (selfIF > 0 && jIF > 0) {
         ifScore = 1 / (1 + Math.abs(Math.log(selfIF) - Math.log(jIF)));
@@ -4440,7 +2834,7 @@
     if (!related.length) return '';
     const cards = related.map(j => {
       const name = titleCase(j.name || j.cn_name || '');
-      const ifVal = j.if_2024 != null ? `IF ${j.if_2024}` : '';
+      const ifVal = currentIfValue(j) != null ? `IF ${currentIfText(j)}` : '';
       const cas = j.cas_zone ? `${T('中科院','CAS')} ${j.cas_zone}${T('区','')}` : '';
       const badges = [ifVal, cas].filter(Boolean).join(' · ');
       return `<div class="related-card" data-fid="${escape(favId(j))}" style="cursor:pointer">
@@ -4458,69 +2852,48 @@
   let drawerOpen = false;
   let _currentDrawerRec = null;
   let _drawerStack = []; // for back-navigation through related journals
-  let _drawerSourceTab = 'int'; // tab active when drawer opened in pageMode
   // 跨源按 favId 检索任意期刊记录（用于 #j/<id> 深链）
   function findRecByFid(id) {
     if (!id) return null;
-    const wantedList = journalRouteKeyList(id);
-    const findIn = (arr, src) => {
-      for (const wantedKey of wantedList) {
-        for (const r of arr || []) {
-          if (recordRouteKeys(r).has(wantedKey)) {
-            const rr = Object.assign({}, r);
-            if (src && !rr.__src) rr.__src = src;
-            return rr;
-          }
+    if (Array.isArray(journals)) {
+      for (const r of journals) {
+        if (favId(r) === id) {
+          const rr = Object.assign({}, r);
+          if (!rr.__src) rr.__src = 'int';
+          return rr;
         }
       }
-      return null;
-    };
-    if (Array.isArray(journals)) {
-      const rr = findIn(journals, 'int');
-      if (rr) return rr;
     }
     if (domestic) {
       const groups = [
         ['cssci', domestic.cssci_core || []],
         ['cssci_ext', domestic.cssci_ext || []],
         ['pku', domestic.pku_core || []],
-        ['cscd', (domestic.cscd && domestic.cscd.records) || []],
-        ['cstpcd', (domestic.cstpcd && domestic.cstpcd.records) || []],
         ['cnkx', (domestic.cnkx && domestic.cnkx.records) || []],
-        ['nsfc_mgmt', (domestic.nsfc_mgmt && domestic.nsfc_mgmt.records) || []],
         ['zju', (domestic.zju && domestic.zju.records) || []],
       ];
       for (const [src, arr] of groups) {
-        const rr = findIn(arr, src);
-        if (rr) return rr;
+        for (const r of arr) {
+          if (favId(r) === id) return Object.assign({}, r, { __src: src });
+        }
       }
-    }
-    if (india && Array.isArray(india.records)) {
-      const rr = findIn(india.records.map(r => ({ ...r, name: r.journal_title })), 'in');
-      if (rr) return rr;
     }
     return null;
   }
   function applyHashRoute() {
-    if (journalPathSlug()) return;
     const hash = location.hash || '';
-    // #fav → 收藏 tab
-    if (hash === '#fav' || hash === '#favorites') {
-      activateTab('fav');
-      return;
-    }
     // #search?q=<query> → switch to pick tab and fill search
     const searchMatch = hash.match(/^#search\?q=(.+)$/);
     if (searchMatch) {
       try {
         const q = decodeURIComponent(searchMatch[1]);
         const pickEl = document.querySelector('[data-tab="pick"]');
-        if (pickEl) {
+        const pickInput = $('#pick-input');
+        if (pickEl && pickInput) {
           pickEl.click();
-          const searchInput = $('#q');
-          if (searchInput) searchInput.value = q;
+          pickInput.value = q;
           setTimeout(() => {
-            const btn = $('#search-submit');
+            const btn = $('#pick-search-btn');
             if (btn) btn.click();
           }, 800);
         }
@@ -4533,19 +2906,48 @@
     try { id = decodeURIComponent(m[1]); } catch (_) { id = m[1]; }
     if (_currentDrawerRec && favId(_currentDrawerRec) === id) return;
     const r = findRecByFid(id);
-    if (r) openDrawer(r, { fromHash: true, pageMode: true });
+    if (r) openDrawer(r, { fromHash: true });
   }
-  async function openDrawer(r, opts) {
-    // Journal browsing should stay generous for anonymous visitors; login is only
-    // needed for cloud sync and paid/pro features.
-    incrementUsage("views");
 
+  function renderTrendSvg(points, opts = {}) {
+    const width = 560;
+    const height = 220;
+    const pad = { left: 42, right: 18, top: 20, bottom: 34 };
+    const vals = points.map(p => p.value);
+    const minVal = Math.min(...vals);
+    const maxVal = Math.max(...vals);
+    const span = Math.max(maxVal - minVal, 1);
+    const x = (idx) => points.length === 1
+      ? width / 2
+      : pad.left + (idx * (width - pad.left - pad.right)) / (points.length - 1);
+    const y = (val) => pad.top + (height - pad.top - pad.bottom) * (1 - ((val - minVal) / span));
+    const path = points.map((p, idx) => `${idx ? 'L' : 'M'} ${x(idx).toFixed(2)} ${y(p.value).toFixed(2)}`).join(' ');
+    const changeAbs = points.length > 1 ? points[points.length - 1].value - points[0].value : 0;
+    const changePct = points.length > 1 && points[0].value ? (changeAbs / points[0].value) * 100 : null;
+    return `
+      <div class="trend-chart-wrap">
+        <svg viewBox="0 0 ${width} ${height}" class="trend-chart" role="img" aria-label="${escape(opts.title || 'trend chart')}">
+          <line x1="${pad.left}" y1="${height - pad.bottom}" x2="${width - pad.right}" y2="${height - pad.bottom}" class="trend-axis" />
+          <line x1="${pad.left}" y1="${pad.top}" x2="${pad.left}" y2="${height - pad.bottom}" class="trend-axis" />
+          <path d="${path}" class="trend-line" />
+          ${points.map((p, idx) => `
+            <circle cx="${x(idx).toFixed(2)}" cy="${y(p.value).toFixed(2)}" r="4.5" class="trend-dot" />
+            <text x="${x(idx).toFixed(2)}" y="${height - 10}" text-anchor="middle" class="trend-year">${escape(String(p.year))}</text>
+            <text x="${x(idx).toFixed(2)}" y="${(y(p.value) - 10).toFixed(2)}" text-anchor="middle" class="trend-value">${escape(String(p.value))}</text>
+          `).join('')}
+        </svg>
+        ${points.length > 1 ? `<div class="trend-summary">${T('变化','Change')}: ${changeAbs >= 0 ? '+' : ''}${changeAbs.toFixed(1)}${changePct != null ? ` · ${changePct >= 0 ? '+' : ''}${changePct.toFixed(1)}%` : ''}</div>` : ''}
+      </div>`;
+  }
+
+  function statCardHtml(stat) {
+    const attrs = stat.interactive ? ` data-trend-kind="${escape(stat.interactive)}"` : '';
+    const cls = stat.interactive ? 'stat stat-clickable' : 'stat';
+    return `<div class="${cls}"${attrs}><div class="stat-v">${escape(String(stat.value))}</div><div class="stat-k">${stat.label}</div>${stat.sub ? `<div class="stat-sub">${stat.sub}</div>` : ''}</div>`;
+  }
+
+  async function openDrawer(r, opts) {
     _currentDrawerRec = r;
-    recordView(r); // 记录浏览历史，用于学科推荐
-    const pageMode = !!(opts && opts.pageMode);
-    document.body.classList.toggle('journal-route', pageMode);
-    // 记录抽屉打开时的 tab，关闭时回到原 tab
-    if (pageMode) _drawerSourceTab = activeTab;
     const drawer = $('#j-drawer'), scrim = $('#drawer-scrim'), body = $('#drawer-body');
     if (!drawer || !body) return;
     // 懒加载 OpenAlex 数据（首次打开抽屉时加载）
@@ -4554,18 +2956,7 @@
       catch(e) { oaMap = {}; }
     }
     // 上报浏览（无需登录），结果回填进 cache
-    reportJournalView(r, opts || {});
-    // GA4 虚拟浏览 — 期刊详情抽屉打开时通知 GA4（无需 GTM 配置）
-    try {
-      if (typeof gtag === 'function') {
-        var jvPath = '/journal/' + (favId(r) || '');
-        gtag('event', 'page_view', {
-          'page_title': (r.name || r.cn_name || '期刊详情').slice(0, 200),
-          'page_location': window.location.origin + jvPath,
-          'page_path': jvPath,
-        });
-      }
-    } catch(_) {}
+    reportJournalView(favId(r));
     const src = r.__src || 'int';
     const titleRaw = r.name || r.cn_name || '';
     const title = titleCase(titleRaw);
@@ -4580,160 +2971,28 @@
     const intRec = src === 'int' ? r : lookupInt(r);
     const ir = intRec || {};
     // 徽章块 — 分两行：索引收录 / 分区等级
-	    const drawerIndexBadges = (src === 'int' || intRec) ? renderIndexBadges(ir) : '';
-	    const drawerRankBadges = (src === 'int' || intRec) ? renderRankBadges(ir) : '';
-	    const titleFeatureBadges = (ir.free || r.free) ? badgeFree(true) : '';
-	    const tierBadge = r.tier && /^T[123]$/.test(r.tier) ? badgeTier(r.tier)
+    const drawerIndexBadges = (src === 'int' || intRec) ? renderIndexBadges(ir) : '';
+    const drawerRankBadges = (src === 'int' || intRec) ? renderRankBadges(ir) : '';
+    const tierBadge = r.tier && /^T[123]$/.test(r.tier) ? badgeTier(r.tier)
                     : r.tier ? `<span class="tier-pill t3">${escape(tn(r.tier, "tier"))}</span>` : '';
     const crossBadges = renderDomCrossBadges(r, src);
-    const drawerCoverageBadges = (src === 'int' || intRec) ? renderCoverageBadges(ir) : '';
-    const drawerLevelBadges = (src === 'int' || intRec) ? renderLevelBadges(ir) : '';
-    const drawerAccessBadges = (src === 'int' || intRec) ? renderAccessBadges(ir) : ((r.free) ? badgeFree(true) : '');
-    const drawerRiskBadges = (src === 'int' || intRec) ? renderRiskBadges(ir) : '';
 
     // 基础元信息（真实字段）
     const meta = [];
     if (r.abbr20 && r.abbr20 !== (r.name||'').replace(/\*$/,'')) meta.push([T('期刊缩写','Abbreviation'), r.abbr20]);
     if (r.publisher) meta.push([T('出版商','Publisher'), r.publisher]);
-    if (r.org || r.sponsor) meta.push([T('主办单位','Sponsor'), r.org || r.sponsor]);
+    if (r.org) meta.push([T('主办单位','Sponsor'), r.org]);
     if (r.address) meta.push([T('出版地址','Address'), r.address]);
     if (r.country) meta.push([T('国家/地区','Country/Region'), r.country]);
     if (r.languages || r.language_cn || r.language) meta.push([T('语种','Language'), r.languages || r.language_cn || r.language]);
     if (r.frequency) meta.push([T('出版周期','Frequency'), r.frequency]);
     if (r.discipline) meta.push([T('学科','Discipline'), tn(r.discipline, 'cssci')]);
     if (r.category) meta.push([T('分类','Category'), tn(r.category, 'pku')]);
-    if (Array.isArray(r.categories) && r.categories.length) meta.push([T('CNKI 分类','CNKI Categories'), r.categories.join(' · ')]);
     if (r.domain) meta.push([T('科协领域','CAST Domain'), tn(r.domain, 'domain') + (r.subdomain ? ' · ' + tn(r.subdomain, 'sub') : '')]);
     if (r.ccf_area) meta.push([T('CCF 方向','CCF Area'), r.ccf_area]);
     if (ir.abdc && ir.abdc.rating) meta.push([T('ABDC 等级','ABDC Rating'), ir.abdc.rating + (ir.abdc.field ? ' · ' + ir.abdc.field : '')]);
-    if (ir.ft50) meta.push(['FT50', (ir.ft50.order ? `#${ir.ft50.order}` : '') + (ir.ft50.source ? ` · ${ir.ft50.source}` : '')]);
-    if (ir.utd24) meta.push(['UTD24', (ir.utd24.order ? `#${ir.utd24.order}` : '') + (ir.utd24.subject ? ` · ${ir.utd24.subject}` : '')]);
-    if (src === 'nsfc_mgmt' || r.source === 'NSFC Management Science Department Journal List') meta.push([T('来源','Source'), T('国家自然科学基金委管理科学部期刊目录','NSFC Management Science Journal List')]);
     if (r.note) meta.push([T('备注','Note'), r.note]);
     const metaHTML = meta.map(([k,v]) => `<div class="meta-row"><div class="meta-k">${k}</div><div class="meta-v">${escape(v)}</div></div>`).join('');
-    const oa = ir.oa || lookupOA(ir.issn || ir.eissn ? ir : r);
-
-    const journalIntroHTML = (() => {
-      const officialText = r.official_desc || ir.official_desc || r.description || ir.description || '';
-      const cats = Array.isArray(ir.wos_categories) ? ir.wos_categories.slice(0, 3) : [];
-      const indexText = Array.isArray(ir.indices) && ir.indices.length ? ir.indices.join('/') : '';
-      const plainName = title;
-      const plainCats = cats.join(lang.startsWith('zh') ? '、' : ', ');
-      const major = ir.cas_major_cn || ir.jcr_cat || cats[0] || ir.esi_category || '';
-      // 判断是否为真正的中文学术期刊：必须有 CN 号或中文刊名（不止一个短横），且来自国内源
-      const hasCnCode = !!r.cn_code;
-      const hasRealCnName = !!r.cn_name && r.cn_name !== '-' && r.cn_name !== title;
-      const isDomesticJournal = src !== 'int' && (hasCnCode || hasRealCnName);
-      const domesticFields = [
-        r.discipline ? tn(r.discipline, 'cssci') : '',
-        r.category ? tn(r.category, 'pku') : '',
-        r.domain ? tn(r.domain, 'domain') : '',
-        r.subdomain ? tn(r.subdomain, 'sub') : '',
-        r.ccf_area || '',
-      ].filter(Boolean);
-      const domesticFieldText = [...new Set(domesticFields)].slice(0, 3).join('、');
-      const cnName = r.cn_name || ir.cn_name || '';
-      const abbr = r.abbr20 || ir.abbr20 || '';
-      const doajWeeks = parseFloat(r.doaj?.review_weeks || ir.doaj?.review_weeks);
-      const apcValue = oa?.apc || oa?.apc_usd || r.doaj?.fee || ir.doaj?.fee || r.doaj?.apc_amount || ir.doaj?.apc_amount || '';
-      const apcText = apcValue
-        ? (typeof apcValue === 'number'
-            ? (lang.startsWith('zh') ? `版面费 APC 约 ${apcValue.toLocaleString()} USD` : `APC is approximately ${apcValue.toLocaleString()} USD`)
-            : (lang.startsWith('zh') ? `版面费 APC：${apcValue}` : `APC: ${apcValue}`))
-        : '';
-      const reviewText = doajWeeks > 0
-        ? (lang.startsWith('zh')
-            ? `公开数据记录的投稿至出版周期约 ${(doajWeeks / 4.33).toFixed(1)} 个月（约 ${doajWeeks.toFixed(1)} 周）`
-            : `public data records an estimated submission-to-publication cycle of ${(doajWeeks / 4.33).toFixed(1)} months (${doajWeeks.toFixed(1)} weeks)`)
-        : '';
-      const oaText = (() => {
-        const label = oa?.l || oa?.label || '';
-        const isOa = ir.cas_oa || r.cas_oa || r.doaj || ir.doaj || label === 'gold_apc' || label === 'diamond';
-        if (lang.startsWith('zh')) {
-          if (label === 'hybrid') return '本刊为 Hybrid 期刊，可选择开放获取发表';
-          if (isOa) return '本刊是一本 OA 开放访问期刊';
-          return '';
-        }
-        if (label === 'hybrid') return 'This is a hybrid journal with optional open access publishing';
-        return isOa ? 'This is an open access journal' : 'This journal is not currently marked as fully open access';
-      })();
-      const cnkxTiers = Array.isArray(ir.cnkx || r.cnkx)
-        ? (ir.cnkx || r.cnkx).map(x => x.tier).filter(Boolean)
-        : [];
-      const tierText = cnkxTiers.length ? `，并入选中国科协高质量科技期刊分级目录（${[...new Set(cnkxTiers)].join(' / ')}）` : '';
-      const topicList = (oa && Array.isArray(oa.tp) && oa.tp.length)
-        ? oa.tp.slice(0, 4)
-        : cats;
-      const zhSentence = (s) => {
-        const text = String(s || '').replace(/\s+/g, ' ').replace(/[，、；：:,.。\s]+$/, '');
-        return text ? `${text}。` : '';
-      };
-      const fallbackText = lang.startsWith('zh')
-        ? (isDomesticJournal
-          ? [
-              zhSentence(`${plainName} 是一份中文学术期刊${domesticFieldText ? `，主要关注${domesticFieldText}等方向` : ''}${r.org || r.sponsor ? `，由${r.org || r.sponsor}主办` : r.publisher ? `，出版单位为${r.publisher}` : ''}`),
-              zhSentence(`${r.cn_code ? `国内统一连续出版物号：${r.cn_code}` : ''}${issn ? `${r.cn_code ? '，' : ''}ISSN：${issn}` : ''}${r.frequency ? `${(r.cn_code || issn) ? '，' : ''}出版周期：${r.frequency}` : ''}`),
-              zhSentence(`${crossBadges ? '该刊已收录于本站标注的相关中文核心/评价目录' : ''}${r.tier ? `${crossBadges ? '，' : ''}科协分级：${tn(r.tier, 'tier')}` : ''}`),
-              zhSentence(`${oaText}${apcText ? `${oaText ? '，' : ''}${apcText}` : ''}${reviewText ? `${(oaText || apcText) ? '，' : ''}${reviewText}` : ''}`),
-            ].filter(Boolean).join(' ')
-          : [
-              zhSentence(`${plainName} 是一份国际学术期刊${major || plainCats ? `，主要面向${major || plainCats}等研究方向` : ''}，为相关研究成果提供发表平台`),
-              zhSentence(`${cnName ? `该期刊中文名称：${cnName}` : ''}${abbr ? `${cnName ? '，' : ''}国际简称：${abbr}` : ''}${ir.cas_zone ? `${(cnName || abbr) ? '，' : ''}在中科院分区表 2025 年版中大类学科位于 ${ir.cas_zone} 区${ir.cas_top ? '，为 Top 期刊' : ''}` : ''}${ir.if_quartile ? `，JCR 分区为 ${String(ir.if_quartile).toUpperCase()}` : ''}${ir.if_2024 != null ? `，影响因子 IF ${ir.if_2024}` : ''}${ir.if_rank ? `，IF 排名 ${ir.if_rank}` : ''}${tierText}`),
-              zhSentence(`${oaText}${apcText ? `${oaText ? '，' : ''}${apcText}` : ''}${reviewText ? `${(oaText || apcText) ? '，' : ''}${reviewText}` : ''}`),
-              zhSentence(`${topicList.length ? `期刊聚焦 ${topicList.join('、')} 等方向` : ''}${indexText ? `${topicList.length ? '，' : ''}目前收录于 ${indexText}` : ''}`),
-            ].filter(Boolean).join(' '))
-        : [
-            `${plainName} is an international scholarly journal for researchers in ${major || plainCats || 'related fields'}, providing a venue for new research and academic exchange.`,
-            `${abbr ? `Abbreviation: ${abbr}. ` : ''}${ir.cas_zone ? `CAS 2025 major tier: ${ir.cas_zone}${ir.cas_top ? ' · Top' : ''}. ` : ''}${ir.if_quartile ? `JCR ${String(ir.if_quartile).toUpperCase()}. ` : ''}${ir.if_2024 != null ? `IF ${ir.if_2024}. ` : ''}${ir.if_rank ? `IF rank ${ir.if_rank}.` : ''}`,
-            `${oaText}${apcText ? `; ${apcText}` : ''}${reviewText ? `; ${reviewText}` : ''}.`,
-            `${topicList.length ? `Focus areas include ${topicList.join(', ')}. ` : ''}${indexText ? `Indexed in ${indexText}.` : ''}`,
-          ].filter(Boolean).join(' ');
-      const coverRec = lookupCover(ir.issn || ir.eissn ? ir : r);
-      const coverUrl = r.cover_url || ir.cover_url || r.official_cover_url || ir.official_cover_url || coverRec?.u || '';
-      const fallbackCover = `<div class="journal-cover-fallback" aria-hidden="true">
-             <div class="journal-cover-mark">${escape((title || 'J').split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase())}</div>
-             <div class="journal-cover-name">${escape(title)}</div>
-             ${r.publisher ? `<div class="journal-cover-pub">${escape(r.publisher)}</div>` : ''}
-           </div>`;
-      const cover = coverUrl
-        ? `<img class="journal-cover-img" src="${escape(coverUrl)}" alt="${escape(title)} cover" loading="lazy" referrerpolicy="no-referrer" onerror="this.closest('.journal-cover').classList.add('cover-load-failed');this.remove()" />${fallbackCover}`
-        : fallbackCover;
-      return `<div class="journal-overview">
-        <div class="journal-overview-copy">
-          <h4>${officialText ? T('官方介绍','Official Description') : T('期刊概览','Journal Overview')}</h4>
-          <p>${officialText ? escape(officialText) : escape(fallbackText)}</p>
-        </div>
-        <div class="journal-cover ${coverUrl ? 'has-remote-cover' : ''}">${cover}</div>
-      </div>`;
-    })();
-
-    const cnkiHTML = (() => {
-      if (src !== 'cnki_major' && !(r.source || '').includes('CNKI')) return '';
-      const categories = Array.isArray(r.categories) && r.categories.length
-        ? r.categories
-        : (r.category ? [r.category] : []);
-      const majors = Array.isArray(r.major_categories) ? r.major_categories.filter(Boolean) : [];
-      const tags = Array.isArray(r.tags)
-        ? r.tags
-        : (typeof r.tags === 'string' ? r.tags.split(/[|;；,，]/).map(s => s.trim()).filter(Boolean) : []);
-      const rows = [
-        r.sponsor ? [T('主办单位','Sponsor'), r.sponsor] : null,
-        r.cn_code ? ['CN', r.cn_code] : null,
-        r.issn ? ['ISSN', r.issn] : null,
-        r.compound_if ? [T('复合影响因子','Compound IF'), r.compound_if] : null,
-        r.comprehensive_if ? [T('综合影响因子','Comprehensive IF'), r.comprehensive_if] : null,
-        r.category_code ? [T('CNKI 分类号','CNKI Category Code'), r.category_code] : null,
-      ].filter(Boolean);
-      if (!rows.length && !categories.length && !majors.length && !tags.length && !r.detail_url) return '';
-      return `<div class="drawer-section cnki-section">
-        <h4>${T('CNKI 中文期刊信息','CNKI Journal Information')}</h4>
-        ${rows.map(([k,v]) => `<div class="meta-row"><div class="meta-k">${escape(k)}</div><div class="meta-v">${escape(v)}</div></div>`).join('')}
-        ${categories.length ? `<div class="cat-sub-label">${T('细分学科','Subject Categories')}</div><div class="cat-chips">${categories.map(c => `<span class="cat-chip">${escape(c)}</span>`).join('')}</div>` : ''}
-        ${majors.length ? `<div class="cat-sub-label">${T('大类','Major Categories')}</div><div class="cat-chips">${majors.map(c => `<span class="cat-chip">${escape(c)}</span>`).join('')}</div>` : ''}
-        ${tags.length ? `<div class="cat-sub-label">${T('标签','Tags')}</div><div class="cat-chips">${tags.map(c => `<span class="cat-chip">${escape(c)}</span>`).join('')}</div>` : ''}
-        ${r.detail_url ? `<div class="meta-row"><div class="meta-k">CNKI</div><div class="meta-v"><a href="${escape(r.detail_url)}" target="_blank" rel="noopener">${T('打开 CNKI 详情页','Open CNKI detail page')}</a></div></div>` : ''}
-      </div>`;
-    })();
 
     // 解锁源收录状态（高校自编目录 2023，已解锁才显示）
     const lockedSrcHTML = (() => {
@@ -4770,48 +3029,23 @@
     // 核心指标数值 — 只放真正的"数值"，分区/Q 用徽章呈现，避免重复
     // 重复信息已删：JCR Q（→ badges）、CAS 大类区（→ casHTML）、Emerging 2026 区（→ xrHTML）
     const stats = [];
-    if (ir.if_2024 != null) stats.push([T('影响因子 / IF','Impact Factor'), ir.if_2024]);
-    if (ir.if_rank) stats.push([T('IF 排名','IF Rank'), ir.if_rank]);
+    if (currentIfValue(ir) != null) stats.push({ interactive: 'if', label: T('影响因子 / IF','Impact Factor'), value: currentIfText(ir) });
+    if (ir.if_rank) stats.push({ label: T('IF 排名','IF Rank'), value: ir.if_rank });
     // 审稿周期 — 从嵌入的 DOAJ review_weeks 读取
     {
       const weeks = parseFloat(r.doaj?.review_weeks || ir.doaj?.review_weeks);
       if (weeks > 0) {
         const m = (weeks / 4.33).toFixed(1);
-        stats.push([T('审稿周期','Review Cycle'), m + T(' 个月',' months'), T('投稿→出版 (DOAJ)','Submission→pub. (DOAJ)')]);
+        stats.push({ label: T('审稿周期','Review Cycle'), value: m + T(' 个月',' months'), sub: T('投稿→出版 (DOAJ)','Submission→pub. (DOAJ)') });
       }
     }
-    // 已发表论文数量（来自 OpenAlex）
-    {
-      const oaWorks = oa?.w || oa?.works_count;
-      if (oaWorks) {
-        stats.push([T('已发表论文','Published Works'), oaWorks.toLocaleString()]);
-      }
+    const oa = ir.oa || lookupOA(ir.issn || ir.eissn ? ir : r);
+    const oaWorks = oa?.w || oa?.works_count;
+    if (oaWorks) {
+      stats.push({ interactive: 'annual_outputs', label: T('年度发文量','Published Works'), value: Number(oaWorks).toLocaleString(), sub: T('点击查看近 10 年趋势','Tap to view 10-year trend') });
     }
-    const ifNote = ir.if_2024 != null ? T('JCR 2025发布 · 2024指标','JCR 2025 rel. · 2024 metric') : '';
-    const statsHTML = stats.length ? `<div class="stats-grid stats-count-${Math.min(stats.length, 4)}">${stats.map(([k,v,sub]) =>
-      `<div class="stat"><div class="stat-v">${escape(String(v))}</div><div class="stat-k">${k}</div>${sub?`<div class="stat-sub">${sub}</div>`:''}</div>`
-    ).join('')}</div>${ifNote ? `<div class="stats-sub">${ifNote}</div>` : ''}` : '';
-
-    const jcrHTML = (() => {
-      const q = ir.if_quartile ? String(ir.if_quartile).toUpperCase() : '';
-      const mainCat = ir.jcr_cat || (Array.isArray(ir.jcr_cats) ? ir.jcr_cats[0] : '');
-      const cats = Array.isArray(ir.jcr_cats) && ir.jcr_cats.length
-        ? ir.jcr_cats
-        : (mainCat ? [mainCat] : []);
-      if (!mainCat && !cats.length && !q && !ir.if_rank) return '';
-      const majorLine = `<div class="cat-major-line">
-        <span class="cat-major-name">${T('JCR 主类','JCR Primary Category')}</span>
-        ${mainCat ? `<span class="cat-major-zone">${escape(mainCat)}</span>` : ''}
-        ${q ? `<span class="cat-major-zone jcr-${q.toLowerCase()}">${q}</span>` : ''}
-        ${ir.if_rank ? `<span class="cat-major-rank">${T('IF 排名','IF Rank')} ${escape(ir.if_rank)}</span>` : ''}
-      </div>`;
-      const items = cats.map(c => `<li>${escape(c)}${q ? ` · <b>${q}</b>` : ''}</li>`).join('');
-      return `<div class="drawer-section jcr-section">
-        <h4>${T('JCR 2025 学科分区','JCR 2025 Subject Categories')}</h4>
-        ${majorLine}
-        ${items ? `<div class="cat-sub-label">${T('小类 / 学科分类','Subject Categories')}</div><ul class="cas-sub-list">${items}</ul>` : ''}
-      </div>`;
-    })();
+    const ifNote = currentIfValue(ir) != null ? T('JCR 2026 发布 · 2025 指标','JCR 2026 release · 2025 metric') : '';
+    const statsHTML = stats.length ? `<div class="stats-grid">${stats.map(statCardHtml).join('')}</div>${ifNote ? `<div class="stats-sub">${ifNote}</div>` : ''}<div class="trend-modal" id="trend-modal" hidden><div class="trend-modal-card"><button class="trend-close" type="button" aria-label="Close">×</button><div id="trend-modal-content"></div></div></div>` : '';
 
     // WoS 学科分类
     const wosHTML = (Array.isArray(ir.wos_categories) && ir.wos_categories.length)
@@ -4904,27 +3138,6 @@
          </div>`
       : '';
 
-    const indiaHit = src === 'in' ? { ...r, journal_title: r.journal_title || r.name } : lookupIndia(ir.issn || ir.eissn ? ir : r);
-    const indiaHTML = indiaHit ? `<div class="drawer-section india-detail-section">
-      <h4>${T('印度 UGC-CARE 收录','India UGC-CARE Listing')}</h4>
-      <div class="meta-row"><div class="meta-k">${T('状态','Status')}</div><div class="meta-v"><span class="domsrc-pill ds-india">UGC-CARE listed</span></div></div>
-      ${indiaHit.subject ? `<div class="meta-row"><div class="meta-k">${T('学科','Subject')}</div><div class="meta-v">${escape(indiaHit.subject)}</div></div>` : ''}
-      ${indiaHit.publisher ? `<div class="meta-row"><div class="meta-k">${T('出版社','Publisher')}</div><div class="meta-v">${escape(indiaHit.publisher)}</div></div>` : ''}
-      ${indiaHit.source_url ? `<div class="meta-row"><div class="meta-k">${T('来源','Source')}</div><div class="meta-v"><a href="${escape(indiaHit.source_url)}" target="_blank" rel="noopener nofollow">UGC-CARE PDF source</a></div></div>` : ''}
-      <div class="muted-cell" style="margin-top:6px;font-size:12px;line-height:1.6">${t('india_source_note')}</div>
-    </div>` : '';
-
-    const malaysiaHTML = src === 'my' ? `<div class="drawer-section malaysia-detail-section">
-      <h4>${T('马来西亚 / ERA 来源','Malaysia / ERA Source')}</h4>
-      <div class="meta-row"><div class="meta-k">${T('来源','Source')}</div><div class="meta-v"><span class="domsrc-pill ds-malaysia">${escape(r.source || 'MyCite / ERA')}</span></div></div>
-      ${r.publisher ? `<div class="meta-row"><div class="meta-k">${T('出版社','Publisher')}</div><div class="meta-v">${escape(r.publisher)}</div></div>` : ''}
-      ${r.indexed_year ? `<div class="meta-row"><div class="meta-k">${T('MyCite 年份','MyCite Year')}</div><div class="meta-v">${escape(r.indexed_year)}</div></div>` : ''}
-      ${r.era_year ? `<div class="meta-row"><div class="meta-k">ERA</div><div class="meta-v">${escape(r.era_year)}</div></div>` : ''}
-      ${r.for_subjects ? `<div class="meta-row"><div class="meta-k">${T('FoR 学科','FoR Subjects')}</div><div class="meta-v">${escape(r.for_subjects)}</div></div>` : ''}
-      ${malaysia?.official_pdf?.url ? `<div class="meta-row"><div class="meta-k">MyCite PDF</div><div class="meta-v"><a href="${escape(malaysia.official_pdf.url)}" target="_blank" rel="noopener nofollow">MyCite 2025 RASMI</a></div></div>` : ''}
-      <div class="muted-cell" style="margin-top:6px;font-size:12px;line-height:1.6">${t('malaysia_source_note')}</div>
-    </div>` : '';
-
     // 警示刊
     const warnHTML = (() => {
       const w = ir.warning;
@@ -4976,7 +3189,6 @@
       const apcText = (ir.doaj?.apc === 'Yes' && doajFee) ? doajFee : (ir.doaj?.apc === 'Yes' ? T('有 APC','Has APC') : '');
       const doajBadge = doaj ? `<span class="oa-chip oa-doaj">&check; ${T('收录 DOAJ','In DOAJ')}</span>` : '';
       const isoaBadge = isoa ? '<span class="oa-chip oa-isoa">Open Access</span>' : '';
-      const freeBadge = r.free ? `<span class="oa-chip oa-free" title="${T('提供 OA 发表选项（含 Diamond/Gold/Hybrid）','Offers OA publishing option (Diamond/Gold/Hybrid)')}">${T('✓ 免费发表','✓ FREE TO PUBLISH')}</span>` : '';
       const rows = [];
       if (homepage) rows.push([T('官网','Website'), `<a href="${escape(homepage)}" target="_blank" rel="noopener nofollow">${escape(homepage.replace(/^https?:\/\//,'').replace(/\/$/,''))}</a>`]);
       if (apcText) rows.push([T('版面费 (APC)','APC'), escape(apcText)]);
@@ -4986,7 +3198,7 @@
         <h4>${T('开放获取 / 版面费','Open Access / APC')}</h4>
         <div class="oa-head">
           <span class="oa-pill ${L.cls}">${L.text}</span>
-          ${doajBadge}${isoaBadge}${freeBadge}
+          ${doajBadge}${isoaBadge}
         </div>
         ${L.desc ? `<div class="oa-desc muted">${L.desc}</div>` : ''}
         ${rows.length ? `<div class="oa-rows">${rows.map(([k,v]) =>
@@ -5017,22 +3229,6 @@
       </div>
     </div>` : '';
 
-    // PubMed 数据库收录
-    const pubmedHTML = r.pubmed ? `<div class="drawer-section">
-      <h4>${T('PubMed 数据库收录','Included in PubMed')}</h4>
-      <div class="muted-cell" style="font-size:12px">
-        ${T('期刊被 PubMed 数据库收录，包含 NLM 精选索引的引文数据。','Journal is included in PubMed, the NLM citation database.')}
-      </div>
-    </div>` : '';
-
-    // PMC 全文存档
-    const pmcHTML = r.pmc ? `<div class="drawer-section">
-      <h4>${T('PMC 全文存档','Archived in PubMed Central')}</h4>
-      <div class="muted-cell" style="font-size:12px">
-        ${T('期刊全文存储在 PubMed Central（PMC），NLM 的免费数字档案库。','Full text stored in PubMed Central (PMC), NLM\'s free digital archive.')}
-      </div>
-    </div>` : '';
-
     const doajHTML = ir.doaj ? `<div class="drawer-section">
       <h4>${T('DOAJ 开放获取期刊目录','DOAJ — Directory of Open Access Journals')}</h4>
       <div class="meta-row"><div class="meta-k">${T('许可证','License')}</div><div class="meta-v">${escape(ir.doaj.lic || ir.doaj.license || '—')}</div></div>
@@ -5050,71 +3246,51 @@
     const on = isFav(r);
     body.innerHTML = `
       <div class="drawer-hero">
-        <div class="drawer-titlebar">
-          <div class="drawer-title-main">
-            <div class="drawer-title-line">
-              <div class="drawer-title">${escape(title.replace(/\*$/,''))}</div>
-              ${titleFeatureBadges ? `<div class="drawer-title-badges">${titleFeatureBadges}</div>` : ''}
-            </div>
-            ${sub ? `<div class="drawer-sub">${escape(sub)}</div>` : ''}
-          </div>
-          <div class="drawer-actions">
-            <div class="rating-pill" data-rating-key="${escape(favId(r))}" title="${T('综合推荐评分','Overall rating')}">
-              <span class="rating-avg" id="rating-avg">—</span><span class="rating-avg-suffix">/ 5</span>
-              <span class="rating-avg-stars" id="rating-avg-stars"></span>
-              <span class="rating-count muted-cell" id="rating-count">${T('暂无评分','No ratings yet')}</span>
-            </div>
-            <button class="big-btn ${on?'ghost':'primary'}" id="drawer-fav-big">${on ? T('★ 已收藏（点击取消）','★ Favorited (click to remove)') : T('☆ 加入收藏','☆ Add to favorites')}</button>
-            ${favLists.length > 1 ? `<div class="drawer-fav-select">
-              <span class="muted-cell" style="font-size:12px">${T('保存到：','Save to:')}</span>
-              <select id="drawer-fav-list-select">${favLists.map(l => `<option value="${escape(l.id)}" ${l.id===activeListId?'selected':''}>${escape(favListDisplayName(l))} (${l.ids.length})</option>`).join('')}</select>
-            </div>` : ''}
-          </div>
+        <div class="drawer-title">${escape(title.replace(/\*$/,''))}</div>
+        ${sub ? `<div class="drawer-sub">${escape(sub)}</div>` : ''}
+        <div class="drawer-issn">
+          ${issn ? 'ISSN ' + escape(issn) : ''}${eissn ? ' · eISSN ' + escape(eissn) : ''}
+          <span class="drawer-views" id="drawer-views" data-fid="${escape(favId(r))}"></span>
         </div>
-	        <div class="drawer-issn">
-	          ${issn ? 'ISSN ' + escape(issn) : ''}${eissn ? ' · eISSN ' + escape(eissn) : ''}
-	          <span class="drawer-views" id="drawer-views" data-fid="${escape(favId(r))}"></span>
-	        </div>
-	        ${journalIntroHTML}
-	        ${(drawerCoverageBadges || drawerLevelBadges || tierBadge || crossBadges || drawerAccessBadges || drawerRiskBadges) ? `<div class="hero-badge-grid">
-	          ${drawerCoverageBadges ? `<div class="drawer-section badges-section"><h4>${T('收录','Indexed')}</h4><div class="badges">${drawerCoverageBadges}</div></div>` : ''}
-	          ${(drawerLevelBadges || tierBadge || crossBadges) ? `<div class="drawer-section badges-section"><h4>${T('等级','Ranking')}</h4><div class="badges">${drawerLevelBadges}${tierBadge}${crossBadges}</div></div>` : ''}
-	          ${drawerAccessBadges ? `<div class="drawer-section badges-section"><h4>${T('开放费用','Access & Fees')}</h4><div class="badges">${drawerAccessBadges}</div></div>` : ''}
-	          ${drawerRiskBadges ? `<div class="drawer-section badges-section"><h4>${T('风险提示','Caution')}</h4><div class="badges">${drawerRiskBadges}</div></div>` : ''}
-	        </div>` : ''}
-	      </div>
-	      ${statsHTML}
-	      <div class="journal-detail-masonry">
-	        ${jcrHTML}
-	        ${casHTML}
-	        ${xrHTML}
-	        ${wosHTML}
-	        ${scopusHTML}
-	        ${eiHTML}
-	        ${oajHTML}
-	        ${doajHTML}
-	        ${pubmedHTML}
-	        ${pmcHTML}
-	        ${cycleHTML}
-	        ${oaHTML}
-	        ${topicsHTML}
-		        ${warnHTML}
-		        ${cnkiHTML}
-        ${metaHTML ? `<div class="meta-block">${metaHTML}</div>` : ''}
-        ${cnkxHTML}
-        ${indiaHTML}
-        ${malaysiaHTML}
-        ${lockedSrcHTML}
-	        <div class="drawer-section rating-section" data-rating-key="${escape(favId(r))}">
-	          <h4>${T('我的评分','My Rating')}</h4>
-	          <div class="rating-my-wrap">
-	            <div class="rating-stars-input" id="rating-input" role="radiogroup" aria-label="${T('评分','Rating')}"></div>
-	            <div class="rating-my-hint muted-cell" id="rating-hint">${T('登录后可打分 · 半星可评 · 可随时修改','Sign in to rate · half-stars supported · editable anytime')}</div>
-	          </div>
-	        </div>
-	      </div>
-	      ${renderRelatedHTML(r)}
-	    `;
+        ${drawerIndexBadges ? `<div class="drawer-section badges-section"><h4>${T('索引收录','Index Coverage')}</h4><div class="badges">${drawerIndexBadges}</div></div>` : ''}
+        ${(drawerRankBadges || tierBadge || crossBadges) ? `<div class="drawer-section badges-section"><h4>${T('分区等级','Tier & Ranking')}</h4><div class="badges">${drawerRankBadges}${tierBadge}${crossBadges}</div></div>` : ''}
+        <div class="drawer-actions">
+          <div class="rating-pill" data-rating-key="${escape(favId(r))}" title="${T('综合推荐评分','Overall rating')}">
+            <span class="rating-avg" id="rating-avg">—</span><span class="rating-avg-suffix">/ 5</span>
+            <span class="rating-avg-stars" id="rating-avg-stars"></span>
+            <span class="rating-count muted-cell" id="rating-count">${T('暂无评分','No ratings yet')}</span>
+          </div>
+          <button class="big-btn ${on?'ghost':'primary'}" id="drawer-fav-big">${on ? T('★ 已收藏（点击取消）','★ Favorited (click to remove)') : T('☆ 加入收藏','☆ Add to favorites')}</button>
+          ${favLists.length > 1 ? `<div class="drawer-fav-select">
+            <span class="muted-cell" style="font-size:12px">${T('保存到：','Save to:')}</span>
+            <select id="drawer-fav-list-select">${favLists.map(l => `<option value="${escape(l.id)}" ${l.id===activeListId?'selected':''}>${escape(favListDisplayName(l))} (${l.ids.length})</option>`).join('')}</select>
+          </div>` : ''}
+        </div>
+      </div>
+      ${statsHTML}
+      ${casHTML}
+      ${xrHTML}
+      ${wosHTML}
+      ${scopusHTML}
+      ${eiHTML}
+      ${oajHTML}
+      ${doajHTML}
+      ${cycleHTML}
+      ${oaHTML}
+      ${topicsHTML}
+      ${warnHTML}
+      ${metaHTML ? `<div class="meta-block">${metaHTML}</div>` : ''}
+      ${cnkxHTML}
+      ${lockedSrcHTML}
+      <div class="drawer-section rating-section" data-rating-key="${escape(favId(r))}">
+        <h4>${T('我的评分','My Rating')}</h4>
+        <div class="rating-my-wrap">
+          <div class="rating-stars-input" id="rating-input" role="radiogroup" aria-label="${T('评分','Rating')}"></div>
+          <div class="rating-my-hint muted-cell" id="rating-hint">${T('登录后可打分 · 半星可评 · 可随时修改','Sign in to rate · half-stars supported · editable anytime')}</div>
+        </div>
+      </div>
+      ${renderRelatedHTML(r)}
+    `;
     // init rating widget
     setTimeout(() => initRatingWidget(favId(r)), 0);
     // related journal cards → click to open that journal's drawer
@@ -5124,7 +3300,37 @@
         const rec = journals.find(j => favId(j) === fid) || favsData[fid];
         if (rec) {
           if (_currentDrawerRec) _drawerStack.push(_currentDrawerRec);
-          openDrawer(rec, { pageMode: document.body.classList.contains('journal-route'), source: 'related' });
+          openDrawer(rec);
+        }
+      });
+    });
+    const trendModal = body.querySelector('#trend-modal');
+    const trendContent = body.querySelector('#trend-modal-content');
+    const closeTrendModal = () => {
+      if (!trendModal) return;
+      trendModal.hidden = true;
+      if (trendContent) trendContent.innerHTML = '';
+    };
+    trendModal?.querySelector('.trend-close')?.addEventListener('click', closeTrendModal);
+    trendModal?.addEventListener('click', (ev) => {
+      if (ev.target === trendModal) closeTrendModal();
+    });
+    body.querySelectorAll('[data-trend-kind]').forEach(card => {
+      card.addEventListener('click', async () => {
+        const kind = card.dataset.trendKind;
+        if (!trendModal || !trendContent) return;
+        if (kind === 'if') {
+          const points = ifHistoryPoints(ir);
+          if (!points.length) return;
+          trendContent.innerHTML = `<h4>${T('影响因子历年变化','Impact Factor Trend')}</h4>${renderTrendSvg(points, { title: 'Impact factor trend' })}`;
+          trendModal.hidden = false;
+          return;
+        }
+        if (kind === 'annual_outputs') {
+          const points = (await loadAnnualOutputsSeries(ir.issn || ir.eissn ? ir : r)).slice(-10);
+          if (!points.length) return;
+          trendContent.innerHTML = `<h4>${T('年度发文量变化','Annual Published Works')}</h4>${renderTrendSvg(points, { title: 'Annual published works' })}`;
+          trendModal.hidden = false;
         }
       });
     });
@@ -5147,7 +3353,7 @@
           updateFavCount();
           if (typeof syncFavs === 'function') syncFavs();
         }
-        openDrawer(r, { pageMode: document.body.classList.contains('journal-route') }); // refresh state
+        openDrawer(r); // refresh drawer state
         // 同步主表星号
         document.querySelectorAll(`.fav-star[data-fav="${fid}"]`).forEach(btn => {
           const now = isFav(r);
@@ -5161,7 +3367,7 @@
       // If user selected a different list in dropdown, switch first
       if (drawerListSel && drawerListSel.value !== activeListId) switchList(drawerListSel.value);
       toggleFav(r, { src });
-      openDrawer(r, { pageMode: document.body.classList.contains('journal-route') }); // 刷新状态
+      openDrawer(r); // 刷新状态
       document.querySelectorAll(`.fav-star[data-fav="${favId(r)}"]`).forEach(btn => {
         const now = isFav(r);
         btn.classList.toggle('on', now);
@@ -5172,7 +3378,7 @@
     // 渲染头部收藏按钮状态
     const hdrFav = $('#drawer-fav');
     if (hdrFav) {
-      hdrFav.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.7l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3.7z"/></svg>';
+      hdrFav.textContent = on ? '★' : '☆';
       hdrFav.classList.toggle('on', on);
       hdrFav.onclick = () => $('#drawer-fav-big')?.click();
     }
@@ -5182,45 +3388,33 @@
       const SRC = {
         int: T('SCI / SSCI 国际期刊','International SCI / SSCI'), cssci: T('CSSCI 来源期刊','CSSCI Source Journals'), cssci_ext: T('CSSCI 扩展版','CSSCI Extended'),
         pku: T('北大核心','PKU Core'), cnkx: T('中国科协高质量目录','CAST Tiered Directory'), ccft: T('CCF 推荐中文科技期刊','CCF Recommended Chinese Journals'),
-        zju: T('浙江大学 2024','ZJU 2024'), school_a: T('高校自编目录 2023','In-house School Directory 2023'), nsfc_mgmt: T('国自然管理科学部','NSFC Management'), in: 'India UGC-CARE',
+        zju: T('浙江大学 2024','ZJU 2024'), school_a: T('高校自编目录 2023','In-house School Directory 2023'),
       };
       kicker.textContent = SRC[src] || T('期刊详情','Journal Details');
     }
 
     drawer.classList.add('open');
-    drawer.classList.toggle('journal-page', pageMode);
-    if (pageMode) {
-      scrim?.classList.remove('on');
-      if (scrim) scrim.hidden = true;
-    } else {
-      scrim?.classList.add('on');
-      scrim && (scrim.hidden = false);
-    }
+    scrim?.classList.add('on');
+    scrim && (scrim.hidden = false);
     drawerOpen = true;
-    if (pageMode) {
-      const nextPath = journalPublicPath(r);
-      if (location.pathname !== nextPath) {
-        try { history.pushState({ journal: favId(r) }, '', nextPath); } catch (_) {}
-      }
-      updateJournalSeo(r);
-    } else if (!opts || !opts.fromHash) {
+    // 同步 URL hash（仅当非来自 hash 路由时），便于分享
+    if (!opts || !opts.fromHash) {
       const id = favId(r);
       const newHash = '#j/' + encodeURIComponent(id);
       if (location.hash !== newHash) {
         try { history.replaceState(null, '', newHash); } catch (_) { location.hash = newHash; }
       }
     }
-    document.body.style.overflow = pageMode ? '' : 'hidden';
+    document.body.style.overflow = 'hidden';
   }
   function closeDrawer(skipHashClear) {
     if (!drawerOpen) return;
-    $('#j-drawer')?.classList.remove('open', 'journal-page');
+    $('#j-drawer')?.classList.remove('open');
     const scrim = $('#drawer-scrim');
     scrim?.classList.remove('on');
     if (scrim) scrim.hidden = true;
     drawerOpen = false;
     _currentDrawerRec = null;
-    document.body.classList.remove('journal-route');
     document.body.style.overflow = '';
     // 清掉 #j/<id> hash（避免回到列表后浏览器仍显示旧 hash）
     if (!skipHashClear && /^#j\//.test(location.hash || '')) {
@@ -5229,238 +3423,11 @@
     }
   }
 
-  function updateJournalSeo(r) {
-    const name = titleCase((r.name || r.cn_name || 'Journal').replace(/\*$/, ''));
-    const bits = [name];
-    if (r.if_2024 != null) bits.push(`IF ${r.if_2024}`);
-    if (r.cas_zone) bits.push(`CAS ${r.cas_zone}${T('区','')}`);
-    if (r.if_quartile) bits.push(`JCR ${String(r.if_quartile).toUpperCase()}`);
-    bits.push('AILatest Journal');
-    const title = bits.join(' | ');
-    document.title = title;
-    const descParts = [name];
-    if (r.publisher) descParts.push(r.publisher);
-    if (r.issn) descParts.push(`ISSN ${r.issn}`);
-    if (Array.isArray(r.indices) && r.indices.length) descParts.push(r.indices.join('/'));
-    const descText = `${descParts.join(' · ')}. 查看影响因子、中科院分区、JCR 分区、索引收录、开放获取、版面费与相关期刊推荐。`;
-    const desc = document.querySelector('meta[name="description"]');
-    if (desc) desc.setAttribute('content', descText);
-    const canonical = document.querySelector('link[rel="canonical"]');
-    if (canonical) canonical.setAttribute('href', 'https://journal.ailatest.org' + journalPublicPath(r));
-    const ogTitle = document.querySelector('meta[property="og:title"]');
-    if (ogTitle) ogTitle.setAttribute('content', title);
-    const ogDesc = document.querySelector('meta[property="og:description"]');
-    if (ogDesc) ogDesc.setAttribute('content', descText);
-    const ogUrl = document.querySelector('meta[property="og:url"]');
-    if (ogUrl) ogUrl.setAttribute('content', 'https://journal.ailatest.org' + journalPublicPath(r));
-  }
-
-  function renderJournalRoutePage() {
-    const slug = journalPathSlug();
-    if (!slug) return false;
-    const rec = findRecByFid(slug);
-    if (!rec) {
-      document.body.classList.add('journal-route');
-      const drawer = $('#j-drawer'), body = $('#drawer-body'), scrim = $('#drawer-scrim');
-      if (drawer && body) {
-        drawer.classList.add('open', 'journal-page');
-        scrim?.classList.remove('on');
-        if (scrim) scrim.hidden = true;
-        body.innerHTML = `<div class="journal-not-found">
-          <div class="drawer-kicker">${T('期刊详情','Journal Details')}</div>
-          <h1>${T('没有找到这个期刊','Journal not found')}</h1>
-          <p>${T('这个链接可能已过期，或者该期刊不在当前数据库中。','This link may be stale, or the journal is not in the current database.')}</p>
-          <a class="big-btn primary" href="/">${T('返回首页','Back to home')}</a>
-        </div>`;
-      }
-      return true;
-    }
-    openDrawer(rec, { pageMode: true, fromPath: true });
-    return true;
-  }
-
-  async function updatePublicPulse() {
-    const box = document.getElementById('public-pulse');
-    if (!box) return;
-    try {
-      const visitorId = getAnalyticsId('ailatest.analytics.visitor', localStorage);
-      const url = `${API_BASE}/analytics/public-summary?site=${encodeURIComponent(location.hostname)}&visitor_id=${encodeURIComponent(visitorId)}`;
-      const data = await fetch(url).then(r => r.json()).catch(() => null);
-      if (!data || !data.ok) return;
-      const rankEl = document.getElementById('visitor-rank-line');
-      const topEl = document.getElementById('top-journal-line');
-      if (rankEl && data.visitor_rank) {
-        rankEl.textContent = T(`自建统计第 ${Number(data.visitor_rank).toLocaleString()} 位访客`, `First-party visitor #${Number(data.visitor_rank).toLocaleString()}`);
-      }
-      const top = (data.top_journals || []).slice(0, 3).map(item => {
-        const rec = findRecByFid(item.journal_key) || journals.find(r => favId(r) === item.journal_key);
-        const name = rec ? (rec.name || rec.cn_name || rec.journal_title || item.journal_key) : item.journal_key;
-        const href = rec ? journalPublicPath(rec) : `/journal/${encodeURIComponent(item.journal_key)}/`;
-        const fid = rec ? favId(rec) : item.journal_key;
-        return `<a href="${escape(href)}" data-pulse-fid="${escape(fid)}">${escape(titleCase(name))}</a>`;
-      }).filter(Boolean);
-      if (topEl) {
-        topEl.innerHTML = top.length
-          ? `${T('最热期刊', 'Hottest journals')}: ${top.join(' / ')}`
-          : '';
-      }
-      box.hidden = !top.length;
-      box.querySelectorAll('[data-pulse-fid]').forEach(link => {
-        link.addEventListener('click', (e) => {
-          const fid = link.getAttribute('data-pulse-fid') || '';
-          const rec = findRecByFid(fid) || journals.find(r => favId(r) === fid);
-          if (!rec) return;
-          e.preventDefault();
-          openDrawer(rec, { pageMode: true, source: 'home_top_journal' });
-        });
-      });
-    } catch (_) {}
-  }
-
   // ───────── favorites tab ─────────
-  // ───────── customizable stations (bottom nav) ─────────
-  const STATIONS = [
-    { id: 'int', i18n: 'rail_int', zh: '全球', en: 'Global' },
-    { id: 'dom', i18n: 'rail_dom', zh: '中国', en: 'China' },
-    { id: 'in',  i18n: 'rail_in',  zh: '印度', en: 'India' },
-    { id: 'my',  i18n: 'rail_my',  zh: '马来西亚', en: 'Malaysia' },
-    { id: 'kr',  i18n: 'rail_kr',  zh: '韩国', en: 'Korea' },
-  ];
-  const STATION_IDS = STATIONS.map(s => s.id);
-  function getEnabledStations() {
-    try {
-      const s = JSON.parse(localStorage.getItem('ailatest.stations') || 'null');
-      if (Array.isArray(s)) {
-        const valid = s.filter(id => STATION_IDS.includes(id));
-        if (valid.length) return valid;
-      }
-    } catch (e) {}
-    return STATION_IDS.slice();
-  }
-  function setEnabledStations(ids) {
-    let valid = ids.filter(id => STATION_IDS.includes(id));
-    if (!valid.length) valid = ['int'];
-    localStorage.setItem('ailatest.stations', JSON.stringify(valid));
-    applyStations();
-    // if current tab was just hidden, fall back to the first enabled station
-    if (STATION_IDS.includes(activeTab) && !valid.includes(activeTab)
-        && window.__activateJournalTab) {
-      window.__activateJournalTab(valid[0]);
-    }
-  }
-  function applyStations() {
-    const enabled = getEnabledStations();
-    STATIONS.forEach((s) => {
-      const btn = document.querySelector(`.rail-nav-btn[data-tab="${s.id}"]`);
-      if (!btn) return;
-      const idx = enabled.indexOf(s.id);
-      if (idx === -1) {
-        btn.hidden = true;
-        btn.dataset.stationHidden = '1';
-        btn.style.order = '';
-      } else {
-        btn.hidden = false;
-        delete btn.dataset.stationHidden;
-        btn.style.order = String(idx);
-      }
-    });
-    const favBtn = document.querySelector('.rail-nav-btn[data-tab="fav"]');
-    if (favBtn) favBtn.style.order = '50';
-  }
-  function setUiLanguage(code) {
-    if (!LANG_META[code]) return;
-    lang = code;
-    localStorage.setItem('ailatest.lang', lang);
-    localizeDefaultFavListName();
-    persistFavLists(false);
-    applyI18n();
-    if (domestic) buildDomIndex(domestic);
-    const wosSel2 = $('#wos-col-filter');
-    if (wosSel2) wosSel2.__bound = false;
-    renderCatList();
-    if (activeTab === 'dom') renderDomestic();
-    else if (activeTab === 'fav') renderFav();
-    else if (activeTab === 'int') renderInt();
-    else if (activeTab === 'pick') refreshPickI18n();
-    window.dispatchEvent(new CustomEvent('ailatest:langchange'));
-    if (_currentDrawerRec) {
-      openDrawer(_currentDrawerRec, { pageMode: document.body.classList.contains('journal-route') });
-    }
-  }
-  window.__setJournalLanguage = setUiLanguage;
-  function stationSettingsHtml() {
-    const enabled = getEnabledStations();
-    const langBtns = LANG_ORDER.map(code => {
-      const meta = LANG_META[code];
-      return `<button type="button" class="settings-chip lang-choice${code === lang ? ' active' : ''}" data-lang-choice="${escape(code)}">${meta?.label || escape(code)}</button>`;
-    }).join('');
-    const items = STATIONS.map(s => {
-      const on = enabled.includes(s.id);
-      const label = t(s.i18n) || T(s.zh, s.en);
-      return `<label class="station-opt${on ? ' on' : ''}">
-        <input type="checkbox" data-station="${s.id}"${on ? ' checked' : ''}>
-        <span>${escape(label)}</span></label>`;
-    }).join('');
-    return `<details class="station-settings">
-      <summary class="station-settings-head">${T('我的设置','My settings')}<small>${T('语言与底部导航','Language and bottom nav')}</small></summary>
-      <div class="my-settings-block">
-        <div class="my-settings-label">${T('语言','Language')}</div>
-        <div class="settings-chip-row">${langBtns}</div>
-      </div>
-      <div class="my-settings-block">
-        <div class="my-settings-label">${T('底部导航站点','Bottom nav stations')}</div>
-        <div class="station-opts">${items}</div>
-      </div>
-    </details>`;
-  }
-  function attachStationSettingsHandlers(scope) {
-    (scope || document).querySelectorAll('.station-opts input[data-station]').forEach(cb => {
-      cb.addEventListener('change', () => {
-        const root = cb.closest('.station-opts');
-        const ids = [...root.querySelectorAll('input[data-station]:checked')].map(x => x.dataset.station);
-        setEnabledStations(ids);
-        cb.closest('.station-opt')?.classList.toggle('on', cb.checked);
-      });
-    });
-    (scope || document).querySelectorAll('[data-lang-choice]').forEach(btn => {
-      btn.addEventListener('click', () => setUiLanguage(btn.dataset.langChoice));
-    });
-  }
-
-  // ───────── viewed-journal history → subject-aware default ranking ─────────
-  const VIEWHIST_KEY = 'ailatest.viewhist';
-  function recordView(r) {
-    if (!r) return;
-    const cats = Array.isArray(r.wos_categories) ? r.wos_categories.filter(Boolean) : [];
-    if (!cats.length) return; // only WoS-indexed (international) journals carry subjects
-    try {
-      let h = JSON.parse(localStorage.getItem(VIEWHIST_KEY) || '[]');
-      if (!Array.isArray(h)) h = [];
-      const key = r.issn || r.name || '';
-      h = h.filter(e => e && e.k !== key);
-      h.unshift({ k: key, c: cats.slice(0, 3), t: Date.now() });
-      if (h.length > 40) h = h.slice(0, 40);
-      localStorage.setItem(VIEWHIST_KEY, JSON.stringify(h));
-    } catch (e) {}
-  }
-  function getPreferredCats(maxCats = 6) {
-    try {
-      const h = JSON.parse(localStorage.getItem(VIEWHIST_KEY) || '[]');
-      if (!Array.isArray(h) || !h.length) return null;
-      const score = {};
-      h.slice(0, 25).forEach((e, i) => {
-        const w = 1 / (1 + i * 0.15); // recency-weighted
-        (e && e.c || []).forEach(c => { score[c] = (score[c] || 0) + w; });
-      });
-      const ranked = Object.keys(score).sort((a, b) => score[b] - score[a]).slice(0, maxCats);
-      return ranked.length ? new Set(ranked) : null;
-    } catch (e) { return null; }
-  }
-
   function renderFav() {
     const box = $('#fav-content');
     const list = getActiveList();
-    if (!list) { box.innerHTML = stationSettingsHtml() + `<div class="empty" style="padding:60px 20px;text-align:center;color:var(--muted)">${T('还没有收藏。切到「国际 SCI/SSCI」点任意一行右边的 ★ 就能收藏。','No favorites yet. Go to "International" and click the ★ on any row.')}</div>`; attachStationSettingsHandlers(box); return; }
+    if (!list) { box.innerHTML = ''; return; }
 
     // list 管理栏（全列表切换 + 新建/重命名/删除）
     const bar = favLists.map(l => `
@@ -5489,9 +3456,6 @@
         const src = favsData[id]?.__src || 'cnki_major';
         const domRecs = [
           ...(domestic.cnkx?.records || []).map(r => ({ ...r, __src: 'cnkx' })),
-          ...(domestic.cscd?.records || []).map(r => ({ ...r, __src: 'cscd' })),
-          ...(domestic.cstpcd?.records || []).map(r => ({ ...r, __src: 'cstpcd' })),
-          ...(domestic.nsfc_mgmt?.records || []).map(r => ({ ...r, __src: 'nsfc_mgmt' })),
           ...(domestic.cnki_major?.records || []).map(r => ({ ...r, __src: 'cnki_major' })),
         ];
         rec = domRecs.find(r => favId(r) === id);
@@ -5509,16 +3473,15 @@
     rows = sortByIF(rows, favIfSort);
 
     if (!rows.length) {
-      box.innerHTML = stationSettingsHtml() + toolbar + `<div class="empty" style="padding:40px 0">${t('empty_fav')}</div>`;
+      box.innerHTML = toolbar + `<div class="empty" style="padding:40px 0">${t('empty_fav')}</div>`;
       attachFavBarHandlers();
-      attachStationSettingsHandlers(box);
       return;
     }
 
     // 单一有序表格 + 拖动
     const tbody = rows.map(r => renderFavRow(r)).join('');
     const hint = activeQuery ? '' : `<div class="fav-drag-hint">${T('按住','Hold')} <span class="drag-ico">⋮⋮</span> ${T('拖动排序 · 长按手机端同样支持','to drag-reorder · long-press on mobile')}</div>`;
-    box.innerHTML = stationSettingsHtml() + toolbar + hint + `
+    box.innerHTML = toolbar + hint + `
       <div class="table-wrap" style="margin-top:10px">
         <table class="journals fav-table">
           <thead><tr>
@@ -5527,7 +3490,10 @@
             <th class="col-name">${T('期刊 Title','Journal Title')}</th>
             <th class="col-badge">${T('索引 / 分区','Indices / Tier')}</th>
             <th class="col-if sortable ${favIfSort === 'desc' ? 'sort-desc' : favIfSort === 'asc' ? 'sort-asc' : ''}" data-if-sort="fav">IF <span class="sort-arrow">${favIfSort === 'asc' ? '▲' : '▼'}</span></th>
-            <th class="col-cycle">${T('审稿周期','Review')}</th>
+            <th class="col-cas">${T('中科院大类','CAS Major')}</th>
+            <th class="col-esi">ESI Subject</th>
+            <th class="col-abbr">${T('缩写 Abbr','Abbr')}</th>
+            <th class="col-issn">ISSN</th>
             <th class="col-src" style="width:90px">${T('来源','Source')}</th>
           </tr></thead>
           <tbody id="fav-tbody">${tbody}</tbody>
@@ -5536,7 +3502,6 @@
       <div class="results-count" style="margin-top:18px">${t('showing')} ${rows.length} ${t('total_items')}</div>`;
 
     attachFavBarHandlers();
-    attachStationSettingsHandlers(box);
     // 拖动排序（只在无搜索时启用，搜索时顺序与真实顺序不一致）
     if (!activeQuery && window.Sortable) {
       const tb = document.getElementById('fav-tbody');
@@ -5711,8 +3676,7 @@
   // ───────── 单本期刊分享弹窗（含卡片预览 + 下载图片 + 复制链接） ─────────
   function showJournalShareModal(r) {
     const id = favId(r);
-    // 分享直链到期刊详情页（/journal/<slug>/），打开即是信息页，不再先进首页
-    const url = `${location.origin}${journalPublicPath(r)}`;
+    const url = `${location.origin}${location.pathname}#j/${encodeURIComponent(id)}`;
     const ir = r.__src === 'int' ? r : (lookupInt(r) || r);
     const title = titleCase((r.name || r.cn_name || '').replace(/\*$/,''));
     const cn = r.cn_name && r.cn_name !== title ? r.cn_name : '';
@@ -5729,17 +3693,15 @@
 
     // 关键指标 + 元信息
     const stats = [];
-    if (ir.if_2024 != null) stats.push([T('影响因子','Impact Factor'), ir.if_2024]);
+    if (currentIfValue(ir) != null) stats.push([T('影响因子','Impact Factor'), currentIfText(ir)]);
     if (ir.if_rank) stats.push([T('IF 排名','IF Rank'), ir.if_rank]);
-    const ifNote = ir.if_2024 != null ? T('JCR 2025发布 · 2024指标','JCR 2025 · 2024 IF') : '';
+    const ifNote = currentIfValue(ir) != null ? T('JCR 2026 发布 · 2025 指标','JCR 2026 · 2025 metric') : '';
     const statsHtml = stats.length ? `<div class="jcard-stats">${stats.map(([k,v,sub]) => `<div class="jcard-stat"><div class="jcard-stat-v">${v}</div><div class="jcard-stat-k">${k}</div>${sub?`<div class="jcard-stat-sub">${sub}</div>`:''}</div>`).join('')}</div>${ifNote ? `<div class="jcard-stats-sub">${ifNote}</div>` : ''}` : '';
 
     const meta = [];
     if (ir.cas_major_cn) meta.push([T('中科院大类','CAS Major'), ir.cas_major_cn]);
     if (ir.esi_category) meta.push([T('ESI 高被引','ESI Category'), ir.esi_category]);
     if (ir.abdc && ir.abdc.rating) meta.push([T('ABDC 等级','ABDC Rating'), ir.abdc.rating + (ir.abdc.field ? ' · ' + ir.abdc.field : '')]);
-    if (ir.ft50) meta.push(['FT50', ir.ft50.order ? `#${ir.ft50.order}` : 'Listed']);
-    if (ir.utd24) meta.push(['UTD24', ir.utd24.order ? `#${ir.utd24.order}` : 'Listed']);
     if (r.publisher) meta.push([T('出版商','Publisher'), r.publisher]);
     if (r.country) meta.push([T('国家/地区','Country'), r.country]);
     if (r.frequency) meta.push([T('刊期','Frequency'), r.frequency]);
@@ -5919,15 +3881,10 @@
         const sub = it.cn_name && it.cn_name !== (it.name || '') ? `<span class="share-row-cn">${escape(it.cn_name)}</span>` : '';
         // 反查丰富数据
         const j = lookup[norm(it.issn)] || lookup[norm(it.eissn)] || {};
-        const indexBadges = renderIndexBadges(j);
-        const rankBadges = [renderRankBadges(j), renderDomCrossBadges(j, 'int')].filter(Boolean).join('');
-        const meta = (indexBadges || rankBadges)
-          ? `<div class="share-row-badges">
-              ${indexBadges ? `<div class="share-row-badge-line"><span class="share-row-badge-label">${T('收录','Indexed')}</span><span class="share-row-tags badges">${indexBadges}</span></div>` : ''}
-              ${rankBadges ? `<div class="share-row-badge-line"><span class="share-row-badge-label">${T('分区','Rank')}</span><span class="share-row-tags badges">${rankBadges}</span></div>` : ''}
-            </div>`
+        const meta = (j && (j.indices || j.if_quartile || j.cas_zone || j.scopus))
+          ? `<span class="share-row-tags badges">${renderIndexBadges(j)}</span><span class="share-row-tags badges">${[renderRankBadges(j)].filter(Boolean).join('')}</span>`
           : '';
-        return `<div class="share-list-row"><span class="share-row-idx">${String(i+1).padStart(2,'0')}</span><div class="share-row-main"><div class="share-row-name">${title}${sub}</div>${meta}</div></div>`;
+        return `<div class="share-list-row"><span class="share-row-idx">${String(i+1).padStart(2,'0')}</span><span class="share-row-name">${title}${sub}</span>${meta}</div>`;
       }).join('') || `<div class="empty">${T('（空清单）','(empty list)')}</div>`;
       const exp = d.expires_at ? new Date(d.expires_at * 1000).toLocaleDateString() : '';
       const cnt = (d.items||[]).length;
@@ -6052,8 +4009,13 @@
   function renderFavRow(r) {
     const fid = favId(r);
     rowRecordsByFid[fid] = r;
-    const rawName = r.name || r.cn_name || r.journal_title || '';
-    const nameHtml = `<div class="jname ${r.flagship ? 'jname-flagship' : ''}">${escape(titleCase(rawName.replace(/\*$/,'')))}${r.cn_name && r.cn_name !== rawName ? `<span class="jname-cn">${escape(r.cn_name)}</span>` : ''}${r.en_name && r.en_name !== rawName ? `<span class="jname-cn">${escape(titleCase(r.en_name))}</span>` : ''}${aliasHintHtml(r)}</div>`;
+    const rawName = r.name || r.cn_name || '';
+    const flagshipHtml = r.flagship ? `<span class="flagship-star fs-${r.flagship}" title="${r.flagship.replace('_',' ')}">★</span>` : '';
+    const nameHtml = `<div class="jname">${flagshipHtml}${escape(titleCase(rawName.replace(/\*$/,'')))}${r.cn_name && r.cn_name !== rawName ? `<span class="jname-cn">${escape(r.cn_name)}</span>` : ''}${r.en_name && r.en_name !== rawName ? `<span class="jname-cn">${escape(titleCase(r.en_name))}</span>` : ''}${aliasHintHtml(r)}</div>`;
+    const abbr = r.abbr20 ? `<span class="jabbr">${escape(r.abbr20)}</span>` : '';
+    const issn = (r.issn || r.eissn || r.cn_code)
+      ? `<span class="jissn">${escape(r.issn || r.cn_code || '')}${r.eissn ? ` <span class="eissn">e:${r.eissn}</span>` : ''}</span>`
+      : '<span class="muted-cell">—</span>';
     // 索引行
     const indexBadges = r.__src === 'int' ? renderIndexBadges(r) : '';
     // 分区/等级行（IF 已移到独立列）
@@ -6063,139 +4025,29 @@
     const crossBadges = renderDomCrossBadges(r, r.__src);
     const otherBadges = [tierBadge, crossBadges].filter(Boolean).join('');
     const badgeCell = renderBadgeCell(indexBadges, [rankBadges, otherBadges].filter(Boolean).join(''));
+    const casVal = (lang === 'zh-CN' || lang === 'zh-TW') ? (r.cas_major_cn || '') : tn(r.cas_major_cn || '', 'domain');
+    const esiVal = r.esi_category || '';
+    const casCell = casVal ? escape(casVal) : '<span class="muted-cell">—</span>';
+    const esiCell = esiVal ? escape(esiVal) : '<span class="muted-cell">—</span>';
     const SRC_LABEL = {
-      int: T('国际','Int’l'), cssci: 'CSSCI', cssci_core: 'CSSCI', cssci_ext: T('CSSCI 扩展','CSSCI Ext'),
-      pku: T('北大核心','PKU Core'), pku_core: T('北大核心','PKU Core'), cscd: 'CSCD', cstpcd: T('中国科技核心','CSTPCD'), cnkx: T('科协','CAST'), ccft: 'CCF-T',
-      zju: T('浙大','ZJU'), school_a: T('高校目录','In-house'), nsfc_mgmt: T('国自然','NSFC'), in: 'UGC-CARE', my: 'MyCite / ERA',
+      int: T('国际','Int’l'), cssci: 'CSSCI', cssci_core: 'CSSCI', cssci_ext: T('CSSCI扩展','CSSCI Ext'),
+      pku: T('北大核心','PKU Core'), pku_core: T('北大核心','PKU Core'), cnkx: T('科协','CAST'), ccft: 'CCF-T',
+      zju: T('浙大','ZJU'), school_a: T('高校目录','In-house'),
     };
-    const ifVal = (r.if_2024 != null) ? (+r.if_2024).toFixed(1) : '';
+    const ifVal = currentIfText(r);
     const ifCell = ifVal ? `<span class="if-cell">${ifVal}</span>` : '<span class="muted-cell">—</span>';
-    const cr = r.crossref;
-    const doaj = r.doaj;
-    let cycleDays = null;
-    if (cr && cr.median_days) {
-      cycleDays = +cr.median_days;
-    } else if (doaj && typeof doaj === 'object' && doaj.review_weeks) {
-      cycleDays = +doaj.review_weeks * 7;
-    }
-    const cycleCell = cycleDays
-      ? `${Math.round(cycleDays / 30.4)}${T('个月','mo')}`
-      : '<span class="muted-cell">—</span>';
     return `<tr class="j-row clickable" data-fid="${escape(fid)}" data-src="${escape(r.__src)}">
       <td class="col-drag"><span class="drag-handle" title="${T('拖动排序','Drag to reorder')}">⋮⋮</span></td>
       <td class="col-fav">${starBtn(r, r.__src)}</td>
       <td class="col-name">${nameHtml}</td>
       <td class="col-badge col-badge-split">${badgeCell}</td>
       <td class="col-if">${ifCell}</td>
-      <td class="col-cycle">${cycleCell}</td>
+      <td class="col-cas">${casCell}</td>
+      <td class="col-esi">${esiCell}</td>
+      <td class="col-abbr">${abbr || '<span class="muted-cell">—</span>'}</td>
+      <td class="col-issn">${issn}</td>
       <td class="col-src"><span class="src-tag src-${escape(r.__src)}">${SRC_LABEL[r.__src] || r.__src}</span></td>
     </tr>`;
-  }
-
-  const UPDATE_CATEGORY_KEYS = ['all', 'new_journal', 'index_change', 'warning', 'policy', 'report'];
-  const UPDATE_EN = {
-    'wos-on-hold-four-journals-2026-06-10': {
-      title: 'Four journals newly marked as WoS On Hold',
-      summary: 'LetPub summarized the latest On Hold risk signals and listed four newly marked journals. AILatest has added them to the On Hold watch list.',
-      dek: 'A submission-risk reminder. On Hold means a journal is under further review or observation, not necessarily removed, but authors should verify status before submission.'
-    },
-    'journal-of-research-on-research-launch-2026': {
-      title: 'Journal of Research on Research launches',
-      summary: 'Taylor & Francis has launched Journal of Research on Research for meta-research, research evaluation, governance, and open science. The journal is open for submissions with no APC in the first two years.',
-      dek: 'A new-journal launch for authors working on research evaluation, meta-research, research governance, and open science.'
-    },
-    'clarivate-2026-jcr-edition-webinar': {
-      title: 'Clarivate previews 2026 Journal Citation Reports updates',
-      summary: 'Clarivate announced a webinar for the 2026 Journal Citation Reports, covering metric updates, journal coverage, publishing and citation patterns, and responsible JIF use.',
-      dek: 'This is not the formal JCR data release; it is Clarivate’s public preview and training notice for the 2026 edition.'
-    },
-    'nature-index-2026-research-leaders': {
-      title: 'Nature Index expands coverage and releases 2026 Research Leaders',
-      summary: 'Springer Nature expanded Nature Index coverage, updated article-level subject classification, and released the 2026 Research Leaders list based on 2025 data.',
-      dek: 'Nature Index expanded its journal coverage and methodology while releasing the 2026 Research Leaders list.'
-    },
-    'elsevier-advanced-biosensors-launch-2026': {
-      title: 'Elsevier launches Advanced Biosensors',
-      summary: 'Elsevier launched the open-access journal Advanced Biosensors, covering biosensor research, design, development, and applications. Accepted submissions are APC-free until the end of 2027.',
-      dek: 'A new open-access journal launch relevant to biosensing, materials, analytical chemistry, and biomedical engineering.'
-    },
-    'doaj-new-journals-2026-06-10': {
-      title: 'DOAJ adds new open-access journal records',
-      summary: 'DOAJ added new OA journal records across medicine, humanities and social sciences, public administration, economics, and finance. AILatest has synced the public DOAJ fields.',
-      dek: 'An indexing-change roundup based on DOAJ public records, including license, APC, peer review, and review-week fields.'
-    },
-    'global-oa-publishing-ten-questions-2026': {
-      title: 'Global OA Publishing: Ten Questions report is available',
-      summary: 'The report discusses global OA publishing trends, quality governance, Mega Journals, LLM impact, and future governance paths.',
-      dek: 'A report-style update on the open-access publishing ecosystem, useful for tracking OA governance and publishing strategy.'
-    },
-    'doaj-ambassador-programme-10-years-2026': {
-      title: 'DOAJ reviews ten years of the Ambassador Programme',
-      summary: 'DOAJ highlighted open-access journal quality standards, regional outreach, and author education in its ten-year programme review.',
-      dek: 'A DOAJ programme update focused on OA quality standards, regional outreach, and author education.'
-    },
-    'scholarly-kitchen-scholar-ready-ai-2026': {
-      title: 'The Scholarly Kitchen discusses AI-ready publishing infrastructure',
-      summary: 'The interview covers AI search, source trust, and publishing infrastructure, with a focus on how authoritative content enters AI-driven research workflows.',
-      dek: 'An industry observation on AI and scholarly publishing infrastructure.'
-    },
-    'springer-nature-society-partner-newsletter-epic-2026': {
-      title: 'Springer Nature society-partner newsletter wins 2026 Gold EPIC Award',
-      summary: 'Springer Nature says the newsletter connects more than 900 society partners in 48 countries and covers publishing innovation, research policy, and open access.',
-      dek: 'A publishing-service update reflecting communication and support for society journals.'
-    },
-    'nature-registered-reports-all-disciplines-2026': {
-      title: 'Nature expands Registered Reports to all disciplines',
-      summary: 'Nature expanded the Registered Reports format across natural sciences, social sciences, clinical sciences, engineering, and public health.',
-      dek: 'A submission-policy update for papers emphasizing study design, preregistration, and reproducibility.'
-    },
-    'wiley-acquires-emerald-2026': {
-      title: 'Wiley acquires Emerald and expands its social-science portfolio',
-      summary: 'Wiley announced the acquisition of Emerald Publishing, expanding its portfolio to roughly 2,500 journals and strengthening business, finance, economics, and social science coverage.',
-      dek: 'A publishing-industry update that may affect social science, management, business, and finance journal portfolios.'
-    }
-  };
-
-  function normalizeJournalUpdates(payload) {
-    const rawItems = Array.isArray(payload?.items) ? payload.items : [];
-    const items = rawItems
-      .map(item => {
-        const src = item || {};
-        return {
-          id: String(src.id || src.source_url || src.title || '').trim(),
-          published_at: String(src.published_at || '').trim(),
-          category: UPDATE_CATEGORY_KEYS.includes(src.category) ? src.category : 'report',
-          title: String(src.title || '').trim(),
-          summary: String(src.summary || '').trim(),
-          source_name: String(src.source_name || src.publisher || '').trim(),
-          source_name_en: String(src.source_name_en || src.en?.source_name || src.translations?.en?.source_name || '').trim(),
-          source_url: String(src.source_url || '').trim(),
-          publisher: String(src.publisher || '').trim(),
-          publisher_en: String(src.publisher_en || src.en?.publisher || src.translations?.en?.publisher || '').trim(),
-          journals: Array.isArray(src.journals) ? src.journals.filter(Boolean).map(String) : [],
-          tags: Array.isArray(src.tags) ? src.tags.filter(Boolean).map(String) : [],
-          priority: Number.isFinite(Number(src.priority)) ? Number(src.priority) : 0,
-          image_url: String(src.image_url || src.image || src.cover_image || '').trim(),
-          detail_path: String(src.detail_path || '').trim(),
-          title_en: String(src.title_en || src.en?.title || src.translations?.en?.title || '').trim(),
-          summary_en: String(src.summary_en || src.en?.summary || src.translations?.en?.summary || '').trim(),
-          detail: src.detail && typeof src.detail === 'object' ? src.detail : null,
-          detail_en: src.detail_en && typeof src.detail_en === 'object' ? src.detail_en : null,
-          en: src.en && typeof src.en === 'object' ? src.en : null,
-          translations: src.translations && typeof src.translations === 'object' ? src.translations : null
-        };
-      })
-      .filter(item => item.id && item.title)
-      .sort((a, b) => {
-        const da = Date.parse(a.published_at) || 0;
-        const db = Date.parse(b.published_at) || 0;
-        if (db !== da) return db - da;
-        return (b.priority || 0) - (a.priority || 0);
-      });
-    return {
-      updated_at: String(payload?.updated_at || '').trim(),
-      items
-    };
   }
 
   // ───────── bindings ─────────
@@ -6227,123 +4079,23 @@
     document.querySelectorAll('.feat-row').forEach(row => {
       row.addEventListener('change', () => {
         activeFeats = new Set([...document.querySelectorAll('.feat-row input:checked')].map(i => i.value));
-        const freeCol = document.getElementById('free-col-filter');
-        if (freeCol) freeCol.checked = activeFeats.has('free');
         shown = PAGE; renderInt();
       });
     });
-    const setFreeFilter = (checked) => {
-      const freeCol = document.getElementById('free-col-filter');
-      if (freeCol) freeCol.checked = checked;
-      document.querySelectorAll('.feat-row input[value="free"]').forEach(input => { input.checked = checked; });
-      if (checked) activeFeats.add('free');
-      else activeFeats.delete('free');
-      shown = PAGE;
-      renderInt();
-    };
-    document.getElementById('free-col-filter')?.addEventListener('change', (e) => {
-      setFreeFilter(e.target.checked);
-    });
-    document.getElementById('free-col-filter-label')?.addEventListener('click', (e) => {
-      if (e.target && e.target.id === 'free-col-filter') return;
-      e.preventDefault();
-      setFreeFilter(!activeFeats.has('free'));
-    });
-    $('#topic-dd-search')?.addEventListener('input', () => {
-      const raw = ($('#topic-dd-search')?.value || '').trim().toLowerCase();
-      const panel = $('#topic-dd-list');
-      if (!panel) return;
-      const filtered = !raw ? topicList : topicList.filter(t => t.name.toLowerCase().includes(raw));
-      panel.innerHTML = filtered.map(t =>
-        `<label class="th-chk" data-filter="topic" data-value="${escape(t.name)}">
-           <input type="checkbox" ${activeTopics.has(t.name) ? 'checked' : ''}>
-           <span>${escape(t.name)}</span>
-           <span class="count">${t.count.toLocaleString()}</span>
-         </label>`
-      ).join('');
-      // Re-bind change events for new checkboxes
-      // (the generic handler in renderCatList uses __bound which only binds once,
-      //  but these checkboxes are new DOM nodes so the events need re-binding)
-      panel.querySelectorAll('label.th-chk').forEach(label => {
-        const cb = label.querySelector('input[type=checkbox]');
-        if (!cb || cb.__topicBound) return;
-        cb.__topicBound = true;
-        cb.addEventListener('change', () => {
-          const val = label.dataset.value;
-          if (cb.checked) activeTopics.add(val);
-          else activeTopics.delete(val);
-          shown = PAGE;
-          renderInt();
-        });
-      });
-    });
-    $('#topic-clear')?.addEventListener('click', () => {
-      activeTopics.clear();
-      const inp = $('#topic-search'); if (inp) inp.value = '';
-      renderTopicList();
-      shown = PAGE; renderInt();
-    });
-    $('#topic-all-btn')?.addEventListener('click', () => {
-      activeTopics.clear();
-      const inp = $('#topic-search'); if (inp) inp.value = '';
-      renderTopicList();
+    $('#wos-search')?.addEventListener('input', () => renderWosList());
+    $('#wos-clear')?.addEventListener('click', () => {
+      activeWos.clear();
+      const inp = $('#wos-search'); if (inp) inp.value = '';
+      renderWosList();
       shown = PAGE; renderInt();
     });
     $('#q').addEventListener('input', (e) => {
-      if (activeTab === 'updates') activeUpdateQuery = e.target.value.trim();
-      else activeQuery = e.target.value.trim();
+      activeQuery = e.target.value.trim();
       shown = PAGE;
-      if (activeTab === 'pick') return; // pick tab uses Enter
-      if (activeTab === 'home') {
-        showHomeSearchResults();
-      } else {
-        activeTab === 'int' ? renderInt()
-          : activeTab === 'fav' ? renderFav()
-          : activeTab === 'dom' ? renderDomestic()
-          : activeTab === 'in' ? renderIndia()
-          : activeTab === 'my' ? renderMalaysia()
-          : activeTab === 'kr' ? renderKorea()
-          : activeTab === 'updates' ? renderJournalUpdates()
-          : null;
-      }
-    });
-    $('#q').addEventListener('keydown', (e) => {
-      if (e.key !== 'Enter' || activeTab === 'pick') return;
-      e.preventDefault();
-      if (activeTab === 'updates') activeUpdateQuery = e.currentTarget.value.trim();
-      else activeQuery = e.currentTarget.value.trim();
-      shown = PAGE;
-      const currentQuery = activeTab === 'updates' ? activeUpdateQuery : activeQuery;
-      if (!currentQuery) return;
-      if (activeTab === 'home') saveHomeSearchHistory(currentQuery);
-      trackInteraction('journal_search', { tab: activeTab, query: currentQuery });
-      if (activeTab === 'home') showHomeSearchResults();
-      else if (activeTab === 'int') renderInt();
-      else if (activeTab === 'fav') renderFav();
-      else if (activeTab === 'dom') renderDomestic();
-      else if (activeTab === 'updates') renderJournalUpdates();
-    });
-    $('#search-submit')?.addEventListener('click', () => {
-      const qEl = $('#q');
-      if (!qEl) return;
-      if (activeTab === 'updates') activeUpdateQuery = qEl.value.trim();
-      else activeQuery = qEl.value.trim();
-      shown = PAGE;
-      const currentQuery = activeTab === 'updates' ? activeUpdateQuery : activeQuery;
-      if (!currentQuery) {
-        qEl.focus();
-        return;
-      }
-      if (activeTab === 'pick') {
-        qEl.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
-      } else if (activeTab === 'home') {
-        saveHomeSearchHistory(activeQuery);
-        trackInteraction('journal_search', { tab: activeTab, query: activeQuery });
-        showHomeSearchResults();
-      } else if (activeTab === 'int') { trackInteraction('journal_search', { tab: activeTab, query: activeQuery }); renderInt(); }
-      else if (activeTab === 'fav') { trackInteraction('journal_search', { tab: activeTab, query: activeQuery }); renderFav(); }
-      else if (activeTab === 'dom') { trackInteraction('journal_search', { tab: activeTab, query: activeQuery }); renderDomestic(); }
-      else if (activeTab === 'updates') { trackInteraction('journal_search', { tab: activeTab, query: activeUpdateQuery }); renderJournalUpdates(); }
+      activeTab === 'int' ? renderInt()
+        : activeTab === 'fav' ? renderFav()
+        : activeTab === 'dom' ? renderDomestic()
+        : null;
     });
     $('#more').addEventListener('click', () => { shown += PAGE; renderInt(); });
 
@@ -6361,1193 +4113,31 @@
       }
     });
 
-    /* ───────── Home tab: auto-detect search ───────── */
-    const homeResults = $('#home-results');
-    const homePanel = $('.tab-panel[data-panel="home"]');
-    const homeUpdatesPreview = $('#home-updates-preview');
-    const HOME_SEARCH_HISTORY_KEY = 'ailatest.home.search.history';
-    const HOME_SEARCH_SUGGESTIONS = ['Science', 'Nature', 'Cell', 'The Lancet', 'IEEE Access', '建筑学报', '城市规划'];
-
-    function getHomeSearchHistory() {
-      try {
-        const raw = JSON.parse(localStorage.getItem(HOME_SEARCH_HISTORY_KEY) || '[]');
-        return Array.isArray(raw) ? raw.filter(Boolean).map(String).slice(0, 6) : [];
-      } catch (_) {
-        return [];
-      }
-    }
-
-    function saveHomeSearchHistory(term) {
-      const clean = String(term || '').trim();
-      if (!clean) return;
-      const seen = new Set();
-      const next = [clean, ...getHomeSearchHistory()]
-        .filter(x => {
-          const key = x.toLowerCase();
-          if (seen.has(key)) return false;
-          seen.add(key);
-          return true;
-        })
-        .slice(0, 8);
-      try { localStorage.setItem(HOME_SEARCH_HISTORY_KEY, JSON.stringify(next)); } catch (_) {}
-      renderHomeSearchChips();
-    }
-
-    function renderHomeSearchChips() {
-      const box = $('#home-search-chips');
-      if (!box) return;
-      if (activeTab !== 'home') {
-        box.hidden = true;
-        return;
-      }
-      const seen = new Set();
-      const terms = [...getHomeSearchHistory(), ...HOME_SEARCH_SUGGESTIONS]
-        .map(x => String(x || '').trim())
-        .filter(x => {
-          if (!x) return false;
-          const key = x.toLowerCase();
-          if (seen.has(key)) return false;
-          seen.add(key);
-          return true;
-        })
-        .slice(0, 8);
-      if (!terms.length) {
-        box.hidden = true;
-        return;
-      }
-      box.hidden = false;
-      const current = (activeQuery || '').trim().toLowerCase();
-      box.innerHTML = terms.map(term => {
-        const active = current && term.toLowerCase() === current ? ' active' : '';
-        return `<button class="home-search-chip${active}" type="button" data-home-search-term="${escape(term)}">${escape(term)}</button>`;
-      }).join('');
-      box.querySelectorAll('[data-home-search-term]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const term = btn.dataset.homeSearchTerm || '';
-          const qEl = $('#q');
-          activeQuery = term;
-          if (qEl) qEl.value = term;
-          saveHomeSearchHistory(term);
-          trackInteraction('journal_search', { tab: 'home', query: term, source: 'chip' });
-          showHomeSearchResults();
-        });
-      });
-    }
-
-    function showHomeSearchResults() {
-      if (!activeQuery) {
-        if (homeResults) homeResults.hidden = true;
-        if (homePanel) homePanel.classList.remove('home-tab-has-results');
-        renderHomeSearchChips();
-        renderJournalUpdatesPreview();
-        return;
-      }
-      if (homeUpdatesPreview) homeUpdatesPreview.hidden = true;
-      if (homePanel) homePanel.classList.add('home-tab-has-results');
-      if (homeResults) homeResults.hidden = false;
-      renderHomeSearchChips();
-      renderHomeIntResults();
-    }
-
-    function homeCycleText(r) {
-      const cr = r.crossref;
-      const doaj = r.doaj;
-      let cycleDays = null;
-      if (cr && cr.median_days) cycleDays = +cr.median_days;
-      else if (doaj && typeof doaj === 'object' && doaj.review_weeks) cycleDays = +doaj.review_weeks * 7;
-      return cycleDays ? `${Math.round(cycleDays / 30.4)}${T('个月','mo')}` : '';
-    }
-
-    function homeTopicText(r) {
-      const wosVals = Array.isArray(r.wos_categories) ? r.wos_categories.filter(Boolean) : [];
-      if (wosVals.length) return wosVals.slice(0, 2).join(' / ');
-      return r.esi_category || r.cas_major_cn || '';
-    }
-
-    const HOME_INDEX_BADGE_CLASSES = [
-      'b-scie', 'b-ssci', 'b-ahci', 'b-esci', 'b-ei',
-      'b-scopus', 'b-medline', 'b-pubmed', 'b-pmc',
-      'b-nature-index', 'b-cscd', 'b-cstpcd', 'b-scd'
-    ];
-
-    function homeBadgeItems(html) {
-      const raw = String(html || '').trim();
-      if (!raw || typeof document === 'undefined') return [];
-      const tpl = document.createElement('template');
-      tpl.innerHTML = raw;
-      return [...tpl.content.children].filter(el => String(el.textContent || '').trim());
-    }
-
-    function homeBadgeOuterHtml(el) {
-      if (el.matches && el.matches('details')) {
-        const summary = el.querySelector('summary');
-        if (summary) return summary.outerHTML;
-      }
-      return el.outerHTML;
-    }
-
-    function compactHomeBadges(html, { limit = 4, includeClasses = [] } = {}) {
-      const items = homeBadgeItems(html);
-      if (!items.length) return '';
-      const filtered = includeClasses.length
-        ? items.filter(el => includeClasses.some(cls => el.classList && el.classList.contains(cls)))
-        : items;
-      const usable = filtered.length ? filtered : items;
-      const shown = usable.slice(0, limit).map(homeBadgeOuterHtml).join('');
-      const extra = usable.length - limit;
-      if (extra <= 0) return shown;
-      const extraTitle = usable.slice(limit)
-        .map(el => String(el.textContent || '').replace(/\s+/g, ' ').trim())
-        .filter(Boolean)
-        .join(' / ');
-      return `${shown}<span class="home-more-badge" title="${escape(extraTitle)}">+${extra}</span>`;
-    }
-
-    function renderHomeBadgeLine(html, cls = '', options = {}) {
-      const compact = compactHomeBadges(html, options);
-      return compact ? `<div class="home-card-badges ${cls}">${compact}</div>` : '';
-    }
-
-    function renderHomeJournalCard(r) {
-      const fid = favId(r);
-      rowRecordsByFid[fid] = { ...r, __src: 'int' };
-      const title = titleCase((r.name || '').replace(/\*$/,''));
-      const alias = r.abbr20 && r.abbr20 !== r.name ? r.abbr20 : '';
-      const crossBadges = renderDomCrossBadges(r, 'int');
-      const indexBadges = renderCoverageBadges(r);
-      const rankBadges = [renderLevelBadges(r), crossBadges].filter(Boolean).join('');
-      const riskBadges = renderRiskBadges(r);
-      const ifVal = r.if_2024 != null ? (+r.if_2024).toFixed(1) : '';
-      const cycle = homeCycleText(r);
-      const topic = homeTopicText(r);
-      const metrics = [
-        ifVal ? `<span class="home-metric home-if">IF ${escape(ifVal)}</span>` : '',
-        cycle ? `<span class="home-metric">${escape(cycle)}</span>` : '',
-        topic ? `<span class="home-card-topic">${escape(topic)}</span>` : '',
-      ].filter(Boolean).join('');
-      return `<article class="home-journal-card j-row clickable ${r.flagship ? 'row-flagship' : ''}" data-fid="${escape(fid)}" data-src="int">
-        <div class="home-card-head">
-          <div class="home-card-title-wrap">
-            <h3 class="home-card-title">${escape(title)}</h3>
-            ${alias ? `<div class="home-card-alias">aka: ${escape(alias)}</div>` : ''}
-            ${r.cn_name ? `<div class="home-card-alias">${escape(r.cn_name)}</div>` : ''}
-          </div>
-          <div class="home-card-fav">${starBtn(r, 'int')}</div>
-        </div>
-        ${renderHomeBadgeLine(indexBadges, 'home-card-indexes', { limit: 5, includeClasses: HOME_INDEX_BADGE_CLASSES })}
-        ${renderHomeBadgeLine(rankBadges, 'home-card-ranks', { limit: 3 })}
-        ${renderHomeBadgeLine(riskBadges, 'home-card-risks', { limit: 2 })}
-        ${metrics ? `<div class="home-card-meta">${metrics}</div>` : ''}
-      </article>`;
-    }
-
-    function renderHomeDomesticCard(r) {
-      const fid = favId(r);
-      rowRecordsByFid[fid] = { ...r, __src: r.__src };
-      const name = r.name || r.cn_name || r.title || '';
-      const cnName = r.en_name ? titleCase(r.en_name) : '';
-      const crossBadges = renderDomCrossBadges({ name, issn: r.issn, cn_code: r.cn_code }, r.__src);
-      const sourceLabel = {
-        cnki_major: T('中文期刊目录','Chinese Journal Directory'),
-        cnkx: T('中国科协','CAST'),
-        nsfc_mgmt: T('国自然管理科学部','NSFC Management'),
-        zju: T('浙大目录','ZJU'),
-        cscd: 'CSCD',
-        cstpcd: T('中国科技核心','CSTPCD'),
-        cssci_core: 'CSSCI',
-        cssci_ext: T('CSSCI 扩展','CSSCI Ext'),
-        pku_core: T('北大核心','PKU Core')
-      }[r.__src] || T('国内来源','Domestic Source');
-      const tierText = r.tier ? `<span class="home-metric">${escape(r.tier)}</span>` : '';
-      return `<article class="home-journal-card home-domestic-card j-row clickable" data-fid="${escape(fid)}" data-src="${escape(r.__src)}">
-        <div class="home-card-head">
-          <div class="home-card-title-wrap">
-            <h3 class="home-card-title">${escape(titleCase(name.replace(/\*$/,'')))}</h3>
-            ${cnName ? `<div class="home-card-alias">${escape(cnName)}</div>` : ''}
-          </div>
-          <div class="home-card-fav">${starBtn(r, r.__src)}</div>
-        </div>
-        ${renderHomeBadgeLine(crossBadges, 'home-card-ranks', { limit: 3 })}
-        <div class="home-card-meta">
-          <span class="home-card-topic">${escape(sourceLabel)}</span>
-          ${tierText}
-        </div>
-      </article>`;
-    }
-
-    function renderHomeIntResults() {
-      if (!homeResults) return;
-      const q = activeQuery ? activeQuery.toLowerCase() : '';
-      if (!q) { homeResults.innerHTML = ''; return; }
-      const matchTxt = (...parts) => parts.filter(Boolean).join(' ').toLowerCase().includes(q);
-
-      // Auto-detect: if query has Chinese characters, prioritize domestic
-      const hasChinese = /[\u4e00-\u9fff]/.test(q);
-      const intLimit = hasChinese ? 15 : 30;
-      const looksLikeId = /\b\d{4}-?\d{3}[\dXx]\b|CN\s*\d{2}-\d+/i.test(activeQuery);
-      const domLimit = hasChinese || looksLikeId ? 30 : 0;
-
-      let totalCount = 0;
-      let sections = [];
-
-      // ── International results ──
-      let intFiltered = journals.filter(matches);
-      intFiltered = intFiltered
-        .map(r => ({ r, s: scoreRecord(r, q) }))
-        .sort((a, b) => {
-          if (b.s !== a.s) return b.s - a.s;
-          const fa = a.r.flagship ? 1 : 0;
-          const fb = b.r.flagship ? 1 : 0;
-          if (fa !== fb) return fb - fa;
-          const ifa = a.r.if_2024 ?? -1;
-          const ifb = b.r.if_2024 ?? -1;
-          if (ifa !== ifb) return ifb - ifa;
-          return (a.r.name||'').localeCompare(b.r.name||'');
-        })
-        .map(x => x.r);
-      intFiltered = sortByIF(intFiltered, intIfSort);
-      const intCount = intFiltered.length;
-
-      if (intCount) {
-        sections.push({
-          kind: 'int',
-          label: T('国际期刊','International Journals'),
-          html: intFiltered.slice(0, intLimit).map(renderHomeJournalCard).join(''),
-          count: intCount
-        });
-        totalCount += intCount;
-      }
-
-      // ── Domestic results ──
-      let domCount = 0;
-      let domHtml = '';
-      if (domestic && domLimit > 0) {
-        const allDomestic = [];
-        for (const key of ['cnki_major', 'cnkx', 'nsfc_mgmt', 'zju', 'cscd', 'cstpcd', 'cssci_core', 'cssci_ext', 'pku_core']) {
-          const src = domestic[key];
-          const rows = Array.isArray(src) ? src : ((src && src.records) || []);
-          if (rows.length) {
-            for (const r of rows) {
-              if (matchTxt(
-                r.name, r.cn_name, r.title, r.issn, r.cn_code, r.en_name,
-                r.sponsor, r.publisher, r.category, r.category_code, r.domain, r.subdomain,
-                r.database, r.database_label, r.tier, r.frequency, r.code, r.kind,
-                ...(r.major_categories || []), ...(r.categories || [])
-              )) {
-                allDomestic.push({ ...r, __src: key });
-              }
-            }
-          }
-        }
-        const sourceRank = { cnki_major: 9, cnkx: 8, nsfc_mgmt: 7, zju: 6, cscd: 5, cstpcd: 4, cssci_core: 3, pku_core: 2, cssci_ext: 1 };
-        const dedupedDomestic = [];
-        const byDomesticKey = new Map();
-        allDomestic.forEach((r) => {
-          const key = (r.issn || r.cn_code || pickCleanDomesticName(r.name || r.cn_name || '')).toUpperCase();
-          if (!key) return;
-          const prev = byDomesticKey.get(key);
-          if (!prev || (sourceRank[r.__src] || 0) > (sourceRank[prev.__src] || 0)) {
-            byDomesticKey.set(key, r);
-          }
-        });
-        byDomesticKey.forEach((r) => dedupedDomestic.push(r));
-        domCount = dedupedDomestic.length;
-        if (domCount) {
-          domHtml = dedupedDomestic.slice(0, domLimit).map(renderHomeDomesticCard).join('');
-        }
-      }
-
-      // Order sections: Chinese query → domestic first, English query → int first
-      if (hasChinese) {
-        if (domCount) {
-          sections.unshift({
-            kind: 'dom',
-            label: T('国内期刊','Domestic Journals'),
-            html: domHtml,
-            count: domCount
-          });
-          totalCount += domCount;
-        }
-      } else {
-        if (domCount) {
-          sections.push({
-            kind: 'dom',
-            label: T('国内期刊','Domestic Journals'),
-            html: domHtml,
-            count: domCount
-          });
-          totalCount += domCount;
-        }
-      }
-
-      if (!sections.length) {
-        homeResults.innerHTML = `<div class="empty-state">${t('empty')}</div>`;
-        return;
-      }
-
-      let html = `<div class="results-head" style="margin-bottom:8px">
-        <span class="results-count">${T('找到','Found')} ${totalCount.toLocaleString()} ${T('个结果','results')}</span>
-      </div>`;
-      for (const sec of sections) {
-        const limit = sec.kind === 'int' ? intLimit : domLimit;
-        const tabTarget = sec.kind === 'int' ? 'int' : 'dom';
-        const more = sec.count > limit
-          ? `<div style="padding:4px 0 10px;display:flex;justify-content:space-between;align-items:center">
-              <span class="muted-cell" style="font-size:12px">${T('已显示前','Showing first')} ${limit} ${T('条','')}</span>
-              <button class="home-viewall-btn" data-viewall-tab="${tabTarget}" style="font-size:12px;color:var(--accent,#b4531f);background:none;border:none;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:2px">${T('查看全部','View all')} ${sec.count} →</button>
-            </div>`
-          : '';
-        html += `<div class="home-section-label">${sec.label}</div>
-          <div class="home-results-wrap"><div class="home-card-grid" data-home-kind="${sec.kind}">${sec.html}</div></div>${more}`;
-      }
-      if (totalCount > intLimit + domLimit) {
-        html += `<div class="pager"><button class="big-btn primary" id="home-more-btn" data-i18n="load_more">${t('load_more')}</button></div>`;
-      }
-      homeResults.innerHTML = html;
-
-      const moreBtn = $('#home-more-btn');
-      if (moreBtn) {
-        moreBtn.addEventListener('click', () => {
-          shown += 30;
-          renderHomeIntResults();
-        });
-      }
-      // "查看全部" buttons → switch to full list tab
-      homeResults.querySelectorAll('.home-viewall-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const tab = btn.dataset.viewallTab;
-          // Sync query to topbar search so the target tab picks it up
-          const topQ = $('#q');
-          if (topQ) topQ.value = activeQuery;
-          activateTab(tab);
-        });
-      });
-    }
-
-    function updateCategoryLabel(category) {
-      if (category === 'all') return t('update_cat_all');
-      return t(`update_cat_${category}`) || category;
-    }
-    function updateIsZh() {
-      return lang === 'zh-CN' || lang === 'zh-TW';
-    }
-    function updatePlainObject(value) {
-      return value && typeof value === 'object' && !Array.isArray(value);
-    }
-    function updateFirstText(...values) {
-      for (const value of values) {
-        const text = String(value || '').replace(/\s+/g, ' ').trim();
-        if (text) return text;
-      }
-      return '';
-    }
-    function updateHasCjk(value) {
-      if (typeof value === 'string') return /[\u3400-\u9fff\uf900-\ufaff]/.test(value);
-      if (Array.isArray(value)) return value.some(updateHasCjk);
-      if (updatePlainObject(value)) return Object.values(value).some(updateHasCjk);
-      return false;
-    }
-    function updateEnglishText(value) {
-      const text = String(value || '').replace(/\s+/g, ' ').trim();
-      if (!text || updateHasCjk(text) || !/[A-Za-z0-9]/.test(text)) return '';
-      return text;
-    }
-    function updateEnglishPayload(item) {
-      const direct = updatePlainObject(item.en) ? item.en : {};
-      const translated = updatePlainObject(item.translations?.en) ? item.translations.en : {};
-      const legacy = UPDATE_EN[item.id] || {};
-      const detail =
-        updatePlainObject(item.detail_en) ? item.detail_en :
-        updatePlainObject(direct.detail) ? direct.detail :
-        updatePlainObject(translated.detail) ? translated.detail :
-        legacy.dek ? { dek: legacy.dek } : {};
-      return {
-        title: updateFirstText(item.title_en, direct.title, translated.title, legacy.title),
-        summary: updateFirstText(item.summary_en, direct.summary, translated.summary, legacy.summary),
-        source_name: updateFirstText(item.source_name_en, direct.source_name, translated.source_name),
-        publisher: updateFirstText(item.publisher_en, direct.publisher, translated.publisher),
-        detail
-      };
-    }
-    function updateCategoryLabelEn(category) {
-      return {
-        new_journal: 'New journal',
-        index_change: 'Indexing change',
-        warning: 'Risk alert',
-        policy: 'Publishing policy',
-        report: 'Report'
-      }[category] || 'Journal update';
-    }
-    function updateEnglishSubject(item) {
-      const values = [
-        ...(item.journals || []),
-        item.publisher_en,
-        item.source_name_en,
-        item.publisher,
-        item.source_name,
-        ...(item.tags || [])
-      ].map(updateEnglishText).filter(Boolean);
-      return values[0] || '';
-    }
-    function autoEnglishUpdateTitle(item) {
-      if (!updateHasCjk(item.title)) return item.title || updateCategoryLabelEn(item.category);
-      const subject = updateEnglishSubject(item);
-      return subject ? `${updateCategoryLabelEn(item.category)}: ${subject}` : `${updateCategoryLabelEn(item.category)} update`;
-    }
-    function autoEnglishUpdateSummary(item) {
-      if (item.summary && !updateHasCjk(item.summary)) return item.summary;
-      const category = updateCategoryLabelEn(item.category).toLowerCase();
-      const subject = updateEnglishSubject(item) || 'a scholarly-publishing development';
-      const source = updateEnglishText(item.publisher_en) || updateEnglishText(item.publisher) || updateEnglishText(item.source_name_en) || updateEnglishText(item.source_name) || 'the original source';
-      const journals = (item.journals || []).map(updateEnglishText).filter(Boolean).slice(0, 4).join(', ');
-      const tags = (item.tags || []).map(updateEnglishText).filter(Boolean).slice(0, 4).join(', ');
-      const parts = [`This ${category} update tracks ${subject} from ${source}.`];
-      if (journals) parts.push(`Related journal(s): ${journals}.`);
-      if (tags) parts.push(`Key tags: ${tags}.`);
-      parts.push('The original source link remains the verification basis.');
-      return parts.join(' ');
-    }
-    function autoEnglishUpdateArticle(item) {
-      const source = updateSourceName(item);
-      const journals = (item.journals || []).map(updateEnglishText).filter(Boolean).slice(0, 6);
-      const tags = (item.tags || []).map(updateEnglishText).filter(Boolean).slice(0, 6);
-      const context = [
-        `Type: ${updateCategoryLabelEn(item.category)}.`,
-        source ? `Source: ${source}.` : '',
-        item.published_at ? `Published or logged: ${formatUpdateDate(item.published_at)}.` : '',
-        journals.length ? `Related journal(s): ${journals.join(', ')}.` : '',
-        tags.length ? `Key tags: ${tags.join(', ')}.` : ''
-      ].filter(Boolean);
-      return {
-        intro: [updateSummary(item)],
-        sections: [
-          {
-            heading: 'Structured context',
-            bullets: context
-          },
-          {
-            heading: 'Verification',
-            bullets: ['Original-source details should be checked before using this item for submission, indexing, or ranking decisions.']
-          }
-        ]
-      };
-    }
-    function updateLocalizedDetail(item) {
-      const detail = item.detail || {};
-      if (updateIsZh()) return detail;
-      const enDetail = updateEnglishPayload(item).detail || {};
-      const article = updatePlainObject(enDetail.article)
-        ? enDetail.article
-        : updatePlainObject(detail.article) && !updateHasCjk(detail.article)
-          ? detail.article
-          : autoEnglishUpdateArticle(item);
-      return { ...detail, ...enDetail, article };
-    }
-    function updateSourceName(item) {
-      const raw = item.source_name || item.publisher || t('updates_source');
-      if (updateIsZh()) return raw;
-      const en = updateEnglishPayload(item);
-      const explicit = updateFirstText(en.source_name, en.publisher);
-      if (explicit) return explicit;
-      if (/微信/.test(raw)) return 'WeChat Official Account';
-      if (updateHasCjk(raw)) return updateEnglishText(item.publisher) || t('updates_source');
-      return raw;
-    }
-    function updateTitle(item) {
-      if (updateIsZh()) return item.title;
-      return updateEnglishPayload(item).title || autoEnglishUpdateTitle(item);
-    }
-    function updateSummary(item) {
-      if (updateIsZh()) return item.summary;
-      return updateEnglishPayload(item).summary || autoEnglishUpdateSummary(item);
-    }
-    function updateDek(item) {
-      const detail = item.detail || {};
-      if (!updateIsZh()) {
-        const enDetail = updateEnglishPayload(item).detail || {};
-        return updateFirstText(enDetail.dek, enDetail.lead, updateSummary(item));
-      }
-      return detail.dek || detail.lead || item.summary || '';
-    }
-
-    function formatUpdateDate(value) {
-      if (!value) return '';
-      const text = String(value);
-      const m = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
-      if (m) {
-        return lang === 'en' ? `${m[1]}-${m[2]}-${m[3]}` : `${m[1]}.${m[2]}.${m[3]}`;
-      }
-      const d = new Date(text);
-      if (Number.isNaN(d.getTime())) return text;
-      return d.toLocaleDateString(lang === 'en' ? 'en-US' : 'zh-CN', { year: 'numeric', month: 'short', day: 'numeric' });
-    }
-
-    function journalUpdateMatches(item, query = activeUpdateQuery, category = activeUpdateCategory) {
-      if (category && category !== 'all' && item.category !== category) return false;
-      const q = String(query || '').trim().toLowerCase();
-      if (!q) return true;
-      return [
-        updateTitle(item),
-        updateSummary(item),
-        item.source_name,
-        item.publisher,
-        updateCategoryLabel(item.category),
-        ...(item.journals || []),
-        ...(item.tags || [])
-      ].join(' ').toLowerCase().includes(q);
-    }
-
-    function updatePathIsUpdates(pathname = location.pathname) {
-      const clean = pathname.replace(/\/+$/, '') || '/';
-      return clean === '/updates' || clean.startsWith('/updates/');
-    }
-
-    function updateDetailSlugFromPath(pathname = location.pathname) {
-      const clean = pathname.replace(/\/+$/, '') || '/';
-      if (!clean.startsWith('/updates/')) return '';
-      try { return decodeURIComponent(clean.split('/').filter(Boolean).slice(1).join('/')); }
-      catch (_) { return clean.split('/').filter(Boolean).slice(1).join('/'); }
-    }
-
-    function updateDetailPath(item) {
-      if (item.detail_path) return item.detail_path;
-      return item.id ? `/updates/${encodeURIComponent(item.id)}` : '';
-    }
-
-    function updateDetailItemFromPath() {
-      const slug = updateDetailSlugFromPath();
-      if (!slug) return null;
-      const path = `/updates/${slug}`;
-      return (journalUpdates.items || []).find(item => {
-        const itemPath = (item.detail_path || '').replace(/\/+$/, '');
-        return item.id === slug || itemPath === path;
-      }) || null;
-    }
-
-    function formatFileSize(bytes) {
-      const n = Number(bytes || 0);
-      if (!n) return '';
-      if (n >= 1024 * 1024) return `${(n / 1024 / 1024).toFixed(1)} MB`;
-      if (n >= 1024) return `${Math.round(n / 1024)} KB`;
-      return `${n} B`;
-    }
-
-    function updateTextList(value) {
-      if (Array.isArray(value)) {
-        return value.map(v => String(v || '').trim()).filter(Boolean);
-      }
-      const text = String(value || '').trim();
-      return text ? [text] : [];
-    }
-
-    function updateLinkList(value) {
-      if (!Array.isArray(value)) return [];
-      return value
-        .map(link => {
-          if (!link || typeof link !== 'object') return null;
-          const label = String(link.label || link.title || link.name || '').trim();
-          const url = String(link.url || link.href || '').trim();
-          if (!label || !url) return null;
-          return {
-            label,
-            url,
-            note: String(link.note || '').trim(),
-            external: /^https?:\/\//i.test(url)
-          };
-        })
-        .filter(Boolean);
-    }
-
-    function renderUpdateLinks(links, cls = 'update-link-list') {
-      if (!links.length) return '';
-      return `<div class="${cls}">
-        ${links.map(link => `<a href="${escape(link.url)}"${link.external ? ' target="_blank" rel="noopener"' : ''}>
-          <span>${escape(link.label)}</span>${link.note ? `<em>${escape(link.note)}</em>` : ''}
-        </a>`).join('')}
-      </div>`;
-    }
-
-    function renderUpdateArticle(article) {
-      if (!article || typeof article !== 'object') return '';
-      const intro = updateTextList(article.intro);
-      const stats = Array.isArray(article.stats) ? article.stats : [];
-      const sections = Array.isArray(article.sections) ? article.sections : [];
-      const questions = Array.isArray(article.questions) ? article.questions : [];
-      const takeaways = updateTextList(article.takeaways);
-      const links = updateLinkList(article.links);
-      const note = String(article.note || '').trim();
-
-      const statsHtml = stats
-        .map(stat => {
-          if (!stat || typeof stat !== 'object') return '';
-          const label = String(stat.label || '').trim();
-          const value = String(stat.value || '').trim();
-          const noteText = String(stat.note || '').trim();
-          if (!label && !value && !noteText) return '';
-          return `<div class="update-stat">
-            ${value ? `<strong>${escape(value)}</strong>` : ''}
-            ${label ? `<span>${escape(label)}</span>` : ''}
-            ${noteText ? `<p>${escape(noteText)}</p>` : ''}
-          </div>`;
-        })
-        .filter(Boolean)
-        .join('');
-
-      const sectionsHtml = sections
-        .map(section => {
-          if (!section || typeof section !== 'object') return '';
-          const heading = String(section.heading || '').trim();
-          const body = updateTextList(section.body);
-          const bullets = updateTextList(section.bullets);
-          if (!heading && !body.length && !bullets.length) return '';
-          return `<section class="update-article-section">
-            ${heading ? `<h2>${escape(heading)}</h2>` : ''}
-            ${body.map(p => `<p>${escape(p)}</p>`).join('')}
-            ${bullets.length ? `<ul>${bullets.map(p => `<li>${escape(p)}</li>`).join('')}</ul>` : ''}
-          </section>`;
-        })
-        .filter(Boolean)
-        .join('');
-
-      const questionsHtml = questions
-        .map(q => {
-          if (!q || typeof q !== 'object') return '';
-          const question = String(q.question || '').trim();
-          const answer = updateTextList(q.answer);
-          if (!question && !answer.length) return '';
-          return `<article class="update-question">
-            ${question ? `<h3>${escape(question)}</h3>` : ''}
-            ${answer.map(p => `<p>${escape(p)}</p>`).join('')}
-          </article>`;
-        })
-        .filter(Boolean)
-        .join('');
-
-      if (!intro.length && !statsHtml && !sectionsHtml && !questionsHtml && !takeaways.length && !links.length) return '';
-      return `<div class="update-article">
-        ${note ? `<p class="update-article-note">${escape(note)}</p>` : ''}
-        ${intro.length ? `<section class="update-article-lead">${intro.map(p => `<p>${escape(p)}</p>`).join('')}</section>` : ''}
-        ${statsHtml ? `<section class="update-stats" aria-label="${escape(T('报告关键数据','Report key data'))}">${statsHtml}</section>` : ''}
-        ${sectionsHtml}
-        ${questionsHtml ? `<section class="update-article-section update-question-section">
-          <h2>${escape(article.questions_heading || T('十问导览','Question guide'))}</h2>
-          <div class="update-question-list">${questionsHtml}</div>
-        </section>` : ''}
-        ${takeaways.length ? `<section class="update-article-section update-takeaways">
-          <h2>${T('给选刊用户的启发','Implications for journal selection')}</h2>
-          <ul>${takeaways.map(p => `<li>${escape(p)}</li>`).join('')}</ul>
-        </section>` : ''}
-        ${links.length ? `<section class="update-article-section"><h2>${T('相关链接','Related links')}</h2>${renderUpdateLinks(links)}</section>` : ''}
-      </div>`;
-    }
-
-    const updateDatasetCache = new Map();
-
-    function uniqueUpdateLinks(links) {
-      const seen = new Set();
-      return links.filter(link => {
-        const cleanUrl = String(link.url || '').replace(/\/+$/, '');
-        const key = cleanUrl || String(link.label || '').toLowerCase();
-        if (!key || seen.has(key)) return false;
-        seen.add(key);
-        return true;
-      });
-    }
-
-    function renderNatureIndexRankingsShell(detail) {
-      const dataset = String(detail.rankings_dataset || '').trim();
-      if (!dataset) return '';
-      const defaultTopic = String(detail.rankings_default_topic || 'microbiology').trim();
-      return `<section class="update-topic-rankings" data-nature-index-rankings data-dataset="${escape(dataset)}" data-default-topic="${escape(defaultTopic)}">
-        <div class="nature-rankings-loading">${T('正在加载 Nature Index 学科排行…','Loading Nature Index topic rankings...')}</div>
-      </section>`;
-    }
-
-    async function loadUpdateDataset(url) {
-      if (!updateDatasetCache.has(url)) {
-        updateDatasetCache.set(url, fetchJSON(url));
-      }
-      return updateDatasetCache.get(url);
-    }
-
-    function natureTopicOptions(topics, activeSlug) {
-      const groups = new Map();
-      topics.forEach(topic => {
-        const group = topic.group || 'Topics';
-        if (!groups.has(group)) groups.set(group, []);
-        groups.get(group).push(topic);
-      });
-      return [...groups.entries()].map(([group, rows]) => `<optgroup label="${escape(group)}">
-        ${rows.map(topic => `<option value="${escape(topic.slug)}"${topic.slug === activeSlug ? ' selected' : ''}>${escape(topic.label)}</option>`).join('')}
-      </optgroup>`).join('');
-    }
-
-    function natureShare(value) {
-      const n = Number(value);
-      return Number.isFinite(n) ? n.toFixed(2) : '';
-    }
-
-    function renderNatureRankingsTable(topic) {
-      if (!topic) {
-        return `<div class="nature-rankings-empty">${T('没有匹配的学科。','No matching topic.')}</div>`;
-      }
-      const rows = Array.isArray(topic.rows) ? topic.rows : [];
-      return `<div class="nature-topic-table-head">
-        <div>
-          <p class="updates-kicker">Nature Index Topic</p>
-          <h2>${escape(topic.label)}</h2>
-        </div>
-        <span>Top ${rows.length}</span>
-      </div>
-      <div class="nature-topic-table-wrap">
-        <table class="nature-topic-table">
-          <thead>
-            <tr>
-              <th>${T('排名','Rank')}</th>
-              <th>${T('机构','Institution')}</th>
-              <th>${T('国家/地区','Country/region')}</th>
-              <th>Count</th>
-              <th>Share</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${rows.map(row => `<tr>
-              <td>${escape(row.rank)}</td>
-              <td>${escape(row.institution)}</td>
-              <td>${escape(row.country)}</td>
-              <td>${escape(row.count)}</td>
-              <td>${escape(natureShare(row.share))}</td>
-            </tr>`).join('')}
-          </tbody>
-        </table>
-      </div>`;
-    }
-
-    async function hydrateNatureIndexRankings(root, detail) {
-      const box = root.querySelector('[data-nature-index-rankings]');
-      if (!box) return;
-      const datasetUrl = box.dataset.dataset || detail.rankings_dataset || '';
-      const defaultTopic = box.dataset.defaultTopic || detail.rankings_default_topic || 'microbiology';
-      try {
-        const data = await loadUpdateDataset(datasetUrl);
-        const topics = Array.isArray(data.topics) ? data.topics : [];
-        if (!topics.length) throw new Error('No Nature Index topics in dataset');
-        let activeSlug = topics.some(topic => topic.slug === defaultTopic) ? defaultTopic : topics[0].slug;
-        const sourceUrl = data.source && data.source.page_url ? data.source.page_url : 'https://www.nature.com/nature-index/topics/institution-tables/global/all/';
-        const license = data.source && data.source.license ? data.source.license : {};
-
-        box.innerHTML = `<div class="nature-rankings-head">
-          <div>
-            <p class="updates-kicker">Topic Rankings</p>
-            <h2>${T('Nature Index 学科机构 Top 30','Nature Index topic institution Top 30')}</h2>
-            <p>${escape(data.topic_count || topics.length)} ${T('个学科','topics')} · Global / All sectors · ${escape(data.time_frame?.label || '')}</p>
-          </div>
-          <a href="${escape(sourceUrl)}" target="_blank" rel="noopener">${T('Nature Index 来源','Nature Index source')}</a>
-        </div>
-        <div class="nature-rankings-controls">
-          <label>
-            <span>${T('搜索学科','Search topic')}</span>
-            <input type="search" data-nature-topic-search placeholder="${T('输入 topic，例如 Microbiology / Machine Learning','Enter a topic, e.g. Microbiology / Machine Learning')}">
-          </label>
-          <label>
-            <span>${T('选择学科','Select topic')}</span>
-            <select data-nature-topic-select></select>
-          </label>
-        </div>
-        <div data-nature-topic-table></div>
-        <p class="nature-rankings-license">${T('数值表格来源于 Nature Index；表格数值按','Numerical tables are sourced from Nature Index and attributed under')} <a href="${escape(license.url || 'https://creativecommons.org/licenses/by-nc-sa/4.0/')}" target="_blank" rel="noopener">${escape(license.label || 'CC BY-NC-SA 4.0')}</a>${T(' 标注。','.')}</p>`;
-
-        const search = box.querySelector('[data-nature-topic-search]');
-        const select = box.querySelector('[data-nature-topic-select]');
-        const table = box.querySelector('[data-nature-topic-table]');
-
-        const renderTable = () => {
-          const topic = topics.find(x => x.slug === activeSlug) || topics[0];
-          table.innerHTML = renderNatureRankingsTable(topic);
-        };
-        const applyOptions = (list) => {
-          select.innerHTML = natureTopicOptions(list, activeSlug);
-        };
-
-        applyOptions(topics);
-        renderTable();
-
-        search.addEventListener('input', () => {
-          const q = search.value.trim().toLowerCase();
-          const filtered = q
-            ? topics.filter(topic => `${topic.label} ${topic.group} ${topic.slug}`.toLowerCase().includes(q))
-            : topics;
-          if (!filtered.length) {
-            applyOptions([]);
-            table.innerHTML = renderNatureRankingsTable(null);
-            return;
-          }
-          if (!filtered.some(topic => topic.slug === activeSlug)) {
-            activeSlug = filtered[0].slug;
-          }
-          applyOptions(filtered);
-          renderTable();
-        });
-
-        select.addEventListener('change', () => {
-          activeSlug = select.value || activeSlug;
-          renderTable();
-        });
-      } catch (err) {
-        box.innerHTML = `<div class="nature-rankings-empty">${T('Nature Index 排行数据加载失败，请刷新页面重试。','Nature Index ranking data failed to load. Refresh the page and try again.')}</div>`;
-        console.error(err);
-      }
-    }
-
-    function renderJournalUpdateDetail(item) {
-      const box = $('#journal-updates');
-      if (!box) return;
-      const detail = updateLocalizedDetail(item);
-      const report = detail.report || {};
-      const sourceName = updateSourceName(item);
-      const points = Array.isArray(detail.key_points) ? detail.key_points : [];
-      const sections = Array.isArray(detail.sections) ? detail.sections : [];
-      const articleHtml = renderUpdateArticle(detail.article);
-      const sourceLinks = uniqueUpdateLinks(updateLinkList([
-        item.source_url ? { label: T('原始来源','Original source'), url: item.source_url, note: sourceName } : null,
-        ...(Array.isArray(detail.source_links) ? detail.source_links : []),
-      ].filter(Boolean)));
-      const journalLinks = updateLinkList(detail.journal_links || []);
-      const reportUrl = report.file_detail_url || report.view_url || report.pdf_url || '';
-      const pdfUrl = report.pdf_url || report.download_url || report.view_url || '';
-      const detailTitle = updateTitle(item);
-      const detailDek = updateDek(item);
-      box.innerHTML = `
-        <article class="update-detail">
-          <a class="updates-back" href="/updates" data-updates-back>← ${escape(t('updates_view_all'))}</a>
-          <header class="update-detail-head">
-            <div class="update-card-top">
-              <span class="update-category">${escape(updateCategoryLabel(item.category))}</span>
-              ${item.published_at ? `<time datetime="${escape(item.published_at)}">${escape(formatUpdateDate(item.published_at))}</time>` : ''}
-            </div>
-            <h1>${escape(detailTitle)}</h1>
-            <p class="update-detail-dek">${escape(detailDek)}</p>
-            <div class="update-detail-meta">
-              <span>${escape(t('updates_source'))}: ${escape(sourceName)}</span>
-              ${item.publisher ? `<span>${escape(updateIsZh() ? item.publisher : (updateFirstText(item.publisher_en, updateEnglishText(item.publisher), item.publisher)))}</span>` : ''}
-            </div>
-            ${sourceLinks.length ? renderUpdateLinks(sourceLinks, 'update-source-actions') : ''}
-          </header>
-          ${articleHtml || `
-            ${(detail.lead || item.summary) ? `<section class="update-detail-section"><p>${escape(updateIsZh() ? (detail.lead || item.summary) : updateSummary(item))}</p></section>` : ''}
-            ${points.length ? `<section class="update-detail-section"><h2>${T('要点','Key points')}</h2><ul>${points.map(p => `<li>${escape(p)}</li>`).join('')}</ul></section>` : ''}
-            ${sections.map(section => `
-              <section class="update-detail-section">
-                <h2>${escape(section.heading || '')}</h2>
-                <p>${escape(section.body || '')}</p>
-              </section>`).join('')}
-          `}
-          ${renderNatureIndexRankingsShell(detail)}
-          ${reportUrl ? `
-            <section class="update-report">
-              <div class="update-report-info">
-                <div>
-                  <p class="updates-kicker">${T('报告来源','Report source')}</p>
-                  <h2>${escape(report.title || detailTitle)}</h2>
-                  <p>${[
-                    report.pages ? `${report.pages} ${T('页','pages')}` : '',
-                    formatFileSize(report.size_bytes),
-                    report.file_id ? `File ID ${report.file_id}` : ''
-                  ].filter(Boolean).map(escape).join(' · ')}</p>
-                  ${report.source_note ? `<p class="muted-note">${escape(report.source_note)}</p>` : ''}
-                  <div class="update-report-actions">
-                    ${pdfUrl ? `<a href="${escape(pdfUrl)}" target="_blank" rel="noopener">${T('查看原 PDF','View PDF')}</a>` : ''}
-                    ${report.download_url ? `<a href="${escape(report.download_url)}" target="_blank" rel="noopener">${T('下载 PDF','Download PDF')}</a>` : ''}
-                    ${report.file_detail_url ? `<a href="${escape(report.file_detail_url)}" target="_blank" rel="noopener">${T('官方文件页','Official file page')}</a>` : ''}
-                  </div>
-                </div>
-              </div>
-            </section>` : ''}
-          ${journalLinks.length ? `<section class="update-detail-section update-related-section"><h2>${T('相关期刊','Related journals')}</h2>${renderUpdateLinks(journalLinks)}</section>` : ''}
-        </article>`;
-      box.querySelector('[data-updates-back]')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        history.pushState({ tab: 'updates' }, '', '/updates');
-        renderJournalUpdates();
-        updatePageSeo('updates');
-      });
-      hydrateNatureIndexRankings(box, detail);
-    }
-
-    // Monogram for the no-image banner: leading letters of an ASCII source, else first CJK chars.
-    function updateBannerMark(item) {
-      const name = String(updateSourceName(item) || item.category || '').trim();
-      const ascii = name.match(/[A-Za-z0-9]+/);
-      if (ascii) return ascii[0][0].toUpperCase();
-      return name ? name.replace(/\s+/g, '')[0] : '•';
-    }
-
-    function shortUpdateText(value, max = 72) {
-      const text = String(value || '').replace(/\s+/g, ' ').trim();
-      return text.length > max ? `${text.slice(0, max).replace(/[，。,.;；、\s]+$/g, '')}…` : text;
-    }
-
-    function updateCardBanner(item, sourceName) {
-      const cat = item.category ? ` data-cat="${escape(item.category)}"` : '';
-      const mark = updateBannerMark(item);
-      return `<div class="update-card-image update-card-generated"${cat}>
-        <div class="update-cover-main"><span class="update-card-ph-mark">${escape(mark)}</span><b>${escape(updateTitle(item))}</b></div>
-      </div>`;
-    }
-
-    function renderUpdateCard(item, options = {}) {
-      const isHome = !!options.home;
-      const isBrief = !!options.brief;
-      const dateHtml = item.published_at ? `<time datetime="${escape(item.published_at)}">${escape(formatUpdateDate(item.published_at))}</time>` : '';
-      const sourceName = updateSourceName(item);
-      const summary = updateSummary(item);
-      const body = `
-        ${updateCardBanner(item, sourceName)}
-        ${!isBrief ? `<p class="update-card-summary">${escape(summary)}</p>` : ''}
-        ${!isBrief ? `<div class="update-card-simple-meta">${dateHtml}<span>${escape(updateCategoryLabel(item.category))}</span></div>` : ''}`;
-      const cls = `update-card${options.featured ? ' featured' : ''}${options.compact ? ' compact' : ''}${isHome ? ' home-compact' : ''}${isBrief ? ' brief' : ''}`;
-      const detailPath = updateDetailPath(item);
-      if (detailPath) {
-        return `<a class="${cls}" href="${escape(detailPath)}" data-update-detail="${escape(item.id)}">${body}</a>`;
-      }
-      if (item.source_url) {
-        return `<a class="${cls}" href="${escape(item.source_url)}" target="_blank" rel="noopener">${body}</a>`;
-      }
-      return `<article class="${cls}">${body}</article>`;
-    }
-
-    function attachUpdatesViewAll(root) {
-      root?.querySelector('[data-updates-view-all]')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        activateTab('updates');
-      });
-    }
-
-    function renderJournalUpdatesPreview() {
-      if (!homeUpdatesPreview) return;
-      if (activeQuery) {
-        homeUpdatesPreview.hidden = true;
-        return;
-      }
-      const items = (journalUpdates.items || []).slice(0, 3);
-      if (!items.length) {
-        homeUpdatesPreview.hidden = true;
-        return;
-      }
-      homeUpdatesPreview.hidden = false;
-      homeUpdatesPreview.innerHTML = `
-        <div class="updates-preview-head">
-          <a href="/updates" class="updates-view-all" data-updates-view-all>${escape(t('updates_view_all'))}</a>
-        </div>
-        <div class="updates-preview-grid">
-          ${items.map(item => renderUpdateCard(item, { compact: true, home: true })).join('')}
-        </div>`;
-      attachUpdatesViewAll(homeUpdatesPreview);
-    }
-
-    function renderJournalUpdates() {
-      const box = $('#journal-updates');
-      if (!box) return;
-      document.body.classList.add('update-reading-mode');
-      const detailItem = updateDetailItemFromPath();
-      if (detailItem) {
-        renderJournalUpdateDetail(detailItem);
-        return;
-      }
-      const allItems = journalUpdates.items || [];
-      const filtered = allItems.filter(item => journalUpdateMatches(item));
-      const chipHtml = UPDATE_CATEGORY_KEYS.map(key => {
-        const count = key === 'all' ? allItems.length : allItems.filter(item => item.category === key).length;
-        return `<button class="update-chip ${activeUpdateCategory === key ? 'active' : ''}" type="button" data-update-category="${escape(key)}">
-          <span>${escape(updateCategoryLabel(key))}</span><em>${count}</em>
-        </button>`;
-      }).join('');
-      const updatedAt = journalUpdates.updated_at
-        ? `<span>${escape(t('updates_updated_at'))}: ${escape(formatUpdateDate(journalUpdates.updated_at))}</span>`
-        : '';
-      box.innerHTML = `
-        <div class="updates-page-head">
-          <div>
-            <h1>${escape(t('updates_title'))}</h1>
-            <p>${escape(t('updates_intro'))}</p>
-          </div>
-          <div class="updates-page-meta">${updatedAt}</div>
-        </div>
-        <div class="update-chips" aria-label="${escape(t('updates_title'))}">
-          ${chipHtml}
-        </div>
-        ${filtered.length ? `
-          <section class="updates-list" aria-label="${escape(t('updates_latest'))}">
-            ${filtered.map(item => renderUpdateCard(item, { compact: true })).join('')}
-          </section>
-        ` : `<div class="updates-empty">${escape(t('updates_empty'))}</div>`}`;
-      box.querySelectorAll('[data-update-category]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          activeUpdateCategory = btn.dataset.updateCategory || 'all';
-          renderJournalUpdates();
-        });
-      });
-      box.querySelectorAll('[data-update-detail]').forEach(link => {
-        link.addEventListener('click', (e) => {
-          const href = link.getAttribute('href');
-          if (!href || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-          e.preventDefault();
-          history.pushState({ tab: 'updates' }, '', href);
-          renderJournalUpdates();
-          updatePageSeo('updates');
-        });
-      });
-    }
-
-    window.addEventListener('ailatest:langchange', () => {
-      if (activeTab === 'home') {
-        if (activeQuery) renderHomeIntResults();
-        else renderJournalUpdatesPreview();
-      } else if (activeTab === 'updates' || updatePathIsUpdates()) {
-        renderJournalUpdates();
-      }
-    });
-
-    // Also sync topbar search when on home tab
-    const origSearchHandler = $('#q')?.addEventListener;
-    // (the existing #q listener already handles this for int/dom/fav)
-
-    function activateTab(tab, opts = {}) {
-      if (!TAB_PATHS[tab]) tab = 'home';
-      if (!opts.keepWarnList) activeWarnList = false; // 切换标签默认退出预警名单
-      if (document.body.classList.contains('journal-route')) {
-        _drawerStack = [];
-        closeDrawer(true);
-      }
-      // ── 切换前：把当前搜索框的值存到 activeQuery（仅非选刊tab）──
-      const prevTab = activeTab;
-      if (prevTab !== 'pick') {
-        const qEl = $('#q');
-        if (qEl) {
-          if (prevTab === 'updates') activeUpdateQuery = qEl.value.trim();
-          else activeQuery = qEl.value.trim();
-        }
-      }
-
-      $$('[data-tab]').forEach(x => x.classList.toggle('active', x.dataset.tab === tab));
-      activeTab = tab;
-      document.body.classList.toggle('update-reading-mode', activeTab === 'updates');
-      updateSearchSubmitLabel();
+    $$('.tab').forEach(b => b.addEventListener('click', () => {
+      $$('.tab').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      activeTab = b.dataset.tab;
       $$('.tab-panel').forEach(p => p.hidden = p.dataset.panel !== activeTab);
       $$('[data-international]').forEach(el => el.hidden = activeTab !== 'int');
       $$('[data-domestic]').forEach(el => el.hidden = activeTab !== 'dom');
-      // Sidebar: show on int/dom, hide on home/fav/pick
-      const sidebar = $('#sidebar');
-      if (sidebar) sidebar.style.display = (activeTab === 'int' || activeTab === 'dom') ? '' : 'none';
-      // 统一搜索框 #q：更新 placeholder 和内容
-      const qEl = $('#q');
-      if (qEl) {
-        // 选刊tab：清空内容，独立于其他tab
-        if (activeTab === 'pick') {
-          qEl.value = '';
-        } else if (activeTab === 'updates') {
-          qEl.value = activeUpdateQuery || '';
-        } else {
-          qEl.value = activeQuery || '';
-        }
-        qEl.maxLength = 200;
-        if (activeTab === 'pick') {
-          qEl.placeholder = T('输入你的论文标题和关键词，如：基于深度学习的室内人数预测', 'Enter your paper title and keywords, e.g.: Deep learning for indoor occupancy estimation');
-        } else if (activeTab === 'home') {
-          qEl.placeholder = t('search_home_ph');
-        } else if (activeTab === 'updates') {
-          qEl.placeholder = t('search_updates_ph');
-        } else if (activeTab === 'in') {
-          qEl.placeholder = T('搜索：印度期刊名 / 出版社 / ISSN / 学科', 'Search: India journal title / publisher / ISSN / subject');
-        } else if (activeTab === 'kr') {
-          qEl.placeholder = T('搜索韩国期刊', 'Search Korea journals');
-        } else {
-          qEl.placeholder = t(activeTab === 'dom' ? 'search_dom' : 'search_int');
-        }
-      }
-      // Reset home UI state when switching away
-      if (activeTab !== 'home') {
-        const results = $('#home-results');
-        const subtabs = $('#home-subtabs');
-        const hero = $('.home-hero');
-        const preview = $('#home-updates-preview');
-        const chips = $('#home-search-chips');
-        if (results) results.hidden = true;
-        if (subtabs) subtabs.hidden = true;
-        if (preview) preview.hidden = true;
-        if (chips) chips.hidden = true;
-        if (hero) hero.closest('.tab-panel')?.classList.remove('home-tab-has-results');
-      }
-      if (!opts.skipPath) {
-        const nextPath = TAB_PATHS[activeTab] || '/';
-        if (location.pathname !== nextPath) {
-          try { history.pushState({ tab: activeTab }, '', nextPath + location.search + location.hash); }
-          catch (_) {}
-        }
-      }
-      updatePageSeo(activeTab);
       applyI18n(); // refresh placeholder
       if (activeTab === 'dom') renderDomestic();
       else if (activeTab === 'fav') renderFav();
       else if (activeTab === 'int') renderInt();
-      else if (activeTab === 'in') renderIndia();
-      else if (activeTab === 'my') renderMalaysia();
-      else if (activeTab === 'kr') renderKorea();
-      else if (activeTab === 'updates') renderJournalUpdates();
       else if (activeTab === 'pick') initPickTool();
-      // Home tab: if there's an active query, show results
-      else if (activeTab === 'home' && activeQuery) {
-        showHomeSearchResults();
-      } else if (activeTab === 'home') {
-        showHomeSearchResults();
-      }
-      renderHomeSearchChips();
-      updateStickySearchState();
-    }
-    window.__activateJournalTab = activateTab;
-    // Home entry pills → switch tab
-    document.querySelectorAll('.home-pill[data-tab], .rail-nav-btn[data-tab], .page-brand[data-tab], .rail-brand-mobile[data-tab]').forEach(b => {
-      b.addEventListener('click', (e) => {
-        e.preventDefault();
-        activateTab(b.dataset.tab);
-        if (window.matchMedia('(max-width: 900px)').matches) closeSidebar();
-      });
-    });
-    // Process any clicks that happened before boot() finished
-    if (window.__journalTabQueue) {
-      window.__journalTabQueue.forEach(t => activateTab(t));
-      window.__journalTabQueue = null;
-    }
-    $$('.tab[data-tab]').forEach(b => b.addEventListener('click', (e) => {
-      e.preventDefault();
-      activateTab(b.dataset.tab);
     }));
-    window.addEventListener('popstate', () => {
-      if (renderJournalRoutePage()) return;
-      activateTab(tabFromPath(), { skipPath: true });
-    });
 
-    // Favorites header link → <a href="#fav"> works natively, hashchange handled below
+    $('#fav-tab').addEventListener('click', () => {
+      const favTab = $$('.tab').find(t => t.dataset.tab === 'fav');
+      if (favTab) favTab.click();
+    });
 
     // ─── 国内导航 ───
-    $('#dom-content')?.addEventListener('click', (e) => {
-      const btn = e.target.closest('[data-dom-switch]');
-      if (!btn) return;
-      activeDom = btn.dataset.domSwitch;
-      window.__cnkiShown = 100;
-      window.__cnkxShown = 100;
-      window.__cscdShown = 100;
-      window.__cstpcdShown = 100;
-      renderDomestic();
-    });
-
     document.querySelectorAll('[data-domestic] .nav-item').forEach(btn => {
       btn.addEventListener('click', () => {
         $$('[data-domestic] .nav-item').forEach(n => n.classList.remove('active'));
         btn.classList.add('active');
         activeDom = btn.dataset.dom;
-        window.__cscdShown = 100;
-        window.__cstpcdShown = 100;
         renderDomestic();
       });
     });
@@ -7565,9 +4155,7 @@
     // ─── 语言切换下拉菜单 ───
     (function initLangDropdown() {
       const btn = $('#lang-toggle');
-      if (!btn) return;
       const wrap = btn.closest('.lang-toggle-wrap');
-      if (!wrap) return;
       let dropdown;
 
       function buildDropdown() {
@@ -7581,7 +4169,15 @@
           if (code === lang) opt.classList.add('active');
           opt.addEventListener('click', (e) => {
             e.stopPropagation();
-            setUiLanguage(code);
+            lang = code;
+            localStorage.setItem('ailatest.lang', lang);
+            localizeDefaultFavListName();
+            persistFavLists(false);
+            applyI18n();
+            renderWosList();
+            if (activeTab === 'dom') renderDomestic();
+            else if (activeTab === 'fav') renderFav();
+            else if (activeTab === 'int') renderInt();
             closeDropdown();
           });
           dropdown.appendChild(opt);
@@ -7629,7 +4225,13 @@
       const meta = LANG_META[lang];
       if (meta) btn.textContent = meta.label;
     })();
-  // ──── favorite star delegation (国际 + 国内全覆盖) ────
+    $('#theme-toggle').addEventListener('click', () => {
+      theme = theme === 'light' ? 'dark' : 'light';
+      document.documentElement.dataset.theme = theme;
+      localStorage.setItem('ailatest.theme', theme);
+    });
+
+    // favorite star delegation (国际 + 国内全覆盖)
     let activePicker = null;
     function closeFavPicker() {
       if (activePicker) { activePicker.remove(); activePicker = null; }
@@ -7648,28 +4250,26 @@
         || favsData[fid];
       if (!rec) return;
 
-      // Only 1 list → direct toggle (old behavior)
-      if (favLists.length <= 1) {
+      // If already favorited OR only 1 list → direct toggle (old behavior)
+      const alreadyFav = allFavIds().has(fid);
+      if (alreadyFav || favLists.length <= 1) {
         toggleFav(rec, { src });
         btn.classList.toggle('on');
         btn.textContent = btn.classList.contains('on') ? '★' : '☆';
         if (activeTab === 'fav') renderFav();
         return;
       }
-      // Multiple lists → show picker popover (toggle per list, stays open)
+      // Multiple lists & not yet favorited → show picker popover
       closeFavPicker();
       const picker = document.createElement('div');
       picker.className = 'fav-picker';
-      function renderPickerItems() {
-        return favLists.map(l => {
-          const has = l.ids.includes(fid);
-          return `<div class="fav-picker-item ${has?'active':''}" data-list-id="${escape(l.id)}">
-            <span class="check">${has ? '✓' : ''}</span>
-            <span>${escape(favListDisplayName(l))} (${l.ids.length})</span>
-          </div>`;
-        }).join('');
-      }
-      picker.innerHTML = renderPickerItems() + `<div class="fav-picker-new">＋ ${T('新建清单','New list')}</div>`;
+      picker.innerHTML = favLists.map(l => {
+        const has = l.ids.includes(fid);
+        return `<div class="fav-picker-item ${has?'active':''}" data-list-id="${escape(l.id)}">
+          <span class="check">${has ? '✓' : ''}</span>
+          <span>${escape(favListDisplayName(l))} (${l.ids.length})</span>
+        </div>`;
+      }).join('') + `<div class="fav-picker-new">＋ ${T('新建清单','New list')}</div>`;
       // Position near the button
       const rect = btn.getBoundingClientRect();
       picker.style.position = 'fixed';
@@ -7677,66 +4277,34 @@
       picker.style.left = Math.min(rect.left, window.innerWidth - 220) + 'px';
       document.body.appendChild(picker);
       activePicker = picker;
-      // Picker item click → toggle that specific list
+      // Picker item click
       picker.querySelectorAll('.fav-picker-item').forEach(item => {
         item.addEventListener('click', () => {
           const listId = item.dataset.listId;
-          const list = favLists.find(l => l.id === listId);
-          if (!list) return;
-          const idx = list.ids.indexOf(fid);
-          if (idx >= 0) {
-            list.ids.splice(idx, 1);
-            if (!favLists.some(l => l.ids.includes(fid))) delete favsData[fid];
-          } else {
-            list.ids.push(fid);
-            favsData[fid] = { ...rec, __src: src, __savedAt: Date.now() };
-          }
-          localStorage.setItem(STORAGE_PREFIX + 'favsData', JSON.stringify(favsData));
-          // rebuild flat union for star
-          const union = new Set();
-          favLists.forEach(l => l.ids.forEach(id => union.add(id)));
-          favs = union;
-          localStorage.setItem(STORAGE_PREFIX + 'favs', JSON.stringify([...union]));
-          // update visual
-          const nowInList = list.ids.includes(fid);
-          item.classList.toggle('active', nowInList);
-          const checkSpan = item.querySelector('.check');
-          if (checkSpan) checkSpan.textContent = nowInList ? '✓' : '';
-          // update counts in all items
-          picker.querySelectorAll('.fav-picker-item').forEach(pi => {
-            const li = favLists.find(l => l.id === pi.dataset.listId);
-            if (li) {
-              const nameSpan = pi.querySelector('span:last-child');
-              if (nameSpan) nameSpan.textContent = `${favListDisplayName(li)} (${li.ids.length})`;
-            }
-          });
-          // update star on page
-          const inAnyList = allFavIds().has(fid);
-          btn.classList.toggle('on', inAnyList);
-          btn.textContent = inAnyList ? '★' : '☆';
-          // persist + sync
-          persistFavLists();
-          updateFavCount();
-          if (activeTab === 'fav') renderFav();
-          // keep picker open — user can keep toggling
-        });
-      });
-      picker.querySelector('.fav-picker-new')?.addEventListener('click', () => {
-        closeFavPicker();
-        const name = prompt(T('新清单名称：','New list name:'), T('新清单','New list'));
-        if (name && name.trim()) {
-          const newId = createList(name.trim());
-          const list = favLists.find(l => l.id === newId);
-          if (list) {
-            list.ids.push(fid);
-            favsData[fid] = { ...rec, __src: src, __savedAt: Date.now() };
-            localStorage.setItem(STORAGE_PREFIX + 'favsData', JSON.stringify(favsData));
-            persistFavLists();
-            updateFavCount();
-          }
+          const prevActive = activeListId;
+          activeListId = listId;
+          toggleFav(rec, { src });
+          activeListId = prevActive; // restore
+          closeFavPicker();
           btn.classList.add('on');
           btn.textContent = '★';
           if (activeTab === 'fav') renderFav();
+        });
+      });
+      picker.querySelector('.fav-picker-new')?.addEventListener('click', () => {
+        const name = prompt(T('新清单名称：','New list name:'), T('新清单','New list'));
+        if (name && name.trim()) {
+          const newId = createList(name.trim());
+          const prevActive = activeListId;
+          activeListId = newId;
+          toggleFav(rec, { src });
+          activeListId = prevActive;
+          closeFavPicker();
+          btn.classList.add('on');
+          btn.textContent = '★';
+          if (activeTab === 'fav') renderFav();
+        } else {
+          closeFavPicker();
         }
       });
     });
@@ -7745,26 +4313,15 @@
     document.addEventListener('click', (e) => {
       if (e.target.closest('.fav-star')) return;
       if (e.target.closest('.drag-handle')) return;
-      if (e.target.closest('.vhb-details')) return;
-      const row = e.target.closest('.j-row.clickable'); if (!row) return;
+      const row = e.target.closest('tr.j-row.clickable'); if (!row) return;
       const fid = row.dataset.fid;
       const rec = rowRecordsByFid[fid] || journals.find(r => favId(r) === fid) || favsData[fid];
-      if (rec) openDrawer(rec, { pageMode: true, source: journalOpenSource() });
+      if (rec) openDrawer(rec);
     });
-    $('#drawer-close')?.addEventListener('click', () => {
-      if (document.body.classList.contains('journal-route')) {
-        const backTab = _drawerSourceTab || 'int';
-        const backPath = TAB_PATHS[backTab] || '/global';
-        try { history.pushState({ tab: backTab }, '', backPath); } catch (_) {}
-        closeDrawer(true);
-        activateTab(backTab, { skipPath: true });
-        return;
-      }
-      closeDrawer();
-    });
+    $('#drawer-close')?.addEventListener('click', () => closeDrawer());
     $('#drawer-back')?.addEventListener('click', () => {
       const prev = _drawerStack.pop();
-      if (prev) openDrawer(prev, { pageMode: document.body.classList.contains('journal-route') });
+      if (prev) openDrawer(prev);
     });
     $('#drawer-scrim')?.addEventListener('click', () => closeDrawer());
     // 复制当前期刊的分享链接 + 生成卡片图片
@@ -7773,32 +4330,35 @@
       showJournalShareModal(_currentDrawerRec);
     });
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') { closeDrawer(); closeSidebar(); }
+      if (e.key === 'Escape') closeDrawer();
     });
 
-    function closeSidebar() {
-      $('#sidebar').classList.remove('open');
-      $('.app-rail')?.classList.remove('mobile-open');
-      $('#sidebar-scrim').classList.remove('on');
+    // 移动端侧栏抽屉：☰ 开 / 点 scrim 关 / 点 nav-item 自动关
+    const side = document.querySelector('aside.sidebar');
+    const sideScrim = $('#sidebar-scrim');
+    function openSide() {
+      side?.classList.add('open');
+      if (sideScrim) { sideScrim.hidden = false; requestAnimationFrame(() => sideScrim.classList.add('on')); }
     }
-
-    // 侧栏切换
-    $('#side-toggle')?.addEventListener('click', () => {
-      if (window.matchMedia('(max-width: 900px)').matches) {
-        $('.app-rail')?.classList.toggle('mobile-open');
-      } else {
-        $('#sidebar').classList.toggle('open');
+    function closeSide() {
+      side?.classList.remove('open');
+      if (sideScrim) {
+        sideScrim.classList.remove('on');
+        setTimeout(() => { sideScrim.hidden = true; }, 200);
       }
-      $('#sidebar-scrim').classList.toggle('on');
-      $('#sidebar-scrim').hidden = false;
+    }
+    $('#side-toggle')?.addEventListener('click', openSide);
+    sideScrim?.addEventListener('click', closeSide);
+    side?.addEventListener('click', (e) => {
+      if (window.matchMedia('(max-width: 900px)').matches &&
+          e.target.closest('.nav-item, .chip, .nav-sub')) {
+        closeSide();
+      }
     });
-    $('#rail-close-mobile')?.addEventListener('click', closeSidebar);
-    $('#sidebar-scrim')?.addEventListener('click', () => {
-      $('#sidebar').classList.remove('open');
-      $('.app-rail')?.classList.remove('mobile-open');
-      $('#sidebar-scrim').classList.remove('on');
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeSide();
     });
-  
+
     // auth
     $('#auth-btn').addEventListener('click', () => {
       if (user) {
@@ -7811,763 +4371,444 @@
 
   // ───────── pick-for-me (journal recommendation) ─────────
   let _pickInit = false;
+  const OPENALEX_WORKS_ENDPOINT = location.hostname === 'localhost'
+    ? `${API_BASE}/openalex`
+    : `${location.origin}/openalex`;
+
+  function openAlexWorksUrl(params) {
+    const searchParams = params instanceof URLSearchParams
+      ? new URLSearchParams(params)
+      : new URLSearchParams(String(params || ''));
+    const email = String(user?.email || '').trim().toLowerCase();
+    if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && !searchParams.has('mailto')) {
+      searchParams.set('mailto', email);
+    }
+    return `${OPENALEX_WORKS_ENDPOINT}?${searchParams.toString()}`;
+  }
 
   function initPickTool() {
     if (_pickInit) return;
     _pickInit = true;
 
-    const input = $('#q');
+    const btn = $('#pick-search-btn');
+    const input = $('#pick-input');
     const results = $('#pick-results');
     const status = $('#pick-status');
-    const progress = $('#pick-progress');
-    const progressBar = $('#pick-progress-bar');
-    const progressPct = $('#pick-progress-pct');
-    const charCount = $('#pick-char-count');
-
-    function setPickProgress(text, pct = 0, visible = true) {
-      if (progress) progress.hidden = !visible;
-      if (status) status.textContent = text || '';
-      const n = Math.max(0, Math.min(100, Math.round(pct || 0)));
-      if (progressBar) progressBar.style.width = `${n}%`;
-      if (progressPct) progressPct.textContent = `${n}%`;
-    }
-
-    function updatePickCharCount() {
-      if (!input || !charCount) return;
-      const max = parseInt(input.getAttribute('maxlength') || '200', 10);
-      const len = input.value.length;
-      charCount.textContent = `${len} / ${max}`;
-      charCount.classList.toggle('near', len >= Math.floor(max * 0.85) && len < max);
-      charCount.classList.toggle('limit', len >= max);
-    }
-    input?.addEventListener('input', updatePickCharCount);
-    updatePickCharCount();
-    let pickLastQuery = '';
-    let pickJournalLookup = null;
-    let pickLastReportState = null;
-
-    function refreshRenderedPickReport() {
-      if (!results || !pickLastReportState) return;
-      const html = renderPickAiReport(
-        pickLastReportState.report,
-        pickLastReportState.profile,
-        pickLastReportState.fallbackEntries
-      );
-      const current = results.querySelector('.pick-report');
-      if (current && html) current.outerHTML = html;
-      else if (current) current.remove();
-      else if (html) results.insertAdjacentHTML('afterbegin', html);
-    }
-    window.__refreshPickReportI18n = refreshRenderedPickReport;
-
-    function pickFiltersPayload() {
-      const indices = [];
-      if (document.getElementById('pick-filter-sci')?.checked) indices.push('SCIE');
-      if (document.getElementById('pick-filter-ssci')?.checked) indices.push('SSCI');
-      if (document.getElementById('pick-filter-ahci')?.checked) indices.push('AHCI');
-      if (document.getElementById('pick-filter-esci')?.checked) indices.push('ESCI');
-      return {
-        indices,
-        exclude_multidisciplinary: !!document.getElementById('pick-filter-comprehensive')?.checked,
-        free: !!document.getElementById('pick-filter-free')?.checked,
-      };
-    }
-
-    function ensurePickJournalLookup() {
-      if (pickJournalLookup) return pickJournalLookup;
-      const map = new Map();
-      for (const r of journals || []) {
-        [r.issn, r.eissn, r.slug, favId(r), r.name].filter(Boolean).forEach(v => {
-          map.set(String(v).toLowerCase(), r);
-          const compact = compactIssnKey(v);
-          if (compact) map.set(compact.toLowerCase(), r);
-        });
-      }
-      pickJournalLookup = map;
-      return map;
-    }
-
-    function resolvePickJournal(item) {
-      const map = ensurePickJournalLookup();
-      const keys = [item.issn, item.eissn, item.slug, item.name].filter(Boolean);
-      for (const key of keys) {
-        const direct = map.get(String(key).toLowerCase());
-        if (direct) return direct;
-        const compact = compactIssnKey(key);
-        if (compact && map.get(compact.toLowerCase())) return map.get(compact.toLowerCase());
-      }
-      return null;
-    }
-
-    async function fetchAiPick(query) {
-      const request = {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(user && user.token ? { 'Authorization': `Bearer ${user.token}` } : {}),
-        },
-        body: JSON.stringify({
-          query,
-          filters: pickFiltersPayload(),
-          limit: 120,
-          language: pickReportLang(),
-          locale: lang,
-        }),
-      };
-      let res;
-      try {
-        res = await fetch(`${API_BASE}/pick`, request);
-      } catch (err) {
-        const fallbackBase = 'https://api.ailatest.org';
-        if (API_BASE === fallbackBase) throw err;
-        res = await fetch(`${fallbackBase}/pick`, request);
-      }
-      const data = await res.json().catch(() => null);
-      if (!res.ok || !data || data.ok === false) {
-        const msg = data?.error || data?.message || `HTTP ${res.status}`;
-        const error = new Error(msg);
-        error.status = res.status;
-        error.data = data;
-        throw error;
-      }
-      return data;
-    }
-
-    function aiEntriesFromResults(data) {
-      const profile = data?.profile || {};
-      return (data?.results || []).map(item => {
-        const r = resolvePickJournal(item);
-        const rec = r || {
-          name: item.name,
-          issn: item.issn,
-          eissn: item.eissn,
-          slug: item.slug,
-          if_2024: item.if_2024,
-          if_quartile: item.if_quartile,
-          cas_zone: item.cas_zone,
-          cas_top: item.cas_top,
-          indices: item.indices || [],
-          publisher: item.publisher || '',
-          wos_categories: item.topics || [],
-          doaj: item.doaj || null,
-        };
-        const issn = rec.issn || rec.eissn || item.issn || item.eissn || item.slug || item.name;
-        return {
-          journalRec: rec,
-          issn,
-          zone: rec.cas_zone || item.cas_zone,
-          top: !!(rec.cas_top || item.cas_top),
-          jcr_q: rec.if_quartile || item.if_quartile,
-          indices: rec.indices || item.indices || [],
-          wos_categories: rec.wos_categories || item.topics || [],
-          topics: item.topics || profile.wos_categories || [],
-          matched: item.matched || profile.domain_keywords || [],
-          count: Math.max(1, (item.matched || []).length || (profile.domain_keywords || []).length || 1),
-          score: Math.max(0.01, Number(item.score || 1) / 100),
-          srcName: rec.name || item.name,
-          semanticProfile: profile,
-        };
-      });
-    }
-
-    function pickAiErrorMessage(error) {
-      if (error?.status === 401 || error?.status === 403) {
-        doLogout();
-        return t('pick_ai_auth_error');
-      }
-      if (error?.status === 429) return t('pick_ai_quota_error');
-      if (error?.status === 503 || /api[_ -]?key|secret|not configured/i.test(error?.message || '')) {
-        return t('pick_ai_config_error');
-      }
-      // fetch 本身失败（断网/代理/被墙）→ TypeError: Failed to fetch
-      if (error instanceof TypeError && /fetch|network/i.test(error?.message || '')) {
-        return T('AI 推荐网络请求失败（请检查网络或代理），已自动改用本地匹配。','AI request failed at network level (check connection/proxy); switched to local matching.');
-      }
-      return t('pick_ai_unavailable');
-    }
-
-    function pickNormText(value) {
-      return String(value || '')
-        .toLowerCase()
-        .normalize('NFKD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/&/g, ' and ')
-        .replace(/[^a-z0-9\u4e00-\u9fff]+/g, ' ')
-        .replace(/\s+/g, ' ')
-        .trim();
-    }
-
-    function pickUnique(values, max = 16) {
-      const out = [];
-      const seen = new Set();
-      for (const value of values || []) {
-        const raw = String(value || '').trim();
-        const key = pickNormText(raw);
-        if (!key || seen.has(key)) continue;
-        seen.add(key);
-        out.push(raw);
-        if (out.length >= max) break;
-      }
-      return out;
-    }
-
-    function pickIsZhLang() {
-      return lang === 'zh-CN' || lang === 'zh-TW';
-    }
-
-    function pickReportLang() {
-      return pickIsZhLang() ? 'zh' : 'en';
-    }
-
-    function pickHasCjk(value) {
-      return /[\u3400-\u9fff\uf900-\ufaff]/.test(String(value || ''));
-    }
-
-    function pickReadableField(value) {
-      const raw = String(value || '').replace(/\s+/g, ' ').trim();
-      if (!raw || pickIsZhLang() || pickHasCjk(raw)) return raw;
-      return raw.replace(/\b([a-z])/g, m => m.toUpperCase());
-    }
-
-    function pickMetricIf(r) {
-      return r && r.if_2024 != null && r.if_2024 !== '' ? (+r.if_2024).toFixed(1) : '';
-    }
-
-    function pickMetricCas(r) {
-      if (!r || !r.cas_zone) return '';
-      return `${r.cas_zone}${T('区','')}${r.cas_top ? ' TOP' : ''}`;
-    }
-
-    function pickDoajApcText(r) {
-      const doaj = r && typeof r.doaj === 'object' ? r.doaj : null;
-      if (!doaj) return '';
-      const apc = String(doaj.apc || '').trim();
-      const fee = String(doaj.fee || '').trim();
-      if (!apc && !fee) return '';
-      if (/^no$/i.test(apc)) return T('免费（DOAJ）','Free (DOAJ)');
-      if (fee) return fee;
-      if (/^yes$/i.test(apc)) return T('有 APC（DOAJ）','APC listed (DOAJ)');
-      return apc;
-    }
-
-    function pickDoajApcBadge(r) {
-      const text = pickDoajApcText(r);
-      if (!text) return '';
-      const noApc = /^no$/i.test(String(r?.doaj?.apc || '').trim());
-      return `<span class="pick-apc ${noApc ? 'pick-apc-free' : 'pick-apc-paid'}" title="${T('DOAJ 公开 APC 数据','Public APC data from DOAJ')}">${escape(text)}</span>`;
-    }
-
-    function pickIsDoajNoApc(r) {
-      return /^no$/i.test(String(r?.doaj?.apc || '').trim());
-    }
-
-    // Fee info combined: site "free to publish" flag first, then public DOAJ APC data.
-    function pickFeeBadge(r) {
-      if (r?.free) {
-        return `<span class="pick-apc pick-apc-free" title="${T('提供 OA 发表选项（含 Diamond/Gold/Hybrid）','Offers OA publishing option (Diamond/Gold/Hybrid)')}">${T('免费发表','Free to publish')}</span>`;
-      }
-      return pickDoajApcBadge(r);
-    }
-
-    function pickDomesticSources() {
-      if (!domestic) return [];
-      const out = [];
-      const add = (source, records) => {
-        (records || []).forEach(record => {
-          if (record && (record.name || record.cn_name || record.title)) out.push({ source, record });
-        });
-      };
-      add('cnki_major', domestic.cnki_major?.records);
-      add('zju', domestic.zju?.records);
-      add('nsfc_mgmt', domestic.nsfc_mgmt?.records);
-      add('cscd', domestic.cscd?.records);
-      add('cstpcd', domestic.cstpcd?.records);
-      add('cnkx', domestic.cnkx?.records);
-      add('cssci_core', domestic.cssci_core);
-      add('cssci_ext', domestic.cssci_ext);
-      add('pku_core', domestic.pku_core);
-      return out;
-    }
-
-    function pickCleanDomesticName(value) {
-      return String(value || '').replace(/[＊*☆★]/g, '').replace(/\s+/g, '').trim();
-    }
-
-    // Resolve an AI-suggested Chinese journal name against the domestic catalogs.
-    function resolveDomesticByName(name) {
-      const clean = pickCleanDomesticName(name);
-      if (!clean) return null;
-      const sourceRows = pickDomesticSources();
-      if (!sourceRows.length) return null;
-      const exact = sourceRows.filter(({ record }) => pickCleanDomesticName(record.name || record.cn_name || record.title) === clean);
-      const loose = exact.length ? [] : sourceRows.filter(({ record }) => pickCleanDomesticName(record.name || record.cn_name || record.title).includes(clean));
-      const hits = exact.length ? exact : loose;
-      if (!hits.length) return null;
-      const sourceWeight = { cnki_major:80, zju:70, nsfc_mgmt:65, cstpcd:63, cscd:62, cnkx:60, cssci_core:55, pku_core:50, cssci_ext:45 };
-      hits.sort((a, b) => {
-        const ar = a.record, br = b.record;
-        const as = (sourceWeight[a.source] || 0) + (ar.issn ? 12 : 0) + (ar.cn_code ? 8 : 0);
-        const bs = (sourceWeight[b.source] || 0) + (br.issn ? 12 : 0) + (br.cn_code ? 8 : 0);
-        return bs - as;
-      });
-      const best = hits[0];
-      return {
-        record: { ...best.record, name: clean, __src: best.source },
-        source: best.source,
-        cnki: hits.find(h => h.source === 'cnki_major')?.record || null,
-      };
-    }
-
-    function pickReportFallbackReason(source) {
-      const rec = source?.journalRec || source || {};
-      const parts = pickUnique([
-        ...(source?.matched || []),
-        ...(source?.topics || []),
-        ...(source?.wos_categories || []),
-        ...(rec.wos_categories || []),
-        rec.esi_category,
-        rec.cas_major_cn,
-        rec.cas_major_cat,
-      ].filter(Boolean), 3).map(pickReadableField).filter(Boolean);
-      if (pickIsZhLang()) {
-        return parts.length ? `与${parts.join('、')}方向匹配，站内指标可核验。` : '与论文主题匹配，站内指标可核验。';
-      }
-      return parts.length ? `Matches ${parts.join(', ')}; site metrics are available.` : 'Matches the topic; site metrics are available.';
-    }
-
-    function pickReportReason(value, source) {
-      const text = String(value || '').replace(/\s+/g, ' ').trim();
-      if (text && (pickIsZhLang() ? pickHasCjk(text) : !pickHasCjk(text))) return text;
-      return pickReportFallbackReason(source);
-    }
-
-    function pickFallbackReport(profile, entries = []) {
-      const defs = pickIsZhLang()
-        ? [
-            ['primary', '优先主投', 0, 6],
-            ['backup', '稳妥备选', 6, 14],
-            ['fallback', '保底期刊', 14, 20],
-          ]
-        : [
-            ['primary', 'Primary targets', 0, 6],
-            ['backup', 'Solid alternatives', 6, 14],
-            ['fallback', 'Safer fallbacks', 14, 20],
-          ];
-      const fields = pickUnique([...(profile?.research_fields || []), ...(profile?.wos_categories || [])], 4)
-        .map(pickReadableField).filter(Boolean);
-      return {
-        intro: pickIsZhLang()
-          ? `该论文主要落在${fields.join('、') || '相关交叉学科'}方向，以下推荐按主题匹配度与站内期刊指标分层。`
-          : `This paper is positioned around ${fields.join(', ') || 'the identified research field'}; recommendations are tiered by topic fit and site metrics.`,
-        tiers: defs.map(([id, label, start, end]) => ({
-          id,
-          label,
-          items: entries.slice(start, end).map(e => ({
-            name: e.journalRec?.name || e.srcName || e.issn || '',
-            reason: pickReportFallbackReason(e),
-          })).filter(x => x.name),
-        })).filter(t => t.items.length),
-        chinese: [],
-        strategy: pickIsZhLang()
-          ? ['优先选择主题贴合且分区稳定的期刊。', '保底期刊用于覆盖审稿风险，不建议把预警期刊放入主投。']
-          : ['Prioritize journals with strong topic fit and stable rankings.', 'Use fallback journals to manage review risk; avoid warning-list journals as primary targets.'],
-      };
-    }
-
-    function pickLocalizedReport(report) {
-      if (!report || typeof report !== 'object') return null;
-      const key = pickReportLang();
-      const i18n = report.i18n && typeof report.i18n === 'object' ? report.i18n : null;
-      const localized = i18n?.[key] && typeof i18n[key] === 'object' ? i18n[key] : report;
-      return {
-        intro: localized.intro || '',
-        tiers: Array.isArray(localized.tiers) ? localized.tiers : [],
-        chinese: Array.isArray(localized.chinese) ? localized.chinese : [],
-        strategy: Array.isArray(localized.strategy) ? localized.strategy : [],
-      };
-    }
-
-    function pickEnsureReport(report, profile, fallbackEntries) {
-      const localized = pickLocalizedReport(report);
-      const fallback = pickFallbackReport(profile, fallbackEntries);
-      const out = localized ? { ...fallback, ...localized } : fallback;
-      if (!Array.isArray(out.tiers) || !out.tiers.length) out.tiers = fallback.tiers;
-      if (!Array.isArray(out.chinese)) out.chinese = [];
-      const intro = String(out.intro || '').trim();
-      if (!intro || (pickIsZhLang() ? !pickHasCjk(intro) : pickHasCjk(intro))) out.intro = fallback.intro;
-      const strategy = (out.strategy || []).map(s => String(s || '').replace(/\s+/g, ' ').trim())
-        .filter(s => s && (pickIsZhLang() ? pickHasCjk(s) : !pickHasCjk(s)));
-      out.strategy = strategy.length ? strategy : fallback.strategy;
-      return out;
-    }
-
-    function pickTierLabel(tier) {
-      const id = String(tier?.id || '').toLowerCase();
-      const zh = { primary:'优先主投', backup:'稳妥备选', fallback:'保底期刊', tier:'推荐期刊' };
-      const en = { primary:'Primary targets', backup:'Solid alternatives', fallback:'Safer fallbacks', tier:'Recommended journals' };
-      const map = pickIsZhLang() ? zh : en;
-      const label = String(tier?.label || '').trim();
-      if (!label || (pickIsZhLang() ? !pickHasCjk(label) : pickHasCjk(label))) return map[id] || map.tier;
-      return label;
-    }
-
-    // One international-journal row in the AI report: AI gives name+reason,
-    // all metrics are resolved from site data; unresolved names are flagged.
-    function renderPickReportEnRow(item, i) {
-      const rec = resolvePickJournal({ name: item.name });
-      const reason = pickReportReason(item.reason, rec || item);
-      if (!rec) {
-        return `<tr>
-          <td class="pick-report-num">${i + 1}</td>
-          <td>${escape(titleCase(item.name))} <span class="pick-report-missing">${T('站内未收录','not in site data')}</span></td>
-          <td colspan="4"><span class="muted-cell">&mdash;</span></td>
-          <td class="pick-report-reason">${escape(reason)}</td>
-        </tr>`;
-      }
-      const fid = favId(rec);
-      if (fid) rowRecordsByFid[fid] = { ...rec, __src: 'int' };
-      const idxText = (rec.indices || []).join(' / ');
-      const feeHtml = pickFeeBadge(rec);
-      const warnText = (rec.warning || rec.citic_warning || rec.on_hold || rec.under_review) ? ' ⚠' : '';
-      return `<tr>
-        <td class="pick-report-num">${i + 1}</td>
-        <td>
-          <a href="#j/${escape(fid)}" data-pick-report-fid="${escape(fid)}">${escape(titleCase(rec.name || item.name))}</a>${warnText}
-          ${idxText ? `<span class="pick-report-meta">${escape(idxText)}</span>` : ''}
-        </td>
-        <td>${pickMetricIf(rec) || '<span class="muted-cell">&mdash;</span>'}</td>
-        <td>${escape(rec.if_quartile || '') || '<span class="muted-cell">&mdash;</span>'}</td>
-        <td>${pickMetricCas(rec) ? escape(pickMetricCas(rec)) : '<span class="muted-cell">&mdash;</span>'}</td>
-        <td>${feeHtml || '<span class="muted-cell">&mdash;</span>'}</td>
-        <td class="pick-report-reason">${escape(reason)}</td>
-      </tr>`;
-    }
-
-    function renderPickReportCnRow(item, i) {
-      const hit = resolveDomesticByName(item.name);
-      const unresolvedReason = pickReportReason(item.reason, item);
-      if (!hit) {
-        return `<tr>
-          <td class="pick-report-num">${i + 1}</td>
-          <td>${escape(item.name)} <span class="pick-report-missing">${T('站内未收录','not in site data')}</span></td>
-          <td><span class="muted-cell">&mdash;</span></td>
-          <td class="pick-report-reason">${escape(unresolvedReason)}</td>
-        </tr>`;
-      }
-      const r = hit.record;
-      const fid = favId(r);
-      if (fid) rowRecordsByFid[fid] = { ...r, __src: r.__src || hit.source };
-      const crossBadges = renderDomCrossBadges({ name: r.name, issn: r.issn, cn_code: r.cn_code });
-      const metrics = [
-        hit.cnki?.compound_if ? `<span class="domsrc-pill">CNKI ${T('复合IF','compound IF')} ${escape(hit.cnki.compound_if)}</span>` : '',
-        hit.cnki?.comprehensive_if ? `<span class="domsrc-pill">CNKI ${T('综合IF','comprehensive IF')} ${escape(hit.cnki.comprehensive_if)}</span>` : '',
-      ].filter(Boolean).join('');
-      const dataHtml = `${crossBadges ? `<div class="pick-report-badges pick-report-dom-badges">${crossBadges}</div>` : '<span class="muted-cell">&mdash;</span>'}${metrics ? `<div class="pick-report-dom-metrics">${metrics}</div>` : ''}`;
-      const reason = pickReportReason(item.reason, r);
-      return `<tr>
-        <td class="pick-report-num">${i + 1}</td>
-        <td><a href="#j/${escape(fid)}" data-pick-report-fid="${escape(fid)}">${escape(r.name)}</a></td>
-        <td>${dataHtml}</td>
-        <td class="pick-report-reason">${escape(reason)}</td>
-      </tr>`;
-    }
-
-    // AI recommendation report: the AI picks tiers/reasons/strategy, every
-    // metric shown comes from site data (clickable into the journal page).
-    function renderPickAiReport(report, profile, fallbackEntries = []) {
-      if (!report && !fallbackEntries.length) return '';
-      const activeReport = pickEnsureReport(report, profile, fallbackEntries);
-      if (!activeReport || (!(activeReport.tiers || []).length && !(activeReport.chinese || []).length)) return '';
-      const fields = pickUnique([
-        ...(profile?.research_fields || []),
-        ...(profile?.wos_categories || []),
-      ], 10).map(pickReadableField).filter(Boolean);
-      const fieldsText = fields.join(' · ');
-      const intro = activeReport.intro || '';
-      const tiersHtml = (activeReport.tiers || []).map(tier => {
-        const items = Array.isArray(tier.items) ? tier.items : [];
-        if (!items.length) return '';
-        return `<section class="pick-report-section pick-tier-${escape(tier.id || 'tier')}">
-        <div class="pick-report-section-head">
-          <h3><span class="pick-tier-dot" aria-hidden="true"></span>${escape(pickTierLabel(tier))}<span class="pick-tier-count">${items.length} ${T('本','journals')}</span></h3>
-        </div>
-        <div class="pick-report-table-wrap">
-          <table class="pick-report-table pick-report-tier-table">
-            <thead><tr><th>#</th><th>${T('期刊','Journal')}</th><th>IF</th><th>JCR</th><th>${T('中科院','CAS')}</th><th>${T('费用','Fees')}</th><th>${T('推荐理由','Why')}</th></tr></thead>
-            <tbody>${items.map((item, i) => renderPickReportEnRow(item, i)).join('')}</tbody>
-          </table>
-        </div>
-      </section>`;
-      }).join('');
-      const chineseItems = activeReport.chinese || [];
-      const chineseNote = T(
-        '期刊由 AI 按论文主题推荐，收录与分级信息来自站内 CSSCI、北大核心、中国科协、CNKI 等目录。',
-        'Chinese-language options suggested by AI; catalog and tier data come from site CSSCI, PKU Core, CAST and CNKI records.'
-      );
-      const chineseHead = chineseItems.length ? `<div class="pick-report-section-head">
-          <h3><span class="pick-tier-dot" aria-hidden="true"></span>${T('中文期刊推荐','Chinese journal appendix')}<span class="pick-tier-count">${chineseItems.length} ${T('本','journals')}</span></h3>
-          <p>${chineseNote}</p>
-        </div>` : '';
-      const chineseBody = chineseItems.length ? `<div class="pick-report-table-wrap">
-          <table class="pick-report-table pick-report-dom-table">
-            <thead><tr><th>#</th><th>${T('期刊','Journal')}</th><th>${T('站内数据','Site data')}</th><th>${T('推荐理由','Why')}</th></tr></thead>
-            <tbody>${chineseItems.map((item, i) => renderPickReportCnRow(item, i)).join('')}</tbody>
-          </table>
-        </div>` : '';
-      const chineseHtml = chineseItems.length
-        ? pickIsZhLang()
-          ? `<section class="pick-report-section pick-tier-chinese">${chineseHead}${chineseBody}</section>`
-          : `<details class="pick-report-section pick-tier-chinese pick-report-appendix">
-              <summary><span class="pick-tier-dot" aria-hidden="true"></span>${T('中文期刊推荐','Chinese journal appendix')}<span class="pick-tier-count">${chineseItems.length} ${T('本','journals')}</span></summary>
-              <p class="pick-report-appendix-note">${chineseNote}</p>
-              ${chineseBody}
-            </details>`
-        : '';
-      const strategyTips = (activeReport.strategy || []).concat([
-        T('费用列综合站内「免费发表」标记（含 Diamond/Gold/Hybrid OA 选项）与 DOAJ 公开 APC 数据；空白表示暂无公开费用信息，不代表免费或收费。','The fees column combines the site "free to publish" flag (Diamond/Gold/Hybrid OA options) with public DOAJ APC data; blank cells mean no public fee info, not free or paid.'),
-      ]);
-      const strategyHtml = `<section class="pick-report-section">
-        <div class="pick-report-section-head">
-          <h3>${T('投稿策略建议','Submission strategy')}</h3>
-        </div>
-        <ul class="pick-report-strategy">${strategyTips.map(tip => `<li>${escape(tip)}</li>`).join('')}</ul>
-      </section>`;
-      return `<div class="pick-report">
-        <div class="pick-report-head">
-          <div>
-            <div class="pick-report-kicker">${T('AI 综合荐刊','AI recommendation report')}</div>
-            <h2>${T('荐刊综合建议','Comprehensive journal recommendation')}</h2>
-          </div>
-          <span class="pick-report-source">${T('AI 给出梯队与理由，指标数据全部来自站内：IF / JCR / 中科院 / 索引 / 费用','AI picks tiers and reasons; all metrics come from site data: IF / JCR / CAS / indexes / fees')}</span>
-        </div>
-        ${intro ? `<p class="pick-report-intro">${escape(intro)}</p>` : ''}
-        ${fieldsText ? `<div class="pick-report-fields"><span class="pick-report-fields-label">${T('匹配方向','Matched fields')}</span><b class="pick-report-fields-text">${escape(fieldsText)}</b></div>` : ''}
-        ${tiersHtml}
-        ${chineseHtml}
-        ${strategyHtml}
-      </div>`;
-    }
 
     async function doSearch() {
-      // 未登录用户可用本地匹配（每日限次）；登录后不限本地次数，AI 推荐另有服务端额度。
-      if (isOverLimit('searches', 10) && !requireLogin(T('今日免费荐刊搜索已达上限，请登录后继续使用','Daily free search limit reached. Sign in to continue.'))) return;
-      incrementUsage('searches');
-
       const query = input.value.trim();
-      if (!query) { setPickProgress(T('请输入内容','Please enter a query'), 0); return; }
+      if (!query) { status.textContent = T('请输入内容','Please enter a query'); return; }
 
-      setPickProgress(T('准备研究主题与筛选条件…','Preparing topic and filters…'), 8);
+      if (!user || !user.token) {
+        status.textContent = T('请先登录/注册后使用推荐期刊功能', 'Please sign in or create an account to use journal recommendations');
+        results.innerHTML = `<div class="pick-no-results" style="padding:40px 20px">
+          <p>${T('推荐期刊需要登录账号，每个账号拥有独立使用额度。','Journal recommendations require an account. Each account has its own quota.')}</p>
+          <button class="btn primary" id="pick-login-btn" type="button">${T('登录 / 注册','Sign in / Sign up')}</button>
+        </div>`;
+        document.getElementById('pick-login-btn')?.addEventListener('click', startLogin);
+        return;
+      }
+
+      let quotaInfo = null;
+      try {
+        const quotaResp = await fetch(`${API_BASE}/pick/quota/consume`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${user.token}` },
+        });
+        quotaInfo = await readJsonResponse(quotaResp, T('额度检查失败','Quota check failed'));
+      } catch (err) {
+        const msg = err.message || '';
+        if (/login required|unauthorized|401/i.test(msg)) {
+          status.textContent = T('登录已过期，请重新登录后使用推荐期刊功能','Your session has expired. Please sign in again to use journal recommendations');
+          results.innerHTML = `<div class="pick-no-results" style="padding:40px 20px">
+            <button class="btn primary" id="pick-login-btn" type="button">${T('重新登录','Sign in again')}</button>
+          </div>`;
+          document.getElementById('pick-login-btn')?.addEventListener('click', startLogin);
+          return;
+        }
+        if (/quota exceeded|429/i.test(msg)) {
+          status.textContent = T('今日免费推荐次数已用完，可升级后继续使用','Daily free recommendation quota used up. Upgrade to continue');
+          results.innerHTML = `<div class="pick-no-results" style="padding:40px 20px">
+            <p>${T('免费账号每天 5 次；付费账号可配置更高月额度。','Free accounts get 5 searches per day. Paid accounts can receive a higher monthly quota.')}</p>
+            <p>${T('联系 support@ailatest.org 升级额度','Contact support@ailatest.org to upgrade your quota')}</p>
+          </div>`;
+          return;
+        }
+        status.textContent = fetchFailureMessage(err, T('额度检查','Quota check'));
+        return;
+      }
+
+      status.textContent = T('正在搜索相关论文…','Searching related papers…');
       results.innerHTML = '';
 
       try {
-        // Lazy-load local topic snapshot for richer journal profiles. No live API calls.
+        // Lazy-load oaMap for topic matching (only if pick tool is first to need it)
         if (!oaMap) {
-          setPickProgress(T('加载本地期刊画像…','Loading local journal profiles…'), 18);
-          try { oaMap = await fetchJSON('data/oa.json.gz'); }
+          try { oaMap = await fetchJSON('data/oa.json.gz?v=' + (typeof __BUILD_VER !== 'undefined' ? __BUILD_VER : Date.now())); }
           catch(e) { oaMap = {}; }
         }
 
-        let entries = null;
-        let pickMode = 'local';
-        let quotaInfo = null;
-        let statusNotice = '';
-        let aiReport = null;
-        let aiProfile = null;
-        const useAi = !!document.getElementById('pick-ai-toggle')?.checked;
-        if (useAi && !(user && user.token)) {
-          // AI 需要登录：提示后自动改用本地匹配，而不是直接中断。
-          statusNotice = t('pick_ai_login');
-        } else if (useAi) {
-          try {
-            setPickProgress(T('AI 正在分析研究语义…','AI is analyzing research context…'), 34);
-            const aiData = await fetchAiPick(query);
-            setPickProgress(T('整理 AI 推荐梯队…','Organizing AI recommendation tiers…'), 72);
-            entries = aiEntriesFromResults(aiData);
-            pickMode = 'ai';
-            quotaInfo = aiData.quota || null;
-            aiReport = aiData.report || null;
-            aiProfile = aiData.profile || null;
-          } catch (e) {
-            // AI 失败（网络/额度/配置）→ 自动回退本地匹配，并在状态栏说明原因。
-            statusNotice = pickAiErrorMessage(e);
-            setPickProgress(statusNotice, 42);
+        // Step 1: Extract keywords from input, then search OpenAlex
+        const lines = query.split('\n').filter(l => l.trim());
+        let titleTerms = [];
+        let abstractTerms = [];
+        let explicitKeywords = [];
+
+        for (const line of lines) {
+          const trimmed = line.trim();
+
+          // Detect keywords line (English/Chinese markers)
+          if (/^keywords?:/i.test(trimmed) || /^关键词[：:]/.test(trimmed) || /^關鍵詞[：:]/.test(trimmed)) {
+            const kwStr = trimmed.replace(/^keywords?:/i, '').replace(/^关键词[：:]/, '').replace(/^關鍵詞[：:]/, '').trim();
+            explicitKeywords = kwStr.split(/[,;，；、\/]/).map(s => s.trim()).filter(s => s.length > 2);
+            continue;
           }
         }
 
-        if (!entries) {
-          setPickProgress(T('匹配本地候选期刊…','Matching local candidate journals…'), 45);
-          // 本地匹配：词干化 + 标题短语 + 歧义词消歧 + 领域锚点，逻辑在 js/pick-match.js（与 Worker 共用）。
-          const PM = window.PickMatch;
-          if (!PM) {
-            setPickProgress(T('本地匹配模块加载失败，请刷新页面重试','Local matching module failed to load. Please refresh.'), 0);
-            return;
+        // Title = first non-empty line (keep concise)
+        const firstLine = lines.find(l => !/^keywords?:/i.test(l) && !/^关键词[：:]/.test(l));
+        if (firstLine) {
+          let t = firstLine.replace(/[.。！!?？,，;；]+$/, '').trim();
+          if (t.length > 80) {
+            const firstPart = t.slice(0, 60);
+            const lastSpace = firstPart.lastIndexOf(' ');
+            t = (lastSpace > 20 ? firstPart.slice(0, lastSpace) : firstPart).replace(/[,;，；]+$/, '');
           }
-          const localProfile = PM.buildLocalProfile(query);
-          if (!localProfile.terms.length) {
-            setPickProgress(T('请输入更具体的研究对象关键词（避免只填“分析/机制/演化”等方法词）','Enter more specific research-topic keywords (not just method words like analysis/mechanism)'), 0);
-            return;
-          }
+          titleTerms = [t];
+        }
 
-          function localTopicProfile(r) {
-            const issns = [r.issn, r.eissn].filter(Boolean).map(x => String(x).toUpperCase());
-            const topics = [];
-            for (const k of issns) {
-              const rec = oaMap && oaMap[k];
-              if (!rec) continue;
-              (rec.tp || []).forEach(t => topics.push(t));
-            }
-            return [...new Set(topics)];
-          }
+        // ── Multi-query search with OpenAlex 'search' (relevance) param ──
+        // OpenAlex 'search' uses BM25 matching (not strict AND), so 5-8 keywords work fine.
+        // We run 2-3 complementary queries, deduplicate papers, then aggregate by journal.
 
-          entries = [];
-          for (const r of journals) {
-            const topics = localTopicProfile(r);
-            const res = PM.scoreLocal(r, localProfile, topics);
-            if (!PM.passesLocalThreshold(res, localProfile)) continue;
-            let score = res.score;
-            const idx = r.indices || [];
-            if (idx.includes('SCIE') || idx.includes('SSCI') || idx.includes('AHCI') || idx.includes('ESCI')) score *= 1.10;
-            if (r.cas_zone === 1 || r.if_quartile === 'Q1') score *= 1.06;
-            if (r.warning || r.citic_warning || r.on_hold || r.under_review) score *= 0.72;
-            entries.push({
-              journalRec: r,
-              issn: r.issn || r.eissn || favId(r),
-              zone: r.cas_zone,
-              top: r.cas_top,
-              jcr_q: r.if_quartile,
-              indices: idx,
-              wos_categories: r.wos_categories || [],
-              topics: topics.slice(0, 6),
-              matched: [...new Set(res.matched)].slice(0, 8),
-              count: res.matched.length,
-              score,
-              srcName: r.name,
-            });
+        const bodyText = lines.slice(1).filter(l => !/^keywords?:/i.test(l) && !/^关键词[：:]/.test(l)).join(' ');
+        const MAX_URL = 155;
+
+        const stopWords = new Set(('this that with from which were have been than into also their about '+
+          'study show were used using based results method model data paper these between while where '+
+          'after before other there analysis approach process system research above during well such '+
+          'each both more most some than very just also although however therefore because without '+
+          'within across among through before after below under over upon could should would may might '+
+          'shall can will does did has had been being made make made made using used based related '+
+          'significant different important various multiple including following providing performing '+
+          'proposes presents demonstrates investigates examines explores develops describes reports '+
+          'shows found test tests testing methods models datasets dataset experiments experimental '+
+          'proposed presented demonstrated investigated examined explored developed described reported '+
+          'tested showed found approach techniques algorithm algorithms features feature accuracy '+
+          'performance evaluation values value results analysis prediction predictions').split(' '));
+
+        // Collect all English words (length > 3) from title + body
+        const allText = [(titleTerms[0]||''), bodyText].join(' ').toLowerCase();
+        const allWords = allText.replace(/[^a-z0-9\s-]/g, ' ')
+          .split(/\s+/)
+          .filter(w => w.length > 3 && !stopWords.has(w) && !/^\d+$/.test(w) && !w.startsWith('http'));
+        const uniqueWords = allWords.filter((w, i) => allWords.indexOf(w) === i);
+
+        // Build 2-3 diverse queries from different keyword subsets
+        const queries = [];
+
+        // Q1: Explicit keywords (if present) — these are the most reliable signal
+        if (explicitKeywords.length) {
+          const q = explicitKeywords.slice(0, 4).join(' ');
+          if (encodeURIComponent(q).length < MAX_URL) queries.push(q);
+        }
+
+        // Q2: Title-derived keywords (core topic of the paper)
+        const titleLower = (titleTerms[0]||'').toLowerCase().replace(/[^a-z\s-]/g, '').replace(/-/g, ' ');
+        const titleKws = titleLower.split(/\s+/).filter(w => w.length > 3 && !stopWords.has(w));
+        if (titleKws.length >= 3) {
+          const q = titleKws.slice(0, 10).join(' ');
+          if (encodeURIComponent(q).length < MAX_URL && !queries.some(x => x.toLowerCase().includes(q.slice(0,15)))) {
+            queries.push(q);
           }
         }
 
-        setPickProgress(T('应用索引与费用筛选…','Applying index and fee filters…'), 82);
-        let filtered = entries;
-        const wantSci = document.getElementById('pick-filter-sci')?.checked;
-        const wantSsci = document.getElementById('pick-filter-ssci')?.checked;
-        const wantAhci = document.getElementById('pick-filter-ahci')?.checked;
-        const wantEsci = document.getElementById('pick-filter-esci')?.checked;
-        if (wantSci || wantSsci || wantAhci || wantEsci) {
-          filtered = filtered.filter(e => {
-            const idx = e.journalRec?.indices || [];
-            if (!idx.length) return false;
-            if (wantSci && idx.includes('SCIE')) return true;
-            if (wantSsci && idx.includes('SSCI')) return true;
-            if (wantAhci && idx.includes('AHCI')) return true;
-            if (wantEsci && idx.includes('ESCI')) return true;
-            return false;
+        // Q3: Body-derived technical terms (methods, algorithms, sensors, etc.)
+        // Pick words that are ≥5 chars (more specific), not already covered by Q1/Q2
+        const covered = queries.join(' ').toLowerCase();
+        const bodyKws = uniqueWords.filter(w => w.length >= 4 && !covered.includes(w)).slice(0, 6);
+        if (bodyKws.length >= 3) {
+          const q = bodyKws.join(' ');
+          if (encodeURIComponent(q).length < MAX_URL) queries.push(q);
+        }
+
+        // Fallback: if no queries built, just use first 5 unique words
+        if (!queries.length) {
+          queries.push(uniqueWords.slice(0, 6).join(' '));
+        }
+
+        // Collect all search keyword tokens for title matching
+        const searchKeywords = new Set();
+        [...explicitKeywords, ...titleKws, ...bodyKws, ...uniqueWords].forEach(k => {
+          k.toLowerCase().split(/[\s-]+/).filter(w => w.length > 2).forEach(w => searchKeywords.add(w));
+        });
+
+        // Run all queries concurrently via Promise.all
+        status.textContent = T('正在搜索相关论文…','Searching related papers…');
+        const SEARCH_FIELDS = 'id,title,publication_date,primary_location,relevance_score';
+        const FIVE_YEARS_AGO = new Date(Date.now() - 5*365*24*60*60*1000).toISOString().slice(0,10);
+        const PICK_SEARCH_PAGE_SIZE = 60;
+        const PICK_BACKUP_PAGE_SIZE = 60;
+        const PICK_CN_PAGE_SIZE = 40;
+        const PICK_MAX_JOURNALS = 60;
+        const PICK_PAPERS_PER_JOURNAL = 8;
+        let openAlexErrorStatus = null;
+        const rememberOpenAlexError = (statusCode) => {
+          if (statusCode === 429 || !openAlexErrorStatus) openAlexErrorStatus = statusCode;
+        };
+        const queryBatches = await Promise.all(queries.slice(0, 3).map(async (q) => {
+          const params = new URLSearchParams({
+            search: q.slice(0, 120),
+            per_page: String(PICK_SEARCH_PAGE_SIZE),
+            sort: 'relevance_score:desc',
+            select: SEARCH_FIELDS,
           });
+          params.set('filter', `from_publication_date:${FIVE_YEARS_AGO}`);
+          const url = openAlexWorksUrl(params);
+          try {
+            const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
+            if (!r.ok) {
+              rememberOpenAlexError(r.status);
+              const text = await r.text().catch(() => '');
+              console.error('OpenAlex API error:', r.status, text.slice(0,200));
+              return [];
+            }
+            const d = await r.json();
+            return d.results || [];
+          } catch (e) {
+            rememberOpenAlexError('network');
+            console.error('OpenAlex fetch error:', e?.message || e);
+            return [];
+          }
+        }));
+        const seenIds = new Set();
+        const allWorks = [];
+        for (const batch of queryBatches) {
+          for (const w of batch) {
+            if (w.id && !seenIds.has(w.id)) {
+              seenIds.add(w.id);
+              allWorks.push(w);
+            }
+          }
         }
+
+        // If too few results, try a broader backup query
+        if (allWorks.length < 16) {
+          const backup = uniqueWords.slice(0, 5).join(' ');
+          const params = new URLSearchParams({
+            search: backup,
+            per_page: String(PICK_BACKUP_PAGE_SIZE),
+            sort: 'relevance_score:desc',
+            select: SEARCH_FIELDS,
+          });
+          params.set('filter', `from_publication_date:${FIVE_YEARS_AGO}`);
+          const url = openAlexWorksUrl(params);
+          try {
+            const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
+            if (r.ok) {
+              const d = await r.json();
+              for (const w of (d.results || [])) {
+                if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); }
+              }
+            } else {
+              rememberOpenAlexError(r.status);
+            }
+          } catch (e) { rememberOpenAlexError('network'); console.error('OpenAlex backup fetch error:', e?.message || e); }
+        }
+
+        // Chinese fallback: if still nothing and has Chinese, try short Chinese title
+        if (allWorks.length < 6 && titleTerms[0]) {
+          const chn = titleTerms[0].replace(/[a-zA-Z0-9\s]/g, '').replace(/[，。、；：！？（）【】《》""''\s]/g, '');
+          if (chn) {
+            const cnQuery = chn.slice(0, 12);
+            const params = new URLSearchParams({
+              search: cnQuery,
+              per_page: String(PICK_CN_PAGE_SIZE),
+              sort: 'relevance_score:desc',
+              select: SEARCH_FIELDS,
+            });
+            params.set('filter', `from_publication_date:${FIVE_YEARS_AGO}`);
+            const url = openAlexWorksUrl(params);
+            try {
+              const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
+              if (r.ok) { const d = await r.json(); for (const w of (d.results||[])) { if (w.id && !seenIds.has(w.id)) { seenIds.add(w.id); allWorks.push(w); } } }
+              else { rememberOpenAlexError(r.status); }
+            } catch (e) { rememberOpenAlexError('network'); console.error('OpenAlex CN fetch error:', e?.message || e); }
+          }
+        }
+
+        const hasCnOnly = [...query].filter(c => c >= '\u4e00' && c <= '\u9fff').length > 0
+          && uniqueWords.filter(w => w.length > 4).length < 2 && !explicitKeywords.length;
+        if (!allWorks.length) {
+          if (openAlexErrorStatus) {
+            status.textContent = T(
+              `OpenAlex 暂时不可用（${openAlexErrorStatus}），请稍后再试`,
+              `OpenAlex is temporarily unavailable (${openAlexErrorStatus}), please try again later`
+            );
+            return;
+          }
+          status.textContent = hasCnOnly
+            ? T('未找到相关论文。OpenAlex 对中文搜索效果不佳，建议在摘要后添加英文 Keywords: 行（如 Keywords: indoor occupancy, sensor）',
+              'No papers found. OpenAlex has limited Chinese support. Try adding an English "Keywords:" line.')
+            : T('未找到相关论文，请尝试其他关键词','No papers found, try different keywords');
+          return;
+        }
+
+        // Step 2: Aggregate by journal ISSN
+        const journalMap = new Map();
+        const topicSet = new Set();
+        for (const w of allWorks) {
+          const src = w.primary_location?.source;
+          if (!src) continue;
+          const issn = (src.issn_l || '').toUpperCase();
+          if (!issn) continue;
+          if (!journalMap.has(issn)) journalMap.set(issn, { count: 0, papers: [], scores: [], topics: new Set(), srcName: src.display_name || '', kwMatch: 0, recentCount: 0 });
+          const j = journalMap.get(issn);
+          j.count++;
+          const titleLower = (w.title || '').toLowerCase();
+          const year = (w.publication_date||'').slice(0,4);
+          // Keyword match: does paper title contain any search keyword?
+          let hasKw = false;
+          for (const kw of searchKeywords) {
+            if (titleLower.includes(kw)) { hasKw = true; break; }
+          }
+          if (hasKw) j.kwMatch++;
+          // Recency: papers from last 2 years
+          if (year >= String(new Date().getFullYear() - 1)) j.recentCount++;
+          j.papers.push({
+            title: w.title,
+            year: year,
+            id: w.id,
+            url: w.id // OpenAlex full URL, e.g. https://openalex.org/W12345
+          });
+          j.scores.push(w.relevance_score || 0);
+          if (oaMap && oaMap[issn]) {
+            (oaMap[issn].tp || []).forEach(t => { j.topics.add(t); topicSet.add(t); });
+          }
+        }
+
+        // Step 3: Build ranked results — multi-factor scoring
+        const maxCount = Math.max(...[...journalMap.values()].map(j => j.count), 1);
+
+        // Compute topic frequency across journals (for topic match scoring)
+        const topicJournalCount = {};
+        for (const [, j] of journalMap) {
+          for (const t of j.topics) {
+            topicJournalCount[t] = (topicJournalCount[t] || 0) + 1;
+          }
+        }
+        const maxTopicFreq = Math.max(...Object.values(topicJournalCount), 1);
+
+        const entries = [...journalMap.entries()].map(([issn, j]) => {
+          const countRatio = j.count / maxCount;
+          const kwMatchRatio = j.count > 0 ? j.kwMatch / j.count : 0;
+          const topicMatch = j.topics.size > 0
+            ? [...j.topics].reduce((sum, t) => sum + (topicJournalCount[t] || 0), 0) / (j.topics.size * maxTopicFreq)
+            : 0;
+
+          const totalScore = countRatio * 0.60 + kwMatchRatio * 0.30 + topicMatch * 0.10;
+
+          const journalRec = journals.find(r => r.issn === issn || r.eissn === issn);
+          const zoneVal = journalRec?.cas_zone;
+          const topVal = journalRec?.cas_top;
+          const qVal = journalRec?.jcr_q;
+          const scopusVal = journalRec?.scopus;
+          const eiVal = journalRec?.ei;
+          const indices = journalRec?.indices || [];
+          const wosCats = journalRec?.wos_categories || [];
+
+          return {
+            issn, journalRec, zone: zoneVal, top: topVal,
+            jcr_q: qVal, scopus: scopusVal, ei: eiVal,
+            indices, wos_categories: wosCats,
+            count: j.count, papers: j.papers.slice(0, PICK_PAPERS_PER_JOURNAL),
+            topics: [...j.topics].slice(0,6),
+            score: totalScore, srcName: j.srcName,
+          };
+        });
+
+        // Step 4: Filter and sort
+        let filtered = entries;
+        // Exclude single-paper journals (noise from broad queries)
+        filtered = filtered.filter(e => e.count >= 2);
+        const ifMin = parseFloat(document.getElementById('pick-if-min')?.value || '0');
+        if (document.getElementById('pick-filter-if')?.checked && ifMin > 0) {
+          filtered = filtered.filter(e => e.if != null && e.if >= ifMin);
+        }
+        const zoneVal = document.getElementById('pick-zone')?.value || 'all';
+        if (zoneVal !== 'all') {
+          filtered = filtered.filter(e => e.zone != null && String(e.zone) === zoneVal);
+        }
+        if (document.getElementById('pick-filter-scopus')?.checked) {
+          filtered = filtered.filter(e => e.journalRec?.scopus);
+        }
+        // Comprehensive journal filter (use wos_categories)
         if (document.getElementById('pick-filter-comprehensive')?.checked) {
           filtered = filtered.filter(e => {
             const cats = e.wos_categories || [];
             return !cats.some(c => /multidisciplinary/i.test(c));
           });
         }
-        if (document.getElementById('pick-filter-free')?.checked) {
-          filtered = filtered.filter(e => pickIsDoajNoApc(e.journalRec));
+        // Topic filter (always on if checkbox checked, acts as minimum signal filter)
+        if (document.getElementById('pick-filter-topics')?.checked) {
+          filtered = filtered.filter(e => e.score > 0.1);
         }
-        filtered.sort((a, b) => b.score - a.score || (b.journalRec.if_2024 || 0) - (a.journalRec.if_2024 || 0));
-        if (query !== pickLastQuery) {
-          pickLastQuery = query;
-          window.__pickShown = 30;
-        }
-        const allFiltered = filtered;
-        const maxScore = allFiltered.length > 0 ? allFiltered[0].score : 1;
-        allFiltered.forEach(e => e.score = maxScore > 0 ? e.score / maxScore : 0);
-        const shownLimit = Math.max(30, window.__pickShown || 30);
-        filtered = allFiltered.slice(0, shownLimit);
+        filtered.sort((a, b) => b.score - a.score);
+        filtered = filtered.slice(0, PICK_MAX_JOURNALS);
 
+        // Normalize: top journal = 100%
+        const maxScore = filtered.length > 0 ? filtered[0].score : 1;
+        filtered.forEach(e => e.score = maxScore > 0 ? e.score / maxScore : 0);
+
+        // Step 5: Render
         if (!filtered.length) {
           results.innerHTML = `<div class="pick-no-results">${T('没有符合筛选条件的期刊推荐','No journals match your filters')}</div>`;
-          setPickProgress(entries.length
-            ? T('已匹配到候选期刊，但当前索引/综合刊/费用筛选把结果过滤完了，请放宽筛选条件。',
-                'Local candidates were found, but the current index / multidisciplinary / fee filters removed them all. Try relaxing filters.')
-            : pickMode === 'ai'
-            ? T('AI 语义匹配没有符合当前筛选条件的期刊，请放宽索引或综合刊筛选','AI semantic matching found no journals under the current filters. Try relaxing index or multidisciplinary filters.')
-            : T('没有匹配到本地期刊画像。中文题目建议补充 2-5 个研究对象或学科关键词；英文题目建议补充具体领域词。',
-                'No local journal profiles matched. Add 2-5 concrete research objects or field keywords.'), 100);
+          status.textContent = `${T('已发表','Published')} ${allWorks.length} ${T('篇相关论文','related papers')}，${T('分布在','in')} ${journalMap.size} ${T('个期刊','journals')}`;
           return;
         }
 
-        setPickProgress(T('渲染推荐结果…','Rendering recommendations…'), 92);
-        pickLastReportState = pickMode === 'ai'
-          ? { report: aiReport, profile: aiProfile || entries[0]?.semanticProfile || {}, fallbackEntries: allFiltered }
-          : null;
-        const reportHtml = pickLastReportState
-          ? renderPickAiReport(pickLastReportState.report, pickLastReportState.profile, pickLastReportState.fallbackEntries)
-          : '';
-        results.innerHTML = reportHtml + filtered.map(e => {
+        results.innerHTML = filtered.map(e => {
           const scorePct = Math.round(e.score * 100);
+          const ifStr = e.if != null ? `IF ${e.if}` : '';
+          const zoneStr = e.zone ? `CAS ${e.zone}区` : '';
           const name = e.journalRec?.name || e.srcName || e.issn;
           const issnStr = e.issn;
-          const signalList = [
-            ...e.matched.map(t => `<span class="pick-topic">${escape(t)}</span>`),
-            ...e.topics.slice(0, 3).map(t => `<span class="pick-topic">${escape(t)}</span>`),
-          ].join('');
+          const paperList = e.papers.map(p => `<a class="pick-paper" href="${escape(p.url)}" target="_blank" rel="noopener" title="${escape(p.title)}">${escape((p.title||'').slice(0,55))}${(p.title||'').length>55?'…':''} (${escape(p.year||'')})</a>`).join('');
+          const topics = e.topics.map(t => `<span class="pick-topic">${escape(t)}</span>`).join('');
 
-          let topInfoHtml = '';
-          let flagsHtml = '';
+          // Build badges — zone/JCR go in zone-tags above title
+          let badgesHtml = '';
           let zoneTagsHtml = '';
           let zoneColor = '';
           if (e.journalRec) {
             const r = e.journalRec;
-            const idxBadges = [...new Set(e.indices||[])].map(idx => badgeIndex(idx)).join('');
+            // Index badges (SCIE/SSCI/AHCI/ESCI)
+            const idxBadges = (e.indices||[]).map(idx => badgeIndex(idx)).join('');
+            // Scopus
             const scBadge = badgeScopus(r.scopus);
-            const ifTxt = r.if_2024 != null && r.if_2024 !== ''
-              ? `<span class="if-pill" title="${T('JCR 2024 影响因子','JCR 2024 Impact Factor')}">IF ${(+r.if_2024).toFixed(1)}</span>`
-              : '';
-            topInfoHtml = [idxBadges, scBadge].filter(Boolean).join('');
-            // Warning & publisher flags
-            const r2 = e.journalRec;
-            if (r2) {
-              // Warning list
-              if (r2.warning) {
-                const w = r2.warning;
-                if (typeof w === 'object') {
-                  const arr = Array.isArray(w) ? w : [w];
-                  const latest = arr.reduce((a,b) => (!a || (b.year && b.year > (a.year||0))) ? b : a, null);
-                  const yearStr = latest && latest.year ? latest.year : '';
-                  const levelStr = latest && latest.level ? latest.level : '';
-                  const label = yearStr ? `${yearStr}${levelStr ? '/'+levelStr : ''}` : (levelStr || '⚠');
-                  flagsHtml += `<span class="badge b-warn">⚠ ${escape(label)}</span>`;
-                } else {
-                  flagsHtml += `<span class="badge b-warn">⚠ ${T('预警','Warning')}</span>`;
-                }
-              }
-              // OA publisher badges (MDPI / Frontiers / Hindawi)
-              const pub = (r2.publisher || '').toLowerCase();
-              if (pub.includes('mdpi')) flagsHtml += `<span class="badge b-mdpi">MDPI</span>`;
-              if (pub.includes('frontier')) flagsHtml += `<span class="badge b-frontiers">Frontiers</span>`;
-              if (pub.includes('hindawi')) flagsHtml += `<span class="badge b-hindawi">Hindawi</span>`;
-            }
-            const jcrQ = String(e.jcr_q || '').toUpperCase();
-            const xrZone = r.cas_xr && r.cas_xr.zone ? String(r.cas_xr.zone) : '';
+            // EI
+            const eiBdg = r.ei ? `<span class="badge b-ei">EI</span>` : '';
+            // IF
+            const ifBdg = badgeIF(e.if);
+            // CCF
+            const ccfTxt = r.ccf_2026_type ? `<span class="badge b-ccf">CCF ${r.ccf_2026_type}</span>` : '';
+            badgesHtml = [idxBadges, scBadge, eiBdg, ifBdg, ccfTxt].filter(Boolean).join('');
+            // Prominent zone/JCR tags at top of card
             const zTag = e.zone
-              ? `<span class="zone z${e.zone}" title="${T('中科院 2025 大类分区','CAS 2025 major category tier')}">${T('中科院2025','CAS 2025')} ${e.zone}${T('区','')}${e.top ? ' TOP' : ''}</span>`
+              ? `<span class="zone z${e.zone}">${e.top ? 'TOP·' : ''}${e.zone}${T('区','')}</span>`
               : '';
-            const jcrTag = /^Q[1-4]$/.test(jcrQ)
-              ? `<span class="zone jcr-${jcrQ.toLowerCase()}" title="${T('JCR 2024 分区','JCR 2024 quartile')}">JCR 2024 ${jcrQ}</span>`
+            const jcrTag = e.jcr_q
+              ? `<span class="zone jcr-${e.jcr_q.toLowerCase()}">JCR ${e.jcr_q}</span>`
               : '';
-            const xrTag = /^[1-4]$/.test(xrZone)
-              ? `<span class="zone z${xrZone}" title="${T('中科院新锐 2026 分区','CAS Emerging 2026 tier')}">${T('新锐2026','Emerging 2026')} ${xrZone}${T('区','')}${r.cas_xr.top ? ' TOP' : ''}</span>`
-              : '';
-            const ccfTxt = r.ccf ? `<span class="badge b-ccf" title="${T('中国计算机学会推荐等级','CCF recommended ranking')}">CCF ${escape(r.ccf)}</span>` : '';
-            // 卡片只保留最核心的三档（IF / JCR / 中科院），新锐·CCF 收进详情页，减少徽章堆叠
-            zoneTagsHtml = [ifTxt, jcrTag, zTag].filter(Boolean).join('');
-            // Zone strip color（无分区数据时用中性色兜底，保证每张卡片都有左色条、不忽有忽无）
+            zoneTagsHtml = [zTag, jcrTag].filter(Boolean).join('');
+            // Zone strip color
             zoneColor = e.zone === '1' || e.zone === 1 ? '#1f3a5f'
               : e.zone === '2' || e.zone === 2 ? '#4f6f9b'
               : e.zone === '3' || e.zone === 3 ? '#9eb1cb'
               : e.zone === '4' || e.zone === 4 ? '#d3dbe6'
-              : jcrQ === 'Q1' ? '#7a2030'
-              : jcrQ === 'Q2' ? '#a04a5a'
-              : '#cbbfa8';
+              : e.jcr_q === 'Q1' ? '#7a2030'
+              : e.jcr_q === 'Q2' ? '#a04a5a'
+              : '';
           }
 
           // Compute score color for the score bar
@@ -8579,104 +4820,67 @@
 
           const cardZoneClass = e.zone ? ` zone-${e.zone}` : '';
           const zoneStripStyle = zoneColor ? `style="background:${zoneColor}"` : '';
-          const coverRec = e.journalRec ? lookupCover(e.journalRec) : null;
-          const coverUrl = e.journalRec?.cover_url || e.journalRec?.official_cover_url || coverRec?.u || '';
-          const coverMark = name.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase() || 'J';
-          const coverFallback = `<div class="pick-cover-fallback"><span>${escape(coverMark)}</span><b>${escape(name)}</b></div>`;
-          const coverHtml = `<div class="pick-cover ${coverUrl ? 'has-cover' : ''}" aria-hidden="true">${
-            coverUrl
-              ? `<img src="${escape(coverUrl)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.closest('.pick-cover').classList.add('cover-failed');this.remove()" />${coverFallback}`
-              : coverFallback
-          }</div>`;
 
           return `<div class="pick-card${cardZoneClass}" data-issn="${escape(issnStr)}">
             ${zoneColor ? `<div class="pick-zone-strip" ${zoneStripStyle}></div>` : ''}
-            <div class="pick-card-main">
-              ${topInfoHtml ? `<div class="pick-index-line">${topInfoHtml}</div>` : ''}
-              <h3><a href="#j/${escape(e.journalRec ? favId(e.journalRec) : issnStr)}">${escape(name)}</a></h3>
-              ${zoneTagsHtml ? `<div class="pick-zone-tags">${zoneTagsHtml}</div>` : ''}
-              <div class="pick-head">
-                <span class="pick-count">${e.count}<small> ${T('个匹配信号','signals')}</small></span>
-                <div class="pick-head-right">
-                  <span class="pick-score-bar"><span class="bar"><span class="bar-fill" style="width:${scorePct}%;background:${barColor}"></span></span></span>
-                  <span class="pick-score-pct">${scorePct}%</span>
-                </div>
+            ${zoneTagsHtml ? `<div class="pick-zone-tags">${zoneTagsHtml}</div>` : ''}
+            <h3><a href="#j/${escape(e.journalRec ? favId(e.journalRec) : issnStr)}">${escape(name)}</a></h3>
+            <div class="pick-head">
+              <span class="pick-count">${e.count}<small> ${T('篇论文','papers')}</small></span>
+              <div class="pick-head-right">
+                <span class="pick-score-bar"><span class="bar"><span class="bar-fill" style="width:${scorePct}%;background:${barColor}"></span></span></span>
+                <span class="pick-score-pct">${scorePct}%</span>
               </div>
-              ${flagsHtml ? `<div class="pick-flags">${flagsHtml}</div>` : ''}
-              ${(function(){
-                const r2 = e.journalRec;
-                const apcState = pickFeeBadge(r2);
-                const weeks = parseFloat(r2?.doaj?.review_weeks);
-                // 仅在有实际审稿周期数据时显示；无数据则不展示（不再用 DOAJ 平均值兜底）
-                const cycleHtml = weeks > 0
-                  ? `<span class="pick-cycle-label">${T('审稿周期','Review cycle')}:</span><strong>${(weeks / 4.33).toFixed(1)}${T(' 个月',' months')}</strong><span class="pick-cycle-sub">${T('投稿到发表, DOAJ','submission to publication, DOAJ')}</span>`
-                  : '';
-                return (apcState || cycleHtml) ? `<div class="pick-cycle">${apcState}${cycleHtml}</div>` : '';
-              })()}
-              ${signalList ? `<div class="pick-papers">${signalList}</div>` : ''}
             </div>
-            ${coverHtml}
+            ${badgesHtml ? `<div class="pick-badges">${badgesHtml}</div>` : ''}
+            ${(function(){
+              const r2 = e.journalRec;
+              let txt = '📅 ' + T('审稿周期','Review cycle') + ': ';
+              // Prefer CrossRef (measured in days), fall back to DOAJ (weeks)
+              const cr = r2?.crossref;
+              if (cr && cr.median_days > 0) {
+                const months = (cr.median_days / 30.44).toFixed(1);
+                txt += months + T(' 个月 (收稿→录用,Crossref,',' months (submission→acceptance, ') + (cr.sample_size || '?') + T('篇样本)',' samples)');
+              } else {
+                const weeks = parseFloat(r2?.doaj?.review_weeks);
+                if (weeks > 0) {
+                  txt += (weeks / 4.33).toFixed(1) + T(' 个月 (投稿→出版,DOAJ)',' months (submission→pub.,DOAJ)');
+                } else {
+                  txt += 'N/A';
+                }
+              }
+              return '<div class="pick-cycle">' + txt + '</div>';
+            })()}
+            ${paperList ? `<div class="pick-papers">${paperList}</div>` : ''}
           </div>`;
         }).join('');
-        if (allFiltered.length > filtered.length) {
-          results.innerHTML += `<button id="pick-more" class="pick-more" type="button">${T('再显示 30 本','Show 30 more')} <span>${allFiltered.length - filtered.length} ${T('本剩余','left')}</span></button>`;
-        }
-        document.getElementById('pick-more')?.addEventListener('click', () => {
-          window.__pickShown = Math.max(30, window.__pickShown || 30) + 30;
-          doSearch();
-        });
 
-        // Click to open the normal journal details page.
+        // Click to open journal drawer (only if we have our data)
         const pickEl = document.getElementById('pick-results');
         if (pickEl) {
           pickEl.querySelectorAll('.pick-card').forEach(card => {
-            card.addEventListener('click', (ev) => {
-              if (ev.target.closest('a') && (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.button === 1)) return;
-              ev.preventDefault();
+            card.addEventListener('click', () => {
               const issn = card.dataset.issn;
-              const rec = journals.find(r => r.issn === issn || r.eissn === issn) || resolvePickJournal({ issn, slug: issn, name: issn });
-              if (rec) openDrawer(rec, { pageMode: true, source: 'recommendation' });
+              const rec = journals.find(r => r.issn === issn || r.eissn === issn);
+              if (rec) openDrawer(rec);
             });
           });
         }
 
-        const quotaText = pickMode === 'ai' && quotaInfo && quotaInfo.remaining != null
-          ? ` · ${T('今日剩余','remaining today')} ${quotaInfo.remaining}/${quotaInfo.limit}`
+        const quotaText = quotaInfo && quotaInfo.remaining != null
+          ? T(`，剩余额度 ${quotaInfo.remaining}/${quotaInfo.limit}`, `, quota left ${quotaInfo.remaining}/${quotaInfo.limit}`)
           : '';
-        const modeText = pickMode === 'ai' ? t('pick_mode_ai') : t('pick_mode_local');
-        setPickProgress(`${statusNotice ? statusNotice + ' · ' : ''}${modeText} ${entries.length} ${T('个候选期刊','candidate journals')}, ${T('显示','showing')} ${filtered.length}/${allFiltered.length}${quotaText}`, 100);
-        trackInteraction('journal_pick', {
-          tab: 'pick',
-          query,
-          result_count: allFiltered.length,
-          metadata: {
-            mode: pickMode,
-            shown: filtered.length,
-            candidate_count: entries.length,
-            quota_remaining: quotaInfo?.remaining ?? null,
-            sci: !!document.getElementById('pick-filter-sci')?.checked,
-            ssci: !!document.getElementById('pick-filter-ssci')?.checked,
-            ahci: !!document.getElementById('pick-filter-ahci')?.checked,
-            esci: !!document.getElementById('pick-filter-esci')?.checked,
-            exclude_comprehensive: !!document.getElementById('pick-filter-comprehensive')?.checked,
-          },
-        });
+        status.textContent = `${T('已发表','Published')} ${allWorks.length} ${T('篇相关论文','related papers')}，${T('分布在','in')} ${journalMap.size} ${T('个期刊','journals')}，${T('推荐','recommended')} ${filtered.length} ${T('个','')}${quotaText}`;
         // ── Save to search history ──
         savePickHistory(query);
       } catch (e) {
-        setPickProgress(T('检索失败：','Search failed: ') + e.message, 100);
+        status.textContent = T('检索失败：','Search failed: ') + e.message;
         console.error(e);
       }
     }
 
-    input.addEventListener('keydown', (e) => { if (activeTab !== 'pick') return; if (e.key === 'Enter') { e.preventDefault(); doSearch(); } });
-    document.querySelectorAll('.pick-filter-bar input').forEach(el => {
-      el.addEventListener('change', () => {
-        if (!input.value.trim()) return;
-        window.__pickShown = 30;
-        doSearch();
-      });
-    });
+    btn.addEventListener('click', doSearch);
+    input.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.ctrlKey) doSearch(); });
 
     // ── Search history ──
     const HISTORY_KEY = 'ailatest.pick.history';
@@ -8711,16 +4915,9 @@
       list.innerHTML = history.map(h => {
         const q = escape(h.query);
         const preview = h.query.length > 40 ? h.query.slice(0, 40) + '…' : h.query;
-        const timeStr = h.time ? (() => {
-          const d = new Date(h.time);
-          try {
-            return d.toLocaleString(lang === 'zh' ? 'zh-CN' : 'en-US', {
-              month: 'short', day: 'numeric',
-              hour: '2-digit', minute: '2-digit',
-              hour12: false,
-            });
-          } catch { return ''; }
-        })() : '';
+        const timeStr = h.time ? new Date(h.time).toLocaleString(lang === 'zh' ? 'zh-CN' : 'en-US', {
+          month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+        }) : '';
         return `<div class="pick-history-item" data-query="${q}">
           <span class="pick-history-text">${escape(preview)}</span>
           <span class="pick-history-time">${timeStr}</span>
@@ -8750,56 +4947,27 @@
     if (window.location.search.includes(OWNER_EMAIL)) {
       try { localStorage.setItem('ailatest_unlocked', '1'); } catch {}
     }
-    installRouteAnalytics();
     trackPageview();
     loadFavLists();
     bind();
     applyI18n();
-    applyStations();
     updateFavCount();
     await handleAuthCallback();
     // 分享着陆页：/s/<id> 直接接管 main，不走主流程
     if (await maybeRenderShareLanding()) return;
     try {
-      const [j, d, indiaData, m, esi, aliases, underReviewIssns, onHoldIssns, oa, covers, updates] = await Promise.all([
+      const [j, d, m, esi, aliases] = await Promise.all([
         fetchJSON('data/journals.json.gz'),
-        fetch('/data/domestic.json').then(r => r.json()).catch(() => null),
-        fetch('/data/india.json').then(r => r.json()).catch(() => null),
-        fetch('/data/meta.json').then(r => r.json()).catch(() => null),
-        fetch('/data/esi_categories.json').then(r => r.json()).catch(() => []),
-        fetch('/data/journal_aliases.json').then(r => r.json()).catch(() => DEFAULT_JOURNAL_ALIASES),
-        fetch('/data/under_review_issn.json').then(r => r.json()).catch(() => []),
-        fetch('/data/on_hold_issn.json').then(r => r.json()).catch(() => []),
-        fetchJSON('data/oa.json.gz').catch(() => ({})),
-        fetchJSON('data/journal_covers.json.gz').catch(() => ({})),
-        fetch('/data/journal_updates.json').then(r => r.json()).catch(() => ({ updated_at: '', items: [] })),
+        fetch('data/domestic.json').then(r => r.json()).catch(() => null),
+        fetch('data/meta.json').then(r => r.json()).catch(() => null),
+        fetch('data/esi_categories.json').then(r => r.json()).catch(() => []),
+        fetch('data/journal_aliases.json').then(r => r.json()).catch(() => DEFAULT_JOURNAL_ALIASES),
       ]);
       setJournalAliases(aliases);
-      journals = j; domestic = d; india = indiaData; meta = m; esiCats = esi; oaMap = oa; coverMap = covers;
-      journalUpdates = normalizeJournalUpdates(updates);
-      // Build Under Review lookup set
-      const underReviewSet = new Set((underReviewIssns||[]).filter(Boolean).map(s => s.replace(/[^0-9xX]/gi,'').toLowerCase()));
-      journals.forEach(r => {
-        const issnClean = (r.issn||'').replace(/[^0-9xX]/gi,'').toLowerCase();
-        const eissnClean = (r.eissn||'').replace(/[^0-9xX]/gi,'').toLowerCase();
-        if (underReviewSet.has(issnClean) || underReviewSet.has(eissnClean)) {
-          r.under_review = true;
-        }
-      });
-      // Build On Hold lookup set
-      const onHoldSet = new Set((onHoldIssns||[]).filter(Boolean).map(s => s.replace(/[^0-9xX]/gi,'').toLowerCase()));
-      journals.forEach(r => {
-        const issnClean = (r.issn||'').replace(/[^0-9xX]/gi,'').toLowerCase();
-        const eissnClean = (r.eissn||'').replace(/[^0-9xX]/gi,'').toLowerCase();
-        if (onHoldSet.has(issnClean) || onHoldSet.has(eissnClean)) {
-          r.on_hold = true;
-        }
-      });
+      journals = j; domestic = d; meta = m; esiCats = esi; oaMap = null;
       journals.forEach(journalSearchMeta);
       buildDomIndex(domestic);
       buildIntIndex(journals);
-      updateFilterCounts();
-      buildIndiaIndex(india);
       // Refresh stale favsData with live international journal data
       (function refreshFavsData() {
         let dirty = false;
@@ -8810,11 +4978,11 @@
             const newName = live.name || '';
             if (oldName !== newName) {
               favsData[id] = { ...favsData[id], name: newName, cn_name: live.cn_name,
-                en_name: live.en_name, abbr20: live.abbr20, if_2024: live.if_2024,
+                en_name: live.en_name, abbr20: live.abbr20, if_2024: live.if_2024, if_2025: live.if_2025,
                 cas_zone: live.cas_zone, cas_top: live.cas_top, indices: live.indices,
-                flagship: live.flagship, nature_index: live.nature_index, esi_category: live.esi_category,
+                flagship: live.flagship, esi_category: live.esi_category,
                 if_quartile: live.if_quartile, publisher: live.publisher, ccf: live.ccf,
-                scopus: live.scopus, warning: live.warning, under_review: live.under_review, on_hold: live.on_hold, citic_warning: live.citic_warning,
+                scopus: live.scopus, warning: live.warning,
               };
               dirty = true;
             }
@@ -8822,149 +4990,26 @@
         }
         if (dirty) localStorage.setItem(STORAGE_PREFIX + 'favsData', JSON.stringify(favsData));
       })();
-      // 计算合并的 topicList（WoS 学科 + OpenAlex subfield）
+      // 计算 WoS 学科表（按字母 A-Z 排序）
       const _wc = Object.create(null);
       for (const r of journals) for (const c of (r.wos_categories||[])) _wc[c] = (_wc[c]||0)+1;
-      // Add OA subfield counts for topics not already in WoS（修复：之前 !(s in _wc) 守卫导致只计到 1）
-      const wosKeys = new Set(Object.keys(_wc));
-      const issnSet = new Set(journals.map(j => (j.issn || j.eissn || '').toUpperCase()).filter(Boolean));
-      const oaCount = Object.create(null);
-      for (const issn of issnSet) {
-        const rec = oaMap[issn];
-        if (rec && Array.isArray(rec.sf)) {
-          for (const s of rec.sf) {
-            if (!s || wosKeys.has(s)) continue;
-            oaCount[s] = (oaCount[s] || 0) + 1;
-          }
-        }
-      }
-      for (const s in oaCount) _wc[s] = oaCount[s];
-      topicList = Object.entries(_wc).map(([name,count])=>({name,count})).sort((a,b)=>a.name.localeCompare(b.name,'en'));
+      wosCats = Object.entries(_wc).map(([name,count])=>({name,count})).sort((a,b)=>a.name.localeCompare(b.name,'en'));
       if (meta?.total && $('#total')) $('#total').textContent = meta.total.toLocaleString();
       $('#hint').textContent = lang === 'zh'
         ? `${T('已加载','Loaded')} ${journals.length.toLocaleString()} ${T('本期刊','journals')}`
         : `${journals.length.toLocaleString()} journals loaded`;
       renderCatList();
-      renderTopicList();
-      updatePublicPulse();
-      // ── 小程序收藏导入（方案A：/import?d=ISSN1,ISSN2…，无后端）──
-      (function importFromMiniProgram() {
-        if (location.pathname.replace(/\/+$/, '') !== '/import') return;
-        let raw = new URLSearchParams(location.search).get('d') || '';
-        if (!raw && location.hash) {
-          const m = location.hash.match(/[#&?]d=([^&]+)/);
-          if (m) raw = decodeURIComponent(m[1]);
-        }
-        const issns = (raw || '').split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
-        let added = 0, missing = 0;
-        for (const issn of issns) {
-          const r = journals.find(j => (j.issn || '').toUpperCase() === issn || (j.eissn || '').toUpperCase() === issn);
-          if (!r) { missing++; continue; }
-          if (!isFav(r)) { toggleFav(r, {}); added++; }
-        }
-        try { history.replaceState(null, '', '/favorites'); } catch (_) {}
-        const msg = issns.length
-          ? `${T('已导入', 'Imported')} ${added} ${T('本期刊到收藏', 'journals to favorites')}` + (missing ? `（${missing} ${T('本未匹配', 'unmatched')}）` : '')
-          : T('链接里没有可导入的期刊', 'No journals found in the link');
-        setTimeout(() => {
-          try {
-            const el = document.createElement('div');
-            el.className = 'import-toast';
-            el.textContent = msg;
-            el.style.cssText = 'position:fixed;left:50%;bottom:34px;transform:translateX(-50%);z-index:3000;background:#1f2c4c;color:#fff;padding:11px 20px;border-radius:10px;font-size:14px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.28);max-width:88vw;text-align:center';
-            document.body.appendChild(el);
-            setTimeout(() => el.remove(), 4500);
-          } catch (_) {}
-        }, 200);
-      })();
-      // 预警名单：切到国际刊，合并展示 中科院/中信所预警 + 新锐 under review / WoS on hold
-      document.getElementById('warn-rank-link')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        [activeIndices, activeJcr, activeZones, activeXr, activeAbdc, activeAbs, activeTopics, activeFeats].forEach(s => s.clear());
-        activeWarnList = true;
-        activeCat = '__all'; activeQuery = '';
-        const qEl = document.getElementById('q'); if (qEl) qEl.value = '';
-        shown = PAGE;
-        if (window.__activateJournalTab) window.__activateJournalTab('int', { keepWarnList: true });
-        renderInt(); syncThChkState();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      });
-      // 影响因子滑块
-      (function initIfSlider() {
-        const slider = document.getElementById('if-slider');
-        const valEl = document.getElementById('if-slider-val');
-        if (!slider) return;
-        const max = +slider.max || 50;
-        const sync = () => {
-          activeIfMin = +slider.value;
-          if (valEl) valEl.textContent = activeIfMin > 0
-            ? `IF ≥ ${activeIfMin}${activeIfMin >= max ? '+' : ''}`
-            : T('不限', 'Any');
-          slider.style.setProperty('--pct', (activeIfMin / max * 100) + '%');
-        };
-        slider.addEventListener('input', () => { sync(); shown = PAGE; renderInt(); });
-        sync();
-      })();
-      if (renderJournalRoutePage()) {
-        window.addEventListener('hashchange', applyHashRoute);
-        if (user) await pullFavs();
-        return;
-      }
-      if (window.__activateJournalTab) window.__activateJournalTab(tabFromPath(), { skipPath: true });
-      else renderInt();
+      renderWosList();
+      renderInt();
       // 启用 #j/<id> 深链
       window.addEventListener('hashchange', applyHashRoute);
       applyHashRoute();
       if (user) await pullFavs();
-      // 设置表头吸顶偏移 = 搜索栏高度
-      updateStickySearchState();
-      window.addEventListener('resize', updateStickySearchState);
-      window.addEventListener('scroll', updateStickySearchState, { passive: true });
     } catch (e) {
       $('#hint').textContent = 'Load failed: ' + e.message;
       console.error(e);
     }
   }
 
-  function updateThStickyTop() {
-    const topbar = document.querySelector('.topbar');
-    if (topbar) {
-      const h = topbar.getBoundingClientRect().height;
-      const top = parseFloat(getComputedStyle(topbar).top) || 0;
-      document.documentElement.style.setProperty('--th-sticky-top', Math.ceil(top + h) + 'px');
-    }
-  }
-
-  function refreshPickI18n() {
-    // data-i18n and data-i18n-placeholder are handled by applyI18n()
-    if (typeof window.__refreshPickReportI18n === 'function') window.__refreshPickReportI18n();
-  }
-
-  async function loadJournalViewTotalFootnote() {
-    const el = document.getElementById('journal-view-total');
-    if (!el) return;
-    try {
-      const resp = await fetch(`${API_BASE}/analytics/public-total?site=${encodeURIComponent(location.hostname)}`, { cache: 'no-store' });
-      const data = await readJsonResponse(resp, 'Public traffic total failed');
-      const pageviews = Number(data.total_pageviews || 0);
-      const visitors = Number(data.total_visitors || 0);
-      const total = Number(data.total_journal_views || 0);
-      const journals = Number(data.viewed_journals || 0);
-      if (!pageviews && !total) return;
-      el.innerHTML = `${T('全站浏览量','Total site views')}：<strong>${pageviews.toLocaleString()}</strong>${visitors ? ` · ${T('访客','Visitors')} ${visitors.toLocaleString()}` : ''}${total ? ` · ${T('期刊详情浏览','Journal detail views')} ${total.toLocaleString()}` : ''}${journals ? ` · ${T('覆盖期刊','Journals viewed')} ${journals.toLocaleString()}` : ''}`;
-      el.hidden = false;
-    } catch (_) {}
-  }
-
-  // CNKX 复选面板切换（动态生成，不经过 initThDropdowns）
-  window.toggleCnkxDropdown = function(panelId) {
-    const panel = document.getElementById(panelId);
-    if (!panel) return;
-    const wasOpen = panel.classList.contains('open');
-    document.querySelectorAll('.th-dropdown-panel.open').forEach(p => p.classList.remove('open'));
-    if (!wasOpen) panel.classList.add('open');
-  };
-
-  loadJournalViewTotalFootnote();
   boot();
 })();

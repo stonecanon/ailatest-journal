@@ -1,27 +1,29 @@
-﻿<!doctype html>
-<html lang="en">
+<!doctype html>
+<html lang="zh-CN">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>AILatest Journal - Journal Finder, Rankings &amp; Impact Factors</title>
-<meta name="description" content="AILatest Journal helps researchers search 40,000+ academic journals, compare impact factors, JCR quartiles, CAS tiers, indexing databases, review cycles, and AI-powered submission matches." />
-<meta name="keywords" content="journal finder, journal search, 期刊查询, SCI期刊查询, 期刊检索, 荐刊推荐, 投稿期刊推荐, 中科院分区查询, 影响因子查询, JCR分区, CCF推荐, CSSCI, 北大核心, journal recommendation, journal matcher, find journal for paper" />
+<title>AILatest Journal — Journal Finder &amp; Journal Search for Researchers | 期刊查询 · 选刊推荐 · SCI期刊检索</title>
+<meta name="description" content="AILatest Journal 是面向科研人员的免费期刊查询与选刊推荐工具。聚合 SCI/SSCI/AHCI/ESCI/EI 索引、JCR 影响因子、中科院分区、CCF 推荐、CSSCI、北大核心等数据，支持期刊检索、影响因子查询、选刊推荐、收藏同步。Journal finder &amp; search tool with IF, CAS tiers, Scopus, DOAJ, review cycles." />
+<meta name="keywords" content="journal finder, journal search, 期刊查询, SCI期刊查询, 期刊检索, 选刊推荐, 投稿期刊推荐, 中科院分区查询, 影响因子查询, JCR分区, CCF推荐, CSSCI, 北大核心, journal recommendation, journal matcher, find journal for paper" />
 <link rel="canonical" href="https://journal.ailatest.org/" />
-<link rel="alternate" href="https://journal.ailatest.org/" hreflang="en" />
-<link rel="alternate" href="https://journal.ailatest.org/zh" hreflang="zh-CN" />
-<link rel="alternate" href="https://journal.ailatest.org/" hreflang="x-default" />
 
 <!-- Open Graph -->
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://journal.ailatest.org/" />
-<meta property="og:title" content="AILatest Journal - Journal Finder, Rankings &amp; Submission Insights" />
-<meta property="og:description" content="Search SCI, SSCI, AHCI, ESCI, EI, Scopus and regional journal lists with impact factors, quartiles, CAS tiers, review cycles and AI-powered journal recommendation." />
-<meta property="og:image" content="https://journal.ailatest.org/icons/og-image.jpg?v=2" />
+<meta property="og:title" content="AILatest Journal — Journal Finder · 期刊查询与选刊推荐" />
+<meta property="og:description" content="Free journal finder &amp; search tool for researchers. SCI/SSCI/AHCI/ESCI/EI, JCR IF, CAS tiers, CCF, CSSCI, PKU Core, Scopus, DOAJ, review cycles, and smart journal recommendation." />
+<meta property="og:image" content="https://journal.ailatest.org/icons/og-image.png" />
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="AILatest Journal - Journal Finder, Rankings &amp; Submission Insights" />
-<meta name="twitter:description" content="Search SCI, SSCI, JCR impact factors, CAS tiers, Scopus, DOAJ and regional journal lists in one place." />
+<meta name="twitter:title" content="AILatest Journal — Journal Finder · 期刊查询与选刊推荐" />
+<meta name="twitter:description" content="Free journal finder &amp; search for researchers. SCI/SSCI, IF, CAS tiers, CCF, CSSCI, Scopus — all in one place." />
+
+<!-- Hreflang for multilingual -->
+<link rel="alternate" href="https://journal.ailatest.org/" hreflang="zh-CN" />
+<link rel="alternate" href="https://journal.ailatest.org/" hreflang="en" />
+<link rel="alternate" href="https://journal.ailatest.org/" hreflang="x-default" />
 
 <!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -32,7 +34,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- End Google Tag Manager -->
 <link rel="preload" href="/data/journals.json.gz" as="fetch" crossorigin="anonymous" />
 <link rel="preload" href="/data/journal_aliases.json" as="fetch" crossorigin="anonymous" />
-<link rel="stylesheet" href="/css/app.css?v=20260616-pick-i18n-report" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/css/app.css?v=20260527-53" />
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json" />
@@ -50,73 +55,20 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   "@context": "https://schema.org",
   "@type": "WebSite",
   "name": "AILatest Journal",
-  "alternateName": ["Journal Finder", "Journal Search", "期刊查询", "荐刊推荐"],
+  "alternateName": ["期刊查询", "选刊推荐", "Journal Finder", "Journal Search"],
   "url": "https://journal.ailatest.org/",
-  "description": "Journal finder, ranking database and submission decision tool for researchers. Search SCI, SSCI, AHCI, ESCI, EI, Scopus, DOAJ and regional journal lists with impact factors, quartiles and AI-powered journal matching.",
+  "description": "Free journal finder & search tool for researchers. SCI/SSCI, JCR IF, CAS tiers, CCF, CSSCI, Scopus, DOAJ, review cycles, and smart journal recommendation.",
   "inLanguage": ["zh-CN", "en"],
   "potentialAction": {
     "@type": "SearchAction",
     "target": {
       "@type": "EntryPoint",
-      "urlTemplate": "https://journal.ailatest.org/pick#search?q={search_term_string}"
+      "urlTemplate": "https://journal.ailatest.org/#search?q={search_term_string}"
     },
     "query-input": "required name=search_term_string"
   }
 }
 </script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "ItemList",
-  "name": "AILatest Journal main sections",
-  "itemListElement": [
-    {"@type": "SiteNavigationElement", "position": 1, "name": "Journal Finder", "url": "https://journal.ailatest.org/global"},
-    {"@type": "SiteNavigationElement", "position": 2, "name": "AI Journal Recommendation", "url": "https://journal.ailatest.org/pick"},
-    {"@type": "SiteNavigationElement", "position": 3, "name": "Browse by Subject", "url": "https://journal.ailatest.org/subjects/"},
-    {"@type": "SiteNavigationElement", "position": 4, "name": "Browse by Index", "url": "https://journal.ailatest.org/indexes/"},
-    {"@type": "SiteNavigationElement", "position": 5, "name": "China Journals", "url": "https://journal.ailatest.org/cn"},
-    {"@type": "SiteNavigationElement", "position": 6, "name": "Malaysia Journals", "url": "https://journal.ailatest.org/my"},
-    {"@type": "SiteNavigationElement", "position": 7, "name": "Journal Updates", "url": "https://journal.ailatest.org/updates"}
-  ]
-}
-</script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  "name": "AILatest Journal Finder",
-  "applicationCategory": "EducationalApplication",
-  "operatingSystem": "Web",
-  "url": "https://journal.ailatest.org/pick",
-  "description": "Journal finder and recommendation tool for researchers. Enter a paper title, abstract or keywords to match target journals by research topic, SCI/SSCI/EI coverage, JCR quartile, CAS tier, Scopus and impact factor.",
-  "offers": {
-    "@type": "Offer",
-    "price": "0",
-    "priceCurrency": "USD"
-  }
-}
-</script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  "itemListElement": [
-    {
-      "@type": "ListItem",
-      "position": 1,
-      "name": "AILatest Journal",
-      "item": "https://journal.ailatest.org/"
-    },
-    {
-      "@type": "ListItem",
-      "position": 2,
-      "name": "International Journals",
-      "item": "https://journal.ailatest.org/international"
-    }
-  ]
-}
-</script>
-
 
 </head>
 <body>
@@ -125,107 +77,182 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
 <div id="sidebar-scrim" class="sidebar-scrim" hidden></div>
+<aside class="sidebar">
+  <h1 class="brand">
+    <a href="./">AILatest<span>Journal</span></a>
+  </h1>
+  <div class="brand-sub" data-i18n="tagline"><b>AILatest Journal</b> — 面向科研人员的期刊检索与投稿决策工具，聚合 SCI/SSCI、中科院分区、JCR、ESI、CSSCI、北大核心、浙大目录等数据，支持收藏、评分与跨设备同步。</div>
 
-<aside class="app-rail" aria-label="Primary navigation">
-  <nav class="rail-top">
-    <button class="rail-close-mobile" id="rail-close-mobile" aria-label="Close navigation">×</button>
-    <button class="rail-brand-mobile" data-tab="home" aria-label="知刊" title="回到首页" data-i18n="brand_zhikan">知刊</button>
-    <button class="rail-nav-btn" data-tab="int" aria-label="国际期刊" title="国际期刊" data-i18n-aria="rail_int" data-i18n-title="rail_int">
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 3.4 9A14 14 0 0 1 12 21a14 14 0 0 1-3.4-9A14 14 0 0 1 12 3Z"/></svg>
-      <span data-i18n="rail_int">国际期刊</span>
-    </button>
-    <button class="rail-nav-btn" data-tab="dom" aria-label="中国期刊" title="中国期刊" data-i18n-aria="rail_dom" data-i18n-title="rail_dom">
-      <span class="rail-flag" aria-hidden="true">CN</span>
-      <span data-i18n="rail_dom">中国期刊</span>
-    </button>
-    <button class="rail-nav-btn" data-tab="in" aria-label="India journals" title="India journals" data-i18n-aria="rail_in" data-i18n-title="rail_in">
-      <span class="rail-flag" aria-hidden="true">IN</span>
-      <span data-i18n="rail_in">India</span>
-    </button>
-    <button class="rail-nav-btn" data-tab="my" aria-label="Malaysia journals" title="Malaysia journals" data-i18n-aria="rail_my" data-i18n-title="rail_my">
-      <span class="rail-flag" aria-hidden="true">MY</span>
-      <span data-i18n="rail_my">Malaysia</span>
-    </button>
-    <button class="rail-nav-btn" data-tab="kr" aria-label="Korea journals" title="Korea journals" data-i18n-aria="rail_kr" data-i18n-title="rail_kr">
-      <span class="rail-flag" aria-hidden="true">KR</span>
-      <span data-i18n="rail_kr">Korea</span>
-    </button>
-    <button class="rail-nav-btn" data-tab="updates" aria-label="期刊动态" title="期刊动态" data-i18n-aria="rail_updates" data-i18n-title="rail_updates">
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h10"/><path d="M4 12h7"/><path d="M4 17h9"/><path d="M16 7a5 5 0 0 1 0 10"/><path d="M19 4a9 9 0 0 1 0 16"/></svg>
-      <span data-i18n="rail_updates">动态</span>
-    </button>
-    <button class="rail-nav-btn" id="fav-header-btn" data-tab="fav" aria-label="我的收藏" title="我的收藏" data-i18n-aria="hero_title_fav" data-i18n-title="hero_title_fav">
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.7l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3.7z"/></svg>
-      <span data-i18n="rail_fav">我的收藏</span>
-      <span id="fav-count-badge" class="fav-count-badge" style="display:none"></span>
-    </button>
-  </nav>
-  <div class="rail-bottom">
-    <button class="auth-btn" id="auth-btn" aria-label="Sign in" data-i18n="login">登录</button>
+  <div class="side-section" data-international>
+    <div class="side-label" data-i18n="indices">索引</div>
+    <div class="chip-row" id="index-toggles">
+      <label class="chip tag-scie"><input type="checkbox" value="SCIE" checked>SCIE</label>
+      <label class="chip tag-ssci"><input type="checkbox" value="SSCI" checked>SSCI</label>
+      <label class="chip tag-ahci"><input type="checkbox" value="AHCI" checked>AHCI</label>
+      <label class="chip tag-esci"><input type="checkbox" value="ESCI" checked>ESCI</label>
+      <label class="chip tag-ei"><input type="checkbox" value="EI" checked>EI</label>
+    </div>
   </div>
+
+  <div class="side-section" data-international>
+    <div class="side-label">JCR Quartile</div>
+    <div class="chip-row" id="jcr-toggles">
+      <label class="chip jcr-q1"><input type="checkbox" value="Q1">Q1</label>
+      <label class="chip jcr-q2"><input type="checkbox" value="Q2">Q2</label>
+      <label class="chip jcr-q3"><input type="checkbox" value="Q3">Q3</label>
+      <label class="chip jcr-q4"><input type="checkbox" value="Q4">Q4</label>
+    </div>
+  </div>
+
+  <div class="side-section" data-international>
+    <div class="side-label" data-i18n="cas_zone">中科院 2025 分区</div>
+    <div class="chip-row" id="zone-toggles">
+      <label class="chip zone-1"><input type="checkbox" value="1"><span data-i18n="z1">1 区</span></label>
+      <label class="chip zone-2"><input type="checkbox" value="2"><span data-i18n="z2">2 区</span></label>
+      <label class="chip zone-3"><input type="checkbox" value="3"><span data-i18n="z3">3 区</span></label>
+      <label class="chip zone-4"><input type="checkbox" value="4"><span data-i18n="z4">4 区</span></label>
+      <label class="chip zone-top"><input type="checkbox" value="top">TOP</label>
+    </div>
+  </div>
+
+  <div class="side-section" data-international>
+    <div class="side-label"><span data-i18n="filter_xinrui">新锐分区</span></div>
+    <div class="chip-row" id="xr-toggles">
+      <label class="chip xr-1"><input type="checkbox" value="1"><span data-i18n="z1">1 区</span></label>
+      <label class="chip xr-2"><input type="checkbox" value="2"><span data-i18n="z2">2 区</span></label>
+      <label class="chip xr-3"><input type="checkbox" value="3"><span data-i18n="z3">3 区</span></label>
+      <label class="chip xr-4"><input type="checkbox" value="4"><span data-i18n="z4">4 区</span></label>
+      <label class="chip xr-top"><input type="checkbox" value="xr-top">TOP</label>
+    </div>
+  </div>
+
+  <div class="side-section" data-international>
+    <div class="side-label">ABDC</div>
+    <div class="chip-row" id="abdc-toggles">
+      <label class="chip"><input type="checkbox" value="A*">A*</label>
+      <label class="chip"><input type="checkbox" value="A">A</label>
+      <label class="chip"><input type="checkbox" value="B">B</label>
+      <label class="chip"><input type="checkbox" value="C">C</label>
+    </div>
+  </div>
+
+  <div class="side-section" data-international>
+    <div class="side-label">ABS</div>
+    <div class="chip-row" id="abs-toggles">
+      <label class="chip"><input type="checkbox" value="4*">4*</label>
+      <label class="chip"><input type="checkbox" value="4">4</label>
+      <label class="chip"><input type="checkbox" value="3">3</label>
+      <label class="chip"><input type="checkbox" value="2">2</label>
+      <label class="chip"><input type="checkbox" value="1">1</label>
+    </div>
+  </div>
+
+  <div class="side-section" data-international>
+    <div class="side-label" data-i18n="filters">附加筛选</div>
+    <div class="chip-row feat-row">
+      <label class="chip"><input type="checkbox" value="if" data-feat>IF</label>
+      <label class="chip"><input type="checkbox" value="ccf" data-feat>CCF</label>
+      <label class="chip" hidden style="display:none"><input type="checkbox" value="cnkx" data-feat>T1/T2/T3</label>
+      <label class="chip"><input type="checkbox" value="flagship" data-feat>N/S/C</label>
+      <label class="chip"><input type="checkbox" value="scopus" data-feat>Scopus</label>
+      <label class="chip"><input type="checkbox" value="oaj" data-feat>OAJ</label>
+      <label class="chip"><input type="checkbox" value="doaj" data-feat>DOAJ</label>
+      <label class="chip"><input type="checkbox" value="warning" data-feat><span data-i18n="filter_warning">预警</span></label>
+    </div>
+  </div>
+
+  <div class="side-section" data-international>
+    <div class="side-label" data-i18n="wos_subjects">WoS 细分学科</div>
+    <div class="wos-actions">
+      <button class="wos-clear" id="wos-clear" type="button" title="清空选择 / Clear" data-i18n-title="wos_clear_title">×</button>
+    </div>
+    <div class="wos-search-wrap">
+      <input id="wos-search" type="search" placeholder="筛选学科（A-Z）…" data-i18n-placeholder="wos_search_ph" autocomplete="off" spellcheck="false" />
+    </div>
+    <div class="wos-list wos-list-tall" id="wos-list"></div>
+    <button class="nav-item" data-cat="__all" id="wos-all-btn" style="margin-top:8px"><span data-i18n="all">全部</span> <span class="count" id="count-all">—</span></button>
+  </div>
+
+  <div class="side-section" data-domestic hidden>
+    <div class="side-label" data-i18n="domestic_sources">国内分级来源</div>
+    <div class="chip-row" id="domestic-badge-toggles">
+      <label class="chip ds-chip-cssci"><input type="checkbox" value="cssci">CSSCI</label>
+      <label class="chip ds-chip-cssci-ext"><input type="checkbox" value="cssci_ext">CSSCI 扩展</label>
+      <label class="chip ds-chip-pku"><input type="checkbox" value="pku">北大核心</label>
+      <label class="chip ds-chip-ccft"><input type="checkbox" value="ccft">CCF 中文</label>
+    </div>
+  </div>
+
+  <div class="side-section" data-domestic hidden>
+    <nav class="nav">
+      <button class="nav-item active" data-dom="cnki_major"><span data-i18n="src_cnki_major">中文期刊目录</span></button>
+      <button class="nav-item" data-dom="cnkx"><span data-i18n="src_cnkx">中国科协高质量目录</span></button>
+    </nav>
+    <div class="nav-divider" style="margin:8px 0"></div>
+    <div class="nav-sub" data-i18n="nav_sub_inhouse">院校自编目录</div>
+    <nav class="nav">
+      <button class="nav-item" data-dom="zju_zju"><span data-i18n="src_zju">浙江大学 2024</span></button>
+      <button class="nav-item nav-locked" data-dom="school_a" title="In-house School Directory (paid unlock) / 高校自编目录（付费解锁）">
+        <span data-i18n="locked_school_a">🔒 学校 A · 2023</span>
+        <span class="count" data-i18n="paid_label">付费</span>
+      </button>
+    </nav>
+  </div>
+
+  <footer class="aside-foot">
+    <a href="https://journal.ailatest.org" target="_blank" rel="noopener">← journal.ailatest.org</a>
+  </footer>
 </aside>
-<div class="lang-toggle-wrap">
-  <button class="lang-toggle" id="lang-toggle" aria-label="Switch language">中文</button>
-</div>
 
 <main class="main">
-  <section class="home-hero" aria-label="AILatest Journal">
-    <h1 class="home-title">
-      <span class="home-brand-row">
-        <span><span data-i18n="brand_title">Journal</span> <em><span class="brand-ai">AI</span>Latest<span class="brand-dot">.</span><span class="brand-org">org</span></em></span>
-      </span>
-      <small data-i18n="home_subtitle">全球期刊检索与推荐平台</small>
-    </h1>
-  </section>
-
-  <nav class="seo-nav" aria-label="Browse journals">
-    <a href="/indexes/" class="seo-nav-link" data-i18n="nav_index_rank">索引排行榜</a>
-    <a href="/subjects/" class="seo-nav-link" data-i18n="nav_subject_rank">学科排行榜</a>
-    <a href="#" class="seo-nav-link" id="warn-rank-link" data-i18n="nav_warn_rank">预警名单</a>
-    <a href="/extension.html" class="seo-nav-link" id="extension-beta-link"><span data-i18n="nav_extension_beta">插件内测</span><span class="new-badge">NEW</span></a>
-  </nav>
-
-  <header class="topbar">
-    <button class="side-toggle" id="side-toggle" aria-label="Open navigation">☰</button>
-    <div class="search-wrap">
-      <input id="q" type="text" maxlength="200" placeholder="Search: journal title / abbr / ISSN" autocomplete="off" spellcheck="false" />
-      <div class="search-actions">
-        <button class="search-submit" id="search-submit" type="button" aria-label="Search">
-          <span data-i18n="search_button">Search</span>
-        </button>
-      </div>
-      <span class="hint" id="hint" data-i18n="loading">加载中…</span>
-    </div>
-  </header>
-  <div id="home-search-chips" class="home-search-chips" hidden></div>
-
-  <div id="mode-tabs">
-    <a class="tab active" data-tab="home" href="/">
-      <span class="tab-label" data-i18n="tab_home">查刊</span>
-    </a>
-    <a class="tab" data-tab="pick" href="/pick">
-      <span class="tab-label" data-i18n="tab_pick">荐刊</span><span class="tab-ai-badge" aria-hidden="true">AI</span>
-    </a>
-    <a class="mobile-nav-brand" href="/" aria-label="AILatest Journal"><em data-i18n="brand_title">Journal</em><span>.ailatest</span></a>
+  <div class="tabs">
+    <button class="tab active" data-tab="int">
+      <span class="tab-icon">🌍</span>
+      <span class="tab-label" data-i18n="tab_int">国际</span>
+    </button>
+    <button class="tab" data-tab="dom">
+      <span class="tab-icon">🇨🇳</span>
+      <span class="tab-label" data-i18n="tab_dom">中国</span>
+    </button>
+    <button class="tab" data-tab="fav">
+      <span class="tab-icon">⭐</span>
+      <span class="tab-label" data-i18n="tab_fav">我的收藏</span>
+    </button>
+    <button class="tab" data-tab="pick">
+      <span class="tab-icon">🤖</span>
+      <span class="tab-label" data-i18n="tab_pick">帮我选刊</span>
+    </button>
   </div>
 
-
-  <!-- ─── Home tab ─── -->
-  <section class="tab-panel" data-panel="home">
-    <div id="home-results" class="home-results" hidden></div>
-    <section id="home-updates-preview" class="updates-preview" aria-label="期刊动态" hidden></section>
-  </section>
-
-  <!-- ─── Journal updates tab ─── -->
-  <section class="tab-panel" data-panel="updates" hidden>
-    <section id="journal-updates" class="updates-page" aria-label="期刊动态"></section>
-  </section>
+  <header class="topbar">
+    <button class="side-toggle" id="side-toggle" aria-label="Toggle filters / 打开筛选侧栏">☰</button>
+    <div class="search-wrap">
+      <input id="q" type="search" placeholder="Search: journal title / abbr / ISSN" autocomplete="off" spellcheck="false" />
+      <span class="hint" id="hint" data-i18n="loading">加载中…</span>
+    </div>
+    <div class="topbar-actions">
+      <button class="fav-tab" id="fav-tab" aria-label="Favorites" title="My Favorites / 我的收藏">★ <span id="fav-count">0</span></button>
+      <button class="auth-btn" id="auth-btn" aria-label="Sign in" data-i18n="login">登录</button>
+      <div class="lang-toggle-wrap">
+        <button class="lang-toggle" id="lang-toggle" aria-label="Switch language">中 / EN</button>
+      </div>
+    </div>
+  </header>
+  <div class="if-update-notice" data-i18n="if_update_notice">2025 影响因子已更新，当前显示为 JCR 2026 发布的 2025 指标。</div>
 
   <!-- ─── International tab ─── -->
-  <section class="tab-panel" data-panel="int" hidden>
+  <section class="tab-panel" data-panel="int">
+    <section class="hero">
+      <h2 data-i18n="hero_title_int">SCI / SSCI 国际期刊检索</h2>
+      <p>
+        <span data-i18n="hero_body_int">数据源：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI）· 更新至 2026-05-18，并合并 <b>EI Compendex</b> 期刊目录（2025-10-10）。合并 <b>JCR 2025</b> 归属标记、<b>ESI</b> 22 大学科分类、<b>中科院 2025 大类分区</b>、<b>ShowJCR</b> JCR 2025 发布版 · 2024 指标（IF / 小类分区 / 排名）、新锐版、CCF 2026 推荐与国际期刊预警名单。共收录 <b id="total">—</b> 本。</span><br/>
+        <span class="muted" data-i18n="hero_note">徽章语义：<b>SCIE/SSCI/AHCI/ESCI/EI</b> 索引收录 · <b>中科院</b> 中科院 2025 大类分区（1-4 区，TOP 标志） · <b>JCR Q</b> Quartile（Q1-Q4） · <b>新锐</b> 中科院 2026 新锐版分区 · <b>CCF</b> 中国计算机学会 2026 推荐（A/B/C） · <b>ABDC</b> 澳洲经管期刊分级（A*/A/B/C） · <b>ABS</b> 英国 Chartered ABS Academic Journal Guide 2024（4*/4/3/2/1，仅经管商科） · <b>T1/T2/T3</b> 中国科协 2025 高质量期刊分级 · <b>⚠ Warning</b> 国际期刊预警名单。<b>IF</b> 单独成列，按 JCR 2025 发布版 · 2024 指标展示，可升序/降序排序。</span>
+      </p>
+    </section>
+
     <section class="results">
       <div class="results-head">
-        <h1 id="results-title" data-i18n="results_all">全部期刊</h1>
+        <h3 id="results-title" data-i18n="results_all">全部期刊</h3>
         <span class="results-count" id="results-count">—</span>
       </div>
       <div class="table-wrap">
@@ -234,109 +261,20 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <tr>
               <th class="col-fav" aria-label="Favorite"></th>
               <th class="col-name" data-i18n="col_name">期刊 Title</th>
-              <th class="col-free">
-                <label class="free-th-filter" id="free-col-filter-label" data-i18n-title="filter_free_only" title="只看免费发表 / FREE only">
-                  <input type="checkbox" id="free-col-filter" data-i18n-aria="filter_free_only" aria-label="只看免费发表">
-                  <span data-i18n="col_free">FREE</span>
-                </label>
+              <th class="col-badge" data-i18n="col_badges">索引 / 分区</th>
+              <th class="col-if sortable" data-if-sort="int" title="按 IF 排序">IF <span class="sort-arrow">▼</span></th>
+              <th class="col-cas">
+                <select id="cas-col-filter" class="th-select" aria-label="筛选中科院大类">
+                  <option value="__all">中科院大类</option>
+                </select>
               </th>
-              <th class="col-badge">
-                <div class="th-dropdown" id="idx-dropdown">
-                  <button class="th-dropdown-btn"><span class="dd-label" data-i18n="filter_idx">索引</span><span class="dd-arrow">▼</span></button>
-                  <div class="th-dropdown-panel" id="idx-panel">
-                  <label class="th-chk" data-filter="index" data-value="SCIE"><input type="checkbox"><span>SCIE</span></label>
-                    <label class="th-chk" data-filter="index" data-value="SSCI"><input type="checkbox"><span>SSCI</span></label>
-                    <label class="th-chk" data-filter="index" data-value="AHCI"><input type="checkbox"><span>AHCI</span></label>
-                    <label class="th-chk" data-filter="index" data-value="ESCI"><input type="checkbox"><span>ESCI</span></label>
-                    <label class="th-chk" data-filter="index" data-value="EI"><input type="checkbox"><span>EI</span></label>
-                    <div class="dd-sep"></div>
-                    <label class="th-chk" data-filter="feat" data-value="scopus"><input type="checkbox"><span>Scopus</span></label>
-                    <label class="th-chk" data-filter="feat" data-value="oaj"><input type="checkbox"><span>OAJ</span></label>
-                    <label class="th-chk" data-filter="feat" data-value="doaj"><input type="checkbox"><span>DOAJ</span></label>
-                    <label class="th-chk" data-filter="feat" data-value="medline"><input type="checkbox"><span>MEDLINE</span></label>
-                    <label class="th-chk" data-filter="feat" data-value="cscd"><input type="checkbox"><span>CSCD</span></label>
-                    <label class="th-chk" data-filter="feat" data-value="cstpcd"><input type="checkbox"><span>科技核心</span></label>
-                  </div>
-                </div>
-                <div class="th-dropdown" id="if-dropdown">
-                  <button class="th-dropdown-btn"><span class="dd-label" data-i18n="filter_if_range">影响因子</span><span class="dd-arrow">▼</span></button>
-                  <div class="th-dropdown-panel" id="if-panel">
-                    <div class="if-slider-row">
-                      <span class="if-slider-val" id="if-slider-val" data-i18n="if_any">不限</span>
-                    </div>
-                    <input type="range" id="if-slider" min="0" max="50" step="0.5" value="0" aria-label="最低影响因子">
-                    <div class="if-slider-ticks"><span>0</span><span>10</span><span>20</span><span>30</span><span>40</span><span>50+</span></div>
-                  </div>
-                </div>
-                <div class="th-dropdown" id="jcr-dropdown">
-                  <button class="th-dropdown-btn"><span class="dd-label" data-i18n="jcr_label">JCR 分区</span><span class="dd-arrow">▼</span></button>
-                  <div class="th-dropdown-panel" id="jcr-panel">
-                    <label class="th-chk" data-filter="jcr" data-value="Q1"><input type="checkbox"><span>Q1</span></label>
-                    <label class="th-chk" data-filter="jcr" data-value="Q2"><input type="checkbox"><span>Q2</span></label>
-                    <label class="th-chk" data-filter="jcr" data-value="Q3"><input type="checkbox"><span>Q3</span></label>
-                    <label class="th-chk" data-filter="jcr" data-value="Q4"><input type="checkbox"><span>Q4</span></label>
-                  </div>
-                </div>
-                <div class="th-dropdown" id="cas-dropdown">
-                  <button class="th-dropdown-btn"><span class="dd-label" data-i18n="cas_zone">中科院分区</span><span class="dd-arrow">▼</span></button>
-                  <div class="th-dropdown-panel" id="cas-panel">
-                    <label class="th-chk" data-filter="zone" data-value="1"><input type="checkbox"><span>1区</span></label>
-                    <label class="th-chk" data-filter="zone" data-value="2"><input type="checkbox"><span>2区</span></label>
-                    <label class="th-chk" data-filter="zone" data-value="3"><input type="checkbox"><span>3区</span></label>
-                    <label class="th-chk" data-filter="zone" data-value="4"><input type="checkbox"><span>4区</span></label>
-                    <label class="th-chk" data-filter="zone" data-value="top"><input type="checkbox"><span>TOP</span></label>
-                  </div>
-                </div>
-                <div class="th-dropdown" id="xr-dropdown">
-                  <button class="th-dropdown-btn"><span class="dd-label" data-i18n="filter_xinrui">新锐分区</span><span class="dd-arrow">▼</span></button>
-                  <div class="th-dropdown-panel" id="xr-panel">
-                    <label class="th-chk" data-filter="xr" data-value="1"><input type="checkbox"><span>1区</span></label>
-                    <label class="th-chk" data-filter="xr" data-value="2"><input type="checkbox"><span>2区</span></label>
-                    <label class="th-chk" data-filter="xr" data-value="3"><input type="checkbox"><span>3区</span></label>
-                    <label class="th-chk" data-filter="xr" data-value="4"><input type="checkbox"><span>4区</span></label>
-                    <label class="th-chk" data-filter="xr" data-value="xr-top"><input type="checkbox"><span>TOP</span></label>
-                  </div>
-                </div>
-                <div class="th-dropdown" id="abdc-dropdown">
-                  <button class="th-dropdown-btn"><span class="dd-label" data-i18n="abdc_label">ABDC</span><span class="dd-arrow">▼</span></button>
-                  <div class="th-dropdown-panel" id="abdc-panel">
-                    <label class="th-chk" data-filter="abdc" data-value="A*"><input type="checkbox"><span>A*</span></label>
-                    <label class="th-chk" data-filter="abdc" data-value="A"><input type="checkbox"><span>A</span></label>
-                    <label class="th-chk" data-filter="abdc" data-value="B"><input type="checkbox"><span>B</span></label>
-                    <label class="th-chk" data-filter="abdc" data-value="C"><input type="checkbox"><span>C</span></label>
-                  </div>
-                </div>
-                <div class="th-dropdown" id="abs-dropdown">
-                  <button class="th-dropdown-btn"><span class="dd-label" data-i18n="abs_label">ABS</span><span class="dd-arrow">▼</span></button>
-                  <div class="th-dropdown-panel" id="abs-panel">
-                    <label class="th-chk" data-filter="abs" data-value="4*"><input type="checkbox"><span>4*</span></label>
-                    <label class="th-chk" data-filter="abs" data-value="4"><input type="checkbox"><span>4</span></label>
-                    <label class="th-chk" data-filter="abs" data-value="3"><input type="checkbox"><span>3</span></label>
-                    <label class="th-chk" data-filter="abs" data-value="2"><input type="checkbox"><span>2</span></label>
-                    <label class="th-chk" data-filter="abs" data-value="1"><input type="checkbox"><span>1</span></label>
-                  </div>
-                </div>
-                <div class="th-dropdown" id="warn-dropdown">
-                  <button class="th-dropdown-btn"><span class="dd-label" data-i18n="filter_warning">预警名单</span><span class="dd-arrow">▼</span></button>
-                  <div class="th-dropdown-panel" id="warn-panel">
-                    <label class="th-chk" data-filter="feat" data-value="warning"><input type="checkbox"><span>中科院预警</span></label>
-                    <label class="th-chk" data-filter="feat" data-value="citic_warning"><input type="checkbox"><span>中信所预警</span></label>
-                    <label class="th-chk" data-filter="feat" data-value="under_review"><input type="checkbox"><span>新锐 Under Review</span></label>
-                    <label class="th-chk" data-filter="feat" data-value="on_hold"><input type="checkbox"><span>WoS On Hold</span></label>
-                  </div>
-                </div>
+              <th class="col-esi">
+                <select id="esi-col-filter" class="th-select" aria-label="筛选 ESI 学科">
+                  <option value="__all">ESI Subject</option>
+                </select>
               </th>
-              <th class="col-if sortable" data-if-sort="int" title="按 IF 排序"><span data-i18n="col_if">IF</span> <span class="sort-arrow">▼</span></th>
-              <th class="col-cycle"><span data-i18n="col_cycle">审稿周期</span></th>
-              <th class="col-wos">
-                <div class="th-dropdown" id="topic-dropdown">
-                  <button class="th-dropdown-btn"><span class="dd-label" data-i18n="filter_topic">学科</span><span class="dd-arrow">▼</span></button>
-                  <div class="th-dropdown-panel th-dropdown-panel-search" id="topic-panel">
-                    <div class="dd-search-wrap"><input id="topic-dd-search" type="search" placeholder="搜索…" data-i18n-placeholder="wos_search_ph" class="dd-search" autocomplete="off" spellcheck="false"></div>
-                    <div class="dd-check-list" id="topic-dd-list"></div>
-                  </div>
-                </div>
-              </th>
+              <th class="col-abbr" data-i18n="col_abbr">缩写 Abbr</th>
+              <th class="col-issn">ISSN</th>
             </tr>
           </thead>
           <tbody id="tbody"></tbody>
@@ -350,50 +288,75 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
   <!-- ─── Domestic tab ─── -->
   <section class="tab-panel" data-panel="dom" hidden>
+    <section class="hero">
+      <h2 data-i18n="hero_title_dom">国内学术期刊分级目录</h2>
+      <p>
+        <span data-i18n="hero_body_dom"><b>中国科协 高质量科技期刊分级目录 (2025-12 修订)</b> 共 11,084 条 / 59 学科领域；<b>CSSCI 来源期刊 (2025-2026)</b> 正刊与扩展版；<b>北大《中文核心期刊要目总览》(2023 年版)</b>；<b>浙江大学 2024 版</b> 国内期刊分级与 <b>高校自编目录 2023</b>（付费解锁）；<b>CCF 推荐中文科技期刊 2025</b> T 分区。</span><br/>
+        <span class="muted" data-i18n="hero_note_dom">CSSCI / 北大核心目录为扫描件 PDF，OCR 版稍后补入。</span>
+      </p>
+    </section>
+
+    <nav class="subnav" data-i18n-static>
+      <button class="subnav-btn active" data-sub="all">全部</button>
+      <button class="subnav-btn" data-sub="cnkx">中国科协</button>
+      <button class="subnav-btn" data-sub="cssci">CSSCI</button>
+      <button class="subnav-btn" data-sub="pku">北大核心</button>
+      <button class="subnav-btn" data-sub="zju">浙江大学</button>
+    </nav>
+
     <div id="dom-content"></div>
-  </section>
-
-  <!-- ─── India tab ─── -->
-  <section class="tab-panel" data-panel="in" hidden>
-    <div id="india-content"></div>
-  </section>
-
-  <!-- ─── Malaysia tab ─── -->
-  <section class="tab-panel" data-panel="my" hidden>
-    <div id="malaysia-content"></div>
-  </section>
-
-  <!-- ─── Korea tab ─── -->
-  <section class="tab-panel" data-panel="kr" hidden>
-    <div id="korea-content"></div>
   </section>
 
   <!-- ─── Favorites tab ─── -->
   <section class="tab-panel" data-panel="fav" hidden>
+    <section class="hero">
+      <h2 data-i18n="hero_title_fav">我的收藏</h2>
+      <p>
+        <span data-i18n="hero_body_fav">点击任意期刊右侧的 <b>★</b> 可加入收藏。未登录时保存在本机 localStorage；登录后自动同步到云端，可跨设备访问。</span>
+      </p>
+    </section>
+    <nav class="subnav" data-i18n-static id="fav-subnav">
+      <button class="subnav-btn active" data-sub="all">全部收藏</button>
+    </nav>
     <div id="fav-content"></div>
   </section>
 
   <!-- ─── Pick-for-me tab ─── -->
   <section class="tab-panel" data-panel="pick" hidden>
+    <section class="hero">
+      <h2 data-i18n="hero_title_pick">帮我选刊</h2>
+      <p>
+        <span data-i18n="hero_body_pick">采用自研大模型算法，深度分析你的研究主题与海量期刊数据的匹配度，智能推荐最合适的目标期刊。每人每天免费使用 5 次。</span>
+      </p>
+    </section>
     <div class="pick-tool">
-      <div class="pick-action-row">
-        <div class="pick-progress" id="pick-progress" hidden>
-          <div class="pick-progress-head">
-            <span id="pick-status" class="pick-status muted-cell"></span>
-            <span id="pick-progress-pct" class="pick-progress-pct">0%</span>
+      <div class="pick-input-wrap">
+        <textarea id="pick-input" class="pick-input" rows="4" maxlength="200" placeholder="输入论文标题、摘要或关键词… 例如：indoor air quality occupancy estimation machine learning" data-i18n-placeholder="pick_placeholder"></textarea>
+        <div class="pick-options">
+          <div class="pick-option-group">
+            <label class="pick-opt"><input type="checkbox" id="pick-filter-topics" checked> <span data-i18n="pick_filter_topics">匹配研究领域 (Topics)</span></label>
+            <label class="pick-opt"><input type="checkbox" id="pick-filter-if"> <span data-i18n="pick_filter_if">限 IF ></span> <input type="number" id="pick-if-min" class="pick-num" value="0" min="0" step="0.5" style="width:60px"></label>
           </div>
-          <div class="pick-progress-track" aria-hidden="true"><span id="pick-progress-bar"></span></div>
+          <div class="pick-option-group">
+            <label class="pick-opt"><span data-i18n="pick_filter_zone">中科院分区</span>
+              <select id="pick-zone" class="pick-select">
+                <option value="all">全部</option>
+                <option value="1">1 区</option>
+                <option value="2">2 区</option>
+                <option value="3">3 区</option>
+                <option value="4">4 区</option>
+              </select>
+            </label>
+            <label class="pick-opt"><input type="checkbox" id="pick-filter-scopus"> <span data-i18n="pick_filter_scopus">仅 Scopus 收录</span></label>
+            <label class="pick-opt"><input type="checkbox" id="pick-filter-comprehensive"> <span data-i18n="pick_filter_compre">排除综合性期刊</span></label>
+          </div>
         </div>
-      </div>
-      <div class="pick-filter-bar">
-        <div class="pick-filter-group">
-          <label class="pick-opt pick-ai-opt"><input type="checkbox" id="pick-ai-toggle" checked> <span data-i18n="pick_ai_toggle">AI 推荐</span><small data-i18n="pick_ai_hint">语义增强，默认开启</small></label>
-          <label class="pick-opt"><input type="checkbox" id="pick-filter-sci" checked> <span data-i18n="pick_filter_sci">SCIE</span></label>
-          <label class="pick-opt"><input type="checkbox" id="pick-filter-ssci" checked> <span data-i18n="pick_filter_ssci">SSCI</span></label>
-          <label class="pick-opt"><input type="checkbox" id="pick-filter-ahci" checked> <span data-i18n="pick_filter_ahci">AHCI</span></label>
-          <label class="pick-opt"><input type="checkbox" id="pick-filter-esci" checked> <span data-i18n="pick_filter_esci">ESCI</span></label>
-          <label class="pick-opt"><input type="checkbox" id="pick-filter-comprehensive"> <span data-i18n="pick_filter_compre">排除综合刊</span></label>
-          <label class="pick-opt"><input type="checkbox" id="pick-filter-free"> <span data-i18n="pick_filter_free_doaj">免费（DOAJ）</span></label>
+        <div class="pick-apikey-row">
+          <input type="text" id="pick-apikey" placeholder="OpenAlex API Key（可选，填了解除额度限制）" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:4px;background:var(--bg);color:var(--ink);font-size:12px;box-sizing:border-box">
+        </div>
+        <div class="pick-actions">
+          <button id="pick-search-btn" class="big-btn primary" data-i18n="pick_search_btn">开始推荐</button>
+          <span id="pick-status" class="pick-status muted-cell"></span>
         </div>
       </div>
       <div id="pick-history" class="pick-history" style="display:none">
@@ -404,149 +367,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
   </section>
 
-  <section class="sidebar" id="sidebar">
-    <h1 class="brand">
-      <a href="./">AILatest<span data-i18n="brand_title">Journal</span></a>
-    </h1>
-    <div class="brand-sub" data-i18n="tagline"><b>AILatest Journal</b> — 面向科研人员的期刊检索与投稿决策工具，聚合 SCI/SSCI、中科院分区、JCR、ESI、CSSCI、北大核心、浙大目录等数据，支持收藏、评分与跨设备同步。</div>
-
-    <div class="side-section" data-international>
-      <div class="side-label" data-i18n="indices">索引</div>
-      <div class="chip-row" id="index-toggles">
-        <label class="chip tag-scie"><input type="checkbox" value="SCIE">SCIE</label>
-        <label class="chip tag-ssci"><input type="checkbox" value="SSCI">SSCI</label>
-        <label class="chip tag-ahci"><input type="checkbox" value="AHCI">AHCI</label>
-        <label class="chip tag-esci"><input type="checkbox" value="ESCI">ESCI</label>
-        <label class="chip tag-ei"><input type="checkbox" value="EI">EI</label>
-        <label class="chip tag-esi"><input type="checkbox" value="ESI">ESI</label>
-      </div>
-    </div>
-
-    <div class="side-section" data-international>
-      <div class="side-label" data-i18n="jcr_label">JCR 分区</div>
-      <div class="chip-row" id="jcr-toggles">
-        <label class="chip jcr-q1"><input type="checkbox" value="Q1">Q1</label>
-        <label class="chip jcr-q2"><input type="checkbox" value="Q2">Q2</label>
-        <label class="chip jcr-q3"><input type="checkbox" value="Q3">Q3</label>
-        <label class="chip jcr-q4"><input type="checkbox" value="Q4">Q4</label>
-      </div>
-    </div>
-
-    <div class="side-section" data-international>
-      <div class="side-label" data-i18n="cas_zone">中科院 2025 分区</div>
-      <div class="chip-row" id="zone-toggles">
-        <label class="chip zone-1"><input type="checkbox" value="1"><span data-i18n="z1">1 区</span></label>
-        <label class="chip zone-2"><input type="checkbox" value="2"><span data-i18n="z2">2 区</span></label>
-        <label class="chip zone-3"><input type="checkbox" value="3"><span data-i18n="z3">3 区</span></label>
-        <label class="chip zone-4"><input type="checkbox" value="4"><span data-i18n="z4">4 区</span></label>
-        <label class="chip zone-top"><input type="checkbox" value="top"><span data-i18n="zone_top">TOP</span></label>
-      </div>
-    </div>
-
-    <div class="side-section" data-international>
-      <div class="side-label"><span data-i18n="filter_xinrui">新锐分区</span></div>
-      <div class="chip-row" id="xr-toggles">
-        <label class="chip xr-1"><input type="checkbox" value="1"><span data-i18n="z1">1 区</span></label>
-        <label class="chip xr-2"><input type="checkbox" value="2"><span data-i18n="z2">2 区</span></label>
-        <label class="chip xr-3"><input type="checkbox" value="3"><span data-i18n="z3">3 区</span></label>
-        <label class="chip xr-4"><input type="checkbox" value="4"><span data-i18n="z4">4 区</span></label>
-        <label class="chip xr-top"><input type="checkbox" value="xr-top"><span data-i18n="xinrui_top">TOP</span></label>
-      </div>
-    </div>
-
-    <div class="side-section" data-international>
-      <div class="side-label" data-i18n="abdc_label">ABDC</div>
-      <div class="chip-row" id="abdc-toggles">
-        <label class="chip"><input type="checkbox" value="A*">A*</label>
-        <label class="chip"><input type="checkbox" value="A">A</label>
-        <label class="chip"><input type="checkbox" value="B">B</label>
-        <label class="chip"><input type="checkbox" value="C">C</label>
-      </div>
-    </div>
-
-    <div class="side-section" data-international>
-      <div class="side-label" data-i18n="abs_label">ABS</div>
-      <div class="chip-row" id="abs-toggles">
-        <label class="chip"><input type="checkbox" value="4*">4*</label>
-        <label class="chip"><input type="checkbox" value="4">4</label>
-        <label class="chip"><input type="checkbox" value="3">3</label>
-        <label class="chip"><input type="checkbox" value="2">2</label>
-        <label class="chip"><input type="checkbox" value="1">1</label>
-      </div>
-    </div>
-
-    <div class="side-section" data-international>
-      <div class="side-label" data-i18n="filters">附加筛选</div>
-      <div class="chip-row feat-row">
-        <label class="chip"><input type="checkbox" value="if" data-feat><span data-i18n="col_if">IF</span></label>
-        <label class="chip"><input type="checkbox" value="ccf" data-feat>CCF</label>
-        <label class="chip" hidden style="display:none"><input type="checkbox" value="cnkx" data-feat>T1/T2/T3</label>
-        <label class="chip"><input type="checkbox" value="flagship" data-feat><span data-i18n="filter_nsc">N/S/C</span></label>
-        <label class="chip"><input type="checkbox" value="scopus" data-feat>Scopus</label>
-        <label class="chip"><input type="checkbox" value="oaj" data-feat>OAJ</label>
-        <label class="chip"><input type="checkbox" value="doaj" data-feat>DOAJ</label>
-        <label class="chip"><input type="checkbox" value="medline" data-feat>MEDLINE</label>
-        <label class="chip"><input type="checkbox" value="cscd" data-feat>CSCD</label>
-        <label class="chip"><input type="checkbox" value="cstpcd" data-feat>科技核心</label>
-        <label class="chip"><input type="checkbox" value="free" data-feat><span data-i18n="filter_free">免费发表</span></label>
-        <label class="chip"><input type="checkbox" value="warning" data-feat><span data-i18n="filter_warning">预警</span></label>
-      </div>
-    </div>
-
-    <div class="side-section" data-international>
-      <div class="side-label"><span data-i18n="wos_subjects">学科 / 研究主题</span> <span class="muted-cell" style="font-size:11px">(WoS + OpenAlex)</span></div>
-      <div class="wos-actions">
-        <button class="wos-clear" id="topic-clear" type="button" title="清空选择" data-i18n-title="wos_clear_title">×</button>
-      </div>
-      <div class="wos-search-wrap">
-        <input id="topic-search" type="search" placeholder="筛选学科或主题…" data-i18n-placeholder="wos_search_ph" autocomplete="off" spellcheck="false" />
-      </div>
-      <div class="wos-list wos-list-tall" id="topic-list"></div>
-      <button class="nav-item" id="topic-all-btn" style="margin-top:8px"><span data-i18n="all">全部</span> <span class="count" id="count-topic">—</span></button>
-    </div>
-
-    <div class="side-section" data-domestic hidden>
-      <div class="side-label" data-i18n="domestic_sources">国内分级来源</div>
-      <div class="chip-row" id="domestic-badge-toggles">
-        <label class="chip ds-chip-cssci"><input type="checkbox" value="cssci">CSSCI</label>
-        <label class="chip ds-chip-cssci-ext"><input type="checkbox" value="cssci_ext">CSSCI 扩展</label>
-        <label class="chip ds-chip-pku"><input type="checkbox" value="pku">北大核心</label>
-        <label class="chip ds-chip-ccft"><input type="checkbox" value="ccft">CCF 中文</label>
-        <label class="chip ds-chip-cscd"><input type="checkbox" value="cscd">CSCD</label>
-        <label class="chip ds-chip-cstpcd"><input type="checkbox" value="cstpcd">科技核心</label>
-      </div>
-    </div>
-
-    <div class="side-section" data-domestic hidden>
-      <nav class="nav">
-        <button class="nav-item active" data-dom="cnki_major"><span data-i18n="src_cnki_major">中文期刊目录</span></button>
-        <button class="nav-item" data-dom="nsfc_mgmt"><span data-i18n="src_nsfc_mgmt">国自然管理科学部</span></button>
-        <button class="nav-item" data-dom="cscd"><span>CSCD 来源期刊</span></button>
-        <button class="nav-item" data-dom="cstpcd"><span>中国科技核心期刊</span></button>
-        <button class="nav-item" data-dom="cnkx"><span data-i18n="src_cnkx">中国科协高质量目录</span></button>
-      </nav>
-      <div class="nav-divider" style="margin:8px 0"></div>
-      <div class="nav-sub" data-i18n="nav_sub_inhouse">院校自编目录</div>
-      <nav class="nav">
-        <button class="nav-item" data-dom="zju_zju"><span data-i18n="src_zju">浙江大学 2024</span></button>
-        <button class="nav-item nav-locked" data-dom="school_a" title="In-house School Directory (paid unlock) / 高校自编目录（付费解锁）">
-          <span data-i18n="locked_school_a">🔒 学校 A · 2023</span>
-          <span class="count" data-i18n="paid_label">付费</span>
-        </button>
-      </nav>
-    </div>
-
-    <footer class="aside-foot">
-      <a href="https://journal.ailatest.org" target="_blank" rel="noopener">← journal.ailatest.org</a>
-    </footer>
-  </section>
-
   <footer class="site-foot">
-    <p data-i18n="footer_data">数据来源：Clarivate WoS Core Collection (SCIE/SSCI/AHCI/ESCI) · JCR 2025 · ESI · EI Compendex · Scopus · DOAJ · CSCD · 中国科技核心 · SCD · AMI · FMS · VHB 2024 · CNRS Section 37 · UGC-CARE India · 中科院文献情报中心分区表 2025 · ShowJCR (GPL-3.0) · CCF 2026 (A/B/C) · CCF-T 2025 · ABDC 2025 · ABS 2024 · 中国科协 2025 · CSSCI · 北大核心 · CNKI · 浙江大学 2024 · Crossref Retraction Watch · OpenAlex。© <a href="https://journal.ailatest.org">AILatest Journal</a></p>
-    <p id="journal-view-total" class="visitor-footnote" hidden></p>
+    <p data-i18n="footer_data">数据来源：Clarivate WoS Core Collection · JCR 2025 · ESI · 中科院文献情报中心分区表 2025 · ShowJCR (GPL-3.0) · 中国科协 2025 · 浙江大学 2024 · 高校自编目录 2023。© <a href="https://journal.ailatest.org">AILatest Journal</a></p>
   </footer>
 </main>
 
+<button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">◐</button>
 
 <!-- Journal detail drawer -->
 <div id="drawer-scrim" class="drawer-scrim" hidden></div>
@@ -554,22 +380,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <header class="drawer-head">
     <span class="drawer-kicker" id="drawer-kicker" data-i18n="drawer_kicker">期刊详情</span>
     <div class="drawer-head-actions">
-      <button id="drawer-back" class="drawer-back" aria-label="Back" title="返回上一个期刊">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/><path d="M9 12h11"/></svg>
-      </button>
-      <button id="drawer-fav" class="drawer-fav" title="Favorite / 收藏">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.7l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3.7z"/></svg>
-      </button>
+      <button id="drawer-back" class="drawer-back" aria-label="Back" title="返回上一个期刊">←</button>
+      <button id="drawer-fav" class="drawer-fav" title="Favorite / 收藏">☆</button>
       <button id="drawer-share" class="drawer-share" title="复制链接 / Copy link" aria-label="Share">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M5 12v7h14v-7"/>
-          <path d="M12 16V4"/>
-          <path d="M8 8l4-4 4 4"/>
+        <svg class="ico-share" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/>
+          <polyline points="16 6 12 2 8 6"/>
+          <line x1="12" y1="2" x2="12" y2="15"/>
         </svg>
       </button>
-      <button id="drawer-close" class="drawer-close" aria-label="Close">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12"/><path d="M18 6L6 18"/></svg>
-      </button>
+      <button id="drawer-close" class="drawer-close" aria-label="Close">✕</button>
     </div>
   </header>
   <div id="drawer-body" class="drawer-body"></div>
@@ -578,7 +398,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <button id="pwa-install" class="pwa-install" hidden data-i18n="pwa_install">📲 安装到主屏</button>
 <script>
 // Build version for cache busting data files
-const __BUILD_VER = 'v20260616-pick-i18n-report';
+const __BUILD_VER = 'v20260529-14';
 // Service Worker 清理 — 必须在 app.js 加载前运行
 (function() {
   if ('serviceWorker' in navigator) {
@@ -591,8 +411,7 @@ const __BUILD_VER = 'v20260616-pick-i18n-report';
   }
 })();
 </script>
-<script src="/js/pick-match.js?v=20260614-pick-progress-card-tidy" defer></script>
-<script src="/js/app.js?v=20260616-pick-i18n-report" defer></script>
+<script src="/js/app.js?v=v20260529-14" defer></script>
 <script>
   // Custom install prompt
   let __pwaPrompt = null;
@@ -616,6 +435,5 @@ const __BUILD_VER = 'v20260616-pick-i18n-report';
     if (btn) btn.hidden = true;
   });
 </script>
-
 </body>
 </html>
