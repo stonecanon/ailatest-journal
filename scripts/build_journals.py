@@ -21,12 +21,13 @@ Match priority: ISSN > eISSN > normalized title.
 """
 from __future__ import annotations
 import csv
-import gzip
 import json
+import gzip
 import re
 import shutil
 import subprocess
 import sys
+import unicodedata
 from collections import Counter, defaultdict
 from pathlib import Path
 
@@ -47,7 +48,6 @@ INDEX_FILES = {
     'ESCI': 'Emerging Sources Citation Index (ESCI).csv',
 }
 JCR_FILE    = LIST_DIR / 'JCR 2025.csv'
-JCR_2026_XLSX = LIST_DIR / '2026影响因子和分区_所有期刊.xlsx'
 ESI_FILE    = LIST_DIR / 'ESI全部期刊列表.xlsx'
 CAS_FILE    = LIST_DIR / '2025中科院分区表完整版（附2023vs2025对比版）.xlsx'
 CJU_FILE    = LIST_DIR / '中国科学院2025年期刊大类划分（仅供参考用）第二来源-长江大学.xlsx'
@@ -76,6 +76,15 @@ ABS_CANDIDATES = [
     LIST_DIR / 'AJG_2024.xlsx',
     LIST_DIR / 'AJG2024.csv',
 ]
+FT50_JSON    = DATA_DIR / 'ft50.json'
+UTD24_JSON   = DATA_DIR / 'utd24.json'
+NSFC_MGMT_JSON = DATA_DIR / 'nsfc_management.json'
+FMS_JSON     = DATA_DIR / 'fms_journals.json'
+VHB_JSON     = DATA_DIR / 'vhb_journals.json'
+CNRS_JSON    = DATA_DIR / 'cnrs_journals.json'
+SCD_JSON     = DATA_DIR / 'scd_journals.json'
+AMI_JSON     = DATA_DIR / 'ami_journals.json'
+RETRACTION_METRICS_JSON = DATA_DIR / 'retraction_metrics.json.gz'
 SCOPUS_FILE  = LIST_DIR / 'scopus_source_list.xlsx'
 EI_FILE      = LIST_DIR / 'CPXSourceList_102025.xlsx'
 OAJ_FILE     = LIST_DIR / 'oaj_journals.json'
@@ -84,12 +93,15 @@ DOAJ_FILE    = LIST_DIR / 'doaj_journals.csv'
 CNKX_JSON    = DATA_DIR / 'cnkx_tiers.json'
 CNKX_RECORDS = DATA_DIR / 'cnkx_records.json'
 CNKX_DOMAINS = DATA_DIR / 'cnkx_domains_59.json'
+CSCD_JSON    = DATA_DIR / 'cscd_journals.json'
+CSTPCD_JSON  = DATA_DIR / 'cstpcd_journals.json'
 ZJU_JSON     = DATA_DIR / 'zju_tiers.json'
 SCHOOL_A_JSON= DATA_DIR / 'school_a_tiers.json'
 CSSCI_CORE_JSON = ROOT / 'generated' / 'cssci_core.json'
 CSSCI_EXT_JSON  = ROOT / 'generated' / 'cssci_ext.json'
 PKU_CORE_JSON   = ROOT / 'generated' / 'pku_core.json'
 CNKI_MAJOR_FILE = LIST_DIR / 'cnki_leaf_journals.csv'
+CNKI_LEAF_JSON = LIST_DIR / 'cnki_leaf_journals.json'
 CNKI_MAJOR_JSON = DATA_DIR / 'cnki_major_journals.json'
 
 
@@ -100,6 +112,12 @@ def norm_title(s: str) -> str:
     s = s.upper()
     s = re.sub(r'[^A-Z0-9]+', '', s)
     return s
+
+def norm_domestic_title(s: str) -> str:
+    if not s:
+        return ''
+    s = unicodedata.normalize('NFKC', str(s)).upper()
+    return re.sub(r'[^A-Z0-9\u4e00-\u9fff]+', '', s)
 
 def clean_issn(s) -> str:
     if s is None: return ''
@@ -114,6 +132,41 @@ def split_issn_pair(s):
     issns = [clean_issn(p) for p in parts if clean_issn(p)]
     return (issns[0] if issns else '',
             issns[1] if len(issns) > 1 else '')
+
+def write_journals_bundle(journals):
+    with open(DATA_DIR / 'journals.json', 'w', encoding='utf-8') as f:
+        json.dump(journals, f, ensure_ascii=False, separators=(',', ':'))
+    with open(DATA_DIR / 'journals.json', 'rb') as fin:
+        with gzip.open(DATA_DIR / 'journals.json.gz', 'wb', compresslevel=9) as fout:
+            shutil.copyfileobj(fin, fout)
+
+def attach_retraction_metrics(journals):
+    if not RETRACTION_METRICS_JSON.exists():
+        return 0
+    with gzip.open(RETRACTION_METRICS_JSON, 'rt', encoding='utf-8') as f:
+        metrics = json.load(f)
+    if isinstance(metrics, dict) and isinstance(metrics.get('metrics'), dict):
+        metrics = metrics['metrics']
+    attached = 0
+    for rec in journals:
+        candidates = [
+            clean_issn(rec.get('issn')),
+            clean_issn(rec.get('eissn')),
+            norm_title(rec.get('name') or rec.get('cn_name') or ''),
+        ]
+        metric = next((metrics.get(k) for k in candidates if k and metrics.get(k)), None)
+        if not metric:
+            continue
+        rec['retraction'] = {
+            'retractions_total': metric.get('retractions_total') or 0,
+            'r5': metric.get('retractions_5y') or 0,
+            'r10': metric.get('retractions_10y') or 0,
+            'rate_per_1000_5y': metric.get('rate_per_1000_5y'),
+            'rate_per_1000_10y': metric.get('rate_per_1000_10y'),
+            'matched_by': metric.get('matched_by') or '',
+        }
+        attached += 1
+    return attached
 
 def first_existing(paths):
     for p in paths:
@@ -334,6 +387,7 @@ def parse_warning_xlsx(path, by_title, by_issn):
         print(f'  WARNING: column mismatch in "全部名单": {e}')
         return 0
     hits = 0
+    warning_order = 0
     for row in rows[1:]:
         if not row or not row[idx_jrnl]:
             continue
@@ -351,6 +405,8 @@ def parse_warning_xlsx(path, by_title, by_issn):
             rec = by_issn.get(issn)
         if rec is None:
             continue
+        warning_order += 1
+        rec['warning_order'] = warning_order
         wobj = {'year': year, 'level': level, 'reason': reason, 'subject': subject}
         existing = rec.get('warning')
         if isinstance(existing, list):
@@ -403,135 +459,6 @@ def parse_showjcr_if(path, by_title, by_issn):
     return hits
 
 
-def _parse_floatish(value):
-    if value in (None, ''):
-        return None
-    text = str(value).strip().replace(',', '')
-    if not text:
-        return None
-    try:
-        return float(text)
-    except ValueError:
-        return None
-
-
-def _parse_jsonish(value):
-    if value in (None, ''):
-        return None
-    if isinstance(value, (list, dict)):
-        return value
-    text = str(value).strip()
-    if not text:
-        return None
-    try:
-        return json.loads(text)
-    except Exception:
-        return None
-
-
-def _normalize_jcr_categories(raw, fallback_quartile=''):
-    if not raw:
-        return []
-    items = []
-    if isinstance(raw, list):
-        for entry in raw:
-            if isinstance(entry, dict):
-                name = str(entry.get('category') or entry.get('name') or '').strip()
-                quartile = str(entry.get('quartile') or entry.get('q') or fallback_quartile or '').strip()
-            else:
-                name = str(entry).strip()
-                quartile = str(fallback_quartile or '').strip()
-            if name:
-                items.append({'category': name, 'quartile': quartile.upper() if quartile else ''})
-    elif isinstance(raw, dict):
-        for key, value in raw.items():
-            name = str(key).strip()
-            quartile = str(value or fallback_quartile or '').strip()
-            if name:
-                items.append({'category': name, 'quartile': quartile.upper() if quartile else ''})
-    return items
-
-
-def parse_jcr_2026_excel(path, by_title, by_issn):
-    """Read Clarivate JCR 2026 release workbook (carrying 2025 metrics)."""
-    if not path.exists() or openpyxl is None:
-        return 0
-    wb = openpyxl.load_workbook(path, read_only=True, data_only=True)
-    try:
-        if 'Journals' not in wb.sheetnames:
-            return 0
-        ws = wb['Journals']
-        rows = ws.iter_rows(values_only=True)
-        headers = [str(x).strip() if x is not None else '' for x in next(rows)]
-        idx = {h: i for i, h in enumerate(headers)}
-        required = ['Journal name', 'ISSN', 'eISSN', '2025 JIF']
-        if any(name not in idx for name in required):
-            return 0
-        hits = 0
-        for row in rows:
-            title = str(row[idx['Journal name']] or '').strip()
-            if not title:
-                continue
-            issn = clean_issn(row[idx.get('ISSN')])
-            eissn = clean_issn(row[idx.get('eISSN')])
-            rec = (issn and by_issn.get(issn)) or (eissn and by_issn.get(eissn)) or by_title.get(norm_title(title))
-            if rec is None:
-                continue
-
-            if_2025 = _parse_floatish(row[idx.get('2025 JIF')])
-            if if_2025 is not None:
-                rec['if_2025'] = if_2025
-            if_5y = _parse_floatish(row[idx.get('5-year JIF')])
-            if if_5y is not None:
-                rec['if_5y'] = if_5y
-            jci = _parse_floatish(row[idx.get('JCI')])
-            if jci is not None:
-                rec['jci'] = jci
-            ais = _parse_floatish(row[idx.get('Article influence score')])
-            if ais is not None:
-                rec['ais'] = ais
-            jif_percentile = _parse_floatish(row[idx.get('JIF percentile')])
-            if jif_percentile is not None:
-                rec['jif_percentile'] = jif_percentile
-
-            for key, col in (
-                ('if_quartile', 'JIF quartile'),
-                ('if_rank', 'JIF rank'),
-                ('jci_quartile', 'JCI quartile'),
-                ('jci_rank', 'JCI rank'),
-                ('ais_quartile', 'AIS quartile'),
-                ('ais_rank', 'AIS rank'),
-            ):
-                val = str(row[idx.get(col)] or '').strip()
-                if val:
-                    rec[key] = val.upper() if 'quartile' in key else val
-
-            cats_text = str(row[idx.get('Categories')] or '').strip()
-            if cats_text:
-                cats = [c.strip() for c in re.split(r'[;；]+', cats_text) if c and c.strip()]
-                if cats:
-                    rec['jcr_cat'] = cats[0]
-                    rec['jcr_cats'] = cats
-
-            cat_json = _parse_jsonish(row[idx.get('Category quartiles JSON')])
-            norm_cats = _normalize_jcr_categories(cat_json, rec.get('if_quartile', ''))
-            if norm_cats:
-                rec['jcr_categories_detail'] = norm_cats
-
-            history = []
-            if rec.get('if_2024') not in (None, ''):
-                history.append({'year': 2024, 'value': float(rec['if_2024'])})
-            if rec.get('if_2025') not in (None, ''):
-                history.append({'year': 2025, 'value': float(rec['if_2025'])})
-            if history:
-                history.sort(key=lambda x: x['year'])
-                rec['if_history'] = history
-            hits += 1
-        return hits
-    finally:
-        wb.close()
-
-
 # ───────────────────────── ShowJCR FQB 2025 (小类分区) ─────────────────────────
 
 def parse_showjcr_fqb(path, by_title, by_issn):
@@ -562,6 +489,11 @@ def parse_showjcr_fqb(path, by_title, by_issn):
                     except ValueError: pass
             if is_top and not rec.get('cas_top'):
                 rec['cas_top'] = True
+            mark = (row.get('标注') or '').strip()
+            if mark:
+                rec['cas_mark'] = mark
+                if 'Mega' in mark:
+                    rec['cas_mega'] = True
 
             subs = []
             for i in range(1, 7):
@@ -620,6 +552,7 @@ def parse_showjcr_xr(path, by_title, by_issn):
         col_cname   = find('中文刊名')
         col_cn      = find('CN')
         col_lang    = find('语种')
+        col_warn_flag = find('预警标记')
         col_issn    = 'ISSN' if 'ISSN' in fieldnames else find('ISSN')
         col_eissn   = 'EISSN' if 'EISSN' in fieldnames else find('EISSN')
         col_cat_cn  = None
@@ -641,6 +574,7 @@ def parse_showjcr_xr(path, by_title, by_issn):
         col_top1    = 'Top' if 'Top' in fieldnames else None
         col_zone2   = '大类2新锐分区' if '大类2新锐分区' in fieldnames else None
         col_top2    = '大类2Top' if '大类2Top' in fieldnames else None
+        under_review_counter = 0
         # 小类 1-6 (中文名 + 分区)
         sub_cols = []
         for n in range(1, 7):
@@ -657,6 +591,13 @@ def parse_showjcr_xr(path, by_title, by_issn):
             nt = norm_title(title)
             rec = (issn and by_issn.get(issn)) or (eissn and by_issn.get(eissn)) or by_title.get(nt)
             if rec is None: continue
+            # 预警标记 → under_review (only first match per journal, preserve original order)
+            if col_warn_flag and not rec.get('under_review'):
+                wf = (row.get(col_warn_flag) or '').strip()
+                if wf == 'Under Review':
+                    rec['under_review'] = True
+                    rec['under_review_order'] = under_review_counter
+                    under_review_counter += 1
             if col_cname:
                 cname = (row.get(col_cname) or '').strip()
                 if cname and cname != title:
@@ -907,7 +848,213 @@ def parse_abs(path, by_title, by_issn, store=None):
     return hits + standalone
 
 
+# ───────────────────────── FT50 / UTD24 management lists ─────────────────────────
+
+def title_lookup(by_title, title):
+    for key in management_title_keys(title):
+        rec = by_title.get(key)
+        if rec is not None:
+            return rec
+    return None
+
+
+def management_title_keys(title):
+    variants = []
+    raw = title or ''
+    variants.append(raw)
+    variants.append(re.sub(r'^\s*THE\s+', '', raw, flags=re.I))
+    variants.append(raw.replace('&', ' and '))
+    variants.append(raw.replace('&', ' '))
+    variants.append(re.sub(r'\band\b', ' ', raw, flags=re.I))
+    keys = []
+    for v in variants:
+        k = norm_title(v)
+        if k and k not in keys:
+            keys.append(k)
+    return keys
+
+
+def parse_management_json(path, by_title, store=None, field='', label=''):
+    if not path.exists() or not field:
+        return 0, 0
+    data = json.loads(path.read_text(encoding='utf-8'))
+    records = data.get('records') or []
+    matched = standalone = 0
+    for row in records:
+        title = (row.get('name') or '').strip()
+        if not title:
+            continue
+        payload = {
+            'order': row.get('order'),
+            'subject': row.get('subject') or '',
+            'source': row.get('source') or label,
+            'source_url': row.get('source_url') or '',
+        }
+        rec = title_lookup(by_title, title)
+        if rec is not None:
+            rec[field] = payload
+            matched += 1
+        elif store is not None:
+            key = f'{field}:' + norm_title(title)
+            rec = store.get(key)
+            if rec is None:
+                rec = {
+                    'name': title, 'issn': '', 'eissn': '',
+                    'wos_categories': [], 'esi_category': '',
+                    'abbr20': '', 'country': '', 'indices': [],
+                    f'{field}_only': True,
+                }
+                store[key] = rec
+                for title_key in management_title_keys(title):
+                    by_title.setdefault(title_key, rec)
+                standalone += 1
+            rec[field] = payload
+    return matched, standalone
+
+
 # ───────────────────────── Scopus Source List ─────────────────────────
+
+def parse_fms_json(path, by_title, by_issn, store=None):
+    if not path.exists():
+        return 0, 0
+    data = json.loads(path.read_text(encoding='utf-8'))
+    records = data.get('records') or []
+    matched = standalone = 0
+    for row in records:
+        title = (row.get('name') or '').strip()
+        if not title:
+            continue
+        issn = clean_issn(row.get('issn'))
+        rec = (issn and by_issn.get(issn)) or title_lookup(by_title, title)
+        payload = {
+            'year': str(row.get('year') or '2025'),
+            'tier': (row.get('tier') or '').strip(),
+            'type': (row.get('type') or '').strip(),
+            'discipline': (row.get('discipline') or '').strip(),
+            'source': row.get('source') or 'FMS管理科学高质量期刊推荐列表2025',
+            'source_url': row.get('source_url') or 'https://www.fms-journal.net/',
+        }
+        for src in ('jcr_rank', 'sjr_rank', 'snip_rank', 'sponsor'):
+            if row.get(src) not in (None, ''):
+                payload[src] = str(row.get(src)).strip()
+        if rec is None and store is not None:
+            key = 'fms:' + (issn or norm_title(title))
+            rec = store.get(key)
+            if rec is None:
+                rec = {
+                    'name': title, 'issn': issn, 'eissn': '',
+                    'publisher': row.get('sponsor') or '',
+                    'address': '', 'languages': '',
+                    'wos_categories': [], 'esi_category': '',
+                    'abbr20': '', 'country': '', 'indices': [],
+                    'fms_only': True,
+                }
+                store[key] = rec
+                for title_key in management_title_keys(title):
+                    by_title.setdefault(title_key, rec)
+                if issn:
+                    by_issn.setdefault(issn, rec)
+                standalone += 1
+        if rec is not None:
+            rec['fms'] = payload
+            matched += 1
+    return matched, standalone
+
+
+def parse_vhb_json(path, by_title, by_issn, store=None):
+    if not path.exists():
+        return 0, 0
+    data = json.loads(path.read_text(encoding='utf-8'))
+    rows = data.get('records', []) if isinstance(data, dict) else data
+    grouped = defaultdict(list)
+    titles = {}
+    for row in rows:
+        issn = clean_issn(row.get('issn') or '')
+        if not issn:
+            continue
+        grouped[issn].append({
+            'year': data.get('year') or 2024,
+            'area': row.get('area') or '',
+            'area_code': row.get('area_code') or '',
+            'rating': row.get('rating') or '',
+            'votes_ge_rating_percent': row.get('votes_ge_rating_percent'),
+            'source': 'VHB Publication Media Rating 2024',
+        })
+        titles.setdefault(issn, row.get('title') or '')
+
+    matched = standalone = 0
+    for issn, ratings in grouped.items():
+        title = titles.get(issn) or ''
+        rec = by_issn.get(issn) or title_lookup(by_title, title)
+        if rec is None and store is not None:
+            key = 'vhb:' + issn
+            rec = store.get(key)
+            if rec is None:
+                rec = {
+                    'name': title, 'issn': issn, 'eissn': '',
+                    'publisher': '', 'address': '', 'languages': '',
+                    'wos_categories': [], 'esi_category': '',
+                    'abbr20': '', 'country': '', 'indices': [],
+                    'vhb_only': True,
+                }
+                store[key] = rec
+                nt = norm_title(title)
+                if nt:
+                    by_title.setdefault(nt, rec)
+                by_issn.setdefault(issn, rec)
+                standalone += 1
+        if rec is not None:
+            rec['vhb'] = ratings
+            matched += 1
+    return matched, standalone
+
+
+def parse_cnrs_json(path, by_title, by_issn, store=None):
+    if not path.exists():
+        return 0, 0
+    data = json.loads(path.read_text(encoding='utf-8'))
+    rows = data.get('records', []) if isinstance(data, dict) else data
+    grouped = defaultdict(list)
+    titles = {}
+    for row in rows:
+        issn = clean_issn(row.get('issn') or '')
+        if not issn:
+            continue
+        grouped[issn].append({
+            'year': data.get('year') or 2020,
+            'domain': row.get('domain') or '',
+            'category': row.get('category') or '',
+            'historical': True,
+            'source': 'CNRS Section 37',
+        })
+        titles.setdefault(issn, row.get('title') or '')
+
+    matched = standalone = 0
+    for issn, categories in grouped.items():
+        title = titles.get(issn) or ''
+        rec = by_issn.get(issn) or title_lookup(by_title, title)
+        if rec is None and store is not None:
+            key = 'cnrs:' + issn
+            rec = store.get(key)
+            if rec is None:
+                rec = {
+                    'name': title, 'issn': issn, 'eissn': '',
+                    'publisher': '', 'address': '', 'languages': '',
+                    'wos_categories': [], 'esi_category': '',
+                    'abbr20': '', 'country': '', 'indices': [],
+                    'cnrs_only': True,
+                }
+                store[key] = rec
+                nt = norm_title(title)
+                if nt:
+                    by_title.setdefault(nt, rec)
+                by_issn.setdefault(issn, rec)
+                standalone += 1
+        if rec is not None:
+            rec['cnrs'] = categories
+            matched += 1
+    return matched, standalone
+
 
 def parse_scopus(path, by_title, by_issn, store=None):
     """Scopus Source List (Mar. 2026).
@@ -963,11 +1110,19 @@ def parse_scopus(path, by_title, by_issn, store=None):
         payload = {
             'id': cell(raw, 'Sourcerecord ID'),
             'active': active,
+            'status': status,
             'coverage': cell(raw, 'Coverage'),
+            'discontinued': bool(cell(raw, 'Titles Discontinued by Scopus')),
+            'source_type': cell(raw, 'Source Type'),
             'asjc': asjc,
             'asjc_top': asjc_top,
             'source': 'Scopus Source List (auto-updated)',
         }
+        added_key = next((h for h in col if h.startswith('Added to List')), '')
+        if added_key:
+            added = cell(raw, added_key)
+            if added:
+                payload['added_to_list'] = added
         rec = (issn and by_issn.get(issn)) or (eissn and by_issn.get(eissn)) or by_title.get(nt)
         if rec is not None:
             rec['scopus'] = payload
@@ -1109,7 +1264,103 @@ def merge_cnkx_to_main(by_issn, by_title):
     return hits
 
 
+def merge_cscd_to_main(by_issn, by_title):
+    if not CSCD_JSON.exists(): return 0
+    data = json.loads(CSCD_JSON.read_text(encoding='utf-8'))
+    rows = data.get('records', []) if isinstance(data, dict) else data
+    hits = 0
+    for r in rows:
+        issn = clean_issn(r.get('issn') or '')
+        nt = norm_title(r.get('name') or '')
+        rec = (issn and by_issn.get(issn)) or by_title.get(nt)
+        if rec is None:
+            continue
+        rec['cscd'] = {
+            'database': r.get('database') or '',
+            'database_label': r.get('database_label') or '',
+            'source': 'CSCD',
+        }
+        hits += 1
+    return hits
+
+
+def cstpcd_label(kind: str) -> str:
+    return '科技核心·科普' if kind == 'popular_science' else '科技核心'
+
+
+def merge_cstpcd_to_main(by_title):
+    if not CSTPCD_JSON.exists(): return 0
+    data = json.loads(CSTPCD_JSON.read_text(encoding='utf-8'))
+    rows = data.get('records', []) if isinstance(data, dict) else data
+    hits = 0
+    for r in rows:
+        nt = norm_title(r.get('name') or '')
+        rec = by_title.get(nt)
+        if rec is None:
+            continue
+        rec['cstpcd'] = {
+            'kind': r.get('kind') or 'core',
+            'code': r.get('code') or '',
+            'label': cstpcd_label(r.get('kind') or 'core'),
+            'source': 'CSTPCD',
+        }
+        hits += 1
+    return hits
+
+
 # ───────────────────────── OAJ 全球开放获取期刊索引 ─────────────────────────
+
+def domestic_name_lookup(store):
+    lookup = {}
+    for rec in store.values():
+        for title in (rec.get('cn_name'), rec.get('name'), rec.get('en_name')):
+            key = norm_domestic_title(title or '')
+            if key:
+                lookup.setdefault(key, rec)
+    return lookup
+
+
+def merge_scd_to_main(by_issn, store):
+    if not SCD_JSON.exists(): return 0
+    data = json.loads(SCD_JSON.read_text(encoding='utf-8'))
+    rows = data.get('records', []) if isinstance(data, dict) else data
+    by_name = domestic_name_lookup(store)
+    hits = 0
+    for r in rows:
+        issn = clean_issn(r.get('issn') or '')
+        rec = (issn and by_issn.get(issn)) or by_name.get(norm_domestic_title(r.get('name') or ''))
+        if rec is None:
+            continue
+        rec['scd'] = {
+            'year': data.get('year') or 2026,
+            'category': r.get('category') or '',
+            'cn_code': r.get('cn_code') or '',
+            'newly_added': bool(r.get('newly_added')),
+            'source': 'SCD',
+        }
+        hits += 1
+    return hits
+
+
+def merge_ami_to_main(store):
+    if not AMI_JSON.exists(): return 0
+    data = json.loads(AMI_JSON.read_text(encoding='utf-8'))
+    rows = data.get('records', []) if isinstance(data, dict) else data
+    by_name = domestic_name_lookup(store)
+    hits = 0
+    for r in rows:
+        rec = by_name.get(norm_domestic_title(r.get('name') or ''))
+        if rec is None:
+            continue
+        rec['ami'] = {
+            'year': r.get('year') or data.get('year') or 2022,
+            'tier': r.get('tier') or '',
+            'discipline': r.get('discipline') or '',
+            'source': 'AMI',
+        }
+        hits += 1
+    return hits
+
 
 def parse_oaj(path, by_title, by_issn, store=None):
     """读取 OAJ 开放获取期刊索引 JSON，匹配到现有记录或新增."""
@@ -1227,7 +1478,10 @@ def main():
         for r in store.values():
             for k in (r.get('issn'), r.get('eissn')):
                 if k: by_issn.setdefault(k, r)
-            by_title.setdefault(norm_title(r['name']), r)
+            for title_key in (r.get('name'), r.get('cn_name'), r.get('en_name')):
+                nt = norm_title(title_key or '')
+                if nt:
+                    by_title.setdefault(nt, r)
         return by_issn, by_title
 
     by_issn, by_title = rebuild_lookups()
@@ -1256,10 +1510,6 @@ def main():
     print('== ShowJCR JCR 2024 IF ==')
     h = parse_showjcr_if(SHOW_JCR, by_title, by_issn)
     print(f'  IF matched: {h}')
-
-    print('== JCR 2026 release (2025 metrics) ==')
-    h = parse_jcr_2026_excel(JCR_2026_XLSX, by_title, by_issn)
-    print(f'  JCR 2026 matched: {h}')
 
     print('== ShowJCR 中科院分区 2025 (小类分区) ==')
     h = parse_showjcr_fqb(SHOW_FQB, by_title, by_issn)
@@ -1300,9 +1550,38 @@ def main():
     else:
         print('  ABS skipped: file not found')
 
+    print('== FT50 / UTD24 Management Lists ==')
+    h, s = parse_management_json(FT50_JSON, by_title, store=store, field='ft50', label='Financial Times Top 50 Journals')
+    print(f'  FT50 matched: {h}  standalone: +{s}')
+    h, s = parse_management_json(UTD24_JSON, by_title, store=store, field='utd24', label='UT Dallas Top 24 Business Journals')
+    print(f'  UTD24 matched: {h}  standalone: +{s}')
+    h, s = parse_fms_json(FMS_JSON, by_title, by_issn, store=store)
+    print(f'  FMS matched: {h}  standalone: +{s}')
+    h, s = parse_vhb_json(VHB_JSON, by_title, by_issn, store=store)
+    print(f'  VHB matched: {h}  standalone: +{s}')
+    h, s = parse_cnrs_json(CNRS_JSON, by_title, by_issn, store=store)
+    print(f'  CNRS matched: {h}  standalone: +{s}')
+    by_issn, by_title = rebuild_lookups()
+
     print('== 中国科协 merge ==')
     h = merge_cnkx_to_main(by_issn, by_title)
     print(f'  CNKX merged: {h}')
+
+    print('== CSCD 来源期刊目录 merge ==')
+    h = merge_cscd_to_main(by_issn, by_title)
+    print(f'  CSCD merged: {h}')
+
+    print('== 中国科技核心期刊目录 merge ==')
+    h = merge_cstpcd_to_main(by_title)
+    print(f'  CSTPCD merged: {h}')
+
+    print('== SCD 2026 merge ==')
+    h = merge_scd_to_main(by_issn, store)
+    print(f'  SCD merged: {h}')
+
+    print('== AMI 2022 merge ==')
+    h = merge_ami_to_main(store)
+    print(f'  AMI merged: {h}')
 
     print('== OAJ 全球开放获取期刊索引 ==')
     h, s = parse_oaj(OAJ_FILE, by_title, by_issn, store=store)
@@ -1322,33 +1601,174 @@ def main():
     journals = list(store.values())
     journals.sort(key=lambda r: r['name'])
 
+    # ────── PubMed / MEDLINE / PMC match ──────
+    print('== PubMed / MEDLINE / PMC ==')
+    def load_issn_set(fname):
+        p = LIST_DIR / fname
+        s = set()
+        if p.exists():
+            with open(p) as f:
+                import json as _j
+                for issn in _j.load(f):
+                    s.add(issn)
+                    s.add(f'{issn[:4]}-{issn[4:]}')
+        return s
+    medline_issns = load_issn_set('pubmed_issns.json')
+    pubmed_only_issns = load_issn_set('pubmed_only_issns.json')
+    pmc_issns = load_issn_set('pmc_issns.json')
+    medline_c = pubmed_c = pmc_c = 0
+    for r in journals:
+        for k in ('issn', 'eissn'):
+            v = r.get(k, '')
+            if not v: continue
+            bare = v.replace('-', '')
+            if bare in medline_issns:
+                r['medline'] = True
+                medline_c += 1
+                break
+        for k in ('issn', 'eissn'):
+            v = r.get(k, '')
+            if not v: continue
+            bare = v.replace('-', '')
+            if bare in pubmed_only_issns or bare in medline_issns:
+                r['pubmed'] = True
+                pubmed_c += 1
+                break
+        for k in ('issn', 'eissn'):
+            v = r.get(k, '')
+            if not v: continue
+            bare = v.replace('-', '')
+            if bare in pmc_issns:
+                r['pmc'] = True
+                pmc_c += 1
+                break
+    print(f'  MEDLINE: {medline_c}  PubMed (broader): {pubmed_c}  PMC: {pmc_c}')
+
+    # ────── On Hold / Under Review (ISSN set match) ──────
+    print('== On Hold & Under Review (ISSN set) ==')
+    def load_issn_set_from_data(fname):
+        p = DATA_DIR / fname
+        if p.exists():
+            with open(p) as f:
+                import json as _j
+                raw = _j.load(f)
+                return [s.replace('-', '').lower() for s in raw if s]
+        return []
+    on_hold_issns = load_issn_set_from_data('on_hold_issn.json')
+    under_review_issns = load_issn_set_from_data('under_review_issn.json')
+    on_hold_hits = 0
+    under_review_hits = 0
+    on_hold_order = 0
+    under_review_order = 0
+    on_hold_lookup = {issn: i for i, issn in enumerate(on_hold_issns)}
+    under_review_lookup = {issn: i for i, issn in enumerate(under_review_issns)}
+    for r in journals:
+        for k in ('issn', 'eissn'):
+            v = r.get(k, '')
+            if not v: continue
+            bare = v.replace('-', '').lower()
+            oh_idx = on_hold_lookup.get(bare)
+            if oh_idx is not None and not r.get('on_hold'):
+                r['on_hold'] = True
+                r['on_hold_order'] = oh_idx
+                on_hold_hits += 1
+            ur_idx = under_review_lookup.get(bare)
+            if ur_idx is not None and not r.get('under_review'):
+                r['under_review'] = True
+                r['under_review_order'] = ur_idx
+                under_review_hits += 1
+    total_ur = sum(1 for r in journals if r.get('under_review'))
+    print(f'  On Hold: {on_hold_hits}  Under Review (ISSN): {under_review_hits} (total UR: {total_ur})')
+
+    # ────── 中信所国际期刊预警名单 2025 (CITIC warning) ──────
+    print('== 中信所国际期刊预警名单 2025 ==')
+    citic_issns = load_issn_set_from_data('citic_warning_issn.json')
+    citic_lookup = {issn: i for i, issn in enumerate(citic_issns)}
+    citic_hits = 0
+    for r in journals:
+        for k in ('issn', 'eissn'):
+            v = r.get(k, '')
+            if not v: continue
+            bare = v.replace('-', '').lower()
+            cw_idx = citic_lookup.get(bare)
+            if cw_idx is not None:
+                r['citic_warning'] = True
+                r['citic_warning_order'] = cw_idx
+                citic_hits += 1
+                break
+    print(f'  中信所预警: {citic_hits} journals matched')
+
+    # ────── Generate SEO slugs ──────
+    import re
+    slug_counts = {}
+    first_run = True
+    for r in journals:
+        name = r.get('name') or r.get('cn_name') or r.get('en_name') or ''
+        if not name:
+            r['slug'] = (r.get('issn') or r.get('eissn') or 'j').replace('-', '')
+            continue
+        # Generate slug: lowercase, keep CJK/letters/digits/hyphens, collapse whitespace
+        slug = name.lower().strip()
+        slug = re.sub(r'[^a-z0-9\u4e00-\u9fff\-]+', '-', slug)
+        slug = re.sub(r'-+', '-', slug).strip('-')
+        slug = slug[:60].rstrip('-')
+        if not slug:
+            slug = (r.get('issn') or r.get('eissn') or 'j').replace('-', '')
+        # Deduplicate
+        if slug in slug_counts:
+            slug_counts[slug] += 1
+            issn_part = (r.get('issn') or r.get('eissn') or str(slug_counts[slug])).replace('-', '')
+            slug = slug[:50].rstrip('-') + '-' + issn_part
+        else:
+            slug_counts[slug] = 1
+        r['slug'] = slug
+    slug_count = len(set(r.get('slug', '') for r in journals))
+    deduped = sum(1 for c in slug_counts.values() if c > 1)
+    print(f'  Slugs: {slug_count} unique, {deduped} with dedup suffix')
+
     # stats
     idx_c = Counter()
     for r in journals:
         for i in r['indices']: idx_c[i] += 1
     cas_c = Counter(); cas_top = 0
-    if_count = 0; warning_count = 0; cn_name_count = 0; ccf_count = 0; abdc_count = 0; abs_count = 0; cnkx_count = 0; scopus_count = 0; ei_count = 0; oaj_count = 0; doaj_count = 0
+    if_count = 0; warning_count = 0; cn_name_count = 0; ccf_count = 0; abdc_count = 0; abs_count = 0; ft50_count = 0; utd24_count = 0; fms_count = 0; vhb_count = 0; cnrs_count = 0; cas_mega_count = 0; cnkx_count = 0; cscd_count = 0; cstpcd_count = 0; cstpcd_popular_count = 0; scd_count = 0; ami_count = 0; scopus_count = 0; ei_count = 0; oaj_count = 0; doaj_count = 0; medline_count = 0; pubmed_count = 0; pmc_count = 0
     for r in journals:
         z = r.get('cas_zone')
         if z: cas_c[z] += 1
         if r.get('cas_top'): cas_top += 1
-        if r.get('if_2025') not in (None, '') or r.get('if_2024') not in (None, ''): if_count += 1
+        if r.get('if_2024'): if_count += 1
         if r.get('warning'): warning_count += 1
         if r.get('cn_name'): cn_name_count += 1
         if r.get('ccf'): ccf_count += 1
         if r.get('abdc'): abdc_count += 1
         if r.get('abs'): abs_count += 1
+        if r.get('ft50'): ft50_count += 1
+        if r.get('utd24'): utd24_count += 1
+        if r.get('fms'): fms_count += 1
+        if r.get('vhb'): vhb_count += 1
+        if r.get('cnrs'): cnrs_count += 1
+        if r.get('cas_mega'): cas_mega_count += 1
         if r.get('cnkx'): cnkx_count += 1
+        if r.get('cscd'): cscd_count += 1
+        if r.get('cstpcd'):
+            cstpcd_count += 1
+            if r.get('cstpcd', {}).get('kind') == 'popular_science':
+                cstpcd_popular_count += 1
+        if r.get('scd'): scd_count += 1
+        if r.get('ami'): ami_count += 1
         if r.get('scopus') and r.get('scopus', {}).get('active') is not False: scopus_count += 1
         if 'EI' in r.get('indices', []): ei_count += 1
         if r.get('oaj'): oaj_count += 1
         if r.get('doaj'): doaj_count += 1
+        if r.get('medline'): medline_count += 1
+        if r.get('pubmed'): pubmed_count += 1
+        if r.get('pmc'): pmc_count += 1
 
     print('== Stats ==')
     print(f'  total: {len(journals)}')
     print(f'  indices: {dict(idx_c)}')
     print(f'  CAS zones: {dict(cas_c)} Top={cas_top}')
-    print(f'  IF: {if_count}  warning: {warning_count}  中文刊名: {cn_name_count}  CCF: {ccf_count}  ABDC: {abdc_count}  ABS: {abs_count}  CNKX: {cnkx_count}  Scopus: {scopus_count}  EI: {ei_count}  OAJ: {oaj_count}  DOAJ: {doaj_count}')
+    print(f'  IF: {if_count}  warning: {warning_count}  中文刊名: {cn_name_count}  CCF: {ccf_count}  ABDC: {abdc_count}  ABS: {abs_count}  FT50: {ft50_count}  UTD24: {utd24_count}  FMS: {fms_count}  VHB: {vhb_count}  CNRS: {cnrs_count}  CAS Mega: {cas_mega_count}  CNKX: {cnkx_count}  CSCD: {cscd_count}  CSTPCD: {cstpcd_count}  SCD: {scd_count}  AMI: {ami_count}  Scopus: {scopus_count}  EI: {ei_count}  OAJ: {oaj_count}  DOAJ: {doaj_count}  MEDLINE: {medline_count}  PubMed: {pubmed_count}  PMC: {pmc_count}')
 
     # Strip large non-essential fields to stay under CF Pages 25 MB limit
     for r in journals:
@@ -1405,6 +1825,14 @@ def main():
         'cnkx': None,
         'zju': None,
         'school_a': None,
+        'nsfc_mgmt': None,
+        'fms': None,
+        'vhb': None,
+        'cnrs': None,
+        'cscd': None,
+        'cstpcd': None,
+        'scd': None,
+        'ami': None,
         'ccft': [],
         'cssci_core': [],
         'cssci_ext': [],
@@ -1420,6 +1848,22 @@ def main():
         domestic['zju'] = json.loads(ZJU_JSON.read_text(encoding='utf-8'))
     if SCHOOL_A_JSON.exists():
         domestic['school_a'] = json.loads(SCHOOL_A_JSON.read_text(encoding='utf-8'))
+    if NSFC_MGMT_JSON.exists():
+        domestic['nsfc_mgmt'] = json.loads(NSFC_MGMT_JSON.read_text(encoding='utf-8'))
+    if FMS_JSON.exists():
+        domestic['fms'] = json.loads(FMS_JSON.read_text(encoding='utf-8'))
+    if VHB_JSON.exists():
+        domestic['vhb'] = json.loads(VHB_JSON.read_text(encoding='utf-8'))
+    if CNRS_JSON.exists():
+        domestic['cnrs'] = json.loads(CNRS_JSON.read_text(encoding='utf-8'))
+    if CSCD_JSON.exists():
+        domestic['cscd'] = json.loads(CSCD_JSON.read_text(encoding='utf-8'))
+    if CSTPCD_JSON.exists():
+        domestic['cstpcd'] = json.loads(CSTPCD_JSON.read_text(encoding='utf-8'))
+    if SCD_JSON.exists():
+        domestic['scd'] = json.loads(SCD_JSON.read_text(encoding='utf-8'))
+    if AMI_JSON.exists():
+        domestic['ami'] = json.loads(AMI_JSON.read_text(encoding='utf-8'))
     if CSSCI_CORE_JSON.exists():
         domestic['cssci_core'] = json.loads(CSSCI_CORE_JSON.read_text(encoding='utf-8'))
     if CSSCI_EXT_JSON.exists():
@@ -1442,32 +1886,53 @@ def main():
     # ────── CNKI Major Journals (全量中文期刊主目录) ──────
     cnki_major_records = []
     cnki_major_by_issn = {}
-    if CNKI_MAJOR_FILE.exists():
-        with open(CNKI_MAJOR_FILE, 'r', encoding='utf-8-sig', newline='') as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                title = (row.get('title') or '').strip()
-                if not title: continue
-                issn = clean_issn(row.get('issn') or '')
-                cn = (row.get('cn') or '').strip()
-                sponsor = (row.get('sponsor') or '').strip()
-                compound_if = (row.get('compound_if') or '').strip()
-                comprehensive_if = (row.get('comprehensive_if') or '').strip()
-                tags = (row.get('tags') or '').strip()
-                categories = (row.get('major_categories') or '').strip()
-                rec = {
-                    'name': title,
-                    'issn': issn,
-                    'cn_code': cn,
-                    'sponsor': sponsor,
-                    'compound_if': compound_if,
-                    'comprehensive_if': comprehensive_if,
-                    'tags': tags,
-                    'major_categories': [c.strip() for c in categories.split('|') if c.strip()],
-                }
-                cnki_major_records.append(rec)
-                if issn:
-                    cnki_major_by_issn.setdefault(issn, []).append(rec)
+    if CNKI_LEAF_JSON.exists() or CNKI_MAJOR_FILE.exists():
+        if CNKI_LEAF_JSON.exists():
+            with open(CNKI_LEAF_JSON, 'r', encoding='utf-8') as f:
+                cnki_rows = json.load(f)
+        else:
+            with open(CNKI_MAJOR_FILE, 'r', encoding='utf-8-sig', newline='') as f:
+                cnki_rows = list(csv.DictReader(f))
+        for row in cnki_rows:
+            title = (row.get('title') or '').strip()
+            if not title: continue
+            issn = clean_issn(row.get('issn') or '')
+            cn = (row.get('cn') or '').strip()
+            sponsor = (row.get('sponsor') or '').strip()
+            compound_if = (row.get('compound_if') or '').strip()
+            comprehensive_if = (row.get('comprehensive_if') or '').strip()
+            tags_raw = row.get('tags') or []
+            if isinstance(tags_raw, str):
+                tags = [t.strip() for t in tags_raw.replace('|', ';').split(';') if t.strip()]
+            else:
+                tags = [str(t).strip() for t in tags_raw if str(t).strip()]
+            major_raw = row.get('major_categories') or []
+            if isinstance(major_raw, str):
+                major_categories = [c.strip() for c in major_raw.split('|') if c.strip()]
+            else:
+                major_categories = [str(c).strip() for c in major_raw if str(c).strip()]
+            cats_raw = row.get('categories') or []
+            if isinstance(cats_raw, str):
+                categories = [c.strip() for c in cats_raw.split('|') if c.strip()]
+            else:
+                categories = [str(c).strip() for c in cats_raw if str(c).strip()]
+            rec = {
+                'name': title,
+                'issn': issn,
+                'cn_code': cn,
+                'sponsor': sponsor,
+                'compound_if': compound_if,
+                'comprehensive_if': comprehensive_if,
+                'tags': tags,
+                'category': (row.get('category') or '').strip(),
+                'category_code': (row.get('category_code') or '').strip(),
+                'categories': categories,
+                'major_categories': major_categories,
+                'detail_url': (row.get('detail_url') or '').strip(),
+            }
+            cnki_major_records.append(rec)
+            if issn:
+                cnki_major_by_issn.setdefault(issn, []).append(rec)
         domestic['cnki_major'] = {'records': cnki_major_records, 'by_issn': cnki_major_by_issn}
         print(f'  CNKI Major: {len(cnki_major_records)} records, {len(cnki_major_by_issn)} with ISSN')
         # Also tag international journals that appear in CNKI Major
@@ -1484,12 +1949,11 @@ def main():
 
     # meta
     meta = {
-        'source': 'WoS Core + JCR 2026 release (2025 metrics) + ESI + 中科院 2025 + 长江大学 + ShowJCR (JCR/FQB/XR/CCF/Warning) + Scopus (auto-updated) + EI Compendex Oct. 2025 + ABDC optional + ABS AJG + 中国科协 + OAJ 2025 + DOAJ Journal CSV',
+        'source': 'WoS Core + JCR 2025 + ESI + 中科院 2025 + 长江大学 + ShowJCR (JCR/FQB/XR/CCF/Warning) + Scopus (auto-updated) + EI Compendex Oct. 2025 + ABDC optional + ABS AJG + 中国科协 + CSCD + 中国科技核心 + OAJ 2025 + DOAJ Journal CSV',
         'last_updated_source': 'WoS Core 2026-04-20',
         'total': len(journals),
         'indices': dict(idx_c),
-        'with_if_2024': sum(1 for r in journals if r.get('if_2024') not in (None, '')),
-        'with_if_2025': sum(1 for r in journals if r.get('if_2025') not in (None, '')),
+        'with_if_2024': if_count,
         'with_cas_zone': sum(cas_c.values()),
         'with_cas_top': cas_top,
         'with_warning': warning_count,
@@ -1497,9 +1961,20 @@ def main():
         'with_ccf': ccf_count,
         'with_abdc': abdc_count,
         'with_abs': abs_count,
+        'with_ft50': ft50_count,
+        'with_utd24': utd24_count,
+        'with_fms': fms_count,
+        'with_vhb': vhb_count,
+        'with_cnrs': cnrs_count,
+        'with_cas_mega': cas_mega_count,
         'with_oaj': oaj_count,
         'with_doaj': doaj_count,
         'with_cnkx': cnkx_count,
+        'with_cscd': cscd_count,
+        'with_cstpcd': cstpcd_count,
+        'with_cstpcd_popular': cstpcd_popular_count,
+        'with_scd': scd_count,
+        'with_ami': ami_count,
         'with_scopus': scopus_count,
         'with_ei': ei_count,
         'wos_categories': len(wos_c),
@@ -1529,6 +2004,47 @@ def main():
                     shutil.copyfileobj(fin, fout)
             gz_size = (DATA_DIR / 'oa.json.gz').stat().st_size
             print(f'  oa.json: {oa_size/1024/1024:.1f} MB → oa.json.gz: {gz_size/1024/1024:.1f} MB')
+
+        # ────── Embed "free" flag from OpenAlex OA labels ──────
+        # free = author can publish without paying APC (subscription/hybrid/diamond — excludes gold_apc where author pays)
+        # subscription_paid_read / hybrid → author free via subscription path
+        # diamond → fully free both ways
+        # gold_apc → author pays APC (not free for author)
+        OA_FREE_LABELS = {'diamond', 'hybrid', 'subscription_paid_read'}
+        oa_gz = DATA_DIR / 'oa.json.gz'
+        if oa_gz.exists():
+            with open(oa_gz, 'rb') as f:
+                oa_data = json.loads(gzip.decompress(f.read()))
+            free_count = 0
+            for r in journals:
+                for k in ('issn', 'eissn'):
+                    v = r.get(k, '')
+                    if v and v in oa_data and oa_data[v].get('l') in OA_FREE_LABELS:
+                        r['free'] = True
+                        free_count += 1
+                        break
+            # Re-write journals.json with free flag
+            with open(DATA_DIR / 'journals.json', 'w', encoding='utf-8') as f:
+                json.dump(journals, f, ensure_ascii=False, separators=(',', ':'))
+            with open(DATA_DIR / 'journals.json', 'rb') as fin:
+                with gzip.open(DATA_DIR / 'journals.json.gz', 'wb', compresslevel=9) as fout:
+                    shutil.copyfileobj(fin, fout)
+            print(f'  Free-to-publish flag: {free_count} journals (author-free: subscription/hybrid/diamond)')
+
+        metrics_script = ROOT / 'scripts' / 'build_retraction_metrics.py'
+        if metrics_script.exists() and (DATA_DIR / 'annual_outputs.json').exists() and (DATA_DIR / 'retraction_watch_journals.json').exists():
+            print('== Retraction Metrics ==')
+            r = subprocess.run(
+                [sys.executable, str(metrics_script)],
+                cwd=ROOT, capture_output=True, text=True, timeout=180)
+            print(r.stdout)
+            if r.returncode != 0:
+                print(f'  WARN: build_retraction_metrics.py exited {r.returncode}: {r.stderr.strip()}')
+            else:
+                attached = attach_retraction_metrics(journals)
+                if attached:
+                    write_journals_bundle(journals)
+                print(f'  Retraction metrics embedded: {attached} journals')
     else:
         print('  skip: merge_openalex.py or openalex_cache.json not found')
     return 0
