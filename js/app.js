@@ -48,11 +48,11 @@
       paid_label: '付费',
       drawer_kicker: '期刊详情',
       pwa_install: '📲 安装到主屏',
-      footer_data: '数据来源：Clarivate WoS Core Collection (SCIE/SSCI/AHCI/ESCI) · JCR 2026 · ESI · EI Compendex · Scopus · DOAJ · CSCD · 中国科技核心 · SCD · AMI · FMS · VHB 2024 · CNRS Section 37 · UGC-CARE India · 中科院文献情报中心分区表 2025 · ShowJCR (GPL-3.0) · CCF 2026 (A/B/C) · CCF-T 2025 · ABDC 2025 · ABS 2024 · 中国科协 2025 · CSSCI · 北大核心 · CNKI · 浙江大学 2024 · Crossref Retraction Watch · OpenAlex。© <a href="https://journal.ailatest.org">AILatest Journal</a>',
+      footer_data: '© <a href="https://journal.ailatest.org">AILatest Journal</a>',
       tab_home: '查刊', tab_int: '国际', tab_dom: '中国', tab_fav: '收藏', tab_pick: '荐刊',
       nav_index_rank: '索引排行榜', nav_subject_rank: '学科排行榜', nav_warn_rank: '预警名单', nav_extension_beta: '插件内测', nav_subscription: '订阅',
       filter_if_range: '影响因子', if_any: '不限',
-      rail_int: '全球', rail_dom: '中国', rail_in: '印度', rail_my: '马来西亚', rail_kr: '韩国', rail_fav: '我的',
+      rail_int: '全球', rail_dom: '中国', rail_in: '印度', rail_my: '马来西亚', rail_kr: '韩国', rail_rank: '榜单', rail_fav: '我的',
       loading: '加载中…',
       hero_title_int: 'SCI / SSCI 国际期刊检索',
       hero_body_int: '資料來源：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI）· 更新至 2026-05-18，並合併 <b>EI Compendex</b> 期刊目錄（2025-10-10）。',
@@ -136,11 +136,11 @@
       paid_label: 'Paid',
       drawer_kicker: 'Journal Details',
       pwa_install: '📲 Install to Home',
-      footer_data: 'Sources: Clarivate WoS Core Collection (SCIE/SSCI/AHCI/ESCI) · JCR 2026 · ESI · EI Compendex · Scopus · DOAJ · CSCD · CSTPCD · SCD · AMI · FMS · VHB 2024 · CNRS Section 37 · UGC-CARE India · CAS NSL Tiers 2025 · ShowJCR (GPL-3.0) · CCF 2026 (A/B/C) · CCF-T 2025 · ABDC 2025 · ABS 2024 · CAST 2025 · CSSCI · PKU Core · CNKI · ZJU 2024 · Crossref Retraction Watch · OpenAlex. © <a href="https://journal.ailatest.org">AILatest Journal</a>',
+      footer_data: '© <a href="https://journal.ailatest.org">AILatest Journal</a>',
       tab_home: 'Journals', tab_int: 'International', tab_dom: 'China', tab_fav: 'Favorites', tab_pick: 'Recommend',
       nav_index_rank: 'Index Rankings', nav_subject_rank: 'Subject Rankings', nav_warn_rank: 'Warning List', nav_extension_beta: 'Extension beta', nav_subscription: 'Subscribe',
       filter_if_range: 'Impact Factor', if_any: 'Any',
-      rail_int: 'Global', rail_dom: 'China', rail_in: 'India', rail_my: 'Malaysia', rail_kr: 'Korea', rail_fav: 'Me',
+      rail_int: 'Global', rail_dom: 'China', rail_in: 'India', rail_my: 'Malaysia', rail_kr: 'Korea', rail_rank: 'Rankings', rail_fav: 'Me',
       loading: 'Loading…',
       hero_title_int: 'International SCI / SSCI Search',
       hero_body_int: 'Source: <b>Web of Science Core Collection</b> (SCIE / SSCI / AHCI / ESCI), updated 2026-05-18, merged with <b>EI Compendex</b> source list (2025-10-10).',
@@ -7915,6 +7915,68 @@
       updateStickySearchState();
     }
     window.__activateJournalTab = activateTab;
+    function showWarningRankList() {
+      [activeIndices, activeJcr, activeZones, activeXr, activeAbdc, activeAbs, activeTopics, activeFeats].forEach(s => s.clear());
+      activeWarnList = true;
+      activeCat = '__all';
+      activeQuery = '';
+      const qEl = document.getElementById('q');
+      if (qEl) qEl.value = '';
+      shown = PAGE;
+      activateTab('int', { keepWarnList: true });
+      renderInt();
+      syncThChkState();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function closeRankingsMenu() {
+      document.getElementById('rankings-popup')?.remove();
+      document.removeEventListener('click', closeRankingsMenu);
+      document.removeEventListener('keydown', closeRankingsMenuOnEsc);
+    }
+
+    function closeRankingsMenuOnEsc(e) {
+      if (e.key === 'Escape') closeRankingsMenu();
+    }
+
+    function openRankingsMenu(trigger) {
+      const existing = document.getElementById('rankings-popup');
+      if (existing) {
+        closeRankingsMenu();
+        return;
+      }
+      const rect = trigger.getBoundingClientRect();
+      const menu = document.createElement('div');
+      menu.id = 'rankings-popup';
+      menu.className = 'rankings-popup';
+      menu.style.left = `${Math.max(76, Math.round(rect.right + 10))}px`;
+      menu.style.bottom = `${Math.max(18, Math.round(window.innerHeight - rect.bottom))}px`;
+      menu.innerHTML = `
+        <a href="/indexes/">${T('索引排行榜', 'Index Rankings')}</a>
+        <a href="/subjects/">${T('学科排行榜', 'Subject Rankings')}</a>
+        <button type="button" data-rank-warning>${T('预警名单', 'Warning List')}</button>
+      `;
+      menu.addEventListener('click', (e) => {
+        const warn = e.target.closest('[data-rank-warning]');
+        if (!warn) return;
+        e.preventDefault();
+        closeRankingsMenu();
+        showWarningRankList();
+        if (window.matchMedia('(max-width: 900px)').matches) closeSidebar();
+      });
+      document.body.appendChild(menu);
+      setTimeout(() => {
+        document.addEventListener('click', closeRankingsMenu);
+        document.addEventListener('keydown', closeRankingsMenuOnEsc);
+      }, 0);
+    }
+
+    document.getElementById('rankings-btn')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      openRankingsMenu(e.currentTarget);
+    });
+
     // Home entry pills → switch tab
     document.querySelectorAll('.home-pill[data-tab], .rail-nav-btn[data-tab], .page-brand[data-tab], .rail-brand-mobile[data-tab]').forEach(b => {
       b.addEventListener('click', (e) => {
@@ -9287,18 +9349,6 @@
           } catch (_) {}
         }, 200);
       })();
-      // 预警名单：切到国际刊，合并展示 中科院/中信所预警 + 新锐 under review / WoS on hold
-      document.getElementById('warn-rank-link')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        [activeIndices, activeJcr, activeZones, activeXr, activeAbdc, activeAbs, activeTopics, activeFeats].forEach(s => s.clear());
-        activeWarnList = true;
-        activeCat = '__all'; activeQuery = '';
-        const qEl = document.getElementById('q'); if (qEl) qEl.value = '';
-        shown = PAGE;
-        if (window.__activateJournalTab) window.__activateJournalTab('int', { keepWarnList: true });
-        renderInt(); syncThChkState();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      });
       // 影响因子滑块
       (function initIfSlider() {
         const slider = document.getElementById('if-slider');

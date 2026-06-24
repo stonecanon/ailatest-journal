@@ -32,7 +32,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- End Google Tag Manager -->
 <link rel="preload" href="/data/journals.json.gz?v=v20260619-openalex-publication-history-4" as="fetch" crossorigin="anonymous" />
 <link rel="preload" href="/data/journal_aliases.json" as="fetch" crossorigin="anonymous" />
-<link rel="stylesheet" href="/css/app.css?v=20260624-account-api-clean" />
+<link rel="stylesheet" href="/css/app.css?v=20260624-rank-footer-clean" />
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json" />
@@ -157,9 +157,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </button>
   </nav>
   <div class="rail-bottom">
-    <button class="rail-nav-btn" data-tab="rankings" id="rankings-btn" aria-label="榜单" title="索引/学科排行榜 &amp; 预警名单">
+    <button class="rail-nav-btn" id="rankings-btn" aria-label="榜单" title="索引/学科排行榜 &amp; 预警名单" data-i18n-aria="rail_rank" data-i18n-title="rail_rank">
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 21V11"/><path d="M12 21V7"/><path d="M16 21V3"/><path d="M4 21h16"/></svg>
-      <span>榜单</span>
+      <span data-i18n="rail_rank">榜单</span>
     </button>
     <button class="rail-nav-btn" id="fav-header-btn" data-tab="fav" aria-label="我的收藏" title="我的收藏" data-i18n-aria="hero_title_fav" data-i18n-title="hero_title_fav">
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.7l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3.7z"/></svg>
@@ -183,13 +183,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <small data-i18n="home_subtitle">全球期刊检索与推荐平台</small>
     </h1>
   </section>
-
-  <nav class="seo-nav" style="display:none" aria-label="Browse journals">
-    <a href="/indexes/" class="seo-nav-link" data-i18n="nav_index_rank">索引排行榜</a>
-    <a href="/subjects/" class="seo-nav-link" data-i18n="nav_subject_rank">学科排行榜</a>
-    <a href="#" class="seo-nav-link" id="warn-rank-link" data-i18n="nav_warn_rank">预警名单</a>
-    <a href="/download" class="seo-nav-link" id="extension-beta-link"><span data-i18n="nav_extension_beta">下载</span><span class="new-badge">NEW</span></a>
-  </nav>
 
   <header class="topbar">
     <button class="side-toggle" id="side-toggle" aria-label="Open navigation">☰</button>
@@ -589,7 +582,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <button id="pwa-install" class="pwa-install" hidden data-i18n="pwa_install">📲 安装到主屏</button>
 <script>
 // Build version for cache busting data files
-const __BUILD_VER = 'v20260624-account-api-clean';
+const __BUILD_VER = 'v20260624-rank-footer-clean';
 // Service Worker 清理 — 必须在 app.js 加载前运行
 (function() {
   if ('serviceWorker' in navigator) {
@@ -610,7 +603,7 @@ const __BUILD_VER = 'v20260624-account-api-clean';
 })();
 </script>
 <script src="/js/pick-match.js?v=20260623-analytics-admin" defer></script>
-<script src="/js/app.js?v=20260624-account-api-clean" defer></script>
+<script src="/js/app.js?v=20260624-rank-footer-clean" defer></script>
 <script>
   // Custom install prompt
   let __pwaPrompt = null;
@@ -633,26 +626,6 @@ const __BUILD_VER = 'v20260624-account-api-clean';
     const btn = document.getElementById('pwa-install');
     if (btn) btn.hidden = true;
   });
-</script>
-
-
-<script>
-document.getElementById('rankings-btn').addEventListener('click', function(e) {
-  e.preventDefault();
-  var menu = document.getElementById('rankings-popup');
-  if (!menu) {
-    menu = document.createElement('div');
-    menu.id = 'rankings-popup';
-    menu.style.cssText = 'position:fixed;left:80px;bottom:120px;background:#fff;border:1px solid var(--rule,#e4ddd0);border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.12);padding:8px;z-index:200;min-width:140px;';
-    menu.innerHTML = '<a href="/indexes/" style="display:block;padding:8px 14px;border-radius:6px;font-size:13px;color:var(--ink,#1f1b16);text-decoration:none;">🏆 索引排行榜</a><a href="/subjects/" style="display:block;padding:8px 14px;border-radius:6px;font-size:13px;color:var(--ink,#1f1b16);text-decoration:none;">📚 学科排行榜</a><a href="#" id="warn-rank-popup" style="display:block;padding:8px 14px;border-radius:6px;font-size:13px;color:var(--ink,#1f1b16);text-decoration:none;">⚠️ 预警名单</a>';
-    document.body.appendChild(menu);
-    menu.querySelectorAll('a').forEach(function(a){ a.addEventListener('mouseenter',function(){this.style.background='rgba(0,0,0,.04)'}); a.addEventListener('mouseleave',function(){this.style.background='transparent'}); });
-    document.getElementById('warn-rank-popup').addEventListener('click', function(ev){ ev.preventDefault(); var btn = document.getElementById('warn-rank-link'); if(btn) btn.click(); menu.remove(); });
-    document.addEventListener('click', function close(ev){ if(!menu.contains(ev.target) && ev.target !== document.getElementById('rankings-btn')){ menu.remove(); document.removeEventListener('click',close); } });
-  } else {
-    menu.remove();
-  }
-});
 </script>
 
 </body>

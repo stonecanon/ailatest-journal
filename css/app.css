@@ -198,6 +198,35 @@ body.share-mode .app-rail { display: none !important; }
   line-height: 1.15;
   text-align: center;
 }
+.rankings-popup {
+  position: fixed;
+  z-index: 240;
+  min-width: 148px;
+  padding: 7px;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  background: color-mix(in srgb, #fff 92%, var(--paper-soft, #fbf6ea));
+  box-shadow: 0 14px 34px rgba(39, 35, 31, .16);
+}
+.rankings-popup a,
+.rankings-popup button {
+  display: block;
+  width: 100%;
+  padding: 9px 11px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--ink);
+  font: 700 13px/1.25 var(--sans);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+.rankings-popup a:hover,
+.rankings-popup button:hover {
+  background: rgba(249, 115, 22, .08);
+  color: var(--accent);
+}
 .rail-flag {
   font-size: 13px;
   font-family: var(--sans);
@@ -1097,7 +1126,6 @@ main.main {
   font-size: 10.5px;
 }
 body.update-reading-mode .home-hero,
-body.update-reading-mode .seo-nav,
 body.update-reading-mode .topbar,
 body.update-reading-mode #mode-tabs {
   display: none !important;
@@ -2109,26 +2137,6 @@ table.journals thead th {
   box-shadow: 0 1px 0 var(--rule-soft), 0 8px 18px rgba(66, 49, 27, 0.06);
 }
 
-/* SEO navigation links on home page */
-.seo-nav {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 6px 12px;
-  padding: 8px 0;
-  margin: 0 auto 10px;
-  width: min(760px, 100%);
-}
-.seo-nav-link {
-  font-size: 12px;
-  color: var(--ink-faint);
-  text-decoration: none;
-  padding: 2px 0;
-  border-bottom: 1px solid transparent;
-  transition: color .2s, border-color .2s;
-}
-.seo-nav-link:hover { color: var(--accent); border-color: var(--accent); }
 table.journals th {
   font-family: var(--sans);
   font-weight: 700;
@@ -6525,10 +6533,6 @@ html:not([lang|="zh"]) .j-row .col-topic::before { content: "Subject · "; }
     box-shadow: 0 2px 8px -3px rgba(60,48,36,.25);
   }
   /* 给顶部导航让位，避免和左上角按钮重叠 */
-  .seo-nav {
-    padding-left: 52px;
-    padding-right: 72px;
-  }
 }
 
 /* ═══════ 左侧筛选栏：每个选项显示期刊数量 + 学科完整显示 ═══════ */
@@ -6745,17 +6749,6 @@ body.journal-route .lang-toggle-wrap { display: none; }
 }
 
 /* ── header links: keep Warning List and plugin entry in the same nav flow ── */
-#warn-rank-link {
-  margin-left: 0;
-  color: var(--ink-faint);
-  display: inline-flex;
-  align-items: center;
-  padding: 2px 0;
-  border-bottom: 1px solid transparent;
-  line-height: 1.4;
-}
-#warn-rank-link::before { content: ""; }
-#warn-rank-link:hover { color: var(--accent); border-color: var(--accent); }
 #extension-beta-link {
   margin-left: 0;
   display: inline-flex;
@@ -6803,8 +6796,7 @@ body.journal-route .lang-toggle-wrap { display: none; }
 @media (max-width: 600px) {
   /* on phones the chips wrap without hiding under the fixed language button */
   #extension-beta-link,
-  #plus-link,
-  #warn-rank-link { margin-left: 0; }
+  #plus-link { margin-left: 0; }
 }
 
 /* ── fix: card meta chips overflow (free badge bleeding into IF), esp. EN ── */
