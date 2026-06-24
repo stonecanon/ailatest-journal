@@ -32,7 +32,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- End Google Tag Manager -->
 <link rel="preload" href="/data/journals.json.gz?v=v20260619-openalex-publication-history-4" as="fetch" crossorigin="anonymous" />
 <link rel="preload" href="/data/journal_aliases.json" as="fetch" crossorigin="anonymous" />
-<link rel="stylesheet" href="/css/app.css?v=20260620-fav-import" />
+<link rel="stylesheet" href="/css/app.css?v=20260624-account-api-clean" />
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json" />
@@ -70,7 +70,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   "@type": "ItemList",
   "name": "AILatest Journal main sections",
   "itemListElement": [
-    {"@type": "SiteNavigationElement", "position": 1, "name": "Journal Finder", "url": "https://journal.ailatest.org/global"},
+    {"@type": "SiteNavigationElement", "position": 1, "name": "Global Journal Directory", "url": "https://journal.ailatest.org/global/"},
     {"@type": "SiteNavigationElement", "position": 2, "name": "AI Journal Recommendation", "url": "https://journal.ailatest.org/pick"},
     {"@type": "SiteNavigationElement", "position": 3, "name": "Browse by Subject", "url": "https://journal.ailatest.org/subjects/"},
     {"@type": "SiteNavigationElement", "position": 4, "name": "Browse by Index", "url": "https://journal.ailatest.org/indexes/"},
@@ -110,15 +110,14 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     {
       "@type": "ListItem",
       "position": 2,
-      "name": "International Journals",
-      "item": "https://journal.ailatest.org/international"
+      "name": "Global Journal Directory",
+      "item": "https://journal.ailatest.org/global/"
     }
   ]
 }
 </script>
 
 
-<style>.home-hero{display:none!important}</style>
 </head>
 <body>
 <!-- Google Tag Manager (noscript) -->
@@ -131,13 +130,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <nav class="rail-top">
     <button class="rail-close-mobile" id="rail-close-mobile" aria-label="Close navigation">×</button>
     <button class="rail-brand-mobile" data-tab="home" aria-label="知刊" title="回到首页" data-i18n="brand_zhikan">知刊</button>
-    <button class="rail-nav-btn" data-tab="int" aria-label="国际期刊" title="国际期刊" data-i18n-aria="rail_int" data-i18n-title="rail_int">
+    <button class="rail-nav-btn" data-tab="int" aria-label="全球期刊" title="全球期刊" data-i18n-aria="rail_int" data-i18n-title="rail_int">
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 3.4 9A14 14 0 0 1 12 21a14 14 0 0 1-3.4-9A14 14 0 0 1 12 3Z"/></svg>
-      <span data-i18n="rail_int">国际期刊</span>
+      <span data-i18n="rail_int">全球</span>
+    </button>
+    <button class="rail-nav-btn" data-tab="updates" aria-label="期刊动态" title="期刊动态" data-i18n-aria="rail_updates" data-i18n-title="rail_updates">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h10"/><path d="M4 12h7"/><path d="M4 17h9"/><path d="M16 7a5 5 0 0 1 0 10"/><path d="M19 4a9 9 0 0 1 0 16"/></svg>
+      <span data-i18n="rail_updates">动态</span>
     </button>
     <button class="rail-nav-btn" data-tab="dom" aria-label="中国期刊" title="中国期刊" data-i18n-aria="rail_dom" data-i18n-title="rail_dom">
       <span class="rail-flag" aria-hidden="true">CN</span>
-      <span data-i18n="rail_dom">中国期刊</span>
+      <span data-i18n="rail_dom">中国</span>
     </button>
     <button class="rail-nav-btn" data-tab="in" aria-label="India journals" title="India journals" data-i18n-aria="rail_in" data-i18n-title="rail_in">
       <span class="rail-flag" aria-hidden="true">IN</span>
@@ -151,21 +154,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <span class="rail-flag" aria-hidden="true">KR</span>
       <span data-i18n="rail_kr">Korea</span>
     </button>
-    <button class="rail-nav-btn" data-tab="updates" aria-label="期刊动态" title="期刊动态" data-i18n-aria="rail_updates" data-i18n-title="rail_updates">
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h10"/><path d="M4 12h7"/><path d="M4 17h9"/><path d="M16 7a5 5 0 0 1 0 10"/><path d="M19 4a9 9 0 0 1 0 16"/></svg>
-      <span data-i18n="rail_updates">动态</span>
-    </button>
-    <button class="rail-nav-btn" data-tab="rankings" id="rankings-btn" aria-label="榜单" title="索引/学科排行榜 &amp; 预警名单">
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 21V11"/><path d="M12 21V7"/><path d="M16 21V3"/><path d="M4 21h16"/></svg>
-      <span>榜单</span>
-    </button>
-    <button class="rail-nav-btn" id="fav-header-btn" data-tab="fav" aria-label="我的收藏" title="我的收藏" data-i18n-aria="hero_title_fav" data-i18n-title="hero_title_fav">
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.7l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3.7z"/></svg>
-      <span data-i18n="rail_fav">我的收藏</span>
-      <span id="fav-count-badge" class="fav-count-badge" style="display:none"></span>
-    </button>
   </nav>
   <div class="rail-bottom">
+    <button class="rail-nav-btn" id="fav-header-btn" data-tab="fav" aria-label="我的收藏" title="我的收藏" data-i18n-aria="hero_title_fav" data-i18n-title="hero_title_fav">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.7l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3.7z"/></svg>
+      <span data-i18n="rail_fav">收藏</span>
+      <span id="fav-count-badge" class="fav-count-badge" style="display:none"></span>
+    </button>
+    <span class="account-credit-badge" id="account-credit-badge" hidden></span>
     <button class="auth-btn" id="auth-btn" aria-label="Sign in" data-i18n="login">登录</button>
   </div>
 </aside>
@@ -183,11 +179,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </h1>
   </section>
 
-  <nav class="seo-nav" style="display:none" aria-label="Browse journals">
+  <nav class="seo-nav" aria-label="Browse journals">
     <a href="/indexes/" class="seo-nav-link" data-i18n="nav_index_rank">索引排行榜</a>
     <a href="/subjects/" class="seo-nav-link" data-i18n="nav_subject_rank">学科排行榜</a>
     <a href="#" class="seo-nav-link" id="warn-rank-link" data-i18n="nav_warn_rank">预警名单</a>
-    <a href="/extension.html" class="seo-nav-link" id="extension-beta-link"><span data-i18n="nav_extension_beta">下载</span><span class="new-badge">NEW</span></a>
+    <a href="/download" class="seo-nav-link" id="extension-beta-link"><span data-i18n="nav_extension_beta">下载</span><span class="new-badge">NEW</span></a>
   </nav>
 
   <header class="topbar">
@@ -219,7 +215,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <!-- ─── Home tab ─── -->
   <section class="tab-panel" data-panel="home">
     <div id="home-results" class="home-results" hidden></div>
-    <section id="home-updates-preview" class="updates-preview" aria-label="期刊动态" hidden></section>
   </section>
 
   <!-- ─── Journal updates tab ─── -->
@@ -372,6 +367,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <!-- ─── Korea tab ─── -->
   <section class="tab-panel" data-panel="kr" hidden>
     <div id="korea-content"></div>
+  </section>
+
+  <!-- ─── Me / settings tab ─── -->
+  <section class="tab-panel" data-panel="me" hidden>
+    <div id="me-content"></div>
   </section>
 
   <!-- ─── Favorites tab ─── -->
@@ -548,7 +548,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </section>
 
   <footer class="site-foot">
-    <p>© <a href="https://journal.ailatest.org">AILatest Journal</a></p>
+    <p data-i18n="footer_data">数据来源：Clarivate WoS Core Collection (SCIE/SSCI/AHCI/ESCI) · JCR 2026 · ESI · EI Compendex · Scopus · DOAJ · CSCD · 中国科技核心 · SCD · AMI · FMS · VHB 2024 · CNRS Section 37 · UGC-CARE India · 中科院文献情报中心分区表 2025 · ShowJCR (GPL-3.0) · CCF 2026 (A/B/C) · CCF-T 2025 · ABDC 2025 · ABS 2024 · 中国科协 2025 · CSSCI · 北大核心 · CNKI · 浙江大学 2024 · Crossref Retraction Watch · OpenAlex。© <a href="https://journal.ailatest.org">AILatest Journal</a></p>
     <p id="journal-view-total" class="visitor-footnote" hidden></p>
   </footer>
 </main>
@@ -584,7 +584,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <button id="pwa-install" class="pwa-install" hidden data-i18n="pwa_install">📲 安装到主屏</button>
 <script>
 // Build version for cache busting data files
-const __BUILD_VER = 'v20260619-openalex-publication-history-4';
+const __BUILD_VER = 'v20260624-account-api-clean';
 // Service Worker 清理 — 必须在 app.js 加载前运行
 (function() {
   if ('serviceWorker' in navigator) {
@@ -604,8 +604,8 @@ const __BUILD_VER = 'v20260619-openalex-publication-history-4';
   }
 })();
 </script>
-<script src="/js/pick-match.js?v=20260614-pick-progress-card-tidy" defer></script>
-<script src="/js/app.js?v=20260620-fav-import" defer></script>
+<script src="/js/pick-match.js?v=20260623-analytics-admin" defer></script>
+<script src="/js/app.js?v=20260624-account-api-clean" defer></script>
 <script>
   // Custom install prompt
   let __pwaPrompt = null;
@@ -628,26 +628,6 @@ const __BUILD_VER = 'v20260619-openalex-publication-history-4';
     const btn = document.getElementById('pwa-install');
     if (btn) btn.hidden = true;
   });
-</script>
-
-
-<script>
-document.getElementById('rankings-btn').addEventListener('click', function(e) {
-  e.preventDefault();
-  var menu = document.getElementById('rankings-popup');
-  if (!menu) {
-    menu = document.createElement('div');
-    menu.id = 'rankings-popup';
-    menu.style.cssText = 'position:fixed;left:80px;bottom:120px;background:#fff;border:1px solid var(--rule,#e4ddd0);border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.12);padding:8px;z-index:200;min-width:140px;';
-    menu.innerHTML = '<a href="/indexes/" style="display:block;padding:8px 14px;border-radius:6px;font-size:13px;color:var(--ink,#1f1b16);text-decoration:none;">🏆 索引排行榜</a><a href="/subjects/" style="display:block;padding:8px 14px;border-radius:6px;font-size:13px;color:var(--ink,#1f1b16);text-decoration:none;">📚 学科排行榜</a><a href="#" id="warn-rank-popup" style="display:block;padding:8px 14px;border-radius:6px;font-size:13px;color:var(--ink,#1f1b16);text-decoration:none;">⚠️ 预警名单</a>';
-    document.body.appendChild(menu);
-    menu.querySelectorAll('a').forEach(function(a){ a.addEventListener('mouseenter',function(){this.style.background='rgba(0,0,0,.04)'}); a.addEventListener('mouseleave',function(){this.style.background='transparent'}); });
-    document.getElementById('warn-rank-popup').addEventListener('click', function(ev){ ev.preventDefault(); var btn = document.getElementById('warn-rank-link'); if(btn) btn.click(); menu.remove(); });
-    document.addEventListener('click', function close(ev){ if(!menu.contains(ev.target) && ev.target !== document.getElementById('rankings-btn')){ menu.remove(); document.removeEventListener('click',close); } });
-  } else {
-    menu.remove();
-  }
-});
 </script>
 
 </body>

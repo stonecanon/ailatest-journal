@@ -4,5 +4,3 @@
   Cache-Control: no-cache, no-store, must-revalidate
 /css/*
   Cache-Control: no-cache, no-store, must-revalidate
-/data/*
-  Cache-Control: no-cache, no-store, must-revalidate
