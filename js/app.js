@@ -788,13 +788,15 @@
 
   let journals = [];
   let domestic = null;
+  let domesticPromise = null;
   let india = null;
+  let indiaPromise = null;
   let malaysia = null;
   let malaysiaPromise = null;
   let esiCats = [];
   let meta = null;
-  let oaMap = {};          // compact OpenAlex map: { "ISSN": {hp, l, oa, dj, apc, org, cn, w} }
-  let coverMap = {};       // compact cover map: { "ISSN": {u, s, c, h, t} }
+  let oaMap = null;        // compact OpenAlex map, loaded only when a detail/recommendation needs it.
+  let oaMapPromise = null;
   let journalUpdates = { updated_at: '', items: [] };
   // review_cycles now read from embedded doaj.review_weeks in journals.json.gz
   const DEFAULT_JOURNAL_ALIASES = {
@@ -916,6 +918,52 @@
       if (oaMap[k]) return oaMap[k];
     }
     return null;
+  }
+
+  function loadOaMap() {
+    if (oaMap) return Promise.resolve(oaMap);
+    if (!oaMapPromise) {
+      oaMapPromise = fetchJSON('data/oa.json.gz')
+        .then(data => {
+          oaMap = data || {};
+          return oaMap;
+        })
+        .catch(() => {
+          oaMap = {};
+          return oaMap;
+        });
+    }
+    return oaMapPromise;
+  }
+
+  function loadDomesticData() {
+    if (domestic) return Promise.resolve(domestic);
+    if (!domesticPromise) {
+      domesticPromise = fetch('/data/domestic.json')
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+          domestic = data;
+          buildDomIndex(domestic);
+          return domestic;
+        })
+        .catch(() => null);
+    }
+    return domesticPromise;
+  }
+
+  function loadIndiaData() {
+    if (india) return Promise.resolve(india);
+    if (!indiaPromise) {
+      indiaPromise = fetch('/data/india.json')
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+          india = data;
+          buildIndiaIndex(india);
+          return india;
+        })
+        .catch(() => null);
+    }
+    return indiaPromise;
   }
 
   const countryOutputCache = new Map();
@@ -1109,21 +1157,6 @@
     const oa = lookupOA(r);
     const label = String(oa?.l || oa?.label || '').toLowerCase();
     return label === 'diamond' || label === 'hybrid' || label === 'subscription_paid_read';
-  }
-
-  function lookupCover(r) {
-    if (!coverMap) return null;
-    function coverKeys(s) {
-      const raw = String(s || '').trim().toUpperCase();
-      const compact = raw.replace(/[^0-9X]/g, '');
-      const hyphen = compact.length === 8 ? compact.slice(0, 4) + '-' + compact.slice(4) : '';
-      return [raw, compact, hyphen].filter(Boolean);
-    }
-    const keys = [...new Set([r.issn, r.eissn].flatMap(coverKeys))];
-    for (const k of keys) {
-      if (coverMap[k]) return coverMap[k];
-    }
-    return null;
   }
 
   function journalPathSlug(pathname = location.pathname) {
@@ -3087,7 +3120,7 @@
       if (!ok) {
         // Also check OpenAlex subfields
         const issn = (r.issn || r.eissn || '').toUpperCase();
-        const rec = oaMap[issn];
+        const rec = oaMap && oaMap[issn];
         const sf = (rec && Array.isArray(rec.sf)) ? rec.sf : [];
         for (const s of sf) if (activeTopics.has(s)) { ok = true; break; }
       }
@@ -3834,7 +3867,14 @@
     const box = $('#india-content');
     if (!box) return;
     if (!india || !Array.isArray(india.records)) {
-      box.innerHTML = `<div class="empty">${T('印度期刊数据缺失','India journal data missing')}</div>`;
+      box.innerHTML = `<div class="empty">${T('正在加载印度期刊数据…','Loading India journal data…')}</div>`;
+      loadIndiaData().then((data) => {
+        if (!data || !Array.isArray(data.records)) {
+          box.innerHTML = `<div class="empty">${T('印度期刊数据缺失','India journal data missing')}</div>`;
+          return;
+        }
+        if (activeTab === 'in') renderIndia();
+      });
       return;
     }
     if (!window.__indiaShown) window.__indiaShown = 100;
@@ -4024,7 +4064,18 @@
   function renderDomestic() {
     updateThStickyTop();
     const box = $('#dom-content');
-    if (!domestic) { box.innerHTML = `<div class="empty">${T('无数据','No data')}</div>`; return; }
+    if (!domestic) {
+      box.innerHTML = `<div class="empty">${T('正在加载中文期刊数据…','Loading Chinese journal data…')}</div>`;
+      loadDomesticData().then((data) => {
+        if (!data) {
+          box.innerHTML = `<div class="empty">${T('无数据','No data')}</div>`;
+          return;
+        }
+        updateFilterCounts();
+        if (activeTab === 'dom') renderDomestic();
+      });
+      return;
+    }
     const q = activeQuery.toLowerCase();
 
     // ===== 统一搜索：只要有搜索词就跨库聚合，忽略当前库选择 =====
@@ -4754,11 +4805,8 @@
     if (pageMode) _drawerSourceTab = activeTab;
     const drawer = $('#j-drawer'), scrim = $('#drawer-scrim'), body = $('#drawer-body');
     if (!drawer || !body) return;
-    // 懒加载 OpenAlex 数据（首次打开抽屉时加载）
-    if (!oaMap) {
-      try { oaMap = await fetchJSON('data/oa.json.gz'); }
-      catch(e) { oaMap = {}; }
-    }
+    // Lazy-load OpenAlex data only when a journal detail page actually needs it.
+    await loadOaMap();
     // 上报浏览（无需登录），结果回填进 cache
     reportJournalView(r, opts || {});
     // GA4 虚拟浏览 — 期刊详情抽屉打开时通知 GA4（无需 GTM 配置）
@@ -4894,22 +4942,11 @@
             `${oaText}${apcText ? `; ${apcText}` : ''}${reviewText ? `; ${reviewText}` : ''}.`,
             `${topicList.length ? `Focus areas include ${topicList.join(', ')}. ` : ''}${indexText ? `Indexed in ${indexText}.` : ''}`,
           ].filter(Boolean).join(' ');
-      const coverRec = lookupCover(ir.issn || ir.eissn ? ir : r);
-      const coverUrl = r.cover_url || ir.cover_url || r.official_cover_url || ir.official_cover_url || coverRec?.u || '';
-      const fallbackCover = `<div class="journal-cover-fallback" aria-hidden="true">
-             <div class="journal-cover-mark">${escape((title || 'J').split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase())}</div>
-             <div class="journal-cover-name">${escape(title)}</div>
-             ${r.publisher ? `<div class="journal-cover-pub">${escape(r.publisher)}</div>` : ''}
-           </div>`;
-      const cover = coverUrl
-        ? `<img class="journal-cover-img" src="${escape(coverUrl)}" alt="${escape(title)} cover" loading="lazy" referrerpolicy="no-referrer" onerror="this.closest('.journal-cover').classList.add('cover-load-failed');this.remove()" />${fallbackCover}`
-        : fallbackCover;
       return `<div class="journal-overview">
         <div class="journal-overview-copy">
           <h4>${officialText ? T('官方介绍','Official Description') : T('期刊概览','Journal Overview')}</h4>
           <p>${officialText ? escape(officialText) : escape(fallbackText)}</p>
         </div>
-        <div class="journal-cover ${coverUrl ? 'has-remote-cover' : ''}">${cover}</div>
       </div>`;
     })();
 
@@ -8835,8 +8872,7 @@
         // Lazy-load local topic snapshot for richer journal profiles. No live API calls.
         if (!oaMap) {
           setPickProgress(T('加载本地期刊画像…','Loading local journal profiles…'), 18);
-          try { oaMap = await fetchJSON('data/oa.json.gz'); }
-          catch(e) { oaMap = {}; }
+          await loadOaMap();
         }
 
         let entries = null;
@@ -9051,16 +9087,6 @@
 
           const cardZoneClass = e.zone ? ` zone-${e.zone}` : '';
           const zoneStripStyle = zoneColor ? `style="background:${zoneColor}"` : '';
-          const coverRec = e.journalRec ? lookupCover(e.journalRec) : null;
-          const coverUrl = e.journalRec?.cover_url || e.journalRec?.official_cover_url || coverRec?.u || '';
-          const coverMark = name.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase() || 'J';
-          const coverFallback = `<div class="pick-cover-fallback"><span>${escape(coverMark)}</span><b>${escape(name)}</b></div>`;
-          const coverHtml = `<div class="pick-cover ${coverUrl ? 'has-cover' : ''}" aria-hidden="true">${
-            coverUrl
-              ? `<img src="${escape(coverUrl)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.closest('.pick-cover').classList.add('cover-failed');this.remove()" />${coverFallback}`
-              : coverFallback
-          }</div>`;
-
           return `<div class="pick-card${cardZoneClass}" data-issn="${escape(issnStr)}">
             ${zoneColor ? `<div class="pick-zone-strip" ${zoneStripStyle}></div>` : ''}
             <div class="pick-card-main">
@@ -9087,7 +9113,6 @@
               })()}
               ${signalList ? `<div class="pick-papers">${signalList}</div>` : ''}
             </div>
-            ${coverHtml}
           </div>`;
         }).join('');
         if (allFiltered.length > filtered.length) {
@@ -9233,21 +9258,17 @@
     // 分享着陆页：/s/<id> 直接接管 main，不走主流程
     if (await maybeRenderShareLanding()) return;
     try {
-      const [j, d, indiaData, m, esi, aliases, underReviewIssns, onHoldIssns, oa, covers, updates] = await Promise.all([
+      const [j, m, esi, aliases, underReviewIssns, onHoldIssns, updates] = await Promise.all([
         fetchJSON('data/journals.json.gz'),
-        fetch('/data/domestic.json').then(r => r.json()).catch(() => null),
-        fetch('/data/india.json').then(r => r.json()).catch(() => null),
         fetch('/data/meta.json').then(r => r.json()).catch(() => null),
         fetch('/data/esi_categories.json').then(r => r.json()).catch(() => []),
         fetch('/data/journal_aliases.json').then(r => r.json()).catch(() => DEFAULT_JOURNAL_ALIASES),
         fetch('/data/under_review_issn.json').then(r => r.json()).catch(() => []),
         fetch('/data/on_hold_issn.json').then(r => r.json()).catch(() => []),
-        fetchJSON('data/oa.json.gz').catch(() => ({})),
-        fetchJSON('data/journal_covers.json.gz').catch(() => ({})),
         fetch('/data/journal_updates.json').then(r => r.json()).catch(() => ({ updated_at: '', items: [] })),
       ]);
       setJournalAliases(aliases);
-      journals = j; domestic = d; india = indiaData; meta = m; esiCats = esi; oaMap = oa; coverMap = covers;
+      journals = j; meta = m; esiCats = esi;
       journalUpdates = normalizeJournalUpdates(updates);
       // Build Under Review lookup set
       const underReviewSet = new Set((underReviewIssns||[]).filter(Boolean).map(s => s.replace(/[^0-9xX]/gi,'').toLowerCase()));
@@ -9268,10 +9289,8 @@
         }
       });
       journals.forEach(journalSearchMeta);
-      buildDomIndex(domestic);
       buildIntIndex(journals);
       updateFilterCounts();
-      buildIndiaIndex(india);
       // Refresh stale favsData with live international journal data
       (function refreshFavsData() {
         let dirty = false;
@@ -9297,20 +9316,6 @@
       // 计算合并的 topicList（WoS 学科 + OpenAlex subfield）
       const _wc = Object.create(null);
       for (const r of journals) for (const c of (r.wos_categories||[])) _wc[c] = (_wc[c]||0)+1;
-      // Add OA subfield counts for topics not already in WoS（修复：之前 !(s in _wc) 守卫导致只计到 1）
-      const wosKeys = new Set(Object.keys(_wc));
-      const issnSet = new Set(journals.map(j => (j.issn || j.eissn || '').toUpperCase()).filter(Boolean));
-      const oaCount = Object.create(null);
-      for (const issn of issnSet) {
-        const rec = oaMap[issn];
-        if (rec && Array.isArray(rec.sf)) {
-          for (const s of rec.sf) {
-            if (!s || wosKeys.has(s)) continue;
-            oaCount[s] = (oaCount[s] || 0) + 1;
-          }
-        }
-      }
-      for (const s in oaCount) _wc[s] = oaCount[s];
       topicList = Object.entries(_wc).map(([name,count])=>({name,count})).sort((a,b)=>a.name.localeCompare(b.name,'en'));
       if (meta?.total && $('#total')) $('#total').textContent = meta.total.toLocaleString();
       $('#hint').textContent = lang === 'zh'
@@ -9319,6 +9324,13 @@
       renderCatList();
       renderTopicList();
       updatePublicPulse();
+      loadDomesticData().then(() => {
+        updateFilterCounts();
+        if (activeTab === 'dom') renderDomestic();
+      });
+      loadIndiaData().then(() => {
+        if (activeTab === 'in') renderIndia();
+      });
       // ── 小程序收藏导入（方案A：/import?d=ISSN1,ISSN2…，无后端）──
       (function importFromMiniProgram() {
         if (location.pathname.replace(/\/+$/, '') !== '/import') return;

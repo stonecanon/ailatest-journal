@@ -6586,26 +6586,59 @@ body.journal-route .lang-toggle-wrap { display: none; }
   .app-rail {
     left: 0; right: 0; top: auto; bottom: 0;
     width: 100%; height: auto; min-height: 0;
-    flex-direction: row; align-items: stretch; justify-content: space-around;
-    padding: 5px 2px calc(4px + env(safe-area-inset-bottom));
+    flex-direction: row; align-items: stretch; justify-content: flex-start;
+    gap: 0;
+    overflow-x: auto;
+    padding: 5px 8px calc(4px + env(safe-area-inset-bottom));
     transform: none !important;
     border-right: 0; border-top: 1px solid rgba(39,35,31,.12);
     box-shadow: 0 -8px 28px rgba(39,35,31,.08);
     background: rgba(255,253,249,.9); -webkit-backdrop-filter: blur(22px); backdrop-filter: blur(22px);
     z-index: 130;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
   }
+  .app-rail::-webkit-scrollbar { display: none; }
   .app-rail .rail-top {
     flex-direction: row; align-items: stretch; justify-content: space-around;
-    gap: 0; width: 100%; padding: 0;
+    flex: 0 0 auto;
+    gap: 0; width: auto; padding: 0;
   }
-  .app-rail .rail-bottom,
   .app-rail .rail-close-mobile,
   .app-rail .rail-brand-mobile { display: none !important; }
+  .app-rail .rail-bottom {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: space-around;
+    flex: 0 0 auto;
+    gap: 0;
+    width: auto;
+  }
   .rail-nav-btn {
-    position: relative; flex: 1 1 0; min-width: 0; min-height: 0; width: auto;
+    position: relative; flex: 0 0 58px; min-width: 58px; min-height: 0; width: 58px;
     padding: 3px 0 1px; border-radius: 0; background: none !important;
     flex-direction: column; justify-content: center; align-items: center; gap: 3px;
     color: var(--ink-faint);
+  }
+  .app-rail .auth-btn {
+    flex: 0 0 58px;
+    min-width: 58px;
+    width: 58px;
+    min-height: 44px;
+    padding: 0 4px;
+    border: 0;
+    background: none;
+    font-size: 10px;
+    line-height: 1.1;
+  }
+  .app-rail .account-credit-badge {
+    flex: 0 0 58px;
+    align-self: center;
+    min-width: 58px;
+    text-align: center;
+    font-size: 10px;
+    line-height: 1.1;
   }
   .rail-nav-btn svg { width: 23px; height: 23px; }
   .rail-nav-btn span:not(.rail-flag):not(.fav-count-badge) {

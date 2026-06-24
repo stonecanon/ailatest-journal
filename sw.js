@@ -2,10 +2,10 @@
    Strategy:
    - app shell (HTML/CSS/JS): network-first, cache fallback
    - icons/manifest: stale-while-revalidate
-   - data JSON: network-first, cache fallback (so updates win, offline still works)
+   - data JSON / JSON.GZ: cache versioned data first, network fallback for fresh data
    - everything else: network only
 */
-const VERSION = '20260616-update-auto-en';
+const VERSION = '20260624-perf-data-gz';
 const SHELL_CACHE = `shell-${VERSION}`;
 const DATA_CACHE = `data-${VERSION}`;
 
@@ -35,7 +35,7 @@ self.addEventListener('activate', (e) => {
 });
 
 function isData(url) {
-  return url.pathname.startsWith('/data/') && url.pathname.endsWith('.json');
+  return url.pathname.startsWith('/data/') && (url.pathname.endsWith('.json') || url.pathname.endsWith('.json.gz'));
 }
 function isShell(url) {
   if (url.pathname === '/' || url.pathname.endsWith('.html')) return true;
@@ -57,15 +57,20 @@ self.addEventListener('fetch', (event) => {
   if (req.headers.get('range')) return;               // partial requests bypass
 
   if (isData(url)) {
-    // network-first → cache fallback
+    // Versioned data files are immutable for this build, so cached copies should win.
+    // Unversioned data remains network-first with cache fallback.
     event.respondWith(
-      fetch(req).then((resp) => {
-        if (resp && resp.status === 200) {
-          const clone = resp.clone();
-          caches.open(DATA_CACHE).then((c) => c.put(req, clone)).catch(() => {});
+      caches.open(DATA_CACHE).then(async (cache) => {
+        const cached = await cache.match(req);
+        if (url.searchParams.has('v') && cached) return cached;
+        try {
+          const resp = await fetch(req);
+          if (resp && resp.status === 200) cache.put(req, resp.clone()).catch(() => {});
+          return resp;
+        } catch (_) {
+          return cached || Response.error();
         }
-        return resp;
-      }).catch(() => caches.match(req).then((r) => r || Response.error()))
+      })
     );
     return;
   }
