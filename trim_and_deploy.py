@@ -2,6 +2,7 @@
 """Strip large fields from journals.json and deploy via wrangler."""
 import json
 from pathlib import Path
+import sys
 
 ROOT = Path(__file__).parent
 SRC = ROOT / "data" / "journals.json"
@@ -10,6 +11,10 @@ BAK = ROOT / "data" / "journals.json.bak"
 
 # Fields to strip for deploy (used only in detail drawer, safe to remove)
 STRIP_FIELDS = {"address"}  # ~1.8 MB
+
+if not SRC.exists():
+    print(f"{SRC} not found; current site ships data/journals.json.gz directly. Nothing to trim.")
+    sys.exit(0)
 
 data = json.loads(SRC.read_text(encoding="utf-8"))
 orig_size = SRC.stat().st_size
