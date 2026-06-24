@@ -1,4 +1,4 @@
-/* AILatest Journal — front-end app (i18n + tabs + favorites + auth) */
+﻿/* AILatest Journal — front-end app (i18n + tabs + favorites + auth) */
 (() => {
   const $ = (s, r=document) => r.querySelector(s);
   const $$ = (s, r=document) => [...r.querySelectorAll(s)];
@@ -2229,7 +2229,7 @@
       document.body.appendChild(modal);
 
       modal.addEventListener('click', (e) => {
-        if (e.target === modal) closeLoginModal();
+        if (e.target === modal) { closeLoginModal(); ('.topbar').forEach(function(el){ el.style.display = ''; }); }
       });
       $('.login-close', modal).addEventListener('click', closeLoginModal);
 
@@ -2307,6 +2307,7 @@
         });
       });
     }
+    ('.topbar').forEach(function(el){ el.style.display = 'none'; });
     modal.classList.add('open');
     setTimeout(() => $('.login-email input[name=email]', modal)?.focus(), 50);
   }
@@ -2316,6 +2317,7 @@
   }
 
   async function finishLogin(token, profile = null) {
+    ('.topbar').forEach(function(el){ el.style.display = ''; });
     let me = profile;
     if (!me) {
       const r = await fetch(`${API_BASE}/me`, {
@@ -6066,6 +6068,7 @@
         </div>`;
     }
     modal.innerHTML = `<div class="share-card share-modal-card">${body}</div>`;
+    ('.topbar').forEach(function(el){ el.style.display = 'none'; });
     modal.classList.add('open');
     const closeBtn = document.getElementById('share-close-btn');
     if (closeBtn) closeBtn.addEventListener('click', () => modal.classList.remove('open'));
@@ -6196,6 +6199,7 @@
           <div class="share-modal-foot"><button id="share-close-btn" class="share-foot-link">${T('关闭','Close')}</button></div>
         </div>
       </div>`;
+    ('.topbar').forEach(function(el){ el.style.display = 'none'; });
     modal.classList.add('open');
 
     document.getElementById('share-close-btn').addEventListener('click', () => modal.classList.remove('open'));
