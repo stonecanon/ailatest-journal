@@ -118,6 +118,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 </script>
 
 
+<style>.home-hero{display:none!important}</style>
 </head>
 <body>
 <!-- Google Tag Manager (noscript) -->
@@ -156,6 +157,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </button>
   </nav>
   <div class="rail-bottom">
+    <button class="rail-nav-btn" data-tab="rankings" id="rankings-btn" aria-label="榜单" title="索引/学科排行榜 &amp; 预警名单">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 21V11"/><path d="M12 21V7"/><path d="M16 21V3"/><path d="M4 21h16"/></svg>
+      <span>榜单</span>
+    </button>
     <button class="rail-nav-btn" id="fav-header-btn" data-tab="fav" aria-label="我的收藏" title="我的收藏" data-i18n-aria="hero_title_fav" data-i18n-title="hero_title_fav">
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.7l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3.7z"/></svg>
       <span data-i18n="rail_fav">收藏</span>
@@ -179,7 +184,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </h1>
   </section>
 
-  <nav class="seo-nav" aria-label="Browse journals">
+  <nav class="seo-nav" style="display:none" aria-label="Browse journals">
     <a href="/indexes/" class="seo-nav-link" data-i18n="nav_index_rank">索引排行榜</a>
     <a href="/subjects/" class="seo-nav-link" data-i18n="nav_subject_rank">学科排行榜</a>
     <a href="#" class="seo-nav-link" id="warn-rank-link" data-i18n="nav_warn_rank">预警名单</a>
@@ -548,7 +553,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </section>
 
   <footer class="site-foot">
-    <p data-i18n="footer_data">数据来源：Clarivate WoS Core Collection (SCIE/SSCI/AHCI/ESCI) · JCR 2026 · ESI · EI Compendex · Scopus · DOAJ · CSCD · 中国科技核心 · SCD · AMI · FMS · VHB 2024 · CNRS Section 37 · UGC-CARE India · 中科院文献情报中心分区表 2025 · ShowJCR (GPL-3.0) · CCF 2026 (A/B/C) · CCF-T 2025 · ABDC 2025 · ABS 2024 · 中国科协 2025 · CSSCI · 北大核心 · CNKI · 浙江大学 2024 · Crossref Retraction Watch · OpenAlex。© <a href="https://journal.ailatest.org">AILatest Journal</a></p>
+    <p>© <a href="https://journal.ailatest.org">AILatest Journal</a></p>
     <p id="journal-view-total" class="visitor-footnote" hidden></p>
   </footer>
 </main>
@@ -628,6 +633,26 @@ const __BUILD_VER = 'v20260624-account-api-clean';
     const btn = document.getElementById('pwa-install');
     if (btn) btn.hidden = true;
   });
+</script>
+
+
+<script>
+document.getElementById('rankings-btn').addEventListener('click', function(e) {
+  e.preventDefault();
+  var menu = document.getElementById('rankings-popup');
+  if (!menu) {
+    menu = document.createElement('div');
+    menu.id = 'rankings-popup';
+    menu.style.cssText = 'position:fixed;left:80px;bottom:120px;background:#fff;border:1px solid var(--rule,#e4ddd0);border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.12);padding:8px;z-index:200;min-width:140px;';
+    menu.innerHTML = '<a href="/indexes/" style="display:block;padding:8px 14px;border-radius:6px;font-size:13px;color:var(--ink,#1f1b16);text-decoration:none;">🏆 索引排行榜</a><a href="/subjects/" style="display:block;padding:8px 14px;border-radius:6px;font-size:13px;color:var(--ink,#1f1b16);text-decoration:none;">📚 学科排行榜</a><a href="#" id="warn-rank-popup" style="display:block;padding:8px 14px;border-radius:6px;font-size:13px;color:var(--ink,#1f1b16);text-decoration:none;">⚠️ 预警名单</a>';
+    document.body.appendChild(menu);
+    menu.querySelectorAll('a').forEach(function(a){ a.addEventListener('mouseenter',function(){this.style.background='rgba(0,0,0,.04)'}); a.addEventListener('mouseleave',function(){this.style.background='transparent'}); });
+    document.getElementById('warn-rank-popup').addEventListener('click', function(ev){ ev.preventDefault(); var btn = document.getElementById('warn-rank-link'); if(btn) btn.click(); menu.remove(); });
+    document.addEventListener('click', function close(ev){ if(!menu.contains(ev.target) && ev.target !== document.getElementById('rankings-btn')){ menu.remove(); document.removeEventListener('click',close); } });
+  } else {
+    menu.remove();
+  }
+});
 </script>
 
 </body>
