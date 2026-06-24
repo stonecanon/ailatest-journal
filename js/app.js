@@ -10,9 +10,15 @@
   };
   const fetchJSON = async (url) => {
     if (typeof url === 'string' && url.startsWith('data/')) url = '/' + url;
+    const urlText = String(url);
+    const dataPath = urlText.startsWith('/data/') ? urlText : '';
+    const version = window.__BUILD_VER || '';
+    if (dataPath && version && !/[?&]v=/.test(dataPath)) {
+      url = dataPath + (dataPath.includes('?') ? '&' : '?') + 'v=' + encodeURIComponent(version);
+    }
     const resp = await fetch(url);
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-    if (url.endsWith('.gz')) {
+    if (String(url).split('?')[0].endsWith('.gz')) {
       const ds = new DecompressionStream('gzip');
       const stream = resp.body.pipeThrough(ds);
       return await new Response(stream).json();
@@ -42,7 +48,7 @@
       paid_label: '付费',
       drawer_kicker: '期刊详情',
       pwa_install: '📲 安装到主屏',
-      footer_data: '数据来源：Clarivate WoS Core Collection (SCIE/SSCI/AHCI/ESCI) · JCR 2025 · ESI · EI Compendex · Scopus · DOAJ · CSCD · 中国科技核心 · SCD · AMI · FMS · VHB 2024 · CNRS Section 37 · UGC-CARE India · 中科院文献情报中心分区表 2025 · ShowJCR (GPL-3.0) · CCF 2026 (A/B/C) · CCF-T 2025 · ABDC 2025 · ABS 2024 · 中国科协 2025 · CSSCI · 北大核心 · CNKI · 浙江大学 2024 · Crossref Retraction Watch · OpenAlex。© <a href="https://journal.ailatest.org">AILatest Journal</a>',
+      footer_data: '数据来源：Clarivate WoS Core Collection (SCIE/SSCI/AHCI/ESCI) · JCR 2026 · ESI · EI Compendex · Scopus · DOAJ · CSCD · 中国科技核心 · SCD · AMI · FMS · VHB 2024 · CNRS Section 37 · UGC-CARE India · 中科院文献情报中心分区表 2025 · ShowJCR (GPL-3.0) · CCF 2026 (A/B/C) · CCF-T 2025 · ABDC 2025 · ABS 2024 · 中国科协 2025 · CSSCI · 北大核心 · CNKI · 浙江大学 2024 · Crossref Retraction Watch · OpenAlex。© <a href="https://journal.ailatest.org">AILatest Journal</a>',
       tab_home: '查刊', tab_int: '国际', tab_dom: '中国', tab_fav: '收藏', tab_pick: '荐刊',
       nav_index_rank: '索引排行榜', nav_subject_rank: '学科排行榜', nav_warn_rank: '预警名单', nav_extension_beta: '插件内测', nav_subscription: '订阅',
       filter_if_range: '影响因子', if_any: '不限',
@@ -130,7 +136,7 @@
       paid_label: 'Paid',
       drawer_kicker: 'Journal Details',
       pwa_install: '📲 Install to Home',
-      footer_data: 'Sources: Clarivate WoS Core Collection (SCIE/SSCI/AHCI/ESCI) · JCR 2025 · ESI · EI Compendex · Scopus · DOAJ · CSCD · CSTPCD · SCD · AMI · FMS · VHB 2024 · CNRS Section 37 · UGC-CARE India · CAS NSL Tiers 2025 · ShowJCR (GPL-3.0) · CCF 2026 (A/B/C) · CCF-T 2025 · ABDC 2025 · ABS 2024 · CAST 2025 · CSSCI · PKU Core · CNKI · ZJU 2024 · Crossref Retraction Watch · OpenAlex. © <a href="https://journal.ailatest.org">AILatest Journal</a>',
+      footer_data: 'Sources: Clarivate WoS Core Collection (SCIE/SSCI/AHCI/ESCI) · JCR 2026 · ESI · EI Compendex · Scopus · DOAJ · CSCD · CSTPCD · SCD · AMI · FMS · VHB 2024 · CNRS Section 37 · UGC-CARE India · CAS NSL Tiers 2025 · ShowJCR (GPL-3.0) · CCF 2026 (A/B/C) · CCF-T 2025 · ABDC 2025 · ABS 2024 · CAST 2025 · CSSCI · PKU Core · CNKI · ZJU 2024 · Crossref Retraction Watch · OpenAlex. © <a href="https://journal.ailatest.org">AILatest Journal</a>',
       tab_home: 'Journals', tab_int: 'International', tab_dom: 'China', tab_fav: 'Favorites', tab_pick: 'Recommend',
       nav_index_rank: 'Index Rankings', nav_subject_rank: 'Subject Rankings', nav_warn_rank: 'Warning List', nav_extension_beta: 'Extension beta', nav_subscription: 'Subscribe',
       filter_if_range: 'Impact Factor', if_any: 'Any',
@@ -910,6 +916,191 @@
       if (oaMap[k]) return oaMap[k];
     }
     return null;
+  }
+
+  const countryOutputCache = new Map();
+  const countryOutputColors = ['#b64b3f', '#2c6c8f', '#7a5a24', '#3f7d57', '#6c5a92', '#b7a27b'];
+
+  function normalizeIssnForOpenAlex(value) {
+    const text = String(value || '').trim().toUpperCase();
+    const compact = text.replace(/[^0-9X]/g, '');
+    return compact.length === 8 ? `${compact.slice(0, 4)}-${compact.slice(4)}` : '';
+  }
+
+  function countryOutputYears(r, limit = 5) {
+    const points = Array.isArray(r?.publication_history) ? r.publication_history : [];
+    const years = points
+      .map(p => Number(p.year))
+      .filter(y => Number.isFinite(y) && y >= 1900)
+      .sort((a, b) => a - b);
+    if (years.length) return years.slice(-limit);
+    const now = new Date().getFullYear();
+    return Array.from({ length: limit }, (_, i) => now - limit + 1 + i);
+  }
+
+  function normalizeCountryShareGroup(group) {
+    const code = String(group.code || '').toUpperCase();
+    const name = String(group.name || '').trim();
+    if (['CN', 'TW', 'HK', 'MO'].includes(code) || /^(china|taiwan|hong kong|macao|macau)$/i.test(name)) {
+      return { code: 'CN', name: 'China' };
+    }
+    return { code, name };
+  }
+
+  async function fetchCountryOutputData(r) {
+    const issn = normalizeIssnForOpenAlex(r?.issn) || normalizeIssnForOpenAlex(r?.eissn);
+    if (!issn) return null;
+    const years = countryOutputYears(r);
+    const cacheKey = `${issn}|${years.join(',')}`;
+    if (countryOutputCache.has(cacheKey)) return countryOutputCache.get(cacheKey);
+    const promise = Promise.all(years.map(async (year) => {
+      const params = new URLSearchParams({
+        filter: `primary_location.source.issn:${issn},from_publication_date:${year}-01-01,to_publication_date:${year}-12-31`,
+        group_by: 'authorships.institutions.country_code',
+        'per-page': '200',
+        mailto: 'ailatest@security-contact.local',
+      });
+      const resp = await fetch(`https://api.openalex.org/works?${params.toString()}`);
+      if (!resp.ok) throw new Error(`OpenAlex ${resp.status}`);
+      const data = await resp.json();
+      const groups = (data.group_by || [])
+        .map(g => ({
+          code: String(g.key || '').split('/').pop()?.replace(/^countries\//i, '') || '',
+          name: String(g.key_display_name || '').trim(),
+          count: Number(g.count || 0),
+        }))
+        .filter(g => g.count > 0 && g.name && !/^unknown$/i.test(g.name));
+      const merged = new Map();
+      groups.forEach(g => {
+        const key = normalizeCountryShareGroup(g);
+        if (!key.name) return;
+        const current = merged.get(key.name) || { ...key, count: 0 };
+        current.count += g.count;
+        merged.set(key.name, current);
+      });
+      const mergedGroups = [...merged.values()];
+      const total = mergedGroups.reduce((sum, g) => sum + g.count, 0);
+      return { year, total, groups: mergedGroups };
+    })).then(rows => {
+      const usable = rows.filter(row => row.total > 0);
+      if (!usable.length) return null;
+      const countryTotals = new Map();
+      usable.forEach(row => row.groups.forEach(g => {
+        const key = g.name;
+        countryTotals.set(key, (countryTotals.get(key) || 0) + g.count);
+      }));
+      const topOther = [...countryTotals.entries()]
+        .filter(([name]) => name !== 'China')
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 4)
+        .map(([name]) => name);
+      const top = ['China', ...topOther].filter((name, i, arr) => i === arr.indexOf(name));
+      return { years: usable, top };
+    });
+    countryOutputCache.set(cacheKey, promise);
+    return promise;
+  }
+
+  function renderCountryOutputChartData(payload, selectedCountry = 'China') {
+    if (!payload || !payload.years?.length || !payload.top?.length) return '';
+    const countryDisplay = (name) => {
+      const zh = {
+        'China': '中国（含港澳台）',
+        'United States of America': '美国',
+        'United States': '美国',
+        'United Kingdom of Great Britain and Northern Ireland': '英国',
+        'United Kingdom': '英国',
+        'Australia': '澳大利亚',
+        'Canada': '加拿大',
+        'Germany': '德国',
+        'France': '法国',
+        'Japan': '日本',
+        'India': '印度',
+        'Italy': '意大利',
+        'Spain': '西班牙',
+        'Netherlands': '荷兰',
+        'Brazil': '巴西',
+        'Russian Federation': '俄罗斯',
+        'Iran (Islamic Republic of)': '伊朗',
+        'Korea, Republic of': '韩国',
+        'South Korea': '韩国',
+      };
+      const en = {
+        'China': 'China incl. HK/Macao/Taiwan',
+        'United States of America': 'United States',
+        'United Kingdom of Great Britain and Northern Ireland': 'United Kingdom',
+        'Russian Federation': 'Russia',
+        'Iran (Islamic Republic of)': 'Iran',
+        'Korea, Republic of': 'South Korea',
+      };
+      return T(zh[name] || name, en[name] || name);
+    };
+    const countries = [...payload.top, 'Other'];
+    const selected = payload.top.includes(selectedCountry) ? selectedCountry : 'China';
+    const select = `<label class="country-select-wrap"><span>${T('显示趋势','Trend')}</span><select class="country-select" aria-label="${T('选择国家/地区','Select country/region')}">${payload.top.map(name => `<option value="${escape(name)}"${name === selected ? ' selected' : ''}>${escape(countryDisplay(name))}</option>`).join('')}</select></label>`;
+    const legend = countries.map((name, i) => (
+      `<span class="country-legend-item"><span class="country-swatch" style="background:${countryOutputColors[i % countryOutputColors.length]}"></span>${escape(name === 'Other' ? T('其他','Other') : countryDisplay(name))}</span>`
+    )).join('');
+    const rowH = 29;
+    const w = 320, h = Math.max(rowH, payload.years.length * rowH);
+    const barX = 46, barW = 228;
+    const xFor = (pct) => barX + Math.max(0, Math.min(100, pct)) / 100 * barW;
+    const yFor = (i) => i * rowH + rowH / 2;
+    const trendPoints = [];
+    const rows = payload.years.map(row => {
+      const byName = new Map(row.groups.map(g => [g.name, g.count]));
+      const topCounts = payload.top.map(name => ({ name, count: byName.get(name) || 0 }));
+      const topTotal = topCounts.reduce((sum, item) => sum + item.count, 0);
+      const selectedCount = byName.get(selected) || 0;
+      const selectedPct = row.total ? selectedCount / row.total * 100 : 0;
+      trendPoints.push({ year: row.year, pct: selectedPct, x: xFor(selectedPct), y: yFor(trendPoints.length) });
+      const segments = [...topCounts, { name: 'Other', count: Math.max(0, row.total - topTotal) }]
+        .filter(item => item.count > 0)
+        .map((item) => {
+          const pct = row.total ? (item.count / row.total) * 100 : 0;
+          const label = `${item.name === 'Other' ? T('其他','Other') : countryDisplay(item.name)} ${pct.toFixed(pct >= 10 ? 0 : 1)}%`;
+          return `<div class="country-segment" style="width:${pct.toFixed(3)}%;background:${countryOutputColors[(item.name === 'Other' ? countries.length - 1 : countries.indexOf(item.name)) % countryOutputColors.length]}" title="${escape(`${row.year} · ${label} · ${item.count}`)}">${pct >= 18 ? `<span>${escape(`${pct.toFixed(0)}%`)}</span>` : ''}</div>`;
+        }).join('');
+      return `<div class="country-bar-row">
+        <div class="country-year">${row.year}${row.year >= 2026 ? `<span>${T('快照','YTD')}</span>` : ''}</div>
+        <div class="country-bar" aria-label="${escape(String(row.year))}">${segments}</div>
+        <div class="country-total">${Number.isFinite(selectedPct) ? selectedPct.toFixed(selectedPct >= 10 ? 0 : 1) : '-'}%</div>
+      </div>`;
+    }).join('');
+    const trendPath = trendPoints.map((p, i) => `${i ? 'L' : 'M'}${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
+    const trendDots = trendPoints.map(p => `<circle class="country-line-dot" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="2.4"><title>${p.year}: ${p.pct.toFixed(p.pct >= 10 ? 0 : 1)}%</title></circle>`).join('');
+    return `<div class="country-output-head"><div><div class="trend-title">${T('国家/地区比例','Country/Region Shares')}</div><div class="trend-unit">${T('OpenAlex 作者机构占比','OpenAlex author affiliation share')}</div></div>${select}</div>
+      <div class="country-output-chart">
+        ${rows}
+        <svg class="country-line-svg" viewBox="0 0 ${w} ${h}" aria-label="${escape(countryDisplay(selected))}">
+        <path class="country-line-path" d="${trendPath}"></path>
+        ${trendDots}
+        </svg>
+      </div>
+      <div class="country-legend">${legend}</div>
+      `;
+  }
+
+  function bindCountryOutputSelect(box, payload) {
+    const select = box.querySelector('.country-select');
+    if (!select || !payload) return;
+    select.addEventListener('change', () => {
+      box.innerHTML = renderCountryOutputChartData(payload, select.value);
+      bindCountryOutputSelect(box, payload);
+    });
+  }
+
+  async function hydrateCountryOutputChart(root, r) {
+    const box = root.querySelector('.country-output-card');
+    if (!box) return;
+    try {
+      const payload = await fetchCountryOutputData(r);
+      const html = renderCountryOutputChartData(payload);
+      box.innerHTML = html || `<div class="muted-cell country-empty">${T('暂无可用国家/地区发文比例数据。','No country/region output-share data available yet.')}</div>`;
+      bindCountryOutputSelect(box, payload);
+    } catch (err) {
+      box.innerHTML = `<div class="muted-cell country-empty">${T('国家/地区发文比例暂时加载失败。','Country/region output shares failed to load for now.')}</div>`;
+    }
   }
 
   function isFreeToPublish(r) {
@@ -4828,14 +5019,21 @@
       };
       const chart = (points, titleText, unitText, cls, options = {}) => {
         const partialYear = Number(options.partialYear || 0);
-        const data = points.slice().sort((a, b) => a.year - b.year).map(p => ({
+        const limit = Number(options.limit || 0);
+        const sorted = points.slice().sort((a, b) => a.year - b.year);
+        const limited = limit > 0 ? sorted.slice(-limit) : sorted;
+        const data = limited.map(p => ({
           ...p,
           partial: partialYear && Number(p.year) >= partialYear,
         }));
         if (!data.length) return '';
-        const lineData = data.filter(p => !p.partial);
-        const drawable = lineData.length ? lineData : data;
-        const w = 320, h = 146, padL = 38, padR = 16, padT = 18, padB = 30;
+        const solidData = data.filter(p => !p.partial);
+        const drawable = solidData.length ? solidData : data;
+        const partialDots = data.filter(p => p.partial);
+        const partialPathData = partialDots.length
+          ? [solidData[solidData.length - 1], ...partialDots].filter(Boolean)
+          : [];
+        const w = 360, h = 164, padL = 30, padR = 10, padT = 20, padB = 28;
         const xs = data.map(x => x.year);
         const ys = data.map(x => x.value);
         const minX = Math.min(...xs), maxX = Math.max(...xs);
@@ -4845,26 +5043,42 @@
         maxY = Math.ceil(maxY / magnitude) * magnitude;
         const xScale = (year) => padL + ((year - minX) / Math.max(1, maxX - minX)) * (w - padL - padR);
         const yScale = (value) => padT + (1 - ((value - minY) / Math.max(1, maxY - minY))) * (h - padT - padB);
-        const path = drawable.map((p, i) => `${i ? 'L' : 'M'}${xScale(p.year).toFixed(1)} ${yScale(p.value).toFixed(1)}`).join(' ');
+        const pathFor = arr => arr.map((p, i) => `${i ? 'L' : 'M'}${xScale(p.year).toFixed(1)} ${yScale(p.value).toFixed(1)}`).join(' ');
+        const solidPath = pathFor(drawable);
+        const partialPath = partialPathData.length > 1 ? pathFor(partialPathData) : '';
         const first = drawable[0];
         const last = drawable[drawable.length - 1];
-        const partialDots = data.filter(p => p.partial);
-        const dots = data.map(p => `<circle class="trend-point ${p.partial ? 'trend-dot-partial' : 'trend-dot'}" cx="${xScale(p.year).toFixed(1)}" cy="${yScale(p.value).toFixed(1)}" r="${p.partial ? 4.2 : 3.4}" tabindex="0" role="button" data-year="${p.year}" data-value="${escape(String(p.value))}" data-partial="${p.partial ? '1' : ''}"><title>${p.year}: ${p.value}${p.partial ? ' (YTD)' : ''}</title></circle>`).join('');
-        const delta = drawable.length > 1 ? last.value - first.value : null;
+        const deltaSeries = data.filter(p => Number.isFinite(p.value));
+        const deltaLast = deltaSeries[deltaSeries.length - 1];
+        const deltaPrev = deltaSeries[deltaSeries.length - 2];
+        const dots = data.map(p => `<circle class="trend-point ${p.partial ? 'trend-dot-partial' : 'trend-dot'}" cx="${xScale(p.year).toFixed(1)}" cy="${yScale(p.value).toFixed(1)}" r="${p.partial ? 2.8 : 2.4}" tabindex="0" role="button" data-year="${p.year}" data-value="${escape(String(p.value))}" data-partial="${p.partial ? '1' : ''}"><title>${p.year}: ${p.value}${p.partial ? ' (YTD)' : ''}</title></circle>`).join('');
+        const labels = data.map((p, i) => {
+          const y = yScale(p.value);
+          const dense = data.length >= 8;
+          const offset = dense
+            ? (p.partial ? 16 : (i % 2 === 0 ? -7 : 12))
+            : (y < padT + 12 ? 15 : -8);
+          const labelY = Math.max(padT + 8, Math.min(h - padB - 4, y + offset));
+          return `<text class="trend-value ${p.partial ? 'trend-value-partial' : ''}" x="${xScale(p.year).toFixed(1)}" y="${labelY.toFixed(1)}" text-anchor="middle">${escape(String(p.value))}</text>`;
+        }).join('');
+        const delta = deltaLast && deltaPrev ? deltaLast.value - deltaPrev.value : null;
         const deltaText = delta == null
           ? ''
           : `${delta >= 0 ? '+' : ''}${Math.abs(delta) >= 10 ? delta.toFixed(0) : delta.toFixed(1)}`;
         const endTick = partialDots.length ? partialDots[partialDots.length - 1] : last;
         const ticks = [first, endTick].filter((p, i, arr) => i === 0 || p.year !== arr[0].year);
         const gridVals = [0, maxY * 0.5, maxY];
-        const grid = gridVals.map(v => `<line class="trend-gridline" x1="${padL}" y1="${yScale(v).toFixed(1)}" x2="${w - padR}" y2="${yScale(v).toFixed(1)}"></line>`).join('');
+        const horizontalGrid = gridVals.map(v => `<line class="trend-gridline" x1="${padL}" y1="${yScale(v).toFixed(1)}" x2="${w - padR}" y2="${yScale(v).toFixed(1)}"></line>`).join('');
+        const verticalGrid = data.map(p => `<line class="trend-gridline trend-gridline-vertical" x1="${xScale(p.year).toFixed(1)}" y1="${padT}" x2="${xScale(p.year).toFixed(1)}" y2="${h - padB}"></line>`).join('');
+        const grid = horizontalGrid + verticalGrid;
         const fill = drawable.length > 1
-          ? `<path class="trend-fill" d="${path} L${xScale(last.year).toFixed(1)} ${h - padB} L${xScale(first.year).toFixed(1)} ${h - padB} Z"></path>`
+          ? `<path class="trend-fill" d="${solidPath} L${xScale(last.year).toFixed(1)} ${h - padB} L${xScale(first.year).toFixed(1)} ${h - padB} Z"></path>`
           : '';
         const partialGuides = partialDots.map(p => `<line class="trend-partial-guide" x1="${xScale(p.year).toFixed(1)}" y1="${padT}" x2="${xScale(p.year).toFixed(1)}" y2="${h - padB}"></line>`).join('');
-        const defaultReadout = `${last.year}: ${escape(String(last.value))}`;
-        const defaultX = Math.min(w - 72, Math.max(padL + 4, xScale(last.year) + 8));
-        const defaultY = Math.max(padT + 2, yScale(last.value) - 28);
+        const defaultPoint = data[data.length - 1];
+        const defaultReadout = `${defaultPoint.year}: ${escape(String(defaultPoint.value))}`;
+        const defaultX = Math.min(w - 72, Math.max(padL + 4, xScale(defaultPoint.year) + 8));
+        const defaultY = Math.max(padT + 2, yScale(defaultPoint.value) - 28);
         return `<div class="trend-card ${cls}">
           <div class="trend-head">
             <div><div class="trend-title">${escape(titleText)}</div><div class="trend-unit">${escape(unitText)}</div></div>
@@ -4876,31 +5090,47 @@
             <line class="trend-axis" x1="${padL}" y1="${h - padB}" x2="${w - padR}" y2="${h - padB}"></line>
             <line class="trend-axis" x1="${padL}" y1="${padT}" x2="${padL}" y2="${h - padB}"></line>
             ${fill}
-            ${drawable.length > 1 ? `<path class="trend-line" d="${path}"></path>` : ''}
+            ${drawable.length > 1 ? `<path class="trend-line" d="${solidPath}"></path>` : ''}
+            ${partialPath ? `<path class="trend-line trend-line-partial" d="${partialPath}"></path>` : ''}
             ${dots}
+            ${labels}
             <g class="trend-readout" transform="translate(${defaultX.toFixed(1)} ${defaultY.toFixed(1)})" data-default="${defaultReadout}">
               <rect width="64" height="24" rx="12"></rect>
               <text x="32" y="16" text-anchor="middle">${defaultReadout}</text>
             </g>
-            ${ticks.map(p => `<text class="trend-year" x="${xScale(p.year).toFixed(1)}" y="${h - 8}" text-anchor="${p === first ? 'start' : 'end'}">${p.year}</text>`).join('')}
+            ${data.map(p => `<text class="trend-year" x="${xScale(p.year).toFixed(1)}" y="${h - 8}" text-anchor="middle">${p.year}</text>`).join('')}
             <text class="trend-y max" x="4" y="${padT + 4}">${escape(String(maxY))}</text>
             <text class="trend-y min" x="4" y="${h - padB + 4}">0</text>
           </svg>
         </div>`;
       };
       const ifPoints = toPointList(ir.if_history, 'value');
-      const pubPoints = toPointList(ir.publication_history || r.publication_history, 'count');
+      const pubPoints = toPointList(r.publication_history || ir.publication_history, 'count');
+      const selfCitationPoints = toPointList(ir.self_citation_rate_history, 'value')
+        .map(p => ({ ...p, value: Math.round(p.value * 10) / 10 }));
+      const selfCitationCard = (() => {
+        if (!selfCitationPoints.length) return '';
+        return chart(selfCitationPoints, T('自引用率变化','Self-Citation Rate Trend'), T('JIF 自引贡献占比 (%)','JIF self-citation contribution (%)'), 'selfcite-trend', { limit: 5 });
+      })();
+      const countryCard = (normalizeIssnForOpenAlex(ir.issn) || normalizeIssnForOpenAlex(ir.eissn))
+        ? `<div class="trend-card country-output-card">
+            <div class="muted-cell country-empty">${T('正在加载 OpenAlex 国家/地区分布…','Loading OpenAlex country/region distribution...')}</div>
+          </div>`
+        : '';
       const cards = [
-        chart(ifPoints, T('影响因子年度变化','Impact Factor Trend'), T('JIF by metric year','JIF by metric year'), 'if-trend'),
-        chart(pubPoints, T('逐年发文量变化','Annual Publication Output'), T('OpenAlex 年度作品数','OpenAlex yearly works'), 'pub-trend', { partialYear: 2026 }),
+        chart(ifPoints, T('近 5 年影响因子','5-Year Impact Factor Trend'), T('JIF by metric year','JIF by metric year'), 'if-trend', { limit: 5 }),
+        chart(pubPoints, T('近 10 年逐年发文量','10-Year Annual Publication Output'), T('源自 OpenAlex','From OpenAlex'), 'pub-trend', { partialYear: 2026, limit: 10 }),
+        selfCitationCard,
+        countryCard,
       ].filter(Boolean);
       if (!cards.length) return '';
       return `<div class="drawer-section trends-section">
         <h4>${T('指标趋势','Metric Trends')}</h4>
         <div class="trend-grid">${cards.join('')}</div>
-        <div class="muted-cell trend-note">${T('2026 年发文量为当前快照累计值，非全年最终数。','2026 publication output is a snapshot-to-date value, not a full-year final count.')}</div>
       </div>`;
     })();
+
+    const countryOutputHTML = '';
 
     const jcrHTML = (() => {
       const q = ir.if_quartile ? String(ir.if_quartile).toUpperCase() : '';
@@ -4917,7 +5147,7 @@
       </div>`;
       const items = cats.map(c => `<li>${escape(c)}${q ? ` · <b>${q}</b>` : ''}</li>`).join('');
       return `<div class="drawer-section jcr-section">
-        <h4>${T('JCR 2025 学科分区','JCR 2025 Subject Categories')}</h4>
+        <h4>${T(`JCR ${latestReleaseYear} 学科分区`, `JCR ${latestReleaseYear} Subject Categories`)}</h4>
         ${majorLine}
         ${items ? `<div class="cat-sub-label">${T('小类 / 学科分类','Subject Categories')}</div><ul class="cas-sub-list">${items}</ul>` : ''}
       </div>`;
@@ -5196,6 +5426,7 @@
 	      ${statsHTML}
 	      <div class="journal-detail-masonry">
 	        ${trendsHTML}
+	        ${countryOutputHTML}
 	        ${jcrHTML}
 	        ${casHTML}
 	        ${xrHTML}
@@ -5225,9 +5456,10 @@
 	        </div>
 	      </div>
 	      ${renderRelatedHTML(r)}
-	    `;
+    `;
     // init rating widget
     setTimeout(() => initRatingWidget(favId(r)), 0);
+    hydrateCountryOutputChart(body, ir);
     body.querySelectorAll('.trend-point').forEach(point => {
       const activate = () => {
         const card = point.closest('.trend-card');
@@ -5235,6 +5467,7 @@
         if (!readout) return;
         card.querySelectorAll('.trend-point.is-active').forEach(p => p.classList.remove('is-active'));
         point.classList.add('is-active');
+        readout.classList.add('is-visible');
         const suffix = point.dataset.partial ? T('（当前快照）',' (snapshot)') : '';
         const label = `${point.dataset.year}${suffix}: ${point.dataset.value}`;
         const svg = point.closest('svg');
@@ -5875,7 +6108,11 @@
     const stats = [];
     if (ir.if_2024 != null) stats.push([T('影响因子','Impact Factor'), ir.if_2024]);
     if (ir.if_rank) stats.push([T('IF 排名','IF Rank'), ir.if_rank]);
-    const ifNote = ir.if_2024 != null ? T('JCR 2025发布 · 2024指标','JCR 2025 · 2024 IF') : '';
+    const shareIfYear = Number(ir.if_latest_year || ir.jcr_year || 2025);
+    const shareReleaseYear = Number(ir.jcr_release_year || (shareIfYear + 1));
+    const ifNote = ir.if_2024 != null
+      ? T(`JCR ${shareReleaseYear}发布 · ${shareIfYear}指标`, `JCR ${shareReleaseYear} · ${shareIfYear} IF`)
+      : '';
     const statsHtml = stats.length ? `<div class="jcard-stats">${stats.map(([k,v,sub]) => `<div class="jcard-stat"><div class="jcard-stat-v">${v}</div><div class="jcard-stat-k">${k}</div>${sub?`<div class="jcard-stat-sub">${sub}</div>`:''}</div>`).join('')}</div>${ifNote ? `<div class="jcard-stats-sub">${ifNote}</div>` : ''}` : '';
 
     const meta = [];

@@ -431,6 +431,72 @@ function appStatsHtml(j) {
   `).join('')}</div>`;
 }
 
+function appAnnualTrendHtml(j) {
+  const points = (j.ann || [])
+    .map((item) => ({ year: Number(item.y), value: Number(item.c) }))
+    .filter((item) => Number.isFinite(item.year) && Number.isFinite(item.value))
+    .sort((a, b) => a.year - b.year);
+  if (!points.length) return '';
+
+  const w = 360;
+  const h = 164;
+  const padL = 30;
+  const padR = 10;
+  const padT = 20;
+  const padB = 28;
+  const minX = Math.min(...points.map((p) => p.year));
+  const maxX = Math.max(...points.map((p) => p.year));
+  const maxValue = Math.max(...points.map((p) => p.value), 1);
+  const magnitude = Math.pow(10, Math.max(0, Math.floor(Math.log10(maxValue)) - 1));
+  const maxY = Math.ceil(maxValue / magnitude) * magnitude;
+  const xScale = (year) => padL + ((year - minX) / Math.max(1, maxX - minX)) * (w - padL - padR);
+  const yScale = (value) => padT + (1 - value / Math.max(1, maxY)) * (h - padT - padB);
+  const path = points.map((p, i) => `${i ? 'L' : 'M'}${xScale(p.year).toFixed(1)} ${yScale(p.value).toFixed(1)}`).join(' ');
+  const first = points[0];
+  const last = points[points.length - 1];
+  const prev = points[points.length - 2];
+  const delta = prev ? last.value - prev.value : null;
+  const deltaText = delta == null ? '' : `${delta >= 0 ? '+' : ''}${Math.abs(delta) >= 10 ? delta.toFixed(0) : delta.toFixed(1)}`;
+  const gridVals = [0, maxY * 0.5, maxY];
+  const grid = [
+    ...gridVals.map((v) => `<line class="trend-gridline" x1="${padL}" y1="${yScale(v).toFixed(1)}" x2="${w - padR}" y2="${yScale(v).toFixed(1)}"></line>`),
+    ...points.map((p) => `<line class="trend-gridline trend-gridline-vertical" x1="${xScale(p.year).toFixed(1)}" y1="${padT}" x2="${xScale(p.year).toFixed(1)}" y2="${h - padB}"></line>`),
+  ].join('');
+  const labels = points.map((p, i) => {
+    const y = yScale(p.value);
+    const labelY = Math.max(padT + 8, Math.min(h - padB - 4, y + (i % 2 === 0 ? -7 : 12)));
+    return `<text class="trend-value" x="${xScale(p.year).toFixed(1)}" y="${labelY.toFixed(1)}" text-anchor="middle">${esc(p.value)}</text>`;
+  }).join('');
+  const dots = points.map((p) => `<circle class="trend-point trend-dot" cx="${xScale(p.year).toFixed(1)}" cy="${yScale(p.value).toFixed(1)}" r="2.4"><title>${p.year}: ${p.value}</title></circle>`).join('');
+  const fill = points.length > 1
+    ? `<path class="trend-fill" d="${path} L${xScale(last.year).toFixed(1)} ${h - padB} L${xScale(first.year).toFixed(1)} ${h - padB} Z"></path>`
+    : '';
+
+  return `<div class="drawer-section trends-section ssr-trends-section">
+    <h4>指标趋势</h4>
+    <div class="trend-grid">
+      <div class="trend-card pub-trend">
+        <div class="trend-head">
+          <div><div class="trend-title">逐年发文量</div><div class="trend-unit">源自 OpenAlex</div></div>
+          ${deltaText ? `<div class="trend-delta ${delta >= 0 ? 'up' : 'down'}">${esc(deltaText)}</div>` : ''}
+        </div>
+        <svg class="trend-svg" viewBox="0 0 ${w} ${h}" role="img" aria-label="逐年发文量">
+          ${grid}
+          <line class="trend-axis" x1="${padL}" y1="${h - padB}" x2="${w - padR}" y2="${h - padB}"></line>
+          <line class="trend-axis" x1="${padL}" y1="${padT}" x2="${padL}" y2="${h - padB}"></line>
+          ${fill}
+          ${points.length > 1 ? `<path class="trend-line" d="${path}"></path>` : ''}
+          ${dots}
+          ${labels}
+          ${points.map((p) => `<text class="trend-year" x="${xScale(p.year).toFixed(1)}" y="${h - 8}" text-anchor="middle">${p.year}</text>`).join('')}
+          <text class="trend-y max" x="4" y="${padT + 4}">${esc(maxY)}</text>
+          <text class="trend-y min" x="4" y="${h - padB + 4}">0</text>
+        </svg>
+      </div>
+    </div>
+  </div>`;
+}
+
 function appRelatedHtml(j, index, origin) {
   const rel = (j.rel || []).map((s) => [s, index[s]]).filter(([, item]) => item && !item._r).slice(0, 8);
   if (!rel.length) return '';
@@ -484,6 +550,7 @@ function appDrawerBodyHtml(j, slug, index, origin) {
       </div>` : ''}
     </div>
     ${appStatsHtml(j)}
+    ${appAnnualTrendHtml(j)}
     <div class="journal-detail-masonry">
       ${topicsHtml(j, origin).replace('<section class="section topics">', '<div class="drawer-section topics">').replace('<h2>Explore More</h2>', '<h4>Explore More</h4>').replace('</section>', '</div>')}
       ${faq}

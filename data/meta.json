@@ -52,11 +52,20 @@
     "annual_outputs": 41604
   },
   "annual_outputs_source": "OpenAlex sources counts_by_year",
-  "annual_outputs_count": 41604,
+  "annual_outputs_count": 51881,
   "with_retraction": 5228,
   "jcr_latest_metric_year": 2025,
   "jcr_latest_release_year": 2026,
   "with_if_2025": 22643,
-  "with_publication_history": 23169,
-  "with_free_to_publish": 33326
+  "with_publication_history": 29886,
+  "with_free_to_publish": 33326,
+  "with_if_history_by_year": {
+    "2021": 12134,
+    "2022": 20417,
+    "2023": 20992,
+    "2024": 21527
+  },
+  "with_self_citation_history_by_year": {
+    "2024": 473
+  }
 }

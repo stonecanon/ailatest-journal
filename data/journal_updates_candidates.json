@@ -1,5 +1,1086 @@
 {
-  "generated_at": "2026-06-15T05:41:55+00:00",
+  "generated_at": "2026-06-17T01:06:05+00:00",
   "review_note": "Candidates only. Manually verify source facts, rewrite Chinese summaries, and copy approved items into data/journal_updates.json.",
-  "items": []
+  "items": [
+    {
+      "id": "ai-discovery-7862ee8d",
+      "published_at": "2026-06-17",
+      "category": "index_change",
+      "title": "AI Discovery",
+      "summary": "Scopus is a multidisciplinary abstract and citation database with comprehensive coverage of scientific, technical, medical and social sciences literature.",
+      "source_name": "Scopus source list",
+      "source_url": "https://www.elsevier.com/products/scopus/scopus-ai",
+      "publisher": "Elsevier",
+      "journals": [],
+      "tags": [
+        "Elsevier",
+        "monthly source title list"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "academia-government-blog-insights-clarivate-3e525568",
+      "published_at": "2026-06-17",
+      "category": "report",
+      "title": "Academia & Government Blog & Insights | Clarivate",
+      "summary": "Read insights from Clarivate's Academic & Government experts and stay up to date with the latest trends and news of the industry. Read all blogs.",
+      "source_name": "Clarivate Academia & Government news",
+      "source_url": "https://clarivate.com/academia-government/blog/",
+      "publisher": "Clarivate",
+      "journals": [],
+      "tags": [
+        "Clarivate",
+        "JCR, Web of Science, InCites and research analytics updates"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "academic-journals-on-nature-com-a8507612",
+      "published_at": "2026-06-17",
+      "category": "new_journal",
+      "title": "Academic journals on nature.com",
+      "summary": "Discover the Nature Portfolio journals—your gateway to groundbreaking research that addresses global challenges and aligns with the UN SDGs. Explore our rigorous peer-reviewed articles that shape policies, advance science, and make a societ",
+      "source_name": "Nature Portfolio new launches",
+      "source_url": "https://www.springernature.com/gp/librarians/products/journals/academic-journals-on-nature-com",
+      "publisher": "Springer Nature",
+      "journals": [],
+      "tags": [
+        "Springer Nature",
+        "new Nature Portfolio journals"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "adis-journals-85edbe9a",
+      "published_at": "2026-06-17",
+      "category": "new_journal",
+      "title": "Adis journals",
+      "summary": "Discover the Nature Portfolio journals—your gateway to groundbreaking research that addresses global challenges and aligns with the UN SDGs. Explore our rigorous peer-reviewed articles that shape policies, advance science, and make a societ",
+      "source_name": "Nature Portfolio new launches",
+      "source_url": "https://www.springernature.com/gp/librarians/products/journals/adis-journals",
+      "publisher": "Springer Nature",
+      "journals": [],
+      "tags": [
+        "Springer Nature",
+        "new Nature Portfolio journals"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "africa-40cd5af5",
+      "published_at": "2026-06-17",
+      "category": "report",
+      "title": "Africa",
+      "summary": "The latest press releases covering ground-breaking new research from some of the world's top experts in renowned journals across the globe. % %",
+      "source_name": "Taylor & Francis newsroom",
+      "source_url": "https://taylorandfrancis.com/africa/",
+      "publisher": "Taylor & Francis",
+      "journals": [],
+      "tags": [
+        "Taylor & Francis",
+        "publisher news and journal portfolio updates"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "all-nature-portfolio-journals-springer-nature-for-libr-9a39a5ce",
+      "published_at": "2026-06-17",
+      "category": "new_journal",
+      "title": "All Nature Portfolio Journals | Springer Nature | For Librarians | Springer Nature Element 3Nature_Portfolio_Logo _ _ _ _ _ small_youtube",
+      "summary": "Discover the Nature Portfolio journals—your gateway to groundbreaking research that addresses global challenges and aligns with the UN SDGs. Explore our rigorous peer-reviewed articles that shape policies, advance science, and make a societ",
+      "source_name": "Nature Portfolio new launches",
+      "source_url": "https://www.springernature.com/gp/librarians/products/journals/nature-research-journals/nature-portfolio-new-launches",
+      "publisher": "Springer Nature",
+      "journals": [],
+      "tags": [
+        "Springer Nature",
+        "new Nature Portfolio journals"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "arabic-eb34e2d0",
+      "published_at": "2026-06-17",
+      "category": "new_journal",
+      "title": "Arabic",
+      "summary": "recent open access journal additions",
+      "source_name": "DOAJ RSS guidance",
+      "source_url": "https://blog.doaj.org/ar/2015/04/22/have-you-used-our-rss-feed/",
+      "publisher": "DOAJ",
+      "journals": [],
+      "tags": [
+        "DOAJ",
+        "recent open access journal additions"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "arabic-5c71856c",
+      "published_at": "2026-06-17",
+      "category": "new_journal",
+      "title": "Arabic",
+      "summary": "open access journal additions and policy updates",
+      "source_name": "DOAJ news",
+      "source_url": "https://blog.doaj.org/ar/",
+      "publisher": "DOAJ",
+      "journals": [],
+      "tags": [
+        "DOAJ",
+        "open access journal additions and policy updates"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "author-profiles-0e0f8ff5",
+      "published_at": "2026-06-17",
+      "category": "index_change",
+      "title": "Author Profiles",
+      "summary": "Scopus is a multidisciplinary abstract and citation database with comprehensive coverage of scientific, technical, medical and social sciences literature.",
+      "source_name": "Scopus source list",
+      "source_url": "https://www.elsevier.com/products/scopus/author-profiles",
+      "publisher": "Elsevier",
+      "journals": [],
+      "tags": [
+        "Elsevier",
+        "monthly source title list"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "blog-c6590c76",
+      "published_at": "2026-06-17",
+      "category": "new_journal",
+      "title": "Blog",
+      "summary": "recent open access journal additions",
+      "source_name": "DOAJ RSS guidance",
+      "source_url": "https://blog.doaj.org/news/",
+      "publisher": "DOAJ",
+      "journals": [],
+      "tags": [
+        "DOAJ",
+        "recent open access journal additions"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "blog-elsevier-scopus-blog-737b24eb",
+      "published_at": "2026-06-17",
+      "category": "report",
+      "title": "Blog - Elsevier Scopus Blog",
+      "summary": "Scopus, CiteScore and source coverage updates",
+      "source_name": "Scopus blog",
+      "source_url": "https://blog.scopus.com/",
+      "publisher": "Elsevier",
+      "journals": [],
+      "tags": [
+        "Elsevier",
+        "Scopus, CiteScore and source coverage updates"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "china-d5883e80",
+      "published_at": "2026-06-17",
+      "category": "report",
+      "title": "China",
+      "summary": "The latest press releases covering ground-breaking new research from some of the world's top experts in renowned journals across the globe. % %",
+      "source_name": "Taylor & Francis newsroom",
+      "source_url": "https://china.taylorandfrancis.com",
+      "publisher": "Taylor & Francis",
+      "journals": [],
+      "tags": [
+        "Taylor & Francis",
+        "publisher news and journal portfolio updates"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "connect-101-ways-to-use-scopus-part-one-jun-18-2019-294d84e4",
+      "published_at": "2026-06-17",
+      "category": "report",
+      "title": "Connect 101 ways to use Scopus – part one Jun 18, 2019",
+      "summary": "News, information and features for the research, health and technology communities",
+      "source_name": "Elsevier research publishing news",
+      "source_url": "https://www.elsevier.com/connect/101-ways-to-use-scopus-part-one",
+      "publisher": "Elsevier",
+      "journals": [],
+      "tags": [
+        "Elsevier",
+        "journal launches and research publishing policy updates"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "connect-101-ways-to-use-scopus-part-two-jun-25-2019-216b27e2",
+      "published_at": "2026-06-17",
+      "category": "report",
+      "title": "Connect 101 ways to use Scopus – part two Jun 25, 2019",
+      "summary": "News, information and features for the research, health and technology communities",
+      "source_name": "Elsevier research publishing news",
+      "source_url": "https://www.elsevier.com/connect/101-ways-to-use-scopus-part-two",
+      "publisher": "Elsevier",
+      "journals": [],
+      "tags": [
+        "Elsevier",
+        "journal launches and research publishing policy updates"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "connect-finding-the-best-journal-for-a-paper-may-22-20-06be579e",
+      "published_at": "2026-06-17",
+      "category": "report",
+      "title": "Connect Finding the best journal for a paper May 22, 2013",
+      "summary": "News, information and features for the research, health and technology communities",
+      "source_name": "Elsevier research publishing news",
+      "source_url": "https://www.elsevier.com/connect/finding-the-best-journal-for-a-paper",
+      "publisher": "Elsevier",
+      "journals": [],
+      "tags": [
+        "Elsevier",
+        "journal launches and research publishing policy updates"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "connect-how-editorial-structure-shapes-journal-perform-7881e4aa",
+      "published_at": "2026-06-17",
+      "category": "report",
+      "title": "Connect How editorial structure shapes journal performance Nov 26, 2025",
+      "summary": "News, information and features for the research, health and technology communities",
+      "source_name": "Elsevier research publishing news",
+      "source_url": "https://www.elsevier.com/connect/how-editorial-structure-shapes-journal-performance",
+      "publisher": "Elsevier",
+      "journals": [],
+      "tags": [
+        "Elsevier",
+        "journal launches and research publishing policy updates"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "connect-journal-editors-and-reviewers-need-to-evaluate-d86d98a6",
+      "published_at": "2026-06-17",
+      "category": "report",
+      "title": "Connect Journal editors and reviewers need to evaluate papers on scientific merit, not language Dec 14, 2023",
+      "summary": "News, information and features for the research, health and technology communities",
+      "source_name": "Elsevier research publishing news",
+      "source_url": "https://www.elsevier.com/connect/journal-editors-and-reviewers-need-to-evaluate-papers-on-scientific-merit-not-language",
+      "publisher": "Elsevier",
+      "journals": [],
+      "tags": [
+        "Elsevier",
+        "journal launches and research publishing policy updates"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "connect-meet-the-journals-breaking-the-traditional-res-5ec5eefb",
+      "published_at": "2026-06-17",
+      "category": "report",
+      "title": "Connect Meet the journals breaking the traditional research article mold Oct 18, 2023",
+      "summary": "News, information and features for the research, health and technology communities",
+      "source_name": "Elsevier research publishing news",
+      "source_url": "https://www.elsevier.com/connect/meet-the-journals-breaking-the-traditional-research-article-mold",
+      "publisher": "Elsevier",
+      "journals": [],
+      "tags": [
+        "Elsevier",
+        "journal launches and research publishing policy updates"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "connect-seo-for-scientific-articles-practical-seo-tips-25882f56",
+      "published_at": "2026-06-17",
+      "category": "report",
+      "title": "Connect SEO for scientific articles: Practical SEO tips for journal editors and authors Feb 2, 2026",
+      "summary": "News, information and features for the research, health and technology communities",
+      "source_name": "Elsevier research publishing news",
+      "source_url": "https://www.elsevier.com/connect/seo-for-scientific-articles-practical-seo-tips-for-journal-editors-and",
+      "publisher": "Elsevier",
+      "journals": [],
+      "tags": [
+        "Elsevier",
+        "journal launches and research publishing policy updates"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "corporate-solutions-44413ab7",
+      "published_at": "2026-06-17",
+      "category": "report",
+      "title": "Corporate solutions",
+      "summary": "The latest press releases covering ground-breaking new research from some of the world's top experts in renowned journals across the globe. % %",
+      "source_name": "Taylor & Francis newsroom",
+      "source_url": "https://taylorandfrancis.com/corporate-solutions",
+      "publisher": "Taylor & Francis",
+      "journals": [],
+      "tags": [
+        "Taylor & Francis",
+        "publisher news and journal portfolio updates"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "data-fb7c3d47",
+      "published_at": "2026-06-17",
+      "category": "index_change",
+      "title": "Data",
+      "summary": "Scopus is a multidisciplinary abstract and citation database with comprehensive coverage of scientific, technical, medical and social sciences literature.",
+      "source_name": "Scopus source list",
+      "source_url": "https://www.elsevier.com/products/scopus/data",
+      "publisher": "Elsevier",
+      "journals": [],
+      "tags": [
+        "Elsevier",
+        "monthly source title list"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "elsevier-connect-11426860",
+      "published_at": "2026-06-17",
+      "category": "report",
+      "title": "Elsevier Connect",
+      "summary": "News, information and features for the research, health and technology communities",
+      "source_name": "Elsevier research publishing news",
+      "source_url": "https://www.elsevier.com/connect",
+      "publisher": "Elsevier",
+      "journals": [],
+      "tags": [
+        "Elsevier",
+        "journal launches and research publishing policy updates"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "featured-article-accelerate-your-workflow-with-deep-re-12b7237e",
+      "published_at": "2026-06-17",
+      "category": "report",
+      "title": "Featured article Accelerate your workflow with Deep Research, a new Scopus AI feature By Rachel McCullough 28 Aug 2025",
+      "summary": "Scopus, CiteScore and source coverage updates",
+      "source_name": "Scopus blog",
+      "source_url": "https://blog.scopus.com/accelerate-your-workflow-with-deep-research-a-new-scopus-ai-feature/",
+      "publisher": "Elsevier",
+      "journals": [],
+      "tags": [
+        "Elsevier",
+        "Scopus, CiteScore and source coverage updates"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "french-c58f2fca",
+      "published_at": "2026-06-17",
+      "category": "new_journal",
+      "title": "French",
+      "summary": "recent open access journal additions",
+      "source_name": "DOAJ RSS guidance",
+      "source_url": "https://blog.doaj.org/fr/2015/04/22/have-you-used-our-rss-feed/",
+      "publisher": "DOAJ",
+      "journals": [],
+      "tags": [
+        "DOAJ",
+        "recent open access journal additions"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "french-fd67ec2a",
+      "published_at": "2026-06-17",
+      "category": "new_journal",
+      "title": "French",
+      "summary": "open access journal additions and policy updates",
+      "source_name": "DOAJ news",
+      "source_url": "https://blog.doaj.org/fr/",
+      "publisher": "DOAJ",
+      "journals": [],
+      "tags": [
+        "DOAJ",
+        "open access journal additions and policy updates"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "german-d4d1e159",
+      "published_at": "2026-06-17",
+      "category": "new_journal",
+      "title": "German",
+      "summary": "recent open access journal additions",
+      "source_name": "DOAJ RSS guidance",
+      "source_url": "https://blog.doaj.org/de/2015/04/22/have-you-used-our-rss-feed/",
+      "publisher": "DOAJ",
+      "journals": [],
+      "tags": [
+        "DOAJ",
+        "recent open access journal additions"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "german-f8b5a1a9",
+      "published_at": "2026-06-17",
+      "category": "new_journal",
+      "title": "German",
+      "summary": "open access journal additions and policy updates",
+      "source_name": "DOAJ news",
+      "source_url": "https://blog.doaj.org/de/",
+      "publisher": "DOAJ",
+      "journals": [],
+      "tags": [
+        "DOAJ",
+        "open access journal additions and policy updates"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "get-our-newsletter-603cd442",
+      "published_at": "2026-06-17",
+      "category": "warning",
+      "title": "Get our Newsletter",
+      "summary": "Tracking retractions as a window into the scientific process",
+      "source_name": "Retraction Watch",
+      "source_url": "https://retractionwatch.com/newsletter",
+      "publisher": "Retraction Watch",
+      "journals": [],
+      "tags": [
+        "Retraction Watch",
+        "retractions, expressions of concern and journal integrity signals"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "have-you-used-our-rss-feed-doaj-blog-expand-search-sea-dfe66218",
+      "published_at": "2026-06-17",
+      "category": "new_journal",
+      "title": "Have you used our RSS Feed? – DOAJ Blog Expand Search Search Toggle Menu Previous Continue Scroll to top Scroll to top Expand Toggle Menu Close Search",
+      "summary": "recent open access journal additions",
+      "source_name": "DOAJ RSS guidance",
+      "source_url": "https://blog.doaj.org/2015/04/22/have-you-used-our-rss-feed/",
+      "publisher": "DOAJ",
+      "journals": [],
+      "tags": [
+        "DOAJ",
+        "recent open access journal additions"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "home-3350bc15",
+      "published_at": "2026-06-17",
+      "category": "new_journal",
+      "title": "Home",
+      "summary": "recent open access journal additions",
+      "source_name": "DOAJ RSS guidance",
+      "source_url": "https://blog.doaj.org/",
+      "publisher": "DOAJ",
+      "journals": [],
+      "tags": [
+        "DOAJ",
+        "recent open access journal additions"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "japan-60fee1e6",
+      "published_at": "2026-06-17",
+      "category": "report",
+      "title": "Japan",
+      "summary": "The latest press releases covering ground-breaking new research from some of the world's top experts in renowned journals across the globe. % %",
+      "source_name": "Taylor & Francis newsroom",
+      "source_url": "https://taylorandfrancis.com/japan/",
+      "publisher": "Taylor & Francis",
+      "journals": [],
+      "tags": [
+        "Taylor & Francis",
+        "publisher news and journal portfolio updates"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "journal-citation-reports-52ff2850",
+      "published_at": "2026-06-17",
+      "category": "report",
+      "title": "Journal Citation Reports",
+      "summary": "Read insights from Clarivate's Academic & Government experts and stay up to date with the latest trends and news of the industry. Read all blogs.",
+      "source_name": "Clarivate Academia & Government news",
+      "source_url": "https://clarivate.com/academia-government/scientific-and-academic-research/research-funding-analytics/journal-citation-reports/",
+      "publisher": "Clarivate",
+      "journals": [],
+      "tags": [
+        "Clarivate",
+        "JCR, Web of Science, InCites and research analytics updates"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "journals-7b9d00db",
+      "published_at": "2026-06-17",
+      "category": "new_journal",
+      "title": "Journals",
+      "summary": "Discover the Nature Portfolio journals—your gateway to groundbreaking research that addresses global challenges and aligns with the UN SDGs. Explore our rigorous peer-reviewed articles that shape policies, advance science, and make a societ",
+      "source_name": "Nature Portfolio new launches",
+      "source_url": "https://www.springernature.com/gp/librarians/products/journals",
+      "publisher": "Springer Nature",
+      "journals": [],
+      "tags": [
+        "Springer Nature",
+        "new Nature Portfolio journals"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "knowledge-f56c4541",
+      "published_at": "2026-06-17",
+      "category": "report",
+      "title": "Knowledge",
+      "summary": "The latest press releases covering ground-breaking new research from some of the world's top experts in renowned journals across the globe. % %",
+      "source_name": "Taylor & Francis newsroom",
+      "source_url": "https://taylorandfrancis.com/knowledge",
+      "publisher": "Taylor & Francis",
+      "journals": [],
+      "tags": [
+        "Taylor & Francis",
+        "publisher news and journal portfolio updates"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "librarians-e92aa97e",
+      "published_at": "2026-06-17",
+      "category": "new_journal",
+      "title": "Librarians",
+      "summary": "Discover the Nature Portfolio journals—your gateway to groundbreaking research that addresses global challenges and aligns with the UN SDGs. Explore our rigorous peer-reviewed articles that shape policies, advance science, and make a societ",
+      "source_name": "Nature Portfolio new launches",
+      "source_url": "https://www.springernature.com/gp/librarians/products/journals/nature-research-journals/nature-portfolio-new-launches#/gp/librarians",
+      "publisher": "Springer Nature",
+      "journals": [],
+      "tags": [
+        "Springer Nature",
+        "new Nature Portfolio journals"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "master-journal-list-9169f17d",
+      "published_at": "2026-06-17",
+      "category": "report",
+      "title": "Master Journal List",
+      "summary": "Read insights from Clarivate's Academic & Government experts and stay up to date with the latest trends and news of the industry. Read all blogs.",
+      "source_name": "Clarivate Academia & Government news",
+      "source_url": "https://mjl.clarivate.com/home/?utm_source=clarivate.com&utm_medium=navigation-menu&utm_campaign=main-nav-click",
+      "publisher": "Clarivate",
+      "journals": [],
+      "tags": [
+        "Clarivate",
+        "JCR, Web of Science, InCites and research analytics updates"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "metrics-bdd77257",
+      "published_at": "2026-06-17",
+      "category": "index_change",
+      "title": "Metrics",
+      "summary": "Scopus is a multidisciplinary abstract and citation database with comprehensive coverage of scientific, technical, medical and social sciences literature.",
+      "source_name": "Scopus source list",
+      "source_url": "https://www.elsevier.com/products/scopus/metrics",
+      "publisher": "Elsevier",
+      "journals": [],
+      "tags": [
+        "Elsevier",
+        "monthly source title list"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "nature-portfolio-e5a7f979",
+      "published_at": "2026-06-17",
+      "category": "new_journal",
+      "title": "Nature Portfolio",
+      "summary": "Press releases by Springer Nature",
+      "source_name": "Springer Nature press releases",
+      "source_url": "https://www.nature.com/",
+      "publisher": "Springer Nature",
+      "journals": [],
+      "tags": [
+        "Springer Nature",
+        "nature journal launches"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "nature-portfolio-journals-791db405",
+      "published_at": "2026-06-17",
+      "category": "new_journal",
+      "title": "Nature Portfolio journals",
+      "summary": "Discover the Nature Portfolio journals—your gateway to groundbreaking research that addresses global challenges and aligns with the UN SDGs. Explore our rigorous peer-reviewed articles that shape policies, advance science, and make a societ",
+      "source_name": "Nature Portfolio new launches",
+      "source_url": "https://www.springernature.com/gp/librarians/products/journals/nature-research-journals",
+      "publisher": "Springer Nature",
+      "journals": [],
+      "tags": [
+        "Springer Nature",
+        "new Nature Portfolio journals"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "newsletter-65fcd722",
+      "published_at": "2026-06-17",
+      "category": "report",
+      "title": "Newsletter",
+      "summary": "Scopus, CiteScore and source coverage updates",
+      "source_name": "Scopus blog",
+      "source_url": "https://blog.scopus.com/newsletter-signup/",
+      "publisher": "Elsevier",
+      "journals": [],
+      "tags": [
+        "Elsevier",
+        "Scopus, CiteScore and source coverage updates"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "portuguese-18633589",
+      "published_at": "2026-06-17",
+      "category": "new_journal",
+      "title": "Portuguese",
+      "summary": "open access journal additions and policy updates",
+      "source_name": "DOAJ news",
+      "source_url": "https://blog.doaj.org/pt/",
+      "publisher": "DOAJ",
+      "journals": [],
+      "tags": [
+        "DOAJ",
+        "open access journal additions and policy updates"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "press-releases-springer-nature-group-springer-nature-s-2b7aa23e",
+      "published_at": "2026-06-17",
+      "category": "new_journal",
+      "title": "Press releases | Springer Nature Group | Springer Nature _ _ small_youtube _ _ small_youtube",
+      "summary": "Press releases by Springer Nature",
+      "source_name": "Springer Nature press releases",
+      "source_url": "https://group.springernature.com/gp/group/media/press-releases",
+      "publisher": "Springer Nature",
+      "journals": [],
+      "tags": [
+        "Springer Nature",
+        "nature journal launches"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "products-3a95a2a3",
+      "published_at": "2026-06-17",
+      "category": "new_journal",
+      "title": "Products",
+      "summary": "Discover the Nature Portfolio journals—your gateway to groundbreaking research that addresses global challenges and aligns with the UN SDGs. Explore our rigorous peer-reviewed articles that shape policies, advance science, and make a societ",
+      "source_name": "Nature Portfolio new launches",
+      "source_url": "https://www.springernature.com/gp/librarians/products/journals/nature-research-journals/nature-portfolio-new-launches#/gp/librarians/products",
+      "publisher": "Springer Nature",
+      "journals": [],
+      "tags": [
+        "Springer Nature",
+        "new Nature Portfolio journals"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "profile-meet-the-csab-professor-and-subject-chair-patr-4caff2f9",
+      "published_at": "2026-06-17",
+      "category": "report",
+      "title": "Profile Meet the CSAB: Professor and Subject Chair Patrick Palmieri By Rachel McCullough 20 Nov 2025",
+      "summary": "Scopus, CiteScore and source coverage updates",
+      "source_name": "Scopus blog",
+      "source_url": "https://blog.scopus.com/meet-the-csab-professor-and-subject-chair-patrick-palmieri/",
+      "publisher": "Elsevier",
+      "journals": [],
+      "tags": [
+        "Elsevier",
+        "Scopus, CiteScore and source coverage updates"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "retraction-watch-tracking-retractions-as-a-window-into-6c7543f4",
+      "published_at": "2026-06-17",
+      "category": "warning",
+      "title": "Retraction Watch – Tracking retractions as a window into the scientific process",
+      "summary": "Tracking retractions as a window into the scientific process",
+      "source_name": "Retraction Watch",
+      "source_url": "https://retractionwatch.com/",
+      "publisher": "Retraction Watch",
+      "journals": [],
+      "tags": [
+        "Retraction Watch",
+        "retractions, expressions of concern and journal integrity signals"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "retractions-by-nobel-prize-winners-4f347f64",
+      "published_at": "2026-06-17",
+      "category": "warning",
+      "title": "Retractions by Nobel Prize winners",
+      "summary": "Tracking retractions as a window into the scientific process",
+      "source_name": "Retraction Watch",
+      "source_url": "https://retractionwatch.com/retractions-by-nobel-prize-winners/",
+      "publisher": "Retraction Watch",
+      "journals": [],
+      "tags": [
+        "Retraction Watch",
+        "retractions, expressions of concern and journal integrity signals"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "scientific-academic-research-2a504d0d",
+      "published_at": "2026-06-17",
+      "category": "index_change",
+      "title": "Scientific & Academic Research",
+      "summary": "monthly coverage status",
+      "source_name": "Clarivate Master Journal List",
+      "source_url": "https://support.clarivate.com/ScientificandAcademicResearch/s/article/Web-of-Science-Master-Journal-List",
+      "publisher": "Clarivate",
+      "journals": [],
+      "tags": [
+        "Clarivate",
+        "monthly coverage status"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "scopus-d9bae379",
+      "published_at": "2026-06-17",
+      "category": "index_change",
+      "title": "Scopus",
+      "summary": "Scopus is a multidisciplinary abstract and citation database with comprehensive coverage of scientific, technical, medical and social sciences literature.",
+      "source_name": "Scopus source list",
+      "source_url": "https://www.elsevier.com/products/scopus",
+      "publisher": "Elsevier",
+      "journals": [],
+      "tags": [
+        "Elsevier",
+        "monthly source title list"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "scopus-2141f1ba",
+      "published_at": "2026-06-17",
+      "category": "report",
+      "title": "Scopus",
+      "summary": "Scopus, CiteScore and source coverage updates",
+      "source_name": "Scopus blog",
+      "source_url": "https://www.scopus.com",
+      "publisher": "Elsevier",
+      "journals": [],
+      "tags": [
+        "Elsevier",
+        "Scopus, CiteScore and source coverage updates"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "scopus-content-elsevier-f05d3724",
+      "published_at": "2026-06-17",
+      "category": "index_change",
+      "title": "Scopus content | Elsevier",
+      "summary": "Scopus is a multidisciplinary abstract and citation database with comprehensive coverage of scientific, technical, medical and social sciences literature.",
+      "source_name": "Scopus source list",
+      "source_url": "https://www.elsevier.com/products/scopus/content",
+      "publisher": "Elsevier",
+      "journals": [],
+      "tags": [
+        "Elsevier",
+        "monthly source title list"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "scopus-com-1ff90423",
+      "published_at": "2026-06-17",
+      "category": "report",
+      "title": "Scopus.com",
+      "summary": "Scopus, CiteScore and source coverage updates",
+      "source_name": "Scopus blog",
+      "source_url": "https://www.scopus.com/",
+      "publisher": "Elsevier",
+      "journals": [],
+      "tags": [
+        "Elsevier",
+        "Scopus, CiteScore and source coverage updates"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "skip-to-content-cc63cd8e",
+      "published_at": "2026-06-17",
+      "category": "new_journal",
+      "title": "Skip to content",
+      "summary": "recent open access journal additions",
+      "source_name": "DOAJ RSS guidance",
+      "source_url": "https://blog.doaj.org/2015/04/22/have-you-used-our-rss-feed/#main",
+      "publisher": "DOAJ",
+      "journals": [],
+      "tags": [
+        "DOAJ",
+        "recent open access journal additions"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "skip-to-content-7e9252e8",
+      "published_at": "2026-06-17",
+      "category": "new_journal",
+      "title": "Skip to content",
+      "summary": "open access journal additions and policy updates",
+      "source_name": "DOAJ news",
+      "source_url": "https://blog.doaj.org/#main",
+      "publisher": "DOAJ",
+      "journals": [],
+      "tags": [
+        "DOAJ",
+        "open access journal additions and policy updates"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "skip-to-content-a8faea45",
+      "published_at": "2026-06-17",
+      "category": "warning",
+      "title": "Skip to content",
+      "summary": "Tracking retractions as a window into the scientific process",
+      "source_name": "Retraction Watch",
+      "source_url": "https://retractionwatch.com/#content",
+      "publisher": "Retraction Watch",
+      "journals": [],
+      "tags": [
+        "Retraction Watch",
+        "retractions, expressions of concern and journal integrity signals"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "skip-to-main-content-46774291",
+      "published_at": "2026-06-17",
+      "category": "index_change",
+      "title": "Skip to main content",
+      "summary": "Scopus is a multidisciplinary abstract and citation database with comprehensive coverage of scientific, technical, medical and social sciences literature.",
+      "source_name": "Scopus source list",
+      "source_url": "https://www.elsevier.com/products/scopus/content#main-content",
+      "publisher": "Elsevier",
+      "journals": [],
+      "tags": [
+        "Elsevier",
+        "monthly source title list"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "skip-to-main-content-e27b1c06",
+      "published_at": "2026-06-17",
+      "category": "report",
+      "title": "Skip to main content",
+      "summary": "The latest press releases covering ground-breaking new research from some of the world's top experts in renowned journals across the globe. % %",
+      "source_name": "Taylor & Francis newsroom",
+      "source_url": "https://newsroom.taylorandfrancisgroup.com/#main-content",
+      "publisher": "Taylor & Francis",
+      "journals": [],
+      "tags": [
+        "Taylor & Francis",
+        "publisher news and journal portfolio updates"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "spanish-17912e2f",
+      "published_at": "2026-06-17",
+      "category": "new_journal",
+      "title": "Spanish",
+      "summary": "recent open access journal additions",
+      "source_name": "DOAJ RSS guidance",
+      "source_url": "https://blog.doaj.org/es/2015/04/22/have-you-used-our-rss-feed/",
+      "publisher": "DOAJ",
+      "journals": [],
+      "tags": [
+        "DOAJ",
+        "recent open access journal additions"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "spanish-07965c8e",
+      "published_at": "2026-06-17",
+      "category": "new_journal",
+      "title": "Spanish",
+      "summary": "open access journal additions and policy updates",
+      "source_name": "DOAJ news",
+      "source_url": "https://blog.doaj.org/es/",
+      "publisher": "DOAJ",
+      "journals": [],
+      "tags": [
+        "DOAJ",
+        "open access journal additions and policy updates"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "springer-journals-0b706d7c",
+      "published_at": "2026-06-17",
+      "category": "new_journal",
+      "title": "Springer journals",
+      "summary": "Discover the Nature Portfolio journals—your gateway to groundbreaking research that addresses global challenges and aligns with the UN SDGs. Explore our rigorous peer-reviewed articles that shape policies, advance science, and make a societ",
+      "source_name": "Nature Portfolio new launches",
+      "source_url": "https://www.springernature.com/gp/librarians/products/journals/springer-journals",
+      "publisher": "Springer Nature",
+      "journals": [],
+      "tags": [
+        "Springer Nature",
+        "new Nature Portfolio journals"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    },
+    {
+      "id": "support-centre-c6241d09",
+      "published_at": "2026-06-17",
+      "category": "report",
+      "title": "Support Centre",
+      "summary": "Scopus, CiteScore and source coverage updates",
+      "source_name": "Scopus blog",
+      "source_url": "https://service.elsevier.com/app/home/supporthub/scopus/",
+      "publisher": "Elsevier",
+      "journals": [],
+      "tags": [
+        "Elsevier",
+        "Scopus, CiteScore and source coverage updates"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "verification": "fetched"
+    }
+  ]
 }
