@@ -23,7 +23,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
 JOURNALS_GZ = DATA / "journals.json.gz"
-MOBILE_GZ = DATA / "journals_mobile.json.gz"
 ANNUAL_GZ = DATA / "annual_outputs.json.gz"
 META = DATA / "meta.json"
 
@@ -144,7 +143,6 @@ def main() -> None:
     args = parser.parse_args()
 
     journals = read_gz(JOURNALS_GZ)
-    mobile = read_gz(MOBILE_GZ)
     annual_outputs = read_gz(ANNUAL_GZ) if ANNUAL_GZ.exists() else {}
 
     targets = []
@@ -190,11 +188,9 @@ def main() -> None:
         time.sleep(SLEEP)
 
     journal_touched = update_rows(journals, annual_outputs)
-    mobile_touched = update_rows(mobile, annual_outputs)
 
     write_gz(ANNUAL_GZ, annual_outputs)
     write_gz(JOURNALS_GZ, journals)
-    write_gz(MOBILE_GZ, mobile)
 
     if META.exists():
         meta = json.loads(META.read_text(encoding="utf-8"))
@@ -212,7 +208,6 @@ def main() -> None:
     )
     print(f"Annual output ISSN keys: {len(annual_outputs):,}")
     print(f"Backfilled journals: {journal_touched:,}")
-    print(f"Backfilled mobile records: {mobile_touched:,}")
     print(f"Remaining target journals without history: {remaining_priority:,}")
 
 

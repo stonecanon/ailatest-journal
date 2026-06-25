@@ -1612,7 +1612,9 @@
     $$('[data-lang-choice]').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.langChoice === lang);
     });
-    $('#auth-btn').textContent = user ? (user.name || user.login || t('logout')) : t('login');
+    const authBtn = $('#auth-btn');
+    if (authBtn) authBtn.textContent = user ? (user.name || user.login || t('logout')) : t('login');
+    updateAccountCreditBadge();
     document.documentElement.lang = LANG_META[lang]?.html || 'zh-CN';
   }
 
@@ -1705,6 +1707,47 @@
   let favsData = {};
   try { favsData = JSON.parse(localStorage.getItem(STORAGE_PREFIX + 'favsData') || '{}'); } catch(_){}
   let user = JSON.parse(localStorage.getItem('ailatest.user') || 'null');
+
+  function formatCreditValue(value) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return '';
+    if (n >= 10000) return `${(n / 10000).toFixed(n >= 100000 ? 0 : 1)}万`;
+    return String(Math.max(0, Math.floor(n)));
+  }
+
+  function accountCreditValue() {
+    if (!user) return null;
+    const candidates = [
+      user.credits,
+      user.credit_balance,
+      user.creditBalance,
+      user.points,
+      user.balance,
+      user.api_credits,
+      user.apiCredits,
+      user.quota && user.quota.credits,
+      user.quota && user.quota.remaining,
+    ];
+    const hit = candidates.find(v => v !== undefined && v !== null && v !== '');
+    return hit === undefined ? null : hit;
+  }
+
+  function updateAccountCreditBadge() {
+    const badge = $('#account-credit-badge');
+    if (!badge) return;
+    badge.hidden = false;
+    badge.setAttribute('role', 'button');
+    badge.tabIndex = 0;
+    const credits = accountCreditValue();
+    if (user) {
+      const text = credits === null ? T('积分','Credits') : `${T('积分','Credits')} ${formatCreditValue(credits)}`;
+      badge.textContent = text;
+      badge.title = T('进入我的收藏与账号','Open favorites and account');
+    } else {
+      badge.textContent = `${T('积分','Credits')} 0`;
+      badge.title = T('登录后查看积分','Sign in to view credits');
+    }
+  }
 
 
   // ── Free-tier usage limits ──
@@ -2272,7 +2315,7 @@
       document.body.appendChild(modal);
 
       modal.addEventListener('click', (e) => {
-        if (e.target === modal) { closeLoginModal(); ('.topbar').forEach(function(el){ el.style.display = ''; }); }
+        if (e.target === modal) { closeLoginModal(); $$('.topbar').forEach(function(el){ el.style.display = ''; }); }
       });
       $('.login-close', modal).addEventListener('click', closeLoginModal);
 
@@ -2350,7 +2393,7 @@
         });
       });
     }
-    ('.topbar').forEach(function(el){ el.style.display = 'none'; });
+    $$('.topbar').forEach(function(el){ el.style.display = 'none'; });
     modal.classList.add('open');
     setTimeout(() => $('.login-email input[name=email]', modal)?.focus(), 50);
   }
@@ -2360,7 +2403,7 @@
   }
 
   async function finishLogin(token, profile = null) {
-    ('.topbar').forEach(function(el){ el.style.display = ''; });
+    $$('.topbar').forEach(function(el){ el.style.display = ''; });
     let me = profile;
     if (!me) {
       const r = await fetch(`${API_BASE}/me`, {
@@ -2372,12 +2415,14 @@
     localStorage.setItem('ailatest.user', JSON.stringify(user));
     await pullFavs();
     applyI18n();
+    updateAccountCreditBadge();
   }
 
   function doLogout() {
     user = null;
     localStorage.removeItem('ailatest.user');
     applyI18n();
+    updateAccountCreditBadge();
   }
 
   async function handleAuthCallback() {
@@ -5891,7 +5936,9 @@
       }
     });
     const favBtn = document.querySelector('.rail-nav-btn[data-tab="fav"]');
-    if (favBtn) favBtn.style.order = '50';
+    if (favBtn) favBtn.style.order = '9';
+    const creditBadge = document.querySelector('#account-credit-badge');
+    if (creditBadge) creditBadge.style.order = '10';
   }
   function setUiLanguage(code) {
     if (!LANG_META[code]) return;
@@ -6207,7 +6254,7 @@
         </div>`;
     }
     modal.innerHTML = `<div class="share-card share-modal-card">${body}</div>`;
-    ('.topbar').forEach(function(el){ el.style.display = 'none'; });
+    $$('.topbar').forEach(function(el){ el.style.display = 'none'; });
     modal.classList.add('open');
     const closeBtn = document.getElementById('share-close-btn');
     if (closeBtn) closeBtn.addEventListener('click', () => modal.classList.remove('open'));
@@ -6338,7 +6385,7 @@
           <div class="share-modal-foot"><button id="share-close-btn" class="share-foot-link">${T('关闭','Close')}</button></div>
         </div>
       </div>`;
-    ('.topbar').forEach(function(el){ el.style.display = 'none'; });
+    $$('.topbar').forEach(function(el){ el.style.display = 'none'; });
     modal.classList.add('open');
 
     document.getElementById('share-close-btn').addEventListener('click', () => modal.classList.remove('open'));
@@ -8440,12 +8487,24 @@
     });
   
     // auth
-    $('#auth-btn').addEventListener('click', () => {
+    $('#auth-btn')?.addEventListener('click', () => {
       if (user) {
         if (confirm(T('退出登录？','Sign out?'))) doLogout();
       } else {
         startLogin();
       }
+    });
+    $('#account-credit-badge')?.addEventListener('click', () => {
+      if (!user) {
+        startLogin();
+        return;
+      }
+      activateTab('fav', { push: true });
+    });
+    $('#account-credit-badge')?.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      e.preventDefault();
+      $('#account-credit-badge')?.click();
     });
   }
 
@@ -9415,7 +9474,7 @@
       const initialNeedsFull = !!journalPathSlug()
         || initialPath === '/import'
         || ['int', 'fav', 'pick'].includes(initialTab);
-      const initialJournalUrl = initialNeedsFull ? 'data/journals.json.gz' : 'data/journals_mobile.json.gz';
+      const initialJournalUrl = initialNeedsFull ? 'data/journals.json.gz' : 'data/journals_light.json.gz';
       const [j, m, esi, aliases, underReviewIssns, onHoldIssns, updates] = await Promise.all([
         fetchJSON(initialJournalUrl),
         fetch('/data/meta.json').then(r => r.json()).catch(() => null),

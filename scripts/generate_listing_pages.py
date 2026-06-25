@@ -121,12 +121,13 @@ __JSONLD__
 :root{--accent:#b4531f;--accent-light:#f59e0b;--bg:#f7f5f0;--paper:#fff;--ink:#1c1917;--ink-soft:#6b6559;--rule:#e3ddd0;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
 *{box-sizing:border-box}
 body{font-family:var(--sans);margin:0;padding:0;background:var(--bg);color:var(--ink);line-height:1.6}
-.header{background:var(--paper);border-bottom:1px solid var(--rule);padding:14px 20px;position:sticky;top:0;z-index:10}
+.header{background:rgba(255,253,249,.86);border-bottom:1px solid var(--rule);padding:11px 18px;position:sticky;top:0;z-index:10;backdrop-filter:blur(18px)}
 .header-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:16px}
-.header a{color:var(--ink);text-decoration:none;font-weight:700;font-size:15px;letter-spacing:.02em}
+.header a{color:var(--ink);text-decoration:none;font-weight:700;font-size:15px;letter-spacing:0}
 .header a:hover{color:var(--accent)}
-.header .logo{display:flex;align-items:center;gap:6px}
-.header .logo-symbol{font-size:22px;line-height:1}
+.header .logo{display:flex;align-items:baseline;gap:4px;font-weight:800;font-size:16px}
+.header .logo em{font-family:Georgia,'Times New Roman',serif;font-style:italic;font-weight:700;color:var(--ink-soft)}
+.header .logo-symbol{display:none}
 .header .nav-links{display:flex;gap:16px;margin-left:auto;font-size:13px}
 .header .nav-links a{font-weight:500;color:var(--ink-soft)}
 .wrap{max-width:1100px;margin:0 auto;padding:20px}
@@ -160,7 +161,7 @@ a:hover{text-decoration:underline}
 </style></head><body>
 <div class="header">
 <div class="header-inner">
-  <a href="__ORIGIN__/" class="logo"><span class="logo-symbol">📖</span> AILatest Journal</a>
+  <a href="__ORIGIN__/" class="logo">AILatest <em>Journal</em></a>
   <span class="nav-links">
     <a href="__ORIGIN__/indexes/">Indexes</a>
     <a href="__ORIGIN__/subjects/">Subjects</a>
@@ -175,7 +176,7 @@ a:hover{text-decoration:underline}
 <tbody>__ROWS__</tbody></table></div></div>
 <p class="back-wrap"><a class="back" href="__BACK__">← Back</a></p>
 </div>
-<div class="footer"><a href="__ORIGIN__/">AILatest Journal</a> — journal search &amp; submission decision tool for researchers</div>
+<div class="footer">© 2026 <a href="__ORIGIN__/">AILatest Journal</a> · <a href="__ORIGIN__/about.html">About</a> · <a href="__ORIGIN__/contact.html">Contact</a> · <a href="__ORIGIN__/terms.html">Terms</a> · <a href="__ORIGIN__/privacy.html">Privacy</a> · <a href="__ORIGIN__/refund.html">Refund</a></div>
 </body></html>'''
 
 def make_slug(r):
@@ -357,12 +358,13 @@ def generate_landing(origin):
 :root{{--accent:#b4531f;--bg:#f7f5f0;--paper:#fff;--ink:#1c1917;--ink-soft:#6b6559;--rule:#e3ddd0;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}}
 *{{box-sizing:border-box}}
 body{{font-family:var(--sans);margin:0;padding:0;background:var(--bg);color:var(--ink);line-height:1.6}}
-.header{{background:var(--paper);border-bottom:1px solid var(--rule);padding:14px 20px;position:sticky;top:0;z-index:10}}
+.header{{background:rgba(255,253,249,.86);border-bottom:1px solid var(--rule);padding:11px 18px;position:sticky;top:0;z-index:10;backdrop-filter:blur(18px)}}
 .header-inner{{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:16px}}
-.header a{{color:var(--ink);text-decoration:none;font-weight:700;font-size:15px;letter-spacing:.02em}}
+.header a{{color:var(--ink);text-decoration:none;font-weight:700;font-size:15px;letter-spacing:0}}
 .header a:hover{{color:var(--accent)}}
-.header .logo{{display:flex;align-items:center;gap:6px}}
-.header .logo-symbol{{font-size:22px;line-height:1}}
+.header .logo{{display:flex;align-items:baseline;gap:4px;font-weight:800;font-size:16px}}
+.header .logo em{{font-family:Georgia,'Times New Roman',serif;font-style:italic;font-weight:700;color:var(--ink-soft)}}
+.header .logo-symbol{{display:none}}
 .header .nav-links{{display:flex;gap:16px;margin-left:auto;font-size:13px}}
 .header .nav-links a{{font-weight:500;color:var(--ink-soft)}}
 .header .nav-links a:hover{{color:var(--accent)}}
@@ -382,13 +384,13 @@ h1{{font-size:20px;margin:0 0 6px;font-weight:700}}
 .footer a{{color:var(--ink-soft)}}
 </style>
 </head><body>
-<div class="header"><div class="header-inner"><a href="{origin}/" class="logo"><span class="logo-symbol">📖</span> AILatest Journal</a>
+<div class="header"><div class="header-inner"><a href="{origin}/" class="logo">AILatest <em>Journal</em></a>
 <span class="nav-links"><a href="{origin}/indexes/">Indexes</a><a href="{origin}/subjects/">Subjects</a></span></div></div>
 <div class="wrap"><h1>Browse Journals by WoS Subject</h1><p class="breadcrumb"><a href="{origin}/">Home</a></p>
 <p class="sub">Select a Web of Science subject category to browse top journals sorted by Impact Factor.</p>
 <div class="card"><ul class="cat-list">{r_list}</ul></div>
 <p class="back-wrap"><a class="back" href="{origin}/">← Back</a></p></div>
-<div class="footer"><a href="{origin}/">AILatest Journal</a> — journal search &amp; submission decision tool for researchers</div>
+<div class="footer">© 2026 <a href="{origin}/">AILatest Journal</a> · <a href="{origin}/about.html">About</a> · <a href="{origin}/contact.html">Contact</a> · <a href="{origin}/terms.html">Terms</a> · <a href="{origin}/privacy.html">Privacy</a> · <a href="{origin}/refund.html">Refund</a></div>
 </body></html>'''
     (ROOT / 'subjects').mkdir(parents=True, exist_ok=True)
     (ROOT / 'subjects' / 'index.html').write_text(r_html, encoding='utf-8')
@@ -406,12 +408,13 @@ h1{{font-size:20px;margin:0 0 6px;font-weight:700}}
 :root{{--accent:#b4531f;--bg:#f7f5f0;--paper:#fff;--ink:#1c1917;--ink-soft:#6b6559;--rule:#e3ddd0;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}}
 *{{box-sizing:border-box}}
 body{{font-family:var(--sans);margin:0;padding:0;background:var(--bg);color:var(--ink);line-height:1.6}}
-.header{{background:var(--paper);border-bottom:1px solid var(--rule);padding:14px 20px;position:sticky;top:0;z-index:10}}
+.header{{background:rgba(255,253,249,.86);border-bottom:1px solid var(--rule);padding:11px 18px;position:sticky;top:0;z-index:10;backdrop-filter:blur(18px)}}
 .header-inner{{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:16px}}
-.header a{{color:var(--ink);text-decoration:none;font-weight:700;font-size:15px;letter-spacing:.02em}}
+.header a{{color:var(--ink);text-decoration:none;font-weight:700;font-size:15px;letter-spacing:0}}
 .header a:hover{{color:var(--accent)}}
-.header .logo{{display:flex;align-items:center;gap:6px}}
-.header .logo-symbol{{font-size:22px;line-height:1}}
+.header .logo{{display:flex;align-items:baseline;gap:4px;font-weight:800;font-size:16px}}
+.header .logo em{{font-family:Georgia,'Times New Roman',serif;font-style:italic;font-weight:700;color:var(--ink-soft)}}
+.header .logo-symbol{{display:none}}
 .header .nav-links{{display:flex;gap:16px;margin-left:auto;font-size:13px}}
 .header .nav-links a{{font-weight:500;color:var(--ink-soft)}}
 .header .nav-links a:hover{{color:var(--accent)}}
@@ -432,13 +435,13 @@ h1{{font-size:20px;margin:0 0 6px;font-weight:700}}
 .footer a{{color:var(--ink-soft)}}
 </style>
 </head><body>
-<div class="header"><div class="header-inner"><a href="{origin}/" class="logo"><span class="logo-symbol">📖</span> AILatest Journal</a>
+<div class="header"><div class="header-inner"><a href="{origin}/" class="logo">AILatest <em>Journal</em></a>
 <span class="nav-links"><a href="{origin}/indexes/">Indexes</a><a href="{origin}/subjects/">Subjects</a></span></div></div>
 <div class="wrap"><h1>Browse Journals by Indexing Database</h1><p class="breadcrumb"><a href="{origin}/">Home</a></p>
 <p class="sub">Select an indexing database to browse indexed journals sorted by Impact Factor.</p>
 <div class="card"><ul class="cat-list">{i_list}</ul></div>
 <p class="back-wrap"><a class="back" href="{origin}/">← Back</a></p></div>
-<div class="footer"><a href="{origin}/">AILatest Journal</a> — journal search &amp; submission decision tool for researchers</div>
+<div class="footer">© 2026 <a href="{origin}/">AILatest Journal</a> · <a href="{origin}/about.html">About</a> · <a href="{origin}/contact.html">Contact</a> · <a href="{origin}/terms.html">Terms</a> · <a href="{origin}/privacy.html">Privacy</a> · <a href="{origin}/refund.html">Refund</a></div>
 </body></html>'''
     (ROOT / 'indexes' / 'index.html').write_text(i_html, encoding='utf-8')
     print('  /indexes/ (landing)')

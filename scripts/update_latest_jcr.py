@@ -30,8 +30,7 @@ DEFAULT_WORKBOOKS = [
 ]
 JOURNALS_GZ = DATA_DIR / "journals.json.gz"
 JOURNALS_JSON = DATA_DIR / "journals.json"
-MOBILE_GZ = DATA_DIR / "journals_mobile.json.gz"
-MOBILE_JSON = DATA_DIR / "journals_mobile.json"
+LIGHT_GZ = DATA_DIR / "journals_light.json.gz"
 ANNUAL_OUTPUT_CANDIDATES = [
     DATA_DIR / "annual_outputs.json.gz",
     DATA_DIR / "annual_outputs (1).json.gz",
@@ -80,6 +79,11 @@ def write_json_bundle(path_json: Path, path_gz: Path, data) -> None:
     path_json.write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     with path_json.open("rb") as fin, gzip.open(path_gz, "wb", compresslevel=9) as fout:
         shutil.copyfileobj(fin, fout)
+
+
+def write_json_gz(path_gz: Path, data) -> None:
+    with gzip.open(path_gz, "wt", encoding="utf-8", compresslevel=9) as fout:
+        json.dump(data, fout, ensure_ascii=False, separators=(",", ":"))
 
 
 def first_existing(paths: list[Path]) -> Path | None:
@@ -244,41 +248,55 @@ def apply_updates(journals: list[dict], latest_rows: list[dict], annual_outputs:
     return matched, pub_attached
 
 
-def update_mobile(latest_by_key: dict[str, dict], annual_outputs: dict) -> int:
-    if not MOBILE_GZ.exists():
-        return 0
-    mobile = read_json_gz(MOBILE_GZ)
-    touched = 0
-    for rec in mobile:
-        hit = None
-        for key in (clean_issn(rec.get("issn")), clean_issn(rec.get("eissn")), norm_title(rec.get("name"))):
-            if key and key in latest_by_key:
-                hit = latest_by_key[key]
-                break
-        if not hit:
-            continue
-        if hit["jif"] is not None:
-            old_if = number_or_none(rec.get("if_2024"))
-            history = {}
-            if old_if is not None:
-                history["2024"] = old_if
-            history["2025"] = hit["jif"]
-            rec["if_2024"] = hit["jif"]
-            rec["if_2025"] = hit["jif"]
-            rec["if_latest"] = hit["jif"]
-            rec["if_latest_year"] = 2025
-            rec["if_history"] = history
-        if hit["quartile"]:
-            rec["if_quartile"] = hit["quartile"]
-        rec["jcr_year"] = hit["jcr_year"]
-        rec["jcr_release_year"] = 2026
-        pub_history = output_history_for(rec, annual_outputs)
-        if pub_history:
-            rec["publication_history"] = pub_history
-        touched += 1
-    attach_free_flags(mobile)
-    write_json_bundle(MOBILE_JSON, MOBILE_GZ, mobile)
-    return touched
+def compact_dict(value, keys: tuple[str, ...]):
+    if not isinstance(value, dict):
+        return value
+    return {k: value[k] for k in keys if value.get(k) not in (None, "", [], {})}
+
+
+def compact_journal_for_light(rec: dict) -> dict:
+    base_keys = (
+        "name", "cn_name", "en_name", "abbr20", "slug", "issn", "eissn",
+        "publisher", "country", "indices", "wos_categories", "esi_category",
+        "if_2024", "if_2025", "if_latest", "if_latest_year", "if_quartile",
+        "jcr_year", "jcr_release_year", "cas_zone", "cas_top", "cas_major_cn",
+        "flagship", "nature_index", "free", "pubmed", "pmc", "medline",
+        "under_review", "on_hold", "citic_warning", "ccf", "ft50", "utd24",
+    )
+    out = {k: rec[k] for k in base_keys if rec.get(k) not in (None, "", [], {})}
+    if rec.get("scopus") and rec.get("scopus", {}).get("active", True) is not False:
+        out["scopus"] = {"active": True}
+    for key, keys in {
+        "doaj": ("lic", "license", "review_weeks"),
+        "oaj": ("partition", "position"),
+        "cas_xr": ("zone", "top"),
+        "cscd": ("database",),
+        "cstpcd": ("kind", "year"),
+        "scd": ("year", "category", "newly_added"),
+        "abdc": ("rating",),
+        "abs": ("rating",),
+        "fms": ("tier", "type"),
+        "retraction": ("retractions_total", "rate_per_1000_5y", "rate_per_1000_10y"),
+    }.items():
+        value = compact_dict(rec.get(key), keys)
+        if value not in (None, "", [], {}):
+            out[key] = value
+    warning = rec.get("warning")
+    if warning:
+        if isinstance(warning, list):
+            slim = [compact_dict(x, ("year", "level")) for x in warning if isinstance(x, dict)]
+            out["warning"] = slim or True
+        elif isinstance(warning, dict):
+            out["warning"] = compact_dict(warning, ("year", "level")) or True
+        else:
+            out["warning"] = True
+    return out
+
+
+def write_light_index(journals: list[dict]) -> int:
+    light = [compact_journal_for_light(rec) for rec in journals]
+    write_json_gz(LIGHT_GZ, light)
+    return len(light)
 
 
 def main() -> int:
@@ -298,12 +316,7 @@ def main() -> int:
     free_attached = attach_free_flags(journals)
     write_json_bundle(JOURNALS_JSON, JOURNALS_GZ, journals)
 
-    latest_by_key = {}
-    for row in latest_rows:
-        for key in (row["issn"], row["eissn"], norm_title(row["title"])):
-            if key:
-                latest_by_key.setdefault(key, row)
-    mobile_touched = update_mobile(latest_by_key, annual_outputs)
+    light_records = write_light_index(journals)
 
     meta_path = DATA_DIR / "meta.json"
     if meta_path.exists():
@@ -322,7 +335,7 @@ def main() -> int:
     print(f"Matched journals: {matched}")
     print(f"Publication histories attached: {pub_attached}")
     print(f"Free-to-publish flags attached: {free_attached}")
-    print(f"Mobile records updated: {mobile_touched}")
+    print(f"Light index records written: {light_records}")
     return 0
 
 
