@@ -19,9 +19,17 @@
     const resp = await fetch(url);
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
     if (String(url).split('?')[0].endsWith('.gz')) {
-      const ds = new DecompressionStream('gzip');
-      const stream = resp.body.pipeThrough(ds);
-      return await new Response(stream).json();
+      if (typeof DecompressionStream === 'function' && resp.body && resp.body.pipeThrough) {
+        const ds = new DecompressionStream('gzip');
+        const stream = resp.body.pipeThrough(ds);
+        return await new Response(stream).json();
+      }
+      const plainUrl = String(url).replace(/\.gz(?=($|[?#]))/, '');
+      if (plainUrl !== String(url)) {
+        const fallbackResp = await fetch(plainUrl);
+        if (fallbackResp.ok) return await fallbackResp.json();
+      }
+      throw new Error('gzip decompression unavailable');
     }
     return await resp.json();
   };
@@ -47,9 +55,9 @@
       locked_school_a: '🔒 学校 A · 2023',
       paid_label: '付费',
       drawer_kicker: '期刊详情',
-      pwa_install: '📲 安装到主屏',
       footer_data: '© <a href="https://journal.ailatest.org">AILatest Journal</a>',
       tab_home: '查刊', tab_int: '国际', tab_dom: '中国', tab_fav: '收藏', tab_pick: '荐刊',
+      nav_about: '关于', nav_contact: '联系',
       nav_index_rank: '索引排行榜', nav_subject_rank: '学科排行榜', nav_warn_rank: '预警名单', nav_extension_beta: '插件内测', nav_subscription: '订阅',
       filter_if_range: '影响因子', if_any: '不限',
       rail_int: '全球', rail_dom: '中国', rail_in: '印度', rail_my: '马来西亚', rail_kr: '韩国', rail_rank: '榜单', rail_fav: '我的',
@@ -99,7 +107,6 @@
       search_dom: '搜索：刊名 / ISSN / CN 号（跨库搜索）',
       search_fav: '搜索收藏：期刊 / 缩写 / ISSN',
       search_home_ph: '搜索期刊名、ISSN…',
-      home_if_updated: '最新版 IF 已更新：JCR 2026 发布 · 2025 指标',
       search_submit_hint: '搜索',
       search_button: 'Search',
       home_subtitle: '全球期刊检索与推荐平台',
@@ -135,9 +142,9 @@
       locked_school_a: '🔒 School A · 2023',
       paid_label: 'Paid',
       drawer_kicker: 'Journal Details',
-      pwa_install: '📲 Install to Home',
       footer_data: '© <a href="https://journal.ailatest.org">AILatest Journal</a>',
       tab_home: 'Journals', tab_int: 'International', tab_dom: 'China', tab_fav: 'Favorites', tab_pick: 'Recommend',
+      nav_about: 'About', nav_contact: 'Contact',
       nav_index_rank: 'Index Rankings', nav_subject_rank: 'Subject Rankings', nav_warn_rank: 'Warning List', nav_extension_beta: 'Extension beta', nav_subscription: 'Subscribe',
       filter_if_range: 'Impact Factor', if_any: 'Any',
       rail_int: 'Global', rail_dom: 'China', rail_in: 'India', rail_my: 'Malaysia', rail_kr: 'Korea', rail_rank: 'Rankings', rail_fav: 'Me',
@@ -185,7 +192,6 @@
       search_dom: 'Search: title / ISSN / CN (cross-source)',
       search_fav: 'Search favorites: title / acronym / ISSN',
       search_home_ph: 'Search journal name, ISSN…',
-      home_if_updated: 'Latest IF updated: JCR 2026 release · 2025 metrics',
       search_submit_hint: 'search',
       search_button: 'Search',
       home_subtitle: 'Journal search & submission decision tool for researchers',
@@ -225,7 +231,6 @@
     pick_coming_title: '敬請期待', pick_coming_desc: '未來更新', results_all: '全部期刊', load_more: '載入更多',
     col_name: '期刊 Title', col_free: '免費', col_abbr: '縮寫 Abbr', col_badges: '索引 / 分區', search_int: '搜尋：期刊全稱 / 官方縮寫 / ISSN / 中文刊名', search_dom: '搜尋：中文刊名 / 英文刊名 / ISSN / CN 號', search_fav: '搜尋收藏：期刊 / 縮寫 / ISSN',
       search_home_ph: '搜尋期刊名、ISSN…',
-      home_if_updated: '最新版 IF 已更新：JCR 2026 發布 · 2025 指標',
       home_subtitle: '面向科研人員的期刊檢索與投稿決策工具', showing: '顯示', of: '條 / 共', total_items: '條', empty: '未找到匹配的期刊', login: '登入', logout: '登出', fav_added: '已收藏', fav_removed: '已移除', syncing: '同步中…', synced: '已同步', wos_subjects: 'WoS 細分學科', wos_search_ph: '篩選學科（A-Z）…', cnkx_domain: '學科領域', cnkx_sub: '細分學科', wos_clear_title: '清空選擇', filter_free_only: '只看免費發表'
   };
   Object.assign(I18N, {
@@ -795,6 +800,9 @@
   let malaysiaPromise = null;
   let esiCats = [];
   let meta = null;
+  let journalsReady = false;
+  let journalsPromise = null;
+  let homeJournals = [];
   let oaMap = null;        // compact OpenAlex map, loaded only when a detail/recommendation needs it.
   let oaMapPromise = null;
   let journalUpdates = { updated_at: '', items: [] };
@@ -1599,6 +1607,8 @@
     updateSearchSubmitLabel();
     const langToggle = $('#lang-toggle');
     if (langToggle) langToggle.textContent = LANG_META[lang]?.label || '中文';
+    const topbarLang = $('#topbar-lang-proxy');
+    if (topbarLang) topbarLang.textContent = LANG_META[lang]?.label || '中文';
     $$('[data-lang-choice]').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.langChoice === lang);
     });
@@ -3218,11 +3228,11 @@
 
   function updateStickySearchState() {
     const enabled = !document.body.classList.contains('journal-route')
-      && ['int', 'dom', 'fav'].includes(activeTab);
-    // 迟滞（hysteresis）：进入 compact 用 130，退出用 60，中间留死区，避免临界点反复切换导致抖动
+      && ['int', 'dom', 'in', 'my', 'kr'].includes(activeTab);
+    // 迟滞（hysteresis）：缩小搜索框会改变页面高度，阈值必须拉开，避免临界点反复抖动。
     const isCompact = document.body.classList.contains('topbar-compact');
     const y = window.scrollY;
-    const shouldCompact = enabled && (isCompact ? y > 60 : y > 130);
+    const shouldCompact = enabled && (isCompact ? y > 2 : y > 132);
     const changed = document.body.classList.toggle('topbar-compact', shouldCompact);
     if (changed) requestAnimationFrame(updateThStickyTop);
     else updateThStickyTop();
@@ -3263,6 +3273,106 @@
       if (!badge) { badge = document.createElement('span'); badge.className = 'dd-count'; label.appendChild(badge); }
       badge.textContent = n ? n.toLocaleString() : '';
     });
+  }
+
+  function markJournalStatusFlags(rows, underReviewIssns = [], onHoldIssns = []) {
+    const cleanSet = (arr) => new Set((arr || []).filter(Boolean).map(s => String(s).replace(/[^0-9xX]/gi, '').toLowerCase()));
+    const underReviewSet = cleanSet(underReviewIssns);
+    const onHoldSet = cleanSet(onHoldIssns);
+    (rows || []).forEach(r => {
+      const issnClean = (r.issn || '').replace(/[^0-9xX]/gi, '').toLowerCase();
+      const eissnClean = (r.eissn || '').replace(/[^0-9xX]/gi, '').toLowerCase();
+      if (underReviewSet.has(issnClean) || underReviewSet.has(eissnClean)) r.under_review = true;
+      if (onHoldSet.has(issnClean) || onHoldSet.has(eissnClean)) r.on_hold = true;
+    });
+  }
+
+  function refreshFavsDataFromJournals() {
+    let dirty = false;
+    for (const id of Object.keys(favsData)) {
+      const live = journals.find(r => favId(r) === id);
+      if (live && favsData[id]) {
+        const oldName = favsData[id].name || '';
+        const newName = live.name || '';
+        if (oldName !== newName) {
+          favsData[id] = { ...favsData[id], name: newName, cn_name: live.cn_name,
+            en_name: live.en_name, abbr20: live.abbr20, if_2024: live.if_2024,
+            cas_zone: live.cas_zone, cas_top: live.cas_top, indices: live.indices,
+            flagship: live.flagship, nature_index: live.nature_index, esi_category: live.esi_category,
+            if_quartile: live.if_quartile, publisher: live.publisher, ccf: live.ccf,
+            scopus: live.scopus, warning: live.warning, under_review: live.under_review, on_hold: live.on_hold, citic_warning: live.citic_warning,
+          };
+          dirty = true;
+        }
+      }
+    }
+    if (dirty) localStorage.setItem(STORAGE_PREFIX + 'favsData', JSON.stringify(favsData));
+  }
+
+  function finalizeJournalDataset(rows, { full = false, underReviewIssns = [], onHoldIssns = [] } = {}) {
+    journals = Array.isArray(rows) ? rows : [];
+    markJournalStatusFlags(journals, underReviewIssns, onHoldIssns);
+    journals.forEach(journalSearchMeta);
+    buildIntIndex(journals);
+    if (full) journalsReady = true;
+    updateFilterCounts();
+    refreshFavsDataFromJournals();
+    const wc = Object.create(null);
+    for (const r of journals) for (const c of (r.wos_categories || [])) wc[c] = (wc[c] || 0) + 1;
+    topicList = Object.entries(wc).map(([name, count]) => ({ name, count })).sort((a, b) => a.name.localeCompare(b.name, 'en'));
+    if (meta?.total && $('#total')) $('#total').textContent = meta.total.toLocaleString();
+    const hint = $('#hint');
+    if (hint) {
+      const shownTotal = full && journals.length ? journals.length : (meta?.total || journals.length);
+      hint.textContent = lang === 'zh'
+        ? `${T('已加载','Loaded')} ${shownTotal.toLocaleString()} ${T('本期刊','journals')}`
+        : `${shownTotal.toLocaleString()} journals loaded`;
+    }
+    if (full) {
+      renderCatList();
+      renderTopicList();
+      updatePublicPulse();
+    }
+  }
+
+  function ensureJournalsLoaded() {
+    if (journalsReady && journals.length) return Promise.resolve(journals);
+    if (!journalsPromise) {
+      journalsPromise = fetchJSON('data/journals.json.gz')
+        .then(rows => {
+          finalizeJournalDataset(rows, {
+            full: true,
+            underReviewIssns: window.__underReviewIssns || [],
+            onHoldIssns: window.__onHoldIssns || [],
+          });
+          return journals;
+        })
+        .catch(err => {
+          journalsPromise = null;
+          throw err;
+        });
+    }
+    return journalsPromise;
+  }
+
+  function renderAfterFullJournalLoad(tab = activeTab) {
+    if (tab === 'int') renderInt();
+    else if (tab === 'fav') renderFav();
+    else if (tab === 'pick') initPickTool();
+    updateStickySearchState();
+  }
+
+  function scheduleFullJournalWarmup() {
+    if (journalsReady || journalsPromise) return;
+    const warm = () => {
+      if (activeTab !== 'home') return;
+      if (typeof DecompressionStream !== 'function') return;
+      ensureJournalsLoaded().catch(err => console.warn('Full journal warmup skipped:', err));
+    };
+    setTimeout(() => {
+      if ('requestIdleCallback' in window) requestIdleCallback(warm, { timeout: 12000 });
+      else warm();
+    }, 10000);
   }
 
   function renderInt() {
@@ -5806,10 +5916,6 @@
   window.__setJournalLanguage = setUiLanguage;
   function stationSettingsHtml() {
     const enabled = getEnabledStations();
-    const langBtns = LANG_ORDER.map(code => {
-      const meta = LANG_META[code];
-      return `<button type="button" class="settings-chip lang-choice${code === lang ? ' active' : ''}" data-lang-choice="${escape(code)}">${meta?.label || escape(code)}</button>`;
-    }).join('');
     const items = STATIONS.map(s => {
       const on = enabled.includes(s.id);
       const label = t(s.i18n) || T(s.zh, s.en);
@@ -5818,11 +5924,7 @@
         <span>${escape(label)}</span></label>`;
     }).join('');
     return `<details class="station-settings">
-      <summary class="station-settings-head">${T('我的设置','My settings')}<small>${T('语言与底部导航','Language and bottom nav')}</small></summary>
-      <div class="my-settings-block">
-        <div class="my-settings-label">${T('语言','Language')}</div>
-        <div class="settings-chip-row">${langBtns}</div>
-      </div>
+      <summary class="station-settings-head">${T('我的设置','My settings')}<small>${T('底部导航站点','Bottom nav stations')}</small></summary>
       <div class="my-settings-block">
         <div class="my-settings-label">${T('底部导航站点','Bottom nav stations')}</div>
         <div class="station-opts">${items}</div>
@@ -6711,13 +6813,15 @@
       renderTopicList();
       shown = PAGE; renderInt();
     });
+    let homeSearchDebounce = null;
     $('#q').addEventListener('input', (e) => {
       if (activeTab === 'updates') activeUpdateQuery = e.target.value.trim();
       else activeQuery = e.target.value.trim();
       shown = PAGE;
       if (activeTab === 'pick') return; // pick tab uses Enter
       if (activeTab === 'home') {
-        showHomeSearchResults();
+        clearTimeout(homeSearchDebounce);
+        homeSearchDebounce = setTimeout(showHomeSearchResults, 90);
       } else {
         activeTab === 'int' ? renderInt()
           : activeTab === 'fav' ? renderFav()
@@ -6835,14 +6939,11 @@
 
     function renderHomeSearchChips() {
       const box = $('#home-search-chips');
-      const note = $('#home-data-note');
       if (!box) return;
       if (activeTab !== 'home') {
         box.hidden = true;
-        if (note) note.hidden = true;
         return;
       }
-      if (note) note.hidden = false;
       const seen = new Set();
       const history = getHomeSearchHistory().slice(0, 3);
       const suggestions = latestHighImpactSuggestions().slice(0, Math.max(0, 3 - history.length));
@@ -7036,7 +7137,12 @@
       let sections = [];
 
       // ── International results ──
-      let intFiltered = journals.filter(matches);
+      const homeSource = journalsReady && journals.length ? journals : (homeJournals.length ? homeJournals : journals);
+      if (!homeSource.length) {
+        homeResults.innerHTML = `<div class="empty-state">${T('正在准备期刊索引…','Preparing journal index…')}</div>`;
+        return;
+      }
+      let intFiltered = homeSource.filter(r => scoreRecord(r, q) > 0);
       intFiltered = intFiltered
         .map(r => ({ r, s: scoreRecord(r, q) }))
         .sort((a, b) => {
@@ -7877,6 +7983,8 @@
       $$('[data-tab]').forEach(x => x.classList.toggle('active', x.dataset.tab === tab));
       activeTab = tab;
       document.body.classList.toggle('update-reading-mode', activeTab === 'updates');
+      document.body.classList.toggle('home-route', activeTab === 'home');
+      document.body.classList.toggle('simple-top-route', activeTab === 'updates' || activeTab === 'fav' || activeTab === 'me');
       updateSearchSubmitLabel();
       $$('.tab-panel').forEach(p => p.hidden = p.dataset.panel !== activeTab);
       $$('[data-international]').forEach(el => el.hidden = activeTab !== 'int');
@@ -7917,12 +8025,10 @@
         const hero = $('.home-hero');
         const preview = $('#home-updates-preview');
         const chips = $('#home-search-chips');
-        const dataNote = $('#home-data-note');
         if (results) results.hidden = true;
         if (subtabs) subtabs.hidden = true;
         if (preview) preview.hidden = true;
         if (chips) chips.hidden = true;
-        if (dataNote) dataNote.hidden = true;
         if (hero) hero.closest('.tab-panel')?.classList.remove('home-tab-has-results');
       }
       if (!opts.skipPath) {
@@ -7934,6 +8040,17 @@
       }
       updatePageSeo(activeTab);
       applyI18n(); // refresh placeholder
+      if (['int', 'fav', 'pick'].includes(activeTab) && !journalsReady) {
+        const hint = $('#hint');
+        if (hint) hint.textContent = T('正在加载完整期刊库…', 'Loading full journal database…');
+        ensureJournalsLoaded()
+          .then(() => renderAfterFullJournalLoad(activeTab))
+          .catch(err => {
+            if (hint) hint.textContent = 'Load failed: ' + err.message;
+            console.error(err);
+          });
+        return;
+      }
       if (activeTab === 'dom') renderDomestic();
       else if (activeTab === 'fav') renderFav();
       else if (activeTab === 'int') renderInt();
@@ -8013,6 +8130,11 @@
       e.stopPropagation();
       openRankingsMenu(e.currentTarget);
     });
+    document.querySelector('[data-topbar-home]')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      activateTab('home');
+    });
+    $('#topbar-lang-proxy')?.addEventListener('click', () => $('#lang-toggle')?.click());
 
     // Home entry pills → switch tab
     document.querySelectorAll('.home-pill[data-tab], .rail-nav-btn[data-tab], .page-brand[data-tab], .rail-brand-mobile[data-tab]').forEach(b => {
@@ -8257,6 +8379,15 @@
       if (e.target.closest('.vhb-details')) return;
       const row = e.target.closest('.j-row.clickable'); if (!row) return;
       const fid = row.dataset.fid;
+      if (row.dataset.src === 'int' && !journalsReady) {
+        ensureJournalsLoaded()
+          .then(() => {
+            const live = journals.find(r => favId(r) === fid) || rowRecordsByFid[fid] || favsData[fid];
+            if (live) openDrawer(live, { pageMode: true, source: journalOpenSource() });
+          })
+          .catch(err => console.error(err));
+        return;
+      }
       const rec = rowRecordsByFid[fid] || journals.find(r => favId(r) === fid) || favsData[fid];
       if (rec) openDrawer(rec, { pageMode: true, source: journalOpenSource() });
     });
@@ -8409,16 +8540,19 @@
     }
 
     async function fetchAiPick(query) {
+      const controller = typeof AbortController === 'function' ? new AbortController() : null;
+      const timer = controller ? setTimeout(() => controller.abort(), 22000) : null;
       const request = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           ...(user && user.token ? { 'Authorization': `Bearer ${user.token}` } : {}),
         },
+        ...(controller ? { signal: controller.signal } : {}),
         body: JSON.stringify({
           query,
           filters: pickFiltersPayload(),
-          limit: 120,
+          limit: 80,
           language: pickReportLang(),
           locale: lang,
         }),
@@ -8430,6 +8564,8 @@
         const fallbackBase = 'https://api.ailatest.org';
         if (API_BASE === fallbackBase) throw err;
         res = await fetch(`${fallbackBase}/pick`, request);
+      } finally {
+        if (timer) clearTimeout(timer);
       }
       const data = await res.json().catch(() => null);
       if (!res.ok || !data || data.ok === false) {
@@ -8485,6 +8621,9 @@
         return t('pick_ai_auth_error');
       }
       if (error?.status === 429) return t('pick_ai_quota_error');
+      if (error?.name === 'AbortError') {
+        return T('AI 分析超时，已先使用本地候选生成报告。','AI analysis timed out; generated the report from local candidates first.');
+      }
       if (error?.status === 503 || /api[_ -]?key|secret|not configured/i.test(error?.message || '')) {
         return t('pick_ai_config_error');
       }
@@ -8578,6 +8717,17 @@
       return pickDoajApcBadge(r);
     }
 
+    function pickRiskBadge(r) {
+      if (!r || !(r.warning || r.citic_warning || r.on_hold || r.under_review)) return `<span class="pick-risk pick-risk-ok">${T('无预警','No warning')}</span>`;
+      const labels = [
+        r.warning ? T('预警','Warning') : '',
+        r.citic_warning ? T('中信预警','CITIC warning') : '',
+        r.on_hold ? 'WoS On Hold' : '',
+        r.under_review ? 'WoS Under Review' : '',
+      ].filter(Boolean).join(' / ');
+      return `<span class="pick-risk pick-risk-warn">${escape(labels)}</span>`;
+    }
+
     function pickDomesticSources() {
       if (!domestic) return [];
       const out = [];
@@ -8653,9 +8803,9 @@
     function pickFallbackReport(profile, entries = []) {
       const defs = pickIsZhLang()
         ? [
-            ['primary', '优先主投', 0, 6],
+            ['primary', '重点推荐', 0, 6],
             ['backup', '稳妥备选', 6, 14],
-            ['fallback', '保底期刊', 14, 20],
+            ['fallback', '补充候选', 14, 20],
           ]
         : [
             ['primary', 'Primary targets', 0, 6],
@@ -8678,7 +8828,7 @@
         })).filter(t => t.items.length),
         chinese: [],
         strategy: pickIsZhLang()
-          ? ['优先选择主题贴合且分区稳定的期刊。', '保底期刊用于覆盖审稿风险，不建议把预警期刊放入主投。']
+          ? ['优先选择主题贴合且分区稳定的期刊。', '补充候选用于扩大备选范围，不建议把预警期刊放入主投。']
           : ['Prioritize journals with strong topic fit and stable rankings.', 'Use fallback journals to manage review risk; avoid warning-list journals as primary targets.'],
       };
     }
@@ -8712,11 +8862,12 @@
 
     function pickTierLabel(tier) {
       const id = String(tier?.id || '').toLowerCase();
-      const zh = { primary:'优先主投', backup:'稳妥备选', fallback:'保底期刊', tier:'推荐期刊' };
+      const zh = { primary:'重点推荐', backup:'稳妥备选', fallback:'补充候选', tier:'推荐期刊' };
       const en = { primary:'Primary targets', backup:'Solid alternatives', fallback:'Safer fallbacks', tier:'Recommended journals' };
       const map = pickIsZhLang() ? zh : en;
       const label = String(tier?.label || '').trim();
       if (!label || (pickIsZhLang() ? !pickHasCjk(label) : pickHasCjk(label))) return map[id] || map.tier;
+      if (pickIsZhLang() && /保底|兜底/.test(label)) return map.fallback;
       return label;
     }
 
@@ -8737,11 +8888,12 @@
       if (fid) rowRecordsByFid[fid] = { ...rec, __src: 'int' };
       const idxText = (rec.indices || []).join(' / ');
       const feeHtml = pickFeeBadge(rec);
-      const warnText = (rec.warning || rec.citic_warning || rec.on_hold || rec.under_review) ? ' ⚠' : '';
+      const riskHtml = pickRiskBadge(rec);
       return `<tr>
         <td class="pick-report-num">${i + 1}</td>
         <td>
-          <a href="#j/${escape(fid)}" data-pick-report-fid="${escape(fid)}">${escape(titleCase(rec.name || item.name))}</a>${warnText}
+          <a href="#j/${escape(fid)}" data-pick-report-fid="${escape(fid)}">${escape(titleCase(rec.name || item.name))}</a>
+          ${riskHtml}
           ${idxText ? `<span class="pick-report-meta">${escape(idxText)}</span>` : ''}
         </td>
         <td>${pickMetricIf(rec) || '<span class="muted-cell">&mdash;</span>'}</td>
@@ -8802,7 +8954,7 @@
         </div>
         <div class="pick-report-table-wrap">
           <table class="pick-report-table pick-report-tier-table">
-            <thead><tr><th>#</th><th>${T('期刊','Journal')}</th><th>IF</th><th>JCR</th><th>${T('中科院','CAS')}</th><th>${T('费用','Fees')}</th><th>${T('推荐理由','Why')}</th></tr></thead>
+            <thead><tr><th>#</th><th>${T('期刊','Journal')}</th><th>IF</th><th>JCR</th><th>${T('中科院','CAS')}</th><th>${T('费用参考','Fee note')}</th><th>${T('推荐理由','Why')}</th></tr></thead>
             <tbody>${items.map((item, i) => renderPickReportEnRow(item, i)).join('')}</tbody>
           </table>
         </div>
@@ -8833,7 +8985,7 @@
             </details>`
         : '';
       const strategyTips = (activeReport.strategy || []).concat([
-        T('费用列综合站内「免费发表」标记（含 Diamond/Gold/Hybrid OA 选项）与 DOAJ 公开 APC 数据；空白表示暂无公开费用信息，不代表免费或收费。','The fees column combines the site "free to publish" flag (Diamond/Gold/Hybrid OA options) with public DOAJ APC data; blank cells mean no public fee info, not free or paid.'),
+        T('费用仅作补充参考；投稿判断优先看主题匹配、IF、JCR、中科院分区、索引与预警状态。','Fees are supplementary; prioritize topic fit, IF, JCR, CAS tier, indexes and warning status.'),
       ]);
       const strategyHtml = `<section class="pick-report-section">
         <div class="pick-report-section-head">
@@ -8844,10 +8996,10 @@
       return `<div class="pick-report">
         <div class="pick-report-head">
           <div>
-            <div class="pick-report-kicker">${T('AI 综合荐刊','AI recommendation report')}</div>
-            <h2>${T('荐刊综合建议','Comprehensive journal recommendation')}</h2>
+            <div class="pick-report-kicker">${T('推荐报告','Recommendation report')}</div>
+            <h2>${T('期刊推荐报告','Journal recommendation report')}</h2>
           </div>
-          <span class="pick-report-source">${T('AI 给出梯队与理由，指标数据全部来自站内：IF / JCR / 中科院 / 索引 / 费用','AI picks tiers and reasons; all metrics come from site data: IF / JCR / CAS / indexes / fees')}</span>
+          <span class="pick-report-source">${T('指标数据来自站内：IF / JCR / 中科院 / 索引 / 预警；费用仅作补充。','Metrics come from site data: IF / JCR / CAS / indexes / warning; fees are supplementary.')}</span>
         </div>
         ${intro ? `<p class="pick-report-intro">${escape(intro)}</p>` : ''}
         ${fieldsText ? `<div class="pick-report-fields"><span class="pick-report-fields-label">${T('匹配方向','Matched fields')}</span><b class="pick-report-fields-text">${escape(fieldsText)}</b></div>` : ''}
@@ -9258,8 +9410,14 @@
     // 分享着陆页：/s/<id> 直接接管 main，不走主流程
     if (await maybeRenderShareLanding()) return;
     try {
+      const initialTab = tabFromPath();
+      const initialPath = location.pathname.replace(/\/+$/, '') || '/';
+      const initialNeedsFull = !!journalPathSlug()
+        || initialPath === '/import'
+        || ['int', 'fav', 'pick'].includes(initialTab);
+      const initialJournalUrl = initialNeedsFull ? 'data/journals.json.gz' : 'data/journals_mobile.json.gz';
       const [j, m, esi, aliases, underReviewIssns, onHoldIssns, updates] = await Promise.all([
-        fetchJSON('data/journals.json.gz'),
+        fetchJSON(initialJournalUrl),
         fetch('/data/meta.json').then(r => r.json()).catch(() => null),
         fetch('/data/esi_categories.json').then(r => r.json()).catch(() => []),
         fetch('/data/journal_aliases.json').then(r => r.json()).catch(() => DEFAULT_JOURNAL_ALIASES),
@@ -9268,7 +9426,11 @@
         fetch('/data/journal_updates.json').then(r => r.json()).catch(() => ({ updated_at: '', items: [] })),
       ]);
       setJournalAliases(aliases);
+      window.__underReviewIssns = underReviewIssns || [];
+      window.__onHoldIssns = onHoldIssns || [];
       journals = j; meta = m; esiCats = esi;
+      if (!initialNeedsFull) homeJournals = Array.isArray(j) ? j : [];
+      finalizeJournalDataset(j, { full: initialNeedsFull, underReviewIssns, onHoldIssns });
       journalUpdates = normalizeJournalUpdates(updates);
       // Build Under Review lookup set
       const underReviewSet = new Set((underReviewIssns||[]).filter(Boolean).map(s => s.replace(/[^0-9xX]/gi,'').toLowerCase()));
@@ -9384,6 +9546,7 @@
       }
       if (window.__activateJournalTab) window.__activateJournalTab(tabFromPath(), { skipPath: true });
       else renderInt();
+      if (!initialNeedsFull) scheduleFullJournalWarmup();
       // 启用 #j/<id> 深链
       window.addEventListener('hashchange', applyHashRoute);
       applyHashRoute();

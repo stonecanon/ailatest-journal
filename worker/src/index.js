@@ -40,6 +40,12 @@ import { handleExtLookup } from './ext-lookup.js';
 import { renderSitesDashboard } from './sites-dashboard.js';
 import { classifyRequestTraffic } from './traffic-classifier.js';
 import {
+  buildPublicSearchResponse,
+  buildSkillSearchResponse,
+  buildSkillRecommendResponse,
+  buildSkillQuotaResponse,
+} from './journal-search.js';
+import {
   getEntitlements,
   activateTrialForNewUser,
   enforceFavoritesWrite,
@@ -1815,6 +1821,10 @@ export default {
       if (p === '/extension/download'       && req.method === 'GET') return routeExtensionDownload(req, env);
       if (p === '/me'                  && req.method === 'GET')  return routeMe(req, env);
       if (p === '/me/entitlements'     && req.method === 'GET')  return routeMeEntitlements(req, env);
+      if (p === '/search' && (req.method === 'GET' || req.method === 'POST')) return json(await buildPublicSearchResponse(req, env));
+      if (p === '/skill/search' && (req.method === 'GET' || req.method === 'POST')) return json(await buildSkillSearchResponse(req, env));
+      if (p === '/skill/recommend' && (req.method === 'GET' || req.method === 'POST')) return json(await buildSkillRecommendResponse(req, env));
+      if (p === '/skill/quota' && req.method === 'GET') return json(buildSkillQuotaResponse());
       if (p === '/pick'                && req.method === 'POST') return handlePick(req, env, { consumeQuota: () => consumePickQuotaForRequest(req, env) });
       if (p === '/pick/quota/consume'  && req.method === 'POST') return routeConsumePickQuota(req, env);
       if (p === '/ext/lookup') { const exU = await getUser(req, env).catch(() => null); return handleExtLookup(req, env, exU); }

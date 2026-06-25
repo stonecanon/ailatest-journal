@@ -30,7 +30,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
 })(window,document,'script','dataLayer','GTM-NBNXL7FB');</script>
 <!-- End Google Tag Manager -->
-<link rel="preload" href="/data/journals.json.gz?v=v20260624-perf-mobile-clean" as="fetch" crossorigin="anonymous" />
 <link rel="preload" href="/data/journal_aliases.json" as="fetch" crossorigin="anonymous" />
 <link rel="stylesheet" href="/css/app.css?v=20260624-perf-mobile-clean" />
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
@@ -117,8 +116,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 }
 </script>
 
-
-<style>.home-hero{display:none!important}</style>
 </head>
 <body>
 <!-- Google Tag Manager (noscript) -->
@@ -178,7 +175,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <section class="home-hero" aria-label="AILatest Journal">
     <h1 class="home-title">
       <span class="home-brand-row">
-        <span><span data-i18n="brand_title">Journal</span> <em><span class="brand-ai">AI</span>Latest<span class="brand-dot">.</span><span class="brand-org">org</span></em></span>
+        <span><em><span class="brand-ai">AI</span>Latest</em> <span data-i18n="brand_title">Journal</span></span>
       </span>
       <small data-i18n="home_subtitle">全球期刊检索与推荐平台</small>
     </h1>
@@ -186,6 +183,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
   <header class="topbar">
     <button class="side-toggle" id="side-toggle" aria-label="Open navigation">☰</button>
+    <a class="topbar-brand" href="/" data-topbar-home aria-label="AILatest Journal">AILatest <em>Journal</em></a>
     <div class="search-wrap">
       <input id="q" type="text" maxlength="200" placeholder="Search: journal title / abbr / ISSN" autocomplete="off" spellcheck="false" />
       <div class="search-actions">
@@ -195,8 +193,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </div>
       <span class="hint" id="hint" data-i18n="loading">加载中…</span>
     </div>
+    <nav class="topbar-links" aria-label="Language">
+      <button type="button" id="topbar-lang-proxy">中文</button>
+    </nav>
   </header>
-  <div id="home-data-note" class="home-data-note"><span class="home-data-new">NEW</span><span data-i18n="home_if_updated">最新版 IF 已更新：JCR 2026 发布 · 2025 指标</span></div>
   <div id="home-search-chips" class="home-search-chips" hidden></div>
 
   <div id="mode-tabs">
@@ -546,8 +546,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </section>
 
   <footer class="site-foot">
-    <p>© <a href="https://journal.ailatest.org">AILatest Journal</a></p>
     <p id="journal-view-total" class="visitor-footnote" hidden></p>
+    <p class="site-foot-links">
+      <span>© 2026 <a href="https://journal.ailatest.org">AILatest Journal</a></span>
+      <span>·</span><a href="/pages/about.html" data-i18n="nav_about">关于</a>
+      <span>·</span><a href="/pages/contact.html" data-i18n="nav_contact">联系</a>
+      <span>·</span><a href="/pages/terms.html">Terms</a>
+      <span>·</span><a href="/pages/privacy.html">Privacy</a>
+      <span>·</span><a href="/pages/refund.html">Refund</a>
+    </p>
   </footer>
 </main>
 
@@ -579,14 +586,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div id="drawer-body" class="drawer-body"></div>
 </aside>
 
-<button id="pwa-install" class="pwa-install" hidden data-i18n="pwa_install">📲 安装到主屏</button>
 <script>
 // Build version for cache busting data files
-const __BUILD_VER = 'v20260624-perf-mobile-clean';
+window.__BUILD_VER = 'v20260624-perf-mobile-clean';
 // Service Worker 清理 — 必须在 app.js 加载前运行
 (function() {
   if ('serviceWorker' in navigator) {
-    const resetKey = 'ailatest_cache_reset_' + __BUILD_VER;
+    const resetKey = 'ailatest_cache_reset_' + window.__BUILD_VER;
     const resetDone = localStorage.getItem(resetKey) === '1';
     Promise.all([
       caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k)))).catch(() => null),
@@ -604,29 +610,6 @@ const __BUILD_VER = 'v20260624-perf-mobile-clean';
 </script>
 <script src="/js/pick-match.js?v=20260623-analytics-admin" defer></script>
 <script src="/js/app.js?v=20260624-perf-mobile-clean" defer></script>
-<script>
-  // Custom install prompt
-  let __pwaPrompt = null;
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    __pwaPrompt = e;
-    const btn = document.getElementById('pwa-install');
-    if (btn) btn.hidden = false;
-  });
-  document.addEventListener('click', (e) => {
-    if (e.target && e.target.id === 'pwa-install' && __pwaPrompt) {
-      __pwaPrompt.prompt();
-      __pwaPrompt.userChoice.finally(() => {
-        __pwaPrompt = null;
-        document.getElementById('pwa-install').hidden = true;
-      });
-    }
-  });
-  window.addEventListener('appinstalled', () => {
-    const btn = document.getElementById('pwa-install');
-    if (btn) btn.hidden = true;
-  });
-</script>
 
 </body>
 </html>
