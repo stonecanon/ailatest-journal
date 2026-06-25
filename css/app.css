@@ -4135,6 +4135,7 @@ body.journal-route .trend-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
+  align-items: stretch;
 }
 
 body.journal-route .trend-card {
@@ -4143,6 +4144,9 @@ body.journal-route .trend-card {
   background: rgba(255, 255, 255, 0.58);
   border: 1px solid var(--rule-soft);
   border-radius: 12px;
+  box-sizing: border-box;
+  height: 274px;
+  overflow: hidden;
 }
 
 body.journal-route .trend-head {
@@ -4191,7 +4195,7 @@ body.journal-route .trend-delta.down {
 body.journal-route .trend-svg {
   display: block;
   width: 100%;
-  height: auto;
+  height: 190px;
   overflow: visible;
 }
 
@@ -4205,6 +4209,10 @@ body.journal-route .trend-gridline {
   stroke-width: 1;
 }
 
+body.journal-route .trend-gridline-vertical {
+  stroke: rgba(69, 55, 38, 0.075);
+}
+
 body.journal-route .trend-partial-guide {
   stroke: rgba(69, 55, 38, 0.16);
   stroke-width: 1;
@@ -4214,7 +4222,7 @@ body.journal-route .trend-partial-guide {
 body.journal-route .trend-line {
   fill: none;
   stroke: #2c6c8f;
-  stroke-width: 3;
+  stroke-width: 1.65;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
@@ -4223,18 +4231,31 @@ body.journal-route .pub-trend .trend-line {
   stroke: #7a5a24;
 }
 
+body.journal-route .selfcite-trend .trend-line {
+  stroke: #8f4f7b;
+}
+
+body.journal-route .trend-line-partial {
+  stroke-dasharray: 4 5;
+  opacity: 0.62;
+}
+
 body.journal-route .trend-fill {
-  fill: rgba(44, 108, 143, 0.1);
+  fill: rgba(44, 108, 143, 0.06);
 }
 
 body.journal-route .pub-trend .trend-fill {
-  fill: rgba(122, 90, 36, 0.12);
+  fill: rgba(122, 90, 36, 0.07);
+}
+
+body.journal-route .selfcite-trend .trend-fill {
+  fill: rgba(143, 79, 123, 0.06);
 }
 
 body.journal-route .trend-svg circle {
   fill: #fff;
   stroke: #2c6c8f;
-  stroke-width: 2;
+  stroke-width: 1.35;
   cursor: pointer;
   transition: r .15s, stroke-width .15s, filter .15s;
 }
@@ -4243,29 +4264,54 @@ body.journal-route .pub-trend .trend-svg circle {
   stroke: #7a5a24;
 }
 
+body.journal-route .selfcite-trend .trend-svg circle {
+  stroke: #8f4f7b;
+}
+
 body.journal-route .trend-svg circle:hover,
 body.journal-route .trend-svg circle:focus,
 body.journal-route .trend-svg circle.is-active {
-  stroke-width: 3;
-  filter: drop-shadow(0 3px 6px rgba(39, 35, 31, 0.18));
+  stroke-width: 1.9;
+  filter: drop-shadow(0 2px 4px rgba(39, 35, 31, 0.14));
   outline: none;
 }
 
 body.journal-route .trend-svg .trend-dot-partial {
   fill: #fff;
   stroke: rgba(69, 55, 38, 0.38);
-  stroke-width: 2;
+  stroke-width: 1.25;
   stroke-dasharray: 2 2;
 }
 
 body.journal-route .trend-year,
-body.journal-route .trend-y {
+body.journal-route .trend-y,
+body.journal-route .trend-value {
   fill: var(--muted);
-  font-size: 10px;
+  font-size: 9px;
+}
+
+body.journal-route .trend-value {
+  fill: var(--ink-soft);
+  font-weight: 680;
+  paint-order: stroke;
+  pointer-events: none;
+  stroke: rgba(255, 255, 255, 0.78);
+  stroke-width: 2px;
+  stroke-linejoin: round;
+}
+
+body.journal-route .trend-value-partial {
+  fill: rgba(69, 55, 38, 0.72);
 }
 
 body.journal-route .trend-readout {
   pointer-events: none;
+  opacity: 0;
+  transition: opacity .16s ease;
+}
+
+body.journal-route .trend-readout.is-visible {
+  opacity: 1;
 }
 
 body.journal-route .trend-readout rect {
@@ -4278,6 +4324,175 @@ body.journal-route .trend-readout text {
   fill: var(--ink-soft);
   font-size: 10.5px;
   font-weight: 760;
+}
+
+body.journal-route .country-output-card {
+  min-height: 0;
+  padding-bottom: 12px;
+}
+
+body.journal-route .country-output-chart {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+  min-width: 0;
+}
+
+body.journal-route .country-output-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.4;
+  min-width: 0;
+}
+
+body.journal-route .country-select-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink-soft);
+  font-size: 11px;
+  font-weight: 760;
+  min-width: 0;
+}
+
+body.journal-route .country-select {
+  min-width: 0;
+  max-width: 172px;
+  height: 24px;
+  border: 1px solid var(--rule-soft);
+  border-radius: 7px;
+  background: rgba(255,255,255,.76);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 760;
+  padding: 0 8px;
+}
+
+body.journal-route .country-bar-row {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) 38px;
+  align-items: center;
+  gap: 8px;
+  min-height: 21px;
+  min-width: 0;
+}
+
+body.journal-route .country-year {
+  color: var(--ink-soft);
+  font-size: 10px;
+  font-weight: 760;
+  white-space: nowrap;
+}
+
+body.journal-route .country-year span {
+  display: block;
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 680;
+  line-height: 1.2;
+}
+
+body.journal-route .country-bar {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  width: 100%;
+  min-width: 0;
+  height: 18px;
+  overflow: hidden;
+  background: rgba(69, 55, 38, 0.08);
+  border: 1px solid rgba(69, 55, 38, 0.08);
+  border-radius: 999px;
+}
+
+body.journal-route .country-segment {
+  position: relative;
+  min-width: 1px;
+  height: 100%;
+}
+
+body.journal-route .country-segment + .country-segment {
+  box-shadow: inset 1px 0 rgba(255, 255, 255, 0.68);
+}
+
+body.journal-route .country-segment span {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
+  text-shadow: 0 1px 2px rgba(35, 31, 26, 0.28);
+}
+
+body.journal-route .country-total {
+  color: var(--muted);
+  font-size: 10.5px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+body.journal-route .country-line-svg {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+body.journal-route .country-line-path {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.94);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 1px 2px rgba(31, 109, 72, 0.66));
+}
+
+body.journal-route .country-line-dot {
+  fill: #fff;
+  stroke: #1f6d48;
+  stroke-width: 1.6;
+}
+
+body.journal-route .country-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px 10px;
+  margin-top: 10px;
+}
+
+body.journal-route .country-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--ink-soft);
+  font-size: 10.5px;
+  font-weight: 700;
+}
+
+body.journal-route .country-swatch {
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+}
+
+body.journal-route .country-empty {
+  margin-top: 8px;
+  font-size: 11px;
+  line-height: 1.5;
 }
 
 body.journal-route .related-grid {
