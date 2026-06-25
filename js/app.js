@@ -1493,6 +1493,7 @@
   }
 
   let activeTab = 'home';
+  let homeMode = 'search';
   const TAB_PATHS = { home: '/', int: '/global', dom: '/cn', updates: '/updates', in: '/in', my: '/my', kr: '/kr', fav: '/favorites', me: '/account', pick: '/pick' };
   const PATH_TABS = { '/': 'home', '/en': 'home', '/zh': 'home', '/global': 'int', '/international': 'int', '/journals': 'int', '/cn': 'dom', '/china': 'dom', '/updates': 'updates', '/in': 'in', '/india': 'in', '/my': 'my', '/malaysia': 'my', '/kr': 'kr', '/korea': 'kr', '/favorites': 'fav', '/account': 'me', '/me': 'me', '/profile': 'me', '/pick': 'pick' };
   const TAB_SEO = {
@@ -1940,6 +1941,19 @@
     label.dataset.i18n = key;
     label.textContent = t(key);
     btn?.setAttribute('aria-label', t(key));
+  }
+
+  function syncHomeModeTabs() {
+    document.querySelectorAll('[data-home-mode]').forEach(btn => {
+      const active = btn.dataset.homeMode === homeMode;
+      btn.classList.toggle('active', active);
+      btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
+  }
+
+  function setHomeMode(mode) {
+    homeMode = mode === 'pick' ? 'pick' : 'search';
+    syncHomeModeTabs();
   }
 
   // ───────── favorites (multi-list + drag sort) ─────────
@@ -5238,16 +5252,13 @@
     if (searchMatch) {
       try {
         const q = decodeURIComponent(searchMatch[1]);
-        const pickEl = document.querySelector('[data-tab="pick"]');
-        if (pickEl) {
-          pickEl.click();
-          const searchInput = $('#q');
-          if (searchInput) searchInput.value = q;
-          setTimeout(() => {
-            const btn = $('#search-submit');
-            if (btn) btn.click();
-          }, 800);
-        }
+        activateTab('pick');
+        const searchInput = $('#q');
+        if (searchInput) searchInput.value = q;
+        setTimeout(() => {
+          const btn = $('#search-submit');
+          if (btn) btn.click();
+        }, 800);
       } catch (_) {}
       return;
     }
@@ -8703,6 +8714,7 @@
       }
       updatePageSeo(activeTab);
       applyI18n(); // refresh placeholder
+      syncHomeModeTabs();
       if (['int', 'fav', 'pick'].includes(activeTab) && !journalsReady) {
         const hint = $('#hint');
         if (hint) hint.textContent = T('正在加载完整期刊库…', 'Loading full journal database…');
@@ -8816,6 +8828,10 @@
     $$('.tab[data-tab]').forEach(b => b.addEventListener('click', (e) => {
       e.preventDefault();
       activateTab(b.dataset.tab);
+    }));
+    $$('[data-home-mode]').forEach(b => b.addEventListener('click', (e) => {
+      e.preventDefault();
+      setHomeMode(b.dataset.homeMode);
     }));
     window.addEventListener('popstate', () => {
       if (renderJournalRoutePage()) return;

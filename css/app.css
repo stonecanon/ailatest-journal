@@ -596,6 +596,8 @@ main.main {
 }
 #mode-tabs .tab {
   font-family: var(--sans);
+  appearance: none;
+  -webkit-appearance: none;
   padding: 11px 34px;
   background: transparent;
   border: 0;
