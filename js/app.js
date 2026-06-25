@@ -6258,6 +6258,8 @@
         btn.style.order = String(idx);
       }
     });
+    const updatesBtn = document.querySelector('.rail-nav-btn[data-tab="updates"]');
+    if (updatesBtn) updatesBtn.style.order = String(enabled.length);
     const favBtn = document.querySelector('.rail-nav-btn[data-tab="fav"]');
     if (favBtn) favBtn.style.order = '8';
     const creditBadge = document.querySelector('#account-credit-badge');
