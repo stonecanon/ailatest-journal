@@ -6017,14 +6017,17 @@
   }
 
   function localSearchCount() {
-    let n = 0;
+    let historyCount = 0;
     try {
       const pickHistory = JSON.parse(localStorage.getItem('ailatest.pick.history') || '[]');
-      if (Array.isArray(pickHistory)) n += pickHistory.length;
+      if (Array.isArray(pickHistory)) historyCount += pickHistory.length;
+    } catch (_) {}
+    try {
+      const homeHistory = JSON.parse(localStorage.getItem('ailatest.home.search.history') || '[]');
+      if (Array.isArray(homeHistory)) historyCount += homeHistory.length;
     } catch (_) {}
     const usage = getDailyUsage();
-    n += Number(usage.searches || 0);
-    return n;
+    return Math.max(historyCount, Number(usage.searches || 0));
   }
 
   function localPluginCallCount() {
@@ -6042,6 +6045,164 @@
     const hit = fields.find(v => v !== undefined && v !== null && v !== '');
     const n = Number(hit);
     return Number.isFinite(n) ? n : 0;
+  }
+
+  function formatMeRecordTime(ts) {
+    if (!ts) return T('时间未知', 'Unknown time');
+    const d = new Date(ts);
+    if (!Number.isFinite(d.getTime())) return T('时间未知', 'Unknown time');
+    try {
+      return d.toLocaleString(lang === 'en' ? 'en-US' : 'zh-CN', {
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      });
+    } catch (_) {
+      return d.toLocaleString();
+    }
+  }
+
+  function readJsonArray(key) {
+    try {
+      const raw = JSON.parse(localStorage.getItem(key) || '[]');
+      return Array.isArray(raw) ? raw : [];
+    } catch (_) {
+      return [];
+    }
+  }
+
+  function localViewRecords(limit = 20) {
+    return readJsonArray('ailatest.viewhist').slice(0, limit).map(item => {
+      const title = item.n || item.name || item.title || item.k || T('期刊详情', 'Journal detail');
+      const meta = Array.isArray(item.c) ? item.c.filter(Boolean).join(' · ') : '';
+      return {
+        title,
+        meta,
+        time: item.t,
+        href: item.p || item.path || '',
+      };
+    });
+  }
+
+  function localSearchRecords(limit = 24) {
+    const home = readJsonArray('ailatest.home.search.history')
+      .filter(Boolean)
+      .map((query, idx) => ({
+        title: String(query),
+        meta: T('首页查刊', 'Journal search'),
+        time: Date.now() - idx * 1000,
+      }));
+    const pick = readJsonArray('ailatest.pick.history')
+      .filter(item => item && item.query)
+      .map(item => ({
+        title: item.query,
+        meta: T('荐刊查询', 'Recommendation search'),
+        time: item.time,
+      }));
+    const records = [...pick, ...home]
+      .sort((a, b) => Number(b.time || 0) - Number(a.time || 0))
+      .slice(0, limit);
+    const usage = getDailyUsage();
+    if (!records.length && Number(usage.searches || 0) > 0) {
+      return [{
+        title: T(`今日搜索 ${Number(usage.searches || 0)} 次`, `${Number(usage.searches || 0)} searches today`),
+        meta: T('本机统计', 'Local usage'),
+        time: Date.now(),
+      }];
+    }
+    return records;
+  }
+
+  function localPluginCallRecords(limit = 20) {
+    if (!user) return [];
+    const candidates = [
+      user.plugin_call_records,
+      user.pluginCallRecords,
+      user.pluginCallsLog,
+      user.api_call_records,
+      user.apiCallRecords,
+      user.apiCallsLog,
+      user.recent_api_calls,
+      user.recentApiCalls,
+      user.usage && user.usage.recent_calls,
+      user.usage && user.usage.calls,
+    ];
+    const raw = candidates.find(Array.isArray) || [];
+    return raw.slice(0, limit).map(item => ({
+      title: item.title || item.name || item.endpoint || item.path || item.tool || T('插件 / API 调用', 'Plugin / API call'),
+      meta: [item.method, item.status, item.platform, item.source].filter(Boolean).join(' · '),
+      time: item.time || item.created_at || item.createdAt || item.ts,
+    }));
+  }
+
+  function meRecordRows(records, emptyText) {
+    if (!records.length) {
+      return `<div class="me-record-empty">${escape(emptyText)}</div>`;
+    }
+    return `<div class="me-record-list">${records.map(item => {
+      const titleHtml = item.href
+        ? `<a href="${escape(item.href)}">${escape(item.title)}</a>`
+        : `<span>${escape(item.title)}</span>`;
+      return `<div class="me-record-row">
+        <div class="me-record-main">
+          <strong>${titleHtml}</strong>
+          ${item.meta ? `<span>${escape(item.meta)}</span>` : ''}
+        </div>
+        <time>${escape(formatMeRecordTime(item.time))}</time>
+      </div>`;
+    }).join('')}</div>`;
+  }
+
+  function renderMeRecordPanel(scope, type) {
+    const panel = scope.querySelector('[data-me-record-panel]');
+    if (!panel) return;
+    scope.querySelectorAll('[data-me-stat]').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.meStat === type);
+    });
+    panel.hidden = false;
+    if (type === 'credits') {
+      const credits = accountCreditValue();
+      panel.innerHTML = `<h2>${T('积分记录','Credit records')}</h2>
+        <div class="me-record-list">
+          <div class="me-record-row">
+            <div class="me-record-main">
+              <strong>${escape(credits === null ? T('积分待同步','Credits pending') : formatCreditValue(credits))}</strong>
+              <span>${signedCreditHint()}</span>
+            </div>
+            <time>${T('当前账号','Current account')}</time>
+          </div>
+        </div>`;
+      return;
+    }
+    if (type === 'views') {
+      panel.innerHTML = `<h2>${T('浏览记录','View records')}</h2>${meRecordRows(
+        localViewRecords(),
+        T('暂无本机浏览记录。打开期刊详情后会记录在这里。','No local view records yet. Open journal details and they will appear here.')
+      )}`;
+      return;
+    }
+    if (type === 'searches') {
+      panel.innerHTML = `<h2>${T('搜索记录','Search records')}</h2>${meRecordRows(
+        localSearchRecords(),
+        T('暂无搜索记录。首页查刊或荐刊后会记录在这里。','No search records yet. Journal searches and recommendation searches will appear here.')
+      )}`;
+      return;
+    }
+    if (type === 'api') {
+      const records = localPluginCallRecords();
+      const fallback = localPluginCallCount()
+        ? T('账号只同步了调用次数，暂未返回逐条明细。','Only aggregate call count is synced for this account; itemized records are not available yet.')
+        : T('暂无插件 / API 调用记录。','No plugin / API call records yet.');
+      panel.innerHTML = `<h2>${T('插件 / API 调用记录','Plugin / API call records')}</h2>${meRecordRows(records, fallback)}`;
+    }
+  }
+
+  function signedCreditHint() {
+    return user
+      ? T('账号额度和消耗记录由服务器同步。','Account quota and usage are synced from the server.')
+      : T('登录后可查看账号积分和同步记录。','Sign in to view account credits and synced records.');
   }
 
   function renderActivityDots() {
@@ -6083,12 +6244,13 @@
           </div>
         </header>
         <div class="me-stat-strip">
-          <div><strong>${escape(creditText)}</strong><span>${T('可用积分','Credits')}</span></div>
-          <div><strong>${favCount}</strong><span>${T('收藏期刊','Saved journals')}</span></div>
-          <div><strong>${Number(usage.views || 0)}</strong><span>${T('今日浏览','Views today')}</span></div>
-          <div><strong>${localSearchCount()}</strong><span>${T('搜索记录','Searches')}</span></div>
-          <div><strong>${localPluginCallCount()}</strong><span>${T('插件 / API 调用','Plugin / API calls')}</span></div>
+          <button type="button" class="me-stat-item" data-me-stat="credits"><strong>${escape(creditText)}</strong><span>${T('可用积分','Credits')}</span></button>
+          <a class="me-stat-item" data-me-stat="favorites" href="/favorites"><strong>${favCount}</strong><span>${T('收藏期刊','Saved journals')}</span></a>
+          <button type="button" class="me-stat-item" data-me-stat="views"><strong>${Number(usage.views || 0)}</strong><span>${T('今日浏览','Views today')}</span></button>
+          <button type="button" class="me-stat-item" data-me-stat="searches"><strong>${localSearchCount()}</strong><span>${T('搜索记录','Searches')}</span></button>
+          <button type="button" class="me-stat-item" data-me-stat="api"><strong>${localPluginCallCount()}</strong><span>${T('插件 / API 调用','Plugin / API calls')}</span></button>
         </div>
+        <section class="me-card me-record-panel" data-me-record-panel hidden></section>
         <div class="me-grid">
           <section class="me-card">
             <h2>${T('账号信息','Account')}</h2>
@@ -6113,6 +6275,16 @@
       }
     });
     box.querySelector('[data-me-favs]')?.addEventListener('click', () => activateTab('fav'));
+    box.querySelectorAll('[data-me-stat]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const type = btn.dataset.meStat;
+        if (type === 'favorites') {
+          activateTab('fav');
+          return;
+        }
+        renderMeRecordPanel(box, type);
+      });
+    });
   }
 
   // ───────── viewed-journal history → subject-aware default ranking ─────────
@@ -6126,7 +6298,13 @@
       if (!Array.isArray(h)) h = [];
       const key = r.issn || r.name || '';
       h = h.filter(e => e && e.k !== key);
-      h.unshift({ k: key, c: cats.slice(0, 3), t: Date.now() });
+      h.unshift({
+        k: key,
+        n: r.name || r.en_name || r.cn_name || key,
+        p: journalPublicPath(r),
+        c: cats.slice(0, 3),
+        t: Date.now(),
+      });
       if (h.length > 40) h = h.slice(0, 40);
       localStorage.setItem(VIEWHIST_KEY, JSON.stringify(h));
     } catch (e) {}
