@@ -203,27 +203,50 @@ body.share-mode .app-rail { display: none !important; }
 }
 .app-rail .account-credit-badge {
   display: inline-flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-width: 48px;
-  max-width: 62px;
-  min-height: 34px;
-  padding: 4px 7px;
-  border: 1px solid rgba(39,35,31,.1);
-  border-radius: 999px;
-  background: rgba(255,255,255,.72);
-  color: var(--ink-soft);
-  font-size: 10.5px;
+  gap: 3px;
+  width: 52px;
+  min-width: 52px;
+  min-height: 52px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 18px;
+  background: transparent;
+  color: var(--ink-faint);
+  font-size: 11px;
   font-weight: 750;
   line-height: 1.15;
   text-align: center;
   cursor: pointer;
-  box-shadow: 0 8px 22px rgba(39,35,31,.06);
+  box-shadow: none;
 }
 .app-rail .account-credit-badge:hover {
   color: var(--accent);
-  border-color: rgba(249,115,22,.28);
-  background: #fff;
+  border-color: rgba(249,115,22,.18);
+  background: rgba(249,115,22,.08);
+}
+.app-rail .account-credit-badge span {
+  max-width: 48px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.app-rail .account-credit-badge b {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: #f0c24b;
+  color: #6b4a18;
+  font-size: 10px;
+  font-weight: 820;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
 }
 .rankings-popup {
   position: fixed;
@@ -1661,7 +1684,7 @@ body.update-reading-mode .updates-page {
   display: inline-flex;
   position: fixed;
   top: 20px;
-  left: 34px;
+  left: 96px;
   z-index: 90;
   flex: 0 0 auto;
   align-items: baseline;
@@ -1707,8 +1730,8 @@ body.update-reading-mode .updates-page {
   width: min(670px, 100%);
   margin: -18px auto 24px;
   color: rgba(117,111,104,.86);
-  font-size: 12.5px;
-  line-height: 1.7;
+  font-size: 11px;
+  line-height: 1.55;
   text-align: center;
 }
 .public-pulse span {
@@ -1865,6 +1888,21 @@ body.update-reading-mode .updates-page {
   background: #fff;
 }
 
+body.home-route:not(.home-tab-has-results):not(.topbar-compact) .search-wrap > #q {
+  height: 142px;
+  min-height: 142px;
+  padding: 0 158px 0 26px;
+  line-height: 142px;
+}
+
+body.home-route:not(.home-tab-has-results):not(.topbar-compact) .search-actions {
+  left: auto;
+  right: 16px;
+  top: 50%;
+  bottom: auto;
+  transform: translateY(-50%);
+}
+
 body.topbar-compact .topbar {
   width: 100%;
   padding: 8px 18px 10px;
@@ -1926,11 +1964,10 @@ body.simple-top-route .topbar {
   background: transparent;
   box-shadow: none;
 }
-body.simple-top-route .topbar-brand,
-body.simple-top-route .topbar-links { display: inline-flex; }
+body.simple-top-route .topbar-brand { display: inline-flex; }
+body.simple-top-route .topbar-links { display: none; }
 body.simple-top-route .side-toggle,
 body.simple-top-route .search-wrap { display: none; }
-body.simple-top-route .lang-toggle-wrap { display: none; }
 
 body.topbar-compact .results-head {
   position: sticky;
@@ -6887,7 +6924,36 @@ html:not([lang|="zh"]) .j-row .col-topic::before { content: "Subject · "; }
 }
 
 /* ═══════ 语言切换移到右上角 ═══════ */
-.lang-toggle-wrap { position: fixed; top: 14px; right: 18px; z-index: 60; margin: 0; }
+.lang-toggle-wrap {
+  position: fixed;
+  top: 14px;
+  right: 18px;
+  z-index: 110;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+.download-center-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 33px;
+  padding: 5px 14px;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  background: rgba(255,253,249,.88);
+  color: var(--ink-soft);
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1;
+  text-decoration: none;
+  box-shadow: 0 2px 8px -3px rgba(60,48,36,.25);
+}
+.download-center-link:hover {
+  color: var(--ink);
+  border-color: var(--accent);
+}
 .app-rail .lang-toggle, .lang-toggle {
   background: var(--paper); border: 1px solid var(--rule); border-radius: 999px;
   padding: 5px 15px; font-size: 13px; font-weight: 600; color: var(--ink-soft);

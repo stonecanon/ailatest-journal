@@ -120,16 +120,16 @@ __JSONLD__
 <style>
 :root{--accent:#b4531f;--accent-light:#f59e0b;--bg:#f7f5f0;--paper:#fff;--ink:#1c1917;--ink-soft:#6b6559;--rule:#e3ddd0;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
 *{box-sizing:border-box}
-body{font-family:var(--sans);margin:0;padding:0;background:var(--bg);color:var(--ink);line-height:1.6}
-.header{background:rgba(255,253,249,.86);border-bottom:1px solid var(--rule);padding:11px 18px;position:sticky;top:0;z-index:10;backdrop-filter:blur(18px)}
-.header-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:16px}
+body{font-family:var(--sans);margin:0;padding:0;background:#fffdf9;color:var(--ink);line-height:1.6;background-image:linear-gradient(rgba(39,35,31,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(39,35,31,.035) 1px,transparent 1px);background-size:60px 60px}
+.header{height:60px;background:rgba(255,253,249,.88);border-bottom:1px solid var(--rule);position:sticky;top:0;z-index:10;backdrop-filter:blur(18px)}
+.header-inner{height:100%;max-width:none;margin:0;display:flex;align-items:center;gap:16px;padding:0 24px}
 .header a{color:var(--ink);text-decoration:none;font-weight:700;font-size:15px;letter-spacing:0}
 .header a:hover{color:var(--accent)}
-.header .logo{display:flex;align-items:baseline;gap:4px;font-weight:800;font-size:16px}
+.header .logo{display:flex;align-items:baseline;gap:4px;font-weight:820;font-size:18px}
 .header .logo em{font-family:Georgia,'Times New Roman',serif;font-style:italic;font-weight:700;color:var(--ink-soft)}
 .header .logo-symbol{display:none}
-.header .nav-links{display:flex;gap:16px;margin-left:auto;font-size:13px}
-.header .nav-links a{font-weight:500;color:var(--ink-soft)}
+.header .nav-links{display:flex;align-items:center;gap:8px;margin-left:auto;font-size:13px}
+.header .nav-links a{display:inline-flex;align-items:center;min-height:32px;padding:5px 13px;border:1px solid var(--rule);border-radius:999px;background:rgba(255,253,249,.82);font-weight:650;color:var(--ink-soft)}
 .wrap{max-width:1100px;margin:0 auto;padding:20px}
 h1{font-size:20px;margin:0 0 6px;font-weight:700;letter-spacing:-.01em}
 .breadcrumb{font-size:12px;color:var(--ink-soft);margin-bottom:12px}
@@ -163,8 +163,8 @@ a:hover{text-decoration:underline}
 <div class="header-inner">
   <a href="__ORIGIN__/" class="logo">AILatest <em>Journal</em></a>
   <span class="nav-links">
-    <a href="__ORIGIN__/indexes/">Indexes</a>
-    <a href="__ORIGIN__/subjects/">Subjects</a>
+    <a href="__ORIGIN__/">Home</a>
+    <a href="__ORIGIN__/extension.html">Download Center</a>
   </span>
 </div></div>
 <div class="wrap">
@@ -357,16 +357,16 @@ def generate_landing(origin):
 <style>
 :root{{--accent:#b4531f;--bg:#f7f5f0;--paper:#fff;--ink:#1c1917;--ink-soft:#6b6559;--rule:#e3ddd0;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}}
 *{{box-sizing:border-box}}
-body{{font-family:var(--sans);margin:0;padding:0;background:var(--bg);color:var(--ink);line-height:1.6}}
-.header{{background:rgba(255,253,249,.86);border-bottom:1px solid var(--rule);padding:11px 18px;position:sticky;top:0;z-index:10;backdrop-filter:blur(18px)}}
-.header-inner{{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:16px}}
+body{{font-family:var(--sans);margin:0;padding:0;background:#fffdf9;color:var(--ink);line-height:1.6;background-image:linear-gradient(rgba(39,35,31,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(39,35,31,.035) 1px,transparent 1px);background-size:60px 60px}}
+.header{{height:60px;background:rgba(255,253,249,.88);border-bottom:1px solid var(--rule);position:sticky;top:0;z-index:10;backdrop-filter:blur(18px)}}
+.header-inner{{height:100%;max-width:none;margin:0;display:flex;align-items:center;gap:16px;padding:0 24px}}
 .header a{{color:var(--ink);text-decoration:none;font-weight:700;font-size:15px;letter-spacing:0}}
 .header a:hover{{color:var(--accent)}}
-.header .logo{{display:flex;align-items:baseline;gap:4px;font-weight:800;font-size:16px}}
+.header .logo{{display:flex;align-items:baseline;gap:4px;font-weight:820;font-size:18px}}
 .header .logo em{{font-family:Georgia,'Times New Roman',serif;font-style:italic;font-weight:700;color:var(--ink-soft)}}
 .header .logo-symbol{{display:none}}
-.header .nav-links{{display:flex;gap:16px;margin-left:auto;font-size:13px}}
-.header .nav-links a{{font-weight:500;color:var(--ink-soft)}}
+.header .nav-links{{display:flex;align-items:center;gap:8px;margin-left:auto;font-size:13px}}
+.header .nav-links a{{display:inline-flex;align-items:center;min-height:32px;padding:5px 13px;border:1px solid var(--rule);border-radius:999px;background:rgba(255,253,249,.82);font-weight:650;color:var(--ink-soft)}}
 .header .nav-links a:hover{{color:var(--accent)}}
 .wrap{{max-width:1100px;margin:0 auto;padding:20px}}
 h1{{font-size:20px;margin:0 0 6px;font-weight:700}}
@@ -385,7 +385,7 @@ h1{{font-size:20px;margin:0 0 6px;font-weight:700}}
 </style>
 </head><body>
 <div class="header"><div class="header-inner"><a href="{origin}/" class="logo">AILatest <em>Journal</em></a>
-<span class="nav-links"><a href="{origin}/indexes/">Indexes</a><a href="{origin}/subjects/">Subjects</a></span></div></div>
+<span class="nav-links"><a href="{origin}/">Home</a><a href="{origin}/extension.html">Download Center</a></span></div></div>
 <div class="wrap"><h1>Browse Journals by WoS Subject</h1><p class="breadcrumb"><a href="{origin}/">Home</a></p>
 <p class="sub">Select a Web of Science subject category to browse top journals sorted by Impact Factor.</p>
 <div class="card"><ul class="cat-list">{r_list}</ul></div>
@@ -407,16 +407,16 @@ h1{{font-size:20px;margin:0 0 6px;font-weight:700}}
 <style>
 :root{{--accent:#b4531f;--bg:#f7f5f0;--paper:#fff;--ink:#1c1917;--ink-soft:#6b6559;--rule:#e3ddd0;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}}
 *{{box-sizing:border-box}}
-body{{font-family:var(--sans);margin:0;padding:0;background:var(--bg);color:var(--ink);line-height:1.6}}
-.header{{background:rgba(255,253,249,.86);border-bottom:1px solid var(--rule);padding:11px 18px;position:sticky;top:0;z-index:10;backdrop-filter:blur(18px)}}
-.header-inner{{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:16px}}
+body{{font-family:var(--sans);margin:0;padding:0;background:#fffdf9;color:var(--ink);line-height:1.6;background-image:linear-gradient(rgba(39,35,31,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(39,35,31,.035) 1px,transparent 1px);background-size:60px 60px}}
+.header{{height:60px;background:rgba(255,253,249,.88);border-bottom:1px solid var(--rule);position:sticky;top:0;z-index:10;backdrop-filter:blur(18px)}}
+.header-inner{{height:100%;max-width:none;margin:0;display:flex;align-items:center;gap:16px;padding:0 24px}}
 .header a{{color:var(--ink);text-decoration:none;font-weight:700;font-size:15px;letter-spacing:0}}
 .header a:hover{{color:var(--accent)}}
-.header .logo{{display:flex;align-items:baseline;gap:4px;font-weight:800;font-size:16px}}
+.header .logo{{display:flex;align-items:baseline;gap:4px;font-weight:820;font-size:18px}}
 .header .logo em{{font-family:Georgia,'Times New Roman',serif;font-style:italic;font-weight:700;color:var(--ink-soft)}}
 .header .logo-symbol{{display:none}}
-.header .nav-links{{display:flex;gap:16px;margin-left:auto;font-size:13px}}
-.header .nav-links a{{font-weight:500;color:var(--ink-soft)}}
+.header .nav-links{{display:flex;align-items:center;gap:8px;margin-left:auto;font-size:13px}}
+.header .nav-links a{{display:inline-flex;align-items:center;min-height:32px;padding:5px 13px;border:1px solid var(--rule);border-radius:999px;background:rgba(255,253,249,.82);font-weight:650;color:var(--ink-soft)}}
 .header .nav-links a:hover{{color:var(--accent)}}
 .wrap{{max-width:1100px;margin:0 auto;padding:20px}}
 h1{{font-size:20px;margin:0 0 6px;font-weight:700}}
@@ -436,7 +436,7 @@ h1{{font-size:20px;margin:0 0 6px;font-weight:700}}
 </style>
 </head><body>
 <div class="header"><div class="header-inner"><a href="{origin}/" class="logo">AILatest <em>Journal</em></a>
-<span class="nav-links"><a href="{origin}/indexes/">Indexes</a><a href="{origin}/subjects/">Subjects</a></span></div></div>
+<span class="nav-links"><a href="{origin}/">Home</a><a href="{origin}/extension.html">Download Center</a></span></div></div>
 <div class="wrap"><h1>Browse Journals by Indexing Database</h1><p class="breadcrumb"><a href="{origin}/">Home</a></p>
 <p class="sub">Select an indexing database to browse indexed journals sorted by Impact Factor.</p>
 <div class="card"><ul class="cat-list">{i_list}</ul></div>

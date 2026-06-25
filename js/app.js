@@ -60,7 +60,8 @@
       nav_about: '关于', nav_contact: '联系',
       nav_index_rank: '索引排行榜', nav_subject_rank: '学科排行榜', nav_warn_rank: '预警名单', nav_extension_beta: '插件内测', nav_subscription: '订阅',
       filter_if_range: '影响因子', if_any: '不限',
-      rail_int: '全球', rail_dom: '中国', rail_in: '印度', rail_my: '马来西亚', rail_kr: '韩国', rail_rank: '榜单', rail_fav: '我的',
+      rail_int: '全球', rail_dom: '中国', rail_in: '印度', rail_my: '马来西亚', rail_kr: '韩国', rail_rank: '榜单', rail_fav: '收藏', rail_me: '我的',
+      download_center: '下载中心',
       loading: '加载中…',
       hero_title_int: 'SCI / SSCI 国际期刊检索',
       hero_body_int: '資料來源：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI）· 更新至 2026-05-18，並合併 <b>EI Compendex</b> 期刊目錄（2025-10-10）。',
@@ -147,7 +148,8 @@
       nav_about: 'About', nav_contact: 'Contact',
       nav_index_rank: 'Index Rankings', nav_subject_rank: 'Subject Rankings', nav_warn_rank: 'Warning List', nav_extension_beta: 'Extension beta', nav_subscription: 'Subscribe',
       filter_if_range: 'Impact Factor', if_any: 'Any',
-      rail_int: 'Global', rail_dom: 'China', rail_in: 'India', rail_my: 'Malaysia', rail_kr: 'Korea', rail_rank: 'Rankings', rail_fav: 'Me',
+      rail_int: 'Global', rail_dom: 'China', rail_in: 'India', rail_my: 'Malaysia', rail_kr: 'Korea', rail_rank: 'Rankings', rail_fav: 'Saved', rail_me: 'Me',
+      download_center: 'Downloads',
       loading: 'Loading…',
       hero_title_int: 'International SCI / SSCI Search',
       hero_body_int: 'Source: <b>Web of Science Core Collection</b> (SCIE / SSCI / AHCI / ESCI), updated 2026-05-18, merged with <b>EI Compendex</b> source list (2025-10-10).',
@@ -220,7 +222,8 @@
     filter_xinrui: '新銳分區', filter_warning: '預警', domestic_sources: '中國分級來源',
     src_cnkx: '中國科協高品質目錄', src_cssci_core: 'CSSCI 來源期刊', src_cssci_ext: 'CSSCI 擴展版', src_pku: '北大核心 (2023)', src_zju: '浙江大學 2024', src_ccft: 'CCF 中文 T 分區', nav_sub_inhouse: '院校自編目錄', paid_label: '付費', drawer_kicker: '期刊詳情',
         tab_home: '查刊', tab_int: '國際', tab_dom: '中國', tab_fav: '收藏', tab_pick: '薦刊',
-    rail_int: '國際期刊', rail_dom: '中國期刊', rail_fav: '我的收藏',
+    rail_int: '國際期刊', rail_dom: '中國期刊', rail_fav: '收藏', rail_me: '我的',
+    download_center: '下載中心',
     loading: '載入中…',
     hero_title_int: 'SCI / SSCI 國際期刊檢索',
     hero_body_int: '資料來源：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI）· 更新至 2026-05-18，並合併 <b>EI Compendex</b> 期刊目錄（2025-10-10）。',
@@ -1740,11 +1743,11 @@
     badge.tabIndex = 0;
     const credits = accountCreditValue();
     if (user) {
-      const text = credits === null ? T('积分','Credits') : `${T('积分','Credits')} ${formatCreditValue(credits)}`;
-      badge.textContent = text;
+      const creditHtml = credits === null ? '' : `<b>${formatCreditValue(credits)}</b>`;
+      badge.innerHTML = `<span>${T('我的','Me')}</span>${creditHtml}`;
       badge.title = T('进入个人信息与积分','Open account and credits');
     } else {
-      badge.textContent = `${T('积分','Credits')} 0`;
+      badge.innerHTML = `<span>${T('我的','Me')}</span>`;
       badge.title = T('登录后查看积分','Sign in to view credits');
     }
   }
@@ -5936,9 +5939,9 @@
       }
     });
     const favBtn = document.querySelector('.rail-nav-btn[data-tab="fav"]');
-    if (favBtn) favBtn.style.order = '9';
+    if (favBtn) favBtn.style.order = '8';
     const creditBadge = document.querySelector('#account-credit-badge');
-    if (creditBadge) creditBadge.style.order = '10';
+    if (creditBadge) creditBadge.style.order = '9';
   }
   function setUiLanguage(code) {
     if (!LANG_META[code]) return;
