@@ -1,15 +1,28 @@
-# 原始期刊列表文件（不上传）
-# 原始期刊列表文件（不上传）
+# Raw source lists and private inputs
 list/
 
-# 生成/缓存文件
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+!.env.local.example
+.dev.vars
+.dev.vars.*
+
+# Local/runtime caches
 generated/
 dashboard/
+test-results/
+playwright-report/
+.wrangler/
+**/.wrangler/
 scripts/__pycache__/
 __pycache__/
 *.pyc
+*.pid
+*.tmp
 
-# 数据备份
+# Generated or local-only data
 data/*.bak
 data/sources/
 data/journals.json
@@ -17,18 +30,19 @@ data/oa.json
 data/annual_outputs.json
 data/retraction_metrics.json
 data/openalex_cache.json
-
-# 本地工具文件
-.wrangler/
-.DS_Store
-Thumbs.db
-
-# 日志
-*.log
-*.plist
-
-# 小程序生成数据（weapp目录下有自己的一份）
 data/weapp/
 data/india.json
 data/journal_covers*
 data/stripped.json.gz
+
+# Sync/editor clutter
+_archive/
+.DS_Store
+Thumbs.db
+* (1).*
+*_冲突文件_*
+
+# Logs and launch agents
+*.log
+*.err.log
+*.plist
