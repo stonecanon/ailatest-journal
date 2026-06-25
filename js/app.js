@@ -1179,8 +1179,8 @@
   }
 
   let activeTab = 'home';
-  const TAB_PATHS = { home: '/', int: '/global', dom: '/cn', updates: '/updates', in: '/in', my: '/my', kr: '/kr', fav: '/favorites', pick: '/pick' };
-  const PATH_TABS = { '/': 'home', '/en': 'home', '/zh': 'home', '/global': 'int', '/international': 'int', '/journals': 'int', '/cn': 'dom', '/china': 'dom', '/updates': 'updates', '/in': 'in', '/india': 'in', '/my': 'my', '/malaysia': 'my', '/kr': 'kr', '/korea': 'kr', '/favorites': 'fav', '/pick': 'pick' };
+  const TAB_PATHS = { home: '/', int: '/global', dom: '/cn', updates: '/updates', in: '/in', my: '/my', kr: '/kr', fav: '/favorites', me: '/account', pick: '/pick' };
+  const PATH_TABS = { '/': 'home', '/en': 'home', '/zh': 'home', '/global': 'int', '/international': 'int', '/journals': 'int', '/cn': 'dom', '/china': 'dom', '/updates': 'updates', '/in': 'in', '/india': 'in', '/my': 'my', '/malaysia': 'my', '/kr': 'kr', '/korea': 'kr', '/favorites': 'fav', '/account': 'me', '/me': 'me', '/profile': 'me', '/pick': 'pick' };
   const TAB_SEO = {
     home: {
       title: 'AILatest Journal - Journal Finder, Rankings & Impact Factors',
@@ -1742,7 +1742,7 @@
     if (user) {
       const text = credits === null ? T('积分','Credits') : `${T('积分','Credits')} ${formatCreditValue(credits)}`;
       badge.textContent = text;
-      badge.title = T('进入我的收藏与账号','Open favorites and account');
+      badge.title = T('进入个人信息与积分','Open account and credits');
     } else {
       badge.textContent = `${T('积分','Credits')} 0`;
       badge.title = T('登录后查看积分','Sign in to view credits');
@@ -5992,6 +5992,126 @@
     });
   }
 
+  function userDisplayName() {
+    if (!user) return T('未登录用户', 'Guest');
+    return user.name || user.login || user.email || T('我的账号', 'My account');
+  }
+
+  function userEmailText() {
+    if (!user) return T('未登录', 'Not signed in');
+    return user.email || user.login || T('未提供邮箱', 'No email on file');
+  }
+
+  function userProviderText() {
+    if (!user) return '—';
+    const raw = user.provider || user.auth_provider || user.login_provider || user.oauth_provider || '';
+    const provider = String(raw || '').toLowerCase();
+    if (provider.includes('google')) return 'Google';
+    if (provider.includes('github')) return 'GitHub';
+    if (provider.includes('email')) return T('邮箱验证码', 'Email code');
+    if (provider) return raw;
+    return user.email ? T('邮箱验证码', 'Email code') : T('账号登录', 'Account');
+  }
+
+  function localSearchCount() {
+    let n = 0;
+    try {
+      const pickHistory = JSON.parse(localStorage.getItem('ailatest.pick.history') || '[]');
+      if (Array.isArray(pickHistory)) n += pickHistory.length;
+    } catch (_) {}
+    const usage = getDailyUsage();
+    n += Number(usage.searches || 0);
+    return n;
+  }
+
+  function localPluginCallCount() {
+    if (!user) return 0;
+    const fields = [
+      user.plugin_calls,
+      user.pluginCalls,
+      user.extension_calls,
+      user.extensionCalls,
+      user.api_calls,
+      user.apiCalls,
+      user.usage && user.usage.plugin_calls,
+      user.usage && user.usage.api_calls,
+    ];
+    const hit = fields.find(v => v !== undefined && v !== null && v !== '');
+    const n = Number(hit);
+    return Number.isFinite(n) ? n : 0;
+  }
+
+  function renderActivityDots() {
+    const usage = getDailyUsage();
+    const today = new Date();
+    const dots = [];
+    for (let i = 83; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(today.getDate() - i);
+      const key = d.toISOString().slice(0, 10);
+      const active = usage.date === key ? Math.min(4, Math.max(1, Number(usage.views || 0) + Number(usage.searches || 0))) : 0;
+      dots.push(`<span class="me-activity-dot level-${active}" title="${escape(key)}"></span>`);
+    }
+    return dots.join('');
+  }
+
+  function renderMe() {
+    const box = $('#me-content');
+    if (!box) return;
+    const usage = getDailyUsage();
+    const favCount = allFavIds().size;
+    const credits = accountCreditValue();
+    const creditText = user
+      ? (credits === null ? T('积分待同步', 'Credits pending') : formatCreditValue(credits))
+      : '0';
+    const signed = !!user;
+    box.innerHTML = `
+      <section class="me-page">
+        <header class="me-hero">
+          <div class="me-avatar">${escape((userDisplayName().match(/[A-Za-z0-9\u4e00-\u9fff]/)?.[0] || 'A').toUpperCase())}</div>
+          <div class="me-title-block">
+            <h1>${escape(userDisplayName())}</h1>
+            <p>${escape(userEmailText())} · ${escape(userProviderText())}</p>
+          </div>
+          <div class="me-actions">
+            ${signed
+              ? `<button class="btn-mini" data-me-favs>${T('我的收藏','Favorites')}</button><button class="btn-mini" data-me-logout>${T('退出登录','Sign out')}</button>`
+              : `<button class="btn-mini primary" data-me-login>${T('登录 / 注册','Sign in / Sign up')}</button>`}
+          </div>
+        </header>
+        <div class="me-stat-strip">
+          <div><strong>${escape(creditText)}</strong><span>${T('可用积分','Credits')}</span></div>
+          <div><strong>${favCount}</strong><span>${T('收藏期刊','Saved journals')}</span></div>
+          <div><strong>${Number(usage.views || 0)}</strong><span>${T('今日浏览','Views today')}</span></div>
+          <div><strong>${localSearchCount()}</strong><span>${T('搜索记录','Searches')}</span></div>
+          <div><strong>${localPluginCallCount()}</strong><span>${T('插件 / API 调用','Plugin / API calls')}</span></div>
+        </div>
+        <div class="me-grid">
+          <section class="me-card">
+            <h2>${T('账号信息','Account')}</h2>
+            <dl class="me-kv">
+              <div><dt>${T('邮箱','Email')}</dt><dd>${escape(userEmailText())}</dd></div>
+              <div><dt>${T('登录方式','Sign-in method')}</dt><dd>${escape(userProviderText())}</dd></div>
+              <div><dt>${T('账号状态','Status')}</dt><dd>${signed ? T('已登录','Signed in') : T('未登录','Not signed in')}</dd></div>
+            </dl>
+          </section>
+          <section class="me-card">
+            <h2>${T('活动记录','Activity')}</h2>
+            <div class="me-activity-months"><span>${T('近 12 周','Last 12 weeks')}</span><span>${new Date().toLocaleDateString(lang === 'en' ? 'en-US' : 'zh-CN', { month: 'long', day: 'numeric' })}</span></div>
+            <div class="me-activity-grid">${renderActivityDots()}</div>
+          </section>
+        </div>
+      </section>`;
+    box.querySelector('[data-me-login]')?.addEventListener('click', startLogin);
+    box.querySelector('[data-me-logout]')?.addEventListener('click', () => {
+      if (confirm(T('退出登录？','Sign out?'))) {
+        doLogout();
+        renderMe();
+      }
+    });
+    box.querySelector('[data-me-favs]')?.addEventListener('click', () => activateTab('fav'));
+  }
+
   // ───────── viewed-journal history → subject-aware default ranking ─────────
   const VIEWHIST_KEY = 'ailatest.viewhist';
   function recordView(r) {
@@ -8100,6 +8220,7 @@
       }
       if (activeTab === 'dom') renderDomestic();
       else if (activeTab === 'fav') renderFav();
+      else if (activeTab === 'me') renderMe();
       else if (activeTab === 'int') renderInt();
       else if (activeTab === 'in') renderIndia();
       else if (activeTab === 'my') renderMalaysia();
@@ -8499,7 +8620,7 @@
         startLogin();
         return;
       }
-      activateTab('fav', { push: true });
+      activateTab('me', { push: true });
     });
     $('#account-credit-badge')?.addEventListener('keydown', (e) => {
       if (e.key !== 'Enter' && e.key !== ' ') return;

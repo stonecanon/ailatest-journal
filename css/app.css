@@ -2045,6 +2045,149 @@ body.topbar-compact .results-head {
   .lang-dropdown { right: auto; left: 0; }
 }
 
+/* ───────── Account page ───────── */
+.me-page {
+  width: min(960px, calc(100vw - 56px));
+  margin: 18px auto 36px;
+}
+.me-hero {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 22px 24px;
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  background: rgba(255,255,255,.72);
+  box-shadow: 0 16px 42px rgba(39,35,31,.07);
+}
+.me-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #087a5b;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 25px;
+  font-weight: 850;
+  flex: 0 0 auto;
+}
+.me-title-block {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.me-title-block h1 {
+  margin: 0;
+  font: 780 26px/1.2 var(--display);
+  letter-spacing: 0;
+}
+.me-title-block p {
+  margin: 6px 0 0;
+  color: var(--ink-faint);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+.me-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.me-stat-strip {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  margin: 18px 0;
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(255,255,255,.62);
+}
+.me-stat-strip > div {
+  min-height: 74px;
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  text-align: center;
+  border-right: 1px solid var(--rule-soft);
+}
+.me-stat-strip > div:last-child { border-right: 0; }
+.me-stat-strip strong {
+  font-size: 24px;
+  line-height: 1;
+  color: #6f4e2e;
+  font-variant-numeric: tabular-nums;
+}
+.me-stat-strip span {
+  color: var(--ink-faint);
+  font-size: 12px;
+  font-weight: 650;
+}
+.me-grid {
+  display: grid;
+  grid-template-columns: minmax(260px, .85fr) minmax(0, 1.15fr);
+  gap: 18px;
+}
+.me-card {
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  background: rgba(255,255,255,.64);
+  padding: 18px;
+}
+.me-card h2 {
+  margin: 0 0 14px;
+  font-size: 17px;
+  line-height: 1.2;
+}
+.me-kv {
+  margin: 0;
+  display: grid;
+  gap: 10px;
+}
+.me-kv div {
+  display: grid;
+  grid-template-columns: 82px minmax(0, 1fr);
+  gap: 10px;
+  align-items: baseline;
+}
+.me-kv dt {
+  color: var(--ink-faint);
+  font-size: 12px;
+  font-weight: 700;
+}
+.me-kv dd {
+  margin: 0;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.me-activity-months {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--ink-faint);
+  font-size: 12px;
+  margin-bottom: 12px;
+}
+.me-activity-grid {
+  display: grid;
+  grid-template-columns: repeat(28, 10px);
+  gap: 5px;
+  align-items: center;
+}
+.me-activity-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  background: #ece4d7;
+}
+.me-activity-dot.level-1 { background: #cce6d5; }
+.me-activity-dot.level-2 { background: #8cc7a1; }
+.me-activity-dot.level-3 { background: #43a16e; }
+.me-activity-dot.level-4 { background: #087a5b; }
+
 /* favorite star button on row — 淡雅米色调，与主题一致 */
 .fav-star {
   display: inline-flex;
@@ -6741,6 +6884,42 @@ body.journal-route .lang-toggle-wrap { display: none; }
   body { padding-left: 0; }
   /* 导航交给底栏，隐藏 ☰（筛选已内联在国际刊页顶部） */
   .side-toggle { display: none !important; }
+  .me-page {
+    width: 100%;
+    margin: 8px auto 24px;
+  }
+  .me-hero {
+    align-items: flex-start;
+    padding: 18px;
+    gap: 12px;
+  }
+  .me-avatar {
+    width: 54px;
+    height: 54px;
+    font-size: 22px;
+  }
+  .me-title-block h1 { font-size: 23px; }
+  .me-actions {
+    flex-basis: 100%;
+    justify-content: flex-start;
+    margin-left: 66px;
+  }
+  .me-stat-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .me-stat-strip > div {
+    border-right: 1px solid var(--rule-soft);
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .me-stat-strip > div:nth-child(2n) { border-right: 0; }
+  .me-grid {
+    grid-template-columns: 1fr;
+  }
+  .me-activity-grid {
+    grid-template-columns: repeat(21, 10px);
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
 }
 
 /* ═══════ 手机端：防止横向溢出（中文卡片过长会撑宽页面→底部标签栏被挤出屏幕）═══════ */
