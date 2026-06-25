@@ -2746,6 +2746,26 @@
     updateAccountCreditBadge();
   }
 
+  async function refreshCurrentUserProfile() {
+    if (!user || !user.token) return;
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 2500);
+    try {
+      const r = await fetch(`${API_BASE}/me`, {
+        headers: { 'Authorization': `Bearer ${user.token}` },
+        signal: controller.signal,
+      });
+      const me = await readJsonResponse(r, T('用户信息获取失败','Failed to fetch user info'));
+      user = { ...user, ...me, token: user.token };
+      localStorage.setItem('ailatest.user', JSON.stringify(user));
+      updateAccountCreditBadge();
+      if (activeTab === 'me') renderMe();
+    } catch (_) {
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
   function doLogout() {
     user = null;
     localStorage.removeItem('ailatest.user');
@@ -6344,6 +6364,38 @@
     return user.email ? T('邮箱验证码', 'Email code') : T('账号登录', 'Account');
   }
 
+  function safeAvatarUrl(value) {
+    const raw = String(value || '').trim();
+    if (!raw) return '';
+    try {
+      const url = new URL(raw, location.origin);
+      return /^https?:$/.test(url.protocol) ? url.href : '';
+    } catch (_) {
+      return '';
+    }
+  }
+
+  function userAvatarUrl() {
+    if (!user) return '';
+    return safeAvatarUrl(
+      user.avatar_url || user.avatarUrl || user.picture || user.photo ||
+      user.image || user.image_url || user.profile_image_url
+    );
+  }
+
+  function userInitial() {
+    return escape((userDisplayName().match(/[A-Za-z0-9\u4e00-\u9fff]/)?.[0] || 'A').toUpperCase());
+  }
+
+  function userAvatarHtml() {
+    const avatarUrl = userAvatarUrl();
+    const label = escape(userDisplayName());
+    return `<div class="me-avatar${avatarUrl ? ' has-photo' : ''}">
+      ${avatarUrl ? `<img src="${escape(avatarUrl)}" alt="${label}" referrerpolicy="no-referrer" loading="lazy">` : ''}
+      <span>${userInitial()}</span>
+    </div>`;
+  }
+
   function localSearchCount() {
     let historyCount = 0;
     try {
@@ -6560,7 +6612,7 @@
     box.innerHTML = `
       <section class="me-page">
         <header class="me-hero">
-          <div class="me-avatar">${escape((userDisplayName().match(/[A-Za-z0-9\u4e00-\u9fff]/)?.[0] || 'A').toUpperCase())}</div>
+          ${userAvatarHtml()}
           <div class="me-title-block">
             <h1>${escape(userDisplayName())}</h1>
             <p>${escape(userEmailText())} · ${escape(userProviderText())}</p>
@@ -6596,6 +6648,11 @@
         </div>
       </section>`;
     box.querySelector('[data-me-login]')?.addEventListener('click', startLogin);
+    box.querySelector('.me-avatar img')?.addEventListener('error', (e) => {
+      const wrap = e.currentTarget.closest('.me-avatar');
+      e.currentTarget.remove();
+      wrap?.classList.remove('has-photo');
+    });
     box.querySelector('[data-me-logout]')?.addEventListener('click', () => {
       if (confirm(T('退出登录？','Sign out?'))) {
         doLogout();
@@ -10101,6 +10158,7 @@
     applyStations();
     updateFavCount();
     await handleAuthCallback();
+    refreshCurrentUserProfile();
     // 分享着陆页：/s/<id> 直接接管 main，不走主流程
     if (await maybeRenderShareLanding()) return;
     try {
