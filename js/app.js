@@ -6619,7 +6619,7 @@
           </div>
           <div class="me-actions">
             ${signed
-              ? `<button class="btn-mini" data-me-favs>${T('我的收藏','Favorites')}</button><button class="btn-mini" data-me-logout>${T('退出登录','Sign out')}</button>`
+              ? `<button class="btn-mini" data-me-logout>${T('退出登录','Sign out')}</button>`
               : `<button class="btn-mini primary" data-me-login>${T('登录 / 注册','Sign in / Sign up')}</button>`}
           </div>
         </header>
@@ -6659,7 +6659,6 @@
         renderMe();
       }
     });
-    box.querySelector('[data-me-favs]')?.addEventListener('click', () => activateTab('fav'));
     box.querySelectorAll('[data-me-stat]').forEach(btn => {
       btn.addEventListener('click', () => {
         const type = btn.dataset.meStat;
