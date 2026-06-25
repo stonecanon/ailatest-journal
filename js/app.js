@@ -58,6 +58,7 @@
       footer_data: '© <a href="https://journal.ailatest.org">AILatest Journal</a>',
       tab_home: '查刊', tab_int: '国际', tab_dom: '中国', tab_fav: '收藏', tab_pick: '荐刊',
       nav_about: '关于', nav_contact: '联系',
+      nav_terms: '条款', nav_privacy: '隐私', nav_refund: '退款',
       nav_index_rank: '索引排行榜', nav_subject_rank: '学科排行榜', nav_warn_rank: '预警名单', nav_extension_beta: '插件内测', nav_subscription: '订阅',
       filter_if_range: '影响因子', if_any: '不限',
       rail_int: '全球', rail_dom: '中国', rail_in: '印度', rail_my: '马来西亚', rail_kr: '韩国', rail_rank: '榜单', rail_fav: '收藏', rail_me: '我的',
@@ -146,6 +147,7 @@
       footer_data: '© <a href="https://journal.ailatest.org">AILatest Journal</a>',
       tab_home: 'Journals', tab_int: 'International', tab_dom: 'China', tab_fav: 'Favorites', tab_pick: 'Recommend',
       nav_about: 'About', nav_contact: 'Contact',
+      nav_terms: 'Terms', nav_privacy: 'Privacy', nav_refund: 'Refund',
       nav_index_rank: 'Index Rankings', nav_subject_rank: 'Subject Rankings', nav_warn_rank: 'Warning List', nav_extension_beta: 'Extension beta', nav_subscription: 'Subscribe',
       filter_if_range: 'Impact Factor', if_any: 'Any',
       rail_int: 'Global', rail_dom: 'China', rail_in: 'India', rail_my: 'Malaysia', rail_kr: 'Korea', rail_rank: 'Rankings', rail_fav: 'Saved', rail_me: 'Me',
@@ -360,6 +362,170 @@
     pick_filter_esci: 'ESCI',
     pick_filter_free_doaj: 'Free (DOAJ)'
   });
+  Object.assign(I18N.ja, {
+    tagline: '<b>AILatest Journal</b> — 研究者向けのジャーナル検索・投稿判断ツール。SCI/SSCI、CAS区分、JCR、ESI、CSSCI、北大核心、ZJU などを統合。',
+    brand_title: 'Journal',
+    brand_zhikan: '知刊',
+    indices: '索引',
+    cas_zone: 'CAS 2025 区分',
+    filters: 'フィルター',
+    all: 'すべて',
+    z1: '1区',
+    z2: '2区',
+    z3: '3区',
+    z4: '4区',
+    filter_xinrui: '新興区分',
+    filter_warning: '警告リスト',
+    domestic_sources: '中国国内ソース',
+    src_nsfc_mgmt: 'NSFC 管理科学部',
+    src_cnkx: '中国科協 高品質リスト',
+    src_cnki_major: '中国語ジャーナル目録',
+    src_cssci_core: 'CSSCI ソース',
+    src_cssci_ext: 'CSSCI 拡張',
+    src_pku: '北大核心 (2023)',
+    src_zju: '浙江大学 2024',
+    src_zjucity: '大学独自リスト 2023',
+    src_ccft: 'CCF 中国語 T 区分',
+    nav_sub_inhouse: '大学独自リスト',
+    locked_school_a: '🔒 学校 A · 2023',
+    paid_label: '有料',
+    drawer_kicker: 'ジャーナル詳細',
+    footer_data: '© <a href="https://journal.ailatest.org">AILatest Journal</a>',
+    tab_home: 'ジャーナル',
+    tab_int: '国際',
+    tab_dom: '中国',
+    tab_fav: 'お気に入り',
+    tab_pick: '投稿先AI',
+    tab_updates: '動向',
+    nav_about: '概要',
+    nav_contact: '連絡',
+    nav_terms: '利用規約',
+    nav_privacy: 'プライバシー',
+    nav_refund: '返金',
+    nav_index_rank: '索引ランキング',
+    nav_subject_rank: '分野ランキング',
+    nav_warn_rank: '警告リスト',
+    nav_extension_beta: '拡張機能ベータ',
+    nav_subscription: '購読',
+    filter_if_range: 'インパクトファクター',
+    if_any: '指定なし',
+    rail_int: 'グローバル',
+    rail_dom: '中国',
+    rail_in: 'インド',
+    rail_my: 'マレーシア',
+    rail_kr: '韓国',
+    rail_rank: 'ランキング',
+    rail_fav: '保存',
+    rail_me: 'マイページ',
+    rail_updates: '動向',
+    download_center: 'ダウンロード',
+    loading: '読み込み中…',
+    hero_title_int: 'SCI / SSCI 国際ジャーナル検索',
+    hero_body_int: 'データソース：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI、2026-05-18更新）に <b>EI Compendex</b>（2025-10-10）を統合。',
+    hero_note: 'バッジ凡例：<b>収録</b> は SCIE/SSCI/AHCI/ESCI/EI、Scopus、MEDLINE、CSCD、SCD などの収録状況を示します。<b>評価</b> は CAS/JCR/新興/CCF/ABDC/ABS/FMS/VHB/CNRS/AMI などの区分を示します。<b>アクセス</b> は FREE/OAJ/DOAJ、<b>注意</b> は警告リスト、WoS On Hold、Retraction Watch を示します。',
+    hero_title_dom: '中国学術ジャーナル区分',
+    hero_body_dom: '<b>中国科協 高品質科技ジャーナル区分リスト</b>、<b>中国語ジャーナル目録</b>、CSSCI / 北大核心 / CCF 中国語、<b>浙江大学 2024</b> と大学独自リストを統合。',
+    hero_note_dom: 'CSSCI / 北大核心は PDF OCR 由来のため、一部表記ゆれがある場合があります。',
+    hero_title_in: 'インド UGC-CARE ジャーナル目録',
+    hero_body_in: 'インド UGC-CARE Group I 正式リスト。タイトル、出版社、ISSN、分野で検索できます。',
+    india_subject: '分野',
+    india_source_note: 'UGC-CARE 中央リストは 2024年10月以降継続更新されていません。本ページは履歴目録と投稿確認の手掛かりです。',
+    hero_title_my: 'マレーシア MyCite / ERA ジャーナル目録',
+    hero_body_my: 'MyCite 2025 の記録を標準表示します。正式な認定判断では MyCite 2025 公式 PDF を優先してください。',
+    malaysia_source_note: 'MyCite オンラインデータベースには 2014-2025 の履歴記録が含まれます。MyJurnal は収集時に接続できなかったため未接続です。',
+    hero_title_fav: 'お気に入り',
+    hero_body_fav: '任意の行の <b>★</b> をクリックするとお気に入りに追加できます。未ログイン時はこの端末に保存され、ログイン後はクラウド同期されます。',
+    hero_title_pick: '投稿先AI',
+    hero_body_pick: '研究テーマとサイト内のジャーナル指標を照合し、投稿先候補を推薦します。',
+    pick_placeholder: 'タイトルとキーワードを入力（最大 200 文字）',
+    pick_search_btn: '推薦を開始',
+    pick_filter_topics: '研究分野に一致',
+    pick_filter_if: 'IF >',
+    pick_filter_zone: 'CAS 区分',
+    pick_filter_sci: 'SCIE',
+    pick_filter_ssci: 'SSCI',
+    pick_filter_ahci: 'AHCI',
+    pick_filter_esci: 'ESCI',
+    pick_filter_compre: '総合誌を除外',
+    pick_filter_free_doaj: '無料（DOAJ）',
+    pick_filter_free: '無料（DOAJ）',
+    pick_history: '検索履歴',
+    pick_history_clear: 'クリア',
+    pick_ai_toggle: 'AI 推薦',
+    pick_ai_hint: 'セマンティック補強、標準でオン',
+    pick_ai_login: 'AI 推薦にはログインが必要です。今回はローカル照合に切り替えました。',
+    pick_ai_running: 'AI で研究文脈を解析中…',
+    pick_ai_unavailable: 'AI 推薦は一時的に利用できません。今回はローカル照合に切り替えました。',
+    pick_ai_auth_error: 'AI 推薦のログインが失効しました。今回はローカル照合に切り替えました。',
+    pick_ai_quota_error: '本日の AI 推薦無料枠を使い切りました。ローカル照合に切り替えます。',
+    pick_ai_config_error: 'AI 推薦 API の設定が未完了です。Worker を再デプロイしてください。',
+    pick_mode_ai: 'AI セマンティック照合',
+    pick_mode_local: 'ローカル照合',
+    results_all: 'すべてのジャーナル',
+    load_more: 'さらに読み込む',
+    col_name: 'ジャーナル',
+    col_free: '無料掲載',
+    col_abbr: '略称',
+    col_badges: '索引 / 区分',
+    col_if: 'IF',
+    col_cycle: '査読期間',
+    col_index: '収録索引',
+    col_cas: '分野区分',
+    filter_idx: '索引',
+    filter_tier: '区分',
+    filter_extra: 'その他',
+    filter_topic: '分野',
+    filter_free: '無料掲載',
+    filter_nsc: 'Nature/Science/Cell',
+    filter_free_only: '無料掲載のみ',
+    jcr_label: 'JCR 区分',
+    abdc_label: 'ABDC',
+    abs_label: 'ABS',
+    zone_top: 'TOP',
+    xinrui_top: 'TOP',
+    oa_sf_label: '研究テーマ',
+    oa_sf_ph: 'テーマを絞り込み…',
+    oa_sf_clear: '選択をクリア',
+    col_cat: 'ESI / CAS 大分類',
+    search_int: '検索：正式名 / 略称 / ISSN / 中国語名',
+    search_dom: '検索：誌名 / ISSN / CN（横断検索）',
+    search_fav: 'お気に入りを検索：誌名 / 略称 / ISSN',
+    search_home_ph: 'ジャーナル名、ISSN を検索…',
+    search_updates_ph: 'ジャーナル動向、出典、タグを検索…',
+    search_submit_hint: '検索',
+    search_button: '検索',
+    home_subtitle: 'グローバルジャーナル検索・推薦プラットフォーム',
+    showing: '表示',
+    of: '件 / 全',
+    total_items: '件',
+    empty: '一致するジャーナルがありません',
+    empty_fav: 'まだお気に入りはありません。「国際 SCI/SSCI」で任意の行の ★ をクリックすると保存できます。',
+    login: 'ログイン',
+    logout: 'ログアウト',
+    fav_added: '保存しました',
+    fav_removed: '削除しました',
+    syncing: '同期中…',
+    synced: '同期済み',
+    wos_subjects: 'WoS 細分野',
+    wos_search_ph: '分野を絞り込み（A-Z）…',
+    cnkx_domain: '学問分野',
+    cnkx_sub: '細分野',
+    wos_clear_title: '選択をクリア',
+    updates_title: 'ジャーナル動向',
+    updates_intro: '新刊・子刊、収録変更、警告、投稿方針、重要な出版レポートを追跡します。',
+    updates_latest: '最新動向',
+    updates_view_all: 'すべて見る',
+    updates_source: '出典',
+    updates_featured: '注目',
+    updates_updated_at: 'データ更新日',
+    updates_empty: '一致するジャーナル動向はありません。',
+    update_cat_all: 'すべて',
+    update_cat_new_journal: '新刊・子刊',
+    update_cat_index_change: '収録変更',
+    update_cat_warning: '警告',
+    update_cat_policy: '投稿方針',
+    update_cat_report: 'レポート'
+  });
   const LANG_ORDER = ['zh-CN', 'zh-TW', 'ja', 'ko', 'en', 'es', 'pt', 'fr'];
   const LANG_META = {
     'zh-CN': { label: '中文', html: 'zh-CN' }, 'zh-TW': { label: '繁中', html: 'zh-TW' },
@@ -378,7 +544,152 @@
     return /^zh/i.test(navigator.language || '') ? 'zh-CN' : 'en';
   }
   let lang = normalizeLang(initialLangFromPath());
-  const T = (zh_, en_) => lang === 'zh-CN' || lang === 'zh-TW' ? zh_ : en_;
+  const UI_LOCALES = {
+    'zh-CN': 'zh-CN',
+    'zh-TW': 'zh-TW',
+    ja: 'ja-JP',
+    ko: 'ko-KR',
+    en: 'en-US',
+    es: 'es-ES',
+    pt: 'pt-PT',
+    fr: 'fr-FR',
+  };
+  function uiLocale() {
+    return UI_LOCALES[lang] || 'en-US';
+  }
+  const INLINE_I18N = {
+    ja: {
+      '显示趋势': '傾向を表示',
+      '选择国家/地区': '国・地域を選択',
+      '其他': 'その他',
+      '快照': 'スナップショット',
+      '国家/地区比例': '国・地域別割合',
+      'OpenAlex 作者机构占比': 'OpenAlex 著者所属機関の割合',
+      '暂无可用国家/地区发文比例数据。': '利用可能な国・地域別発文割合データはまだありません。',
+      '国家/地区发文比例暂时加载失败。': '国・地域別発文割合の読み込みに失敗しました。',
+      '默认收藏': 'デフォルトのお気に入り',
+      '未命名': '無題',
+      '我的': 'マイページ',
+      '进入个人信息与积分': '個人情報とクレジットを開く',
+      '登录后查看积分': 'ログインするとクレジットを確認できます',
+      '免费次数已用完，请登录后继续使用': '無料回数を使い切りました。ログインして続行してください。',
+      '本地收藏上限 5 本，请登录后收藏更多': 'ローカル保存は 5 件までです。ログインするとさらに保存できます。',
+      '新清单': '新しいリスト',
+      '人': '件のレビュー',
+      '暂无评分': 'まだ評価はありません',
+      '已评': '評価済み',
+      ' 星 · 再次点击修改 · 长按清除': ' 星 · もう一度クリックして変更 · 長押しで削除',
+      '半星可评 · 点击星左半为 0.5，右半为 1 星': '半星評価に対応 · 左半分で 0.5、右半分で 1 星',
+      '提交中…': '送信中…',
+      '提交失败，请稍后再试': '送信に失敗しました。後でもう一度お試しください',
+      '清除中…': '削除中…',
+      '已清除评分 · 可重新打分': '評価を削除しました · 再評価できます',
+      '清除失败': '削除に失敗しました',
+      '付费解锁': '有料解除',
+      '解锁': '解除',
+      '关闭': '閉じる',
+      '登录 / 注册': 'ログイン / 登録',
+      '跨设备同步收藏、投稿经验、打分记录': 'お気に入り、投稿メモ、評価記録を端末間で同期',
+      '邮箱': 'メール',
+      '6 位验证码': '6桁の認証コード',
+      '发送验证码': '認証コードを送信',
+      '或使用第三方登录': 'または外部アカウントでログイン',
+      '登录即同意': 'ログインすると',
+      '服务条款': '利用規約',
+      '与': 'および',
+      '隐私政策': 'プライバシーポリシー',
+      '发送验证码失败': '認証コードの送信に失敗しました',
+      '登录': 'ログイン',
+      '验证码已发送，10 分钟内有效': '認証コードを送信しました。10分間有効です',
+      '验证码验证失败': '認証コードの検証に失敗しました',
+      '验证码验证失败：未收到登录凭证': '認証コードの検証に失敗しました：ログイン資格情報を受信できませんでした',
+      '验证码登录': '認証コードでログイン',
+      '用户信息获取失败': 'ユーザー情報の取得に失敗しました',
+      'Scopus 收录 (Source List Mar.2026)': 'Scopus 収録（Source List Mar.2026）',
+      'DOAJ 开放获取期刊目录': 'DOAJ オープンアクセスジャーナル目録',
+      'Nature Index 追踪出版物': 'Nature Index 追跡出版物',
+      '中国科技核心': '中国科技核心',
+      '新入选': '新規収録',
+      '中文': '中国語',
+      '国际': '国際',
+      ' 个领域': ' 分野',
+      'PubMed 可检索': 'PubMed で検索可能',
+      'PubMed Central 全文档案': 'PubMed Central 全文アーカイブ',
+      'MEDLINE 数据库收录（NLM 精选索引）': 'MEDLINE 収録（NLM 選定索引）',
+      '作者可选择免费发表路径（Diamond / Hybrid / 订阅制等）': '著者無料の掲載経路があります（Diamond / Hybrid / 購読制など）',
+      '免费发表': '無料掲載',
+      '累计浏览次数': '累計閲覧数',
+      '次浏览': '回閲覧',
+      ' 次浏览': ' 回閲覧',
+      '区': '区',
+      'JCR 影响因子 2024': 'JCR インパクトファクター 2024',
+      'JCR 分区': 'JCR 区分',
+      '中科院大类分区 Top': 'CAS 大分類区分 Top',
+      '中科院大类分区': 'CAS 大分類区分',
+      '中科院': 'CAS',
+      'CSSCI 扩展': 'CSSCI 拡張',
+      '北大核心': '北大核心',
+      '科协 T1': '中国科協 T1',
+      '科协 T2': '中国科協 T2',
+      '科协 T3': '中国科協 T3',
+      '浙大目录': 'ZJU 目録',
+      '学校 A': '学校 A',
+      '中国科协': '中国科協',
+      '新锐': '新興',
+      '中科院 2026 新锐版分区': 'CAS 2026 新興版区分',
+      '预警': '警告',
+      '新锐审查中': '新興区分 審査中',
+      '中信所预警': 'ISTIC 警告',
+      '管理科学部': '管理科学部',
+      '浙大': 'ZJU',
+      '科协': '中国科協',
+      '个月': 'か月',
+      '已加载': '読み込み済み',
+      '本期刊': 'ジャーナル',
+      '我的设置': '設定',
+      '底部导航站点': '下部ナビゲーションの表示サイト',
+      '积分记录': 'クレジット記録',
+      '积分待同步': 'クレジット同期待ち',
+      '账号额度和消耗记录由服务器同步。': 'アカウント残高と使用記録はサーバーから同期されます。',
+      '登录后可查看账号积分和同步记录。': 'ログインするとアカウントクレジットと同期記録を確認できます。',
+      '当前账号': '現在のアカウント',
+      '浏览记录': '閲覧記録',
+      '暂无本机浏览记录。打开期刊详情后会记录在这里。': 'この端末の閲覧記録はまだありません。ジャーナル詳細を開くとここに記録されます。',
+      '搜索记录': '検索記録',
+      '暂无搜索记录。首页查刊或荐刊后会记录在这里。': '検索記録はまだありません。ホーム検索または推薦検索後にここへ表示されます。',
+      '首页查刊': 'ホーム検索',
+      '荐刊查询': '推薦検索',
+      '本机统计': 'ローカル統計',
+      '插件 / API 调用': '拡張機能 / API 呼び出し',
+      '插件 / API 调用记录': '拡張機能 / API 呼び出し記録',
+      '账号只同步了调用次数，暂未返回逐条明细。': 'このアカウントでは呼び出し回数のみ同期され、明細はまだ返されていません。',
+      '暂无插件 / API 调用记录。': '拡張機能 / API 呼び出し記録はまだありません。',
+      '可用积分': '利用可能クレジット',
+      '收藏期刊': '保存したジャーナル',
+      '今日浏览': '本日の閲覧',
+      '账号信息': 'アカウント情報',
+      '登录方式': 'ログイン方式',
+      '账号状态': 'アカウント状態',
+      '已登录': 'ログイン済み',
+      '未登录': '未ログイン',
+      '活动记录': 'アクティビティ',
+      '近 12 周': '過去12週間',
+      '我的收藏': 'お気に入り',
+      '退出登录': 'ログアウト',
+      '退出登录？': 'ログアウトしますか？',
+      '全站浏览量': '全サイト閲覧数',
+      '访客': '訪問者',
+      '期刊详情浏览': 'ジャーナル詳細閲覧',
+      '覆盖期刊': '対象ジャーナル',
+      '关于': '概要',
+      '联系': '連絡',
+      '← 回到主站浏览': '← メインサイトに戻る'
+    },
+  };
+  const T = (zh_, en_) => {
+    if (lang === 'zh-CN' || lang === 'zh-TW') return zh_;
+    return INLINE_I18N[lang]?.[zh_] || INLINE_I18N[lang]?.[en_] || en_;
+  };
   // ── Domestic field-value translations (CAST domains, CSSCI/PKU disciplines, ZJU tiers) ──
   const DOM_I18N = {
     domain: {
@@ -2610,7 +2921,7 @@
         if (el && el.dataset.fid === key) {
           const n = d.count;
           const txt = n >= 1000 ? (n/1000).toFixed(1) + 'k' : String(n);
-          el.textContent = (lang === 'en' ? '👁 ' : '👁 ') + txt + (lang === 'en' ? ' views' : ' 次浏览');
+          el.textContent = `👁 ${txt} ${T('次浏览','views')}`;
         }
       }
     } catch (_) {}
@@ -3372,9 +3683,7 @@
     const hint = $('#hint');
     if (hint) {
       const shownTotal = full && journals.length ? journals.length : (meta?.total || journals.length);
-      hint.textContent = lang === 'zh'
-        ? `${T('已加载','Loaded')} ${shownTotal.toLocaleString()} ${T('本期刊','journals')}`
-        : `${shownTotal.toLocaleString()} journals loaded`;
+      hint.textContent = `${T('已加载','Loaded')} ${shownTotal.toLocaleString()} ${T('本期刊','journals')}`;
     }
     if (full) {
       renderCatList();
@@ -5958,7 +6267,13 @@
     else if (activeTab === 'fav') renderFav();
     else if (activeTab === 'int') renderInt();
     else if (activeTab === 'pick') refreshPickI18n();
+    else if (activeTab === 'updates') renderJournalUpdates();
+    else if (activeTab === 'me') renderMe();
+    else if (activeTab === 'in') renderIndia();
+    else if (activeTab === 'my') renderMalaysia();
+    else if (activeTab === 'kr') renderKorea();
     window.dispatchEvent(new CustomEvent('ailatest:langchange'));
+    loadJournalViewTotalFootnote();
     if (_currentDrawerRec) {
       openDrawer(_currentDrawerRec, { pageMode: document.body.classList.contains('journal-route') });
     }
@@ -6052,7 +6367,7 @@
     const d = new Date(ts);
     if (!Number.isFinite(d.getTime())) return T('时间未知', 'Unknown time');
     try {
-      return d.toLocaleString(lang === 'en' ? 'en-US' : 'zh-CN', {
+      return d.toLocaleString(uiLocale(), {
         month: 'short',
         day: 'numeric',
         hour: '2-digit',
@@ -6262,7 +6577,7 @@
           </section>
           <section class="me-card">
             <h2>${T('活动记录','Activity')}</h2>
-            <div class="me-activity-months"><span>${T('近 12 周','Last 12 weeks')}</span><span>${new Date().toLocaleDateString(lang === 'en' ? 'en-US' : 'zh-CN', { month: 'long', day: 'numeric' })}</span></div>
+            <div class="me-activity-months"><span>${T('近 12 周','Last 12 weeks')}</span><span>${new Date().toLocaleDateString(uiLocale(), { month: 'long', day: 'numeric' })}</span></div>
             <div class="me-activity-grid">${renderActivityDots()}</div>
           </section>
         </div>
@@ -7778,7 +8093,7 @@
       }
       const d = new Date(text);
       if (Number.isNaN(d.getTime())) return text;
-      return d.toLocaleDateString(lang === 'en' ? 'en-US' : 'zh-CN', { year: 'numeric', month: 'short', day: 'numeric' });
+      return d.toLocaleDateString(uiLocale(), { year: 'numeric', month: 'short', day: 'numeric' });
     }
 
     function journalUpdateMatches(item, query = activeUpdateQuery, category = activeUpdateCategory) {
@@ -9724,7 +10039,7 @@
         const timeStr = h.time ? (() => {
           const d = new Date(h.time);
           try {
-            return d.toLocaleString(lang === 'zh' ? 'zh-CN' : 'en-US', {
+            return d.toLocaleString(uiLocale(), {
               month: 'short', day: 'numeric',
               hour: '2-digit', minute: '2-digit',
               hour12: false,
@@ -9841,9 +10156,7 @@
       for (const r of journals) for (const c of (r.wos_categories||[])) _wc[c] = (_wc[c]||0)+1;
       topicList = Object.entries(_wc).map(([name,count])=>({name,count})).sort((a,b)=>a.name.localeCompare(b.name,'en'));
       if (meta?.total && $('#total')) $('#total').textContent = meta.total.toLocaleString();
-      $('#hint').textContent = lang === 'zh'
-        ? `${T('已加载','Loaded')} ${journals.length.toLocaleString()} ${T('本期刊','journals')}`
-        : `${journals.length.toLocaleString()} journals loaded`;
+      $('#hint').textContent = `${T('已加载','Loaded')} ${journals.length.toLocaleString()} ${T('本期刊','journals')}`;
       renderCatList();
       renderTopicList();
       updatePublicPulse();
