@@ -157,8 +157,9 @@ body[data-static-page="extension"] .page-head {
 }
 
 .download-tile {
+  position: relative;
   min-height: 254px;
-  padding: 14px 12px 12px;
+  padding: 14px 12px 44px;
   border: 1px solid var(--line);
   border-radius: 10px;
   background: rgba(255, 255, 255, .78);
@@ -190,6 +191,10 @@ body[data-static-page="extension"] .page-head {
 }
 
 .download-tile .small {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 10px;
   min-height: 18px;
   font-size: 12px;
 }
@@ -198,7 +203,7 @@ body[data-static-page="extension"] .page-head {
   display: block;
   overflow-wrap: anywhere;
   font-size: 11px;
-  line-height: 1.4;
+  line-height: 1.25;
   color: #2e6b4b;
 }
 

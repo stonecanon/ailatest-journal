@@ -2100,7 +2100,6 @@
     return getDailyUsage()[type] >= limit;
   }
   function incrementUsage(type) {
-    if (user) return;
     const usage = getDailyUsage();
     usage[type] = (usage[type] || 0) + 1;
     saveDailyUsage(usage);
@@ -6453,6 +6452,18 @@
     }
   }
 
+  function recordTimeMs(item) {
+    if (!item || typeof item !== 'object') return 0;
+    const raw = item.t ?? item.ts ?? item.time ?? item.created_at ?? item.createdAt ?? item.date;
+    if (raw === undefined || raw === null || raw === '') return 0;
+    const numeric = Number(raw);
+    if (Number.isFinite(numeric)) {
+      return numeric > 1e12 ? numeric : numeric * 1000;
+    }
+    const parsed = Date.parse(String(raw));
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+
   function localViewRecords(limit = 20) {
     return readJsonArray('ailatest.viewhist').slice(0, limit).map(item => {
       const title = item.n || item.name || item.title || item.k || T('期刊详情', 'Journal detail');
@@ -6460,10 +6471,21 @@
       return {
         title,
         meta,
-        time: item.t,
+        time: recordTimeMs(item),
         href: item.p || item.path || '',
       };
     });
+  }
+
+  function todayViewCount() {
+    const usage = getDailyUsage();
+    const today = new Date().toISOString().slice(0, 10);
+    const localToday = readJsonArray('ailatest.viewhist').filter(item => {
+      const ts = recordTimeMs(item);
+      if (!Number.isFinite(ts)) return false;
+      return new Date(ts).toISOString().slice(0, 10) === today;
+    }).length;
+    return Math.max(Number(usage.views || 0), localToday);
   }
 
   function localSearchRecords(limit = 24) {
@@ -6593,7 +6615,7 @@
       const d = new Date(today);
       d.setDate(today.getDate() - i);
       const key = d.toISOString().slice(0, 10);
-      const active = usage.date === key ? Math.min(4, Math.max(1, Number(usage.views || 0) + Number(usage.searches || 0))) : 0;
+      const active = usage.date === key ? Math.min(4, Math.max(1, todayViewCount() + Number(usage.searches || 0))) : 0;
       dots.push(`<span class="me-activity-dot level-${active}" title="${escape(key)}"></span>`);
     }
     return dots.join('');
@@ -6624,12 +6646,13 @@
           </div>
         </header>
         <div class="me-stat-strip">
-          <button type="button" class="me-stat-item" data-me-stat="credits"><strong>${escape(creditText)}</strong><span>${T('可用积分','Credits')}</span></button>
+          <button type="button" class="me-stat-item" data-me-stat="credits"><strong>${escape(creditText)}</strong><span>${T('Credits','Credits')}</span></button>
           <a class="me-stat-item" data-me-stat="favorites" href="/favorites"><strong>${favCount}</strong><span>${T('收藏期刊','Saved journals')}</span></a>
-          <button type="button" class="me-stat-item" data-me-stat="views"><strong>${Number(usage.views || 0)}</strong><span>${T('今日浏览','Views today')}</span></button>
+          <button type="button" class="me-stat-item" data-me-stat="views"><strong>${todayViewCount()}</strong><span>${T('今日浏览','Views today')}</span></button>
           <button type="button" class="me-stat-item" data-me-stat="searches"><strong>${localSearchCount()}</strong><span>${T('搜索记录','Searches')}</span></button>
           <button type="button" class="me-stat-item" data-me-stat="api"><strong>${localPluginCallCount()}</strong><span>${T('插件 / API 调用','Plugin / API calls')}</span></button>
         </div>
+        ${stationSettingsHtml()}
         <section class="me-card me-record-panel" data-me-record-panel hidden></section>
         <div class="me-grid">
           <section class="me-card">
@@ -6659,10 +6682,12 @@
         renderMe();
       }
     });
+    attachStationSettingsHandlers(box);
     box.querySelectorAll('[data-me-stat]').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', (e) => {
         const type = btn.dataset.meStat;
         if (type === 'favorites') {
+          e.preventDefault();
           activateTab('fav');
           return;
         }
@@ -6710,7 +6735,7 @@
   function renderFav() {
     const box = $('#fav-content');
     const list = getActiveList();
-    if (!list) { box.innerHTML = stationSettingsHtml() + `<div class="empty" style="padding:60px 20px;text-align:center;color:var(--muted)">${T('还没有收藏。切到「国际 SCI/SSCI」点任意一行右边的 ★ 就能收藏。','No favorites yet. Go to "International" and click the ★ on any row.')}</div>`; attachStationSettingsHandlers(box); return; }
+    if (!list) { box.innerHTML = `<div class="empty" style="padding:60px 20px;text-align:center;color:var(--muted)">${T('还没有收藏。切到「国际 SCI/SSCI」点任意一行右边的 ★ 就能收藏。','No favorites yet. Go to "International" and click the ★ on any row.')}</div>`; return; }
 
     // list 管理栏（全列表切换 + 新建/重命名/删除）
     const bar = favLists.map(l => `
@@ -6759,16 +6784,15 @@
     rows = sortByIF(rows, favIfSort);
 
     if (!rows.length) {
-      box.innerHTML = stationSettingsHtml() + toolbar + `<div class="empty" style="padding:40px 0">${t('empty_fav')}</div>`;
+      box.innerHTML = toolbar + `<div class="empty" style="padding:40px 0">${t('empty_fav')}</div>`;
       attachFavBarHandlers();
-      attachStationSettingsHandlers(box);
       return;
     }
 
     // 单一有序表格 + 拖动
     const tbody = rows.map(r => renderFavRow(r)).join('');
     const hint = activeQuery ? '' : `<div class="fav-drag-hint">${T('按住','Hold')} <span class="drag-ico">⋮⋮</span> ${T('拖动排序 · 长按手机端同样支持','to drag-reorder · long-press on mobile')}</div>`;
-    box.innerHTML = stationSettingsHtml() + toolbar + hint + `
+    box.innerHTML = toolbar + hint + `
       <div class="table-wrap" style="margin-top:10px">
         <table class="journals fav-table">
           <thead><tr>
@@ -6786,7 +6810,6 @@
       <div class="results-count" style="margin-top:18px">${t('showing')} ${rows.length} ${t('total_items')}</div>`;
 
     attachFavBarHandlers();
-    attachStationSettingsHandlers(box);
     // 拖动排序（只在无搜索时启用，搜索时顺序与真实顺序不一致）
     if (!activeQuery && window.Sortable) {
       const tb = document.getElementById('fav-tbody');
@@ -8817,52 +8840,9 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function closeRankingsMenu() {
-      document.getElementById('rankings-popup')?.remove();
-      document.removeEventListener('click', closeRankingsMenu);
-      document.removeEventListener('keydown', closeRankingsMenuOnEsc);
-    }
-
-    function closeRankingsMenuOnEsc(e) {
-      if (e.key === 'Escape') closeRankingsMenu();
-    }
-
-    function openRankingsMenu(trigger) {
-      const existing = document.getElementById('rankings-popup');
-      if (existing) {
-        closeRankingsMenu();
-        return;
-      }
-      const rect = trigger.getBoundingClientRect();
-      const menu = document.createElement('div');
-      menu.id = 'rankings-popup';
-      menu.className = 'rankings-popup';
-      menu.style.left = `${Math.max(76, Math.round(rect.right + 10))}px`;
-      menu.style.bottom = `${Math.max(18, Math.round(window.innerHeight - rect.bottom))}px`;
-      menu.innerHTML = `
-        <a href="/indexes/">${T('索引排行榜', 'Index Rankings')}</a>
-        <a href="/subjects/">${T('学科排行榜', 'Subject Rankings')}</a>
-        <button type="button" data-rank-warning>${T('预警名单', 'Warning List')}</button>
-      `;
-      menu.addEventListener('click', (e) => {
-        const warn = e.target.closest('[data-rank-warning]');
-        if (!warn) return;
-        e.preventDefault();
-        closeRankingsMenu();
-        showWarningRankList();
-        if (window.matchMedia('(max-width: 900px)').matches) closeSidebar();
-      });
-      document.body.appendChild(menu);
-      setTimeout(() => {
-        document.addEventListener('click', closeRankingsMenu);
-        document.addEventListener('keydown', closeRankingsMenuOnEsc);
-      }, 0);
-    }
-
     document.getElementById('rankings-btn')?.addEventListener('click', (e) => {
       e.preventDefault();
-      e.stopPropagation();
-      openRankingsMenu(e.currentTarget);
+      window.location.href = '/rankings/';
     });
     document.querySelector('[data-topbar-home]')?.addEventListener('click', (e) => {
       e.preventDefault();

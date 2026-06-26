@@ -55,6 +55,24 @@ INDEXES = [
     ('citic-warning', '中信所预警', '中信所(中国科学技术信息研究所)国际期刊预警名单(2025) — 含影响因子、分区、CAS 等级和索引信息。', None, 'status'),
 ]
 
+# Historical broad ESI subject URLs kept as lightweight bridge pages so old
+# links do not fall back to stale templates.
+LEGACY_SUBJECT_PAGES = [
+    ('agricultural-sciences', 'Agricultural Sciences'),
+    ('biology-biochemistry', 'Biology & Biochemistry'),
+    ('chemistry', 'Chemistry'),
+    ('computer-science', 'Computer Science'),
+    ('environment-ecology', 'Environment / Ecology'),
+    ('materials-science', 'Materials Science'),
+    ('molecular-biology-genetics', 'Molecular Biology & Genetics'),
+    ('neuroscience-behavior', 'Neuroscience & Behavior'),
+    ('pharmacology-toxicology', 'Pharmacology & Toxicology'),
+    ('physics', 'Physics'),
+    ('plant-animal-science', 'Plant & Animal Science'),
+    ('psychiatry-psychology', 'Psychiatry / Psychology'),
+    ('social-sciences', 'Social Sciences'),
+]
+
 def esc(s):
     if s is None: return ''
     return str(s).replace('&','&amp;').replace('<','&lt;').replace('>','&gt;').replace('"','&quot;')
@@ -107,7 +125,7 @@ def load_citic_warning_rows(journals):
     return rows
 
 SKELETON = '''<!doctype html>
-<html lang="en">
+<html lang="zh-CN">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>__TITLE__</title>
 <meta name="description" content="__DESC__" />
@@ -117,66 +135,32 @@ SKELETON = '''<!doctype html>
 <meta name="robots" content="index,follow" />
 <meta name="theme-color" content="#b4531f" />
 __JSONLD__
-<style>
-:root{--accent:#b4531f;--accent-light:#f59e0b;--bg:#f7f5f0;--paper:#fff;--ink:#1c1917;--ink-soft:#6b6559;--rule:#e3ddd0;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
-*{box-sizing:border-box}
-body{font-family:var(--sans);margin:0;padding:0;background:#fffdf9;color:var(--ink);line-height:1.6;background-image:linear-gradient(rgba(39,35,31,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(39,35,31,.035) 1px,transparent 1px);background-size:60px 60px}
-.header{height:60px;background:rgba(255,253,249,.88);border-bottom:1px solid var(--rule);position:sticky;top:0;z-index:10;backdrop-filter:blur(18px)}
-.header-inner{height:100%;max-width:none;margin:0;display:flex;align-items:center;gap:16px;padding:0 24px}
-.header a{color:var(--ink);text-decoration:none;font-weight:700;font-size:15px;letter-spacing:0}
-.header a:hover{color:var(--accent)}
-.header .logo{display:flex;align-items:baseline;gap:4px;font-weight:820;font-size:18px}
-.header .logo em{font-family:Georgia,'Times New Roman',serif;font-style:italic;font-weight:700;color:var(--ink-soft)}
-.header .logo-symbol{display:none}
-.header .nav-links{display:flex;align-items:center;gap:8px;margin-left:auto;font-size:13px}
-.header .nav-links a{display:inline-flex;align-items:center;min-height:32px;padding:5px 13px;border:1px solid var(--rule);border-radius:999px;background:rgba(255,253,249,.82);font-weight:650;color:var(--ink-soft)}
-.wrap{max-width:1100px;margin:0 auto;padding:20px}
-h1{font-size:20px;margin:0 0 6px;font-weight:700;letter-spacing:-.01em}
-.breadcrumb{font-size:12px;color:var(--ink-soft);margin-bottom:12px}
-.breadcrumb a{color:var(--accent);text-decoration:none}
-.breadcrumb a:hover{text-decoration:underline}
-.sub{color:var(--ink-soft);font-size:14px;margin-bottom:12px}
-.count{color:var(--ink-soft);font-size:12px;margin-bottom:14px}
-.card{background:var(--paper);border:1px solid var(--rule);border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,0.06),0 4px 12px rgba(0,0,0,0.04);overflow:hidden}
-.table-wrap{background:var(--paper);border:1px solid var(--rule);border-radius:8px;overflow:hidden;overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-size:13px}
-th{text-align:left;padding:10px 12px;border-bottom:2px solid var(--rule);font-weight:700;white-space:nowrap;color:var(--ink);font-size:11px;letter-spacing:.04em;text-transform:uppercase;background:var(--bg)}
-td{padding:8px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
-td.row-num{text-align:center;color:var(--ink-soft);font-size:11px;width:32px;min-width:32px}
-tr:last-child td{border-bottom:0}
-tr:hover td{background:#faf8f4}
-a{color:var(--accent);text-decoration:none;font-weight:500}
-a:hover{text-decoration:underline}
-.muted{color:var(--ink-soft)}
-.back-wrap{margin-top:18px}
-.back{display:inline-block;padding:8px 22px;background:var(--accent);color:#fff!important;text-decoration:none;border-radius:6px;font-size:13px;font-weight:600}
-.back:hover{opacity:.9;text-decoration:none}
-.footer{text-align:center;padding:24px;color:var(--ink-soft);font-size:12px;border-top:1px solid var(--rule);margin-top:24px}
-.footer a{color:var(--ink-soft)}
-.pill{display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600;white-space:nowrap}
-.pill-under-review{background:#c2410c;color:#fff}
-.pill-on-hold{background:#b91c1c;color:#fff}
-.pill-warning{background:#92400e;color:#fff}
-.pill-citic-warning{background:#7c3aed;color:#fff}
-</style></head><body>
-<div class="header">
-<div class="header-inner">
-  <a href="__ORIGIN__/" class="logo">AILatest <em>Journal</em></a>
-  <span class="nav-links">
-    <a href="__ORIGIN__/">Home</a>
-    <a href="__ORIGIN__/extension.html">Download Center</a>
-  </span>
-</div></div>
+<link rel="stylesheet" href="/css/listing.css" />
+</head><body>
+<aside class="listing-rail" aria-label="榜单导航">
+  <a href="__ORIGIN__/" title="全球"><span>◎</span><em>全球</em></a>
+  <a href="__ORIGIN__/rankings/" class="active" title="榜单"><span>▥</span><em>榜单</em></a>
+  <a href="__ORIGIN__/updates" title="动态"><span>≋</span><em>动态</em></a>
+  <a href="__ORIGIN__/account" title="我的"><span>☆</span><em>我的</em></a>
+</aside>
+<header class="listing-topbar">
+  <a href="__ORIGIN__/" class="listing-brand">AILatest <em>Journal</em></a>
+  <nav>
+    <a href="__ORIGIN__/">首页</a>
+    <a href="__ORIGIN__/extension.html">下载中心</a>
+    <span>中文</span>
+  </nav>
+</header>
 <div class="wrap">
-<h1>__TITLE__</h1>
-<p class="breadcrumb"><a href="__ORIGIN__/">Home</a> › <a href="__BACK__">__BACK_LABEL__</a></p>
+<h1>__HEADING__</h1>
+<p class="breadcrumb"><a href="__ORIGIN__/">首页</a> · <a href="__ORIGIN__/rankings/">榜单</a> · <a href="__BACK__">__BACK_LABEL__</a></p>
 <p class="sub">__DESC__</p>
 <p class="count">__COUNT__</p>
 <div class="card"><div class="table-wrap"><table><thead><tr>__HEADERS__</tr></thead>
 <tbody>__ROWS__</tbody></table></div></div>
-<p class="back-wrap"><a class="back" href="__BACK__">← Back</a></p>
+<p class="back-wrap"><a class="back" href="__BACK__">← 返回</a></p>
 </div>
-<div class="footer">© 2026 <a href="__ORIGIN__/">AILatest Journal</a> · <a href="__ORIGIN__/about.html">About</a> · <a href="__ORIGIN__/contact.html">Contact</a> · <a href="__ORIGIN__/terms.html">Terms</a> · <a href="__ORIGIN__/privacy.html">Privacy</a> · <a href="__ORIGIN__/refund.html">Refund</a></div>
+<footer class="footer">© 2026 <a href="__ORIGIN__/">AILatest Journal</a> · <a href="__ORIGIN__/about.html">关于</a> · <a href="__ORIGIN__/contact.html">联系</a> · <a href="__ORIGIN__/terms.html">Terms</a> · <a href="__ORIGIN__/privacy.html">Privacy</a> · <a href="__ORIGIN__/refund.html">Refund</a></footer>
 </body></html>'''
 
 def make_slug(r):
@@ -253,10 +237,11 @@ def generate_subjects(journals, origin):
              'description': desc, 'url': canonical, 'itemListElement': item_list}, ensure_ascii=False) + '\n</script>'
 
         html = SKELETON.replace('__TITLE__', esc(seo_title)).replace('__DESC__', esc(seo_desc))
+        html = html.replace('__HEADING__', esc(f'{title} 期刊'))
         html = html.replace('__CANONICAL__', esc(canonical)).replace('__JSONLD__', jsonld_tag)
         html = html.replace('__ORIGIN__', origin)
         html = html.replace('__COUNT__', esc(count)).replace('__HEADERS__', th_html)
-        html = html.replace('__ROWS__', rows_html).replace('__BACK__', f'{origin}/subjects/').replace('__BACK_LABEL__', 'All Subjects')
+        html = html.replace('__ROWS__', rows_html).replace('__BACK__', f'{origin}/subjects/').replace('__BACK_LABEL__', '学科排行榜')
         (ROOT / 'subjects' / slug).mkdir(parents=True, exist_ok=True)
         (ROOT / 'subjects' / slug / 'index.html').write_text(html, encoding='utf-8')
         print(f'  /subjects/{slug}/ → {len(top)}/{total} journals')
@@ -334,10 +319,11 @@ def generate_indexes(journals, origin):
              'description': desc, 'url': canonical, 'itemListElement': item_list}, ensure_ascii=False) + '\n</script>'
 
         html = SKELETON.replace('__TITLE__', esc(seo_title)).replace('__DESC__', esc(seo_desc))
+        html = html.replace('__HEADING__', esc(f'{title} 期刊'))
         html = html.replace('__CANONICAL__', esc(canonical)).replace('__JSONLD__', jsonld_tag)
         html = html.replace('__ORIGIN__', origin)
         html = html.replace('__COUNT__', esc(count)).replace('__HEADERS__', th_html)
-        html = html.replace('__ROWS__', rows_html).replace('__BACK__', f'{origin}/indexes/').replace('__BACK_LABEL__', 'All Indexes')
+        html = html.replace('__ROWS__', rows_html).replace('__BACK__', f'{origin}/indexes/').replace('__BACK_LABEL__', '索引排行榜')
         (ROOT / 'indexes' / slug).mkdir(parents=True, exist_ok=True)
         (ROOT / 'indexes' / slug / 'index.html').write_text(html, encoding='utf-8')
         print(f'  /indexes/{slug}/ → {len(top)} journals')
@@ -346,105 +332,105 @@ def generate_landing(origin):
     subjects = SUBJECTS
     indexes = INDEXES
 
+    def shell(page_title, meta_desc, canonical, heading, sub, body_html, back_href=None):
+        back = f'<p class="back-wrap"><a class="back" href="{back_href}">← 返回</a></p>' if back_href else ''
+        return f'''<!doctype html><html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{esc(page_title)}</title>
+<meta name="description" content="{esc(meta_desc)}" />
+<link rel="canonical" href="{esc(canonical)}" /><meta name="robots" content="index,follow" />
+<meta name="theme-color" content="#f97316" />
+<link rel="stylesheet" href="/css/listing.css" />
+</head><body>
+<aside class="listing-rail" aria-label="榜单导航">
+  <a href="{origin}/" title="全球"><span>◎</span><em>全球</em></a>
+  <a href="{origin}/rankings/" class="active" title="榜单"><span>▥</span><em>榜单</em></a>
+  <a href="{origin}/updates" title="动态"><span>≋</span><em>动态</em></a>
+  <a href="{origin}/account" title="我的"><span>☆</span><em>我的</em></a>
+</aside>
+<header class="listing-topbar">
+  <a href="{origin}/" class="listing-brand">AILatest <em>Journal</em></a>
+  <nav>
+    <a href="{origin}/">首页</a>
+    <a href="{origin}/extension.html">下载中心</a>
+    <span>中文</span>
+  </nav>
+</header>
+<div class="wrap">
+  <h1>{esc(heading)}</h1>
+  <p class="breadcrumb"><a href="{origin}/">首页</a> · <a href="{origin}/rankings/">榜单</a></p>
+  <p class="sub">{esc(sub)}</p>
+  {body_html}
+  {back}
+</div>
+<footer class="footer">© 2026 <a href="{origin}/">AILatest Journal</a> · <a href="{origin}/about.html">关于</a> · <a href="{origin}/contact.html">联系</a> · <a href="{origin}/terms.html">Terms</a> · <a href="{origin}/privacy.html">Privacy</a> · <a href="{origin}/refund.html">Refund</a></footer>
+</body></html>'''
+
     # Subjects landing
     r_list = '\n'.join(f'<li><a href="{origin}/subjects/{s}/" class="cat-link"><strong>{esc(t)}</strong></a></li>' for s, t, _, _ in subjects)
-    r_html = f'''<!doctype html><html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Browse Journals by WoS Subject | AILatest Journal</title>
-<meta name="description" content="Browse academic journals by Web of Science subject area: Education, Economics, History, Engineering, Medicine, Computer Science and 94+ more categories. Top journals by Impact Factor." />
-<link rel="canonical" href="{origin}/subjects/" /><meta name="robots" content="index,follow" />
-<meta name="theme-color" content="#b4531f" />
-<style>
-:root{{--accent:#b4531f;--bg:#f7f5f0;--paper:#fff;--ink:#1c1917;--ink-soft:#6b6559;--rule:#e3ddd0;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}}
-*{{box-sizing:border-box}}
-body{{font-family:var(--sans);margin:0;padding:0;background:#fffdf9;color:var(--ink);line-height:1.6;background-image:linear-gradient(rgba(39,35,31,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(39,35,31,.035) 1px,transparent 1px);background-size:60px 60px}}
-.header{{height:60px;background:rgba(255,253,249,.88);border-bottom:1px solid var(--rule);position:sticky;top:0;z-index:10;backdrop-filter:blur(18px)}}
-.header-inner{{height:100%;max-width:none;margin:0;display:flex;align-items:center;gap:16px;padding:0 24px}}
-.header a{{color:var(--ink);text-decoration:none;font-weight:700;font-size:15px;letter-spacing:0}}
-.header a:hover{{color:var(--accent)}}
-.header .logo{{display:flex;align-items:baseline;gap:4px;font-weight:820;font-size:18px}}
-.header .logo em{{font-family:Georgia,'Times New Roman',serif;font-style:italic;font-weight:700;color:var(--ink-soft)}}
-.header .logo-symbol{{display:none}}
-.header .nav-links{{display:flex;align-items:center;gap:8px;margin-left:auto;font-size:13px}}
-.header .nav-links a{{display:inline-flex;align-items:center;min-height:32px;padding:5px 13px;border:1px solid var(--rule);border-radius:999px;background:rgba(255,253,249,.82);font-weight:650;color:var(--ink-soft)}}
-.header .nav-links a:hover{{color:var(--accent)}}
-.wrap{{max-width:1100px;margin:0 auto;padding:20px}}
-h1{{font-size:20px;margin:0 0 6px;font-weight:700}}
-.breadcrumb{{font-size:12px;color:var(--ink-soft);margin-bottom:16px}}
-.breadcrumb a{{color:var(--accent);text-decoration:none}}
-.sub{{color:var(--ink-soft);font-size:14px;margin-bottom:16px}}
-.card{{background:var(--paper);border:1px solid var(--rule);border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,0.06),0 4px 12px rgba(0,0,0,0.04);padding:16px 24px}}
-.cat-list{{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px 16px}}
-.cat-link{{display:block;padding:6px 10px;color:var(--accent);text-decoration:none;font-size:13px;border-radius:4px;transition:background .1s}}
-.cat-link:hover{{background:#f5f0ea;text-decoration:none}}
-.back-wrap{{margin-top:20px}}
-.back{{display:inline-block;padding:8px 22px;background:var(--accent);color:#fff!important;text-decoration:none;border-radius:6px;font-size:13px;font-weight:600}}
-.back:hover{{opacity:.9;text-decoration:none}}
-.footer{{text-align:center;padding:24px;color:var(--ink-soft);font-size:12px;border-top:1px solid var(--rule);margin-top:24px}}
-.footer a{{color:var(--ink-soft)}}
-</style>
-</head><body>
-<div class="header"><div class="header-inner"><a href="{origin}/" class="logo">AILatest <em>Journal</em></a>
-<span class="nav-links"><a href="{origin}/">Home</a><a href="{origin}/extension.html">Download Center</a></span></div></div>
-<div class="wrap"><h1>Browse Journals by WoS Subject</h1><p class="breadcrumb"><a href="{origin}/">Home</a></p>
-<p class="sub">Select a Web of Science subject category to browse top journals sorted by Impact Factor.</p>
-<div class="card"><ul class="cat-list">{r_list}</ul></div>
-<p class="back-wrap"><a class="back" href="{origin}/">← Back</a></p></div>
-<div class="footer">© 2026 <a href="{origin}/">AILatest Journal</a> · <a href="{origin}/about.html">About</a> · <a href="{origin}/contact.html">Contact</a> · <a href="{origin}/terms.html">Terms</a> · <a href="{origin}/privacy.html">Privacy</a> · <a href="{origin}/refund.html">Refund</a></div>
-</body></html>'''
+    r_html = shell(
+        '学科排行榜 | AILatest Journal',
+        '按 Web of Science 学科浏览期刊榜单，按影响因子排序。',
+        f'{origin}/subjects/',
+        '学科排行榜',
+        '选择一个 Web of Science 学科，浏览该学科影响因子靠前的期刊。',
+        f'<div class="card"><ul class="cat-list">{r_list}</ul></div>',
+        f'{origin}/rankings/',
+    )
     (ROOT / 'subjects').mkdir(parents=True, exist_ok=True)
     (ROOT / 'subjects' / 'index.html').write_text(r_html, encoding='utf-8')
     print('  /subjects/ (landing)')
 
     # Indexes landing
     i_list = '\n'.join(f'<li><a href="{origin}/indexes/{s}/" class="cat-link"><strong>{esc(t)}</strong></a></li>' for s, t, _, _, _ in indexes)
-    i_html = f'''<!doctype html><html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Browse Journals by Indexing Database | AILatest Journal</title>
-<meta name="description" content="Browse academic journals indexed in SCIE, SSCI, EI Compendex, Scopus and MEDLINE." />
-<link rel="canonical" href="{origin}/indexes/" /><meta name="robots" content="index,follow" />
-<meta name="theme-color" content="#b4531f" />
-<style>
-:root{{--accent:#b4531f;--bg:#f7f5f0;--paper:#fff;--ink:#1c1917;--ink-soft:#6b6559;--rule:#e3ddd0;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}}
-*{{box-sizing:border-box}}
-body{{font-family:var(--sans);margin:0;padding:0;background:#fffdf9;color:var(--ink);line-height:1.6;background-image:linear-gradient(rgba(39,35,31,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(39,35,31,.035) 1px,transparent 1px);background-size:60px 60px}}
-.header{{height:60px;background:rgba(255,253,249,.88);border-bottom:1px solid var(--rule);position:sticky;top:0;z-index:10;backdrop-filter:blur(18px)}}
-.header-inner{{height:100%;max-width:none;margin:0;display:flex;align-items:center;gap:16px;padding:0 24px}}
-.header a{{color:var(--ink);text-decoration:none;font-weight:700;font-size:15px;letter-spacing:0}}
-.header a:hover{{color:var(--accent)}}
-.header .logo{{display:flex;align-items:baseline;gap:4px;font-weight:820;font-size:18px}}
-.header .logo em{{font-family:Georgia,'Times New Roman',serif;font-style:italic;font-weight:700;color:var(--ink-soft)}}
-.header .logo-symbol{{display:none}}
-.header .nav-links{{display:flex;align-items:center;gap:8px;margin-left:auto;font-size:13px}}
-.header .nav-links a{{display:inline-flex;align-items:center;min-height:32px;padding:5px 13px;border:1px solid var(--rule);border-radius:999px;background:rgba(255,253,249,.82);font-weight:650;color:var(--ink-soft)}}
-.header .nav-links a:hover{{color:var(--accent)}}
-.wrap{{max-width:1100px;margin:0 auto;padding:20px}}
-h1{{font-size:20px;margin:0 0 6px;font-weight:700}}
-.breadcrumb{{font-size:12px;color:var(--ink-soft);margin-bottom:16px}}
-.breadcrumb a{{color:var(--accent);text-decoration:none}}
-.sub{{color:var(--ink-soft);font-size:14px;margin-bottom:16px}}
-.card{{background:var(--paper);border:1px solid var(--rule);border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,0.06),0 4px 12px rgba(0,0,0,0.04);padding:16px 24px}}
-.cat-list{{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px 16px}}
-.cat-list li{{}}
-.cat-link{{display:block;padding:6px 10px;color:var(--accent);text-decoration:none;font-size:13px;border-radius:4px;transition:background .1s}}
-.cat-link:hover{{background:#f5f0ea;text-decoration:none}}
-.back-wrap{{margin-top:20px}}
-.back{{display:inline-block;padding:8px 22px;background:var(--accent);color:#fff!important;text-decoration:none;border-radius:6px;font-size:13px;font-weight:600}}
-.back:hover{{opacity:.9;text-decoration:none}}
-.footer{{text-align:center;padding:24px;color:var(--ink-soft);font-size:12px;border-top:1px solid var(--rule);margin-top:24px}}
-.footer a{{color:var(--ink-soft)}}
-</style>
-</head><body>
-<div class="header"><div class="header-inner"><a href="{origin}/" class="logo">AILatest <em>Journal</em></a>
-<span class="nav-links"><a href="{origin}/">Home</a><a href="{origin}/extension.html">Download Center</a></span></div></div>
-<div class="wrap"><h1>Browse Journals by Indexing Database</h1><p class="breadcrumb"><a href="{origin}/">Home</a></p>
-<p class="sub">Select an indexing database to browse indexed journals sorted by Impact Factor.</p>
-<div class="card"><ul class="cat-list">{i_list}</ul></div>
-<p class="back-wrap"><a class="back" href="{origin}/">← Back</a></p></div>
-<div class="footer">© 2026 <a href="{origin}/">AILatest Journal</a> · <a href="{origin}/about.html">About</a> · <a href="{origin}/contact.html">Contact</a> · <a href="{origin}/terms.html">Terms</a> · <a href="{origin}/privacy.html">Privacy</a> · <a href="{origin}/refund.html">Refund</a></div>
-</body></html>'''
+    i_html = shell(
+        '索引排行榜 | AILatest Journal',
+        '按 SCIE、SSCI、EI、Scopus、MEDLINE 等索引浏览期刊榜单。',
+        f'{origin}/indexes/',
+        '索引排行榜',
+        '选择一个收录索引或风险名单，浏览对应期刊。',
+        f'<div class="card"><ul class="cat-list">{i_list}</ul></div>',
+        f'{origin}/rankings/',
+    )
     (ROOT / 'indexes' / 'index.html').write_text(i_html, encoding='utf-8')
     print('  /indexes/ (landing)')
+
+    ranking_choices = f'''<div class="ranking-choice-grid">
+  <a class="ranking-choice" href="{origin}/indexes/"><strong>索引排行榜</strong><span>按 SCIE、SSCI、AHCI、ESCI、EI、Scopus、MEDLINE 等索引查看期刊。</span></a>
+  <a class="ranking-choice" href="{origin}/subjects/"><strong>学科排行榜</strong><span>按 Web of Science 学科分类查看期刊，适合快速定位领域内期刊。</span></a>
+  <a class="ranking-choice" href="{origin}/indexes/warning/"><strong>预警名单</strong><span>查看中科院预警、WoS On Hold、新锐 Under Review 等风险标记。</span></a>
+</div>'''
+    rankings_html = shell(
+        '榜单 | AILatest Journal',
+        'AILatest Journal 期刊榜单入口：索引排行榜、学科排行榜和预警名单。',
+        f'{origin}/rankings/',
+        '期刊榜单',
+        '选择一个榜单入口，再查看对应期刊列表。',
+        ranking_choices,
+        f'{origin}/',
+    )
+    (ROOT / 'rankings').mkdir(parents=True, exist_ok=True)
+    (ROOT / 'rankings' / 'index.html').write_text(rankings_html, encoding='utf-8')
+    print('  /rankings/ (landing)')
+
+    bridge_body = f'''<div class="ranking-choice-grid">
+  <a class="ranking-choice" href="{origin}/subjects/"><strong>进入学科排行榜</strong><span>旧版 ESI 大类页面已合并到 Web of Science 学科排行榜。</span></a>
+  <a class="ranking-choice" href="{origin}/indexes/"><strong>查看索引排行榜</strong><span>按 SCIE、SSCI、EI、Scopus 等索引浏览期刊。</span></a>
+  <a class="ranking-choice" href="{origin}/rankings/"><strong>返回榜单入口</strong><span>在榜单入口选择索引、学科或预警名单。</span></a>
+</div>'''
+    for slug, title in LEGACY_SUBJECT_PAGES:
+        legacy_html = shell(
+            f'{title} | AILatest Journal',
+            f'{title} 旧版 ESI 大类页面已合并到 AILatest Journal 学科排行榜。',
+            f'{origin}/subjects/{slug}/',
+            f'{title} 已合并',
+            '旧版 ESI 大类页面已合并到新的学科排行榜，请从下面入口继续浏览。',
+            bridge_body,
+            f'{origin}/subjects/',
+        )
+        (ROOT / 'subjects' / slug).mkdir(parents=True, exist_ok=True)
+        (ROOT / 'subjects' / slug / 'index.html').write_text(legacy_html, encoding='utf-8')
+    print(f'  legacy /subjects/* bridge pages: {len(LEGACY_SUBJECT_PAGES)}')
 
 def update_sitemap(origin):
     sitemap_path = ROOT / 'sitemap.xml'
@@ -452,12 +438,16 @@ def update_sitemap(origin):
         print('  sitemap.xml not found, skipping'); return
     existing = sitemap_path.read_text(encoding='utf-8')
     new_urls = []
+    new_urls.append(f'  <url><loc>{origin}/rankings/</loc><priority>0.7</priority></url>')
+    new_urls.append(f'  <url><loc>{origin}/indexes/</loc><priority>0.7</priority></url>')
+    for slug, _, _, _, _ in INDEXES:
+        new_urls.append(f'  <url><loc>{origin}/indexes/{slug}/</loc><priority>0.7</priority></url>')
     new_urls.append(f'  <url><loc>{origin}/subjects/</loc><priority>0.7</priority></url>')
     for slug, _, _, _ in SUBJECTS:
         new_urls.append(f'  <url><loc>{origin}/subjects/{slug}/</loc><priority>0.7</priority></url>')
-    # Remove old subjects/ links and /rankings/ lines
+    # Remove old generated listing URLs before inserting the fresh set.
     lines = existing.split('\n')
-    clean = [l for l in lines if '/rankings/' not in l and '/subjects/' not in l]
+    clean = [l for l in lines if '/rankings/' not in l and '/subjects/' not in l and '/indexes/' not in l]
     existing = '\n'.join(clean)
     if '</urlset>' in existing:
         existing = existing.replace('</urlset>', '\n'.join(new_urls) + '\n</urlset>')

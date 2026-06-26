@@ -75,6 +75,36 @@
       toggle.textContent = dict.lang_toggle;
       toggle.setAttribute('aria-label', lang === 'zh-CN' ? 'Switch to English' : '切换到中文');
     }
+    syncStaticAuth(lang);
+  }
+
+  function readStaticUser() {
+    try {
+      const user = JSON.parse(localStorage.getItem('ailatest.user') || 'null');
+      return user && (user.token || user.email || user.name || user.login) ? user : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function staticUserName(user) {
+    return user.name || user.login || user.email || '我的';
+  }
+
+  function syncStaticAuth(lang) {
+    const dict = STRINGS[lang] || STRINGS.en;
+    const el = document.querySelector('[data-static-i18n="nav_login"].cta');
+    if (!el) return;
+    const user = readStaticUser();
+    if (user) {
+      el.textContent = staticUserName(user);
+      el.href = '/account';
+      el.title = user.email || staticUserName(user);
+    } else {
+      el.textContent = dict.nav_login;
+      el.href = '/signup.html';
+      el.removeAttribute('title');
+    }
   }
 
   function bind() {

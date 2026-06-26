@@ -387,6 +387,12 @@ function extensionAssetFromUrl(req) {
       path: '/downloads/ailatest-journal-extension-latest.zip',
     };
   }
+  if (raw === 'skill' || raw === 'ailatest-journal-skill-latest.zip') {
+    return {
+      key: 'ailatest-journal-skill-latest.zip',
+      path: '/downloads/ailatest-journal-skill-latest.zip',
+    };
+  }
   return null;
 }
 

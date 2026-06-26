@@ -8,7 +8,7 @@
 <meta name="robots" content="index,follow" />
 <link rel="canonical" href="https://journal.ailatest.org/extension.html" />
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
-<link rel="stylesheet" href="/css/static.css" />
+<link rel="stylesheet" href="/css/static.css?v=20260626-ui-polish" />
 </head>
 <body data-static-page="extension">
 <header class="page-head">
@@ -44,8 +44,8 @@
       <span class="download-badge">Skill</span>
       <h2>Journal Skill 内测版</h2>
       <p>给 Codex / AI 助手接入期刊搜索与荐刊接口，适合写作和投稿工作流。</p>
-      <a class="btn" href="https://github.com/stonecanon/ailatest-journal/tree/main/skills/ailatest-journal" target="_blank" rel="noopener">GitHub 安装</a>
-      <p class="small muted"><a href="https://github.com/stonecanon/ailatest-journal/tree/main/skills/ailatest-journal" target="_blank" rel="noopener">查看源码</a></p>
+      <button class="btn" type="button" data-copy-text="请从 GitHub 安装 AILatest Journal Skill：https://github.com/stonecanon/ailatest-journal/tree/main/skills/ailatest-journal">复制安装文本</button>
+      <p class="small muted"><a href="/api/extension/download?asset=skill&source=extension-page" data-extension-download-link download="ailatest-journal-skill-latest.zip">下载 Skill 包</a> · <a href="https://github.com/stonecanon/ailatest-journal/tree/main/skills/ailatest-journal" target="_blank" rel="noopener">查看源码</a></p>
     </article>
 
     <article class="download-tile tile-teal">
@@ -53,7 +53,7 @@
       <h2>MCP 内测服务</h2>
       <p>在线 MCP 服务，无需下载即可连接 Codex、Claude 等客户端。</p>
       <button class="btn" type="button" data-copy-text="codex mcp add ailatest-journal --url https://journal.ailatest.org/api/mcp">复制运行代码</button>
-      <p class="small muted"><code>codex mcp add ailatest-journal --url https://journal.ailatest.org/api/mcp</code></p>
+      <p class="small muted">在线服务 · 复制后运行</p>
     </article>
 
     <article class="download-tile tile-sand">
@@ -117,8 +117,8 @@
       <span class="download-badge">Skill</span>
       <h2>Journal Skill beta</h2>
       <p>Connect Codex / AI assistants to journal search and recommendation workflows.</p>
-      <a class="btn" href="https://github.com/stonecanon/ailatest-journal/tree/main/skills/ailatest-journal" target="_blank" rel="noopener">Install from GitHub</a>
-      <p class="small muted"><a href="https://github.com/stonecanon/ailatest-journal/tree/main/skills/ailatest-journal" target="_blank" rel="noopener">View source</a></p>
+      <button class="btn" type="button" data-copy-text="Install AILatest Journal Skill from GitHub: https://github.com/stonecanon/ailatest-journal/tree/main/skills/ailatest-journal">Copy install text</button>
+      <p class="small muted"><a href="/api/extension/download?asset=skill&source=extension-page" data-extension-download-link download="ailatest-journal-skill-latest.zip">Download Skill package</a> · <a href="https://github.com/stonecanon/ailatest-journal/tree/main/skills/ailatest-journal" target="_blank" rel="noopener">View source</a></p>
     </article>
 
     <article class="download-tile tile-teal">
@@ -126,7 +126,7 @@
       <h2>MCP beta service</h2>
       <p>Connect to the online MCP service from Codex, Claude and compatible clients.</p>
       <button class="btn" type="button" data-copy-text="codex mcp add ailatest-journal --url https://journal.ailatest.org/api/mcp">Copy command</button>
-      <p class="small muted"><code>codex mcp add ailatest-journal --url https://journal.ailatest.org/api/mcp</code></p>
+      <p class="small muted">Online service · copy command</p>
     </article>
 
     <article class="download-tile tile-sand">
@@ -174,8 +174,8 @@
     <a href="/privacy.html">Privacy</a> ·
     <a href="/refund.html">Refund</a></p>
 </footer>
-<script src="/js/static-i18n.js" defer></script>
-<script src="/js/extension-downloads.js" defer></script>
+<script src="/js/static-i18n.js?v=20260626-ui-polish" defer></script>
+<script src="/js/extension-downloads.js?v=20260626-ui-polish" defer></script>
 <script>
 document.addEventListener('click', async (event) => {
   const button = event.target.closest('[data-copy-text]');
