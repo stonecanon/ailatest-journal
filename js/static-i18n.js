@@ -12,8 +12,8 @@
       lang_toggle: 'English',
       pricing_title: '订阅即将开放 | AILatest Journal',
       pricing_desc: 'AILatest Journal 订阅功能即将开放。当前主推浏览器插件内测版，可在 Google Scholar、PubMed、知网等页面显示期刊徽章。',
-      extension_title: '浏览器插件内测版下载 | AILatest Journal',
-      extension_desc: '下载 AILatest Journal 浏览器插件内测版，在 Google Scholar、PubMed、知网等页面试用期刊影响因子、中科院分区、JCR 分区和收录评级徽章。'
+      extension_title: '下载中心 | AILatest Journal',
+      extension_desc: 'AILatest Journal 下载中心，提供浏览器插件内测版、Skill、MCP 服务和后续移动端入口。'
     },
     en: {
       nav_about: 'About',
@@ -27,8 +27,8 @@
       lang_toggle: '中文',
       pricing_title: 'Subscription Coming Soon | AILatest Journal',
       pricing_desc: 'AILatest Journal subscription is coming soon. For now, try the browser extension beta for journal badges on Google Scholar, PubMed, CNKI and more.',
-      extension_title: 'Browser Extension Beta Download | AILatest Journal',
-      extension_desc: 'Download the AILatest Journal browser extension beta to show IF, CAS tiers, JCR quartiles, indexed databases and domestic ranking badges on Google Scholar, PubMed, CNKI and more.'
+      extension_title: 'Download Center | AILatest Journal',
+      extension_desc: 'AILatest Journal Download Center for the browser extension beta, Skill, MCP service and future mobile entries.'
     }
   };
 

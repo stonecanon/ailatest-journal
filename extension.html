@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>浏览器插件内测版下载 | AILatest Journal</title>
-<meta name="description" content="下载 AILatest Journal 浏览器插件内测版，在 Google Scholar、PubMed、知网等页面试用期刊影响因子、中科院分区、JCR 分区和收录评级徽章。" />
+<title>下载中心 | AILatest Journal</title>
+<meta name="description" content="AILatest Journal 下载中心，提供浏览器插件内测版、Skill、MCP 服务和后续移动端入口。" />
 <meta name="robots" content="index,follow" />
 <link rel="canonical" href="https://journal.ailatest.org/extension.html" />
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
@@ -20,73 +20,151 @@
     <button class="static-lang-toggle" type="button" data-static-lang-toggle>English</button>
   </nav>
 </header>
-<main data-lang-panel="zh-CN">
-  <h1>浏览器插件内测版</h1>
-  <p class="sub">用于小范围试用和兼容性反馈。在 Google Scholar、PubMed、知网等论文页面直接显示期刊影响因子、中科院分区、JCR 分区、收录索引和国内目录评级。</p>
+<main class="download-main" data-lang-panel="zh-CN">
+  <section class="download-hero">
+    <p class="download-kicker">AILatest Journal</p>
+    <h1>下载中心</h1>
+    <div class="download-updates" aria-label="最新动态">
+      <div><strong>浏览器插件内测版</strong><time>可下载</time></div>
+      <div><strong>Skill 在线查询</strong><time>可安装</time></div>
+      <div><strong>MCP 内测服务</strong><time>可连接</time></div>
+    </div>
+  </section>
 
-  <div class="card">
-    <h2 style="margin-top:0">AILatest Journal 插件内测版 v0.2.9</h2>
-    <p>当前提供 Chrome / Edge 手动安装包。此版本不是 Chrome 商店正式版，适合先体验功能、反馈识别问题和站点兼容性。</p>
-    <p>下载后解压，在浏览器扩展管理页开启开发者模式，并选择解压后的文件夹。</p>
-    <p><a class="btn" href="/api/extension/download?asset=latest&source=extension-page" data-extension-download-link download="ailatest-journal-extension-latest.zip">下载插件 ZIP</a></p>
-    <p class="small muted">文件大小约 43KB。插件会请求 journal.ailatest.org 的期刊数据接口；匿名试用额度有限，登录后可获得更高查询额度。</p>
-    <p class="small muted download-stats" aria-live="polite">累计下载 <b data-extension-download-count>—</b> 次 · 实时更新</p>
-  </div>
+  <section class="download-products" aria-label="下载项目">
+    <article class="download-tile tile-green">
+      <span class="download-badge">浏览器插件</span>
+      <h2>Chrome / Edge 内测版</h2>
+      <p>在 Google Scholar、PubMed、知网页面显示期刊徽章，并支持文献卡片保存。</p>
+      <a class="btn" href="/api/extension/download?asset=latest&source=extension-page" data-extension-download-link download="ailatest-journal-extension-latest.zip">下载最新版 ZIP</a>
+      <p class="small muted download-stats" aria-live="polite">累计下载 <b data-extension-download-count>—</b> 次</p>
+    </article>
 
-  <div class="card">
-    <h2 style="margin-top:0">稳定、安全、无流量劫持</h2>
-    <p>AILatest 插件按生产力工具标准设计：核心查询依赖自有云端接口与本地缓存，目标是让高频检索时的徽章识别更稳定，减少因为第三方页面变化或接口波动造成的中断。</p>
-    <p>插件只为期刊识别请求必要数据，不上传浏览记录、检索关键词或论文阅读内容；不会注入广告、劫持优惠券链接、改写跳转或出售匿名流量数据。正式上架 Chrome Web Store 时，我们会按商店要求完整披露 Privacy Practices。</p>
-  </div>
+    <article class="download-tile tile-mint">
+      <span class="download-badge">Skill</span>
+      <h2>Journal Skill 内测版</h2>
+      <p>给 Codex / AI 助手接入期刊搜索与荐刊接口，适合写作和投稿工作流。</p>
+      <a class="btn" href="https://github.com/stonecanon/ailatest-journal/tree/main/skills/ailatest-journal" target="_blank" rel="noopener">GitHub 安装</a>
+      <p class="small muted"><a href="https://github.com/stonecanon/ailatest-journal/tree/main/skills/ailatest-journal" target="_blank" rel="noopener">查看源码</a></p>
+    </article>
 
-  <div class="card">
-    <h2 style="margin-top:0">安装方式</h2>
-    <ol>
-      <li>下载 ZIP 并解压到本地文件夹。</li>
-      <li>打开 Chrome 或 Edge 的扩展管理页。</li>
-      <li>开启“开发者模式”。</li>
-      <li>点击“加载已解压的扩展程序”，选择刚才解压出的文件夹。</li>
-      <li>打开 Google Scholar、PubMed 或知网页面查看期刊徽章。</li>
-    </ol>
-  </div>
+    <article class="download-tile tile-teal">
+      <span class="download-badge">MCP</span>
+      <h2>MCP 内测服务</h2>
+      <p>在线 MCP 服务，无需下载即可连接 Codex、Claude 等客户端。</p>
+      <button class="btn" type="button" data-copy-text="codex mcp add ailatest-journal --url https://journal.ailatest.org/api/mcp">复制运行代码</button>
+      <p class="small muted"><code>codex mcp add ailatest-journal --url https://journal.ailatest.org/api/mcp</code></p>
+    </article>
 
-  <div class="note">
-    内测 ZIP 不会自动更新。正式版后续会以上架 Chrome Web Store 为准；商店版发布后，用户会通过浏览器自动更新。内测期间若某些站点没有识别出期刊，请下载本页新版或把页面链接发给我们。
-  </div>
+    <article class="download-tile tile-sand">
+      <span class="download-badge">小程序</span>
+      <h2>微信小程序</h2>
+      <p>移动端期刊查询、收藏和本地推荐入口，二维码后续开放。</p>
+      <button class="btn" type="button" disabled>敬请期待</button>
+    </article>
+
+    <article class="download-tile tile-sand">
+      <span class="download-badge">Android</span>
+      <h2>Android</h2>
+      <p>移动端本地收藏夹、报告下载和 AI 投稿助手预留入口。</p>
+      <button class="btn" type="button" disabled>敬请期待</button>
+    </article>
+
+    <article class="download-tile tile-sand">
+      <span class="download-badge">iOS</span>
+      <h2>iOS</h2>
+      <p>面向 iPhone / iPad 的轻量期刊查询与文献工作目录体验。</p>
+      <button class="btn" type="button" disabled>敬请期待</button>
+    </article>
+  </section>
+
+  <section class="download-help">
+    <div>
+      <h2>浏览器插件</h2>
+      <p>下载 ZIP，解压后在扩展管理页加载已解压目录。</p>
+    </div>
+    <div>
+      <h2>Skill</h2>
+      <p>将 GitHub 目录地址交给 Codex 并要求安装；ZIP 仅作为备用。</p>
+    </div>
+    <div>
+      <h2>MCP</h2>
+      <p>复制运行代码，在支持 MCP 的客户端中添加在线服务。</p>
+    </div>
+  </section>
 </main>
-<main data-lang-panel="en">
-  <h1>Browser Extension Beta</h1>
-  <p class="sub">A small beta release for compatibility testing and feedback. On Google Scholar, PubMed, CNKI and other literature pages, it shows journal IF, CAS tiers, JCR quartiles, indexed databases and domestic ranking badges directly beside each result.</p>
+<main class="download-main" data-lang-panel="en">
+  <section class="download-hero">
+    <p class="download-kicker">AILatest Journal</p>
+    <h1>Download Center</h1>
+    <div class="download-updates" aria-label="Latest releases">
+      <div><strong>Browser extension beta</strong><time>Download</time></div>
+      <div><strong>Journal Skill</strong><time>Install</time></div>
+      <div><strong>MCP beta service</strong><time>Connect</time></div>
+    </div>
+  </section>
 
-  <div class="card">
-    <h2 style="margin-top:0">AILatest Journal Extension beta v0.2.9</h2>
-    <p>The current release is a manual Chrome / Edge installation package. It is not the final Chrome Web Store version yet, so it is intended for early testing, compatibility feedback and journal recognition fixes.</p>
-    <p>Download and unzip the package, enable Developer mode in the browser extension page, then load the unzipped folder.</p>
-    <p><a class="btn" href="/api/extension/download?asset=latest&source=extension-page" data-extension-download-link download="ailatest-journal-extension-latest.zip">Download extension ZIP</a></p>
-    <p class="small muted">File size is about 43KB. The extension queries journal.ailatest.org for journal data. Anonymous trial quota is limited; signing in provides a higher quota.</p>
-    <p class="small muted download-stats" aria-live="polite">Downloads <b data-extension-download-count>—</b> · updates live</p>
-  </div>
+  <section class="download-products" aria-label="Download products">
+    <article class="download-tile tile-green">
+      <span class="download-badge">Extension</span>
+      <h2>Chrome / Edge beta</h2>
+      <p>Show journal badges on Google Scholar, PubMed and CNKI, with citation-card saving.</p>
+      <a class="btn" href="/api/extension/download?asset=latest&source=extension-page" data-extension-download-link download="ailatest-journal-extension-latest.zip">Download ZIP</a>
+      <p class="small muted download-stats" aria-live="polite">Downloads <b data-extension-download-count>—</b></p>
+    </article>
 
-  <div class="card">
-    <h2 style="margin-top:0">Stable, safe and no traffic hijacking</h2>
-    <p>AILatest is designed as a research productivity tool. Core lookup uses our cloud API and local cache to make high-frequency journal recognition more stable when third-party pages or interfaces change.</p>
-    <p>The extension only requests the fields needed for journal recognition. It does not upload browsing history, search keywords or reading content. It does not inject ads, rewrite links, hijack coupons or sell anonymous traffic data. When the Chrome Web Store version is released, we will publish complete Privacy Practices disclosures.</p>
-  </div>
+    <article class="download-tile tile-mint">
+      <span class="download-badge">Skill</span>
+      <h2>Journal Skill beta</h2>
+      <p>Connect Codex / AI assistants to journal search and recommendation workflows.</p>
+      <a class="btn" href="https://github.com/stonecanon/ailatest-journal/tree/main/skills/ailatest-journal" target="_blank" rel="noopener">Install from GitHub</a>
+      <p class="small muted"><a href="https://github.com/stonecanon/ailatest-journal/tree/main/skills/ailatest-journal" target="_blank" rel="noopener">View source</a></p>
+    </article>
 
-  <div class="card">
-    <h2 style="margin-top:0">How to install</h2>
-    <ol>
-      <li>Download the ZIP and unzip it to a local folder.</li>
-      <li>Open the extension management page in Chrome or Edge.</li>
-      <li>Turn on Developer mode.</li>
-      <li>Click "Load unpacked" and choose the unzipped folder.</li>
-      <li>Open Google Scholar, PubMed or CNKI to check the journal badges.</li>
-    </ol>
-  </div>
+    <article class="download-tile tile-teal">
+      <span class="download-badge">MCP</span>
+      <h2>MCP beta service</h2>
+      <p>Connect to the online MCP service from Codex, Claude and compatible clients.</p>
+      <button class="btn" type="button" data-copy-text="codex mcp add ailatest-journal --url https://journal.ailatest.org/api/mcp">Copy command</button>
+      <p class="small muted"><code>codex mcp add ailatest-journal --url https://journal.ailatest.org/api/mcp</code></p>
+    </article>
 
-  <div class="note">
-    The beta ZIP does not update automatically. The final release will be published through the Chrome Web Store, where the browser can update it automatically. During beta testing, if a site or journal is not recognized, download the latest version here or send us the page link.
-  </div>
+    <article class="download-tile tile-sand">
+      <span class="download-badge">Mini program</span>
+      <h2>WeChat Mini Program</h2>
+      <p>Mobile journal search, saved lists and local recommendation entry.</p>
+      <button class="btn" type="button" disabled>Coming soon</button>
+    </article>
+
+    <article class="download-tile tile-sand">
+      <span class="download-badge">Android</span>
+      <h2>Android</h2>
+      <p>Local library, report downloads and AI submission assistant entry.</p>
+      <button class="btn" type="button" disabled>Coming soon</button>
+    </article>
+
+    <article class="download-tile tile-sand">
+      <span class="download-badge">iOS</span>
+      <h2>iOS</h2>
+      <p>Lightweight journal search and document workspace for iPhone / iPad.</p>
+      <button class="btn" type="button" disabled>Coming soon</button>
+    </article>
+  </section>
+
+  <section class="download-help">
+    <div>
+      <h2>Extension</h2>
+      <p>Download and unzip the ZIP, then load the unpacked folder from Extensions.</p>
+    </div>
+    <div>
+      <h2>Skill</h2>
+      <p>Give the GitHub folder URL to Codex and ask it to install the skill.</p>
+    </div>
+    <div>
+      <h2>MCP</h2>
+      <p>Copy the command and add the online service in an MCP-compatible client.</p>
+    </div>
+  </section>
 </main>
 <footer class="page-foot">
   <p>© 2026 AILatest Journal ·
@@ -98,5 +176,36 @@
 </footer>
 <script src="/js/static-i18n.js" defer></script>
 <script src="/js/extension-downloads.js" defer></script>
+<script>
+document.addEventListener('click', async (event) => {
+  const button = event.target.closest('[data-copy-text]');
+  if (!button) return;
+  const original = button.textContent;
+  const text = button.dataset.copyText || '';
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      throw new Error('clipboard api unavailable');
+    }
+    button.textContent = document.documentElement.lang === 'en' ? 'Copied' : '已复制';
+    setTimeout(() => { button.textContent = original; }, 1400);
+  } catch {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.setAttribute('readonly', '');
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    const ok = document.execCommand('copy');
+    textarea.remove();
+    button.textContent = ok
+      ? (document.documentElement.lang === 'en' ? 'Copied' : '已复制')
+      : (document.documentElement.lang === 'en' ? 'Copy failed' : '复制失败');
+    setTimeout(() => { button.textContent = original; }, 1400);
+  }
+});
+</script>
 </body>
 </html>

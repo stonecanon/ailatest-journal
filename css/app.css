@@ -2132,7 +2132,7 @@ body.topbar-compact .results-head {
 }
 .me-title-block h1 {
   margin: 0;
-  font: 780 26px/1.2 var(--display);
+  font: 760 22px/1.24 var(--display);
   letter-spacing: 0;
 }
 .me-title-block p {
@@ -7268,7 +7268,7 @@ body.journal-route .lang-toggle-wrap { display: none; }
     height: 54px;
     font-size: 22px;
   }
-  .me-title-block h1 { font-size: 23px; }
+  .me-title-block h1 { font-size: 20px; }
   .me-actions {
     flex-basis: 100%;
     justify-content: flex-start;

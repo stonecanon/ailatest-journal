@@ -75,6 +75,197 @@ li { margin: 4px 0; }
   font-weight: 800;
 }
 
+body[data-static-page="extension"] {
+  background:
+    linear-gradient(rgba(128, 91, 48, .055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(128, 91, 48, .045) 1px, transparent 1px),
+    var(--bg);
+  background-size: 64px 64px;
+}
+
+body[data-static-page="extension"] .page-head {
+  max-width: 1180px;
+}
+
+.download-main {
+  max-width: 1180px;
+  padding-top: 10px;
+}
+
+.download-hero {
+  margin: 8px 0 16px;
+  padding: 30px 34px;
+  border: 1px solid #a9d5bb;
+  border-radius: 12px;
+  background: #2eaf69;
+  color: #fff;
+  box-shadow: 0 14px 32px rgba(24, 92, 55, .12);
+}
+
+.download-kicker {
+  margin: 0 0 4px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  opacity: .82;
+}
+
+.download-hero h1 {
+  margin: 0 0 18px;
+  font-size: clamp(30px, 4vw, 46px);
+  line-height: 1.05;
+  letter-spacing: 0;
+}
+
+.download-updates {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, .34);
+}
+
+.download-updates div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 42px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .14);
+  font-size: 14px;
+}
+
+.download-updates strong,
+.download-updates time {
+  color: #fff;
+  font-weight: 800;
+}
+
+.download-updates time {
+  white-space: nowrap;
+  opacity: .82;
+}
+
+.download-products {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 10px;
+  margin: 12px 0 10px;
+}
+
+.download-tile {
+  min-height: 254px;
+  padding: 14px 12px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, .78);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 10px 24px rgba(68, 50, 28, .06);
+}
+
+.download-tile h2 {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.25;
+}
+
+.download-tile p {
+  margin: 0;
+  color: #776f64;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.download-tile .btn {
+  margin-top: auto;
+  min-height: 36px;
+  padding: 8px 10px;
+  border-radius: 7px;
+  font-size: 13px;
+}
+
+.download-tile .small {
+  min-height: 18px;
+  font-size: 12px;
+}
+
+.download-tile code {
+  display: block;
+  overflow-wrap: anywhere;
+  font-size: 11px;
+  line-height: 1.4;
+  color: #2e6b4b;
+}
+
+.download-badge {
+  align-self: flex-start;
+  min-height: 28px;
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 9px;
+  border-radius: 5px;
+  font-size: 13px;
+  line-height: 1;
+  font-weight: 850;
+}
+
+.tile-green {
+  background: linear-gradient(180deg, rgba(230, 248, 238, .9), rgba(255,255,255,.82));
+  border-color: #b8dcc6;
+}
+.tile-green .download-badge { background: #d5f0df; color: #07583d; }
+
+.tile-mint {
+  background: linear-gradient(180deg, rgba(233, 246, 238, .92), rgba(255,255,255,.84));
+  border-color: #bfd9c7;
+}
+.tile-mint .download-badge { background: #dcefe3; color: #0c593f; }
+
+.tile-teal {
+  background: linear-gradient(180deg, rgba(229, 245, 239, .92), rgba(255,255,255,.84));
+  border-color: #b9d7cb;
+}
+.tile-teal .download-badge { background: #d9efe7; color: #0c5a4d; }
+
+.tile-sand {
+  background: linear-gradient(180deg, rgba(249, 242, 229, .95), rgba(255,255,255,.82));
+}
+.tile-sand .download-badge { background: #e9decc; color: #4c3d2c; }
+
+.download-help {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(255,255,255,.62);
+}
+
+.download-help div {
+  padding: 10px 12px;
+  border: 1px solid #eadcc9;
+  border-radius: 8px;
+  background: rgba(255, 252, 247, .72);
+}
+
+.download-help h2 {
+  margin: 0 0 4px;
+  font-size: 14px;
+}
+
+.download-help p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
 .card {
   background: var(--card); border: 1px solid var(--line); border-radius: 10px;
   padding: 20px 22px; margin: 14px 0;
@@ -138,4 +329,24 @@ td.c, th.c { text-align: center; }
   .page-head nav { justify-content: center; }
   h1 { font-size: 24px; }
   .oauth-row { flex-direction: column; }
+}
+
+@media (max-width: 1080px) {
+  .download-products {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .download-hero {
+    padding: 24px 18px;
+  }
+  .download-updates,
+  .download-products,
+  .download-help {
+    grid-template-columns: 1fr;
+  }
+  .download-tile {
+    min-height: 0;
+  }
 }
