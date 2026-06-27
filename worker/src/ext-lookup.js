@@ -8,7 +8,7 @@
 
 import { CORS, json, loadJournals } from './deepseek-common.js';
 
-const DEFAULT_LOOKUP_URL = 'https://journal.ailatest.org/data/ext_lookup.json.gz';
+const DEFAULT_LOOKUP_URL = 'https://journal.ailatest.org/data/ext_lookup.json.gz?v=20260627';
 
 let lookupCache = null;
 let lookupPromise = null;
@@ -46,7 +46,7 @@ function addRecord(index, record) {
     const key = issnKey(value);
     if (key && !index.byIssn.has(key)) index.byIssn.set(key, record);
   }
-  for (const value of [record.name, record.cn_name]) {
+  for (const value of [record.name, record.cn_name, ...(Array.isArray(record.aliases) ? record.aliases : [])]) {
     const key = norm(value);
     if (key && !index.byName.has(key)) index.byName.set(key, record);
   }
@@ -104,13 +104,27 @@ function buildDisplayBadges(journal) {
   if (j.scopus && !indices.map(String).some((x) => x.toLowerCase() === 'scopus')) addBadge(out, 'index', 'Scopus', 'index', 'Scopus 收录');
   if (j.cstpcd) addBadge(out, 'index', '中国科技核心', 'cstpcd', '中国科技核心期刊目录');
   if (j.cscd) addBadge(out, 'index', typeof j.cscd === 'string' ? j.cscd : 'CSCD', 'cscd', '中国科学引文数据库');
+  if (j.scd) addBadge(out, 'index', typeof j.scd === 'string' ? j.scd : 'SCD', 'scd', 'SCD 源期刊');
+  if (j.ami) addBadge(out, 'index', `AMI ${typeof j.ami === 'string' ? j.ami : ''}`.trim(), 'ami', 'AMI 综合评价');
   if (j.cssci === 'core' || j.cssci === true) addBadge(out, 'index', 'CSSCI', 'cssci', 'CSSCI 来源期刊');
   if (j.cssci === 'ext') addBadge(out, 'index', 'CSSCI 扩展', 'cssci-ext', 'CSSCI 扩展版来源期刊');
   if (j.pku) addBadge(out, 'index', '北大核心', 'pku', '北大中文核心期刊要目总览');
+  if (Array.isArray(j.cnkx) && j.cnkx.length) {
+    j.cnkx.slice(0, 3).forEach((item) => {
+      const tier = String(item?.tier || '').toUpperCase();
+      const domain = String(item?.domain || '').replace(/领域$/, '').trim();
+      const text = domain ? `科协·${domain} ${tier}` : `科协 ${tier}`;
+      addBadge(out, 'rating', text, 'tier', `中国科协高质量科技期刊分级目录${tier ? ' · ' + tier : ''}${item?.domain ? ' · ' + item.domain : ''}`);
+    });
+    if (j.cnkx.length > 3) addBadge(out, 'rating', `科协 +${j.cnkx.length - 3}`, 'tier', '中国科协高质量科技期刊分级目录');
+  }
   if (j.if_quartile) addBadge(out, 'rating', `JCR ${String(j.if_quartile).toUpperCase()}`, 'zone', 'JCR 分区');
   if (j.cas_zone) addBadge(out, 'rating', `中科院 ${j.cas_zone}区${j.cas_top ? '·TOP' : ''}`, 'zone', '中科院分区');
   if (j.if_2024 != null || j.if_latest != null) addBadge(out, 'rating', `IF ${displayIf(j.if_latest ?? j.if_2024)}`, 'if', '影响因子');
   if (j.ccf) addBadge(out, 'rating', `CCF ${j.ccf}`, 'ccf', 'CCF 推荐目录');
+  if (j.ccft) addBadge(out, 'rating', `CCF-T ${j.ccft}`, 'ccft', 'CCF 中文科技期刊分级目录');
+  if (j.zju) addBadge(out, 'rating', `浙大 ${j.zju}`, 'zju', '浙江大学期刊分级目录');
+  if (j.nsfc_mgmt) addBadge(out, 'rating', `NSFC ${j.nsfc_mgmt}`, 'nsfc', '国家自然科学基金委管理科学部期刊目录');
   if (j.abdc) addBadge(out, 'rating', `ABDC ${typeof j.abdc === 'string' ? j.abdc : j.abdc.rating || ''}`, 'biz', 'ABDC Journal Quality List');
   if (j.abs) addBadge(out, 'rating', `ABS ${typeof j.abs === 'string' ? j.abs : j.abs.rating || ''}`, 'biz', 'ABS Academic Journal Guide');
   if (j.free) addBadge(out, 'access', '免费发表', 'free', '开放获取/免费发表信号');
