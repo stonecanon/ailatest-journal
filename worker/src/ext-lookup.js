@@ -110,13 +110,21 @@ function buildDisplayBadges(journal) {
   if (j.cssci === 'ext') addBadge(out, 'index', 'CSSCI 扩展', 'cssci-ext', 'CSSCI 扩展版来源期刊');
   if (j.pku) addBadge(out, 'index', '北大核心', 'pku', '北大中文核心期刊要目总览');
   if (Array.isArray(j.cnkx) && j.cnkx.length) {
-    j.cnkx.slice(0, 3).forEach((item) => {
+    const cnkxBadges = [];
+    const cnkxSeen = new Set();
+    j.cnkx.forEach((item) => {
       const tier = String(item?.tier || '').toUpperCase();
       const domain = String(item?.domain || '').replace(/领域$/, '').trim();
       const text = domain ? `科协·${domain} ${tier}` : `科协 ${tier}`;
-      addBadge(out, 'rating', text, 'tier', `中国科协高质量科技期刊分级目录${tier ? ' · ' + tier : ''}${item?.domain ? ' · ' + item.domain : ''}`);
+      if (cnkxSeen.has(text)) return;
+      cnkxSeen.add(text);
+      cnkxBadges.push({
+        text,
+        title: `中国科协高质量科技期刊分级目录${tier ? ' · ' + tier : ''}${item?.domain ? ' · ' + item.domain : ''}`,
+      });
     });
-    if (j.cnkx.length > 3) addBadge(out, 'rating', `科协 +${j.cnkx.length - 3}`, 'tier', '中国科协高质量科技期刊分级目录');
+    cnkxBadges.slice(0, 3).forEach((badge) => addBadge(out, 'rating', badge.text, 'tier', badge.title));
+    if (cnkxBadges.length > 3) addBadge(out, 'rating', `科协 +${cnkxBadges.length - 3}`, 'tier', '中国科协高质量科技期刊分级目录');
   }
   if (j.if_quartile) addBadge(out, 'rating', `JCR ${String(j.if_quartile).toUpperCase()}`, 'zone', 'JCR 分区');
   if (j.cas_zone) addBadge(out, 'rating', `中科院 ${j.cas_zone}区${j.cas_top ? '·TOP' : ''}`, 'zone', '中科院分区');
