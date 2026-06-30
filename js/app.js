@@ -73,8 +73,8 @@
       hero_body_fav: '点击任意期刊右侧的 <b>★</b> 可加入收藏。未登录时保存在本机 localStorage；登录后自动同步到云端，可跨设备访问。',
       hero_title_pick: '智能荐刊',
       hero_body_pick: '采用自研大模型算法，深度分析你的研究主题与海量期刊数据的匹配度，智能推荐最合适的目标期刊。每人每天免费使用 5 次。',
-      pick_placeholder: '建议输入标题 + 关键词，最多 200 字符',
-      pick_search_btn: '开始推荐',
+      pick_placeholder: '输入论文标题、摘要或关键词，开始推荐期刊',
+      pick_search_btn: '推荐期刊',
       pick_filter_topics: '匹配研究领域 (Topics)',
       pick_filter_if: '限 IF >',
       pick_filter_zone: '中科院分区',
@@ -160,8 +160,8 @@
       hero_body_fav: 'Click the <b>★</b> on any row to bookmark. Saved locally when signed-out; syncs to the cloud when signed-in.',
       hero_title_pick: 'Pick for me',
       hero_body_pick: 'Powered by proprietary large-model algorithm — intelligently matches your research topic against millions of journal data points to recommend the best target journals. 5 free searches per day per user.',
-      pick_placeholder: 'Enter title + keywords, max 200 characters',
-      pick_search_btn: 'Start',
+      pick_placeholder: 'Enter a paper title, abstract, or keywords to recommend journals',
+      pick_search_btn: 'Recommend',
       pick_filter_topics: 'Match Topics',
       pick_filter_if: 'IF >',
       pick_filter_zone: 'CAS Zone',
@@ -437,8 +437,8 @@
     hero_body_fav: '任意の行の <b>★</b> をクリックするとお気に入りに追加できます。未ログイン時はこの端末に保存され、ログイン後はクラウド同期されます。',
     hero_title_pick: '投稿先AI',
     hero_body_pick: '研究テーマとサイト内のジャーナル指標を照合し、投稿先候補を推薦します。',
-    pick_placeholder: 'タイトルとキーワードを入力（最大 200 文字）',
-    pick_search_btn: '推薦を開始',
+    pick_placeholder: '論文タイトル・要旨・キーワードを入力して投稿先を推薦',
+    pick_search_btn: '推薦',
     pick_filter_topics: '研究分野に一致',
     pick_filter_if: 'IF >',
     pick_filter_zone: 'CAS 区分',
@@ -1894,6 +1894,19 @@
 
   setJournalAliases(DEFAULT_JOURNAL_ALIASES);
 
+  function isPickSearchContext() {
+    return activeTab === 'pick' || (activeTab === 'home' && homeMode === 'pick');
+  }
+
+  function currentSearchPlaceholderKey() {
+    if (isPickSearchContext()) return 'pick_placeholder';
+    if (activeTab === 'home') return 'search_home_ph';
+    if (activeTab === 'int') return 'search_int';
+    if (activeTab === 'fav') return 'search_fav';
+    if (activeTab === 'updates') return 'search_updates_ph';
+    return 'search_dom';
+  }
+
   function applyI18n() {
     $$('[data-i18n]').forEach(el => {
       const k = el.dataset.i18n;
@@ -1911,14 +1924,8 @@
       const k = el.dataset.i18nAria;
       const v = t(k); if (v) el.setAttribute('aria-label', v);
     });
-    if (activeTab !== 'pick') {
-      const search = activeTab === 'home' ? 'search_home_ph'
-                    : activeTab === 'int' ? 'search_int'
-                    : activeTab === 'fav' ? 'search_fav'
-                    : activeTab === 'updates' ? 'search_updates_ph'
-                    : 'search_dom';
-      $('#q').placeholder = t(search);
-    }
+    const qEl = $('#q');
+    if (qEl) qEl.placeholder = t(currentSearchPlaceholderKey());
     updateSearchSubmitLabel();
     const langToggle = $('#lang-toggle');
     if (langToggle) langToggle.textContent = LANG_META[lang]?.label || '中文';
@@ -1937,7 +1944,7 @@
     const btn = $('#search-submit');
     const label = $('#search-submit [data-i18n]');
     if (!label) return;
-    const key = activeTab === 'pick' ? 'pick_search_btn' : 'search_button';
+    const key = isPickSearchContext() ? 'pick_search_btn' : 'search_button';
     label.dataset.i18n = key;
     label.textContent = t(key);
     btn?.setAttribute('aria-label', t(key));
@@ -1954,6 +1961,9 @@
   function setHomeMode(mode) {
     homeMode = mode === 'pick' ? 'pick' : 'search';
     syncHomeModeTabs();
+    const qEl = $('#q');
+    if (qEl) qEl.placeholder = t(currentSearchPlaceholderKey());
+    updateSearchSubmitLabel();
   }
 
   // ───────── favorites (multi-list + drag sort) ─────────
@@ -7573,7 +7583,7 @@
       if (activeTab === 'updates') activeUpdateQuery = e.target.value.trim();
       else activeQuery = e.target.value.trim();
       shown = PAGE;
-      if (activeTab === 'pick') return; // pick tab uses Enter
+      if (isPickSearchContext()) return; // pick mode uses Enter / submit
       if (activeTab === 'home') {
         clearTimeout(homeSearchDebounce);
         homeSearchDebounce = setTimeout(showHomeSearchResults, 90);
@@ -7589,8 +7599,12 @@
       }
     });
     $('#q').addEventListener('keydown', (e) => {
-      if (e.key !== 'Enter' || activeTab === 'pick') return;
+      if (e.key !== 'Enter') return;
       e.preventDefault();
+      if (isPickSearchContext()) {
+        submitPickSearchFromTopbar(e.currentTarget.value.trim());
+        return;
+      }
       if (activeTab === 'updates') activeUpdateQuery = e.currentTarget.value.trim();
       else activeQuery = e.currentTarget.value.trim();
       shown = PAGE;
@@ -7604,9 +7618,18 @@
       else if (activeTab === 'dom') renderDomestic();
       else if (activeTab === 'updates') renderJournalUpdates();
     });
-    $('#search-submit')?.addEventListener('click', () => {
+    $('#search-submit')?.addEventListener('click', async () => {
       const qEl = $('#q');
       if (!qEl) return;
+      const query = qEl.value.trim();
+      if (isPickSearchContext()) {
+        if (!query) {
+          qEl.focus();
+          return;
+        }
+        await submitPickSearchFromTopbar(query);
+        return;
+      }
       if (activeTab === 'updates') activeUpdateQuery = qEl.value.trim();
       else activeQuery = qEl.value.trim();
       shown = PAGE;
@@ -8760,7 +8783,7 @@
         }
         qEl.maxLength = 200;
         if (activeTab === 'pick') {
-          qEl.placeholder = T('输入你的论文标题和关键词，如：基于深度学习的室内人数预测', 'Enter your paper title and keywords, e.g.: Deep learning for indoor occupancy estimation');
+          qEl.placeholder = t('pick_placeholder');
         } else if (activeTab === 'home') {
           qEl.placeholder = t('search_home_ph');
         } else if (activeTab === 'updates') {
@@ -9181,6 +9204,43 @@
 
   // ───────── pick-for-me (journal recommendation) ─────────
   let _pickInit = false;
+  let _runPickSearch = null;
+
+  async function submitPickSearchFromTopbar(query) {
+    const value = String(query || '').trim();
+    const input = $('#q');
+    if (!value) {
+      input?.focus();
+      return;
+    }
+    if (activeTab !== 'pick') {
+      const activate = window.__activateJournalTab;
+      if (typeof activate === 'function') activate('pick');
+    }
+    const qEl = $('#q');
+    if (qEl) qEl.value = value;
+    try {
+      if (!journalsReady) {
+        const hint = $('#hint');
+        if (hint) hint.textContent = T('正在加载完整期刊库…', 'Loading full journal database…');
+        await ensureJournalsLoaded();
+        renderAfterFullJournalLoad('pick');
+      } else {
+        initPickTool();
+      }
+      const qElAfterLoad = $('#q');
+      if (qElAfterLoad) qElAfterLoad.value = value;
+      if (_runPickSearch) await _runPickSearch();
+    } catch (err) {
+      const results = $('#pick-results');
+      if (results) {
+        results.innerHTML = `<div class="pick-no-results">${escape(T('荐刊功能暂时不可用，请稍后重试。', 'Journal recommendation is temporarily unavailable. Please try again later.'))}</div>`;
+      }
+      const status = $('#pick-status');
+      if (status) status.textContent = err?.message || String(err || '');
+      console.error(err);
+    }
+  }
 
   function initPickTool() {
     if (_pickInit) return;
@@ -10048,7 +10108,9 @@
       }
     }
 
-    input.addEventListener('keydown', (e) => { if (activeTab !== 'pick') return; if (e.key === 'Enter') { e.preventDefault(); doSearch(); } });
+    _runPickSearch = doSearch;
+
+    input.addEventListener('keydown', (e) => { if (!isPickSearchContext()) return; if (e.key === 'Enter') { e.preventDefault(); doSearch(); } });
     document.querySelectorAll('.pick-filter-bar input').forEach(el => {
       el.addEventListener('change', () => {
         if (!input.value.trim()) return;
