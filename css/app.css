@@ -7234,7 +7234,6 @@ body.journal-route .lang-toggle-wrap { display: none; }
     font-size: 10px;
     line-height: 1.1;
   }
-  .rail-nav-btn[data-tab="updates"] { order: 5; }
   #fav-header-btn { order: 9; }
   #account-credit-badge { order: 10; }
   #rankings-btn { order: 7; }

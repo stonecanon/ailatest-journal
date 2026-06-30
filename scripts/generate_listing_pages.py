@@ -135,18 +135,11 @@ SKELETON = '''<!doctype html>
 <meta name="robots" content="index,follow" />
 <meta name="theme-color" content="#b4531f" />
 __JSONLD__
-<link rel="stylesheet" href="/css/listing.css" />
+<link rel="stylesheet" href="/css/listing.css?v=20260630-nav-unify" />
 </head><body>
-<aside class="listing-rail" aria-label="榜单导航">
-  <a href="__ORIGIN__/" title="全球"><span>◎</span><em>全球</em></a>
-  <a href="__ORIGIN__/rankings/" class="active" title="榜单"><span>▥</span><em>榜单</em></a>
-  <a href="__ORIGIN__/updates" title="动态"><span>≋</span><em>动态</em></a>
-  <a href="__ORIGIN__/account" title="我的"><span>☆</span><em>我的</em></a>
-</aside>
 <header class="listing-topbar">
   <a href="__ORIGIN__/" class="listing-brand">AILatest <em>Journal</em></a>
   <nav>
-    <a href="__ORIGIN__/">首页</a>
     <a href="__ORIGIN__/extension.html">下载中心</a>
     <span>中文</span>
   </nav>
@@ -340,18 +333,11 @@ def generate_landing(origin):
 <meta name="description" content="{esc(meta_desc)}" />
 <link rel="canonical" href="{esc(canonical)}" /><meta name="robots" content="index,follow" />
 <meta name="theme-color" content="#f97316" />
-<link rel="stylesheet" href="/css/listing.css" />
+<link rel="stylesheet" href="/css/listing.css?v=20260630-nav-unify" />
 </head><body>
-<aside class="listing-rail" aria-label="榜单导航">
-  <a href="{origin}/" title="全球"><span>◎</span><em>全球</em></a>
-  <a href="{origin}/rankings/" class="active" title="榜单"><span>▥</span><em>榜单</em></a>
-  <a href="{origin}/updates" title="动态"><span>≋</span><em>动态</em></a>
-  <a href="{origin}/account" title="我的"><span>☆</span><em>我的</em></a>
-</aside>
 <header class="listing-topbar">
   <a href="{origin}/" class="listing-brand">AILatest <em>Journal</em></a>
   <nav>
-    <a href="{origin}/">首页</a>
     <a href="{origin}/extension.html">下载中心</a>
     <span>中文</span>
   </nav>

@@ -2,6 +2,8 @@
   const STRINGS = {
     'zh-CN': {
       nav_about: '关于',
+      nav_home: '首页',
+      download_center: '下载中心',
       nav_pricing: '订阅',
       nav_extension: '插件内测',
       nav_contact: '联系',
@@ -17,6 +19,8 @@
     },
     en: {
       nav_about: 'About',
+      nav_home: 'Home',
+      download_center: 'Download Center',
       nav_pricing: 'Subscribe',
       nav_extension: 'Extension beta',
       nav_contact: 'Contact',

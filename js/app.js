@@ -1494,8 +1494,8 @@
 
   let activeTab = 'home';
   let homeMode = 'search';
-  const TAB_PATHS = { home: '/', int: '/global', dom: '/cn', updates: '/updates', in: '/in', my: '/my', kr: '/kr', fav: '/favorites', me: '/account', pick: '/pick' };
-  const PATH_TABS = { '/': 'home', '/en': 'home', '/zh': 'home', '/global': 'int', '/international': 'int', '/journals': 'int', '/cn': 'dom', '/china': 'dom', '/updates': 'updates', '/in': 'in', '/india': 'in', '/my': 'my', '/malaysia': 'my', '/kr': 'kr', '/korea': 'kr', '/favorites': 'fav', '/account': 'me', '/me': 'me', '/profile': 'me', '/pick': 'pick' };
+  const TAB_PATHS = { home: '/', int: '/global', dom: '/cn', in: '/in', my: '/my', kr: '/kr', fav: '/favorites', me: '/account', pick: '/pick' };
+  const PATH_TABS = { '/': 'home', '/en': 'home', '/zh': 'home', '/global': 'int', '/international': 'int', '/journals': 'int', '/cn': 'dom', '/china': 'dom', '/in': 'in', '/india': 'in', '/my': 'my', '/malaysia': 'my', '/kr': 'kr', '/korea': 'kr', '/favorites': 'fav', '/account': 'me', '/me': 'me', '/profile': 'me', '/pick': 'pick' };
   const TAB_SEO = {
     home: {
       title: 'AILatest Journal - Journal Finder, Rankings & Impact Factors',
@@ -1540,7 +1540,6 @@
   };
   function tabFromPath(pathname = location.pathname) {
     const clean = pathname.replace(/\/+$/, '') || '/';
-    if (clean.startsWith('/updates/')) return 'updates';
     return PATH_TABS[clean] || 'home';
   }
   function updatePageSeo(tab = activeTab) {
@@ -6287,8 +6286,6 @@
         btn.style.order = String(idx);
       }
     });
-    const updatesBtn = document.querySelector('.rail-nav-btn[data-tab="updates"]');
-    if (updatesBtn) updatesBtn.style.order = String(enabled.length);
     const favBtn = document.querySelector('.rail-nav-btn[data-tab="fav"]');
     if (favBtn) favBtn.style.order = '8';
     const creditBadge = document.querySelector('#account-credit-badge');
@@ -6309,7 +6306,6 @@
     else if (activeTab === 'fav') renderFav();
     else if (activeTab === 'int') renderInt();
     else if (activeTab === 'pick') refreshPickI18n();
-    else if (activeTab === 'updates') renderJournalUpdates();
     else if (activeTab === 'me') renderMe();
     else if (activeTab === 'in') renderIndia();
     else if (activeTab === 'my') renderMalaysia();
@@ -7763,7 +7759,6 @@
         if (homeResults) homeResults.hidden = true;
         if (homePanel) homePanel.classList.remove('home-tab-has-results');
         renderHomeSearchChips();
-        renderJournalUpdatesPreview();
         return;
       }
       if (homeUpdatesPreview) homeUpdatesPreview.hidden = true;
@@ -8227,30 +8222,19 @@
     }
 
     function updatePathIsUpdates(pathname = location.pathname) {
-      const clean = pathname.replace(/\/+$/, '') || '/';
-      return clean === '/updates' || clean.startsWith('/updates/');
+      return false;
     }
 
     function updateDetailSlugFromPath(pathname = location.pathname) {
-      const clean = pathname.replace(/\/+$/, '') || '/';
-      if (!clean.startsWith('/updates/')) return '';
-      try { return decodeURIComponent(clean.split('/').filter(Boolean).slice(1).join('/')); }
-      catch (_) { return clean.split('/').filter(Boolean).slice(1).join('/'); }
+      return '';
     }
 
     function updateDetailPath(item) {
-      if (item.detail_path) return item.detail_path;
-      return item.id ? `/updates/${encodeURIComponent(item.id)}` : '';
+      return '';
     }
 
     function updateDetailItemFromPath() {
-      const slug = updateDetailSlugFromPath();
-      if (!slug) return null;
-      const path = `/updates/${slug}`;
-      return (journalUpdates.items || []).find(item => {
-        const itemPath = (item.detail_path || '').replace(/\/+$/, '');
-        return item.id === slug || itemPath === path;
-      }) || null;
+      return null;
     }
 
     function formatFileSize(bytes) {
@@ -8548,7 +8532,7 @@
       const detailDek = updateDek(item);
       box.innerHTML = `
         <article class="update-detail">
-          <a class="updates-back" href="/updates" data-updates-back>← ${escape(t('updates_view_all'))}</a>
+          <a class="updates-back" href="/" data-updates-back>← ${escape(T('返回首页', 'Back home'))}</a>
           <header class="update-detail-head">
             <div class="update-card-top">
               <span class="update-category">${escape(updateCategoryLabel(item.category))}</span>
@@ -8596,9 +8580,7 @@
         </article>`;
       box.querySelector('[data-updates-back]')?.addEventListener('click', (e) => {
         e.preventDefault();
-        history.pushState({ tab: 'updates' }, '', '/updates');
-        renderJournalUpdates();
-        updatePageSeo('updates');
+        activateTab('home');
       });
       hydrateNatureIndexRankings(box, detail);
     }
@@ -8646,32 +8628,13 @@
     }
 
     function attachUpdatesViewAll(root) {
-      root?.querySelector('[data-updates-view-all]')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        activateTab('updates');
-      });
+      root?.querySelector('[data-updates-view-all]')?.remove();
     }
 
     function renderJournalUpdatesPreview() {
       if (!homeUpdatesPreview) return;
-      if (activeQuery) {
-        homeUpdatesPreview.hidden = true;
-        return;
-      }
-      const items = (journalUpdates.items || []).slice(0, 3);
-      if (!items.length) {
-        homeUpdatesPreview.hidden = true;
-        return;
-      }
-      homeUpdatesPreview.hidden = false;
-      homeUpdatesPreview.innerHTML = `
-        <div class="updates-preview-head">
-          <a href="/updates" class="updates-view-all" data-updates-view-all>${escape(t('updates_view_all'))}</a>
-        </div>
-        <div class="updates-preview-grid">
-          ${items.map(item => renderUpdateCard(item, { compact: true, home: true })).join('')}
-        </div>`;
-      attachUpdatesViewAll(homeUpdatesPreview);
+      homeUpdatesPreview.hidden = true;
+      homeUpdatesPreview.innerHTML = '';
     }
 
     function renderJournalUpdates() {
@@ -8731,9 +8694,6 @@
     window.addEventListener('ailatest:langchange', () => {
       if (activeTab === 'home') {
         if (activeQuery) renderHomeIntResults();
-        else renderJournalUpdatesPreview();
-      } else if (activeTab === 'updates' || updatePathIsUpdates()) {
-        renderJournalUpdates();
       }
     });
 
@@ -10209,14 +10169,13 @@
         || initialPath === '/import'
         || ['int', 'fav', 'pick'].includes(initialTab);
       const initialJournalUrl = initialNeedsFull ? 'data/journals.json.gz' : 'data/journals_light.json.gz';
-      const [j, m, esi, aliases, underReviewIssns, onHoldIssns, updates] = await Promise.all([
+      const [j, m, esi, aliases, underReviewIssns, onHoldIssns] = await Promise.all([
         fetchJSON(initialJournalUrl),
         fetch('/data/meta.json').then(r => r.json()).catch(() => null),
         fetch('/data/esi_categories.json').then(r => r.json()).catch(() => []),
         fetch('/data/journal_aliases.json').then(r => r.json()).catch(() => DEFAULT_JOURNAL_ALIASES),
         fetch('/data/under_review_issn.json').then(r => r.json()).catch(() => []),
         fetch('/data/on_hold_issn.json').then(r => r.json()).catch(() => []),
-        fetch('/data/journal_updates.json').then(r => r.json()).catch(() => ({ updated_at: '', items: [] })),
       ]);
       setJournalAliases(aliases);
       window.__underReviewIssns = underReviewIssns || [];
@@ -10224,7 +10183,7 @@
       journals = j; meta = m; esiCats = esi;
       if (!initialNeedsFull) homeJournals = Array.isArray(j) ? j : [];
       finalizeJournalDataset(j, { full: initialNeedsFull, underReviewIssns, onHoldIssns });
-      journalUpdates = normalizeJournalUpdates(updates);
+      journalUpdates = { updated_at: '', items: [] };
       // Build Under Review lookup set
       const underReviewSet = new Set((underReviewIssns||[]).filter(Boolean).map(s => s.replace(/[^0-9xX]/gi,'').toLowerCase()));
       journals.forEach(r => {

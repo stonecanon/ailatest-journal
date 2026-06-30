@@ -22,12 +22,26 @@ a:hover { text-decoration: underline; }
 
 .page-head {
   display: flex; align-items: center; justify-content: space-between;
-  max-width: 880px; margin: 0 auto; padding: 18px 20px;
+  min-height: 60px;
+  max-width: none; margin: 0; padding: 0 32px;
+  border-bottom: 1px solid rgba(43, 40, 36, .08);
+  background: rgba(250, 247, 242, .88);
+  backdrop-filter: blur(18px);
 }
-.brand { font-weight: 800; font-size: 18px; color: var(--ink); letter-spacing: .2px; }
-.brand span { color: var(--muted); font-weight: 600; }
-.page-head nav { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; justify-content: flex-end; font-size: 14px; }
-.page-head nav a { color: var(--ink); }
+.brand { font-weight: 820; font-size: 18px; color: var(--ink); letter-spacing: 0; }
+.brand span { color: var(--muted); font-family: Georgia, "Times New Roman", serif; font-style: italic; font-weight: 650; }
+.page-head nav { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: flex-end; font-size: 14px; }
+.page-head nav a {
+  min-height: 33px;
+  padding: 6px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .86);
+  color: var(--ink);
+  font-weight: 650;
+  line-height: 1.2;
+  box-shadow: 0 4px 14px rgba(66, 49, 27, .06);
+}
 .page-head nav a.cta {
   background: var(--ink); color: #fff; padding: 7px 14px; border-radius: 6px; font-weight: 600;
 }
@@ -81,10 +95,6 @@ body[data-static-page="extension"] {
     linear-gradient(90deg, rgba(128, 91, 48, .045) 1px, transparent 1px),
     var(--bg);
   background-size: 64px 64px;
-}
-
-body[data-static-page="extension"] .page-head {
-  max-width: 1180px;
 }
 
 .download-main {
@@ -330,8 +340,9 @@ td.c, th.c { text-align: center; }
 .page-foot a { color: var(--muted); margin: 0 6px; }
 
 @media (max-width: 640px) {
-  .page-head { flex-direction: column; gap: 10px; }
-  .page-head nav { justify-content: center; }
+  .page-head { min-height: 54px; padding: 8px 12px; }
+  .page-head nav { justify-content: flex-end; gap: 8px; }
+  .brand { font-size: 16px; }
   h1 { font-size: 24px; }
   .oauth-row { flex-direction: column; }
 }
