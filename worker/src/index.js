@@ -468,6 +468,53 @@ async function routeExtensionDownload(req, env) {
   });
 }
 
+let apiKeysReady = false;
+async function ensureApiKeyTables(env) {
+  if (apiKeysReady || !env?.DB) return;
+  await env.DB.batch([
+    env.DB.prepare(
+      `CREATE TABLE IF NOT EXISTS api_keys (
+        id           TEXT PRIMARY KEY,
+        user_id      INTEGER NOT NULL,
+        name         TEXT NOT NULL DEFAULT 'My API',
+        key_hash     TEXT NOT NULL UNIQUE,
+        key_prefix   TEXT NOT NULL,
+        key_tail     TEXT NOT NULL,
+        created_at   INTEGER NOT NULL,
+        revoked_at   INTEGER,
+        last_used_at INTEGER,
+        call_count   INTEGER NOT NULL DEFAULT 0
+      )`
+    ),
+    env.DB.prepare('CREATE INDEX IF NOT EXISTS idx_api_keys_user ON api_keys(user_id, created_at DESC)'),
+    env.DB.prepare('CREATE INDEX IF NOT EXISTS idx_api_keys_hash ON api_keys(key_hash)'),
+  ]);
+  apiKeysReady = true;
+}
+
+function apiKeySecret() {
+  const bytes = new Uint8Array(24);
+  crypto.getRandomValues(bytes);
+  return `aj_live_${b64url(bytes)}`;
+}
+
+async function apiKeyHash(secret, env) {
+  return sha256Hex(`${secret}|${env.API_KEY_PEPPER || env.JWT_SECRET || ''}`);
+}
+
+function publicApiKey(row) {
+  return {
+    id: row.id,
+    name: row.name,
+    key_prefix: row.key_prefix,
+    key_tail: row.key_tail,
+    created_at: row.created_at,
+    revoked_at: row.revoked_at,
+    last_used_at: row.last_used_at,
+    call_count: row.call_count || 0,
+  };
+}
+
 async function routeInteraction(req, env) {
   const body = await req.json().catch(() => null);
   if (!body) return err('invalid json');
@@ -1044,6 +1091,62 @@ async function routeMeEntitlements(req, env) {
   const u = await getUser(req, env);
   if (!u) return err('unauthorized', 401);
   return json(await getEntitlements(env, u, isOwnerUser(u)));
+}
+
+async function routeApiKeys(req, env) {
+  const u = await getUser(req, env);
+  if (!u) return err('unauthorized', 401);
+  await ensureApiKeyTables(env);
+  const rows = await env.DB.prepare(
+    `SELECT id, name, key_prefix, key_tail, created_at, revoked_at, last_used_at, call_count
+       FROM api_keys
+      WHERE user_id = ? AND revoked_at IS NULL
+      ORDER BY created_at DESC
+      LIMIT 50`
+  ).bind(u.id).all();
+  return json({ ok: true, keys: (rows.results || []).map(publicApiKey) });
+}
+
+async function routeCreateApiKey(req, env) {
+  const u = await getUser(req, env);
+  if (!u) return err('unauthorized', 401);
+  await ensureApiKeyTables(env);
+  const body = await req.json().catch(() => ({}));
+  const name = cleanText(body?.name || 'My API', 80) || 'My API';
+  const existing = await env.DB.prepare(
+    'SELECT COUNT(*) AS n FROM api_keys WHERE user_id = ? AND revoked_at IS NULL'
+  ).bind(u.id).first();
+  if (Number(existing?.n || 0) >= 10) return err('api key limit reached', 429);
+  const secret = apiKeySecret();
+  const now = nowSec();
+  const id = crypto.randomUUID();
+  const row = {
+    id,
+    name,
+    key_prefix: secret.slice(0, 8),
+    key_tail: secret.slice(-6),
+    created_at: now,
+    revoked_at: null,
+    last_used_at: null,
+    call_count: 0,
+  };
+  await env.DB.prepare(
+    `INSERT INTO api_keys (id, user_id, name, key_hash, key_prefix, key_tail, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`
+  ).bind(id, u.id, name, await apiKeyHash(secret, env), row.key_prefix, row.key_tail, now).run();
+  return json({ ok: true, secret, key: publicApiKey(row) }, 201);
+}
+
+async function routeRevokeApiKey(req, env, id) {
+  const u = await getUser(req, env);
+  if (!u) return err('unauthorized', 401);
+  await ensureApiKeyTables(env);
+  const keyId = cleanText(id || '', 80);
+  if (!keyId) return err('invalid id', 400);
+  await env.DB.prepare(
+    'UPDATE api_keys SET revoked_at = ? WHERE id = ? AND user_id = ? AND revoked_at IS NULL'
+  ).bind(nowSec(), keyId, u.id).run();
+  return json({ ok: true });
 }
 
 async function routeGetFavs(req, env) {
@@ -1827,6 +1930,10 @@ export default {
       if (p === '/extension/download'       && req.method === 'GET') return routeExtensionDownload(req, env);
       if (p === '/me'                  && req.method === 'GET')  return routeMe(req, env);
       if (p === '/me/entitlements'     && req.method === 'GET')  return routeMeEntitlements(req, env);
+      if (p === '/api-keys'            && req.method === 'GET')  return routeApiKeys(req, env);
+      if (p === '/api-keys'            && req.method === 'POST') return routeCreateApiKey(req, env);
+      const mApiKey = p.match(/^\/api-keys\/([0-9a-f-]+)$/i);
+      if (mApiKey && req.method === 'DELETE') return routeRevokeApiKey(req, env, mApiKey[1]);
       if (p === '/search' && (req.method === 'GET' || req.method === 'POST')) return json(await buildPublicSearchResponse(req, env));
       if (p === '/skill/search' && (req.method === 'GET' || req.method === 'POST')) return json(await buildSkillSearchResponse(req, env));
       if (p === '/skill/recommend' && (req.method === 'GET' || req.method === 'POST')) return json(await buildSkillRecommendResponse(req, env));

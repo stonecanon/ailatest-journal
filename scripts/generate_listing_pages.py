@@ -137,8 +137,24 @@ SKELETON = '''<!doctype html>
 __JSONLD__
 <link rel="stylesheet" href="/css/listing.css?v=20260630-nav-unify" />
 </head><body>
+<aside class="listing-rail" aria-label="Primary navigation">
+  <a class="listing-rail-link" href="__ORIGIN__/global"><span>◎</span><b>全球</b></a>
+  <a class="listing-rail-link" href="__ORIGIN__/cn"><span>CN</span><b>中国</b></a>
+  <details class="listing-rail-region">
+    <summary class="listing-rail-link"><span>···</span><b>地区 ▾</b></summary>
+    <div class="listing-rail-region-menu">
+      <a href="__ORIGIN__/in"><span>IN</span><b>印度</b></a>
+      <a href="__ORIGIN__/my"><span>MY</span><b>马来西亚</b></a>
+      <a href="__ORIGIN__/kr"><span>KR</span><b>韩国</b></a>
+    </div>
+  </details>
+  <a class="listing-rail-link active" href="__ORIGIN__/rankings/"><span>▥</span><b>榜单</b></a>
+  <a class="listing-rail-link" href="__ORIGIN__/favorites"><span>☆</span><b>收藏</b></a>
+  <a class="listing-rail-link" href="__ORIGIN__/account"><span>Me</span><b>我的</b></a>
+</aside>
 <header class="listing-topbar">
   <a href="__ORIGIN__/" class="listing-brand">AILatest <em>Journal</em></a>
+  <span class="listing-section-title">期刊榜单</span>
   <nav>
     <a href="__ORIGIN__/extension.html">下载中心</a>
     <span>中文</span>
@@ -335,8 +351,24 @@ def generate_landing(origin):
 <meta name="theme-color" content="#f97316" />
 <link rel="stylesheet" href="/css/listing.css?v=20260630-nav-unify" />
 </head><body>
+<aside class="listing-rail" aria-label="Primary navigation">
+  <a class="listing-rail-link" href="{origin}/global"><span>◎</span><b>全球</b></a>
+  <a class="listing-rail-link" href="{origin}/cn"><span>CN</span><b>中国</b></a>
+  <details class="listing-rail-region">
+    <summary class="listing-rail-link"><span>···</span><b>地区 ▾</b></summary>
+    <div class="listing-rail-region-menu">
+      <a href="{origin}/in"><span>IN</span><b>印度</b></a>
+      <a href="{origin}/my"><span>MY</span><b>马来西亚</b></a>
+      <a href="{origin}/kr"><span>KR</span><b>韩国</b></a>
+    </div>
+  </details>
+  <a class="listing-rail-link active" href="{origin}/rankings/"><span>▥</span><b>榜单</b></a>
+  <a class="listing-rail-link" href="{origin}/favorites"><span>☆</span><b>收藏</b></a>
+  <a class="listing-rail-link" href="{origin}/account"><span>Me</span><b>我的</b></a>
+</aside>
 <header class="listing-topbar">
   <a href="{origin}/" class="listing-brand">AILatest <em>Journal</em></a>
+  <span class="listing-section-title">期刊榜单</span>
   <nav>
     <a href="{origin}/extension.html">下载中心</a>
     <span>中文</span>

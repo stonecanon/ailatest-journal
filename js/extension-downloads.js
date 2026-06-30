@@ -1,6 +1,6 @@
 (() => {
   const API = '/api/extension';
-  const ASSET = 'latest';
+  const DEFAULT_ASSET = 'latest';
 
   function storageId(storage, key) {
     try {
@@ -24,19 +24,29 @@
     return new Intl.NumberFormat(lang).format(n);
   }
 
-  function setCount(value) {
-    document.querySelectorAll('[data-extension-download-count]').forEach((el) => {
-      el.textContent = formatCount(value);
+  function setCount(asset, value) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return;
+    document.querySelectorAll(`[data-extension-download-count="${asset}"]`).forEach((el) => {
+      el.textContent = formatCount(n);
     });
   }
 
-  async function loadCount() {
-    const res = await fetch(`${API}/download-stats?asset=${encodeURIComponent(ASSET)}&t=${Date.now()}`, {
+  async function loadCount(asset = DEFAULT_ASSET) {
+    const res = await fetch(`${API}/download-stats?asset=${encodeURIComponent(asset)}&t=${Date.now()}`, {
       cache: 'no-store',
     });
     if (!res.ok) throw new Error(`download stats ${res.status}`);
     const data = await res.json();
-    setCount(data.total || 0);
+    setCount(asset, data.total);
+  }
+
+  function visibleAssets() {
+    const assets = new Set();
+    document.querySelectorAll('[data-extension-download-count]').forEach((el) => {
+      assets.add(el.dataset.extensionDownloadCount || DEFAULT_ASSET);
+    });
+    return [...assets];
   }
 
   function decorateDownloadLinks() {
@@ -48,16 +58,18 @@
       if (sessionId) url.searchParams.set('session_id', sessionId);
       link.href = url.pathname + url.search;
       link.addEventListener('click', () => {
-        window.setTimeout(() => loadCount().catch(() => null), 1200);
-        window.setTimeout(() => loadCount().catch(() => null), 3500);
+        const asset = url.searchParams.get('asset') || DEFAULT_ASSET;
+        window.setTimeout(() => loadCount(asset).catch(() => null), 1200);
+        window.setTimeout(() => loadCount(asset).catch(() => null), 3500);
       });
     });
   }
 
   function boot() {
     decorateDownloadLinks();
-    loadCount().catch(() => null);
-    window.setInterval(() => loadCount().catch(() => null), 15000);
+    const refresh = () => visibleAssets().forEach(asset => loadCount(asset).catch(() => null));
+    refresh();
+    window.setInterval(refresh, 15000);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);

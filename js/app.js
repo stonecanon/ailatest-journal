@@ -61,7 +61,7 @@
       nav_terms: '条款', nav_privacy: '隐私', nav_refund: '退款',
       nav_index_rank: '索引排行榜', nav_subject_rank: '学科排行榜', nav_warn_rank: '预警名单', nav_extension_beta: '插件内测', nav_subscription: '订阅',
       filter_if_range: '影响因子', if_any: '不限',
-      rail_int: '全球', rail_dom: '中国', rail_in: '印度', rail_my: '马来西亚', rail_kr: '韩国', rail_rank: '榜单', rail_fav: '收藏', rail_me: '我的',
+      rail_int: '全球', rail_dom: '中国', rail_region: '地区', rail_in: '印度', rail_my: '马来西亚', rail_kr: '韩国', rail_rank: '榜单', rail_fav: '收藏', rail_me: '我的',
       download_center: '下载中心',
       loading: '加载中…',
       hero_title_int: 'SCI / SSCI 国际期刊检索',
@@ -150,7 +150,7 @@
       nav_terms: 'Terms', nav_privacy: 'Privacy', nav_refund: 'Refund',
       nav_index_rank: 'Index Rankings', nav_subject_rank: 'Subject Rankings', nav_warn_rank: 'Warning List', nav_extension_beta: 'Extension beta', nav_subscription: 'Subscribe',
       filter_if_range: 'Impact Factor', if_any: 'Any',
-      rail_int: 'Global', rail_dom: 'China', rail_in: 'India', rail_my: 'Malaysia', rail_kr: 'Korea', rail_rank: 'Rankings', rail_fav: 'Saved', rail_me: 'Me',
+      rail_int: 'Global', rail_dom: 'China', rail_region: 'Regions', rail_in: 'India', rail_my: 'Malaysia', rail_kr: 'Korea', rail_rank: 'Rankings', rail_fav: 'Saved', rail_me: 'Me',
       download_center: 'Downloads',
       loading: 'Loading…',
       hero_title_int: 'International SCI / SSCI Search',
@@ -411,6 +411,7 @@
     if_any: '指定なし',
     rail_int: 'グローバル',
     rail_dom: '中国',
+    rail_region: '地域',
     rail_in: 'インド',
     rail_my: 'マレーシア',
     rail_kr: '韓国',
@@ -2073,16 +2074,16 @@
     const badge = $('#account-credit-badge');
     if (!badge) return;
     badge.hidden = false;
-    badge.setAttribute('role', 'button');
-    badge.tabIndex = 0;
     const credits = accountCreditValue();
     if (user) {
       const creditHtml = credits === null ? '' : `<b>${formatCreditValue(credits)}</b>`;
-      badge.innerHTML = `<span>${T('我的','Me')}</span>${creditHtml}`;
+      badge.innerHTML = `<span class="rail-account-mark" aria-hidden="true">Me</span><span>${T('我的','Me')}</span>${creditHtml}`;
       badge.title = T('进入个人信息与积分','Open account and credits');
+      badge.setAttribute('aria-label', T('我的，查看个人信息与 Credits','Me, account and credits'));
     } else {
-      badge.innerHTML = `<span>${T('我的','Me')}</span>`;
+      badge.innerHTML = `<span class="rail-account-mark" aria-hidden="true">Me</span><span>${T('我的','Me')}</span>`;
       badge.title = T('登录后查看积分','Sign in to view credits');
+      badge.setAttribute('aria-label', T('登录后查看个人信息与 Credits','Sign in for account and credits'));
     }
   }
 
@@ -6271,21 +6272,17 @@
     }
   }
   function applyStations() {
-    const enabled = getEnabledStations();
     STATIONS.forEach((s) => {
       const btn = document.querySelector(`.rail-nav-btn[data-tab="${s.id}"]`);
       if (!btn) return;
-      const idx = enabled.indexOf(s.id);
-      if (idx === -1) {
-        btn.hidden = true;
-        btn.dataset.stationHidden = '1';
-        btn.style.order = '';
-      } else {
-        btn.hidden = false;
-        delete btn.dataset.stationHidden;
-        btn.style.order = String(idx);
-      }
+      btn.hidden = false;
+      delete btn.dataset.stationHidden;
+      if (s.id === 'int') btn.style.order = '0';
+      else if (s.id === 'dom') btn.style.order = '1';
+      else btn.style.order = '';
     });
+    const regionPicker = document.querySelector('.rail-region-picker');
+    if (regionPicker) regionPicker.style.order = '2';
     const favBtn = document.querySelector('.rail-nav-btn[data-tab="fav"]');
     if (favBtn) favBtn.style.order = '8';
     const creditBadge = document.querySelector('#account-credit-badge');
@@ -6545,6 +6542,96 @@
     }));
   }
 
+  async function authedJson(path, options = {}) {
+    if (!user?.token) throw new Error(T('请先登录。','Please sign in first.'));
+    const headers = {
+      ...(options.headers || {}),
+      'Authorization': `Bearer ${user.token}`,
+    };
+    if (options.body && !headers['Content-Type']) headers['Content-Type'] = 'application/json';
+    const resp = await fetch(`${API_BASE}${path}`, { ...options, headers });
+    return readJsonResponse(resp, T('请求失败','Request failed'));
+  }
+
+  function apiKeyDisplay(row) {
+    const prefix = row?.key_prefix || row?.prefix || 'aj_live_';
+    const tail = row?.key_tail || row?.tail || '';
+    return tail ? `${prefix}••••${tail}` : prefix;
+  }
+
+  function apiKeyRows(keys) {
+    if (!keys?.length) {
+      return `<div class="me-record-empty">${T('还没有 API Key。点击右侧按钮新建一个。','No API keys yet. Create one with the button on the right.')}</div>`;
+    }
+    return `<div class="me-record-list">${keys.map(row => `
+      <div class="me-record-row api-key-row">
+        <div class="me-record-main">
+          <strong>${escape(row.name || T('我的 API','My API'))}</strong>
+          <code>${escape(apiKeyDisplay(row))}</code>
+          <span>${T('创建于','Created')} ${escape(formatMeRecordTime((row.created_at || 0) * 1000 || row.createdAt))}${row.last_used_at ? ` · ${T('最近调用','Last used')} ${escape(formatMeRecordTime(row.last_used_at * 1000))}` : ''}</span>
+        </div>
+        <time>${Number(row.call_count || 0)} ${T('次调用','calls')}</time>
+      </div>`).join('')}</div>`;
+  }
+
+  async function hydrateApiKeyPanel(panel, created = null) {
+    const target = panel.querySelector('[data-api-key-body]');
+    if (!target) return;
+    if (!user?.token) {
+      target.innerHTML = `<div class="me-record-empty">${T('登录后可以创建和管理 API Key。','Sign in to create and manage API keys.')}</div>`;
+      return;
+    }
+    try {
+      const data = await authedJson('/api-keys');
+      const secretHtml = created?.secret ? `<div class="api-key-secret">
+        <strong>${T('请立即复制，密钥只显示一次','Copy now. The secret is shown only once.')}</strong>
+        <code>${escape(created.secret)}</code>
+        <button type="button" class="btn-mini" data-copy-api-secret="${escape(created.secret)}">${T('复制密钥','Copy key')}</button>
+      </div>` : '';
+      target.innerHTML = `${secretHtml}${apiKeyRows(data.keys || [])}`;
+    } catch (err) {
+      target.innerHTML = `<div class="me-record-empty">${escape(fetchFailureMessage(err, T('读取 API Key','Load API keys')))}</div>`;
+    }
+  }
+
+  function bindApiKeyPanel(panel) {
+    panel.querySelector('[data-create-api-key]')?.addEventListener('click', async () => {
+      if (!user?.token) {
+        startLogin();
+        return;
+      }
+      const name = prompt(T('API Key 名称：','API key name:'), T('我的 API','My API'));
+      if (name === null) return;
+      const btn = panel.querySelector('[data-create-api-key]');
+      btn.disabled = true;
+      btn.textContent = T('创建中…','Creating…');
+      try {
+        const created = await authedJson('/api-keys', {
+          method: 'POST',
+          body: JSON.stringify({ name: name.trim() || T('我的 API','My API') }),
+        });
+        await hydrateApiKeyPanel(panel, created);
+      } catch (err) {
+        const target = panel.querySelector('[data-api-key-body]');
+        if (target) target.innerHTML = `<div class="me-record-empty">${escape(fetchFailureMessage(err, T('创建 API Key','Create API key')))}</div>`;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = T('新建 API Key','New API key');
+      }
+    });
+    panel.addEventListener('click', async (e) => {
+      const btn = e.target.closest('[data-copy-api-secret]');
+      if (!btn) return;
+      const text = btn.dataset.copyApiSecret || '';
+      try {
+        await navigator.clipboard.writeText(text);
+        const old = btn.textContent;
+        btn.textContent = T('已复制','Copied');
+        setTimeout(() => { btn.textContent = old; }, 1200);
+      } catch (_) {}
+    });
+  }
+
   function meRecordRows(records, emptyText) {
     if (!records.length) {
       return `<div class="me-record-empty">${escape(emptyText)}</div>`;
@@ -6603,7 +6690,14 @@
       const fallback = localPluginCallCount()
         ? T('账号只同步了调用次数，暂未返回逐条明细。','Only aggregate call count is synced for this account; itemized records are not available yet.')
         : T('暂无插件 / API 调用记录。','No plugin / API call records yet.');
-      panel.innerHTML = `<h2>${T('插件 / API 调用记录','Plugin / API call records')}</h2>${meRecordRows(records, fallback)}`;
+      panel.innerHTML = `<div class="me-record-head">
+        <h2>${T('插件 / API 调用记录','Plugin / API call records')}</h2>
+        <button type="button" class="btn-mini" data-create-api-key>${T('新建 API Key','New API key')}</button>
+      </div>
+      <div data-api-key-body>${T('加载中…','Loading…')}</div>
+      <div class="me-record-api-usage">${meRecordRows(records, fallback)}</div>`;
+      bindApiKeyPanel(panel);
+      hydrateApiKeyPanel(panel);
     }
   }
 
@@ -8832,6 +8926,29 @@
       activateTab('home');
     });
     $('#topbar-lang-proxy')?.addEventListener('click', () => $('#lang-toggle')?.click());
+    (function initRegionPicker() {
+      const picker = document.querySelector('.rail-region-picker');
+      const toggle = document.getElementById('region-toggle');
+      if (!picker || !toggle) return;
+      const close = () => {
+        picker.classList.remove('open');
+        toggle.setAttribute('aria-expanded', 'false');
+      };
+      toggle.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const open = !picker.classList.contains('open');
+        picker.classList.toggle('open', open);
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+      picker.querySelectorAll('[data-tab]').forEach(btn => {
+        btn.addEventListener('click', close);
+      });
+      document.addEventListener('click', (e) => {
+        if (!picker.contains(e.target)) close();
+      });
+      window.addEventListener('resize', close);
+    })();
 
     // Home entry pills → switch tab
     document.querySelectorAll('.home-pill[data-tab], .rail-nav-btn[data-tab], .page-brand[data-tab], .rail-brand-mobile[data-tab]').forEach(b => {

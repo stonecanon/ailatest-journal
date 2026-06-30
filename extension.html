@@ -11,10 +11,26 @@
 <link rel="stylesheet" href="/css/static.css?v=20260630-nav-unify" />
 </head>
 <body data-static-page="extension">
+<aside class="site-rail" aria-label="Primary navigation">
+  <a class="site-rail-link" href="/global"><span>◎</span><b>全球</b></a>
+  <a class="site-rail-link" href="/cn"><span>CN</span><b>中国</b></a>
+  <details class="site-rail-region">
+    <summary class="site-rail-link"><span>···</span><b>地区 ▾</b></summary>
+    <div class="site-rail-region-menu">
+      <a href="/in"><span>IN</span><b>印度</b></a>
+      <a href="/my"><span>MY</span><b>马来西亚</b></a>
+      <a href="/kr"><span>KR</span><b>韩国</b></a>
+    </div>
+  </details>
+  <a class="site-rail-link" href="/rankings/"><span>▥</span><b>榜单</b></a>
+  <a class="site-rail-link" href="/favorites"><span>☆</span><b>收藏</b></a>
+  <a class="site-rail-link" href="/account"><span>Me</span><b>我的</b></a>
+</aside>
 <header class="page-head">
   <a class="brand" href="/">AILatest <span>Journal</span></a>
   <nav>
     <a href="/" data-static-i18n="nav_home">首页</a>
+    <a class="cta" href="/signup.html" data-static-i18n="nav_login">注册 / 登录</a>
     <button class="static-lang-toggle" type="button" data-static-lang-toggle>English</button>
   </nav>
 </header>
@@ -35,7 +51,7 @@
       <h2>Chrome / Edge 内测版</h2>
       <p>在 Google Scholar、PubMed、知网页面显示期刊徽章，并支持文献卡片保存。</p>
       <a class="btn" href="/api/extension/download?asset=latest&source=extension-page" data-extension-download-link download="ailatest-journal-extension-latest.zip">下载 v0.2.12 ZIP</a>
-      <p class="small muted download-stats" aria-live="polite">累计下载 <b data-extension-download-count>—</b> 次</p>
+      <p class="small muted download-stats" aria-live="polite">累计下载 <b data-extension-download-count="latest">28</b> 次</p>
     </article>
 
     <article class="download-tile tile-mint">
@@ -43,7 +59,7 @@
       <h2>Journal Skill 内测版</h2>
       <p>给 Codex / AI 助手接入期刊搜索与荐刊接口，适合写作和投稿工作流。</p>
       <button class="btn" type="button" data-copy-text="请从 GitHub 安装 AILatest Journal Skill：https://github.com/stonecanon/ailatest-journal/tree/main/skills/ailatest-journal">复制安装文本</button>
-      <p class="small muted"><a href="/api/extension/download?asset=skill&source=extension-page" data-extension-download-link download="ailatest-journal-skill-latest.zip">下载 Skill 包</a> · <a href="https://github.com/stonecanon/ailatest-journal/tree/main/skills/ailatest-journal" target="_blank" rel="noopener">查看源码</a></p>
+      <p class="small muted"><a href="/api/extension/download?asset=skill&source=extension-page" data-extension-download-link download="ailatest-journal-skill-latest.zip">下载 Skill 包</a> · 下载 <b data-extension-download-count="skill">11</b> 次 · <a href="https://github.com/stonecanon/ailatest-journal/tree/main/skills/ailatest-journal" target="_blank" rel="noopener">查看源码</a></p>
     </article>
 
     <article class="download-tile tile-teal">
@@ -108,7 +124,7 @@
       <h2>Chrome / Edge beta</h2>
       <p>Show journal badges on Google Scholar, PubMed and CNKI, with citation-card saving.</p>
       <a class="btn" href="/api/extension/download?asset=latest&source=extension-page" data-extension-download-link download="ailatest-journal-extension-latest.zip">Download v0.2.12 ZIP</a>
-      <p class="small muted download-stats" aria-live="polite">Downloads <b data-extension-download-count>—</b></p>
+      <p class="small muted download-stats" aria-live="polite">Downloads <b data-extension-download-count="latest">28</b></p>
     </article>
 
     <article class="download-tile tile-mint">
@@ -116,7 +132,7 @@
       <h2>Journal Skill beta</h2>
       <p>Connect Codex / AI assistants to journal search and recommendation workflows.</p>
       <button class="btn" type="button" data-copy-text="Install AILatest Journal Skill from GitHub: https://github.com/stonecanon/ailatest-journal/tree/main/skills/ailatest-journal">Copy install text</button>
-      <p class="small muted"><a href="/api/extension/download?asset=skill&source=extension-page" data-extension-download-link download="ailatest-journal-skill-latest.zip">Download Skill package</a> · <a href="https://github.com/stonecanon/ailatest-journal/tree/main/skills/ailatest-journal" target="_blank" rel="noopener">View source</a></p>
+      <p class="small muted"><a href="/api/extension/download?asset=skill&source=extension-page" data-extension-download-link download="ailatest-journal-skill-latest.zip">Download Skill package</a> · <b data-extension-download-count="skill">11</b> downloads · <a href="https://github.com/stonecanon/ailatest-journal/tree/main/skills/ailatest-journal" target="_blank" rel="noopener">View source</a></p>
     </article>
 
     <article class="download-tile tile-teal">
