@@ -54,8 +54,8 @@
     a.dataset.regionStation = region.id;
     a.href = region.href;
     if (linkClass === 'rail-nav-btn') {
-      a.setAttribute('aria-label', `${region.label} journals`);
-      a.title = `${region.label} journals`;
+      a.setAttribute('aria-label', `${region.label}期刊`);
+      a.title = `${region.label}期刊`;
       a.innerHTML = `<span class="rail-flag" aria-hidden="true">${region.code}</span><span>${region.label}</span>`;
     } else {
       a.innerHTML = `<span>${region.code}</span><b>${region.label}</b>`;

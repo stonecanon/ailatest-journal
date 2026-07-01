@@ -124,7 +124,7 @@ def load_citic_warning_rows(journals):
         rows.append(row)
     return rows
 
-CACHE_VERSION = '20260701-rank-home-rail'
+CACHE_VERSION = '20260701-rank-rail-zh'
 
 APP_RAIL_HTML = '''<aside class="app-rail" aria-label="Primary navigation">
   <nav class="rail-top" aria-label="站点">
@@ -136,17 +136,17 @@ APP_RAIL_HTML = '''<aside class="app-rail" aria-label="Primary navigation">
       <span class="rail-flag" aria-hidden="true">CN</span>
       <span>中国</span>
     </a>
-    <a class="rail-nav-btn rail-region-station" data-region-station="in" href="/in" aria-label="India journals" title="India journals" hidden>
+    <a class="rail-nav-btn rail-region-station" data-region-station="in" href="/in" aria-label="印度期刊" title="印度期刊" hidden>
       <span class="rail-flag" aria-hidden="true">IN</span>
-      <span>India</span>
+      <span>印度</span>
     </a>
-    <a class="rail-nav-btn rail-region-station" data-region-station="my" href="/my" aria-label="Malaysia journals" title="Malaysia journals" hidden>
+    <a class="rail-nav-btn rail-region-station" data-region-station="my" href="/my" aria-label="马来西亚期刊" title="马来西亚期刊" hidden>
       <span class="rail-flag" aria-hidden="true">MY</span>
-      <span>Malaysia</span>
+      <span>马来西亚</span>
     </a>
-    <a class="rail-nav-btn rail-region-station" data-region-station="kr" href="/kr" aria-label="Korea journals" title="Korea journals" hidden>
+    <a class="rail-nav-btn rail-region-station" data-region-station="kr" href="/kr" aria-label="韩国期刊" title="韩国期刊" hidden>
       <span class="rail-flag" aria-hidden="true">KR</span>
-      <span>Korea</span>
+      <span>韩国</span>
     </a>
     <div class="rail-region-picker">
       <button class="rail-nav-btn rail-region-toggle" type="button" aria-label="地区站点" title="地区站点" aria-expanded="false">
@@ -154,17 +154,17 @@ APP_RAIL_HTML = '''<aside class="app-rail" aria-label="Primary navigation">
         <span><span>地区</span><b class="rail-caret" aria-hidden="true">▾</b></span>
       </button>
       <div class="rail-region-menu" aria-label="地区站点">
-        <button class="rail-region-option rail-nav-btn" type="button" data-region-pin="in" aria-label="India journals" title="India journals">
+        <button class="rail-region-option rail-nav-btn" type="button" data-region-pin="in" aria-label="印度期刊" title="印度期刊">
           <span class="rail-flag" aria-hidden="true">IN</span>
-          <span>India</span>
+          <span>印度</span>
         </button>
-        <button class="rail-region-option rail-nav-btn" type="button" data-region-pin="my" aria-label="Malaysia journals" title="Malaysia journals">
+        <button class="rail-region-option rail-nav-btn" type="button" data-region-pin="my" aria-label="马来西亚期刊" title="马来西亚期刊">
           <span class="rail-flag" aria-hidden="true">MY</span>
-          <span>Malaysia</span>
+          <span>马来西亚</span>
         </button>
-        <button class="rail-region-option rail-nav-btn" type="button" data-region-pin="kr" aria-label="Korea journals" title="Korea journals">
+        <button class="rail-region-option rail-nav-btn" type="button" data-region-pin="kr" aria-label="韩国期刊" title="韩国期刊">
           <span class="rail-flag" aria-hidden="true">KR</span>
-          <span>Korea</span>
+          <span>韩国</span>
         </button>
       </div>
     </div>
@@ -179,7 +179,7 @@ APP_RAIL_HTML = '''<aside class="app-rail" aria-label="Primary navigation">
       <span>收藏</span>
     </a>
     <a class="rail-nav-btn account-credit-badge" href="/account" aria-label="我的" title="我的">
-      <span class="rail-account-mark">Me</span>
+      <span class="rail-account-mark">我</span>
       <b>我的</b>
     </a>
   </div>
