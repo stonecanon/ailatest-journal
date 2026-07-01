@@ -6250,6 +6250,35 @@
     { id: 'kr',  i18n: 'rail_kr',  zh: '韩国', en: 'Korea' },
   ];
   const STATION_IDS = STATIONS.map(s => s.id);
+  const REGION_STATION_IDS = ['in', 'my', 'kr'];
+  const PINNED_REGION_KEY = 'ailatest.pinnedRegionStations';
+  function getPinnedRegions() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(PINNED_REGION_KEY) || '[]');
+      return Array.isArray(saved) ? saved.filter(id => REGION_STATION_IDS.includes(id)) : [];
+    } catch (_) {
+      return [];
+    }
+  }
+  function setPinnedRegions(ids) {
+    const unique = [...new Set((ids || []).filter(id => REGION_STATION_IDS.includes(id)))];
+    try { localStorage.setItem(PINNED_REGION_KEY, JSON.stringify(unique)); } catch (_) {}
+    applyStations();
+  }
+  function togglePinnedRegion(id) {
+    if (!REGION_STATION_IDS.includes(id)) return;
+    const pinned = getPinnedRegions();
+    if (pinned.includes(id)) setPinnedRegions(pinned.filter(x => x !== id));
+    else setPinnedRegions([...pinned, id]);
+  }
+  function applyRegionPinState() {
+    const pinned = getPinnedRegions();
+    document.querySelectorAll('[data-region-pin]').forEach(btn => {
+      const on = pinned.includes(btn.dataset.regionPin);
+      btn.classList.toggle('active', on);
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+  }
   function getEnabledStations() {
     try {
       const s = JSON.parse(localStorage.getItem('ailatest.stations') || 'null');
@@ -6272,21 +6301,25 @@
     }
   }
   function applyStations() {
+    const pinned = getPinnedRegions();
     STATIONS.forEach((s) => {
       const btn = document.querySelector(`.rail-nav-btn[data-tab="${s.id}"]`);
       if (!btn) return;
-      btn.hidden = false;
-      delete btn.dataset.stationHidden;
+      const region = REGION_STATION_IDS.includes(s.id);
+      btn.hidden = region && !pinned.includes(s.id);
+      btn.toggleAttribute('data-station-hidden', btn.hidden);
       if (s.id === 'int') btn.style.order = '0';
       else if (s.id === 'dom') btn.style.order = '1';
+      else if (region) btn.style.order = String(2 + REGION_STATION_IDS.indexOf(s.id));
       else btn.style.order = '';
     });
     const regionPicker = document.querySelector('.rail-region-picker');
-    if (regionPicker) regionPicker.style.order = '2';
+    if (regionPicker) regionPicker.style.order = String(2 + REGION_STATION_IDS.length);
     const favBtn = document.querySelector('.rail-nav-btn[data-tab="fav"]');
     if (favBtn) favBtn.style.order = '8';
     const creditBadge = document.querySelector('#account-credit-badge');
     if (creditBadge) creditBadge.style.order = '9';
+    applyRegionPinState();
   }
   function setUiLanguage(code) {
     if (!LANG_META[code]) return;
@@ -8941,8 +8974,12 @@
         picker.classList.toggle('open', open);
         toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
       });
-      picker.querySelectorAll('[data-tab]').forEach(btn => {
-        btn.addEventListener('click', close);
+      picker.querySelectorAll('[data-region-pin]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          togglePinnedRegion(btn.dataset.regionPin);
+        });
       });
       document.addEventListener('click', (e) => {
         if (!picker.contains(e.target)) close();

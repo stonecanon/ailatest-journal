@@ -31,7 +31,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 })(window,document,'script','dataLayer','GTM-NBNXL7FB');</script>
 <!-- End Google Tag Manager -->
 <link rel="preload" href="/data/journal_aliases.json" as="fetch" crossorigin="anonymous" />
-<link rel="stylesheet" href="/css/app.css?v=20260630-nav-unify" />
+<link rel="stylesheet" href="/css/app.css?v=20260701-rail-shell" />
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json" />
@@ -135,21 +135,33 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <span class="rail-flag" aria-hidden="true">CN</span>
       <span data-i18n="rail_dom">中国</span>
     </button>
+    <button class="rail-nav-btn rail-region-station" data-tab="in" data-region-station="in" aria-label="India journals" title="India journals" data-i18n-aria="rail_in" data-i18n-title="rail_in" hidden>
+      <span class="rail-flag" aria-hidden="true">IN</span>
+      <span data-i18n="rail_in">India</span>
+    </button>
+    <button class="rail-nav-btn rail-region-station" data-tab="my" data-region-station="my" aria-label="Malaysia journals" title="Malaysia journals" data-i18n-aria="rail_my" data-i18n-title="rail_my" hidden>
+      <span class="rail-flag" aria-hidden="true">MY</span>
+      <span data-i18n="rail_my">Malaysia</span>
+    </button>
+    <button class="rail-nav-btn rail-region-station" data-tab="kr" data-region-station="kr" aria-label="Korea journals" title="Korea journals" data-i18n-aria="rail_kr" data-i18n-title="rail_kr" hidden>
+      <span class="rail-flag" aria-hidden="true">KR</span>
+      <span data-i18n="rail_kr">Korea</span>
+    </button>
     <div class="rail-region-picker">
       <button class="rail-nav-btn rail-region-toggle" id="region-toggle" type="button" aria-label="地区站点" title="地区站点" aria-expanded="false">
         <span class="rail-flag rail-region-symbol" aria-hidden="true">···</span>
         <span><span data-i18n="rail_region">地区</span><b class="rail-caret" aria-hidden="true">▾</b></span>
       </button>
       <div class="rail-region-menu" id="region-menu" aria-label="地区站点">
-        <button class="rail-region-option rail-nav-btn" data-tab="in" aria-label="India journals" title="India journals" data-i18n-aria="rail_in" data-i18n-title="rail_in">
+        <button class="rail-region-option rail-nav-btn" type="button" data-region-pin="in" aria-label="India journals" title="India journals" data-i18n-aria="rail_in" data-i18n-title="rail_in">
           <span class="rail-flag" aria-hidden="true">IN</span>
           <span data-i18n="rail_in">India</span>
         </button>
-        <button class="rail-region-option rail-nav-btn" data-tab="my" aria-label="Malaysia journals" title="Malaysia journals" data-i18n-aria="rail_my" data-i18n-title="rail_my">
+        <button class="rail-region-option rail-nav-btn" type="button" data-region-pin="my" aria-label="Malaysia journals" title="Malaysia journals" data-i18n-aria="rail_my" data-i18n-title="rail_my">
           <span class="rail-flag" aria-hidden="true">MY</span>
           <span data-i18n="rail_my">Malaysia</span>
         </button>
-        <button class="rail-region-option rail-nav-btn" data-tab="kr" aria-label="Korea journals" title="Korea journals" data-i18n-aria="rail_kr" data-i18n-title="rail_kr">
+        <button class="rail-region-option rail-nav-btn" type="button" data-region-pin="kr" aria-label="Korea journals" title="Korea journals" data-i18n-aria="rail_kr" data-i18n-title="rail_kr">
           <span class="rail-flag" aria-hidden="true">KR</span>
           <span data-i18n="rail_kr">Korea</span>
         </button>
@@ -608,7 +620,7 @@ window.__BUILD_VER = 'v20260626-ui-polish';
 })();
 </script>
 <script src="/js/pick-match.js?v=20260623-analytics-admin" defer></script>
-<script src="/js/app.js?v=20260630-nav-unify" defer></script>
+<script src="/js/app.js?v=20260701-rail-shell" defer></script>
 
 </body>
 </html>

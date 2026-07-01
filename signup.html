@@ -7,24 +7,28 @@
 <meta name="description" content="注册 AILatest Journal：邮箱验证码或 GitHub / Google 一键登录，免费同步收藏与插件登录状态。" />
 <link rel="canonical" href="https://journal.ailatest.org/signup.html" />
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
-<link rel="stylesheet" href="/css/static.css?v=20260630-nav-unify" />
+<link rel="stylesheet" href="/css/static.css?v=20260701-rail-shell" />
 <meta name="robots" content="noindex" />
 </head>
 <body>
 <aside class="site-rail" aria-label="Primary navigation">
-  <a class="site-rail-link" href="/global"><span>◎</span><b>全球</b></a>
-  <a class="site-rail-link" href="/cn"><span>CN</span><b>中国</b></a>
-  <details class="site-rail-region">
-    <summary class="site-rail-link"><span>···</span><b>地区 ▾</b></summary>
-    <div class="site-rail-region-menu">
-      <a href="/in"><span>IN</span><b>印度</b></a>
-      <a href="/my"><span>MY</span><b>马来西亚</b></a>
-      <a href="/kr"><span>KR</span><b>韩国</b></a>
-    </div>
-  </details>
-  <a class="site-rail-link" href="/rankings/"><span>▥</span><b>榜单</b></a>
-  <a class="site-rail-link" href="/favorites"><span>☆</span><b>收藏</b></a>
-  <a class="site-rail-link" href="/account"><span>Me</span><b>我的</b></a>
+  <nav class="site-rail-top" aria-label="站点">
+    <a class="site-rail-link" href="/global"><span>◎</span><b>全球</b></a>
+    <a class="site-rail-link" href="/cn"><span>CN</span><b>中国</b></a>
+    <details class="site-rail-region">
+      <summary class="site-rail-link"><span>···</span><b>地区 ▾</b></summary>
+      <div class="site-rail-region-menu">
+        <a href="/in"><span>IN</span><b>印度</b></a>
+        <a href="/my"><span>MY</span><b>马来西亚</b></a>
+        <a href="/kr"><span>KR</span><b>韩国</b></a>
+      </div>
+    </details>
+  </nav>
+  <div class="site-rail-bottom" aria-label="账户与工具">
+    <a class="site-rail-link" href="/rankings/"><span>▥</span><b>榜单</b></a>
+    <a class="site-rail-link" href="/favorites"><span>☆</span><b>收藏</b></a>
+    <a class="site-rail-link" href="/account"><span>Me</span><b>我的</b></a>
+  </div>
 </aside>
 <header class="page-head">
   <a class="brand" href="/">AILatest <span>Journal</span></a>
@@ -193,5 +197,6 @@
   });
 })();
 </script>
+<script src="/js/site-rail.js?v=20260701-rail-shell" defer></script>
 </body>
 </html>

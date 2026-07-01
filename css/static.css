@@ -30,13 +30,13 @@ a:hover { text-decoration: underline; }
   z-index: 80;
   display: flex; align-items: center; justify-content: space-between;
   min-height: 60px;
-  max-width: none; margin: 0; padding: 0 32px;
+  max-width: none; margin: 0; padding: 0 32px 0 24px;
   border-bottom: 1px solid rgba(43, 40, 36, .08);
   background: rgba(250, 247, 242, .88);
   backdrop-filter: blur(18px);
 }
 .brand { display: inline-flex; align-items: baseline; gap: 4px; font-weight: 820; font-size: 18px; color: var(--ink); letter-spacing: 0; line-height: 1; }
-.brand span { color: var(--muted); font-family: Georgia, "Times New Roman", serif; font-style: italic; font-weight: 650; }
+.brand span { color: rgba(117,111,104,.88); font-family: inherit; font-style: italic; font-weight: 650; }
 .brand:hover { text-decoration: none; }
 .site-rail {
   position: fixed;
@@ -48,12 +48,20 @@ a:hover { text-decoration: underline; }
   padding: 18px 8px;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   align-items: center;
-  gap: 12px;
+  gap: 0;
   background: rgba(255,255,255,.48);
   border-right: 1px solid rgba(43,40,36,.08);
   box-shadow: 12px 0 38px rgba(43,40,36,.045);
   backdrop-filter: blur(18px);
+}
+.site-rail-top,
+.site-rail-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
 }
 .site-rail-link {
   width: 52px;
@@ -68,6 +76,9 @@ a:hover { text-decoration: underline; }
   font-size: 11px;
   font-weight: 650;
   line-height: 1;
+}
+.site-rail-link[hidden] {
+  display: none !important;
 }
 .site-rail-link span {
   font-size: 16px;
@@ -145,6 +156,16 @@ a:hover { text-decoration: underline; }
   background: rgba(249,115,22,.08);
   color: var(--link);
   text-decoration: none;
+}
+.site-rail-region-menu a::after {
+  content: "✓";
+  margin-left: auto;
+  color: transparent;
+  font-size: 12px;
+  font-weight: 900;
+}
+.site-rail-region-menu a.active::after {
+  color: #f97316;
 }
 .page-head nav { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: flex-end; font-size: 14px; }
 .page-head nav a {
@@ -483,6 +504,10 @@ td.c, th.c { text-align: center; }
     border-right: 0;
     border-top: 1px solid rgba(43,40,36,.12);
     box-shadow: 0 -8px 28px rgba(43,40,36,.08);
+  }
+  .site-rail-top,
+  .site-rail-bottom {
+    display: contents;
   }
   .site-rail-link {
     flex: 0 0 58px;

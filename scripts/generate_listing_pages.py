@@ -135,41 +135,46 @@ SKELETON = '''<!doctype html>
 <meta name="robots" content="index,follow" />
 <meta name="theme-color" content="#b4531f" />
 __JSONLD__
-<link rel="stylesheet" href="/css/listing.css?v=20260630-nav-unify" />
+<link rel="stylesheet" href="/css/listing.css?v=20260701-rail-shell" />
 </head><body>
 <aside class="listing-rail" aria-label="Primary navigation">
-  <a class="listing-rail-link" href="__ORIGIN__/global"><span>◎</span><b>全球</b></a>
-  <a class="listing-rail-link" href="__ORIGIN__/cn"><span>CN</span><b>中国</b></a>
-  <details class="listing-rail-region">
-    <summary class="listing-rail-link"><span>···</span><b>地区 ▾</b></summary>
-    <div class="listing-rail-region-menu">
-      <a href="__ORIGIN__/in"><span>IN</span><b>印度</b></a>
-      <a href="__ORIGIN__/my"><span>MY</span><b>马来西亚</b></a>
-      <a href="__ORIGIN__/kr"><span>KR</span><b>韩国</b></a>
-    </div>
-  </details>
-  <a class="listing-rail-link active" href="__ORIGIN__/rankings/"><span>▥</span><b>榜单</b></a>
-  <a class="listing-rail-link" href="__ORIGIN__/favorites"><span>☆</span><b>收藏</b></a>
-  <a class="listing-rail-link" href="__ORIGIN__/account"><span>Me</span><b>我的</b></a>
+  <nav class="listing-rail-top" aria-label="站点">
+    <a class="listing-rail-link" href="/global"><span>◎</span><b>全球</b></a>
+    <a class="listing-rail-link" href="/cn"><span>CN</span><b>中国</b></a>
+    <details class="listing-rail-region">
+      <summary class="listing-rail-link"><span>···</span><b>地区 ▾</b></summary>
+      <div class="listing-rail-region-menu">
+        <a href="/in"><span>IN</span><b>印度</b></a>
+        <a href="/my"><span>MY</span><b>马来西亚</b></a>
+        <a href="/kr"><span>KR</span><b>韩国</b></a>
+      </div>
+    </details>
+  </nav>
+  <div class="listing-rail-bottom" aria-label="账户与工具">
+    <a class="listing-rail-link active" href="/rankings/"><span>▥</span><b>榜单</b></a>
+    <a class="listing-rail-link" href="/favorites"><span>☆</span><b>收藏</b></a>
+    <a class="listing-rail-link" href="/account"><span>Me</span><b>我的</b></a>
+  </div>
 </aside>
 <header class="listing-topbar">
-  <a href="__ORIGIN__/" class="listing-brand">AILatest <em>Journal</em></a>
+  <a href="/" class="listing-brand">AILatest <em>Journal</em></a>
   <span class="listing-section-title">期刊榜单</span>
   <nav>
-    <a href="__ORIGIN__/extension.html">下载中心</a>
+    <a href="/extension.html">下载中心</a>
     <span>中文</span>
   </nav>
 </header>
 <div class="wrap">
 <h1>__HEADING__</h1>
-<p class="breadcrumb"><a href="__ORIGIN__/">首页</a> · <a href="__ORIGIN__/rankings/">榜单</a> · <a href="__BACK__">__BACK_LABEL__</a></p>
+<p class="breadcrumb"><a href="/">首页</a> · <a href="/rankings/">榜单</a> · <a href="__BACK__">__BACK_LABEL__</a></p>
 <p class="sub">__DESC__</p>
 <p class="count">__COUNT__</p>
 <div class="card"><div class="table-wrap"><table><thead><tr>__HEADERS__</tr></thead>
 <tbody>__ROWS__</tbody></table></div></div>
 <p class="back-wrap"><a class="back" href="__BACK__">← 返回</a></p>
 </div>
-<footer class="footer">© 2026 <a href="__ORIGIN__/">AILatest Journal</a> · <a href="__ORIGIN__/about.html">关于</a> · <a href="__ORIGIN__/contact.html">联系</a> · <a href="__ORIGIN__/terms.html">Terms</a> · <a href="__ORIGIN__/privacy.html">Privacy</a> · <a href="__ORIGIN__/refund.html">Refund</a></footer>
+<footer class="footer">© 2026 <a href="/">AILatest Journal</a> · <a href="/about.html">关于</a> · <a href="/contact.html">联系</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a> · <a href="/refund.html">Refund</a></footer>
+<script src="/js/site-rail.js?v=20260701-rail-shell" defer></script>
 </body></html>'''
 
 def make_slug(r):
@@ -349,39 +354,44 @@ def generate_landing(origin):
 <meta name="description" content="{esc(meta_desc)}" />
 <link rel="canonical" href="{esc(canonical)}" /><meta name="robots" content="index,follow" />
 <meta name="theme-color" content="#f97316" />
-<link rel="stylesheet" href="/css/listing.css?v=20260630-nav-unify" />
+<link rel="stylesheet" href="/css/listing.css?v=20260701-rail-shell" />
 </head><body>
 <aside class="listing-rail" aria-label="Primary navigation">
-  <a class="listing-rail-link" href="{origin}/global"><span>◎</span><b>全球</b></a>
-  <a class="listing-rail-link" href="{origin}/cn"><span>CN</span><b>中国</b></a>
-  <details class="listing-rail-region">
-    <summary class="listing-rail-link"><span>···</span><b>地区 ▾</b></summary>
-    <div class="listing-rail-region-menu">
-      <a href="{origin}/in"><span>IN</span><b>印度</b></a>
-      <a href="{origin}/my"><span>MY</span><b>马来西亚</b></a>
-      <a href="{origin}/kr"><span>KR</span><b>韩国</b></a>
-    </div>
-  </details>
-  <a class="listing-rail-link active" href="{origin}/rankings/"><span>▥</span><b>榜单</b></a>
-  <a class="listing-rail-link" href="{origin}/favorites"><span>☆</span><b>收藏</b></a>
-  <a class="listing-rail-link" href="{origin}/account"><span>Me</span><b>我的</b></a>
+  <nav class="listing-rail-top" aria-label="站点">
+    <a class="listing-rail-link" href="/global"><span>◎</span><b>全球</b></a>
+    <a class="listing-rail-link" href="/cn"><span>CN</span><b>中国</b></a>
+    <details class="listing-rail-region">
+      <summary class="listing-rail-link"><span>···</span><b>地区 ▾</b></summary>
+      <div class="listing-rail-region-menu">
+        <a href="/in"><span>IN</span><b>印度</b></a>
+        <a href="/my"><span>MY</span><b>马来西亚</b></a>
+        <a href="/kr"><span>KR</span><b>韩国</b></a>
+      </div>
+    </details>
+  </nav>
+  <div class="listing-rail-bottom" aria-label="账户与工具">
+    <a class="listing-rail-link active" href="/rankings/"><span>▥</span><b>榜单</b></a>
+    <a class="listing-rail-link" href="/favorites"><span>☆</span><b>收藏</b></a>
+    <a class="listing-rail-link" href="/account"><span>Me</span><b>我的</b></a>
+  </div>
 </aside>
 <header class="listing-topbar">
-  <a href="{origin}/" class="listing-brand">AILatest <em>Journal</em></a>
+  <a href="/" class="listing-brand">AILatest <em>Journal</em></a>
   <span class="listing-section-title">期刊榜单</span>
   <nav>
-    <a href="{origin}/extension.html">下载中心</a>
+    <a href="/extension.html">下载中心</a>
     <span>中文</span>
   </nav>
 </header>
 <div class="wrap">
   <h1>{esc(heading)}</h1>
-  <p class="breadcrumb"><a href="{origin}/">首页</a> · <a href="{origin}/rankings/">榜单</a></p>
+  <p class="breadcrumb"><a href="/">首页</a> · <a href="/rankings/">榜单</a></p>
   <p class="sub">{esc(sub)}</p>
   {body_html}
   {back}
 </div>
-<footer class="footer">© 2026 <a href="{origin}/">AILatest Journal</a> · <a href="{origin}/about.html">关于</a> · <a href="{origin}/contact.html">联系</a> · <a href="{origin}/terms.html">Terms</a> · <a href="{origin}/privacy.html">Privacy</a> · <a href="{origin}/refund.html">Refund</a></footer>
+<footer class="footer">© 2026 <a href="/">AILatest Journal</a> · <a href="/about.html">关于</a> · <a href="/contact.html">联系</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a> · <a href="/refund.html">Refund</a></footer>
+<script src="/js/site-rail.js?v=20260701-rail-shell" defer></script>
 </body></html>'''
 
     # Subjects landing
