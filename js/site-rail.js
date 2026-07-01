@@ -1,5 +1,6 @@
 (() => {
   const KEY = 'ailatest.pinnedRegionStations';
+  let memoryPinned = [];
   const REGIONS = [
     { id: 'in', label: '印度', code: 'IN', href: '/in' },
     { id: 'my', label: '马来西亚', code: 'MY', href: '/my' },
@@ -9,28 +10,32 @@
   function readPinned() {
     try {
       const saved = JSON.parse(localStorage.getItem(KEY) || '[]');
-      return Array.isArray(saved) ? saved.filter(id => REGIONS.some(r => r.id === id)) : [];
+      memoryPinned = Array.isArray(saved) ? saved.filter(id => REGIONS.some(r => r.id === id)) : [];
+      return memoryPinned;
     } catch (_) {
-      return [];
+      return memoryPinned;
     }
   }
 
   function writePinned(ids) {
     const valid = [...new Set(ids.filter(id => REGIONS.some(r => r.id === id)))];
+    memoryPinned = valid;
     try { localStorage.setItem(KEY, JSON.stringify(valid)); } catch (_) {}
     return valid;
   }
 
   function railParts() {
-    const rail = document.querySelector('.site-rail') || document.querySelector('.listing-rail');
+    const rail = document.querySelector('.app-rail') || document.querySelector('.site-rail') || document.querySelector('.listing-rail');
     if (!rail) return null;
+    const app = rail.classList.contains('app-rail');
     const listing = rail.classList.contains('listing-rail');
     return {
       rail,
-      linkClass: listing ? 'listing-rail-link' : 'site-rail-link',
-      regionClass: listing ? 'listing-rail-region' : 'site-rail-region',
-      menuClass: listing ? 'listing-rail-region-menu' : 'site-rail-region-menu',
-      topClass: listing ? 'listing-rail-top' : 'site-rail-top',
+      app,
+      linkClass: app ? 'rail-nav-btn' : listing ? 'listing-rail-link' : 'site-rail-link',
+      regionClass: app ? 'rail-region-picker' : listing ? 'listing-rail-region' : 'site-rail-region',
+      menuClass: app ? 'rail-region-menu' : listing ? 'listing-rail-region-menu' : 'site-rail-region-menu',
+      topClass: app ? 'rail-top' : listing ? 'listing-rail-top' : 'site-rail-top',
     };
   }
 
@@ -48,7 +53,13 @@
     a.className = `${linkClass} rail-region-station`;
     a.dataset.regionStation = region.id;
     a.href = region.href;
-    a.innerHTML = `<span>${region.code}</span><b>${region.label}</b>`;
+    if (linkClass === 'rail-nav-btn') {
+      a.setAttribute('aria-label', `${region.label} journals`);
+      a.title = `${region.label} journals`;
+      a.innerHTML = `<span class="rail-flag" aria-hidden="true">${region.code}</span><span>${region.label}</span>`;
+    } else {
+      a.innerHTML = `<span>${region.code}</span><b>${region.label}</b>`;
+    }
     return a;
   }
 
@@ -71,8 +82,8 @@
       link.classList.toggle('active', location.pathname.replace(/\/+$/, '') === region.href);
     });
 
-    rail.querySelectorAll(`.${menuClass} a`).forEach(link => {
-      const id = regionIdFromHref(link.href);
+    rail.querySelectorAll(`.${menuClass} a, .${menuClass} [data-region-pin]`).forEach(link => {
+      const id = link.dataset.regionPin || regionIdFromHref(link.href);
       if (!id) return;
       const active = pinned.includes(id);
       link.classList.toggle('active', active);
@@ -84,9 +95,27 @@
   function bind() {
     const parts = railParts();
     if (!parts) return;
+    if (parts.app) {
+      const picker = parts.rail.querySelector('.rail-region-picker');
+      const toggle = parts.rail.querySelector('.rail-region-toggle');
+      const close = () => {
+        picker?.classList.remove('open');
+        toggle?.setAttribute('aria-expanded', 'false');
+      };
+      toggle?.addEventListener('click', (event) => {
+        event.preventDefault();
+        const open = !picker?.classList.contains('open');
+        picker?.classList.toggle('open', open);
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+      document.addEventListener('click', (event) => {
+        if (picker && !picker.contains(event.target)) close();
+      });
+      window.addEventListener('resize', close);
+    }
     const menu = parts.rail.querySelector(`.${parts.menuClass}`);
-    menu?.querySelectorAll('a').forEach(link => {
-      const id = regionIdFromHref(link.href);
+    menu?.querySelectorAll('a, [data-region-pin]').forEach(link => {
+      const id = link.dataset.regionPin || regionIdFromHref(link.href);
       if (!id) return;
       link.addEventListener('click', (event) => {
         event.preventDefault();

@@ -52,6 +52,178 @@ a:hover { text-decoration: underline; }
   justify-content: flex-start;
   gap: 18px;
 }
+.app-rail {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 72px;
+  z-index: 120;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 8px;
+  background: rgba(255,255,255,.48);
+  border-right: 1px solid rgba(39,35,31,.08);
+  box-shadow: 12px 0 38px rgba(39,35,31,.045);
+  backdrop-filter: blur(18px);
+}
+.rail-top,
+.rail-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.rail-nav-btn,
+.app-rail .account-credit-badge {
+  position: relative;
+  width: 52px;
+  min-height: 52px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 18px;
+  background: transparent;
+  color: var(--ink-faint);
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 650;
+  line-height: 1;
+  letter-spacing: 0;
+  cursor: pointer;
+  box-shadow: none;
+  transition: background .15s, color .15s, transform .15s, border-color .15s;
+}
+.rail-nav-btn[hidden],
+.app-rail .account-credit-badge[hidden] {
+  display: none !important;
+}
+.rail-nav-btn:hover,
+.rail-nav-btn.active,
+.app-rail .account-credit-badge:hover,
+.app-rail .account-credit-badge.active {
+  color: var(--accent);
+  background: rgba(249,115,22,.08);
+  border-color: rgba(249,115,22,.18);
+  text-decoration: none;
+}
+.rail-nav-btn.active {
+  background: rgba(255,255,255,.9);
+  border-color: rgba(249,115,22,.24);
+  box-shadow: 0 10px 24px rgba(249,115,22,.12);
+}
+.rail-nav-btn svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.rail-nav-btn span:not(.rail-flag) {
+  max-width: 48px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rail-flag {
+  font-size: 13px;
+  font-family: var(--sans);
+  font-weight: 850;
+  letter-spacing: 0;
+  line-height: 1;
+}
+.rail-region-picker {
+  position: relative;
+  display: inline-flex;
+  justify-content: center;
+}
+.rail-region-symbol {
+  background: rgba(249,115,22,.12);
+  color: var(--accent);
+  letter-spacing: -1px;
+}
+.rail-caret {
+  margin-left: 2px;
+  font-size: 9px;
+  font-weight: 800;
+  color: currentColor;
+}
+.rail-region-menu {
+  position: absolute;
+  top: 0;
+  left: calc(100% + 10px);
+  z-index: 170;
+  width: 138px;
+  display: none;
+  grid-template-columns: 1fr;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  background: rgba(255,253,249,.96);
+  box-shadow: 0 18px 44px rgba(39,35,31,.12);
+  backdrop-filter: blur(18px);
+}
+.rail-region-picker.open .rail-region-menu {
+  display: grid;
+}
+.rail-region-option.rail-nav-btn {
+  width: 100%;
+  min-height: 38px;
+  padding: 0 9px;
+  border-radius: 10px;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 8px;
+  font-size: 12px;
+}
+.rail-region-option::after {
+  content: "✓";
+  margin-left: auto;
+  color: transparent;
+  font-size: 12px;
+  font-weight: 900;
+}
+.rail-region-option.active::after {
+  color: var(--accent);
+}
+.app-rail .account-credit-badge {
+  gap: 3px;
+  font-weight: 750;
+  line-height: 1.15;
+  text-align: center;
+}
+.app-rail .account-credit-badge .rail-account-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 23px;
+  height: 23px;
+  border-radius: 9px;
+  background: rgba(39,35,31,.08);
+  color: var(--ink-faint);
+  font-size: 10px;
+  font-weight: 900;
+}
+.app-rail .account-credit-badge:hover .rail-account-mark,
+.app-rail .account-credit-badge.active .rail-account-mark {
+  background: rgba(249,115,22,.12);
+  color: var(--accent);
+}
+.app-rail .account-credit-badge span,
+.app-rail .account-credit-badge b {
+  max-width: 48px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .listing-rail {
   position: fixed;
   left: 0;
@@ -396,8 +568,10 @@ tr:hover td { background: rgba(249,115,22,.035); }
     padding-left: 0;
     padding-bottom: 68px;
   }
+  .app-rail,
   .listing-rail {
     top: auto;
+    left: 0;
     right: 0;
     bottom: 0;
     width: 100%;
@@ -411,20 +585,56 @@ tr:hover td { background: rgba(249,115,22,.035); }
     border-top: 1px solid rgba(39,35,31,.12);
     box-shadow: 0 -8px 28px rgba(39,35,31,.08);
   }
+  .app-rail {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .app-rail::-webkit-scrollbar {
+    display: none;
+  }
+  .rail-top,
+  .rail-bottom,
   .listing-rail-top,
   .listing-rail-bottom {
     display: contents;
   }
+  .rail-nav-btn,
+  .app-rail .account-credit-badge,
   .listing-rail-link {
     flex: 0 0 58px;
     width: 58px;
     min-height: 48px;
     border-radius: 0;
   }
+  .rail-nav-btn svg {
+    width: 23px;
+    height: 23px;
+  }
+  .rail-nav-btn span:not(.rail-flag),
+  .app-rail .account-credit-badge b {
+    max-width: none;
+    font-size: 10px;
+  }
+  .rail-nav-btn .rail-flag {
+    min-width: 23px;
+    height: 19px;
+    font-size: 11px;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .rail-region-picker,
   .listing-rail-region {
     flex: 0 0 58px;
     width: 58px;
   }
+  .rail-region-toggle {
+    flex: 0 0 58px;
+    width: 58px;
+  }
+  .rail-region-menu,
   .listing-rail-region-menu {
     position: fixed;
     left: 10px;
@@ -436,11 +646,18 @@ tr:hover td { background: rgba(249,115,22,.035); }
     padding: 10px;
     border-radius: 16px;
   }
+  .rail-region-option.rail-nav-btn,
   .listing-rail-region-menu a {
+    min-width: 0;
     min-height: 44px;
     justify-content: center;
     flex-direction: column;
     padding: 4px 6px;
+  }
+  .rail-region-option::after {
+    position: absolute;
+    right: 8px;
+    top: 6px;
   }
   .listing-topbar {
     height: auto;
