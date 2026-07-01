@@ -1547,6 +1547,15 @@
     const clean = pathname.replace(/\/+$/, '') || '/';
     return PATH_TABS[clean] || 'home';
   }
+  function consumePendingTab() {
+    try {
+      const tab = sessionStorage.getItem('ailatest.pendingTab') || '';
+      sessionStorage.removeItem('ailatest.pendingTab');
+      return TAB_PATHS[tab] ? tab : '';
+    } catch (_) {
+      return '';
+    }
+  }
   function updatePageSeo(tab = activeTab) {
     const isZhHome = tab === 'home' && (location.pathname.replace(/\/+$/, '') === '/zh' || lang === 'zh-CN' || lang === 'zh-TW');
     const seo = isZhHome ? TAB_SEO.homeZh : (TAB_SEO[tab] || TAB_SEO.int);
@@ -6255,19 +6264,31 @@
     { id: 'kr',  i18n: 'rail_kr',  zh: '韩国', en: 'Korea' },
   ];
   const STATION_IDS = STATIONS.map(s => s.id);
-  const REGION_STATION_IDS = ['in', 'my', 'kr'];
+  const REGION_STATION_IDS = ['dom', 'in', 'my', 'kr'];
+  const DEFAULT_PINNED_REGION_IDS = ['dom'];
   const PINNED_REGION_KEY = 'ailatest.pinnedRegionStations';
+  const PINNED_REGION_MIGRATION_KEY = `${PINNED_REGION_KEY}.v2`;
   function getPinnedRegions() {
     try {
-      const saved = JSON.parse(localStorage.getItem(PINNED_REGION_KEY) || '[]');
-      return Array.isArray(saved) ? saved.filter(id => REGION_STATION_IDS.includes(id)) : [];
+      const raw = localStorage.getItem(PINNED_REGION_KEY);
+      if (!raw) return DEFAULT_PINNED_REGION_IDS.slice();
+      const saved = JSON.parse(raw);
+      if (!Array.isArray(saved)) return DEFAULT_PINNED_REGION_IDS.slice();
+      let valid = saved.filter(id => REGION_STATION_IDS.includes(id));
+      if (!localStorage.getItem(PINNED_REGION_MIGRATION_KEY) && !valid.includes('dom')) {
+        valid = ['dom', ...valid];
+        localStorage.setItem(PINNED_REGION_KEY, JSON.stringify(valid));
+        localStorage.setItem(PINNED_REGION_MIGRATION_KEY, '1');
+      }
+      return valid;
     } catch (_) {
-      return [];
+      return DEFAULT_PINNED_REGION_IDS.slice();
     }
   }
   function setPinnedRegions(ids) {
     const unique = [...new Set((ids || []).filter(id => REGION_STATION_IDS.includes(id)))];
     try { localStorage.setItem(PINNED_REGION_KEY, JSON.stringify(unique)); } catch (_) {}
+    try { localStorage.setItem(PINNED_REGION_MIGRATION_KEY, '1'); } catch (_) {}
     applyStations();
   }
   function togglePinnedRegion(id) {
@@ -6314,12 +6335,11 @@
       btn.hidden = region && !pinned.includes(s.id);
       btn.toggleAttribute('data-station-hidden', btn.hidden);
       if (s.id === 'int') btn.style.order = '0';
-      else if (s.id === 'dom') btn.style.order = '1';
-      else if (region) btn.style.order = String(2 + REGION_STATION_IDS.indexOf(s.id));
+      else if (region) btn.style.order = String(1 + REGION_STATION_IDS.indexOf(s.id));
       else btn.style.order = '';
     });
     const regionPicker = document.querySelector('.rail-region-picker');
-    if (regionPicker) regionPicker.style.order = String(2 + REGION_STATION_IDS.length);
+    if (regionPicker) regionPicker.style.order = String(1 + REGION_STATION_IDS.length);
     const favBtn = document.querySelector('.rail-nav-btn[data-tab="fav"]');
     if (favBtn) favBtn.style.order = '8';
     const creditBadge = document.querySelector('#account-credit-badge');
@@ -8910,6 +8930,8 @@
       }
       updatePageSeo(activeTab);
       applyI18n(); // refresh placeholder
+      updateFavCount();
+      updateAccountCreditBadge();
       syncHomeModeTabs();
       if (['int', 'fav', 'pick'].includes(activeTab) && !journalsReady) {
         const hint = $('#hint');
@@ -10322,7 +10344,8 @@
     // 分享着陆页：/s/<id> 直接接管 main，不走主流程
     if (await maybeRenderShareLanding()) return;
     try {
-      const initialTab = tabFromPath();
+      const pendingInitialTab = consumePendingTab();
+      const initialTab = pendingInitialTab || tabFromPath();
       const initialPath = location.pathname.replace(/\/+$/, '') || '/';
       const initialNeedsFull = !!journalPathSlug()
         || initialPath === '/import'
@@ -10453,7 +10476,7 @@
         if (user) await pullFavs();
         return;
       }
-      if (window.__activateJournalTab) window.__activateJournalTab(tabFromPath(), { skipPath: true });
+      if (window.__activateJournalTab) window.__activateJournalTab(initialTab, { skipPath: !pendingInitialTab });
       else renderInt();
       if (!initialNeedsFull) scheduleFullJournalWarmup();
       // 启用 #j/<id> 深链

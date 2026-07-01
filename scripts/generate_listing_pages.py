@@ -124,7 +124,7 @@ def load_citic_warning_rows(journals):
         rows.append(row)
     return rows
 
-CACHE_VERSION = '20260701-rank-shell-unified'
+CACHE_VERSION = '20260702-region-rank-shell'
 
 APP_RAIL_HTML = '''<aside class="app-rail" aria-label="Primary navigation">
   <nav class="rail-top" aria-label="站点">
@@ -132,7 +132,7 @@ APP_RAIL_HTML = '''<aside class="app-rail" aria-label="Primary navigation">
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 3.4 9A14 14 0 0 1 12 21a14 14 0 0 1-3.4-9A14 14 0 0 1 12 3Z"/></svg>
       <span>全球</span>
     </a>
-    <a class="rail-nav-btn" href="/cn" aria-label="中国期刊" title="中国期刊">
+    <a class="rail-nav-btn rail-region-station" data-region-station="dom" href="/cn" aria-label="中国期刊" title="中国期刊">
       <span class="rail-flag" aria-hidden="true">CN</span>
       <span>中国</span>
     </a>
@@ -154,6 +154,10 @@ APP_RAIL_HTML = '''<aside class="app-rail" aria-label="Primary navigation">
         <span><span>地区</span><b class="rail-caret" aria-hidden="true">▾</b></span>
       </button>
       <div class="rail-region-menu" aria-label="地区站点">
+        <button class="rail-region-option rail-nav-btn" type="button" data-region-pin="dom" aria-label="中国期刊" title="中国期刊">
+          <span class="rail-flag" aria-hidden="true">CN</span>
+          <span>中国</span>
+        </button>
         <button class="rail-region-option rail-nav-btn" type="button" data-region-pin="in" aria-label="印度期刊" title="印度期刊">
           <span class="rail-flag" aria-hidden="true">IN</span>
           <span>印度</span>
@@ -397,6 +401,10 @@ def generate_landing(origin):
   <p class="breadcrumb"><a href="/">首页</a> · <a href="/rankings/">榜单</a></p>
   <p class="sub">{esc(sub)}</p>'''
         wrap_class = 'wrap ranking-entry-wrap' if minimal else 'wrap'
+        redirect = '''<script>
+try { sessionStorage.setItem('ailatest.pendingTab', 'rank'); } catch (_) {}
+location.replace('/');
+</script>''' if minimal else ''
         return f'''<!doctype html><html lang="zh-CN">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{esc(page_title)}</title>
@@ -404,6 +412,7 @@ def generate_landing(origin):
 <link rel="canonical" href="{esc(canonical)}" /><meta name="robots" content="index,follow" />
 <meta name="theme-color" content="#f97316" />
 <link rel="stylesheet" href="/css/listing.css?v={CACHE_VERSION}" />
+{redirect}
 </head><body>
 {APP_RAIL_HTML}
 <header class="listing-topbar">

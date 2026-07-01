@@ -1,7 +1,10 @@
 (() => {
   const KEY = 'ailatest.pinnedRegionStations';
+  const MIGRATION_KEY = `${KEY}.v2`;
   let memoryPinned = [];
+  const DEFAULT_PINNED = ['dom'];
   const REGIONS = [
+    { id: 'dom', label: '中国', code: 'CN', href: '/cn' },
     { id: 'in', label: '印度', code: 'IN', href: '/in' },
     { id: 'my', label: '马来西亚', code: 'MY', href: '/my' },
     { id: 'kr', label: '韩国', code: 'KR', href: '/kr' },
@@ -9,11 +12,21 @@
 
   function readPinned() {
     try {
-      const saved = JSON.parse(localStorage.getItem(KEY) || '[]');
-      memoryPinned = Array.isArray(saved) ? saved.filter(id => REGIONS.some(r => r.id === id)) : [];
+      const raw = localStorage.getItem(KEY);
+      if (!raw) {
+        memoryPinned = DEFAULT_PINNED.slice();
+        return memoryPinned;
+      }
+      const saved = JSON.parse(raw);
+      memoryPinned = Array.isArray(saved) ? saved.filter(id => REGIONS.some(r => r.id === id)) : DEFAULT_PINNED.slice();
+      if (!localStorage.getItem(MIGRATION_KEY) && !memoryPinned.includes('dom')) {
+        memoryPinned = ['dom', ...memoryPinned];
+        localStorage.setItem(KEY, JSON.stringify(memoryPinned));
+        localStorage.setItem(MIGRATION_KEY, '1');
+      }
       return memoryPinned;
     } catch (_) {
-      return memoryPinned;
+      return memoryPinned.length ? memoryPinned : DEFAULT_PINNED.slice();
     }
   }
 
@@ -21,6 +34,7 @@
     const valid = [...new Set(ids.filter(id => REGIONS.some(r => r.id === id)))];
     memoryPinned = valid;
     try { localStorage.setItem(KEY, JSON.stringify(valid)); } catch (_) {}
+    try { localStorage.setItem(MIGRATION_KEY, '1'); } catch (_) {}
     return valid;
   }
 
@@ -63,17 +77,56 @@
     return a;
   }
 
+  function normalizeLegacyRegionLink(rail, region) {
+    if (region.id !== 'dom') return null;
+    const legacy = rail.querySelector('[data-tab="dom"], a[href="/cn"], a[href="/china"]');
+    if (!legacy) return null;
+    legacy.classList.add('rail-region-station');
+    legacy.dataset.regionStation = region.id;
+    if (!legacy.getAttribute('href') && legacy.tagName === 'A') legacy.href = region.href;
+    return legacy;
+  }
+
+  function makeMenuOption(region, linkClass) {
+    const appMenu = linkClass === 'rail-nav-btn';
+    const el = document.createElement(appMenu ? 'button' : 'a');
+    el.className = appMenu ? 'rail-region-option rail-nav-btn' : linkClass;
+    el.dataset.regionPin = region.id;
+    if (appMenu) {
+      el.type = 'button';
+      el.setAttribute('aria-label', `${region.label}期刊`);
+      el.title = `${region.label}期刊`;
+      el.innerHTML = `<span class="rail-flag" aria-hidden="true">${region.code}</span><span>${region.label}</span>`;
+    } else {
+      el.href = region.href;
+      el.innerHTML = `<span>${region.code}</span><b>${region.label}</b>`;
+    }
+    return el;
+  }
+
+  function ensureMenuOptions(rail, menuClass, linkClass) {
+    const menu = rail.querySelector(`.${menuClass}`);
+    if (!menu) return;
+    REGIONS.forEach(region => {
+      if (!menu.querySelector(`[data-region-pin="${region.id}"]`)) {
+        menu.appendChild(makeMenuOption(region, linkClass));
+      }
+    });
+  }
+
   function apply() {
     const parts = railParts();
     if (!parts) return;
     const { rail, linkClass, regionClass, menuClass, topClass } = parts;
     const regionBox = rail.querySelector(`.${regionClass}`);
     if (!regionBox) return;
+    ensureMenuOptions(rail, menuClass, linkClass);
     const stationGroup = rail.querySelector(`.${topClass}`) || regionBox.parentElement || rail;
     const pinned = readPinned();
 
     REGIONS.forEach(region => {
       let link = rail.querySelector(`[data-region-station="${region.id}"]`);
+      if (!link) link = normalizeLegacyRegionLink(rail, region);
       if (!link) {
         link = makePinnedLink(region, linkClass);
         stationGroup.insertBefore(link, regionBox);
