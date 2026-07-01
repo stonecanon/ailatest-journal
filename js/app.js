@@ -1495,8 +1495,8 @@
 
   let activeTab = 'home';
   let homeMode = 'search';
-  const TAB_PATHS = { home: '/', int: '/global', dom: '/cn', in: '/in', my: '/my', kr: '/kr', fav: '/favorites', me: '/account', pick: '/pick' };
-  const PATH_TABS = { '/': 'home', '/en': 'home', '/zh': 'home', '/global': 'int', '/international': 'int', '/journals': 'int', '/cn': 'dom', '/china': 'dom', '/in': 'in', '/india': 'in', '/my': 'my', '/malaysia': 'my', '/kr': 'kr', '/korea': 'kr', '/favorites': 'fav', '/account': 'me', '/me': 'me', '/profile': 'me', '/pick': 'pick' };
+  const TAB_PATHS = { home: '/', int: '/global', dom: '/cn', in: '/in', my: '/my', kr: '/kr', fav: '/favorites', me: '/account', rank: '/rankings/', pick: '/pick' };
+  const PATH_TABS = { '/': 'home', '/en': 'home', '/zh': 'home', '/global': 'int', '/international': 'int', '/journals': 'int', '/cn': 'dom', '/china': 'dom', '/in': 'in', '/india': 'in', '/my': 'my', '/malaysia': 'my', '/kr': 'kr', '/korea': 'kr', '/favorites': 'fav', '/account': 'me', '/me': 'me', '/profile': 'me', '/rankings': 'rank', '/pick': 'pick' };
   const TAB_SEO = {
     home: {
       title: 'AILatest Journal - Journal Finder, Rankings & Impact Factors',
@@ -1533,6 +1533,10 @@
     fav: {
       title: '期刊收藏清单 | Journal Favorites - AILatest Journal',
       desc: '保存、同步、排序并分享你的目标期刊清单，支持跨设备收藏和期刊清单分享。'
+    },
+    rank: {
+      title: '期刊榜单 | AILatest Journal',
+      desc: 'AILatest Journal 期刊榜单入口：索引排行榜、学科排行榜和预警名单。'
     },
     pick: {
       title: '荐刊推荐工具 | Journal Finder for Paper Title and Keywords - AILatest Journal',
@@ -2075,13 +2079,14 @@
     if (!badge) return;
     badge.hidden = false;
     const credits = accountCreditValue();
+    const mark = T('我', 'Me');
     if (user) {
       const creditHtml = credits === null ? '' : `<b>${formatCreditValue(credits)}</b>`;
-      badge.innerHTML = `<span class="rail-account-mark" aria-hidden="true">Me</span><span>${T('我的','Me')}</span>${creditHtml}`;
+      badge.innerHTML = `<span class="rail-account-mark" aria-hidden="true">${escape(mark)}</span><span>${T('我的','Me')}</span>${creditHtml}`;
       badge.title = T('进入个人信息与积分','Open account and credits');
       badge.setAttribute('aria-label', T('我的，查看个人信息与 Credits','Me, account and credits'));
     } else {
-      badge.innerHTML = `<span class="rail-account-mark" aria-hidden="true">Me</span><span>${T('我的','Me')}</span>`;
+      badge.innerHTML = `<span class="rail-account-mark" aria-hidden="true">${escape(mark)}</span><span>${T('我的','Me')}</span>`;
       badge.title = T('登录后查看积分','Sign in to view credits');
       badge.setAttribute('aria-label', T('登录后查看个人信息与 Credits','Sign in for account and credits'));
     }
@@ -8849,7 +8854,7 @@
       activeTab = tab;
       document.body.classList.toggle('update-reading-mode', activeTab === 'updates');
       document.body.classList.toggle('home-route', activeTab === 'home');
-      document.body.classList.toggle('simple-top-route', activeTab === 'updates' || activeTab === 'fav' || activeTab === 'me');
+      document.body.classList.toggle('simple-top-route', activeTab === 'updates' || activeTab === 'fav' || activeTab === 'me' || activeTab === 'rank');
       updateSearchSubmitLabel();
       $$('.tab-panel').forEach(p => p.hidden = p.dataset.panel !== activeTab);
       $$('[data-international]').forEach(el => el.hidden = activeTab !== 'int');
@@ -8952,7 +8957,7 @@
 
     document.getElementById('rankings-btn')?.addEventListener('click', (e) => {
       e.preventDefault();
-      window.location.href = '/rankings/';
+      activateTab('rank');
     });
     document.querySelector('[data-topbar-home]')?.addEventListener('click', (e) => {
       e.preventDefault();

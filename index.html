@@ -169,7 +169,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
   </nav>
   <div class="rail-bottom">
-    <button class="rail-nav-btn" id="rankings-btn" aria-label="榜单" title="索引/学科排行榜 &amp; 预警名单" data-i18n-aria="rail_rank" data-i18n-title="rail_rank">
+    <button class="rail-nav-btn" id="rankings-btn" data-tab="rank" aria-label="榜单" title="索引/学科排行榜 &amp; 预警名单" data-i18n-aria="rail_rank" data-i18n-title="rail_rank">
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 21V11"/><path d="M12 21V7"/><path d="M16 21V3"/><path d="M4 21h16"/></svg>
       <span data-i18n="rail_rank">榜单</span>
     </button>
@@ -386,6 +386,21 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <!-- ─── Favorites tab ─── -->
   <section class="tab-panel" data-panel="fav" hidden>
     <div id="fav-content"></div>
+  </section>
+
+  <!-- ─── Rankings tab ─── -->
+  <section class="tab-panel" data-panel="rank" hidden>
+    <div class="rank-panel">
+      <a class="rank-choice" href="/indexes/">
+        <strong>索引排行榜</strong>
+      </a>
+      <a class="rank-choice" href="/subjects/">
+        <strong>学科排行榜</strong>
+      </a>
+      <a class="rank-choice" href="/indexes/warning/">
+        <strong>预警名单</strong>
+      </a>
+    </div>
   </section>
 
   <!-- ─── Pick-for-me tab ─── -->

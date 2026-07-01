@@ -124,7 +124,7 @@ def load_citic_warning_rows(journals):
         rows.append(row)
     return rows
 
-CACHE_VERSION = '20260701-rank-rail-zh'
+CACHE_VERSION = '20260701-rank-shell-unified'
 
 APP_RAIL_HTML = '''<aside class="app-rail" aria-label="Primary navigation">
   <nav class="rail-top" aria-label="站点">
@@ -391,8 +391,12 @@ def generate_landing(origin):
     subjects = SUBJECTS
     indexes = INDEXES
 
-    def shell(page_title, meta_desc, canonical, heading, sub, body_html, back_href=None):
-        back = f'<p class="back-wrap"><a class="back" href="{back_href}">← 返回</a></p>' if back_href else ''
+    def shell(page_title, meta_desc, canonical, heading, sub, body_html, back_href=None, minimal=False):
+        back = f'<p class="back-wrap"><a class="back" href="{back_href}">← 返回</a></p>' if back_href and not minimal else ''
+        intro = '' if minimal else f'''  <h1>{esc(heading)}</h1>
+  <p class="breadcrumb"><a href="/">首页</a> · <a href="/rankings/">榜单</a></p>
+  <p class="sub">{esc(sub)}</p>'''
+        wrap_class = 'wrap ranking-entry-wrap' if minimal else 'wrap'
         return f'''<!doctype html><html lang="zh-CN">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{esc(page_title)}</title>
@@ -410,10 +414,8 @@ def generate_landing(origin):
     <span>中文</span>
   </nav>
 </header>
-<div class="wrap">
-  <h1>{esc(heading)}</h1>
-  <p class="breadcrumb"><a href="/">首页</a> · <a href="/rankings/">榜单</a></p>
-  <p class="sub">{esc(sub)}</p>
+<div class="{wrap_class}">
+{intro}
   {body_html}
   {back}
 </div>
@@ -451,9 +453,9 @@ def generate_landing(origin):
     print('  /indexes/ (landing)')
 
     ranking_choices = f'''<div class="ranking-choice-grid">
-  <a class="ranking-choice" href="{origin}/indexes/"><strong>索引排行榜</strong><span>按 SCIE、SSCI、AHCI、ESCI、EI、Scopus、MEDLINE 等索引查看期刊。</span></a>
-  <a class="ranking-choice" href="{origin}/subjects/"><strong>学科排行榜</strong><span>按 Web of Science 学科分类查看期刊，适合快速定位领域内期刊。</span></a>
-  <a class="ranking-choice" href="{origin}/indexes/warning/"><strong>预警名单</strong><span>查看中科院预警、WoS On Hold、新锐 Under Review 等风险标记。</span></a>
+  <a class="ranking-choice" href="{origin}/indexes/"><strong>索引排行榜</strong></a>
+  <a class="ranking-choice" href="{origin}/subjects/"><strong>学科排行榜</strong></a>
+  <a class="ranking-choice" href="{origin}/indexes/warning/"><strong>预警名单</strong></a>
 </div>'''
     rankings_html = shell(
         '榜单 | AILatest Journal',
@@ -463,6 +465,7 @@ def generate_landing(origin):
         '选择一个榜单入口，再查看对应期刊列表。',
         ranking_choices,
         f'{origin}/',
+        minimal=True,
     )
     (ROOT / 'rankings').mkdir(parents=True, exist_ok=True)
     (ROOT / 'rankings' / 'index.html').write_text(rankings_html, encoding='utf-8')

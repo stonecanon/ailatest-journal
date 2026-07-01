@@ -403,6 +403,9 @@ a:hover { text-decoration: underline; }
   padding: 28px 0 36px;
   flex: 1 0 auto;
 }
+.ranking-entry-wrap {
+  padding-top: 30px;
+}
 h1 {
   margin: 0 0 8px;
   color: var(--ink);
@@ -502,15 +505,17 @@ tr:hover td { background: rgba(249,115,22,.035); }
   gap: 0;
 }
 .ranking-choice {
-  min-height: 132px;
-  padding: 18px;
+  min-height: 104px;
+  padding: 20px 22px;
   border-radius: 0;
   border-right-color: var(--rule-soft);
+  display: flex;
+  align-items: center;
 }
 .ranking-choice:last-child { border-right-color: transparent; }
 .ranking-choice strong {
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 0;
   font-size: 18px;
 }
 .ranking-choice span {
@@ -675,11 +680,15 @@ tr:hover td { background: rgba(249,115,22,.035); }
     width: 100%;
     padding: 22px 12px 30px;
   }
+  .ranking-entry-wrap {
+    padding-top: 14px;
+  }
   .ranking-choice-grid {
     grid-template-columns: 1fr;
   }
   .ranking-choice {
-    min-height: 0;
+    min-height: 74px;
+    padding: 16px;
     border-right-color: transparent;
     border-bottom-color: var(--rule-soft);
   }
