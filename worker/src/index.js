@@ -18,6 +18,7 @@
  *   GET  /favorites              (Bearer)                  → favorite ids
  *   PUT  /favorites              (Bearer) { favs: [...] }   （tier 限额校验）
  *   POST /analytics/pageview      { path, referrer, session_id, visitor_id, client_timezone, client_language }
+ *   POST /events/collect          { site_key, events: [...] }       → batch analytics ingest
  *
  * Required secrets:
  *   JWT_SECRET              long random
@@ -162,6 +163,32 @@ function metadataJson(value) {
   }
 }
 
+function canonicalAnalyticsSite(value) {
+  let site = cleanText(value || '', 120).toLowerCase();
+  site = site.replace(/^https?:\/\//, '').replace(/\/.*$/, '').replace(/:\d+$/, '');
+  const aliases = {
+    grant: 'grant.ailatest.org',
+    grants: 'grant.ailatest.org',
+    'grant.ailatest.org': 'grant.ailatest.org',
+    journal: 'journal.ailatest.org',
+    'journal.ailatest.org': 'journal.ailatest.org',
+    ailatest: 'ailatest.org',
+    main: 'ailatest.org',
+    'ailatest.org': 'ailatest.org',
+  };
+  return aliases[site] || site;
+}
+
+function analyticsSiteFromBody(body, req) {
+  const hostname = canonicalAnalyticsSite(body?.hostname);
+  if (hostname && hostname !== 'api.ailatest.org') return hostname;
+  const site = canonicalAnalyticsSite(body?.site);
+  if (site && site !== 'api.ailatest.org') return site;
+  const siteKey = canonicalAnalyticsSite(body?.site_key);
+  if (siteKey && siteKey !== 'api.ailatest.org') return siteKey;
+  return canonicalAnalyticsSite(new URL(req.url).hostname) || 'journal.ailatest.org';
+}
+
 async function requestIpHash(req, env) {
   const ip = req.headers.get('CF-Connecting-IP') || req.headers.get('x-forwarded-for') || '';
   if (!ip) return '';
@@ -272,6 +299,7 @@ async function routePageview(req, env) {
   }
   const clientTimezone = cleanText(body?.client_timezone || '', 80);
   const clientLanguage = cleanText(body?.client_language || '', 80);
+  const site = analyticsSiteFromBody(body || {}, req);
   const userAgent = cleanText(body?.user_agent || req.headers.get('user-agent') || '', 500);
   const screenResolution = cleanText(body?.screen_resolution || '', 40);
   const cf = req.cf || {};
@@ -318,7 +346,7 @@ async function routePageview(req, env) {
   ).bind(
     cleanText(body?.event_id || crypto.randomUUID(), 80),
     cleanText(body?.event_type || 'page_view', 60) || 'page_view',
-    cleanText(body?.site || new URL(req.url).hostname, 120) || 'journal.ailatest.org',
+    site,
     path,
     referrer,
     visitorId,
@@ -520,7 +548,7 @@ async function routeInteraction(req, env) {
   if (!body) return err('invalid json');
   const now = nowSec();
   const eventTs = clampEventTs(body.event_ts, now);
-  const site = cleanText(body.site || new URL(req.url).hostname, 120) || 'journal.ailatest.org';
+  const site = analyticsSiteFromBody(body || {}, req);
   const eventType = cleanText(body.event_type || 'interaction', 80) || 'interaction';
   const path = cleanText(body.path || '/', 240) || '/';
   const referrer = cleanText(body.referrer || '', 300);
@@ -587,6 +615,48 @@ async function routeInteraction(req, env) {
   }
 
   return json({ ok: true });
+}
+
+async function routeEventsCollect(req, env) {
+  const body = await req.json().catch(() => null);
+  if (!body || !Array.isArray(body.events)) return err('invalid events');
+  const events = body.events.slice(0, 40);
+  let accepted = 0;
+  let pageviews = 0;
+  let interactions = 0;
+  let ignored = 0;
+  for (const event of events) {
+    if (!event || typeof event !== 'object') continue;
+    const payload = {
+      ...event,
+      site_key: event.site_key || body.site_key || body.site || '',
+    };
+    payload.site = analyticsSiteFromBody(payload, req);
+    const eventType = cleanText(payload.event_type || '', 80).toLowerCase();
+    const target = eventType === 'page_view' || eventType === 'pageview'
+      ? '/analytics/pageview'
+      : '/analytics/interaction';
+    const headers = new Headers(req.headers);
+    headers.set('Content-Type', 'application/json');
+    headers.delete('Content-Length');
+    const eventReq = new Request(new URL(target, req.url), {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(payload),
+    });
+    const res = target.endsWith('/pageview')
+      ? await routePageview(eventReq, env)
+      : await routeInteraction(eventReq, env);
+    if (!res.ok) continue;
+    const result = await res.json().catch(() => ({}));
+    if (result.ignored) ignored += 1;
+    else {
+      accepted += 1;
+      if (target.endsWith('/pageview')) pageviews += 1;
+      else interactions += 1;
+    }
+  }
+  return json({ ok: true, accepted, pageviews, interactions, ignored });
 }
 
 async function routeAiUsageIngest(req, env) {
@@ -1917,6 +1987,7 @@ export default {
       if (p === '/auth/google/callback'&& req.method === 'GET')  return routeGoogleCallback(req, env);
       if (p === '/analytics/pageview' && req.method === 'POST')  return routePageview(req, env);
       if (p === '/analytics/interaction' && req.method === 'POST') return routeInteraction(req, env);
+      if (p === '/events/collect' && req.method === 'POST') return routeEventsCollect(req, env);
       if (p === '/grant/deepseek-usage' && req.method === 'POST') return routeAiUsageIngest(req, env);
       if (p === '/grant/deepseek-usage' && req.method === 'GET') return routeAiUsageSummary(req, env);
       if (p === '/analytics/dashboard' && req.method === 'GET')  return routeDashboard(req, env);
