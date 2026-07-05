@@ -1728,6 +1728,114 @@ async function routeGetJournalViewTotal(req, env) {
   });
 }
 
+function normalizeOpenAlexIssn(value) {
+  const compact = cleanText(value || '', 32).toUpperCase().replace(/[^0-9X]/g, '');
+  return compact.length === 8 ? `${compact.slice(0, 4)}-${compact.slice(4)}` : '';
+}
+
+function normalizeOpenAlexCountry(group) {
+  const code = cleanText(group?.code || '', 12).toUpperCase();
+  const name = cleanText(group?.name || '', 120);
+  if (['CN', 'TW', 'HK', 'MO'].includes(code) || /^(china|taiwan|hong kong|macao|macau)$/i.test(name)) {
+    return { code: 'CN', name: 'China' };
+  }
+  return { code, name };
+}
+
+async function fetchOpenAlexCountryYear(sourceIssn, year) {
+  const params = new URLSearchParams({
+    filter: `primary_location.source.issn:${sourceIssn},from_publication_date:${year}-01-01,to_publication_date:${year}-12-31`,
+    group_by: 'authorships.institutions.country_code',
+    'per-page': '200',
+    mailto: 'ailatest@ailatest.org',
+  });
+  const resp = await fetch(`https://api.openalex.org/works?${params.toString()}`, {
+    headers: { Accept: 'application/json', 'User-Agent': 'AILatest Journal country-output cache (mailto:ailatest@ailatest.org)' },
+  });
+  if (!resp.ok) return { year, total: 0, groups: [], skipped: true, status: resp.status };
+  const data = await resp.json();
+  const groups = (data.group_by || [])
+    .map(g => ({
+      code: String(g.key || '').split('/').pop()?.replace(/^countries\//i, '') || '',
+      name: String(g.key_display_name || '').trim(),
+      count: Number(g.count || 0),
+    }))
+    .filter(g => g.count > 0 && g.name && !/^unknown$/i.test(g.name));
+  const merged = new Map();
+  for (const group of groups) {
+    const key = normalizeOpenAlexCountry(group);
+    if (!key.name) continue;
+    const current = merged.get(key.name) || { ...key, count: 0 };
+    current.count += group.count;
+    merged.set(key.name, current);
+  }
+  const mergedGroups = [...merged.values()];
+  const total = mergedGroups.reduce((sum, group) => sum + group.count, 0);
+  return { year, total, groups: mergedGroups };
+}
+
+function buildCountryOutputPayload(rows) {
+  const usable = rows.filter(row => row.total > 0);
+  if (!usable.length) return null;
+  const countryTotals = new Map();
+  usable.forEach(row => row.groups.forEach(group => {
+    countryTotals.set(group.name, (countryTotals.get(group.name) || 0) + group.count);
+  }));
+  const topOther = [...countryTotals.entries()]
+    .filter(([name]) => name !== 'China')
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 4)
+    .map(([name]) => name);
+  const top = ['China', ...topOther].filter((name, index, arr) => index === arr.indexOf(name));
+  return { ok: true, years: usable, top, source: 'openalex' };
+}
+
+// GET /openalex/country-output?issn=1474-760X[,1474-760X]&years=2022,2023,2024,2025,2026
+async function routeOpenAlexCountryOutput(req, env) {
+  const url = new URL(req.url);
+  const debug = url.searchParams.get('debug') === '1';
+  const issns = cleanText(url.searchParams.get('issn') || '', 120)
+    .split(',')
+    .map(normalizeOpenAlexIssn)
+    .filter((value, index, arr) => value && arr.indexOf(value) === index)
+    .slice(0, 2);
+  const years = cleanText(url.searchParams.get('years') || '', 80)
+    .split(',')
+    .map(year => Number(year))
+    .filter(year => Number.isFinite(year) && year >= 1900 && year <= 2100)
+    .slice(-8);
+  if (!issns.length || !years.length) return err('missing issn or years', 400);
+
+  const cache = caches.default;
+  const cacheKey = new Request(`https://cache.internal/openalex-country-output/v2?issn=${encodeURIComponent(issns.join(','))}&years=${encodeURIComponent(years.join(','))}`);
+  const hit = debug ? null : await cache.match(cacheKey);
+  if (hit) return new Response(hit.body, { status: 200, headers: { 'Content-Type': 'application/json', ...CORS, 'Cache-Control': 'public, max-age=86400' } });
+
+  let payload = null;
+  const attempts = [];
+  for (const sourceIssn of issns) {
+    const rows = [];
+    for (const year of years) {
+      const row = await fetchOpenAlexCountryYear(sourceIssn, year);
+      rows.push(row);
+      if (debug || row.skipped) attempts.push({ issn: sourceIssn, year, total: row.total, status: row.status || 200, skipped: !!row.skipped });
+    }
+    payload = buildCountryOutputPayload(rows);
+    if (payload) {
+      payload.issn = sourceIssn;
+      break;
+    }
+  }
+  if (!payload) payload = { ok: true, years: [], top: [], source: 'openalex' };
+  if (debug) payload.attempts = attempts;
+
+  const bodyText = JSON.stringify(payload);
+  const ttl = payload.years.length ? 86400 : 60;
+  const headers = { 'Content-Type': 'application/json', ...CORS, 'Cache-Control': `public, max-age=${ttl}` };
+  if (payload.years.length && !debug) await cache.put(cacheKey, new Response(bodyText, { status: 200, headers }));
+  return new Response(bodyText, { status: 200, headers });
+}
+
 // GET /analytics/public-total  (public aggregate, no user-level detail)
 async function routePublicTrafficTotal(req, env) {
   const page = await env.DB.prepare(
@@ -1997,6 +2105,7 @@ export default {
       if (p === '/analytics/journal-view-trend' && req.method === 'GET') return routeJournalViewTrend(req, env);
       if (p === '/analytics/site-traffic-trend' && req.method === 'GET') return routeSiteTrafficTrend(req, env);
       if (p === '/analytics/public-total' && req.method === 'GET') return routePublicTrafficTotal(req, env);
+      if (p === '/openalex/country-output' && req.method === 'GET') return routeOpenAlexCountryOutput(req, env);
       if (p === '/extension/download-stats' && req.method === 'GET') return routeExtensionDownloadStats(req, env);
       if (p === '/extension/download'       && req.method === 'GET') return routeExtensionDownload(req, env);
       if (p === '/me'                  && req.method === 'GET')  return routeMe(req, env);

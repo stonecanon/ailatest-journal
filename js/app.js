@@ -1319,46 +1319,21 @@
   }
 
   async function fetchCountryOutputData(r) {
-    const issn = normalizeIssnForOpenAlex(r?.issn) || normalizeIssnForOpenAlex(r?.eissn);
-    if (!issn) return null;
+    const issns = [normalizeIssnForOpenAlex(r?.issn), normalizeIssnForOpenAlex(r?.eissn)]
+      .filter((value, index, arr) => value && arr.indexOf(value) === index);
+    if (!issns.length) return null;
     const years = countryOutputYears(r);
-    const cacheKey = `${issn}|${years.join(',')}`;
+    const cacheKey = `${issns.join('|')}|${years.join(',')}`;
     if (countryOutputCache.has(cacheKey)) return countryOutputCache.get(cacheKey);
-    const promise = Promise.all(years.map(async (year) => {
-      const params = new URLSearchParams({
-        filter: `primary_location.source.issn:${issn},from_publication_date:${year}-01-01,to_publication_date:${year}-12-31`,
-        group_by: 'authorships.institutions.country_code',
-        'per-page': '200',
-        mailto: 'ailatest@security-contact.local',
-      });
-      const resp = await fetch(`https://api.openalex.org/works?${params.toString()}`);
-      if (!resp.ok) throw new Error(`OpenAlex ${resp.status}`);
-      const data = await resp.json();
-      const groups = (data.group_by || [])
-        .map(g => ({
-          code: String(g.key || '').split('/').pop()?.replace(/^countries\//i, '') || '',
-          name: String(g.key_display_name || '').trim(),
-          count: Number(g.count || 0),
-        }))
-        .filter(g => g.count > 0 && g.name && !/^unknown$/i.test(g.name));
-      const merged = new Map();
-      groups.forEach(g => {
-        const key = normalizeCountryShareGroup(g);
-        if (!key.name) return;
-        const current = merged.get(key.name) || { ...key, count: 0 };
-        current.count += g.count;
-        merged.set(key.name, current);
-      });
-      const mergedGroups = [...merged.values()];
-      const total = mergedGroups.reduce((sum, g) => sum + g.count, 0);
-      return { year, total, groups: mergedGroups };
-    })).then(rows => {
-      const usable = rows.filter(row => row.total > 0);
+    const normalizePayload = (payload) => {
+      const usable = (Array.isArray(payload?.years) ? payload.years : [])
+        .filter(row => Number(row?.total || 0) > 0 && Array.isArray(row?.groups));
       if (!usable.length) return null;
+      if (Array.isArray(payload?.top) && payload.top.length) return { years: usable, top: payload.top };
       const countryTotals = new Map();
       usable.forEach(row => row.groups.forEach(g => {
         const key = g.name;
-        countryTotals.set(key, (countryTotals.get(key) || 0) + g.count);
+        countryTotals.set(key, (countryTotals.get(key) || 0) + Number(g.count || 0));
       }));
       const topOther = [...countryTotals.entries()]
         .filter(([name]) => name !== 'China')
@@ -1367,6 +1342,82 @@
         .map(([name]) => name);
       const top = ['China', ...topOther].filter((name, i, arr) => i === arr.indexOf(name));
       return { years: usable, top };
+    };
+    const fetchFromApi = async () => {
+      const params = new URLSearchParams({
+        issn: issns.join(','),
+        years: years.join(','),
+      });
+      try {
+        const resp = await fetch(`${API_BASE}/openalex/country-output?${params.toString()}`, { cache: 'force-cache' });
+        if (!resp.ok) return null;
+        return normalizePayload(await resp.json());
+      } catch (_) {
+        return null;
+      }
+    };
+    const fetchYear = async (sourceIssn, year) => {
+      const params = new URLSearchParams({
+        filter: `primary_location.source.issn:${sourceIssn},from_publication_date:${year}-01-01,to_publication_date:${year}-12-31`,
+        group_by: 'authorships.institutions.country_code',
+        'per-page': '200',
+        mailto: 'ailatest@ailatest.org',
+      });
+      const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      const timer = controller ? setTimeout(() => controller.abort(), 9000) : null;
+      try {
+        const resp = await fetch(`https://api.openalex.org/works?${params.toString()}`, controller ? { signal: controller.signal } : undefined);
+        if (!resp.ok) return { year, total: 0, groups: [], skipped: true };
+        const data = await resp.json();
+        const groups = (data.group_by || [])
+          .map(g => ({
+            code: String(g.key || '').split('/').pop()?.replace(/^countries\//i, '') || '',
+            name: String(g.key_display_name || '').trim(),
+            count: Number(g.count || 0),
+          }))
+          .filter(g => g.count > 0 && g.name && !/^unknown$/i.test(g.name));
+        const merged = new Map();
+        groups.forEach(g => {
+          const key = normalizeCountryShareGroup(g);
+          if (!key.name) return;
+          const current = merged.get(key.name) || { ...key, count: 0 };
+          current.count += g.count;
+          merged.set(key.name, current);
+        });
+        const mergedGroups = [...merged.values()];
+        const total = mergedGroups.reduce((sum, g) => sum + g.count, 0);
+        return { year, total, groups: mergedGroups };
+      } catch (_) {
+        return { year, total: 0, groups: [], skipped: true };
+      } finally {
+        if (timer) clearTimeout(timer);
+      }
+    };
+    const promise = (async () => {
+      const apiPayload = await fetchFromApi();
+      if (apiPayload) return apiPayload;
+      for (const sourceIssn of issns) {
+        const rows = [];
+        for (const year of years) rows.push(await fetchYear(sourceIssn, year));
+        const usable = rows.filter(row => row.total > 0);
+        if (!usable.length) continue;
+        const countryTotals = new Map();
+        usable.forEach(row => row.groups.forEach(g => {
+          const key = g.name;
+          countryTotals.set(key, (countryTotals.get(key) || 0) + g.count);
+        }));
+        const topOther = [...countryTotals.entries()]
+          .filter(([name]) => name !== 'China')
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 4)
+          .map(([name]) => name);
+        const top = ['China', ...topOther].filter((name, i, arr) => i === arr.indexOf(name));
+        return { years: usable, top };
+      }
+      return null;
+    })().catch(err => {
+      countryOutputCache.delete(cacheKey);
+      throw err;
     });
     countryOutputCache.set(cacheKey, promise);
     return promise;
