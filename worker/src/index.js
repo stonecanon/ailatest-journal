@@ -1838,6 +1838,38 @@ async function routeOpenAlexCountryOutput(req, env) {
 
 // GET /analytics/public-total  (public aggregate, no user-level detail)
 async function routePublicTrafficTotal(req, env) {
+  const url = new URL(req.url);
+  const requestedSite = url.searchParams.has('site')
+    ? canonicalAnalyticsSite(url.searchParams.get('site') || 'journal.ailatest.org')
+    : '';
+  if (requestedSite) {
+    const raw = await env.DB.prepare(
+      `SELECT COUNT(*) AS raw_pageviews,
+        COUNT(DISTINCT visitor_id) AS raw_visitors,
+        COUNT(DISTINCT session_id) AS raw_sessions,
+        MIN(event_ts) AS first_pageview_at,
+        MAX(event_ts) AS latest_pageview_at,
+        SUM(CASE WHEN is_bot=1 THEN 1 ELSE 0 END) AS raw_bot_pageviews
+       FROM raw_events
+       WHERE site = ? AND event_type IN ('pageview','page_view')`
+    ).bind(requestedSite).first();
+
+    return json({
+      ok: true,
+      site: requestedSite,
+      total_pageviews: Number(raw?.raw_pageviews || 0),
+      total_visitors: Number(raw?.raw_visitors || 0),
+      total_sessions: Number(raw?.raw_sessions || 0),
+      first_pageview_at: raw?.first_pageview_at || null,
+      latest_pageview_at: raw?.latest_pageview_at || null,
+      viewed_journals: 0,
+      total_journal_views: 0,
+      latest_journal_view_at: null,
+      raw_pageviews: Number(raw?.raw_pageviews || 0),
+      raw_bot_pageviews: Number(raw?.raw_bot_pageviews || 0),
+    }, 200, { 'Cache-Control': 'public, max-age=60' });
+  }
+
   const page = await env.DB.prepare(
     `SELECT COUNT(*) AS total_pageviews,
       COUNT(DISTINCT visitor_id) AS total_visitors,
@@ -1855,8 +1887,7 @@ async function routePublicTrafficTotal(req, env) {
 
   let raw = null;
   try {
-    const url = new URL(req.url);
-    const site = cleanText(url.searchParams.get('site') || 'journal.ailatest.org', 120) || 'journal.ailatest.org';
+    const site = 'journal.ailatest.org';
     raw = await env.DB.prepare(
       `SELECT COUNT(*) AS raw_pageviews,
         COUNT(DISTINCT visitor_id) AS raw_visitors,
