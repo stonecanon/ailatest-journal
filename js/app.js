@@ -61,7 +61,7 @@
       nav_terms: '条款', nav_privacy: '隐私', nav_refund: '退款',
       nav_index_rank: '索引排行榜', nav_subject_rank: '学科排行榜', nav_warn_rank: '预警名单', nav_extension_beta: '插件内测', nav_subscription: '订阅',
       filter_if_range: '影响因子', if_any: '不限',
-      rail_int: '全球', rail_dom: '中国', rail_region: '地区', rail_in: '印度', rail_my: '马来西亚', rail_kr: '韩国', rail_rank: '榜单', rail_fav: '收藏', rail_me: '我的',
+      rail_int: '全球', rail_dom: '中国', rail_region: '地区', rail_in: '印度', rail_my: '马来西亚', rail_kr: '韩国', rail_pbn: '波兰', rail_isc: 'ISC', rail_scielo: 'SciELO', rail_rank: '榜单', rail_fav: '收藏', rail_me: '我的',
       download_center: '下载中心',
       loading: '加载中…',
       hero_title_int: 'SCI / SSCI 国际期刊检索',
@@ -150,7 +150,7 @@
       nav_terms: 'Terms', nav_privacy: 'Privacy', nav_refund: 'Refund',
       nav_index_rank: 'Index Rankings', nav_subject_rank: 'Subject Rankings', nav_warn_rank: 'Warning List', nav_extension_beta: 'Extension beta', nav_subscription: 'Subscribe',
       filter_if_range: 'Impact Factor', if_any: 'Any',
-      rail_int: 'Global', rail_dom: 'China', rail_region: 'Regions', rail_in: 'India', rail_my: 'Malaysia', rail_kr: 'Korea', rail_rank: 'Rankings', rail_fav: 'Saved', rail_me: 'Me',
+      rail_int: 'Global', rail_dom: 'China', rail_region: 'Regions', rail_in: 'India', rail_my: 'Malaysia', rail_kr: 'Korea', rail_pbn: 'Poland', rail_isc: 'ISC', rail_scielo: 'SciELO', rail_rank: 'Rankings', rail_fav: 'Saved', rail_me: 'Me',
       download_center: 'Downloads',
       loading: 'Loading…',
       hero_title_int: 'International SCI / SSCI Search',
@@ -1115,8 +1115,8 @@
   let malaysiaPromise = null;
   let korea = null;
   let koreaPromise = null;
-  let regionalIndexes = null;
-  let regionalIndexesPromise = null;
+  const regionalDirectoryCache = Object.create(null);
+  const regionalDirectoryPromises = Object.create(null);
   let esiCats = [];
   let meta = null;
   let journalsReady = false;
@@ -1252,15 +1252,14 @@
     return koreaPromise;
   }
 
-  function loadRegionalIndexes() {
-    if (regionalIndexes) return Promise.resolve(regionalIndexes);
-    if (!regionalIndexesPromise) {
-      regionalIndexesPromise = fetch('/data/regional_indexes.json')
-        .then(r => r.ok ? r.json() : null)
-        .then(data => (regionalIndexes = data))
+  function loadRegionalDirectory(source) {
+    if (regionalDirectoryCache[source]) return Promise.resolve(regionalDirectoryCache[source]);
+    if (!regionalDirectoryPromises[source]) {
+      regionalDirectoryPromises[source] = fetchJSON(`/data/regional/${source}.json.gz`)
+        .then(data => (regionalDirectoryCache[source] = data))
         .catch(() => null);
     }
-    return regionalIndexesPromise;
+    return regionalDirectoryPromises[source];
   }
 
   function lookupOA(r) {
@@ -1590,8 +1589,8 @@
 
   let activeTab = 'home';
   let homeMode = 'search';
-  const TAB_PATHS = { home: '/', int: '/global', dom: '/cn', in: '/in', my: '/my', kr: '/kr', regions: '/regions', fav: '/favorites', me: '/account', rank: '/rankings/', pick: '/pick' };
-  const PATH_TABS = { '/': 'home', '/en': 'home', '/zh': 'home', '/global': 'int', '/international': 'int', '/journals': 'int', '/cn': 'dom', '/china': 'dom', '/in': 'in', '/india': 'in', '/my': 'my', '/malaysia': 'my', '/kr': 'kr', '/korea': 'kr', '/regions': 'regions', '/favorites': 'fav', '/account': 'me', '/me': 'me', '/profile': 'me', '/rankings': 'rank', '/pick': 'pick' };
+  const TAB_PATHS = { home: '/', int: '/global', dom: '/cn', in: '/in', my: '/my', kr: '/kr', pbn: '/pbn', isc: '/isc', scielo: '/scielo', fav: '/favorites', me: '/account', rank: '/rankings/', pick: '/pick' };
+  const PATH_TABS = { '/': 'home', '/en': 'home', '/zh': 'home', '/global': 'int', '/international': 'int', '/journals': 'int', '/cn': 'dom', '/china': 'dom', '/in': 'in', '/india': 'in', '/my': 'my', '/malaysia': 'my', '/kr': 'kr', '/korea': 'kr', '/pbn': 'pbn', '/poland': 'pbn', '/isc': 'isc', '/scielo': 'scielo', '/favorites': 'fav', '/account': 'me', '/me': 'me', '/profile': 'me', '/rankings': 'rank', '/pick': 'pick' };
   const TAB_SEO = {
     home: {
       title: 'AILatest Journal - Journal Finder, Rankings & Impact Factors',
@@ -1625,9 +1624,17 @@
       title: 'Korea KCI Journal Directory & Impact Factors | AILatest Journal',
       desc: 'Search Korea Research Foundation KCI journals by title, publisher, ISSN, subject, accreditation status and KCI impact factor.'
     },
-    regions: {
-      title: 'Regional Journal Indexes | SciELO ARCI TCI CiNii TR Dizin - AILatest Journal',
-      desc: 'Official entry points and data status for regional and national scholarly indexes including SciELO, ARCI, TCI-HSS, CiNii Research, TR Dizin, ISC, PBN and RSCI.'
+    pbn: {
+      title: 'Poland PBN / POL-on Journal Directory | AILatest Journal',
+      desc: 'Search the official 2026 Polish PBN / POL-on journal directory by title, ISSN and ministry points.'
+    },
+    isc: {
+      title: 'ISC Master Journals List | AILatest Journal',
+      desc: 'Search the official ISC Master Journals List by journal title, ISSN, E-ISSN and ISC H-index.'
+    },
+    scielo: {
+      title: 'SciELO Journal Directory | AILatest Journal',
+      desc: 'Search the official SciELO network journal directory by title, ISSN and regional collection.'
     },
     fav: {
       title: '期刊收藏清单 | Journal Favorites - AILatest Journal',
@@ -2039,9 +2046,13 @@
       const v = t(k); if (v) el.setAttribute('aria-label', v);
     });
     const qEl = $('#q');
-    if (qEl) qEl.placeholder = activeTab === 'kr'
-      ? T('搜索：韩国期刊名 / 韩文刊名 / 出版社 / ISSN', 'Search: Korea journal / Korean title / publisher / ISSN')
-      : t(currentSearchPlaceholderKey());
+    if (qEl) {
+      if (activeTab === 'kr') qEl.placeholder = T('搜索：韩国期刊名 / 韩文刊名 / 出版社 / ISSN', 'Search: Korea journal / Korean title / publisher / ISSN');
+      else if (activeTab === 'in') qEl.placeholder = T('搜索：印度期刊名 / 出版社 / ISSN / 学科', 'Search: India journal / publisher / ISSN / subject');
+      else if (activeTab === 'my') qEl.placeholder = T('搜索：马来西亚期刊名 / 出版社 / ISSN', 'Search: Malaysia journal / publisher / ISSN');
+      else if (REGIONAL_DIRECTORY_CONFIG[activeTab]) qEl.placeholder = T('搜索：期刊名 / ISSN / 目录指标', 'Search: journal title / ISSN / directory metric');
+      else qEl.placeholder = t(currentSearchPlaceholderKey());
+    }
     updateSearchSubmitLabel();
     const langToggle = $('#lang-toggle');
     if (langToggle) langToggle.textContent = LANG_META[lang]?.label || '中文';
@@ -4551,14 +4562,14 @@
         `${T('印度 UGC-CARE 期刊目录','India UGC-CARE Journal Directory')} <span class="muted-cell">(${india.records.length.toLocaleString()})</span>`,
         T(`现行目录 ${Number(india.counts?.current_directory || 0).toLocaleString()} 条；Sciences 历史表 ${Number(india.counts?.science_archive || 0).toLocaleString()} 条已补齐并去重。`, `Current directory: ${Number(india.counts?.current_directory || 0).toLocaleString()}; the complete ${Number(india.counts?.science_archive || 0).toLocaleString()}-row Sciences archive is merged and deduplicated.`),
       )}
-      <div class="india-toolbar">
+      <div class="india-toolbar country-toolbar">
         <select id="india-subject-select" class="th-select">
           <option value="__all">${T('全部学科','All subjects')}</option>
           ${subjectOptions}
         </select>
         <span class="muted-cell">${T('显示','Showing')} ${visible.length.toLocaleString()} / ${total.toLocaleString()}</span>
       </div>
-      <div class="table-wrap"><table class="journals india-table"><thead><tr>
+      <div class="table-wrap"><table class="journals india-table country-journal-table" aria-label="${T('印度 UGC-CARE 期刊','India UGC-CARE journals')}"><thead><tr>
         <th style="width:36px" aria-label="Favorite"></th>
         <th>${T('期刊名称','Journal')}</th>
         <th>${T('出版社','Publisher')}</th>
@@ -4661,11 +4672,11 @@
       <div class="dom-source-tabs country-source-tabs" role="tablist" aria-label="Malaysia directory source">
         ${sourceButtons}
       </div>
-      <div class="india-toolbar">
+      <div class="india-toolbar country-toolbar">
         <span class="muted-cell">${T('显示','Showing')} ${visible.length.toLocaleString()} / ${total.toLocaleString()}</span>
         ${malaysia.official_pdf?.url ? `<a class="source-link" href="${escape(malaysia.official_pdf.url)}" target="_blank" rel="noopener nofollow">MyCite 2025 PDF</a>` : ''}
       </div>
-      <div class="table-wrap"><table class="journals malaysia-table"><thead><tr>
+      <div class="table-wrap"><table class="journals malaysia-table country-journal-table" aria-label="${T('马来西亚期刊','Malaysia journals')}"><thead><tr>
         <th style="width:36px" aria-label="Favorite"></th>
         <th>${T('期刊名称','Journal')}</th>
         <th>${sourceKey === 'era_2023' ? T('FoR 学科','FoR Subjects') : T('出版社','Publisher')}</th>
@@ -4781,7 +4792,7 @@
         `${T('韩国 KCI 期刊目录','Korea KCI Journal Directory')} <span class="muted-cell">(${Number(korea.counts?.records || korea.records.length).toLocaleString()})</span>`,
         T('韩国研究财团 KCI 官方期刊与引文指标数据。','Official KCI journal and citation indicators from the National Research Foundation of Korea.'),
       )}
-      <div class="india-toolbar korea-toolbar">
+      <div class="india-toolbar country-toolbar korea-toolbar">
         <select id="korea-subject-select" class="th-select" aria-label="${T('韩国期刊学科','Korea journal subject')}">
           <option value="__all">${T('全部学科','All subjects')}</option>${subjectOptions}
         </select>
@@ -4791,7 +4802,7 @@
         <span class="muted-cell">${T('显示','Showing')} ${visible.length.toLocaleString()} / ${filtered.length.toLocaleString()}</span>
         <a class="source-link" href="${escape(korea.source_pages?.kci_journals || 'https://www.data.go.kr/data/3049043/fileData.do')}" target="_blank" rel="noopener nofollow">${T('官方数据','Official data')}</a>
       </div>
-      <div class="table-wrap"><table class="journals korea-table"><thead><tr>
+      <div class="table-wrap"><table class="journals korea-table country-journal-table" aria-label="${T('韩国 KCI 期刊','Korea KCI journals')}"><thead><tr>
         <th style="width:36px" aria-label="Favorite"></th>
         <th>${T('期刊名称','Journal')}</th>
         <th>${T('出版社','Publisher')}</th>
@@ -4822,61 +4833,92 @@
     });
   }
 
-  function regionalKindLabel(kind) {
-    const labels = {
-      regional_citation_index: T('地区引文索引', 'Regional citation index'),
-      national_index: T('国家索引', 'National index'),
-      national_bibliography: T('国家科研书目', 'National research bibliography'),
-      national_library: T('国家图书馆入口', 'National library gateway'),
-      research_discovery: T('研究发现平台', 'Research discovery platform'),
-    };
-    return labels[kind] || T('地区数据源', 'Regional source');
-  }
+  const REGIONAL_DIRECTORY_CONFIG = {
+    pbn: {
+      title: ['波兰 PBN / POL-on 期刊目录', 'Poland PBN / POL-on Journal Directory'],
+      intro: ['波兰科学与高等教育部 PBN 官方年度期刊清单；本页直接使用 2026 年目录。', 'The official 2026 annual journal list published through Poland\'s PBN system.'],
+      badge: 'PBN / POL-on',
+      metric: row => row.points == null ? '' : `${T('部委分值', 'Ministry points')} ${row.points}`,
+    },
+    isc: {
+      title: ['ISC 期刊目录', 'ISC Master Journals List'],
+      intro: ['伊斯兰世界科学引文中心（ISC）官方 Master Journals List。', 'The official Master Journals List from the Islamic World Science Citation Center.'],
+      badge: 'ISC',
+      metric: row => row.h_index == null ? '' : `ISC H-index ${row.h_index}`,
+    },
+    scielo: {
+      title: ['SciELO 期刊目录', 'SciELO Journal Directory'],
+      intro: ['SciELO 官方网络期刊清单，保留各地区集合来源，不按全球库出版国家反推。', 'The official SciELO network list, retaining each collection source rather than inferring membership from the global database.'],
+      badge: 'SciELO',
+      metric: row => row.network ? row.network.replace(/^www\./, '') : '',
+    },
+  };
 
-  function regionalStatusLabel(status) {
-    const labels = {
-      official_directory: T('官方目录', 'Official directory'),
-      official_search: T('官方检索', 'Official search'),
-      official_info: T('官方介绍', 'Official information'),
-      source_review: T('数据源核验中', 'Source under review'),
-      historical_wos: T('历史 WoS 集成', 'Historical WoS integration'),
-    };
-    return labels[status] || status;
-  }
-
-  function renderRegions() {
-    const box = $('#regions-content');
-    if (!box) return;
-    if (!regionalIndexes) {
-      box.innerHTML = `<div class="empty">${T('正在加载地区索引…','Loading regional indexes…')}</div>`;
-      loadRegionalIndexes().then(data => {
-        if (data?.regions) renderRegions();
-        else box.innerHTML = `<div class="empty">${T('地区索引数据暂不可用','Regional index data is unavailable')}</div>`;
+  function renderRegionalDirectory(source) {
+    updateThStickyTop();
+    const config = REGIONAL_DIRECTORY_CONFIG[source];
+    const box = $(`#${source}-content`);
+    if (!config || !box) return;
+    const data = regionalDirectoryCache[source];
+    if (!data || !Array.isArray(data.records)) {
+      box.innerHTML = `<div class="empty">${T('正在加载官方目录…', 'Loading official directory…')}</div>`;
+      loadRegionalDirectory(source).then(result => {
+        if (activeTab !== source) return;
+        if (result && Array.isArray(result.records)) renderRegionalDirectory(source);
+        else box.innerHTML = `<div class="empty">${T('官方目录数据加载失败', 'Official directory data could not be loaded')}</div>`;
       });
       return;
     }
-    const cards = regionalIndexes.regions.map(item => `<article class="regional-index-card">
-      <div class="regional-index-card-head">
-        <span class="regional-code">${escape(item.code)}</span>
-        <span class="regional-status">${escape(regionalStatusLabel(item.status))}</span>
+    window.__regionalShown ||= Object.create(null);
+    window.__regionalShown[source] ||= 100;
+    const q = activeQuery.trim().toLowerCase();
+    const filtered = data.records.filter(row => {
+      if (!q) return true;
+      return [row.name, row.issn, row.eissn, row.network, row.points, row.h_index]
+        .filter(value => value !== undefined && value !== null)
+        .join(' ').toLowerCase().includes(q);
+    });
+    const shown = window.__regionalShown[source];
+    const visible = filtered.slice(0, shown);
+    const rows = visible.map(row => {
+      const rec = { ...row, name: row.name || row.global_name || '', __src: source };
+      const fid = favId(rec);
+      rowRecordsByFid[fid] = rec;
+      const identifiers = [row.issn ? `ISSN ${escape(row.issn)}` : '', row.eissn ? `eISSN ${escape(row.eissn)}` : ''].filter(Boolean).join('<br>');
+      const globalBadges = row.global_match
+        ? [renderCoverageBadges(rec), renderLevelBadges(rec)].filter(Boolean).join('')
+        : '';
+      const metric = config.metric(row);
+      return `<tr class="j-row clickable regional-directory-row" data-fid="${escape(fid)}" data-src="${escape(source)}">
+        <td class="col-fav">${starBtn(rec, source)}</td>
+        <td class="col-name"><div class="jname">${escape(rec.name)}</div></td>
+        <td class="regional-directory-meta">
+          <div class="badges"><span class="domsrc-pill regional-source-pill">${escape(config.badge)}</span>${globalBadges}</div>
+          ${metric ? `<strong>${escape(metric)}</strong>` : ''}
+        </td>
+        <td class="regional-directory-identifiers">${identifiers || '—'}</td>
+      </tr>`;
+    }).join('');
+    const sourceYear = data.directory_year ? ` · ${T('目录年份', 'Directory year')} ${escape(data.directory_year)}` : '';
+    box.innerHTML = `<div class="section-block regional-directory-section">
+      ${countrySectionHeader(
+        `${T(...config.title)} <span class="muted-cell">(${Number(data.record_count || data.records.length).toLocaleString()})</span>`,
+        T(...config.intro),
+      )}
+      <div class="india-toolbar country-toolbar">
+        <span class="muted-cell">${T('显示', 'Showing')} ${visible.length.toLocaleString()} / ${filtered.length.toLocaleString()}</span>
+        <a class="source-link" href="${escape(data.source_url)}" target="_blank" rel="noopener nofollow">${T('官方目录', 'Official directory')}</a>
       </div>
-      <h3>${escape(item.index)}</h3>
-      <p class="regional-name">${escape(lang === 'en' ? item.name_en : item.name_zh)}</p>
-      <p>${escape(lang === 'en' ? item.note_en : item.note_zh)}</p>
-      <div class="regional-index-card-foot">
-        <span>${escape(regionalKindLabel(item.kind))}</span>
-        <a href="${escape(item.url)}" target="_blank" rel="noopener nofollow">${T('打开官方站点','Open official site')} ↗</a>
-      </div>
-    </article>`).join('');
-    box.innerHTML = `<section class="regional-index-directory">
-      <header class="regional-index-intro">
-        <span class="eyebrow">${T('地区期刊数据源','Regional journal sources')}</span>
-        <h1>${T('按地区找到官方期刊索引','Official journal indexes by region')}</h1>
-        <p>${T('地区引文索引、国家科研书目和研究发现平台分开标注；只有获得可持续的 ISSN 清单后，才会并入本站期刊徽章。','Citation indexes, national bibliographies and discovery platforms are labelled separately. A source is merged into journal badges only when a sustainable ISSN list is available.')}</p>
-      </header>
-      <div class="regional-index-grid">${cards}</div>
-      <p class="source-note">${T('俄罗斯 RSCI 已于 2022 年 5 月从 Web of Science 平台移除，因此本站仅标为历史集成。','RSCI was removed from the Web of Science platform in May 2022 and is therefore labelled as a historical integration only.')}</p>
-    </section>`;
+      <div class="table-wrap"><table class="journals country-journal-table regional-directory-table" aria-label="${escape(T(...config.title))}"><thead><tr><th></th><th>${T('期刊名称', 'Journal')}</th><th>${T('目录信息', 'Directory information')}</th><th>ISSN / E-ISSN</th></tr></thead><tbody>
+        ${rows || `<tr><td colspan="4" class="empty">${T('未找到匹配期刊', 'No matching journals found')}</td></tr>`}
+      </tbody></table></div>
+      ${filtered.length > shown ? `<div class="pager"><button id="${source}-more" class="more-btn">${T('加载更多', 'Load more')} (${(filtered.length - shown).toLocaleString()} ${T('条剩余', 'remaining')})</button></div>` : ''}
+      <div class="source-note">${T('名单成员完全以该机构官方目录为准；全球库仅用于补充交叉收录徽章。', 'Membership follows this institution\'s official directory only; the global database is used solely for optional cross-index badges.')} ${sourceYear}</div>
+    </div>`;
+    $(`#${source}-more`)?.addEventListener('click', () => {
+      window.__regionalShown[source] += 100;
+      renderRegionalDirectory(source);
+    });
   }
 
   // ───────── domestic tab ─────────
@@ -6569,8 +6611,11 @@
     { id: 'in',  i18n: 'rail_in',  zh: '印度', en: 'India' },
     { id: 'my',  i18n: 'rail_my',  zh: '马来西亚', en: 'Malaysia' },
     { id: 'kr',  i18n: 'rail_kr',  zh: '韩国', en: 'Korea' },
+    { id: 'pbn', i18n: 'rail_pbn', zh: '波兰', en: 'Poland' },
+    { id: 'isc', i18n: 'rail_isc', zh: 'ISC', en: 'ISC' },
+    { id: 'scielo', i18n: 'rail_scielo', zh: 'SciELO', en: 'SciELO' },
   ];
-  const REGION_STATION_IDS = ['dom', 'in', 'my', 'kr'];
+  const REGION_STATION_IDS = ['dom', 'in', 'my', 'kr', 'pbn', 'isc', 'scielo'];
   const DEFAULT_PINNED_REGION_IDS = ['dom'];
   const PINNED_REGION_KEY = 'ailatest.pinnedRegionStations';
   const PINNED_REGION_MIGRATION_KEY = `${PINNED_REGION_KEY}.v2`;
@@ -6650,7 +6695,7 @@
     else if (activeTab === 'in') renderIndia();
     else if (activeTab === 'my') renderMalaysia();
     else if (activeTab === 'kr') renderKorea();
-    else if (activeTab === 'regions') renderRegions();
+    else if (REGIONAL_DIRECTORY_CONFIG[activeTab]) renderRegionalDirectory(activeTab);
     window.dispatchEvent(new CustomEvent('ailatest:langchange'));
     loadJournalViewTotalFootnote();
     if (_currentDrawerRec) {
@@ -7995,7 +8040,7 @@
           : activeTab === 'in' ? renderIndia()
           : activeTab === 'my' ? renderMalaysia()
           : activeTab === 'kr' ? renderKorea()
-          : activeTab === 'regions' ? renderRegions()
+          : REGIONAL_DIRECTORY_CONFIG[activeTab] ? renderRegionalDirectory(activeTab)
           : activeTab === 'updates' ? renderJournalUpdates()
           : null;
       }
@@ -8018,6 +8063,7 @@
       else if (activeTab === 'int') renderInt();
       else if (activeTab === 'fav') renderFav();
       else if (activeTab === 'dom') renderDomestic();
+      else if (REGIONAL_DIRECTORY_CONFIG[activeTab]) renderRegionalDirectory(activeTab);
       else if (activeTab === 'updates') renderJournalUpdates();
     });
     $('#search-submit')?.addEventListener('click', async () => {
@@ -8049,6 +8095,7 @@
       } else if (activeTab === 'int') { trackInteraction('journal_search', { tab: activeTab, query: activeQuery }); renderInt(); }
       else if (activeTab === 'fav') { trackInteraction('journal_search', { tab: activeTab, query: activeQuery }); renderFav(); }
       else if (activeTab === 'dom') { trackInteraction('journal_search', { tab: activeTab, query: activeQuery }); renderDomestic(); }
+      else if (REGIONAL_DIRECTORY_CONFIG[activeTab]) { trackInteraction('journal_search', { tab: activeTab, query: activeQuery }); renderRegionalDirectory(activeTab); }
       else if (activeTab === 'updates') { trackInteraction('journal_search', { tab: activeTab, query: activeUpdateQuery }); renderJournalUpdates(); }
     });
     $('#more').addEventListener('click', () => { shown += PAGE; renderInt(); });
@@ -9158,6 +9205,8 @@
           qEl.placeholder = T('搜索：印度期刊名 / 出版社 / ISSN / 学科', 'Search: India journal title / publisher / ISSN / subject');
         } else if (activeTab === 'kr') {
           qEl.placeholder = T('搜索韩国期刊', 'Search Korea journals');
+        } else if (REGIONAL_DIRECTORY_CONFIG[activeTab]) {
+          qEl.placeholder = T('搜索：期刊名 / ISSN / 目录指标', 'Search: journal title / ISSN / directory metric');
         } else {
           qEl.placeholder = t(activeTab === 'dom' ? 'search_dom' : 'search_int');
         }
@@ -9205,7 +9254,7 @@
       else if (activeTab === 'in') renderIndia();
       else if (activeTab === 'my') renderMalaysia();
       else if (activeTab === 'kr') renderKorea();
-      else if (activeTab === 'regions') renderRegions();
+      else if (REGIONAL_DIRECTORY_CONFIG[activeTab]) renderRegionalDirectory(activeTab);
       else if (activeTab === 'updates') renderJournalUpdates();
       else if (activeTab === 'pick') initPickTool();
       // Home tab: if there's an active query, show results
