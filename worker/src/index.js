@@ -1742,13 +1742,14 @@ function normalizeOpenAlexCountry(group) {
   return { code, name };
 }
 
-async function fetchOpenAlexCountryYear(sourceIssn, year) {
+async function fetchOpenAlexCountryYear(sourceIssn, year, apiKey = '') {
   const params = new URLSearchParams({
     filter: `primary_location.source.issn:${sourceIssn},from_publication_date:${year}-01-01,to_publication_date:${year}-12-31`,
     group_by: 'authorships.institutions.country_code',
     'per-page': '200',
     mailto: 'ailatest@ailatest.org',
   });
+  if (apiKey) params.set('api_key', apiKey);
   const resp = await fetch(`https://api.openalex.org/works?${params.toString()}`, {
     headers: { Accept: 'application/json', 'User-Agent': 'AILatest Journal country-output cache (mailto:ailatest@ailatest.org)' },
   });
@@ -1806,6 +1807,20 @@ async function routeOpenAlexCountryOutput(req, env) {
     .slice(-8);
   if (!issns.length || !years.length) return err('missing issn or years', 400);
 
+  const apiKey = cleanText(env.OPENALEX_API_KEY || '', 256);
+  if (!apiKey) {
+    return new Response(JSON.stringify({
+      ok: true,
+      years: [],
+      top: [],
+      source: 'openalex',
+      reason: 'api_key_required',
+    }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json', ...CORS, 'Cache-Control': 'public, max-age=600' },
+    });
+  }
+
   const cache = caches.default;
   const cacheKey = new Request(`https://cache.internal/openalex-country-output/v2?issn=${encodeURIComponent(issns.join(','))}&years=${encodeURIComponent(years.join(','))}`);
   const hit = debug ? null : await cache.match(cacheKey);
@@ -1816,7 +1831,7 @@ async function routeOpenAlexCountryOutput(req, env) {
   for (const sourceIssn of issns) {
     const rows = [];
     for (const year of years) {
-      const row = await fetchOpenAlexCountryYear(sourceIssn, year);
+      const row = await fetchOpenAlexCountryYear(sourceIssn, year, apiKey);
       rows.push(row);
       if (debug || row.skipped) attempts.push({ issn: sourceIssn, year, total: row.total, status: row.status || 200, skipped: !!row.skipped });
     }

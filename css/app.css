@@ -4656,6 +4656,29 @@ body.journal-route .country-output-head {
   min-width: 0;
 }
 
+body.journal-route .country-output-fallback {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  min-height: 132px;
+}
+
+body.journal-route .country-fallback-value {
+  color: var(--ink);
+  font-family: var(--display);
+  font-size: clamp(24px, 3vw, 38px);
+  font-weight: 820;
+  letter-spacing: -.035em;
+  line-height: 1;
+}
+
+body.journal-route .country-fallback-note {
+  max-width: 34em;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
 body.journal-route .country-select-wrap {
   display: inline-flex;
   align-items: center;

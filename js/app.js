@@ -1366,10 +1366,10 @@
       });
       try {
         const resp = await fetch(`${API_BASE}/openalex/country-output?${params.toString()}`, { cache: 'force-cache' });
-        if (!resp.ok) return null;
-        return normalizePayload(await resp.json());
+        if (!resp.ok) return { handled: false, payload: null };
+        return { handled: true, payload: normalizePayload(await resp.json()) };
       } catch (_) {
-        return null;
+        return { handled: false, payload: null };
       }
     };
     const fetchYear = async (sourceIssn, year) => {
@@ -1410,8 +1410,8 @@
       }
     };
     const promise = (async () => {
-      const apiPayload = await fetchFromApi();
-      if (apiPayload) return apiPayload;
+      const apiResult = await fetchFromApi();
+      if (apiResult.handled) return apiResult.payload;
       for (const sourceIssn of issns) {
         const rows = [];
         for (const year of years) rows.push(await fetchYear(sourceIssn, year));
@@ -1528,16 +1528,31 @@
     });
   }
 
+  function renderCountryOutputFallback(r) {
+    const country = String(r?.country || '').trim();
+    if (!country) {
+      return `<div class="country-output-fallback">
+        <div class="trend-title">${T('国家/地区信息','Country/Region')}</div>
+        <div class="country-fallback-note">${T('作者机构分布数据正在恢复。','Author-affiliation distribution is being restored.')}</div>
+      </div>`;
+    }
+    return `<div class="country-output-fallback">
+      <div><div class="trend-title">${T('期刊出版地区','Journal publication region')}</div><div class="trend-unit">${T('来自期刊基础资料','From journal metadata')}</div></div>
+      <div class="country-fallback-value">${escape(country)}</div>
+      <div class="country-fallback-note">${T('OpenAlex 作者机构占比暂不可用，恢复后将在此显示年度趋势。','OpenAlex author-affiliation shares are temporarily unavailable; yearly trends will return here automatically.')}</div>
+    </div>`;
+  }
+
   async function hydrateCountryOutputChart(root, r) {
     const box = root.querySelector('.country-output-card');
     if (!box) return;
     try {
       const payload = await fetchCountryOutputData(r);
       const html = renderCountryOutputChartData(payload);
-      box.innerHTML = html || `<div class="muted-cell country-empty">${T('暂无可用国家/地区发文比例数据。','No country/region output-share data available yet.')}</div>`;
+      box.innerHTML = html || renderCountryOutputFallback(r);
       bindCountryOutputSelect(box, payload);
     } catch (err) {
-      box.innerHTML = `<div class="muted-cell country-empty">${T('国家/地区发文比例暂时加载失败。','Country/region output shares failed to load for now.')}</div>`;
+      box.innerHTML = renderCountryOutputFallback(r);
     }
   }
 
