@@ -45133,8 +45133,9 @@
   <url><loc>https://journal.ailatest.org/indexes/medline/</loc><priority>0.7</priority></url>
   <url><loc>https://journal.ailatest.org/indexes/under-review/</loc><priority>0.7</priority></url>
   <url><loc>https://journal.ailatest.org/indexes/on-hold/</loc><priority>0.7</priority></url>
-  <url><loc>https://journal.ailatest.org/indexes/warning/</loc><priority>0.7</priority></url>
+  <url><loc>https://journal.ailatest.org/indexes/cas-warning/</loc><priority>0.7</priority></url>
   <url><loc>https://journal.ailatest.org/indexes/citic-warning/</loc><priority>0.7</priority></url>
+  <url><loc>https://journal.ailatest.org/indexes/warning/</loc><priority>0.7</priority></url>
   <url><loc>https://journal.ailatest.org/subjects/</loc><priority>0.7</priority></url>
   <url><loc>https://journal.ailatest.org/subjects/acoustics/</loc><priority>0.7</priority></url>
   <url><loc>https://journal.ailatest.org/subjects/agricultural-economics-policy/</loc><priority>0.7</priority></url>

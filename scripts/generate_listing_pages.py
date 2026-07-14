@@ -49,11 +49,16 @@ INDEXES = [
     ('ei', 'EI', 'EI Compendex indexed journals with Impact Factors, Quartiles, CAS rankings and publisher information.', ['EI'], 'index'),
     ('scopus', 'Scopus', 'Scopus indexed journals with Impact Factors, Quartiles, CAS rankings and publisher information.', None, 'index'),
     ('medline', 'MEDLINE', 'MEDLINE indexed journals from the National Library of Medicine with Impact Factors, Quartiles, CAS rankings and publisher information.', None, 'index'),
+]
+
+WARNING_LISTS = [
     ('under-review', '新锐 Under Review', '新锐版(Under Review)期刊 — 正在被 Web of Science 评审的期刊，含影响因子、分区、CAS 等级和索引信息。', None, 'status'),
     ('on-hold', 'WoS On Hold', 'Web of Science On Hold 期刊 — 因质量问题被 Clarivate 暂停收录评估的期刊，含影响因子、分区、CAS 等级和索引信息。', None, 'status'),
-    ('warning', '中科院预警', '中科院文献情报中心国际期刊预警名单 — 含影响因子、分区、CAS 等级和索引信息。', None, 'status'),
+    ('cas-warning', '中科院预警', '中科院文献情报中心国际期刊预警名单 — 含影响因子、分区、CAS 等级和索引信息。', None, 'status'),
     ('citic-warning', '中信所预警', '中信所(中国科学技术信息研究所)国际期刊预警名单(2025) — 含影响因子、分区、CAS 等级和索引信息。', None, 'status'),
 ]
+
+ALL_INDEX_PAGES = INDEXES + WARNING_LISTS
 
 # Historical broad ESI subject URLs kept as lightweight bridge pages so old
 # links do not fall back to stale templates.
@@ -234,7 +239,7 @@ def match_index(j, slug, index_keys):
     if slug == 'medline': return bool(j.get('medline'))
     if slug == 'under-review': return bool(j.get('under_review'))
     if slug == 'on-hold': return bool(j.get('on_hold'))
-    if slug == 'warning': return bool(j.get('warning'))
+    if slug == 'cas-warning': return bool(j.get('warning'))
     if slug == 'citic-warning': return bool(j.get('citic_warning'))
     return any(k in indices for k in index_keys)
 
@@ -309,14 +314,14 @@ def generate_subjects(journals, origin):
         print(f'  /subjects/{slug}/ → {len(top)}/{total} journals')
 
 def generate_indexes(journals, origin):
-    for slug, title, desc, index_keys, table_type in INDEXES:
+    for slug, title, desc, index_keys, table_type in ALL_INDEX_PAGES:
         if slug == 'citic-warning':
             matched = load_citic_warning_rows(journals)
         else:
             matched = [j for j in journals if match_index(j, slug, index_keys or [])]
         if table_type == 'status':
             # 状态列表：保持原始数据源顺序，不按 IF 排序
-            order_key = (lambda x: x.get('warning_order', 999999)) if slug == 'warning' \
+            order_key = (lambda x: x.get('warning_order', 999999)) if slug == 'cas-warning' \
                 else (lambda x: x.get('on_hold_order', 999999)) if slug == 'on-hold' \
                 else (lambda x: x.get('citic_warning_order', 999999)) if slug == 'citic-warning' \
                 else (lambda x: x.get('under_review_order', 999999))
@@ -336,7 +341,7 @@ def generate_indexes(journals, origin):
             def status_badge(j):
                 if slug == 'under-review': return '<span class="pill pill-under-review">新锐 Under Review</span>'
                 if slug == 'on-hold': return '<span class="pill pill-on-hold">WoS On Hold</span>'
-                if slug == 'warning':
+                if slug == 'cas-warning':
                     # 提取年份
                     w = j.get('warning')
                     years = set()
@@ -386,7 +391,9 @@ def generate_indexes(journals, origin):
         html = html.replace('__CANONICAL__', esc(canonical)).replace('__JSONLD__', jsonld_tag)
         html = html.replace('__ORIGIN__', origin)
         html = html.replace('__COUNT__', esc(count)).replace('__HEADERS__', th_html)
-        html = html.replace('__ROWS__', rows_html).replace('__BACK__', f'{origin}/indexes/').replace('__BACK_LABEL__', '索引排行榜')
+        back_path = f'{origin}/indexes/warning/' if table_type == 'status' else f'{origin}/indexes/'
+        back_label = '预警名单' if table_type == 'status' else '索引排行榜'
+        html = html.replace('__ROWS__', rows_html).replace('__BACK__', back_path).replace('__BACK_LABEL__', back_label)
         (ROOT / 'indexes' / slug).mkdir(parents=True, exist_ok=True)
         (ROOT / 'indexes' / slug / 'index.html').write_text(html, encoding='utf-8')
         print(f'  /indexes/{slug}/ → {len(top)} journals')
@@ -394,6 +401,7 @@ def generate_indexes(journals, origin):
 def generate_landing(origin):
     subjects = SUBJECTS
     indexes = INDEXES
+    warning_lists = WARNING_LISTS
 
     def shell(page_title, meta_desc, canonical, heading, sub, body_html, back_href=None, minimal=False):
         back = f'<p class="back-wrap"><a class="back" href="{back_href}">← 返回</a></p>' if back_href and not minimal else ''
@@ -454,12 +462,31 @@ location.replace('/');
         '按 SCIE、SSCI、EI、Scopus、MEDLINE 等索引浏览期刊榜单。',
         f'{origin}/indexes/',
         '索引排行榜',
-        '选择一个收录索引或风险名单，浏览对应期刊。',
+        '选择一个收录索引，浏览对应期刊。',
         f'<div class="card"><ul class="cat-list">{i_list}</ul></div>',
         f'{origin}/rankings/',
     )
     (ROOT / 'indexes' / 'index.html').write_text(i_html, encoding='utf-8')
     print('  /indexes/ (landing)')
+
+    # Warning landing: risk/status lists live together and stay out of the
+    # indexing directory, which is reserved for actual bibliographic indexes.
+    warning_list = '\n'.join(
+        f'<li><a href="{origin}/indexes/{s}/" class="cat-link"><strong>{esc(t)}</strong></a></li>'
+        for s, t, _, _, _ in warning_lists
+    )
+    warning_html = shell(
+        '预警名单 | AILatest Journal',
+        '集中浏览新锐 Under Review、WoS On Hold、中科院预警和中信所预警期刊名单。',
+        f'{origin}/indexes/warning/',
+        '预警名单',
+        '选择一种审查或预警状态，浏览对应期刊。',
+        f'<div class="card"><ul class="cat-list">{warning_list}</ul></div>',
+        f'{origin}/rankings/',
+    )
+    (ROOT / 'indexes' / 'warning').mkdir(parents=True, exist_ok=True)
+    (ROOT / 'indexes' / 'warning' / 'index.html').write_text(warning_html, encoding='utf-8')
+    print('  /indexes/warning/ (landing)')
 
     ranking_choices = f'''<div class="ranking-choice-grid">
   <a class="ranking-choice" href="{origin}/indexes/"><strong>索引排行榜</strong></a>
@@ -507,8 +534,9 @@ def update_sitemap(origin):
     new_urls = []
     new_urls.append(f'  <url><loc>{origin}/rankings/</loc><priority>0.7</priority></url>')
     new_urls.append(f'  <url><loc>{origin}/indexes/</loc><priority>0.7</priority></url>')
-    for slug, _, _, _, _ in INDEXES:
+    for slug, _, _, _, _ in ALL_INDEX_PAGES:
         new_urls.append(f'  <url><loc>{origin}/indexes/{slug}/</loc><priority>0.7</priority></url>')
+    new_urls.append(f'  <url><loc>{origin}/indexes/warning/</loc><priority>0.7</priority></url>')
     new_urls.append(f'  <url><loc>{origin}/subjects/</loc><priority>0.7</priority></url>')
     for slug, _, _, _ in SUBJECTS:
         new_urls.append(f'  <url><loc>{origin}/subjects/{slug}/</loc><priority>0.7</priority></url>')
