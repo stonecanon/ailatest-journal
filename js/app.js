@@ -10708,6 +10708,11 @@
     if (!wasOpen) panel.classList.add('open');
   };
 
+  const canonicalWordmark = document.querySelector('.topbar-brand');
+  if (canonicalWordmark && canonicalWordmark.parentElement !== document.body) {
+    document.body.appendChild(canonicalWordmark);
+  }
+
   loadJournalViewTotalFootnote();
   boot();
 })();
