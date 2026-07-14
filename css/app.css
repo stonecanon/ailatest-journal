@@ -2916,6 +2916,8 @@ table.journals tr:last-child td { border-bottom: 0; }
 .badge.b-free   { background: #2d8a4e; }               /* 绿 — 免费发表 */
 .badge.b-esi  { background: #5a5a7a; }               /* 紫灰 — ESI 大类 */
 .badge.b-scopus { background: #8a706a; }              /* 低饱和红褐 — 次要收录 */
+.badge.b-inspec { background: #395f78; }               /* IET engineering / physics index */
+.badge.b-fsta { background: #6d6342; }                 /* FSTA Full Text subset */
 .badge.b-oaj { background: #5a7a7a; }                 /* 低饱和青 — 次要收录 */
 .badge.b-doaj { background: #6a8a6a; }                /* 低饱和绿 — 次要收录 */
 .badge.b-nature-index { background: #3f3a2f; }
@@ -7442,6 +7444,39 @@ html:not([lang|="zh"]) .j-row .col-topic::before { content: "Subject · "; }
 .j-row .badges-idx .badge.b-scd { background: #4e6f52 !important; }
 .j-row .badges-idx .badge.b-pubmed,
 .j-row .badges-idx .badge.b-pmc { background: #285f7a !important; }
+.j-row .badges-idx .badge.b-inspec { background: #395f78 !important; }
+.j-row .badges-idx .badge.b-fsta { background: #6d6342 !important; }
+
+/* Regional source directory */
+.regional-index-directory {
+  width: min(1320px, calc(100% - 64px));
+  margin: 0 auto;
+  padding: 48px 0 72px;
+}
+.regional-index-intro { max-width: 820px; margin-bottom: 28px; }
+.regional-index-intro h1 { margin: 8px 0 12px; font-size: clamp(34px, 4vw, 58px); line-height: 1.04; letter-spacing: -.04em; }
+.regional-index-intro p { margin: 0; color: var(--muted); font-size: 17px; line-height: 1.7; }
+.regional-index-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.regional-index-card { min-width: 0; padding: 22px; border: 1px solid var(--line); border-radius: 16px; background: color-mix(in srgb, var(--paper) 94%, transparent); }
+.regional-index-card-head, .regional-index-card-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.regional-code, .regional-status { font-size: 12px; font-weight: 800; letter-spacing: .05em; }
+.regional-code { color: var(--accent); }
+.regional-status { padding: 5px 8px; border-radius: 999px; color: var(--muted); background: var(--soft); }
+.regional-index-card h3 { margin: 24px 0 3px; font-size: 25px; letter-spacing: -.025em; }
+.regional-index-card .regional-name { margin: 0 0 14px; color: var(--ink); font-weight: 700; }
+.regional-index-card > p:not(.regional-name) { min-height: 72px; margin: 0 0 20px; color: var(--muted); line-height: 1.55; }
+.regional-index-card-foot { padding-top: 14px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); }
+.regional-index-card-foot a { color: var(--ink); font-weight: 750; text-decoration: none; }
+.rail-region-directory { border-top: 1px solid var(--line); }
+@media (max-width: 960px) {
+  .regional-index-directory { width: min(100% - 32px, 760px); padding-top: 32px; }
+  .regional-index-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 620px) {
+  .regional-index-directory { width: min(100% - 24px, 560px); }
+  .regional-index-grid { grid-template-columns: 1fr; }
+  .regional-index-card > p:not(.regional-name) { min-height: 0; }
+}
 /* 分区：统一暖棕，TOP/Q1 深一档 */
 .j-row .badges-rank .zone,
 .j-row .badges-rank .xr-pill,

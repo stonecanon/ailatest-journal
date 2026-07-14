@@ -1115,6 +1115,8 @@
   let malaysiaPromise = null;
   let korea = null;
   let koreaPromise = null;
+  let regionalIndexes = null;
+  let regionalIndexesPromise = null;
   let esiCats = [];
   let meta = null;
   let journalsReady = false;
@@ -1248,6 +1250,17 @@
         .catch(() => null);
     }
     return koreaPromise;
+  }
+
+  function loadRegionalIndexes() {
+    if (regionalIndexes) return Promise.resolve(regionalIndexes);
+    if (!regionalIndexesPromise) {
+      regionalIndexesPromise = fetch('/data/regional_indexes.json')
+        .then(r => r.ok ? r.json() : null)
+        .then(data => (regionalIndexes = data))
+        .catch(() => null);
+    }
+    return regionalIndexesPromise;
   }
 
   function lookupOA(r) {
@@ -1577,8 +1590,8 @@
 
   let activeTab = 'home';
   let homeMode = 'search';
-  const TAB_PATHS = { home: '/', int: '/global', dom: '/cn', in: '/in', my: '/my', kr: '/kr', fav: '/favorites', me: '/account', rank: '/rankings/', pick: '/pick' };
-  const PATH_TABS = { '/': 'home', '/en': 'home', '/zh': 'home', '/global': 'int', '/international': 'int', '/journals': 'int', '/cn': 'dom', '/china': 'dom', '/in': 'in', '/india': 'in', '/my': 'my', '/malaysia': 'my', '/kr': 'kr', '/korea': 'kr', '/favorites': 'fav', '/account': 'me', '/me': 'me', '/profile': 'me', '/rankings': 'rank', '/pick': 'pick' };
+  const TAB_PATHS = { home: '/', int: '/global', dom: '/cn', in: '/in', my: '/my', kr: '/kr', regions: '/regions', fav: '/favorites', me: '/account', rank: '/rankings/', pick: '/pick' };
+  const PATH_TABS = { '/': 'home', '/en': 'home', '/zh': 'home', '/global': 'int', '/international': 'int', '/journals': 'int', '/cn': 'dom', '/china': 'dom', '/in': 'in', '/india': 'in', '/my': 'my', '/malaysia': 'my', '/kr': 'kr', '/korea': 'kr', '/regions': 'regions', '/favorites': 'fav', '/account': 'me', '/me': 'me', '/profile': 'me', '/rankings': 'rank', '/pick': 'pick' };
   const TAB_SEO = {
     home: {
       title: 'AILatest Journal - Journal Finder, Rankings & Impact Factors',
@@ -1611,6 +1624,10 @@
     kr: {
       title: 'Korea KCI Journal Directory & Impact Factors | AILatest Journal',
       desc: 'Search Korea Research Foundation KCI journals by title, publisher, ISSN, subject, accreditation status and KCI impact factor.'
+    },
+    regions: {
+      title: 'Regional Journal Indexes | SciELO ARCI TCI CiNii TR Dizin - AILatest Journal',
+      desc: 'Official entry points and data status for regional and national scholarly indexes including SciELO, ARCI, TCI-HSS, CiNii Research, TR Dizin, ISC, PBN and RSCI.'
     },
     fav: {
       title: '期刊收藏清单 | Journal Favorites - AILatest Journal',
@@ -2903,6 +2920,14 @@
     if (!sc || sc.active === false) return '';
     return `<span class="badge b-scopus" title="${T('Scopus 收录 (Source List Mar.2026)','Indexed by Scopus (Source List Mar.2026)')}">Scopus</span>`;
   }
+  function badgeInspec(inspec) {
+    if (!inspec) return '';
+    return `<span class="badge b-inspec" title="${T('Inspec 收录（IET 官方 Active Source List · 2026-04）','Indexed by Inspec (official IET Active Source List · Apr 2026)')}">Inspec</span>`;
+  }
+  function badgeFSTAFullText(value) {
+    if (!value) return '';
+    return `<span class="badge b-fsta" title="${T('EBSCO FSTA with Full Text 全文覆盖；这是 FSTA 全库的子集','Full-text coverage in EBSCO FSTA with Full Text; this is a subset of the complete FSTA database')}">FSTA FT</span>`;
+  }
   function badgeOAJ(oaj) {
     if (!oaj) return '';
     const tip = oaj.partition ? `OAJ ${oaj.partition}` : 'OAJ 收录';
@@ -3222,6 +3247,8 @@
       r.nature_index ? badgeNatureIndex() : '',
       ...((r.indices) || []).map(badgeIndex),
       badgeScopus(r.scopus),
+      badgeInspec(r.inspec),
+      badgeFSTAFullText(r.fsta_full_text),
       badgeOAJ(r.oaj),
       badgeDOAJ(r.doaj),
       badgeMEDLINE(r.medline),
@@ -3261,6 +3288,8 @@
       r.nature_index ? badgeNatureIndex() : '',
       ...((r.indices) || []).map(badgeIndex),
       badgeScopus(r.scopus),
+      badgeInspec(r.inspec),
+      badgeFSTAFullText(r.fsta_full_text),
       badgeMEDLINE(r.medline),
       badgePubMed(r.pubmed),
       badgePMC(r.pmc),
@@ -4791,6 +4820,63 @@
       window.__koreaShown += 100;
       renderKorea();
     });
+  }
+
+  function regionalKindLabel(kind) {
+    const labels = {
+      regional_citation_index: T('地区引文索引', 'Regional citation index'),
+      national_index: T('国家索引', 'National index'),
+      national_bibliography: T('国家科研书目', 'National research bibliography'),
+      national_library: T('国家图书馆入口', 'National library gateway'),
+      research_discovery: T('研究发现平台', 'Research discovery platform'),
+    };
+    return labels[kind] || T('地区数据源', 'Regional source');
+  }
+
+  function regionalStatusLabel(status) {
+    const labels = {
+      official_directory: T('官方目录', 'Official directory'),
+      official_search: T('官方检索', 'Official search'),
+      official_info: T('官方介绍', 'Official information'),
+      source_review: T('数据源核验中', 'Source under review'),
+      historical_wos: T('历史 WoS 集成', 'Historical WoS integration'),
+    };
+    return labels[status] || status;
+  }
+
+  function renderRegions() {
+    const box = $('#regions-content');
+    if (!box) return;
+    if (!regionalIndexes) {
+      box.innerHTML = `<div class="empty">${T('正在加载地区索引…','Loading regional indexes…')}</div>`;
+      loadRegionalIndexes().then(data => {
+        if (data?.regions) renderRegions();
+        else box.innerHTML = `<div class="empty">${T('地区索引数据暂不可用','Regional index data is unavailable')}</div>`;
+      });
+      return;
+    }
+    const cards = regionalIndexes.regions.map(item => `<article class="regional-index-card">
+      <div class="regional-index-card-head">
+        <span class="regional-code">${escape(item.code)}</span>
+        <span class="regional-status">${escape(regionalStatusLabel(item.status))}</span>
+      </div>
+      <h3>${escape(item.index)}</h3>
+      <p class="regional-name">${escape(lang === 'en' ? item.name_en : item.name_zh)}</p>
+      <p>${escape(lang === 'en' ? item.note_en : item.note_zh)}</p>
+      <div class="regional-index-card-foot">
+        <span>${escape(regionalKindLabel(item.kind))}</span>
+        <a href="${escape(item.url)}" target="_blank" rel="noopener nofollow">${T('打开官方站点','Open official site')} ↗</a>
+      </div>
+    </article>`).join('');
+    box.innerHTML = `<section class="regional-index-directory">
+      <header class="regional-index-intro">
+        <span class="eyebrow">${T('地区期刊数据源','Regional journal sources')}</span>
+        <h1>${T('按地区找到官方期刊索引','Official journal indexes by region')}</h1>
+        <p>${T('地区引文索引、国家科研书目和研究发现平台分开标注；只有获得可持续的 ISSN 清单后，才会并入本站期刊徽章。','Citation indexes, national bibliographies and discovery platforms are labelled separately. A source is merged into journal badges only when a sustainable ISSN list is available.')}</p>
+      </header>
+      <div class="regional-index-grid">${cards}</div>
+      <p class="source-note">${T('俄罗斯 RSCI 已于 2022 年 5 月从 Web of Science 平台移除，因此本站仅标为历史集成。','RSCI was removed from the Web of Science platform in May 2022 and is therefore labelled as a historical integration only.')}</p>
+    </section>`;
   }
 
   // ───────── domestic tab ─────────
@@ -6564,6 +6650,7 @@
     else if (activeTab === 'in') renderIndia();
     else if (activeTab === 'my') renderMalaysia();
     else if (activeTab === 'kr') renderKorea();
+    else if (activeTab === 'regions') renderRegions();
     window.dispatchEvent(new CustomEvent('ailatest:langchange'));
     loadJournalViewTotalFootnote();
     if (_currentDrawerRec) {
@@ -7908,6 +7995,7 @@
           : activeTab === 'in' ? renderIndia()
           : activeTab === 'my' ? renderMalaysia()
           : activeTab === 'kr' ? renderKorea()
+          : activeTab === 'regions' ? renderRegions()
           : activeTab === 'updates' ? renderJournalUpdates()
           : null;
       }
@@ -9117,6 +9205,7 @@
       else if (activeTab === 'in') renderIndia();
       else if (activeTab === 'my') renderMalaysia();
       else if (activeTab === 'kr') renderKorea();
+      else if (activeTab === 'regions') renderRegions();
       else if (activeTab === 'updates') renderJournalUpdates();
       else if (activeTab === 'pick') initPickTool();
       // Home tab: if there's an active query, show results

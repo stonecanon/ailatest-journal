@@ -100,6 +100,8 @@ function buildDisplayBadges(journal) {
   const j = journal || {};
   const out = [];
   const indices = Array.isArray(j.indices) ? j.indices : [];
+  if (j.inspec) addBadge(out, 'index', 'Inspec', 'inspec', 'Inspec active source list · April 2026');
+  if (j.fsta_full_text) addBadge(out, 'index', 'FSTA FT', 'fsta', 'FSTA with Full Text coverage (subset of FSTA)');
   for (const idx of indices.slice(0, 5)) addBadge(out, 'index', idx, 'index', '收录索引');
   if (j.scopus && !indices.map(String).some((x) => x.toLowerCase() === 'scopus')) addBadge(out, 'index', 'Scopus', 'index', 'Scopus 收录');
   if (j.cstpcd) addBadge(out, 'index', '中国科技核心', 'cstpcd', '中国科技核心期刊目录');
