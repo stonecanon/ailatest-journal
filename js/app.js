@@ -4479,7 +4479,7 @@
     let filtered = india.records.filter(r => {
       if (activeIndiaSubject !== '__all' && r.subject !== activeIndiaSubject) return false;
       if (!q) return true;
-      const hay = [r.journal_title, r.publisher, r.issn, r.eissn, r.subject].filter(Boolean).join(' ').toLowerCase();
+      const hay = [r.journal_title, r.publisher, r.issn, r.eissn, r.subject, r.ugc_care_coverage_year, r.details].filter(Boolean).join(' ').toLowerCase();
       return hay.includes(q);
     });
     filtered.sort((a, b) => (a.journal_title || '').localeCompare(b.journal_title || '', 'en'));
@@ -4490,11 +4490,14 @@
       const fid = favId(rec);
       rowRecordsByFid[fid] = rec;
       const issnCell = [r.issn && r.issn !== 'NA' ? `ISSN ${escape(r.issn)}` : '', r.eissn && r.eissn !== 'NA' ? `eISSN ${escape(r.eissn)}` : ''].filter(Boolean).join('<br>');
+      const historical = r.list_status === 'historical';
+      const sourceLabel = historical ? T('UGC-CARE · 历史', 'UGC-CARE · Historical') : 'UGC-CARE';
+      const sourceDetail = [r.ugc_care_coverage_year, r.details].filter(Boolean).join(' · ');
       return `<tr class="j-row clickable india-row" data-fid="${escape(fid)}" data-src="in">
         <td class="col-fav" style="width:36px">${starBtn(rec, 'in')}</td>
         <td class="col-name"><div class="jname">${escape(titleCase(r.journal_title || ''))}</div></td>
         <td class="muted-cell">${escape(r.publisher || '—')}</td>
-        <td><span class="domsrc-pill ds-india">UGC-CARE</span></td>
+        <td><span class="domsrc-pill ds-india"${sourceDetail ? ` title="${escape(sourceDetail)}"` : ''}>${sourceLabel}</span></td>
         <td class="muted-cell">${escape(r.subject || '—')}</td>
         <td class="muted-cell" style="width:130px">${issnCell || '—'}</td>
       </tr>`;
@@ -4502,7 +4505,7 @@
     box.innerHTML = `<div class="section-block india-section">
       ${countrySectionHeader(
         `${T('印度 UGC-CARE 期刊目录','India UGC-CARE Journal Directory')} <span class="muted-cell">(${india.records.length.toLocaleString()})</span>`,
-        T('印度国家级 UGC-CARE Group I 正表；本页不展示 cloned / fake journal warning list。','India national UGC-CARE Group I positive list; cloned / fake journal warning lists are not shown.'),
+        T(`现行目录 ${Number(india.counts?.current_directory || 0).toLocaleString()} 条；Sciences 历史表 ${Number(india.counts?.science_archive || 0).toLocaleString()} 条已补齐并去重。`, `Current directory: ${Number(india.counts?.current_directory || 0).toLocaleString()}; the complete ${Number(india.counts?.science_archive || 0).toLocaleString()}-row Sciences archive is merged and deduplicated.`),
       )}
       <div class="india-toolbar">
         <select id="india-subject-select" class="th-select">

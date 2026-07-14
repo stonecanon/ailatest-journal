@@ -270,6 +270,17 @@ a:hover { text-decoration: underline; }
   font: 850 13px/1 var(--sans);
   letter-spacing: 0;
 }
+.app-rail .rail-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(117, 111, 104, .12);
+  color: var(--ink-faint);
+  font: 800 12px/1 var(--sans);
+}
 .app-rail .rail-region-picker {
   position: relative;
   display: inline-flex;

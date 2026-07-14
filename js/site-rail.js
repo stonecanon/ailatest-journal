@@ -10,6 +10,44 @@
     { id: 'kr', label: '韩国', code: 'KR', href: '/kr' },
   ];
 
+  function canonicalRailMarkup() {
+    const path = location.pathname.replace(/\/+$/, '') || '/';
+    const active = (href) => {
+      const target = href.replace(/\/+$/, '') || '/';
+      return path === target || (target.endsWith('.html') && path === target.slice(0, -5));
+    };
+    const current = (href) => active(href) ? ' active' : '';
+    const ariaCurrent = (href) => active(href) ? ' aria-current="page"' : '';
+    return `
+      <nav class="rail-top" aria-label="${'\u7ad9\u70b9'}">
+        <a class="rail-nav-btn" href="/global" aria-label="${'\u5168\u7403\u671f\u520a'}" title="${'\u5168\u7403\u671f\u520a'}">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 3.4 9A14 14 0 0 1 12 21a14 14 0 0 1-3.4-9A14 14 0 0 1 12 3Z"/></svg>
+          <span data-static-i18n="rail_global">${'\u5168\u7403'}</span>
+        </a>
+        <a class="rail-nav-btn rail-region-station" data-region-station="dom" href="/cn" aria-label="${'\u4e2d\u56fd\u671f\u520a'}" title="${'\u4e2d\u56fd\u671f\u520a'}"><span class="rail-flag" aria-hidden="true">CN</span><span data-static-i18n="rail_china">${'\u4e2d\u56fd'}</span></a>
+        <a class="rail-nav-btn rail-region-station" data-region-station="in" href="/in" aria-label="${'\u5370\u5ea6\u671f\u520a'}" title="${'\u5370\u5ea6\u671f\u520a'}" hidden><span class="rail-flag" aria-hidden="true">IN</span><span data-static-i18n="rail_india">${'\u5370\u5ea6'}</span></a>
+        <a class="rail-nav-btn rail-region-station" data-region-station="my" href="/my" aria-label="${'\u9a6c\u6765\u897f\u4e9a\u671f\u520a'}" title="${'\u9a6c\u6765\u897f\u4e9a\u671f\u520a'}" hidden><span class="rail-flag" aria-hidden="true">MY</span><span data-static-i18n="rail_malaysia">${'\u9a6c\u6765\u897f\u4e9a'}</span></a>
+        <a class="rail-nav-btn rail-region-station" data-region-station="kr" href="/kr" aria-label="${'\u97e9\u56fd\u671f\u520a'}" title="${'\u97e9\u56fd\u671f\u520a'}" hidden><span class="rail-flag" aria-hidden="true">KR</span><span data-static-i18n="rail_korea">${'\u97e9\u56fd'}</span></a>
+        <div class="rail-region-picker">
+          <button class="rail-nav-btn rail-region-toggle" type="button" aria-label="${'\u5730\u533a\u7ad9\u70b9'}" title="${'\u5730\u533a\u7ad9\u70b9'}" aria-expanded="false"><span class="rail-flag rail-region-symbol" aria-hidden="true">\u00b7\u00b7\u00b7</span><span><span data-static-i18n="rail_regions">${'\u5730\u533a'}</span><b class="rail-caret" aria-hidden="true">\u25be</b></span></button>
+          <div class="rail-region-menu" aria-label="${'\u5730\u533a\u7ad9\u70b9'}"></div>
+        </div>
+      </nav>
+      <div class="rail-bottom" aria-label="${'\u8d26\u6237\u4e0e\u5de5\u5177'}">
+        <a class="rail-nav-btn${current('/extension.html')}" id="download-center-rail-link" href="/extension.html"${ariaCurrent('/extension.html')} aria-label="${'\u4e0b\u8f7d\u4e2d\u5fc3'}" title="${'\u4e0b\u8f7d\u4e2d\u5fc3'}"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 20h14"/></svg><span>${'\u4e0b\u8f7d'}</span></a>
+        <a class="rail-nav-btn${current('/rankings')}" id="rankings-btn" href="/rankings/"${ariaCurrent('/rankings')} aria-label="${'\u699c\u5355'}" title="${'\u699c\u5355'}"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 21V11"/><path d="M12 21V7"/><path d="M16 21V3"/><path d="M4 21h16"/></svg><span data-static-i18n="rail_rankings">${'\u699c\u5355'}</span></a>
+        <a class="rail-nav-btn${current('/favorites')}" id="fav-header-btn" href="/favorites"${ariaCurrent('/favorites')} aria-label="${'\u6211\u7684\u6536\u85cf'}" title="${'\u6211\u7684\u6536\u85cf'}"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.7l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3.7z"/></svg><span data-static-i18n="rail_saved">${'\u6536\u85cf'}</span></a>
+        <a class="rail-nav-btn${current('/account')}" id="account-credit-badge" href="/account"${ariaCurrent('/account')} aria-label="${'\u6211\u7684'}" title="${'\u6211\u7684'}"><span class="rail-avatar" aria-hidden="true">${'\u6211'}</span><span data-static-i18n="rail_account">${'\u6211\u7684'}</span></a>
+      </div>`;
+  }
+
+  function upgradeLegacyRail() {
+    const rail = document.querySelector('.site-rail');
+    if (!rail) return;
+    rail.className = 'app-rail';
+    rail.innerHTML = canonicalRailMarkup();
+  }
+
   function readPinned() {
     try {
       const raw = localStorage.getItem(KEY);
@@ -150,6 +188,7 @@
   }
 
   function bind() {
+    upgradeLegacyRail();
     const parts = railParts();
     if (!parts) return;
     const menu = parts.rail.querySelector(`.${parts.menuClass}`);
