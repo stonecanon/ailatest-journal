@@ -4737,11 +4737,13 @@
       return `<tr class="j-row clickable korea-row" data-fid="${escape(fid)}" data-src="kr">
         <td class="col-fav" style="width:36px">${starBtn(rec, 'kr')}</td>
         <td class="col-name"><div class="jname">${escape(titleCase(rec.name || ''))}${r.journal_title_ko && r.journal_title_ko !== rec.name ? `<span class="jname-cn">${escape(r.journal_title_ko)}</span>` : ''}</div></td>
-        <td class="muted-cell">${escape(r.publisher || r.publisher_ko || '—')}</td>
-        <td><div class="badges"><span class="domsrc-pill ds-korea">${escape(koreaStatusLabel(r.status))}</span>${globalBadges}</div></td>
-        <td class="muted-cell">${escape(koreaSubjectLabel(r.subject_group))}${r.subject && r.subject !== r.subject_group ? `<br><span class="muted-cell">${escape(r.subject)}</span>` : ''}</td>
-        <td class="if-cell">${escape(ifValue)}</td>
-        <td class="muted-cell" style="width:150px">${issnCell || '—'}</td>
+        <td class="muted-cell korea-publisher">${escape(r.publisher || r.publisher_ko || '—')}</td>
+        <td class="korea-summary">
+          <div class="korea-status-block"><div class="badges"><span class="domsrc-pill ds-korea">${escape(koreaStatusLabel(r.status))}</span>${globalBadges}</div></div>
+          <div class="korea-subject"><strong>${escape(koreaSubjectLabel(r.subject_group))}</strong>${r.subject && r.subject !== r.subject_group ? `<span>${escape(r.subject)}</span>` : ''}</div>
+          <div class="korea-metric"><span>KCI IF · 2y</span><strong>${escape(ifValue)}</strong></div>
+          <div class="korea-identifiers">${issnCell || '—'}</div>
+        </td>
       </tr>`;
     }).join('');
     const sourceDate = korea.source_updated || '2025-08-25';
