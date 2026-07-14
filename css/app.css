@@ -227,6 +227,9 @@ body.share-mode .app-rail { display: none !important; }
 .rail-region-picker.open .rail-region-menu {
   display: grid;
 }
+.rail-region-menu.portal-open {
+  display: grid;
+}
 .rail-region-option.rail-nav-btn {
   width: 100%;
   min-height: 38px;
@@ -7438,12 +7441,18 @@ body.journal-route .lang-toggle-wrap { display: none; }
     position: fixed;
     left: 10px;
     right: 10px;
-    bottom: calc(70px + env(safe-area-inset-bottom));
+    bottom: calc(74px + env(safe-area-inset-bottom));
     top: auto;
     width: auto;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    max-width: calc(100vw - 20px);
+    max-height: calc(100dvh - 96px - env(safe-area-inset-bottom));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     padding: 10px;
     border-radius: 16px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    pointer-events: auto;
+    overscroll-behavior: contain;
   }
   .rail-region-option.rail-nav-btn {
     min-width: 0;
@@ -7581,70 +7590,6 @@ body.journal-route .lang-toggle-wrap { display: none; }
   width: 18px; height: 18px; border-radius: 50%; background: #fff; border: 2px solid var(--accent); box-shadow: 0 1px 5px rgba(60,40,20,.28); cursor: pointer;
 }
 .if-slider-ticks { display: flex; justify-content: space-between; font-size: 9px; color: var(--ink-faint); margin-top: 2px; font-variant-numeric: tabular-nums; }
-
-/* ── customizable stations (settings inside 我的) ── */
-.station-settings {
-  margin: 0 0 16px; border: 1px solid var(--rule); border-radius: 12px;
-  background: var(--bg2); overflow: hidden;
-}
-.station-settings-head {
-  cursor: pointer; padding: 12px 14px; font-weight: 700; color: var(--ink);
-  font-size: 14px; list-style: none; display: flex; align-items: baseline; gap: 8px;
-}
-.station-settings-head::-webkit-details-marker { display: none; }
-.station-settings-head::before {
-  content: "";
-  width: 8px; height: 8px; border-radius: 50%;
-  background: var(--accent);
-  box-shadow: 0 0 0 4px rgba(145, 107, 70, .12);
-  flex: 0 0 auto;
-}
-.station-settings-head small { font-weight: 400; color: var(--ink-faint); font-size: 12px; }
-.station-settings[open] .station-settings-head { border-bottom: 1px solid var(--rule-soft); }
-.my-settings-block {
-  padding: 12px 14px;
-  display: grid;
-  grid-template-columns: 120px minmax(0, 1fr);
-  gap: 10px;
-  align-items: start;
-}
-.my-settings-block + .my-settings-block { border-top: 1px solid var(--rule-soft); }
-.my-settings-label {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--ink-faint);
-  line-height: 30px;
-}
-.settings-chip-row,
-.station-opts { display: flex; flex-wrap: wrap; gap: 8px; }
-.settings-chip {
-  border: 1px solid var(--rule);
-  border-radius: 999px;
-  padding: 6px 13px;
-  font: 600 13px/1.3 var(--sans);
-  color: var(--ink-soft);
-  background: var(--paper);
-  cursor: pointer;
-  transition: background .15s, border-color .15s, color .15s;
-}
-.settings-chip:hover,
-.settings-chip.active {
-  background: var(--accent-soft, #f3ece0);
-  border-color: #cbbfa8;
-  color: var(--ink);
-}
-.station-opt {
-  display: inline-flex; align-items: center; gap: 7px; cursor: pointer;
-  border: 1px solid var(--rule); border-radius: 999px; padding: 6px 13px;
-  font-size: 13px; color: var(--ink-soft); background: var(--paper);
-  transition: background .15s, border-color .15s, color .15s; user-select: none;
-}
-.station-opt.on { background: var(--accent-soft, #f3ece0); border-color: #cbbfa8; color: var(--ink); font-weight: 600; }
-.station-opt input { accent-color: #8a6440; margin: 0; }
-@media (max-width: 680px) {
-  .my-settings-block { grid-template-columns: 1fr; gap: 6px; }
-  .my-settings-label { line-height: 1.3; }
-}
 
 /* ── fix: filter cards need spacing; 学科 card full rail width ── */
 .tab-panel[data-panel="int"] thead .col-badge { display: flex !important; flex-direction: column; align-items: stretch; gap: 14px; }

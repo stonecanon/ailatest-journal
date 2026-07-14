@@ -6467,7 +6467,6 @@
     { id: 'my',  i18n: 'rail_my',  zh: '马来西亚', en: 'Malaysia' },
     { id: 'kr',  i18n: 'rail_kr',  zh: '韩国', en: 'Korea' },
   ];
-  const STATION_IDS = STATIONS.map(s => s.id);
   const REGION_STATION_IDS = ['dom', 'in', 'my', 'kr'];
   const DEFAULT_PINNED_REGION_IDS = ['dom'];
   const PINNED_REGION_KEY = 'ailatest.pinnedRegionStations';
@@ -6508,27 +6507,6 @@
       btn.classList.toggle('active', on);
       btn.setAttribute('aria-pressed', on ? 'true' : 'false');
     });
-  }
-  function getEnabledStations() {
-    try {
-      const s = JSON.parse(localStorage.getItem('ailatest.stations') || 'null');
-      if (Array.isArray(s)) {
-        const valid = s.filter(id => STATION_IDS.includes(id));
-        if (valid.length) return valid;
-      }
-    } catch (e) {}
-    return STATION_IDS.slice();
-  }
-  function setEnabledStations(ids) {
-    let valid = ids.filter(id => STATION_IDS.includes(id));
-    if (!valid.length) valid = ['int'];
-    localStorage.setItem('ailatest.stations', JSON.stringify(valid));
-    applyStations();
-    // if current tab was just hidden, fall back to the first enabled station
-    if (STATION_IDS.includes(activeTab) && !valid.includes(activeTab)
-        && window.__activateJournalTab) {
-      window.__activateJournalTab(valid[0]);
-    }
   }
   function applyStations() {
     const pinned = getPinnedRegions();
@@ -6576,37 +6554,6 @@
     }
   }
   window.__setJournalLanguage = setUiLanguage;
-  function stationSettingsHtml() {
-    const enabled = getEnabledStations();
-    const items = STATIONS.map(s => {
-      const on = enabled.includes(s.id);
-      const label = t(s.i18n) || T(s.zh, s.en);
-      return `<label class="station-opt${on ? ' on' : ''}">
-        <input type="checkbox" data-station="${s.id}"${on ? ' checked' : ''}>
-        <span>${escape(label)}</span></label>`;
-    }).join('');
-    return `<details class="station-settings">
-      <summary class="station-settings-head">${T('我的设置','My settings')}<small>${T('底部导航站点','Bottom nav stations')}</small></summary>
-      <div class="my-settings-block">
-        <div class="my-settings-label">${T('底部导航站点','Bottom nav stations')}</div>
-        <div class="station-opts">${items}</div>
-      </div>
-    </details>`;
-  }
-  function attachStationSettingsHandlers(scope) {
-    (scope || document).querySelectorAll('.station-opts input[data-station]').forEach(cb => {
-      cb.addEventListener('change', () => {
-        const root = cb.closest('.station-opts');
-        const ids = [...root.querySelectorAll('input[data-station]:checked')].map(x => x.dataset.station);
-        setEnabledStations(ids);
-        cb.closest('.station-opt')?.classList.toggle('on', cb.checked);
-      });
-    });
-    (scope || document).querySelectorAll('[data-lang-choice]').forEach(btn => {
-      btn.addEventListener('click', () => setUiLanguage(btn.dataset.langChoice));
-    });
-  }
-
   function userDisplayName() {
     if (!user) return T('未登录用户', 'Guest');
     return user.name || user.login || user.email || T('我的账号', 'My account');
@@ -7014,7 +6961,6 @@
           <button type="button" class="me-stat-item" data-me-stat="searches"><strong>${localSearchCount()}</strong><span>${T('搜索记录','Searches')}</span></button>
           <button type="button" class="me-stat-item" data-me-stat="api"><strong>${localPluginCallCount()}</strong><span>${T('插件 / API 调用','Plugin / API calls')}</span></button>
         </div>
-        ${stationSettingsHtml()}
         <section class="me-card me-record-panel" data-me-record-panel hidden></section>
         <div class="me-grid">
           <section class="me-card">
@@ -7044,7 +6990,6 @@
         renderMe();
       }
     });
-    attachStationSettingsHandlers(box);
     box.querySelectorAll('[data-me-stat]').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const type = btn.dataset.meStat;
@@ -9194,7 +9139,10 @@
       const picker = document.querySelector('.rail-region-picker');
       const toggle = document.getElementById('region-toggle');
       if (!picker || !toggle) return;
+      const menu = picker.querySelector('.rail-region-menu');
       const close = () => {
+        if (menu?.parentElement === document.body) picker.appendChild(menu);
+        menu?.classList.remove('portal-open');
         picker.classList.remove('open');
         toggle.setAttribute('aria-expanded', 'false');
       };
@@ -9204,16 +9152,23 @@
         const open = !picker.classList.contains('open');
         picker.classList.toggle('open', open);
         toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (open && menu && window.matchMedia('(max-width: 900px)').matches) {
+          menu.classList.add('portal-open');
+          document.body.appendChild(menu);
+        } else if (!open) {
+          close();
+        }
       });
-      picker.querySelectorAll('[data-region-pin]').forEach(btn => {
+      menu?.querySelectorAll('[data-region-pin]').forEach(btn => {
         btn.addEventListener('click', (e) => {
           e.preventDefault();
           e.stopPropagation();
           togglePinnedRegion(btn.dataset.regionPin);
+          close();
         });
       });
       document.addEventListener('click', (e) => {
-        if (!picker.contains(e.target)) close();
+        if (!picker.contains(e.target) && !menu?.contains(e.target)) close();
       });
       window.addEventListener('resize', close);
     })();
