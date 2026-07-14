@@ -140,40 +140,56 @@
       if (!id) return;
       const active = pinned.includes(id);
       link.classList.toggle('active', active);
-      link.setAttribute('aria-pressed', active ? 'true' : 'false');
-      link.setAttribute('role', 'button');
+      if (parts.app) {
+        link.setAttribute('aria-pressed', active ? 'true' : 'false');
+      } else {
+        link.removeAttribute('aria-pressed');
+        link.removeAttribute('role');
+      }
     });
   }
 
   function bind() {
     const parts = railParts();
     if (!parts) return;
+    const menu = parts.rail.querySelector(`.${parts.menuClass}`);
+    let closeAppMenu = () => {};
     if (parts.app) {
       const picker = parts.rail.querySelector('.rail-region-picker');
       const toggle = parts.rail.querySelector('.rail-region-toggle');
       const close = () => {
+        if (menu?.parentElement === document.body) picker?.appendChild(menu);
+        menu?.classList.remove('portal-open');
         picker?.classList.remove('open');
         toggle?.setAttribute('aria-expanded', 'false');
       };
+      closeAppMenu = close;
       toggle?.addEventListener('click', (event) => {
         event.preventDefault();
         const open = !picker?.classList.contains('open');
         picker?.classList.toggle('open', open);
         toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (open && menu && window.matchMedia('(max-width: 900px)').matches) {
+          menu.classList.add('portal-open');
+          document.body.appendChild(menu);
+        } else if (!open) {
+          close();
+        }
       });
       document.addEventListener('click', (event) => {
-        if (picker && !picker.contains(event.target)) close();
+        if (picker && !picker.contains(event.target) && !menu?.contains(event.target)) close();
       });
       window.addEventListener('resize', close);
     }
-    const menu = parts.rail.querySelector(`.${parts.menuClass}`);
     menu?.querySelectorAll('a, [data-region-pin]').forEach(link => {
       const id = link.dataset.regionPin || regionIdFromHref(link.href);
       if (!id) return;
       link.addEventListener('click', (event) => {
+        if (!parts.app && link.tagName === 'A') return;
         event.preventDefault();
         const pinned = readPinned();
         writePinned(pinned.includes(id) ? pinned.filter(x => x !== id) : [...pinned, id]);
+        if (parts.app) closeAppMenu();
         apply();
       });
     });

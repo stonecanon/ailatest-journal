@@ -84,6 +84,13 @@ a:hover { text-decoration: underline; }
   font-size: 16px;
   font-weight: 800;
 }
+.site-rail-link svg {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 auto;
+  stroke: currentColor;
+  stroke-width: 1.7;
+}
 .site-rail-link b {
   max-width: 48px;
   overflow: hidden;
@@ -95,6 +102,11 @@ a:hover { text-decoration: underline; }
   color: var(--link);
   background: rgba(249,115,22,.08);
   text-decoration: none;
+}
+.site-rail-link.active,
+.site-rail-link[aria-current="page"] {
+  color: var(--link);
+  background: rgba(249,115,22,.12);
 }
 .site-rail-region {
   position: relative;
@@ -167,6 +179,183 @@ a:hover { text-decoration: underline; }
 .site-rail-region-menu a.active::after {
   color: #f97316;
 }
+
+/* Shared application rail: keep static pages on the same shell as the journal app. */
+.app-rail {
+  --paper: #fffdf9;
+  --rule: #ded8cf;
+  --accent: #f97316;
+  --ink-faint: #756f68;
+  --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 120;
+  width: 72px;
+  padding: 18px 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, .48);
+  border-right: 1px solid rgba(39, 35, 31, .08);
+  box-shadow: 12px 0 38px rgba(39, 35, 31, .045);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+}
+.app-rail .rail-top,
+.app-rail .rail-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.app-rail .rail-nav-btn {
+  position: relative;
+  width: 52px;
+  min-height: 52px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 18px;
+  background: transparent;
+  color: var(--ink-faint);
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 650;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: none;
+  text-decoration: none;
+  transition: background-color .15s, border-color .15s, color .15s, transform .15s, box-shadow .15s;
+}
+.app-rail .rail-nav-btn[hidden] { display: none !important; }
+.app-rail .rail-nav-btn:hover {
+  background: rgba(249, 115, 22, .08);
+  color: var(--accent);
+  transform: translateY(-1px);
+  text-decoration: none;
+}
+.app-rail .rail-nav-btn.active,
+.app-rail .rail-nav-btn[aria-current="page"] {
+  background: rgba(255, 255, 255, .9);
+  border-color: rgba(249, 115, 22, .24);
+  color: var(--accent);
+  box-shadow: 0 10px 24px rgba(249, 115, 22, .12);
+}
+.app-rail .rail-nav-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.app-rail .rail-nav-btn svg {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.app-rail .rail-nav-btn span:not(.rail-flag) {
+  max-width: 48px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.app-rail .rail-flag {
+  font: 850 13px/1 var(--sans);
+  letter-spacing: 0;
+}
+.app-rail .rail-region-picker {
+  position: relative;
+  display: inline-flex;
+  justify-content: center;
+}
+.app-rail .rail-region-symbol {
+  background: rgba(249, 115, 22, .12);
+  color: var(--accent);
+  letter-spacing: -1px;
+}
+.app-rail .rail-caret {
+  margin-left: 2px;
+  color: currentColor;
+  font-size: 9px;
+  font-weight: 800;
+}
+.app-rail .rail-region-menu,
+.rail-region-menu.portal-open {
+  --paper: #fffdf9;
+  --rule: #ded8cf;
+  --accent: #f97316;
+  --ink-faint: #756f68;
+  --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  position: absolute;
+  top: 0;
+  left: calc(100% + 10px);
+  z-index: 170;
+  width: 138px;
+  display: none;
+  grid-template-columns: 1fr;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  background: rgba(255, 253, 249, .96);
+  box-shadow: 0 18px 44px rgba(39, 35, 31, .12);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+}
+.app-rail .rail-region-picker.open .rail-region-menu,
+.rail-region-menu.portal-open { display: grid; }
+.app-rail .rail-region-option.rail-nav-btn,
+.rail-region-menu.portal-open .rail-region-option.rail-nav-btn {
+  position: relative;
+  width: 100%;
+  min-height: 38px;
+  padding: 0 9px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ink-faint);
+  display: inline-flex;
+  align-items: center;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 8px;
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1;
+  cursor: pointer;
+}
+.app-rail .rail-region-option::after,
+.rail-region-menu.portal-open .rail-region-option::after {
+  content: "✓";
+  margin-left: auto;
+  color: transparent;
+  font-size: 12px;
+  font-weight: 900;
+}
+.app-rail .rail-region-option.active::after,
+.rail-region-menu.portal-open .rail-region-option.active::after { color: var(--accent); }
+.rail-region-menu.portal-open .rail-region-option:hover {
+  background: rgba(249, 115, 22, .08);
+  color: var(--accent);
+}
+.rail-region-menu.portal-open .rail-region-option:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.rail-region-menu.portal-open .rail-flag {
+  font: 850 13px/1 var(--sans);
+}
+.app-rail .rail-nav-btn[data-station-hidden="1"] { display: none !important; }
+
 .page-head nav { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: flex-end; font-size: 14px; }
 .page-head nav a {
   min-height: 33px;
@@ -345,6 +534,30 @@ body[data-static-page="extension"] {
   font-size: 13px;
 }
 
+.download-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: auto;
+}
+
+.download-actions .btn {
+  margin-top: 0;
+  text-align: center;
+}
+
+.download-actions .btn-secondary {
+  border-color: #8f806f;
+  background: transparent;
+  color: var(--ink);
+}
+
+.download-actions .btn-secondary:hover {
+  background: rgba(43, 40, 36, .08);
+  color: var(--ink);
+  text-decoration: none;
+}
+
 .download-tile .small {
   position: absolute;
   left: 12px;
@@ -485,10 +698,13 @@ td.c, th.c { text-align: center; }
 }
 .page-foot a { color: var(--muted); margin: 0 6px; }
 
-@media (max-width: 640px) {
+@media (max-width: 900px) {
+  html {
+    scroll-padding-bottom: calc(76px + env(safe-area-inset-bottom));
+  }
   body {
     padding-left: 0;
-    padding-bottom: 68px;
+    padding-bottom: calc(76px + env(safe-area-inset-bottom));
   }
   .site-rail {
     top: auto;
@@ -497,27 +713,31 @@ td.c, th.c { text-align: center; }
     width: 100%;
     height: auto;
     min-height: 58px;
-    padding: 5px 8px calc(4px + env(safe-area-inset-bottom));
+    padding: 5px 4px calc(4px + env(safe-area-inset-bottom));
     flex-direction: row;
     justify-content: space-around;
     gap: 0;
+    overflow: visible;
     border-right: 0;
     border-top: 1px solid rgba(43,40,36,.12);
     box-shadow: 0 -8px 28px rgba(43,40,36,.08);
+    background: rgba(255,253,249,.98);
   }
   .site-rail-top,
   .site-rail-bottom {
     display: contents;
   }
   .site-rail-link {
-    flex: 0 0 58px;
-    width: 58px;
+    flex: 1 1 44px;
+    width: auto;
+    min-width: 44px;
     min-height: 48px;
     border-radius: 0;
   }
   .site-rail-region {
-    flex: 0 0 58px;
-    width: 58px;
+    flex: 1 1 44px;
+    width: auto;
+    min-width: 44px;
   }
   .site-rail-region-menu {
     position: fixed;
@@ -536,6 +756,84 @@ td.c, th.c { text-align: center; }
     flex-direction: column;
     padding: 4px 6px;
   }
+  .app-rail {
+    inset: auto 0 0;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    padding: 5px 8px calc(4px + env(safe-area-inset-bottom));
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    border-right: 0;
+    border-top: 1px solid rgba(39, 35, 31, .12);
+    background: rgba(255, 253, 249, .94);
+    box-shadow: 0 -8px 28px rgba(39, 35, 31, .08);
+    scrollbar-width: none;
+  }
+  .app-rail::-webkit-scrollbar { display: none; }
+  .app-rail .rail-top,
+  .app-rail .rail-bottom { display: contents; }
+  .app-rail .rail-nav-btn {
+    flex: 0 0 58px;
+    width: 58px;
+    min-width: 58px;
+    min-height: 52px;
+    padding: 3px 0 1px;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+  .app-rail .rail-nav-btn:hover { transform: none; }
+  .app-rail .rail-nav-btn.active,
+  .app-rail .rail-nav-btn[aria-current="page"] {
+    border-color: transparent;
+    background: transparent;
+    box-shadow: none;
+  }
+  .app-rail .rail-nav-btn svg {
+    width: 23px;
+    height: 23px;
+  }
+  .app-rail .rail-nav-btn span:not(.rail-flag) { font-size: 10px; }
+  .app-rail .rail-region-picker {
+    flex: 0 0 58px;
+    width: 58px;
+    min-width: 58px;
+  }
+  .app-rail .rail-region-toggle { width: 58px; }
+  .app-rail .rail-region-menu,
+  .rail-region-menu.portal-open {
+    position: fixed;
+    inset: auto 10px calc(70px + env(safe-area-inset-bottom));
+    width: auto;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    padding: 10px;
+    border-radius: 16px;
+  }
+  .app-rail .rail-region-option.rail-nav-btn,
+  .rail-region-menu.portal-open .rail-region-option.rail-nav-btn {
+    width: 100%;
+    min-width: 0;
+    min-height: 48px;
+    justify-content: center;
+    flex-direction: column;
+    padding: 4px 6px;
+    gap: 4px;
+  }
+  .app-rail .rail-region-option::after,
+  .rail-region-menu.portal-open .rail-region-option::after {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+  }
+  .app-rail #rankings-btn { order: 7; }
+  .app-rail #download-center-rail-link { order: 8; }
+  .app-rail #fav-header-btn { order: 9; }
+  .app-rail #account-credit-badge { order: 10; }
   .page-head { min-height: 54px; padding: 8px 12px; }
   .page-head nav { justify-content: flex-end; gap: 8px; }
   .brand { font-size: 16px; }
@@ -551,7 +849,7 @@ td.c, th.c { text-align: center; }
 
 @media (max-width: 760px) {
   .download-hero {
-    padding: 24px 18px;
+    padding: 18px;
   }
   .download-updates,
   .download-products,
@@ -560,5 +858,24 @@ td.c, th.c { text-align: center; }
   }
   .download-tile {
     min-height: 0;
+  }
+}
+
+:where(a, button, input, textarea, select, summary):focus-visible {
+  outline: 2px solid #b4531f !important;
+  outline-offset: 3px;
+}
+
+:where(a, button, summary) {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(180, 83, 31, .16);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
   }
 }
