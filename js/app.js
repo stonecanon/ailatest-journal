@@ -65,10 +65,10 @@
       download_center: '下载中心',
       loading: '加载中…',
       hero_title_int: 'SCI / SSCI 国际期刊检索',
-      hero_body_int: '資料來源：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI）· 更新至 2026-05-18，並合併 <b>EI Compendex</b> 期刊目錄（2025-10-10）。',
+      hero_body_int: '資料來源：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI）· 更新至 2026-05-18，並合併 <b>EI Compendex</b>（2025-10-10）、<b>Inspec</b>（2026-04）、<b>FSTA</b> 全文清單與 <b>CAB Abstracts</b> serial report（2013-09）。',
       src_cnkx: '中国科协高质量目录',
       src_cnki_major: '中文期刊目录',
-      hero_note: '徽章语义：<b>收录</b> 显示 SCIE/SSCI/AHCI/ESCI/EI、Scopus、MEDLINE、CSCD、SCD 等数据库覆盖 · <b>等级</b> 显示中科院/JCR/新锐/CCF/ABDC/ABS/FMS/VHB/CNRS/AMI 等评价级别 · <b>开放费用</b> 显示 FREE/OAJ/DOAJ · <b>风险</b> 显示预警、WoS On Hold 与 Retraction Watch 撤稿记录。',
+      hero_note: '徽章语义：<b>收录</b> 显示 SCIE/SSCI/AHCI/ESCI/EI、Scopus、MEDLINE、Inspec、FSTA、CABI 等数据库覆盖 · <b>等级</b> 显示中科院/JCR/新锐/CCF/ABDC/ABS/FMS/VHB/CNRS/AMI 等评价级别 · <b>开放费用</b> 显示 FREE/OAJ/DOAJ · <b>风险</b> 显示预警、WoS On Hold 与 Retraction Watch 撤稿记录。',
       hero_title_fav: '我的收藏',
       hero_body_fav: '点击任意期刊右侧的 <b>★</b> 可加入收藏。未登录时保存在本机 localStorage；登录后自动同步到云端，可跨设备访问。',
       hero_title_pick: '智能荐刊',
@@ -154,8 +154,8 @@
       download_center: 'Downloads',
       loading: 'Loading…',
       hero_title_int: 'International SCI / SSCI Search',
-      hero_body_int: 'Source: <b>Web of Science Core Collection</b> (SCIE / SSCI / AHCI / ESCI), updated 2026-05-18, merged with <b>EI Compendex</b> source list (2025-10-10).',
-      hero_note: 'Badge legend: <b>Indexed</b> covers SCIE/SSCI/AHCI/ESCI/EI, Scopus, MEDLINE, CSCD, SCD and related databases · <b>Ranking</b> covers CAS/JCR/Emerging/CCF/ABDC/ABS/FMS/VHB/CNRS/AMI tiers · <b>Access & Fees</b> covers FREE/OAJ/DOAJ · <b>Caution</b> covers warning lists, WoS On Hold and Retraction Watch records.',
+      hero_body_int: 'Source: <b>Web of Science Core Collection</b> (SCIE / SSCI / AHCI / ESCI), updated 2026-05-18, merged with <b>EI Compendex</b> (2025-10-10), <b>Inspec</b> (Apr 2026), the <b>FSTA</b> full-text list, and the <b>CAB Abstracts</b> serial report (Sep 2013).',
+      hero_note: 'Badge legend: <b>Indexed</b> covers SCIE/SSCI/AHCI/ESCI/EI, Scopus, MEDLINE, Inspec, FSTA, CABI and related databases · <b>Ranking</b> covers CAS/JCR/Emerging/CCF/ABDC/ABS/FMS/VHB/CNRS/AMI tiers · <b>Access & Fees</b> covers FREE/OAJ/DOAJ · <b>Caution</b> covers warning lists, WoS On Hold and Retraction Watch records.',
       hero_title_fav: 'My Favorites',
       hero_body_fav: 'Click the <b>★</b> on any row to bookmark. Saved locally when signed-out; syncs to the cloud when signed-in.',
       hero_title_pick: 'Pick for me',
@@ -2937,7 +2937,11 @@
   }
   function badgeFSTAFullText(value) {
     if (!value) return '';
-    return `<span class="badge b-fsta" title="${T('EBSCO FSTA with Full Text 全文覆盖；这是 FSTA 全库的子集','Full-text coverage in EBSCO FSTA with Full Text; this is a subset of the complete FSTA database')}">FSTA FT</span>`;
+    return `<span class="badge b-fsta" title="${T('EBSCO FSTA with Full Text 收录；公开清单是 FSTA 全库的全文子集','Indexed by EBSCO FSTA with Full Text; the public list is the full-text subset of FSTA')}">FSTA</span>`;
+  }
+  function badgeCABI(value) {
+    if (!value) return '';
+    return `<span class="badge b-cabi" style="background:#446b53" title="${T('CAB Abstracts 收录（CABI Serial Cited Report · 2013-09）','Indexed by CAB Abstracts (CABI Serial Cited Report · Sep 2013)')}">CABI</span>`;
   }
   function badgeOAJ(oaj) {
     if (!oaj) return '';
@@ -3259,7 +3263,8 @@
       ...((r.indices) || []).map(badgeIndex),
       badgeScopus(r.scopus),
       badgeInspec(r.inspec),
-      badgeFSTAFullText(r.fsta_full_text),
+      badgeFSTAFullText(r.fsta || r.fsta_full_text),
+      badgeCABI(r.cabi),
       badgeOAJ(r.oaj),
       badgeDOAJ(r.doaj),
       badgeMEDLINE(r.medline),
@@ -3300,7 +3305,8 @@
       ...((r.indices) || []).map(badgeIndex),
       badgeScopus(r.scopus),
       badgeInspec(r.inspec),
-      badgeFSTAFullText(r.fsta_full_text),
+      badgeFSTAFullText(r.fsta || r.fsta_full_text),
+      badgeCABI(r.cabi),
       badgeMEDLINE(r.medline),
       badgePubMed(r.pubmed),
       badgePMC(r.pmc),

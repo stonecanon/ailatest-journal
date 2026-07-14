@@ -4,6 +4,7 @@
 Supported inputs:
 - EBSCO FSTA with Full Text coverage HTML (public title list)
 - IET Inspec active source list XLSX (public source list)
+- CABI CAB Abstracts serial cited report XLS (official source report)
 
 The FSTA list is intentionally stored as ``fsta_full_text``.  It is a subset
 of FSTA, not the complete FSTA abstracting and indexing database.
@@ -14,6 +15,7 @@ import argparse
 import gzip
 import json
 import re
+import unicodedata
 import urllib.request
 from html.parser import HTMLParser
 from pathlib import Path
@@ -23,10 +25,16 @@ try:
 except ImportError:  # pragma: no cover
     openpyxl = None
 
+try:
+    import xlrd
+except ImportError:  # pragma: no cover
+    xlrd = None
+
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
 FSTA_URL = "https://about.ebsco.com/m/ee/Marketing/titleLists/fwt-coverage.htm"
+CABI_URL = "https://www.cabi.org/what-we-do/publishing-products/"
 
 
 def clean_issn(value) -> str:
@@ -146,25 +154,118 @@ def load_inspec(path: str) -> list[dict]:
     return out
 
 
+def load_cabi(path: str) -> list[dict]:
+    """Read CABI's CAB Abstracts serial cited report (legacy BIFF XLS)."""
+    if not xlrd:
+        raise RuntimeError("xlrd is required for the CABI XLS")
+    book = xlrd.open_workbook(path, on_demand=True)
+    sheet = book.sheet_by_index(0)
+    header = [str(v or "").strip() for v in sheet.row_values(0)]
+    out, seen = [], set()
+    for row_no in range(1, sheet.nrows):
+        values = sheet.row_values(row_no)
+        rec = dict(zip(header, values))
+        title = str(rec.get("Document Title") or "").strip()
+        issn = clean_issn(rec.get("ISSN"))
+        eissn = clean_issn(rec.get("eISSN"))
+        if not title or not (issn or eissn):
+            continue
+        key = (issn, eissn, title.casefold())
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append({
+            "title": title,
+            "issn": issn,
+            "eissn": eissn,
+            "publisher": str(rec.get("Publisher name") or "").strip(),
+            "country": str(rec.get("Country of publication") or "").strip(),
+        })
+    book.release_resources()
+    return out
+
+
 def issn_keys(rec: dict) -> set[str]:
     return {x for x in (clean_issn(rec.get("issn")), clean_issn(rec.get("eissn"))) if x}
 
 
-def patch_list(records: list[dict], fsta: set[str], inspec: set[str]) -> tuple[int, int]:
-    f_hits = i_hits = 0
+def norm_title(value: str) -> str:
+    value = unicodedata.normalize("NFKD", str(value or "")).casefold()
+    value = "".join(ch for ch in value if not unicodedata.combining(ch))
+    return re.sub(r"[^a-z0-9\u4e00-\u9fff]+", " ", value).strip()
+
+
+def slugify(title: str, issn: str, used: set[str]) -> str:
+    value = unicodedata.normalize("NFKD", title).encode("ascii", "ignore").decode().lower()
+    base = re.sub(r"[^a-z0-9]+", "-", value).strip("-")[:60].rstrip("-")
+    base = base or re.sub(r"[^0-9X]", "", issn.upper()) or "journal"
+    slug = base
+    if slug in used:
+        suffix = re.sub(r"[^0-9X]", "", issn.upper()) or str(len(used) + 1)
+        slug = f"{base[:50].rstrip('-')}-{suffix}"
+    serial = 2
+    candidate = slug
+    while candidate in used:
+        candidate = f"{slug}-{serial}"
+        serial += 1
+    used.add(candidate)
+    return candidate
+
+
+def merge_source(records: list[dict], rows: list[dict], flag: str, aliases=()) -> dict:
+    """Match by ISSN/EISSN, then exact normalized title; append unmatched serials."""
+    flags = (flag, *aliases)
     for rec in records:
-        keys = issn_keys(rec)
-        if keys & fsta:
-            rec["fsta_full_text"] = True
-            f_hits += 1
+        for key in flags:
+            rec.pop(key, None)
+
+    by_issn, by_title = {}, {}
+    used_slugs = {str(r.get("slug") or "") for r in records if r.get("slug")}
+    for rec in records:
+        for key in issn_keys(rec):
+            by_issn.setdefault(key, rec)
+        title_key = norm_title(rec.get("name") or rec.get("en_name") or rec.get("cn_name"))
+        if title_key:
+            by_title.setdefault(title_key, rec)
+
+    matched = added = 0
+    for row in rows:
+        keys = issn_keys(row)
+        rec = next((by_issn[k] for k in keys if k in by_issn), None)
+        if rec is None:
+            rec = by_title.get(norm_title(row.get("title")))
+        if rec is None:
+            title = str(row.get("title") or "").strip()
+            issn = clean_issn(row.get("issn"))
+            eissn = clean_issn(row.get("eissn"))
+            if not title or not (issn or eissn):
+                continue
+            rec = {
+                "name": title,
+                "issn": issn,
+                "eissn": eissn,
+                "publisher": str(row.get("publisher") or "").strip(),
+                "country": str(row.get("country") or "").strip(),
+                "abbr20": "",
+                "indices": [],
+                "wos_categories": [],
+                "esi_category": "",
+                "specialty_only": True,
+            }
+            rec["slug"] = slugify(title, issn or eissn, used_slugs)
+            records.append(rec)
+            added += 1
         else:
-            rec.pop("fsta_full_text", None)
-        if keys & inspec:
-            rec["inspec"] = True
-            i_hits += 1
-        elif inspec:
-            rec.pop("inspec", None)
-    return f_hits, i_hits
+            matched += 1
+            for key in ("issn", "eissn", "publisher", "country"):
+                if not rec.get(key) and row.get(key):
+                    rec[key] = row[key]
+        for key in flags:
+            rec[key] = True
+        for key in issn_keys(rec):
+            by_issn.setdefault(key, rec)
+        by_title.setdefault(norm_title(rec.get("name")), rec)
+    return {"matched": matched, "added": added, "total": matched + added}
 
 
 def read_json(path: Path):
@@ -183,27 +284,88 @@ def write_json(path: Path, data):
         path.write_bytes(raw)
 
 
+def update_routing(records: list[dict]) -> dict:
+    """Make newly added specialty journals resolvable by detail URL and sitemap."""
+    index_path = DATA / "journal_index.json"
+    index = read_json(index_path) if index_path.exists() else {}
+    added_index = 0
+    sitemap_urls = []
+    for rec in records:
+        if not rec.get("specialty_only"):
+            continue
+        slug = str(rec.get("slug") or "").strip()
+        if not slug:
+            continue
+        if slug not in index:
+            entry = {
+                "n": rec.get("name") or "",
+                "i": rec.get("issn") or "",
+                "is": rec.get("eissn") or "",
+                "p": rec.get("publisher") or "",
+                "ix": rec.get("indices") or [],
+                "sp": [name for name, enabled in (
+                    ("FSTA", rec.get("fsta")),
+                    ("CABI", rec.get("cabi")),
+                    ("Inspec", rec.get("inspec")),
+                ) if enabled],
+            }
+            index[slug] = {k: v for k, v in entry.items() if v not in ("", [], None)}
+            added_index += 1
+        for value in (rec.get("issn"), rec.get("eissn")):
+            compact = re.sub(r"[^0-9X]", "", str(value or "").upper())
+            if compact and compact not in index:
+                index[compact] = {"_r": slug}
+        sitemap_urls.append(f"https://journal.ailatest.org/journal/{slug}/")
+    write_json(index_path, index)
+
+    sitemap_path = ROOT / "sitemap.xml"
+    added_sitemap = 0
+    if sitemap_path.exists():
+        xml = sitemap_path.read_text(encoding="utf-8")
+        additions = []
+        for url in sitemap_urls:
+            if f"<loc>{url}</loc>" not in xml:
+                additions.append(f"  <url><loc>{url}</loc><priority>0.8</priority></url>")
+        if additions:
+            xml = xml.replace("</urlset>", "\n".join(additions) + "\n</urlset>")
+            sitemap_path.write_text(xml, encoding="utf-8")
+            added_sitemap = len(additions)
+    return {"journal_index_added": added_index, "sitemap_added": added_sitemap}
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--fsta", default=FSTA_URL, help="FSTA coverage HTML URL or file")
     ap.add_argument("--inspec", help="IET Inspec active source list XLSX")
+    ap.add_argument("--cabi", help="CABI CAB Abstracts serial cited report XLS")
     args = ap.parse_args()
 
     fsta_rows = load_fsta(args.fsta)
     inspec_rows = load_inspec(args.inspec) if args.inspec else []
+    cabi_rows = load_cabi(args.cabi) if args.cabi else []
     active_fsta = [r for r in fsta_rows if not r.get("full_text_stop")]
-    fsta_issns = {r["issn"] for r in active_fsta}
-    inspec_issns = {x for r in inspec_rows for x in issn_keys(r)}
 
     stats = {}
-    for name in ("journals.json.gz", "journals_deploy.json", "journals_light.json.gz"):
+    full_records = None
+    # The live site consumes the compressed full/light datasets.  The legacy
+    # uncompressed deploy snapshot is intentionally left untouched because it
+    # is no longer served and would exceed the host's per-file size limit.
+    for name in ("journals.json.gz", "journals_light.json.gz"):
         path = DATA / name
         if not path.exists():
             continue
         records = read_json(path)
-        hits = patch_list(records, fsta_issns, inspec_issns)
+        source_stats = {
+            "fsta": merge_source(records, active_fsta, "fsta", ("fsta_full_text",)),
+            "inspec": merge_source(records, inspec_rows, "inspec") if inspec_rows else {},
+            "cabi": merge_source(records, cabi_rows, "cabi") if cabi_rows else {},
+        }
         write_json(path, records)
-        stats[name] = {"fsta_full_text": hits[0], "inspec": hits[1]}
+        stats[name] = {"records": len(records), **source_stats}
+        if name == "journals.json.gz":
+            full_records = records
+
+    routing = update_routing(full_records or [])
 
     payload = {
         "updated": "2026-07-14",
@@ -214,17 +376,26 @@ def main():
                 "url": FSTA_URL,
                 "records": len(fsta_rows),
                 "active_records": len(active_fsta),
-                "active_issns": len(fsta_issns),
+                "active_issns": len({x for r in active_fsta for x in issn_keys(r)}),
             },
             "inspec": {
                 "label": "Inspec",
                 "scope": "active_source_list",
                 "url": "https://www.theiet.org/publishing/solutions-for-your-institution-or-organisation/inspec/inspec-content-and-coverage",
                 "records": len(inspec_rows),
-                "issns": len(inspec_issns),
+                "issns": len({x for r in inspec_rows for x in issn_keys(r)}),
+            },
+            "cabi": {
+                "label": "CAB Abstracts",
+                "scope": "serial_cited_report",
+                "report_date": "2013-09",
+                "url": CABI_URL,
+                "records": len(cabi_rows),
+                "issns": len({x for r in cabi_rows for x in issn_keys(r)}),
             },
         },
         "matches": stats,
+        "routing": routing,
     }
     write_json(DATA / "specialty_indexes.json", payload)
     print(json.dumps(payload, ensure_ascii=False, indent=2))

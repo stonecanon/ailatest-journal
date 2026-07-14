@@ -34,6 +34,7 @@ function compactJournal(j) {
     'indices', 'scopus', 'cstpcd', 'cscd', 'cssci', 'pku',
     'if_quartile', 'cas_zone', 'cas_top', 'if_2024', 'if_latest',
     'cas_xr', 'ccf', 'abdc', 'abs', 'free',
+    'inspec', 'fsta', 'fsta_full_text', 'cabi',
     'warning', 'citic_warning', 'on_hold', 'under_review',
   ];
   fields.forEach((key) => {

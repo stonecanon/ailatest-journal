@@ -101,7 +101,8 @@ function buildDisplayBadges(journal) {
   const out = [];
   const indices = Array.isArray(j.indices) ? j.indices : [];
   if (j.inspec) addBadge(out, 'index', 'Inspec', 'inspec', 'Inspec active source list · April 2026');
-  if (j.fsta_full_text) addBadge(out, 'index', 'FSTA FT', 'fsta', 'FSTA with Full Text coverage (subset of FSTA)');
+  if (j.fsta || j.fsta_full_text) addBadge(out, 'index', 'FSTA', 'fsta', 'FSTA with Full Text coverage (public full-text subset)');
+  if (j.cabi) addBadge(out, 'index', 'CABI', 'cabi', 'CAB Abstracts serial cited report · September 2013');
   for (const idx of indices.slice(0, 5)) addBadge(out, 'index', idx, 'index', '收录索引');
   if (j.scopus && !indices.map(String).some((x) => x.toLowerCase() === 'scopus')) addBadge(out, 'index', 'Scopus', 'index', 'Scopus 收录');
   if (j.cstpcd) addBadge(out, 'index', '中国科技核心', 'cstpcd', '中国科技核心期刊目录');
