@@ -1113,6 +1113,8 @@
   let indiaPromise = null;
   let malaysia = null;
   let malaysiaPromise = null;
+  let korea = null;
+  let koreaPromise = null;
   let esiCats = [];
   let meta = null;
   let journalsReady = false;
@@ -1232,6 +1234,20 @@
         .catch(() => null);
     }
     return malaysiaPromise;
+  }
+
+  function loadKoreaData() {
+    if (korea) return Promise.resolve(korea);
+    if (!koreaPromise) {
+      koreaPromise = fetch('/data/korea.json')
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+          korea = data;
+          return korea;
+        })
+        .catch(() => null);
+    }
+    return koreaPromise;
   }
 
   function lookupOA(r) {
@@ -1578,8 +1594,8 @@
       desc: 'Search Malaysia MyCite 2025, MyCite online historical indexed journals, and ERA 2023 Submitted Journal List records.'
     },
     kr: {
-      title: 'Korea Journal Directory | AILatest Journal',
-      desc: 'Korea country journal directory placeholder in AILatest Journal.'
+      title: 'Korea KCI Journal Directory & Impact Factors | AILatest Journal',
+      desc: 'Search Korea Research Foundation KCI journals by title, publisher, ISSN, subject, accreditation status and KCI impact factor.'
     },
     fav: {
       title: '期刊收藏清单 | Journal Favorites - AILatest Journal',
@@ -1645,6 +1661,8 @@
   let activeDom = 'cnki_major';   // 中文期刊目录
   let activeIndiaSubject = '__all';
   let activeMalaysiaSource = 'mycite_2025';
+  let activeKoreaSubject = '__all';
+  let activeKoreaStatus = '__all';
   let activeDomBadges = new Set(); // 默认不勾选 = 显示全部；勾选 = 只看有该徽章的
   let activeUpdateCategory = 'all';
   const PAGE = 100;
@@ -1989,7 +2007,9 @@
       const v = t(k); if (v) el.setAttribute('aria-label', v);
     });
     const qEl = $('#q');
-    if (qEl) qEl.placeholder = t(currentSearchPlaceholderKey());
+    if (qEl) qEl.placeholder = activeTab === 'kr'
+      ? T('搜索：韩国期刊名 / 韩文刊名 / 出版社 / ISSN', 'Search: Korea journal / Korean title / publisher / ISSN')
+      : t(currentSearchPlaceholderKey());
     updateSearchSubmitLabel();
     const langToggle = $('#lang-toggle');
     if (langToggle) langToggle.textContent = LANG_META[lang]?.label || '中文';
@@ -4626,13 +4646,131 @@
     });
   }
 
+  function koreaStatusLabel(status) {
+    return ({
+      '우수등재': T('KCI 优秀期刊','KCI Excellent'),
+      '등재': T('KCI 收录','KCI Indexed'),
+      '등재후보': T('KCI 候选','KCI Candidate'),
+    })[status] || status || 'KCI';
+  }
+
+  function koreaSubjectLabel(subject) {
+    return ({
+      '인문학': T('人文学','Humanities'),
+      '사회과학': T('社会科学','Social sciences'),
+      '자연과학': T('自然科学','Natural sciences'),
+      '공학': T('工学','Engineering'),
+      '의약학': T('医药学','Medicine'),
+      '농수해양학': T('农林水产海洋','Agriculture & marine'),
+      '예술체육학': T('艺术体育','Arts & sports'),
+      '복합학': T('交叉学科','Interdisciplinary'),
+    })[subject] || subject || '—';
+  }
+
   function renderKorea() {
+    updateThStickyTop();
     const box = $('#korea-content');
     if (!box) return;
-    box.innerHTML = `<div class="section-block">
-      ${countrySectionHeader('KR', T('韩国期刊数据入口预留中。','Korea journal directory will be added later.'))}
-      <div class="empty">${T('暂未接入韩国官方期刊列表。','No Korea official journal list has been connected yet.')}</div>
+    if (!korea || !Array.isArray(korea.records)) {
+      box.innerHTML = `<div class="empty">${T('正在加载韩国 KCI 期刊数据…','Loading Korea KCI journal data…')}</div>`;
+      loadKoreaData().then(data => {
+        if (activeTab !== 'kr') return;
+        if (data && Array.isArray(data.records)) renderKorea();
+        else box.innerHTML = `<div class="empty">${T('韩国 KCI 期刊数据缺失','Korea KCI journal data missing')}</div>`;
+      });
+      return;
+    }
+    if (!window.__koreaShown) window.__koreaShown = 100;
+    const q = activeQuery.trim().toLowerCase();
+    const subjects = (korea.subjects || []).map(item => item.name).filter(Boolean);
+    const statuses = ['우수등재', '등재', '등재후보'].filter(status => korea.counts?.status?.[status]);
+    const subjectOptions = subjects.map(subject => `<option value="${escape(subject)}"${activeKoreaSubject === subject ? ' selected' : ''}>${escape(koreaSubjectLabel(subject))} (${Number(korea.counts?.subjects?.[subject] || 0).toLocaleString()})</option>`).join('');
+    const statusOptions = statuses.map(status => `<option value="${escape(status)}"${activeKoreaStatus === status ? ' selected' : ''}>${escape(koreaStatusLabel(status))} (${Number(korea.counts?.status?.[status] || 0).toLocaleString()})</option>`).join('');
+    const filtered = korea.records.filter(r => {
+      if (activeKoreaSubject !== '__all' && r.subject_group !== activeKoreaSubject) return false;
+      if (activeKoreaStatus !== '__all' && r.status !== activeKoreaStatus) return false;
+      if (!q) return true;
+      const hay = [
+        r.journal_title, r.journal_title_ko, r.journal_title_en,
+        r.publisher, r.publisher_ko, r.issn, r.eissn,
+        r.subject_group, r.subject, r.affiliated_university,
+      ].filter(Boolean).join(' ').toLowerCase();
+      return hay.includes(q);
+    });
+    const visible = filtered.slice(0, window.__koreaShown);
+    const rows = visible.map(r => {
+      const rec = {
+        ...(r.global || {}),
+        ...r,
+        name: r.journal_title || r.journal_title_en || r.journal_title_ko,
+        en_name: r.journal_title_ko || '',
+        discipline: r.subject || r.subject_group || '',
+        country: 'South Korea',
+        __src: 'kr',
+      };
+      const fid = favId(rec);
+      rowRecordsByFid[fid] = rec;
+      const issnCell = [
+        r.issn ? `ISSN ${escape(r.issn)}` : '',
+        r.eissn ? `eISSN ${escape(r.eissn)}` : '',
+      ].filter(Boolean).join('<br>');
+      const globalBadges = [renderCoverageBadges(rec), renderLevelBadges(rec)].filter(Boolean).join('');
+      const ifValue = r.kci_if_2y !== undefined && r.kci_if_2y !== '' ? Number(r.kci_if_2y).toFixed(2).replace(/0+$/, '').replace(/\.$/, '') : '—';
+      return `<tr class="j-row clickable korea-row" data-fid="${escape(fid)}" data-src="kr">
+        <td class="col-fav" style="width:36px">${starBtn(rec, 'kr')}</td>
+        <td class="col-name"><div class="jname">${escape(titleCase(rec.name || ''))}${r.journal_title_ko && r.journal_title_ko !== rec.name ? `<span class="jname-cn">${escape(r.journal_title_ko)}</span>` : ''}</div></td>
+        <td class="muted-cell">${escape(r.publisher || r.publisher_ko || '—')}</td>
+        <td><div class="badges"><span class="domsrc-pill ds-korea">${escape(koreaStatusLabel(r.status))}</span>${globalBadges}</div></td>
+        <td class="muted-cell">${escape(koreaSubjectLabel(r.subject_group))}${r.subject && r.subject !== r.subject_group ? `<br><span class="muted-cell">${escape(r.subject)}</span>` : ''}</td>
+        <td class="if-cell">${escape(ifValue)}</td>
+        <td class="muted-cell" style="width:150px">${issnCell || '—'}</td>
+      </tr>`;
+    }).join('');
+    const sourceDate = korea.source_updated || '2025-08-25';
+    box.innerHTML = `<div class="section-block korea-section">
+      ${countrySectionHeader(
+        `${T('韩国 KCI 期刊目录','Korea KCI Journal Directory')} <span class="muted-cell">(${Number(korea.counts?.records || korea.records.length).toLocaleString()})</span>`,
+        T('韩国研究财团 KCI 官方期刊与引文指标数据。','Official KCI journal and citation indicators from the National Research Foundation of Korea.'),
+      )}
+      <div class="india-toolbar korea-toolbar">
+        <select id="korea-subject-select" class="th-select" aria-label="${T('韩国期刊学科','Korea journal subject')}">
+          <option value="__all">${T('全部学科','All subjects')}</option>${subjectOptions}
+        </select>
+        <select id="korea-status-select" class="th-select" aria-label="${T('KCI 等级','KCI status')}">
+          <option value="__all">${T('全部 KCI 等级','All KCI statuses')}</option>${statusOptions}
+        </select>
+        <span class="muted-cell">${T('显示','Showing')} ${visible.length.toLocaleString()} / ${filtered.length.toLocaleString()}</span>
+        <a class="source-link" href="${escape(korea.source_pages?.kci_journals || 'https://www.data.go.kr/data/3049043/fileData.do')}" target="_blank" rel="noopener nofollow">${T('官方数据','Official data')}</a>
+      </div>
+      <div class="table-wrap"><table class="journals korea-table"><thead><tr>
+        <th style="width:36px" aria-label="Favorite"></th>
+        <th>${T('期刊名称','Journal')}</th>
+        <th>${T('出版社','Publisher')}</th>
+        <th>KCI / ${T('国际收录','Global indexes')}</th>
+        <th>${T('学科','Subject')}</th>
+        <th>KCI IF</th>
+        <th>ISSN / E-ISSN</th>
+      </tr></thead><tbody>
+        ${rows}
+        ${filtered.length === 0 ? `<tr><td colspan="7" class="empty">${T('未找到匹配的韩国期刊','No matching Korea journals found')}</td></tr>` : ''}
+      </tbody></table></div>
+      ${filtered.length > window.__koreaShown ? `<div class="pager"><button id="korea-more" class="more-btn">${T('加载更多','Load more')} (${filtered.length - window.__koreaShown} ${T('条剩余','remaining')})</button></div>` : ''}
+      <div class="source-note">${T('来源：韩国研究财团 KCI 官方公开数据；数据日期','Source: official public KCI data from the National Research Foundation of Korea; source date')} ${escape(sourceDate)} · ${T('KCI IF 为 2 年影响力指数，不等同于 JCR Impact Factor。','KCI IF is the two-year KCI impact metric and is not the JCR Impact Factor.')}</div>
     </div>`;
+    $('#korea-subject-select')?.addEventListener('change', event => {
+      activeKoreaSubject = event.target.value;
+      window.__koreaShown = 100;
+      renderKorea();
+    });
+    $('#korea-status-select')?.addEventListener('change', event => {
+      activeKoreaStatus = event.target.value;
+      window.__koreaShown = 100;
+      renderKorea();
+    });
+    $('#korea-more')?.addEventListener('click', () => {
+      window.__koreaShown += 100;
+      renderKorea();
+    });
   }
 
   // ───────── domestic tab ─────────
@@ -5435,6 +5573,18 @@
     if (ir.ft50) meta.push(['FT50', (ir.ft50.order ? `#${ir.ft50.order}` : '') + (ir.ft50.source ? ` · ${ir.ft50.source}` : '')]);
     if (ir.utd24) meta.push(['UTD24', (ir.utd24.order ? `#${ir.utd24.order}` : '') + (ir.utd24.subject ? ` · ${ir.utd24.subject}` : '')]);
     if (src === 'nsfc_mgmt' || r.source === 'NSFC Management Science Department Journal List') meta.push([T('来源','Source'), T('国家自然科学基金委管理科学部期刊目录','NSFC Management Science Journal List')]);
+    if (src === 'kr') {
+      if (r.status) meta.push([T('KCI 等级','KCI Status'), koreaStatusLabel(r.status)]);
+      if (r.subject_group || r.subject) meta.push([T('KCI 学科','KCI Subject'), [koreaSubjectLabel(r.subject_group), r.subject].filter(Boolean).join(' · ')]);
+      if (r.kci_if_2y !== undefined && r.kci_if_2y !== '') meta.push(['KCI IF (2y)', String(r.kci_if_2y)]);
+      if (r.kci_if_no_self_2y !== undefined && r.kci_if_no_self_2y !== '') meta.push([T('去自引 KCI IF','KCI IF without self-cites'), String(r.kci_if_no_self_2y)]);
+      if (r.kci_self_cite_rate_2y !== undefined && r.kci_self_cite_rate_2y !== '') meta.push([T('2 年自引率','2-year self-citation rate'), `${r.kci_self_cite_rate_2y}%`]);
+      if (r.kci_articles_2y !== undefined && r.kci_articles_2y !== '') meta.push([T('2 年论文数','Articles (2y)'), String(r.kci_articles_2y)]);
+      if (r.kci_citations_2y !== undefined && r.kci_citations_2y !== '') meta.push([T('2 年被引次数','Citations (2y)'), String(r.kci_citations_2y)]);
+      if (r.founded_year) meta.push([T('创刊年份','Founded'), String(r.founded_year)]);
+      if (r.affiliated_university) meta.push([T('所属大学','Affiliated university'), r.affiliated_university]);
+      meta.push([T('来源','Source'), 'National Research Foundation of Korea · KCI']);
+    }
     if (r.note) meta.push([T('备注','Note'), r.note]);
     const metaHTML = meta.map(([k,v]) => `<div class="meta-row"><div class="meta-k">${k}</div><div class="meta-v">${escape(v)}</div></div>`).join('');
     const oa = ir.oa || lookupOA(ir.issn || ir.eissn ? ir : r);

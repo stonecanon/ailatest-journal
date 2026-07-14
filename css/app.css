@@ -342,6 +342,11 @@ body.share-mode .app-rail { display: none !important; }
   color: #244b67;
   border-color: #b9ccda;
 }
+.domsrc-pill.ds-korea {
+  background: #f2ece5;
+  color: #71411f;
+  border-color: #dbc3ae;
+}
 .india-toolbar {
   display: flex;
   align-items: center;
@@ -356,6 +361,17 @@ body.share-mode .app-rail { display: none !important; }
 .malaysia-table th:nth-child(3),
 .malaysia-table td:nth-child(3) {
   min-width: 230px;
+}
+.korea-table th:nth-child(2),
+.korea-table td:nth-child(2) {
+  min-width: 260px;
+}
+.korea-table th:nth-child(3),
+.korea-table td:nth-child(3) {
+  min-width: 220px;
+}
+.korea-toolbar .th-select {
+  min-width: 180px;
 }
 .country-source-tabs {
   margin: 10px 0 12px;
