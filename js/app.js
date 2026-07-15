@@ -1747,8 +1747,23 @@
   const tabScrollPositions = new Map();
   const reusableTabPanels = new Set(['int', 'dom', 'in', 'my', 'kr', 'pbn', 'isc', 'scielo']);
   let homeMode = 'search';
-  // 一律无尾斜杠：避免 /rankings/ 命中旧静态 stub，也与其它 tab 路径风格一致
-  const TAB_PATHS = { home: '/', int: '/global', dom: '/cn', in: '/in', my: '/my', kr: '/kr', pbn: '/pbn', isc: '/isc', scielo: '/scielo', fav: '/favorites', me: '/account', rank: '/rankings', pick: '/pick' };
+  // 一律带尾斜杠：Cloudflare Pages 对无尾斜杠的 SPA 路径会 308 到「/」首页
+  // （/rankings → /，/global → / …）；有尾斜杠则 rewrite 到 index.html 正常。
+  const TAB_PATHS = {
+    home: '/',
+    int: '/global/',
+    dom: '/cn/',
+    in: '/in/',
+    my: '/my/',
+    kr: '/kr/',
+    pbn: '/pbn/',
+    isc: '/isc/',
+    scielo: '/scielo/',
+    fav: '/favorites/',
+    me: '/account/',
+    rank: '/rankings/',
+    pick: '/pick/',
+  };
   const PATH_TABS = {
     '/': 'home', '/en': 'home', '/zh': 'home',
     '/global': 'int', '/international': 'int', '/journals': 'int',
