@@ -47,15 +47,62 @@
     gap: 8px;
     flex-wrap: wrap;
   }
-  .plan .edu {
-    font-size: 12.5px;
+  .plan .edu-offer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 10px;
+    margin: 0 0 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #c8e6d3;
+    background: linear-gradient(180deg, #f3fbf6 0%, #eef8f2 100%);
+  }
+  .plan .edu-badge {
+    flex: 0 0 auto;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .04em;
+    color: #fff;
+    background: #2eaf69;
+    border-radius: 99px;
+    padding: 3px 9px;
+    line-height: 1.3;
+  }
+  .plan .edu-price {
+    font-size: 18px;
+    font-weight: 800;
+    color: #1b7a45;
+    line-height: 1.2;
+  }
+  .plan .edu-price small {
+    font-size: 12px;
+    font-weight: 650;
+    color: #3d8f5c;
+  }
+  .plan .edu-save {
+    font-size: 12px;
+    color: #3d8f5c;
+    font-weight: 650;
+  }
+  .plan .price-std {
+    font-size: 13px;
     color: var(--muted);
-    margin: 0 0 10px;
+    margin: 0 0 4px;
+  }
+  .plan .price-std s {
+    color: #9a9288;
+    margin-right: 4px;
   }
   .plan li .dim { color: var(--muted); }
   .plan .lock {
     color: #a05a2b;
     font-weight: 650;
+  }
+  .edu-note {
+    margin: 6px 0 0;
+    font-size: 12.5px;
+    color: var(--muted);
   }
   .compare-wrap { overflow-x: auto; margin: 12px 0 28px; }
   .compare-wrap table { min-width: 640px; }
@@ -148,10 +195,12 @@
       <!-- Pro -->
       <div class="plan">
         <h3>Pro</h3>
-        <div class="price-row">
-          <div class="price">¥98 <small>/年</small></div>
+        <p class="price-std"><s>标准价 ¥98/年</s></p>
+        <div class="edu-offer">
+          <span class="edu-badge">教育优惠</span>
+          <span class="edu-price">¥49 <small>/年</small></span>
+          <span class="edu-save">省 ¥49 · 约 ¥4.1/月</span>
         </div>
-        <p class="edu">教育认证 <b>¥49/年</b> · 约 ¥8.2/月</p>
         <div class="per">高频刷刊与投稿决策：中科院、预警全开，插件日常用量充裕。</div>
         <ul>
           <li>Free 全部能力</li>
@@ -169,10 +218,12 @@
       <div class="plan hot">
         <span class="tag">推荐</span>
         <h3>Max</h3>
-        <div class="price-row">
-          <div class="price">¥148 <small>/年</small></div>
+        <p class="price-std"><s>标准价 ¥148/年</s></p>
+        <div class="edu-offer">
+          <span class="edu-badge">教育优惠</span>
+          <span class="edu-price">¥79 <small>/年</small></span>
+          <span class="edu-save">省 ¥69 · 约 ¥6.6/月</span>
         </div>
-        <p class="edu">教育认证 <b>¥79/年</b> · 约 ¥12.3/月</p>
         <div class="per">完整文献工作流 + AI 荐刊（DeepSeek V4 Flash）。</div>
         <ul>
           <li>Pro 全部能力</li>
@@ -224,8 +275,9 @@
       <p>Free 提供基础服务（检索与 IF/JCR/收录）；中科院分区、预警与风险类标签从 Pro 起开放，便于投稿前完整判断。</p>
       <h3>会员插件额度会不会不够？</h3>
       <p>Pro / Max 均为高额度设计，覆盖日常与高强度刷刊场景；服务端保留合理防护上限，正常使用一般无感。</p>
-      <h3>教育价怎么用？</h3>
-      <p>机构邮箱（.edu.cn / .edu / .ac.uk 等）验证码认证。Pro 教育 ¥49/年，Max 教育 ¥79/年；续费需再验证。</p>
+      <h3>教育优惠怎么用？</h3>
+      <p>用机构邮箱（.edu.cn / .edu / .ac.uk 等）完成验证码认证后，自动享受教育优惠价：<b>Pro ¥49/年</b>、<b>Max ¥79/年</b>。续费时重新认证即可续享。</p>
+      <p class="edu-note">面向在读学生与科研机构师生；认证通过后收银台显示优惠价。</p>
     </div>
   </section>
 
@@ -257,8 +309,12 @@
 
       <div class="plan">
         <h3>Pro</h3>
-        <div class="price-row"><div class="price">¥98 <small>/year</small></div></div>
-        <p class="edu">Education <b>¥49/year</b></p>
+        <p class="price-std"><s>Standard ¥98/year</s></p>
+        <div class="edu-offer">
+          <span class="edu-badge">Edu price</span>
+          <span class="edu-price">¥49 <small>/year</small></span>
+          <span class="edu-save">Save ¥49</span>
+        </div>
         <div class="per">For heavy searching and submission decisions.</div>
         <ul>
           <li>Everything in Free</li>
@@ -275,8 +331,12 @@
       <div class="plan hot">
         <span class="tag">Recommended</span>
         <h3>Max</h3>
-        <div class="price-row"><div class="price">¥148 <small>/year</small></div></div>
-        <p class="edu">Education <b>¥79/year</b></p>
+        <p class="price-std"><s>Standard ¥148/year</s></p>
+        <div class="edu-offer">
+          <span class="edu-badge">Edu price</span>
+          <span class="edu-price">¥79 <small>/year</small></span>
+          <span class="edu-save">Save ¥69</span>
+        </div>
         <div class="per">Full research workflow + AI (DeepSeek V4 Flash).</div>
         <ul>
           <li>Everything in Pro</li>
