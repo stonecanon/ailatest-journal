@@ -1755,17 +1755,25 @@
     return false;
   }
 
-  /** 收藏 / 清单 / 分享 / 导出 / Zotero·Notion·Obsidian — Free 不可用 */
+  /** 收藏 / 清单 / 分享 — Pro 起；导出联动见 canUseExportIntegrations */
   function canUseFavoritesWorkflow() {
     return getProductTier() !== 'free';
   }
+  /** 导出 RIS/BibTeX · Zotero / Notion / Obsidian — 仅 Max */
   function canUseExportIntegrations() {
-    return canUseFavoritesWorkflow();
+    return getProductTier() === 'pro';
   }
 
-  /** Free 原文/OA 全文查找终身 30 篇（按文章去重） */
+  /** 原文/OA 全文查找：Free 30 · Pro 200 · Max 不限（按文章去重累计） */
   const FREE_FULLTEXT_LIMIT = 30;
+  const PRO_FULLTEXT_LIMIT = 200;
   const FULLTEXT_USAGE_KEY = 'ailatest.fulltextUsage';
+  function getFulltextLimit() {
+    const tier = getProductTier();
+    if (tier === 'pro') return null; // Max 不限
+    if (tier === 'plus') return PRO_FULLTEXT_LIMIT;
+    return FREE_FULLTEXT_LIMIT;
+  }
   function getFulltextUsage() {
     try {
       const raw = JSON.parse(localStorage.getItem(FULLTEXT_USAGE_KEY) || '{}');
@@ -1776,7 +1784,7 @@
     }
   }
   function saveFulltextUsage(u) {
-    try { localStorage.setItem(FULLTEXT_USAGE_KEY, JSON.stringify({ keys: (u.keys || []).slice(0, 500) })); } catch (_) {}
+    try { localStorage.setItem(FULLTEXT_USAGE_KEY, JSON.stringify({ keys: (u.keys || []).slice(0, 800) })); } catch (_) {}
   }
   function fulltextArticleKey(data) {
     const doi = String(data?.doi || '').replace(/^https?:\/\/(dx\.)?doi\.org\//i, '').trim().toLowerCase();
@@ -1787,18 +1795,20 @@
     return title ? `t:${title}` : '';
   }
   function canUseFulltextOpen(articleKey) {
-    if (getProductTier() !== 'free') return { ok: true, unlimited: true };
+    const limit = getFulltextLimit();
+    if (limit == null) return { ok: true, unlimited: true };
     const u = getFulltextUsage();
     if (articleKey && u.keys.includes(articleKey)) {
-      return { ok: true, used: u.keys.length, limit: FREE_FULLTEXT_LIMIT, remaining: Math.max(0, FREE_FULLTEXT_LIMIT - u.keys.length) };
+      return { ok: true, used: u.keys.length, limit, remaining: Math.max(0, limit - u.keys.length) };
     }
-    if (u.keys.length >= FREE_FULLTEXT_LIMIT) {
-      return { ok: false, used: u.keys.length, limit: FREE_FULLTEXT_LIMIT, remaining: 0 };
+    if (u.keys.length >= limit) {
+      return { ok: false, used: u.keys.length, limit, remaining: 0 };
     }
-    return { ok: true, used: u.keys.length, limit: FREE_FULLTEXT_LIMIT, remaining: FREE_FULLTEXT_LIMIT - u.keys.length };
+    return { ok: true, used: u.keys.length, limit, remaining: limit - u.keys.length };
   }
   function consumeFulltextOpen(articleKey) {
-    if (getProductTier() !== 'free') return true;
+    const limit = getFulltextLimit();
+    if (limit == null) return true;
     const gate = canUseFulltextOpen(articleKey);
     if (!gate.ok) return false;
     if (!articleKey) return true;
@@ -3100,7 +3110,7 @@
       document.body.appendChild(modal);
 
       modal.addEventListener('click', (e) => {
-        if (e.target === modal) { closeLoginModal(); $$('.topbar').forEach(function(el){ el.style.display = ''; }); }
+        if (e.target === modal) closeLoginModal();
       });
       $('.login-close', modal).addEventListener('click', closeLoginModal);
 
@@ -3178,17 +3188,25 @@
         });
       });
     }
-    $$('.topbar').forEach(function(el){ el.style.display = 'none'; });
+    // 勿隐藏 .topbar：搜索框在 topbar 内，隐藏后关闭弹窗常不恢复 → 首页搜索消失
     modal.classList.add('open');
     setTimeout(() => $('.login-email input[name=email]', modal)?.focus(), 50);
   }
 
   function closeLoginModal() {
     $('#login-modal')?.classList.remove('open');
+    restoreTopbarSearch();
+  }
+
+  /** 恢复被历史逻辑误藏的搜索顶栏（登录/分享弹窗曾用 style.display=none） */
+  function restoreTopbarSearch() {
+    $$('.topbar').forEach((el) => {
+      if (el.style.display === 'none') el.style.display = '';
+    });
   }
 
   async function finishLogin(token, profile = null) {
-    $$('.topbar').forEach(function(el){ el.style.display = ''; });
+    restoreTopbarSearch();
     let me = profile;
     if (!me) {
       const r = await fetch(`${API_BASE}/me`, {
@@ -7121,29 +7139,52 @@
 
     if (reason === 'workflow') {
       if (eyebrowEl) eyebrowEl.textContent = T('工作流 · 升级解锁', 'Workflow · Upgrade');
-      if (titleEl) titleEl.textContent = T('收藏 / 导出 / 联动 · Pro 起开放', 'Favorites / export / send · from Pro');
+      if (titleEl) titleEl.textContent = T('收藏与清单 · Pro 起开放', 'Favorites & lists · from Pro');
       if (descEl) descEl.textContent = T(
-        'Free 不包含云收藏、清单、分享，以及导出到 Zotero / Notion / Obsidian。升级 Pro 后即可使用完整工作流。',
-        'Free does not include cloud favorites, lists, sharing, or export to Zotero / Notion / Obsidian. Upgrade to Pro for the full workflow.'
+        'Free 不包含云收藏、清单与分享。升级 Pro 后可收藏期刊并管理清单；导出与 Zotero / Notion / Obsidian 联动为 Max 权益。',
+        'Free does not include cloud favorites, lists, or sharing. Upgrade to Pro to save journals; export and Zotero / Notion / Obsidian are Max features.'
       );
       if (perksEl) {
         perksEl.innerHTML = [
-          T('<b>Pro</b> · 收藏与清单 · 导出 · Zotero / Notion / Obsidian', '<b>Pro</b> · Favorites & lists · Export · Zotero / Notion / Obsidian'),
-          T('<b>Pro</b> · 是否付费发表 / APC · 插件中科院与预警', '<b>Pro</b> · Publish-fee / APC · Extension CAS & warning'),
-          T('<b>Max</b> · 高额度 AI 荐刊 · 全部地区站', '<b>Max</b> · High-quota AI picks · All regions'),
+          T('<b>Pro</b> · 云收藏与清单 · 插件中科院与预警', '<b>Pro</b> · Cloud favorites & lists · Extension CAS & warning'),
+          T('<b>Max</b> · 导出 RIS/BibTeX · Zotero / Notion / Obsidian', '<b>Max</b> · Export RIS/BibTeX · Zotero / Notion / Obsidian'),
+          T('<b>Max</b> · 高额度 AI 荐刊 · 原文查找不限量', '<b>Max</b> · High-quota AI picks · Unlimited full-text lookup'),
+        ].map((html) => `<li>${html}</li>`).join('');
+      }
+    } else if (reason === 'export') {
+      if (eyebrowEl) eyebrowEl.textContent = T('导出联动 · Max', 'Export · Max');
+      if (titleEl) titleEl.textContent = T('导出与文献管理联动 · Max 专属', 'Export & reference managers · Max only');
+      if (descEl) descEl.textContent = T(
+        'RIS / BibTeX 导出与 Zotero / Notion / Obsidian 联动为 Max 权益。Pro 可收藏与管理清单，升级 Max 即可一键导出。',
+        'RIS / BibTeX export and Zotero / Notion / Obsidian are Max features. Pro can save favorites; upgrade to Max to export.'
+      );
+      if (perksEl) {
+        perksEl.innerHTML = [
+          T('<b>Max</b> · RIS / BibTeX · CSV / Markdown', '<b>Max</b> · RIS / BibTeX · CSV / Markdown'),
+          T('<b>Max</b> · Zotero / Notion / Obsidian / EndNote', '<b>Max</b> · Zotero / Notion / Obsidian / EndNote'),
+          T('<b>Pro</b> 已含收藏与清单，可随时升级 Max', '<b>Pro</b> already includes favorites — upgrade anytime'),
         ].map((html) => `<li>${html}</li>`).join('');
       }
     } else if (reason === 'fulltext') {
       if (eyebrowEl) eyebrowEl.textContent = T('原文查找 · 升级解锁', 'Full text · Upgrade');
-      if (titleEl) titleEl.textContent = T('Free 原文查找已达上限', 'Free full-text lookup limit reached');
-      if (descEl) descEl.textContent = T(
-        `Free 累计可查找开放全文 ${FREE_FULLTEXT_LIMIT} 篇（按文章去重）。升级 Pro 后不再受此上限限制。`,
-        `Free includes ${FREE_FULLTEXT_LIMIT} open full-text lookups in total (unique articles). Upgrade to Pro for unlimited lookups.`
-      );
+      const ftLimit = getFulltextLimit();
+      const isProCap = getProductTier() === 'plus';
+      if (titleEl) titleEl.textContent = isProCap
+        ? T('Pro 原文查找已达上限', 'Pro full-text lookup limit reached')
+        : T('Free 原文查找已达上限', 'Free full-text lookup limit reached');
+      if (descEl) descEl.textContent = isProCap
+        ? T(
+          `Pro 累计可查找开放全文 ${PRO_FULLTEXT_LIMIT} 篇（按文章去重）。升级 Max 后不限篇数。`,
+          `Pro includes ${PRO_FULLTEXT_LIMIT} open full-text lookups in total (unique articles). Upgrade to Max for unlimited lookups.`
+        )
+        : T(
+          `Free 累计可查找开放全文 ${FREE_FULLTEXT_LIMIT} 篇（按文章去重）。Pro 提升至 ${PRO_FULLTEXT_LIMIT} 篇；Max 不限量。`,
+          `Free includes ${FREE_FULLTEXT_LIMIT} open full-text lookups in total. Pro raises this to ${PRO_FULLTEXT_LIMIT}; Max is unlimited.`
+        );
       if (perksEl) {
         perksEl.innerHTML = [
-          T('<b>Pro</b> · 原文查找不限量（合法 OA 来源）', '<b>Pro</b> · Unlimited full-text lookup (legal OA sources)'),
-          T('<b>Pro</b> · 收藏 / 导出 / 文献管理联动', '<b>Pro</b> · Favorites / export / reference managers'),
+          T(`<b>Pro</b> · 原文查找累计 ${PRO_FULLTEXT_LIMIT} 篇`, `<b>Pro</b> · ${PRO_FULLTEXT_LIMIT} full-text lookups total`),
+          T('<b>Max</b> · 原文查找不限量 · 导出与文献管理联动', '<b>Max</b> · Unlimited full-text · Export & reference managers'),
           T('不升级仍可继续查刊与查看期刊指标', 'You can keep searching journals without upgrading'),
         ].map((html) => `<li>${html}</li>`).join('');
       }
@@ -7206,8 +7247,8 @@
     }
     if (noteEl) {
       noteEl.textContent = T(
-        '支付通道即将开放；可先查看方案，关闭弹窗不影响当前使用。',
-        'Checkout is coming soon. You can close this and keep using the site.'
+        '可先了解各档权益；关闭弹窗后仍可继续使用 Free 能力。',
+        'You can review plan benefits first; close this dialog to keep using Free.'
       );
     }
 
@@ -7867,7 +7908,7 @@
     if (!user) return T('登录后可查看会员档位与积分。','Sign in to view membership and credits.');
     const m = membershipTierLabel();
     if (m.id === 'max') return T('Max 月度 AI credits，由服务器同步。','Max monthly AI credits, synced from server.');
-    if (m.id === 'pro') return T('Pro 含插件与工作流；AI 荐刊约 50 次/月。','Pro includes extension workflow; ~50 AI picks/month.');
+    if (m.id === 'pro') return T('Pro 含插件徽章与收藏；原文累计 200 篇 · AI 约 50 次/月。','Pro: extension badges & favorites; 200 full-text lookups · ~50 AI picks/month.');
     return T('Free 账号 · AI 荐刊终身共 10 次 · 升级可解锁更多。','Free plan · 10 lifetime AI picks · upgrade for more.');
   }
 
@@ -8017,7 +8058,7 @@
       box.innerHTML = `
         <div class="empty workflow-lock" style="padding:48px 20px;text-align:center;color:var(--muted)">
           <div style="font-size:18px;font-weight:700;color:var(--ink,#3a2e1f);margin-bottom:10px">${T('收藏与清单 · Pro 起开放','Favorites & lists · from Pro')}</div>
-          <p style="max-width:420px;margin:0 auto 16px;line-height:1.55">${T('Free 不提供云收藏、清单、分享与导出联动。升级 Pro 后可收藏期刊、管理清单，并导出到 Zotero / Notion / Obsidian。','Free does not include favorites, lists, sharing, or export. Upgrade to Pro to save journals and export to Zotero / Notion / Obsidian.')}</p>
+          <p style="max-width:420px;margin:0 auto 16px;line-height:1.55">${T('Free 不提供云收藏、清单与分享。升级 Pro 后可收藏期刊并管理清单；导出与 Zotero / Notion / Obsidian 为 Max 权益。','Free does not include favorites, lists, or sharing. Upgrade to Pro to save journals; export and Zotero / Notion / Obsidian are Max features.')}</p>
           <button type="button" class="btn-mini" data-workflow-upgrade style="padding:10px 16px;font-size:14px">${T('查看订阅方案','View plans')}</button>
         </div>`;
       box.querySelector('[data-workflow-upgrade]')?.addEventListener('click', () => showRegionPaywallModal('workflow'));
@@ -8165,6 +8206,10 @@
     if (exportBtn && exportMenu) {
       exportBtn.addEventListener('click', (e) => {
         e.stopPropagation();
+        if (!canUseExportIntegrations()) {
+          showRegionPaywallModal('export');
+          return;
+        }
         const open = exportMenu.hasAttribute('hidden');
         if (open) exportMenu.removeAttribute('hidden');
         else exportMenu.setAttribute('hidden', '');
@@ -8172,6 +8217,10 @@
       exportMenu.querySelectorAll('[data-fav-export]').forEach((btn) => {
         btn.addEventListener('click', async (e) => {
           e.stopPropagation();
+          if (!canUseExportIntegrations()) {
+            showRegionPaywallModal('export');
+            return;
+          }
           exportMenu.setAttribute('hidden', '');
           await runFavExport(btn.getAttribute('data-fav-export'));
         });
@@ -8383,7 +8432,7 @@
 
   async function runFavExport(kind) {
     if (!canUseExportIntegrations()) {
-      showRegionPaywallModal('workflow');
+      showRegionPaywallModal('export');
       return;
     }
     const list = getActiveList();
@@ -8489,7 +8538,9 @@
       modal.id = 'share-modal';
       modal.className = 'share-modal';
       document.body.appendChild(modal);
-      modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('open'); });
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) { modal.classList.remove('open'); restoreTopbarSearch(); }
+      });
     }
     let body;
     if (opts.loading) {
@@ -8535,10 +8586,9 @@
         </div>`;
     }
     modal.innerHTML = `<div class="share-card share-modal-card">${body}</div>`;
-    $$('.topbar').forEach(function(el){ el.style.display = 'none'; });
     modal.classList.add('open');
     const closeBtn = document.getElementById('share-close-btn');
-    if (closeBtn) closeBtn.addEventListener('click', () => modal.classList.remove('open'));
+    if (closeBtn) closeBtn.addEventListener('click', () => { modal.classList.remove('open'); restoreTopbarSearch(); });
     const copyBtn = document.getElementById('share-copy-btn');
     if (copyBtn) copyBtn.addEventListener('click', async () => {
       const inp = document.getElementById('share-url-input');
@@ -8638,7 +8688,9 @@
       modal = document.createElement('div');
       modal.id = 'share-modal'; modal.className = 'share-modal';
       document.body.appendChild(modal);
-      modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('open'); });
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) { modal.classList.remove('open'); restoreTopbarSearch(); }
+      });
     }
 
     modal.innerHTML = `
@@ -8672,10 +8724,12 @@
           <div class="share-modal-foot"><button id="share-close-btn" class="share-foot-link">${T('关闭','Close')}</button></div>
         </div>
       </div>`;
-    $$('.topbar').forEach(function(el){ el.style.display = 'none'; });
     modal.classList.add('open');
 
-    document.getElementById('share-close-btn').addEventListener('click', () => modal.classList.remove('open'));
+    document.getElementById('share-close-btn').addEventListener('click', () => {
+      modal.classList.remove('open');
+      restoreTopbarSearch();
+    });
 
     document.getElementById('jcard-copy-btn').addEventListener('click', async () => {
       const ok = await copyToClipboard(url);
@@ -11908,6 +11962,8 @@
     if (window.location.search.includes(OWNER_EMAIL)) {
       try { localStorage.setItem('ailatest_unlocked', '1'); } catch {}
     }
+    // 立刻恢复被登录/分享弹窗误藏的搜索框（同一会话未刷新时）
+    restoreTopbarSearch();
     installRouteAnalytics();
     trackPageview();
     loadFavLists();
