@@ -104,7 +104,7 @@
     return normalize(navigator.language || 'en');
   }
 
-  /** 全站静态页统一页脚（对齐 Todo 落地页：品牌 + 产品 / 支持 / 条款 + 底栏） */
+  /** 全站静态页统一页脚：品牌 + 产品 / 支持 / 条款（单层，不重复底栏链接） */
   function unifiedFooterHtml(dict) {
     return `
     <div class="site-foot-grid">
@@ -114,11 +114,12 @@
           <span class="site-foot-name">AILatest <em>Journal</em></span>
         </a>
         <p data-static-i18n="footer_tag">${dict.footer_tag}</p>
+        <a class="site-foot-copy" href="https://ailatest.org" target="_blank" rel="noopener noreferrer" title="AILatest">© 2026 AILatest</a>
       </div>
       <div class="site-foot-col">
         <h4 data-static-i18n="footer_product">${dict.footer_product}</h4>
-        <a href="/global" data-static-i18n="footer_global">${dict.footer_global}</a>
-        <a href="/cn" data-static-i18n="footer_china">${dict.footer_china}</a>
+        <a href="/global/" data-static-i18n="footer_global">${dict.footer_global}</a>
+        <a href="/cn/" data-static-i18n="footer_china">${dict.footer_china}</a>
         <a href="/rankings/" data-static-i18n="footer_rankings">${dict.footer_rankings}</a>
         <a href="/extension.html" data-static-i18n="footer_download">${dict.footer_download}</a>
         <a href="/about" data-static-i18n="footer_about">${dict.footer_about}</a>
@@ -135,16 +136,6 @@
         <a href="/privacy" data-static-i18n="footer_privacy">${dict.footer_privacy}</a>
         <a href="/terms" data-static-i18n="footer_terms">${dict.footer_terms}</a>
         <a href="/refund" data-static-i18n="footer_refund">${dict.footer_refund}</a>
-      </div>
-    </div>
-    <div class="site-foot-bottom">
-      <a class="site-foot-copy" href="https://ailatest.org" target="_blank" rel="noopener noreferrer" title="AILatest">© 2026 AILatest</a>
-      <div class="site-foot-quick">
-        <a href="/extension.html" data-static-i18n="footer_download">${dict.footer_download}</a>
-        <a href="/contact" data-static-i18n="footer_contact">${dict.footer_contact}</a>
-        <a href="https://ailatest.org/connect.html" target="_blank" rel="noopener noreferrer" data-static-i18n="footer_matrix">${dict.footer_matrix}</a>
-        <a href="/privacy" data-static-i18n="footer_privacy">${dict.footer_privacy}</a>
-        <a href="/terms" data-static-i18n="footer_terms">${dict.footer_terms}</a>
       </div>
     </div>`;
   }

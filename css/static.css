@@ -761,6 +761,9 @@ td.c, th.c { text-align: center; }
   line-height: 1.55;
   max-width: 28ch;
 }
+.page-foot .site-foot-brand .site-foot-copy {
+  margin-top: 4px;
+}
 .page-foot .site-foot-logo {
   align-items: center;
   color: var(--ink);
@@ -808,32 +811,12 @@ td.c, th.c { text-align: center; }
   width: fit-content;
 }
 .page-foot .site-foot-col a:hover { color: var(--ink); }
-.page-foot .site-foot-bottom {
-  align-items: flex-start;
-  border-top: 1px solid var(--line);
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px 24px;
-  justify-content: space-between;
-  margin-top: 26px;
-  padding-top: 18px;
-  row-gap: 14px;
-}
 .page-foot .site-foot-copy {
   color: var(--muted);
-  font-size: 13px;
+  font-size: 12.5px;
+  width: fit-content;
 }
 .page-foot .site-foot-copy:hover { color: var(--ink); }
-.page-foot .site-foot-quick {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px;
-}
-.page-foot .site-foot-quick a {
-  color: var(--muted);
-  font-size: 13px;
-}
-.page-foot .site-foot-quick a:hover { color: var(--ink); }
 
 @media (max-width: 800px) {
   .page-foot .site-foot-grid {
@@ -851,9 +834,6 @@ td.c, th.c { text-align: center; }
   .page-foot .site-foot-grid {
     grid-template-columns: 1fr;
     gap: 22px;
-  }
-  .page-foot .site-foot-bottom {
-    flex-direction: column;
   }
 }
 

@@ -3783,6 +3783,9 @@ body:not(.home-route) .site-foot .visitor-footnote {
   line-height: 1.55;
   max-width: 28ch;
 }
+.site-foot-brand .site-foot-copy {
+  margin-top: 4px;
+}
 
 .site-foot-logo {
   align-items: center;
@@ -3845,43 +3848,17 @@ body:not(.home-route) .site-foot .visitor-footnote {
   color: rgba(43,40,36,.92);
 }
 
-.site-foot-bottom {
-  align-items: flex-start;
-  border-top: 1px solid var(--rule-soft);
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px 24px;
-  justify-content: space-between;
-  margin-top: 26px;
-  padding-top: 18px;
-  row-gap: 14px;
-}
 .site-foot-copy {
   color: rgba(117,111,104,.72);
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 540;
   text-decoration: none;
   border-bottom: none !important;
   transition: color .12s ease;
+  width: fit-content;
 }
 .site-foot-copy:hover {
   color: rgba(81,75,69,.9);
-}
-.site-foot-quick {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px;
-}
-.site-foot-quick a {
-  color: rgba(117,111,104,.72);
-  font-size: 13px;
-  font-weight: 540;
-  text-decoration: none;
-  border-bottom: none !important;
-  transition: color .12s ease;
-}
-.site-foot-quick a:hover {
-  color: rgba(81,75,69,.92);
 }
 
 @media (max-width: 800px) {
@@ -3900,9 +3877,6 @@ body:not(.home-route) .site-foot .visitor-footnote {
   .site-foot-grid {
     grid-template-columns: 1fr;
     gap: 22px;
-  }
-  .site-foot-bottom {
-    flex-direction: column;
   }
 }
 
