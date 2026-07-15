@@ -8,7 +8,7 @@
 <meta name="robots" content="noindex,nofollow" />
 <link rel="canonical" href="https://journal.ailatest.org/pricing.html" />
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
-<link rel="stylesheet" href="/css/static.css?v=20260715-pricing-fpm" />
+<link rel="stylesheet" href="/css/static.css?v=20260715-plan-btn-align" />
 <style>
   body[data-static-page="pricing"] main.pricing-main {
     max-width: 1080px;
@@ -34,12 +34,38 @@
     color: var(--link);
   }
   .plans.plans-3 {
+    display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 14px;
     margin-top: 20px;
+    align-items: stretch;
   }
   @media (max-width: 900px) {
     .plans.plans-3 { grid-template-columns: 1fr; }
+  }
+  /* 三卡等高，底部 CTA 对齐 */
+  .plans.plans-3 .plan {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 100%;
+  }
+  .plans.plans-3 .plan > ul {
+    flex: 1 1 auto;
+    min-height: 0;
+    margin-bottom: 0;
+  }
+  .plans.plans-3 .plan > .btn,
+  .plans.plans-3 .plan > a.btn,
+  .plans.plans-3 .plan > button.btn {
+    margin-top: auto;
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
   }
   .plan .price-row {
     display: flex;
