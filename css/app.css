@@ -7249,19 +7249,19 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .tab-panel table.journals thead .col-name,
 .tab-panel table.journals thead .col-cycle { display: none; }
 
-/* 每行 2 卡 · 同行等高（HIG: consistent layout） */
+/* 每行 2 卡 · 高度随内容（信息少的卡不硬撑高） */
 .tab-panel table.journals tbody {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
   padding-top: 12px;
-  align-items: stretch;
+  align-items: start;
 }
 @media (max-width: 760px) {
   .tab-panel table.journals tbody { grid-template-columns: 1fr; }
 }
 
-/* 全站统一白卡：上块（刊名/副信息）+ 下块（徽章），高度随信息密度 */
+/* 全站统一白卡：上块（刊名/副信息）+ 分割线 + 下块（徽章） */
 .tab-panel table.journals tbody tr.j-row,
 .tab-panel table.journals tbody tr.j-row.j-card {
   position: relative;
@@ -7269,12 +7269,12 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   flex-direction: column;
   align-items: stretch;
   gap: 0;
-  min-width: 0 !important; /* 禁止 grid item 被 IF 撑破轨道 */
+  min-width: 0 !important;
   max-width: 100%;
   min-height: 0;
-  height: 100%;
+  height: auto; /* 不强制 100% 等高，地区站信息少时自然变矮 */
   padding: 0;
-  overflow: hidden !important; /* IF 绝不能画出卡片 */
+  overflow: hidden !important;
   background: #ffffff;
   border: 1px solid rgba(60, 60, 67, 0.12);
   border-radius: 16px;
@@ -7611,6 +7611,9 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .j-row .j-card-main {
   overflow: hidden;
   max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 auto; /* 不把卡撑满整行高度 */
 }
 .j-row .j-card-head {
   display: grid;
@@ -7624,11 +7627,15 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   box-sizing: border-box;
   background: #f4f2ed;
   border-radius: 15px 15px 0 0;
+  /* 与下块（收录/分区）的清晰分割线 */
+  border-bottom: 1px solid rgba(60, 60, 67, 0.12);
   overflow: hidden;
 }
+/* 无徽章下块时：上块圆角到底，无分割线 */
 .j-row.j-card-compact .j-card-head {
   border-radius: 15px;
-  flex: 1 1 auto;
+  border-bottom: 0;
+  flex: 0 0 auto;
 }
 /* 左：刊名 + meta */
 .j-row .j-card-head-main {
@@ -7843,16 +7850,16 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .j-row .j-meta-topic { display: none; }
 .j-row .j-meta-topic-show { display: inline-flex; }
 
-/* 下块：纯白，收录/分区徽章，无整区底色 */
+/* 下块：纯白；与上块用分割线分开；收录/分区分行且有行距 */
 .j-row .j-card-body {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 0;
   width: 100%;
   min-width: 0;
   margin: 0;
-  padding: 10px 14px 12px;
-  flex: 1 1 auto;
+  padding: 12px 14px 14px;
+  flex: 0 0 auto; /* 不硬撑空白高度 */
   background: #ffffff;
   box-sizing: border-box;
   overflow: visible;
@@ -7863,7 +7870,7 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 6px;
+  gap: 10px; /* 收录行 ↔ 分区行 间距 */
   width: 100%;
   min-width: 0;
   max-height: none !important;
@@ -7874,7 +7881,7 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   flex-direction: row;
   flex-wrap: wrap;
   align-items: center;
-  gap: 5px 6px;
+  gap: 6px 6px;
 }
 .j-row .j-card-badges .badge-cell,
 .j-row .j-card-badges .badge-line {
@@ -7896,6 +7903,14 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   gap: 5px 6px;
   width: 100%;
   min-width: 0;
+}
+/* 收录 / 分区 / 获取 / 风险 各行明确分行 */
+.j-row .j-card-badges .badges-idx + .badges-rank,
+.j-row .j-card-badges .badges-rank + .badges-access,
+.j-row .j-card-badges .badges-access + .badges-risk,
+.j-row .j-card-badges .badges-idx + .badges-access,
+.j-row .j-card-badges .badges-rank + .badges-risk {
+  margin-top: 0; /* gap 已负责间距 */
 }
 .j-row .j-card-badges .badge,
 .j-row .j-card-badges .zone,
