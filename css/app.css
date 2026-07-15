@@ -9658,6 +9658,120 @@ body[data-boot-tab="me"] .tab-panel[data-panel="me"] {
   max-width: 100%;
 }
 
+/* 设置 · 语言 */
+.settings-hint {
+  margin: 0 0 12px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #57534e;
+}
+.settings-hint-soft { color: #78716c; font-size: 12.5px; }
+.settings-lang-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(108px, 1fr));
+  gap: 8px;
+  max-width: 100%;
+}
+.settings-lang-chip {
+  appearance: none;
+  border: 1px solid #e7e5e4;
+  background: #fff;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  color: #44403c;
+  cursor: pointer;
+  text-align: center;
+  min-width: 0;
+}
+.settings-lang-chip:hover { border-color: #d6d3d1; background: #fffefb; }
+.settings-lang-chip.active {
+  border-color: #f97316;
+  background: #fff7ed;
+  color: #c2410c;
+  box-shadow: inset 0 0 0 1px rgba(249,115,22,.2);
+}
+
+/* 设置 · 地区站固定 */
+.settings-region-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 100%;
+}
+.settings-region-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid #e7e5e4;
+  border-radius: 12px;
+  background: #fff;
+  min-width: 0;
+}
+.settings-region-row.is-pinned {
+  border-color: rgba(249,115,22,.35);
+  background: #fffaf5;
+}
+.settings-region-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.settings-region-flag {
+  flex: 0 0 auto;
+  width: 32px;
+  height: 28px;
+  border-radius: 7px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .04em;
+  color: #57534e;
+  background: #f5f5f4;
+  border: 1px solid #e7e5e4;
+}
+.settings-region-meta strong {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1c1917;
+  overflow-wrap: anywhere;
+}
+.settings-region-toggle {
+  flex: 0 0 auto;
+  appearance: none;
+  border: 1px solid #d6d3d1;
+  background: #fff;
+  border-radius: 999px;
+  padding: 7px 12px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  color: #44403c;
+  cursor: pointer;
+  white-space: nowrap;
+  max-width: 48%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.settings-region-row.is-pinned .settings-region-toggle {
+  border-color: rgba(249,115,22,.4);
+  color: #c2410c;
+  background: #fff7ed;
+}
+.settings-region-toggle:hover { filter: brightness(0.98); }
+
+/* 地区站管理已迁入设置：隐藏侧栏「···地区」入口 */
+.rail-region-picker {
+  display: none !important;
+}
+
 @media (max-width: 900px) {
   .tab-panel[data-panel="me"] { align-items: flex-end; }
   .settings-panel {

@@ -7806,8 +7806,13 @@
       else if (region) btn.style.order = String(1 + REGION_STATION_IDS.indexOf(s.id));
       else btn.style.order = '';
     });
+    // 地区增减已迁入设置页：始终隐藏侧栏 ··· 入口
     const regionPicker = document.querySelector('.rail-region-picker');
-    if (regionPicker) regionPicker.style.order = String(1 + REGION_STATION_IDS.length);
+    if (regionPicker) {
+      regionPicker.hidden = true;
+      regionPicker.setAttribute('aria-hidden', 'true');
+      regionPicker.style.display = 'none';
+    }
     const favBtn = document.querySelector('.rail-nav-btn[data-tab="fav"]');
     if (favBtn) favBtn.style.order = '8';
     const creditBadge = document.querySelector('#account-credit-badge');
@@ -7825,11 +7830,16 @@
     const wosSel2 = $('#wos-col-filter');
     if (wosSel2) wosSel2.__bound = false;
     renderCatList();
-    if (activeTab === 'dom') renderDomestic();
+    // 设置页语言切换：保留当前设置分区
+    if (activeTab === 'me' || document.body.classList.contains('settings-open')) {
+      if (!_settingsSection || _settingsSection === 'activity') _settingsSection = 'language';
+      const keep = _settingsSection;
+      renderMe();
+      showSettingsSection(keep === 'language' ? 'language' : keep);
+    } else if (activeTab === 'dom') renderDomestic();
     else if (activeTab === 'fav') renderFav();
     else if (activeTab === 'int') renderInt();
     else if (activeTab === 'pick') refreshPickI18n();
-    else if (activeTab === 'me') renderMe();
     else if (activeTab === 'in') renderIndia();
     else if (activeTab === 'my') renderMalaysia();
     else if (activeTab === 'kr') renderKorea();
@@ -8413,6 +8423,7 @@
           <nav class="settings-nav" aria-label="${T('设置导航','Settings')}">
             <div class="settings-nav-title">${T('设置','Settings')}</div>
             <button type="button" data-settings-nav="account" class="${_settingsSection === 'account' ? 'active' : ''}">${T('账号','Account')}</button>
+            <button type="button" data-settings-nav="regions" class="${_settingsSection === 'regions' ? 'active' : ''}">${T('地区站','Regions')}</button>
             <button type="button" data-settings-nav="billing" class="${_settingsSection === 'billing' ? 'active' : ''}">${T('订阅','Billing')}</button>
             <button type="button" data-settings-nav="downloads" class="${_settingsSection === 'downloads' ? 'active' : ''}">${T('下载','Downloads')}</button>
             <button type="button" data-settings-nav="rankings" class="${_settingsSection === 'rankings' ? 'active' : ''}">${T('榜单','Rankings')}</button>
@@ -8447,6 +8458,37 @@
                 <div class="me-activity-months"><span>${T('近 12 周','Last 12 weeks')}</span><span>${new Date().toLocaleDateString(uiLocale(), { month: 'short', day: 'numeric' })}</span></div>
                 <div class="me-activity-grid settings-activity-grid">${renderActivityDots()}</div>
               </section>
+            </section>
+
+            <section class="settings-section" data-settings-section="regions" ${_settingsSection === 'regions' ? '' : 'hidden'}>
+              <h2 class="settings-section-title">${T('地区站','Region stations')}</h2>
+              <p class="settings-hint">${T(
+                '固定后会出现在左侧导航。取消固定则从侧栏移除（仍可在此重新添加）。',
+                'Pinned regions appear on the left rail. Unpin removes them from the rail (you can pin again here).'
+              )}</p>
+              <p class="settings-hint settings-hint-soft">${(() => {
+                const ent = regionEntitlements();
+                if (ent.unlockAll) return T('当前为 Max：可自由固定 / 取消任意地区。', 'Max plan: pin or unpin any region freely.');
+                if (ent.maxCustomPins > 0) return T(`当前为 Pro：除中国外最多再固定 ${ent.maxCustomPins} 个地区。`, `Pro plan: pin up to ${ent.maxCustomPins} extra regions beyond China.`);
+                return T('当前为 Free：中国站默认保留；其他地区可临时查看，升级后可固定到侧栏。', 'Free plan: China stays on the rail; other regions open temporarily. Upgrade to pin them.');
+              })()}</p>
+              <div class="settings-region-list" data-settings-region-list>
+                ${REGION_STATION_IDS.map((id) => {
+                  const st = STATIONS.find(s => s.id === id) || { zh: id, en: id };
+                  const label = lang === 'en' ? (st.en || st.zh) : (st.zh || st.en);
+                  const code = ({ dom: 'CN', in: 'IN', my: 'MY', kr: 'KR', pbn: 'PL', isc: 'IR', scielo: 'LA' })[id] || id.toUpperCase();
+                  const pinned = getPinnedRegions().includes(id);
+                  return `<div class="settings-region-row${pinned ? ' is-pinned' : ''}" data-region-id="${escape(id)}">
+                    <div class="settings-region-meta">
+                      <span class="settings-region-flag" aria-hidden="true">${escape(code)}</span>
+                      <strong>${escape(label)}</strong>
+                    </div>
+                    <button type="button" class="settings-region-toggle" data-settings-region-toggle="${escape(id)}" aria-pressed="${pinned ? 'true' : 'false'}">
+                      ${pinned ? T('已固定 · 点击取消', 'Pinned · tap to unpin') : T('固定到侧栏', 'Pin to rail')}
+                    </button>
+                  </div>`;
+                }).join('')}
+              </div>
             </section>
 
             <section class="settings-section" data-settings-section="billing" ${_settingsSection === 'billing' ? '' : 'hidden'}>
@@ -8511,8 +8553,14 @@
 
             <section class="settings-section" data-settings-section="language" ${_settingsSection === 'language' ? '' : 'hidden'}>
               <h2 class="settings-section-title">${T('语言','Language')}</h2>
-              <p style="margin:0 0 12px;color:#78716c;font-size:13px">${T('当前','Current')}：${escape(langLabel)}</p>
-              <button type="button" class="settings-link-row" data-toggle-lang style="width:100%">${T('切换中文 / English','Switch Chinese / English')}<span>⇄</span></button>
+              <p class="settings-hint">${T('当前','Current')}：<strong>${escape(LANG_META[lang]?.label || langLabel)}</strong></p>
+              <div class="settings-lang-grid" role="listbox" aria-label="${T('界面语言','Interface language')}">
+                ${LANG_ORDER.map((code) => {
+                  const meta = LANG_META[code] || { label: code };
+                  const on = code === lang;
+                  return `<button type="button" class="settings-lang-chip${on ? ' active' : ''}" data-set-lang="${escape(code)}" aria-selected="${on ? 'true' : 'false'}">${escape(meta.label)}</button>`;
+                }).join('')}
+              </div>
             </section>
           </div>
         </div>
@@ -8529,9 +8577,50 @@
       if (typeof window.__activateJournalTab === 'function') window.__activateJournalTab('rank', { push: true });
       else activateTab('rank', { push: true });
     });
-    box.querySelector('[data-toggle-lang]')?.addEventListener('click', () => {
-      $('#lang-toggle')?.click();
-      renderMe();
+    // 语言：直接 setUiLanguage，不依赖页面角落下拉（设置浮层下原点击无效）
+    box.querySelectorAll('[data-set-lang]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const code = btn.getAttribute('data-set-lang');
+        if (!code || code === lang) return;
+        setUiLanguage(code);
+        // setUiLanguage 在 me tab 会 renderMe；确保仍停留在语言分区
+        _settingsSection = 'language';
+        if (activeTab === 'me') {
+          // renderMe 已由 setUiLanguage 触发时保持 language；否则补一次
+          const still = $('#me-content [data-settings-section="language"]');
+          if (!still || still.hidden) {
+            showSettingsSection('language');
+          }
+        }
+      });
+    });
+    // 地区站固定 / 取消（只改侧栏钉选，不强制跳转）
+    box.querySelectorAll('[data-settings-region-toggle]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-settings-region-toggle');
+        if (!id) return;
+        const wasPinned = getPinnedRegions().includes(id);
+        const ent = regionEntitlements();
+        // Free 不能固定自定义地区：点击给出升级提示，不打开页面
+        if (!wasPinned && !ent.unlockAll && ent.maxCustomPins === 0 && !FREE_BASE_REGION_IDS.includes(id)) {
+          showRegionPaywallModal('pin_free');
+          return;
+        }
+        const ok = togglePinnedRegion(id);
+        if (!ok && !wasPinned) {
+          // 已弹 paywall 或失败
+          return;
+        }
+        applyStations();
+        // 轻量刷新本行状态，避免整页闪烁
+        const pinnedNow = getPinnedRegions().includes(id);
+        const row = btn.closest('.settings-region-row');
+        row?.classList.toggle('is-pinned', pinnedNow);
+        btn.setAttribute('aria-pressed', pinnedNow ? 'true' : 'false');
+        btn.textContent = pinnedNow
+          ? T('已固定 · 点击取消', 'Pinned · tap to unpin')
+          : T('固定到侧栏', 'Pin to rail');
+      });
     });
     box.querySelector('[data-me-login]')?.addEventListener('click', startLogin);
     box.querySelector('.me-avatar img')?.addEventListener('error', (e) => {
