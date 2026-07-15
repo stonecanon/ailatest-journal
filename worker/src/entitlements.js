@@ -57,6 +57,12 @@ const TIERS = {
     export: false,
     integrations: false,
     ai: { enabled: false },
+    regions: {
+      free_base: ['dom'],
+      max_custom_pins: 0,
+      daily_views: 3,
+      unlock_all: false,
+    },
     extension: {
       queries_per_day: 80,
       devices: 1,
@@ -78,6 +84,12 @@ const TIERS = {
     export: false,
     integrations: false,
     ai: { enabled: false },
+    regions: {
+      free_base: ['dom'],
+      max_custom_pins: 2,
+      daily_views: null,
+      unlock_all: false,
+    },
     extension: {
       queries_per_day: 20000,
       devices: 2,
@@ -101,6 +113,7 @@ const TIERS = {
     integrations: ['zotero', 'notion', 'endnote', 'obsidian'],
     // trial 继承 pro 但 AI 锁定
     ai: { enabled: false, ui: 'visible_locked', locked_hint: 'AI 荐刊为 Max 功能，订阅后每月含 1000 credits' },
+    regions: { free_base: ['dom'], max_custom_pins: null, daily_views: null, unlock_all: true },
     extension: {
       queries_per_day: 50000,
       devices: 4,
@@ -124,6 +137,7 @@ const TIERS = {
     export: { formats: ['csv', 'ris', 'bibtex', 'xlsx'] },
     integrations: false, // 深度联动规划中；插件 RIS/BibTeX/EndNote 导出已支持
     ai: { enabled: true, monthly_credits: PRO_MONTHLY_CREDITS, credits_rollover: false },
+    regions: { free_base: ['dom'], max_custom_pins: null, daily_views: null, unlock_all: true },
     extension: {
       queries_per_day: 50000,
       devices: 4,

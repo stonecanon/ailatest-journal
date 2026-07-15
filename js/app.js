@@ -6835,9 +6835,63 @@
     { id: 'scielo', i18n: 'rail_scielo', zh: '拉美', en: 'LatAm' },
   ];
   const REGION_STATION_IDS = ['dom', 'in', 'my', 'kr', 'pbn', 'isc', 'scielo'];
+  const FREE_BASE_REGION_IDS = ['dom']; // 中国站始终可用
   const DEFAULT_PINNED_REGION_IDS = ['dom'];
   const PINNED_REGION_KEY = 'ailatest.pinnedRegionStations';
   const PINNED_REGION_MIGRATION_KEY = `${PINNED_REGION_KEY}.v2`;
+  const REGION_VIEW_KEY = 'ailatest.regionViewDaily';
+  const FREE_REGION_DAILY_VIEWS = 3;
+
+  /** free | plus(Pro) | pro(Max) — 与 entitlements 对齐；支付未开时默认 free */
+  function getRegionPlanTier() {
+    try {
+      if (user && (user.is_owner || user.plan === 'owner')) return 'pro';
+      const tier = String(user?.entitlements?.tier || user?.tier || 'free').toLowerCase();
+      if (tier === 'pro' || tier === 'max') return 'pro';
+      if (tier === 'plus' || tier === 'trial') return 'plus';
+      return 'free';
+    } catch (_) {
+      return 'free';
+    }
+  }
+  function regionEntitlements() {
+    const tier = getRegionPlanTier();
+    if (tier === 'pro') {
+      return { maxCustomPins: null, dailyViews: null, unlockAll: true };
+    }
+    if (tier === 'plus') {
+      return { maxCustomPins: 2, dailyViews: null, unlockAll: false };
+    }
+    return { maxCustomPins: 0, dailyViews: FREE_REGION_DAILY_VIEWS, unlockAll: false };
+  }
+  function getRegionViewUsage() {
+    const today = new Date().toISOString().slice(0, 10);
+    try {
+      const raw = JSON.parse(localStorage.getItem(REGION_VIEW_KEY) || '{}');
+      if (raw.date !== today) return { date: today, count: 0, seen: [] };
+      return {
+        date: today,
+        count: Number(raw.count) || 0,
+        seen: Array.isArray(raw.seen) ? raw.seen : [],
+      };
+    } catch (_) {
+      return { date: today, count: 0, seen: [] };
+    }
+  }
+  function saveRegionViewUsage(u) {
+    try { localStorage.setItem(REGION_VIEW_KEY, JSON.stringify(u)); } catch (_) {}
+  }
+  function showRegionUpgradeToast(msg) {
+    try {
+      const el = document.createElement('div');
+      el.className = 'import-toast';
+      el.textContent = msg;
+      el.style.cssText = 'position:fixed;left:50%;bottom:34px;transform:translateX(-50%);z-index:3000;background:#1f2c4c;color:#fff;padding:11px 20px;border-radius:10px;font-size:14px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.28);max-width:88vw;text-align:center';
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 4200);
+    } catch (_) {}
+  }
+
   function getPinnedRegions() {
     try {
       const raw = localStorage.getItem(PINNED_REGION_KEY);
@@ -6849,6 +6903,14 @@
         valid = ['dom', ...valid];
         localStorage.setItem(PINNED_REGION_KEY, JSON.stringify(valid));
         localStorage.setItem(PINNED_REGION_MIGRATION_KEY, '1');
+      }
+      // 权益降级时裁剪多余钉选
+      const ent = regionEntitlements();
+      if (!ent.unlockAll && ent.maxCustomPins != null) {
+        const base = FREE_BASE_REGION_IDS.filter(id => valid.includes(id));
+        const custom = valid.filter(id => !FREE_BASE_REGION_IDS.includes(id)).slice(0, ent.maxCustomPins);
+        valid = [...new Set([...base, ...custom])];
+        if (!valid.includes('dom')) valid = ['dom', ...valid];
       }
       return valid;
     } catch (_) {
@@ -6863,25 +6925,90 @@
   }
   function togglePinnedRegion(id) {
     if (!REGION_STATION_IDS.includes(id)) return;
+    const ent = regionEntitlements();
     const pinned = getPinnedRegions();
-    if (pinned.includes(id)) setPinnedRegions(pinned.filter(x => x !== id));
-    else setPinnedRegions([...pinned, id]);
+    if (pinned.includes(id)) {
+      // 中国站建议保留；允许取消但至少留一个或保留 dom
+      if (id === 'dom' && pinned.length === 1) {
+        showRegionUpgradeToast(T('中国地区站为默认站点，请至少保留一个地区。','China is the default region station. Keep at least one region.'));
+        return;
+      }
+      setPinnedRegions(pinned.filter(x => x !== id));
+      return;
+    }
+    if (ent.unlockAll) {
+      setPinnedRegions([...pinned, id]);
+      return;
+    }
+    // 自定义钉选（不含默认中国）
+    const customPinned = pinned.filter(x => !FREE_BASE_REGION_IDS.includes(x));
+    const isCustom = !FREE_BASE_REGION_IDS.includes(id);
+    if (isCustom && ent.maxCustomPins != null && customPinned.length >= ent.maxCustomPins) {
+      if (ent.maxCustomPins === 0) {
+        showRegionUpgradeToast(T('免费版可每日查看地区站 3 次；升级 Pro 可固定 2 个自定义地区，Max 解锁全部。','Free: 3 regional views/day. Pro: pin 2 custom regions. Max: unlock all.'));
+      } else {
+        showRegionUpgradeToast(T(`Pro 最多固定 ${ent.maxCustomPins} 个自定义地区，升级 Max 可解锁全部。`,`Pro can pin up to ${ent.maxCustomPins} custom regions. Upgrade to Max for all.`));
+      }
+      return;
+    }
+    setPinnedRegions([...pinned, id]);
+  }
+  function canAccessRegionStation(id) {
+    if (!REGION_STATION_IDS.includes(id)) return true;
+    const ent = regionEntitlements();
+    if (ent.unlockAll) return true;
+    if (FREE_BASE_REGION_IDS.includes(id)) return true;
+    if (getPinnedRegions().includes(id)) return true;
+    // Free：每日临时查看
+    if (ent.dailyViews != null) {
+      const u = getRegionViewUsage();
+      if (u.seen.includes(id) || u.count < ent.dailyViews) return true;
+    }
+    return false;
+  }
+  function consumeRegionViewIfNeeded(id) {
+    if (!REGION_STATION_IDS.includes(id)) return true;
+    const ent = regionEntitlements();
+    if (ent.unlockAll) return true;
+    if (FREE_BASE_REGION_IDS.includes(id)) return true;
+    if (getPinnedRegions().includes(id)) return true;
+    if (ent.dailyViews == null) return true;
+    const u = getRegionViewUsage();
+    if (u.seen.includes(id)) return true;
+    if (u.count >= ent.dailyViews) {
+      showRegionUpgradeToast(T('今日地区站免费查看次数已用完（3 次）。升级 Pro 可固定 2 个地区，Max 解锁全部。','Daily free regional views used (3). Pro: pin 2 regions. Max: unlock all.'));
+      return false;
+    }
+    u.count += 1;
+    u.seen.push(id);
+    saveRegionViewUsage(u);
+    return true;
   }
   function applyRegionPinState() {
     const pinned = getPinnedRegions();
+    const ent = regionEntitlements();
     document.querySelectorAll('[data-region-pin]').forEach(btn => {
-      const on = pinned.includes(btn.dataset.regionPin);
+      const id = btn.dataset.regionPin;
+      const on = pinned.includes(id);
       btn.classList.toggle('active', on);
       btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      // Max 解锁全部时钉选按钮可作「侧栏常驻」
+      btn.disabled = false;
+      if (!ent.unlockAll && ent.maxCustomPins === 0 && !FREE_BASE_REGION_IDS.includes(id) && !on) {
+        btn.title = T('升级后可固定到侧栏','Upgrade to pin on the rail');
+      }
     });
   }
   function applyStations() {
     const pinned = getPinnedRegions();
+    const ent = regionEntitlements();
     STATIONS.forEach((s) => {
       const btn = document.querySelector(`.rail-nav-btn[data-tab="${s.id}"]`);
       if (!btn) return;
       const region = REGION_STATION_IDS.includes(s.id);
-      btn.hidden = region && !pinned.includes(s.id);
+      // Max：全部地区站显示；否则仅显示已钉选
+      const show = !region || ent.unlockAll || pinned.includes(s.id);
+      btn.hidden = !show;
       btn.toggleAttribute('data-station-hidden', btn.hidden);
       if (s.id === 'int') btn.style.order = '0';
       else if (region) btn.style.order = String(1 + REGION_STATION_IDS.indexOf(s.id));
@@ -9375,6 +9502,14 @@
 
     function activateTab(tab, opts = {}) {
       if (!TAB_PATHS[tab]) tab = 'home';
+      // 地区站权益：Free 每日 3 次临时查看；Pro 固定 2 个自定义；Max 全部
+      if (REGION_STATION_IDS.includes(tab) && !opts.skipRegionGate) {
+        if (!canAccessRegionStation(tab)) {
+          showRegionUpgradeToast(T('今日地区站免费查看次数已用完（3 次）。升级 Pro 可固定 2 个地区，Max 解锁全部。','Daily free regional views used (3). Pro: pin 2 regions. Max: unlock all.'));
+          return;
+        }
+        if (!consumeRegionViewIfNeeded(tab)) return;
+      }
       const previousTab = activeTab;
       const changingTab = previousTab !== tab;
       if (changingTab) tabScrollPositions.set(previousTab, window.scrollY);
