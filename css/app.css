@@ -7263,13 +7263,13 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .tab-panel table.journals thead .col-name,
 .tab-panel table.journals thead .col-cycle { display: none; }
 
-/* 每行 2 卡 · 高度随内容（信息少的卡不硬撑高） */
+/* 每行 2 卡 · 同行等高（矮卡下块留白对齐） */
 .tab-panel table.journals tbody {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
   padding-top: 12px;
-  align-items: start;
+  align-items: stretch;
 }
 @media (max-width: 760px) {
   .tab-panel table.journals tbody { grid-template-columns: 1fr; }
@@ -7286,7 +7286,7 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   min-width: 0 !important;
   max-width: 100%;
   min-height: 0;
-  height: auto; /* 不强制 100% 等高，地区站信息少时自然变矮 */
+  height: 100%; /* 同行 stretch 等高 */
   padding: 0;
   overflow: hidden !important;
   background: #ffffff;
@@ -7625,9 +7625,10 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .j-row .j-card-main {
   overflow: hidden;
   max-width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  flex: 0 0 auto; /* 不把卡撑满整行高度 */
+  flex: 1 1 auto; /* 撑满卡片，便于下块留白 */
 }
 .j-row .j-card-head {
   display: grid;
@@ -7878,7 +7879,7 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .j-row .j-meta-topic { display: none; }
 .j-row .j-meta-topic-show { display: inline-flex; }
 
-/* 下块：纯白；始终存在；无徽章时略留白 */
+/* 下块：纯白；始终存在；flex 增长吸收留白，保证同行等高 */
 .j-row .j-card-body {
   display: flex;
   flex-direction: column;
@@ -7887,8 +7888,8 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   min-width: 0;
   margin: 0;
   padding: 12px 14px 14px;
-  min-height: 44px; /* 保证两区结构，哪怕只有一点点留白 */
-  flex: 0 0 auto;
+  min-height: 44px;
+  flex: 1 1 auto; /* 矮卡用白底留白对齐高卡 */
   background: #ffffff;
   box-sizing: border-box;
   overflow: visible;
