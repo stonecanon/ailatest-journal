@@ -8,7 +8,7 @@
 <meta name="robots" content="index,follow" />
 <link rel="canonical" href="https://journal.ailatest.org/pricing.html" />
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
-<link rel="stylesheet" href="/css/static.css?v=20260715-pricing-v2" />
+<link rel="stylesheet" href="/css/static.css?v=20260715-pricing-v3" />
 <style>
   /* ── Journal 定价页：参考 Todo 层次，保留 Journal 暖纸气质 ── */
   body[data-static-page="pricing"] {
@@ -191,12 +191,43 @@
     color: #fff;
     background: linear-gradient(180deg, #fb923c, #f97316);
   }
+  /* 原价 + 限时折扣价（USD = Creem 产品价） */
+  .plan .price-block {
+    margin: 18px 0 12px;
+    min-height: 108px;
+  }
+  .plan .price-list-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+    min-height: 22px;
+  }
+  .plan .price-list-row s {
+    color: #9a9288;
+    font-size: 15px;
+    font-weight: 650;
+    text-decoration: line-through;
+    text-decoration-thickness: 1.5px;
+  }
+  .plan .deal-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 99px;
+    background: #fff1e8;
+    color: #c2410c;
+    font-size: 11px;
+    font-weight: 850;
+    letter-spacing: .02em;
+  }
   .plan .price-row {
     display: flex;
     align-items: baseline;
     gap: 6px;
     flex-wrap: wrap;
-    margin: 22px 0 4px;
+    margin: 0 0 4px;
   }
   .plan .price-row .price {
     font-size: 44px;
@@ -210,29 +241,34 @@
     font-weight: 700;
     color: #6b6358;
   }
-  .plan .price-row .price-local {
-    font-size: 15px;
-    font-weight: 700;
+  .plan .price-row .price-currency {
+    font-size: 13px;
+    font-weight: 750;
     color: #8a8377;
+    letter-spacing: .04em;
   }
   .plan .price-std {
-    margin: 0 0 12px;
+    margin: 0;
     font-size: 12.5px;
     color: #8a8377;
   }
-  .plan .price-std[data-cycle-hide] { display: none; }
+  .plan .price-std strong { color: #5c564c; font-weight: 750; }
 
-  /* 教育价：轻量一行，不再大块绿条抢戏 */
+  /* 教育价：原价划线 + 教育折扣价 */
   .plan .edu-offer {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 6px 10px;
+    display: grid;
+    gap: 4px;
     margin: 0 0 14px;
     padding: 10px 12px;
     border-radius: 12px;
     border: 1px solid #cfe8d8;
     background: #f3faf6;
+  }
+  .plan .edu-offer-top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
   }
   .plan .edu-badge {
     flex: 0 0 auto;
@@ -244,14 +280,19 @@
     border-radius: 99px;
     padding: 3px 8px;
   }
+  .plan .edu-list {
+    color: #6b9a7e;
+    font-size: 12.5px;
+    font-weight: 650;
+  }
+  .plan .edu-list s { color: #8ab59a; }
   .plan .edu-price {
-    font-size: 14px;
-    font-weight: 800;
+    font-size: 15px;
+    font-weight: 850;
     color: #0a4f2c;
   }
   .plan .edu-price small { font-size: 12px; font-weight: 650; color: #145c36; }
   .plan .edu-save {
-    width: 100%;
     font-size: 12px;
     color: #2f6b4a;
     font-weight: 650;
@@ -328,10 +369,17 @@
   }
 
   /* 周期切换时显隐 */
-  [data-show-cycle="month"] { display: none; }
-  body[data-billing="month"] [data-show-cycle="year"] { display: none; }
-  body[data-billing="month"] [data-show-cycle="month"] { display: inline; }
-  body[data-billing="month"] .price-std[data-cycle-alt] { display: none; }
+  [data-show-cycle="month"] { display: none !important; }
+  body[data-billing="month"] [data-show-cycle="year"] { display: none !important; }
+  body[data-billing="month"] [data-show-cycle="month"] { display: revert !important; }
+  body[data-billing="month"] .price-list-row[data-show-cycle="month"],
+  body[data-billing="year"] .price-list-row[data-show-cycle="year"] {
+    display: flex !important;
+  }
+  body[data-billing="month"] .edu-offer-top [data-show-cycle="month"],
+  body[data-billing="year"] .edu-offer-top [data-show-cycle="year"] {
+    display: inline !important;
+  }
 
   /* 对比表 */
   .pricing-section-title {
@@ -484,7 +532,7 @@
         <button type="button" data-billing-set="month">月付</button>
         <button type="button" class="active" data-billing-set="year">年付 <span>更划算</span></button>
       </div>
-      <p class="pricing-edu">教育邮箱（.edu / .ac 等）可享优惠价 · Pro <b>$4.99/年</b> · Max <b>$5.99/年</b></p>
+      <p class="pricing-edu">价格以 <b>USD</b> 结算（Creem 收银台）· 下方划线为产品原价 · 教育邮箱另享更低价</p>
     </header>
 
     <div class="plans plans-3">
@@ -496,8 +544,11 @@
           </div>
           <span class="plan-glyph" aria-hidden="true">○</span>
         </div>
-        <div class="price-row"><div class="price">$0</div><span class="price-local">(¥0)</span></div>
-        <p class="price-std">无需订阅</p>
+        <div class="price-block">
+          <div class="price-list-row"></div>
+          <div class="price-row"><div class="price">$0</div><span class="price-currency">USD</span></div>
+          <p class="price-std">无需订阅</p>
+        </div>
         <ul>
           <li>4 万+ 期刊检索与详情</li>
           <li>网站 IF / JCR / 中科院 / 预警完整信息</li>
@@ -517,20 +568,29 @@
           </div>
           <span class="plan-glyph" aria-hidden="true">◆</span>
         </div>
-        <div class="price-row">
-          <div class="price" data-show-cycle="year">$7.99</div>
-          <div class="price" data-show-cycle="month">$0.99</div>
-          <span class="per-unit" data-show-cycle="year">/年</span>
-          <span class="per-unit" data-show-cycle="month">/月</span>
-          <span class="price-local" data-show-cycle="year">(¥58)</span>
-          <span class="price-local" data-show-cycle="month">(¥8)</span>
+        <div class="price-block">
+          <div class="price-list-row" data-show-cycle="year"><s>$11.99</s><span class="deal-pill">限时折扣</span></div>
+          <div class="price-list-row" data-show-cycle="month"><s>$1.99</s><span class="deal-pill">限时折扣</span></div>
+          <div class="price-row">
+            <div class="price" data-show-cycle="year">$7.99</div>
+            <div class="price" data-show-cycle="month">$0.99</div>
+            <span class="per-unit" data-show-cycle="year">/年</span>
+            <span class="per-unit" data-show-cycle="month">/月</span>
+            <span class="price-currency">USD</span>
+          </div>
+          <p class="price-std" data-show-cycle="year">Creem 原价 $11.99 · 现省 <strong>$4.00</strong></p>
+          <p class="price-std" data-show-cycle="month">Creem 原价 $1.99 · 现省 <strong>$1.00</strong></p>
         </div>
-        <p class="price-std" data-cycle-alt>月付 $0.99 · 约 $0.67/月</p>
         <div class="edu-offer">
-          <span class="edu-badge">教育价</span>
-          <span class="edu-price" data-show-cycle="year">$4.99 <small>/年</small> <span class="price-local">(¥35)</span></span>
-          <span class="edu-price" data-show-cycle="month">$0.69 <small>/月</small> <span class="price-local">(¥5)</span></span>
-          <span class="edu-save" data-show-cycle="year">年付教育价省 $3</span>
+          <div class="edu-offer-top">
+            <span class="edu-badge">教育价</span>
+            <span class="edu-list" data-show-cycle="year"><s>$11.99</s> →</span>
+            <span class="edu-list" data-show-cycle="month"><s>$1.99</s> →</span>
+            <span class="edu-price" data-show-cycle="year">$4.99 <small>/年 USD</small></span>
+            <span class="edu-price" data-show-cycle="month">$0.69 <small>/月 USD</small></span>
+          </div>
+          <span class="edu-save" data-show-cycle="year">限时教育折扣 · 较原价省 $7.00</span>
+          <span class="edu-save" data-show-cycle="month">限时教育折扣 · 较原价省 $1.30</span>
         </div>
         <ul>
           <li>包含 Free 全部能力</li>
@@ -556,20 +616,29 @@
           </div>
           <span class="plan-glyph" aria-hidden="true">★</span>
         </div>
-        <div class="price-row">
-          <div class="price" data-show-cycle="year">$9.99</div>
-          <div class="price" data-show-cycle="month">$1.49</div>
-          <span class="per-unit" data-show-cycle="year">/年</span>
-          <span class="per-unit" data-show-cycle="month">/月</span>
-          <span class="price-local" data-show-cycle="year">(¥68)</span>
-          <span class="price-local" data-show-cycle="month">(¥10)</span>
+        <div class="price-block">
+          <div class="price-list-row" data-show-cycle="year"><s>$14.99</s><span class="deal-pill">限时折扣</span></div>
+          <div class="price-list-row" data-show-cycle="month"><s>$2.99</s><span class="deal-pill">限时折扣</span></div>
+          <div class="price-row">
+            <div class="price" data-show-cycle="year">$9.99</div>
+            <div class="price" data-show-cycle="month">$1.49</div>
+            <span class="per-unit" data-show-cycle="year">/年</span>
+            <span class="per-unit" data-show-cycle="month">/月</span>
+            <span class="price-currency">USD</span>
+          </div>
+          <p class="price-std" data-show-cycle="year">Creem 原价 $14.99 · 现省 <strong>$5.00</strong></p>
+          <p class="price-std" data-show-cycle="month">Creem 原价 $2.99 · 现省 <strong>$1.50</strong></p>
         </div>
-        <p class="price-std" data-cycle-alt>月付 $1.49 · 约 $0.83/月</p>
         <div class="edu-offer">
-          <span class="edu-badge">教育价</span>
-          <span class="edu-price" data-show-cycle="year">$5.99 <small>/年</small> <span class="price-local">(¥42)</span></span>
-          <span class="edu-price" data-show-cycle="month">$0.89 <small>/月</small> <span class="price-local">(¥6)</span></span>
-          <span class="edu-save" data-show-cycle="year">年付教育价省 $4</span>
+          <div class="edu-offer-top">
+            <span class="edu-badge">教育价</span>
+            <span class="edu-list" data-show-cycle="year"><s>$14.99</s> →</span>
+            <span class="edu-list" data-show-cycle="month"><s>$2.99</s> →</span>
+            <span class="edu-price" data-show-cycle="year">$5.99 <small>/年 USD</small></span>
+            <span class="edu-price" data-show-cycle="month">$0.89 <small>/月 USD</small></span>
+          </div>
+          <span class="edu-save" data-show-cycle="year">限时教育折扣 · 较原价省 $9.00</span>
+          <span class="edu-save" data-show-cycle="month">限时教育折扣 · 较原价省 $2.10</span>
         </div>
         <ul>
           <li>包含 Pro 全部能力</li>
@@ -622,7 +691,7 @@
     <h2 class="pricing-section-title">常见问题</h2>
     <div class="pricing-faq">
       <h3>如何订阅？</h3>
-      <p>建议先 <a href="/signup.html">登录 / 注册</a>，再点方案按钮前往收银台。标价以 <b>USD</b> 为准，中文括号为人民币参考。支付成功后权益通常数秒内到账。</p>
+      <p>建议先 <a href="/signup.html">登录 / 注册</a>，再点方案按钮前往收银台。价格以 <b>USD</b> 结算；划线价为 Creem 产品原价，现价为限时折扣价。支付成功后权益通常数秒内到账。</p>
       <h3>Free 能看中科院和预警吗？</h3>
       <p>网站上可以。插件侧：中科院 / TOP / 新锐自 Pro 起；预警 · 撤稿 · 科协仅 Max；APC 自 Pro 起。</p>
       <h3>教育优惠怎么用？</h3>
@@ -641,7 +710,7 @@
         <button type="button" data-billing-set="month">Monthly</button>
         <button type="button" class="active" data-billing-set="year">Yearly <span>Best value</span></button>
       </div>
-      <p class="pricing-edu">Edu emails (.edu / .ac…) get discounted plans · Pro <b>$4.99/yr</b> · Max <b>$5.99/yr</b></p>
+      <p class="pricing-edu">Prices in <b>USD</b> (Creem checkout) · Strikethrough = list price · Edu emails get deeper discounts</p>
     </header>
 
     <div class="plans plans-3">
@@ -653,8 +722,11 @@
           </div>
           <span class="plan-glyph" aria-hidden="true">○</span>
         </div>
-        <div class="price-row"><div class="price">$0</div></div>
-        <p class="price-std">No subscription</p>
+        <div class="price-block">
+          <div class="price-list-row"></div>
+          <div class="price-row"><div class="price">$0</div><span class="price-currency">USD</span></div>
+          <p class="price-std">No subscription</p>
+        </div>
         <ul>
           <li>40k+ journals &amp; detail pages</li>
           <li>Website IF / JCR / CAS / warnings</li>
@@ -674,18 +746,29 @@
           </div>
           <span class="plan-glyph" aria-hidden="true">◆</span>
         </div>
-        <div class="price-row">
-          <div class="price" data-show-cycle="year">$7.99</div>
-          <div class="price" data-show-cycle="month">$0.99</div>
-          <span class="per-unit" data-show-cycle="year">/year</span>
-          <span class="per-unit" data-show-cycle="month">/mo</span>
+        <div class="price-block">
+          <div class="price-list-row" data-show-cycle="year"><s>$11.99</s><span class="deal-pill">Limited offer</span></div>
+          <div class="price-list-row" data-show-cycle="month"><s>$1.99</s><span class="deal-pill">Limited offer</span></div>
+          <div class="price-row">
+            <div class="price" data-show-cycle="year">$7.99</div>
+            <div class="price" data-show-cycle="month">$0.99</div>
+            <span class="per-unit" data-show-cycle="year">/year</span>
+            <span class="per-unit" data-show-cycle="month">/mo</span>
+            <span class="price-currency">USD</span>
+          </div>
+          <p class="price-std" data-show-cycle="year">Creem list $11.99 · save <strong>$4.00</strong></p>
+          <p class="price-std" data-show-cycle="month">Creem list $1.99 · save <strong>$1.00</strong></p>
         </div>
-        <p class="price-std" data-cycle-alt>Monthly $0.99 · ~$0.67/mo</p>
         <div class="edu-offer">
-          <span class="edu-badge">Edu</span>
-          <span class="edu-price" data-show-cycle="year">$4.99 <small>/year</small></span>
-          <span class="edu-price" data-show-cycle="month">$0.69 <small>/mo</small></span>
-          <span class="edu-save" data-show-cycle="year">Save $3 on yearly edu</span>
+          <div class="edu-offer-top">
+            <span class="edu-badge">Edu</span>
+            <span class="edu-list" data-show-cycle="year"><s>$11.99</s> →</span>
+            <span class="edu-list" data-show-cycle="month"><s>$1.99</s> →</span>
+            <span class="edu-price" data-show-cycle="year">$4.99 <small>/yr USD</small></span>
+            <span class="edu-price" data-show-cycle="month">$0.69 <small>/mo USD</small></span>
+          </div>
+          <span class="edu-save" data-show-cycle="year">Limited edu offer · $7.00 off list</span>
+          <span class="edu-save" data-show-cycle="month">Limited edu offer · $1.30 off list</span>
         </div>
         <ul>
           <li>Everything in Free</li>
@@ -711,18 +794,29 @@
           </div>
           <span class="plan-glyph" aria-hidden="true">★</span>
         </div>
-        <div class="price-row">
-          <div class="price" data-show-cycle="year">$9.99</div>
-          <div class="price" data-show-cycle="month">$1.49</div>
-          <span class="per-unit" data-show-cycle="year">/year</span>
-          <span class="per-unit" data-show-cycle="month">/mo</span>
+        <div class="price-block">
+          <div class="price-list-row" data-show-cycle="year"><s>$14.99</s><span class="deal-pill">Limited offer</span></div>
+          <div class="price-list-row" data-show-cycle="month"><s>$2.99</s><span class="deal-pill">Limited offer</span></div>
+          <div class="price-row">
+            <div class="price" data-show-cycle="year">$9.99</div>
+            <div class="price" data-show-cycle="month">$1.49</div>
+            <span class="per-unit" data-show-cycle="year">/year</span>
+            <span class="per-unit" data-show-cycle="month">/mo</span>
+            <span class="price-currency">USD</span>
+          </div>
+          <p class="price-std" data-show-cycle="year">Creem list $14.99 · save <strong>$5.00</strong></p>
+          <p class="price-std" data-show-cycle="month">Creem list $2.99 · save <strong>$1.50</strong></p>
         </div>
-        <p class="price-std" data-cycle-alt>Monthly $1.49 · ~$0.83/mo</p>
         <div class="edu-offer">
-          <span class="edu-badge">Edu</span>
-          <span class="edu-price" data-show-cycle="year">$5.99 <small>/year</small></span>
-          <span class="edu-price" data-show-cycle="month">$0.89 <small>/mo</small></span>
-          <span class="edu-save" data-show-cycle="year">Save $4 on yearly edu</span>
+          <div class="edu-offer-top">
+            <span class="edu-badge">Edu</span>
+            <span class="edu-list" data-show-cycle="year"><s>$14.99</s> →</span>
+            <span class="edu-list" data-show-cycle="month"><s>$2.99</s> →</span>
+            <span class="edu-price" data-show-cycle="year">$5.99 <small>/yr USD</small></span>
+            <span class="edu-price" data-show-cycle="month">$0.89 <small>/mo USD</small></span>
+          </div>
+          <span class="edu-save" data-show-cycle="year">Limited edu offer · $9.00 off list</span>
+          <span class="edu-save" data-show-cycle="month">Limited edu offer · $2.10 off list</span>
         </div>
         <ul>
           <li>Everything in Pro</li>
@@ -775,7 +869,7 @@
     <h2 class="pricing-section-title">FAQ</h2>
     <div class="pricing-faq">
       <h3>How do I subscribe?</h3>
-      <p><a href="/signup.html">Sign in</a> first, then choose a plan. Prices are in <b>USD</b>. Entitlements usually sync within seconds after payment.</p>
+      <p><a href="/signup.html">Sign in</a> first, then choose a plan. Prices are in <b>USD</b>. Strikethrough is the Creem list price; the larger number is the limited-time offer. Entitlements usually sync within seconds after payment.</p>
       <h3>Can Free see CAS and warnings?</h3>
       <p>Yes on the website. Extension: CAS from Pro; risk badges only on Max; APC from Pro.</p>
       <h3>Education pricing?</h3>
