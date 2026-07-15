@@ -7253,7 +7253,7 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   .tab-panel table.journals tbody { grid-template-columns: 1fr; }
 }
 
-/* 白卡 · 系统灰分组底上的 inset card · 16pt 圆角 */
+/* 白卡 · 足够高 · 禁止裁切内容 */
 .tab-panel table.journals tbody tr.j-row,
 .tab-panel table.journals tbody tr.j-row.j-card {
   position: relative;
@@ -7262,10 +7262,10 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   align-items: stretch;
   gap: 0;
   min-width: 0;
-  min-height: 168px;
+  min-height: 228px;
   height: 100%;
-  padding: 14px 16px 14px;
-  overflow: hidden;
+  padding: 16px 14px 16px 16px;
+  overflow: visible; /* 勿裁剪徽章/文字 */
   background: #ffffff;
   border: 1px solid rgba(60, 60, 67, 0.12);
   border-radius: 16px;
@@ -7570,15 +7570,15 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 /* 收藏 · 拖拽 */
 .j-row .col-fav {
   position: absolute;
-  top: 10px;
+  top: 12px;
   right: 10px;
-  z-index: 2;
+  z-index: 3;
   width: auto !important;
 }
 .j-row .col-fav .fav-star {
-  width: 36px;
-  height: 36px;
-  min-width: 36px;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
   border-radius: 999px;
   background: #f2f2f7;
   border: 0;
@@ -7586,6 +7586,7 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  font-size: 15px;
 }
 .j-row .col-fav .fav-star.on {
   color: #ff9500;
@@ -7601,9 +7602,9 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   font-size: 14px;
   cursor: grab;
 }
-.j-row:has(.col-drag) .j-card-main { padding-left: 22px; }
+.j-row:has(.col-drag) .j-card-main { padding-left: 20px; }
 
-/* 主内容区：整卡一体白底，无米色头 */
+/* 主内容：统一左内边距，保证上下卡片文字起点一致 */
 .j-row .j-card-main,
 .j-row .j-card-head,
 .j-row .col-name {
@@ -7613,27 +7614,29 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   width: 100%;
   min-width: 0;
   min-height: 0;
-  padding: 0 40px 0 0; /* 右侧给收藏星留空 */
+  /* 右：IF 列 72px + 收藏 36px */
+  padding: 0 108px 0 0;
   background: transparent;
   border: 0;
   box-sizing: border-box;
 }
 
-/* 顶行：刊名（左） + IF（最右） */
+/* 顶行：刊名占满左栏；IF 绝对定位到卡片最右（收藏星下方） */
 .j-row .j-card-top {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
+  position: relative;
+  display: block;
   width: 100%;
   min-width: 0;
+  min-height: 44px;
 }
 .j-row .j-card-title-block {
-  flex: 1 1 auto;
+  width: 100%;
   min-width: 0;
+  padding-right: 4px;
 }
 .j-row .jname {
   margin: 0;
-  min-height: 0;
+  min-height: 2.56em; /* 固定两行高度，上下卡刊名起点一致 */
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
   font-size: 16px;
   font-weight: 600;
@@ -7659,24 +7662,22 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   text-overflow: ellipsis;
 }
 
-/* IF · 永远贴右 */
+/* IF · 卡片最右侧对齐（在收藏星左侧一列） */
 .j-row .j-card-if {
-  flex: 0 0 auto;
+  position: absolute;
+  top: 0;
+  right: -100px; /* 落在 main 的 padding-right 区域 */
+  width: 64px;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   justify-content: flex-start;
-  min-width: 52px;
-  max-width: 88px;
-  margin-top: 1px;
   text-align: right;
   line-height: 1.1;
+  z-index: 2;
 }
 .j-row .j-card-if.is-empty {
-  min-width: 0;
-  width: 0;
-  margin: 0;
-  overflow: hidden;
+  visibility: hidden;
 }
 .j-row .j-card-if-label {
   font-size: 10px;
@@ -7687,27 +7688,29 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 }
 .j-row .j-card-if strong {
   margin-top: 2px;
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.03em;
   color: #000;
+  white-space: nowrap;
 }
 
-/* 次行 meta：审稿 / 来源 / 出版 / ISSN */
+/* 刊名下：免费发表 + 审稿周期 同一行 */
 .j-row .j-card-meta-row {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 6px 10px;
+  gap: 8px 10px;
   margin-top: 8px;
+  min-height: 22px;
   min-width: 0;
-  overflow: hidden;
+  overflow: visible;
 }
 .j-row .j-meta {
   display: inline-flex;
-  align-items: baseline;
-  gap: 3px;
+  align-items: center;
+  gap: 4px;
   max-width: 100%;
   min-width: 0;
   padding: 0;
@@ -7717,8 +7720,6 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   font-size: 12px;
   line-height: 1.25;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 .j-row .j-meta em {
   font-style: normal;
@@ -7729,9 +7730,20 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .j-row .j-meta strong,
 .j-row .j-meta > span {
   font-weight: 500;
-  color: rgba(60, 60, 67, 0.72);
-  overflow: hidden;
-  text-overflow: ellipsis;
+  color: rgba(60, 60, 67, 0.75);
+}
+/* 免费发表：放在 meta 行，与审稿并列 */
+.j-row .j-meta-free {
+  display: inline-flex !important;
+}
+.j-row .j-meta-free .badge,
+.j-row .j-meta-free .b-free,
+.j-row .j-meta-free .b-free-lock {
+  font-size: 11px !important;
+  padding: 2px 8px !important;
+  border-radius: 6px !important;
+  margin: 0 !important;
+  line-height: 1.3 !important;
 }
 .j-row .j-meta-src .src-tag {
   display: inline-flex;
@@ -7742,10 +7754,9 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   font-size: 11px;
   font-weight: 600;
 }
-.j-row .j-meta-topic,
-.j-row .j-meta-free { display: none; }
+.j-row .j-meta-topic { display: none; }
 
-/* 徽章区：自然换行，铺满宽度，不强制两列切半 */
+/* 徽章区：完整显示，不裁切 */
 .j-row .j-card-body {
   display: flex;
   flex-direction: column;
@@ -7754,6 +7765,7 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   min-width: 0;
   margin-top: 10px;
   flex: 1 1 auto;
+  overflow: visible;
 }
 .j-row .j-card-badges,
 .j-row .col-badge,
@@ -7765,8 +7777,8 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   gap: 6px;
   width: 100%;
   min-width: 0;
-  max-height: none;
-  overflow: visible;
+  max-height: none !important;
+  overflow: visible !important;
 }
 .j-row .j-card-badges .badge-cell,
 .j-row .j-card-badges .badge-line,
@@ -7796,11 +7808,10 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   line-height: 1.25 !important;
   padding: 3px 8px !important;
   margin: 0 !important;
-  max-width: 100%;
+  max-width: none;
   border-radius: 6px !important;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow: visible;
   box-sizing: border-box;
 }
 .j-row .j-card-subline {

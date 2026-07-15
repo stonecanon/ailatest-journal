@@ -3691,10 +3691,10 @@
       r.scd ? badgeSCD(r.scd) : '',
     ].filter(Boolean).join('');
   }
-  function renderAccessBadges(r) {
+  function renderAccessBadges(r, { includeFree = true } = {}) {
     if (!r) return '';
     return [
-      canSeePublishFeeInfo() ? badgeFree(isFreeToPublish(r)) : '',
+      includeFree && canSeePublishFeeInfo() ? badgeFree(isFreeToPublish(r)) : '',
       badgeOAJ(r.oaj),
       badgeDOAJ(r.doaj),
     ].filter(Boolean).join('');
@@ -3995,9 +3995,10 @@
     rowRecordsByFid[fid] = { ...r, __src: 'int' };
     const nameHtml = `<div class="jname ${r.flagship ? 'jname-flagship' : ''}">${escape(titleCase(r.name))}${r.cn_name ? `<span class="jname-cn">${escape(r.cn_name)}</span>` : ''}${aliasHintHtml(r)}</div>`;
     const crossBadges = renderDomCrossBadges(r, 'int');
+    // 免费发表不进徽章堆，改到刊名下 meta 行
     const indexBadges = limitBadgeHtml(renderCoverageBadges(r), 8);
     const rankBadges = limitBadgeHtml([renderLevelBadges(r), crossBadges].filter(Boolean).join(''), 6);
-    const accessBadges = limitBadgeHtml(renderAccessBadges(r), 3);
+    const accessBadges = limitBadgeHtml(renderAccessBadges(r, { includeFree: false }), 3);
     const riskBadges = limitBadgeHtml(renderRiskBadges(r), 2);
     const badgeCell = renderBadgeCell(indexBadges, rankBadges, accessBadges, riskBadges);
     const ifVal = (r.if_2024 != null) ? (+r.if_2024).toFixed(1) : '';
@@ -4012,8 +4013,13 @@
     const cycleLabel = cycleDays
       ? `${Math.round(cycleDays / 30.4)}${T('个月','mo')}`
       : '';
+    const freeHtml = freeBadgeCell(r);
+    const freeMeta = freeHtml && !/muted-cell/.test(freeHtml)
+      ? jMetaPlain(freeHtml, 'j-meta-free')
+      : '';
     const metaHtml = [
-      cycleLabel ? jMetaText(T('审稿','Rev'), escape(cycleLabel), 'j-meta-cycle') : '',
+      freeMeta,
+      cycleLabel ? jMetaText(T('审稿','审稿'), escape(cycleLabel), 'j-meta-cycle') : '',
     ].filter(Boolean).join('');
     const bodyHtml = `<div class="j-card-badges">${badgeCell}</div>`;
     return journalCardRow({
@@ -9131,9 +9137,14 @@
       cycleDays = +doaj.review_weeks * 7;
     }
     const cycleLabel = cycleDays ? `${Math.round(cycleDays / 30.4)}${T('个月','mo')}` : '';
+    const freeHtml = freeBadgeCell(r);
+    const freeMeta = freeHtml && !/muted-cell/.test(freeHtml)
+      ? jMetaPlain(freeHtml, 'j-meta-free')
+      : '';
     const metaHtml = [
       jMetaPlain(`<span class="src-tag src-${escape(r.__src)}">${SRC_LABEL[r.__src] || r.__src}</span>`, 'j-meta-src'),
-      cycleLabel ? jMetaText(T('审稿','Rev'), escape(cycleLabel), 'j-meta-cycle') : '',
+      freeMeta,
+      cycleLabel ? jMetaText(T('审稿','审稿'), escape(cycleLabel), 'j-meta-cycle') : '',
     ].filter(Boolean).join('');
     const bodyHtml = `<div class="j-card-badges">${badgeCell}</div>`;
     return journalCardRow({
