@@ -4296,8 +4296,9 @@
   }
 
   function updateStickySearchState() {
+    // 全球 / 中国 / 地区站（含波兰、伊朗、拉美）滚动后顶部搜索收成紧凑条
     const enabled = !document.body.classList.contains('journal-route')
-      && ['int', 'dom', 'in', 'my', 'kr'].includes(activeTab);
+      && ['int', 'dom', 'in', 'my', 'kr', 'pbn', 'isc', 'scielo'].includes(activeTab);
     // 迟滞（hysteresis）：缩小搜索框会改变页面高度，阈值必须拉开，避免临界点反复抖动。
     const isCompact = document.body.classList.contains('topbar-compact');
     const y = window.scrollY;
@@ -5422,7 +5423,7 @@
     },
     scielo: {
       title: ['SciELO 期刊目录', 'SciELO Journal Directory'],
-      intro: ['SciELO 官方网络期刊清单，保留各地区集合来源，不按全球库出版国家反推。', 'The official SciELO network list, retaining each collection source rather than inferring membership from the global database.'],
+      intro: ['SciELO 官方网络期刊清单，按各国家节点收录展示，不按全球库出版国家反推。', 'The official SciELO network list, shown by country nodes rather than inferring membership from the global database.'],
       badge: 'SciELO',
       metric: row => row.network ? row.network.replace(/^www\./, '') : '',
     },
@@ -5558,7 +5559,7 @@
       const shortNet = (n) => String(n).replace(/^www\./, '').replace(/^scielo\./, '').replace(/\/$/, '');
       filterGroups.push(`
         <div class="dom-filter-group is-subject">
-          <div class="dom-filter-label">${T('地区集合','Collection')}</div>
+          <div class="dom-filter-label">${T('收录站点','Country nodes')}</div>
           <div class="dom-filter-chips is-wrap">
             ${chip('network', '__all', T('全部','All'))}
             ${nets.map(([n]) => chip('network', n, shortNet(n))).join('')}

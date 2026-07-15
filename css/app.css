@@ -2858,34 +2858,35 @@ button.me-record-row {
 .me-activity-dot.level-3 { background: #43a16e; }
 .me-activity-dot.level-4 { background: #087a5b; }
 
-/* favorite star button on row — 淡雅米色调，与主题一致 */
+/* favorite star — 扁平星标，无圆形底 */
 .fav-star {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 36px;
-  height: 30px;
-  padding: 0 10px;
-  background: var(--paper-soft);
+  min-width: 28px;
+  height: 28px;
+  padding: 0;
+  background: transparent;
   border: 0;
-  border-radius: 999px;
+  border-radius: 0;
   font-size: 18px;
   line-height: 1;
   color: var(--ink-faint);
   cursor: pointer;
-  transition: background .12s, color .12s, transform .08s;
+  transition: color .12s, transform .08s;
 }
 .fav-star:hover {
-  background: var(--paper-deeper);
+  background: transparent;
   color: var(--accent);
-  transform: translateY(-1px);
+  transform: scale(1.08);
 }
 .fav-star.on {
-  background: var(--paper-deeper);
-  color: var(--gold);
+  background: transparent;
+  color: #e8940f;
 }
 .fav-star.on:hover {
-  color: var(--accent);
+  color: #f0a020;
+  background: transparent;
 }
 
 .col-fav { width: 48px; text-align: center; padding-left: 4px; padding-right: 8px; }
@@ -4100,7 +4101,7 @@ td.empty,
   .home-card-grid { grid-template-columns: minmax(0, 1fr); gap: 10px; }
   .home-journal-card { min-height: 0; padding: 14px 14px 13px; }
   .home-card-title { font-size: 15.5px; }
-  .home-card-fav .fav-star { width: 34px; height: 34px; }
+  .home-card-fav .fav-star { width: 30px; height: 30px; min-width: 30px; background: transparent; }
   body.topbar-compact .search-wrap > #q { height: 46px; min-height: 46px; padding: 0 86px 0 14px; font-size: 14px; }
   body.topbar-compact .search-submit { min-width: 74px; min-height: 34px; padding: 0 10px; }
   .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
@@ -7628,9 +7629,12 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   margin: -3px 0 0;
 }
 .home-card-fav .fav-star {
-  width: 38px;
-  height: 38px;
-  border-radius: 999px;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  border-radius: 0;
+  background: transparent;
+  font-size: 20px;
 }
 .home-card-badges {
   display: flex;
@@ -7783,48 +7787,48 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   min-width: 0;
   padding: 14px 14px 12px;
   box-sizing: border-box;
-  /* 默认上块：略浅的暖深色 + 轻光泽渐变 + 白字 */
+  /* 默认上块：更浅的暖灰 + 轻光泽 + 白字 */
   background: linear-gradient(
     165deg,
-    #6a6156 0%,
-    #5a5248 38%,
-    #4f4840 72%,
-    #565048 100%
+    #8a8176 0%,
+    #7a7167 36%,
+    #6f675e 70%,
+    #756d64 100%
   );
   border-radius: 15px 15px 0 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.14);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
   overflow: hidden;
   color: #fff;
 }
-/* 收藏卡有拖动手柄：左 | 刊名 | IF+星 */
+/* 收藏卡有拖动手柄：窄左栏 | 刊名 | IF+星（不挤乱刊名对齐） */
 .j-row.j-card.has-drag .j-card-head {
-  grid-template-columns: 28px minmax(0, 1fr) minmax(72px, auto);
-  column-gap: 8px;
+  grid-template-columns: 18px minmax(0, 1fr) minmax(72px, auto);
+  column-gap: 6px;
   padding-left: 10px;
 }
 .j-row.j-card-compact .j-card-head {
   border-radius: 15px 15px 0 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.18);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
   flex: 0 0 auto;
 }
-/* 拖动手柄：始终最左侧（深色底用浅色） */
+/* 拖动手柄：最左侧窄条，与刊名首行对齐 */
 .j-row .j-card-drag,
 .j-row .col-drag {
   position: static !important;
   top: auto !important;
   left: auto !important;
   grid-column: 1;
-  width: 28px !important;
-  min-width: 28px;
-  max-width: 28px;
+  width: 18px !important;
+  min-width: 18px;
+  max-width: 18px;
   display: flex !important;
   align-items: flex-start;
   justify-content: center;
-  padding: 2px 0 0;
+  padding: 3px 0 0;
   margin: 0;
-  color: rgba(255, 255, 255, 0.55);
-  font-size: 14px;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 11px;
   line-height: 1;
   cursor: grab;
   z-index: 2;
@@ -7835,10 +7839,12 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  min-height: 28px;
-  letter-spacing: -1px;
-  color: rgba(255, 255, 255, 0.55);
+  width: 14px;
+  min-height: 18px;
+  padding: 0;
+  letter-spacing: -1.5px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.48);
 }
 /* 刊名区 */
 .j-row .j-card-head-main {
@@ -7877,7 +7883,7 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   max-width: 100%;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
   font-size: 16px;
-  font-weight: 750;
+  font-weight: 780;
   line-height: 1.28;
   letter-spacing: -0.02em;
   color: #ffffff;
@@ -7945,17 +7951,17 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   line-height: 1;
 }
 
-/* 收藏星：深色底上用半透明白圈 */
+/* 收藏星：无圆底，仅星形（参考扁平星标） */
 .j-row .j-card-fav,
 .j-row .col-fav {
   position: static !important;
   top: auto !important;
   right: auto !important;
   left: auto !important;
-  width: 32px !important;
-  min-width: 32px;
-  max-width: 32px;
-  flex: 0 0 32px;
+  width: 28px !important;
+  min-width: 28px;
+  max-width: 28px;
+  flex: 0 0 28px;
   z-index: 1;
   margin: 0;
   padding: 0;
@@ -7963,25 +7969,40 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 }
 .j-row .j-card-fav .fav-star,
 .j-row .col-fav .fav-star {
-  width: 32px;
-  height: 32px;
-  min-width: 32px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.14);
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  padding: 0;
+  border-radius: 0;
+  background: transparent !important;
   border: 0;
-  color: rgba(255, 255, 255, 0.78);
+  box-shadow: none;
+  color: rgba(255, 255, 255, 0.72);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 15px;
+  font-size: 18px;
+  line-height: 1;
   flex-shrink: 0;
+  transition: color .12s, transform .08s;
+}
+.j-row .j-card-fav .fav-star:hover,
+.j-row .col-fav .fav-star:hover {
+  background: transparent !important;
+  color: #ffc45c;
+  transform: scale(1.08);
 }
 .j-row .j-card-fav .fav-star.on,
 .j-row .col-fav .fav-star.on {
-  color: #ffb340;
-  background: rgba(255, 179, 64, 0.22);
+  color: #f0a020;
+  background: transparent !important;
 }
-/* 已收藏：上块更深一档；下块仍白 */
+.j-row .j-card-fav .fav-star.on:hover,
+.j-row .col-fav .fav-star.on:hover {
+  color: #ffb840;
+  background: transparent !important;
+}
+/* 已收藏：上块略深一档；下块仍白 */
 .j-row.j-card:has(.fav-star.on) {
   background: #ffffff;
 }
@@ -7989,15 +8010,14 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   background: transparent;
 }
 .j-row.j-card:has(.fav-star.on) .j-card-head {
-  /* 已收藏：略深一档，同样带光泽 */
   background: linear-gradient(
     165deg,
-    #5a5248 0%,
-    #4a433b 40%,
-    #3f3932 75%,
-    #464039 100%
+    #7a7167 0%,
+    #6b6359 38%,
+    #615950 72%,
+    #686058 100%
   );
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
 }
 .j-row.j-card:has(.fav-star.on) .j-card-body {
   background: #ffffff;
