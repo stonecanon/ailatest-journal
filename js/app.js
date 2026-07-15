@@ -3932,7 +3932,7 @@
 
   /**
    * 统一期刊卡片：上块（刊名/副信息 | IF+收藏）+ 下块（徽章）
-   * 信息少时自然变矮，同行靠 CSS stretch 对齐，不再绝对定位把 IF 挤出卡片。
+   * 无论有无徽章，始终保留上下两区与分割线；信息少时下块可略留白。
    */
   function journalCardRow({
     fid,
@@ -3946,8 +3946,10 @@
     ifHtml = '',
     dragHtml = '',
   }) {
-    const hasBody = !!(bodyHtml && String(bodyHtml).replace(/\s+/g, ''));
-    return `<tr class="j-row j-card clickable${flagship ? ' row-flagship' : ''}${!hasBody ? ' j-card-compact' : ''}${extraClass ? ` ${extraClass}` : ''}" data-fid="${escape(fid)}" data-src="${escape(src)}">
+    const bodyInner = (bodyHtml && String(bodyHtml).replace(/\s+/g, ''))
+      ? bodyHtml
+      : `<div class="j-card-badges j-card-body-placeholder" aria-hidden="true"></div>`;
+    return `<tr class="j-row j-card clickable${extraClass ? ` ${extraClass}` : ''}${flagship ? ' row-flagship' : ''}" data-fid="${escape(fid)}" data-src="${escape(src)}">
       ${dragHtml ? `<td class="col-drag">${dragHtml}</td>` : ''}
       <td class="j-card-main col-name">
         <div class="j-card-head">
@@ -3960,7 +3962,7 @@
             <div class="j-card-fav col-fav">${favHtml || ''}</div>
           </div>
         </div>
-        ${hasBody ? `<div class="j-card-body">${bodyHtml}</div>` : ''}
+        <div class="j-card-body">${bodyInner}</div>
       </td>
     </tr>`;
   }
@@ -5816,12 +5818,15 @@
       const visible = filtered.slice(0, window.__cnkiShown || 100);
       const total = filtered.length;
 
-      // 渲染行（统一 j-card：上刊名/学科 · 下收录徽章）
+      // 渲染行：上刊名/学科 · 下收录（中文目录一律标知网 + 交叉徽章）
       const rows = visible.map(r => {
         const fid = favId(r);
         rowRecordsByFid[fid] = { ...r, __src: 'cnki_major' };
         const hits = lookupDom(r);
+        // 本目录条目均来自知网中文期刊库
+        const cnkiBadge = `<span class="domsrc-pill ds-cnki_major" title="${T('中国知网中文期刊目录收录','Listed in CNKI Chinese journal directory')}">${T('知网','CNKI')}</span>`;
         const badges = limitBadgeHtml([
+          cnkiBadge,
           ...hits.filter(h => h.source === 'cssci').map(() => `<span class="domsrc-pill ds-cssci">CSSCI</span>`),
           ...hits.filter(h => h.source === 'cssci_ext').map(() => `<span class="domsrc-pill ds-cssci-ext">${T('CSSCI 扩展','CSSCI Ext')}</span>`),
           ...hits.filter(h => h.source === 'pku').map(() => `<span class="domsrc-pill ds-pku">${T('北大核心','PKU Core')}</span>`),
@@ -5837,15 +5842,12 @@
         const displayCats = (r.major_categories || []).length ? r.major_categories : (r.categories || []);
         const catLine = displayCats.slice(0, 2).join(' · ');
         const nameHtml = `<div class="jname cnki-name">${escape(name)}</div>`;
-        // 学科放 meta；徽章有则下块，无徽章也不强撑空卡
         const metaHtml = [
           catLine ? jMetaChip(catLine, 'j-meta-topic-show') : '',
           r.issn ? jMetaChip(`ISSN ${r.issn}`, 'j-meta-id') : '',
           r.cn_code ? jMetaChip(`CN ${r.cn_code}`, 'j-meta-id') : '',
         ].filter(Boolean).join('');
-        const bodyHtml = badges
-          ? `<div class="j-card-badges badges">${badges}</div>`
-          : '';
+        const bodyHtml = `<div class="j-card-badges badges">${badges}</div>`;
         return journalCardRow({
           fid, src: 'cnki_major', extraClass: 'cnki-row',
           favHtml: starBtn(r, 'cnki_major'),

@@ -7646,10 +7646,10 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   border-bottom: 1px solid rgba(60, 60, 67, 0.14);
   overflow: hidden;
 }
-/* 无徽章下块时：上块圆角到底，无分割线 */
+/* 始终上下两区；compact 仅作兼容（不再默认使用） */
 .j-row.j-card-compact .j-card-head {
-  border-radius: 15px;
-  border-bottom: 0;
+  border-radius: 15px 15px 0 0;
+  border-bottom: 1px solid rgba(60, 60, 67, 0.14);
   flex: 0 0 auto;
 }
 /* 左：刊名 + meta */
@@ -7878,7 +7878,7 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .j-row .j-meta-topic { display: none; }
 .j-row .j-meta-topic-show { display: inline-flex; }
 
-/* 下块：纯白；与上块用分割线分开；收录/分区分行且有行距 */
+/* 下块：纯白；始终存在；无徽章时略留白 */
 .j-row .j-card-body {
   display: flex;
   flex-direction: column;
@@ -7887,10 +7887,15 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   min-width: 0;
   margin: 0;
   padding: 12px 14px 14px;
-  flex: 0 0 auto; /* 不硬撑空白高度 */
+  min-height: 44px; /* 保证两区结构，哪怕只有一点点留白 */
+  flex: 0 0 auto;
   background: #ffffff;
   box-sizing: border-box;
   overflow: visible;
+}
+.j-row .j-card-body-placeholder {
+  min-height: 20px;
+  width: 100%;
 }
 .j-row .j-card-badges,
 .j-row .col-badge,
@@ -7978,6 +7983,12 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   text-overflow: ellipsis;
 }
 .j-row .j-card-body-empty { display: none !important; }
+/* 知网：中文期刊目录默认收录标 */
+.j-row .j-card-badges .domsrc-pill.ds-cnki_major {
+  background: #e6eef4 !important;
+  color: #2d5568 !important;
+  font-weight: 650 !important;
+}
 
 /* 旧列隐藏 */
 .j-row .col-free,
