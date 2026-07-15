@@ -8350,6 +8350,8 @@
   let _settingsSection = 'account';
 
   function openSettingsShell(section) {
+    // 活动已并入账号，旧 hash/状态兼容
+    if (section === 'activity') section = 'account';
     if (section) _settingsSection = section;
     document.body.classList.add('settings-open');
     document.documentElement.classList.add('settings-open');
@@ -8378,6 +8380,7 @@
   }
 
   function showSettingsSection(id) {
+    if (id === 'activity') id = 'account';
     _settingsSection = id || 'account';
     const root = $('#me-content');
     if (!root) return;
@@ -8387,6 +8390,9 @@
     root.querySelectorAll('[data-settings-nav]').forEach((btn) => {
       btn.classList.toggle('active', btn.getAttribute('data-settings-nav') === _settingsSection);
     });
+    // 切换分区时滚回顶部，避免内容被裁切后看不见
+    const body = root.querySelector('.settings-body');
+    if (body) body.scrollTop = 0;
   }
 
   function renderMe() {
@@ -8412,16 +8418,15 @@
             <button type="button" data-settings-nav="rankings" class="${_settingsSection === 'rankings' ? 'active' : ''}">${T('榜单','Rankings')}</button>
             <button type="button" data-settings-nav="gift" class="${_settingsSection === 'gift' ? 'active' : ''}">${T('礼品码','Gift codes')}</button>
             <button type="button" data-settings-nav="language" class="${_settingsSection === 'language' ? 'active' : ''}">${T('语言','Language')}</button>
-            <button type="button" data-settings-nav="activity" class="${_settingsSection === 'activity' ? 'active' : ''}">${T('活动','Activity')}</button>
           </nav>
           <div class="settings-body">
             <section class="settings-section" data-settings-section="account" ${_settingsSection === 'account' ? '' : 'hidden'}>
-              <h2 class="settings-section-title">${T('账号','Account')}</h2>
-              <header class="me-hero">
+              <h2 class="settings-section-title">${T('账号与活动','Account & activity')}</h2>
+              <header class="me-hero settings-account-hero">
                 ${userAvatarHtml()}
                 <div class="me-title-block">
-                  <h1>${escape(userDisplayName())} ${membershipBadgeHtml()}</h1>
-                  <p>${escape(userEmailText())} · ${escape(userProviderText())}</p>
+                  <h1><span class="me-display-name">${escape(userDisplayName())}</span> ${membershipBadgeHtml()}</h1>
+                  <p class="me-account-meta" title="${escape(userEmailText())}">${escape(userEmailText())}<span class="me-meta-sep">·</span>${escape(userProviderText())}</p>
                 </div>
                 <div class="me-actions">
                   ${signed
@@ -8429,14 +8434,19 @@
                     : `<button class="btn-mini primary" data-me-login>${T('登录 / 注册','Sign in / Sign up')}</button>`}
                 </div>
               </header>
-              <div class="me-stat-strip">
+              <div class="me-stat-strip settings-stat-strip">
                 <button type="button" class="me-stat-item" data-me-stat="credits"><strong>${escape(creditText)}</strong><span>${T('Credits','Credits')}</span></button>
-                <a class="me-stat-item" data-me-stat="favorites" href="/favorites"><strong>${favCount}</strong><span>${T('收藏期刊','Saved journals')}</span></a>
-                <button type="button" class="me-stat-item" data-me-stat="views"><strong>${todayViewCount()}</strong><span>${T('今日浏览','Views today')}</span></button>
-                <button type="button" class="me-stat-item" data-me-stat="searches"><strong>${localSearchCount()}</strong><span>${T('搜索记录','Searches')}</span></button>
-                <button type="button" class="me-stat-item" data-me-stat="api"><strong>${localPluginCallCount()}</strong><span>${T('插件 / API 调用','Plugin / API calls')}</span></button>
+                <a class="me-stat-item" data-me-stat="favorites" href="/favorites"><strong>${favCount}</strong><span>${T('收藏','Saved')}</span></a>
+                <button type="button" class="me-stat-item" data-me-stat="views"><strong>${todayViewCount()}</strong><span>${T('今日浏览','Views')}</span></button>
+                <button type="button" class="me-stat-item" data-me-stat="searches"><strong>${localSearchCount()}</strong><span>${T('搜索','Searches')}</span></button>
+                <button type="button" class="me-stat-item" data-me-stat="api"><strong>${localPluginCallCount()}</strong><span>${T('API','API')}</span></button>
               </div>
               <section class="me-card me-record-panel" data-me-record-panel hidden></section>
+              <section class="me-card me-activity-card settings-activity-card">
+                <h3 class="settings-subhead">${T('活动记录','Activity')}</h3>
+                <div class="me-activity-months"><span>${T('近 12 周','Last 12 weeks')}</span><span>${new Date().toLocaleDateString(uiLocale(), { month: 'short', day: 'numeric' })}</span></div>
+                <div class="me-activity-grid settings-activity-grid">${renderActivityDots()}</div>
+              </section>
             </section>
 
             <section class="settings-section" data-settings-section="billing" ${_settingsSection === 'billing' ? '' : 'hidden'}>
@@ -8503,14 +8513,6 @@
               <h2 class="settings-section-title">${T('语言','Language')}</h2>
               <p style="margin:0 0 12px;color:#78716c;font-size:13px">${T('当前','Current')}：${escape(langLabel)}</p>
               <button type="button" class="settings-link-row" data-toggle-lang style="width:100%">${T('切换中文 / English','Switch Chinese / English')}<span>⇄</span></button>
-            </section>
-
-            <section class="settings-section" data-settings-section="activity" ${_settingsSection === 'activity' ? '' : 'hidden'}>
-              <h2 class="settings-section-title">${T('活动记录','Activity')}</h2>
-              <section class="me-card me-activity-card" style="margin:0">
-                <div class="me-activity-months"><span>${T('近 12 周','Last 12 weeks')}</span><span>${new Date().toLocaleDateString(uiLocale(), { month: 'long', day: 'numeric' })}</span></div>
-                <div class="me-activity-grid">${renderActivityDots()}</div>
-              </section>
             </section>
           </div>
         </div>
