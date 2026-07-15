@@ -3930,9 +3930,17 @@
     return out.join('');
   }
 
+  /** 刊名兜底：兼容 name/n/journal_title 等字段，避免收藏卡标题空白 */
+  function journalDisplayName(r) {
+    if (!r) return '';
+    return String(
+      r.name || r.n || r.cn_name || r.journal_title || r.global_name || r.en_name || r.title || ''
+    ).trim();
+  }
+
   /**
-   * 统一期刊卡片：上块（刊名/副信息 | IF+收藏）+ 下块（徽章）
-   * 无论有无徽章，始终保留上下两区与分割线；信息少时下块可略留白。
+   * 统一期刊卡片：上块（拖动手柄 | 刊名/副信息 | IF+收藏）+ 下块（徽章）
+   * 拖动手柄放在上块最左侧，不再单独占一整行。
    */
   function journalCardRow({
     fid,
@@ -3949,10 +3957,11 @@
     const bodyInner = (bodyHtml && String(bodyHtml).replace(/\s+/g, ''))
       ? bodyHtml
       : `<div class="j-card-badges j-card-body-placeholder" aria-hidden="true"></div>`;
-    return `<tr class="j-row j-card clickable${extraClass ? ` ${extraClass}` : ''}${flagship ? ' row-flagship' : ''}" data-fid="${escape(fid)}" data-src="${escape(src)}">
-      ${dragHtml ? `<td class="col-drag">${dragHtml}</td>` : ''}
+    const hasDrag = !!(dragHtml && String(dragHtml).trim());
+    return `<tr class="j-row j-card clickable${extraClass ? ` ${extraClass}` : ''}${flagship ? ' row-flagship' : ''}${hasDrag ? ' has-drag' : ''}" data-fid="${escape(fid)}" data-src="${escape(src)}">
       <td class="j-card-main col-name">
         <div class="j-card-head">
+          ${hasDrag ? `<div class="j-card-drag col-drag">${dragHtml}</div>` : ''}
           <div class="j-card-head-main">
             <div class="j-card-title-block">${nameHtml}</div>
             ${metaHtml ? `<div class="j-card-meta-row">${metaHtml}</div>` : ''}
@@ -8426,14 +8435,11 @@
         </div>
       </div>`;
 
-    // 取当前 list 的有序记录
+    // 取当前 list 的有序记录（实时库 + favsData 合并，刊名永不丢）
     let rows = [];
     for (const id of list.ids) {
-      // 优先使用实时数据，收藏时保存的旧数据可能过时（如刊名大小写变化）
       let rec = journals.find(r => favId(r) === id);
       if (!rec && domestic) {
-        // 搜索国内源
-        const src = favsData[id]?.__src || 'cnki_major';
         const domRecs = [
           ...(domestic.cnkx?.records || []).map(r => ({ ...r, __src: 'cnkx' })),
           ...(domestic.cscd?.records || []).map(r => ({ ...r, __src: 'cscd' })),
@@ -8443,8 +8449,18 @@
         ];
         rec = domRecs.find(r => favId(r) === id);
       }
-      if (!rec) rec = favsData[id]; // 最终 fallback
-      if (rec) rows.push({ ...rec, __src: rec.__src || 'int' });
+      const saved = favsData[id];
+      if (!rec) rec = saved;
+      if (!rec) continue;
+      const merged = {
+        ...(saved || {}),
+        ...rec,
+        name: journalDisplayName(rec) || journalDisplayName(saved) || (saved && saved.name) || '',
+        __src: rec.__src || saved?.__src || 'int',
+      };
+      // 若合并后仍无刊名，至少用 id 占位，避免空白卡
+      if (!journalDisplayName(merged)) merged.name = String(id || '');
+      rows.push(merged);
     }
     if (activeQuery) {
       const q = activeQuery.toLowerCase();
@@ -9294,9 +9310,19 @@
 
   function renderFavRow(r) {
     const fid = favId(r);
+    // 合并 favsData 兜底，防止点击后重绘丢刊名
+    const saved = (favsData && favsData[fid]) || {};
+    r = {
+      ...saved,
+      ...r,
+      name: journalDisplayName(r) || journalDisplayName(saved) || r.name || saved.name || '',
+      __src: r.__src || saved.__src || 'int',
+    };
     rowRecordsByFid[fid] = r;
-    const rawName = r.name || r.cn_name || r.journal_title || '';
-    const nameHtml = `<div class="jname ${r.flagship ? 'jname-flagship' : ''}">${escape(titleCase(rawName.replace(/\*$/,'')))}${r.cn_name && r.cn_name !== rawName ? `<span class="jname-cn">${escape(r.cn_name)}</span>` : ''}${r.en_name && r.en_name !== rawName ? `<span class="jname-cn">${escape(titleCase(r.en_name))}</span>` : ''}${aliasHintHtml(r)}</div>`;
+    const rawName = journalDisplayName(r) || String(fid || '');
+    const displayTitle = rawName.startsWith('t:') ? rawName.slice(2) : rawName.replace(/\*$/, '');
+    const pretty = /[\u4e00-\u9fff]/.test(displayTitle) ? displayTitle : titleCase(displayTitle);
+    const nameHtml = `<div class="jname ${r.flagship ? 'jname-flagship' : ''}">${escape(pretty || T('（未命名期刊）','(Untitled journal)'))}${r.cn_name && r.cn_name !== rawName ? `<span class="jname-cn">${escape(r.cn_name)}</span>` : ''}${r.en_name && r.en_name !== rawName ? `<span class="jname-cn">${escape(titleCase(r.en_name))}</span>` : ''}${aliasHintHtml(r)}</div>`;
     const indexBadges = r.__src === 'int' ? renderIndexBadges(r) : '';
     const rankBadges = r.__src === 'int' ? renderRankBadges(r) : '';
     // 科协：显示「科协·学科 T2」，禁止裸 T2；从交叉索引排除 cnkx 后由 castBadgeHtml 统一输出

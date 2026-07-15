@@ -7663,27 +7663,66 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   min-width: 0;
   padding: 14px 14px 12px;
   box-sizing: border-box;
-  /* 默认上块底色：全站统一略深暖灰，与白底徽章区区分 */
-  background: #e0d9ce;
+  /* 默认上块：全站统一暖灰 */
+  background: #ddd5c8;
   border-radius: 15px 15px 0 0;
-  /* 与下块（收录/分区）的清晰分割线 */
   border-bottom: 1px solid rgba(60, 60, 67, 0.14);
   overflow: hidden;
 }
-/* 始终上下两区；compact 仅作兼容（不再默认使用） */
+/* 收藏卡有拖动手柄：左 | 刊名 | IF+星 */
+.j-row.j-card.has-drag .j-card-head {
+  grid-template-columns: 28px minmax(0, 1fr) minmax(72px, auto);
+  column-gap: 8px;
+  padding-left: 10px;
+}
 .j-row.j-card-compact .j-card-head {
   border-radius: 15px 15px 0 0;
   border-bottom: 1px solid rgba(60, 60, 67, 0.14);
   flex: 0 0 auto;
 }
-/* 左：刊名 + meta */
+/* 拖动手柄：始终最左侧 */
+.j-row .j-card-drag,
+.j-row .col-drag {
+  position: static !important;
+  top: auto !important;
+  left: auto !important;
+  grid-column: 1;
+  width: 28px !important;
+  min-width: 28px;
+  max-width: 28px;
+  display: flex !important;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 2px 0 0;
+  margin: 0;
+  color: #9a8f80;
+  font-size: 14px;
+  line-height: 1;
+  cursor: grab;
+  z-index: 2;
+  box-sizing: border-box;
+}
+.j-row .j-card-drag .drag-handle,
+.j-row .col-drag .drag-handle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  min-height: 28px;
+  letter-spacing: -1px;
+  color: #8a7f70;
+}
+/* 刊名区 */
 .j-row .j-card-head-main {
   grid-column: 1;
   min-width: 0;
   max-width: 100%;
   overflow: hidden;
 }
-/* 右：IF + 收藏，宽度随 IF 同行文案 */
+.j-row.j-card.has-drag .j-card-head-main {
+  grid-column: 2;
+}
+/* 右：IF + 收藏 */
 .j-row .j-card-head-side {
   grid-column: 2;
   min-width: 72px;
@@ -7695,6 +7734,9 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   overflow: hidden;
   box-sizing: border-box;
 }
+.j-row.j-card.has-drag .j-card-head-side {
+  grid-column: 3;
+}
 .j-row .j-card-title-block,
 .j-row .j-card-top {
   width: 100%;
@@ -7703,14 +7745,14 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 }
 .j-row .jname {
   margin: 0;
-  min-height: 0;
+  min-height: 1.28em;
   max-width: 100%;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
   font-size: 16px;
   font-weight: 600;
   line-height: 1.28;
   letter-spacing: -0.02em;
-  color: #000;
+  color: #1a1612;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -7808,7 +7850,7 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   color: #ff9500;
   background: rgba(255, 149, 0, 0.18);
 }
-/* 已收藏：仅上块再深一档；下块仍白；其它卡保持默认同色 */
+/* 已收藏：仅上块再深一档；下块仍白 */
 .j-row.j-card:has(.fav-star.on) {
   background: #ffffff;
 }
@@ -7816,23 +7858,11 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   background: transparent;
 }
 .j-row.j-card:has(.fav-star.on) .j-card-head {
-  background: #d0c7b8;
+  background: #cfc3b0;
 }
 .j-row.j-card:has(.fav-star.on) .j-card-body {
   background: #ffffff;
 }
-
-.j-row .col-drag {
-  position: absolute;
-  top: 14px;
-  left: 10px;
-  z-index: 2;
-  width: auto !important;
-  color: #c7c7cc;
-  font-size: 14px;
-  cursor: grab;
-}
-.j-row:has(.col-drag) .j-card-head { padding-left: 28px; }
 
 /* meta：免费发表 + 审稿，止于上块 */
 .j-row .j-card-meta-row {
@@ -8281,10 +8311,19 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   font-weight: 650 !important;
   border: 0 !important;
 }
-/* 收藏 meta 里的「科协」来源标同样浅色 */
+/* 收藏 meta 来源标：浅色胶囊，统一轻量 */
+.j-row .j-meta-src .src-tag {
+  background: #ebe4d8 !important;
+  color: #5c5348 !important;
+  font-weight: 650 !important;
+}
 .j-row .j-meta-src .src-tag.src-cnkx {
   background: #f2ebe2 !important;
   color: #5c4a36 !important;
+}
+.j-row .j-meta-src .src-tag.src-int {
+  background: #e6eef4 !important;
+  color: #2d5568 !important;
 }
 
 /* 免费发表：小号绿色标，紧挨 IF */
