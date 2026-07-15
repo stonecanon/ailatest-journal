@@ -1,3 +1,49 @@
+# AILatest Journal — https://journal.ailatest.org/
 User-agent: *
 Allow: /
+Allow: /llms.txt
+Allow: /ai.txt
+Allow: /sitemap.xml
+Allow: /pricing.html
+Allow: /extension.html
+Allow: /rankings/
+Allow: /subjects/
+Allow: /indexes/
+Disallow: /api/
+Disallow: /worker/
+
+# Generative engines & AI crawlers (GEO / AI-EO)
+User-agent: GPTBot
+Allow: /
+User-agent: ChatGPT-User
+Allow: /
+User-agent: OAI-SearchBot
+Allow: /
+User-agent: ClaudeBot
+Allow: /
+User-agent: Claude-SearchBot
+Allow: /
+User-agent: anthropic-ai
+Allow: /
+User-agent: PerplexityBot
+Allow: /
+User-agent: Google-Extended
+Allow: /
+User-agent: GoogleOther
+Allow: /
+User-agent: Applebot-Extended
+Allow: /
+User-agent: Amazonbot
+Allow: /
+User-agent: cohere-ai
+Allow: /
+User-agent: CCBot
+Allow: /
+User-agent: meta-externalagent
+Allow: /
+User-agent: Bytespider
+Allow: /
+User-agent: Diffbot
+Allow: /
+
 Sitemap: https://journal.ailatest.org/sitemap.xml

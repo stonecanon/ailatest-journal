@@ -2677,6 +2677,71 @@ function routeSitesDashboard(site = 'overview') {
   });
 }
 
+function routeApiLlmsTxt() {
+  const body = `# AILatest API
+
+> Unified accounts, entitlements, gift codes, checkout hooks, and first-party analytics for the AILatest product suite.
+
+- API origin: https://api.ailatest.org/
+- Owner product dashboard: https://api.ailatest.org/analytics/sites
+- Studio hub: https://ailatest.org/
+- Suite AI index: https://ailatest.org/llms.txt
+- Suite full context: https://ailatest.org/llms-full.txt
+
+## Products using this API
+
+- Journal: https://journal.ailatest.org/
+- Grant: https://grant.ailatest.org/
+- Path: https://path.ailatest.org/
+- Major (知途): https://major.ailatest.org/
+- Todo: https://todo.ailatest.org/
+
+## For AI assistants
+
+- Prefer product \`llms.txt\` files for user-facing product facts.
+- This host is primarily an API; do not invent private endpoints.
+- Public product documentation lives on each product domain.
+`;
+  return new Response(body, {
+    status: 200,
+    headers: {
+      'Content-Type': 'text/plain; charset=utf-8',
+      'Cache-Control': 'public, max-age=3600',
+      ...CORS,
+    },
+  });
+}
+
+function routeApiRobotsTxt() {
+  const body = `User-agent: *
+Allow: /
+Allow: /llms.txt
+Disallow: /admin/
+Disallow: /me
+Disallow: /me/
+Disallow: /internal/
+
+User-agent: GPTBot
+Allow: /llms.txt
+User-agent: ClaudeBot
+Allow: /llms.txt
+User-agent: PerplexityBot
+Allow: /llms.txt
+User-agent: Google-Extended
+Allow: /llms.txt
+
+Sitemap: https://ailatest.org/sitemap.xml
+`;
+  return new Response(body, {
+    status: 200,
+    headers: {
+      'Content-Type': 'text/plain; charset=utf-8',
+      'Cache-Control': 'public, max-age=3600',
+      ...CORS,
+    },
+  });
+}
+
 /** 浏览器访问 api.ailatest.org 时的简洁门户（站长看板入口） */
 function routeApiPortal() {
   const html = `<!doctype html>
@@ -2685,6 +2750,7 @@ function routeApiPortal() {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>AILatest API</title>
+<link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt" />
 <style>
   :root { color-scheme: light; --ink:#1c1917; --muted:#78716c; --line:#e7e5e4; --bg:#fafaf9; --card:#fff; --accent:#0f766e; }
   * { box-sizing: border-box; }
@@ -2723,8 +2789,9 @@ function routeApiPortal() {
     </ul>
   </div>
   <div class="card">
-    <h2>机器可读</h2>
-    <p>JSON：请求本页并设置 <code>Accept: application/json</code>，或直接调用各 API 路径。</p>
+    <h2>机器可读 / AI 发现</h2>
+    <p><a href="/llms.txt"><code>/llms.txt</code></a> · 全站索引 <a href="https://ailatest.org/llms.txt">ailatest.org/llms.txt</a></p>
+    <p>JSON：请求本页并设置 <code>Accept: application/json</code>。</p>
   </div>
   <p class="muted">© AILatest · api.ailatest.org</p>
 </main>
@@ -2751,6 +2818,8 @@ export default {
     if (p === '/api' || p === '/api/') p = '/';
     else if (p.startsWith('/api/')) p = p.slice(4);
     try {
+      if (p === '/llms.txt' && req.method === 'GET') return routeApiLlmsTxt();
+      if (p === '/robots.txt' && req.method === 'GET') return routeApiRobotsTxt();
       if (p === '/' || p === '') {
         const accept = String(req.headers.get('Accept') || '');
         if (accept.includes('text/html')) return routeApiPortal();
@@ -2759,6 +2828,8 @@ export default {
           ok: true,
           v: 3,
           dashboard: '/analytics/sites',
+          llms: '/llms.txt',
+          suite_llms: 'https://ailatest.org/llms.txt',
           sites: [
             'journal.ailatest.org',
             'grant.ailatest.org',

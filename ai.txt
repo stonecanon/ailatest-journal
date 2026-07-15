@@ -1,0 +1,7 @@
+# AI discovery — AILatest Journal
+llms: https://journal.ailatest.org/llms.txt
+sitemap: https://journal.ailatest.org/sitemap.xml
+suite: https://ailatest.org/llms.txt
+suite-full: https://ailatest.org/llms-full.txt
+homepage: https://journal.ailatest.org/
+pricing: https://journal.ailatest.org/pricing.html
