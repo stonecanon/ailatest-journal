@@ -1336,6 +1336,122 @@ async function routeMeEntitlements(req, env) {
   return json(await getEntitlements(env, u, isOwnerUser(u, env)));
 }
 
+// ───────── 跨产品会员快照（Todo 等订阅写入统一账号库） ─────────
+async function ensureProductMembershipTables(env) {
+  await env.DB.batch([
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS product_memberships (
+      user_id INTEGER NOT NULL,
+      product TEXT NOT NULL,
+      plan TEXT NOT NULL DEFAULT 'free',
+      status TEXT NOT NULL DEFAULT 'inactive',
+      paid_until INTEGER,
+      external_user_key TEXT,
+      source TEXT,
+      updated_at INTEGER NOT NULL,
+      PRIMARY KEY (user_id, product)
+    )`),
+    env.DB.prepare(`CREATE INDEX IF NOT EXISTS idx_product_memberships_product
+      ON product_memberships(product, status, updated_at)`),
+  ]);
+}
+
+function internalSecretOk(req, env) {
+  const secret = String(env.ACCOUNT_SYNC_SECRET || env.TODO_INTERNAL_SECRET || '').trim();
+  if (!secret) return false;
+  const got = String(req.headers.get('X-Internal-Secret') || req.headers.get('X-AILATEST-INTERNAL') || '').trim();
+  return got && got === secret;
+}
+
+/** POST /internal/product-membership — Todo/其它产品回写订阅到统一账号表 */
+async function routeInternalProductMembership(req, env) {
+  if (!internalSecretOk(req, env)) return err('forbidden', 403);
+  const body = await req.json().catch(() => ({}));
+  const product = String(body?.product || '').toLowerCase().trim();
+  const email = String(body?.email || '').toLowerCase().trim();
+  const plan = String(body?.plan || 'free').toLowerCase().trim();
+  const status = String(body?.status || 'inactive').toLowerCase().trim();
+  const externalKey = String(body?.user_key || body?.external_user_key || '').trim();
+  if (!product || product.length > 32) return err('invalid_product', 400);
+  if (!email || !isEmail(email)) return err('invalid_email', 400);
+
+  await ensureProductMembershipTables(env);
+  // 确保 users 有此邮箱
+  let row = await env.DB.prepare('SELECT id FROM users WHERE email = ?').bind(email).first();
+  let uid = row?.id;
+  if (!uid) {
+    const now = nowSec();
+    const login = email.split('@')[0] || email;
+    const ins = await env.DB.prepare(
+      `INSERT INTO users (email, login, name, provider, created_at, updated_at)
+       VALUES (?, ?, ?, 'sync', ?, ?)`
+    ).bind(email, login, login, now, now).run();
+    uid = ins.meta.last_row_id;
+  }
+  let paidUntil = null;
+  if (body?.current_period_end) {
+    const t = Date.parse(body.current_period_end);
+    if (Number.isFinite(t)) paidUntil = Math.floor(t / 1000);
+  } else if (body?.paid_until != null) {
+    paidUntil = Math.floor(Number(body.paid_until)) || null;
+  }
+  const now = nowSec();
+  await env.DB.prepare(
+    `INSERT INTO product_memberships (user_id, product, plan, status, paid_until, external_user_key, source, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+     ON CONFLICT(user_id, product) DO UPDATE SET
+       plan = excluded.plan,
+       status = excluded.status,
+       paid_until = excluded.paid_until,
+       external_user_key = COALESCE(excluded.external_user_key, product_memberships.external_user_key),
+       source = excluded.source,
+       updated_at = excluded.updated_at`
+  ).bind(uid, product, plan, status, paidUntil, externalKey || null, String(body?.source || 'sync'), now).run();
+
+  return json({ ok: true, user_id: uid, product, plan, status, paid_until: paidUntil });
+}
+
+/** GET /admin/product-memberships?product=todo — 站长看跨产品会员 */
+async function routeAdminProductMemberships(req, env) {
+  const u = await getUser(req, env);
+  if (!u) return err('unauthorized', 401);
+  if (!isOwnerUser(u, env)) return err('forbidden', 403);
+  await ensureProductMembershipTables(env);
+  const url = new URL(req.url);
+  const product = String(url.searchParams.get('product') || '').trim();
+  let rows;
+  if (product) {
+    rows = await env.DB.prepare(
+      `SELECT m.user_id, m.product, m.plan, m.status, m.paid_until, m.external_user_key, m.source, m.updated_at,
+              u.email, u.login, u.provider
+         FROM product_memberships m
+         LEFT JOIN users u ON u.id = m.user_id
+        WHERE m.product = ?
+        ORDER BY m.updated_at DESC LIMIT 200`
+    ).bind(product).all();
+  } else {
+    rows = await env.DB.prepare(
+      `SELECT m.user_id, m.product, m.plan, m.status, m.paid_until, m.external_user_key, m.source, m.updated_at,
+              u.email, u.login, u.provider
+         FROM product_memberships m
+         LEFT JOIN users u ON u.id = m.user_id
+        ORDER BY m.updated_at DESC LIMIT 200`
+    ).all();
+  }
+  const summary = await env.DB.prepare(
+    `SELECT product, plan, status, COUNT(*) AS n
+       FROM product_memberships
+      GROUP BY product, plan, status`
+  ).all();
+  return json({
+    ok: true,
+    summary: summary.results || [],
+    rows: (rows.results || []).map(r => ({
+      ...r,
+      email: r.email ? String(r.email).replace(/^(.{2}).*(@.*)$/, '$1***$2') : '',
+    })),
+  });
+}
+
 // ───────── gift codes（对齐 Todo 安全模型） ─────────
 // - 生成 N 张 → 仅 N 条有效记录，最多成功兑换 N 次
 // - 每码仅可兑换一次（gift_redemptions 主键；并发也进 409）
@@ -2678,6 +2794,8 @@ export default {
       if (p === '/me/entitlements'     && req.method === 'GET')  return routeMeEntitlements(req, env);
       if (p === '/admin/gift-codes'    && req.method === 'POST') return routeAdminGiftCodes(req, env);
       if (p === '/admin/gift-codes/void' && req.method === 'POST') return routeAdminVoidGiftCode(req, env);
+      if (p === '/admin/product-memberships' && req.method === 'GET') return routeAdminProductMemberships(req, env);
+      if (p === '/internal/product-membership' && req.method === 'POST') return routeInternalProductMembership(req, env);
       if (p === '/gift-codes/redeem'   && req.method === 'POST') return routeRedeemGiftCode(req, env);
       if (p === '/checkout/creem'      && req.method === 'POST') {
         const out = await routeCreemCheckout(req, env, getUser);

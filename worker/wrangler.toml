@@ -24,6 +24,15 @@ SITE_URL         = "https://journal.ailatest.org"
 MAIL_FROM        = "noreply@ailatest.org"   # must be a Resend-verified sender
 CF_ZONE_ID       = "435525fb783ba7bf4c686a9734e26124"  # journal.ailatest.org zone (Cloudflare Analytics)
 GA4_PROPERTY_ID  = "537014253"                          # Google Analytics 4 property
+# Creem Journal products（与 Todo 分离；可被 secret 外的 vars 覆盖）
+CREEM_PRO_MONTHLY_PRODUCT_ID     = "prod_4U7xCv0XuvaQwngA8GzAwk"
+CREEM_PRO_YEARLY_PRODUCT_ID      = "prod_4qPTXwWFki7H97CnEGg0UU"
+CREEM_MAX_MONTHLY_PRODUCT_ID     = "prod_4dQ8oxI13n13UujKijvupS"
+CREEM_MAX_YEARLY_PRODUCT_ID      = "prod_5ndNsgM1cIcItVoNCpQxLK"
+CREEM_PRO_EDU_MONTHLY_PRODUCT_ID = "prod_2UjZDHaflN6qnqyPKsSWzu"
+CREEM_PRO_EDU_YEARLY_PRODUCT_ID  = "prod_2KUfnQxKKFYS2zIRX8bIyD"
+CREEM_MAX_EDU_MONTHLY_PRODUCT_ID = "prod_2Il9sgrjBPMbgCA4eALdCz"
+CREEM_MAX_EDU_YEARLY_PRODUCT_ID  = "prod_1a4d3MaM7X10XbTUP6ixCW"
 
 [[d1_databases]]
 binding = "DB"
@@ -40,3 +49,7 @@ database_id = "861dd053-c23a-4363-b62b-2559c06ec3fd"
 #   wrangler secret put CODE_PEPPER
 #   wrangler secret put CF_ANALYTICS_TOKEN   # Cloudflare API token, Analytics:Read (dashboard)
 #   wrangler secret put GA4_SA_KEY           # GA4 service-account JSON (dashboard)
+#   wrangler secret put ACCOUNT_SYNC_SECRET  # 与 Todo 相同：跨产品订阅写入 product_memberships
+#   wrangler secret put TODO_INTERNAL_SECRET # 可选，读取 todo.ailatest.org 订阅汇总
+#   wrangler secret put CREEM_API_KEY        # Creem production API key (checkout sessions)
+#   wrangler secret put CREEM_WEBHOOK_SECRET # Creem webhook signing secret

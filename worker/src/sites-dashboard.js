@@ -598,12 +598,37 @@ button.active,.btn.active{background:var(--accent);border-color:var(--accent);co
         '</tbody></table></section>'+
       '</div>';
   }
+  function todoBusinessSection(tb){
+    var base = genericSiteBusinessSection('Todo', tb);
+    var k = (tb && tb.kpis) || {};
+    var remote = (tb && tb.remote) || {};
+    var members = (tb && tb.tables && tb.tables.productMembers) || [];
+    var extra = '<div class="section-title">Todo 订阅（统一账号 + 远程汇总）</div>'+
+      metricCards([
+        ['统一库会员行', k.membership_rows || 0],
+        ['有效订阅', k.membership_active || remote.active || 0],
+        ['Pro', k.membership_pro || 0],
+        ['Max', k.membership_max || 0],
+        ['Todo 库订阅总数', remote.total || 0]
+      ])+
+      (remote.status && remote.status !== 'ok'
+        ? '<section class="card"><strong>远程 Todo 库</strong><p class="muted">'+esc(remote.reason || remote.status)+'</p><p class="muted">配置 Worker secret <code>ACCOUNT_SYNC_SECRET</code>（与 Journal API 相同）后可自动同步。</p></section>'
+        : '')+
+      '<section class="card"><strong>最近同步到统一账号的 Todo 会员</strong><table class="table"><thead><tr><th>用户</th><th>档位</th><th>状态</th><th>更新</th></tr></thead><tbody>'+
+        rowsFrom(members.slice(0,20), [
+          {f:function(r){return r.email || r.login || ('#'+r.user_id);}},
+          {k:'plan'},{k:'status'},
+          {f:function(r){return secTs(r.updated_at);}}
+        ])+
+      '</tbody></table></section>';
+    return base + extra;
+  }
   function businessSection(siteId, business){
     if (siteId === 'journal') return journalBusinessSection(business);
     if (siteId === 'grant') return grantBusinessSection(business);
     if (siteId === 'path') return genericSiteBusinessSection('Path', business);
     if (siteId === 'major') return genericSiteBusinessSection('Major · 知途', business);
-    if (siteId === 'todo') return genericSiteBusinessSection('Todo', business);
+    if (siteId === 'todo') return todoBusinessSection(business);
     if (siteId === 'ailatest') return ailatestBusinessSection(business);
     return '<section class="card"><strong>业务明细</strong><p class="muted">'+esc((business && business.reason) || '当前站点暂无业务明细。')+'</p></section>';
   }

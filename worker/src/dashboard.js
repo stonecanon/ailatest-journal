@@ -137,6 +137,27 @@ function splitExternalByFirstParty(source, firstParty, kind) {
     };
   }
 
+  // 已有按 host 拆分的真实数据时，直接使用（不再按第一方份额估算）
+  if (source.sites && typeof source.sites === 'object' && Object.keys(source.sites).length) {
+    const sitesOut = {};
+    for (const site of sites) {
+      const raw = source.sites[site.id] || {};
+      sitesOut[site.id] = {
+        ...site,
+        source: source.source,
+        status: raw.status || 'ok',
+        reason: raw.reason || source.reason || '',
+        filter_note: raw.filter_note || 'Host-level filter',
+        totals: raw.totals || {},
+        series: raw.series || [],
+        topPages: raw.topPages || raw.topPaths || [],
+        topPaths: raw.topPaths || raw.topPages || [],
+        topCountries: raw.topCountries || source.topCountries || [],
+      };
+    }
+    return { ...source, sites: sitesOut };
+  }
+
   const firstPartyTotal = sites.reduce((sum, site) => sum + num(firstParty?.[site.id]?.totals?.pageviews), 0);
   const scale = (value, share) => Math.round(num(value) * share);
   const numericKeys = new Set();
@@ -335,6 +356,82 @@ function internalVisitorExpr(column = 'visitor_id') {
 }
 function humanAnalyticsExpr(column = 'visitor_id') {
   return `${humanTrafficExpr()} AND ${internalVisitorExpr(column)}`;
+}
+
+async function loadProductMembershipKpis(env, product) {
+  try {
+    const tableRows = await q(env, "SELECT name FROM sqlite_master WHERE type='table' AND name='product_memberships'");
+    if (!tableRows.length) return {};
+    const rows = await q(
+      env,
+      `SELECT plan, status, COUNT(*) AS n FROM product_memberships WHERE product = ? GROUP BY plan, status`,
+      [product],
+    );
+    let members = 0;
+    let pro = 0;
+    let max = 0;
+    let active = 0;
+    for (const r of rows) {
+      const n = num(r.n);
+      members += n;
+      if (String(r.plan) === 'pro') pro += n;
+      if (String(r.plan) === 'max') max += n;
+      if (['active', 'paid', 'trialing', 'gift_active', 'owner', 'scheduled_cancel'].includes(String(r.status))) {
+        active += n;
+      }
+    }
+    return {
+      membership_rows: members,
+      membership_active: active,
+      membership_pro: pro,
+      membership_max: max,
+    };
+  } catch (_) {
+    return {};
+  }
+}
+
+async function loadProductMembershipRows(env, product) {
+  try {
+    const tableRows = await q(env, "SELECT name FROM sqlite_master WHERE type='table' AND name='product_memberships'");
+    if (!tableRows.length) return [];
+    const rows = await q(
+      env,
+      `SELECT m.user_id, m.plan, m.status, m.paid_until, m.updated_at, u.email, u.login
+         FROM product_memberships m
+         LEFT JOIN users u ON u.id = m.user_id
+        WHERE m.product = ?
+        ORDER BY m.updated_at DESC LIMIT 40`,
+      [product],
+    );
+    return rows.map(r => ({
+      ...r,
+      email: r.email ? String(r.email).replace(/^(.{2}).*(@.*)$/, '$1***$2') : '',
+    }));
+  } catch (_) {
+    return [];
+  }
+}
+
+/** 从 Todo Worker 拉取订阅汇总（需 ACCOUNT_SYNC_SECRET / TODO_INTERNAL_SECRET） */
+async function fetchTodoSubscriptionSummary(env) {
+  const secret = String(env.TODO_INTERNAL_SECRET || env.ACCOUNT_SYNC_SECRET || '').trim();
+  const base = String(env.TODO_API_BASE || 'https://todo.ailatest.org').replace(/\/$/, '');
+  if (!secret) {
+    return { status: 'disabled', reason: '未配置 TODO_INTERNAL_SECRET / ACCOUNT_SYNC_SECRET' };
+  }
+  try {
+    const resp = await fetch(`${base}/api/internal/subscription-summary`, {
+      headers: { 'X-Internal-Secret': secret },
+    });
+    const data = await resp.json().catch(() => ({}));
+    if (!resp.ok) {
+      return { status: 'error', reason: data?.error || `HTTP ${resp.status}` };
+    }
+    return { status: 'ok', ...data };
+  } catch (e) {
+    return { status: 'error', reason: e.message || String(e) };
+  }
 }
 
 /** 各站通用：流量 + 访客基础数据（第一方 raw_events） */
@@ -636,7 +733,18 @@ async function buildSiteBusiness(env, options = {}) {
     },
     path: pathBasics,
     major: majorBasics,
-    todo: todoBasics,
+    todo: {
+      ...todoBasics,
+      kpis: {
+        ...(todoBasics.kpis || {}),
+        ...(await loadProductMembershipKpis(env, 'todo')),
+      },
+      tables: {
+        ...(todoBasics.tables || {}),
+        productMembers: await loadProductMembershipRows(env, 'todo'),
+      },
+      remote: await fetchTodoSubscriptionSummary(env),
+    },
     ailatest: {
       ...studioBasics,
       kpis: {
@@ -785,7 +893,7 @@ async function buildD1(env) {
   };
 }
 
-// ───────── 2. Cloudflare GraphQL Analytics ─────────
+// ───────── 2. Cloudflare GraphQL Analytics（整区 + 按 host 拆分） ─────────
 async function buildCloudflare(env) {
   const zoneId = env.CF_ZONE_ID;
   const token = env.CF_ANALYTICS_TOKEN;
@@ -808,32 +916,13 @@ async function buildCloudflare(env) {
     }
     return body;
   };
-  // Dates/zoneTag inlined as string literals (zoneId + dates are server-controlled).
-  // httpRequests1dGroups date filters expect the Cloudflare `string` scalar, so passing
-  // them via typed GraphQL variables is fragile — inlining avoids any type mismatch.
+
   const dailyQuery = `{
     viewer { zones(filter: { zoneTag: "${zoneId}" }) {
       httpRequests1dGroups(limit: 30, filter: { date_geq: "${since}", date_leq: "${until}" }, orderBy: [date_ASC]) {
         dimensions { date }
         sum { requests pageViews bytes cachedRequests encryptedRequests threats }
         uniq { uniques }
-      }
-    } }
-  }`;
-  const adaptiveQuery = `{
-    viewer { zones(filter: { zoneTag: "${zoneId}" }) {
-      httpRequestsAdaptiveGroups(
-        limit: 30,
-        filter: {
-          datetime_geq: "${since}T00:00:00Z",
-          datetime_lt: "${untilExclusive}T00:00:00Z",
-          requestSource: "eyeball"
-        },
-        orderBy: [datetimeDay_ASC]
-      ) {
-        count
-        dimensions { datetimeDay }
-        sum { visits edgeResponseBytes }
       }
     } }
   }`;
@@ -861,6 +950,23 @@ async function buildCloudflare(env) {
 
   if (!series.length || !series.some(row => row.requests || row.pageviews || row.visitors)) {
     try {
+      const adaptiveQuery = `{
+        viewer { zones(filter: { zoneTag: "${zoneId}" }) {
+          httpRequestsAdaptiveGroups(
+            limit: 30,
+            filter: {
+              datetime_geq: "${since}T00:00:00Z",
+              datetime_lt: "${untilExclusive}T00:00:00Z",
+              requestSource: "eyeball"
+            },
+            orderBy: [datetimeDay_ASC]
+          ) {
+            count
+            dimensions { datetimeDay }
+            sum { visits edgeResponseBytes }
+          }
+        } }
+      }`;
       const body = await runGraphql(adaptiveQuery);
       const adaptive = body?.data?.viewer?.zones?.[0]?.httpRequestsAdaptiveGroups || [];
       if (adaptive.length) {
@@ -884,11 +990,67 @@ async function buildCloudflare(env) {
     }
   }
 
+  // 按 host 拉取 Adaptive Groups（真实分站，失败则留给份额估算）
+  const hostSites = {};
+  await Promise.all(siteDefs().map(async (site) => {
+    const host = site.host.replace(/"/g, '');
+    try {
+      const q = `{
+        viewer { zones(filter: { zoneTag: "${zoneId}" }) {
+          httpRequestsAdaptiveGroups(
+            limit: 30,
+            filter: {
+              datetime_geq: "${since}T00:00:00Z",
+              datetime_lt: "${untilExclusive}T00:00:00Z",
+              requestSource: "eyeball",
+              clientRequestHTTPHost: "${host}"
+            },
+            orderBy: [datetimeDay_ASC]
+          ) {
+            count
+            dimensions { datetimeDay }
+            sum { visits edgeResponseBytes }
+          }
+        } }
+      }`;
+      const body = await runGraphql(q);
+      const rows = body?.data?.viewer?.zones?.[0]?.httpRequestsAdaptiveGroups || [];
+      const hostSeries = rows.map(g => ({
+        day: String(g.dimensions.datetimeDay || '').slice(0, 10),
+        requests: num(g.count),
+        pageviews: num(g.sum?.visits),
+        visitors: num(g.sum?.visits),
+        bytes: num(g.sum?.edgeResponseBytes),
+      })).filter(r => r.day);
+      const sum = key => hostSeries.reduce((s, r) => s + num(r[key]), 0);
+      hostSites[site.id] = {
+        status: hostSeries.length ? 'ok' : 'empty',
+        reason: hostSeries.length ? 'Cloudflare Adaptive · host filter' : '该 host 暂无 Adaptive 数据',
+        filter_note: `clientRequestHTTPHost=${host}`,
+        totals: {
+          requests: sum('requests'),
+          pageviews: sum('pageviews'),
+          visitors: sum('visitors'),
+          bytes: sum('bytes'),
+        },
+        series: hostSeries,
+      };
+    } catch (e) {
+      hostSites[site.id] = {
+        status: 'error',
+        reason: e.message || String(e),
+        totals: {},
+        series: [],
+      };
+    }
+  }));
+
   const sum = key => series.reduce((s, r) => s + num(r[key]), 0);
+  const hasHostData = Object.values(hostSites).some(s => s.status === 'ok' && num(s.totals?.requests || s.totals?.pageviews));
   return {
     source: 'Cloudflare Analytics',
     status: 'ok',
-    reason: primaryError && sourceMode !== 'httpRequests1dGroups' ? `主查询无数据或失败，已使用 Adaptive Groups：${primaryError}` : '',
+    reason: primaryError && sourceMode !== 'httpRequests1dGroups' ? `主查询回退 Adaptive：${primaryError}` : '',
     mode: sourceMode,
     zone_id: zoneId,
     today: series[series.length - 1] || null,
@@ -898,6 +1060,7 @@ async function buildCloudflare(env) {
       encrypted_requests: sum('encrypted_requests'), threats: sum('threats'),
     },
     series,
+    sites: hasHostData ? hostSites : undefined,
   };
 }
 
@@ -993,12 +1156,14 @@ async function buildGoogleAnalytics(env) {
     };
   }
   const range = [{ startDate: '13daysAgo', endDate: 'today' }];
+  const fmtDay = s => (s && s.length === 8 ? `${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)}` : s);
 
   let daily;
   let pages;
   let countries;
+  let byHost;
   try {
-    [daily, pages, countries] = await Promise.all([
+    [daily, pages, countries, byHost] = await Promise.all([
       ga4Report(propertyId, token, {
         dateRanges: range,
         dimensions: [{ name: 'date' }],
@@ -1010,7 +1175,7 @@ async function buildGoogleAnalytics(env) {
         dimensions: [{ name: 'pagePath' }],
         metrics: [{ name: 'screenPageViews' }, { name: 'totalUsers' }],
         orderBys: [{ metric: { metricName: 'screenPageViews' }, desc: true }],
-        limit: 15,
+        limit: 20,
       }),
       ga4Report(propertyId, token, {
         dateRanges: range,
@@ -1019,6 +1184,14 @@ async function buildGoogleAnalytics(env) {
         orderBys: [{ metric: { metricName: 'totalUsers' }, desc: true }],
         limit: 15,
       }),
+      // 分站：hostName × date（需各站在同一 GA4 属性下有数据流/标签）
+      ga4Report(propertyId, token, {
+        dateRanges: range,
+        dimensions: [{ name: 'hostName' }, { name: 'date' }],
+        metrics: [{ name: 'sessions' }, { name: 'totalUsers' }, { name: 'screenPageViews' }],
+        orderBys: [{ dimension: { dimensionName: 'date' } }],
+        limit: 10000,
+      }).catch(() => null),
     ]);
   } catch (e) {
     return {
@@ -1027,12 +1200,11 @@ async function buildGoogleAnalytics(env) {
       reason: `GA4 Data API 查询失败：${e.message || e}`,
       property_id: propertyId,
       service_account_email: serviceAccountEmail,
-      fix_hint: '请确认该 service account 已加入 GA4 property 537014253，并至少拥有 Viewer/Analyst 权限；同时确认 Analytics Data API 已启用。',
+      fix_hint: '请确认 service account 已加入 GA4 属性且 Analytics Data API 已启用；各产品站需发送到同一 property。',
     };
   }
 
   const dRows = daily.rows || [];
-  const fmtDay = s => (s && s.length === 8 ? `${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)}` : s);
   const series = dRows.map(r => ({
     day: fmtDay(r.dimensionValues[0].value),
     sessions: num(r.metricValues[0].value),
@@ -1041,10 +1213,56 @@ async function buildGoogleAnalytics(env) {
   })).sort((a, b) => String(a.day).localeCompare(String(b.day)));
   const sum = key => series.reduce((s, r) => s + num(r[key]), 0);
 
+  // 按 host 归到 siteDefs
+  const hostSites = {};
+  const hostRows = byHost?.rows || [];
+  if (hostRows.length) {
+    const byId = Object.create(null);
+    for (const site of siteDefs()) {
+      byId[site.id] = { map: new Map(), host: site.host };
+    }
+    const hostToId = Object.create(null);
+    for (const site of siteDefs()) {
+      hostToId[site.host] = site.id;
+      hostToId[`www.${site.host}`] = site.id;
+    }
+    for (const r of hostRows) {
+      const hostRaw = String(r.dimensionValues[0]?.value || '').toLowerCase().replace(/^www\./, '');
+      const day = fmtDay(r.dimensionValues[1]?.value);
+      const id = hostToId[hostRaw] || hostToId[`www.${hostRaw}`];
+      if (!id || !day) continue;
+      const prev = byId[id].map.get(day) || { day, sessions: 0, users: 0, pageviews: 0 };
+      prev.sessions += num(r.metricValues[0]?.value);
+      prev.users += num(r.metricValues[1]?.value);
+      prev.pageviews += num(r.metricValues[2]?.value);
+      byId[id].map.set(day, prev);
+    }
+    for (const site of siteDefs()) {
+      const hostSeries = [...(byId[site.id].map.values())].sort((a, b) => String(a.day).localeCompare(String(b.day)));
+      const ssum = key => hostSeries.reduce((acc, row) => acc + num(row[key]), 0);
+      hostSites[site.id] = {
+        status: hostSeries.length ? 'ok' : 'empty',
+        reason: hostSeries.length ? 'GA4 hostName filter' : `GA4 无 ${site.host} 数据：请在该属性添加数据流并部署 gtag/GTM`,
+        filter_note: `hostName=${site.host}`,
+        totals: {
+          sessions: ssum('sessions'),
+          users: ssum('users'),
+          pageviews: ssum('pageviews'),
+        },
+        series: hostSeries,
+      };
+    }
+  }
+
+  const hasHostData = Object.values(hostSites).some(s => s.status === 'ok' && num(s.totals?.pageviews));
   return {
     source: 'Google Analytics 4',
     status: 'ok',
-    reason: '',
+    reason: hasHostData
+      ? ''
+      : (hostRows.length
+        ? '有 host 行但未匹配产品域名'
+        : '未能按 hostName 拆分；请将 Journal/Grant/Path/Major/Todo/Studio 全部接入同一 GA4 属性'),
     property_id: propertyId,
     service_account_email: serviceAccountEmail,
     today: series[series.length - 1] || null,
@@ -1060,6 +1278,7 @@ async function buildGoogleAnalytics(env) {
       users: num(r.metricValues[0].value),
       sessions: num(r.metricValues[1].value),
     })),
+    sites: hasHostData ? hostSites : undefined,
   };
 }
 
