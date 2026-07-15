@@ -7269,11 +7269,12 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   flex-direction: column;
   align-items: stretch;
   gap: 0;
-  min-width: 0;
+  min-width: 0 !important; /* 禁止 grid item 被 IF 撑破轨道 */
+  max-width: 100%;
   min-height: 0;
   height: 100%;
   padding: 0;
-  overflow: hidden;
+  overflow: hidden !important; /* IF 绝不能画出卡片 */
   background: #ffffff;
   border: 1px solid rgba(60, 60, 67, 0.12);
   border-radius: 16px;
@@ -7295,8 +7296,11 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   display: block;
   border: 0;
   padding: 0;
-  min-width: 0;
-  width: auto;
+  min-width: 0 !important;
+  width: 100% !important;
+  max-width: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 /* 地区表：隐藏旧列头，与全球/中国站同一套 2 列卡片网格 */
 .tab-panel table.journals.country-journal-table thead,
@@ -7603,40 +7607,48 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   box-sizing: border-box;
 }
 
-/* 上块：始终浅底，撑满卡片宽度，到 meta 为止 */
+/* 上块：grid 锁右栏，IF/收藏永不溢出卡片 */
+.j-row .j-card-main {
+  overflow: hidden;
+  max-width: 100%;
+}
 .j-row .j-card-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px 16px; /* 刊名与右侧 IF/收藏保持距离，禁止重叠 */
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 64px;
+  column-gap: 12px;
+  align-items: start;
   width: 100%;
+  max-width: 100%;
   min-width: 0;
   padding: 14px 14px 12px;
   box-sizing: border-box;
   background: #f4f2ed;
   border-radius: 15px 15px 0 0;
+  overflow: hidden;
 }
 .j-row.j-card-compact .j-card-head {
   border-radius: 15px;
   flex: 1 1 auto;
 }
-/* 左：刊名区可收缩截断，绝不压到收藏星上 */
+/* 左：刊名 + meta */
 .j-row .j-card-head-main {
-  flex: 1 1 0;
+  grid-column: 1;
   min-width: 0;
   max-width: 100%;
   overflow: hidden;
 }
-/* 右：IF + 收藏固定占位，不可被挤扁 */
+/* 右：固定 64px，IF 在上、收藏在下 */
 .j-row .j-card-head-side {
-  flex: 0 0 auto;
-  flex-shrink: 0;
+  grid-column: 2;
+  width: 64px;
+  max-width: 64px;
+  min-width: 64px;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 6px;
-  min-width: 36px;
-  max-width: 38%;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 .j-row .j-card-title-block,
 .j-row .j-card-top {
@@ -7674,16 +7686,21 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   text-overflow: ellipsis;
 }
 
-/* IF / 指标：侧栏流式布局，禁止 absolute 飞出卡片 */
+/* IF：锁在右栏内，禁止 absolute / 飞出 */
 .j-row .j-card-if {
-  position: static;
-  width: auto;
-  max-width: 100%;
+  position: static !important;
+  top: auto !important;
+  right: auto !important;
+  left: auto !important;
+  width: 100%;
+  max-width: 64px;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   text-align: right;
   line-height: 1.1;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 .j-row .j-card-if-label {
   font-size: 10px;
@@ -7694,27 +7711,28 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 }
 .j-row .j-card-if strong {
   margin-top: 2px;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.03em;
   color: #000;
   white-space: nowrap;
-  max-width: 140px;
+  max-width: 64px;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* 收藏星：始终圆形底色；占位固定，不与刊名重叠 */
+/* 收藏星：始终圆形底色；占位固定 */
 .j-row .j-card-fav,
 .j-row .col-fav {
   position: static !important;
   top: auto !important;
   right: auto !important;
   left: auto !important;
-  width: 36px !important;
-  min-width: 36px;
-  flex: 0 0 36px;
+  width: 32px !important;
+  min-width: 32px;
+  max-width: 32px;
+  flex: 0 0 32px;
   z-index: 1;
   margin: 0;
   padding: 0;
