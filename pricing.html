@@ -111,7 +111,11 @@
   }
   @media (max-width: 920px) {
     .plans.plans-3 { grid-template-columns: 1fr; max-width: 400px; margin-left: auto; margin-right: auto; }
-    .plans.plans-3 .plan.hot { order: -1; transform: none; }
+    /* 手机端顺序：Max → Pro → Free（DOM 为 Free / Pro / Max） */
+    .plans.plans-3 .plan:nth-child(1) { order: 3; } /* Free */
+    .plans.plans-3 .plan:nth-child(2) { order: 2; } /* Pro */
+    .plans.plans-3 .plan:nth-child(3) { order: 1; } /* Max */
+    .plans.plans-3 .plan.hot { transform: none; }
   }
   .plans.plans-3 .plan {
     position: relative;
