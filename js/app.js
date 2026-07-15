@@ -8387,7 +8387,7 @@
             </div>
             <div class="gift-redeem-row">
               <input name="code" type="text" autocomplete="off" spellcheck="false"
-                placeholder="JOURNAL-MAX-XXXX-XXXX-XXXX"
+                placeholder="JOURNAL-MAX-XXXX-XXXX-XXXX-XXXX"
                 ${signed ? '' : 'disabled'} />
               <button type="submit" ${signed ? '' : 'disabled'}>${T('兑换','Redeem')}</button>
             </div>
@@ -8398,7 +8398,7 @@
             <header>
               <div>
                 <strong>${T('站长礼品卡','Owner gift cards')}</strong>
-                <p>${T('生成后只显示一次，请复制后发送给用户。','Codes are shown once. Copy them before leaving.')}</p>
+                <p>${T('生成后只显示一次；服务端验证，每个码仅可成功兑换一次。','Shown once after creation; server-verified and redeemable exactly once.')}</p>
               </div>
               <span>OWNER · MAX</span>
             </header>
@@ -8477,7 +8477,10 @@
             invalid_gift_code: T('礼品码无效','Invalid gift code'),
             gift_code_used: T('该礼品码已被使用','This gift code has been used'),
             gift_code_expired: T('该礼品码已过期','This gift code has expired'),
+            too_many_gift_attempts: T('尝试次数过多，请 15 分钟后再试','Too many attempts — try again in 15 minutes'),
             unauthorized: T('请先登录','Sign in first'),
+            forbidden: T('无权限','Not allowed'),
+            not_found: T('服务未就绪，请稍后重试','Service not ready, try again shortly'),
           };
           throw new Error(map[d.error] || d.error || `HTTP ${r.status}`);
         }
@@ -8493,7 +8496,15 @@
     });
     box.querySelector('[data-gift-admin]')?.addEventListener('submit', async (e) => {
       e.preventDefault();
-      if (!user?.token || !isOwnerClient()) return;
+      if (!user?.token) {
+        setGiftMsg(T('请先登录','Sign in first'), true);
+        startLogin();
+        return;
+      }
+      if (!isOwnerClient()) {
+        setGiftMsg(T('仅站长可生成礼品码','Only the owner can generate gift codes'), true);
+        return;
+      }
       const form = e.currentTarget;
       const fd = new FormData(form);
       const plan = String(fd.get('plan') || 'max');
@@ -8510,7 +8521,15 @@
           body: JSON.stringify({ plan, durationDays, quantity }),
         });
         const d = await r.json().catch(() => ({}));
-        if (!r.ok) throw new Error(d.error || `HTTP ${r.status}`);
+        if (!r.ok) {
+          const map = {
+            unauthorized: T('登录已失效，请重新登录','Session expired — sign in again'),
+            forbidden: T('服务端未识别站长账号，请用站长邮箱重新登录','Owner not recognized — re-sign in with owner email'),
+            invalid_gift_options: T('礼品选项无效','Invalid gift options'),
+            not_found: T('礼品服务未部署，请稍后再试','Gift API not deployed yet'),
+          };
+          throw new Error(map[d.error] || d.error || `HTTP ${r.status}`);
+        }
         const codes = Array.isArray(d.codes) ? d.codes : [];
         const results = form.querySelector('[data-gift-results]');
         if (results) {

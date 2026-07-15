@@ -72,7 +72,7 @@ const json = (o, status = 200, extra = {}) =>
     headers: { 'Content-Type': 'application/json', ...CORS, ...extra },
   });
 
-const err = (msg, status = 400) => json({ error: msg }, status);
+const err = (msg, status = 400, extra = {}) => json({ error: msg }, status, extra);
 
 // ───────── utils ─────────
 const enc = new TextEncoder();
@@ -209,11 +209,25 @@ async function getUser(req, env) {
   const h = req.headers.get('Authorization') || '';
   const token = h.startsWith('Bearer ') ? h.slice(7) : '';
   const payload = await verifyJWT(token, env.JWT_SECRET);
-  if (!payload) return null;
+  if (!payload || payload.uid == null) return null;
   const row = await env.DB.prepare(
     'SELECT id, email, github_id, google_id, login, name, avatar_url, provider FROM users WHERE id = ?'
   ).bind(payload.uid).first();
-  return row || null;
+  if (!row) return null;
+  // JWT 可能带 email（Google/邮箱登录）；DB 为空时回填，避免站长判定失败
+  const jwtEmail = String(payload.email || '').toLowerCase().trim();
+  if (jwtEmail && isEmail(jwtEmail) && !String(row.email || '').trim()) {
+    row.email = jwtEmail;
+    try {
+      await env.DB.prepare(
+        `UPDATE users SET email = ?, updated_at = ? WHERE id = ? AND (email IS NULL OR email = '')`
+      ).bind(jwtEmail, nowSec(), row.id).run();
+    } catch (_) { /* ignore */ }
+  }
+  if (!String(row.login || '').trim() && payload.login) {
+    row.login = String(payload.login);
+  }
+  return row;
 }
 
 function genCode() {
@@ -861,12 +875,17 @@ function nextUtcMonthStart(sec) {
   return Math.floor(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 1) / 1000);
 }
 
-const OWNER_EMAILS = new Set(['jiantaoweng@gmail.com']);
+/** 与 Todo 一致：站长邮箱白名单（生成礼品码等管理接口） */
+const OWNER_EMAIL = 'jiantaoweng@gmail.com';
+const OWNER_EMAILS = new Set([OWNER_EMAIL]);
 
-function isOwnerUser(u) {
+function isOwnerUser(u, env) {
   const email = String(u?.email || '').toLowerCase().trim();
   const login = String(u?.login || '').toLowerCase().trim();
-  if (OWNER_EMAILS.has(email) || OWNER_EMAILS.has(login)) return true;
+  const envOwner = String(env?.OWNER_EMAIL || '').toLowerCase().trim();
+  if (envOwner && email === envOwner) return true;
+  if (email === OWNER_EMAIL || OWNER_EMAILS.has(email)) return true;
+  if (login === OWNER_EMAIL || OWNER_EMAILS.has(login)) return true;
   // Google 登录 login 常为邮箱本地部分
   const local = email.includes('@') ? email.split('@')[0] : login;
   if (local === 'jiantaoweng' && (!email || email.endsWith('@gmail.com'))) return true;
@@ -1304,10 +1323,15 @@ async function routeMe(req, env) {
 async function routeMeEntitlements(req, env) {
   const u = await getUser(req, env);
   if (!u) return err('unauthorized', 401);
-  return json(await getEntitlements(env, u, isOwnerUser(u)));
+  return json(await getEntitlements(env, u, isOwnerUser(u, env)));
 }
 
-// ───────── gift codes（礼品码：生成 / 兑换） ─────────
+// ───────── gift codes（对齐 Todo 安全模型） ─────────
+// - 生成 N 张 → 仅 N 条有效记录，最多成功兑换 N 次
+// - 每码仅可兑换一次（gift_redemptions 主键；并发也进 409）
+// - 只存 SHA-256，不存明文；码中 MAX/PRO 文案可改无效，套餐以库记录为准
+// - 80 bit 随机强度；必须登录兑换；同账号+IP 15 分钟最多 12 次尝试（429）
+// - 生成：前端隐藏 + 后端站长邮箱校验（非站长 403）
 async function ensureGiftTables(env) {
   await env.DB.batch([
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS gift_codes (
@@ -1325,6 +1349,11 @@ async function ensureGiftTables(env) {
       redeemed_at INTEGER NOT NULL,
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     )`),
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS gift_redeem_limits (
+      limiter_key TEXT PRIMARY KEY,
+      window_start INTEGER NOT NULL,
+      attempts INTEGER NOT NULL DEFAULT 0
+    )`),
   ]);
 }
 
@@ -1333,21 +1362,38 @@ function normalizeGiftCode(value) {
 }
 
 function createGiftCodeText(plan) {
-  // plan: pro | max（产品文案）；码前缀 JOURNAL-
+  // plan: pro | max。32 字符字母表 ≈ 5 bit/字；16 字 = 80 bit 随机强度
   const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  const bytes = crypto.getRandomValues(new Uint8Array(12));
+  const bytes = crypto.getRandomValues(new Uint8Array(16));
   const token = Array.from(bytes, (b) => alphabet[b % alphabet.length]).join('');
   const tag = plan === 'max' ? 'MAX' : 'PRO';
-  return `JOURNAL-${tag}-${token.slice(0, 4)}-${token.slice(4, 8)}-${token.slice(8)}`;
+  return `JOURNAL-${tag}-${token.slice(0, 4)}-${token.slice(4, 8)}-${token.slice(8, 12)}-${token.slice(12)}`;
+}
+
+async function allowGiftRedeemAttempt(userId, request, env) {
+  const ip = request.headers.get('CF-Connecting-IP')?.trim() || 'unknown';
+  const limiterKey = await sha256Hex(`gift:${userId}:${ip}`);
+  const now = nowSec();
+  const cutoff = now - 15 * 60;
+  await env.DB.prepare(
+    `INSERT INTO gift_redeem_limits (limiter_key, window_start, attempts)
+     VALUES (?, ?, 1)
+     ON CONFLICT(limiter_key) DO UPDATE SET
+       attempts = CASE WHEN gift_redeem_limits.window_start < ? THEN 1 ELSE gift_redeem_limits.attempts + 1 END,
+       window_start = CASE WHEN gift_redeem_limits.window_start < ? THEN excluded.window_start ELSE gift_redeem_limits.window_start END`
+  ).bind(limiterKey, now, cutoff, cutoff).run();
+  const row = await env.DB.prepare(
+    'SELECT attempts FROM gift_redeem_limits WHERE limiter_key = ?'
+  ).bind(limiterKey).first();
+  return Number(row?.attempts ?? 0) <= 12;
 }
 
 /** POST /admin/gift-codes  { plan:'pro'|'max', durationDays:number|null, quantity:1-20 } */
 async function routeAdminGiftCodes(req, env) {
   const u = await getUser(req, env);
   if (!u) return err('unauthorized', 401);
-  if (!isOwnerUser(u)) return err('forbidden', 403);
+  if (!isOwnerUser(u, env)) return err('forbidden', 403);
   const body = await req.json().catch(() => ({}));
-  // 产品档：pro=产品 Pro → 内部 plus；max=产品 Max → 内部 pro
   const productPlan = body?.plan === 'pro' ? 'pro' : body?.plan === 'max' ? 'max' : null;
   const durationRaw = body?.durationDays;
   const durationDays = durationRaw === null || durationRaw === 'permanent'
@@ -1369,25 +1415,42 @@ async function routeAdminGiftCodes(req, env) {
       env.DB.prepare(
         `INSERT INTO gift_codes (code_hash, code_hint, plan, duration_days, expires_at, created_by, created_at)
          VALUES (?, ?, ?, ?, NULL, ?, ?)`
-      ).bind(await sha256Hex(canonical), code.slice(-4), productPlan, durationDays, String(u.email || u.login || u.id), now)
+      ).bind(
+        await sha256Hex(canonical),
+        code.slice(-4),
+        productPlan,
+        durationDays,
+        String(u.email || u.login || u.id),
+        now,
+      )
     );
   }
   await env.DB.batch(stmts);
-  return json({ codes, plan: productPlan, durationDays, createdAt: now });
+  return json({
+    codes,
+    plan: productPlan,
+    durationDays,
+    createdAt: now,
+    note: 'single_use_server_verified',
+  });
 }
 
-/** POST /gift-codes/redeem  { code } */
+/** POST /gift-codes/redeem  { code } — 须登录；套餐/时长以库中记录为准 */
 async function routeRedeemGiftCode(req, env) {
   const u = await getUser(req, env);
   if (!u) return err('unauthorized', 401);
   const body = await req.json().catch(() => ({}));
   const canonical = normalizeGiftCode(body?.code || '');
-  if (canonical.length < 12) return err('invalid_gift_code', 400);
+  if (canonical.length < 12 || canonical.length > 64) return err('invalid_gift_code', 400);
   await ensureGiftTables(env);
+  if (!(await allowGiftRedeemAttempt(u.id, req, env))) {
+    return err('too_many_gift_attempts', 429, { 'Retry-After': '900' });
+  }
   const codeHash = await sha256Hex(canonical);
   const gift = await env.DB.prepare(
     'SELECT plan, duration_days, expires_at, code_hint FROM gift_codes WHERE code_hash = ?'
   ).bind(codeHash).first();
+  // 套餐以库记录为准；改码里的 MAX/PRO 文字无效（哈希对不上）
   if (!gift || (gift.plan !== 'pro' && gift.plan !== 'max')) {
     return err('invalid_gift_code', 404);
   }
@@ -1404,17 +1467,12 @@ async function routeRedeemGiftCode(req, env) {
   const now = nowSec();
   let paidUntil = null;
   if (gift.duration_days != null && Number(gift.duration_days) > 0) {
-    // 若已有未过期 paid_until，在其上叠加
     let base = now;
     try {
       const row = await env.DB.prepare(
         'SELECT tier, paid_until FROM user_entitlements WHERE user_id = ?'
       ).bind(u.id).first();
       if (row?.paid_until && Number(row.paid_until) > now) base = Number(row.paid_until);
-      // 已是 Max 不降级
-      if (row?.tier === 'pro') {
-        // keep max
-      }
     } catch (_) {}
     paidUntil = base + Number(gift.duration_days) * 86400;
   }
@@ -1425,7 +1483,7 @@ async function routeRedeemGiftCode(req, env) {
   } catch (_) {
     return err('gift_code_used', 409);
   }
-  // 若用户已是 Max，礼品是 Pro 也不降级
+  // 已是 Max 不降级
   let applyTier = internalTier;
   try {
     const cur = await env.DB.prepare(
