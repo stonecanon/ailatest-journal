@@ -6200,15 +6200,17 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   margin-top: 8px;
 }
 .dom-filter-rail {
-  flex: 0 0 220px;
+  flex: 0 0 248px;
   position: sticky;
   top: var(--th-sticky-top, 64px);
   max-height: calc(100vh - 90px);
   overflow-y: auto;
-  padding: 12px 12px 14px;
-  border: 1px solid var(--rule);
-  border-radius: 14px;
-  background: var(--bg2);
+  padding: 14px 12px 16px;
+  border: 1px solid rgba(60, 60, 67, 0.12);
+  border-radius: 16px;
+  background: #ffffff;
+  box-sizing: border-box;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 .dom-filter-main {
   flex: 1 1 auto;
@@ -6216,42 +6218,66 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 }
 .dom-filter-group + .dom-filter-group {
   margin-top: 16px;
-  padding-top: 12px;
+  padding-top: 14px;
   border-top: 1px solid var(--rule-soft);
 }
 .dom-filter-label {
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   color: var(--ink);
   font-size: 12px;
   font-weight: 750;
   letter-spacing: .04em;
 }
+/* 两列等宽网格：按钮对齐、宽度一致 */
 .dom-filter-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
 }
 .dom-filter-chip {
   appearance: none;
-  border: 1px solid var(--rule);
-  border-radius: 7px;
-  background: var(--paper);
-  color: var(--ink-soft);
-  font-size: 11.5px;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 36px;
+  margin: 0;
+  padding: 7px 8px;
+  border: 1px solid rgba(60, 60, 67, 0.12);
+  border-radius: 10px;
+  background: #f2f2f7;
+  color: rgba(60, 60, 67, 0.85);
+  font-size: 12px;
   font-weight: 600;
-  line-height: 1.2;
-  padding: 5px 10px;
+  line-height: 1.25;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   cursor: pointer;
+  transition: background .15s cubic-bezier(0.25, 0.1, 0.25, 1), color .15s;
 }
 .dom-filter-chip:hover {
-  border-color: var(--deep);
-  color: var(--ink);
+  background: #e5e5ea;
+  color: #000;
 }
 .dom-filter-chip.on {
-  background: var(--deep);
-  border-color: var(--deep);
+  background: #007aff;
+  border-color: #007aff;
   color: #fff;
-  font-weight: 750;
+  font-weight: 650;
+}
+.dom-filter-chip:active {
+  transform: scale(0.98);
+}
+/* 学科名较长时允许换行，仍保持等高格子感 */
+.dom-filter-group:nth-child(2) .dom-filter-chip {
+  white-space: normal;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  font-size: 11.5px;
 }
 @media (max-width: 900px) {
   .dom-browse {
@@ -6263,6 +6289,14 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
     max-height: none;
     width: 100%;
     flex: none;
+  }
+  .dom-filter-chips {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 560px) {
+  .dom-filter-chips {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 .dom-source-tabs {
@@ -7187,16 +7221,17 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .drawer-fav-select { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
 .drawer-fav-select select { padding: 5px 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 12.5px; background: #f8f8f8; }
 
-/* ═══════════ 期刊列表：左侧筛选栏 + 右侧卡片（暖色版式，参考整洁版） ═══════════ */
+/* ═══════════ 期刊卡片 · Apple HIG / iOS-minimal 统一语言 ═══════════
+   参考: axiaoge2/Apple-Hig-Designer · ehmo/platform-design-skills · android-ios-minimal
+   Clarity / Deference / Depth · system gray · white cards · IF 最右 */
 .tab-panel .table-wrap { overflow: visible; }
 .tab-panel table.journals { display: block; width: 100%; border-collapse: separate; }
 .tab-panel table.journals > colgroup { display: none; }
 
-/* 默认（中国/韩国/印度/收藏）：表头=顶部工具条，卡片单列 */
 .tab-panel table.journals thead { display: block; }
 .tab-panel table.journals thead tr {
   display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px;
-  padding: 6px 2px 12px; border-bottom: 1px solid var(--rule); background: var(--paper);
+  padding: 6px 2px 12px; border-bottom: 1px solid rgba(60,60,67,.12); background: transparent;
 }
 .tab-panel table.journals thead th {
   display: inline-flex; align-items: center; padding: 0; border: 0;
@@ -7206,42 +7241,54 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .tab-panel table.journals thead .col-name,
 .tab-panel table.journals thead .col-cycle { display: none; }
 
-/* 卡片网格：全球 / 地区 / 收藏统一「每行 2 卡」 */
+/* 每行 2 卡 · 同行等高（HIG: consistent layout） */
 .tab-panel table.journals tbody {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
-  padding-top: 14px;
-  align-items: start; /* 勿 stretch，避免空卡被拉高 */
+  padding-top: 12px;
+  align-items: stretch;
 }
 @media (max-width: 760px) {
-  .tab-panel table.journals tbody {
-    grid-template-columns: 1fr;
-  }
+  .tab-panel table.journals tbody { grid-template-columns: 1fr; }
 }
-/* 紧凑卡片：上=刊名+关键指标 · 下=收录徽章（无强制最小高度） */
-.tab-panel table.journals tbody tr.j-row {
+
+/* 白卡 · 系统灰分组底上的 inset card · 16pt 圆角 */
+.tab-panel table.journals tbody tr.j-row,
+.tab-panel table.journals tbody tr.j-row.j-card {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: stretch;
   gap: 0;
   min-width: 0;
-  min-height: 0;
-  height: auto;
-  padding: 0;
+  min-height: 168px;
+  height: 100%;
+  padding: 14px 16px 14px;
   overflow: hidden;
-  background: #fffefb;
-  border: 1px solid var(--rule);
-  border-radius: 12px;
-  box-shadow: 0 1px 0 rgba(43,42,39,.03), 0 8px 20px -16px rgba(60,48,36,.22);
+  background: #ffffff;
+  border: 1px solid rgba(60, 60, 67, 0.12);
+  border-radius: 16px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
   cursor: pointer;
-  transition: box-shadow .16s, border-color .16s, transform .16s;
+  transition: box-shadow .2s cubic-bezier(0.25, 0.1, 0.25, 1),
+              border-color .2s cubic-bezier(0.25, 0.1, 0.25, 1),
+              transform .15s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 .tab-panel table.journals tbody tr.j-row:hover {
-  border-color: #e7d8c4;
-  box-shadow: 0 1px 0 rgba(43,42,39,.04), 0 12px 28px -14px rgba(60,48,36,.28);
+  border-color: rgba(60, 60, 67, 0.18);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
   transform: translateY(-1px);
+}
+.tab-panel table.journals tbody tr.j-row:active {
+  transform: scale(0.99);
+}
+.tab-panel table.journals tbody td {
+  display: block;
+  border: 0;
+  padding: 0;
+  min-width: 0;
+  width: auto;
 }
 
 /* Home search results: compact cards, independent from full list pages. */
@@ -7504,50 +7551,95 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .home-domestic-card {
   min-height: 150px;
 }
-.tab-panel table.journals tbody tr.row-flagship { border-left: 3px solid var(--accent); }
-.tab-panel table.journals tbody tr:has(td[colspan]) {
-  display: block; grid-column: 1 / -1; padding: 50px 0; text-align: center; color: var(--muted);
-  background: none; border: 0; box-shadow: none; cursor: default;
+.tab-panel table.journals tbody tr.row-flagship {
+  border-color: rgba(255, 149, 0, 0.35);
 }
-.tab-panel table.journals tbody td { display: block; border: 0; padding: 0; min-width: 0; width: 100%; }
+.tab-panel table.journals tbody tr:has(td[colspan]) {
+  display: block;
+  grid-column: 1 / -1;
+  min-height: 0;
+  padding: 48px 16px;
+  text-align: center;
+  color: #8e8e93;
+  background: none;
+  border: 0;
+  box-shadow: none;
+  cursor: default;
+}
 
-/* ── 卡片上部：刊名 + 短指标（浅底） ── */
+/* 收藏 · 拖拽 */
 .j-row .col-fav {
   position: absolute;
   top: 10px;
   right: 10px;
   z-index: 2;
   width: auto !important;
-  font-size: 15px;
+}
+.j-row .col-fav .fav-star {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border-radius: 999px;
+  background: #f2f2f7;
+  border: 0;
+  color: #8e8e93;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.j-row .col-fav .fav-star.on {
+  color: #ff9500;
+  background: rgba(255, 149, 0, 0.12);
 }
 .j-row .col-drag {
   position: absolute;
-  top: 12px;
-  left: 8px;
+  top: 14px;
+  left: 10px;
   z-index: 2;
   width: auto !important;
+  color: #c7c7cc;
+  font-size: 14px;
+  cursor: grab;
 }
-.j-row:has(.col-drag) .j-card-head,
-.j-row:has(.col-drag) .col-name {
-  padding-left: 30px;
-}
+.j-row:has(.col-drag) .j-card-main { padding-left: 22px; }
+
+/* 主内容区：整卡一体白底，无米色头 */
+.j-row .j-card-main,
 .j-row .j-card-head,
 .j-row .col-name {
-  order: 1;
-  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
   width: 100%;
   min-width: 0;
-  padding: 13px 40px 10px 14px;
-  background: #f7f2e9;
-  border-bottom: 1px solid rgba(120, 100, 72, .08);
+  min-height: 0;
+  padding: 0 40px 0 0; /* 右侧给收藏星留空 */
+  background: transparent;
+  border: 0;
+  box-sizing: border-box;
+}
+
+/* 顶行：刊名（左） + IF（最右） */
+.j-row .j-card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+}
+.j-row .j-card-title-block {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 .j-row .jname {
   margin: 0;
-  font-size: 15px;
-  font-weight: 800;
-  line-height: 1.3;
-  color: var(--ink);
-  letter-spacing: -.01em;
+  min-height: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.28;
+  letter-spacing: -0.02em;
+  color: #000;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -7558,20 +7650,56 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .j-row .jname-aka {
   display: block;
   margin-top: 3px;
-  font-size: 11.5px;
-  font-weight: 500;
-  color: var(--ink-faint);
+  font-size: 13px;
+  font-weight: 400;
+  color: rgba(60, 60, 67, 0.6);
   line-height: 1.3;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-/* 指标行：单行优先，超出省略；不堆成长胶囊墙 */
+
+/* IF · 永远贴右 */
+.j-row .j-card-if {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-start;
+  min-width: 52px;
+  max-width: 88px;
+  margin-top: 1px;
+  text-align: right;
+  line-height: 1.1;
+}
+.j-row .j-card-if.is-empty {
+  min-width: 0;
+  width: 0;
+  margin: 0;
+  overflow: hidden;
+}
+.j-row .j-card-if-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: rgba(60, 60, 67, 0.45);
+  text-transform: uppercase;
+}
+.j-row .j-card-if strong {
+  margin-top: 2px;
+  font-size: 18px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+  color: #000;
+}
+
+/* 次行 meta：审稿 / 来源 / 出版 / ISSN */
 .j-row .j-card-meta-row {
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 8px 10px;
+  gap: 6px 10px;
   margin-top: 8px;
   min-width: 0;
   overflow: hidden;
@@ -7580,14 +7708,12 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   display: inline-flex;
   align-items: baseline;
   gap: 3px;
-  flex: 0 1 auto;
-  max-width: 42%;
+  max-width: 100%;
   min-width: 0;
   padding: 0;
   border: 0;
-  border-radius: 0;
   background: none;
-  color: var(--ink-soft);
+  color: rgba(60, 60, 67, 0.6);
   font-size: 12px;
   line-height: 1.25;
   white-space: nowrap;
@@ -7596,72 +7722,62 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 }
 .j-row .j-meta em {
   font-style: normal;
-  font-weight: 700;
-  color: var(--ink-faint);
-  font-size: 10.5px;
-  flex: 0 0 auto;
+  font-weight: 600;
+  color: rgba(60, 60, 67, 0.4);
+  font-size: 11px;
 }
 .j-row .j-meta strong,
 .j-row .j-meta > span {
-  font-weight: 700;
-  color: var(--ink);
-  min-width: 0;
+  font-weight: 500;
+  color: rgba(60, 60, 67, 0.72);
   overflow: hidden;
   text-overflow: ellipsis;
 }
-/* IF 单独强调 */
-.j-row .j-meta-if {
-  flex: 0 0 auto;
-  max-width: none;
+.j-row .j-meta-src .src-tag {
+  display: inline-flex;
   padding: 2px 8px;
-  border-radius: 999px;
-  background: #eef1f6;
-  border: 1px solid #d5dbe6;
-  font-size: 12px;
+  border-radius: 6px;
+  background: #f2f2f7;
+  color: rgba(60, 60, 67, 0.72);
+  font-size: 11px;
+  font-weight: 600;
 }
-.j-row .j-meta-if strong {
-  font-variant-numeric: tabular-nums;
-  font-weight: 850;
-}
-.j-row .j-meta-id { max-width: 28%; }
-.j-row .j-meta-pub { max-width: 36%; }
 .j-row .j-meta-topic,
-.j-row .j-meta-free { display: none; } /* 学科/免费不进头区，避免乱 */
+.j-row .j-meta-free { display: none; }
 
-/* ── 卡片下部：仅收录徽章 ── */
+/* 徽章区：自然换行，铺满宽度，不强制两列切半 */
 .j-row .j-card-body {
-  order: 2;
-  flex: 0 0 auto; /* 内容多高就多高，不撑空 */
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   width: 100%;
   min-width: 0;
-  padding: 10px 14px 12px;
-  background: #fff;
-}
-.j-row .j-card-body:empty,
-.j-row .j-card-body:has(> .j-card-body-empty:only-child) {
-  display: none;
+  margin-top: 10px;
+  flex: 1 1 auto;
 }
 .j-row .j-card-badges,
 .j-row .col-badge,
 .j-row .col-cross {
   display: flex;
   flex-wrap: wrap;
+  align-content: flex-start;
   align-items: center;
-  gap: 4px 5px;
+  gap: 6px;
+  width: 100%;
   min-width: 0;
-  max-width: 100%;
-  max-height: 52px; /* 最多约两行徽章，多余裁切 */
-  overflow: hidden;
+  max-height: none;
+  overflow: visible;
 }
 .j-row .j-card-badges .badge-cell,
 .j-row .j-card-badges .badge-line,
 .j-row .j-card-badges .badges,
 .j-row .col-badge .badge-cell,
-.j-row .col-badge .badge-line {
-  display: contents; /* 徽章直接排进 flex，不分层乱套 */
+.j-row .col-badge .badge-line,
+.j-row .col-badge .badges-idx,
+.j-row .col-badge .badges-rank,
+.j-row .col-badge .badges-access,
+.j-row .col-badge .badges-risk {
+  display: contents;
 }
 .j-row .j-card-badges .badge,
 .j-row .j-card-badges .zone,
@@ -7674,19 +7790,24 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .j-row .j-card-badges .warn-pill,
 .j-row .col-badge .badge,
 .j-row .col-badge .zone,
-.j-row .col-badge .domsrc-pill {
-  font-size: 10px !important;
-  line-height: 1.3 !important;
-  padding: 2px 6px !important;
+.j-row .col-badge .domsrc-pill,
+.j-row .col-badge .xr-pill {
+  font-size: 11px !important;
+  line-height: 1.25 !important;
+  padding: 3px 8px !important;
   margin: 0 !important;
   max-width: 100%;
+  border-radius: 6px !important;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  box-sizing: border-box;
 }
 .j-row .j-card-subline {
-  color: var(--ink-faint);
-  font-size: 11.5px;
+  margin-top: auto;
+  padding-top: 4px;
+  color: rgba(60, 60, 67, 0.45);
+  font-size: 12px;
   line-height: 1.35;
   white-space: nowrap;
   overflow: hidden;
@@ -7694,25 +7815,12 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 }
 .j-row .j-card-body-empty { display: none !important; }
 
-/* 兼容旧列类 */
+/* 旧列隐藏 */
 .j-row .col-free,
 .j-row .col-if,
 .j-row .col-cycle,
 .j-row .col-topic {
-  display: none;
-}
-.j-row:not(.j-card) .col-name {
-  padding: 13px 40px 10px 14px;
-}
-.j-row:not(.j-card) .col-badge,
-.j-row:not(.j-card) .col-cross {
-  order: 2;
-  padding: 10px 14px 12px;
-}
-.j-row:not(.j-card) .col-if,
-.j-row:not(.j-card) .col-cycle,
-.j-row:not(.j-card) .col-free {
-  display: none;
+  display: none !important;
 }
 
 /* ── 国际刊：表头 → 左侧筛选栏 ── */
@@ -7934,17 +8042,9 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 }
 .tab-panel[data-panel="int"] #topic-dd-list .th-chk .count { margin-left: auto; opacity: .55; font-size: 10px; }
 
-/* ═══════ 卡片杂项修复 ═══════ */
-/* 1) 空值单元格(仅 —)直接隐藏，避免出现孤零零的横杠 */
+/* ═══════ 卡片杂项 ═══════ */
 .j-row td:has(> .muted-cell:only-child) { display: none; }
-/* 2) 旗舰刊与普通卡同边框，避免视觉忽闪 */
-.tab-panel table.journals tbody tr.row-flagship { border-left: 1px solid var(--rule); }
-/* 3) 统一 j-card 已处理上下区；勿再覆盖 order */
-.j-row.j-card .j-card-head,
-.j-row.j-card .col-name { order: 1 !important; }
-.j-row.j-card .j-card-body { order: 2 !important; }
-.j-row .col-cross .badges { display: flex; flex-wrap: wrap; gap: 4px 5px; }
-/* 4) 详情页(journal-route)：手机端隐藏右上角语言切换，避免与内容重叠 */
+.j-row .col-cross .badges { display: flex; flex-wrap: wrap; gap: 6px; }
 body.journal-route .lang-toggle-wrap { display: none; }
 
 /* ═══════ 手机端国际刊：把筛选分组显示出来（之前被隐藏，导致没有筛选按钮）═══════ */

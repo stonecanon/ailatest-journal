@@ -3908,8 +3908,8 @@
   }
 
   /**
-   * 统一期刊卡片（全球 / 地区共用）：
-   * 上部 j-card-head：刊名 + IF/出版/收藏 · 下部 j-card-body：收录与分区等
+   * 统一期刊卡片（HIG / iOS-minimal）：
+   * 左：刊名 → 副信息 → 徽章；右上：收藏；右中：IF（始终最右）
    */
   function journalCardRow({
     fid,
@@ -3920,20 +3920,27 @@
     nameHtml,
     metaHtml = '',
     bodyHtml = '',
+    ifHtml = '',
+    dragHtml = '',
   }) {
     return `<tr class="j-row j-card clickable${flagship ? ' row-flagship' : ''}${extraClass ? ` ${extraClass}` : ''}" data-fid="${escape(fid)}" data-src="${escape(src)}">
+      ${dragHtml ? `<td class="col-drag">${dragHtml}</td>` : ''}
       <td class="col-fav">${favHtml}</td>
-      <td class="j-card-head col-name">
-        ${nameHtml}
+      <td class="j-card-main col-name">
+        <div class="j-card-top">
+          <div class="j-card-title-block">${nameHtml}</div>
+          ${ifHtml || '<span class="j-card-if is-empty" aria-hidden="true"></span>'}
+        </div>
         ${metaHtml ? `<div class="j-card-meta-row">${metaHtml}</div>` : ''}
+        <div class="j-card-body">${bodyHtml || ''}</div>
       </td>
-      <td class="j-card-body">${bodyHtml || '<span class="j-card-body-empty muted-cell">—</span>'}</td>
     </tr>`;
   }
 
   function jMetaIf(label, value) {
     if (value == null || value === '' || value === '—') return '';
-    return `<span class="j-meta j-meta-if"><em>${escape(label)}</em><strong>${escape(String(value))}</strong></span>`;
+    // 卡片右侧专用 IF 块
+    return `<div class="j-card-if" title="${escape(label)} ${escape(String(value))}"><span class="j-card-if-label">${escape(label)}</span><strong>${escape(String(value))}</strong></div>`;
   }
   function jMetaText(label, value, cls = '') {
     if (value == null || value === '' || value === '—') return '';
@@ -3988,9 +3995,8 @@
     rowRecordsByFid[fid] = { ...r, __src: 'int' };
     const nameHtml = `<div class="jname ${r.flagship ? 'jname-flagship' : ''}">${escape(titleCase(r.name))}${r.cn_name ? `<span class="jname-cn">${escape(r.cn_name)}</span>` : ''}${aliasHintHtml(r)}</div>`;
     const crossBadges = renderDomCrossBadges(r, 'int');
-    // 头区只放 IF + 审稿；收录/分区/风险全部进下部（并限量）
-    const indexBadges = limitBadgeHtml(renderCoverageBadges(r), 6);
-    const rankBadges = limitBadgeHtml([renderLevelBadges(r), crossBadges].filter(Boolean).join(''), 5);
+    const indexBadges = limitBadgeHtml(renderCoverageBadges(r), 8);
+    const rankBadges = limitBadgeHtml([renderLevelBadges(r), crossBadges].filter(Boolean).join(''), 6);
     const accessBadges = limitBadgeHtml(renderAccessBadges(r), 3);
     const riskBadges = limitBadgeHtml(renderRiskBadges(r), 2);
     const badgeCell = renderBadgeCell(indexBadges, rankBadges, accessBadges, riskBadges);
@@ -4007,14 +4013,14 @@
       ? `${Math.round(cycleDays / 30.4)}${T('个月','mo')}`
       : '';
     const metaHtml = [
-      ifVal ? jMetaIf('IF', ifVal) : '',
       cycleLabel ? jMetaText(T('审稿','Rev'), escape(cycleLabel), 'j-meta-cycle') : '',
     ].filter(Boolean).join('');
-    const bodyHtml = `<div class="j-card-badges col-badge col-badge-split">${badgeCell}</div>`;
+    const bodyHtml = `<div class="j-card-badges">${badgeCell}</div>`;
     return journalCardRow({
       fid, src: 'int', flagship: !!r.flagship,
       favHtml: starBtn(r, 'int'),
       nameHtml,
+      ifHtml: ifVal ? jMetaIf('IF', ifVal) : '',
       metaHtml,
       bodyHtml,
     });
@@ -4698,29 +4704,47 @@
     });
   }
 
-  function domSourceTabsHTML() {
-    if (activeTab !== 'dom') return '';
-    const items = [
+  /** 中国站目录列表（仅左侧筛选，不再放顶栏横排按钮） */
+  function domCatalogItems() {
+    return [
       ['cnki_major', T('中文期刊目录','Chinese Journal Directory')],
       ['nsfc_mgmt', T('国自然管理','NSFC Mgmt')],
       ['cscd', 'CSCD'],
       ['cstpcd', T('中国科技核心','CSTPCD')],
       ['cnkx', T('中国科协','CAST')],
-      ['zju_zju', T('浙江大学 2024','ZJU 2024')],
-      ['school_a', T('学校 A · 2023','School A · 2023')],
+      ['zju_zju', T('浙江大学','ZJU')],
+      ['school_a', T('学校目录','School')],
     ];
-    return `<div class="dom-source-tabs" role="tablist" aria-label="${T('国内目录切换','Domestic directory switcher')}">
-      ${items.map(([key, label]) => `<button type="button" class="dom-source-tab ${activeDom === key ? 'active' : ''}" data-dom-switch="${key}">${escape(label)}</button>`).join('')}
+  }
+
+  function domCatalogRailGroupHTML() {
+    if (activeTab !== 'dom') return '';
+    const chips = domCatalogItems().map(([key, label]) =>
+      `<button type="button" class="dom-filter-chip${activeDom === key ? ' on' : ''}" data-dom-switch="${key}">${escape(label)}</button>`
+    ).join('');
+    return `<div class="dom-filter-group">
+      <div class="dom-filter-label">${T('目录','Catalog')}</div>
+      <div class="dom-filter-chips">${chips}</div>
     </div>`;
   }
 
   function domSectionHeader(title, subtitle = '') {
+    // 顶栏只保留标题/副标题，目录切换统一在左侧筛选轨
     return `<div class="dom-section-head">
       <div class="dom-section-copy">
         <h1 class="section-title">${title}</h1>
         ${subtitle ? `<div class="section-subtitle">${subtitle}</div>` : ''}
       </div>
-      ${domSourceTabsHTML()}
+    </div>`;
+  }
+
+  /** 把国内子目录主体包进「左侧目录 + 右侧内容」布局 */
+  function wrapDomBrowse(mainHtml) {
+    return `<div class="dom-browse">
+      <aside class="dom-filter-rail" aria-label="${T('筛选','Filters')}">
+        ${domCatalogRailGroupHTML()}
+      </aside>
+      <div class="dom-filter-main">${mainHtml}</div>
     </div>`;
   }
 
@@ -5001,36 +5025,42 @@
         nameHtml, metaHtml, bodyHtml,
       });
     }).join('');
+    const subjectChips = [
+      ['__all', T('全部学科','All subjects')],
+      ...(subjects || []).slice(0, 40).map(s => [s, s]),
+    ].map(([value, label]) => {
+      const on = activeIndiaSubject === value;
+      return `<button type="button" class="dom-filter-chip${on ? ' on' : ''}" data-india-subject="${escape(value)}">${escape(label)}</button>`;
+    }).join('');
     box.innerHTML = `<div class="section-block india-section">
       ${countrySectionHeader(
         `${T('印度 UGC-CARE 期刊目录','India UGC-CARE Journal Directory')} <span class="muted-cell">(${india.records.length.toLocaleString()})</span>`,
-        T(`现行目录 ${Number(india.counts?.current_directory || 0).toLocaleString()} 条；Sciences 历史表 ${Number(india.counts?.science_archive || 0).toLocaleString()} 条已补齐并去重。`, `Current directory: ${Number(india.counts?.current_directory || 0).toLocaleString()}; the complete ${Number(india.counts?.science_archive || 0).toLocaleString()}-row Sciences archive is merged and deduplicated.`),
+        T(`现行目录 ${Number(india.counts?.current_directory || 0).toLocaleString()} 条；Sciences 历史表 ${Number(india.counts?.science_archive || 0).toLocaleString()} 条已补齐并去重。`, `Current directory: ${Number(india.counts?.current_directory || 0).toLocaleString()}; the complete ${Number(india.counts?.science_archive || 0).toLocaleString()}-row Sciences archive is merged and deduplicated.`)
+          + ` · ${T('显示','Showing')} ${visible.length.toLocaleString()} / ${total.toLocaleString()}`,
       )}
-      <div class="india-toolbar country-toolbar">
-        <select id="india-subject-select" class="th-select">
-          <option value="__all">${T('全部学科','All subjects')}</option>
-          ${subjectOptions}
-        </select>
-        <span class="muted-cell">${T('显示','Showing')} ${visible.length.toLocaleString()} / ${total.toLocaleString()}</span>
+      <div class="dom-browse">
+        <aside class="dom-filter-rail" aria-label="${T('筛选','Filters')}">
+          <div class="dom-filter-group">
+            <div class="dom-filter-label">${T('学科','Subject')}</div>
+            <div class="dom-filter-chips">${subjectChips}</div>
+          </div>
+        </aside>
+        <div class="dom-filter-main">
+          <div class="table-wrap"><table class="journals india-table country-journal-table" aria-label="${T('印度 UGC-CARE 期刊','India UGC-CARE journals')}"><thead hidden><tr><th></th></tr></thead><tbody>
+            ${rows}
+            ${total === 0 ? `<tr><td colspan="3" class="empty">${T('未找到匹配的印度期刊','No matching India journals found')}</td></tr>` : ''}
+          </tbody></table></div>
+          ${total > window.__indiaShown ? `<div class="pager"><button id="india-more" class="more-btn">${T('加载更多','Load more')} (${total - window.__indiaShown} ${T('条剩余','remaining')})</button></div>` : ''}
+          <div class="source-note">${t('india_source_note')}</div>
+        </div>
       </div>
-      <div class="table-wrap"><table class="journals india-table country-journal-table" aria-label="${T('印度 UGC-CARE 期刊','India UGC-CARE journals')}"><thead><tr>
-        <th style="width:36px" aria-label="Favorite"></th>
-        <th>${T('期刊名称','Journal')}</th>
-        <th>${T('出版社','Publisher')}</th>
-        <th>${T('来源','Source')}</th>
-        <th>${T('学科','Subject')}</th>
-        <th>ISSN / E-ISSN</th>
-      </tr></thead><tbody>
-        ${rows}
-        ${total === 0 ? `<tr><td colspan="6" class="empty">${T('未找到匹配的印度期刊','No matching India journals found')}</td></tr>` : ''}
-      </tbody></table></div>
-      ${total > window.__indiaShown ? `<div class="pager"><button id="india-more" class="more-btn">${T('加载更多','Load more')} (${total - window.__indiaShown} ${T('条剩余','remaining')})</button></div>` : ''}
-      <div class="source-note">${t('india_source_note')}</div>
     </div>`;
-    $('#india-subject-select')?.addEventListener('change', e => {
-      activeIndiaSubject = e.target.value;
-      window.__indiaShown = 100;
-      renderIndia();
+    box.querySelectorAll('[data-india-subject]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeIndiaSubject = btn.getAttribute('data-india-subject') || '__all';
+        window.__indiaShown = 100;
+        renderIndia();
+      });
     });
     $('#india-more')?.addEventListener('click', () => {
       window.__indiaShown += 100;
@@ -5218,21 +5248,20 @@
         : '';
       const nameHtml = `<div class="jname">${escape(titleCase(rec.name || ''))}${r.journal_title_ko && r.journal_title_ko !== rec.name ? `<span class="jname-cn">${escape(r.journal_title_ko)}</span>` : ''}</div>`;
       const pub = r.publisher || r.publisher_ko || '';
-      const metaHtml = [
-        ifValue ? jMetaIf('KCI IF', ifValue) : '',
-        jMetaChip(pub, 'j-meta-pub'),
-      ].filter(Boolean).join('');
+      const metaHtml = [jMetaChip(pub, 'j-meta-pub')].filter(Boolean).join('');
       const subjectLine = [
         koreaSubjectLabel(r.subject_group),
         r.subject && r.subject !== r.subject_group ? r.subject : '',
       ].filter(Boolean).join(' · ');
       const bodyHtml = `
-        <div class="j-card-badges badges"><span class="domsrc-pill ds-korea">${escape(koreaStatusLabel(r.status))}</span>${limitBadgeHtml(globalBadges, 4)}</div>
+        <div class="j-card-badges"><span class="domsrc-pill ds-korea">${escape(koreaStatusLabel(r.status))}</span>${limitBadgeHtml(globalBadges, 5)}</div>
         ${subjectLine ? `<div class="j-card-subline">${escape(subjectLine)}</div>` : ''}`;
       return journalCardRow({
         fid, src: 'kr', extraClass: 'korea-row',
         favHtml: starBtn(rec, 'kr'),
-        nameHtml, metaHtml, bodyHtml,
+        nameHtml,
+        ifHtml: ifValue ? jMetaIf('KCI IF', ifValue) : '',
+        metaHtml, bodyHtml,
       });
     }).join('');
     const sourceDate = korea.source_updated || '2025-08-25';
@@ -5339,14 +5368,18 @@
       const metric = config.metric(row);
       const nameHtml = `<div class="jname">${escape(rec.name)}</div>`;
       const metaHtml = [
-        metric ? jMetaChip(metric, 'j-meta-metric') : '',
         row.issn ? jMetaChip(`ISSN ${row.issn}`, 'j-meta-id') : '',
       ].filter(Boolean).join('');
-      const bodyHtml = `<div class="j-card-badges badges"><span class="domsrc-pill regional-source-pill">${escape(config.badge)}</span>${limitBadgeHtml(globalBadges, 4)}</div>`;
+      const bodyHtml = `<div class="j-card-badges"><span class="domsrc-pill regional-source-pill">${escape(config.badge)}</span>${limitBadgeHtml(globalBadges, 5)}</div>`;
+      const ifHtmlClean = metric
+        ? `<div class="j-card-if" title="${escape(metric)}"><span class="j-card-if-label">${T('指标','Metric')}</span><strong style="font-size:13px;max-width:92px;overflow:hidden;text-overflow:ellipsis">${escape(metric)}</strong></div>`
+        : '';
       return journalCardRow({
         fid, src: source, extraClass: 'regional-directory-row',
         favHtml: starBtn(rec, source),
-        nameHtml, metaHtml, bodyHtml,
+        nameHtml,
+        ifHtml: ifHtmlClean,
+        metaHtml, bodyHtml,
       });
     }).join('');
     const sourceYear = data.directory_year ? ` · ${T('目录年份', 'Directory year')} ${escape(data.directory_year)}` : '';
@@ -5411,13 +5444,7 @@
           T('国家自然科学基金委管理科学部期刊目录','NSFC Management Science Journal List'),
           `${all.length.toLocaleString()} ${T('种期刊；A 类 / B 类按原目录顺序展示。','journals; A/B tiers shown in source order.')}`,
         )}
-        <div class="table-wrap"><table class="journals"><thead><tr>
-          <th class="col-fav" aria-label="Favorite"></th>
-          <th style="width:60px">${T('级别','Tier')}</th>
-          <th class="col-name">${T('期刊','Journal')}</th>
-          <th>${T('交叉收录','Also In')}</th>
-          <th style="width:110px">${T('刊期','Frequency')}</th>
-        </tr></thead><tbody>${rows}</tbody></table></div>
+        ${wrapDomBrowse(`<div class="table-wrap"><table class="journals"><thead hidden><tr><th></th></tr></thead><tbody>${rows}</tbody></table></div>`)}
       </div>`;
       return;
     }
@@ -5450,14 +5477,10 @@
           'CSCD 来源期刊目录',
           `${(d.count || all.length).toLocaleString()} ${T('种期刊；C 为核心库，E 为扩展库。','journals; C is Core, E is Extended.')} ${d.source_url ? `<a class="source-link" href="${escape(d.source_url)}" target="_blank" rel="noopener nofollow">sciencechina.cn/select</a>` : ''}`,
         )}
-        <div class="table-wrap"><table class="journals"><thead><tr>
-          <th class="col-fav" aria-label="Favorite"></th>
-          <th class="col-name">${T('期刊','Journal')}</th>
-          <th>${T('收录索引','Indices')}</th>
-          <th style="width:110px">ISSN</th>
-          <th style="width:110px">CN</th>
-        </tr></thead><tbody>${rows}</tbody></table></div>
-        ${all.length > window.__cscdShown ? `<div class="pager"><button id="cscd-more" class="more-btn" style="margin-top:12px;padding:8px 20px;border:1px solid var(--rule);background:var(--paper);color:var(--ink-soft);border-radius:2px;cursor:pointer">${T('加载更多','Load more')} (${all.length - window.__cscdShown} ${T('条剩余','remaining')})</button></div>` : ''}
+        ${wrapDomBrowse(`
+          <div class="table-wrap"><table class="journals"><thead hidden><tr><th></th></tr></thead><tbody>${rows}</tbody></table></div>
+          ${all.length > window.__cscdShown ? `<div class="pager"><button id="cscd-more" class="more-btn">${T('加载更多','Load more')} (${all.length - window.__cscdShown} ${T('条剩余','remaining')})</button></div>` : ''}
+        `)}
       </div>`;
       document.getElementById('cscd-more')?.addEventListener('click', () => {
         window.__cscdShown += 100;
@@ -5490,13 +5513,10 @@
           T('中国科技核心期刊目录','Chinese Science and Technology Core Journals'),
           `${(d.count || all.length).toLocaleString()} ${T('种期刊；含核心卷与科普卷。','journals; includes core and popular-science volumes.')} ${d.core_source_url ? `<a class="source-link" href="${escape(d.core_source_url)}" target="_blank" rel="noopener nofollow">${T('核心 PDF','Core PDF')}</a>` : ''} ${d.popular_science_source_url ? `<a class="source-link" href="${escape(d.popular_science_source_url)}" target="_blank" rel="noopener nofollow">${T('科普 PDF','Popular PDF')}</a>` : ''}`,
         )}
-        <div class="table-wrap"><table class="journals"><thead><tr>
-          <th class="col-fav" aria-label="Favorite"></th>
-          <th class="col-name">${T('期刊','Journal')}</th>
-          <th>${T('收录索引','Indices')}</th>
-          <th style="width:110px">${T('期刊代码','Code')}</th>
-        </tr></thead><tbody>${rows}</tbody></table></div>
-        ${all.length > window.__cstpcdShown ? `<div class="pager"><button id="cstpcd-more" class="more-btn" style="margin-top:12px;padding:8px 20px;border:1px solid var(--rule);background:var(--paper);color:var(--ink-soft);border-radius:2px;cursor:pointer">${T('加载更多','Load more')} (${all.length - window.__cstpcdShown} ${T('条剩余','remaining')})</button></div>` : ''}
+        ${wrapDomBrowse(`
+          <div class="table-wrap"><table class="journals"><thead hidden><tr><th></th></tr></thead><tbody>${rows}</tbody></table></div>
+          ${all.length > window.__cstpcdShown ? `<div class="pager"><button id="cstpcd-more" class="more-btn">${T('加载更多','Load more')} (${all.length - window.__cstpcdShown} ${T('条剩余','remaining')})</button></div>` : ''}
+        `)}
       </div>`;
       document.getElementById('cstpcd-more')?.addEventListener('click', () => {
         window.__cstpcdShown += 100;
@@ -5800,6 +5820,7 @@
         )}
         <div class="dom-browse">
           <aside class="dom-filter-rail" aria-label="${T('筛选','Filters')}">
+            ${domCatalogRailGroupHTML()}
             <div class="dom-filter-group">
               <div class="dom-filter-label">${T('收录索引','Indices')}</div>
               <div class="dom-filter-chips" id="cnki-index-chips">${indexChips}</div>
@@ -9111,17 +9132,19 @@
     }
     const cycleLabel = cycleDays ? `${Math.round(cycleDays / 30.4)}${T('个月','mo')}` : '';
     const metaHtml = [
-      ifVal ? jMetaIf('IF', ifVal) : '',
-      cycleLabel ? jMetaText(T('审稿','Review'), escape(cycleLabel), 'j-meta-cycle') : '',
       jMetaPlain(`<span class="src-tag src-${escape(r.__src)}">${SRC_LABEL[r.__src] || r.__src}</span>`, 'j-meta-src'),
+      cycleLabel ? jMetaText(T('审稿','Rev'), escape(cycleLabel), 'j-meta-cycle') : '',
     ].filter(Boolean).join('');
-    const bodyHtml = `<div class="j-card-badges col-badge col-badge-split">${badgeCell}</div>`;
-    return `<tr class="j-row j-card clickable" data-fid="${escape(fid)}" data-src="${escape(r.__src)}">
-      <td class="col-drag"><span class="drag-handle" title="${T('拖动排序','Drag to reorder')}">⋮⋮</span></td>
-      <td class="col-fav">${starBtn(r, r.__src)}</td>
-      <td class="j-card-head col-name">${nameHtml}${metaHtml ? `<div class="j-card-meta-row">${metaHtml}</div>` : ''}</td>
-      <td class="j-card-body">${bodyHtml}</td>
-    </tr>`;
+    const bodyHtml = `<div class="j-card-badges">${badgeCell}</div>`;
+    return journalCardRow({
+      fid, src: r.__src,
+      favHtml: starBtn(r, r.__src),
+      dragHtml: `<span class="drag-handle" title="${T('拖动排序','Drag to reorder')}">⋮⋮</span>`,
+      nameHtml,
+      ifHtml: ifVal ? jMetaIf('IF', ifVal) : '',
+      metaHtml,
+      bodyHtml,
+    });
   }
 
   const UPDATE_CATEGORY_KEYS = ['all', 'new_journal', 'index_change', 'warning', 'policy', 'report'];
