@@ -37,13 +37,18 @@ function scalar(row, key, fallback = 0) {
   const v = row?.[key];
   return v == null ? fallback : v;
 }
+/** 五产品站 + 门户：看板与第一方统计统一入口 */
 function siteDefs() {
   return [
-    { id: 'journal', label: 'Journal', host: 'journal.ailatest.org' },
-    { id: 'grant', label: 'Grant', host: 'grant.ailatest.org' },
-    { id: 'ailatest', label: 'AILatest', host: 'ailatest.org' },
+    { id: 'journal', label: 'Journal', host: 'journal.ailatest.org', kind: 'product' },
+    { id: 'grant', label: 'Grant', host: 'grant.ailatest.org', kind: 'product' },
+    { id: 'path', label: 'Path', host: 'path.ailatest.org', kind: 'product' },
+    { id: 'major', label: 'Major', host: 'major.ailatest.org', kind: 'product' },
+    { id: 'todo', label: 'Todo', host: 'todo.ailatest.org', kind: 'product' },
+    { id: 'ailatest', label: 'Studio', host: 'ailatest.org', kind: 'hub' },
   ];
 }
+export { siteDefs };
 function dayKeyFromNow(daysBack) {
   const d = new Date();
   d.setUTCDate(d.getUTCDate() - daysBack);
@@ -331,6 +336,49 @@ function internalVisitorExpr(column = 'visitor_id') {
 function humanAnalyticsExpr(column = 'visitor_id') {
   return `${humanTrafficExpr()} AND ${internalVisitorExpr(column)}`;
 }
+
+/** 各站通用：流量 + 访客基础数据（第一方 raw_events） */
+async function loadGenericSiteBasics(run, host, startSec) {
+  const [summary, topPaths, recentPageviews, byDay] = await Promise.all([
+    run('raw_events', `SELECT COUNT(*) AS pageviews,
+        COUNT(DISTINCT NULLIF(visitor_id,'')) AS visitors,
+        COUNT(DISTINCT NULLIF(session_id,'')) AS sessions
+      FROM raw_events
+      WHERE site = ? AND event_ts >= ? AND ${humanAnalyticsExpr()}`, [host, startSec]),
+    run('raw_events', `SELECT COALESCE(NULLIF(path,''),'/') AS path, COUNT(*) AS pageviews,
+        COUNT(DISTINCT NULLIF(visitor_id,'')) AS visitors
+      FROM raw_events
+      WHERE site = ? AND event_ts >= ? AND ${humanAnalyticsExpr()}
+      GROUP BY COALESCE(NULLIF(path,''),'/')
+      ORDER BY pageviews DESC LIMIT 30`, [host, startSec]),
+    run('raw_events', `SELECT event_ts, received_at, visitor_id, session_id, path, referrer, country,
+        client_language, ip_hash, traffic_type, bot_reason
+      FROM raw_events
+      WHERE site = ? AND event_ts >= ? AND ${humanAnalyticsExpr()}
+      ORDER BY event_ts DESC LIMIT 120`, [host, startSec]),
+    run('raw_events', `SELECT date(event_ts,'unixepoch') AS day, COUNT(*) AS pageviews,
+        COUNT(DISTINCT NULLIF(visitor_id,'')) AS visitors,
+        COUNT(DISTINCT NULLIF(session_id,'')) AS sessions
+      FROM raw_events
+      WHERE site = ? AND event_ts >= ? AND ${humanAnalyticsExpr()}
+      GROUP BY day ORDER BY day ASC`, [host, startSec]),
+  ]);
+  const kpis = {
+    pageviews: scalar(summary[0], 'pageviews'),
+    visitors: scalar(summary[0], 'visitors'),
+    sessions: scalar(summary[0], 'sessions'),
+  };
+  return {
+    status: (kpis.pageviews || recentPageviews.length) ? 'ok' : 'empty',
+    kpis,
+    tables: {
+      topPaths,
+      recentPageviews,
+      byDay,
+    },
+  };
+}
+
 async function buildSiteBusiness(env, options = {}) {
   const days = normalizeDays(options);
   const startSec = startSecForDays(days);
@@ -359,7 +407,7 @@ async function buildSiteBusiness(env, options = {}) {
     aiUsageSummary, aiUsageByDay, aiUsageByFeature, aiUsageByModel, recentAiUsage,
     grantSummary, grantTopSearchQueries, grantZeroResultSearches, grantRecentInteractions,
     grantRecentPageviews, grantInteractionByDay,
-    ailatestRecentPageviews,
+    pathBasics, majorBasics, todoBasics, studioBasics, loginProviders,
   ] = await Promise.all([
     run('users', `SELECT COUNT(*) AS total_users FROM users`),
     run('login_events', `SELECT COUNT(*) AS total_login_events FROM login_events`),
@@ -511,11 +559,12 @@ async function buildSiteBusiness(env, options = {}) {
       FROM interaction_events
       WHERE site = 'grant.ailatest.org' AND event_ts >= ? AND ${humanAnalyticsExpr()}
       GROUP BY day ORDER BY day ASC`, [startSec]),
-    run('raw_events', `SELECT event_ts, received_at, visitor_id, session_id, path, referrer, country,
-        client_language, ip_hash, traffic_type, bot_reason
-      FROM raw_events
-      WHERE site = 'ailatest.org' AND event_ts >= ? AND ${humanAnalyticsExpr()}
-      ORDER BY event_ts DESC LIMIT 120`, [startSec]),
+    loadGenericSiteBasics(run, 'path.ailatest.org', startSec),
+    loadGenericSiteBasics(run, 'major.ailatest.org', startSec),
+    loadGenericSiteBasics(run, 'todo.ailatest.org', startSec),
+    loadGenericSiteBasics(run, 'ailatest.org', startSec),
+    run('users', `SELECT COALESCE(provider,'unknown') AS provider, COUNT(*) AS users
+      FROM users GROUP BY COALESCE(provider,'unknown') ORDER BY users DESC`),
   ]);
 
   const interactionEvents = rows => sumRows(rows, 'events');
@@ -585,10 +634,20 @@ async function buildSiteBusiness(env, options = {}) {
         interactionByDay: grantInteractionByDay,
       },
     },
+    path: pathBasics,
+    major: majorBasics,
+    todo: todoBasics,
     ailatest: {
-      status: has('raw_events') ? 'ok' : 'empty',
+      ...studioBasics,
+      kpis: {
+        ...(studioBasics.kpis || {}),
+        total_accounts: scalar(usersSummary[0], 'total_users'),
+        total_login_events: scalar(loginSummary[0], 'total_login_events'),
+      },
       tables: {
-        recentPageviews: ailatestRecentPageviews,
+        ...(studioBasics.tables || {}),
+        loginProviders,
+        recentUsers: recentUsers.map(user => ({ ...user, email: maskEmail(user.email) })),
       },
     },
   };

@@ -178,9 +178,19 @@ function canonicalAnalyticsSite(value) {
     'grant.ailatest.org': 'grant.ailatest.org',
     journal: 'journal.ailatest.org',
     'journal.ailatest.org': 'journal.ailatest.org',
+    path: 'path.ailatest.org',
+    'path.ailatest.org': 'path.ailatest.org',
+    major: 'major.ailatest.org',
+    'major.ailatest.org': 'major.ailatest.org',
+    zhitou: 'major.ailatest.org',
+    todo: 'todo.ailatest.org',
+    'todo.ailatest.org': 'todo.ailatest.org',
+    studio: 'ailatest.org',
+    hub: 'ailatest.org',
     ailatest: 'ailatest.org',
     main: 'ailatest.org',
     'ailatest.org': 'ailatest.org',
+    'www.ailatest.org': 'ailatest.org',
   };
   return aliases[site] || site;
 }
@@ -2428,7 +2438,10 @@ async function routeSiteTrafficTrend(req, env) {
   const sites = {
     journal: { id: 'journal', label: 'Journal', host: 'journal.ailatest.org' },
     grant: { id: 'grant', label: 'Grant', host: 'grant.ailatest.org' },
-    ailatest: { id: 'ailatest', label: 'AILatest', host: 'ailatest.org' },
+    path: { id: 'path', label: 'Path', host: 'path.ailatest.org' },
+    major: { id: 'major', label: 'Major', host: 'major.ailatest.org' },
+    todo: { id: 'todo', label: 'Todo', host: 'todo.ailatest.org' },
+    ailatest: { id: 'ailatest', label: 'Studio', host: 'ailatest.org' },
   };
   const url = new URL(req.url);
   const siteId = url.searchParams.get('site') || 'journal';
@@ -2548,6 +2561,69 @@ function routeSitesDashboard(site = 'overview') {
   });
 }
 
+/** 浏览器访问 api.ailatest.org 时的简洁门户（站长看板入口） */
+function routeApiPortal() {
+  const html = `<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AILatest API</title>
+<style>
+  :root { color-scheme: light; --ink:#1c1917; --muted:#78716c; --line:#e7e5e4; --bg:#fafaf9; --card:#fff; --accent:#0f766e; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: var(--bg); color: var(--ink); line-height: 1.55; }
+  main { max-width: 720px; margin: 0 auto; padding: 48px 20px 72px; }
+  h1 { margin: 0 0 8px; font-size: 1.6rem; letter-spacing: -.02em; font-weight: 750; }
+  p { margin: 0 0 18px; color: var(--muted); font-size: 0.95rem; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; margin: 0 0 12px; }
+  .card h2 { margin: 0 0 6px; font-size: 1rem; }
+  .card p { margin: 0; font-size: 0.88rem; }
+  a.btn { display: inline-flex; align-items: center; gap: 6px; margin-top: 12px; padding: 9px 14px; border-radius: 9px; background: var(--accent); color: #fff; text-decoration: none; font-weight: 650; font-size: 0.9rem; }
+  a.btn:hover { filter: brightness(1.05); }
+  ul { margin: 8px 0 0; padding-left: 1.15rem; color: var(--muted); font-size: 0.88rem; }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.84em; background: #f5f5f4; padding: 1px 5px; border-radius: 4px; }
+  .muted { color: var(--muted); font-size: 0.82rem; margin-top: 20px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>AILatest API</h1>
+  <p>统一账号、支付与第一方分析。产品数据看板请从下方进入（需站长登录）。</p>
+  <div class="card">
+    <h2>产品数据看板</h2>
+    <p>Journal · Grant · Path · Major · Todo · Studio 流量与基础用户数据。</p>
+    <a class="btn" href="/analytics/sites">打开看板 →</a>
+  </div>
+  <div class="card">
+    <h2>已接入站点</h2>
+    <ul>
+      <li><code>journal.ailatest.org</code></li>
+      <li><code>grant.ailatest.org</code></li>
+      <li><code>path.ailatest.org</code></li>
+      <li><code>major.ailatest.org</code></li>
+      <li><code>todo.ailatest.org</code></li>
+      <li><code>ailatest.org</code>（门户）</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h2>机器可读</h2>
+    <p>JSON：请求本页并设置 <code>Accept: application/json</code>，或直接调用各 API 路径。</p>
+  </div>
+  <p class="muted">© AILatest · api.ailatest.org</p>
+</main>
+</body>
+</html>`;
+  return new Response(html, {
+    status: 200,
+    headers: {
+      'Content-Type': 'text/html; charset=utf-8',
+      'Cache-Control': 'public, max-age=300',
+      ...CORS,
+    },
+  });
+}
+
 export default {
   async fetch(req, env) {
     if (req.method === 'OPTIONS') {
@@ -2559,7 +2635,24 @@ export default {
     if (p === '/api' || p === '/api/') p = '/';
     else if (p.startsWith('/api/')) p = p.slice(4);
     try {
-      if (p === '/')                                             return json({ name: 'ailatest-journal-api', ok: true, v: 2 });
+      if (p === '/' || p === '') {
+        const accept = String(req.headers.get('Accept') || '');
+        if (accept.includes('text/html')) return routeApiPortal();
+        return json({
+          name: 'ailatest-api',
+          ok: true,
+          v: 3,
+          dashboard: '/analytics/sites',
+          sites: [
+            'journal.ailatest.org',
+            'grant.ailatest.org',
+            'path.ailatest.org',
+            'major.ailatest.org',
+            'todo.ailatest.org',
+            'ailatest.org',
+          ],
+        });
+      }
       if (p === '/auth/email/request'  && req.method === 'POST') return routeEmailRequest(req, env);
       if (p === '/auth/email/verify'   && req.method === 'POST') return routeEmailVerify(req, env);
       if (p === '/auth/github'         && req.method === 'GET')  return routeAuthStart(req, env);

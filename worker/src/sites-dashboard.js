@@ -9,7 +9,7 @@ export function renderSitesDashboard(opts = {}) {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AILatest 三站数据看板</title>
+<title>AILatest 产品数据看板</title>
 <style>
 :root{color-scheme:light;--bg:#f6f7f8;--panel:#fff;--line:#d9dde3;--ink:#1f2933;--muted:#667085;--accent:#2563eb;--good:#0f766e;--warn:#b45309}
 *{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink)}
@@ -40,8 +40,8 @@ button.active,.btn.active{background:var(--accent);border-color:var(--accent);co
 <main class="shell">
   <div class="top">
     <div>
-      <h1>📊 三站数据看板</h1>
-      <div class="muted">journal.ailatest.org · grant.ailatest.org · ailatest.org</div>
+      <h1>产品数据看板</h1>
+      <div class="muted">Journal · Grant · Path · Major · Todo · Studio</div>
     </div>
     <button id="logout" style="display:none;border:1px solid var(--line);background:#fff;border-radius:6px;padding:6px 10px;cursor:pointer">退出</button>
   </div>
@@ -536,12 +536,31 @@ button.active,.btn.active{background:var(--accent);border-color:var(--accent);co
           rowsFrom((t.interactionByDay || []).slice(-20).reverse(), [{k:'day'},{f:function(r){return n(r.events);}}])+'</tbody></table></section>'+
       '</div>';
   }
-  function ailatestBusinessSection(ab){
-    if (!ab || ab.status !== 'ok') return '<section class="card"><strong>AILatest 主站明细</strong><p class="muted">'+esc((ab && ab.reason) || '当前站点暂无明细。')+'</p></section>';
+  function genericSiteBusinessSection(label, ab){
+    if (!ab || (ab.status !== 'ok' && ab.status !== 'empty')) {
+      return '<section class="card"><strong>'+esc(label)+' 明细</strong><p class="muted">'+esc((ab && ab.reason) || '当前站点暂无明细。')+'</p></section>';
+    }
+    var k = ab.kpis || {};
     var t = ab.tables || {};
     var recentPageviews = (t.recentPageviews || []).filter(matchesTraffic).slice(0,50);
-    return '<div class="section-title">AILatest 主站浏览 <span class="pill">'+esc(trafficLabel(activeTraffic))+'</span></div>'+trafficControls()+
-      '<section class="card"><strong>最近 50 条真实访问记录</strong><div class="scroll tall"><table class="table"><thead><tr><th>时间</th><th>访客</th><th>路径</th><th>来源页</th><th>国家</th><th>语言</th><th>IP哈希</th><th>类型</th><th>原因</th></tr></thead><tbody>'+
+    var topPaths = t.topPaths || [];
+    var byDay = (t.byDay || []).slice(-20).reverse();
+    return '<div class="section-title">'+esc(label)+' 用户与流量 <span class="pill">'+esc(trafficLabel(activeTraffic))+'</span></div>'+trafficControls()+
+      metricCards([
+        ['真人 PV', k.pageviews || 0],
+        ['独立访客', k.visitors || 0],
+        ['会话', k.sessions || 0],
+        ['账号（统一）', k.total_accounts || 0]
+      ].filter(function(it){ return it[0] !== '账号（统一）' || Number(it[1]) > 0; }))+
+      '<div class="detail-grid">'+
+        '<section class="card"><strong>热门路径</strong><table class="table"><thead><tr><th>路径</th><th>PV</th><th>访客</th></tr></thead><tbody>'+
+          rowsFrom(topPaths.slice(0,15), [{k:'path',cls:'path-cell'},{f:function(r){return n(r.pageviews);}},{f:function(r){return n(r.visitors);}}])+
+        '</tbody></table></section>'+
+        '<section class="card"><strong>按日</strong><table class="table"><thead><tr><th>日期</th><th>PV</th><th>访客</th><th>会话</th></tr></thead><tbody>'+
+          rowsFrom(byDay, [{k:'day'},{f:function(r){return n(r.pageviews);}},{f:function(r){return n(r.visitors);}},{f:function(r){return n(r.sessions);}}])+
+        '</tbody></table></section>'+
+      '</div>'+
+      '<section class="card" style="margin-top:12px"><strong>最近访问</strong><div class="scroll tall"><table class="table"><thead><tr><th>时间</th><th>访客</th><th>路径</th><th>来源</th><th>国家</th><th>语言</th><th>类型</th></tr></thead><tbody>'+
         rowsFrom(recentPageviews, [
           {f:function(r){return secTs(r.event_ts || r.received_at);}},
           {f:function(r){return r.visitor_id?'访客 '+String(r.visitor_id).slice(0,8):'anonymous';}},
@@ -549,13 +568,42 @@ button.active,.btn.active{background:var(--accent);border-color:var(--accent);co
           {k:'referrer',cls:'path-cell'},
           {k:'country'},
           {k:'client_language'},
-          {f:function(r){return r.ip_hash ? String(r.ip_hash).slice(0,12) : '';}},
-          {k:'traffic_type'},{k:'bot_reason',cls:'path-cell'}
+          {k:'traffic_type'}
         ])+'</tbody></table></div></section>';
+  }
+  function ailatestBusinessSection(ab){
+    var base = genericSiteBusinessSection('Studio 门户', ab);
+    var t = (ab && ab.tables) || {};
+    var users = t.recentUsers || [];
+    var providers = t.loginProviders || [];
+    if (!users.length && !providers.length) return base;
+    return base +
+      '<div class="section-title">统一账号（全站登录）</div>'+
+      metricCards([
+        ['注册用户', (ab.kpis && ab.kpis.total_accounts) || users.length || 0],
+        ['登录事件', (ab.kpis && ab.kpis.total_login_events) || 0]
+      ])+
+      '<div class="detail-grid">'+
+        '<section class="card"><strong>登录方式</strong><table class="table"><thead><tr><th>Provider</th><th>用户数</th></tr></thead><tbody>'+
+          rowsFrom(providers, [{k:'provider'},{f:function(r){return n(r.users);}}])+
+        '</tbody></table></section>'+
+        '<section class="card"><strong>最近注册</strong><table class="table"><thead><tr><th>ID</th><th>邮箱</th><th>登录名</th><th>方式</th><th>时间</th></tr></thead><tbody>'+
+          rowsFrom(users.slice(0,20), [
+            {k:'id'},
+            {k:'email'},
+            {k:'login'},
+            {k:'provider'},
+            {f:function(r){return secTs(r.created_at);}}
+          ])+
+        '</tbody></table></section>'+
+      '</div>';
   }
   function businessSection(siteId, business){
     if (siteId === 'journal') return journalBusinessSection(business);
     if (siteId === 'grant') return grantBusinessSection(business);
+    if (siteId === 'path') return genericSiteBusinessSection('Path', business);
+    if (siteId === 'major') return genericSiteBusinessSection('Major · 知途', business);
+    if (siteId === 'todo') return genericSiteBusinessSection('Todo', business);
     if (siteId === 'ailatest') return ailatestBusinessSection(business);
     return '<section class="card"><strong>业务明细</strong><p class="muted">'+esc((business && business.reason) || '当前站点暂无业务明细。')+'</p></section>';
   }
@@ -564,7 +612,7 @@ button.active,.btn.active{background:var(--accent);border-color:var(--accent);co
     var sites = sm.sites || [];
     app.className = '';
     app.innerHTML = '<div class="tabs">'+sites.map(function(s){return '<a class="btn" href="'+SITES_BASE+'/'+esc(s.id)+'?days='+activeDays+'">'+esc(s.label)+' · '+esc(s.host)+'</a>';}).join('')+'</div>'+
-      '<div class="banner">每个网站现在是独立运营页；默认只统计真人流量，Bot / AI / 搜索引擎可在站点页切换查看。</div>'+
+      '<div class="banner">五个产品站 + Studio 门户已接入。默认统计真人流量；各站可查看访客与路径基础数据。Journal 另含账号/收藏/AI 等业务表。</div>'+
       '<div class="grid">'+sites.map(function(s){
         var fp = (sm.first_party || {})[s.id] || {};
         var mix = fp.traffic_mix || {};
