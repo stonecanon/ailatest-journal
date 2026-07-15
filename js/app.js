@@ -81,7 +81,7 @@
       hero_title_fav: '我的收藏',
       hero_body_fav: '点击任意期刊右侧的 <b>★</b> 可加入收藏。未登录时保存在本机 localStorage；登录后自动同步到云端，可跨设备访问。',
       hero_title_pick: '智能荐刊',
-      hero_body_pick: '采用自研大模型算法，深度分析你的研究主题与海量期刊数据的匹配度，智能推荐最合适的目标期刊。每人每天免费使用 5 次。',
+      hero_body_pick: '采用自研大模型算法，深度分析你的研究主题与海量期刊数据的匹配度，智能推荐最合适的目标期刊。Free 登录后共 10 次 AI 荐刊（用完即止）。',
       pick_placeholder: '输入论文标题、摘要或关键词，开始推荐期刊',
       pick_search_btn: '推荐期刊',
       pick_filter_topics: '匹配研究领域 (Topics)',
@@ -177,7 +177,7 @@
       hero_title_fav: 'My Favorites',
       hero_body_fav: 'Click the <b>★</b> on any row to bookmark. Saved locally when signed-out; syncs to the cloud when signed-in.',
       hero_title_pick: 'Pick for me',
-      hero_body_pick: 'Powered by proprietary large-model algorithm — intelligently matches your research topic against millions of journal data points to recommend the best target journals. 5 free searches per day per user.',
+      hero_body_pick: 'Powered by proprietary large-model algorithm — intelligently matches your research topic against millions of journal data points to recommend the best target journals. Free: 10 AI picks total after sign-in.',
       pick_placeholder: 'Enter a paper title, abstract, or keywords to recommend journals',
       pick_search_btn: 'Recommend',
       pick_filter_topics: 'Match Topics',
@@ -307,11 +307,11 @@
     update_cat_report: '重要报告',
     pick_ai_toggle: 'AI 推荐',
     pick_ai_hint: '语义增强，默认开启',
-    pick_ai_login: 'AI 推荐需要登录（每日 5 次免费额度），本次已自动改用本地匹配。',
+    pick_ai_login: 'AI 推荐需要登录（Free 共 10 次额度），本次已自动改用本地匹配。',
     pick_ai_running: '正在用 AI 解析研究语境…',
     pick_ai_unavailable: 'AI 推荐暂不可用，已自动改用本地匹配；该次不扣 AI 额度，可稍后重试。',
     pick_ai_auth_error: 'AI 推荐登录已失效，请重新登录；本次已自动改用本地匹配。',
-    pick_ai_quota_error: '今日 AI 推荐免费额度已用完，已自动改用本地匹配。',
+    pick_ai_quota_error: 'Free AI 荐刊 10 次额度已用完，已自动改用本地匹配。升级 Pro / Max 可继续使用。',
     pick_ai_config_error: 'AI 推荐接口还没有正确读取 DeepSeek 密钥，请重新部署 Worker 后再试。',
     pick_mode_ai: 'AI 语义匹配',
     pick_mode_local: '本地匹配',
@@ -338,11 +338,11 @@
     update_cat_report: '重要報告',
     pick_ai_toggle: 'AI 推薦',
     pick_ai_hint: '語義增強，預設開啟',
-    pick_ai_login: 'AI 推薦需要登入（每日 5 次免費額度），本次已自動改用本地匹配。',
+    pick_ai_login: 'AI 推薦需要登入（Free 共 10 次額度），本次已自動改用本地匹配。',
     pick_ai_running: '正在用 AI 解析研究語境…',
     pick_ai_unavailable: 'AI 推薦暫不可用，已自動改用本地匹配；該次不扣 AI 額度，可稍後重試。',
     pick_ai_auth_error: 'AI 推薦登入已失效，請重新登入；本次已自動改用本地匹配。',
-    pick_ai_quota_error: '今日 AI 推薦免費額度已用完，已自動改用本地匹配。',
+    pick_ai_quota_error: 'Free AI 薦刊 10 次額度已用完，已自動改用本地匹配。升級 Pro / Max 可繼續使用。',
     pick_ai_config_error: 'AI 推薦接口還沒有正確讀取 DeepSeek 密鑰，請重新部署 Worker 後再試。',
     pick_mode_ai: 'AI 語義匹配',
     pick_mode_local: '本地匹配',
@@ -369,11 +369,11 @@
     update_cat_report: 'Reports',
     pick_ai_toggle: 'AI Match',
     pick_ai_hint: 'Semantic mode, on by default',
-    pick_ai_login: 'AI Match requires sign-in (5 free uses per day); switched to local matching for this search.',
+    pick_ai_login: 'AI Match requires sign-in (Free: 10 total picks); switched to local matching for this search.',
     pick_ai_running: 'Analyzing research context with AI…',
     pick_ai_unavailable: 'AI Match is temporarily unavailable; switched to local matching. No AI credit was used — retry later.',
     pick_ai_auth_error: 'Your AI Match sign-in has expired. Sign in again; switched to local matching for this search.',
-    pick_ai_quota_error: 'Today’s free AI Match quota is used up; switched to local matching.',
+    pick_ai_quota_error: 'Free AI Match (10 total) is used up; switched to local matching. Upgrade Pro/Max to continue.',
     pick_ai_config_error: 'AI Match cannot read the DeepSeek key yet. Redeploy the Worker and try again.',
     pick_mode_ai: 'AI semantic match',
     pick_mode_local: 'Local match',
@@ -11596,7 +11596,9 @@
         }
 
         const quotaText = pickMode === 'ai' && quotaInfo && quotaInfo.remaining != null
-          ? ` · ${T('今日剩余','remaining today')} ${quotaInfo.remaining}/${quotaInfo.limit}`
+          ? (quotaInfo.lifetime || quotaInfo.period === 'lifetime'
+            ? ` · ${T('剩余','left')} ${quotaInfo.remaining}/${quotaInfo.limit}`
+            : ` · ${T('今日剩余','remaining today')} ${quotaInfo.remaining}/${quotaInfo.limit}`)
           : '';
         const modeText = pickMode === 'ai' ? t('pick_mode_ai') : t('pick_mode_local');
         setPickProgress(`${statusNotice ? statusNotice + ' · ' : ''}${modeText} ${entries.length} ${T('个候选期刊','candidate journals')}, ${T('显示','showing')} ${filtered.length}/${allFiltered.length}${quotaText}`, 100);

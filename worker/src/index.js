@@ -785,14 +785,18 @@ function isOwnerUser(u) {
   return email === 'jiantaoweng@gmail.com' || login === 'jiantaoweng@gmail.com';
 }
 
+/** Free：AI 荐刊终身共 10 次（不按日重置）；Pro(plus) 每日 5 次；Max 走 monthly_limit/credits */
+const FREE_PICK_LIFETIME_LIMIT = 10;
+const PLUS_PICK_DAILY_LIMIT = 5;
+
 async function getPickQuota(env, userId) {
   try {
     const row = await env.DB.prepare(
       'SELECT plan, daily_limit, monthly_limit, paid_until FROM user_quotas WHERE user_id = ?'
     ).bind(userId).first();
-    return row || { plan: 'free', daily_limit: 5, monthly_limit: null, paid_until: null };
+    return row || { plan: 'free', daily_limit: FREE_PICK_LIFETIME_LIMIT, monthly_limit: null, paid_until: null };
   } catch (e) {
-    return { plan: 'free', daily_limit: 5, monthly_limit: null, paid_until: null };
+    return { plan: 'free', daily_limit: FREE_PICK_LIFETIME_LIMIT, monthly_limit: null, paid_until: null };
   }
 }
 
@@ -802,7 +806,7 @@ async function ensurePickQuotaTables(env) {
       `CREATE TABLE IF NOT EXISTS user_quotas (
         user_id       INTEGER PRIMARY KEY,
         plan          TEXT    NOT NULL DEFAULT 'free',
-        daily_limit   INTEGER NOT NULL DEFAULT 5,
+        daily_limit   INTEGER NOT NULL DEFAULT 10,
         monthly_limit INTEGER,
         paid_until    INTEGER,
         updated_at    INTEGER NOT NULL,
@@ -832,13 +836,34 @@ async function consumePickQuotaForUser(env, u) {
 
   await ensurePickQuotaTables(env);
   const quota = await getPickQuota(env, u.id);
-  const hasPaid = quota.plan !== 'free'
+  const plan = String(quota.plan || 'free').toLowerCase();
+  const hasPaidMonthly = plan !== 'free'
     && Number(quota.monthly_limit || 0) > 0
     && (!quota.paid_until || Number(quota.paid_until) >= now);
-  const period = hasPaid ? 'month' : 'day';
-  const periodKey = hasPaid ? monthFromSec(now) : dayFromSec(now);
-  const limit = hasPaid ? Number(quota.monthly_limit) : Number(quota.daily_limit || 5);
-  const resetAt = hasPaid ? nextUtcMonthStart(now) : nextUtcDayStart(now);
+  // plus / trial：日额度；free：终身 lifetime；pro/max：月额度
+  const isPlusPlan = plan === 'plus' || plan === 'trial';
+  let period;
+  let periodKey;
+  let limit;
+  let resetAt;
+
+  if (hasPaidMonthly) {
+    period = 'month';
+    periodKey = monthFromSec(now);
+    limit = Number(quota.monthly_limit);
+    resetAt = nextUtcMonthStart(now);
+  } else if (isPlusPlan) {
+    period = 'day';
+    periodKey = dayFromSec(now);
+    limit = Number(quota.daily_limit || PLUS_PICK_DAILY_LIMIT);
+    resetAt = nextUtcDayStart(now);
+  } else {
+    // Free：终身 10 次，用完即止（不按日重置）
+    period = 'lifetime';
+    periodKey = 'total';
+    limit = FREE_PICK_LIFETIME_LIMIT;
+    resetAt = null;
+  }
 
   await env.DB.prepare(
     `INSERT OR IGNORE INTO pick_usage (user_id, period, period_key, used, updated_at)
@@ -850,7 +875,19 @@ async function consumePickQuotaForUser(env, u) {
   ).bind(u.id, period, periodKey).first();
   const used = Number(usage?.used || 0);
   if (used >= limit) {
-    return { ok: false, allowed: false, plan: hasPaid ? quota.plan : 'free', used, limit, remaining: 0, period, period_key: periodKey, reset_at: resetAt, error: 'quota exceeded' };
+    return {
+      ok: false,
+      allowed: false,
+      plan: hasPaidMonthly || isPlusPlan ? plan : 'free',
+      used,
+      limit,
+      remaining: 0,
+      period,
+      period_key: periodKey,
+      reset_at: resetAt,
+      lifetime: period === 'lifetime',
+      error: period === 'lifetime' ? 'lifetime quota exhausted' : 'quota exceeded',
+    };
   }
 
   await env.DB.prepare(
@@ -859,7 +896,18 @@ async function consumePickQuotaForUser(env, u) {
   ).bind(now, u.id, period, periodKey).run();
 
   const nextUsed = used + 1;
-  return { ok: true, allowed: true, plan: hasPaid ? quota.plan : 'free', used: nextUsed, limit, remaining: Math.max(0, limit - nextUsed), period, period_key: periodKey, reset_at: resetAt };
+  return {
+    ok: true,
+    allowed: true,
+    plan: hasPaidMonthly || isPlusPlan ? plan : 'free',
+    used: nextUsed,
+    limit,
+    remaining: Math.max(0, limit - nextUsed),
+    period,
+    period_key: periodKey,
+    reset_at: resetAt,
+    lifetime: period === 'lifetime',
+  };
 }
 
 async function routeConsumePickQuota(req, env) {
