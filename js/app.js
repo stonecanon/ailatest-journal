@@ -2595,13 +2595,13 @@
     const planTitle = m.id === 'max' ? T('Max 会员', 'Max plan')
       : m.id === 'pro' ? T('Pro 会员', 'Pro plan')
         : T('Free 基础版', 'Free plan');
-    badge.innerHTML = `<span class="rail-me-label">${T('我的','Me')}</span><span class="rail-tier-chip ${m.cls}" aria-hidden="true">${escape(tierLabel)}</span>`;
+    badge.innerHTML = `<span class="rail-me-label">${T('设置','Settings')}</span><span class="rail-tier-chip ${m.cls}" aria-hidden="true">${escape(tierLabel)}</span>`;
     badge.title = user
-      ? `${T('我的账号','My account')} · ${planTitle}`
-      : T('登录后查看会员与账号', 'Sign in to view membership');
+      ? `${T('设置与账号','Settings & account')} · ${planTitle}`
+      : T('登录后查看会员与设置', 'Sign in for membership & settings');
     badge.setAttribute('aria-label', user
-      ? `${T('我的','Me')}，${planTitle}`
-      : T('我的，登录或注册', 'Me, sign in or sign up'));
+      ? `${T('设置','Settings')}，${planTitle}`
+      : T('设置，登录或注册', 'Settings, sign in or sign up'));
   }
 
 
@@ -8347,84 +8347,190 @@
     return dots.join('');
   }
 
+  let _settingsSection = 'account';
+
+  function openSettingsShell(section) {
+    if (section) _settingsSection = section;
+    document.body.classList.add('settings-open');
+    document.documentElement.classList.add('settings-open');
+    const panel = document.querySelector('.tab-panel[data-panel="me"]');
+    if (panel) panel.hidden = false;
+    renderMe();
+  }
+
+  function closeSettingsShell(opts = {}) {
+    document.body.classList.remove('settings-open');
+    document.documentElement.classList.remove('settings-open');
+    const panel = document.querySelector('.tab-panel[data-panel="me"]');
+    if (panel) panel.hidden = true;
+    // 关闭后回到打开设置前的页面
+    if (!opts.keepTab && activeTab === 'me') {
+      let back = window.__settingsReturnTab || 'int';
+      if (back === 'me') back = 'int';
+      if (typeof window.__activateJournalTab === 'function') {
+        window.__activateJournalTab(back, { push: true });
+      } else if (typeof activateTab === 'function') {
+        activateTab(back, { push: true });
+      } else {
+        activeTab = back;
+      }
+    }
+  }
+
+  function showSettingsSection(id) {
+    _settingsSection = id || 'account';
+    const root = $('#me-content');
+    if (!root) return;
+    root.querySelectorAll('[data-settings-section]').forEach((el) => {
+      el.hidden = el.getAttribute('data-settings-section') !== _settingsSection;
+    });
+    root.querySelectorAll('[data-settings-nav]').forEach((btn) => {
+      btn.classList.toggle('active', btn.getAttribute('data-settings-nav') === _settingsSection);
+    });
+  }
+
   function renderMe() {
     const box = $('#me-content');
     if (!box) return;
+    document.body.classList.add('settings-open');
     const favCount = allFavIds().size;
     const credits = accountCreditValue();
     const creditText = formatCreditValue(user ? credits : 0);
     const signed = !!user;
-    const tier = membershipTierLabel();
+    const langLabel = (typeof uiLocale === 'function' && uiLocale() === 'en') ? 'English' : '中文';
     box.innerHTML = `
-      <section class="me-page">
-        <header class="me-hero">
-          ${userAvatarHtml()}
-          <div class="me-title-block">
-            <h1>${escape(userDisplayName())} ${membershipBadgeHtml()}</h1>
-            <p>${escape(userEmailText())} · ${escape(userProviderText())}</p>
-          </div>
-          <div class="me-actions">
-            ${signed
-              ? `<a class="btn-mini" href="/pricing.html">${T('订阅','Plans')}</a>
-                 <button class="btn-mini" data-me-logout>${T('退出登录','Sign out')}</button>`
-              : `<button class="btn-mini primary" data-me-login>${T('登录 / 注册','Sign in / Sign up')}</button>`}
-          </div>
-        </header>
-        <div class="me-stat-strip">
-          <button type="button" class="me-stat-item" data-me-stat="credits"><strong>${escape(creditText)}</strong><span>${T('Credits','Credits')}</span></button>
-          <a class="me-stat-item" data-me-stat="favorites" href="/favorites"><strong>${favCount}</strong><span>${T('收藏期刊','Saved journals')}</span></a>
-          <button type="button" class="me-stat-item" data-me-stat="views"><strong>${todayViewCount()}</strong><span>${T('今日浏览','Views today')}</span></button>
-          <button type="button" class="me-stat-item" data-me-stat="searches"><strong>${localSearchCount()}</strong><span>${T('搜索记录','Searches')}</span></button>
-          <button type="button" class="me-stat-item" data-me-stat="api"><strong>${localPluginCallCount()}</strong><span>${T('插件 / API 调用','Plugin / API calls')}</span></button>
-        </div>
-        <section class="me-card me-record-panel" data-me-record-panel hidden></section>
-        <section class="me-card me-gift-card">
-          <h2>${T('礼品码','Gift codes')}</h2>
-          <form class="gift-redeem" data-gift-redeem>
-            <div>
-              <strong>${T('兑换礼品码','Redeem a gift code')}</strong>
-              <p>${T('输入礼品码，立即激活对应会员。','Enter a code to activate the included plan.')}</p>
-            </div>
-            <div class="gift-redeem-row">
-              <input name="code" type="text" autocomplete="off" spellcheck="false"
-                placeholder="JOURNAL-MAX-XXXX-XXXX-XXXX-XXXX"
-                ${signed ? '' : 'disabled'} />
-              <button type="submit" ${signed ? '' : 'disabled'}>${T('兑换','Redeem')}</button>
-            </div>
-            ${signed ? '' : `<small>${T('登录后可兑换礼品码','Sign in to redeem a code')}</small>`}
-          </form>
-          ${isOwnerClient() ? `
-          <form class="gift-admin" data-gift-admin>
-            <header>
-              <div>
-                <strong>${T('站长礼品卡','Owner gift cards')}</strong>
-                <p>${T('生成后只显示一次；服务端验证，每个码仅可成功兑换一次。右上角 × 可作废未使用的码。','Shown once; server-verified, redeemable once. Use × to void unused codes.')}</p>
+      <div class="settings-scrim" data-settings-close tabindex="-1" aria-hidden="true"></div>
+      <div class="settings-panel" role="dialog" aria-modal="true" aria-label="${T('设置','Settings')}">
+        <div class="settings-handle" aria-hidden="true"></div>
+        <button type="button" class="settings-close" data-settings-close aria-label="${T('关闭','Close')}">×</button>
+        <div class="settings-layout me-page settings-me">
+          <nav class="settings-nav" aria-label="${T('设置导航','Settings')}">
+            <div class="settings-nav-title">${T('设置','Settings')}</div>
+            <button type="button" data-settings-nav="account" class="${_settingsSection === 'account' ? 'active' : ''}">${T('账号','Account')}</button>
+            <button type="button" data-settings-nav="billing" class="${_settingsSection === 'billing' ? 'active' : ''}">${T('订阅','Billing')}</button>
+            <button type="button" data-settings-nav="downloads" class="${_settingsSection === 'downloads' ? 'active' : ''}">${T('下载','Downloads')}</button>
+            <button type="button" data-settings-nav="rankings" class="${_settingsSection === 'rankings' ? 'active' : ''}">${T('榜单','Rankings')}</button>
+            <button type="button" data-settings-nav="gift" class="${_settingsSection === 'gift' ? 'active' : ''}">${T('礼品码','Gift codes')}</button>
+            <button type="button" data-settings-nav="language" class="${_settingsSection === 'language' ? 'active' : ''}">${T('语言','Language')}</button>
+            <button type="button" data-settings-nav="activity" class="${_settingsSection === 'activity' ? 'active' : ''}">${T('活动','Activity')}</button>
+          </nav>
+          <div class="settings-body">
+            <section class="settings-section" data-settings-section="account" ${_settingsSection === 'account' ? '' : 'hidden'}>
+              <h2 class="settings-section-title">${T('账号','Account')}</h2>
+              <header class="me-hero">
+                ${userAvatarHtml()}
+                <div class="me-title-block">
+                  <h1>${escape(userDisplayName())} ${membershipBadgeHtml()}</h1>
+                  <p>${escape(userEmailText())} · ${escape(userProviderText())}</p>
+                </div>
+                <div class="me-actions">
+                  ${signed
+                    ? `<button class="btn-mini" data-me-logout>${T('退出登录','Sign out')}</button>`
+                    : `<button class="btn-mini primary" data-me-login>${T('登录 / 注册','Sign in / Sign up')}</button>`}
+                </div>
+              </header>
+              <div class="me-stat-strip">
+                <button type="button" class="me-stat-item" data-me-stat="credits"><strong>${escape(creditText)}</strong><span>${T('Credits','Credits')}</span></button>
+                <a class="me-stat-item" data-me-stat="favorites" href="/favorites"><strong>${favCount}</strong><span>${T('收藏期刊','Saved journals')}</span></a>
+                <button type="button" class="me-stat-item" data-me-stat="views"><strong>${todayViewCount()}</strong><span>${T('今日浏览','Views today')}</span></button>
+                <button type="button" class="me-stat-item" data-me-stat="searches"><strong>${localSearchCount()}</strong><span>${T('搜索记录','Searches')}</span></button>
+                <button type="button" class="me-stat-item" data-me-stat="api"><strong>${localPluginCallCount()}</strong><span>${T('插件 / API 调用','Plugin / API calls')}</span></button>
               </div>
-              <span>OWNER · MAX</span>
-            </header>
-            <div class="gift-admin-controls">
-              <select name="plan" aria-label="plan">
-                <option value="pro">Pro</option>
-                <option value="max" selected>Max</option>
-              </select>
-              <select name="duration" aria-label="duration">
-                <option value="30">${T('30 天','30 days')}</option>
-                <option value="365" selected>${T('1 年','1 year')}</option>
-                <option value="permanent">${T('永久','Permanent')}</option>
-              </select>
-              <input name="quantity" type="number" min="1" max="20" value="1" aria-label="${T('数量','Quantity')}" />
-              <button type="submit">${T('生成礼品码','Generate')}</button>
-            </div>
-            <div class="gift-code-results" data-gift-results hidden></div>
-          </form>` : ''}
-          <p class="gift-message" data-gift-message role="status" hidden></p>
-        </section>
-        <section class="me-card me-activity-card">
-          <h2>${T('活动记录','Activity')}</h2>
-          <div class="me-activity-months"><span>${T('近 12 周','Last 12 weeks')}</span><span>${new Date().toLocaleDateString(uiLocale(), { month: 'long', day: 'numeric' })}</span></div>
-          <div class="me-activity-grid">${renderActivityDots()}</div>
-        </section>
-      </section>`;
+              <section class="me-card me-record-panel" data-me-record-panel hidden></section>
+            </section>
+
+            <section class="settings-section" data-settings-section="billing" ${_settingsSection === 'billing' ? '' : 'hidden'}>
+              <h2 class="settings-section-title">${T('订阅','Billing')}</h2>
+              <a class="settings-link-row" href="/pricing.html">${T('查看套餐与订阅','View plans & subscribe')}<span>↗</span></a>
+              <p class="muted" style="margin:8px 0 0;font-size:13px;color:#78716c">${T('当前档位','Current plan')}：${escape(membershipTierLabel().label || '—')}</p>
+            </section>
+
+            <section class="settings-section" data-settings-section="downloads" ${_settingsSection === 'downloads' ? '' : 'hidden'}>
+              <h2 class="settings-section-title">${T('下载','Downloads')}</h2>
+              <a class="settings-link-row" href="/extension.html">${T('插件与下载中心','Extension & download center')}<span>↗</span></a>
+            </section>
+
+            <section class="settings-section" data-settings-section="rankings" ${_settingsSection === 'rankings' ? '' : 'hidden'}>
+              <h2 class="settings-section-title">${T('榜单','Rankings')}</h2>
+              <button type="button" class="settings-link-row" data-open-rankings style="width:100%">${T('索引 / 学科排行榜与预警','Indexes, rankings & warnings')}<span>→</span></button>
+            </section>
+
+            <section class="settings-section" data-settings-section="gift" ${_settingsSection === 'gift' ? '' : 'hidden'}>
+              <h2 class="settings-section-title">${T('礼品码','Gift codes')}</h2>
+              <section class="me-card me-gift-card" style="margin:0">
+                <form class="gift-redeem" data-gift-redeem>
+                  <div>
+                    <strong>${T('兑换礼品码','Redeem a gift code')}</strong>
+                    <p>${T('输入礼品码，立即激活对应会员。','Enter a code to activate the included plan.')}</p>
+                  </div>
+                  <div class="gift-redeem-row">
+                    <input name="code" type="text" autocomplete="off" spellcheck="false"
+                      placeholder="JOURNAL-MAX-XXXX-XXXX-XXXX-XXXX"
+                      ${signed ? '' : 'disabled'} />
+                    <button type="submit" ${signed ? '' : 'disabled'}>${T('兑换','Redeem')}</button>
+                  </div>
+                  ${signed ? '' : `<small>${T('登录后可兑换礼品码','Sign in to redeem a code')}</small>`}
+                </form>
+                ${isOwnerClient() ? `
+                <form class="gift-admin" data-gift-admin>
+                  <header>
+                    <div>
+                      <strong>${T('站长礼品卡','Owner gift cards')}</strong>
+                      <p>${T('生成后只显示一次；服务端验证，每个码仅可成功兑换一次。右上角 × 可作废未使用的码。','Shown once; server-verified, redeemable once. Use × to void unused codes.')}</p>
+                    </div>
+                    <span>OWNER · MAX</span>
+                  </header>
+                  <div class="gift-admin-controls">
+                    <select name="plan" aria-label="plan">
+                      <option value="pro">Pro</option>
+                      <option value="max" selected>Max</option>
+                    </select>
+                    <select name="duration" aria-label="duration">
+                      <option value="30">${T('30 天','30 days')}</option>
+                      <option value="365" selected>${T('1 年','1 year')}</option>
+                      <option value="permanent">${T('永久','Permanent')}</option>
+                    </select>
+                    <input name="quantity" type="number" min="1" max="20" value="1" aria-label="${T('数量','Quantity')}" />
+                    <button type="submit">${T('生成礼品码','Generate')}</button>
+                  </div>
+                  <div class="gift-code-results" data-gift-results hidden></div>
+                </form>` : ''}
+                <p class="gift-message" data-gift-message role="status" hidden></p>
+              </section>
+            </section>
+
+            <section class="settings-section" data-settings-section="language" ${_settingsSection === 'language' ? '' : 'hidden'}>
+              <h2 class="settings-section-title">${T('语言','Language')}</h2>
+              <p style="margin:0 0 12px;color:#78716c;font-size:13px">${T('当前','Current')}：${escape(langLabel)}</p>
+              <button type="button" class="settings-link-row" data-toggle-lang style="width:100%">${T('切换中文 / English','Switch Chinese / English')}<span>⇄</span></button>
+            </section>
+
+            <section class="settings-section" data-settings-section="activity" ${_settingsSection === 'activity' ? '' : 'hidden'}>
+              <h2 class="settings-section-title">${T('活动记录','Activity')}</h2>
+              <section class="me-card me-activity-card" style="margin:0">
+                <div class="me-activity-months"><span>${T('近 12 周','Last 12 weeks')}</span><span>${new Date().toLocaleDateString(uiLocale(), { month: 'long', day: 'numeric' })}</span></div>
+                <div class="me-activity-grid">${renderActivityDots()}</div>
+              </section>
+            </section>
+          </div>
+        </div>
+      </div>`;
+
+    box.querySelectorAll('[data-settings-close]').forEach((el) => {
+      el.addEventListener('click', () => closeSettingsShell());
+    });
+    box.querySelectorAll('[data-settings-nav]').forEach((btn) => {
+      btn.addEventListener('click', () => showSettingsSection(btn.getAttribute('data-settings-nav')));
+    });
+    box.querySelector('[data-open-rankings]')?.addEventListener('click', () => {
+      closeSettingsShell({ keepTab: true });
+      if (typeof window.__activateJournalTab === 'function') window.__activateJournalTab('rank', { push: true });
+      else activateTab('rank', { push: true });
+    });
+    box.querySelector('[data-toggle-lang]')?.addEventListener('click', () => {
+      $('#lang-toggle')?.click();
+      renderMe();
+    });
     box.querySelector('[data-me-login]')?.addEventListener('click', startLogin);
     box.querySelector('.me-avatar img')?.addEventListener('error', (e) => {
       const wrap = e.currentTarget.closest('.me-avatar');
@@ -8442,6 +8548,7 @@
         const type = btn.dataset.meStat;
         if (type === 'favorites') {
           e.preventDefault();
+          closeSettingsShell({ keepTab: true });
           activateTab('fav');
           return;
         }
@@ -11029,6 +11136,39 @@
         }
       }
 
+      // 设置页：磨砂浮层，底层页面保持可见
+      if (tab === 'me') {
+        if (previousTab && previousTab !== 'me') window.__settingsReturnTab = previousTab;
+        $$('[data-tab]').forEach(x => x.classList.toggle('active', x.dataset.tab === 'me'));
+        activeTab = 'me';
+        if (document.body.dataset.bootTab) delete document.body.dataset.bootTab;
+        document.body.classList.add('settings-open');
+        document.body.classList.remove('simple-top-route');
+        const mePanel = document.querySelector('.tab-panel[data-panel="me"]');
+        if (mePanel) {
+          mePanel.hidden = false;
+          mePanel.style.display = '';
+        }
+        if (!opts.skipPath) {
+          const nextPath = TAB_PATHS.me || '/account';
+          if (normalizeAppPath(location.pathname) !== normalizeAppPath(nextPath)) {
+            try { history.pushState({ tab: 'me' }, '', nextPath + location.search + location.hash); }
+            catch (_) {}
+          }
+        }
+        updatePageSeo('me');
+        applyI18n();
+        updateAccountCreditBadge();
+        renderMe();
+        $('.app-rail')?.classList.remove('mobile-open');
+        $('#sidebar-scrim')?.classList.remove('on');
+        return;
+      }
+
+      // 离开设置时关掉浮层
+      document.body.classList.remove('settings-open');
+      document.documentElement.classList.remove('settings-open');
+
       // 先切面板 / 路由壳，再关详情页，避免 journal-route 卸掉后短暂露出首页
       $$('[data-tab]').forEach(x => x.classList.toggle('active', x.dataset.tab === tab));
       activeTab = tab;
@@ -11036,7 +11176,7 @@
       if (document.body.dataset.bootTab) delete document.body.dataset.bootTab;
       document.body.classList.toggle('update-reading-mode', activeTab === 'updates');
       document.body.classList.toggle('home-route', activeTab === 'home');
-      document.body.classList.toggle('simple-top-route', activeTab === 'updates' || activeTab === 'fav' || activeTab === 'me' || activeTab === 'rank');
+      document.body.classList.toggle('simple-top-route', activeTab === 'updates' || activeTab === 'fav' || activeTab === 'rank');
       updateSearchSubmitLabel();
       $$('.tab-panel').forEach(p => {
         const on = p.dataset.panel === activeTab;
@@ -11536,7 +11676,10 @@
       showJournalShareModal(_currentDrawerRec);
     });
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') { closeDrawer(); closeSidebar(); }
+      if (e.key === 'Escape') {
+        if (document.body.classList.contains('settings-open')) closeSettingsShell();
+        else { closeDrawer(); closeSidebar(); }
+      }
     });
 
     function closeSidebar() {
@@ -11582,6 +11725,57 @@
       e.preventDefault();
       $('#account-credit-badge')?.click();
     });
+
+    // 边缘滑动返回：左缘 → 右滑 / 右缘 → 左滑
+    (function installEdgeBackGestures() {
+      let tracking = false;
+      let edge = '';
+      let startX = 0;
+      let startY = 0;
+      const EDGE = 28;
+      const THRESH = 72;
+      function goBackLayer() {
+        if (document.body.classList.contains('settings-open')) {
+          closeSettingsShell();
+          return;
+        }
+        if (drawerOpen && !document.body.classList.contains('journal-route')) {
+          closeDrawer();
+          return;
+        }
+        if ($('.app-rail')?.classList.contains('mobile-open')) {
+          closeSidebar();
+          return;
+        }
+        if (document.body.classList.contains('journal-route')) {
+          $('#drawer-back')?.click();
+        }
+      }
+      document.addEventListener('touchstart', (e) => {
+        if (e.touches.length !== 1) return;
+        const x = e.touches[0].clientX;
+        const y = e.touches[0].clientY;
+        if (x <= EDGE) { tracking = true; edge = 'left'; startX = x; startY = y; }
+        else if (x >= window.innerWidth - EDGE) { tracking = true; edge = 'right'; startX = x; startY = y; }
+        else tracking = false;
+      }, { passive: true });
+      document.addEventListener('touchend', (e) => {
+        if (!tracking) return;
+        tracking = false;
+        const t = e.changedTouches[0];
+        const dx = t.clientX - startX;
+        const dy = Math.abs(t.clientY - startY);
+        if (dy > 90) return;
+        if (edge === 'left' && dx > THRESH) goBackLayer();
+        if (edge === 'right' && dx < -THRESH) goBackLayer();
+      }, { passive: true });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && document.body.classList.contains('settings-open')) {
+          e.preventDefault();
+          closeSettingsShell();
+        }
+      });
+    })();
   }
 
   // ───────── pick-for-me (journal recommendation) ─────────
