@@ -9715,7 +9715,30 @@
         btn.addEventListener('click', (e) => {
           e.preventDefault();
           e.stopPropagation();
-          togglePinnedRegion(btn.dataset.regionPin);
+          const id = btn.dataset.regionPin;
+          const ent = regionEntitlements();
+          // Free：无法固定时改为「打开查看」并计入每日次数
+          if (!ent.unlockAll && ent.maxCustomPins === 0 && !FREE_BASE_REGION_IDS.includes(id)) {
+            activateTab(id);
+            close();
+            return;
+          }
+          // Pro：未钉选且未达上限 → 钉选；已钉选 → 打开
+          if (!getPinnedRegions().includes(id) && !ent.unlockAll && ent.maxCustomPins != null) {
+            const custom = getPinnedRegions().filter(x => !FREE_BASE_REGION_IDS.includes(x));
+            if (custom.length < ent.maxCustomPins) {
+              togglePinnedRegion(id);
+              activateTab(id, { skipRegionGate: true });
+              close();
+              return;
+            }
+          }
+          if (getPinnedRegions().includes(id) || ent.unlockAll || FREE_BASE_REGION_IDS.includes(id)) {
+            activateTab(id, { skipRegionGate: true });
+            close();
+            return;
+          }
+          togglePinnedRegion(id);
         });
       });
       document.addEventListener('click', (e) => {
