@@ -1458,12 +1458,11 @@
         const key = g.name;
         countryTotals.set(key, (countryTotals.get(key) || 0) + Number(g.count || 0));
       }));
-      const topOther = [...countryTotals.entries()]
-        .filter(([name]) => name !== 'China')
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 4)
-        .map(([name]) => name);
-      const top = ['China', ...topOther].filter((name, i, arr) => i === arr.indexOf(name));
+      const ranked = [...countryTotals.entries()].sort((a, b) => b[1] - a[1]).map(([n]) => n);
+      const top = (ranked.includes('China')
+        ? ['China', ...ranked.filter((n) => n !== 'China')]
+        : ranked
+      ).slice(0, 5);
       return { years: usable, top };
     };
     const fetchFromApi = async () => {
@@ -1659,12 +1658,17 @@
     });
   }
 
-  function renderCountryOutputFallback(r) {
+  function renderCountryOutputFallback(r, opts = {}) {
     const country = String(r?.country || '').trim();
+    const loadingNote = opts.loading
+      ? T('正在拉取作者机构国家/地区占比…', 'Loading author-affiliation country/region shares…')
+      : T('出版地信息正常显示；作者机构国家/地区占比暂无数据。', 'Publication region is shown above; author-affiliation country/region shares are not currently available.');
     if (!country) {
       return `<div class="country-output-fallback">
         <div class="trend-title">${T('国家/地区信息','Country/Region')}</div>
-        <div class="country-fallback-note">${T('作者机构分布数据正在恢复。','Author-affiliation distribution is being restored.')}</div>
+        <div class="country-fallback-note">${opts.loading
+          ? T('正在拉取作者机构国家/地区占比…', 'Loading author-affiliation country/region shares…')
+          : T('作者机构分布数据暂时不可用。','Author-affiliation distribution is temporarily unavailable.')}</div>
       </div>`;
     }
     const countryNames = {
@@ -1683,7 +1687,7 @@
     return `<div class="country-output-fallback">
       <div><div class="trend-title">${T('期刊出版地区','Journal publication region')}</div><div class="trend-unit">${T('来自期刊基础资料','From journal metadata')}</div></div>
       <div class="country-fallback-value"><strong>${escape(display)}</strong>${display.toUpperCase() !== country.toUpperCase() ? `<span>${escape(country)}</span>` : ''}</div>
-      <div class="country-fallback-note">${T('出版地信息正常显示；作者机构国家/地区占比暂无数据。','Publication region is shown above; author-affiliation country/region shares are not currently available.')}</div>
+      <div class="country-fallback-note">${loadingNote}</div>
     </div>`;
   }
 
@@ -1704,19 +1708,22 @@
       new Promise((_, rej) => setTimeout(() => rej(new Error('country-output timeout')), ms)),
     ]);
     try {
-      // 1) 静态预置优先：命中即出图，零「正在加载」
-      const preseed = await withTimeout(fetchCountryOutputData(r, { preseedOnly: true }), 3500);
+      // 1) 静态预置优先：命中即出图
+      const preseed = await withTimeout(fetchCountryOutputData(r, { preseedOnly: true }), 4000);
       if (paint(preseed)) return;
-      // 2) 无预置时立刻展示出版地回退，不再长时间停在 loading
-      box.innerHTML = renderCountryOutputFallback(r);
-      // 3) 后台尝试实时补全；成功则无感升级为分布图（失败保持回退）
-      withTimeout(fetchCountryOutputData(r), 12000)
-        .then(payload => {
+      // 2) 无预置：先展示出版地，并提示正在补全作者机构分布
+      box.innerHTML = renderCountryOutputFallback(r, { loading: true });
+      // 3) 实时补全：拉长超时；失败仍保留出版地
+      withTimeout(fetchCountryOutputData(r), 28000)
+        .then((payload) => {
           if (!box.isConnected) return;
-          paint(payload);
+          if (!paint(payload)) {
+            box.innerHTML = renderCountryOutputFallback(r);
+          }
         })
-        .catch(err => {
+        .catch((err) => {
           console.warn('country distribution live refresh failed:', err?.message || err);
+          if (box.isConnected) box.innerHTML = renderCountryOutputFallback(r);
         });
     } catch (err) {
       console.warn('country distribution load failed:', err?.message || err);
@@ -1764,27 +1771,43 @@
     return getProductTier() === 'pro';
   }
 
-  /** 原文/OA 全文查找：Free 30 · Pro 200 · Max 不限（按文章去重累计） */
+  /** 原文/OA 全文查找：Free 终身 30 · Pro 每月 200 · Max 不限（按文章去重） */
   const FREE_FULLTEXT_LIMIT = 30;
-  const PRO_FULLTEXT_LIMIT = 200;
+  const PRO_FULLTEXT_LIMIT = 200; // Pro：每月额度
   const FULLTEXT_USAGE_KEY = 'ailatest.fulltextUsage';
+  function fulltextMonthKey() {
+    return new Date().toISOString().slice(0, 7); // YYYY-MM UTC
+  }
   function getFulltextLimit() {
     const tier = getProductTier();
     if (tier === 'pro') return null; // Max 不限
     if (tier === 'plus') return PRO_FULLTEXT_LIMIT;
     return FREE_FULLTEXT_LIMIT;
   }
+  /** Free 用 lifetime；Pro 用 month 桶（换月清空） */
   function getFulltextUsage() {
     try {
       const raw = JSON.parse(localStorage.getItem(FULLTEXT_USAGE_KEY) || '{}');
-      const keys = Array.isArray(raw.keys) ? raw.keys.map(String) : [];
-      return { keys };
+      const lifetime = Array.isArray(raw.lifetime)
+        ? raw.lifetime.map(String)
+        : (Array.isArray(raw.keys) && !raw.month ? raw.keys.map(String) : []);
+      const month = fulltextMonthKey();
+      const monthly = (raw.month === month && Array.isArray(raw.monthly))
+        ? raw.monthly.map(String)
+        : [];
+      return { lifetime, month, monthly };
     } catch (_) {
-      return { keys: [] };
+      return { lifetime: [], month: fulltextMonthKey(), monthly: [] };
     }
   }
   function saveFulltextUsage(u) {
-    try { localStorage.setItem(FULLTEXT_USAGE_KEY, JSON.stringify({ keys: (u.keys || []).slice(0, 800) })); } catch (_) {}
+    try {
+      localStorage.setItem(FULLTEXT_USAGE_KEY, JSON.stringify({
+        lifetime: (u.lifetime || []).slice(0, 500),
+        month: u.month || fulltextMonthKey(),
+        monthly: (u.monthly || []).slice(0, 800),
+      }));
+    } catch (_) {}
   }
   function fulltextArticleKey(data) {
     const doi = String(data?.doi || '').replace(/^https?:\/\/(dx\.)?doi\.org\//i, '').trim().toLowerCase();
@@ -1794,17 +1817,21 @@
     const title = String(data?.title || '').trim().toLowerCase().slice(0, 120);
     return title ? `t:${title}` : '';
   }
+  function fulltextKeysForTier(u) {
+    return getProductTier() === 'plus' ? (u.monthly || []) : (u.lifetime || []);
+  }
   function canUseFulltextOpen(articleKey) {
     const limit = getFulltextLimit();
     if (limit == null) return { ok: true, unlimited: true };
     const u = getFulltextUsage();
-    if (articleKey && u.keys.includes(articleKey)) {
-      return { ok: true, used: u.keys.length, limit, remaining: Math.max(0, limit - u.keys.length) };
+    const keys = fulltextKeysForTier(u);
+    if (articleKey && keys.includes(articleKey)) {
+      return { ok: true, used: keys.length, limit, remaining: Math.max(0, limit - keys.length), monthly: getProductTier() === 'plus' };
     }
-    if (u.keys.length >= limit) {
-      return { ok: false, used: u.keys.length, limit, remaining: 0 };
+    if (keys.length >= limit) {
+      return { ok: false, used: keys.length, limit, remaining: 0, monthly: getProductTier() === 'plus' };
     }
-    return { ok: true, used: u.keys.length, limit, remaining: limit - u.keys.length };
+    return { ok: true, used: keys.length, limit, remaining: limit - keys.length, monthly: getProductTier() === 'plus' };
   }
   function consumeFulltextOpen(articleKey) {
     const limit = getFulltextLimit();
@@ -1813,8 +1840,12 @@
     if (!gate.ok) return false;
     if (!articleKey) return true;
     const u = getFulltextUsage();
-    if (!u.keys.includes(articleKey)) {
-      u.keys.push(articleKey);
+    const isPro = getProductTier() === 'plus';
+    const keys = isPro ? u.monthly : u.lifetime;
+    if (!keys.includes(articleKey)) {
+      keys.push(articleKey);
+      if (isPro) u.monthly = keys;
+      else u.lifetime = keys;
       saveFulltextUsage(u);
     }
     return true;
@@ -2494,10 +2525,14 @@
     return { id: 'free', label: 'Free', cls: 'tier-free' };
   }
 
-  function membershipBadgeHtml() {
-    if (!user) return '';
+  function membershipBadgeHtml(opts = {}) {
+    if (!user && !opts.force) return '';
     const m = membershipTierLabel();
-    return `<span class="me-tier-badge ${m.cls}" title="${T('会员档位','Membership tier')}">${escape(m.label)}</span>`;
+    const title = opts.title
+      || (m.id === 'max' ? T('Max 会员', 'Max plan')
+        : m.id === 'pro' ? T('Pro 会员', 'Pro plan')
+          : T('Free 基础版', 'Free plan'));
+    return `<span class="me-tier-badge ${m.cls}" title="${escape(title)}" aria-label="${escape(title)}">${escape(m.label)}</span>`;
   }
 
   async function fetchAndMergeEntitlements() {
@@ -2524,18 +2559,19 @@
     const badge = $('#account-credit-badge');
     if (!badge) return;
     badge.hidden = false;
-    const credits = accountCreditValue();
-    const mark = T('我', 'Me');
-    if (user) {
-      const creditHtml = credits === null ? '' : `<b>${formatCreditValue(credits)}</b>`;
-      badge.innerHTML = `<span class="rail-account-mark" aria-hidden="true">${escape(mark)}</span><span>${T('我的','Me')}</span>${creditHtml}`;
-      badge.title = T('进入个人信息与积分','Open account and credits');
-      badge.setAttribute('aria-label', T('我的，查看个人信息与 Credits','Me, account and credits'));
-    } else {
-      badge.innerHTML = `<span class="rail-account-mark" aria-hidden="true">${escape(mark)}</span><span>${T('我的','Me')}</span>`;
-      badge.title = T('登录后查看积分','Sign in to view credits');
-      badge.setAttribute('aria-label', T('登录后查看个人信息与 Credits','Sign in for account and credits'));
-    }
+    // 侧栏「我的」下方展示 Free / Pro / Max 徽章，不展示 Credits
+    const m = membershipTierLabel();
+    const tierLabel = m.label; // Free | Pro | Max
+    const planTitle = m.id === 'max' ? T('Max 会员', 'Max plan')
+      : m.id === 'pro' ? T('Pro 会员', 'Pro plan')
+        : T('Free 基础版', 'Free plan');
+    badge.innerHTML = `<span class="rail-me-label">${T('我的','Me')}</span><span class="rail-tier-chip ${m.cls}" aria-hidden="true">${escape(tierLabel)}</span>`;
+    badge.title = user
+      ? `${T('我的账号','My account')} · ${planTitle}`
+      : T('登录后查看会员与账号', 'Sign in to view membership');
+    badge.setAttribute('aria-label', user
+      ? `${T('我的','Me')}，${planTitle}`
+      : T('我的，登录或注册', 'Me, sign in or sign up'));
   }
 
 
@@ -7146,9 +7182,9 @@
       );
       if (perksEl) {
         perksEl.innerHTML = [
-          T('<b>Pro</b> · 云收藏与清单 · 插件中科院与预警', '<b>Pro</b> · Cloud favorites & lists · Extension CAS & warning'),
-          T('<b>Max</b> · 导出 RIS/BibTeX · Zotero / Notion / Obsidian', '<b>Max</b> · Export RIS/BibTeX · Zotero / Notion / Obsidian'),
-          T('<b>Max</b> · 高额度 AI 荐刊 · 原文查找不限量', '<b>Max</b> · High-quota AI picks · Unlimited full-text lookup'),
+          T('<b>Pro</b> · 云收藏与清单 · 插件中科院徽章', '<b>Pro</b> · Cloud favorites & lists · Extension CAS badges'),
+          T('<b>Max</b> · 插件预警 · 撤稿 · 科协风险徽章', '<b>Max</b> · Extension warning · retraction · CAST badges'),
+          T('<b>Max</b> · 导出联动 · 高额度 AI · 原文不限', '<b>Max</b> · Export · High AI quota · Unlimited full-text'),
         ].map((html) => `<li>${html}</li>`).join('');
       }
     } else if (reason === 'export') {
@@ -7174,16 +7210,16 @@
         : T('Free 原文查找已达上限', 'Free full-text lookup limit reached');
       if (descEl) descEl.textContent = isProCap
         ? T(
-          `Pro 累计可查找开放全文 ${PRO_FULLTEXT_LIMIT} 篇（按文章去重）。升级 Max 后不限篇数。`,
-          `Pro includes ${PRO_FULLTEXT_LIMIT} open full-text lookups in total (unique articles). Upgrade to Max for unlimited lookups.`
+          `Pro 每月可查找开放全文 ${PRO_FULLTEXT_LIMIT} 篇（按文章去重，按月重置）。升级 Max 后不限篇数。`,
+          `Pro includes ${PRO_FULLTEXT_LIMIT} open full-text lookups per month (unique articles, resets monthly). Upgrade to Max for unlimited lookups.`
         )
         : T(
-          `Free 累计可查找开放全文 ${FREE_FULLTEXT_LIMIT} 篇（按文章去重）。Pro 提升至 ${PRO_FULLTEXT_LIMIT} 篇；Max 不限量。`,
-          `Free includes ${FREE_FULLTEXT_LIMIT} open full-text lookups in total. Pro raises this to ${PRO_FULLTEXT_LIMIT}; Max is unlimited.`
+          `Free 累计可查找开放全文 ${FREE_FULLTEXT_LIMIT} 篇（按文章去重）。Pro 为每月 ${PRO_FULLTEXT_LIMIT} 篇；Max 不限量。`,
+          `Free includes ${FREE_FULLTEXT_LIMIT} open full-text lookups total. Pro is ${PRO_FULLTEXT_LIMIT}/month; Max is unlimited.`
         );
       if (perksEl) {
         perksEl.innerHTML = [
-          T(`<b>Pro</b> · 原文查找累计 ${PRO_FULLTEXT_LIMIT} 篇`, `<b>Pro</b> · ${PRO_FULLTEXT_LIMIT} full-text lookups total`),
+          T(`<b>Pro</b> · 原文查找每月 ${PRO_FULLTEXT_LIMIT} 篇`, `<b>Pro</b> · ${PRO_FULLTEXT_LIMIT} full-text lookups / month`),
           T('<b>Max</b> · 原文查找不限量 · 导出与文献管理联动', '<b>Max</b> · Unlimited full-text · Export & reference managers'),
           T('不升级仍可继续查刊与查看期刊指标', 'You can keep searching journals without upgrading'),
         ].map((html) => `<li>${html}</li>`).join('');
@@ -7197,8 +7233,8 @@
       );
       if (perksEl) {
         perksEl.innerHTML = [
-          T('<b>Pro</b> · 是否免费发表 / APC · 插件中科院与预警徽章', '<b>Pro</b> · Free-to-publish / APC · Extension CAS & warning badges'),
-          T('<b>Max</b> · 高额度 AI 荐刊 · 全部地区站', '<b>Max</b> · High-quota AI picks · All regional stations'),
+          T('<b>Pro</b> · 是否免费发表 / APC · 插件中科院徽章', '<b>Pro</b> · Free-to-publish / APC · Extension CAS badges'),
+          T('<b>Max</b> · 插件预警 · 撤稿 · 科协 · 高额度 AI', '<b>Max</b> · Warning · retraction · CAST · High AI quota'),
           T('不升级也可继续查 IF、分区与收录信息', 'Without upgrading you can still browse IF, tiers, and indexing'),
         ].map((html) => `<li>${html}</li>`).join('');
       }
@@ -7206,42 +7242,42 @@
       if (eyebrowEl) eyebrowEl.textContent = T('地区站 · 升级解锁', 'Regional stations · Upgrade');
       if (titleEl) titleEl.textContent = T('自定义地区已达上限', 'Custom region pin limit reached');
       if (descEl) descEl.textContent = T(
-        'Pro 最多固定 2 个自定义地区。升级 Max 可解锁全部地区站并固定到侧栏。',
-        'Pro can pin up to 2 custom regions. Upgrade to Max to unlock and pin all regional stations.'
+        'Pro 侧栏最多固定 2 个自定义地区。升级 Max 可打开全部地区，并自由固定/取消到侧栏。',
+        'Pro can pin up to 2 custom regions on the rail. Max can open any region and pin/unpin freely.'
       );
       if (perksEl) {
         perksEl.innerHTML = [
-          T('<b>Pro</b> · 固定 2 个自定义地区 · 插件中科院/预警徽章', '<b>Pro</b> · Pin 2 custom regions · Extension CAS/warning badges'),
-          T('<b>Max</b> · 全部地区站解锁 · 高额度 AI 荐刊', '<b>Max</b> · All regions unlocked · High-quota AI picks'),
-          T('中国站始终免费，不付费也可继续使用', 'China station stays free — you can keep using it without paying'),
+          T('<b>Pro</b> · 侧栏可固定 2 个自定义地区', '<b>Pro</b> · Pin up to 2 custom regions on the rail'),
+          T('<b>Max</b> · 全部地区可打开 · 侧栏自选固定/取消', '<b>Max</b> · Open any region · pin/unpin freely'),
+          T('中国站始终可用', 'China station stays available'),
         ].map((html) => `<li>${html}</li>`).join('');
       }
     } else if (reason === 'pin_free') {
       if (eyebrowEl) eyebrowEl.textContent = T('地区站 · 升级解锁', 'Regional stations · Upgrade');
       if (titleEl) titleEl.textContent = T('固定地区站需升级', 'Upgrade to pin regional stations');
       if (descEl) descEl.textContent = T(
-        'Free 可每日临时查看其他地区站 3 次。升级后可将常用地区固定到侧栏，不必每天重新点开。',
-        'Free includes 3 temporary regional views per day. Upgrade to pin favorite regions on the rail.'
+        'Free 可每日临时查看其他地区站 3 次。升级后可将常用地区固定到侧栏，也可随时取消。',
+        'Free includes 3 temporary regional views per day. Upgrade to pin favorites on the rail (and unpin anytime).'
       );
       if (perksEl) {
         perksEl.innerHTML = [
-          T('<b>Pro</b> · 固定 2 个自定义地区 · 插件中科院/预警徽章', '<b>Pro</b> · Pin 2 custom regions · Extension CAS/warning badges'),
-          T('<b>Max</b> · 全部地区站解锁 · 高额度 AI 荐刊', '<b>Max</b> · All regions unlocked · High-quota AI picks'),
-          T('中国站始终免费，不付费也可继续使用', 'China station stays free — you can keep using it without paying'),
+          T('<b>Pro</b> · 侧栏可固定 2 个自定义地区', '<b>Pro</b> · Pin up to 2 custom regions on the rail'),
+          T('<b>Max</b> · 全部地区可打开 · 侧栏自选固定/取消', '<b>Max</b> · Open any region · pin/unpin freely'),
+          T('中国站始终可用', 'China station stays available'),
         ].map((html) => `<li>${html}</li>`).join('');
       }
     } else {
       if (eyebrowEl) eyebrowEl.textContent = T('地区站 · 升级解锁', 'Regional stations · Upgrade');
       if (titleEl) titleEl.textContent = T('今日免费查看次数已用完', 'Daily free regional views used up');
       if (descEl) descEl.textContent = T(
-        'Free 每天可临时查看其他地区站 3 次（今日已用尽）。升级后可固定常用地区，或解锁全部地区站。',
-        'Free includes 3 temporary views of other regional stations per day (used up today). Upgrade to pin favorites or unlock all.'
+        'Free 每天可临时查看其他地区站 3 次（今日已用尽）。升级后可固定常用地区到侧栏；Max 可打开全部地区。',
+        'Free includes 3 temporary views per day (used up today). Upgrade to pin favorites; Max can open all regions.'
       );
       if (perksEl) {
         perksEl.innerHTML = [
-          T('<b>Pro</b> · 固定 2 个自定义地区 · 插件中科院/预警徽章', '<b>Pro</b> · Pin 2 custom regions · Extension CAS/warning badges'),
-          T('<b>Max</b> · 全部地区站解锁 · 高额度 AI 荐刊', '<b>Max</b> · All regions unlocked · High-quota AI picks'),
-          T('中国站始终免费，不付费也可继续使用', 'China station stays free — you can keep using it without paying'),
+          T('<b>Pro</b> · 侧栏可固定 2 个自定义地区', '<b>Pro</b> · Pin up to 2 custom regions on the rail'),
+          T('<b>Max</b> · 全部地区可打开 · 侧栏自选固定/取消', '<b>Max</b> · Open any region · pin/unpin freely'),
+          T('中国站始终可用', 'China station stays available'),
         ].map((html) => `<li>${html}</li>`).join('');
       }
     }
@@ -7356,22 +7392,27 @@
       const on = pinned.includes(id);
       btn.classList.toggle('active', on);
       btn.setAttribute('aria-pressed', on ? 'true' : 'false');
-      // Max 解锁全部时钉选按钮可作「侧栏常驻」
       btn.disabled = false;
-      if (!ent.unlockAll && ent.maxCustomPins === 0 && !FREE_BASE_REGION_IDS.includes(id) && !on) {
-        btn.title = T('升级后可固定到侧栏','Upgrade to pin on the rail');
+      // 钉选 = 侧栏常驻（菜单 ✓）；Max 能打开全部地区，侧栏仍只挂已钉选
+      if (on) {
+        btn.title = T('点击取消侧栏固定', 'Click to unpin from rail');
+      } else if (ent.unlockAll) {
+        btn.title = T('点击固定到侧栏并打开', 'Click to pin on rail and open');
+      } else if (ent.maxCustomPins === 0 && !FREE_BASE_REGION_IDS.includes(id)) {
+        btn.title = T('点击临时查看；升级后可固定到侧栏', 'Open temporarily; upgrade to pin on rail');
+      } else {
+        btn.title = T('点击固定到侧栏并打开', 'Click to pin on rail and open');
       }
     });
   }
   function applyStations() {
     const pinned = getPinnedRegions();
-    const ent = regionEntitlements();
     STATIONS.forEach((s) => {
       const btn = document.querySelector(`.rail-nav-btn[data-tab="${s.id}"]`);
       if (!btn) return;
       const region = REGION_STATION_IDS.includes(s.id);
-      // Max：全部地区站显示；否则仅显示已钉选
-      const show = !region || ent.unlockAll || pinned.includes(s.id);
+      // 侧栏只显示已钉选地区站（Max 可访问全部，但不默认全部挂侧栏）
+      const show = !region || pinned.includes(s.id);
       btn.hidden = !show;
       btn.toggleAttribute('data-station-hidden', btn.hidden);
       if (s.id === 'int') btn.style.order = '0';
@@ -7839,21 +7880,14 @@
         : (ents && ents.credits && ents.credits.unlimited)
           ? '∞'
           : formatCreditValue(credits);
-      panel.innerHTML = `<h2>${T('会员与积分','Membership & credits')}</h2>
+      // 会员档位已在顶部展示，此处只补 Credits 说明与订阅入口
+      panel.innerHTML = `<h2>${T('积分说明','Credits')}</h2>
         <div class="me-record-list">
-          <div class="me-record-row">
-            <div class="me-record-main">
-              <strong>${T('会员档位','Plan')} · ${escape(m.label)}</strong>
-              <span>${user ? T('与定价页 Free / Pro / Max 对齐','Aligned with Free / Pro / Max on pricing') : T('登录后显示','Sign in to view')}</span>
-            </div>
-            <time>${escape(m.label)}</time>
-          </div>
           <div class="me-record-row">
             <div class="me-record-main">
               <strong>${escape(creditLine)} Credits</strong>
               <span>${signedCreditHint()}</span>
             </div>
-            <time>${T('当前账号','Current account')}</time>
           </div>
           ${user ? `<div class="me-record-row is-clickable" data-me-open-pricing type="button" role="button">
             <div class="me-record-main">
@@ -7908,7 +7942,7 @@
     if (!user) return T('登录后可查看会员档位与积分。','Sign in to view membership and credits.');
     const m = membershipTierLabel();
     if (m.id === 'max') return T('Max 月度 AI credits，由服务器同步。','Max monthly AI credits, synced from server.');
-    if (m.id === 'pro') return T('Pro 含插件徽章与收藏；原文累计 200 篇 · AI 约 50 次/月。','Pro: extension badges & favorites; 200 full-text lookups · ~50 AI picks/month.');
+    if (m.id === 'pro') return T('Pro 含插件徽章与收藏；原文每月 200 篇 · AI 500 credits/月。','Pro: extension badges & favorites; 200 full-text lookups/month · 500 AI credits/month.');
     return T('Free 账号 · AI 荐刊终身共 10 次 · 升级可解锁更多。','Free plan · 10 lifetime AI picks · upgrade for more.');
   }
 
@@ -7957,22 +7991,11 @@
           <button type="button" class="me-stat-item" data-me-stat="api"><strong>${localPluginCallCount()}</strong><span>${T('插件 / API 调用','Plugin / API calls')}</span></button>
         </div>
         <section class="me-card me-record-panel" data-me-record-panel hidden></section>
-        <div class="me-grid">
-          <section class="me-card">
-            <h2>${T('账号信息','Account')}</h2>
-            <dl class="me-kv">
-              <div><dt>${T('邮箱','Email')}</dt><dd>${escape(userEmailText())}</dd></div>
-              <div><dt>${T('登录方式','Sign-in method')}</dt><dd>${escape(userProviderText())}</dd></div>
-              <div><dt>${T('会员档位','Plan')}</dt><dd><span class="me-tier-badge ${tier.cls}">${escape(tier.label)}</span></dd></div>
-              <div><dt>${T('账号状态','Status')}</dt><dd>${signed ? T('已登录','Signed in') : T('未登录','Not signed in')}</dd></div>
-            </dl>
-          </section>
-          <section class="me-card">
-            <h2>${T('活动记录','Activity')}</h2>
-            <div class="me-activity-months"><span>${T('近 12 周','Last 12 weeks')}</span><span>${new Date().toLocaleDateString(uiLocale(), { month: 'long', day: 'numeric' })}</span></div>
-            <div class="me-activity-grid">${renderActivityDots()}</div>
-          </section>
-        </div>
+        <section class="me-card me-activity-card">
+          <h2>${T('活动记录','Activity')}</h2>
+          <div class="me-activity-months"><span>${T('近 12 周','Last 12 weeks')}</span><span>${new Date().toLocaleDateString(uiLocale(), { month: 'long', day: 'numeric' })}</span></div>
+          <div class="me-activity-grid">${renderActivityDots()}</div>
+        </section>
       </section>`;
     box.querySelector('[data-me-login]')?.addEventListener('click', startLogin);
     box.querySelector('.me-avatar img')?.addEventListener('error', (e) => {
@@ -8003,12 +8026,16 @@
         if (activeTab === 'me') {
           const strip = box.querySelector('[data-me-stat="credits"] strong');
           if (strip) strip.textContent = formatCreditValue(accountCreditValue());
-          const badge = box.querySelector('.me-tier-badge');
           const m = membershipTierLabel();
-          if (badge) {
+          box.querySelectorAll('.me-tier-badge').forEach((badge) => {
             badge.textContent = m.label;
             badge.className = `me-tier-badge ${m.cls}`;
-          }
+            const title = m.id === 'max' ? T('Max 会员', 'Max plan')
+              : m.id === 'pro' ? T('Pro 会员', 'Pro plan')
+                : T('Free 基础版', 'Free plan');
+            badge.title = title;
+            badge.setAttribute('aria-label', title);
+          });
         }
         updateAccountCreditBadge();
       });
@@ -10580,28 +10607,38 @@
           e.stopPropagation();
           const id = btn.dataset.regionPin;
           const ent = regionEntitlements();
-          // Free：无法固定时改为「打开查看」并计入每日次数
+          const wasPinned = getPinnedRegions().includes(id);
+
+          // Free：不能固定自定义地区 → 临时打开（计每日次数）
           if (!ent.unlockAll && ent.maxCustomPins === 0 && !FREE_BASE_REGION_IDS.includes(id)) {
             activateTab(id);
             close();
             return;
           }
-          // Pro：未钉选且未达上限 → 钉选；已钉选 → 打开
-          if (!getPinnedRegions().includes(id) && !ent.unlockAll && ent.maxCustomPins != null) {
+
+          // Pro / Max / 默认站：点击切换侧栏固定（✓）
+          // Max 可访问全部地区，但侧栏只显示已固定项（applyStations 不因 unlockAll 全挂）
+          if (wasPinned) {
+            togglePinnedRegion(id);
+            close();
+            return;
+          }
+
+          // 未固定 → 尝试固定并打开
+          if (!ent.unlockAll && ent.maxCustomPins != null) {
             const custom = getPinnedRegions().filter(x => !FREE_BASE_REGION_IDS.includes(x));
-            if (custom.length < ent.maxCustomPins) {
-              togglePinnedRegion(id);
-              activateTab(id, { skipRegionGate: true });
+            const isCustom = !FREE_BASE_REGION_IDS.includes(id);
+            if (isCustom && custom.length >= ent.maxCustomPins) {
+              showRegionPaywallModal(ent.maxCustomPins === 0 ? 'pin_free' : 'pin_pro');
               close();
               return;
             }
           }
-          if (getPinnedRegions().includes(id) || ent.unlockAll || FREE_BASE_REGION_IDS.includes(id)) {
-            activateTab(id, { skipRegionGate: true });
-            close();
-            return;
-          }
           togglePinnedRegion(id);
+          if (getPinnedRegions().includes(id)) {
+            activateTab(id, { skipRegionGate: true });
+          }
+          close();
         });
       });
       document.addEventListener('click', (e) => {

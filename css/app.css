@@ -330,14 +330,46 @@ body.share-mode .app-rail { display: none !important; }
   background: rgba(249,115,22,.12);
   color: var(--accent);
 }
-.app-rail .account-credit-badge span {
+.app-rail .account-credit-badge span.rail-me-label {
   max-width: 48px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.app-rail .account-credit-badge b {
+/* 侧栏会员徽章（Free / Pro / Max），替代原 Credits 数字 */
+.app-rail .account-credit-badge .rail-tier-chip {
   display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 16px;
+  padding: 0 6px;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: .04em;
+  line-height: 1;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+  box-shadow: none;
+}
+.app-rail .account-credit-badge .rail-tier-chip.tier-free {
+  background: #ebe6dc;
+  color: #5c5348;
+  border-color: #cfc6b6;
+}
+.app-rail .account-credit-badge .rail-tier-chip.tier-pro {
+  background: linear-gradient(180deg, #ff9a3c 0%, #f97316 100%);
+  color: #fff;
+  border-color: #e85d04;
+}
+.app-rail .account-credit-badge .rail-tier-chip.tier-max {
+  background: linear-gradient(135deg, #1f2c4c 0%, #0f172a 100%);
+  color: #f6e7b2;
+  border-color: #c9a227;
+}
+.app-rail .account-credit-badge b {
+  display: none; /* 不再展示 Credits */
   align-items: center;
   justify-content: center;
   min-width: 22px;
@@ -2700,6 +2732,10 @@ body.topbar-compact .results-head {
   grid-template-columns: minmax(260px, .85fr) minmax(0, 1.15fr);
   gap: 18px;
 }
+/* 账号信息只在顶部 me-hero；活动记录通栏 */
+.me-activity-card {
+  margin-top: 18px;
+}
 .me-card {
   border: 1px solid var(--rule);
   border-radius: 14px;
@@ -2744,39 +2780,98 @@ button.me-record-row {
   border-color: rgba(139, 105, 20, 0.35);
   background: #faf4e6;
 }
+/* 订阅徽章：个人信息页跳色标识 */
 .me-tier-badge {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  gap: 5px;
   vertical-align: middle;
-  margin-left: 8px;
-  padding: 2px 10px;
-  border-radius: 99px;
+  margin-left: 10px;
+  min-height: 26px;
+  padding: 0 11px 0 9px;
+  border-radius: 999px;
+  border: 1.5px solid transparent;
   font-size: 12px;
-  font-weight: 800;
-  letter-spacing: .03em;
-  line-height: 1.4;
+  font-weight: 820;
+  letter-spacing: .06em;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  box-shadow: 0 1px 0 rgba(255,255,255,.35) inset, 0 6px 16px rgba(39,35,31,.08);
+  flex: 0 0 auto;
 }
+.me-tier-badge::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: .92;
+  box-shadow: 0 0 0 2px rgba(255,255,255,.35);
+}
+/* Free：中性灰，不抢眼 */
 .me-tier-badge.tier-free {
-  background: #ebe6dc;
-  color: #5a5044;
+  background: linear-gradient(180deg, #f3efe6 0%, #e5dfd2 100%);
+  color: #5c5348;
+  border-color: #cfc6b6;
+  box-shadow: none;
 }
+.me-tier-badge.tier-free::before {
+  background: #8a8174;
+  box-shadow: none;
+  opacity: 1;
+}
+/* Pro：品牌橙跳色 */
 .me-tier-badge.tier-pro {
-  background: #e8f5ee;
-  color: #1b7a45;
-  border: 1px solid #b8e0c8;
+  background: linear-gradient(180deg, #ff9a3c 0%, #f97316 55%, #e85d04 100%);
+  color: #fff;
+  border-color: #d9480f;
+  text-shadow: 0 1px 0 rgba(0,0,0,.12);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,.35) inset,
+    0 8px 18px rgba(249,115,22,.28);
 }
+.me-tier-badge.tier-pro::before {
+  background: #fff;
+  opacity: 1;
+  box-shadow: 0 0 0 2px rgba(255,255,255,.25);
+}
+/* Max：深墨 + 金点，最高档跳色 */
 .me-tier-badge.tier-max {
-  background: linear-gradient(180deg, #2a2a2a, #1a1a1a);
-  color: #f5e6c8;
-  border: 1px solid #3a3a3a;
+  background: linear-gradient(135deg, #1f2c4c 0%, #162033 48%, #0f172a 100%);
+  color: #f6e7b2;
+  border-color: #c9a227;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,.12) inset,
+    0 8px 20px rgba(31,44,76,.28);
+}
+.me-tier-badge.tier-max::before {
+  background: linear-gradient(180deg, #ffe08a, #e0b13a);
+  opacity: 1;
+  box-shadow: 0 0 0 2px rgba(201,162,39,.35);
 }
 .me-title-block h1 {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 4px;
+  gap: 6px 8px;
 }
-.me-kv .me-tier-badge { margin-left: 0; }
+.me-title-block h1 .me-tier-badge {
+  margin-left: 2px;
+  transform: translateY(-1px);
+}
+.me-kv .me-tier-badge {
+  margin-left: 0;
+  min-height: 24px;
+  padding: 0 10px 0 8px;
+  font-size: 11.5px;
+}
+.me-kv dd {
+  display: flex;
+  align-items: center;
+  min-height: 1.4em;
+}
 .me-record-main {
   min-width: 0;
   display: grid;
