@@ -2488,8 +2488,9 @@
   }
 
 
-  // ── Free-tier usage limits ──
-  const DAILY_VIEW_LIMIT = 300;
+  // ── 未登录每日限额（登录后不限制详情查看）──
+  /** 未登录每日可打开期刊详情页数（按期刊去重） */
+  const DAILY_VIEW_LIMIT = 10;
   const DAILY_SEARCH_LIMIT = 2;
   const LOCAL_FAV_LIMIT = 5;
   const USAGE_KEY = 'ailatest.daily_usage';
@@ -2498,9 +2499,14 @@
     const today = new Date().toISOString().slice(0, 10);
     try {
       const raw = JSON.parse(localStorage.getItem(USAGE_KEY) || '{}');
-      if (raw.date !== today) return { date: today, views: 0, searches: 0 };
-      return raw;
-    } catch (e) { return { date: today, views: 0, searches: 0 }; }
+      if (raw.date !== today) return { date: today, views: 0, searches: 0, viewKeys: [] };
+      return {
+        date: today,
+        views: Number(raw.views) || 0,
+        searches: Number(raw.searches) || 0,
+        viewKeys: Array.isArray(raw.viewKeys) ? raw.viewKeys.map(String) : [],
+      };
+    } catch (e) { return { date: today, views: 0, searches: 0, viewKeys: [] }; }
   }
   function saveDailyUsage(u) {
     try { localStorage.setItem(USAGE_KEY, JSON.stringify(u)); } catch (e) {}
@@ -2513,6 +2519,31 @@
     const usage = getDailyUsage();
     usage[type] = (usage[type] || 0) + 1;
     saveDailyUsage(usage);
+  }
+  /** 未登录：今日是否还能打开该期刊详情（已看过的不重复计） */
+  function canViewJournalDetail(fid) {
+    if (user) return true;
+    const u = getDailyUsage();
+    const key = String(fid || '');
+    if (key && u.viewKeys.includes(key)) return true;
+    return u.viewKeys.length < DAILY_VIEW_LIMIT;
+  }
+  /** 记录一次详情查看；超限返回 false */
+  function consumeJournalDetailView(fid) {
+    if (user) {
+      incrementUsage('views');
+      return true;
+    }
+    const u = getDailyUsage();
+    const key = String(fid || '');
+    if (key && u.viewKeys.includes(key)) return true;
+    if (u.viewKeys.length >= DAILY_VIEW_LIMIT) return false;
+    if (key) u.viewKeys.push(key);
+    u.views = u.viewKeys.length;
+    // 控制体积
+    if (u.viewKeys.length > 200) u.viewKeys = u.viewKeys.slice(-200);
+    saveDailyUsage(u);
+    return true;
   }
   function requireLogin(msg) {
     if (user) return true;
@@ -5912,9 +5943,26 @@
     if (r) openDrawer(r, { fromHash: true, pageMode: true });
   }
   async function openDrawer(r, opts) {
-    // Journal browsing should stay generous for anonymous visitors; login is only
-    // needed for cloud sync and paid/pro features.
-    incrementUsage("views");
+    // 未登录：每日 10 个期刊详情（去重）；登录后不限
+    const fid = favId(r);
+    if (!user) {
+      if (!canViewJournalDetail(fid)) {
+        requireLogin(T(
+          `今日免费可查看 ${DAILY_VIEW_LIMIT} 个期刊详情，登录后不限次数。`,
+          `Free: ${DAILY_VIEW_LIMIT} journal pages per day. Sign in for unlimited viewing.`
+        ));
+        return;
+      }
+      if (!consumeJournalDetailView(fid)) {
+        requireLogin(T(
+          `今日免费可查看 ${DAILY_VIEW_LIMIT} 个期刊详情，登录后不限次数。`,
+          `Free: ${DAILY_VIEW_LIMIT} journal pages per day. Sign in for unlimited viewing.`
+        ));
+        return;
+      }
+    } else {
+      incrementUsage('views');
+    }
 
     _currentDrawerRec = r;
     recordView(r); // 记录浏览历史，用于学科推荐
