@@ -119,7 +119,7 @@
         <h4 data-static-i18n="footer_product">${dict.footer_product}</h4>
         <a href="/global" data-static-i18n="footer_global">${dict.footer_global}</a>
         <a href="/cn" data-static-i18n="footer_china">${dict.footer_china}</a>
-        <a href="/rankings" data-static-i18n="footer_rankings">${dict.footer_rankings}</a>
+        <a href="/rankings/" data-static-i18n="footer_rankings">${dict.footer_rankings}</a>
         <a href="/extension.html" data-static-i18n="footer_download">${dict.footer_download}</a>
         <a href="/about" data-static-i18n="footer_about">${dict.footer_about}</a>
       </div>
