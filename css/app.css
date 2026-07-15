@@ -4540,9 +4540,8 @@ body.journal-route .drawer-brand {
   letter-spacing: 0.04em;
   color: var(--ink);
   text-decoration: none;
-  border: 1.5px solid var(--rule);
-  border-radius: 10px;
-  padding: 4px 11px;
+  border: 0;
+  padding: 0;
   line-height: 1.25;
   white-space: nowrap;
 }
@@ -4552,7 +4551,6 @@ body.journal-route .drawer-brand em {
   opacity: 0.88;
 }
 body.journal-route .drawer-brand:hover {
-  border-color: var(--accent);
   color: var(--accent);
 }
 body.journal-route .drawer-kicker {
