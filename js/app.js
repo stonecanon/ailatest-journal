@@ -3907,6 +3907,43 @@
     return out.join('');
   }
 
+  /**
+   * 统一期刊卡片（全球 / 地区共用）：
+   * 上部 j-card-head：刊名 + IF/出版/收藏 · 下部 j-card-body：收录与分区等
+   */
+  function journalCardRow({
+    fid,
+    src,
+    flagship = false,
+    extraClass = '',
+    favHtml,
+    nameHtml,
+    metaHtml = '',
+    bodyHtml = '',
+  }) {
+    return `<tr class="j-row j-card clickable${flagship ? ' row-flagship' : ''}${extraClass ? ` ${extraClass}` : ''}" data-fid="${escape(fid)}" data-src="${escape(src)}">
+      <td class="col-fav">${favHtml}</td>
+      <td class="j-card-head col-name">
+        ${nameHtml}
+        ${metaHtml ? `<div class="j-card-meta-row">${metaHtml}</div>` : ''}
+      </td>
+      <td class="j-card-body">${bodyHtml || '<span class="j-card-body-empty muted-cell">—</span>'}</td>
+    </tr>`;
+  }
+
+  function jMetaIf(label, value) {
+    if (value == null || value === '' || value === '—') return '';
+    return `<span class="j-meta j-meta-if"><em>${escape(label)}</em><strong>${escape(String(value))}</strong></span>`;
+  }
+  function jMetaText(label, value, cls = '') {
+    if (value == null || value === '' || value === '—') return '';
+    return `<span class="j-meta ${cls}"><em>${escape(label)}</em><span>${value}</span></span>`;
+  }
+  function jMetaPlain(html, cls = '') {
+    if (!html) return '';
+    return `<span class="j-meta ${cls}">${html}</span>`;
+  }
+
   // 通用中文期刊行渲染
   function renderDomRow(r, opts = {}) {
     const { src, showTier, tierValue, extraCols = '', extraBadges = '' } = opts;
@@ -3916,13 +3953,19 @@
     const enName = r.en_name ? `<span class="jname-cn">${escape(titleCase(r.en_name))}</span>` : '';
     const crossBadges = renderDomCrossBadges({ name, issn: r.issn, cn_code: r.cn_code }, src);
     const tierBadge = showTier && tierValue ? badgeTier(tierValue) : '';
-    return `<tr class="j-row clickable" data-fid="${escape(fid)}" data-src="${escape(src)}">
-      <td class="col-fav">${starBtn(r, src)}</td>
-      ${showTier ? `<td class="col-tier" style="width:60px">${tierBadge}</td>` : ''}
-      <td class="col-name"><div class="jname" style="font-size:13.5px">${escape(titleCase(name.replace(/\*$/,'')))}${enName}</div></td>
-      <td class="col-cross"><div class="badges">${extraBadges}${crossBadges}</div></td>
-      ${extraCols}
-    </tr>`;
+    const nameHtml = `<div class="jname">${escape(titleCase(name.replace(/\*$/,'')))}${enName}</div>`;
+    const metaHtml = [
+      tierBadge ? jMetaPlain(tierBadge, 'j-meta-tier') : '',
+      r.issn ? jMetaText('ISSN', escape(r.issn), 'j-meta-id') : '',
+    ].filter(Boolean).join('');
+    const bodyHtml = `<div class="j-card-badges badges">${extraBadges}${crossBadges}${extraCols}</div>`;
+    return journalCardRow({
+      fid, src,
+      favHtml: starBtn(r, src),
+      nameHtml,
+      metaHtml,
+      bodyHtml,
+    });
   }
 
   function renderRow(r) {
@@ -3930,43 +3973,43 @@
     rowRecordsByFid[fid] = { ...r, __src: 'int' };
     const nameHtml = `<div class="jname ${r.flagship ? 'jname-flagship' : ''}">${escape(titleCase(r.name))}${r.cn_name ? `<span class="jname-cn">${escape(r.cn_name)}</span>` : ''}${aliasHintHtml(r)}</div>`;
     const crossBadges = renderDomCrossBadges(r, 'int');
-    // 第一行：索引（SCIE/SSCI/AHCI/ESCI/EI）— 回答"这本被哪些数据库收录"
+    // 索引（SCIE/SSCI/…）— 下部「收录」
     const indexBadges = renderCoverageBadges(r);
-    // 第二行：分区/等级/预警 — 回答"这本的等级和影响力"（IF 已移到独立列）
+    // 分区/等级 — 下部
     const rankBadges = [renderLevelBadges(r), crossBadges].filter(Boolean).join('');
     const accessBadges = renderAccessBadges(r);
     const riskBadges = renderRiskBadges(r);
     const badgeCell = renderBadgeCell(indexBadges, rankBadges, accessBadges, riskBadges);
-    const casVal = (lang === 'zh-CN' || lang === 'zh-TW') ? (r.cas_major_cn || '') : tn(r.cas_major_cn || '', 'domain');
-    const esiVal = r.esi_category || '';
     const wosVals = Array.isArray(r.wos_categories) ? r.wos_categories.filter(Boolean) : [];
     const wosShown = wosVals.slice(0, 2).join(' / ');
-    const wosCell = wosVals.length
-      ? `<span title="${escape(wosVals.join(' / '))}">${escape(wosShown)}${wosVals.length > 2 ? ` <span class="muted-cell">+${wosVals.length - 2}</span>` : ''}</span>`
-      : '<span class="muted-cell">—</span>';
     const ifVal = (r.if_2024 != null) ? (+r.if_2024).toFixed(1) : '';
-    const ifCell = ifVal ? `<span class="if-cell">${ifVal}</span>` : '<span class="muted-cell">—</span>';
     const cr = r.crossref;
     const doaj = r.doaj;
-    // Review cycle: CrossRef median_days → DOAJ review_weeks → —
     let cycleDays = null;
     if (cr && cr.median_days) {
       cycleDays = +cr.median_days;
     } else if (doaj && typeof doaj === 'object' && doaj.review_weeks) {
       cycleDays = +doaj.review_weeks * 7;
     }
-    const cycleCell = cycleDays
+    const cycleLabel = cycleDays
       ? `${Math.round(cycleDays / 30.4)}${T('个月','mo')}`
-      : '<span class="muted-cell">—</span>';
-    return `<tr data-fid="${escape(fid)}" class="j-row clickable ${r.flagship ? 'row-flagship' : ''}" data-src="int">
-      <td class="col-fav">${starBtn(r, 'int')}</td>
-      <td class="col-name">${nameHtml}</td>
-      <td class="col-free">${freeBadgeCell(r)}</td>
-      <td class="col-badge col-badge-split">${badgeCell}</td>
-      <td class="col-if">${ifCell}</td>
-      <td class="col-cycle">${cycleCell}</td>
-      <td class="col-topic">${wosCell}</td>
-    </tr>`;
+      : '';
+    const freeHtml = freeBadgeCell(r);
+    const freeIsEmpty = /muted-cell/.test(freeHtml) || /b-free-lock/.test(freeHtml);
+    const metaHtml = [
+      ifVal ? jMetaIf('IF', ifVal) : '',
+      cycleLabel ? jMetaText(T('审稿','Review'), escape(cycleLabel), 'j-meta-cycle') : '',
+      !freeIsEmpty ? jMetaPlain(freeHtml, 'j-meta-free') : (canSeePublishFeeInfo() ? '' : jMetaPlain(freeHtml, 'j-meta-free')),
+      wosShown ? jMetaText(T('学科','Subject'), escape(wosShown) + (wosVals.length > 2 ? ` <span class="muted-cell">+${wosVals.length - 2}</span>` : ''), 'j-meta-topic') : '',
+    ].filter(Boolean).join('');
+    const bodyHtml = `<div class="j-card-badges col-badge col-badge-split">${badgeCell}</div>`;
+    return journalCardRow({
+      fid, src: 'int', flagship: !!r.flagship,
+      favHtml: starBtn(r, 'int'),
+      nameHtml,
+      metaHtml,
+      bodyHtml,
+    });
   }
 
   /* ───────── FREE badge helper（Pro+ 可见是否付费发表） ───────── */
@@ -4933,18 +4976,23 @@
       const rec = { ...r, name: r.journal_title, __src: 'in' };
       const fid = favId(rec);
       rowRecordsByFid[fid] = rec;
-      const issnCell = [r.issn && r.issn !== 'NA' ? `ISSN ${escape(r.issn)}` : '', r.eissn && r.eissn !== 'NA' ? `eISSN ${escape(r.eissn)}` : ''].filter(Boolean).join('<br>');
       const historical = r.list_status === 'historical';
       const sourceLabel = historical ? T('UGC-CARE · 历史', 'UGC-CARE · Historical') : 'UGC-CARE';
       const sourceDetail = [r.ugc_care_coverage_year, r.details].filter(Boolean).join(' · ');
-      return `<tr class="j-row clickable india-row" data-fid="${escape(fid)}" data-src="in">
-        <td class="col-fav" style="width:36px">${starBtn(rec, 'in')}</td>
-        <td class="col-name"><div class="jname">${escape(titleCase(r.journal_title || ''))}</div></td>
-        <td class="muted-cell">${escape(r.publisher || '—')}</td>
-        <td><span class="domsrc-pill ds-india"${sourceDetail ? ` title="${escape(sourceDetail)}"` : ''}>${sourceLabel}</span></td>
-        <td class="muted-cell">${escape(r.subject || '—')}</td>
-        <td class="muted-cell" style="width:130px">${issnCell || '—'}</td>
-      </tr>`;
+      const nameHtml = `<div class="jname">${escape(titleCase(r.journal_title || ''))}</div>`;
+      const metaHtml = [
+        jMetaText(T('出版','Pub'), escape(r.publisher || ''), 'j-meta-pub'),
+        r.issn && r.issn !== 'NA' ? jMetaText('ISSN', escape(r.issn), 'j-meta-id') : '',
+        r.eissn && r.eissn !== 'NA' ? jMetaText('eISSN', escape(r.eissn), 'j-meta-id') : '',
+      ].filter(Boolean).join('');
+      const bodyHtml = `
+        <div class="j-card-badges badges"><span class="domsrc-pill ds-india"${sourceDetail ? ` title="${escape(sourceDetail)}"` : ''}>${sourceLabel}</span></div>
+        ${r.subject ? `<div class="j-card-subline">${escape(r.subject)}</div>` : ''}`;
+      return journalCardRow({
+        fid, src: 'in', extraClass: 'india-row',
+        favHtml: starBtn(rec, 'in'),
+        nameHtml, metaHtml, bodyHtml,
+      });
     }).join('');
     box.innerHTML = `<div class="section-block india-section">
       ${countrySectionHeader(
@@ -5030,24 +5078,25 @@
       const rec = { ...r, name: r.journal_title, __src: 'my' };
       const fid = favId(rec);
       rowRecordsByFid[fid] = rec;
-      const issnCell = [
-        r.issn ? `ISSN ${escape(r.issn)}` : '',
-        r.eissn ? `eISSN ${escape(r.eissn)}` : '',
-      ].filter(Boolean).join('<br>');
-      const detailCell = sourceKey === 'era_2023'
-        ? escape(r.for_subjects || r.foreign_title || '—')
-        : escape(r.publisher || '—');
+      const pubOrSubject = sourceKey === 'era_2023'
+        ? (r.for_subjects || r.foreign_title || '')
+        : (r.publisher || '');
       const yearCell = sourceKey === 'era_2023'
-        ? escape(r.era_year || '2023')
-        : escape(r.indexed_year || '—');
-      return `<tr class="j-row clickable malaysia-row" data-fid="${escape(fid)}" data-src="my">
-        <td class="col-fav" style="width:36px">${starBtn(rec, 'my')}</td>
-        <td class="col-name"><div class="jname">${escape(titleCase(r.journal_title || ''))}</div></td>
-        <td class="muted-cell">${detailCell}</td>
-        <td><span class="domsrc-pill ds-malaysia">${escape(malaysiaSourceLabel(sourceKey))}</span></td>
-        <td class="muted-cell">${yearCell}</td>
-        <td class="muted-cell" style="width:150px">${issnCell || '—'}</td>
-      </tr>`;
+        ? (r.era_year || '2023')
+        : (r.indexed_year || '');
+      const nameHtml = `<div class="jname">${escape(titleCase(r.journal_title || ''))}</div>`;
+      const metaHtml = [
+        jMetaText(sourceKey === 'era_2023' ? T('学科','Subject') : T('出版','Pub'), escape(pubOrSubject), 'j-meta-pub'),
+        yearCell ? jMetaText(T('年份','Year'), escape(String(yearCell)), 'j-meta-year') : '',
+        r.issn ? jMetaText('ISSN', escape(r.issn), 'j-meta-id') : '',
+        r.eissn ? jMetaText('eISSN', escape(r.eissn), 'j-meta-id') : '',
+      ].filter(Boolean).join('');
+      const bodyHtml = `<div class="j-card-badges badges"><span class="domsrc-pill ds-malaysia">${escape(malaysiaSourceLabel(sourceKey))}</span></div>`;
+      return journalCardRow({
+        fid, src: 'my', extraClass: 'malaysia-row',
+        favHtml: starBtn(rec, 'my'),
+        nameHtml, metaHtml, bodyHtml,
+      });
     }).join('');
     const yearCounts = malaysia.counts?.mycite_online_years || {};
     const years = Object.keys(yearCounts).length
@@ -5157,23 +5206,29 @@
       };
       const fid = favId(rec);
       rowRecordsByFid[fid] = rec;
-      const issnCell = [
-        r.issn ? `ISSN ${escape(r.issn)}` : '',
-        r.eissn ? `eISSN ${escape(r.eissn)}` : '',
-      ].filter(Boolean).join('<br>');
       const globalBadges = [renderCoverageBadges(rec), renderLevelBadges(rec)].filter(Boolean).join('');
-      const ifValue = r.kci_if_2y !== undefined && r.kci_if_2y !== '' ? Number(r.kci_if_2y).toFixed(2).replace(/0+$/, '').replace(/\.$/, '') : '—';
-      return `<tr class="j-row clickable korea-row" data-fid="${escape(fid)}" data-src="kr">
-        <td class="col-fav" style="width:36px">${starBtn(rec, 'kr')}</td>
-        <td class="col-name"><div class="jname">${escape(titleCase(rec.name || ''))}${r.journal_title_ko && r.journal_title_ko !== rec.name ? `<span class="jname-cn">${escape(r.journal_title_ko)}</span>` : ''}</div></td>
-        <td class="muted-cell korea-publisher">${escape(r.publisher || r.publisher_ko || '—')}</td>
-        <td class="korea-summary">
-          <div class="korea-status-block"><div class="badges"><span class="domsrc-pill ds-korea">${escape(koreaStatusLabel(r.status))}</span>${globalBadges}</div></div>
-          <div class="korea-subject"><strong>${escape(koreaSubjectLabel(r.subject_group))}</strong>${r.subject && r.subject !== r.subject_group ? `<span>${escape(r.subject)}</span>` : ''}</div>
-          <div class="korea-metric"><span>KCI IF · 2y</span><strong>${escape(ifValue)}</strong></div>
-          <div class="korea-identifiers">${issnCell || '—'}</div>
-        </td>
-      </tr>`;
+      const ifValue = r.kci_if_2y !== undefined && r.kci_if_2y !== ''
+        ? Number(r.kci_if_2y).toFixed(2).replace(/0+$/, '').replace(/\.$/, '')
+        : '';
+      const nameHtml = `<div class="jname">${escape(titleCase(rec.name || ''))}${r.journal_title_ko && r.journal_title_ko !== rec.name ? `<span class="jname-cn">${escape(r.journal_title_ko)}</span>` : ''}</div>`;
+      const metaHtml = [
+        ifValue ? jMetaIf('KCI IF', ifValue) : '',
+        jMetaText(T('出版','Pub'), escape(r.publisher || r.publisher_ko || ''), 'j-meta-pub'),
+        r.issn ? jMetaText('ISSN', escape(r.issn), 'j-meta-id') : '',
+        r.eissn ? jMetaText('eISSN', escape(r.eissn), 'j-meta-id') : '',
+      ].filter(Boolean).join('');
+      const subjectLine = [
+        koreaSubjectLabel(r.subject_group),
+        r.subject && r.subject !== r.subject_group ? r.subject : '',
+      ].filter(Boolean).join(' · ');
+      const bodyHtml = `
+        <div class="j-card-badges badges"><span class="domsrc-pill ds-korea">${escape(koreaStatusLabel(r.status))}</span>${globalBadges}</div>
+        ${subjectLine ? `<div class="j-card-subline">${escape(subjectLine)}</div>` : ''}`;
+      return journalCardRow({
+        fid, src: 'kr', extraClass: 'korea-row',
+        favHtml: starBtn(rec, 'kr'),
+        nameHtml, metaHtml, bodyHtml,
+      });
     }).join('');
     const sourceDate = korea.source_updated || '2025-08-25';
     box.innerHTML = `<div class="section-block korea-section">
@@ -5273,20 +5328,22 @@
       const rec = { ...row, name: row.name || row.global_name || '', __src: source };
       const fid = favId(rec);
       rowRecordsByFid[fid] = rec;
-      const identifiers = [row.issn ? `ISSN ${escape(row.issn)}` : '', row.eissn ? `eISSN ${escape(row.eissn)}` : ''].filter(Boolean).join('<br>');
       const globalBadges = row.global_match
         ? [renderCoverageBadges(rec), renderLevelBadges(rec)].filter(Boolean).join('')
         : '';
       const metric = config.metric(row);
-      return `<tr class="j-row clickable regional-directory-row" data-fid="${escape(fid)}" data-src="${escape(source)}">
-        <td class="col-fav">${starBtn(rec, source)}</td>
-        <td class="col-name"><div class="jname">${escape(rec.name)}</div></td>
-        <td class="regional-directory-meta">
-          <div class="badges"><span class="domsrc-pill regional-source-pill">${escape(config.badge)}</span>${globalBadges}</div>
-          ${metric ? `<strong>${escape(metric)}</strong>` : ''}
-        </td>
-        <td class="regional-directory-identifiers">${identifiers || '—'}</td>
-      </tr>`;
+      const nameHtml = `<div class="jname">${escape(rec.name)}</div>`;
+      const metaHtml = [
+        metric ? jMetaText(T('指标','Metric'), escape(metric), 'j-meta-metric') : '',
+        row.issn ? jMetaText('ISSN', escape(row.issn), 'j-meta-id') : '',
+        row.eissn ? jMetaText('eISSN', escape(row.eissn), 'j-meta-id') : '',
+      ].filter(Boolean).join('');
+      const bodyHtml = `<div class="j-card-badges badges"><span class="domsrc-pill regional-source-pill">${escape(config.badge)}</span>${globalBadges}</div>`;
+      return journalCardRow({
+        fid, src: source, extraClass: 'regional-directory-row',
+        favHtml: starBtn(rec, source),
+        nameHtml, metaHtml, bodyHtml,
+      });
     }).join('');
     const sourceYear = data.directory_year ? ` · ${T('目录年份', 'Directory year')} ${escape(data.directory_year)}` : '';
     box.innerHTML = `<div class="section-block regional-directory-section">
@@ -8993,9 +9050,7 @@
     rowRecordsByFid[fid] = r;
     const rawName = r.name || r.cn_name || r.journal_title || '';
     const nameHtml = `<div class="jname ${r.flagship ? 'jname-flagship' : ''}">${escape(titleCase(rawName.replace(/\*$/,'')))}${r.cn_name && r.cn_name !== rawName ? `<span class="jname-cn">${escape(r.cn_name)}</span>` : ''}${r.en_name && r.en_name !== rawName ? `<span class="jname-cn">${escape(titleCase(r.en_name))}</span>` : ''}${aliasHintHtml(r)}</div>`;
-    // 索引行
     const indexBadges = r.__src === 'int' ? renderIndexBadges(r) : '';
-    // 分区/等级行（IF 已移到独立列）
     const rankBadges = r.__src === 'int' ? renderRankBadges(r) : '';
     const tierBadge = r.tier && /^T[123]$/.test(r.tier) ? badgeTier(r.tier)
                     : r.tier ? `<span class="tier-pill t3">${escape(tn(r.tier, "tier"))}</span>` : '';
@@ -9006,9 +9061,9 @@
       int: T('国际','Int’l'), cssci: 'CSSCI', cssci_core: 'CSSCI', cssci_ext: T('CSSCI 扩展','CSSCI Ext'),
       pku: T('北大核心','PKU Core'), pku_core: T('北大核心','PKU Core'), cscd: 'CSCD', cstpcd: T('中国科技核心','CSTPCD'), cnkx: T('科协','CAST'), ccft: 'CCF-T',
       zju: T('浙大','ZJU'), school_a: T('高校目录','In-house'), nsfc_mgmt: T('国自然','NSFC'), in: 'UGC-CARE', my: 'MyCite / ERA',
+      kr: 'KCI', pbn: 'PBN', isc: 'ISC', scielo: 'SciELO',
     };
     const ifVal = (r.if_2024 != null) ? (+r.if_2024).toFixed(1) : '';
-    const ifCell = ifVal ? `<span class="if-cell">${ifVal}</span>` : '<span class="muted-cell">—</span>';
     const cr = r.crossref;
     const doaj = r.doaj;
     let cycleDays = null;
@@ -9017,17 +9072,18 @@
     } else if (doaj && typeof doaj === 'object' && doaj.review_weeks) {
       cycleDays = +doaj.review_weeks * 7;
     }
-    const cycleCell = cycleDays
-      ? `${Math.round(cycleDays / 30.4)}${T('个月','mo')}`
-      : '<span class="muted-cell">—</span>';
-    return `<tr class="j-row clickable" data-fid="${escape(fid)}" data-src="${escape(r.__src)}">
+    const cycleLabel = cycleDays ? `${Math.round(cycleDays / 30.4)}${T('个月','mo')}` : '';
+    const metaHtml = [
+      ifVal ? jMetaIf('IF', ifVal) : '',
+      cycleLabel ? jMetaText(T('审稿','Review'), escape(cycleLabel), 'j-meta-cycle') : '',
+      jMetaPlain(`<span class="src-tag src-${escape(r.__src)}">${SRC_LABEL[r.__src] || r.__src}</span>`, 'j-meta-src'),
+    ].filter(Boolean).join('');
+    const bodyHtml = `<div class="j-card-badges col-badge col-badge-split">${badgeCell}</div>`;
+    return `<tr class="j-row j-card clickable" data-fid="${escape(fid)}" data-src="${escape(r.__src)}">
       <td class="col-drag"><span class="drag-handle" title="${T('拖动排序','Drag to reorder')}">⋮⋮</span></td>
       <td class="col-fav">${starBtn(r, r.__src)}</td>
-      <td class="col-name">${nameHtml}</td>
-      <td class="col-badge col-badge-split">${badgeCell}</td>
-      <td class="col-if">${ifCell}</td>
-      <td class="col-cycle">${cycleCell}</td>
-      <td class="col-src"><span class="src-tag src-${escape(r.__src)}">${SRC_LABEL[r.__src] || r.__src}</span></td>
+      <td class="j-card-head col-name">${nameHtml}${metaHtml ? `<div class="j-card-meta-row">${metaHtml}</div>` : ''}</td>
+      <td class="j-card-body">${bodyHtml}</td>
     </tr>`;
   }
 
