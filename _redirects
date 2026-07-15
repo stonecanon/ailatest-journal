@@ -39,7 +39,5 @@
 /updates/ /index.html 200
 /updates/* /index.html 200
 /import /index.html 200
-/about /about.html 200
-/about/ /about.html 200
-/contact /contact.html 200
-/contact/ /contact.html 200
+# 勿把 /about、/contact 再 rewrite 到 *.html —— Cloudflare Pages 会自动提供
+# about.html → /about，再 rewrite 回 about.html 会触发 308 无限重定向。
