@@ -11,20 +11,43 @@
  *  4. credits 扣减与调用同事务 → spendCredits 单语句条件更新（调用方失败时 refundCredits）
  */
 
-export const SPEC_VERSION = '2026-06-13.1';
+export const SPEC_VERSION = '2026-07-15.1';
 
 const TRIAL_DAYS = 7;
 const SNAPSHOT_TTL_SEC = 24 * 3600;
 const FLASH_OFFER_WINDOW_SEC = 24 * 3600;
-const PRO_MONTHLY_CREDITS = 50;
+/** Pro 月度 AI credits；对齐 docs/entitlements.spec.json（DeepSeek V4 Flash 测算后为 500） */
+const PRO_MONTHLY_CREDITS = 500;
 const UPGRADE_URL = 'https://journal.ailatest.org/pricing.html';
 const PRO_COMING_SOON = true;
+
+const PREMIUM_LABELS_LOCKED = {
+  cas_zone: false,
+  cas_top: false,
+  warning: false,
+  citic_warning: false,
+  under_review: false,
+  on_hold: false,
+  retraction: false,
+  cnkx_tier: false,
+};
+const PREMIUM_LABELS_OPEN = {
+  cas_zone: true,
+  cas_top: true,
+  warning: true,
+  citic_warning: true,
+  under_review: true,
+  on_hold: true,
+  retraction: true,
+  cnkx_tier: true,
+};
 
 // tier → 功能面。favorites 限额由服务端强制，其余开关下发给客户端渲染 UI。
 const TIERS = {
   free: {
     badge_display: true,
     journal_detail: true,
+    premium_labels: PREMIUM_LABELS_LOCKED,
     favorites: { max_items: 5, max_lists: 2 },
     cloud_sync: true,
     tags: false,
@@ -33,10 +56,26 @@ const TIERS = {
     export: false,
     integrations: false,
     ai: { enabled: false },
+    extension: { queries_per_day: 80, devices: 1, sites: 'basic', advanced_sort: false },
+  },
+  plus: {
+    badge_display: true,
+    journal_detail: true,
+    premium_labels: PREMIUM_LABELS_OPEN,
+    favorites: { max_items: 50, max_lists: 5 },
+    cloud_sync: true,
+    tags: false,
+    notes: false,
+    submission_history: false,
+    export: false,
+    integrations: false,
+    ai: { enabled: false },
+    extension: { queries_per_day: 1000, devices: 2, sites: 'enhanced', advanced_sort: true },
   },
   trial: {
     badge_display: true,
     journal_detail: true,
+    premium_labels: PREMIUM_LABELS_OPEN,
     favorites: { max_items: null, max_lists: null },
     cloud_sync: true,
     tags: true,
@@ -46,12 +85,14 @@ const TIERS = {
     advanced_filters: true,
     export: { formats: ['csv', 'ris', 'bibtex', 'xlsx'] },
     integrations: ['zotero', 'notion', 'endnote', 'obsidian'],
-    // trial 继承 pro 但 AI 锁定（spec: tiers.trial.overrides.ai）
-    ai: { enabled: false, ui: 'visible_locked', locked_hint: 'AI 选刊为 Pro 功能，订阅后每月含 50 credits' },
+    // trial 继承 pro 但 AI 锁定
+    ai: { enabled: false, ui: 'visible_locked', locked_hint: 'AI 荐刊为 Pro 功能，订阅后每月含 500 credits' },
+    extension: { queries_per_day: 3000, devices: 4, sites: 'enhanced', advanced_sort: true },
   },
   pro: {
     badge_display: true,
     journal_detail: true,
+    premium_labels: PREMIUM_LABELS_OPEN,
     favorites: { max_items: null, max_lists: null },
     cloud_sync: true,
     tags: true,
@@ -62,6 +103,7 @@ const TIERS = {
     export: { formats: ['csv', 'ris', 'bibtex', 'xlsx'] },
     integrations: ['zotero', 'notion', 'endnote', 'obsidian'],
     ai: { enabled: true, monthly_credits: PRO_MONTHLY_CREDITS, credits_rollover: false },
+    extension: { queries_per_day: 3000, devices: 4, sites: 'enhanced', advanced_sort: true },
   },
 };
 
@@ -143,7 +185,8 @@ async function getOrCreateRow(env, userId) {
 /** trial 到期 → 降级 free（数据冻结不删除，由写入路径的 enforce 实现） */
 async function effectiveTier(env, userId, row) {
   const now = nowSec();
-  if (PRO_COMING_SOON && row.tier !== 'pro') return 'free';
+  // 付费通道未开时，除已手工标 pro/plus 外一律 free
+  if (PRO_COMING_SOON && row.tier !== 'pro' && row.tier !== 'plus') return 'free';
   if (row.tier === 'trial' && row.trial_expires_at && now > row.trial_expires_at) {
     await env.DB.prepare(
       "UPDATE user_entitlements SET tier='free', updated_at=? WHERE user_id=? AND tier='trial'"
@@ -153,7 +196,7 @@ async function effectiveTier(env, userId, row) {
   return TIERS[row.tier] ? row.tier : 'free';
 }
 
-/** Pro 月度额度：换月时重置为 50（不结转）；free/trial 无月度额度 */
+/** Pro 月度额度：换月时重置为 PRO_MONTHLY_CREDITS（不结转）；free/plus/trial 无月度额度 */
 async function getCredits(env, userId, tier) {
   const now = nowSec();
   const period = monthOf(now);
