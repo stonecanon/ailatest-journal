@@ -716,9 +716,9 @@ th { background: var(--accent-bg); font-weight: 700; }
 th[colspan] { color: var(--link); background: #fff7ec; }
 td.c, th.c { text-align: center; }
 
-/* 定价卡片 */
-.plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin: 22px 0; }
-.plan { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 22px; position: relative; display: flex; flex-direction: column; min-height: 100%; }
+/* 定价卡片 — 等高 + 底部按钮对齐 */
+.plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin: 22px 0; align-items: stretch; }
+.plan { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 22px; position: relative; display: flex; flex-direction: column; height: 100%; min-height: 100%; box-sizing: border-box; }
 .plan.hot { border: 2px solid var(--ink); }
 .plan .tag {
   position: absolute; top: -11px; left: 18px; background: var(--ink); color: #fff;
@@ -728,12 +728,24 @@ td.c, th.c { text-align: center; }
 .plan .price { font-size: 30px; font-weight: 800; margin: 8px 0 2px; }
 .plan .price small { font-size: 13px; font-weight: 400; color: var(--muted); }
 .plan .per { color: var(--muted); font-size: 13px; margin-bottom: 14px; }
-.plan ul { padding-left: 18px; font-size: 14px; min-height: 120px; }
-.plan .btn { margin-top: auto; }
+.plan ul { padding-left: 18px; font-size: 14px; flex: 1 1 auto; margin: 0 0 16px; }
+.plan .btn,
+.plan a.btn,
+.plan button.btn {
+  margin-top: auto;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
 .plan .small.muted { min-height: 18px; }
 .btn {
-  display: block; text-align: center; padding: 10px 0; border-radius: 8px; font-weight: 700;
+  display: inline-flex; align-items: center; justify-content: center; text-align: center; padding: 10px 0; border-radius: 8px; font-weight: 700;
   background: var(--ink); color: #fff; border: none; width: 100%; font-size: 15px; cursor: pointer;
+  box-sizing: border-box; min-height: 44px;
 }
 .btn:hover { text-decoration: none; opacity: .9; }
 .btn.ghost { background: transparent; color: var(--ink); border: 1.5px solid var(--ink); }
