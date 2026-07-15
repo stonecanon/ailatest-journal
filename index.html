@@ -41,7 +41,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 })(window,document,'script','dataLayer','GTM-NBNXL7FB');</script>
 <!-- End Google Tag Manager -->
 <link rel="preload" href="/data/journal_aliases.json" as="fetch" crossorigin="anonymous" />
-<link rel="stylesheet" href="/css/app.css?v=20260715-foot-todo" />
+<link rel="stylesheet" href="/css/app.css?v=20260715-rank-nav" />
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json" />
@@ -134,8 +134,16 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   const path = location.pathname.replace(/\/+$/, '') || '/';
   const homeRoutes = new Set(['/', '/en', '/zh']);
   const simpleRoutes = new Set(['/favorites', '/account', '/me', '/profile', '/rankings']);
+  const pathTab = ({
+    '/favorites': 'fav', '/account': 'me', '/me': 'me', '/profile': 'me',
+    '/rankings': 'rank', '/pick': 'pick', '/global': 'int', '/international': 'int',
+    '/cn': 'dom', '/china': 'dom', '/in': 'in', '/india': 'in',
+    '/my': 'my', '/malaysia': 'my', '/kr': 'kr', '/korea': 'kr',
+    '/pbn': 'pbn', '/poland': 'pbn', '/isc': 'isc', '/scielo': 'scielo',
+  })[path] || (homeRoutes.has(path) ? 'home' : '');
   document.body.classList.toggle('home-route', homeRoutes.has(path));
   document.body.classList.toggle('simple-top-route', simpleRoutes.has(path));
+  if (pathTab) document.body.dataset.bootTab = pathTab;
 })();
 </script>
 <!-- Google Tag Manager (noscript) -->
@@ -732,7 +740,7 @@ window.__BUILD_VER = 'v20260626-ui-polish';
 })();
 </script>
 <script src="/js/pick-match.js?v=20260715-pick-fast" defer></script>
-<script src="/js/app.js?v=20260715-foot-todo" defer></script>
+<script src="/js/app.js?v=20260715-rank-nav" defer></script>
 
 </body>
 </html>

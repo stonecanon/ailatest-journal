@@ -488,24 +488,22 @@ location.replace('/');
     (ROOT / 'indexes' / 'warning' / 'index.html').write_text(warning_html, encoding='utf-8')
     print('  /indexes/warning/ (landing)')
 
-    ranking_choices = f'''<div class="ranking-choice-grid">
-  <a class="ranking-choice" href="{origin}/indexes/"><strong>索引排行榜</strong></a>
-  <a class="ranking-choice" href="{origin}/subjects/"><strong>学科排行榜</strong></a>
-  <a class="ranking-choice" href="{origin}/indexes/warning/"><strong>预警名单</strong></a>
-</div>'''
-    rankings_html = shell(
-        '榜单 | AILatest Journal',
-        'AILatest Journal 期刊榜单入口：索引排行榜、学科排行榜和预警名单。',
-        f'{origin}/rankings/',
-        '期刊榜单',
-        '选择一个榜单入口，再查看对应期刊列表。',
-        ranking_choices,
-        f'{origin}/',
-        minimal=True,
-    )
-    (ROOT / 'rankings').mkdir(parents=True, exist_ok=True)
-    (ROOT / 'rankings' / 'index.html').write_text(rankings_html, encoding='utf-8')
-    print('  /rankings/ (landing)')
+    # 榜单入口由 SPA 接管（_redirects → index.html）。
+    # 切勿再生成 rankings/index.html + location.replace('/')，否则侧栏点「榜单」
+    # 会先整页跳到首页再靠 pendingTab 切回，造成明显闪烁。
+    rankings_dir = ROOT / 'rankings'
+    if rankings_dir.exists():
+        for child in rankings_dir.iterdir():
+            if child.is_file():
+                child.unlink()
+            elif child.is_dir():
+                import shutil
+                shutil.rmtree(child)
+        try:
+            rankings_dir.rmdir()
+        except OSError:
+            pass
+    print('  /rankings/ → SPA (no static stub)')
 
     bridge_body = f'''<div class="ranking-choice-grid">
   <a class="ranking-choice" href="{origin}/subjects/"><strong>进入学科排行榜</strong><span>旧版 ESI 大类页面已合并到 Web of Science 学科排行榜。</span></a>

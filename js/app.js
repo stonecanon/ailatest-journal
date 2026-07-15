@@ -1747,7 +1747,8 @@
   const tabScrollPositions = new Map();
   const reusableTabPanels = new Set(['int', 'dom', 'in', 'my', 'kr', 'pbn', 'isc', 'scielo']);
   let homeMode = 'search';
-  const TAB_PATHS = { home: '/', int: '/global', dom: '/cn', in: '/in', my: '/my', kr: '/kr', pbn: '/pbn', isc: '/isc', scielo: '/scielo', fav: '/favorites', me: '/account', rank: '/rankings/', pick: '/pick' };
+  // 一律无尾斜杠：避免 /rankings/ 命中旧静态 stub，也与其它 tab 路径风格一致
+  const TAB_PATHS = { home: '/', int: '/global', dom: '/cn', in: '/in', my: '/my', kr: '/kr', pbn: '/pbn', isc: '/isc', scielo: '/scielo', fav: '/favorites', me: '/account', rank: '/rankings', pick: '/pick' };
   const PATH_TABS = {
     '/': 'home', '/en': 'home', '/zh': 'home',
     '/global': 'int', '/international': 'int', '/journals': 'int',
@@ -1820,9 +1821,11 @@
       desc: '输入论文题目、摘要或关键词，智能匹配研究主题、SCI/SSCI/EI 收录、JCR 分区、中科院分区、Scopus 与影响因子，推荐适合投稿的目标期刊。'
     }
   };
+  function normalizeAppPath(pathname = location.pathname) {
+    return String(pathname || '/').replace(/\/+$/, '') || '/';
+  }
   function tabFromPath(pathname = location.pathname) {
-    const clean = pathname.replace(/\/+$/, '') || '/';
-    return PATH_TABS[clean] || 'home';
+    return PATH_TABS[normalizeAppPath(pathname)] || 'home';
   }
   function consumePendingTab() {
     try {
@@ -9361,10 +9364,6 @@
       const changingTab = previousTab !== tab;
       if (changingTab) tabScrollPositions.set(previousTab, window.scrollY);
       if (!opts.keepWarnList) activeWarnList = false; // 切换标签默认退出预警名单
-      if (document.body.classList.contains('journal-route')) {
-        _drawerStack = [];
-        closeDrawer(true);
-      }
       // ── 切换前：把当前搜索框的值存到 activeQuery（仅非选刊tab）──
       const prevTab = activeTab;
       if (prevTab !== 'pick') {
@@ -9375,13 +9374,25 @@
         }
       }
 
+      // 先切面板 / 路由壳，再关详情页，避免 journal-route 卸掉后短暂露出首页
       $$('[data-tab]').forEach(x => x.classList.toggle('active', x.dataset.tab === tab));
       activeTab = tab;
+      // 首屏 boot-tab 防闪用完即清，之后交给 .hidden 控制
+      if (document.body.dataset.bootTab) delete document.body.dataset.bootTab;
       document.body.classList.toggle('update-reading-mode', activeTab === 'updates');
       document.body.classList.toggle('home-route', activeTab === 'home');
       document.body.classList.toggle('simple-top-route', activeTab === 'updates' || activeTab === 'fav' || activeTab === 'me' || activeTab === 'rank');
       updateSearchSubmitLabel();
-      $$('.tab-panel').forEach(p => p.hidden = p.dataset.panel !== activeTab);
+      $$('.tab-panel').forEach(p => {
+        const on = p.dataset.panel === activeTab;
+        p.hidden = !on;
+        // 清掉 boot-tab 的 display:block/none，避免与 hidden 打架
+        p.style.display = '';
+      });
+      if (document.body.classList.contains('journal-route')) {
+        _drawerStack = [];
+        closeDrawer(true);
+      }
       if (changingTab) window.scrollTo(0, tabScrollPositions.get(activeTab) || 0);
       $$('[data-international]').forEach(el => el.hidden = activeTab !== 'int');
       $$('[data-domestic]').forEach(el => el.hidden = activeTab !== 'dom');
@@ -9439,7 +9450,7 @@
       }
       if (!opts.skipPath) {
         const nextPath = TAB_PATHS[activeTab] || '/';
-        if (location.pathname !== nextPath) {
+        if (normalizeAppPath(location.pathname) !== normalizeAppPath(nextPath)) {
           try { history.pushState({ tab: activeTab }, '', nextPath + location.search + location.hash); }
           catch (_) {}
         }

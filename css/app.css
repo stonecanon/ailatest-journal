@@ -2398,6 +2398,23 @@ body.simple-top-route .topbar-links { display: none; }
 body.simple-top-route .side-toggle,
 body.simple-top-route .search-wrap { display: none; }
 
+/* boot-tab: hide wrong panels before app.js paints (stops /rankings home flash) */
+body[data-boot-tab]:not([data-boot-tab="home"]) .tab-panel { display: none !important; }
+body[data-boot-tab="rank"] .tab-panel[data-panel="rank"],
+body[data-boot-tab="fav"] .tab-panel[data-panel="fav"],
+body[data-boot-tab="me"] .tab-panel[data-panel="me"],
+body[data-boot-tab="pick"] .tab-panel[data-panel="pick"],
+body[data-boot-tab="int"] .tab-panel[data-panel="int"],
+body[data-boot-tab="dom"] .tab-panel[data-panel="dom"],
+body[data-boot-tab="in"] .tab-panel[data-panel="in"],
+body[data-boot-tab="my"] .tab-panel[data-panel="my"],
+body[data-boot-tab="kr"] .tab-panel[data-panel="kr"],
+body[data-boot-tab="pbn"] .tab-panel[data-panel="pbn"],
+body[data-boot-tab="isc"] .tab-panel[data-panel="isc"],
+body[data-boot-tab="scielo"] .tab-panel[data-panel="scielo"] {
+  display: block !important;
+}
+
 body.simple-top-route .tab-panel[data-panel="fav"],
 body.simple-top-route .tab-panel[data-panel="me"],
 body.simple-top-route .tab-panel[data-panel="rank"] {

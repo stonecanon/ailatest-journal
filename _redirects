@@ -26,8 +26,11 @@
 /isc /index.html 200
 /scielo /index.html 200
 /favorites /index.html 200
+/favorites/ /index.html 200
 /pick /index.html 200
+/pick/ /index.html 200
 /my /index.html 200
+/my/ /index.html 200
 /malaysia /index.html 200
 /rankings /index.html 200
 /rankings/ /index.html 200
@@ -35,6 +38,13 @@
 /account/ /index.html 200
 /me /index.html 200
 /me/ /index.html 200
+/global/ /index.html 200
+/cn/ /index.html 200
+/in/ /index.html 200
+/kr/ /index.html 200
+/pbn/ /index.html 200
+/isc/ /index.html 200
+/scielo/ /index.html 200
 /updates /index.html 200
 /updates/ /index.html 200
 /updates/* /index.html 200
