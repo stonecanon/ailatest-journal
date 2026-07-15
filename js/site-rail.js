@@ -231,7 +231,6 @@
         event.preventDefault();
         const pinned = readPinned();
         writePinned(pinned.includes(id) ? pinned.filter(x => x !== id) : [...pinned, id]);
-        if (parts.app) closeAppMenu();
         apply();
       });
     });

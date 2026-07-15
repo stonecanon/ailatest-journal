@@ -9338,7 +9338,6 @@
           e.preventDefault();
           e.stopPropagation();
           togglePinnedRegion(btn.dataset.regionPin);
-          close();
         });
       });
       document.addEventListener('click', (e) => {
