@@ -55,20 +55,20 @@
       "on_register": "merge_local_favorites_to_cloud"
     },
     "free": {
-      "note": "注册用户基础档。锁定中科院分区与预警类标签；解锁见 Plus/Pro。",
+      "note": "注册用户基础档。网站查刊与详情完整开放；仅浏览器插件的中科院/预警等高级徽章锁定。",
       "features": {
         "badge_display": true,
         "journal_detail": true,
         "premium_labels": {
-          "cas_zone": false,
-          "cas_top": false,
-          "warning": false,
-          "citic_warning": false,
-          "under_review": false,
-          "on_hold": false,
-          "retraction": false,
-          "cnkx_tier": false,
-          "note": "Free 不展示中科院分区/TOP、预警/中信所预警、On Hold/Under Review、撤稿、科协分级；仅基础 IF/JCR 分位/收录索引"
+          "cas_zone": true,
+          "cas_top": true,
+          "warning": true,
+          "citic_warning": true,
+          "under_review": true,
+          "on_hold": true,
+          "retraction": true,
+          "cnkx_tier": true,
+          "note": "网站侧完整展示；插件侧见 extension.premium_labels"
         },
         "favorites": {
           "enabled": true,
@@ -87,7 +87,18 @@
           "queries_per_day": 80,
           "devices": 1,
           "sites": "basic",
-          "advanced_sort": false
+          "advanced_sort": false,
+          "premium_labels": {
+            "cas_zone": false,
+            "cas_top": false,
+            "warning": false,
+            "citic_warning": false,
+            "under_review": false,
+            "on_hold": false,
+            "retraction": false,
+            "cnkx_tier": false,
+            "note": "插件仅基础 IF/JCR/收录；中科院与预警等徽章 Pro 起开放"
+          }
         }
       }
     },
@@ -329,8 +340,8 @@
   },
   "enforcement": {
     "rules": [
-      "所有限额（收藏数、清单数、credits、premium_labels）由服务端在写入/调用时校验；客户端仅做 UI 降级与升级提示",
-      "Free 请求若带 cas_zone / warning 等过滤或要求返回对应字段，服务端应剥离或 402/403 + upgrade_url",
+      "所有限额（收藏数、清单数、credits）由服务端在写入/调用时校验；客户端仅做 UI 降级与升级提示",
+      "中科院/预警等：网站不因 Free 降级；仅插件徽章读取 features.extension.premium_labels",
       "trial_expires_at、tier、edu_verified 为服务端字段，JWT entitlements 快照 ≤ 24h",
       "匿名 24h 为纯客户端宽限期，重装可重置",
       "AI 接口按账号限频（建议 10 次/分钟），credits 扣减与 LLM 调用同事务"

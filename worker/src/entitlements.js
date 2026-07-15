@@ -47,7 +47,8 @@ const TIERS = {
   free: {
     badge_display: true,
     journal_detail: true,
-    premium_labels: PREMIUM_LABELS_LOCKED,
+    // 网站完整展示；插件高级徽章另控
+    premium_labels: PREMIUM_LABELS_OPEN,
     favorites: { max_items: 5, max_lists: 2 },
     cloud_sync: true,
     tags: false,
@@ -56,9 +57,16 @@ const TIERS = {
     export: false,
     integrations: false,
     ai: { enabled: false },
-    extension: { queries_per_day: 80, devices: 1, sites: 'basic', advanced_sort: false },
+    extension: {
+      queries_per_day: 80,
+      devices: 1,
+      sites: 'basic',
+      advanced_sort: false,
+      premium_labels: PREMIUM_LABELS_LOCKED,
+    },
   },
   plus: {
+    // 产品名 Pro
     badge_display: true,
     journal_detail: true,
     premium_labels: PREMIUM_LABELS_OPEN,
@@ -70,7 +78,13 @@ const TIERS = {
     export: false,
     integrations: false,
     ai: { enabled: false },
-    extension: { queries_per_day: 20000, devices: 2, sites: 'enhanced', advanced_sort: true },
+    extension: {
+      queries_per_day: 20000,
+      devices: 2,
+      sites: 'enhanced',
+      advanced_sort: true,
+      premium_labels: PREMIUM_LABELS_OPEN,
+    },
   },
   trial: {
     badge_display: true,
@@ -87,9 +101,16 @@ const TIERS = {
     integrations: ['zotero', 'notion', 'endnote', 'obsidian'],
     // trial 继承 pro 但 AI 锁定
     ai: { enabled: false, ui: 'visible_locked', locked_hint: 'AI 荐刊为 Max 功能，订阅后每月含 1000 credits' },
-    extension: { queries_per_day: 50000, devices: 4, sites: 'enhanced', advanced_sort: true },
+    extension: {
+      queries_per_day: 50000,
+      devices: 4,
+      sites: 'enhanced',
+      advanced_sort: true,
+      premium_labels: PREMIUM_LABELS_OPEN,
+    },
   },
   pro: {
+    // 产品名 Max
     badge_display: true,
     journal_detail: true,
     premium_labels: PREMIUM_LABELS_OPEN,
@@ -101,9 +122,15 @@ const TIERS = {
     drag_sort: true,
     advanced_filters: true,
     export: { formats: ['csv', 'ris', 'bibtex', 'xlsx'] },
-    integrations: ['zotero', 'notion', 'endnote', 'obsidian'],
+    integrations: false, // 深度联动规划中；插件 RIS/BibTeX/EndNote 导出已支持
     ai: { enabled: true, monthly_credits: PRO_MONTHLY_CREDITS, credits_rollover: false },
-    extension: { queries_per_day: 50000, devices: 4, sites: 'enhanced', advanced_sort: true },
+    extension: {
+      queries_per_day: 50000,
+      devices: 4,
+      sites: 'enhanced',
+      advanced_sort: true,
+      premium_labels: PREMIUM_LABELS_OPEN,
+    },
   },
 };
 
