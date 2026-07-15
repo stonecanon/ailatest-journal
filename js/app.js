@@ -61,7 +61,7 @@
       nav_terms: '条款', nav_privacy: '隐私', nav_refund: '退款',
       nav_index_rank: '索引排行榜', nav_subject_rank: '学科排行榜', nav_warn_rank: '预警名单', nav_extension_beta: '插件内测', nav_subscription: '订阅',
       filter_if_range: '影响因子', if_any: '不限',
-      rail_int: '全球', rail_dom: '中国', rail_region: '地区', rail_in: '印度', rail_my: '马来西亚', rail_kr: '韩国', rail_pbn: '波兰', rail_isc: 'ISC', rail_scielo: 'SciELO', rail_rank: '榜单', rail_fav: '收藏', rail_me: '我的',
+      rail_int: '全球', rail_dom: '中国', rail_region: '地区', rail_in: '印度', rail_my: '马来西亚', rail_kr: '韩国', rail_pbn: '波兰', rail_isc: '伊朗', rail_scielo: '拉美', rail_rank: '榜单', rail_fav: '收藏', rail_me: '我的',
       download_center: '下载中心',
       loading: '加载中…',
       hero_title_int: 'SCI / SSCI 国际期刊检索',
@@ -150,7 +150,7 @@
       nav_terms: 'Terms', nav_privacy: 'Privacy', nav_refund: 'Refund',
       nav_index_rank: 'Index Rankings', nav_subject_rank: 'Subject Rankings', nav_warn_rank: 'Warning List', nav_extension_beta: 'Extension beta', nav_subscription: 'Subscribe',
       filter_if_range: 'Impact Factor', if_any: 'Any',
-      rail_int: 'Global', rail_dom: 'China', rail_region: 'Regions', rail_in: 'India', rail_my: 'Malaysia', rail_kr: 'Korea', rail_pbn: 'Poland', rail_isc: 'ISC', rail_scielo: 'SciELO', rail_rank: 'Rankings', rail_fav: 'Saved', rail_me: 'Me',
+      rail_int: 'Global', rail_dom: 'China', rail_region: 'Regions', rail_in: 'India', rail_my: 'Malaysia', rail_kr: 'Korea', rail_pbn: 'Poland', rail_isc: 'Iran', rail_scielo: 'LatAm', rail_rank: 'Rankings', rail_fav: 'Saved', rail_me: 'Me',
       download_center: 'Downloads',
       loading: 'Loading…',
       hero_title_int: 'International SCI / SSCI Search',
@@ -1548,10 +1548,23 @@
         <div class="country-fallback-note">${T('作者机构分布数据正在恢复。','Author-affiliation distribution is being restored.')}</div>
       </div>`;
     }
+    const countryNames = {
+      'ENGLAND': ['英国', 'United Kingdom'], 'UNITED KINGDOM': ['英国', 'United Kingdom'],
+      'UNITED STATES': ['美国', 'United States'], 'USA': ['美国', 'United States'],
+      'CHINA': ['中国', 'China'], 'TAIWAN': ['中国台湾', 'China Taiwan'],
+      'HONG KONG': ['中国香港', 'China Hong Kong'], 'MACAO': ['中国澳门', 'China Macao'],
+      'ITALY': ['意大利', 'Italy'], 'GERMANY': ['德国', 'Germany'], 'FRANCE': ['法国', 'France'],
+      'JAPAN': ['日本', 'Japan'], 'SOUTH KOREA': ['韩国', 'South Korea'], 'KOREA': ['韩国', 'South Korea'],
+      'INDIA': ['印度', 'India'], 'POLAND': ['波兰', 'Poland'], 'IRAN': ['伊朗', 'Iran'],
+      'BRAZIL': ['巴西', 'Brazil'], 'SPAIN': ['西班牙', 'Spain'], 'AUSTRALIA': ['澳大利亚', 'Australia'],
+      'CANADA': ['加拿大', 'Canada'], 'NETHERLANDS': ['荷兰', 'Netherlands'], 'SWITZERLAND': ['瑞士', 'Switzerland'],
+    };
+    const labels = countryNames[country.toUpperCase()] || [country, country];
+    const display = T(labels[0], labels[1]);
     return `<div class="country-output-fallback">
       <div><div class="trend-title">${T('期刊出版地区','Journal publication region')}</div><div class="trend-unit">${T('来自期刊基础资料','From journal metadata')}</div></div>
-      <div class="country-fallback-value">${escape(country)}</div>
-      <div class="country-fallback-note">${T('OpenAlex 作者机构占比暂不可用，恢复后将在此显示年度趋势。','OpenAlex author-affiliation shares are temporarily unavailable; yearly trends will return here automatically.')}</div>
+      <div class="country-fallback-value"><strong>${escape(display)}</strong>${display.toUpperCase() !== country.toUpperCase() ? `<span>${escape(country)}</span>` : ''}</div>
+      <div class="country-fallback-note">${T('出版地信息正常显示；作者机构国家/地区占比暂无数据。','Publication region is shown above; author-affiliation country/region shares are not currently available.')}</div>
     </div>`;
   }
 
@@ -6618,8 +6631,8 @@
     { id: 'my',  i18n: 'rail_my',  zh: '马来西亚', en: 'Malaysia' },
     { id: 'kr',  i18n: 'rail_kr',  zh: '韩国', en: 'Korea' },
     { id: 'pbn', i18n: 'rail_pbn', zh: '波兰', en: 'Poland' },
-    { id: 'isc', i18n: 'rail_isc', zh: 'ISC', en: 'ISC' },
-    { id: 'scielo', i18n: 'rail_scielo', zh: 'SciELO', en: 'SciELO' },
+    { id: 'isc', i18n: 'rail_isc', zh: '伊朗', en: 'Iran' },
+    { id: 'scielo', i18n: 'rail_scielo', zh: '拉美', en: 'LatAm' },
   ];
   const REGION_STATION_IDS = ['dom', 'in', 'my', 'kr', 'pbn', 'isc', 'scielo'];
   const DEFAULT_PINNED_REGION_IDS = ['dom'];

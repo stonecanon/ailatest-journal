@@ -151,13 +151,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <span class="rail-flag" aria-hidden="true">PL</span>
       <span data-i18n="rail_pbn">Poland</span>
     </button>
-    <button class="rail-nav-btn rail-region-station" data-tab="isc" data-region-station="isc" aria-label="ISC journals" title="ISC journals" hidden>
-      <span class="rail-flag" aria-hidden="true">ISC</span>
-      <span data-i18n="rail_isc">ISC</span>
+    <button class="rail-nav-btn rail-region-station" data-tab="isc" data-region-station="isc" aria-label="Iran ISC journals" title="Iran ISC journals" hidden>
+      <span class="rail-flag" aria-hidden="true">IR</span>
+      <span data-i18n="rail_isc">Iran</span>
     </button>
-    <button class="rail-nav-btn rail-region-station" data-tab="scielo" data-region-station="scielo" aria-label="SciELO journals" title="SciELO journals" hidden>
-      <span class="rail-flag" aria-hidden="true">SC</span>
-      <span data-i18n="rail_scielo">SciELO</span>
+    <button class="rail-nav-btn rail-region-station" data-tab="scielo" data-region-station="scielo" aria-label="Latin America SciELO journals" title="Latin America SciELO journals" hidden>
+      <span class="rail-flag" aria-hidden="true">LA</span>
+      <span data-i18n="rail_scielo">LatAm</span>
     </button>
     <div class="rail-region-picker">
       <button class="rail-nav-btn rail-region-toggle" id="region-toggle" type="button" aria-label="地区站点" title="地区站点" aria-expanded="false">
@@ -185,18 +185,22 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <span class="rail-flag" aria-hidden="true">PL</span>
           <span data-i18n="rail_pbn">Poland</span>
         </button>
-        <button class="rail-region-option rail-nav-btn" type="button" data-region-pin="isc" aria-label="ISC journals" title="ISC journals">
-          <span class="rail-flag" aria-hidden="true">ISC</span>
-          <span data-i18n="rail_isc">ISC</span>
+        <button class="rail-region-option rail-nav-btn" type="button" data-region-pin="isc" aria-label="Iran ISC journals" title="Iran ISC journals">
+          <span class="rail-flag" aria-hidden="true">IR</span>
+          <span data-i18n="rail_isc">Iran</span>
         </button>
-        <button class="rail-region-option rail-nav-btn" type="button" data-region-pin="scielo" aria-label="SciELO journals" title="SciELO journals">
-          <span class="rail-flag" aria-hidden="true">SC</span>
-          <span data-i18n="rail_scielo">SciELO</span>
+        <button class="rail-region-option rail-nav-btn" type="button" data-region-pin="scielo" aria-label="Latin America SciELO journals" title="Latin America SciELO journals">
+          <span class="rail-flag" aria-hidden="true">LA</span>
+          <span data-i18n="rail_scielo">LatAm</span>
         </button>
       </div>
     </div>
   </nav>
   <div class="rail-bottom">
+    <a class="rail-nav-btn" id="download-center-rail-link" href="/extension.html" aria-label="下载中心" title="下载中心">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 20h14"/></svg>
+      <span data-i18n="download_center">下载中心</span>
+    </a>
     <button class="rail-nav-btn" id="rankings-btn" data-tab="rank" aria-label="榜单" title="索引/学科排行榜 &amp; 预警名单" data-i18n-aria="rail_rank" data-i18n-title="rail_rank">
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 21V11"/><path d="M12 21V7"/><path d="M16 21V3"/><path d="M4 21h16"/></svg>
       <span data-i18n="rail_rank">榜单</span>
@@ -211,7 +215,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 </aside>
 <div class="lang-toggle-wrap">
-  <a class="download-center-link" href="/extension.html" data-i18n="download_center">下载中心</a>
   <button class="lang-toggle" id="lang-toggle" aria-label="Switch language">中文</button>
 </div>
 
@@ -229,7 +232,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <button class="side-toggle" id="side-toggle" aria-label="Open navigation">☰</button>
     <a class="topbar-brand" href="/" data-topbar-home aria-label="AILatest Journal">AILatest <em>Journal</em></a>
     <div class="search-wrap">
-      <input id="q" type="text" maxlength="200" placeholder="Search: journal title / abbr / ISSN" autocomplete="off" spellcheck="false" />
+      <input id="q" type="text" maxlength="200" aria-label="Search journals by title, abbreviation, or ISSN" placeholder="Search: journal title / abbr / ISSN" autocomplete="off" spellcheck="false" />
       <div class="search-actions">
         <button class="search-submit" id="search-submit" type="button" aria-label="Search">
           <span data-i18n="search_button">Search</span>
@@ -635,7 +638,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <button id="drawer-back" class="drawer-back" aria-label="Back" title="返回上一个期刊">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/><path d="M9 12h11"/></svg>
       </button>
-      <button id="drawer-fav" class="drawer-fav" title="Favorite / 收藏">
+      <button id="drawer-fav" class="drawer-fav" title="Favorite / 收藏" aria-label="Favorite journal / 收藏期刊">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.7l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3.7z"/></svg>
       </button>
       <button id="drawer-share" class="drawer-share" title="复制链接 / Copy link" aria-label="Share">

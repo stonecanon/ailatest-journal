@@ -8,6 +8,9 @@
     { id: 'in', label: '印度', code: 'IN', href: '/in' },
     { id: 'my', label: '马来西亚', code: 'MY', href: '/my' },
     { id: 'kr', label: '韩国', code: 'KR', href: '/kr' },
+    { id: 'pbn', label: '波兰', code: 'PL', href: '/pbn' },
+    { id: 'isc', label: '伊朗', code: 'IR', href: '/isc' },
+    { id: 'scielo', label: '拉美', code: 'LA', href: '/scielo' },
   ];
 
   function canonicalRailMarkup() {

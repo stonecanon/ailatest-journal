@@ -86,7 +86,7 @@ SCD_JSON     = DATA_DIR / 'scd_journals.json'
 AMI_JSON     = DATA_DIR / 'ami_journals.json'
 RETRACTION_METRICS_JSON = DATA_DIR / 'retraction_metrics.json.gz'
 SCOPUS_FILE  = LIST_DIR / 'scopus_source_list.xlsx'
-EI_FILE      = LIST_DIR / 'CPXSourceList_102025.xlsx'
+EI_FILE      = LIST_DIR / 'CPXSourceList_072026.xlsx'
 OAJ_FILE     = LIST_DIR / 'oaj_journals.json'
 DOAJ_FILE    = LIST_DIR / 'doaj_journals.csv'
 
@@ -1153,7 +1153,7 @@ def parse_scopus(path, by_title, by_issn, store=None):
 # ───────────────────────── EI Compendex Source List ─────────────────────────
 
 def parse_ei_compendex(path, by_title, by_issn, store=None):
-    """EI/Compendex Source List (Oct. 2025) journal rows + Chinese journals sheet."""
+    """EI/Compendex Source List (updated July 9, 2026) journal rows + Chinese journals sheet."""
     if not path.exists() or not openpyxl:
         return 0, 0, 0
     wb = openpyxl.load_workbook(path, read_only=True, data_only=True)
@@ -1212,7 +1212,7 @@ def parse_ei_compendex(path, by_title, by_issn, store=None):
                   country=str(raw[5] or '').strip() if len(raw)>5 else '',
                   language=str(raw[6] or '').strip() if len(raw)>6 else '',
                   subjects=list(raw[7:15]) if len(raw)>7 else [],
-                  status='Compendex Source List Oct. 2025')
+                  status='Compendex Source List Jul. 9, 2026')
 
     if 'CHINESE JRS on SERIALS LIST' in wb.sheetnames:
         ws = wb['CHINESE JRS on SERIALS LIST']
@@ -1949,7 +1949,7 @@ def main():
 
     # meta
     meta = {
-        'source': 'WoS Core + JCR 2025 + ESI + 中科院 2025 + 长江大学 + ShowJCR (JCR/FQB/XR/CCF/Warning) + Scopus (auto-updated) + EI Compendex Oct. 2025 + ABDC optional + ABS AJG + 中国科协 + CSCD + 中国科技核心 + OAJ 2025 + DOAJ Journal CSV',
+        'source': 'WoS Core + JCR 2025 + ESI + 中科院 2025 + 长江大学 + ShowJCR (JCR/FQB/XR/CCF/Warning) + Scopus (auto-updated) + EI Compendex Jul. 9, 2026 + ABDC optional + ABS AJG + 中国科协 + CSCD + 中国科技核心 + OAJ 2025 + DOAJ Journal CSV',
         'last_updated_source': 'WoS Core 2026-04-20',
         'total': len(journals),
         'indices': dict(idx_c),

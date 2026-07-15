@@ -1,12 +1,12 @@
 {
-  "source": "WoS Core + JCR 2025 + ESI + 中科院 2025 + 长江大学 + ShowJCR (JCR/FQB/XR/CCF/Warning) + Scopus (auto-updated) + EI Compendex Oct. 2025 + ABDC optional + ABS AJG + 中国科协 + CSCD + 中国科技核心 + OAJ 2025 + DOAJ Journal CSV",
+  "source": "WoS Core + JCR 2025 + ESI + 中科院 2025 + 长江大学 + ShowJCR (JCR/FQB/XR/CCF/Warning) + Scopus (auto-updated) + EI Compendex Jul. 9, 2026 + ABDC optional + ABS AJG + 中国科协 + CSCD + 中国科技核心 + OAJ 2025 + DOAJ Journal CSV",
   "last_updated_source": "WoS Core 2026-04-20",
-  "total": 45120,
+  "total": 48722,
   "indices": {
     "ESCI": 9449,
     "AHCI": 1819,
     "SCIE": 9527,
-    "EI": 4503,
+    "EI": 4887,
     "SSCI": 3557
   },
   "with_if_2024": 21525,
@@ -32,7 +32,7 @@
   "with_scd": 571,
   "with_ami": 32,
   "with_scopus": 29887,
-  "with_ei": 4503,
+  "with_ei": 4887,
   "wos_categories": 259,
   "esi_categories": 22,
   "oa_enriched": true,
@@ -67,5 +67,7 @@
   },
   "with_self_citation_history_by_year": {
     "2024": 473
-  }
+  },
+  "ei_source_updated": "2026-07-09",
+  "ei_source_url": "https://www.elsevier.com/products/engineering-village/databases/compendex"
 }
