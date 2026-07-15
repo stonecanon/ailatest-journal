@@ -6325,23 +6325,49 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   hyphens: auto;
 }
 @media (max-width: 900px) {
-  .dom-browse {
+  /* 手机/平板：筛选轨横铺全宽，避免「又窄又长」竖条 */
+  .dom-browse,
+  .regional-directory-section .dom-browse,
+  .india-section .dom-browse,
+  .korea-section .dom-browse,
+  .malaysia-section .dom-browse,
+  .dom-layout .dom-browse {
     flex-direction: column;
     gap: 12px;
   }
   .dom-filter-rail {
-    position: static;
-    max-height: none;
-    width: 100%;
-    flex: none;
+    position: static !important;
+    flex: none !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    max-height: min(42vh, 320px);
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 10px;
+  }
+  .dom-filter-group {
+    padding: 12px;
   }
   .dom-filter-chips {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .dom-filter-chip {
+    min-height: 36px;
   }
 }
 @media (max-width: 560px) {
+  .dom-filter-rail {
+    max-height: min(38vh, 280px);
+  }
   .dom-filter-chips {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
+  }
+  .dom-filter-chip {
+    font-size: 11px;
+    padding: 6px 6px;
   }
 }
 .dom-source-tabs {
@@ -8088,20 +8114,50 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .tab-panel[data-panel="int"] table.journals thead .col-fav { display: none; }
 .tab-panel[data-panel="int"] table.journals tbody { flex: 1 1 auto; min-width: 0; padding-top: 0; }
 
-/* 左栏筛选组：标题 + 常开 chip（其他/学科也展开） */
-.tab-panel[data-panel="int"] .th-dropdown { display: block; position: static; }
+/* 左栏筛选组：与地区站一致 — 标题 + 两列等宽 chip */
+.tab-panel[data-panel="int"] .th-dropdown { display: block; position: static; width: 100%; }
 .tab-panel[data-panel="int"] .th-dropdown > .th-dropdown-btn {
   pointer-events: none; width: 100%; justify-content: flex-start;
   border: 0; padding: 0 0 8px; color: var(--ink); font-size: 12px; font-weight: 700; letter-spacing: .04em;
 }
 .tab-panel[data-panel="int"] .th-dropdown > .th-dropdown-btn .dd-arrow { display: none; }
 .tab-panel[data-panel="int"] .th-dropdown-panel {
-  display: flex !important; position: static; flex-wrap: wrap; gap: 6px;
-  min-width: 0; max-height: none; overflow: visible; padding: 0; background: none; border: 0; box-shadow: none;
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  position: static;
+  min-width: 0;
+  max-height: none;
+  overflow: visible;
+  padding: 0;
+  background: none;
+  border: 0;
+  box-shadow: none;
+  width: 100%;
+  box-sizing: border-box;
 }
 .tab-panel[data-panel="int"] .th-chk {
-  padding: 4px 11px; border: 1px solid var(--rule); border-radius: 7px; background: var(--paper);
-  color: var(--ink-soft); font-size: 11.5px; font-weight: 600; white-space: nowrap; gap: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 34px;
+  margin: 0;
+  padding: 6px 8px;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink-soft);
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  gap: 0;
+  cursor: pointer;
 }
 .tab-panel[data-panel="int"] .th-chk:hover { border-color: var(--deep); color: var(--ink); }
 .tab-panel[data-panel="int"] .th-chk input { display: none; }
@@ -8111,23 +8167,65 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   color: var(--filter-on-fg);
   font-weight: 700;
 }
-.tab-panel[data-panel="int"] .dd-sep { flex-basis: 100%; height: 0; margin: 1px 0; background: none; border: 0; }
+/* 分隔线占满两列 */
+.tab-panel[data-panel="int"] .dd-sep {
+  grid-column: 1 / -1;
+  height: 0;
+  margin: 2px 0;
+  background: none;
+  border: 0;
+  padding: 0;
+}
+/* IF 滑条整行 */
+.tab-panel[data-panel="int"] #if-panel {
+  display: flex !important;
+  flex-direction: column;
+  gap: 8px;
+}
 /* 学科：搜索 + 列表 */
-.tab-panel[data-panel="int"] .th-dropdown-panel-search { display: block !important; }
+.tab-panel[data-panel="int"] .th-dropdown-panel-search {
+  display: flex !important;
+  flex-direction: column;
+  gap: 8px;
+}
 .tab-panel[data-panel="int"] #topic-dd-search {
-  width: 100%; box-sizing: border-box; margin-bottom: 8px; padding: 6px 10px;
+  width: 100%; box-sizing: border-box; margin: 0; padding: 6px 10px;
   border: 1px solid var(--rule); border-radius: 8px; background: var(--paper); font-size: 12px;
 }
-.tab-panel[data-panel="int"] #topic-dd-list { max-height: 200px; overflow: auto; }
+.tab-panel[data-panel="int"] #topic-dd-list {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  max-height: 200px;
+  overflow: auto;
+  width: 100%;
+}
+.tab-panel[data-panel="int"] #topic-dd-list .th-chk {
+  white-space: normal;
+  text-align: center;
+  min-height: 38px;
+  font-size: 11px;
+}
 .tab-panel[data-panel="int"] thead .col-free { order: -1; }
 
 @media (max-width: 900px) {
-  /* 窄屏：国际刊筛选栏回到顶部横排 */
+  /* 窄屏：国际刊筛选栏回到顶部，宽度拉满 */
   .tab-panel[data-panel="int"] table.journals { display: block; }
   .tab-panel[data-panel="int"] table.journals thead {
-    position: static; max-height: none; flex: none; margin-bottom: 8px;
+    position: static;
+    max-height: min(42vh, 320px);
+    overflow-y: auto;
+    flex: none;
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 10px;
+    box-sizing: border-box;
   }
-  .tab-panel[data-panel="int"] table.journals thead tr { flex-direction: row; flex-wrap: wrap; gap: 8px 14px; }
+  .tab-panel[data-panel="int"] table.journals thead tr {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 12px;
+  }
   .tab-panel[data-panel="int"] table.journals tbody { padding-top: 4px; }
 }
 @media (max-width: 600px) {
