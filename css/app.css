@@ -7619,7 +7619,7 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 }
 .j-row .j-card-head {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 64px;
+  grid-template-columns: minmax(0, 1fr) minmax(72px, auto);
   column-gap: 12px;
   align-items: start;
   width: 100%;
@@ -7627,10 +7627,11 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   min-width: 0;
   padding: 14px 14px 12px;
   box-sizing: border-box;
-  background: #f4f2ed;
+  /* 上块底色略加深，与白底徽章区对比更清晰 */
+  background: #e9e4db;
   border-radius: 15px 15px 0 0;
   /* 与下块（收录/分区）的清晰分割线 */
-  border-bottom: 1px solid rgba(60, 60, 67, 0.12);
+  border-bottom: 1px solid rgba(60, 60, 67, 0.14);
   overflow: hidden;
 }
 /* 无徽章下块时：上块圆角到底，无分割线 */
@@ -7646,12 +7647,11 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   max-width: 100%;
   overflow: hidden;
 }
-/* 右：固定 64px，IF 在上、收藏在下 */
+/* 右：IF + 收藏，宽度随 IF 同行文案 */
 .j-row .j-card-head-side {
   grid-column: 2;
-  width: 64px;
-  max-width: 64px;
-  min-width: 64px;
+  min-width: 72px;
+  max-width: 110px;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -7695,40 +7695,45 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   text-overflow: ellipsis;
 }
 
-/* IF：锁在右栏内，禁止 absolute / 飞出 */
+/* IF：与数字同一行，数字更大 */
 .j-row .j-card-if {
   position: static !important;
   top: auto !important;
   right: auto !important;
   left: auto !important;
-  width: 100%;
-  max-width: 64px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+  width: auto;
+  max-width: 110px;
+  display: inline-flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 4px;
   text-align: right;
-  line-height: 1.1;
+  line-height: 1;
   overflow: hidden;
   box-sizing: border-box;
 }
 .j-row .j-card-if-label {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.04em;
-  color: rgba(60, 60, 67, 0.45);
+  letter-spacing: 0.02em;
+  color: rgba(60, 60, 67, 0.5);
   text-transform: uppercase;
+  flex: 0 0 auto;
 }
 .j-row .j-card-if strong {
-  margin-top: 2px;
-  font-size: 15px;
-  font-weight: 700;
+  margin: 0;
+  font-size: 18px;
+  font-weight: 750;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.03em;
   color: #000;
   white-space: nowrap;
-  max-width: 64px;
+  max-width: 72px;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 1;
 }
 
 /* 收藏星：始终圆形底色；占位固定 */
@@ -7775,7 +7780,7 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   background: transparent;
 }
 .j-row.j-card:has(.fav-star.on) .j-card-head {
-  background: #ebe6dc;
+  background: #e0d9ce;
 }
 .j-row.j-card:has(.fav-star.on) .j-card-body {
   background: #ffffff;
@@ -7839,6 +7844,15 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   border-radius: 6px !important;
   margin: 0 !important;
   line-height: 1.3 !important;
+}
+/* 免费发表：浅底，避免实心深绿 */
+.j-row .j-meta-free .badge.b-free,
+.j-row .j-card-badges .badge.b-free,
+.j-row .badges-access .badge.b-free {
+  background: #e6f3ea !important;
+  color: #2f6b45 !important;
+  font-weight: 650 !important;
+  border: 0 !important;
 }
 .j-row .j-meta-src .src-tag {
   display: inline-flex;
@@ -8134,6 +8148,20 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   color: #2c4566 !important;
 }
 .j-row .badges-idx .badge.b-nature-index { background: #efebe3 !important; color: #4a4336 !important; }
+/* Nature/Science/Cell 子刊·正刊：浅棕底，避免实心深色 */
+.j-row .j-card-badges .flagship-pill,
+.j-row .badges-idx .flagship-pill,
+.j-row .j-card-badges .flag-nature-main,
+.j-row .j-card-badges .flag-nature-sub,
+.j-row .j-card-badges .flag-science-main,
+.j-row .j-card-badges .flag-science-sub,
+.j-row .j-card-badges .flag-cell-main,
+.j-row .j-card-badges .flag-cell-sub {
+  background: #f0ebe3 !important;
+  color: #5c4a32 !important;
+  font-weight: 650 !important;
+  border: 0 !important;
+}
 .j-row .badges-idx .badge.b-cscd { background: #e6eef1 !important; color: #3a555e !important; }
 .j-row .badges-idx .badge.b-cstpcd { background: #f0ebe3 !important; color: #5a4a32 !important; }
 .j-row .badges-idx .badge.b-scd { background: #e8f0ea !important; color: #3d5a42 !important; }
