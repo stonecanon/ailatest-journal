@@ -24,7 +24,11 @@
       pricing_title: '订阅即将开放 | AILatest Journal',
       pricing_desc: 'AILatest Journal 订阅功能即将开放。当前主推浏览器插件内测版，可在 Google Scholar、PubMed、知网等页面显示期刊徽章。',
       extension_title: '下载中心 | AILatest Journal',
-      extension_desc: 'AILatest Journal 下载中心，提供浏览器插件内测版、Skill、MCP 服务和后续移动端入口。'
+      extension_desc: 'AILatest Journal 下载中心，提供浏览器插件内测版、Skill、MCP 服务和后续移动端入口。',
+      about_title: '关于我们 | AILatest Journal',
+      about_desc: 'AILatest Journal 数据来源与更新时间：WoS、JCR、中科院分区、EI、Scopus、DOAJ、OpenAlex 等公开评级与元数据汇总说明。',
+      contact_title: '联系我们 | AILatest Journal',
+      contact_desc: '联系 AILatest Journal：产品反馈、数据纠错、商务合作与媒体联系。'
     },
     en: {
       nav_about: 'About',
@@ -50,7 +54,11 @@
       pricing_title: 'Subscription Coming Soon | AILatest Journal',
       pricing_desc: 'AILatest Journal subscription is coming soon. For now, try the browser extension beta for journal badges on Google Scholar, PubMed, CNKI and more.',
       extension_title: 'Download Center | AILatest Journal',
-      extension_desc: 'AILatest Journal Download Center for the browser extension beta, Skill, MCP service and future mobile entries.'
+      extension_desc: 'AILatest Journal Download Center for the browser extension beta, Skill, MCP service and future mobile entries.',
+      about_title: 'About | AILatest Journal',
+      about_desc: 'AILatest Journal data sources and cutoffs: WoS, JCR, CAS zones, EI, Scopus, DOAJ, OpenAlex and more.',
+      contact_title: 'Contact | AILatest Journal',
+      contact_desc: 'Contact AILatest Journal for product feedback, data corrections, business and media.'
     }
   };
 

@@ -5,101 +5,182 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>联系我们 Contact | AILatest Journal</title>
 <meta name="description" content="联系 AILatest Journal：产品反馈、数据纠错、商务合作与媒体联系。" />
-<link rel="canonical" href="https://journal.ailatest.org/contact.html" />
+<link rel="canonical" href="https://journal.ailatest.org/contact" />
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
-<link rel="stylesheet" href="/css/static.css?v=20260714-social-compact" />
+<link rel="stylesheet" href="/css/static.css?v=20260715-about-sources" />
 </head>
-<body>
-<aside class="site-rail" aria-label="Primary navigation">
-  <nav class="site-rail-top" aria-label="站点">
-    <a class="site-rail-link" href="/global"><span>◎</span><b>全球</b></a>
-    <a class="site-rail-link" href="/cn"><span>CN</span><b>中国</b></a>
-    <details class="site-rail-region">
-      <summary class="site-rail-link"><span>···</span><b>地区 ▾</b></summary>
-      <div class="site-rail-region-menu">
-        <a href="/in"><span>IN</span><b>印度</b></a>
-        <a href="/my"><span>MY</span><b>马来西亚</b></a>
-        <a href="/kr"><span>KR</span><b>韩国</b></a>
-      </div>
-    </details>
+<body data-static-page="contact">
+<aside class="app-rail" aria-label="Primary navigation">
+  <nav class="rail-top" aria-label="站点">
+    <a class="rail-nav-btn" href="/global" aria-label="全球期刊" title="全球期刊">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 3.4 9A14 14 0 0 1 12 21a14 14 0 0 1-3.4-9A14 14 0 0 1 12 3Z"/></svg>
+      <span data-static-i18n="rail_global">全球</span>
+    </a>
+    <a class="rail-nav-btn rail-region-station" data-region-station="dom" href="/cn" aria-label="中国期刊" title="中国期刊">
+      <span class="rail-flag" aria-hidden="true">CN</span>
+      <span data-static-i18n="rail_china">中国</span>
+    </a>
+    <div class="rail-region-picker">
+      <button class="rail-nav-btn rail-region-toggle" type="button" aria-label="地区站点" title="地区站点" aria-expanded="false">
+        <span class="rail-flag rail-region-symbol" aria-hidden="true">···</span>
+        <span><span data-static-i18n="rail_regions">地区</span><b class="rail-caret" aria-hidden="true">▾</b></span>
+      </button>
+      <div class="rail-region-menu" aria-label="地区站点"></div>
+    </div>
   </nav>
-  <div class="site-rail-bottom" aria-label="账户与工具">
-    <a class="site-rail-link" href="/rankings/"><span>▥</span><b>榜单</b></a>
-    <a class="site-rail-link" href="/favorites"><span>☆</span><b>收藏</b></a>
-    <a class="site-rail-link" href="/account"><span>Me</span><b>我的</b></a>
+  <div class="rail-bottom" aria-label="账户与工具">
+    <a class="rail-nav-btn" href="/extension.html" aria-label="下载中心" title="下载中心">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 20h14"/></svg>
+      <span data-static-i18n="download_center">下载中心</span>
+    </a>
+    <a class="rail-nav-btn" href="/rankings" aria-label="榜单" title="榜单">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 21V11"/><path d="M12 21V7"/><path d="M16 21V3"/><path d="M4 21h16"/></svg>
+      <span data-static-i18n="rail_rankings">榜单</span>
+    </a>
+    <a class="rail-nav-btn" href="/favorites" aria-label="收藏" title="收藏">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.7l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3.7z"/></svg>
+      <span data-static-i18n="rail_saved">收藏</span>
+    </a>
+    <a class="rail-nav-btn" href="/account" aria-label="我的" title="我的">
+      <span class="rail-avatar" aria-hidden="true">我</span>
+      <span data-static-i18n="rail_account">我的</span>
+    </a>
   </div>
 </aside>
+
 <header class="page-head">
   <a class="brand" href="/">AILatest <span>Journal</span></a>
   <nav>
-    <a href="/extension.html">下载中心</a>
-    <span class="static-lang-toggle">中文</span>
+    <a href="/extension.html" data-static-i18n="download_center">下载中心</a>
+    <a href="/about.html" data-static-i18n="nav_about">关于</a>
+    <button class="static-lang-toggle" type="button" data-static-lang-toggle>English</button>
   </nav>
 </header>
+
 <main class="narrow">
-  <h1>联系我们</h1>
-  <p class="sub">Contact us — we usually reply within 2 business days.</p>
+  <div data-lang-panel="zh-CN">
+    <h1>联系我们</h1>
+    <p class="sub">通常 2 个工作日内回复</p>
 
-  <section class="social-matrix" aria-labelledby="social-matrix-title">
-    <header><p class="eyebrow">Find us</p><h2 id="social-matrix-title">关注、接收更新或加入反馈群</h2></header>
-    <article>
-      <div class="platform-heading">
-        <span class="platform-logo platform-xhs" aria-hidden="true"><svg viewBox="0 0 32 32"><text x="16" y="19.2" text-anchor="middle">RED</text></svg></span>
-        <div><h3>小红书</h3><span>REDnote</span></div>
-      </div>
-      <p>产品方法与团队动态</p>
-      <a class="social-qr" href="https://ailatest.org/assets/contact/xiaohongshu-qr.jpg" aria-label="查看 AILATEST STUDIO 小红书二维码"><img src="https://ailatest.org/assets/contact/xiaohongshu-qr.jpg" width="941" height="867" loading="lazy" alt="AILATEST STUDIO 小红书二维码"></a>
-    </article>
-    <article>
-      <div class="platform-heading">
-        <span class="platform-logo platform-wechat" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M13.3 7.2c-5 0-9.1 3.3-9.1 7.4 0 2.3 1.3 4.3 3.3 5.7l-.8 3 3.1-1.6c1.1.3 2.3.5 3.5.5.5 0 1 0 1.5-.1a7.2 7.2 0 0 1-.7-3.1c0-4.3 3.9-7.8 8.8-8.1-1.6-2.2-5.2-3.7-9.6-3.7Z"/><path d="M27.8 18.9c0-3.6-3.5-6.5-7.8-6.5s-7.8 2.9-7.8 6.5 3.5 6.5 7.8 6.5c1 0 2-.2 2.9-.4l2.7 1.4-.7-2.6c1.8-1.2 2.9-3 2.9-4.9Z"/><circle cx="10.2" cy="13.6" r="1.1" class="platform-eye"/><circle cx="16.3" cy="13.6" r="1.1" class="platform-eye"/><circle cx="17.4" cy="18.2" r="1" class="platform-eye"/><circle cx="22.7" cy="18.2" r="1" class="platform-eye"/></svg></span>
-        <div><h3>微信公众号</h3><span>WeChat Official</span></div>
-      </div>
-      <p>产品更新与重要通知</p>
-      <a class="social-qr" href="https://weixin.qq.com/r/mp/iS_4oBfEH0pgrVPD93qb" aria-label="打开 AILATEST STUDIO 微信公众号"><img src="https://ailatest.org/assets/contact/wechat-official-qr.jpg" width="430" height="430" loading="lazy" alt="AILATEST STUDIO 微信公众号二维码"></a>
-    </article>
-    <article>
-      <div class="platform-heading">
-        <span class="platform-logo platform-wechat" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M13.3 7.2c-5 0-9.1 3.3-9.1 7.4 0 2.3 1.3 4.3 3.3 5.7l-.8 3 3.1-1.6c1.1.3 2.3.5 3.5.5.5 0 1 0 1.5-.1a7.2 7.2 0 0 1-.7-3.1c0-4.3 3.9-7.8 8.8-8.1-1.6-2.2-5.2-3.7-9.6-3.7Z"/><path d="M27.8 18.9c0-3.6-3.5-6.5-7.8-6.5s-7.8 2.9-7.8 6.5 3.5 6.5 7.8 6.5c1 0 2-.2 2.9-.4l2.7 1.4-.7-2.6c1.8-1.2 2.9-3 2.9-4.9Z"/><circle cx="10.2" cy="13.6" r="1.1" class="platform-eye"/><circle cx="16.3" cy="13.6" r="1.1" class="platform-eye"/><circle cx="17.4" cy="18.2" r="1" class="platform-eye"/><circle cx="22.7" cy="18.2" r="1" class="platform-eye"/></svg></span>
-        <div><h3>微信反馈群</h3><span>WeChat Group</span></div>
-      </div>
-      <p>二维码会过期，以联系矩阵页为准</p>
-      <a class="social-qr" href="https://ailatest.org/connect.html#wechat-group" aria-label="查看当前 AILATEST STUDIO 微信反馈群二维码"><img src="https://ailatest.org/assets/contact/wechat-group-current.jpg" width="1080" height="1080" loading="lazy" alt="AILATEST STUDIO 微信产品反馈群二维码"></a>
-    </article>
-  </section>
+    <section class="social-matrix" aria-labelledby="social-matrix-title-zh">
+      <header><p class="eyebrow">Find us</p><h2 id="social-matrix-title-zh">关注、接收更新或加入反馈群</h2></header>
+      <article>
+        <div class="platform-heading">
+          <span class="platform-logo platform-xhs" aria-hidden="true"><svg viewBox="0 0 32 32"><text x="16" y="19.2" text-anchor="middle">RED</text></svg></span>
+          <div><h3>小红书</h3><span>REDnote</span></div>
+        </div>
+        <p>产品方法与团队动态</p>
+        <a class="social-qr" href="https://ailatest.org/assets/contact/xiaohongshu-qr.jpg" aria-label="查看小红书二维码"><img src="https://ailatest.org/assets/contact/xiaohongshu-qr.jpg" width="941" height="867" loading="lazy" alt="AILATEST STUDIO 小红书二维码"></a>
+      </article>
+      <article>
+        <div class="platform-heading">
+          <span class="platform-logo platform-wechat" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M13.3 7.2c-5 0-9.1 3.3-9.1 7.4 0 2.3 1.3 4.3 3.3 5.7l-.8 3 3.1-1.6c1.1.3 2.3.5 3.5.5.5 0 1 0 1.5-.1a7.2 7.2 0 0 1-.7-3.1c0-4.3 3.9-7.8 8.8-8.1-1.6-2.2-5.2-3.7-9.6-3.7Z"/><path d="M27.8 18.9c0-3.6-3.5-6.5-7.8-6.5s-7.8 2.9-7.8 6.5 3.5 6.5 7.8 6.5c1 0 2-.2 2.9-.4l2.7 1.4-.7-2.6c1.8-1.2 2.9-3 2.9-4.9Z"/><circle cx="10.2" cy="13.6" r="1.1" class="platform-eye"/><circle cx="16.3" cy="13.6" r="1.1" class="platform-eye"/><circle cx="17.4" cy="18.2" r="1" class="platform-eye"/><circle cx="22.7" cy="18.2" r="1" class="platform-eye"/></svg></span>
+          <div><h3>微信公众号</h3><span>WeChat Official</span></div>
+        </div>
+        <p>产品更新与重要通知</p>
+        <a class="social-qr" href="https://weixin.qq.com/r/mp/iS_4oBfEH0pgrVPD93qb" aria-label="打开微信公众号"><img src="https://ailatest.org/assets/contact/wechat-official-qr.jpg" width="430" height="430" loading="lazy" alt="微信公众号二维码"></a>
+      </article>
+      <article>
+        <div class="platform-heading">
+          <span class="platform-logo platform-wechat" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M13.3 7.2c-5 0-9.1 3.3-9.1 7.4 0 2.3 1.3 4.3 3.3 5.7l-.8 3 3.1-1.6c1.1.3 2.3.5 3.5.5.5 0 1 0 1.5-.1a7.2 7.2 0 0 1-.7-3.1c0-4.3 3.9-7.8 8.8-8.1-1.6-2.2-5.2-3.7-9.6-3.7Z"/><path d="M27.8 18.9c0-3.6-3.5-6.5-7.8-6.5s-7.8 2.9-7.8 6.5 3.5 6.5 7.8 6.5c1 0 2-.2 2.9-.4l2.7 1.4-.7-2.6c1.8-1.2 2.9-3 2.9-4.9Z"/><circle cx="10.2" cy="13.6" r="1.1" class="platform-eye"/><circle cx="16.3" cy="13.6" r="1.1" class="platform-eye"/><circle cx="17.4" cy="18.2" r="1" class="platform-eye"/><circle cx="22.7" cy="18.2" r="1" class="platform-eye"/></svg></span>
+          <div><h3>微信反馈群</h3><span>WeChat Group</span></div>
+        </div>
+        <p>二维码会过期，以联系矩阵页为准</p>
+        <a class="social-qr" href="https://ailatest.org/connect.html#wechat-group" aria-label="查看微信反馈群二维码"><img src="https://ailatest.org/assets/contact/wechat-group-current.jpg" width="1080" height="1080" loading="lazy" alt="微信产品反馈群二维码"></a>
+      </article>
+    </section>
 
-  <div class="card">
-    <h3 style="margin-top:0">📮 通用联系 / General</h3>
-    <p>邮箱：<a href="mailto:contact@ailatest.org"><b>contact@ailatest.org</b></a></p>
-    <p class="small muted">产品反馈、功能建议、账号与插件问题、退款申请（见 <a href="/refund.html">Refund Policy</a>）都发这里。来信请附上注册邮箱，便于查询账号状态。</p>
+    <div class="card">
+      <h3 style="margin-top:0">📮 通用联系</h3>
+      <p>邮箱：<a href="mailto:contact@ailatest.org"><b>contact@ailatest.org</b></a></p>
+      <p class="small muted">产品反馈、功能建议、账号与插件问题、退款申请（见 <a href="/refund.html">Refund Policy</a>）都发这里。来信请附上注册邮箱，便于查询账号状态。</p>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0">🛠 数据纠错</h3>
+      <p>发现某本期刊的影响因子、分区、收录信息有误？发邮件到 <a href="mailto:contact@ailatest.org">contact@ailatest.org</a>，标题注明「数据纠错」，并写明：</p>
+      <ul class="small">
+        <li>期刊名 / ISSN</li>
+        <li>有误的字段与正确值</li>
+        <li>依据来源（官网链接或官方文件）</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0">🤝 商务合作</h3>
+      <p>机构合作、API 接入、内容合作：<a href="mailto:contact@ailatest.org">contact@ailatest.org</a>，标题注明「商务合作」。</p>
+    </div>
+
+    <div class="note">浏览器插件问题也欢迎反馈：请注明插件版本（popup 底部可见数据版本）、所在网站（Google Scholar / PubMed / 知网）与具体页面链接。</div>
   </div>
 
-  <div class="card">
-    <h3 style="margin-top:0">🛠 数据纠错 / Data corrections</h3>
-    <p>发现某本期刊的影响因子、分区、收录信息有误？发邮件到 <a href="mailto:contact@ailatest.org">contact@ailatest.org</a>，标题注明「数据纠错」，并写明：</p>
-    <ul class="small">
-      <li>期刊名 / ISSN</li>
-      <li>有误的字段与正确值</li>
-      <li>依据来源（官网链接或官方文件）</li>
-    </ul>
-  </div>
+  <div data-lang-panel="en">
+    <h1>Contact us</h1>
+    <p class="sub">We usually reply within 2 business days.</p>
 
-  <div class="card">
-    <h3 style="margin-top:0">🤝 商务合作 / Business</h3>
-    <p>机构合作、API 接入、内容合作：<a href="mailto:contact@ailatest.org">contact@ailatest.org</a>，标题注明「商务合作」。</p>
-  </div>
+    <section class="social-matrix" aria-labelledby="social-matrix-title-en">
+      <header><p class="eyebrow">Find us</p><h2 id="social-matrix-title-en">Follow updates or join the feedback group</h2></header>
+      <article>
+        <div class="platform-heading">
+          <span class="platform-logo platform-xhs" aria-hidden="true"><svg viewBox="0 0 32 32"><text x="16" y="19.2" text-anchor="middle">RED</text></svg></span>
+          <div><h3>REDnote</h3><span>Xiaohongshu</span></div>
+        </div>
+        <p>Product notes &amp; team updates</p>
+        <a class="social-qr" href="https://ailatest.org/assets/contact/xiaohongshu-qr.jpg" aria-label="REDnote QR code"><img src="https://ailatest.org/assets/contact/xiaohongshu-qr.jpg" width="941" height="867" loading="lazy" alt="REDnote QR code"></a>
+      </article>
+      <article>
+        <div class="platform-heading">
+          <span class="platform-logo platform-wechat" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M13.3 7.2c-5 0-9.1 3.3-9.1 7.4 0 2.3 1.3 4.3 3.3 5.7l-.8 3 3.1-1.6c1.1.3 2.3.5 3.5.5.5 0 1 0 1.5-.1a7.2 7.2 0 0 1-.7-3.1c0-4.3 3.9-7.8 8.8-8.1-1.6-2.2-5.2-3.7-9.6-3.7Z"/><path d="M27.8 18.9c0-3.6-3.5-6.5-7.8-6.5s-7.8 2.9-7.8 6.5 3.5 6.5 7.8 6.5c1 0 2-.2 2.9-.4l2.7 1.4-.7-2.6c1.8-1.2 2.9-3 2.9-4.9Z"/><circle cx="10.2" cy="13.6" r="1.1" class="platform-eye"/><circle cx="16.3" cy="13.6" r="1.1" class="platform-eye"/><circle cx="17.4" cy="18.2" r="1" class="platform-eye"/><circle cx="22.7" cy="18.2" r="1" class="platform-eye"/></svg></span>
+          <div><h3>WeChat Official Account</h3><span>WeChat OA</span></div>
+        </div>
+        <p>Product updates &amp; notices</p>
+        <a class="social-qr" href="https://weixin.qq.com/r/mp/iS_4oBfEH0pgrVPD93qb" aria-label="WeChat official account"><img src="https://ailatest.org/assets/contact/wechat-official-qr.jpg" width="430" height="430" loading="lazy" alt="WeChat official QR"></a>
+      </article>
+      <article>
+        <div class="platform-heading">
+          <span class="platform-logo platform-wechat" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M13.3 7.2c-5 0-9.1 3.3-9.1 7.4 0 2.3 1.3 4.3 3.3 5.7l-.8 3 3.1-1.6c1.1.3 2.3.5 3.5.5.5 0 1 0 1.5-.1a7.2 7.2 0 0 1-.7-3.1c0-4.3 3.9-7.8 8.8-8.1-1.6-2.2-5.2-3.7-9.6-3.7Z"/><path d="M27.8 18.9c0-3.6-3.5-6.5-7.8-6.5s-7.8 2.9-7.8 6.5 3.5 6.5 7.8 6.5c1 0 2-.2 2.9-.4l2.7 1.4-.7-2.6c1.8-1.2 2.9-3 2.9-4.9Z"/><circle cx="10.2" cy="13.6" r="1.1" class="platform-eye"/><circle cx="16.3" cy="13.6" r="1.1" class="platform-eye"/><circle cx="17.4" cy="18.2" r="1" class="platform-eye"/><circle cx="22.7" cy="18.2" r="1" class="platform-eye"/></svg></span>
+          <div><h3>WeChat feedback group</h3><span>WeChat Group</span></div>
+        </div>
+        <p>QR codes expire; use the live matrix page</p>
+        <a class="social-qr" href="https://ailatest.org/connect.html#wechat-group" aria-label="WeChat group QR"><img src="https://ailatest.org/assets/contact/wechat-group-current.jpg" width="1080" height="1080" loading="lazy" alt="WeChat feedback group QR"></a>
+      </article>
+    </section>
 
-  <div class="note">浏览器插件的问题也欢迎反馈：请注明插件版本（popup 底部可见数据版本）、所在网站（Google Scholar / PubMed / 知网）与具体页面链接。</div>
+    <div class="card">
+      <h3 style="margin-top:0">📮 General</h3>
+      <p>Email: <a href="mailto:contact@ailatest.org"><b>contact@ailatest.org</b></a></p>
+      <p class="small muted">Product feedback, feature ideas, account/extension issues, refunds (see <a href="/refund.html">Refund Policy</a>). Please include your registered email.</p>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0">🛠 Data corrections</h3>
+      <p>Found a wrong IF, quartile, or indexing field? Email <a href="mailto:contact@ailatest.org">contact@ailatest.org</a> with subject “Data correction” and include:</p>
+      <ul class="small">
+        <li>Journal title / ISSN</li>
+        <li>Incorrect field and correct value</li>
+        <li>Source (official link or document)</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0">🤝 Business</h3>
+      <p>Partnerships, API access, content: <a href="mailto:contact@ailatest.org">contact@ailatest.org</a>, subject “Business”.</p>
+    </div>
+
+    <div class="note">For the browser extension, include extension version (data version at the bottom of the popup), site (Google Scholar / PubMed / CNKI), and the page URL.</div>
+  </div>
 </main>
+
 <footer class="page-foot">
   <p>© 2026 AILatest Journal ·
-    <a href="/about.html">关于</a> ·
-    <a href="/extension.html">下载中心</a> ·
-    <a href="/contact.html">联系</a> ·
+    <a href="/about.html" data-static-i18n="footer_about">关于</a> ·
+    <a href="/extension.html" data-static-i18n="download_center">下载中心</a> ·
+    <a href="/contact.html" data-static-i18n="footer_contact">联系</a> ·
     <a href="/terms.html">Terms</a> ·
     <a href="/privacy.html">Privacy</a> ·
     <a href="/refund.html">Refund</a></p>
 </footer>
 <script src="/js/site-rail.js?v=20260715-region-multiselect" defer></script>
+<script src="/js/static-i18n.js?v=20260715-about-contact" defer></script>
 </body>
 </html>
