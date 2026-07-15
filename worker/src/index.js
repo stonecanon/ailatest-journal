@@ -1341,7 +1341,8 @@ async function ensureGiftTables(env) {
       duration_days INTEGER,
       expires_at INTEGER,
       created_by TEXT NOT NULL,
-      created_at INTEGER NOT NULL
+      created_at INTEGER NOT NULL,
+      revoked_at INTEGER
     )`),
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS gift_redemptions (
       code_hash TEXT PRIMARY KEY,
@@ -1355,6 +1356,10 @@ async function ensureGiftTables(env) {
       attempts INTEGER NOT NULL DEFAULT 0
     )`),
   ]);
+  // 已有表补列（幂等）
+  try {
+    await env.DB.prepare('ALTER TABLE gift_codes ADD COLUMN revoked_at INTEGER').run();
+  } catch (_) { /* column may already exist */ }
 }
 
 function normalizeGiftCode(value) {
@@ -1435,6 +1440,37 @@ async function routeAdminGiftCodes(req, env) {
   });
 }
 
+/**
+ * POST /admin/gift-codes/void  { code }
+ * 站长作废：未兑换的码立即失效；已兑换不可作废。
+ */
+async function routeAdminVoidGiftCode(req, env) {
+  const u = await getUser(req, env);
+  if (!u) return err('unauthorized', 401);
+  if (!isOwnerUser(u, env)) return err('forbidden', 403);
+  const body = await req.json().catch(() => ({}));
+  const canonical = normalizeGiftCode(body?.code || '');
+  if (canonical.length < 12 || canonical.length > 64) return err('invalid_gift_code', 400);
+  await ensureGiftTables(env);
+  const codeHash = await sha256Hex(canonical);
+  const gift = await env.DB.prepare(
+    'SELECT code_hash, plan, revoked_at FROM gift_codes WHERE code_hash = ?'
+  ).bind(codeHash).first();
+  if (!gift) return err('invalid_gift_code', 404);
+  if (gift.revoked_at && Number(gift.revoked_at) > 0) {
+    return json({ ok: true, voided: true, already: true });
+  }
+  const redeemed = await env.DB.prepare(
+    'SELECT user_id FROM gift_redemptions WHERE code_hash = ?'
+  ).bind(codeHash).first();
+  if (redeemed) return err('gift_code_already_redeemed', 409);
+  const now = nowSec();
+  await env.DB.prepare(
+    'UPDATE gift_codes SET revoked_at = ? WHERE code_hash = ?'
+  ).bind(now, codeHash).run();
+  return json({ ok: true, voided: true, plan: gift.plan, voidedAt: now });
+}
+
 /** POST /gift-codes/redeem  { code } — 须登录；套餐/时长以库中记录为准 */
 async function routeRedeemGiftCode(req, env) {
   const u = await getUser(req, env);
@@ -1448,11 +1484,14 @@ async function routeRedeemGiftCode(req, env) {
   }
   const codeHash = await sha256Hex(canonical);
   const gift = await env.DB.prepare(
-    'SELECT plan, duration_days, expires_at, code_hint FROM gift_codes WHERE code_hash = ?'
+    'SELECT plan, duration_days, expires_at, code_hint, revoked_at FROM gift_codes WHERE code_hash = ?'
   ).bind(codeHash).first();
   // 套餐以库记录为准；改码里的 MAX/PRO 文字无效（哈希对不上）
   if (!gift || (gift.plan !== 'pro' && gift.plan !== 'max')) {
     return err('invalid_gift_code', 404);
+  }
+  if (gift.revoked_at && Number(gift.revoked_at) > 0) {
+    return err('gift_code_voided', 410);
   }
   if (gift.expires_at && Number(gift.expires_at) > 0 && nowSec() > Number(gift.expires_at)) {
     return err('gift_code_expired', 410);
@@ -2545,6 +2584,7 @@ export default {
       if (p === '/me'                  && req.method === 'GET')  return routeMe(req, env);
       if (p === '/me/entitlements'     && req.method === 'GET')  return routeMeEntitlements(req, env);
       if (p === '/admin/gift-codes'    && req.method === 'POST') return routeAdminGiftCodes(req, env);
+      if (p === '/admin/gift-codes/void' && req.method === 'POST') return routeAdminVoidGiftCode(req, env);
       if (p === '/gift-codes/redeem'   && req.method === 'POST') return routeRedeemGiftCode(req, env);
       if (p === '/checkout/creem'      && req.method === 'POST') {
         const out = await routeCreemCheckout(req, env, getUser);

@@ -2590,7 +2590,14 @@ body.topbar-compact .results-head {
 .gift-code-results {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
+}
+.gift-code-item {
+  position: relative;
+  display: inline-flex;
+  max-width: 100%;
+  padding-top: 6px;
+  padding-right: 6px;
 }
 .gift-code-chip {
   appearance: none;
@@ -2598,14 +2605,54 @@ body.topbar-compact .results-head {
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.03em;
-  padding: 8px 10px;
+  padding: 8px 12px 8px 10px;
   border-radius: 8px;
   border: 1px dashed #c9b89a;
   background: #fffaf0;
   color: #3a2e1f;
   cursor: pointer;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .gift-code-chip:hover { border-color: var(--accent); color: var(--accent); }
+.gift-code-void {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 2;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid #d4ccc0;
+  border-radius: 999px;
+  background: #fff;
+  color: #8a7360;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(43, 40, 36, 0.08);
+}
+.gift-code-void:hover {
+  background: #a33a36;
+  border-color: #a33a36;
+  color: #fff;
+}
+.gift-code-item.is-voided .gift-code-chip {
+  opacity: 0.45;
+  text-decoration: line-through;
+  cursor: default;
+  border-style: solid;
+  color: #8a8377;
+}
+.gift-code-item.is-voided .gift-code-void {
+  display: none;
+}
 .gift-message {
   margin: 0;
   font-size: 13px;

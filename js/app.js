@@ -8398,7 +8398,7 @@
             <header>
               <div>
                 <strong>${T('站长礼品卡','Owner gift cards')}</strong>
-                <p>${T('生成后只显示一次；服务端验证，每个码仅可成功兑换一次。','Shown once after creation; server-verified and redeemable exactly once.')}</p>
+                <p>${T('生成后只显示一次；服务端验证，每个码仅可成功兑换一次。右上角 × 可作废未使用的码。','Shown once; server-verified, redeemable once. Use × to void unused codes.')}</p>
               </div>
               <span>OWNER · MAX</span>
             </header>
@@ -8477,6 +8477,7 @@
             invalid_gift_code: T('礼品码无效','Invalid gift code'),
             gift_code_used: T('该礼品码已被使用','This gift code has been used'),
             gift_code_expired: T('该礼品码已过期','This gift code has expired'),
+            gift_code_voided: T('该礼品码已作废','This gift code has been voided'),
             too_many_gift_attempts: T('尝试次数过多，请 15 分钟后再试','Too many attempts — try again in 15 minutes'),
             unauthorized: T('请先登录','Sign in first'),
             forbidden: T('无权限','Not allowed'),
@@ -8494,6 +8495,55 @@
         if (btn) btn.disabled = false;
       }
     });
+    const bindGiftResultActions = (results) => {
+      if (!results) return;
+      results.querySelectorAll('[data-copy-code]').forEach((b) => {
+        b.addEventListener('click', async () => {
+          if (b.closest('.gift-code-item')?.classList.contains('is-voided')) return;
+          try {
+            await navigator.clipboard.writeText(b.dataset.copyCode || b.textContent || '');
+            setGiftMsg(T('已复制','Copied'));
+          } catch (_) {
+            setGiftMsg(T('复制失败，请手动选择','Copy failed'), true);
+          }
+        });
+      });
+      results.querySelectorAll('[data-void-code]').forEach((b) => {
+        b.addEventListener('click', async (ev) => {
+          ev.preventDefault();
+          ev.stopPropagation();
+          if (!user?.token || !isOwnerClient()) return;
+          const code = b.dataset.voidCode || '';
+          if (!code) return;
+          if (!confirm(T('作废此礼品码？作废后无法兑换。','Void this gift code? It can no longer be redeemed.'))) return;
+          b.disabled = true;
+          setGiftMsg(T('作废中…','Voiding…'));
+          try {
+            const r = await fetch(`${API_BASE}/admin/gift-codes/void`, {
+              method: 'POST',
+              headers: { 'Authorization': `Bearer ${user.token}`, 'Content-Type': 'application/json' },
+              body: JSON.stringify({ code }),
+            });
+            const d = await r.json().catch(() => ({}));
+            if (!r.ok) {
+              const map = {
+                invalid_gift_code: T('礼品码无效','Invalid gift code'),
+                gift_code_already_redeemed: T('已兑换，无法作废','Already redeemed — cannot void'),
+                unauthorized: T('登录已失效，请重新登录','Session expired — sign in again'),
+                forbidden: T('无权限','Not allowed'),
+              };
+              throw new Error(map[d.error] || d.error || `HTTP ${r.status}`);
+            }
+            const item = b.closest('.gift-code-item');
+            if (item) item.classList.add('is-voided');
+            setGiftMsg(T('已作废','Voided'));
+          } catch (err) {
+            setGiftMsg(err.message || String(err), true);
+            b.disabled = false;
+          }
+        });
+      });
+    };
     box.querySelector('[data-gift-admin]')?.addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!user?.token) {
@@ -8535,20 +8585,14 @@
         if (results) {
           results.hidden = !codes.length;
           results.innerHTML = codes.map(c =>
-            `<button type="button" class="gift-code-chip" data-code="${escape(c)}" title="${T('点击复制','Click to copy')}">${escape(c)}</button>`
+            `<div class="gift-code-item" data-code-item="${escape(c)}">
+              <button type="button" class="gift-code-chip" data-copy-code="${escape(c)}" title="${T('点击复制','Click to copy')}">${escape(c)}</button>
+              <button type="button" class="gift-code-void" data-void-code="${escape(c)}" title="${T('作废','Void')}" aria-label="${T('作废礼品码','Void gift code')}">×</button>
+            </div>`
           ).join('');
-          results.querySelectorAll('[data-code]').forEach(b => {
-            b.addEventListener('click', async () => {
-              try {
-                await navigator.clipboard.writeText(b.dataset.code || b.textContent || '');
-                setGiftMsg(T('已复制','Copied'));
-              } catch (_) {
-                setGiftMsg(T('复制失败，请手动选择','Copy failed'), true);
-              }
-            });
-          });
+          bindGiftResultActions(results);
         }
-        setGiftMsg(T(`已生成 ${codes.length} 个单次礼品码（请立即复制）`, `${codes.length} single-use codes created — copy now`));
+        setGiftMsg(T(`已生成 ${codes.length} 个单次礼品码（请立即复制；右上角 × 可作废）`, `${codes.length} single-use codes created — copy now; × voids a code`));
       } catch (err) {
         setGiftMsg(err.message || String(err), true);
       } finally {
