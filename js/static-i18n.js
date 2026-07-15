@@ -17,22 +17,13 @@
       nav_extension: '插件内测',
       nav_contact: '联系',
       nav_login: '注册 / 登录',
-      footer_tag: '期刊检索 · 分区评级 · 投稿决策',
-      footer_product: '产品',
-      footer_support: '支持',
-      footer_legal: '条款',
       footer_about: '关于',
       footer_pricing: '订阅',
       footer_contact: '联系',
-      footer_matrix: '联系矩阵',
-      footer_ailatest: '关于 AILatest',
-      footer_terms: '使用条款',
-      footer_privacy: '隐私政策',
-      footer_refund: '退款政策',
+      footer_terms: '条款',
+      footer_privacy: '隐私',
+      footer_refund: '退款',
       footer_download: '下载中心',
-      footer_global: '全球',
-      footer_china: '中国',
-      footer_rankings: '榜单',
       lang_toggle: 'English',
       pricing_title: '订阅即将开放 | AILatest Journal',
       pricing_desc: 'AILatest Journal 订阅功能即将开放。当前主推浏览器插件内测版，可在 Google Scholar、PubMed、知网等页面显示期刊徽章。',
@@ -60,22 +51,13 @@
       nav_extension: 'Extension beta',
       nav_contact: 'Contact',
       nav_login: 'Sign in',
-      footer_tag: 'Search · rankings · submission decisions',
-      footer_product: 'Product',
-      footer_support: 'Support',
-      footer_legal: 'Legal',
       footer_about: 'About',
       footer_pricing: 'Subscribe',
       footer_contact: 'Contact',
-      footer_matrix: 'Contact matrix',
-      footer_ailatest: 'About AILatest',
       footer_terms: 'Terms',
       footer_privacy: 'Privacy',
       footer_refund: 'Refund',
       footer_download: 'Download Center',
-      footer_global: 'Global',
-      footer_china: 'China',
-      footer_rankings: 'Rankings',
       lang_toggle: '中文',
       pricing_title: 'Subscription Coming Soon | AILatest Journal',
       pricing_desc: 'AILatest Journal subscription is coming soon. For now, try the browser extension beta for journal badges on Google Scholar, PubMed, CNKI and more.',
@@ -104,40 +86,14 @@
     return normalize(navigator.language || 'en');
   }
 
-  /** 全站静态页统一页脚：品牌 + 产品 / 支持 / 条款（单层，不重复底栏链接） */
+  /** 全站静态页统一页脚：一行即可 */
   function unifiedFooterHtml(dict) {
-    return `
-    <div class="site-foot-grid">
-      <div class="site-foot-brand">
-        <a class="site-foot-logo" href="/" aria-label="AILatest Journal">
-          <img class="site-foot-mark" src="/icons/favicon-32.png" width="22" height="22" alt="" decoding="async" />
-          <span class="site-foot-name">AILatest <em>Journal</em></span>
-        </a>
-        <p data-static-i18n="footer_tag">${dict.footer_tag}</p>
-        <a class="site-foot-copy" href="https://ailatest.org" target="_blank" rel="noopener noreferrer" title="AILatest">© 2026 AILatest</a>
-      </div>
-      <div class="site-foot-col">
-        <h4 data-static-i18n="footer_product">${dict.footer_product}</h4>
-        <a href="/global/" data-static-i18n="footer_global">${dict.footer_global}</a>
-        <a href="/cn/" data-static-i18n="footer_china">${dict.footer_china}</a>
-        <a href="/rankings/" data-static-i18n="footer_rankings">${dict.footer_rankings}</a>
-        <a href="/extension.html" data-static-i18n="footer_download">${dict.footer_download}</a>
-        <a href="/about" data-static-i18n="footer_about">${dict.footer_about}</a>
-      </div>
-      <div class="site-foot-col">
-        <h4 data-static-i18n="footer_support">${dict.footer_support}</h4>
-        <a href="/contact" data-static-i18n="footer_contact">${dict.footer_contact}</a>
-        <a href="https://ailatest.org/connect.html" target="_blank" rel="noopener noreferrer" data-static-i18n="footer_matrix">${dict.footer_matrix}</a>
-        <a href="mailto:contact@ailatest.org">contact@ailatest.org</a>
-        <a href="https://ailatest.org" target="_blank" rel="noopener noreferrer" data-static-i18n="footer_ailatest">${dict.footer_ailatest}</a>
-      </div>
-      <div class="site-foot-col">
-        <h4 data-static-i18n="footer_legal">${dict.footer_legal}</h4>
-        <a href="/privacy" data-static-i18n="footer_privacy">${dict.footer_privacy}</a>
-        <a href="/terms" data-static-i18n="footer_terms">${dict.footer_terms}</a>
-        <a href="/refund" data-static-i18n="footer_refund">${dict.footer_refund}</a>
-      </div>
-    </div>`;
+    return `<p class="site-foot-line">© 2026 AILatest Journal ·
+      <a href="/about" data-static-i18n="footer_about">${dict.footer_about}</a> ·
+      <a href="/contact" data-static-i18n="footer_contact">${dict.footer_contact}</a> ·
+      <a href="/terms" data-static-i18n="footer_terms">${dict.footer_terms}</a> ·
+      <a href="/privacy" data-static-i18n="footer_privacy">${dict.footer_privacy}</a> ·
+      <a href="/refund" data-static-i18n="footer_refund">${dict.footer_refund}</a></p>`;
   }
 
   function applyUnifiedFooter(lang) {
