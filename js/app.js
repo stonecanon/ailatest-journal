@@ -7220,6 +7220,8 @@
   const DEFAULT_PINNED_REGION_IDS = ['dom'];
   const PINNED_REGION_KEY = 'ailatest.pinnedRegionStations';
   const PINNED_REGION_MIGRATION_KEY = `${PINNED_REGION_KEY}.v2`;
+  /** 旧版 Max unlockAll 曾把全部地区写进侧栏；一次性收回到默认，之后用户可自行固定 */
+  const PINNED_REGION_COLLAPSE_KEY = `${PINNED_REGION_KEY}.v3-collapse-all`;
   const REGION_VIEW_KEY = 'ailatest.regionViewDaily';
   const FREE_REGION_DAILY_VIEWS = 3;
 
@@ -7457,7 +7459,15 @@
         localStorage.setItem(PINNED_REGION_KEY, JSON.stringify(valid));
         localStorage.setItem(PINNED_REGION_MIGRATION_KEY, '1');
       }
-      // 权益降级时裁剪多余钉选
+      // 旧 Max「全解锁=全钉侧栏」：侧栏一次挂满全部地区 → 收回默认，仅保留中国
+      if (!localStorage.getItem(PINNED_REGION_COLLAPSE_KEY)) {
+        if (valid.length >= REGION_STATION_IDS.length) {
+          valid = DEFAULT_PINNED_REGION_IDS.slice();
+          localStorage.setItem(PINNED_REGION_KEY, JSON.stringify(valid));
+        }
+        localStorage.setItem(PINNED_REGION_COLLAPSE_KEY, '1');
+      }
+      // 权益降级时裁剪多余钉选（Max unlockAll 不裁剪，由用户自由固定/取消）
       const ent = regionEntitlements();
       if (!ent.unlockAll && ent.maxCustomPins != null) {
         const base = FREE_BASE_REGION_IDS.filter(id => valid.includes(id));
@@ -7472,35 +7482,42 @@
   }
   function setPinnedRegions(ids) {
     const unique = [...new Set((ids || []).filter(id => REGION_STATION_IDS.includes(id)))];
+    // 至少保留一个地区入口（默认中国）
+    if (!unique.length) unique.push('dom');
     try { localStorage.setItem(PINNED_REGION_KEY, JSON.stringify(unique)); } catch (_) {}
     try { localStorage.setItem(PINNED_REGION_MIGRATION_KEY, '1'); } catch (_) {}
+    try { localStorage.setItem(PINNED_REGION_COLLAPSE_KEY, '1'); } catch (_) {}
     applyStations();
   }
   function togglePinnedRegion(id) {
-    if (!REGION_STATION_IDS.includes(id)) return;
+    if (!REGION_STATION_IDS.includes(id)) return false;
     const ent = regionEntitlements();
     const pinned = getPinnedRegions();
     if (pinned.includes(id)) {
-      // 中国站建议保留；允许取消但至少留一个或保留 dom
+      // 中国站建议保留；允许取消但至少留一个
       if (id === 'dom' && pinned.length === 1) {
         showRegionUpgradeToast(T('中国地区站为默认站点，请至少保留一个地区。','China is the default region station. Keep at least one region.'));
-        return;
+        return false;
       }
-      setPinnedRegions(pinned.filter(x => x !== id));
-      return;
+      const next = pinned.filter(x => x !== id);
+      setPinnedRegions(next);
+      // 取消固定后若仍停在该站，退回全球
+      if (typeof activeTab !== 'undefined' && activeTab === id) {
+        try { activateTab('int', { skipRegionGate: true }); } catch (_) {}
+      }
+      return true;
     }
-    if (ent.unlockAll) {
-      setPinnedRegions([...pinned, id]);
-      return;
-    }
-    // 自定义钉选（不含默认中国）
-    const customPinned = pinned.filter(x => !FREE_BASE_REGION_IDS.includes(x));
-    const isCustom = !FREE_BASE_REGION_IDS.includes(id);
-    if (isCustom && ent.maxCustomPins != null && customPinned.length >= ent.maxCustomPins) {
-      showRegionPaywallModal(ent.maxCustomPins === 0 ? 'pin_free' : 'pin_pro');
-      return;
+    // Max / Pro / Free：仅把选中项钉到侧栏，绝不因 unlockAll 一次钉满
+    if (!ent.unlockAll) {
+      const customPinned = pinned.filter(x => !FREE_BASE_REGION_IDS.includes(x));
+      const isCustom = !FREE_BASE_REGION_IDS.includes(id);
+      if (isCustom && ent.maxCustomPins != null && customPinned.length >= ent.maxCustomPins) {
+        showRegionPaywallModal(ent.maxCustomPins === 0 ? 'pin_free' : 'pin_pro');
+        return false;
+      }
     }
     setPinnedRegions([...pinned, id]);
+    return true;
   }
   function canAccessRegionStation(id) {
     if (!REGION_STATION_IDS.includes(id)) return true;
@@ -7557,13 +7574,21 @@
   function applyStations() {
     const pinned = getPinnedRegions();
     STATIONS.forEach((s) => {
-      const btn = document.querySelector(`.rail-nav-btn[data-tab="${s.id}"]`);
+      // data-tab 与 data-region-station 双查，避免静态页/SPA 结构差异
+      const btn = document.querySelector(`.rail-nav-btn[data-tab="${s.id}"]`)
+        || document.querySelector(`.rail-nav-btn[data-region-station="${s.id}"]`);
       if (!btn) return;
       const region = REGION_STATION_IDS.includes(s.id);
-      // 侧栏只显示已钉选地区站（Max 可访问全部，但不默认全部挂侧栏）
+      // 侧栏只显示已钉选地区（Max 可访问全部，但侧栏不常驻全部）
       const show = !region || pinned.includes(s.id);
       btn.hidden = !show;
-      btn.toggleAttribute('data-station-hidden', btn.hidden);
+      if (show) {
+        btn.removeAttribute('data-station-hidden');
+        btn.removeAttribute('aria-hidden');
+      } else {
+        btn.setAttribute('data-station-hidden', '1');
+        btn.setAttribute('aria-hidden', 'true');
+      }
       if (s.id === 'int') btn.style.order = '0';
       else if (region) btn.style.order = String(1 + REGION_STATION_IDS.indexOf(s.id));
       else btn.style.order = '';
@@ -10761,38 +10786,31 @@
           e.preventDefault();
           e.stopPropagation();
           const id = btn.dataset.regionPin;
+          if (!id) return;
           const ent = regionEntitlements();
           const wasPinned = getPinnedRegions().includes(id);
 
-          // Free：不能固定自定义地区 → 临时打开（计每日次数）
+          // Free：不能固定自定义地区 → 临时打开（计每日次数），不进侧栏
           if (!ent.unlockAll && ent.maxCustomPins === 0 && !FREE_BASE_REGION_IDS.includes(id)) {
             activateTab(id);
             close();
             return;
           }
 
-          // Pro / Max / 默认站：点击切换侧栏固定（✓）
-          // Max 可访问全部地区，但侧栏只显示已固定项（applyStations 不因 unlockAll 全挂）
+          // 已固定 → 再次点击取消侧栏常驻（收进 ···）
           if (wasPinned) {
             togglePinnedRegion(id);
+            applyStations();
             close();
             return;
           }
 
-          // 未固定 → 尝试固定并打开
-          if (!ent.unlockAll && ent.maxCustomPins != null) {
-            const custom = getPinnedRegions().filter(x => !FREE_BASE_REGION_IDS.includes(x));
-            const isCustom = !FREE_BASE_REGION_IDS.includes(id);
-            if (isCustom && custom.length >= ent.maxCustomPins) {
-              showRegionPaywallModal(ent.maxCustomPins === 0 ? 'pin_free' : 'pin_pro');
-              close();
-              return;
-            }
-          }
-          togglePinnedRegion(id);
-          if (getPinnedRegions().includes(id)) {
+          // 未固定 → 固定到侧栏并打开（Max 也只钉这一项，不全挂）
+          const ok = togglePinnedRegion(id);
+          if (ok && getPinnedRegions().includes(id)) {
             activateTab(id, { skipRegionGate: true });
           }
+          applyStations();
           close();
         });
       });

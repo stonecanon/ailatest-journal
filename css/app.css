@@ -199,6 +199,8 @@ body.share-mode .app-rail { display: none !important; }
 }
 
 .rail-nav-btn[hidden],
+.rail-nav-btn[data-station-hidden],
+.rail-nav-btn[data-station-hidden="1"],
 .app-rail .account-credit-badge[hidden] {
   display: none !important;
 }
@@ -8101,6 +8103,8 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 }
 .lang-toggle:hover { color: var(--ink); border-color: var(--accent); }
 
+/* 未固定的地区站：彻底从侧栏收起（进 ··· 菜单再固定） */
+.rail-nav-btn[data-station-hidden],
 .rail-nav-btn[data-station-hidden="1"] { display: none !important; }
 
 /* ═══════ 卡片徽章配色统一（收录=冷蓝、分区=暖棕、预警=红、免费=绿），不再花 ═══════ */

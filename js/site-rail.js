@@ -97,6 +97,15 @@
         localStorage.setItem(KEY, JSON.stringify(memoryPinned));
         localStorage.setItem(MIGRATION_KEY, '1');
       }
+      // 与 app.js 一致：旧版曾把全部地区钉满侧栏 → 一次性收回默认
+      const collapseKey = `${KEY}.v3-collapse-all`;
+      if (!localStorage.getItem(collapseKey)) {
+        if (memoryPinned.length >= REGIONS.length) {
+          memoryPinned = DEFAULT_PINNED.slice();
+          localStorage.setItem(KEY, JSON.stringify(memoryPinned));
+        }
+        localStorage.setItem(collapseKey, '1');
+      }
       return memoryPinned;
     } catch (_) {
       return memoryPinned.length ? memoryPinned : DEFAULT_PINNED.slice();
@@ -204,7 +213,10 @@
         link = makePinnedLink(region, linkClass);
         stationGroup.insertBefore(link, regionBox);
       }
-      link.hidden = !pinned.includes(region.id);
+      const show = pinned.includes(region.id);
+      link.hidden = !show;
+      if (show) link.removeAttribute('data-station-hidden');
+      else link.setAttribute('data-station-hidden', '1');
       link.classList.toggle('active', location.pathname.replace(/\/+$/, '') === region.href);
     });
 
