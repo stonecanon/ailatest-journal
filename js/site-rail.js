@@ -37,7 +37,8 @@
         </div>
       </nav>
       <div class="rail-bottom" aria-label="${'\u8d26\u6237\u4e0e\u5de5\u5177'}">
-        <a class="rail-nav-btn${current('/extension.html')}" id="download-center-rail-link" href="/extension.html"${ariaCurrent('/extension.html')} aria-label="${'\u4e0b\u8f7d\u4e2d\u5fc3'}" title="${'\u4e0b\u8f7d\u4e2d\u5fc3'}"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 20h14"/></svg><span>${'\u4e0b\u8f7d'}</span></a>
+        <a class="rail-nav-btn rail-pricing-btn${current('/pricing.html')}" id="pricing-rail-link" href="/pricing.html"${ariaCurrent('/pricing.html')} aria-label="${'\u8ba2\u9605'}" title="${'\u8ba2\u9605'}"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l2.2 4.5 5 .7-3.6 3.5.9 5-4.5-2.4L7.5 16.7l.9-5L4.8 8.2l5-.7L12 3z"/><path d="M12 17v4"/></svg><span data-static-i18n="nav_pricing">${'\u8ba2\u9605'}</span></a>
+        <a class="rail-nav-btn${current('/extension.html')}" id="download-center-rail-link" href="/extension.html"${ariaCurrent('/extension.html')} aria-label="${'\u4e0b\u8f7d'}" title="${'\u4e0b\u8f7d'}"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 20h14"/></svg><span data-static-i18n="download_center">${'\u4e0b\u8f7d'}</span></a>
         <a class="rail-nav-btn${current('/rankings')}" id="rankings-btn" href="/rankings/"${ariaCurrent('/rankings')} data-tab="rank" aria-label="${'\u699c\u5355'}" title="${'\u699c\u5355'}"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 21V11"/><path d="M12 21V7"/><path d="M16 21V3"/><path d="M4 21h16"/></svg><span data-static-i18n="rail_rankings">${'\u699c\u5355'}</span></a>
         <a class="rail-nav-btn${current('/favorites')}" id="fav-header-btn" href="/favorites"${ariaCurrent('/favorites')} aria-label="${'\u6211\u7684\u6536\u85cf'}" title="${'\u6211\u7684\u6536\u85cf'}"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.7l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3.7z"/></svg><span data-static-i18n="rail_saved">${'\u6536\u85cf'}</span></a>
         <a class="rail-nav-btn${current('/account')}" id="account-credit-badge" href="/account"${ariaCurrent('/account')} aria-label="${'\u6211\u7684'}" title="${'\u6211\u7684'}"><span class="rail-avatar" aria-hidden="true">${'\u6211'}</span><span data-static-i18n="rail_account">${'\u6211\u7684'}</span></a>
@@ -49,6 +50,37 @@
     if (!rail) return;
     rail.className = 'app-rail';
     rail.innerHTML = canonicalRailMarkup();
+  }
+
+  /** 已有 .app-rail 但缺订阅入口时补上（下载页等硬编码侧栏） */
+  function ensurePricingRailLink() {
+    const bottom = document.querySelector('.app-rail .rail-bottom');
+    if (!bottom) return;
+    if (bottom.querySelector('#pricing-rail-link, .rail-pricing-btn, a[href*="pricing"]')) return;
+    const a = document.createElement('a');
+    a.className = 'rail-nav-btn rail-pricing-btn';
+    a.id = 'pricing-rail-link';
+    a.href = '/pricing.html';
+    a.setAttribute('aria-label', '订阅');
+    a.title = '订阅';
+    a.innerHTML = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l2.2 4.5 5 .7-3.6 3.5.9 5-4.5-2.4L7.5 16.7l.9-5L4.8 8.2l5-.7L12 3z"/><path d="M12 17v4"/></svg><span data-static-i18n="nav_pricing">订阅</span>';
+    const download = bottom.querySelector('#download-center-rail-link, a[href*="extension"]');
+    if (download) bottom.insertBefore(a, download);
+    else bottom.prepend(a);
+  }
+
+  /** 侧栏「下载中心」文案统一为「下载」 */
+  function normalizeDownloadLabel() {
+    document.querySelectorAll('#download-center-rail-link span, a[href*="extension.html"] span[data-static-i18n="download_center"]').forEach((el) => {
+      if (/下载中心|Download Center/i.test(el.textContent || '')) {
+        el.textContent = /[A-Za-z]/.test(el.textContent) && !/[\u4e00-\u9fff]/.test(el.textContent) ? 'Download' : '下载';
+      }
+    });
+    const link = document.getElementById('download-center-rail-link');
+    if (link) {
+      if (link.getAttribute('aria-label') === '下载中心') link.setAttribute('aria-label', '下载');
+      if (link.getAttribute('title') === '下载中心') link.setAttribute('title', '下载');
+    }
   }
 
   function readPinned() {
@@ -192,6 +224,8 @@
 
   function bind() {
     upgradeLegacyRail();
+    ensurePricingRailLink();
+    normalizeDownloadLabel();
     const parts = railParts();
     if (!parts) return;
     const menu = parts.rail.querySelector(`.${parts.menuClass}`);

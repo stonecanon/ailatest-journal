@@ -11,7 +11,7 @@
  *  4. credits 扣减与调用同事务 → spendCredits 单语句条件更新（调用方失败时 refundCredits）
  */
 
-export const SPEC_VERSION = '2026-07-15.1';
+export const SPEC_VERSION = '2026-07-15.4';
 
 const TRIAL_DAYS = 7;
 const SNAPSHOT_TTL_SEC = 24 * 3600;
@@ -30,6 +30,7 @@ const PREMIUM_LABELS_LOCKED = {
   on_hold: false,
   retraction: false,
   cnkx_tier: false,
+  publish_fee: false, // 是否付费发表 / APC
 };
 const PREMIUM_LABELS_OPEN = {
   cas_zone: true,
@@ -40,6 +41,7 @@ const PREMIUM_LABELS_OPEN = {
   on_hold: true,
   retraction: true,
   cnkx_tier: true,
+  publish_fee: true,
 };
 
 // tier → 功能面。favorites 限额由服务端强制，其余开关下发给客户端渲染 UI。
@@ -47,15 +49,17 @@ const TIERS = {
   free: {
     badge_display: true,
     journal_detail: true,
-    // 网站完整展示；插件高级徽章另控
-    premium_labels: PREMIUM_LABELS_OPEN,
-    favorites: { max_items: 5, max_lists: 2 },
-    cloud_sync: true,
+    // 网站：查刊字段基本全开，但发表费用（是否免费发表/APC）对 Free 关闭
+    premium_labels: { ...PREMIUM_LABELS_OPEN, publish_fee: false },
+    publish_fee_info: false,
+    favorites: { enabled: false, max_items: 0, max_lists: 0 },
+    cloud_sync: false,
     tags: false,
     notes: false,
     submission_history: false,
     export: false,
     integrations: false,
+    fulltext: { max_total: 30 }, // 原文/OA 全文查找终身累计篇数
     ai: { enabled: false },
     regions: {
       free_base: ['dom'],
@@ -69,6 +73,9 @@ const TIERS = {
       sites: 'basic',
       advanced_sort: false,
       premium_labels: PREMIUM_LABELS_LOCKED,
+      fulltext: { max_total: 30 },
+      export: false,
+      integrations: false,
     },
   },
   plus: {
@@ -76,13 +83,15 @@ const TIERS = {
     badge_display: true,
     journal_detail: true,
     premium_labels: PREMIUM_LABELS_OPEN,
-    favorites: { max_items: 50, max_lists: 5 },
+    publish_fee_info: true,
+    favorites: { enabled: true, max_items: 50, max_lists: 5 },
     cloud_sync: true,
     tags: false,
     notes: false,
     submission_history: false,
-    export: false,
-    integrations: false,
+    export: { formats: ['csv', 'ris', 'bibtex', 'markdown'] },
+    integrations: ['zotero', 'notion', 'obsidian', 'endnote'],
+    fulltext: { max_total: null },
     ai: { enabled: false },
     regions: {
       free_base: ['dom'],
@@ -96,21 +105,26 @@ const TIERS = {
       sites: 'enhanced',
       advanced_sort: true,
       premium_labels: PREMIUM_LABELS_OPEN,
+      fulltext: { max_total: null },
+      export: true,
+      integrations: true,
     },
   },
   trial: {
     badge_display: true,
     journal_detail: true,
     premium_labels: PREMIUM_LABELS_OPEN,
-    favorites: { max_items: null, max_lists: null },
+    publish_fee_info: true,
+    favorites: { enabled: true, max_items: null, max_lists: null },
     cloud_sync: true,
     tags: true,
     notes: true,
     submission_history: true,
     drag_sort: true,
     advanced_filters: true,
-    export: { formats: ['csv', 'ris', 'bibtex', 'xlsx'] },
-    integrations: ['zotero', 'notion', 'endnote', 'obsidian'],
+    export: { formats: ['csv', 'ris', 'bibtex', 'markdown', 'xlsx'] },
+    integrations: ['zotero', 'notion', 'obsidian', 'endnote'],
+    fulltext: { max_total: null },
     // trial 继承 pro 但 AI 锁定
     ai: { enabled: false, ui: 'visible_locked', locked_hint: 'AI 荐刊为 Max 功能，订阅后每月含 1000 credits' },
     regions: { free_base: ['dom'], max_custom_pins: null, daily_views: null, unlock_all: true },
@@ -120,6 +134,9 @@ const TIERS = {
       sites: 'enhanced',
       advanced_sort: true,
       premium_labels: PREMIUM_LABELS_OPEN,
+      fulltext: { max_total: null },
+      export: true,
+      integrations: true,
     },
   },
   pro: {
@@ -127,15 +144,17 @@ const TIERS = {
     badge_display: true,
     journal_detail: true,
     premium_labels: PREMIUM_LABELS_OPEN,
-    favorites: { max_items: null, max_lists: null },
+    publish_fee_info: true,
+    favorites: { enabled: true, max_items: null, max_lists: null },
     cloud_sync: true,
     tags: true,
     notes: true,
     submission_history: true,
     drag_sort: true,
     advanced_filters: true,
-    export: { formats: ['csv', 'ris', 'bibtex', 'xlsx'] },
-    integrations: false, // 深度联动规划中；插件 RIS/BibTeX/EndNote 导出已支持
+    export: { formats: ['csv', 'ris', 'bibtex', 'markdown', 'xlsx'] },
+    integrations: ['zotero', 'notion', 'obsidian', 'endnote'],
+    fulltext: { max_total: null },
     ai: { enabled: true, monthly_credits: PRO_MONTHLY_CREDITS, credits_rollover: false },
     regions: { free_base: ['dom'], max_custom_pins: null, daily_views: null, unlock_all: true },
     extension: {
@@ -144,6 +163,9 @@ const TIERS = {
       sites: 'enhanced',
       advanced_sort: true,
       premium_labels: PREMIUM_LABELS_OPEN,
+      fulltext: { max_total: null },
+      export: true,
+      integrations: true,
     },
   },
 };
@@ -323,7 +345,14 @@ function limitError(message, tier, limit) {
  */
 export async function enforceFavoritesWrite(env, user, isOwner, newKeys) {
   const ents = await getEntitlements(env, user, isOwner);
-  const limit = ents.features.favorites.max_items;
+  const favFeat = ents.features.favorites || {};
+  if (favFeat.enabled === false) {
+    return limitError('免费版不支持云收藏，请升级 Pro', ents.tier, 0);
+  }
+  const limit = favFeat.max_items;
+  if (limit === 0 && newKeys.length > 0) {
+    return limitError('免费版不支持云收藏，请升级 Pro', ents.tier, 0);
+  }
   if (limit == null || newKeys.length <= limit) return { ok: true };
 
   const rows = await env.DB.prepare(
@@ -343,7 +372,11 @@ export async function enforceFavoritesWrite(env, user, isOwner, newKeys) {
  */
 export async function enforceListsWrite(env, user, isOwner, cleanLists) {
   const ents = await getEntitlements(env, user, isOwner);
-  const { max_items: itemLimit, max_lists: listLimit } = ents.features.favorites;
+  const favFeat = ents.features.favorites || {};
+  if (favFeat.enabled === false) {
+    return limitError('免费版不支持清单，请升级 Pro', ents.tier, 0);
+  }
+  const { max_items: itemLimit, max_lists: listLimit } = favFeat;
 
   if (listLimit != null && cleanLists.length > listLimit) {
     const rows = await env.DB.prepare(

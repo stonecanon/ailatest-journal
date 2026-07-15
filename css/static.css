@@ -260,6 +260,19 @@ a:hover { text-decoration: underline; }
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+.app-rail .rail-nav-btn.rail-pricing-btn {
+  color: #6b4a12;
+  border-color: rgba(139, 105, 20, 0.22);
+  background: rgba(250, 244, 230, 0.72);
+}
+.app-rail .rail-nav-btn.rail-pricing-btn:hover,
+.app-rail .rail-nav-btn.rail-pricing-btn.active,
+.app-rail .rail-nav-btn.rail-pricing-btn[aria-current="page"] {
+  color: #3a2e1f;
+  border-color: rgba(139, 105, 20, 0.45);
+  background: #f5ecd6;
+  box-shadow: none;
+}
 .app-rail .rail-nav-btn span:not(.rail-flag) {
   max-width: 48px;
   overflow: hidden;
@@ -513,7 +526,7 @@ body[data-static-page="extension"] {
 
 .download-tile {
   position: relative;
-  min-height: 254px;
+  min-height: 268px;
   padding: 14px 12px 44px;
   border: 1px solid var(--line);
   border-radius: 10px;
@@ -530,26 +543,44 @@ body[data-static-page="extension"] {
   line-height: 1.25;
 }
 
-.download-tile p {
+.download-tile > p {
   margin: 0;
   color: #776f64;
   font-size: 13px;
   line-height: 1.5;
+  flex: 1 1 auto;
+}
+
+/* 所有卡片主按钮区对齐：固定贴底、等高按钮 */
+.download-tile-actions {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 36px;
 }
 
 .download-tile .btn {
-  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 0;
   min-height: 36px;
   padding: 8px 10px;
   border-radius: 7px;
   font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .download-actions {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: 8px;
-  margin-top: auto;
 }
 
 .download-actions .btn {
@@ -558,7 +589,7 @@ body[data-static-page="extension"] {
 }
 
 .download-actions .btn-secondary {
-  border-color: #8f806f;
+  border: 1.5px solid #8f806f;
   background: transparent;
   color: var(--ink);
 }

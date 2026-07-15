@@ -3,7 +3,7 @@
     'zh-CN': {
       nav_about: '关于',
       nav_home: '首页',
-      download_center: '下载中心',
+      download_center: '下载',
       rail_global: '全球',
       rail_china: '中国',
       rail_india: '印度',
@@ -23,12 +23,12 @@
       footer_terms: '条款',
       footer_privacy: '隐私',
       footer_refund: '退款',
-      footer_download: '下载中心',
+      footer_download: '下载',
       lang_toggle: 'English',
       pricing_title: '订阅即将开放 | AILatest Journal',
       pricing_desc: 'AILatest Journal 订阅功能即将开放。当前主推浏览器插件内测版，可在 Google Scholar、PubMed、知网等页面显示期刊徽章。',
-      extension_title: '下载中心 | AILatest Journal',
-      extension_desc: 'AILatest Journal 下载中心，提供浏览器插件内测版、Skill、MCP 服务和后续移动端入口。',
+      extension_title: '下载 | AILatest Journal',
+      extension_desc: 'AILatest Journal 下载：浏览器插件、Skill、MCP 与后续移动端入口。',
       about_title: '关于我们 | AILatest Journal',
       about_desc: 'AILatest Journal 数据来源与更新时间：WoS、JCR、中科院分区、EI、Scopus、DOAJ、OpenAlex 等公开评级与元数据汇总说明。',
       contact_title: '联系我们 | AILatest Journal',
@@ -37,7 +37,7 @@
     en: {
       nav_about: 'About',
       nav_home: 'Home',
-      download_center: 'Download Center',
+      download_center: 'Download',
       rail_global: 'Global',
       rail_china: 'China',
       rail_india: 'India',
@@ -57,12 +57,12 @@
       footer_terms: 'Terms',
       footer_privacy: 'Privacy',
       footer_refund: 'Refund',
-      footer_download: 'Download Center',
+      footer_download: 'Download',
       lang_toggle: '中文',
       pricing_title: 'Subscription Coming Soon | AILatest Journal',
       pricing_desc: 'AILatest Journal subscription is coming soon. For now, try the browser extension beta for journal badges on Google Scholar, PubMed, CNKI and more.',
-      extension_title: 'Download Center | AILatest Journal',
-      extension_desc: 'AILatest Journal Download Center for the browser extension beta, Skill, MCP service and future mobile entries.',
+      extension_title: 'Downloads | AILatest Journal',
+      extension_desc: 'AILatest Journal downloads: browser extension, Skill, MCP and future mobile apps.',
       about_title: 'About | AILatest Journal',
       about_desc: 'AILatest Journal data sources and cutoffs: WoS, JCR, CAS zones, EI, Scopus, DOAJ, OpenAlex and more.',
       contact_title: 'Contact | AILatest Journal',
@@ -89,6 +89,7 @@
   /** 全站静态页统一页脚：一行即可 */
   function unifiedFooterHtml(dict) {
     return `<p class="site-foot-line">© 2026 AILatest Journal ·
+      <a href="/pricing.html" data-static-i18n="footer_pricing">${dict.footer_pricing}</a> ·
       <a href="/about" data-static-i18n="footer_about">${dict.footer_about}</a> ·
       <a href="/contact" data-static-i18n="footer_contact">${dict.footer_contact}</a> ·
       <a href="/terms" data-static-i18n="footer_terms">${dict.footer_terms}</a> ·

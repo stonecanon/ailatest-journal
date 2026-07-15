@@ -174,6 +174,27 @@ body.share-mode .app-rail { display: none !important; }
   box-shadow: none;
   transition: background .15s, color .15s, transform .15s, border-color .15s;
 }
+/* 侧栏「订阅」入口：略突出，不抢主导航 */
+.rail-nav-btn.rail-pricing-btn {
+  color: #6b4a12;
+  border-color: rgba(139, 105, 20, 0.22);
+  background: rgba(250, 244, 230, 0.72);
+}
+.rail-nav-btn.rail-pricing-btn:hover,
+.rail-nav-btn.rail-pricing-btn.active,
+.rail-nav-btn.rail-pricing-btn[aria-current="page"] {
+  color: #3a2e1f;
+  border-color: rgba(139, 105, 20, 0.45);
+  background: #f5ecd6;
+}
+.rail-nav-btn.rail-pricing-btn svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  fill: none;
+}
+
 .rail-nav-btn[hidden],
 .app-rail .account-credit-badge[hidden] {
   display: none !important;
@@ -3121,6 +3142,24 @@ table.journals tr:last-child td { border-bottom: 0; }
 .badge.b-ei   { background: #7a7a6a; }               /* 低饱和橄榄 — 次要收录 */
 .badge.b-medline { background: #1a5276; }               /* 深蓝 — MEDLINE 精选索引 */
 .badge.b-free   { background: #2d8a4e; }               /* 绿 — 免费发表 */
+.badge.b-free-lock {
+  background: #e8e0cc; color: #6e5a30; border: 1px solid #c9bb95;
+  font-size: 10px; font-weight: 700; cursor: pointer;
+  padding: 2px 6px; border-radius: 3px; font-family: inherit;
+}
+.badge.b-free-lock:hover { background: #f5ecd6; border-color: #8b6914; }
+.oa-chip.oa-lock {
+  background: #f5ecd6; color: #6e5a30; border: 1px solid #c9bb95;
+  cursor: pointer; font: inherit; font-size: 12px; font-weight: 700;
+  padding: 2px 8px; border-radius: 999px;
+}
+.oa-chip.oa-lock:hover { background: #ebe0b8; }
+button.linkish {
+  background: none; border: 0; padding: 0; margin: 0;
+  color: #8b6914; font: inherit; font-weight: 700; cursor: pointer;
+  text-decoration: underline; text-underline-offset: 2px;
+}
+button.linkish:hover { color: #5a4818; }
 .badge.b-esi  { background: #5a5a7a; }               /* 紫灰 — ESI 大类 */
 .badge.b-scopus { background: #8a706a; }              /* 低饱和红褐 — 次要收录 */
 .badge.b-inspec { background: #395f78; }               /* IET engineering / physics index */
@@ -6522,6 +6561,80 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 }
 .login-modal.open { display: flex; }
 
+/* 地区站额度用尽 / 钉选受限 — 付费升级弹窗（可关闭） */
+.region-paywall-modal {
+  position: fixed; inset: 0; z-index: 3200;
+  display: none; align-items: center; justify-content: center;
+  padding: 16px;
+  background: rgba(28, 22, 12, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.region-paywall-modal.open { display: flex; }
+.region-paywall-card {
+  position: relative;
+  width: 420px; max-width: calc(100vw - 32px);
+  background: var(--paper, #f9f6ed);
+  border: 1px solid var(--ink-border, #d4c9a8);
+  border-radius: 14px;
+  padding: 28px 28px 22px;
+  box-shadow: 0 24px 64px rgba(30, 22, 12, 0.32);
+  color: var(--ink, #3a2e1f);
+}
+.region-paywall-close {
+  position: absolute; top: 10px; right: 12px;
+  background: none; border: 0; font-size: 24px; line-height: 1;
+  color: var(--ink-mid, #8a7456); cursor: pointer;
+  padding: 4px 10px; border-radius: 6px;
+}
+.region-paywall-close:hover { background: rgba(90, 72, 48, 0.08); }
+.region-paywall-eyebrow {
+  font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase;
+  font-weight: 700; color: #8a7a4a; margin-bottom: 8px;
+}
+.region-paywall-title {
+  margin: 0 0 10px; font-size: 20px; font-weight: 750; line-height: 1.3;
+  color: #1f1a10;
+}
+.region-paywall-desc {
+  margin: 0 0 14px; font-size: 14px; line-height: 1.55;
+  color: var(--ink-mid, #5a4830);
+}
+.region-paywall-perks {
+  margin: 0 0 18px; padding: 12px 14px 12px 32px;
+  background: #fffaf0; border: 1px solid #e6dfc8; border-radius: 10px;
+  font-size: 13px; line-height: 1.55; color: #3a2e1f;
+}
+.region-paywall-perks li { margin: 6px 0; }
+.region-paywall-actions {
+  display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+}
+.region-paywall-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 40px; padding: 0 16px; border-radius: 8px;
+  font: inherit; font-size: 14px; font-weight: 700;
+  text-decoration: none; cursor: pointer; border: 1px solid transparent;
+}
+.region-paywall-btn.primary {
+  background: #3a2e1f; color: #f5ecd6; border-color: #3a2e1f;
+  flex: 1 1 auto;
+}
+.region-paywall-btn.primary:hover { background: #2a2116; }
+.region-paywall-btn.ghost {
+  background: #fff; color: #3a2e1f; border-color: #c9bb95;
+  flex: 0 0 auto;
+}
+.region-paywall-btn.ghost:hover { background: #faf4e6; border-color: #8b6914; }
+.region-paywall-note {
+  margin: 14px 0 0; font-size: 12px; line-height: 1.45;
+  color: #8a7a4a; text-align: center;
+}
+@media (max-width: 480px) {
+  .region-paywall-card { padding: 24px 18px 18px; }
+  .region-paywall-actions { flex-direction: column; align-items: stretch; }
+  .region-paywall-btn.ghost { width: 100%; }
+}
+
 .login-card {
   background: var(--paper, #f9f6ed);
   border: 1px solid var(--ink-border, #d4c9a8);
@@ -6634,7 +6747,7 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 }
 .fav-list-chip.active .lcount { background: rgba(255,255,255,0.18); }
 
-.fav-list-ops { display: flex; gap: 6px; flex-shrink: 0; }
+.fav-list-ops { display: flex; gap: 6px; flex-shrink: 0; flex-wrap: wrap; align-items: center; }
 .btn-mini {
   padding: 5px 10px; font-size: 12px; cursor: pointer;
   background: #fff; color: var(--ink, #3a2e1f);
@@ -6644,6 +6757,23 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .btn-mini:hover:not([disabled]) { background: #faf4e6; border-color: #8b6914; }
 .btn-mini[disabled] { opacity: 0.4; cursor: not-allowed; }
 .btn-mini.btn-danger:hover:not([disabled]) { background: #fbe9e6; border-color: #a33a2a; color: #a33a2a; }
+
+.fav-export-wrap { position: relative; display: inline-flex; }
+.fav-export-menu {
+  position: absolute; z-index: 40; top: calc(100% + 4px); right: 0;
+  min-width: 210px; padding: 6px;
+  background: #fffdf8; border: 1px solid var(--ink-border, #c9bb95);
+  border-radius: 8px; box-shadow: 0 10px 28px rgba(58, 46, 31, 0.14);
+  display: flex; flex-direction: column; gap: 2px;
+}
+.fav-export-menu[hidden] { display: none !important; }
+.fav-export-menu button {
+  display: block; width: 100%; text-align: left;
+  padding: 8px 10px; border: 0; border-radius: 5px;
+  background: transparent; color: var(--ink, #3a2e1f);
+  font: inherit; font-size: 12px; font-weight: 600; cursor: pointer;
+}
+.fav-export-menu button:hover { background: #f5ecd6; }
 
 .fav-drag-hint {
   font-size: 12px; color: var(--ink-mid, #8a7456);

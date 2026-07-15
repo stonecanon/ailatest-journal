@@ -71,7 +71,7 @@
       nav_index_rank: '索引排行榜', nav_subject_rank: '学科排行榜', nav_warn_rank: '预警名单', nav_extension_beta: '插件内测', nav_subscription: '订阅',
       filter_if_range: '影响因子', if_any: '不限',
       rail_int: '全球', rail_dom: '中国', rail_region: '地区', rail_in: '印度', rail_my: '马来西亚', rail_kr: '韩国', rail_pbn: '波兰', rail_isc: '伊朗', rail_scielo: '拉美', rail_rank: '榜单', rail_fav: '收藏', rail_me: '我的',
-      download_center: '下载中心',
+      download_center: '下载',
       loading: '加载中…',
       hero_title_int: 'SCI / SSCI 国际期刊检索',
       hero_body_int: '資料來源：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI）· 更新至 2026-05-18，並合併 <b>EI Compendex</b>（2025-10-10）、<b>Inspec</b>（2026-04）、<b>FSTA</b> 全文清單與 <b>CAB Abstracts</b> serial report（2013-09）。',
@@ -169,7 +169,7 @@
       nav_index_rank: 'Index Rankings', nav_subject_rank: 'Subject Rankings', nav_warn_rank: 'Warning List', nav_extension_beta: 'Extension beta', nav_subscription: 'Subscribe',
       filter_if_range: 'Impact Factor', if_any: 'Any',
       rail_int: 'Global', rail_dom: 'China', rail_region: 'Regions', rail_in: 'India', rail_my: 'Malaysia', rail_kr: 'Korea', rail_pbn: 'Poland', rail_isc: 'Iran', rail_scielo: 'LatAm', rail_rank: 'Rankings', rail_fav: 'Saved', rail_me: 'Me',
-      download_center: 'Downloads',
+      download_center: 'Download',
       loading: 'Loading…',
       hero_title_int: 'International SCI / SSCI Search',
       hero_body_int: 'Source: <b>Web of Science Core Collection</b> (SCIE / SSCI / AHCI / ESCI), updated 2026-05-18, merged with <b>EI Compendex</b> (2025-10-10), <b>Inspec</b> (Apr 2026), the <b>FSTA</b> full-text list, and the <b>CAB Abstracts</b> serial report (Sep 2013).',
@@ -243,7 +243,7 @@
     src_cnkx: '中國科協高品質目錄', src_cssci_core: 'CSSCI 來源期刊', src_cssci_ext: 'CSSCI 擴展版', src_pku: '北大核心 (2023)', src_zju: '浙江大學 2024', src_ccft: 'CCF 中文 T 分區', nav_sub_inhouse: '院校自編目錄', paid_label: '付費', drawer_kicker: '期刊詳情',
         tab_home: '查刊', tab_int: '國際', tab_dom: '中國', tab_fav: '收藏', tab_pick: '薦刊',
     rail_int: '國際期刊', rail_dom: '中國期刊', rail_fav: '收藏', rail_me: '我的',
-    download_center: '下載中心',
+    download_center: '下載',
     loading: '載入中…',
     hero_title_int: 'SCI / SSCI 國際期刊檢索',
     hero_body_int: '資料來源：<b>Web of Science Core Collection</b>（SCIE / SSCI / AHCI / ESCI）· 更新至 2026-05-18，並合併 <b>EI Compendex</b> 期刊目錄（2025-10-10）。',
@@ -1732,6 +1732,84 @@
     return label === 'diamond' || label === 'hybrid' || label === 'subscription_paid_read';
   }
 
+  /** free | plus(Pro) | pro(Max) */
+  function getProductTier() {
+    try {
+      if (user && (user.is_owner || user.plan === 'owner')) return 'pro';
+      const tier = String(user?.entitlements?.tier || user?.tier || 'free').toLowerCase();
+      if (tier === 'pro' || tier === 'max') return 'pro';
+      if (tier === 'plus' || tier === 'trial') return 'plus';
+    } catch (_) {}
+    return 'free';
+  }
+
+  /** 发表费用信息（是否免费发表 / APC）— Pro(plus) 与 Max(pro) 可见；Free 不可见 */
+  function canSeePublishFeeInfo() {
+    if (getProductTier() !== 'free') return true;
+    try {
+      const labels = user?.entitlements?.features?.premium_labels
+        || user?.entitlements?.premium_labels;
+      if (labels && labels.publish_fee === true) return true;
+      if (user?.entitlements?.features?.publish_fee_info === true) return true;
+    } catch (_) {}
+    return false;
+  }
+
+  /** 收藏 / 清单 / 分享 / 导出 / Zotero·Notion·Obsidian — Free 不可用 */
+  function canUseFavoritesWorkflow() {
+    return getProductTier() !== 'free';
+  }
+  function canUseExportIntegrations() {
+    return canUseFavoritesWorkflow();
+  }
+
+  /** Free 原文/OA 全文查找终身 30 篇（按文章去重） */
+  const FREE_FULLTEXT_LIMIT = 30;
+  const FULLTEXT_USAGE_KEY = 'ailatest.fulltextUsage';
+  function getFulltextUsage() {
+    try {
+      const raw = JSON.parse(localStorage.getItem(FULLTEXT_USAGE_KEY) || '{}');
+      const keys = Array.isArray(raw.keys) ? raw.keys.map(String) : [];
+      return { keys };
+    } catch (_) {
+      return { keys: [] };
+    }
+  }
+  function saveFulltextUsage(u) {
+    try { localStorage.setItem(FULLTEXT_USAGE_KEY, JSON.stringify({ keys: (u.keys || []).slice(0, 500) })); } catch (_) {}
+  }
+  function fulltextArticleKey(data) {
+    const doi = String(data?.doi || '').replace(/^https?:\/\/(dx\.)?doi\.org\//i, '').trim().toLowerCase();
+    if (doi) return `doi:${doi}`;
+    const url = String(data?.url || data?.pdfUrl || '').split('#')[0].trim().toLowerCase();
+    if (url) return `url:${url}`;
+    const title = String(data?.title || '').trim().toLowerCase().slice(0, 120);
+    return title ? `t:${title}` : '';
+  }
+  function canUseFulltextOpen(articleKey) {
+    if (getProductTier() !== 'free') return { ok: true, unlimited: true };
+    const u = getFulltextUsage();
+    if (articleKey && u.keys.includes(articleKey)) {
+      return { ok: true, used: u.keys.length, limit: FREE_FULLTEXT_LIMIT, remaining: Math.max(0, FREE_FULLTEXT_LIMIT - u.keys.length) };
+    }
+    if (u.keys.length >= FREE_FULLTEXT_LIMIT) {
+      return { ok: false, used: u.keys.length, limit: FREE_FULLTEXT_LIMIT, remaining: 0 };
+    }
+    return { ok: true, used: u.keys.length, limit: FREE_FULLTEXT_LIMIT, remaining: FREE_FULLTEXT_LIMIT - u.keys.length };
+  }
+  function consumeFulltextOpen(articleKey) {
+    if (getProductTier() !== 'free') return true;
+    const gate = canUseFulltextOpen(articleKey);
+    if (!gate.ok) return false;
+    if (!articleKey) return true;
+    const u = getFulltextUsage();
+    if (!u.keys.includes(articleKey)) {
+      u.keys.push(articleKey);
+      saveFulltextUsage(u);
+    }
+    return true;
+  }
+
   function journalPathSlug(pathname = location.pathname) {
     const m = pathname.match(/^\/journal\/([^/?#]+)\/?$/);
     if (!m) return '';
@@ -2463,6 +2541,10 @@
   }
 
   function toggleFav(r, meta = {}) {
+    if (!canUseFavoritesWorkflow()) {
+      showRegionPaywallModal('workflow');
+      return;
+    }
     const id = favId(r);
     const list = getActiveList();
     if (!list) return;
@@ -2472,38 +2554,6 @@
       // 其他 list 都不含它 → 从 favsData 移除
       if (!favLists.some(l => l.ids.includes(id))) delete favsData[id];
     } else {
-    // Local-only favorite limit
-    if (!user && list.ids.length >= LOCAL_FAV_LIMIT) {
-            openLoginModal();
-            const card = document.querySelector('.login-card');
-            if (card) {
-              let el = document.getElementById('login-limit-msg');
-              if (!el) {
-                el = document.createElement('p');
-                el.id = 'login-limit-msg';
-                el.className = 'login-limit-msg';
-                card.prepend(el);
-              }
-              el.textContent = T('本地收藏上限 5 本，请登录后收藏更多','Local favorites limit (5) reached. Sign in to save more.');
-            }
-            return;
-    }
-    // Local-only favorite limit
-    if (!user && list.ids.length >= LOCAL_FAV_LIMIT) {
-            openLoginModal();
-            const card = document.querySelector('.login-card');
-            if (card) {
-              let el = document.getElementById('login-limit-msg');
-              if (!el) {
-                el = document.createElement('p');
-                el.id = 'login-limit-msg';
-                el.className = 'login-limit-msg';
-                card.prepend(el);
-              }
-              el.textContent = T('本地收藏上限 5 本，请登录后收藏更多','Local favorites limit (5) reached. Sign in to save more.');
-            }
-            return;
-    }
       list.ids.push(id);
       favsData[id] = { ...r, __src: meta.src || 'int', __savedAt: Date.now() };
     }
@@ -2538,6 +2588,10 @@
 
   // list 管理
   function createList(name) {
+    if (!canUseFavoritesWorkflow()) {
+      showRegionPaywallModal('workflow');
+      return null;
+    }
     const id = 'l_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
     favLists.push({ id, name: name || T('新清单','New list'), ids: [] });
     activeListId = id;
@@ -3239,7 +3293,7 @@
     return `<span class="badge b-medline" title="${T('MEDLINE 数据库收录（NLM 精选索引）','Indexed in MEDLINE (NLM curated)')}">MEDLINE</span>`;
   }
   function badgeFree(f) {
-    if (!f) return '';
+    if (!f || !canSeePublishFeeInfo()) return '';
     return `<span class="badge b-free" title="${T('作者可选择免费发表路径（Diamond / Hybrid / 订阅制等）','Author-free publishing path available (Diamond / Hybrid / subscription, etc.)')}">${T('免费发表','FREE TO PUBLISH')}</span>`;
   }
   // 期刊浏览量缓存（journal_key → count）
@@ -3512,7 +3566,7 @@
   function renderAccessBadges(r) {
     if (!r) return '';
     return [
-      badgeFree(isFreeToPublish(r)),
+      canSeePublishFeeInfo() ? badgeFree(isFreeToPublish(r)) : '',
       badgeOAJ(r.oaj),
       badgeDOAJ(r.doaj),
     ].filter(Boolean).join('');
@@ -3561,7 +3615,11 @@
 
   function starBtn(r, src = 'int') {
     const on = isFav(r);
-    return `<button class="fav-star ${on?'on':''}" data-fav="${escape(favId(r))}" data-fav-src="${escape(src)}" aria-label="toggle favorite" title="${on?t('fav_removed'):t('fav_added')}">${on?'★':'☆'}</button>`;
+    const locked = !canUseFavoritesWorkflow();
+    const title = locked
+      ? T('收藏 · Pro 起开放', 'Favorites · from Pro')
+      : (on ? t('fav_removed') : t('fav_added'));
+    return `<button class="fav-star ${on?'on':''}${locked?' is-locked':''}" data-fav="${escape(favId(r))}" data-fav-src="${escape(src)}" aria-label="toggle favorite" title="${title}">${on?'★':'☆'}</button>`;
   }
 
   // row-record 映射，供 star click / 详情抽屉查找完整记录
@@ -3783,8 +3841,11 @@
     </tr>`;
   }
 
-  /* ───────── FREE badge helper ───────── */
+  /* ───────── FREE badge helper（Pro+ 可见是否付费发表） ───────── */
   function freeBadgeCell(r) {
+    if (!canSeePublishFeeInfo()) {
+      return `<button type="button" class="badge b-free-lock" data-publish-fee-lock title="${T('升级 Pro 后可查看是否付费发表','Upgrade to Pro to see publish-fee info')}">${T('Pro','Pro')}</button>`;
+    }
     return isFreeToPublish(r)
       ? `<span class="badge b-free" title="${T('作者可选择免费发表路径（Diamond / Hybrid / 订阅制等）','Author-free publishing path available (Diamond / Hybrid / subscription, etc.)')}">${T('免费发表','FREE TO PUBLISH')}</span>`
       : '<span class="muted-cell">&mdash;</span>';
@@ -3811,7 +3872,7 @@
             (activeFeats.has('medline') && r.medline) ||
             (activeFeats.has('cscd') && r.cscd) ||
             (activeFeats.has('cstpcd') && r.cstpcd) ||
-            (activeFeats.has('free') && isFreeToPublish(r)) ||
+            (activeFeats.has('free') && canSeePublishFeeInfo() && isFreeToPublish(r)) ||
             (activeFeats.has('warning') && r.warning) ||
             (activeFeats.has('citic_warning') && r.citic_warning) ||
             (activeFeats.has('under_review') && r.under_review) ||
@@ -3857,7 +3918,7 @@
     if (activeFeats.has('medline') && !r.medline) return false;
     if (activeFeats.has('cscd') && !r.cscd) return false;
     if (activeFeats.has('cstpcd') && !r.cstpcd) return false;
-    if (activeFeats.has('free') && !isFreeToPublish(r)) return false;
+    if (activeFeats.has('free') && (!canSeePublishFeeInfo() || !isFreeToPublish(r))) return false;
     if (activeFeats.has('warning') && !r.warning) return false;
     if (activeFeats.has('citic_warning') && !r.citic_warning) return false;
     if (activeFeats.has('under_review') && !r.under_review) return false;
@@ -5897,13 +5958,15 @@
     // 徽章块 — 分两行：索引收录 / 分区等级
 	    const drawerIndexBadges = (src === 'int' || intRec) ? renderIndexBadges(ir) : '';
 	    const drawerRankBadges = (src === 'int' || intRec) ? renderRankBadges(ir) : '';
-	    const titleFeatureBadges = isFreeToPublish(ir) || isFreeToPublish(r) ? badgeFree(true) : '';
+	    const titleFeatureBadges = canSeePublishFeeInfo() && (isFreeToPublish(ir) || isFreeToPublish(r)) ? badgeFree(true) : '';
 	    const tierBadge = r.tier && /^T[123]$/.test(r.tier) ? badgeTier(r.tier)
                     : r.tier ? `<span class="tier-pill t3">${escape(tn(r.tier, "tier"))}</span>` : '';
     const crossBadges = renderDomCrossBadges(r, src);
     const drawerCoverageBadges = (src === 'int' || intRec) ? renderCoverageBadges(ir) : '';
     const drawerLevelBadges = (src === 'int' || intRec) ? renderLevelBadges(ir) : '';
-    const drawerAccessBadges = (src === 'int' || intRec) ? renderAccessBadges(ir) : (isFreeToPublish(r) ? badgeFree(true) : '');
+    const drawerAccessBadges = (src === 'int' || intRec)
+      ? renderAccessBadges(ir)
+      : (canSeePublishFeeInfo() && isFreeToPublish(r) ? badgeFree(true) : '');
     const drawerRiskBadges = (src === 'int' || intRec) ? renderRiskBadges(ir) : '';
 
     // 基础元信息（真实字段）
@@ -5962,7 +6025,10 @@
       const cnName = r.cn_name || ir.cn_name || '';
       const abbr = r.abbr20 || ir.abbr20 || '';
       const doajWeeks = parseFloat(r.doaj?.review_weeks || ir.doaj?.review_weeks);
-      const apcValue = oa?.apc || oa?.apc_usd || r.doaj?.fee || ir.doaj?.fee || r.doaj?.apc_amount || ir.doaj?.apc_amount || '';
+      const showFee = canSeePublishFeeInfo();
+      const apcValue = showFee
+        ? (oa?.apc || oa?.apc_usd || r.doaj?.fee || ir.doaj?.fee || r.doaj?.apc_amount || ir.doaj?.apc_amount || '')
+        : '';
       const apcText = apcValue
         ? (typeof apcValue === 'number'
             ? (lang.startsWith('zh') ? `版面费 APC 约 ${apcValue.toLocaleString()} USD` : `APC is approximately ${apcValue.toLocaleString()} USD`)
@@ -5976,6 +6042,11 @@
       const oaText = (() => {
         const label = oa?.l || oa?.label || '';
         const isOa = ir.cas_oa || r.cas_oa || r.doaj || ir.doaj || label === 'gold_apc' || label === 'diamond';
+        // Free 用户不暴露 Hybrid/付费路径等「是否付费发表」细节
+        if (!canSeePublishFeeInfo()) {
+          if (lang.startsWith('zh')) return isOa ? '本刊是一本 OA 开放访问期刊' : '';
+          return isOa ? 'This is an open-access journal' : '';
+        }
         if (lang.startsWith('zh')) {
           if (label === 'hybrid') return '本刊为 Hybrid 期刊，可选择开放获取发表';
           if (isOa) return '本刊是一本 OA 开放访问期刊';
@@ -6407,8 +6478,9 @@
          </div>`;
     })();
 
-    // OpenAlex enriched block (homepage / OA / APC)
+    // OpenAlex enriched block (homepage / OA / APC — 版面费细节 Pro+)
     const oaHTML = oa ? (() => {
+      const showFee = canSeePublishFeeInfo();
       const labelMap = {
         diamond:                 { text: T('Diamond OA · 读投全免费','Diamond OA · free to read & publish'),   cls: 'oa-diamond',  desc: T('由机构/基金全额资助，作者读者都不付费。','Fully funded by institutions / grants. No fees for authors or readers.') },
         gold_apc:                { text: T('Gold OA · 投稿付 APC','Gold OA · APC paid by author'),       cls: 'oa-gold',     desc: T('全刊开放获取，作者支付版面费（APC）。','Fully open-access; author pays the APC.') },
@@ -6418,29 +6490,37 @@
       };
       // Normalize both compact (hp/l/oa/dj/apc/org/w) and verbose shapes
       const label   = oa.l || oa.label || 'unknown';
-      const L       = labelMap[label] || labelMap.unknown;
+      const L       = showFee ? (labelMap[label] || labelMap.unknown) : null;
       const homepage= oa.hp || oa.homepage;
       const isoa    = oa.oa ?? oa.is_oa;
       const doaj    = oa.dj ?? oa.in_doaj;
       const org     = oa.org || oa.host_org;
       const works   = oa.w   || oa.works_count;
       const doajFee = ir.doaj?.fee || ir.doaj?.apc_amount || '';
-      const apcText = (ir.doaj?.apc === 'Yes' && doajFee) ? doajFee : (ir.doaj?.apc === 'Yes' ? T('有 APC','Has APC') : '');
+      const apcText = showFee
+        ? ((ir.doaj?.apc === 'Yes' && doajFee) ? doajFee : (ir.doaj?.apc === 'Yes' ? T('有 APC','Has APC') : ''))
+        : '';
       const doajBadge = doaj ? `<span class="oa-chip oa-doaj">&check; ${T('收录 DOAJ','In DOAJ')}</span>` : '';
       const isoaBadge = isoa ? '<span class="oa-chip oa-isoa">Open Access</span>' : '';
-      const freeBadge = isFreeToPublish(ir) || isFreeToPublish(r) ? `<span class="oa-chip oa-free" title="${T('作者可选择免费发表路径（Diamond / Hybrid / 订阅制等）','Author-free publishing path available (Diamond / Hybrid / subscription, etc.)')}">${T('✓ 免费发表','✓ FREE TO PUBLISH')}</span>` : '';
+      const freeBadge = showFee && (isFreeToPublish(ir) || isFreeToPublish(r))
+        ? `<span class="oa-chip oa-free" title="${T('作者可选择免费发表路径（Diamond / Hybrid / 订阅制等）','Author-free publishing path available (Diamond / Hybrid / subscription, etc.)')}">${T('✓ 免费发表','✓ FREE TO PUBLISH')}</span>`
+        : '';
+      const lockBadge = !showFee
+        ? `<button type="button" class="oa-chip oa-lock" data-publish-fee-lock>${T('发表费用 · Pro 可见','Publish fees · Pro')}</button>`
+        : '';
       const rows = [];
       if (homepage) rows.push([T('官网','Website'), `<a href="${escape(homepage)}" target="_blank" rel="noopener nofollow">${escape(homepage.replace(/^https?:\/\//,'').replace(/\/$/,''))}</a>`]);
       if (apcText) rows.push([T('版面费 (APC)','APC'), escape(apcText)]);
       if (org) rows.push([T('出版方 (OpenAlex)','Publisher (OpenAlex)'), escape(org)]);
       if (works) rows.push([T('已发表论文','Published works'), works.toLocaleString() + T(' 篇','')]);
       return `<div class="drawer-section oa-section">
-        <h4>${T('开放获取 / 版面费','Open Access / APC')}</h4>
+        <h4>${showFee ? T('开放获取 / 版面费','Open Access / APC') : T('开放获取','Open Access')}</h4>
         <div class="oa-head">
-          <span class="oa-pill ${L.cls}">${L.text}</span>
-          ${doajBadge}${isoaBadge}${freeBadge}
+          ${L ? `<span class="oa-pill ${L.cls}">${L.text}</span>` : ''}
+          ${doajBadge}${isoaBadge}${freeBadge}${lockBadge}
         </div>
-        ${L.desc ? `<div class="oa-desc muted">${L.desc}</div>` : ''}
+        ${L && L.desc ? `<div class="oa-desc muted">${L.desc}</div>` : ''}
+        ${!showFee ? `<div class="oa-desc muted">${T('是否免费发表、APC 金额等费用信息对 Free 隐藏，升级 Pro 后可见。','Whether authors pay to publish and APC details are hidden on Free. Upgrade to Pro to view.')}</div>` : ''}
         ${rows.length ? `<div class="oa-rows">${rows.map(([k,v]) =>
           `<div class="meta-row"><div class="meta-k">${k}</div><div class="meta-v">${v}</div></div>`
         ).join('')}</div>` : ''}
@@ -6488,7 +6568,9 @@
     const doajHTML = ir.doaj ? `<div class="drawer-section">
       <h4>${T('DOAJ 开放获取期刊目录','DOAJ — Directory of Open Access Journals')}</h4>
       <div class="meta-row"><div class="meta-k">${T('许可证','License')}</div><div class="meta-v">${escape(ir.doaj.lic || ir.doaj.license || '—')}</div></div>
-      <div class="meta-row"><div class="meta-k">APC</div><div class="meta-v">${escape(ir.doaj.apc || '—')}${(ir.doaj.fee || ir.doaj.apc_amount) ? ` · ${escape(ir.doaj.fee || ir.doaj.apc_amount)}` : ''}</div></div>
+      ${canSeePublishFeeInfo()
+        ? `<div class="meta-row"><div class="meta-k">APC</div><div class="meta-v">${escape(ir.doaj.apc || '—')}${(ir.doaj.fee || ir.doaj.apc_amount) ? ` · ${escape(ir.doaj.fee || ir.doaj.apc_amount)}` : ''}</div></div>`
+        : `<div class="meta-row"><div class="meta-k">APC</div><div class="meta-v"><button type="button" class="linkish" data-publish-fee-lock>${T('Pro 可见','Pro only')}</button></div></div>`}
       <div class="meta-row"><div class="meta-k">${T('同行评议','Peer review')}</div><div class="meta-v">${escape(ir.doaj.review || ir.doaj.review_process || '—')}</div></div>
       ${ir.doaj.du || ir.doaj.doaj_url ? `<div class="meta-row"><div class="meta-k">DOAJ</div><div class="meta-v"><a href="${escape(ir.doaj.du || ir.doaj.doaj_url)}" target="_blank" rel="noopener">${T('打开目录页','Open directory page')}</a></div></div>` : ''}
       <div class="muted-cell" style="font-size:11px;margin-top:4px">
@@ -6621,6 +6703,11 @@
     const drawerListSel = document.getElementById('drawer-fav-list-select');
     if (drawerListSel) {
       drawerListSel.addEventListener('change', () => {
+        if (!canUseFavoritesWorkflow()) {
+          showRegionPaywallModal('workflow');
+          drawerListSel.value = activeListId || '';
+          return;
+        }
         const targetId = drawerListSel.value;
         const target = favLists.find(l => l.id === targetId);
         if (!target) return;
@@ -6892,6 +6979,155 @@
     } catch (_) {}
   }
 
+  /**
+   * 付费引导弹窗（可关闭）
+   * reason: 'daily' | 'pin_free' | 'pin_pro' | 'publish_fee'
+   */
+  function showRegionPaywallModal(reason = 'daily') {
+    let modal = document.getElementById('region-paywall-modal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'region-paywall-modal';
+      modal.className = 'region-paywall-modal';
+      modal.setAttribute('role', 'dialog');
+      modal.setAttribute('aria-modal', 'true');
+      modal.innerHTML = `
+        <div class="region-paywall-card" role="document">
+          <button type="button" class="region-paywall-close" id="region-paywall-close" aria-label="Close">×</button>
+          <div class="region-paywall-eyebrow" id="region-paywall-eyebrow"></div>
+          <h3 class="region-paywall-title" id="region-paywall-title"></h3>
+          <p class="region-paywall-desc" id="region-paywall-desc"></p>
+          <ul class="region-paywall-perks" id="region-paywall-perks"></ul>
+          <div class="region-paywall-actions">
+            <a class="region-paywall-btn primary" id="region-paywall-cta" href="/pricing.html">${T('查看订阅方案','View plans')}</a>
+            <button type="button" class="region-paywall-btn ghost" id="region-paywall-later">${T('暂不升级','Not now')}</button>
+          </div>
+          <p class="region-paywall-note" id="region-paywall-note"></p>
+        </div>`;
+      document.body.appendChild(modal);
+      const close = () => {
+        modal.classList.remove('open');
+        document.removeEventListener('keydown', onEsc);
+      };
+      const onEsc = (e) => { if (e.key === 'Escape') close(); };
+      modal.__close = close;
+      modal.__onEsc = onEsc;
+      modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
+      modal.querySelector('#region-paywall-close')?.addEventListener('click', close);
+      modal.querySelector('#region-paywall-later')?.addEventListener('click', close);
+    }
+
+    const titleEl = modal.querySelector('#region-paywall-title');
+    const descEl = modal.querySelector('#region-paywall-desc');
+    const eyebrowEl = modal.querySelector('#region-paywall-eyebrow');
+    const perksEl = modal.querySelector('#region-paywall-perks');
+    const noteEl = modal.querySelector('#region-paywall-note');
+    const ctaEl = modal.querySelector('#region-paywall-cta');
+    const laterEl = modal.querySelector('#region-paywall-later');
+
+    if (ctaEl) ctaEl.textContent = T('查看订阅方案', 'View plans');
+    if (laterEl) laterEl.textContent = T('暂不升级', 'Not now');
+
+    if (reason === 'workflow') {
+      if (eyebrowEl) eyebrowEl.textContent = T('工作流 · 升级解锁', 'Workflow · Upgrade');
+      if (titleEl) titleEl.textContent = T('收藏 / 导出 / 联动 · Pro 起开放', 'Favorites / export / send · from Pro');
+      if (descEl) descEl.textContent = T(
+        'Free 不包含云收藏、清单、分享，以及导出到 Zotero / Notion / Obsidian。升级 Pro 后即可使用完整工作流。',
+        'Free does not include cloud favorites, lists, sharing, or export to Zotero / Notion / Obsidian. Upgrade to Pro for the full workflow.'
+      );
+      if (perksEl) {
+        perksEl.innerHTML = [
+          T('<b>Pro</b> · 收藏与清单 · 导出 · Zotero / Notion / Obsidian', '<b>Pro</b> · Favorites & lists · Export · Zotero / Notion / Obsidian'),
+          T('<b>Pro</b> · 是否付费发表 / APC · 插件中科院与预警', '<b>Pro</b> · Publish-fee / APC · Extension CAS & warning'),
+          T('<b>Max</b> · 高额度 AI 荐刊 · 全部地区站', '<b>Max</b> · High-quota AI picks · All regions'),
+        ].map((html) => `<li>${html}</li>`).join('');
+      }
+    } else if (reason === 'fulltext') {
+      if (eyebrowEl) eyebrowEl.textContent = T('原文查找 · 升级解锁', 'Full text · Upgrade');
+      if (titleEl) titleEl.textContent = T('Free 原文查找已达上限', 'Free full-text lookup limit reached');
+      if (descEl) descEl.textContent = T(
+        `Free 累计可查找开放全文 ${FREE_FULLTEXT_LIMIT} 篇（按文章去重）。升级 Pro 后不再受此上限限制。`,
+        `Free includes ${FREE_FULLTEXT_LIMIT} open full-text lookups in total (unique articles). Upgrade to Pro for unlimited lookups.`
+      );
+      if (perksEl) {
+        perksEl.innerHTML = [
+          T('<b>Pro</b> · 原文查找不限量（合法 OA 来源）', '<b>Pro</b> · Unlimited full-text lookup (legal OA sources)'),
+          T('<b>Pro</b> · 收藏 / 导出 / 文献管理联动', '<b>Pro</b> · Favorites / export / reference managers'),
+          T('不升级仍可继续查刊与查看期刊指标', 'You can keep searching journals without upgrading'),
+        ].map((html) => `<li>${html}</li>`).join('');
+      }
+    } else if (reason === 'publish_fee') {
+      if (eyebrowEl) eyebrowEl.textContent = T('发表费用 · 升级解锁', 'Publish fees · Upgrade');
+      if (titleEl) titleEl.textContent = T('是否付费发表 · Pro 可见', 'Publish-fee info · Pro');
+      if (descEl) descEl.textContent = T(
+        'Free 不展示是否免费发表、APC 版面费等费用信息。升级 Pro 后可在列表、详情与插件中查看。',
+        'Free hides free-to-publish flags and APC fees. Upgrade to Pro to see them in lists, details, and the extension.'
+      );
+      if (perksEl) {
+        perksEl.innerHTML = [
+          T('<b>Pro</b> · 是否免费发表 / APC · 插件中科院与预警徽章', '<b>Pro</b> · Free-to-publish / APC · Extension CAS & warning badges'),
+          T('<b>Max</b> · 高额度 AI 荐刊 · 全部地区站', '<b>Max</b> · High-quota AI picks · All regional stations'),
+          T('不升级也可继续查 IF、分区与收录信息', 'Without upgrading you can still browse IF, tiers, and indexing'),
+        ].map((html) => `<li>${html}</li>`).join('');
+      }
+    } else if (reason === 'pin_pro') {
+      if (eyebrowEl) eyebrowEl.textContent = T('地区站 · 升级解锁', 'Regional stations · Upgrade');
+      if (titleEl) titleEl.textContent = T('自定义地区已达上限', 'Custom region pin limit reached');
+      if (descEl) descEl.textContent = T(
+        'Pro 最多固定 2 个自定义地区。升级 Max 可解锁全部地区站并固定到侧栏。',
+        'Pro can pin up to 2 custom regions. Upgrade to Max to unlock and pin all regional stations.'
+      );
+      if (perksEl) {
+        perksEl.innerHTML = [
+          T('<b>Pro</b> · 固定 2 个自定义地区 · 插件中科院/预警徽章', '<b>Pro</b> · Pin 2 custom regions · Extension CAS/warning badges'),
+          T('<b>Max</b> · 全部地区站解锁 · 高额度 AI 荐刊', '<b>Max</b> · All regions unlocked · High-quota AI picks'),
+          T('中国站始终免费，不付费也可继续使用', 'China station stays free — you can keep using it without paying'),
+        ].map((html) => `<li>${html}</li>`).join('');
+      }
+    } else if (reason === 'pin_free') {
+      if (eyebrowEl) eyebrowEl.textContent = T('地区站 · 升级解锁', 'Regional stations · Upgrade');
+      if (titleEl) titleEl.textContent = T('固定地区站需升级', 'Upgrade to pin regional stations');
+      if (descEl) descEl.textContent = T(
+        'Free 可每日临时查看其他地区站 3 次。升级后可将常用地区固定到侧栏，不必每天重新点开。',
+        'Free includes 3 temporary regional views per day. Upgrade to pin favorite regions on the rail.'
+      );
+      if (perksEl) {
+        perksEl.innerHTML = [
+          T('<b>Pro</b> · 固定 2 个自定义地区 · 插件中科院/预警徽章', '<b>Pro</b> · Pin 2 custom regions · Extension CAS/warning badges'),
+          T('<b>Max</b> · 全部地区站解锁 · 高额度 AI 荐刊', '<b>Max</b> · All regions unlocked · High-quota AI picks'),
+          T('中国站始终免费，不付费也可继续使用', 'China station stays free — you can keep using it without paying'),
+        ].map((html) => `<li>${html}</li>`).join('');
+      }
+    } else {
+      if (eyebrowEl) eyebrowEl.textContent = T('地区站 · 升级解锁', 'Regional stations · Upgrade');
+      if (titleEl) titleEl.textContent = T('今日免费查看次数已用完', 'Daily free regional views used up');
+      if (descEl) descEl.textContent = T(
+        'Free 每天可临时查看其他地区站 3 次（今日已用尽）。升级后可固定常用地区，或解锁全部地区站。',
+        'Free includes 3 temporary views of other regional stations per day (used up today). Upgrade to pin favorites or unlock all.'
+      );
+      if (perksEl) {
+        perksEl.innerHTML = [
+          T('<b>Pro</b> · 固定 2 个自定义地区 · 插件中科院/预警徽章', '<b>Pro</b> · Pin 2 custom regions · Extension CAS/warning badges'),
+          T('<b>Max</b> · 全部地区站解锁 · 高额度 AI 荐刊', '<b>Max</b> · All regions unlocked · High-quota AI picks'),
+          T('中国站始终免费，不付费也可继续使用', 'China station stays free — you can keep using it without paying'),
+        ].map((html) => `<li>${html}</li>`).join('');
+      }
+    }
+    if (noteEl) {
+      noteEl.textContent = T(
+        '支付通道即将开放；可先查看方案，关闭弹窗不影响当前使用。',
+        'Checkout is coming soon. You can close this and keep using the site.'
+      );
+    }
+
+    modal.classList.add('open');
+    if (modal.__onEsc) {
+      document.removeEventListener('keydown', modal.__onEsc);
+      document.addEventListener('keydown', modal.__onEsc);
+    }
+    try { modal.querySelector('#region-paywall-later')?.focus(); } catch (_) {}
+  }
+
   function getPinnedRegions() {
     try {
       const raw = localStorage.getItem(PINNED_REGION_KEY);
@@ -6944,11 +7180,7 @@
     const customPinned = pinned.filter(x => !FREE_BASE_REGION_IDS.includes(x));
     const isCustom = !FREE_BASE_REGION_IDS.includes(id);
     if (isCustom && ent.maxCustomPins != null && customPinned.length >= ent.maxCustomPins) {
-      if (ent.maxCustomPins === 0) {
-        showRegionUpgradeToast(T('免费版可每日查看地区站 3 次；升级 Pro 可固定 2 个自定义地区，Max 解锁全部。','Free: 3 regional views/day. Pro: pin 2 custom regions. Max: unlock all.'));
-      } else {
-        showRegionUpgradeToast(T(`Pro 最多固定 ${ent.maxCustomPins} 个自定义地区，升级 Max 可解锁全部。`,`Pro can pin up to ${ent.maxCustomPins} custom regions. Upgrade to Max for all.`));
-      }
+      showRegionPaywallModal(ent.maxCustomPins === 0 ? 'pin_free' : 'pin_pro');
       return;
     }
     setPinnedRegions([...pinned, id]);
@@ -6976,7 +7208,7 @@
     const u = getRegionViewUsage();
     if (u.seen.includes(id)) return true;
     if (u.count >= ent.dailyViews) {
-      showRegionUpgradeToast(T('今日地区站免费查看次数已用完（3 次）。升级 Pro 可固定 2 个地区，Max 解锁全部。','Daily free regional views used (3). Pro: pin 2 regions. Max: unlock all.'));
+      showRegionPaywallModal('daily');
       return false;
     }
     u.count += 1;
@@ -7536,6 +7768,16 @@
 
   function renderFav() {
     const box = $('#fav-content');
+    if (!canUseFavoritesWorkflow()) {
+      box.innerHTML = `
+        <div class="empty workflow-lock" style="padding:48px 20px;text-align:center;color:var(--muted)">
+          <div style="font-size:18px;font-weight:700;color:var(--ink,#3a2e1f);margin-bottom:10px">${T('收藏与清单 · Pro 起开放','Favorites & lists · from Pro')}</div>
+          <p style="max-width:420px;margin:0 auto 16px;line-height:1.55">${T('Free 不提供云收藏、清单、分享与导出联动。升级 Pro 后可收藏期刊、管理清单，并导出到 Zotero / Notion / Obsidian。','Free does not include favorites, lists, sharing, or export. Upgrade to Pro to save journals and export to Zotero / Notion / Obsidian.')}</p>
+          <button type="button" class="btn-mini" data-workflow-upgrade style="padding:10px 16px;font-size:14px">${T('查看订阅方案','View plans')}</button>
+        </div>`;
+      box.querySelector('[data-workflow-upgrade]')?.addEventListener('click', () => showRegionPaywallModal('workflow'));
+      return;
+    }
     const list = getActiveList();
     if (!list) { box.innerHTML = `<div class="empty" style="padding:60px 20px;text-align:center;color:var(--muted)">${T('还没有收藏。切到「国际 SCI/SSCI」点任意一行右边的 ★ 就能收藏。','No favorites yet. Go to "International" and click the ★ on any row.')}</div>`; return; }
 
@@ -7551,6 +7793,17 @@
         <div class="fav-list-ops">
           <button class="btn-mini" id="fav-list-new" title="${T('新建清单','New list')}">＋ ${T('新建','New')}</button>
           <button class="btn-mini" id="fav-list-rename" title="${T('重命名当前','Rename current')}">✎ ${T('重命名','Rename')}</button>
+          <div class="fav-export-wrap">
+            <button class="btn-mini" id="fav-list-export" title="${T('导出到 Zotero / Notion / Obsidian 等','Export for Zotero / Notion / Obsidian')}">⬇ ${T('导出','Export')}</button>
+            <div class="fav-export-menu" id="fav-export-menu" hidden>
+              <button type="button" data-fav-export="ris">RIS · Zotero / EndNote</button>
+              <button type="button" data-fav-export="bib">BibTeX</button>
+              <button type="button" data-fav-export="csv">CSV · Notion</button>
+              <button type="button" data-fav-export="md">Markdown · Obsidian</button>
+              <button type="button" data-fav-export="notion">📋 ${T('复制 Notion 表格','Copy Notion table')}</button>
+              <button type="button" data-fav-export="obsidian">↗ ${T('打开 Obsidian 笔记','Open in Obsidian')}</button>
+            </div>
+          </div>
           <button class="btn-mini" id="fav-list-share" title="${T('生成分享短链','Generate share link')}">🔗 ${T('分享','Share')}</button>
           <button class="btn-mini btn-danger" id="fav-list-del" title="${T('删除当前','Delete current')}" ${favLists.length<=1?'disabled':''}>🗑 ${T('删除','Delete')}</button>
         </div>
@@ -7662,10 +7915,283 @@
     });
     const shareBtn = document.getElementById('fav-list-share');
     if (shareBtn) shareBtn.addEventListener('click', () => openShareDialog());
+    const exportBtn = document.getElementById('fav-list-export');
+    const exportMenu = document.getElementById('fav-export-menu');
+    if (exportBtn && exportMenu) {
+      exportBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const open = exportMenu.hasAttribute('hidden');
+        if (open) exportMenu.removeAttribute('hidden');
+        else exportMenu.setAttribute('hidden', '');
+      });
+      exportMenu.querySelectorAll('[data-fav-export]').forEach((btn) => {
+        btn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          exportMenu.setAttribute('hidden', '');
+          await runFavExport(btn.getAttribute('data-fav-export'));
+        });
+      });
+      if (!window.__favExportDocClose) {
+        window.__favExportDocClose = true;
+        document.addEventListener('click', () => {
+          const m = document.getElementById('fav-export-menu');
+          if (m) m.setAttribute('hidden', '');
+        });
+      }
+    }
+  }
+
+  // ───────── favorites export → Zotero / Notion / Obsidian ─────────
+  function collectActiveFavRows() {
+    const list = getActiveList();
+    if (!list) return [];
+    const rows = [];
+    for (const id of list.ids) {
+      let rec = journals.find(r => favId(r) === id);
+      if (!rec && domestic) {
+        const src = favsData[id]?.__src || 'cnki_major';
+        const domRecs = [
+          ...(domestic.cnkx?.records || []).map(r => ({ ...r, __src: 'cnkx' })),
+          ...(domestic.cscd?.records || []).map(r => ({ ...r, __src: 'cscd' })),
+          ...(domestic.cstpcd?.records || []).map(r => ({ ...r, __src: 'cstpcd' })),
+          ...(domestic.nsfc_mgmt?.records || []).map(r => ({ ...r, __src: 'nsfc_mgmt' })),
+          ...(domestic.cnki_major?.records || []).map(r => ({ ...r, __src: 'cnki_major' })),
+        ];
+        rec = domRecs.find(r => favId(r) === id);
+      }
+      if (!rec) rec = favsData[id];
+      if (rec) rows.push({ ...rec, __src: rec.__src || 'int' });
+    }
+    return rows;
+  }
+
+  function favJournalTitle(r) {
+    return String(r.name || r.cn_name || r.en_name || r.journal_title || 'Untitled').trim();
+  }
+
+  function favJournalKey(r) {
+    const base = (r.issn || r.eissn || favJournalTitle(r)).replace(/[^a-zA-Z0-9]+/g, '').slice(0, 24) || 'journal';
+    return base;
+  }
+
+  function favCasLabel(r) {
+    const zh = String(lang || '').startsWith('zh');
+    if (r.cz != null && r.cz !== '' && r.cz !== 0) return String(r.cz) + (zh ? '区' : '');
+    if (r.xr && r.xr.z) return String(r.xr.z) + (zh ? '区' : '');
+    return '';
+  }
+
+  function favIfLabel(r) {
+    const v = r.if != null ? r.if : (r.jif != null ? r.jif : '');
+    return v === '' || v == null ? '' : String(v);
+  }
+
+  function favIndexLabels(r) {
+    const xs = Array.isArray(r.x) ? r.x : (Array.isArray(r.indexes) ? r.indexes : []);
+    return xs.filter(Boolean).join('; ');
+  }
+
+  function escCsv(v) {
+    const s = String(v == null ? '' : v);
+    if (/[",\n\r]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+    return s;
+  }
+
+  function escBibField(v) {
+    return String(v || '')
+      .replace(/\\/g, '\\\\')
+      .replace(/[{}]/g, '\\$&');
+  }
+
+  function journalToRis(r) {
+    const title = favJournalTitle(r);
+    const lines = ['TY  - JFULL'];
+    lines.push(`TI  - ${title}`);
+    lines.push(`T2  - ${title}`);
+    if (r.issn) lines.push(`SN  - ${r.issn}`);
+    if (r.eissn && r.eissn !== r.issn) lines.push(`SN  - ${r.eissn}`);
+    if (r.p || r.publisher) lines.push(`PB  - ${r.p || r.publisher}`);
+    if (r.c || r.country) lines.push(`CY  - ${r.c || r.country}`);
+    const notes = [
+      favIfLabel(r) ? `IF ${favIfLabel(r)}` : '',
+      r.jq ? `JCR ${r.jq}` : '',
+      favCasLabel(r) ? `CAS ${favCasLabel(r)}` : '',
+      favIndexLabels(r) ? `Index ${favIndexLabels(r)}` : '',
+      'AILatest Journal',
+    ].filter(Boolean).join(' | ');
+    if (notes) lines.push(`N1  - ${notes}`);
+    if (r.s) lines.push(`UR  - https://journal.ailatest.org/journal/${encodeURIComponent(r.s)}/`);
+    else if (r.issn) lines.push(`UR  - https://journal.ailatest.org/?q=${encodeURIComponent(r.issn)}`);
+    lines.push('ER  - ');
+    return lines.join('\r\n') + '\r\n';
+  }
+
+  function journalToBibtex(r) {
+    const title = favJournalTitle(r);
+    const fields = [
+      ['title', title],
+      ['issn', r.issn || ''],
+      ['publisher', r.p || r.publisher || ''],
+      ['note', [
+        favIfLabel(r) ? `IF=${favIfLabel(r)}` : '',
+        r.jq ? `JCR=${r.jq}` : '',
+        favCasLabel(r) ? `CAS=${favCasLabel(r)}` : '',
+      ].filter(Boolean).join('; ')],
+      ['url', r.s ? `https://journal.ailatest.org/journal/${r.s}/` : ''],
+    ].filter(([, v]) => v);
+    return `@periodical{${favJournalKey(r)},\n${fields.map(([k, v]) => `  ${k} = {${escBibField(v)}}`).join(',\n')}\n}\n`;
+  }
+
+  function journalsToCsv(rows) {
+    const headers = ['Title', 'ISSN', 'eISSN', 'IF', 'JCR', 'CAS', 'Indexes', 'Publisher', 'Country', 'URL'];
+    const lines = [headers.join(',')];
+    rows.forEach((r) => {
+      const url = r.s
+        ? `https://journal.ailatest.org/journal/${r.s}/`
+        : (r.issn ? `https://journal.ailatest.org/?q=${encodeURIComponent(r.issn)}` : '');
+      lines.push([
+        favJournalTitle(r),
+        r.issn || '',
+        r.eissn || '',
+        favIfLabel(r),
+        r.jq || '',
+        favCasLabel(r),
+        favIndexLabels(r),
+        r.p || r.publisher || '',
+        r.c || r.country || '',
+        url,
+      ].map(escCsv).join(','));
+    });
+    return lines.join('\r\n') + '\r\n';
+  }
+
+  function journalsToMarkdown(rows, listName) {
+    const title = listName || T('收藏清单', 'Favorites');
+    const header = [
+      '---',
+      `title: "${String(title).replace(/"/g, '\\"')}"`,
+      `exported_at: "${new Date().toISOString()}"`,
+      'source: "AILatest Journal"',
+      '---',
+      '',
+      `# ${title}`,
+      '',
+      `| ${T('刊名','Title')} | ISSN | IF | JCR | ${T('中科院','CAS')} | ${T('索引','Indexes')} |`,
+      '| --- | --- | --- | --- | --- | --- |',
+    ];
+    const body = rows.map((r) => {
+      const name = favJournalTitle(r).replace(/\|/g, '\\|');
+      return `| ${name} | ${r.issn || r.eissn || '—'} | ${favIfLabel(r) || '—'} | ${r.jq || '—'} | ${favCasLabel(r) || '—'} | ${(favIndexLabels(r) || '—').replace(/\|/g, '/')} |`;
+    });
+    return header.concat(body).join('\n') + '\n';
+  }
+
+  function journalsToNotionTsv(rows) {
+    // Notion 粘贴：制表符分隔会变成表格
+    const lines = [
+      [T('刊名','Title'), 'ISSN', 'IF', 'JCR', T('中科院','CAS'), T('索引','Indexes'), T('出版商','Publisher')].join('\t'),
+    ];
+    rows.forEach((r) => {
+      lines.push([
+        favJournalTitle(r),
+        r.issn || r.eissn || '',
+        favIfLabel(r),
+        r.jq || '',
+        favCasLabel(r),
+        favIndexLabels(r),
+        r.p || r.publisher || '',
+      ].join('\t'));
+    });
+    return lines.join('\n');
+  }
+
+  function downloadTextFile(filename, text, mime) {
+    const blob = new Blob(['\uFEFF' + text], { type: mime || 'text/plain;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+  }
+
+  async function copyText(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch (_) {
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.cssText = 'position:fixed;left:-9999px;top:0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        ta.remove();
+        return true;
+      } catch (_) {
+        return false;
+      }
+    }
+  }
+
+  async function runFavExport(kind) {
+    if (!canUseExportIntegrations()) {
+      showRegionPaywallModal('workflow');
+      return;
+    }
+    const list = getActiveList();
+    const rows = collectActiveFavRows();
+    if (!list || !rows.length) {
+      alert(T('当前清单为空，先收藏几本期刊再导出。', 'This list is empty. Favorite some journals first.'));
+      return;
+    }
+    const base = (favListDisplayName(list) || 'favorites').replace(/[\\/:*?"<>|]+/g, '_').slice(0, 48);
+    if (kind === 'ris') {
+      downloadTextFile(`${base}.ris`, rows.map(journalToRis).join('\r\n'), 'application/x-research-info-systems');
+      return;
+    }
+    if (kind === 'bib') {
+      downloadTextFile(`${base}.bib`, rows.map(journalToBibtex).join('\n'), 'application/x-bibtex');
+      return;
+    }
+    if (kind === 'csv') {
+      downloadTextFile(`${base}.csv`, journalsToCsv(rows), 'text/csv;charset=utf-8');
+      return;
+    }
+    if (kind === 'md') {
+      downloadTextFile(`${base}.md`, journalsToMarkdown(rows, favListDisplayName(list)), 'text/markdown;charset=utf-8');
+      return;
+    }
+    if (kind === 'notion') {
+      const ok = await copyText(journalsToNotionTsv(rows));
+      if (ok) alert(T('已复制表格。打开 Notion 新建页面后粘贴即可成表。', 'Table copied. Paste into a Notion page to create a table.'));
+      else alert(T('复制失败，请改用 CSV 导出。', 'Copy failed. Try CSV export instead.'));
+      return;
+    }
+    if (kind === 'obsidian') {
+      const md = journalsToMarkdown(rows, favListDisplayName(list));
+      const file = `AILatest/${base}`.replace(/\s+/g, ' ');
+      // 内置 URI：写入新笔记；过长则回退下载
+      if (md.length < 12000) {
+        const uri = `obsidian://new?file=${encodeURIComponent(file)}&content=${encodeURIComponent(md)}`;
+        window.location.href = uri;
+        setTimeout(() => {
+          // 若未安装 Obsidian，用户仍可手动打开下载的 md
+        }, 400);
+      }
+      downloadTextFile(`${base}.md`, md, 'text/markdown;charset=utf-8');
+      return;
+    }
   }
 
   // ───────── share lists ─────────
   async function openShareDialog() {
+    if (!canUseFavoritesWorkflow()) {
+      showRegionPaywallModal('workflow');
+      return;
+    }
     if (!user || !user.token) {
       alert(T('请先登录后分享清单','Please sign in to share a list'));
       return;
@@ -7835,24 +8361,30 @@
       meta.push([T('审稿周期','Review Cycle'), cycTxt]);
     }
 
-    // OA / 订阅模式 + APC
+    // OA / 订阅模式 + APC（费用细节 Pro+）
     const oaRec = ir.oa || lookupOA(ir.issn || ir.eissn ? ir : r);
     if (oaRec) {
-      const labelMapShort = {
-        diamond: T('Diamond · 读投全免费','Diamond · free both ways'),
-        gold_apc: T('Gold OA · 投稿付 APC','Gold OA · author pays APC'),
-        hybrid: T('Hybrid · 可选 OA','Hybrid · optional OA'),
-        subscription_paid_read: T('订阅制 · 读付费','Subscription · paid read'),
-        unknown: T('未知','Unknown'),
-      };
-      const lab = oaRec.l || oaRec.label || 'unknown';
       const doaj = oaRec.dj ?? oaRec.in_doaj;
-      let oaText = labelMapShort[lab] || labelMapShort.unknown;
-      const doajFee = ir.doaj?.fee || ir.doaj?.apc_amount || '';
-      if (ir.doaj?.apc === 'Yes' && doajFee) oaText += ` · APC ${doajFee}`;
-      else if (ir.doaj?.apc === 'Yes') oaText += T(' · 有 APC',' · has APC');
-      if (doaj) oaText += T(' · 收录 DOAJ',' · in DOAJ');
-      meta.push([T('开放获取','Open Access'), oaText]);
+      if (canSeePublishFeeInfo()) {
+        const labelMapShort = {
+          diamond: T('Diamond · 读投全免费','Diamond · free both ways'),
+          gold_apc: T('Gold OA · 投稿付 APC','Gold OA · author pays APC'),
+          hybrid: T('Hybrid · 可选 OA','Hybrid · optional OA'),
+          subscription_paid_read: T('订阅制 · 读付费','Subscription · paid read'),
+          unknown: T('未知','Unknown'),
+        };
+        const lab = oaRec.l || oaRec.label || 'unknown';
+        let oaText = labelMapShort[lab] || labelMapShort.unknown;
+        const doajFee = ir.doaj?.fee || ir.doaj?.apc_amount || '';
+        if (ir.doaj?.apc === 'Yes' && doajFee) oaText += ` · APC ${doajFee}`;
+        else if (ir.doaj?.apc === 'Yes') oaText += T(' · 有 APC',' · has APC');
+        if (doaj) oaText += T(' · 收录 DOAJ',' · in DOAJ');
+        meta.push([T('开放获取','Open Access'), oaText]);
+      } else {
+        let oaText = (oaRec.oa ?? oaRec.is_oa) ? 'Open Access' : T('开放获取信息','Open access');
+        if (doaj) oaText += T(' · 收录 DOAJ',' · in DOAJ');
+        meta.push([T('开放获取','Open Access'), oaText]);
+      }
     }
     const metaHtml = meta.length ? `<div class="jcard-meta">${meta.map(([k,v]) => `<div class="jcard-meta-row"><span class="jcard-meta-k">${k}</span><span class="jcard-meta-v">${escape(v)}</span></div>`).join('')}</div>` : '';
 
@@ -8314,6 +8846,14 @@
       });
     });
     const setFreeFilter = (checked) => {
+      if (checked && !canSeePublishFeeInfo()) {
+        showRegionPaywallModal('publish_fee');
+        const freeCol = document.getElementById('free-col-filter');
+        if (freeCol) freeCol.checked = false;
+        document.querySelectorAll('.feat-row input[value="free"]').forEach(input => { input.checked = false; });
+        activeFeats.delete('free');
+        return;
+      }
       const freeCol = document.getElementById('free-col-filter');
       if (freeCol) freeCol.checked = checked;
       document.querySelectorAll('.feat-row input[value="free"]').forEach(input => { input.checked = checked; });
@@ -8329,6 +8869,30 @@
       if (e.target && e.target.id === 'free-col-filter') return;
       e.preventDefault();
       setFreeFilter(!activeFeats.has('free'));
+    });
+    // 侧栏「免费发表」筛选
+    document.querySelectorAll('.feat-row input[value="free"]').forEach((input) => {
+      input.addEventListener('change', (e) => {
+        if (!canSeePublishFeeInfo() && e.target.checked) {
+          e.target.checked = false;
+          activeFeats.delete('free');
+          showRegionPaywallModal('publish_fee');
+        }
+      });
+    });
+    document.getElementById('pick-filter-free')?.addEventListener('change', (e) => {
+      if (!canSeePublishFeeInfo() && e.target.checked) {
+        e.target.checked = false;
+        showRegionPaywallModal('publish_fee');
+      }
+    });
+    // 列表 / 详情中的 Pro 锁
+    document.addEventListener('click', (e) => {
+      const lock = e.target && e.target.closest && e.target.closest('[data-publish-fee-lock]');
+      if (!lock) return;
+      e.preventDefault();
+      e.stopPropagation();
+      showRegionPaywallModal('publish_fee');
     });
     $('#topic-dd-search')?.addEventListener('input', () => {
       const raw = ($('#topic-dd-search')?.value || '').trim().toLowerCase();
@@ -9505,7 +10069,7 @@
       // 地区站权益：Free 每日 3 次临时查看；Pro 固定 2 个自定义；Max 全部
       if (REGION_STATION_IDS.includes(tab) && !opts.skipRegionGate) {
         if (!canAccessRegionStation(tab)) {
-          showRegionUpgradeToast(T('今日地区站免费查看次数已用完（3 次）。升级 Pro 可固定 2 个地区，Max 解锁全部。','Daily free regional views used (3). Pro: pin 2 regions. Max: unlock all.'));
+          showRegionPaywallModal('daily');
           return;
         }
         if (!consumeRegionViewIfNeeded(tab)) return;
@@ -10173,7 +10737,7 @@
       return {
         indices,
         exclude_multidisciplinary: !!document.getElementById('pick-filter-comprehensive')?.checked,
-        free: !!document.getElementById('pick-filter-free')?.checked,
+        free: !!(canSeePublishFeeInfo() && document.getElementById('pick-filter-free')?.checked),
       };
     }
 
@@ -10823,7 +11387,7 @@
             return !cats.some(c => /multidisciplinary/i.test(c));
           });
         }
-        if (document.getElementById('pick-filter-free')?.checked) {
+        if (document.getElementById('pick-filter-free')?.checked && canSeePublishFeeInfo()) {
           filtered = filtered.filter(e => pickIsDoajNoApc(e.journalRec));
         }
         filtered.sort((a, b) => b.score - a.score || (b.journalRec.if_2024 || 0) - (a.journalRec.if_2024 || 0));

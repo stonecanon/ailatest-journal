@@ -1,6 +1,6 @@
 {
   "$schema_note": "AILatest Journal 插件/网站共用权限配置。服务端为唯一权威来源，客户端只读不判权。版本号变更时客户端需重新拉取。",
-  "version": "2026-07-15.1",
+  "version": "2026-07-15.4",
   "status": "pro_coming_soon",
   "model": {
     "provider": "DeepSeek",
@@ -55,7 +55,7 @@
       "on_register": "merge_local_favorites_to_cloud"
     },
     "free": {
-      "note": "注册用户基础档。网站查刊与详情完整开放；仅浏览器插件的中科院/预警等高级徽章锁定。",
+      "note": "注册用户基础档。网站查刊与详情基本开放；是否付费发表/APC 与插件中科院/预警锁定。",
       "features": {
         "badge_display": true,
         "journal_detail": true,
@@ -68,26 +68,32 @@
           "on_hold": true,
           "retraction": true,
           "cnkx_tier": true,
-          "note": "网站侧完整展示；插件侧见 extension.premium_labels"
+          "publish_fee": false,
+          "note": "网站侧中科院/预警开放；发表费用对 Free 关闭；插件侧见 extension.premium_labels"
         },
+        "publish_fee_info": false,
         "favorites": {
-          "enabled": true,
-          "storage": "cloud",
-          "max_items": 5,
-          "max_lists": 2
+          "enabled": false,
+          "storage": "none",
+          "max_items": 0,
+          "max_lists": 0
         },
-        "cloud_sync": true,
+        "cloud_sync": false,
         "tags": false,
         "notes": false,
         "submission_history": false,
         "export": false,
         "integrations": false,
+        "fulltext": { "max_total": 30 },
         "ai": false,
         "extension": {
           "queries_per_day": 80,
           "devices": 1,
           "sites": "basic",
           "advanced_sort": false,
+          "export": false,
+          "integrations": false,
+          "fulltext": { "max_total": 30 },
           "premium_labels": {
             "cas_zone": false,
             "cas_top": false,
@@ -97,7 +103,8 @@
             "on_hold": false,
             "retraction": false,
             "cnkx_tier": false,
-            "note": "插件仅基础 IF/JCR/收录；中科院与预警等徽章 Pro 起开放"
+            "publish_fee": false,
+            "note": "插件仅基础 IF/JCR/收录；中科院/预警/发表费用/导出联动 Pro 起开放；原文查找终身 30 篇"
           }
         }
       }
@@ -140,8 +147,10 @@
           "under_review": true,
           "on_hold": true,
           "retraction": true,
-          "cnkx_tier": true
+          "cnkx_tier": true,
+          "publish_fee": true
         },
+        "publish_fee_info": true,
         "favorites": {
           "enabled": true,
           "storage": "cloud",
@@ -152,14 +161,20 @@
         "tags": false,
         "notes": false,
         "submission_history": false,
-        "export": false,
-        "integrations": false,
+        "export": {
+          "formats": ["csv", "ris", "bibtex", "markdown"]
+        },
+        "integrations": ["zotero", "notion", "obsidian", "endnote"],
+        "fulltext": { "max_total": null },
         "ai": false,
         "extension": {
           "queries_per_day": 20000,
           "devices": 2,
           "sites": "enhanced",
           "advanced_sort": true,
+          "export": true,
+          "integrations": true,
+          "fulltext": { "max_total": null },
           "copy": "高额度 · 日常刷刊无压力（对外不写「不限」；服务端保留防护上限）"
         }
       }
@@ -177,8 +192,10 @@
           "under_review": true,
           "on_hold": true,
           "retraction": true,
-          "cnkx_tier": true
+          "cnkx_tier": true,
+          "publish_fee": true
         },
+        "publish_fee_info": true,
         "favorites": {
           "enabled": true,
           "storage": "cloud",
@@ -192,9 +209,9 @@
         "drag_sort": true,
         "advanced_filters": true,
         "export": {
-          "formats": ["csv", "ris", "bibtex", "xlsx"]
+          "formats": ["csv", "ris", "bibtex", "markdown", "xlsx"]
         },
-        "integrations": ["zotero", "notion", "endnote", "obsidian"],
+        "integrations": ["zotero", "notion", "obsidian", "endnote"],
         "ai": {
           "enabled": true,
           "monthly_credits": 1000,
