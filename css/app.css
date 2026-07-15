@@ -7640,8 +7640,8 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   min-width: 0;
   padding: 14px 14px 12px;
   box-sizing: border-box;
-  /* 上块底色略加深，与白底徽章区对比更清晰 */
-  background: #e9e4db;
+  /* 默认上块底色：全站统一略深暖灰，与白底徽章区区分 */
+  background: #e0d9ce;
   border-radius: 15px 15px 0 0;
   /* 与下块（收录/分区）的清晰分割线 */
   border-bottom: 1px solid rgba(60, 60, 67, 0.14);
@@ -7785,7 +7785,7 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   color: #ff9500;
   background: rgba(255, 149, 0, 0.18);
 }
-/* 已收藏：仅上块略加深，绝不铺到徽章区 */
+/* 已收藏：仅上块再深一档；下块仍白；其它卡保持默认同色 */
 .j-row.j-card:has(.fav-star.on) {
   background: #ffffff;
 }
@@ -7793,7 +7793,7 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   background: transparent;
 }
 .j-row.j-card:has(.fav-star.on) .j-card-head {
-  background: #e0d9ce;
+  background: #d0c7b8;
 }
 .j-row.j-card:has(.fav-star.on) .j-card-body {
   background: #ffffff;
