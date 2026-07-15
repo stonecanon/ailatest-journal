@@ -1601,6 +1601,8 @@
   }
 
   let activeTab = 'home';
+  const tabScrollPositions = new Map();
+  const reusableTabPanels = new Set(['int', 'dom', 'in', 'my', 'kr', 'pbn', 'isc', 'scielo']);
   let homeMode = 'search';
   const TAB_PATHS = { home: '/', int: '/global', dom: '/cn', in: '/in', my: '/my', kr: '/kr', pbn: '/pbn', isc: '/isc', scielo: '/scielo', fav: '/favorites', me: '/account', rank: '/rankings/', pick: '/pick' };
   const PATH_TABS = { '/': 'home', '/en': 'home', '/zh': 'home', '/global': 'int', '/international': 'int', '/journals': 'int', '/cn': 'dom', '/china': 'dom', '/in': 'in', '/india': 'in', '/my': 'my', '/malaysia': 'my', '/kr': 'kr', '/korea': 'kr', '/pbn': 'pbn', '/poland': 'pbn', '/isc': 'isc', '/scielo': 'scielo', '/favorites': 'fav', '/account': 'me', '/me': 'me', '/profile': 'me', '/rankings': 'rank', '/pick': 'pick' };
@@ -9175,6 +9177,9 @@
 
     function activateTab(tab, opts = {}) {
       if (!TAB_PATHS[tab]) tab = 'home';
+      const previousTab = activeTab;
+      const changingTab = previousTab !== tab;
+      if (changingTab) tabScrollPositions.set(previousTab, window.scrollY);
       if (!opts.keepWarnList) activeWarnList = false; // 切换标签默认退出预警名单
       if (document.body.classList.contains('journal-route')) {
         _drawerStack = [];
@@ -9197,6 +9202,7 @@
       document.body.classList.toggle('simple-top-route', activeTab === 'updates' || activeTab === 'fav' || activeTab === 'me' || activeTab === 'rank');
       updateSearchSubmitLabel();
       $$('.tab-panel').forEach(p => p.hidden = p.dataset.panel !== activeTab);
+      if (changingTab) window.scrollTo(0, tabScrollPositions.get(activeTab) || 0);
       $$('[data-international]').forEach(el => el.hidden = activeTab !== 'int');
       $$('[data-domestic]').forEach(el => el.hidden = activeTab !== 'dom');
       // Sidebar: show on int/dom, hide on home/fav/pick
@@ -9266,21 +9272,31 @@
           });
         return;
       }
-      if (activeTab === 'dom') renderDomestic();
-      else if (activeTab === 'fav') renderFav();
-      else if (activeTab === 'me') renderMe();
-      else if (activeTab === 'int') renderInt();
-      else if (activeTab === 'in') renderIndia();
-      else if (activeTab === 'my') renderMalaysia();
-      else if (activeTab === 'kr') renderKorea();
-      else if (REGIONAL_DIRECTORY_CONFIG[activeTab]) renderRegionalDirectory(activeTab);
-      else if (activeTab === 'updates') renderJournalUpdates();
-      else if (activeTab === 'pick') initPickTool();
-      // Home tab: if there's an active query, show results
-      else if (activeTab === 'home' && activeQuery) {
-        showHomeSearchResults();
-      } else if (activeTab === 'home') {
-        showHomeSearchResults();
+      const activePanel = document.querySelector(`.tab-panel[data-panel="${activeTab}"]`);
+      const renderKey = `${lang}\n${activeQuery}`;
+      const reusePanel = !opts.forceRender
+        && reusableTabPanels.has(activeTab)
+        && activePanel?.dataset.renderKey === renderKey;
+      if (!reusePanel) {
+        if (activeTab === 'dom') renderDomestic();
+        else if (activeTab === 'fav') renderFav();
+        else if (activeTab === 'me') renderMe();
+        else if (activeTab === 'int') renderInt();
+        else if (activeTab === 'in') renderIndia();
+        else if (activeTab === 'my') renderMalaysia();
+        else if (activeTab === 'kr') renderKorea();
+        else if (REGIONAL_DIRECTORY_CONFIG[activeTab]) renderRegionalDirectory(activeTab);
+        else if (activeTab === 'updates') renderJournalUpdates();
+        else if (activeTab === 'pick') initPickTool();
+        // Home tab: if there's an active query, show results
+        else if (activeTab === 'home' && activeQuery) {
+          showHomeSearchResults();
+        } else if (activeTab === 'home') {
+          showHomeSearchResults();
+        }
+        if (reusableTabPanels.has(activeTab) && activePanel) {
+          activePanel.dataset.renderKey = renderKey;
+        }
       }
       renderHomeSearchChips();
       updateStickySearchState();

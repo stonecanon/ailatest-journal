@@ -117,6 +117,17 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
 </head>
 <body>
+<script>
+// Apply the route shell before visible markup is parsed. This prevents the
+// home search from briefly using the catalogue layout while app data loads.
+(() => {
+  const path = location.pathname.replace(/\/+$/, '') || '/';
+  const homeRoutes = new Set(['/', '/en', '/zh']);
+  const simpleRoutes = new Set(['/favorites', '/account', '/me', '/profile', '/rankings']);
+  document.body.classList.toggle('home-route', homeRoutes.has(path));
+  document.body.classList.toggle('simple-top-route', simpleRoutes.has(path));
+})();
+</script>
 <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NBNXL7FB"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
@@ -679,7 +690,7 @@ window.__BUILD_VER = 'v20260626-ui-polish';
 })();
 </script>
 <script src="/js/pick-match.js?v=20260623-analytics-admin" defer></script>
-<script src="/js/app.js?v=20260715-region-multiselect" defer></script>
+<script src="/js/app.js?v=20260715-route-shell-cache" defer></script>
 
 </body>
 </html>
