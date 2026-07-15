@@ -2446,14 +2446,20 @@
   let user = JSON.parse(localStorage.getItem('ailatest.user') || 'null');
 
   function formatCreditValue(value) {
+    if (value === Infinity || value === '∞') return '∞';
     const n = Number(value);
-    if (!Number.isFinite(n)) return '';
+    if (!Number.isFinite(n)) return '0';
     if (n >= 10000) return `${(n / 10000).toFixed(n >= 100000 ? 0 : 1)}万`;
     return String(Math.max(0, Math.floor(n)));
   }
 
   function accountCreditValue() {
-    if (!user) return null;
+    if (!user) return 0;
+    const ents = user.entitlements;
+    if (ents && ents.credits) {
+      if (ents.credits.unlimited) return Infinity;
+      if (ents.credits.total != null && ents.credits.total !== '') return Number(ents.credits.total) || 0;
+    }
     const candidates = [
       user.credits,
       user.credit_balance,
@@ -2464,9 +2470,44 @@
       user.apiCredits,
       user.quota && user.quota.credits,
       user.quota && user.quota.remaining,
+      user.entitlements && user.entitlements.credits && user.entitlements.credits.total,
     ];
     const hit = candidates.find(v => v !== undefined && v !== null && v !== '');
-    return hit === undefined ? null : hit;
+    if (hit === undefined) return 0; // 已登录未下发 credits → 显示 0，不再「待同步」
+    return hit;
+  }
+
+  function membershipTierLabel() {
+    const tier = getProductTier();
+    if (tier === 'pro') return { id: 'max', label: 'Max', cls: 'tier-max' };
+    if (tier === 'plus') return { id: 'pro', label: 'Pro', cls: 'tier-pro' };
+    return { id: 'free', label: 'Free', cls: 'tier-free' };
+  }
+
+  function membershipBadgeHtml() {
+    if (!user) return '';
+    const m = membershipTierLabel();
+    return `<span class="me-tier-badge ${m.cls}" title="${T('会员档位','Membership tier')}">${escape(m.label)}</span>`;
+  }
+
+  async function fetchAndMergeEntitlements() {
+    if (!user || !user.token) return null;
+    try {
+      const r = await fetch(`${API_BASE}/me/entitlements`, {
+        headers: { 'Authorization': `Bearer ${user.token}` },
+      });
+      if (!r.ok) return null;
+      const ents = await r.json();
+      if (!ents || ents.error) return null;
+      user = { ...user, entitlements: ents, tier: ents.tier, credits: ents.credits?.total ?? user.credits };
+      if (ents.credits && ents.credits.unlimited) user.credits = null; // display as ∞
+      else if (ents.credits && ents.credits.total != null) user.credits = ents.credits.total;
+      localStorage.setItem('ailatest.user', JSON.stringify(user));
+      updateAccountCreditBadge();
+      return ents;
+    } catch (_) {
+      return null;
+    }
   }
 
   function updateAccountCreditBadge() {
@@ -3157,6 +3198,7 @@
     }
     user = { ...me, token };
     localStorage.setItem('ailatest.user', JSON.stringify(user));
+    await fetchAndMergeEntitlements();
     await pullFavs();
     applyI18n();
     updateAccountCreditBadge();
@@ -3174,6 +3216,7 @@
       const me = await readJsonResponse(r, T('用户信息获取失败','Failed to fetch user info'));
       user = { ...user, ...me, token: user.token };
       localStorage.setItem('ailatest.user', JSON.stringify(user));
+      await fetchAndMergeEntitlements();
       updateAccountCreditBadge();
       if (activeTab === 'me') renderMe();
     } catch (_) {
@@ -7451,13 +7494,24 @@
     return Number.isFinite(parsed) ? parsed : 0;
   }
 
-  function localViewRecords(limit = 20) {
-    return readJsonArray('ailatest.viewhist').slice(0, limit).map(item => {
+  function localViewRecords(limit = 40, { todayOnly = false } = {}) {
+    const today = new Date().toISOString().slice(0, 10);
+    let list = readJsonArray('ailatest.viewhist');
+    if (todayOnly) {
+      list = list.filter(item => {
+        const ts = recordTimeMs(item);
+        return Number.isFinite(ts) && new Date(ts).toISOString().slice(0, 10) === today;
+      });
+    }
+    return list.slice(0, limit).map(item => {
       const title = item.n || item.name || item.title || item.k || T('期刊详情', 'Journal detail');
-      const meta = Array.isArray(item.c) ? item.c.filter(Boolean).join(' · ') : '';
+      const meta = Array.isArray(item.c) ? item.c.filter(Boolean).join(' · ') : (item.issn || '');
       return {
+        action: 'journal',
+        fid: item.k || item.fid || '',
+        issn: item.issn || '',
         title,
-        meta,
+        meta: meta || T('点击打开期刊详情', 'Click to open journal'),
         time: recordTimeMs(item),
         href: item.p || item.path || '',
       };
@@ -7472,22 +7526,27 @@
       if (!Number.isFinite(ts)) return false;
       return new Date(ts).toISOString().slice(0, 10) === today;
     }).length;
-    return Math.max(Number(usage.views || 0), localToday);
+    const fromKeys = Array.isArray(usage.viewKeys) ? usage.viewKeys.length : 0;
+    return Math.max(Number(usage.views || 0), localToday, usage.date === today ? fromKeys : 0);
   }
 
   function localSearchRecords(limit = 24) {
     const home = readJsonArray('ailatest.home.search.history')
       .filter(Boolean)
       .map((query, idx) => ({
+        action: 'search',
+        query: String(query),
         title: String(query),
-        meta: T('首页查刊', 'Journal search'),
+        meta: T('首页查刊 · 点击重新搜索', 'Journal search · click to run again'),
         time: Date.now() - idx * 1000,
       }));
     const pick = readJsonArray('ailatest.pick.history')
       .filter(item => item && item.query)
       .map(item => ({
+        action: 'pick',
+        query: item.query,
         title: item.query,
-        meta: T('荐刊查询', 'Recommendation search'),
+        meta: T('荐刊查询 · 点击重新推荐', 'Recommendation · click to run again'),
         time: item.time,
       }));
     const records = [...pick, ...home]
@@ -7621,17 +7680,105 @@
       return `<div class="me-record-empty">${escape(emptyText)}</div>`;
     }
     return `<div class="me-record-list">${records.map(item => {
-      const titleHtml = item.href
-        ? `<a href="${escape(item.href)}">${escape(item.title)}</a>`
-        : `<span>${escape(item.title)}</span>`;
-      return `<div class="me-record-row">
+      const clickable = item.action === 'journal' || item.action === 'search' || item.action === 'pick';
+      const tag = clickable ? 'button' : 'div';
+      const typeAttr = clickable ? ' type="button"' : '';
+      return `<${tag} class="me-record-row${clickable ? ' is-clickable' : ''}"${typeAttr}
+        data-me-action="${escape(item.action || '')}"
+        data-me-fid="${escape(item.fid || '')}"
+        data-me-issn="${escape(item.issn || '')}"
+        data-me-query="${escape(item.query || '')}"
+        data-me-href="${escape(item.href || '')}"
+        data-me-title="${escape(item.title || '')}">
         <div class="me-record-main">
-          <strong>${titleHtml}</strong>
+          <strong>${escape(item.title)}</strong>
           ${item.meta ? `<span>${escape(item.meta)}</span>` : ''}
         </div>
         <time>${escape(formatMeRecordTime(item.time))}</time>
-      </div>`;
+      </${tag}>`;
     }).join('')}</div>`;
+  }
+
+  function openJournalFromMeHistory({ fid, issn, href, title }) {
+    let rec = null;
+    if (fid) rec = findRecByFid(fid) || (favsData && favsData[fid]) || null;
+    if (!rec && issn) {
+      const key = String(issn).toUpperCase();
+      rec = (journals || []).find(j => String(j.issn || '').toUpperCase() === key || String(j.eissn || '').toUpperCase() === key);
+    }
+    if (!rec && title) {
+      const t0 = String(title).toLowerCase().trim();
+      rec = (journals || []).find(j => String(j.name || '').toLowerCase() === t0);
+    }
+    if (!rec && href) {
+      const m = String(href).match(/\/journal\/([^/?#]+)/);
+      if (m) {
+        let slug = m[1];
+        try { slug = decodeURIComponent(slug); } catch (_) {}
+        rec = (journals || []).find(j => j.slug === slug || favId(j) === slug);
+      }
+    }
+    if (rec) {
+      openDrawer(rec, { pageMode: true, source: 'me_history' });
+      return true;
+    }
+    if (href && /^https?:\/\//i.test(href)) {
+      window.open(href, '_blank', 'noopener');
+      return true;
+    }
+    showFavToast(T('未找到该期刊，请稍后数据加载完成再试', 'Journal not found. Wait for data to load and try again.'));
+    return false;
+  }
+
+  function runSearchFromMeHistory(query, mode) {
+    const q = String(query || '').trim();
+    if (!q) return;
+    if (mode === 'pick') {
+      activateTab('pick');
+      const ta = document.getElementById('pick-input') || document.querySelector('#pick-query, textarea.pick-input, #pick-text');
+      if (ta) {
+        ta.value = q;
+        ta.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+      const btn = document.getElementById('pick-run') || document.querySelector('[data-pick-run], #pick-submit, .pick-run-btn');
+      if (btn) btn.click();
+      else showFavToast(T('已填入荐刊关键词，请点击开始推荐', 'Query filled. Click run to recommend.'));
+      return;
+    }
+    activateTab('home');
+    activeQuery = q;
+    const qEl = $('#q');
+    if (qEl) {
+      qEl.value = q;
+      qEl.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    const submit = $('#search-submit');
+    if (submit) submit.click();
+  }
+
+  function bindMeRecordClicks(panel) {
+    if (!panel || panel.__meRecordBound) return;
+    panel.__meRecordBound = true;
+    panel.addEventListener('click', (e) => {
+      const row = e.target.closest('[data-me-action]');
+      if (!row || !panel.contains(row)) return;
+      const action = row.dataset.meAction;
+      if (action === 'journal') {
+        e.preventDefault();
+        openJournalFromMeHistory({
+          fid: row.dataset.meFid,
+          issn: row.dataset.meIssn,
+          href: row.dataset.meHref,
+          title: row.dataset.meTitle,
+        });
+      } else if (action === 'search') {
+        e.preventDefault();
+        runSearchFromMeHistory(row.dataset.meQuery || row.dataset.meTitle, 'search');
+      } else if (action === 'pick') {
+        e.preventDefault();
+        runSearchFromMeHistory(row.dataset.meQuery || row.dataset.meTitle, 'pick');
+      }
+    });
   }
 
   function renderMeRecordPanel(scope, type) {
@@ -7641,31 +7788,62 @@
       btn.classList.toggle('active', btn.dataset.meStat === type);
     });
     panel.hidden = false;
+    bindMeRecordClicks(panel);
     if (type === 'credits') {
       const credits = accountCreditValue();
-      panel.innerHTML = `<h2>${T('积分记录','Credit records')}</h2>
+      const m = membershipTierLabel();
+      const ents = user && user.entitlements;
+      const creditLine = !user
+        ? '0'
+        : (ents && ents.credits && ents.credits.unlimited)
+          ? '∞'
+          : formatCreditValue(credits);
+      panel.innerHTML = `<h2>${T('会员与积分','Membership & credits')}</h2>
         <div class="me-record-list">
           <div class="me-record-row">
             <div class="me-record-main">
-              <strong>${escape(credits === null ? T('积分待同步','Credits pending') : formatCreditValue(credits))}</strong>
+              <strong>${T('会员档位','Plan')} · ${escape(m.label)}</strong>
+              <span>${user ? T('与定价页 Free / Pro / Max 对齐','Aligned with Free / Pro / Max on pricing') : T('登录后显示','Sign in to view')}</span>
+            </div>
+            <time>${escape(m.label)}</time>
+          </div>
+          <div class="me-record-row">
+            <div class="me-record-main">
+              <strong>${escape(creditLine)} Credits</strong>
               <span>${signedCreditHint()}</span>
             </div>
             <time>${T('当前账号','Current account')}</time>
           </div>
+          ${user ? `<div class="me-record-row is-clickable" data-me-open-pricing type="button" role="button">
+            <div class="me-record-main">
+              <strong>${T('查看订阅方案','View plans')}</strong>
+              <span>${T('升级 Pro / Max 解锁更多能力','Upgrade to Pro / Max for more features')}</span>
+            </div>
+            <time>→</time>
+          </div>` : ''}
         </div>`;
+      panel.querySelector('[data-me-open-pricing]')?.addEventListener('click', () => {
+        location.href = '/pricing.html';
+      });
       return;
     }
     if (type === 'views') {
-      panel.innerHTML = `<h2>${T('浏览记录','View records')}</h2>${meRecordRows(
-        localViewRecords(),
-        T('暂无本机浏览记录。打开期刊详情后会记录在这里。','No local view records yet. Open journal details and they will appear here.')
-      )}`;
+      const todayRows = localViewRecords(40, { todayOnly: true });
+      const allRows = localViewRecords(40, { todayOnly: false });
+      panel.innerHTML = `<h2>${T('今日浏览','Views today')}</h2>
+        ${meRecordRows(
+          todayRows.length ? todayRows : allRows,
+          T('暂无本机浏览记录。打开期刊详情后会记录在这里，点击可再次打开。','No view records yet. Open journal details to record them; click a row to reopen.')
+        )}
+        ${todayRows.length && allRows.length > todayRows.length
+          ? `<h2 style="margin-top:16px">${T('更早浏览','Earlier views')}</h2>${meRecordRows(allRows.filter(r => !todayRows.some(t => t.fid === r.fid && t.time === r.time)), '')}`
+          : ''}`;
       return;
     }
     if (type === 'searches') {
       panel.innerHTML = `<h2>${T('搜索记录','Search records')}</h2>${meRecordRows(
         localSearchRecords(),
-        T('暂无搜索记录。首页查刊或荐刊后会记录在这里。','No search records yet. Journal searches and recommendation searches will appear here.')
+        T('暂无搜索记录。首页查刊或荐刊后会记录在这里，点击可重新搜索。','No search records yet. Searches appear here; click a row to run again.')
       )}`;
       return;
     }
@@ -7686,9 +7864,11 @@
   }
 
   function signedCreditHint() {
-    return user
-      ? T('账号额度和消耗记录由服务器同步。','Account quota and usage are synced from the server.')
-      : T('登录后可查看账号积分和同步记录。','Sign in to view account credits and synced records.');
+    if (!user) return T('登录后可查看会员档位与积分。','Sign in to view membership and credits.');
+    const m = membershipTierLabel();
+    if (m.id === 'max') return T('Max 月度 AI credits，由服务器同步。','Max monthly AI credits, synced from server.');
+    if (m.id === 'pro') return T('Pro 含插件与工作流；AI 荐刊约 50 次/月。','Pro includes extension workflow; ~50 AI picks/month.');
+    return T('Free 账号 · AI 荐刊终身共 10 次 · 升级可解锁更多。','Free plan · 10 lifetime AI picks · upgrade for more.');
   }
 
   function renderActivityDots() {
@@ -7708,24 +7888,23 @@
   function renderMe() {
     const box = $('#me-content');
     if (!box) return;
-    const usage = getDailyUsage();
     const favCount = allFavIds().size;
     const credits = accountCreditValue();
-    const creditText = user
-      ? (credits === null ? T('积分待同步', 'Credits pending') : formatCreditValue(credits))
-      : '0';
+    const creditText = formatCreditValue(user ? credits : 0);
     const signed = !!user;
+    const tier = membershipTierLabel();
     box.innerHTML = `
       <section class="me-page">
         <header class="me-hero">
           ${userAvatarHtml()}
           <div class="me-title-block">
-            <h1>${escape(userDisplayName())}</h1>
+            <h1>${escape(userDisplayName())} ${membershipBadgeHtml()}</h1>
             <p>${escape(userEmailText())} · ${escape(userProviderText())}</p>
           </div>
           <div class="me-actions">
             ${signed
-              ? `<button class="btn-mini" data-me-logout>${T('退出登录','Sign out')}</button>`
+              ? `<a class="btn-mini" href="/pricing.html">${T('订阅','Plans')}</a>
+                 <button class="btn-mini" data-me-logout>${T('退出登录','Sign out')}</button>`
               : `<button class="btn-mini primary" data-me-login>${T('登录 / 注册','Sign in / Sign up')}</button>`}
           </div>
         </header>
@@ -7743,6 +7922,7 @@
             <dl class="me-kv">
               <div><dt>${T('邮箱','Email')}</dt><dd>${escape(userEmailText())}</dd></div>
               <div><dt>${T('登录方式','Sign-in method')}</dt><dd>${escape(userProviderText())}</dd></div>
+              <div><dt>${T('会员档位','Plan')}</dt><dd><span class="me-tier-badge ${tier.cls}">${escape(tier.label)}</span></dd></div>
               <div><dt>${T('账号状态','Status')}</dt><dd>${signed ? T('已登录','Signed in') : T('未登录','Not signed in')}</dd></div>
             </dl>
           </section>
@@ -7776,6 +7956,22 @@
         renderMeRecordPanel(box, type);
       });
     });
+    // 登录用户后台拉权益 / 积分
+    if (signed) {
+      fetchAndMergeEntitlements().then(() => {
+        if (activeTab === 'me') {
+          const strip = box.querySelector('[data-me-stat="credits"] strong');
+          if (strip) strip.textContent = formatCreditValue(accountCreditValue());
+          const badge = box.querySelector('.me-tier-badge');
+          const m = membershipTierLabel();
+          if (badge) {
+            badge.textContent = m.label;
+            badge.className = `me-tier-badge ${m.cls}`;
+          }
+        }
+        updateAccountCreditBadge();
+      });
+    }
   }
 
   // ───────── viewed-journal history → subject-aware default ranking ─────────
@@ -7783,20 +7979,21 @@
   function recordView(r) {
     if (!r) return;
     const cats = Array.isArray(r.wos_categories) ? r.wos_categories.filter(Boolean) : [];
-    if (!cats.length) return; // only WoS-indexed (international) journals carry subjects
     try {
       let h = JSON.parse(localStorage.getItem(VIEWHIST_KEY) || '[]');
       if (!Array.isArray(h)) h = [];
-      const key = r.issn || r.name || '';
+      const key = favId(r) || r.issn || r.name || '';
+      if (!key) return;
       h = h.filter(e => e && e.k !== key);
       h.unshift({
         k: key,
         n: r.name || r.en_name || r.cn_name || key,
         p: journalPublicPath(r),
+        issn: r.issn || r.eissn || '',
         c: cats.slice(0, 3),
         t: Date.now(),
       });
-      if (h.length > 40) h = h.slice(0, 40);
+      if (h.length > 80) h = h.slice(0, 80);
       localStorage.setItem(VIEWHIST_KEY, JSON.stringify(h));
     } catch (e) {}
   }

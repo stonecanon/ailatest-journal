@@ -2726,11 +2726,57 @@ body.topbar-compact .results-head {
   align-items: center;
   justify-content: space-between;
   gap: 14px;
+  width: 100%;
   padding: 11px 12px;
   border: 1px solid var(--rule-soft);
   border-radius: 10px;
   background: rgba(255,253,249,.72);
+  box-sizing: border-box;
+  font: inherit;
+  color: inherit;
+  text-align: left;
 }
+button.me-record-row {
+  appearance: none;
+  cursor: pointer;
+}
+.me-record-row.is-clickable:hover {
+  border-color: rgba(139, 105, 20, 0.35);
+  background: #faf4e6;
+}
+.me-tier-badge {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  margin-left: 8px;
+  padding: 2px 10px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .03em;
+  line-height: 1.4;
+}
+.me-tier-badge.tier-free {
+  background: #ebe6dc;
+  color: #5a5044;
+}
+.me-tier-badge.tier-pro {
+  background: #e8f5ee;
+  color: #1b7a45;
+  border: 1px solid #b8e0c8;
+}
+.me-tier-badge.tier-max {
+  background: linear-gradient(180deg, #2a2a2a, #1a1a1a);
+  color: #f5e6c8;
+  border: 1px solid #3a3a3a;
+}
+.me-title-block h1 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+.me-kv .me-tier-badge { margin-left: 0; }
 .me-record-main {
   min-width: 0;
   display: grid;
