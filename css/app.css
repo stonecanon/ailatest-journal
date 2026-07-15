@@ -9333,7 +9333,7 @@ body.simple-top-route .topbar-brand {
 }
 
 /* ═══════════════════════════════════════════════
-   Settings shell (Me) — Grok-like modal / sheet
+   Settings shell (Me) — Grok-like: lists + hairlines
    ═══════════════════════════════════════════════ */
 body.settings-open { overflow: hidden; }
 .tab-panel[data-panel="me"] {
@@ -9358,9 +9358,9 @@ body[data-boot-tab="me"] .tab-panel[data-panel="me"] {
 .settings-scrim {
   position: absolute;
   inset: 0;
-  background: rgba(28, 25, 23, 0.38);
-  backdrop-filter: blur(14px) saturate(1.05);
-  -webkit-backdrop-filter: blur(14px) saturate(1.05);
+  background: rgba(28, 25, 23, 0.32);
+  backdrop-filter: blur(10px) saturate(1.02);
+  -webkit-backdrop-filter: blur(10px) saturate(1.02);
 }
 .settings-panel {
   position: relative;
@@ -9371,10 +9371,10 @@ body[data-boot-tab="me"] .tab-panel[data-panel="me"] {
   height: min(760px, calc(100vh - 40px));
   max-width: 100%;
   max-height: calc(100vh - 24px);
-  background: #fafaf9;
-  border-radius: 18px;
-  box-shadow: 0 24px 80px rgba(28, 25, 23, 0.22);
-  border: 1px solid rgba(255,255,255,.65);
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 20px 64px rgba(28, 25, 23, 0.18);
+  border: 1px solid rgba(28, 25, 23, 0.06);
   overflow: hidden;
   animation: settings-pop .22s ease;
   box-sizing: border-box;
@@ -9385,11 +9385,11 @@ body[data-boot-tab="me"] .tab-panel[data-panel="me"] {
 }
 .settings-handle {
   display: none;
-  width: 40px;
+  width: 36px;
   height: 4px;
   margin: 10px auto 0;
   border-radius: 99px;
-  background: #d6d3d1;
+  background: #e7e5e4;
   flex-shrink: 0;
 }
 .settings-layout {
@@ -9402,22 +9402,22 @@ body[data-boot-tab="me"] .tab-panel[data-panel="me"] {
   overflow: hidden;
 }
 .settings-nav {
-  border-right: 1px solid #e7e5e4;
-  background: #f5f5f4;
-  padding: 14px 10px;
+  border-right: 1px solid #ebe9e6;
+  background: #fafaf9;
+  padding: 16px 8px;
   overflow-x: hidden;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
   min-width: 0;
 }
 .settings-nav-title {
-  margin: 4px 10px 12px;
-  font-size: 13px;
-  font-weight: 750;
-  color: #78716c;
-  letter-spacing: .04em;
+  margin: 2px 12px 14px;
+  font-size: 12px;
+  font-weight: 650;
+  color: #a8a29e;
+  letter-spacing: .06em;
   text-transform: uppercase;
 }
 .settings-nav button {
@@ -9425,29 +9425,30 @@ body[data-boot-tab="me"] .tab-panel[data-panel="me"] {
   border: 0;
   background: transparent;
   text-align: left;
-  padding: 10px 12px;
-  border-radius: 10px;
+  padding: 9px 12px;
+  border-radius: 8px;
   font: inherit;
   font-size: 14px;
-  font-weight: 650;
-  color: #44403c;
+  font-weight: 550;
+  color: #57534e;
   cursor: pointer;
 }
-.settings-nav button:hover { background: rgba(28,25,23,.05); }
+.settings-nav button:hover { background: rgba(28, 25, 23, 0.04); color: #1c1917; }
 .settings-nav button.active {
-  background: #fff;
+  background: rgba(28, 25, 23, 0.06);
   color: #1c1917;
-  box-shadow: 0 1px 0 rgba(28,25,23,.04);
+  font-weight: 650;
+  box-shadow: none;
 }
 .settings-body {
   position: relative;
   overflow-x: hidden;
   overflow-y: auto;
-  padding: 18px 20px 28px;
+  padding: 20px 24px 32px;
   min-height: 0;
   min-width: 0;
   max-width: 100%;
-  background: #fafaf9;
+  background: #ffffff;
   box-sizing: border-box;
   -webkit-overflow-scrolling: touch;
 }
@@ -9458,54 +9459,60 @@ body[data-boot-tab="me"] .tab-panel[data-panel="me"] {
   box-sizing: border-box;
 }
 .settings-subhead {
-  margin: 0 0 10px;
-  font-size: 15px;
-  font-weight: 750;
-  color: #1c1917;
-  letter-spacing: -.01em;
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 650;
+  color: #78716c;
+  letter-spacing: 0;
 }
 .settings-close {
   position: absolute;
-  top: 14px;
-  right: 14px;
+  top: 12px;
+  right: 12px;
   z-index: 3;
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   border: 0;
   border-radius: 999px;
-  background: rgba(28,25,23,.06);
-  color: #57534e;
-  font-size: 20px;
+  background: transparent;
+  color: #78716c;
+  font-size: 22px;
   line-height: 1;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
 }
-.settings-close:hover { background: rgba(28,25,23,.1); }
+.settings-close:hover { background: rgba(28, 25, 23, 0.06); color: #1c1917; }
 .settings-section-title {
-  margin: 0 36px 14px 0;
-  font-size: 20px;
-  font-weight: 750;
+  margin: 0 36px 18px 0;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #ebe9e6;
+  font-size: 18px;
+  font-weight: 700;
   letter-spacing: -.02em;
   color: #1c1917;
   line-height: 1.25;
   overflow-wrap: anywhere;
 }
 .settings-section[hidden] { display: none !important; }
+
+/* 行式入口：仅底部分割线，无色块卡片 */
 .settings-link-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 12px 14px;
-  border: 1px solid #e7e5e4;
-  border-radius: 12px;
-  background: #fff;
-  margin-bottom: 10px;
+  padding: 14px 2px;
+  margin: 0;
+  border: 0;
+  border-bottom: 1px solid #ebe9e6;
+  border-radius: 0;
+  background: transparent;
   text-decoration: none;
-  color: inherit;
-  font-weight: 650;
+  color: #1c1917;
+  font-weight: 550;
+  font-size: 14.5px;
   cursor: pointer;
   max-width: 100%;
   box-sizing: border-box;
@@ -9514,11 +9521,17 @@ body[data-boot-tab="me"] .tab-panel[data-panel="me"] {
   white-space: normal;
   line-height: 1.35;
 }
-.settings-link-row:hover { border-color: #d6d3d1; background: #fffefb; }
+.settings-link-row:last-of-type { border-bottom: 0; }
+.settings-link-row:hover {
+  border-color: #ebe9e6;
+  background: transparent;
+  color: #0c0a09;
+}
 .settings-link-row span {
-  color: #a8a29e;
-  font-size: 16px;
+  color: #c4c0bb;
+  font-size: 15px;
   flex: 0 0 auto;
+  font-weight: 400;
 }
 .me-page.settings-me {
   max-width: none;
@@ -9529,17 +9542,18 @@ body[data-boot-tab="me"] .tab-panel[data-panel="me"] {
   width: 100%;
   overflow: hidden;
 }
+/* 账号头：无卡片边框，底部分割 */
 .me-page.settings-me .me-hero,
 .me-page.settings-me .settings-account-hero {
   border: 0;
-  background: #fff;
-  padding: 12px 14px;
+  border-bottom: 1px solid #ebe9e6;
+  border-radius: 0;
+  background: transparent;
+  padding: 0 0 16px;
   box-shadow: none;
-  border: 1px solid #e7e5e4;
-  border-radius: 12px;
   flex-wrap: wrap;
   gap: 10px 12px;
-  align-items: flex-start;
+  align-items: center;
   min-width: 0;
   max-width: 100%;
   box-sizing: border-box;
@@ -9550,13 +9564,14 @@ body[data-boot-tab="me"] .tab-panel[data-panel="me"] {
   overflow: hidden;
 }
 .me-page.settings-me .me-title-block h1 {
-  font-size: 17px;
+  font-size: 16px;
   line-height: 1.3;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 6px 8px;
   max-width: 100%;
+  font-weight: 700;
 }
 .me-page.settings-me .me-display-name {
   min-width: 0;
@@ -9564,10 +9579,10 @@ body[data-boot-tab="me"] .tab-panel[data-panel="me"] {
   word-break: break-word;
 }
 .me-page.settings-me .me-account-meta {
-  margin-top: 4px;
+  margin-top: 3px;
   font-size: 12.5px;
   line-height: 1.4;
-  color: #78716c;
+  color: #a8a29e;
   overflow-wrap: anywhere;
   word-break: break-word;
 }
@@ -9580,49 +9595,79 @@ body[data-boot-tab="me"] .tab-panel[data-panel="me"] {
   margin-left: 0;
   justify-content: flex-start;
 }
-.me-page.settings-me .me-avatar {
-  width: 48px;
-  height: 48px;
-  font-size: 18px;
+.me-page.settings-me .me-actions .btn-mini {
+  border-radius: 8px;
+  border: 1px solid #e7e5e4;
+  background: transparent;
+  box-shadow: none;
 }
+.me-page.settings-me .me-avatar {
+  width: 44px;
+  height: 44px;
+  font-size: 17px;
+  box-shadow: none;
+  border: 1px solid #ebe9e6;
+}
+/* 数据条：横向数字，仅竖线分隔，无底板 */
 .me-page.settings-me .me-stat-strip,
 .me-page.settings-me .settings-stat-strip {
-  border-radius: 12px;
-  overflow: hidden;
-  border: 1px solid #e7e5e4;
-  background: #fff;
-  margin: 12px 0;
+  border-radius: 0;
+  overflow: visible;
+  border: 0;
+  border-bottom: 1px solid #ebe9e6;
+  background: transparent;
+  margin: 0 0 4px;
+  padding: 4px 0 2px;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   max-width: 100%;
+  gap: 0;
 }
 .me-page.settings-me .me-stat-strip > .me-stat-item {
-  min-height: 64px;
-  padding: 10px 6px;
-  gap: 4px;
+  min-height: 56px;
+  padding: 12px 8px;
+  gap: 3px;
   min-width: 0;
+  border-right: 1px solid #ebe9e6;
+  border-bottom: 0;
+  background: transparent;
+  border-radius: 0;
+}
+.me-page.settings-me .me-stat-strip > .me-stat-item:last-child { border-right: 0; }
+.me-page.settings-me .me-stat-strip > .me-stat-item:hover,
+.me-page.settings-me .me-stat-strip > .me-stat-item.active {
+  background: transparent;
 }
 .me-page.settings-me .me-stat-strip strong {
-  font-size: 16px;
+  font-size: 15px;
+  font-weight: 700;
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: #1c1917;
 }
 .me-page.settings-me .me-stat-strip span {
   font-size: 11px;
   line-height: 1.25;
+  color: #a8a29e;
   overflow-wrap: anywhere;
   word-break: break-word;
 }
+/* 内容块：去卡片，用间距 + 必要时一条顶部分割 */
 .me-page.settings-me .me-card {
-  background: #fff;
-  border-color: #e7e5e4;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
   max-width: 100%;
   box-sizing: border-box;
   overflow: hidden;
-  padding: 14px;
+  padding: 16px 0 0;
+  margin: 0;
 }
 .me-page.settings-me .settings-activity-card {
   margin-top: 0;
+  padding-top: 16px;
+  border-top: 1px solid #ebe9e6;
 }
 .me-page.settings-me .me-activity-months {
   display: flex;
@@ -9630,8 +9675,8 @@ body[data-boot-tab="me"] .tab-panel[data-panel="me"] {
   gap: 8px;
   flex-wrap: wrap;
   font-size: 12px;
-  color: #78716c;
-  margin-bottom: 8px;
+  color: #a8a29e;
+  margin-bottom: 10px;
 }
 .me-page.settings-me .settings-activity-grid,
 .me-page.settings-me .me-activity-grid {
@@ -9650,7 +9695,6 @@ body[data-boot-tab="me"] .tab-panel[data-panel="me"] {
   border-radius: 2px;
   box-sizing: border-box;
 }
-/* 礼品码结果区防溢出 */
 .me-page.settings-me .gift-code-results {
   max-width: 100%;
   overflow-x: auto;
@@ -9677,64 +9721,104 @@ body[data-boot-tab="me"] .tab-panel[data-panel="me"] {
   min-width: 0;
   max-width: 100%;
 }
+.me-page.settings-me .me-gift-card {
+  border-top: 0;
+  padding-top: 4px;
+}
+.me-page.settings-me .gift-redeem,
+.me-page.settings-me .gift-admin {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+  margin: 0 0 18px;
+}
+.me-page.settings-me .gift-admin {
+  padding-top: 16px;
+  border-top: 1px solid #ebe9e6;
+}
 
-/* 设置 · 语言 */
+/* 设置 · 语言：行选择，无色块芯片 */
 .settings-hint {
-  margin: 0 0 12px;
+  margin: 0 0 10px;
   font-size: 13px;
   line-height: 1.45;
-  color: #57534e;
+  color: #78716c;
 }
-.settings-hint-soft { color: #78716c; font-size: 12.5px; }
+.settings-hint-soft {
+  color: #a8a29e;
+  font-size: 12.5px;
+  margin-bottom: 14px;
+}
 .settings-lang-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(108px, 1fr));
-  gap: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
   max-width: 100%;
+  border-top: 1px solid #ebe9e6;
 }
 .settings-lang-chip {
   appearance: none;
-  border: 1px solid #e7e5e4;
-  background: #fff;
-  border-radius: 10px;
-  padding: 10px 12px;
+  border: 0;
+  border-bottom: 1px solid #ebe9e6;
+  border-radius: 0;
+  background: transparent;
+  padding: 13px 2px;
   font: inherit;
-  font-size: 13px;
-  font-weight: 650;
-  color: #44403c;
+  font-size: 14.5px;
+  font-weight: 550;
+  color: #1c1917;
   cursor: pointer;
-  text-align: center;
+  text-align: left;
   min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
-.settings-lang-chip:hover { border-color: #d6d3d1; background: #fffefb; }
+.settings-lang-chip:hover {
+  border-color: #ebe9e6;
+  background: transparent;
+  color: #0c0a09;
+}
 .settings-lang-chip.active {
-  border-color: #f97316;
-  background: #fff7ed;
-  color: #c2410c;
-  box-shadow: inset 0 0 0 1px rgba(249,115,22,.2);
+  border-color: #ebe9e6;
+  background: transparent;
+  color: #1c1917;
+  box-shadow: none;
+  font-weight: 650;
+}
+.settings-lang-chip.active::after {
+  content: "✓";
+  color: #f97316;
+  font-weight: 700;
+  font-size: 14px;
 }
 
-/* 设置 · 地区站固定 */
+/* 设置 · 地区站：列表 + 底线，无橙色底板 */
 .settings-region-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0;
   max-width: 100%;
+  border-top: 1px solid #ebe9e6;
 }
 .settings-region-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding: 10px 12px;
-  border: 1px solid #e7e5e4;
-  border-radius: 12px;
-  background: #fff;
+  padding: 12px 2px;
+  border: 0;
+  border-bottom: 1px solid #ebe9e6;
+  border-radius: 0;
+  background: transparent;
   min-width: 0;
 }
+.settings-region-row:last-child { border-bottom: 0; }
 .settings-region-row.is-pinned {
-  border-color: rgba(249,115,22,.35);
-  background: #fffaf5;
+  border-color: #ebe9e6;
+  background: transparent;
 }
 .settings-region-meta {
   display: flex;
@@ -9744,36 +9828,36 @@ body[data-boot-tab="me"] .tab-panel[data-panel="me"] {
 }
 .settings-region-flag {
   flex: 0 0 auto;
-  width: 32px;
-  height: 28px;
-  border-radius: 7px;
+  width: 28px;
+  height: 22px;
+  border-radius: 4px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-size: 10px;
-  font-weight: 800;
-  letter-spacing: .04em;
-  color: #57534e;
-  background: #f5f5f4;
+  font-weight: 750;
+  letter-spacing: .03em;
+  color: #78716c;
+  background: transparent;
   border: 1px solid #e7e5e4;
 }
 .settings-region-meta strong {
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
   color: #1c1917;
   overflow-wrap: anywhere;
 }
 .settings-region-toggle {
   flex: 0 0 auto;
   appearance: none;
-  border: 1px solid #d6d3d1;
-  background: #fff;
-  border-radius: 999px;
-  padding: 7px 12px;
+  border: 0;
+  background: transparent;
+  border-radius: 0;
+  padding: 4px 0;
   font: inherit;
-  font-size: 12px;
-  font-weight: 700;
-  color: #44403c;
+  font-size: 13px;
+  font-weight: 600;
+  color: #a8a29e;
   cursor: pointer;
   white-space: nowrap;
   max-width: 48%;
@@ -9781,11 +9865,17 @@ body[data-boot-tab="me"] .tab-panel[data-panel="me"] {
   text-overflow: ellipsis;
 }
 .settings-region-row.is-pinned .settings-region-toggle {
-  border-color: rgba(249,115,22,.4);
-  color: #c2410c;
-  background: #fff7ed;
+  border-color: transparent;
+  color: #f97316;
+  background: transparent;
 }
-.settings-region-toggle:hover { filter: brightness(0.98); }
+.settings-region-toggle:hover {
+  filter: none;
+  color: #57534e;
+}
+.settings-region-row.is-pinned .settings-region-toggle:hover {
+  color: #c2410c;
+}
 
 /* 地区站管理已迁入设置：隐藏侧栏「···地区」入口 */
 .rail-region-picker {
@@ -9798,7 +9888,7 @@ body[data-boot-tab="me"] .tab-panel[data-panel="me"] {
     width: 100%;
     height: min(94vh, 100%);
     max-height: 100%;
-    border-radius: 18px 18px 0 0;
+    border-radius: 16px 16px 0 0;
     animation: settings-sheet-up .28s cubic-bezier(.2,.7,.2,1);
   }
   @keyframes settings-sheet-up {
@@ -9816,8 +9906,9 @@ body[data-boot-tab="me"] .tab-panel[data-panel="me"] {
     overflow-x: auto;
     overflow-y: hidden;
     border-right: 0;
-    border-bottom: 1px solid #e7e5e4;
-    gap: 4px;
+    border-bottom: 1px solid #ebe9e6;
+    background: #fafaf9;
+    gap: 2px;
     padding: 8px 10px 10px;
     -webkit-overflow-scrolling: touch;
   }
@@ -9828,20 +9919,24 @@ body[data-boot-tab="me"] .tab-panel[data-panel="me"] {
     padding: 8px 12px;
     font-size: 13px;
   }
-  .settings-body { padding: 14px 14px calc(28px + env(safe-area-inset-bottom, 0px)); }
+  .settings-body { padding: 14px 16px calc(28px + env(safe-area-inset-bottom, 0px)); }
   .me-page.settings-me .settings-stat-strip,
   .me-page.settings-me .me-stat-strip {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .me-page.settings-me .me-stat-strip > .me-stat-item:nth-child(2n) { border-right: 0; }
   .me-page.settings-me .me-stat-strip > .me-stat-item {
-    border-bottom: 1px solid #e7e5e4;
+    border-right: 1px solid #ebe9e6;
+    border-bottom: 1px solid #ebe9e6;
+  }
+  .me-page.settings-me .me-stat-strip > .me-stat-item:nth-child(2n) { border-right: 0; }
+  .me-page.settings-me .me-stat-strip > .me-stat-item:nth-last-child(-n+2) {
+    border-bottom: 0;
   }
   .me-page.settings-me .me-actions {
     flex-basis: auto;
     width: 100%;
   }
-}
+  /* 手机全宽抽屉：必须留在本 media query 内，切勿泄漏为全局 */
   .app-rail {
     width: 100% !important;
     max-width: 100% !important;
