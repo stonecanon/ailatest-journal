@@ -785,9 +785,9 @@ function isOwnerUser(u) {
   return email === 'jiantaoweng@gmail.com' || login === 'jiantaoweng@gmail.com';
 }
 
-/** Free：AI 荐刊终身共 10 次（不按日重置）；Pro(plus) 每日 5 次；Max 走 monthly_limit/credits */
+/** Free：终身 10 次；Pro(plus)：每月约 Max 一半（50 次完整荐刊）；Max：monthly_limit/credits（约 100 次） */
 const FREE_PICK_LIFETIME_LIMIT = 10;
-const PLUS_PICK_DAILY_LIMIT = 5;
+const PLUS_PICK_MONTHLY_LIMIT = 50; // Max ≈ 100 次完整荐刊 / 1000 credits → Pro 一半
 
 async function getPickQuota(env, userId) {
   try {
@@ -840,7 +840,7 @@ async function consumePickQuotaForUser(env, u) {
   const hasPaidMonthly = plan !== 'free'
     && Number(quota.monthly_limit || 0) > 0
     && (!quota.paid_until || Number(quota.paid_until) >= now);
-  // plus / trial：日额度；free：终身 lifetime；pro/max：月额度
+  // plus / trial：月额度（Max 的一半）；free：终身 lifetime；pro/max：库内 monthly_limit
   const isPlusPlan = plan === 'plus' || plan === 'trial';
   let period;
   let periodKey;
@@ -853,10 +853,13 @@ async function consumePickQuotaForUser(env, u) {
     limit = Number(quota.monthly_limit);
     resetAt = nextUtcMonthStart(now);
   } else if (isPlusPlan) {
-    period = 'day';
-    periodKey = dayFromSec(now);
-    limit = Number(quota.daily_limit || PLUS_PICK_DAILY_LIMIT);
-    resetAt = nextUtcDayStart(now);
+    period = 'month';
+    periodKey = monthFromSec(now);
+    // 优先库内 monthly_limit；否则固定为 Max 一半
+    limit = Number(quota.monthly_limit) > 0
+      ? Number(quota.monthly_limit)
+      : PLUS_PICK_MONTHLY_LIMIT;
+    resetAt = nextUtcMonthStart(now);
   } else {
     // Free：终身 10 次，用完即止（不按日重置）
     period = 'lifetime';

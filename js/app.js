@@ -11598,7 +11598,9 @@
         const quotaText = pickMode === 'ai' && quotaInfo && quotaInfo.remaining != null
           ? (quotaInfo.lifetime || quotaInfo.period === 'lifetime'
             ? ` · ${T('剩余','left')} ${quotaInfo.remaining}/${quotaInfo.limit}`
-            : ` · ${T('今日剩余','remaining today')} ${quotaInfo.remaining}/${quotaInfo.limit}`)
+            : quotaInfo.period === 'month'
+              ? ` · ${T('本月剩余','left this month')} ${quotaInfo.remaining}/${quotaInfo.limit}`
+              : ` · ${T('今日剩余','remaining today')} ${quotaInfo.remaining}/${quotaInfo.limit}`)
           : '';
         const modeText = pickMode === 'ai' ? t('pick_mode_ai') : t('pick_mode_local');
         setPickProgress(`${statusNotice ? statusNotice + ' · ' : ''}${modeText} ${entries.length} ${T('个候选期刊','candidate journals')}, ${T('显示','showing')} ${filtered.length}/${allFiltered.length}${quotaText}`, 100);
