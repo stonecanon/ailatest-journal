@@ -1377,14 +1377,21 @@
         years: years.join(','),
       });
       try {
-        const resp = await fetch(`${API_BASE}/openalex/country-output?${params.toString()}`, { cache: 'force-cache' });
+        // 勿 force-cache：空结果（缺 key / 上游失败）会被永久缓存成「无分布」
+        const resp = await fetch(`${API_BASE}/openalex/country-output?${params.toString()}`, {
+          cache: 'default',
+        });
         if (!resp.ok) return { handled: false, payload: null };
-        return { handled: true, payload: normalizePayload(await resp.json()) };
+        const raw = await resp.json();
+        const payload = normalizePayload(raw);
+        // 有有效年份数据才算成功；否则继续走 OpenAlex 直连回退
+        if (payload?.years?.length) return { handled: true, payload };
+        return { handled: false, payload: null, reason: raw?.reason || 'empty' };
       } catch (_) {
         return { handled: false, payload: null };
       }
     };
-    const fetchYear = async (sourceIssn, year) => {
+    const fetchYear = async (sourceIssn, year, attempt = 0) => {
       const params = new URLSearchParams({
         filter: `primary_location.source.issn:${sourceIssn},from_publication_date:${year}-01-01,to_publication_date:${year}-12-31`,
         group_by: 'authorships.institutions.country_code',
@@ -1392,9 +1399,13 @@
         mailto: 'ailatest@ailatest.org',
       });
       const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-      const timer = controller ? setTimeout(() => controller.abort(), 9000) : null;
+      const timer = controller ? setTimeout(() => controller.abort(), 12000) : null;
       try {
         const resp = await fetch(`https://api.openalex.org/works?${params.toString()}`, controller ? { signal: controller.signal } : undefined);
+        if (resp.status === 429 && attempt < 2) {
+          await new Promise(r => setTimeout(r, 900 * (attempt + 1)));
+          return fetchYear(sourceIssn, year, attempt + 1);
+        }
         if (!resp.ok) return { year, total: 0, groups: [], skipped: true };
         const data = await resp.json();
         const groups = (data.group_by || [])
@@ -1423,10 +1434,16 @@
     };
     const promise = (async () => {
       const apiResult = await fetchFromApi();
-      if (apiResult.handled) return apiResult.payload;
+      if (apiResult.handled && apiResult.payload?.years?.length) return apiResult.payload;
+      // Worker 无 key 或空结果时：浏览器直连 OpenAlex 公开接口（mailto 礼貌池）
+      // 仅取近 3 年，并串行间隔，降低 429
+      const clientYears = years.slice(-3);
       for (const sourceIssn of issns) {
         const rows = [];
-        for (const year of years) rows.push(await fetchYear(sourceIssn, year));
+        for (const year of clientYears) {
+          rows.push(await fetchYear(sourceIssn, year));
+          await new Promise(r => setTimeout(r, 280));
+        }
         const usable = rows.filter(row => row.total > 0);
         if (!usable.length) continue;
         const countryTotals = new Map();
@@ -1439,8 +1456,13 @@
           .sort((a, b) => b[1] - a[1])
           .slice(0, 4)
           .map(([name]) => name);
-        const top = ['China', ...topOther].filter((name, i, arr) => i === arr.indexOf(name));
-        return { years: usable, top };
+        // 不必强行把 China 放第一；无中国数据时用真实 top
+        const ranked = [...countryTotals.entries()].sort((a, b) => b[1] - a[1]).map(([n]) => n);
+        const top = (ranked.includes('China')
+          ? ['China', ...ranked.filter(n => n !== 'China')]
+          : ranked
+        ).slice(0, 5);
+        return { years: usable, top: top.length ? top : topOther };
       }
       return null;
     })().catch(err => {
@@ -1486,7 +1508,9 @@
       return T(zh[name] || name, en[name] || name);
     };
     const countries = [...payload.top, 'Other'];
-    const selected = payload.top.includes(selectedCountry) ? selectedCountry : 'China';
+    const selected = payload.top.includes(selectedCountry)
+      ? selectedCountry
+      : (payload.top[0] || 'China');
     const select = `<label class="country-select-wrap"><span>${T('显示趋势','Trend')}</span><select class="country-select" aria-label="${T('选择国家/地区','Select country/region')}">${payload.top.map(name => `<option value="${escape(name)}"${name === selected ? ' selected' : ''}>${escape(countryDisplay(name))}</option>`).join('')}</select></label>`;
     const legend = countries.map((name, i) => (
       `<span class="country-legend-item"><span class="country-swatch" style="background:${countryOutputColors[i % countryOutputColors.length]}"></span>${escape(name === 'Other' ? T('其他','Other') : countryDisplay(name))}</span>`
@@ -1605,7 +1629,20 @@
   const reusableTabPanels = new Set(['int', 'dom', 'in', 'my', 'kr', 'pbn', 'isc', 'scielo']);
   let homeMode = 'search';
   const TAB_PATHS = { home: '/', int: '/global', dom: '/cn', in: '/in', my: '/my', kr: '/kr', pbn: '/pbn', isc: '/isc', scielo: '/scielo', fav: '/favorites', me: '/account', rank: '/rankings/', pick: '/pick' };
-  const PATH_TABS = { '/': 'home', '/en': 'home', '/zh': 'home', '/global': 'int', '/international': 'int', '/journals': 'int', '/cn': 'dom', '/china': 'dom', '/in': 'in', '/india': 'in', '/my': 'my', '/malaysia': 'my', '/kr': 'kr', '/korea': 'kr', '/pbn': 'pbn', '/poland': 'pbn', '/isc': 'isc', '/scielo': 'scielo', '/favorites': 'fav', '/account': 'me', '/me': 'me', '/profile': 'me', '/rankings': 'rank', '/pick': 'pick' };
+  const PATH_TABS = {
+    '/': 'home', '/en': 'home', '/zh': 'home',
+    '/global': 'int', '/international': 'int', '/journals': 'int',
+    '/cn': 'dom', '/china': 'dom',
+    '/in': 'in', '/india': 'in',
+    '/my': 'my', '/malaysia': 'my',
+    '/kr': 'kr', '/korea': 'kr',
+    '/pbn': 'pbn', '/poland': 'pbn',
+    '/isc': 'isc', '/scielo': 'scielo',
+    '/favorites': 'fav',
+    '/account': 'me', '/me': 'me', '/profile': 'me',
+    '/rankings': 'rank', '/rankings/': 'rank',
+    '/pick': 'pick',
+  };
   const TAB_SEO = {
     home: {
       title: 'AILatest Journal - Journal Finder, Rankings & Impact Factors',
@@ -1670,12 +1707,17 @@
   }
   function consumePendingTab() {
     try {
+      // 1) sessionStorage 过渡（旧链接 / SEO 入口）
       const tab = sessionStorage.getItem('ailatest.pendingTab') || '';
       sessionStorage.removeItem('ailatest.pendingTab');
-      return TAB_PATHS[tab] ? tab : '';
-    } catch (_) {
-      return '';
-    }
+      if (TAB_PATHS[tab]) return tab;
+    } catch (_) { /* ignore */ }
+    // 2) ?tab=rank 查询参数
+    try {
+      const qTab = new URLSearchParams(location.search).get('tab') || '';
+      if (TAB_PATHS[qTab]) return qTab;
+    } catch (_) { /* ignore */ }
+    return '';
   }
   function updatePageSeo(tab = activeTab) {
     const isZhHome = tab === 'home' && (location.pathname.replace(/\/+$/, '') === '/zh' || lang === 'zh-CN' || lang === 'zh-TW');
@@ -9205,9 +9247,17 @@
       if (changingTab) window.scrollTo(0, tabScrollPositions.get(activeTab) || 0);
       $$('[data-international]').forEach(el => el.hidden = activeTab !== 'int');
       $$('[data-domestic]').forEach(el => el.hidden = activeTab !== 'dom');
-      // Sidebar: show on int/dom, hide on home/fav/pick
+      // Sidebar 筛选：全球 + 各地区站统一显示；首页/收藏/荐刊/榜单/账户隐藏
       const sidebar = $('#sidebar');
-      if (sidebar) sidebar.style.display = (activeTab === 'int' || activeTab === 'dom') ? '' : 'none';
+      if (sidebar) {
+        const showSidebar = activeTab === 'int'
+          || activeTab === 'dom'
+          || activeTab === 'in'
+          || activeTab === 'my'
+          || activeTab === 'kr'
+          || Boolean(REGIONAL_DIRECTORY_CONFIG[activeTab]);
+        sidebar.style.display = showSidebar ? '' : 'none';
+      }
       // 统一搜索框 #q：更新 placeholder 和内容
       const qEl = $('#q');
       if (qEl) {
@@ -9316,10 +9366,23 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    // 榜单：SPA 内切 tab，禁止整页刷新
     document.getElementById('rankings-btn')?.addEventListener('click', (e) => {
       e.preventDefault();
+      e.stopPropagation();
       activateTab('rank');
     });
+    // 侧栏注入后的榜单链接（listing 页 / 动态 rail）同样拦截
+    document.addEventListener('click', (e) => {
+      const a = e.target.closest?.('a#rankings-btn, a.rail-nav-btn[href="/rankings/"], a.rail-nav-btn[href="/rankings"]');
+      if (!a) return;
+      // 仅本站 SPA 内处理
+      if (!document.getElementById('mode-tabs') && !document.querySelector('.tab-panel')) return;
+      e.preventDefault();
+      e.stopPropagation();
+      if (typeof window.__activateJournalTab === 'function') window.__activateJournalTab('rank');
+      else activateTab('rank');
+    }, true);
     document.querySelector('[data-topbar-home]')?.addEventListener('click', (e) => {
       e.preventDefault();
       activateTab('home');

@@ -1742,7 +1742,7 @@ function normalizeOpenAlexCountry(group) {
   return { code, name };
 }
 
-async function fetchOpenAlexCountryYear(sourceIssn, year, apiKey = '') {
+async function fetchOpenAlexCountryYear(sourceIssn, year, apiKey = '', attempt = 0) {
   const params = new URLSearchParams({
     filter: `primary_location.source.issn:${sourceIssn},from_publication_date:${year}-01-01,to_publication_date:${year}-12-31`,
     group_by: 'authorships.institutions.country_code',
@@ -1750,9 +1750,20 @@ async function fetchOpenAlexCountryYear(sourceIssn, year, apiKey = '') {
     mailto: 'ailatest@ailatest.org',
   });
   if (apiKey) params.set('api_key', apiKey);
-  const resp = await fetch(`https://api.openalex.org/works?${params.toString()}`, {
-    headers: { Accept: 'application/json', 'User-Agent': 'AILatest Journal country-output cache (mailto:ailatest@ailatest.org)' },
-  });
+  let resp;
+  try {
+    resp = await fetch(`https://api.openalex.org/works?${params.toString()}`, {
+      headers: { Accept: 'application/json', 'User-Agent': 'AILatest Journal country-output cache (mailto:ailatest@ailatest.org)' },
+    });
+  } catch (_) {
+    return { year, total: 0, groups: [], skipped: true, status: 0 };
+  }
+  // 礼貌池限流：短暂退避后重试
+  if (resp.status === 429 && attempt < 3) {
+    const wait = Number(resp.headers.get('Retry-After') || 0) * 1000 || (800 * (attempt + 1));
+    await new Promise(r => setTimeout(r, Math.min(wait, 4000)));
+    return fetchOpenAlexCountryYear(sourceIssn, year, apiKey, attempt + 1);
+  }
   if (!resp.ok) return { year, total: 0, groups: [], skipped: true, status: resp.status };
   const data = await resp.json();
   const groups = (data.group_by || [])
@@ -1807,33 +1818,26 @@ async function routeOpenAlexCountryOutput(req, env) {
     .slice(-8);
   if (!issns.length || !years.length) return err('missing issn or years', 400);
 
+  // api_key 可选：无 key 时走 OpenAlex 礼貌池（mailto），不再返回空壳阻断前端
   const apiKey = cleanText(env.OPENALEX_API_KEY || '', 256);
-  if (!apiKey) {
-    return new Response(JSON.stringify({
-      ok: true,
-      years: [],
-      top: [],
-      source: 'openalex',
-      reason: 'api_key_required',
-    }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json', ...CORS, 'Cache-Control': 'public, max-age=600' },
-    });
-  }
 
   const cache = caches.default;
-  const cacheKey = new Request(`https://cache.internal/openalex-country-output/v2?issn=${encodeURIComponent(issns.join(','))}&years=${encodeURIComponent(years.join(','))}`);
+  const cacheKey = new Request(`https://cache.internal/openalex-country-output/v3?issn=${encodeURIComponent(issns.join(','))}&years=${encodeURIComponent(years.join(','))}&k=${apiKey ? '1' : '0'}`);
   const hit = debug ? null : await cache.match(cacheKey);
   if (hit) return new Response(hit.body, { status: 200, headers: { 'Content-Type': 'application/json', ...CORS, 'Cache-Control': 'public, max-age=86400' } });
 
+  // 无 API key 时少查几年，降低礼貌池 429
+  const queryYears = apiKey ? years : years.slice(-3);
   let payload = null;
   const attempts = [];
   for (const sourceIssn of issns) {
     const rows = [];
-    for (const year of years) {
+    for (const year of queryYears) {
       const row = await fetchOpenAlexCountryYear(sourceIssn, year, apiKey);
       rows.push(row);
       if (debug || row.skipped) attempts.push({ issn: sourceIssn, year, total: row.total, status: row.status || 200, skipped: !!row.skipped });
+      // 年份之间留空隙，降低限流概率
+      if (!apiKey) await new Promise(r => setTimeout(r, 350));
     }
     payload = buildCountryOutputPayload(rows);
     if (payload) {
@@ -1841,7 +1845,15 @@ async function routeOpenAlexCountryOutput(req, env) {
       break;
     }
   }
-  if (!payload) payload = { ok: true, years: [], top: [], source: 'openalex' };
+  if (!payload) {
+    payload = {
+      ok: true,
+      years: [],
+      top: [],
+      source: 'openalex',
+      reason: apiKey ? 'no_data' : 'public_pool_empty',
+    };
+  }
   if (debug) payload.attempts = attempts;
 
   const bodyText = JSON.stringify(payload);

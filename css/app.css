@@ -7152,8 +7152,18 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .tab-panel table.journals thead .col-name,
 .tab-panel table.journals thead .col-cycle { display: none; }
 
-/* 卡片网格（一行多个） */
-.tab-panel table.journals tbody { display: grid; grid-template-columns: repeat(auto-fill, minmax(248px, 1fr)); gap: 12px; padding-top: 14px; }
+/* 卡片网格：全球 / 地区 / 收藏统一「每行 2 卡」 */
+.tab-panel table.journals tbody {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  padding-top: 14px;
+}
+@media (max-width: 760px) {
+  .tab-panel table.journals tbody {
+    grid-template-columns: 1fr;
+  }
+}
 .tab-panel table.journals tbody tr.j-row {
   position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px;
   padding: 15px 16px; min-width: 0;
@@ -7646,22 +7656,7 @@ html:not([lang|="zh"]) .j-row .col-topic::before { content: "Subject · "; }
 }
 .j-row .col-if { margin-left: 2px; }
 
-/* ═══════ 列表一行 2 个（国际/中国/印度/韩国），收藏一行 3 个 ═══════ */
-.tab-panel[data-panel="int"] table.journals tbody,
-.tab-panel[data-panel="dom"] table.journals tbody,
-.tab-panel[data-panel="in"] table.journals tbody,
-.tab-panel[data-panel="kr"] table.journals tbody { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.tab-panel[data-panel="fav"] table.journals tbody { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-@media (max-width: 1024px) {
-  .tab-panel[data-panel="fav"] table.journals tbody { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-@media (max-width: 760px) {
-  .tab-panel[data-panel="int"] table.journals tbody,
-  .tab-panel[data-panel="dom"] table.journals tbody,
-  .tab-panel[data-panel="in"] table.journals tbody,
-  .tab-panel[data-panel="kr"] table.journals tbody,
-  .tab-panel[data-panel="fav"] table.journals tbody { grid-template-columns: 1fr; }
-}
+/* 列表卡片列数由上方统一规则控制（每行 2；窄屏 1） */
 
 /* ═══════ 手机端：筛选菜单按钮(☰)固定到左上角 ═══════ */
 @media (max-width: 900px) {
