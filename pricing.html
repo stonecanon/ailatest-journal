@@ -8,7 +8,7 @@
 <meta name="robots" content="index,follow" />
 <link rel="canonical" href="https://journal.ailatest.org/pricing.html" />
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
-<link rel="stylesheet" href="/css/static.css?v=20260715-pricing-v3" />
+<link rel="stylesheet" href="/css/static.css?v=20260715-pricing-v4" />
 <style>
   /* ── Journal 定价页：参考 Todo 层次，保留 Journal 暖纸气质 ── */
   body[data-static-page="pricing"] {
@@ -144,23 +144,34 @@
   }
   .plan .tag {
     position: absolute;
-    right: 18px;
-    top: 14px;
-    padding: 5px 10px;
-    border-radius: 9px;
+    left: 18px;
+    right: auto;
+    top: 0;
+    padding: 5px 12px;
+    border-radius: 0 0 10px 10px;
     background: #f97316;
     color: #fff;
     font-size: 11px;
     font-weight: 850;
     letter-spacing: .02em;
-    z-index: 1;
+    z-index: 2;
+  }
+  /* 推荐标签占顶，标题整体下移，避免与星标抢位 */
+  .plans.plans-3 .plan.hot {
+    padding-top: 40px;
   }
   .plan-head {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 12px;
+    gap: 16px;
     margin-bottom: 6px;
+    min-width: 0;
+  }
+  .plan-head > div {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
   }
   .plan h3 {
     margin: 0 0 4px;
@@ -168,6 +179,8 @@
     font-weight: 850;
     color: #1a1612;
     letter-spacing: -.02em;
+    line-height: 1.15;
+    max-width: 100%;
   }
   .plan .per {
     margin: 0;
@@ -176,16 +189,20 @@
     line-height: 1.45;
   }
   .plan-glyph {
-    flex: 0 0 auto;
-    width: 36px;
-    height: 36px;
-    border-radius: 11px;
+    flex: 0 0 40px;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    margin-left: 4px;
+    border-radius: 12px;
     display: grid;
     place-items: center;
     font-size: 16px;
     font-weight: 900;
     color: #7a7368;
     background: #f0ebe3;
+    position: relative;
+    z-index: 1;
   }
   .plan.hot .plan-glyph {
     color: #fff;
