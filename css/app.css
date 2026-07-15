@@ -8223,6 +8223,22 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   color: #5c564c !important;
   font-weight: 650 !important;
 }
+/* 科协：浅棕底（降低饱和，与 Nature 子刊同级轻量） */
+.j-row .j-card-badges .domsrc-pill.ds-cnkx,
+.j-row .j-card-badges .tier-pill,
+.j-row .j-card-badges .tier-pill.t1,
+.j-row .j-card-badges .tier-pill.t2,
+.j-row .j-card-badges .tier-pill.t3 {
+  background: #f2ebe2 !important;
+  color: #5c4a36 !important;
+  font-weight: 650 !important;
+  border: 0 !important;
+}
+/* 收藏 meta 里的「科协」来源标同样浅色 */
+.j-row .j-meta-src .src-tag.src-cnkx {
+  background: #f2ebe2 !important;
+  color: #5c4a36 !important;
+}
 
 /* 免费发表：小号绿色标，紧挨 IF */
 .j-row .col-free .badge.b-free {

@@ -3854,14 +3854,36 @@
     const d = tn(domain, 'domain') || '';
     return d.replace(/领域$/, '').replace(/\s*(field|area)$/i, '').trim();
   }
-  // Badge label: 科协 + discipline (falls back to 科协 + tier if no discipline).
+  // Badge label: 科协·学科 T2（有学科必显示；无学科时退化为 科协 T2，禁止只显示裸 T2）
   function castLabel(domain, tier) {
     const disc = castDiscipline(domain);
     const needsSpace = !(lang === 'zh-CN' || lang === 'zh-TW' || lang === 'ja' || lang === 'ko');
     const tierText = tier ? String(tier).trim().toUpperCase() : '';
-    return disc
-      ? `${T('科协','CAST')}${needsSpace ? ' ' : '·'}${disc}${tierText ? ' ' + tierText : ''}`
-      : `${T('科协','CAST')} ${tierText}`.trim();
+    if (disc && tierText) return `${T('科协','CAST')}${needsSpace ? ' ' : '·'}${disc} ${tierText}`;
+    if (disc) return `${T('科协','CAST')}${needsSpace ? ' ' : '·'}${disc}`;
+    if (tierText) return `${T('科协','CAST')} ${tierText}`;
+    return T('科协','CAST');
+  }
+  /** 卡片用科协徽章：优先索引里的 domain，否则用记录自身 domain+tier */
+  function castBadgeHtml(r) {
+    const hits = lookupDom(r).filter(h => h.source === 'cnkx');
+    const seen = new Set();
+    const pills = [];
+    const push = (domain, tier, labelHint) => {
+      const tierText = tier ? String(tier).trim().toUpperCase() : '';
+      const disc = castDiscipline(domain) || (domain ? (tn(domain, 'domain') || String(domain)) : '');
+      const label = labelHint || castLabel(domain, tier);
+      if (!label || seen.has(label)) return;
+      seen.add(label);
+      const title = `${T('中国科协','CAST')}${tierText ? ' ' + tierText : ''}${disc ? ' · ' + disc : ''}${T(' 级',' tier')}`;
+      pills.push(`<span class="domsrc-pill ds-cnkx" title="${escape(title)}">${escape(label)}</span>`);
+    };
+    hits.forEach(h => push(h.domain, h.tag || h.tier, h.label));
+    // 当前记录本身是科协条目，或有 T 级但索引未命中
+    if (!pills.length && (r.__src === 'cnkx' || (r.tier && /^T[123]$/i.test(String(r.tier))))) {
+      push(r.domain, r.tier, null);
+    }
+    return pills.join('');
   }
   function renderDomCrossBadges(r, excludeSource) {
     const rankSources = new Set(['vhb', 'cnrs', 'fms', 'abdc', 'abs', 'ft50', 'utd24']);
@@ -3979,13 +4001,20 @@
     const name = r.name || r.cn_name || '';
     const enName = r.en_name ? `<span class="jname-cn">${escape(titleCase(r.en_name))}</span>` : '';
     const crossBadges = renderDomCrossBadges({ name, issn: r.issn, cn_code: r.cn_code }, src);
-    const tierBadge = showTier && tierValue ? badgeTier(tierValue) : '';
+    // 科协目录：徽章带学科+T 级，不用裸 T2
+    const castBadge = (src === 'cnkx' || showTier)
+      ? castBadgeHtml({ ...r, __src: src, tier: tierValue || r.tier })
+      : '';
+    const tierBadge = (!castBadge && showTier && tierValue && !/^T[123]$/i.test(String(tierValue)))
+      ? badgeTier(tierValue)
+      : '';
     const nameHtml = `<div class="jname">${escape(titleCase(name.replace(/\*$/,'')))}${enName}</div>`;
     const metaHtml = [
       r.issn ? jMetaChip(`ISSN ${r.issn}`, 'j-meta-id') : '',
+      (src === 'cnkx' && r.domain) ? jMetaChip(tn(r.domain, 'domain') || r.domain, 'j-meta-topic-show') : '',
     ].filter(Boolean).join('');
     // extraCols 可能是旧 <td>…，卡片体里只放徽章
-    const bodyHtml = `<div class="j-card-badges badges">${limitBadgeHtml([tierBadge, extraBadges, crossBadges].filter(Boolean).join(''), 8)}</div>`;
+    const bodyHtml = `<div class="j-card-badges badges">${limitBadgeHtml([castBadge, tierBadge, extraBadges, crossBadges].filter(Boolean).join(''), 8)}</div>`;
     return journalCardRow({
       fid, src,
       favHtml: starBtn(r, src),
@@ -9169,10 +9198,18 @@
     const nameHtml = `<div class="jname ${r.flagship ? 'jname-flagship' : ''}">${escape(titleCase(rawName.replace(/\*$/,'')))}${r.cn_name && r.cn_name !== rawName ? `<span class="jname-cn">${escape(r.cn_name)}</span>` : ''}${r.en_name && r.en_name !== rawName ? `<span class="jname-cn">${escape(titleCase(r.en_name))}</span>` : ''}${aliasHintHtml(r)}</div>`;
     const indexBadges = r.__src === 'int' ? renderIndexBadges(r) : '';
     const rankBadges = r.__src === 'int' ? renderRankBadges(r) : '';
-    const tierBadge = r.tier && /^T[123]$/.test(r.tier) ? badgeTier(r.tier)
-                    : r.tier ? `<span class="tier-pill t3">${escape(tn(r.tier, "tier"))}</span>` : '';
-    const crossBadges = renderDomCrossBadges(r, r.__src);
-    const otherBadges = [tierBadge, crossBadges].filter(Boolean).join('');
+    // 科协：显示「科协·学科 T2」，禁止裸 T2；从交叉索引排除 cnkx 后由 castBadgeHtml 统一输出
+    const castBadge = castBadgeHtml(r);
+    const nonCastTier = r.tier && !/^T[123]$/i.test(String(r.tier))
+      ? `<span class="tier-pill t3">${escape(tn(r.tier, 'tier'))}</span>`
+      : '';
+    const crossBadges = renderDomCrossBadges(r, r.__src === 'cnkx' ? 'cnkx' : r.__src);
+    // 若 cross 已含科协（国际刊交叉命中），castBadgeHtml 与 cross 可能重复 — castBadge 优先、cross 再滤一次
+    let crossClean = crossBadges;
+    if (castBadge && crossClean) {
+      crossClean = crossClean.replace(/<span class="domsrc-pill ds-cnkx"[^>]*>[\s\S]*?<\/span>/g, '').replace(/(<span class="domsrc-dot"[^>]*>·<\/span>\s*)+/g, '');
+    }
+    const otherBadges = [castBadge, nonCastTier, crossClean].filter(Boolean).join('');
     const badgeCell = renderBadgeCell(indexBadges, [rankBadges, otherBadges].filter(Boolean).join(''));
     const SRC_LABEL = {
       int: T('国际','Int’l'), cssci: 'CSSCI', cssci_core: 'CSSCI', cssci_ext: T('CSSCI 扩展','CSSCI Ext'),
