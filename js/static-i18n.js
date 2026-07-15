@@ -20,6 +20,10 @@
       footer_about: '关于',
       footer_pricing: '订阅',
       footer_contact: '联系',
+      footer_terms: '条款',
+      footer_privacy: '隐私',
+      footer_refund: '退款',
+      footer_download: '下载中心',
       lang_toggle: 'English',
       pricing_title: '订阅即将开放 | AILatest Journal',
       pricing_desc: 'AILatest Journal 订阅功能即将开放。当前主推浏览器插件内测版，可在 Google Scholar、PubMed、知网等页面显示期刊徽章。',
@@ -50,6 +54,10 @@
       footer_about: 'About',
       footer_pricing: 'Subscribe',
       footer_contact: 'Contact',
+      footer_terms: 'Terms',
+      footer_privacy: 'Privacy',
+      footer_refund: 'Refund',
+      footer_download: 'Download Center',
       lang_toggle: '中文',
       pricing_title: 'Subscription Coming Soon | AILatest Journal',
       pricing_desc: 'AILatest Journal subscription is coming soon. For now, try the browser extension beta for journal badges on Google Scholar, PubMed, CNKI and more.',
@@ -78,11 +86,31 @@
     return normalize(navigator.language || 'en');
   }
 
+  /** 全站静态页统一页脚（避免中英混排、链接集合不一致） */
+  function unifiedFooterHtml(dict) {
+    return `<p>© 2026 AILatest Journal ·
+      <a href="/about" data-static-i18n="footer_about">${dict.footer_about}</a> ·
+      <a href="/contact" data-static-i18n="footer_contact">${dict.footer_contact}</a> ·
+      <a href="/terms.html" data-static-i18n="footer_terms">${dict.footer_terms}</a> ·
+      <a href="/privacy.html" data-static-i18n="footer_privacy">${dict.footer_privacy}</a> ·
+      <a href="/refund.html" data-static-i18n="footer_refund">${dict.footer_refund}</a></p>`;
+  }
+
+  function applyUnifiedFooter(lang) {
+    const dict = STRINGS[lang] || STRINGS.en;
+    document.querySelectorAll('footer.page-foot').forEach((foot) => {
+      foot.innerHTML = unifiedFooterHtml(dict);
+    });
+  }
+
   function applyLang(lang) {
     const dict = STRINGS[lang] || STRINGS.en;
     document.documentElement.lang = lang;
     document.documentElement.dataset.staticLang = lang;
     try { localStorage.setItem('ailatest.lang', lang); } catch {}
+
+    // 先统一页脚结构，再跑 i18n 文本（页脚内节点会被重建）
+    applyUnifiedFooter(lang);
 
     document.querySelectorAll('[data-static-i18n]').forEach((el) => {
       const key = el.dataset.staticI18n;
