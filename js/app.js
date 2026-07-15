@@ -5416,18 +5416,22 @@
     window.__regionalShown ||= Object.create(null);
     window.__regionalShown[source] ||= 100;
     window.__regionalFilter ||= Object.create(null);
-    window.__regionalFilter[source] ||= { points: '__all', match: '__all', network: '__all', hband: '__all' };
+    window.__regionalFilter[source] ||= { points: '__all', match: '__all', network: '__all', hMin: 0 };
     const filt = window.__regionalFilter[source];
+    if (filt.hMin == null || Number.isNaN(+filt.hMin)) filt.hMin = 0;
+    // 兼容旧区间字段
+    if (filt.hband && filt.hband !== '__all' && !(+filt.hMin > 0)) {
+      const bandMap = { '0': 0, '20': 20, '50': 50, '100': 100 };
+      if (bandMap[filt.hband] != null) filt.hMin = bandMap[filt.hband];
+      delete filt.hband;
+    }
     const q = activeQuery.trim().toLowerCase();
     const filtered = data.records.filter(row => {
       if (source === 'pbn' && filt.points !== '__all' && String(row.points) !== String(filt.points)) return false;
       if (source === 'scielo' && filt.network !== '__all' && String(row.network || '') !== String(filt.network)) return false;
-      if (source === 'isc' && filt.hband !== '__all') {
+      if (source === 'isc' && +filt.hMin > 0) {
         const h = Number(row.h_index);
-        if (filt.hband === '0' && !(h >= 0 && h < 20)) return false;
-        if (filt.hband === '20' && !(h >= 20 && h < 50)) return false;
-        if (filt.hband === '50' && !(h >= 50 && h < 100)) return false;
-        if (filt.hband === '100' && !(h >= 100)) return false;
+        if (!Number.isFinite(h) || h < +filt.hMin) return false;
       }
       if (filt.match === 'yes' && !row.global_match) return false;
       if (filt.match === 'no' && row.global_match) return false;
@@ -5497,14 +5501,22 @@
           <div class="dom-filter-chips">${pointOpts.map(([v, lab]) => chip('points', v, lab)).join('')}</div>
         </div>`);
     } else if (source === 'isc') {
-      const hOpts = [
-        ['__all', T('全部 H', 'All H')],
-        ['100', 'H >= 100'], ['50', '50-99'], ['20', '20-49'], ['0', 'H < 20'],
-      ];
+      // 与全球站 IF 一致：最低 H 滑块（自定义，非固定区间）
+      const hMax = 60;
+      const hMin = Math.min(hMax, Math.max(0, Math.round(+filt.hMin || 0)));
+      const hPct = (hMin / hMax * 100).toFixed(1);
+      const hLabel = hMin > 0
+        ? `H ≥ ${hMin}${hMin >= hMax ? '+' : ''}`
+        : T('不限', 'Any');
       filterGroups.push(`
-        <div class="dom-filter-group">
+        <div class="dom-filter-group isc-h-filter">
           <div class="dom-filter-label">${T('H 指数','H-index')}</div>
-          <div class="dom-filter-chips">${hOpts.map(([v, lab]) => chip('hband', v, lab)).join('')}</div>
+          <div class="reg-slider-wrap">
+            <div class="if-slider-row"><span class="if-slider-val" id="isc-h-slider-val">${escape(hLabel)}</span></div>
+            <input type="range" id="isc-h-slider" class="reg-metric-slider" min="0" max="${hMax}" step="1" value="${hMin}"
+              style="--pct:${hPct}%" aria-label="${T('最低 H 指数','Minimum H-index')}" />
+            <div class="if-slider-ticks"><span>0</span><span>15</span><span>30</span><span>45</span><span>60+</span></div>
+          </div>
         </div>`);
     } else if (source === 'scielo') {
       const netCounts = Object.create(null);
@@ -5569,6 +5581,37 @@
         renderRegionalDirectory(source);
       });
     });
+    // 伊朗 H 指数滑块（最低值，自定义）
+    if (source === 'isc') {
+      const slider = box.querySelector('#isc-h-slider');
+      const valEl = box.querySelector('#isc-h-slider-val');
+      if (slider) {
+        const max = +slider.max || 60;
+        let debounceTimer = null;
+        const paint = () => {
+          const v = +slider.value || 0;
+          window.__regionalFilter.isc.hMin = v;
+          if (valEl) {
+            valEl.textContent = v > 0
+              ? `H ≥ ${v}${v >= max ? '+' : ''}`
+              : T('不限', 'Any');
+          }
+          slider.style.setProperty('--pct', (v / max * 100) + '%');
+        };
+        const apply = () => {
+          window.__regionalShown.isc = 100;
+          renderRegionalDirectory('isc');
+        };
+        slider.addEventListener('input', () => {
+          paint();
+          // 拖动中只更新文案；松手/停顿后再筛选，避免卡顿
+          if (debounceTimer) clearTimeout(debounceTimer);
+          debounceTimer = setTimeout(apply, 120);
+        });
+        slider.addEventListener('change', apply);
+        paint();
+      }
+    }
     $(`#${source}-more`)?.addEventListener('click', () => {
       window.__regionalShown[source] += 100;
       renderRegionalDirectory(source);

@@ -8709,23 +8709,29 @@ body.journal-route .lang-toggle-wrap { display: none; }
   .tab-panel[data-panel="int"] thead .col-free { flex-basis: 100%; }
 }
 
-/* ═══════ 影响因子滑块 ═══════ */
+/* ═══════ 影响因子 / 地区站指标滑块 ═══════ */
 .tab-panel[data-panel="int"] #if-dropdown .th-dropdown-panel { display: block !important; }
 .if-slider-row { display: flex; justify-content: flex-end; margin-bottom: 2px; }
-.if-slider-val { font-size: 12.5px; font-weight: 800; color: var(--accent-deep); font-variant-numeric: tabular-nums; }
-#if-slider {
+.if-slider-val { font-size: 12.5px; font-weight: 800; color: var(--accent-deep, #c2410c); font-variant-numeric: tabular-nums; }
+#if-slider,
+.reg-metric-slider {
   -webkit-appearance: none; appearance: none; width: 100%; height: 5px; border-radius: 999px;
   background: linear-gradient(90deg, var(--accent) var(--pct,0%), var(--rule) var(--pct,0%));
   outline: none; cursor: pointer; margin: 6px 0 2px;
 }
-#if-slider::-webkit-slider-thumb {
+#if-slider::-webkit-slider-thumb,
+.reg-metric-slider::-webkit-slider-thumb {
   -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 50%;
   background: #fff; border: 2px solid var(--accent); box-shadow: 0 1px 5px rgba(60,40,20,.28); cursor: pointer; margin-top: -1px;
 }
-#if-slider::-moz-range-thumb {
+#if-slider::-moz-range-thumb,
+.reg-metric-slider::-moz-range-thumb {
   width: 18px; height: 18px; border-radius: 50%; background: #fff; border: 2px solid var(--accent); box-shadow: 0 1px 5px rgba(60,40,20,.28); cursor: pointer;
 }
 .if-slider-ticks { display: flex; justify-content: space-between; font-size: 9px; color: var(--ink-faint); margin-top: 2px; font-variant-numeric: tabular-nums; }
+/* 伊朗 H 指数滑块容器 */
+.reg-slider-wrap { width: 100%; }
+.isc-h-filter .dom-filter-label { margin-bottom: 6px; }
 
 /* ── fix: filter cards need spacing; 学科 card full rail width ── */
 .tab-panel[data-panel="int"] thead .col-badge { display: flex !important; flex-direction: column; align-items: stretch; gap: 14px; }
