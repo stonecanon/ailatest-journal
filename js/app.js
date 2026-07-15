@@ -5430,36 +5430,52 @@
     const shown = window.__regionalShown[source];
     const visible = filtered.slice(0, shown);
     const rows = visible.map(row => {
-      const rec = { ...row, name: row.name || row.global_name || '', __src: source };
-      const fid = favId(rec);
-      rowRecordsByFid[fid] = rec;
-      const globalBadges = row.global_match
-        ? [renderCoverageBadges(rec), renderLevelBadges(rec)].filter(Boolean).join('')
-        : '';
-      const metric = config.metric(row);
-      const nameHtml = `<div class="jname">${escape(rec.name)}</div>`;
-      const metaHtml = [
-        row.issn ? jMetaChip(`ISSN ${row.issn}`, 'j-meta-id') : '',
-        source === 'scielo' && row.network ? jMetaChip(String(row.network).replace(/^www\./, ''), 'j-meta-pub') : '',
-      ].filter(Boolean).join('');
-      const bodyHtml = `<div class="j-card-badges">
-        <div class="badges badges-idx"><span class="domsrc-pill regional-source-pill">${escape(config.badge)}</span>${limitBadgeHtml(globalBadges ? renderCoverageBadges(rec) : '', 6)}</div>
-        ${globalBadges ? `<div class="badges badges-rank">${limitBadgeHtml(renderLevelBadges(rec), 5)}</div>` : ''}
-      </div>`;
-      let ifHtmlClean = '';
-      if (source === 'pbn' && row.points != null) ifHtmlClean = jMetaIf(T('分值', 'Pts'), row.points);
-      else if (source === 'isc' && row.h_index != null) ifHtmlClean = jMetaIf('H', row.h_index);
-      else if (metric) ifHtmlClean = jMetaIf(T('指标', 'Metric'), metric);
-      return journalCardRow({
-        fid, src: source, extraClass: 'regional-directory-row',
-        favHtml: starBtn(rec, source),
-        nameHtml,
-        ifHtml: ifHtmlClean,
-        metaHtml, bodyHtml,
-      });
+      try {
+        const rec = { ...row, name: row.name || row.global_name || '', __src: source };
+        // 把 indices 规范成数组，避免交叉徽章渲染异常
+        if (rec.indices && !Array.isArray(rec.indices)) {
+          rec.indices = String(rec.indices).split(/[,;|/]/).map(s => s.trim()).filter(Boolean);
+        }
+        const fid = favId(rec);
+        rowRecordsByFid[fid] = rec;
+        let cov = '', lvl = '';
+        try {
+          if (row.global_match) {
+            cov = renderCoverageBadges(rec) || '';
+            lvl = renderLevelBadges(rec) || '';
+          }
+        } catch (_) { cov = ''; lvl = ''; }
+        const nameHtml = `<div class="jname">${escape(rec.name)}</div>`;
+        const metaHtml = [
+          row.issn ? jMetaChip(`ISSN ${row.issn}`, 'j-meta-id') : '',
+          source === 'scielo' && row.network ? jMetaChip(String(row.network).replace(/^www\./, ''), 'j-meta-pub') : '',
+        ].filter(Boolean).join('');
+        const bodyHtml = `<div class="j-card-badges">
+          <div class="badges badges-idx"><span class="domsrc-pill regional-source-pill">${escape(config.badge)}</span>${limitBadgeHtml(cov, 6)}</div>
+          ${lvl ? `<div class="badges badges-rank">${limitBadgeHtml(lvl, 5)}</div>` : ''}
+        </div>`;
+        let ifHtmlClean = '';
+        if (source === 'pbn' && row.points != null && row.points !== '') ifHtmlClean = jMetaIf(T('分值', 'Pts'), row.points);
+        else if (source === 'isc' && row.h_index != null && row.h_index !== '') ifHtmlClean = jMetaIf('H', row.h_index);
+        else {
+          const metric = config.metric(row);
+          if (metric) ifHtmlClean = jMetaIf(T('指标', 'Metric'), metric);
+        }
+        return journalCardRow({
+          fid, src: source, extraClass: 'regional-directory-row',
+          favHtml: starBtn(rec, source),
+          nameHtml,
+          ifHtml: ifHtmlClean,
+          metaHtml, bodyHtml,
+        });
+      } catch (_) {
+        return '';
+      }
     }).join('');
 
-    // 左侧筛选轨（与中国/印度/韩国同一套 dom-filter-*）
+    // 左侧筛选轨：波兰 / 伊朗 / 拉美统一结构（主筛 + 全球匹配 + 官方链接）
+    const chip = (key, value, label) =>
+      `<button type="button" class="dom-filter-chip${filt[key] === value ? ' on' : ''}" data-reg-filter="${escape(key)}" data-value="${escape(value)}">${escape(label)}</button>`;
     const filterGroups = [];
     if (source === 'pbn') {
       const pointOpts = [
@@ -5469,25 +5485,19 @@
       filterGroups.push(`
         <div class="dom-filter-group">
           <div class="dom-filter-label">${T('部委分值','Ministry points')}</div>
-          <div class="dom-filter-chips">${pointOpts.map(([v, lab]) =>
-            `<button type="button" class="dom-filter-chip${filt.points === v ? ' on' : ''}" data-reg-filter="points" data-value="${escape(v)}">${escape(lab)}</button>`
-          ).join('')}</div>
+          <div class="dom-filter-chips">${pointOpts.map(([v, lab]) => chip('points', v, lab)).join('')}</div>
         </div>`);
-    }
-    if (source === 'isc') {
+    } else if (source === 'isc') {
       const hOpts = [
         ['__all', T('全部 H', 'All H')],
-        ['100', 'H ≥ 100'], ['50', '50–99'], ['20', '20–49'], ['0', 'H < 20'],
+        ['100', 'H >= 100'], ['50', '50-99'], ['20', '20-49'], ['0', 'H < 20'],
       ];
       filterGroups.push(`
         <div class="dom-filter-group">
-          <div class="dom-filter-label">H-index</div>
-          <div class="dom-filter-chips">${hOpts.map(([v, lab]) =>
-            `<button type="button" class="dom-filter-chip${filt.hband === v ? ' on' : ''}" data-reg-filter="hband" data-value="${escape(v)}">${escape(lab)}</button>`
-          ).join('')}</div>
+          <div class="dom-filter-label">${T('H 指数','H-index')}</div>
+          <div class="dom-filter-chips">${hOpts.map(([v, lab]) => chip('hband', v, lab)).join('')}</div>
         </div>`);
-    }
-    if (source === 'scielo') {
+    } else if (source === 'scielo') {
       const netCounts = Object.create(null);
       data.records.forEach(r => {
         const n = r.network || '';
@@ -5499,27 +5509,27 @@
         <div class="dom-filter-group is-subject">
           <div class="dom-filter-label">${T('地区集合','Collection')}</div>
           <div class="dom-filter-chips is-wrap">
-            <button type="button" class="dom-filter-chip${filt.network === '__all' ? ' on' : ''}" data-reg-filter="network" data-value="__all">${T('全部','All')}</button>
-            ${nets.map(([n, c]) =>
-              `<button type="button" class="dom-filter-chip${filt.network === n ? ' on' : ''}" data-reg-filter="network" data-value="${escape(n)}" title="${escape(n)}">${escape(shortNet(n))}</button>`
-            ).join('')}
+            ${chip('network', '__all', T('全部','All'))}
+            ${nets.map(([n]) => chip('network', n, shortNet(n))).join('')}
           </div>
         </div>`);
     }
-    // 交叉匹配（三站通用）
+    // 三站通用：全球库匹配
     filterGroups.push(`
       <div class="dom-filter-group">
         <div class="dom-filter-label">${T('全球库匹配','Global match')}</div>
         <div class="dom-filter-chips">
-          <button type="button" class="dom-filter-chip${filt.match === '__all' ? ' on' : ''}" data-reg-filter="match" data-value="__all">${T('全部','All')}</button>
-          <button type="button" class="dom-filter-chip${filt.match === 'yes' ? ' on' : ''}" data-reg-filter="match" data-value="yes">${T('有匹配','Matched')}</button>
-          <button type="button" class="dom-filter-chip${filt.match === 'no' ? ' on' : ''}" data-reg-filter="match" data-value="no">${T('无匹配','Unmatched')}</button>
+          ${chip('match', '__all', T('全部','All'))}
+          ${chip('match', 'yes', T('有匹配','Matched'))}
+          ${chip('match', 'no', T('无匹配','Unmatched'))}
         </div>
       </div>`);
-    filterGroups.push(`
-      <div class="dom-filter-group">
-        <a class="source-link" href="${escape(data.source_url)}" target="_blank" rel="noopener nofollow">${T('官方目录', 'Official directory')}</a>
-      </div>`);
+    if (data.source_url) {
+      filterGroups.push(`
+        <div class="dom-filter-group">
+          <a class="source-link" href="${escape(data.source_url)}" target="_blank" rel="noopener nofollow">${T('官方目录', 'Official directory')}</a>
+        </div>`);
+    }
 
     const sourceYear = data.directory_year ? ` · ${T('目录年份', 'Directory year')} ${escape(data.directory_year)}` : '';
     box.innerHTML = `<div class="section-block regional-directory-section">

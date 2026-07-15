@@ -6204,9 +6204,13 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 }
 .dom-filter-rail {
   flex: 0 0 230px;
+  width: 230px;
+  min-width: 230px;
+  max-width: 230px;
   position: sticky;
   top: var(--th-sticky-top, 64px);
   max-height: calc(100vh - 86px);
+  overflow-x: hidden;
   overflow-y: auto;
   padding: 0;
   border: 0;
@@ -6214,9 +6218,28 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   background: transparent;
   box-sizing: border-box;
   box-shadow: none;
-  display: flex;
+  display: flex !important; /* 波兰/伊朗/拉美等地区站必须显示 */
   flex-direction: column;
   gap: 12px;
+  visibility: visible !important;
+}
+/* 地区目录页：保证左轨不被表格挤掉 */
+.regional-directory-section .dom-browse,
+.india-section .dom-browse,
+.korea-section .dom-browse,
+.malaysia-section .dom-browse,
+.dom-layout .dom-browse {
+  display: flex;
+  align-items: flex-start;
+  gap: 22px;
+}
+.regional-directory-section .dom-filter-main,
+.india-section .dom-filter-main,
+.korea-section .dom-filter-main,
+.malaysia-section .dom-filter-main,
+.dom-layout .dom-filter-main {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 .dom-filter-main {
   flex: 1 1 auto;
