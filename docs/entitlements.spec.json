@@ -216,7 +216,7 @@
           "enabled": true,
           "monthly_credits": 1000,
           "credits_rollover": false,
-          "note": "1000 credits ≈ 100 次完整荐刊；满用 API ≈ ¥0.75/月，相对 Max 年付 ¥148 不会亏"
+          "note": "1000 credits ≈ 100 次完整荐刊；满用 API ≈ ¥0.75/月，相对 Max 年付 ¥68 不会亏"
         },
         "extension": {
           "queries_per_day": 50000,
@@ -230,48 +230,69 @@
   },
   "pricing": {
     "currency": "CNY",
+    "align_with": "AILatest Todo (docs/PRICING.md)",
+    "note": "与 Todo 同价：Pro ¥58/年、Max ¥68/年；教育 Pro ¥35、Max ¥42",
     "plans": [
       {
+        "id": "plus_monthly",
+        "label": "Pro 月付",
+        "price": 8,
+        "period": "month",
+        "usd": 0.99
+      },
+      {
         "id": "plus_annual",
-        "label": "Plus 年付",
-        "price": 98,
+        "label": "Pro 年付",
+        "price": 58,
         "period": "year",
-        "approx_month": 8.2
+        "approx_month": 4.8,
+        "usd": 7.99
+      },
+      {
+        "id": "plus_monthly_edu",
+        "label": "Pro 教育月付",
+        "price": 5,
+        "period": "month",
+        "usd": 0.69,
+        "condition": "edu 邮箱验证通过"
       },
       {
         "id": "plus_annual_edu",
-        "label": "Plus 教育认证",
-        "price": 49,
+        "label": "Pro 教育年付",
+        "price": 35,
         "period": "year",
+        "usd": 4.99,
         "condition": "edu 邮箱验证通过；续费时需重新验证"
       },
       {
         "id": "pro_monthly",
-        "label": "Pro 月付（价格锚点）",
-        "price": 18,
+        "label": "Max 月付",
+        "price": 10,
         "period": "month",
-        "note": "×12=216，衬托年付；可不开通，仅作锚点"
+        "usd": 1.49
       },
       {
         "id": "pro_annual",
-        "label": "Pro 年付原价",
-        "price": 148,
+        "label": "Max 年付",
+        "price": 68,
         "period": "year",
-        "approx_month": 12.3
+        "approx_month": 5.7,
+        "usd": 9.99
       },
       {
-        "id": "pro_annual_flash",
-        "label": "Pro 试用到期限时价",
-        "price": 99,
-        "period": "year",
-        "condition": "trial 到期后 24h 内，且未走教育价",
-        "discount_note": "约 33% off"
+        "id": "pro_monthly_edu",
+        "label": "Max 教育月付",
+        "price": 6,
+        "period": "month",
+        "usd": 0.89,
+        "condition": "edu 邮箱验证通过"
       },
       {
         "id": "pro_annual_edu",
-        "label": "Pro 教育认证",
-        "price": 79,
+        "label": "Max 教育年付",
+        "price": 42,
         "period": "year",
+        "usd": 5.99,
         "condition": "edu 邮箱验证通过；续费时需重新验证"
       }
     ],

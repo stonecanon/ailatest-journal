@@ -44,8 +44,20 @@
   .plan .price-row {
     display: flex;
     align-items: baseline;
-    gap: 8px;
+    gap: 6px;
     flex-wrap: wrap;
+    margin: 4px 0 2px;
+  }
+  .plan .price-row .price {
+    font-size: 32px;
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--ink);
+  }
+  .plan .price-row .per-unit {
+    font-size: 14px;
+    font-weight: 650;
+    color: var(--muted);
   }
   .plan .edu-offer {
     display: flex;
@@ -197,14 +209,15 @@
         <a class="btn ghost" href="/signup.html">免费注册</a>
       </div>
 
-      <!-- Pro -->
+      <!-- Pro — 与 AILatest Todo 一致：¥58/年 · 教育 ¥35/年 -->
       <div class="plan">
         <h3>Pro</h3>
-        <p class="price-std"><s>标准价 ¥98/年</s></p>
+        <div class="price-row"><div class="price">¥58</div><span class="per-unit">/年</span></div>
+        <p class="price-std">月付 ¥8 · 约 ¥4.8/月</p>
         <div class="edu-offer">
           <span class="edu-badge">教育优惠</span>
-          <span class="edu-price">¥49 <small>/年</small></span>
-          <span class="edu-save">省 ¥49 · 约 ¥4.1/月</span>
+          <span class="edu-price">¥35 <small>/年</small></span>
+          <span class="edu-save">省 ¥23 · 月付教育价 ¥5</span>
         </div>
         <div class="per">高频刷刊：插件解锁中科院与预警徽章，额度充裕。</div>
         <ul>
@@ -223,15 +236,16 @@
         <button class="btn ghost" type="button" disabled>支付即将开放</button>
       </div>
 
-      <!-- Max -->
+      <!-- Max — 与 AILatest Todo 一致：¥68/年 · 教育 ¥42/年 -->
       <div class="plan hot">
         <span class="tag">推荐</span>
         <h3>Max</h3>
-        <p class="price-std"><s>标准价 ¥148/年</s></p>
+        <div class="price-row"><div class="price">¥68</div><span class="per-unit">/年</span></div>
+        <p class="price-std">月付 ¥10 · 约 ¥5.7/月</p>
         <div class="edu-offer">
           <span class="edu-badge">教育优惠</span>
-          <span class="edu-price">¥79 <small>/年</small></span>
-          <span class="edu-save">省 ¥69 · 约 ¥6.6/月</span>
+          <span class="edu-price">¥42 <small>/年</small></span>
+          <span class="edu-save">省 ¥26 · 月付教育价 ¥6</span>
         </div>
         <div class="per">完整文献工作流 + 高额度 AI 荐刊。</div>
         <ul>
@@ -294,7 +308,7 @@
       <h3>会员插件额度会不会不够？</h3>
       <p>Pro / Max 均为高额度设计，覆盖日常与高强度刷刊；正常使用一般无感。</p>
       <h3>教育优惠怎么用？</h3>
-      <p>用机构邮箱（.edu.cn / .edu / .ac.uk 等）完成验证码认证后，自动享受教育优惠价：<b>Pro ¥49/年</b>、<b>Max ¥79/年</b>。续费时重新认证即可续享。</p>
+      <p>用机构邮箱（.edu.cn / .edu / .ac.uk 等）完成验证码认证后，自动享受教育优惠价：<b>Pro ¥35/年</b>（月付 ¥5）、<b>Max ¥42/年</b>（月付 ¥6）。与 AILatest Todo 一致。续费时重新认证即可续享。</p>
       <p class="edu-note">面向在读学生与科研机构师生；认证通过后收银台显示优惠价。</p>
     </div>
   </section>
@@ -328,11 +342,12 @@
 
       <div class="plan">
         <h3>Pro</h3>
-        <p class="price-std"><s>Standard ¥98/year</s></p>
+        <div class="price-row"><div class="price">¥58</div><span class="per-unit">/year</span></div>
+        <p class="price-std">Monthly ¥8 · ~¥4.8/mo</p>
         <div class="edu-offer">
           <span class="edu-badge">Edu price</span>
-          <span class="edu-price">¥49 <small>/year</small></span>
-          <span class="edu-save">Save ¥49</span>
+          <span class="edu-price">¥35 <small>/year</small></span>
+          <span class="edu-save">Save ¥23 · edu monthly ¥5</span>
         </div>
         <div class="per">Heavy literature browsing with full extension badges.</div>
         <ul>
@@ -354,11 +369,12 @@
       <div class="plan hot">
         <span class="tag">Recommended</span>
         <h3>Max</h3>
-        <p class="price-std"><s>Standard ¥148/year</s></p>
+        <div class="price-row"><div class="price">¥68</div><span class="per-unit">/year</span></div>
+        <p class="price-std">Monthly ¥10 · ~¥5.7/mo</p>
         <div class="edu-offer">
           <span class="edu-badge">Edu price</span>
-          <span class="edu-price">¥79 <small>/year</small></span>
-          <span class="edu-save">Save ¥69</span>
+          <span class="edu-price">¥42 <small>/year</small></span>
+          <span class="edu-save">Save ¥26 · edu monthly ¥6</span>
         </div>
         <div class="per">Full research workflow + high-quota AI picks.</div>
         <ul>
