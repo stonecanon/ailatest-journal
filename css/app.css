@@ -12,6 +12,9 @@
   --accent-soft:    #fb8a35;
   --deep:           #1f2c4c;   /* 学术深蓝 */
   --deep-soft:      #2c3d68;
+  /* 全站筛选选中：黑底白字（与全球站索引 chip 一致） */
+  --filter-on:      #1c1c1e;
+  --filter-on-fg:   #ffffff;
   --sage:           #5b6a4d;
   --gold:           #a07a2a;
   --crimson:        #7a2020;
@@ -635,37 +638,35 @@ main.main {
   user-select: none;
 }
 .chip input { position: absolute; opacity: 0; pointer-events: none; }
-.chip:has(input:checked) {
-  background: var(--ink);
-  color: var(--paper);
-  border-color: var(--ink);
-}
-/* 索引侧边栏已选状态：三大索引统一深蓝，次要索引低调 */
+/* 全站筛选选中：统一黑底白字 */
+.chip:has(input:checked),
 .chip.tag-scie:has(input:checked),
 .chip.tag-ssci:has(input:checked),
-.chip.tag-ahci:has(input:checked) { background: #1f3a5f; border-color: #1f3a5f; }
-.chip.tag-esci:has(input:checked) { background: #6a7a6a; border-color: #6a7a6a; }
-.chip.tag-esi:has(input:checked) { background: #7a6a8a; border-color: #7a6a8a; color:#fff; }
-.chip.tag-ei:has(input:checked)   { background: #7a7a6a; border-color: #7a7a6a; }
-/* 分区筛选项 — 分区组 */
+.chip.tag-ahci:has(input:checked),
+.chip.tag-esci:has(input:checked),
+.chip.tag-esi:has(input:checked),
+.chip.tag-ei:has(input:checked),
 .chip.zone-1:has(input:checked),
 .chip.zone-2:has(input:checked),
 .chip.zone-3:has(input:checked),
 .chip.zone-4:has(input:checked),
-.chip.zone-top:has(input:checked) { background: #735a3e; border-color: #735a3e; color: #fff; }
-/* 新锐分区 — 同分区组 */
+.chip.zone-top:has(input:checked),
 .chip.xr-1:has(input:checked),
 .chip.xr-2:has(input:checked),
 .chip.xr-3:has(input:checked),
 .chip.xr-4:has(input:checked),
-.chip.xr-top:has(input:checked) { background: #735a3e; border-color: #735a3e; color: #fff; }
-/* domestic source chips */
-.chip.ds-chip-cssci:has(input:checked) { background: #b33c6e; border-color: #b33c6e; }
-.chip.ds-chip-cssci-ext:has(input:checked) { background: #b33c6e; border-color: #b33c6e; opacity: 0.75; }
-.chip.ds-chip-pku:has(input:checked) { background: #c7442d; border-color: #c7442d; }
-.chip.ds-chip-ccft:has(input:checked) { background: #2e6a8a; border-color: #2e6a8a; }
-.chip.ds-chip-cscd:has(input:checked) { background: #4f6f7c; border-color: #4f6f7c; }
-.chip.ds-chip-cstpcd:has(input:checked) { background: #6b5a3a; border-color: #6b5a3a; }
+.chip.xr-top:has(input:checked),
+.chip.ds-chip-cssci:has(input:checked),
+.chip.ds-chip-cssci-ext:has(input:checked),
+.chip.ds-chip-pku:has(input:checked),
+.chip.ds-chip-ccft:has(input:checked),
+.chip.ds-chip-cscd:has(input:checked),
+.chip.ds-chip-cstpcd:has(input:checked) {
+  background: var(--filter-on);
+  color: var(--filter-on-fg);
+  border-color: var(--filter-on);
+  opacity: 1;
+}
 
 /* cat 列表：书页目录感 */
 .nav { display: flex; flex-direction: column; gap: 1px; }
@@ -5634,8 +5635,8 @@ body.journal-route .journal-not-found {
   accent-color: var(--accent);
 }
 .th-dropdown-panel .th-chk:has(input:checked) {
-  color: var(--accent);
-  font-weight: 600;
+  color: var(--filter-on);
+  font-weight: 700;
 }
 .dd-sep {
   height: 1px;
@@ -6192,62 +6193,77 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   font-size: 15px;
   font-weight: 700;
 }
-/* 中国站：左侧筛选 + 右侧双列卡片（对齐全球站） */
+/* 地区/中国站筛选：与全球站左侧 thead 筛选同一套视觉语言 */
 .dom-browse {
   display: flex;
   align-items: flex-start;
-  gap: 20px;
+  gap: 22px;
   margin-top: 8px;
 }
 .dom-filter-rail {
-  flex: 0 0 248px;
+  flex: 0 0 230px;
   position: sticky;
   top: var(--th-sticky-top, 64px);
-  max-height: calc(100vh - 90px);
+  max-height: calc(100vh - 86px);
   overflow-y: auto;
-  padding: 14px 12px 16px;
-  border: 1px solid rgba(60, 60, 67, 0.12);
-  border-radius: 16px;
-  background: #ffffff;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   box-sizing: border-box;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 .dom-filter-main {
   flex: 1 1 auto;
   min-width: 0;
 }
+/* 每组独立卡片（对齐全球站「免费 / 索引 / 分区」分组） */
+.dom-filter-group {
+  margin: 0;
+  padding: 14px 14px 16px;
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  background: var(--bg2);
+  box-shadow: 0 1px 0 rgba(43, 42, 39, 0.03), 0 6px 16px -14px rgba(60, 48, 36, 0.2);
+}
 .dom-filter-group + .dom-filter-group {
-  margin-top: 16px;
+  margin-top: 0;
   padding-top: 14px;
-  border-top: 1px solid var(--rule-soft);
+  border-top: 1px solid var(--rule);
 }
 .dom-filter-label {
-  margin-bottom: 10px;
+  margin: 0 0 8px;
+  padding: 0;
   color: var(--ink);
   font-size: 12px;
-  font-weight: 750;
+  font-weight: 700;
   letter-spacing: .04em;
+  border: 0;
 }
-/* 两列等宽网格：按钮对齐、宽度一致 */
+/* 全球站同款：自动换行 pill，非整列等宽格子 */
 .dom-filter-chips {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
   width: 100%;
 }
 .dom-filter-chip {
   appearance: none;
   box-sizing: border-box;
-  width: 100%;
+  width: auto;
+  max-width: 100%;
   min-width: 0;
-  min-height: 36px;
+  min-height: 0;
   margin: 0;
-  padding: 7px 8px;
-  border: 1px solid rgba(60, 60, 67, 0.12);
-  border-radius: 10px;
-  background: #f2f2f7;
-  color: rgba(60, 60, 67, 0.85);
-  font-size: 12px;
+  padding: 4px 11px;
+  border: 1px solid var(--rule);
+  border-radius: 7px;
+  background: var(--paper);
+  color: var(--ink-soft);
+  font-size: 11.5px;
   font-weight: 600;
   line-height: 1.25;
   text-align: center;
@@ -6255,30 +6271,29 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   overflow: hidden;
   text-overflow: ellipsis;
   cursor: pointer;
-  transition: background .15s cubic-bezier(0.25, 0.1, 0.25, 1), color .15s;
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
 }
 .dom-filter-chip:hover {
-  background: #e5e5ea;
-  color: #000;
+  border-color: var(--deep);
+  color: var(--ink);
+  background: var(--paper);
 }
-/* 选中态：墨色/暖纸，避免系统亮蓝 #007aff 与学术纸色冲突 */
+/* 选中态：全站统一黑底 */
 .dom-filter-chip.on {
-  background: #27231f;
-  border-color: #27231f;
-  color: #fffdf9;
-  font-weight: 650;
+  background: var(--filter-on);
+  border-color: var(--filter-on);
+  color: var(--filter-on-fg);
+  font-weight: 700;
 }
 .dom-filter-chip:active {
   transform: scale(0.98);
 }
-/* 学科名较长时允许换行，仍保持等高格子感 */
-.dom-filter-group:nth-child(2) .dom-filter-chip {
+/* 学科名较长时可换行 */
+.dom-filter-chips.is-wrap .dom-filter-chip,
+.dom-filter-group.is-subject .dom-filter-chip {
   white-space: normal;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 40px;
-  font-size: 11.5px;
+  text-align: left;
+  line-height: 1.3;
 }
 @media (max-width: 900px) {
   .dom-browse {
@@ -6290,14 +6305,6 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
     max-height: none;
     width: 100%;
     flex: none;
-  }
-  .dom-filter-chips {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-@media (max-width: 560px) {
-  .dom-filter-chips {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 .dom-source-tabs {
@@ -7254,7 +7261,7 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   .tab-panel table.journals tbody { grid-template-columns: 1fr; }
 }
 
-/* 白卡 · 足够高 · 禁止裁切内容 */
+/* 全站统一白卡：上块（刊名/副信息）+ 下块（徽章），高度随信息密度 */
 .tab-panel table.journals tbody tr.j-row,
 .tab-panel table.journals tbody tr.j-row.j-card {
   position: relative;
@@ -7263,10 +7270,10 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   align-items: stretch;
   gap: 0;
   min-width: 0;
-  min-height: 228px;
+  min-height: 0;
   height: 100%;
-  padding: 16px 14px 16px 16px;
-  overflow: visible; /* 勿裁剪徽章/文字 */
+  padding: 0;
+  overflow: hidden;
   background: #ffffff;
   border: 1px solid rgba(60, 60, 67, 0.12);
   border-radius: 16px;
@@ -7290,6 +7297,15 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   padding: 0;
   min-width: 0;
   width: auto;
+}
+/* 地区表：隐藏旧列头，与全球/中国站同一套 2 列卡片网格 */
+.tab-panel table.journals.country-journal-table thead,
+.tab-panel table.journals.regional-directory-table thead,
+.tab-panel table.journals.india-table thead,
+.tab-panel table.journals.korea-table thead,
+.tab-panel table.journals.malaysia-table thead,
+.tab-panel table.journals.cnki-table thead {
+  display: none !important;
 }
 
 /* Home search results: compact cards, independent from full list pages. */
@@ -7568,54 +7584,11 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   cursor: default;
 }
 
-/* 收藏 · 放在 IF 下方，避免与 IF 重叠 */
-.j-row .col-fav {
-  position: absolute;
-  top: 52px; /* IF 块下方 */
-  right: 10px;
-  z-index: 3;
-  width: auto !important;
-}
-.j-row .col-fav .fav-star {
-  width: 32px;
-  height: 32px;
-  min-width: 32px;
-  border-radius: 999px;
-  background: #f2f2f7;
-  border: 0;
-  color: #8e8e93;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 15px;
-}
-.j-row .col-fav .fav-star.on {
-  color: #ff9500;
-  background: rgba(255, 149, 0, 0.14);
-}
-/* 已收藏：上半区（刊名区）略加深 */
-.j-row.j-card:has(.fav-star.on) .j-card-main,
-.j-row.j-card:has(.fav-star.on) {
-  background: linear-gradient(180deg, #f3f0ea 0%, #f3f0ea 58%, #ffffff 58%);
-}
-.j-row.j-card:has(.fav-star.on) .j-card-body {
-  background: transparent;
-}
-.j-row .col-drag {
-  position: absolute;
-  top: 14px;
-  left: 10px;
-  z-index: 2;
-  width: auto !important;
-  color: #c7c7cc;
-  font-size: 14px;
-  cursor: grab;
-}
-.j-row:has(.col-drag) .j-card-main { padding-left: 20px; }
+/* ── 全站统一 j-card 结构（全球/中国/印度/韩国/波兰…同一逻辑）──
+   上块 j-card-head：刊名 + 免费/审稿 + IF + 收藏（浅底，满宽）
+   下块 j-card-body：收录/分区徽章（白底，无整区底色） */
 
-/* 主内容：统一左内边距，保证上下卡片文字起点一致 */
 .j-row .j-card-main,
-.j-row .j-card-head,
 .j-row .col-name {
   display: flex;
   flex-direction: column;
@@ -7623,29 +7596,50 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   width: 100%;
   min-width: 0;
   min-height: 0;
-  /* 右：IF 列 72px + 收藏 36px */
-  padding: 0 108px 0 0;
+  padding: 0 !important;
+  margin: 0;
   background: transparent;
   border: 0;
   box-sizing: border-box;
 }
 
-/* 顶行：刊名占满左栏；IF 绝对定位到卡片最右（收藏星下方） */
-.j-row .j-card-top {
-  position: relative;
-  display: block;
+/* 上块：始终浅底，撑满卡片宽度，到 meta 为止 */
+.j-row .j-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px 12px;
   width: 100%;
   min-width: 0;
-  min-height: 44px;
+  padding: 14px 14px 12px;
+  box-sizing: border-box;
+  background: #f4f2ed;
+  border-radius: 15px 15px 0 0;
 }
-.j-row .j-card-title-block {
+.j-row.j-card-compact .j-card-head {
+  border-radius: 15px;
+  flex: 1 1 auto;
+}
+.j-row .j-card-head-main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.j-row .j-card-head-side {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  max-width: 42%;
+}
+.j-row .j-card-title-block,
+.j-row .j-card-top {
   width: 100%;
   min-width: 0;
-  padding-right: 4px;
 }
 .j-row .jname {
   margin: 0;
-  min-height: 2.56em; /* 固定两行高度，上下卡刊名起点一致 */
+  min-height: 0;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
   font-size: 16px;
   font-weight: 600;
@@ -7671,22 +7665,16 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   text-overflow: ellipsis;
 }
 
-/* IF · 卡片最右侧对齐（在收藏星左侧一列） */
+/* IF / 指标：侧栏流式布局，禁止 absolute 飞出卡片 */
 .j-row .j-card-if {
-  position: absolute;
-  top: 0;
-  right: -100px; /* 落在 main 的 padding-right 区域 */
-  width: 64px;
+  position: static;
+  width: auto;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  justify-content: flex-start;
   text-align: right;
   line-height: 1.1;
-  z-index: 2;
-}
-.j-row .j-card-if.is-empty {
-  visibility: hidden;
 }
 .j-row .j-card-if-label {
   font-size: 10px;
@@ -7697,22 +7685,78 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 }
 .j-row .j-card-if strong {
   margin-top: 2px;
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.03em;
   color: #000;
   white-space: nowrap;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* 刊名下：免费发表 + 审稿周期 同一行 */
+/* 收藏星：始终圆形底色（收藏前后都有） */
+.j-row .j-card-fav,
+.j-row .col-fav {
+  position: static !important;
+  top: auto !important;
+  right: auto !important;
+  width: auto !important;
+  z-index: 1;
+}
+.j-row .j-card-fav .fav-star,
+.j-row .col-fav .fav-star {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  border-radius: 999px;
+  background: #e8e4dc;
+  border: 0;
+  color: #8e8e93;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+}
+.j-row .j-card-fav .fav-star.on,
+.j-row .col-fav .fav-star.on {
+  color: #ff9500;
+  background: rgba(255, 149, 0, 0.18);
+}
+/* 已收藏：仅上块略加深，绝不铺到徽章区 */
+.j-row.j-card:has(.fav-star.on) {
+  background: #ffffff;
+}
+.j-row.j-card:has(.fav-star.on) .j-card-main {
+  background: transparent;
+}
+.j-row.j-card:has(.fav-star.on) .j-card-head {
+  background: #ebe6dc;
+}
+.j-row.j-card:has(.fav-star.on) .j-card-body {
+  background: #ffffff;
+}
+
+.j-row .col-drag {
+  position: absolute;
+  top: 14px;
+  left: 10px;
+  z-index: 2;
+  width: auto !important;
+  color: #c7c7cc;
+  font-size: 14px;
+  cursor: grab;
+}
+.j-row:has(.col-drag) .j-card-head { padding-left: 28px; }
+
+/* meta：免费发表 + 审稿，止于上块 */
 .j-row .j-card-meta-row {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 8px 10px;
   margin-top: 8px;
-  min-height: 22px;
   min-width: 0;
   overflow: visible;
 }
@@ -7741,7 +7785,6 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   font-weight: 500;
   color: rgba(60, 60, 67, 0.75);
 }
-/* 免费发表：放在 meta 行，与审稿并列 */
 .j-row .j-meta-free {
   display: inline-flex !important;
 }
@@ -7758,41 +7801,51 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   display: inline-flex;
   padding: 2px 8px;
   border-radius: 6px;
-  background: #f2f2f7;
+  background: #ebe8e2;
   color: rgba(60, 60, 67, 0.72);
   font-size: 11px;
   font-weight: 600;
 }
 .j-row .j-meta-topic { display: none; }
+.j-row .j-meta-topic-show { display: inline-flex; }
 
-/* 徽章区：收录一行 · 分区一行（勿 display:contents 合并） */
+/* 下块：纯白，收录/分区徽章，无整区底色 */
 .j-row .j-card-body {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   width: 100%;
   min-width: 0;
-  margin-top: 10px;
+  margin: 0;
+  padding: 10px 14px 12px;
   flex: 1 1 auto;
+  background: #ffffff;
+  box-sizing: border-box;
   overflow: visible;
 }
 .j-row .j-card-badges,
 .j-row .col-badge,
 .j-row .col-cross {
   display: flex;
-  flex-direction: column; /* 各 badges-* 分行 */
-  align-items: stretch;
+  flex-direction: column;
+  align-items: flex-start;
   gap: 6px;
   width: 100%;
   min-width: 0;
   max-height: none !important;
   overflow: visible !important;
 }
+/* 地区站若直接塞 badge 子节点：按行内 pill 换行，禁止拉成整条色块 */
+.j-row .j-card-badges:not(:has(.badges)) {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px 6px;
+}
 .j-row .j-card-badges .badge-cell,
 .j-row .j-card-badges .badge-line {
   display: contents;
 }
-/* 每类徽章各自一行换行 */
 .j-row .j-card-badges .badges,
 .j-row .j-card-badges .badges-idx,
 .j-row .j-card-badges .badges-rank,
@@ -7823,19 +7876,23 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .j-row .col-badge .zone,
 .j-row .col-badge .domsrc-pill,
 .j-row .col-badge .xr-pill {
+  display: inline-flex !important;
+  width: auto !important;
+  max-width: 100%;
+  flex: 0 0 auto !important;
   font-size: 11px !important;
   line-height: 1.25 !important;
   padding: 3px 8px !important;
   margin: 0 !important;
-  max-width: none;
   border-radius: 6px !important;
   white-space: nowrap;
-  overflow: visible;
+  overflow: hidden;
+  text-overflow: ellipsis;
   box-sizing: border-box;
 }
 .j-row .j-card-subline {
-  margin-top: auto;
-  padding-top: 4px;
+  margin-top: 2px;
+  padding-top: 0;
   color: rgba(60, 60, 67, 0.45);
   font-size: 12px;
   line-height: 1.35;
@@ -7887,7 +7944,12 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 }
 .tab-panel[data-panel="int"] .th-chk:hover { border-color: var(--deep); color: var(--ink); }
 .tab-panel[data-panel="int"] .th-chk input { display: none; }
-.tab-panel[data-panel="int"] .th-chk:has(input:checked) { background: var(--deep); border-color: var(--deep); color: #fff; font-weight: 700; }
+.tab-panel[data-panel="int"] .th-chk:has(input:checked) {
+  background: var(--filter-on);
+  border-color: var(--filter-on);
+  color: var(--filter-on-fg);
+  font-weight: 700;
+}
 .tab-panel[data-panel="int"] .dd-sep { flex-basis: 100%; height: 0; margin: 1px 0; background: none; border: 0; }
 /* 学科：搜索 + 列表 */
 .tab-panel[data-panel="int"] .th-dropdown-panel-search { display: block !important; }
@@ -7908,7 +7970,9 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   .tab-panel[data-panel="int"] table.journals tbody { padding-top: 4px; }
 }
 @media (max-width: 600px) {
-  .tab-panel table.journals tbody tr.j-row { padding: 13px 92px 13px 14px; }
+  .tab-panel table.journals tbody tr.j-row { padding: 0; }
+  .j-row .j-card-head { padding: 12px 12px 10px; }
+  .j-row .j-card-body { padding: 10px 12px 12px; }
   .j-row .jname { font-size: 14.5px; }
 }
 
@@ -7950,8 +8014,10 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   .tab-panel table.journals tr.j-row {
     min-height: 0;
   }
-  .tab-panel table.journals .col-fav {
-    position: absolute; left: auto; right: 12px; top: 12px; width: auto;
+  .tab-panel table.journals .col-fav,
+  .tab-panel table.journals .j-card-fav {
+    position: static !important;
+    width: auto;
   }
   /* legacy hooks — no-op for j-card rows */
   .tab-panel[data-panel="int"] table.journals .col-if {

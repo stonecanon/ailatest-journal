@@ -3733,12 +3733,13 @@
     return [renderLevelBadges(r), renderRiskBadges(r)].filter(Boolean).join('');
   }
   function renderBadgeCell(indexBadges, rankBadges, accessBadges, riskBadges) {
+    // 每类独立 div，CSS 强制分行：收录 / 分区 / 获取 / 风险
     return [
-      indexBadges ? `<div class="badges badges-idx">${indexBadges}</div>` : '',
-      rankBadges  ? `<div class="badges badges-rank">${rankBadges}</div>`  : '',
-      accessBadges ? `<div class="badges badges-access">${accessBadges}</div>` : '',
-      riskBadges ? `<div class="badges badges-risk">${riskBadges}</div>` : '',
-    ].filter(Boolean).join('') || '<span class="muted-cell">—</span>';
+      indexBadges ? `<div class="badges badges-idx" data-badge-row="index">${indexBadges}</div>` : '',
+      rankBadges  ? `<div class="badges badges-rank" data-badge-row="rank">${rankBadges}</div>`  : '',
+      accessBadges ? `<div class="badges badges-access" data-badge-row="access">${accessBadges}</div>` : '',
+      riskBadges ? `<div class="badges badges-risk" data-badge-row="risk">${riskBadges}</div>` : '',
+    ].filter(Boolean).join('') || '';
   }
 
   function starBtn(r, src = 'int') {
@@ -3908,8 +3909,8 @@
   }
 
   /**
-   * 统一期刊卡片（HIG / iOS-minimal）：
-   * 左：刊名 → 副信息 → 徽章；右上：收藏；右中：IF（始终最右）
+   * 统一期刊卡片：上块（刊名/副信息 | IF+收藏）+ 下块（徽章）
+   * 信息少时自然变矮，同行靠 CSS stretch 对齐，不再绝对定位把 IF 挤出卡片。
    */
   function journalCardRow({
     fid,
@@ -3923,23 +3924,27 @@
     ifHtml = '',
     dragHtml = '',
   }) {
-    return `<tr class="j-row j-card clickable${flagship ? ' row-flagship' : ''}${extraClass ? ` ${extraClass}` : ''}" data-fid="${escape(fid)}" data-src="${escape(src)}">
+    const hasBody = !!(bodyHtml && String(bodyHtml).replace(/\s+/g, ''));
+    return `<tr class="j-row j-card clickable${flagship ? ' row-flagship' : ''}${!hasBody ? ' j-card-compact' : ''}${extraClass ? ` ${extraClass}` : ''}" data-fid="${escape(fid)}" data-src="${escape(src)}">
       ${dragHtml ? `<td class="col-drag">${dragHtml}</td>` : ''}
-      <td class="col-fav">${favHtml}</td>
       <td class="j-card-main col-name">
-        <div class="j-card-top">
-          <div class="j-card-title-block">${nameHtml}</div>
-          ${ifHtml || '<span class="j-card-if is-empty" aria-hidden="true"></span>'}
+        <div class="j-card-head">
+          <div class="j-card-head-main">
+            <div class="j-card-title-block">${nameHtml}</div>
+            ${metaHtml ? `<div class="j-card-meta-row">${metaHtml}</div>` : ''}
+          </div>
+          <div class="j-card-head-side">
+            ${ifHtml || ''}
+            <div class="j-card-fav col-fav">${favHtml || ''}</div>
+          </div>
         </div>
-        ${metaHtml ? `<div class="j-card-meta-row">${metaHtml}</div>` : ''}
-        <div class="j-card-body">${bodyHtml || ''}</div>
+        ${hasBody ? `<div class="j-card-body">${bodyHtml}</div>` : ''}
       </td>
     </tr>`;
   }
 
   function jMetaIf(label, value) {
     if (value == null || value === '' || value === '—') return '';
-    // 卡片右侧专用 IF 块
     return `<div class="j-card-if" title="${escape(label)} ${escape(String(value))}"><span class="j-card-if-label">${escape(label)}</span><strong>${escape(String(value))}</strong></div>`;
   }
   function jMetaText(label, value, cls = '') {
@@ -5048,7 +5053,7 @@
         <aside class="dom-filter-rail" aria-label="${T('筛选','Filters')}">
           <div class="dom-filter-group">
             <div class="dom-filter-label">${T('学科','Subject')}</div>
-            <div class="dom-filter-chips">${subjectChips}</div>
+            <div class="dom-filter-chips is-wrap">${subjectChips}</div>
           </div>
         </aside>
         <div class="dom-filter-main">
@@ -5111,11 +5116,10 @@
     filtered.sort((a, b) => (a.journal_title || '').localeCompare(b.journal_title || '', 'en'));
     const visible = filtered.slice(0, window.__malaysiaShown);
     const total = filtered.length;
-    const sourceButtons = ['mycite_2025', 'mycite_online', 'era_2023'].map(key => {
+    const sourceChips = ['mycite_2025', 'mycite_online', 'era_2023'].map(key => {
       const count = malaysia.counts?.[key] || (malaysia.records[key] || []).length;
-      return `<button type="button" class="dom-source-tab ${sourceKey === key ? 'active' : ''}" data-malaysia-source="${key}">
-        ${escape(malaysiaSourceLabel(key))} <span class="muted-cell">(${Number(count).toLocaleString()})</span>
-      </button>`;
+      const on = sourceKey === key;
+      return `<button type="button" class="dom-filter-chip${on ? ' on' : ''}" data-malaysia-source="${key}">${escape(malaysiaSourceLabel(key))} · ${Number(count).toLocaleString()}</button>`;
     }).join('');
     const rows = visible.map(r => {
       const rec = { ...r, name: r.journal_title, __src: 'my' };
@@ -5147,29 +5151,26 @@
     box.innerHTML = `<div class="section-block malaysia-section">
       ${countrySectionHeader(
         `${t('hero_title_my')} <span class="muted-cell">(${Number(malaysia.counts?.mycite_2025 || 0).toLocaleString()} / ${Number(malaysia.counts?.era_2023 || 0).toLocaleString()})</span>`,
-        t('hero_body_my'),
+        t('hero_body_my') + ` · ${T('显示','Showing')} ${visible.length.toLocaleString()} / ${total.toLocaleString()}`,
       )}
-      <div class="dom-source-tabs country-source-tabs" role="tablist" aria-label="Malaysia directory source">
-        ${sourceButtons}
+      <div class="dom-browse">
+        <aside class="dom-filter-rail" aria-label="${T('筛选','Filters')}">
+          <div class="dom-filter-group">
+            <div class="dom-filter-label">${T('来源','Source')}</div>
+            <div class="dom-filter-chips is-wrap">${sourceChips}</div>
+          </div>
+          ${malaysia.official_pdf?.url ? `<div class="dom-filter-group"><a class="source-link" href="${escape(malaysia.official_pdf.url)}" target="_blank" rel="noopener nofollow">MyCite 2025 PDF</a></div>` : ''}
+        </aside>
+        <div class="dom-filter-main">
+          <div class="table-wrap"><table class="journals malaysia-table country-journal-table" aria-label="${T('马来西亚期刊','Malaysia journals')}"><thead hidden><tr><th></th></tr></thead><tbody>
+            ${rows}
+            ${total === 0 ? `<tr><td class="empty">${T('未找到匹配的马来西亚/ERA 期刊','No matching Malaysia / ERA journals found')}</td></tr>` : ''}
+          </tbody></table></div>
+          ${total > window.__malaysiaShown ? `<div class="pager"><button id="malaysia-more" class="more-btn">${T('加载更多','Load more')} (${total - window.__malaysiaShown} ${T('条剩余','remaining')})</button></div>` : ''}
+          <div class="source-note">${t('malaysia_source_note')}</div>
+          ${years}
+        </div>
       </div>
-      <div class="india-toolbar country-toolbar">
-        <span class="muted-cell">${T('显示','Showing')} ${visible.length.toLocaleString()} / ${total.toLocaleString()}</span>
-        ${malaysia.official_pdf?.url ? `<a class="source-link" href="${escape(malaysia.official_pdf.url)}" target="_blank" rel="noopener nofollow">MyCite 2025 PDF</a>` : ''}
-      </div>
-      <div class="table-wrap"><table class="journals malaysia-table country-journal-table" aria-label="${T('马来西亚期刊','Malaysia journals')}"><thead><tr>
-        <th style="width:36px" aria-label="Favorite"></th>
-        <th>${T('期刊名称','Journal')}</th>
-        <th>${sourceKey === 'era_2023' ? T('FoR 学科','FoR Subjects') : T('出版社','Publisher')}</th>
-        <th>${T('来源','Source')}</th>
-        <th>${T('年份','Year')}</th>
-        <th>ISSN / E-ISSN</th>
-      </tr></thead><tbody>
-        ${rows}
-        ${total === 0 ? `<tr><td colspan="6" class="empty">${T('未找到匹配的马来西亚/ERA 期刊','No matching Malaysia / ERA journals found')}</td></tr>` : ''}
-      </tbody></table></div>
-      ${total > window.__malaysiaShown ? `<div class="pager"><button id="malaysia-more" class="more-btn">${T('加载更多','Load more')} (${total - window.__malaysiaShown} ${T('条剩余','remaining')})</button></div>` : ''}
-      <div class="source-note">${t('malaysia_source_note')}</div>
-      ${years}
     </div>`;
     box.querySelectorAll('[data-malaysia-source]').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -5222,8 +5223,6 @@
     const q = activeQuery.trim().toLowerCase();
     const subjects = (korea.subjects || []).map(item => item.name).filter(Boolean);
     const statuses = ['우수등재', '등재', '등재후보'].filter(status => korea.counts?.status?.[status]);
-    const subjectOptions = subjects.map(subject => `<option value="${escape(subject)}"${activeKoreaSubject === subject ? ' selected' : ''}>${escape(koreaSubjectLabel(subject))} (${Number(korea.counts?.subjects?.[subject] || 0).toLocaleString()})</option>`).join('');
-    const statusOptions = statuses.map(status => `<option value="${escape(status)}"${activeKoreaStatus === status ? ' selected' : ''}>${escape(koreaStatusLabel(status))} (${Number(korea.counts?.status?.[status] || 0).toLocaleString()})</option>`).join('');
     const filtered = korea.records.filter(r => {
       if (activeKoreaSubject !== '__all' && r.subject_group !== activeKoreaSubject) return false;
       if (activeKoreaStatus !== '__all' && r.status !== activeKoreaStatus) return false;
@@ -5260,8 +5259,11 @@
         r.subject && r.subject !== r.subject_group ? r.subject : '',
       ].filter(Boolean).join(' · ');
       const bodyHtml = `
-        <div class="j-card-badges"><span class="domsrc-pill ds-korea">${escape(koreaStatusLabel(r.status))}</span>${limitBadgeHtml(globalBadges, 5)}</div>
-        ${subjectLine ? `<div class="j-card-subline">${escape(subjectLine)}</div>` : ''}`;
+        <div class="j-card-badges">
+          <div class="badges badges-idx"><span class="domsrc-pill ds-korea">${escape(koreaStatusLabel(r.status))}</span>${limitBadgeHtml(renderCoverageBadges(rec), 5)}</div>
+          <div class="badges badges-rank">${limitBadgeHtml(renderLevelBadges(rec), 4)}</div>
+          ${subjectLine ? `<div class="j-card-subline">${escape(subjectLine)}</div>` : ''}
+        </div>`;
       return journalCardRow({
         fid, src: 'kr', extraClass: 'korea-row',
         favHtml: starBtn(rec, 'kr'),
@@ -5271,45 +5273,63 @@
       });
     }).join('');
     const sourceDate = korea.source_updated || '2025-08-25';
+    const subjectChips = [
+      ['__all', T('全部学科','All subjects')],
+      ...subjects.slice(0, 36).map(s => [s, `${koreaSubjectLabel(s)}`]),
+    ].map(([value, label]) => {
+      const on = activeKoreaSubject === value;
+      return `<button type="button" class="dom-filter-chip${on ? ' on' : ''}" data-korea-subject="${escape(value)}">${escape(label)}</button>`;
+    }).join('');
+    const statusChips = [
+      ['__all', T('全部等级','All statuses')],
+      ...statuses.map(s => [s, koreaStatusLabel(s)]),
+    ].map(([value, label]) => {
+      const on = activeKoreaStatus === value;
+      return `<button type="button" class="dom-filter-chip${on ? ' on' : ''}" data-korea-status="${escape(value)}">${escape(label)}</button>`;
+    }).join('');
     box.innerHTML = `<div class="section-block korea-section">
       ${countrySectionHeader(
         `${T('韩国 KCI 期刊目录','Korea KCI Journal Directory')} <span class="muted-cell">(${Number(korea.counts?.records || korea.records.length).toLocaleString()})</span>`,
-        T('韩国研究财团 KCI 官方期刊与引文指标数据。','Official KCI journal and citation indicators from the National Research Foundation of Korea.'),
+        T('韩国研究财团 KCI 官方期刊与引文指标数据。','Official KCI journal and citation indicators from the National Research Foundation of Korea.')
+          + ` · ${T('显示','Showing')} ${visible.length.toLocaleString()} / ${filtered.length.toLocaleString()}`,
       )}
-      <div class="india-toolbar country-toolbar korea-toolbar">
-        <select id="korea-subject-select" class="th-select" aria-label="${T('韩国期刊学科','Korea journal subject')}">
-          <option value="__all">${T('全部学科','All subjects')}</option>${subjectOptions}
-        </select>
-        <select id="korea-status-select" class="th-select" aria-label="${T('KCI 等级','KCI status')}">
-          <option value="__all">${T('全部 KCI 等级','All KCI statuses')}</option>${statusOptions}
-        </select>
-        <span class="muted-cell">${T('显示','Showing')} ${visible.length.toLocaleString()} / ${filtered.length.toLocaleString()}</span>
-        <a class="source-link" href="${escape(korea.source_pages?.kci_journals || 'https://www.data.go.kr/data/3049043/fileData.do')}" target="_blank" rel="noopener nofollow">${T('官方数据','Official data')}</a>
+      <div class="dom-browse">
+        <aside class="dom-filter-rail" aria-label="${T('筛选','Filters')}">
+          <div class="dom-filter-group">
+            <div class="dom-filter-label">${T('KCI 等级','KCI status')}</div>
+            <div class="dom-filter-chips">${statusChips}</div>
+          </div>
+          <div class="dom-filter-group is-subject">
+            <div class="dom-filter-label">${T('学科','Subject')}</div>
+            <div class="dom-filter-chips is-wrap">${subjectChips}</div>
+          </div>
+          <div class="dom-filter-group">
+            <a class="source-link" href="${escape(korea.source_pages?.kci_journals || 'https://www.data.go.kr/data/3049043/fileData.do')}" target="_blank" rel="noopener nofollow">${T('官方数据','Official data')}</a>
+          </div>
+        </aside>
+        <div class="dom-filter-main">
+          <div class="table-wrap"><table class="journals korea-table country-journal-table" aria-label="${T('韩国 KCI 期刊','Korea KCI journals')}"><thead hidden><tr><th></th></tr></thead><tbody>
+            ${rows}
+            ${filtered.length === 0 ? `<tr><td class="empty">${T('未找到匹配的韩国期刊','No matching Korea journals found')}</td></tr>` : ''}
+          </tbody></table></div>
+          ${filtered.length > window.__koreaShown ? `<div class="pager"><button id="korea-more" class="more-btn">${T('加载更多','Load more')} (${filtered.length - window.__koreaShown} ${T('条剩余','remaining')})</button></div>` : ''}
+          <div class="source-note">${T('来源：韩国研究财团 KCI 官方公开数据；数据日期','Source: official public KCI data from the National Research Foundation of Korea; source date')} ${escape(sourceDate)} · ${T('KCI IF 为 2 年影响力指数，不等同于 JCR Impact Factor。','KCI IF is the two-year KCI impact metric and is not the JCR Impact Factor.')}</div>
+        </div>
       </div>
-      <div class="table-wrap"><table class="journals korea-table country-journal-table" aria-label="${T('韩国 KCI 期刊','Korea KCI journals')}"><thead><tr>
-        <th style="width:36px" aria-label="Favorite"></th>
-        <th>${T('期刊名称','Journal')}</th>
-        <th>${T('出版社','Publisher')}</th>
-        <th>KCI / ${T('国际收录','Global indexes')}</th>
-        <th>${T('学科','Subject')}</th>
-        <th>KCI IF</th>
-        <th>ISSN / E-ISSN</th>
-      </tr></thead><tbody>
-        ${rows}
-        ${filtered.length === 0 ? `<tr><td colspan="7" class="empty">${T('未找到匹配的韩国期刊','No matching Korea journals found')}</td></tr>` : ''}
-      </tbody></table></div>
-      ${filtered.length > window.__koreaShown ? `<div class="pager"><button id="korea-more" class="more-btn">${T('加载更多','Load more')} (${filtered.length - window.__koreaShown} ${T('条剩余','remaining')})</button></div>` : ''}
-      <div class="source-note">${T('来源：韩国研究财团 KCI 官方公开数据；数据日期','Source: official public KCI data from the National Research Foundation of Korea; source date')} ${escape(sourceDate)} · ${T('KCI IF 为 2 年影响力指数，不等同于 JCR Impact Factor。','KCI IF is the two-year KCI impact metric and is not the JCR Impact Factor.')}</div>
     </div>`;
-    $('#korea-subject-select')?.addEventListener('change', event => {
-      activeKoreaSubject = event.target.value;
-      window.__koreaShown = 100;
-      renderKorea();
+    box.querySelectorAll('[data-korea-subject]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeKoreaSubject = btn.getAttribute('data-korea-subject') || '__all';
+        window.__koreaShown = 100;
+        renderKorea();
+      });
     });
-    $('#korea-status-select')?.addEventListener('change', event => {
-      activeKoreaStatus = event.target.value;
-      window.__koreaShown = 100;
-      renderKorea();
+    box.querySelectorAll('[data-korea-status]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeKoreaStatus = btn.getAttribute('data-korea-status') || '__all';
+        window.__koreaShown = 100;
+        renderKorea();
+      });
     });
     $('#korea-more')?.addEventListener('click', () => {
       window.__koreaShown += 100;
@@ -5376,10 +5396,16 @@
       const metaHtml = [
         row.issn ? jMetaChip(`ISSN ${row.issn}`, 'j-meta-id') : '',
       ].filter(Boolean).join('');
-      const bodyHtml = `<div class="j-card-badges"><span class="domsrc-pill regional-source-pill">${escape(config.badge)}</span>${limitBadgeHtml(globalBadges, 5)}</div>`;
-      const ifHtmlClean = metric
-        ? `<div class="j-card-if" title="${escape(metric)}"><span class="j-card-if-label">${T('指标','Metric')}</span><strong style="font-size:13px;max-width:92px;overflow:hidden;text-overflow:ellipsis">${escape(metric)}</strong></div>`
-        : '';
+      // 与全球站一致：来源 pill + 索引/分区分行，禁止直接把 badge 堆成竖条
+      const bodyHtml = `<div class="j-card-badges">
+        <div class="badges badges-idx"><span class="domsrc-pill regional-source-pill">${escape(config.badge)}</span>${limitBadgeHtml(globalBadges ? renderCoverageBadges(rec) : '', 6)}</div>
+        ${globalBadges ? `<div class="badges badges-rank">${limitBadgeHtml(renderLevelBadges(rec), 5)}</div>` : ''}
+      </div>`;
+      // 指标进 IF 位（短标签），与全球 IF 同一布局
+      let ifHtmlClean = '';
+      if (source === 'pbn' && row.points != null) ifHtmlClean = jMetaIf(T('分值', 'Pts'), row.points);
+      else if (source === 'isc' && row.h_index != null) ifHtmlClean = jMetaIf('H', row.h_index);
+      else if (metric) ifHtmlClean = jMetaIf(T('指标', 'Metric'), metric);
       return journalCardRow({
         fid, src: source, extraClass: 'regional-directory-row',
         favHtml: starBtn(rec, source),
@@ -5398,8 +5424,8 @@
         <span class="muted-cell">${T('显示', 'Showing')} ${visible.length.toLocaleString()} / ${filtered.length.toLocaleString()}</span>
         <a class="source-link" href="${escape(data.source_url)}" target="_blank" rel="noopener nofollow">${T('官方目录', 'Official directory')}</a>
       </div>
-      <div class="table-wrap"><table class="journals country-journal-table regional-directory-table" aria-label="${escape(T(...config.title))}"><thead><tr><th></th><th>${T('期刊名称', 'Journal')}</th><th>${T('目录信息', 'Directory information')}</th><th>ISSN / E-ISSN</th></tr></thead><tbody>
-        ${rows || `<tr><td colspan="4" class="empty">${T('未找到匹配期刊', 'No matching journals found')}</td></tr>`}
+      <div class="table-wrap"><table class="journals country-journal-table regional-directory-table" aria-label="${escape(T(...config.title))}"><thead hidden><tr><th></th></tr></thead><tbody>
+        ${rows || `<tr><td class="empty">${T('未找到匹配期刊', 'No matching journals found')}</td></tr>`}
       </tbody></table></div>
       ${filtered.length > shown ? `<div class="pager"><button id="${source}-more" class="more-btn">${T('加载更多', 'Load more')} (${(filtered.length - shown).toLocaleString()} ${T('条剩余', 'remaining')})</button></div>` : ''}
       <div class="source-note">${T('名单成员完全以该机构官方目录为准；全球库仅用于补充交叉收录徽章。', 'Membership follows this institution\'s official directory only; the global database is used solely for optional cross-index badges.')} ${sourceYear}</div>
@@ -5781,8 +5807,10 @@
         const name = r.name || '';
         const displayCats = (r.major_categories || []).length ? r.major_categories : (r.categories || []);
         const catLine = displayCats.slice(0, 2).join(' · ');
-        const nameHtml = `<div class="jname cnki-name">${escape(name)}</div>${catLine ? `<span class="jname-cn">${escape(catLine)}</span>` : ''}`;
+        const nameHtml = `<div class="jname cnki-name">${escape(name)}</div>`;
+        // 学科放 meta；徽章有则下块，无徽章也不强撑空卡
         const metaHtml = [
+          catLine ? jMetaChip(catLine, 'j-meta-topic-show') : '',
           r.issn ? jMetaChip(`ISSN ${r.issn}`, 'j-meta-id') : '',
           r.cn_code ? jMetaChip(`CN ${r.cn_code}`, 'j-meta-id') : '',
         ].filter(Boolean).join('');
