@@ -9883,7 +9883,8 @@
 
     async function fetchAiPick(query) {
       const controller = typeof AbortController === 'function' ? new AbortController() : null;
-      const timer = controller ? setTimeout(() => controller.abort(), 22000) : null;
+      // 单次 DeepSeek + 本地排序，通常 3–8s；15s 超时避免长时间卡住
+      const timer = controller ? setTimeout(() => controller.abort(), 15000) : null;
       const request = {
         method: 'POST',
         headers: {
@@ -9897,6 +9898,7 @@
           limit: 80,
           language: pickReportLang(),
           locale: lang,
+          ai_report: false, // 默认跳过第二次大模型润色，换速度
         }),
       };
       let res;
@@ -9958,19 +9960,27 @@
     }
 
     function pickAiErrorMessage(error) {
+      const msg = String(error?.message || error?.data?.error || '');
+      const detail = String(error?.data?.detail || '');
       if (error?.status === 401 || error?.status === 403) {
+        // 登录失效 vs DeepSeek 密钥失败
+        if (/deepseek|api.?key|not configured/i.test(msg + detail)) {
+          return t('pick_ai_config_error');
+        }
         doLogout();
         return t('pick_ai_auth_error');
       }
       if (error?.status === 429) return t('pick_ai_quota_error');
       if (error?.name === 'AbortError') {
-        return T('AI 分析超时，已先使用本地候选生成报告。','AI analysis timed out; generated the report from local candidates first.');
+        return T('AI 分析超时，已改用本地匹配。','AI analysis timed out; switched to local matching.');
       }
-      if (error?.status === 503 || /api[_ -]?key|secret|not configured/i.test(error?.message || '')) {
+      if (
+        error?.status === 503
+        || /deepseek_auth_failed|not configured|DEEPSEEK|invalid.*key|authentication/i.test(msg + detail)
+      ) {
         return t('pick_ai_config_error');
       }
-      // fetch 本身失败（断网/代理/被墙）→ TypeError: Failed to fetch
-      if (error instanceof TypeError && /fetch|network/i.test(error?.message || '')) {
+      if (error instanceof TypeError && /fetch|network/i.test(msg)) {
         return T('AI 推荐网络请求失败（请检查网络或代理），已自动改用本地匹配。','AI request failed at network level (check connection/proxy); switched to local matching.');
       }
       return t('pick_ai_unavailable');
@@ -10363,12 +10373,6 @@
       results.innerHTML = '';
 
       try {
-        // Lazy-load local topic snapshot for richer journal profiles. No live API calls.
-        if (!oaMap) {
-          setPickProgress(T('加载本地期刊画像…','Loading local journal profiles…'), 18);
-          await loadOaMap();
-        }
-
         let entries = null;
         let pickMode = 'local';
         let quotaInfo = null;
@@ -10381,9 +10385,11 @@
           statusNotice = t('pick_ai_login');
         } else if (useAi) {
           try {
-            setPickProgress(T('AI 正在分析研究语义…','AI is analyzing research context…'), 34);
+            setPickProgress(T('AI 正在分析研究语义并匹配期刊…','AI is analyzing the topic and matching journals…'), 30);
+            // 确保完整期刊库已加载（AI 解析在服务端，本地只做结果解析）
+            if (!journalsReady) await ensureJournalsLoaded();
             const aiData = await fetchAiPick(query);
-            setPickProgress(T('整理 AI 推荐梯队…','Organizing AI recommendation tiers…'), 72);
+            setPickProgress(T('整理推荐梯队…','Organizing recommendation tiers…'), 78);
             entries = aiEntriesFromResults(aiData);
             pickMode = 'ai';
             quotaInfo = aiData.quota || null;
@@ -10397,8 +10403,14 @@
         }
 
         if (!entries) {
-          setPickProgress(T('匹配本地候选期刊…','Matching local candidate journals…'), 45);
-          // 本地匹配：词干化 + 标题短语 + 歧义词消歧 + 领域锚点，逻辑在 js/pick-match.js（与 Worker 共用）。
+          setPickProgress(T('匹配本地候选期刊…','Matching local candidate journals…'), 48);
+          if (!journalsReady) await ensureJournalsLoaded();
+          // 本地匹配时再加载 OA 画像（AI 成功则不必等这个大文件）
+          if (!oaMap) {
+            setPickProgress(T('加载期刊主题画像…','Loading topic profiles…'), 55);
+            await loadOaMap().catch(() => null);
+          }
+          // 本地匹配：词干化 + 中文 n-gram + 歧义词消歧 + 领域锚点
           const PM = window.PickMatch;
           if (!PM) {
             setPickProgress(T('本地匹配模块加载失败，请刷新页面重试','Local matching module failed to load. Please refresh.'), 0);
@@ -10422,15 +10434,22 @@
           }
 
           entries = [];
-          for (const r of journals) {
+          const pool = journals || [];
+          const n = pool.length;
+          for (let i = 0; i < n; i++) {
+            const r = pool[i];
+            // 优先有学科/索引信息的刊，减少无关刊噪声
+            const idx = r.indices || [];
+            if (!idx.length && !(r.wos_categories || []).length && !r.cas_major_cn) continue;
             const topics = localTopicProfile(r);
             const res = PM.scoreLocal(r, localProfile, topics);
             if (!PM.passesLocalThreshold(res, localProfile)) continue;
             let score = res.score;
-            const idx = r.indices || [];
-            if (idx.includes('SCIE') || idx.includes('SSCI') || idx.includes('AHCI') || idx.includes('ESCI')) score *= 1.10;
-            if (r.cas_zone === 1 || r.if_quartile === 'Q1') score *= 1.06;
-            if (r.warning || r.citic_warning || r.on_hold || r.under_review) score *= 0.72;
+            if (idx.includes('SCIE') || idx.includes('SSCI') || idx.includes('AHCI') || idx.includes('ESCI')) score *= 1.12;
+            if (r.cas_zone === 1 || r.if_quartile === 'Q1') score *= 1.08;
+            if (r.warning || r.citic_warning || r.on_hold || r.under_review) score *= 0.65;
+            // 只要命中强，且匹配词过少则降权
+            if (res.matched.length < 2) score *= 0.7;
             entries.push({
               journalRec: r,
               issn: r.issn || r.eissn || favId(r),
@@ -10445,7 +10464,18 @@
               score,
               srcName: r.name,
             });
+            // 进度条：避免主线程长时间无反馈
+            if (i > 0 && i % 4000 === 0) {
+              setPickProgress(
+                T(`本地匹配中… ${Math.min(99, Math.round(i / n * 100))}%`, `Local matching… ${Math.min(99, Math.round(i / n * 100))}%`),
+                55 + Math.round((i / n) * 25),
+              );
+              await new Promise(r => setTimeout(r, 0));
+            }
           }
+          // 只保留分数较高的前 200，避免「几千候选」稀释观感
+          entries.sort((a, b) => b.score - a.score);
+          if (entries.length > 200) entries = entries.slice(0, 200);
         }
 
         setPickProgress(T('应用索引与费用筛选…','Applying index and fee filters…'), 82);

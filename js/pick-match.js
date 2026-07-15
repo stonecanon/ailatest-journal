@@ -253,6 +253,23 @@
     var titleTokens = tokenize(title);
     var bodyTokens = tokenize(body);
 
+    // 中文题名：2–4 字滑窗作领域信号（否则纯中文几乎抽不到 term）
+    function addCjkNgrams(text, baseWeight) {
+      var pure = String(text || '').replace(/[^\u4e00-\u9fff]/g, '');
+      if (pure.length < 2) return;
+      var maxN = pure.length >= 8 ? 4 : 3;
+      for (var n = 2; n <= maxN; n++) {
+        for (var i = 0; i + n <= pure.length && i < 24; i++) {
+          var gram = pure.slice(i, i + n);
+          // 过短泛词跳过
+          if (/^(研究|分析|基于|方法|模型|系统|问题|影响|发展|应用|中国|我国|情况|结果)$/.test(gram)) continue;
+          addTerm(gram, baseWeight + (n >= 3 ? 0.6 : 0), { phrase: n >= 3, explicit: false });
+        }
+      }
+    }
+    if (hasCjk(title)) addCjkNgrams(title, 3.5);
+    if (hasCjk(body)) addCjkNgrams(body.slice(0, 200), 2.2);
+
     // bigram phrases from the title: strongest signal after explicit keywords
     var phraseCount = 0;
     for (var p = 0; p + 1 < titleTokens.length && phraseCount < 8; p++) {
@@ -356,8 +373,10 @@
 
   function passesLocalThreshold(result, profile) {
     if (!result || result.score <= 0 || !result.matched.length) return false;
-    if (result.strong >= profile.minStrong) return true;
-    return result.strong >= 1 && (result.phraseHit || result.explicitHit);
+    // 提高门槛：至少 2 个无歧义命中，或短语/显式关键词 + 1 个强命中
+    if (result.strong >= Math.max(2, profile.minStrong || 1)) return true;
+    if (result.strong >= 1 && result.score >= 4.5 && (result.phraseHit || result.explicitHit)) return true;
+    return result.strong >= 2;
   }
 
   return {

@@ -324,29 +324,100 @@ function normalizeProfile(profile) {
   return out;
 }
 
-async function extractProfile(apiKey, query, context) {
-  const res = await trackedDeepseekChat(apiKey, [
-    {
-      role: 'system',
-      content: `你是学术期刊荐刊系统的语义解析器。请把论文标题/摘要转成期刊匹配画像，而不是做普通关键词抽取。
+const PROFILE_SYSTEM = `你是学术期刊荐刊系统的语义解析器。把论文标题/摘要转成期刊匹配画像（不是普通关键词抽取）。
 
-关键要求：
-- 先识别研究对象和学科语境，再决定关键词。network、system、model、mechanism、structure 等词必须按语境消歧：
-  例如经济/区域语境下的 "network" 指经济空间网络，应排除 computer networks、telecommunications 等错误方向（放入 negative_keywords）。
-- domain_keywords 要使用能匹配期刊学科分类的词（如 economic geography、regional science、transportation economics），
-  不要输出 formation、mechanism、analysis 这类跨学科通用方法词。
-- wos_categories 给出最可能的 Web of Science 学科类目。
-- 交叉学科论文请覆盖所有相关方向（如同时给出地理、交通、经济类目）。
-- 只调用函数，不要输出普通文本。`,
-    },
-    { role: 'user', content: query },
-  ], { tools: [semanticTool()], temperature: 0.05, maxTokens: 900, model: context.model }, { ...context, step: 'profile', feature: 'pick_profile' });
-  const msg = res?.choices?.[0]?.message;
-  const call = msg?.tool_calls?.[0];
-  if (call?.function?.name === 'extract_journal_recommendation_profile') {
-    return normalizeProfile(JSON.parse(call.function.arguments || '{}'));
+硬性要求：
+- 先识别研究对象与学科语境，再决定关键词。network/system/model/mechanism 等词必须消歧：
+  经济/区域语境的 network → economic/regional networks，negative_keywords 写入 computer networks、telecommunications 等错误方向。
+- domain_keywords 用能对上期刊学科分类的英文短语（如 economic geography, urban studies），禁止 analysis/mechanism/formation 等泛方法词。
+- wos_categories 填最可能的 Web of Science 类目英文名。
+- 交叉学科请同时给出多个相关类目。
+- research_fields 2-6 个；domain_keywords 4-12 个；negative_keywords 2-8 个。`;
+
+async function extractProfile(apiKey, query, context) {
+  // 1) 优先 tool calling（结构化）
+  try {
+    const res = await trackedDeepseekChat(apiKey, [
+      { role: 'system', content: PROFILE_SYSTEM + '\n只调用函数 extract_journal_recommendation_profile，不要输出普通文本。' },
+      { role: 'user', content: query },
+    ], {
+      tools: [semanticTool()],
+      temperature: 0.05,
+      maxTokens: 700,
+      model: context.model,
+    }, { ...context, step: 'profile_tool', feature: 'pick_profile' });
+    const call = res?.choices?.[0]?.message?.tool_calls?.[0];
+    if (call?.function?.name === 'extract_journal_recommendation_profile') {
+      const profile = normalizeProfile(JSON.parse(call.function.arguments || '{}'));
+      if (profile) return profile;
+    }
+  } catch (e) {
+    console.warn('pick profile tool failed:', e?.message || e);
+  }
+
+  // 2) JSON 模式回退（DeepSeek tool 偶发失败时仍可用）
+  try {
+    const res = await trackedDeepseekChat(apiKey, [
+      {
+        role: 'system',
+        content: `${PROFILE_SYSTEM}
+
+只输出一个 JSON 对象，键为：
+research_fields, wos_categories, target_indices, domain_keywords, negative_keywords, explanation
+不要 markdown。target_indices 只能是 SCIE/SSCI/ESCI/AHCI 的子集。`,
+      },
+      { role: 'user', content: query },
+    ], {
+      temperature: 0.05,
+      maxTokens: 700,
+      jsonOutput: true,
+      model: context.model,
+    }, { ...context, step: 'profile_json', feature: 'pick_profile' });
+    const content = res?.choices?.[0]?.message?.content || '';
+    const start = content.indexOf('{');
+    const end = content.lastIndexOf('}');
+    if (start >= 0 && end > start) {
+      return normalizeProfile(JSON.parse(content.slice(start, end + 1)));
+    }
+  } catch (e) {
+    console.warn('pick profile json failed:', e?.message || e);
   }
   return null;
+}
+
+/** 无第二次大模型调用：用排序结果快速生成三档报告，显著降低时延 */
+function buildFastReport(profile, ranked, lang = 'zh') {
+  const zh = lang !== 'en';
+  const reasonOf = (r) => {
+    const m = (r.matched || []).slice(0, 3).join(zh ? '、' : ', ');
+    return m || (zh ? '学科方向匹配' : 'Field match');
+  };
+  const items = (slice) => slice.map(r => ({ name: r.name, reason: reasonOf(r) }));
+  const clean = ranked.filter(r => !r.warning);
+  const pool = clean.length >= 8 ? clean : ranked;
+  return {
+    intro: profile.explanation
+      || (zh
+        ? `根据语义画像（${(profile.research_fields || []).slice(0, 3).join('、') || '研究主题'}）匹配的目标期刊梯度。`
+        : `Tiered targets matched to the semantic profile (${(profile.research_fields || []).slice(0, 3).join(', ') || 'topic'}).`),
+    tiers: [
+      { id: 'primary', label: zh ? '优先主投' : 'Primary targets', items: items(pool.slice(0, 6)) },
+      { id: 'backup', label: zh ? '稳妥备选' : 'Solid backups', items: items(pool.slice(6, 14)) },
+      { id: 'fallback', label: zh ? '保底期刊' : 'Safer fallbacks', items: items(pool.slice(14, 20)) },
+    ].filter(t => t.items.length),
+    chinese: [],
+    strategy: zh
+      ? [
+          '按「主投 → 备选 → 保底」梯度投稿，主投优先选学科最贴合且分区合理的刊。',
+          '若审稿周期或 APC 敏感，在备选中优先看 FREE/低 APC 与非预警刊。',
+          '交叉学科可主投交叉类目期刊，备选覆盖各单学科顶刊/二区。',
+        ]
+      : [
+          'Submit in tiers: primary → backup → fallback; prioritize best field fit.',
+          'If APC or review time matters, prefer FREE/low-APC non-warning titles in backups.',
+          'For interdisciplinary work, keep primary at the intersection and backups in each parent field.',
+        ],
+  };
 }
 
 // ─── Step 2: local ranking against the profile ───
@@ -401,9 +472,12 @@ function scoreJournal(j, profile) {
   if (j.cas_zone === 1) score += 5;
   else if (j.cas_zone === 2) score += 3;
   if (j.cas_top) score += 2;
-  if (Number(j.if_2024) > 0) score += Math.min(4, Math.log1p(Number(j.if_2024)));
-  if (j.warning || j.citic_warning || j.on_hold || j.under_review) score *= 0.65;
-  if (negHits.length) score *= 0.45;
+  const ifVal = Number(j.if_2025 != null ? j.if_2025 : j.if_2024);
+  if (ifVal > 0) score += Math.min(4, Math.log1p(ifVal));
+  // 无任何学科类目的刊降权，减少“名气刊/综合刊”刷榜
+  if (!(j.wos_categories || []).length && !j.esi_category && !j.jcr_cat) score *= 0.75;
+  if (j.warning || j.citic_warning || j.on_hold || j.under_review) score *= 0.55;
+  if (negHits.length) score *= 0.4;
 
   return { score, matched: unique(matched, 10), negHits };
 }
@@ -542,12 +616,23 @@ async function generateReport(apiKey, query, profile, ranked, context) {
 
 // ─── handler ───
 
+function resolveDeepseekKey(env) {
+  const raw = env?.DEEPSEEK_API_KEY || env?.DEEPSEEK_KEY || env?.DEEPSEEK_TOKEN || '';
+  return String(raw).trim();
+}
+
 export async function handlePick(req, env, opts = {}) {
   if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS });
   if (req.method !== 'POST') return json({ ok: false, error: 'POST only' }, 405);
 
-  const apiKey = env.DEEPSEEK_API_KEY;
-  if (!apiKey) return json({ ok: false, error: 'AI service not configured' }, 503);
+  const apiKey = resolveDeepseekKey(env);
+  if (!apiKey || apiKey.length < 12) {
+    return json({
+      ok: false,
+      error: 'AI service not configured',
+      detail: 'DEEPSEEK_API_KEY missing or empty on Worker',
+    }, 503);
+  }
   const model = cleanText(env.DEEPSEEK_PICK_MODEL || env.DEEPSEEK_MODEL || DEFAULT_PICK_MODEL, 80) || DEFAULT_PICK_MODEL;
 
   let body;
@@ -559,13 +644,8 @@ export async function handlePick(req, env, opts = {}) {
 
   const query = cleanText(body?.query || body?.title || '', 4000);
   if (!query || query.length < 6) return json({ ok: false, error: 'Query required' }, 400);
-
-  let journals;
-  try {
-    journals = await loadJournals(env);
-  } catch (e) {
-    return json({ ok: false, error: `Data load failed: ${e.message}` }, 500);
-  }
+  const wantAiReport = body?.ai_report === true; // 默认关闭第二次大模型，显著降时延
+  const lang = cleanText(body?.language || body?.locale || 'zh', 8).startsWith('en') ? 'en' : 'zh';
 
   let quota = null;
   let refund = null;
@@ -590,29 +670,52 @@ export async function handlePick(req, env, opts = {}) {
     pricing: deepseekPricing(env),
   };
 
+  // 并行：拉期刊库 + 语义画像（最大时延约等于 max(库加载, 一次 DeepSeek)）
+  let journals;
   let profile = null;
+  let profileError = '';
   try {
-    profile = await extractProfile(apiKey, query, usageContext);
+    const pair = await Promise.all([
+      loadJournals(env),
+      extractProfile(apiKey, query, usageContext).catch((e) => {
+        profileError = e?.message || String(e);
+        console.warn('pick semantic extraction failed:', profileError);
+        return null;
+      }),
+    ]);
+    journals = pair[0];
+    profile = pair[1];
   } catch (e) {
-    console.warn('pick semantic extraction failed:', e?.message || e);
-  }
-  if (!profile) {
-    // AI unavailable → give the credit back and let the client fall back to local matching.
     if (refund) await refund();
-    return json({ ok: false, error: 'ai_unavailable', fallback: 'local' }, 502);
+    return json({ ok: false, error: `Data load failed: ${e.message}` }, 500);
   }
 
-  const limit = clamp(body?.limit || 120, 20, 160);
+  if (!profile) {
+    if (refund) await refund();
+    const authFail = /401|403|invalid.*key|authentication|unauthorized/i.test(profileError);
+    return json({
+      ok: false,
+      error: authFail ? 'deepseek_auth_failed' : 'ai_unavailable',
+      detail: profileError.slice(0, 200),
+      fallback: 'local',
+    }, authFail ? 503 : 502);
+  }
+
+  const limit = clamp(body?.limit || 80, 20, 120);
   const filters = body?.filters && typeof body.filters === 'object' ? body.filters : {};
   const results = rankJournals(journals, profile, filters, limit);
 
-  let report = null;
-  if (results.length) {
+  let report = buildFastReport(profile, results, lang);
+  // 可选：第二次大模型润色报告（默认关，避免 10s+ 等待）
+  if (wantAiReport && results.length) {
     try {
-      report = await generateReport(apiKey, query, profile, results, {
+      const polished = await generateReport(apiKey, query, profile, results, {
         ...usageContext,
-        termsCount: (profile.research_fields || []).length + (profile.wos_categories || []).length + (profile.domain_keywords || []).length,
+        termsCount: (profile.research_fields || []).length
+          + (profile.wos_categories || []).length
+          + (profile.domain_keywords || []).length,
       });
+      if (polished) report = polished;
     } catch (e) {
       console.warn('pick report generation failed:', e?.message || e);
     }
@@ -627,5 +730,6 @@ export async function handlePick(req, env, opts = {}) {
     total: results.length,
     shown: results.length,
     quota,
+    timing: { report: wantAiReport ? 'ai' : 'fast' },
   });
 }
