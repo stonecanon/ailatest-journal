@@ -3,344 +3,334 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>订阅即将开放 | AILatest Journal</title>
-<meta name="description" content="AILatest Journal 订阅功能即将开放。当前主推浏览器插件内测版，可在 Google Scholar、PubMed、知网等页面显示期刊徽章。" />
+<title>订阅与定价（初版预览）| AILatest Journal</title>
+<meta name="description" content="AILatest Journal 订阅初版：Free / Pro / Max 三档。期刊检索永久免费；Pro 解锁中科院与预警；Max 含 AI 荐刊额度。" />
 <meta name="robots" content="noindex,nofollow" />
 <link rel="canonical" href="https://journal.ailatest.org/pricing.html" />
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
-<link rel="stylesheet" href="/css/static.css?v=20260715-foot-line" />
+<link rel="stylesheet" href="/css/static.css?v=20260715-pricing-fpm" />
+<style>
+  body[data-static-page="pricing"] main.pricing-main {
+    max-width: 1080px;
+    padding-top: 8px;
+  }
+  .pricing-banner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+    align-items: center;
+    margin: 18px 0 8px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px dashed var(--accent-line);
+    background: var(--accent-bg);
+    font-size: 13px;
+    color: var(--ink);
+  }
+  .pricing-banner strong {
+    font-size: 12px;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--link);
+  }
+  .plans.plans-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: 20px;
+  }
+  @media (max-width: 900px) {
+    .plans.plans-3 { grid-template-columns: 1fr; }
+  }
+  .plan .price-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .plan .edu {
+    font-size: 12.5px;
+    color: var(--muted);
+    margin: 0 0 10px;
+  }
+  .plan li .dim { color: var(--muted); }
+  .plan .lock {
+    color: #a05a2b;
+    font-weight: 650;
+  }
+  .compare-wrap { overflow-x: auto; margin: 12px 0 28px; }
+  .compare-wrap table { min-width: 640px; }
+  .ai-box {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin: 12px 0 28px;
+  }
+  .ai-box ul { margin: 8px 0 0; }
+</style>
 </head>
 <body data-static-page="pricing">
-<aside class="site-rail" aria-label="Primary navigation">
-  <nav class="site-rail-top" aria-label="站点">
-    <a class="site-rail-link" href="/global"><span>◎</span><b>全球</b></a>
-    <a class="site-rail-link" href="/cn"><span>CN</span><b>中国</b></a>
-    <details class="site-rail-region">
-      <summary class="site-rail-link"><span>···</span><b>地区 ▾</b></summary>
-      <div class="site-rail-region-menu">
-        <a href="/in"><span>IN</span><b>印度</b></a>
-        <a href="/my"><span>MY</span><b>马来西亚</b></a>
-        <a href="/kr"><span>KR</span><b>韩国</b></a>
-      </div>
-    </details>
+<aside class="app-rail" aria-label="Primary navigation">
+  <nav class="rail-top" aria-label="站点">
+    <a class="rail-nav-btn" href="/global" aria-label="全球期刊" title="全球期刊">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 3.4 9A14 14 0 0 1 12 21a14 14 0 0 1-3.4-9A14 14 0 0 1 12 3Z"/></svg>
+      <span data-static-i18n="rail_global">全球</span>
+    </a>
+    <a class="rail-nav-btn rail-region-station" data-region-station="dom" href="/cn" aria-label="中国期刊" title="中国期刊">
+      <span class="rail-flag" aria-hidden="true">CN</span>
+      <span data-static-i18n="rail_china">中国</span>
+    </a>
+    <div class="rail-region-picker">
+      <button class="rail-nav-btn rail-region-toggle" type="button" aria-label="地区站点" title="地区站点" aria-expanded="false">
+        <span class="rail-flag rail-region-symbol" aria-hidden="true">···</span>
+        <span><span data-static-i18n="rail_regions">地区</span><b class="rail-caret" aria-hidden="true">▾</b></span>
+      </button>
+      <div class="rail-region-menu" aria-label="地区站点"></div>
+    </div>
   </nav>
-  <div class="site-rail-bottom" aria-label="账户与工具">
-    <a class="site-rail-link" href="/rankings/"><span>▥</span><b>榜单</b></a>
-    <a class="site-rail-link" href="/favorites"><span>☆</span><b>收藏</b></a>
-    <a class="site-rail-link" href="/account"><span>Me</span><b>我的</b></a>
+  <div class="rail-bottom" aria-label="账户与工具">
+    <a class="rail-nav-btn" href="/extension.html" aria-label="下载中心" title="下载中心">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 20h14"/></svg>
+      <span data-static-i18n="download_center">下载中心</span>
+    </a>
+    <a class="rail-nav-btn" href="/rankings/" aria-label="榜单" title="榜单">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 21V11"/><path d="M12 21V7"/><path d="M16 21V3"/><path d="M4 21h16"/></svg>
+      <span data-static-i18n="rail_rankings">榜单</span>
+    </a>
+    <a class="rail-nav-btn" href="/favorites" aria-label="收藏" title="收藏">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.7l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3.7z"/></svg>
+      <span data-static-i18n="rail_saved">收藏</span>
+    </a>
+    <a class="rail-nav-btn" href="/account" aria-label="我的" title="我的">
+      <span class="rail-avatar" aria-hidden="true">我</span>
+      <span data-static-i18n="rail_account">我的</span>
+    </a>
   </div>
 </aside>
+
 <header class="page-head">
   <a class="brand" href="/">AILatest <span>Journal</span></a>
   <nav>
     <a href="/extension.html" data-static-i18n="download_center">下载中心</a>
+    <a href="/contact" data-static-i18n="nav_contact">联系</a>
     <button class="static-lang-toggle" type="button" data-static-lang-toggle>English</button>
   </nav>
 </header>
-<main class="coming-soon-main">
+
+<main class="pricing-main">
+  <!-- 中文 -->
   <section data-lang-panel="zh-CN">
-    <h1>订阅功能即将开放</h1>
-    <p class="sub">Plus / Pro 付费通道暂时下架调试中。当前请先下载插件内测版，体验 Google Scholar、PubMed、知网等页面的期刊徽章识别。</p>
+    <div class="pricing-banner">
+      <strong>Draft v0.1</strong>
+      <span>初版预览 · 支付通道未开通 · 当前全站仍为 Free · 价格与额度可再调</span>
+    </div>
+
+    <h1>订阅与定价</h1>
+    <p class="sub">三档：<b>Free</b> 日常查刊 · <b>Pro</b> 解锁中科院/预警与插件额度 · <b>Max</b> 完整工作流 + AI 荐刊。</p>
+
+    <div class="plans plans-3">
+      <!-- Free -->
+      <div class="plan">
+        <h3>Free</h3>
+        <div class="price-row"><div class="price">¥0</div></div>
+        <div class="per">永久免费。适合日常检索与毕业论文查刊。</div>
+        <ul>
+          <li>4 万+ 期刊检索与详情</li>
+          <li>基础 IF / JCR 分位 / 收录索引</li>
+          <li>云收藏 <b>5</b> 本 · <b>2</b> 个清单</li>
+          <li>浏览器插件 <b>80 条/天</b> · 1 台</li>
+          <li class="lock">不含中科院分区 / TOP</li>
+          <li class="lock">不含预警 / 撤稿风险标签</li>
+          <li class="dim">不含 AI 荐刊</li>
+        </ul>
+        <a class="btn ghost" href="/signup.html">免费注册</a>
+      </div>
+
+      <!-- Pro -->
+      <div class="plan hot">
+        <span class="tag">推荐</span>
+        <h3>Pro</h3>
+        <div class="price-row">
+          <div class="price">¥98 <small>/年</small></div>
+        </div>
+        <p class="edu">教育认证 <b>¥49/年</b> · 约 ¥8.2/月</p>
+        <div class="per">高频刷刊与投稿决策：解锁中科院、预警，插件额度拉满到够用。</div>
+        <ul>
+          <li>Free 全部能力</li>
+          <li><b>中科院分区 / TOP</b>、新锐</li>
+          <li><b>预警 · 撤稿 · 科协分级</b></li>
+          <li>云收藏 <b>50</b> 本 · <b>5</b> 清单</li>
+          <li>插件 <b>1000 条/天</b> · 最多 2 台</li>
+          <li>全站点增强识别（含 PubMed 等）</li>
+          <li class="dim">不含 AI credits</li>
+        </ul>
+        <button class="btn" type="button" disabled>支付即将开放</button>
+      </div>
+
+      <!-- Max -->
+      <div class="plan">
+        <h3>Max</h3>
+        <div class="price-row">
+          <div class="price">¥148 <small>/年</small></div>
+        </div>
+        <p class="edu">教育认证 <b>¥79/年</b> · 约 ¥12.3/月</p>
+        <div class="per">完整文献工作流 + AI 荐刊（DeepSeek V4 Flash）。</div>
+        <ul>
+          <li>Pro 全部能力</li>
+          <li><b>无限</b>收藏与清单</li>
+          <li>标签 · 笔记 · 投稿记录</li>
+          <li>导出 CSV / RIS / BibTeX / XLSX</li>
+          <li>Zotero / Notion / EndNote / Obsidian</li>
+          <li>插件 <b>3000 条/天</b> · 最多 4 台</li>
+          <li>AI 每月 <b>500 credits</b>（约 50 次完整荐刊）</li>
+        </ul>
+        <button class="btn ghost" type="button" disabled>支付即将开放</button>
+      </div>
+    </div>
+
+    <h2>功能对比</h2>
+    <div class="compare-wrap">
+      <table>
+        <tr>
+          <th>功能</th>
+          <th class="c">Free</th>
+          <th class="c">Pro</th>
+          <th class="c">Max</th>
+        </tr>
+        <tr><td>期刊检索 · 基础 IF/JCR/收录</td><td class="c">✅</td><td class="c">✅</td><td class="c">✅</td></tr>
+        <tr><td>中科院分区 / TOP / 新锐</td><td class="c">—</td><td class="c">✅</td><td class="c">✅</td></tr>
+        <tr><td>预警 · 撤稿 · 科协分级</td><td class="c">—</td><td class="c">✅</td><td class="c">✅</td></tr>
+        <tr><td>云收藏 / 清单</td><td class="c">5 / 2</td><td class="c">50 / 5</td><td class="c">无限</td></tr>
+        <tr><td>插件查询额度 / 设备</td><td class="c">80/天 · 1 台</td><td class="c">1000/天 · 2 台</td><td class="c">3000/天 · 4 台</td></tr>
+        <tr><td>标签 · 笔记 · 投稿记录 · 导出 · 集成</td><td class="c">—</td><td class="c">—</td><td class="c">✅</td></tr>
+        <tr><td>AI 荐刊 credits</td><td class="c">—</td><td class="c">—</td><td class="c">500/月</td></tr>
+      </table>
+    </div>
+
+    <h2>AI Credits（仅 Max）</h2>
+    <div class="ai-box">
+      <p style="margin:0">模型：<b>DeepSeek V4 Flash</b>。一次完整 AI 荐刊约 <b>10 credits</b>；数据库筛选不扣 credits。</p>
+      <ul>
+        <li>Max：每月 500 credits（约 50 次完整荐刊，月底清零）</li>
+        <li>加油包（规划）：300 credits / ¥12 · 1000 credits / ¥36（永不过期）</li>
+        <li>成本参考：单次 API ≈ ¥0.007，售价约 10× 毛利</li>
+      </ul>
+    </div>
+
+    <h2>常见问题</h2>
     <div class="card">
-      <h2 style="margin-top:0">现在主推浏览器插件</h2>
-      <p>插件内测版已经开放下载。当前用户默认使用 Free 版本；订阅、教育价、Pro 与 AI credits 会在支付通道稳定后再开放。</p>
-      <p><a class="btn" href="/extension.html">下载插件内测版</a></p>
-      <p class="small muted">原订阅方案内容已保留，暂不对外展示。</p>
+      <h3 style="margin-top:0">现在能付款吗？</h3>
+      <p>还不能。本页为初版方案预览；收银台接入后会开放 Pro / Max 与教育价。</p>
+      <h3>Free 为什么看不到中科院和预警？</h3>
+      <p>这是付费分界：Free 保留检索与基础 IF/JCR；中科院分区与预警名单从 Pro 起解锁。</p>
+      <h3>教育价怎么用？</h3>
+      <p>机构邮箱（.edu.cn / .edu / .ac.uk 等）验证码认证。Pro 教育 ¥49/年，Max 教育 ¥79/年；续费需再验证。</p>
     </div>
   </section>
+
+  <!-- English -->
   <section data-lang-panel="en">
-    <h1>Subscription Coming Soon</h1>
-    <p class="sub">Plus / Pro checkout is temporarily offline while we finalize the payment flow. For now, please try the browser extension beta for journal badges on Google Scholar, PubMed, CNKI and more.</p>
+    <div class="pricing-banner">
+      <strong>Draft v0.1</strong>
+      <span>Preview only · checkout not live · everyone is still on Free</span>
+    </div>
+
+    <h1>Plans &amp; Pricing</h1>
+    <p class="sub">Three tiers: <b>Free</b> daily search · <b>Pro</b> unlocks CAS zones &amp; warning lists · <b>Max</b> full workflow + AI picks.</p>
+
+    <div class="plans plans-3">
+      <div class="plan">
+        <h3>Free</h3>
+        <div class="price-row"><div class="price">¥0</div></div>
+        <div class="per">Forever free for everyday journal search.</div>
+        <ul>
+          <li>40k+ journals &amp; detail pages</li>
+          <li>Basic IF / JCR quartile / indexing</li>
+          <li>Cloud favorites: <b>5</b> journals · <b>2</b> lists</li>
+          <li>Extension: <b>80/day</b> · 1 browser</li>
+          <li class="lock">No CAS zones / TOP</li>
+          <li class="lock">No warning / retraction labels</li>
+          <li class="dim">No AI picks</li>
+        </ul>
+        <a class="btn ghost" href="/signup.html">Sign up free</a>
+      </div>
+
+      <div class="plan hot">
+        <span class="tag">Popular</span>
+        <h3>Pro</h3>
+        <div class="price-row"><div class="price">¥98 <small>/year</small></div></div>
+        <p class="edu">Education <b>¥49/year</b></p>
+        <div class="per">For heavy searching and submission decisions.</div>
+        <ul>
+          <li>Everything in Free</li>
+          <li><b>CAS zones / TOP</b> &amp; emerging</li>
+          <li><b>Warning · retraction · CAST tiers</b></li>
+          <li>Favorites: <b>50</b> · <b>5</b> lists</li>
+          <li>Extension: <b>1000/day</b> · up to 2 browsers</li>
+          <li>Enhanced site recognition</li>
+          <li class="dim">No AI credits</li>
+        </ul>
+        <button class="btn" type="button" disabled>Checkout soon</button>
+      </div>
+
+      <div class="plan">
+        <h3>Max</h3>
+        <div class="price-row"><div class="price">¥148 <small>/year</small></div></div>
+        <p class="edu">Education <b>¥79/year</b></p>
+        <div class="per">Full research workflow + AI (DeepSeek V4 Flash).</div>
+        <ul>
+          <li>Everything in Pro</li>
+          <li><b>Unlimited</b> favorites &amp; lists</li>
+          <li>Tags · notes · submission log</li>
+          <li>Export CSV / RIS / BibTeX / XLSX</li>
+          <li>Zotero / Notion / EndNote / Obsidian</li>
+          <li>Extension: <b>3000/day</b> · up to 4 browsers</li>
+          <li>AI: <b>500 credits/month</b> (~50 full picks)</li>
+        </ul>
+        <button class="btn ghost" type="button" disabled>Checkout soon</button>
+      </div>
+    </div>
+
+    <h2>Compare</h2>
+    <div class="compare-wrap">
+      <table>
+        <tr>
+          <th>Feature</th>
+          <th class="c">Free</th>
+          <th class="c">Pro</th>
+          <th class="c">Max</th>
+        </tr>
+        <tr><td>Search · basic IF/JCR/indexing</td><td class="c">✅</td><td class="c">✅</td><td class="c">✅</td></tr>
+        <tr><td>CAS zones / TOP / emerging</td><td class="c">—</td><td class="c">✅</td><td class="c">✅</td></tr>
+        <tr><td>Warning · retraction · CAST</td><td class="c">—</td><td class="c">✅</td><td class="c">✅</td></tr>
+        <tr><td>Cloud favorites / lists</td><td class="c">5 / 2</td><td class="c">50 / 5</td><td class="c">Unlimited</td></tr>
+        <tr><td>Extension quota / devices</td><td class="c">80/day · 1</td><td class="c">1000/day · 2</td><td class="c">3000/day · 4</td></tr>
+        <tr><td>Tags · notes · export · integrations</td><td class="c">—</td><td class="c">—</td><td class="c">✅</td></tr>
+        <tr><td>AI pick credits</td><td class="c">—</td><td class="c">—</td><td class="c">500/mo</td></tr>
+      </table>
+    </div>
+
+    <h2>AI Credits (Max only)</h2>
+    <div class="ai-box">
+      <p style="margin:0">Model: <b>DeepSeek V4 Flash</b>. One full AI pick ≈ <b>10 credits</b>. DB filters cost 0.</p>
+      <ul>
+        <li>Max: 500 credits/month (~50 full picks, no rollover)</li>
+        <li>Top-up packs (planned): 300 / ¥12 · 1000 / ¥36 (never expire)</li>
+      </ul>
+    </div>
+
+    <h2>FAQ</h2>
     <div class="card">
-      <h2 style="margin-top:0">Extension beta is the current focus</h2>
-      <p>The extension beta is available for download. All users are currently on the Free version; subscriptions, education pricing, Pro and AI credits will open after the payment channel is ready.</p>
-      <p><a class="btn" href="/extension.html">Download extension beta</a></p>
-      <p class="small muted">The original pricing content is retained internally but not displayed publicly.</p>
+      <h3 style="margin-top:0">Can I pay now?</h3>
+      <p>Not yet. This is a draft plan page; checkout opens after the payment channel is ready.</p>
+      <h3>Why no CAS / warning on Free?</h3>
+      <p>That is the paid boundary: Free keeps search and basic IF/JCR; CAS zones and warning lists unlock from Pro.</p>
     </div>
   </section>
 </main>
 
-<template id="pricing-content-archive">
-<section data-lang-panel="zh-CN">
-  <h1>订阅与定价</h1>
-  <p class="sub">期刊检索、基础评级徽章、期刊详情与浏览器插件基础额度<b>永久免费</b>。Plus 面向高频刷刊用户，Pro 面向完整文献管理与 AI 辅助。</p>
-
-  <div class="note">浏览器插件已开放试用下载：支持 Google Scholar 及镜像、知网、万方、PubMed、Web of Science、Scopus、ScienceDirect、Springer、IEEE Xplore、Wiley、MDPI、Semantic Scholar、Europe PMC、百度学术、Aminer、DBLP、ReadPaper、ResearchGate、X-MOL、JSTOR、ProQuest、Connected Papers 等主流论文检索网站。<a href="/extension.html"><b>下载插件</b></a></div>
-
-  <div class="card">
-    <h2 style="margin-top:0">稳定与隐私，是科研工具的底线</h2>
-    <p>AILatest 按企业级云端架构和 99.9% 服务可用性目标建设。插件查询、云端收藏、同步与后续付费能力都会优先保证稳定、可恢复和可持续维护，避免因为临时接口不可用影响一天的文献工作。</p>
-    <p>浏览器插件严格遵循最小权限原则：优先使用本地缓存；未缓存时，仅向 AILatest 接口发送期刊名、ISSN 等识别所需字段。不上传你的浏览记录、检索关键词或论文阅读内容；不会劫持链接、注入广告、转卖流量或采集与期刊识别无关的数据。Chrome 商店正式版会同步提供清晰的 Privacy Practices 说明。</p>
-  </div>
-
-  <div class="plans">
-    <div class="plan">
-      <h3>Free 免费版</h3>
-      <div class="price">¥0</div>
-      <div class="per">科研萌新首选，满足日常、毕业论文的基础文献检索需求。</div>
-      <ul>
-        <li>40,000+ 期刊检索、基础筛选与详情页</li>
-        <li>基础 IF / JCR / 收录徽章永久免费</li>
-        <li>主流检索站点基础识别，插件 80 条/天</li>
-        <li>云端收藏 5 本 · 2 个清单，支持清单拖拽排序</li>
-        <li>不含预警、撤稿、科协分区、中科院、新锐 TOP</li>
-        <li>不含主题切换与自定义颜色</li>
-      </ul>
-      <a class="btn ghost" href="/signup.html">免费注册</a>
-    </div>
-
-    <div class="plan">
-      <span class="tag">Coming soon</span>
-      <h3>Plus 年付</h3>
-      <div class="price">¥98 <small>/年（≈ ¥8.2/月）</small></div>
-      <div class="per">医学/生物/理工科高频刷刊必备。解锁 PubMed，千条额度，多端同步，告别额度焦虑。</div>
-      <ul>
-        <li>免费版全部功能</li>
-        <li>浏览器插件 <b>1000 条/天</b>，绑定最多 <b>2 台</b> 浏览器</li>
-        <li>全站点增强识别，覆盖更多论文检索网站</li>
-        <li>含 PubMed 等高级站点增强识别</li>
-        <li>含预警、撤稿、科协分区、中科院、新锐 TOP 标签</li>
-        <li>按 IF / 引用量 / 原顺序排序</li>
-        <li>不含 AI 荐刊 credits</li>
-      </ul>
-      <button class="btn ghost" type="button" disabled>Plus 即将开放</button>
-    </div>
-
-    <div class="plan hot">
-      <span class="tag">Coming soon</span>
-      <h3>Pro 年付</h3>
-      <div class="price">¥148 <small>/年（≈ ¥12.3/月）</small></div>
-      <div class="per">文献管理大师的终极方案。全生态联动、高级筛选导出、AI 智能辅助，打造属于你的科研第二大脑。</div>
-      <ul>
-        <li>Plus 全部功能</li>
-        <li><b>无限</b>收藏与清单，标签 · 笔记 · 投稿记录</li>
-        <li>高级筛选、深度数据分析报告导出</li>
-        <li>Zotero / Notion / EndNote / Obsidian 全生态联动</li>
-        <li>主题切换、自定义颜色，未来支持团队协作</li>
-        <li>浏览器插件 <b>3000 条/天</b> · 最多 <b>4 台</b> 浏览器</li>
-        <li>AI 荐刊每月 <b>500 credits</b>（约 50 次完整荐刊）</li>
-      </ul>
-      <p class="small muted" style="text-align:center;margin:8px 0 0">付费通道接入后开放升级</p>
-      <button class="btn" type="button" disabled>Pro 即将开放</button>
-    </div>
-
-    <div class="plan">
-      <h3>Plus 教育认证</h3>
-      <div class="price">¥49 <small>/年</small></div>
-      <div class="per">高校 / 科研机构邮箱认证（.edu.cn、.edu 等）</div>
-      <ul>
-        <li>与 Plus 年付功能完全相同</li>
-        <li>浏览器插件 1000 条/天</li>
-        <li>绑定最多 2 台浏览器</li>
-        <li>含预警、撤稿、科协分区、中科院、新锐 TOP 标签</li>
-        <li>按 IF / 引用量 / 原顺序排序</li>
-        <li>不含 AI 荐刊 credits</li>
-      </ul>
-      <button class="btn ghost" type="button" disabled>教育 Plus 即将开放</button>
-    </div>
-
-    <div class="plan">
-      <h3>Pro 教育认证</h3>
-      <div class="price">¥79 <small>/年</small></div>
-      <div class="per">高校 / 科研机构邮箱认证（.edu.cn、.edu 等）</div>
-      <ul>
-        <li>与 Pro 年付功能完全相同</li>
-        <li>浏览器插件 3000 条/天</li>
-        <li>绑定最多 4 台浏览器</li>
-        <li>邮箱验证码完成认证</li>
-        <li>续费时重新认证即可续享</li>
-      </ul>
-      <button class="btn ghost" type="button" disabled>教育价即将开放</button>
-    </div>
-  </div>
-
-  <h2>功能对比</h2>
-  <table>
-    <tr><th>功能</th><th class="c">Free</th><th class="c">Plus</th><th class="c">Pro</th></tr>
-    <tr><th colspan="4">日常科研基础能力：先让文献检索真正可用</th></tr>
-    <tr><td>期刊检索 · 基础 IF/JCR/收录徽章 · 详情页</td><td class="c">✅</td><td class="c">✅</td><td class="c">✅</td></tr>
-    <tr><td>浏览器插件支持站点</td><td class="c">主流站点基础支持</td><td class="c">全站点增强支持</td><td class="c">全站点增强支持</td></tr>
-    <tr><td>云端收藏</td><td class="c">5 本 / 2 清单</td><td class="c">50 本 / 5 清单</td><td class="c">无限</td></tr>
-    <tr><td>清单拖拽排序</td><td class="c">✅</td><td class="c">✅</td><td class="c">✅</td></tr>
-    <tr><th colspan="4">插件增强：解决高频刷刊、跨站识别和风险判断</th></tr>
-    <tr><td>插件查询额度</td><td class="c">80 条/天</td><td class="c"><b>1000 条/天</b></td><td class="c"><b>3000 条/天</b></td></tr>
-    <tr><td>可绑定浏览器数量</td><td class="c">1 台</td><td class="c"><b>2 台</b></td><td class="c"><b>4 台</b></td></tr>
-    <tr><td>PubMed 等高级站点增强识别</td><td class="c">—</td><td class="c">✅</td><td class="c">✅</td></tr>
-    <tr><td>预警 · 撤稿 · 科协分区</td><td class="c">—</td><td class="c">✅</td><td class="c">✅</td></tr>
-    <tr><td>中科院 · 新锐 TOP 标签</td><td class="c">—</td><td class="c">✅</td><td class="c">✅</td></tr>
-    <tr><td>插件高级排序（IF / 引用量 / 原顺序）</td><td class="c">—</td><td class="c">✅</td><td class="c">✅</td></tr>
-    <tr><th colspan="4">专业科研工作流：管理、导出、集成与 AI 辅助</th></tr>
-    <tr><td>标签 · 笔记 · 投稿记录</td><td class="c">—</td><td class="c">—</td><td class="c">✅</td></tr>
-    <tr><td>高级筛选</td><td class="c">—</td><td class="c">—</td><td class="c">✅</td></tr>
-    <tr><td>导出（CSV / RIS / BibTeX / XLSX）</td><td class="c">—</td><td class="c">—</td><td class="c">✅</td></tr>
-    <tr><td>深度数据分析报告导出</td><td class="c">—</td><td class="c">—</td><td class="c">✅</td></tr>
-    <tr><td>文献工具集成（Zotero / Notion / EndNote / Obsidian）</td><td class="c">—</td><td class="c">—</td><td class="c">✅</td></tr>
-    <tr><td>主题切换 / 自定义颜色</td><td class="c">—</td><td class="c">—</td><td class="c">✅</td></tr>
-    <tr><td>AI 荐刊额度</td><td class="c">—</td><td class="c">—</td><td class="c">500 credits/月</td></tr>
-    <tr><td>团队协作 / 多账号管理后台</td><td class="c">—</td><td class="c">—</td><td class="c">规划中</td></tr>
-  </table>
-
-  <h2>AI Credits</h2>
-  <p>AI 走 DeepSeek V4 Flash API，按 credits 计费；数据库筛选、期刊对比等普通查询<b>不消耗</b> credits。一次完整 AI 荐刊约 10 credits。</p>
-  <ul>
-    <li>Plus / Plus 教育：不含 AI credits（解锁中科院/预警与插件额度）</li>
-    <li>Pro / Pro 教育：每月 <b>500 credits</b>（约 50 次完整荐刊，月底清零）</li>
-    <li>加油包：300 credits / ¥12，1000 credits / ¥36（永不过期；先月度额度，再加油包）</li>
-  </ul>
-
-  <h2>常见问题</h2>
-  <div class="card">
-    <h3 style="margin-top:0">现在可以开通 Plus / Pro 吗？</h3>
-    <p>暂时不开放。当前用户统一使用 Free 版本；Plus、Pro、教育价和 Credits 加油包会在支付通道接入后上线。</p>
-    <h3>怎么完成教育认证？</h3>
-    <p>注册或登录后，用机构邮箱（.edu.cn / .edu / .ac.uk 等）接收验证码完成认证，开通后自动显示教育认证方案。续费时需重新认证。</p>
-    <h3>支持哪些付款方式？</h3>
-    <p>支付由国际收单合作方（Merchant of Record）处理，支持支付宝、微信支付与银行卡，发票/收据由收单方开具。通道正在接入中，开通后会在站内公告。</p>
-    <h3>可以退款吗？</h3>
-    <p>年付首购 14 天内无理由全额退款；月付可随时取消（当期不退）；未使用的加油包 14 天内可退。详见 <a href="/refund.html">Refund Policy</a>。</p>
-  </div>
-
-  <p class="small muted">价格以人民币计;最终结算价格与币种以收银台显示为准。开通即表示同意 <a href="/terms.html">Terms of Service</a> 与 <a href="/privacy.html">Privacy Policy</a>。</p>
-</section>
-<section data-lang-panel="en">
-  <h1>Subscription & Pricing</h1>
-  <p class="sub">Journal search, basic ranking badges, journal detail pages and the browser extension starter quota are <b>free forever</b>. Plus is for high-frequency literature search. Pro is for full research workflow management and AI assistance.</p>
-
-  <div class="note">The browser extension beta is available now. It supports Google Scholar and mirrors, CNKI, Wanfang, PubMed, Web of Science, Scopus, ScienceDirect, Springer, IEEE Xplore, Wiley, MDPI, Semantic Scholar, Europe PMC, Baidu Scholar, Aminer, DBLP, ReadPaper, ResearchGate, X-MOL, JSTOR, ProQuest, Connected Papers and more. <a href="/extension.html"><b>Download extension</b></a></div>
-
-  <div class="card">
-    <h2 style="margin-top:0">Stability and privacy first</h2>
-    <p>AILatest is built as a reliable cloud-backed research tool. Extension lookup, cloud favorites, sync and future paid features are designed around availability, recovery and long-term maintenance.</p>
-    <p>The extension follows least-privilege principles. It uses local cache first; when a lookup is needed, it only sends journal identifiers such as title or ISSN. It does not upload browsing history, search keywords or reading content, and it does not inject ads or rewrite links.</p>
-  </div>
-
-  <div class="plans">
-    <div class="plan">
-      <h3>Free</h3>
-      <div class="price">¥0</div>
-      <div class="per">For everyday journal checks and basic literature search.</div>
-      <ul>
-        <li>40,000+ journal search records</li>
-        <li>Basic IF / JCR / indexed badges</li>
-        <li>Extension starter quota: 80 lookups/day</li>
-        <li>Cloud favorites: 5 journals and 2 lists</li>
-        <li>No warning, retraction, CAST, CAS or Emerging TOP badges</li>
-      </ul>
-      <a class="btn ghost" href="/signup.html">Sign up free</a>
-    </div>
-
-    <div class="plan">
-      <span class="tag">Coming soon</span>
-      <h3>Plus Annual</h3>
-      <div class="price">¥98 <small>/year</small></div>
-      <div class="per">For heavy PubMed, Google Scholar and cross-site journal checking.</div>
-      <ul>
-        <li>Everything in Free</li>
-        <li>Extension quota: <b>1000 lookups/day</b></li>
-        <li>Up to <b>2</b> browsers</li>
-        <li>Enhanced recognition across supported sites</li>
-        <li>Warning, retraction, CAST, CAS and Emerging TOP badges</li>
-        <li>Sort by IF, citations or original order</li>
-        <li>No AI recommendation credits</li>
-      </ul>
-      <button class="btn ghost" type="button" disabled>Plus coming soon</button>
-    </div>
-
-    <div class="plan hot">
-      <span class="tag">Coming soon</span>
-      <h3>Pro Annual</h3>
-      <div class="price">¥148 <small>/year</small></div>
-      <div class="per">For full research workflow management, export, integrations and AI assistance.</div>
-      <ul>
-        <li>Everything in Plus</li>
-        <li>Unlimited favorites and lists, tags, notes and submission history</li>
-        <li>Advanced filters and data report export</li>
-        <li>Zotero / Notion / EndNote / Obsidian integrations</li>
-        <li>Extension quota: <b>3000 lookups/day</b>, up to <b>4</b> browsers</li>
-        <li><b>6000 AI credits/month</b></li>
-      </ul>
-      <p class="small muted" style="text-align:center;margin:8px 0 0">Upgrade opens after payment is connected</p>
-      <button class="btn" type="button" disabled>Pro coming soon</button>
-    </div>
-
-    <div class="plan">
-      <h3>Plus Education</h3>
-      <div class="price">¥49 <small>/year</small></div>
-      <div class="per">For verified university or research institution email addresses.</div>
-      <ul>
-        <li>Same features as Plus Annual</li>
-        <li>1000 extension lookups/day</li>
-        <li>Up to 2 browsers</li>
-        <li>Warning, retraction, CAST, CAS and Emerging TOP badges</li>
-      </ul>
-      <button class="btn ghost" type="button" disabled>Education Plus coming soon</button>
-    </div>
-
-    <div class="plan">
-      <h3>Pro Education</h3>
-      <div class="price">¥79 <small>/year</small></div>
-      <div class="per">For verified university or research institution email addresses.</div>
-      <ul>
-        <li>Same features as Pro Annual</li>
-        <li>3000 extension lookups/day</li>
-        <li>Up to 4 browsers</li>
-        <li>Email verification required</li>
-      </ul>
-      <button class="btn ghost" type="button" disabled>Education pricing coming soon</button>
-    </div>
-  </div>
-
-  <h2>Feature Comparison</h2>
-  <table>
-    <tr><th>Feature</th><th class="c">Free</th><th class="c">Plus</th><th class="c">Pro</th></tr>
-    <tr><th colspan="4">Core journal search</th></tr>
-    <tr><td>Journal search, basic IF/JCR/index badges and detail pages</td><td class="c">Yes</td><td class="c">Yes</td><td class="c">Yes</td></tr>
-    <tr><td>Browser extension coverage</td><td class="c">Basic mainstream sites</td><td class="c">Enhanced all-site support</td><td class="c">Enhanced all-site support</td></tr>
-    <tr><td>Cloud favorites</td><td class="c">5 journals / 2 lists</td><td class="c">50 journals / 5 lists</td><td class="c">Unlimited</td></tr>
-    <tr><th colspan="4">Extension enhancement</th></tr>
-    <tr><td>Extension lookup quota</td><td class="c">80/day</td><td class="c"><b>1000/day</b></td><td class="c"><b>3000/day</b></td></tr>
-    <tr><td>Bound browsers</td><td class="c">1</td><td class="c"><b>2</b></td><td class="c"><b>4</b></td></tr>
-    <tr><td>Advanced PubMed and site recognition</td><td class="c">-</td><td class="c">Yes</td><td class="c">Yes</td></tr>
-    <tr><td>Warning, retraction, CAST, CAS and Emerging TOP badges</td><td class="c">-</td><td class="c">Yes</td><td class="c">Yes</td></tr>
-    <tr><td>Sort by IF, citations or original order</td><td class="c">-</td><td class="c">Yes</td><td class="c">Yes</td></tr>
-    <tr><th colspan="4">Research workflow</th></tr>
-    <tr><td>Tags, notes and submission history</td><td class="c">-</td><td class="c">-</td><td class="c">Yes</td></tr>
-    <tr><td>Export and integrations</td><td class="c">-</td><td class="c">-</td><td class="c">Yes</td></tr>
-    <tr><td>AI recommendation credits</td><td class="c">-</td><td class="c">-</td><td class="c">6000/month</td></tr>
-  </table>
-
-  <h2>AI Credits</h2>
-  <p>AI features use credits after the payment channel is connected. Database filters, journal comparison and ordinary lookups do <b>not</b> consume credits.</p>
-  <ul>
-    <li>Plus and Plus Education do not include AI credits.</li>
-    <li>Pro and Pro Education include 500 credits/month. Monthly credits reset at month end and do not accumulate.</li>
-    <li>Credit packs will be added later and will not expire.</li>
-  </ul>
-
-  <h2>FAQ</h2>
-  <div class="card">
-    <h3 style="margin-top:0">Can I subscribe to Plus or Pro now?</h3>
-    <p>Not yet. All users currently use the Free version. Plus, Pro, education pricing and credit packs will launch after payment is connected.</p>
-    <h3>How does education verification work?</h3>
-    <p>After signing in, verify an institutional email address such as .edu.cn, .edu or .ac.uk. Renewal will require re-verification.</p>
-    <h3>Which payment methods will be supported?</h3>
-    <p>Payment will be handled by a merchant-of-record partner, with support planned for Alipay, WeChat Pay and cards.</p>
-    <h3>Can I get a refund?</h3>
-    <p>Annual first purchase has a 14-day full refund window. Monthly plans can be cancelled any time. See <a href="/refund.html">Refund Policy</a>.</p>
-  </div>
-
-  <p class="small muted">Prices are shown in CNY. Final billing currency and amount are determined at checkout. By subscribing, you agree to the <a href="/terms.html">Terms of Service</a> and <a href="/privacy.html">Privacy Policy</a>.</p>
-</section>
-</template>
-<footer class="page-foot">
-  <p>© 2026 AILatest Journal ·
-    <a href="/about" data-static-i18n="footer_about">关于</a> ·
-    <a href="/contact" data-static-i18n="footer_contact">联系</a> ·
-    <a href="/terms.html" data-static-i18n="footer_terms">条款</a> ·
-    <a href="/privacy.html" data-static-i18n="footer_privacy">隐私</a> ·
-    <a href="/refund.html" data-static-i18n="footer_refund">退款</a></p>
-</footer>
-<script src="/js/site-rail.js?v=20260715-region-multiselect" defer></script>
+<footer class="page-foot"></footer>
 <script src="/js/static-i18n.js?v=20260715-foot-line" defer></script>
+<script src="/js/site-rail.js?v=20260715-foot-line" defer></script>
 </body>
 </html>
