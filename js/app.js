@@ -56,6 +56,15 @@
       paid_label: '付费',
       drawer_kicker: '期刊详情',
       footer_data: '© <a href="https://journal.ailatest.org">AILatest Journal</a>',
+      footer_tag: '期刊检索 · 分区评级 · 投稿决策',
+      footer_product: '产品',
+      footer_support: '支持',
+      footer_legal: '条款',
+      footer_matrix: '联系矩阵',
+      footer_ailatest: '关于 AILatest',
+      footer_privacy_full: '隐私政策',
+      footer_terms_full: '使用条款',
+      footer_refund_full: '退款政策',
       tab_home: '查刊', tab_int: '国际', tab_dom: '中国', tab_fav: '收藏', tab_pick: '荐刊',
       nav_about: '关于', nav_contact: '联系',
       nav_terms: '条款', nav_privacy: '隐私', nav_refund: '退款',
@@ -145,6 +154,15 @@
       paid_label: 'Paid',
       drawer_kicker: 'Journal Details',
       footer_data: '© <a href="https://journal.ailatest.org">AILatest Journal</a>',
+      footer_tag: 'Search · rankings · submission decisions',
+      footer_product: 'Product',
+      footer_support: 'Support',
+      footer_legal: 'Legal',
+      footer_matrix: 'Contact matrix',
+      footer_ailatest: 'About AILatest',
+      footer_privacy_full: 'Privacy',
+      footer_terms_full: 'Terms',
+      footer_refund_full: 'Refund',
       tab_home: 'Journals', tab_int: 'International', tab_dom: 'China', tab_fav: 'Favorites', tab_pick: 'Recommend',
       nav_about: 'About', nav_contact: 'Contact',
       nav_terms: 'Terms', nav_privacy: 'Privacy', nav_refund: 'Refund',
@@ -391,6 +409,15 @@
     paid_label: '有料',
     drawer_kicker: 'ジャーナル詳細',
     footer_data: '© <a href="https://journal.ailatest.org">AILatest Journal</a>',
+    footer_tag: 'ジャーナル検索 · 評価 · 投稿判断',
+    footer_product: '製品',
+    footer_support: 'サポート',
+    footer_legal: '規約',
+    footer_matrix: '連絡マトリクス',
+    footer_ailatest: 'AILatest について',
+    footer_privacy_full: 'プライバシー',
+    footer_terms_full: '利用規約',
+    footer_refund_full: '返金ポリシー',
     tab_home: 'ジャーナル',
     tab_int: '国際',
     tab_dom: '中国',
@@ -1124,6 +1151,8 @@
   let homeJournals = [];
   let oaMap = null;        // compact OpenAlex map, loaded only when a detail/recommendation needs it.
   let oaMapPromise = null;
+  let countryOutputMap = null; // preseeded OpenAlex country shares (data/country_output.json.gz)
+  let countryOutputMapPromise = null;
   let journalUpdates = { updated_at: '', items: [] };
   // review_cycles now read from embedded doaj.review_weeks in journals.json.gz
   const DEFAULT_JOURNAL_ALIASES = {
@@ -1287,6 +1316,64 @@
     return oaMapPromise;
   }
 
+  function loadCountryOutputMap() {
+    if (countryOutputMap) return Promise.resolve(countryOutputMap);
+    if (!countryOutputMapPromise) {
+      countryOutputMapPromise = fetchJSON('data/country_output.json.gz')
+        .then(data => {
+          countryOutputMap = (data && data.m) || data || {};
+          return countryOutputMap;
+        })
+        .catch(() => {
+          countryOutputMap = {};
+          return countryOutputMap;
+        });
+    }
+    return countryOutputMapPromise;
+  }
+
+  function issnKeyForCountryCache(value) {
+    const compact = String(value || '').toUpperCase().replace(/[^0-9X]/g, '');
+    return compact.length === 8 ? compact : '';
+  }
+
+  /** Expand compact preseed row → { years, top } for the chart renderer. */
+  function expandCountryOutputPreseed(compact) {
+    if (!compact || !Array.isArray(compact.y) || !compact.y.length || !Array.isArray(compact.t) || !compact.t.length) {
+      return null;
+    }
+    const names = compact.t;
+    const codes = Array.isArray(compact.c) ? compact.c : [];
+    const years = compact.y.map(row => {
+      const counts = Array.isArray(row.n) ? row.n : [];
+      const groups = names.map((name, i) => ({
+        name,
+        code: codes[i] || '',
+        count: Number(counts[i] || 0),
+      })).filter(g => g.count > 0);
+      return {
+        year: Number(row.y),
+        total: Number(row.tot || 0),
+        groups,
+      };
+    }).filter(row => row.total > 0 && row.groups.length);
+    if (!years.length) return null;
+    return { years, top: names, source: 'preseed' };
+  }
+
+  function lookupCountryOutputPreseed(r) {
+    if (!countryOutputMap) return null;
+    const keys = [r?.issn, r?.eissn].map(issnKeyForCountryCache).filter(Boolean);
+    for (const k of keys) {
+      const hit = countryOutputMap[k];
+      if (!hit) continue;
+      if (hit.empty) return null;
+      const payload = expandCountryOutputPreseed(hit);
+      if (payload) return payload;
+    }
+    return null;
+  }
+
   function loadDomesticData() {
     if (domestic) return Promise.resolve(domestic);
     if (!domesticPromise) {
@@ -1347,10 +1434,17 @@
     return { code, name };
   }
 
-  async function fetchCountryOutputData(r) {
+  async function fetchCountryOutputData(r, opts = {}) {
     const issns = [normalizeIssnForOpenAlex(r?.issn), normalizeIssnForOpenAlex(r?.eissn)]
       .filter((value, index, arr) => value && arr.indexOf(value) === index);
     if (!issns.length) return null;
+    // 1) 静态预置：详情页立刻出图，不再等 OpenAlex
+    try {
+      await loadCountryOutputMap();
+      const preseed = lookupCountryOutputPreseed(r);
+      if (preseed) return preseed;
+    } catch (_) { /* continue live path */ }
+    if (opts.preseedOnly) return null;
     const years = countryOutputYears(r);
     const cacheKey = `${issns.join('|')}|${years.join(',')}`;
     if (countryOutputCache.has(cacheKey)) return countryOutputCache.get(cacheKey);
@@ -1596,16 +1690,34 @@
   async function hydrateCountryOutputChart(root, r) {
     const box = root.querySelector('.country-output-card');
     if (!box) return;
-    // 超时必须收尾，避免永远停在「正在加载…」
+    const paint = (payload) => {
+      const html = renderCountryOutputChartData(payload);
+      if (html) {
+        box.innerHTML = html;
+        bindCountryOutputSelect(box, payload);
+        return true;
+      }
+      return false;
+    };
     const withTimeout = (p, ms) => Promise.race([
       p,
       new Promise((_, rej) => setTimeout(() => rej(new Error('country-output timeout')), ms)),
     ]);
     try {
-      const payload = await withTimeout(fetchCountryOutputData(r), 14000);
-      const html = renderCountryOutputChartData(payload);
-      box.innerHTML = html || renderCountryOutputFallback(r);
-      if (payload) bindCountryOutputSelect(box, payload);
+      // 1) 静态预置优先：命中即出图，零「正在加载」
+      const preseed = await withTimeout(fetchCountryOutputData(r, { preseedOnly: true }), 3500);
+      if (paint(preseed)) return;
+      // 2) 无预置时立刻展示出版地回退，不再长时间停在 loading
+      box.innerHTML = renderCountryOutputFallback(r);
+      // 3) 后台尝试实时补全；成功则无感升级为分布图（失败保持回退）
+      withTimeout(fetchCountryOutputData(r), 12000)
+        .then(payload => {
+          if (!box.isConnected) return;
+          paint(payload);
+        })
+        .catch(err => {
+          console.warn('country distribution live refresh failed:', err?.message || err);
+        });
     } catch (err) {
       console.warn('country distribution load failed:', err?.message || err);
       box.innerHTML = renderCountryOutputFallback(r);
@@ -5735,8 +5847,9 @@
     if (pageMode) _drawerSourceTab = activeTab;
     const drawer = $('#j-drawer'), scrim = $('#drawer-scrim'), body = $('#drawer-body');
     if (!drawer || !body) return;
-    // 不阻塞详情渲染：OpenAlex 画像后台加载（国家分布 hydrate 会自行拉数据）
+    // 不阻塞详情渲染：OpenAlex 画像 + 国家分布预置后台加载
     loadOaMap().catch(() => null);
+    loadCountryOutputMap().catch(() => null);
     // 上报浏览（无需登录），结果回填进 cache
     reportJournalView(r, opts || {});
     // GA4 虚拟浏览 — 期刊详情抽屉打开时通知 GA4（无需 GTM 配置）
@@ -6095,7 +6208,7 @@
       })();
       const countryCard = (normalizeIssnForOpenAlex(ir.issn) || normalizeIssnForOpenAlex(ir.eissn))
         ? `<div class="trend-card country-output-card">
-            <div class="muted-cell country-empty">${T('正在加载 OpenAlex 国家/地区分布…','Loading OpenAlex country/region distribution...')}</div>
+            <div class="muted-cell country-empty">${T('正在读取国家/地区分布…','Reading country/region distribution...')}</div>
           </div>`
         : '';
       const cards = [
