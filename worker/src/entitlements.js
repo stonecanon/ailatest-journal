@@ -16,8 +16,8 @@ export const SPEC_VERSION = '2026-07-15.1';
 const TRIAL_DAYS = 7;
 const SNAPSHOT_TTL_SEC = 24 * 3600;
 const FLASH_OFFER_WINDOW_SEC = 24 * 3600;
-/** Pro 月度 AI credits；对齐 docs/entitlements.spec.json（DeepSeek V4 Flash 测算后为 500） */
-const PRO_MONTHLY_CREDITS = 500;
+/** Max/Pro 顶档月度 AI credits（DeepSeek V4 Flash：1000 ≈ 100 次完整荐刊，满用 API ≈ ¥0.8/月） */
+const PRO_MONTHLY_CREDITS = 1000;
 const UPGRADE_URL = 'https://journal.ailatest.org/pricing.html';
 const PRO_COMING_SOON = true;
 
@@ -70,7 +70,7 @@ const TIERS = {
     export: false,
     integrations: false,
     ai: { enabled: false },
-    extension: { queries_per_day: 1000, devices: 2, sites: 'enhanced', advanced_sort: true },
+    extension: { queries_per_day: 20000, devices: 2, sites: 'enhanced', advanced_sort: true },
   },
   trial: {
     badge_display: true,
@@ -86,8 +86,8 @@ const TIERS = {
     export: { formats: ['csv', 'ris', 'bibtex', 'xlsx'] },
     integrations: ['zotero', 'notion', 'endnote', 'obsidian'],
     // trial 继承 pro 但 AI 锁定
-    ai: { enabled: false, ui: 'visible_locked', locked_hint: 'AI 荐刊为 Pro 功能，订阅后每月含 500 credits' },
-    extension: { queries_per_day: 3000, devices: 4, sites: 'enhanced', advanced_sort: true },
+    ai: { enabled: false, ui: 'visible_locked', locked_hint: 'AI 荐刊为 Max 功能，订阅后每月含 1000 credits' },
+    extension: { queries_per_day: 50000, devices: 4, sites: 'enhanced', advanced_sort: true },
   },
   pro: {
     badge_display: true,
@@ -103,7 +103,7 @@ const TIERS = {
     export: { formats: ['csv', 'ris', 'bibtex', 'xlsx'] },
     integrations: ['zotero', 'notion', 'endnote', 'obsidian'],
     ai: { enabled: true, monthly_credits: PRO_MONTHLY_CREDITS, credits_rollover: false },
-    extension: { queries_per_day: 3000, devices: 4, sites: 'enhanced', advanced_sort: true },
+    extension: { queries_per_day: 50000, devices: 4, sites: 'enhanced', advanced_sort: true },
   },
 };
 

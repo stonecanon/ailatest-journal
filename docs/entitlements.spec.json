@@ -145,14 +145,16 @@
         "integrations": false,
         "ai": false,
         "extension": {
-          "queries_per_day": 1000,
+          "queries_per_day": 20000,
           "devices": 2,
           "sites": "enhanced",
-          "advanced_sort": true
+          "advanced_sort": true,
+          "copy": "高额度 · 日常刷刊无压力（对外不写「不限」；服务端保留防护上限）"
         }
       }
     },
     "pro": {
+      "note": "产品名 Max；代码 id 暂为 pro 以兼容历史字段",
       "features": {
         "badge_display": true,
         "journal_detail": true,
@@ -184,15 +186,16 @@
         "integrations": ["zotero", "notion", "endnote", "obsidian"],
         "ai": {
           "enabled": true,
-          "monthly_credits": 500,
+          "monthly_credits": 1000,
           "credits_rollover": false,
-          "note": "500 credits ≈ 50 次完整 AI 荐刊（10 credits/次）；DeepSeek V4 Flash 满负荷 API 成本约 ¥0.4/月，相对 Pro 年付可忽略"
+          "note": "1000 credits ≈ 100 次完整荐刊；满用 API ≈ ¥0.75/月，相对 Max 年付 ¥148 不会亏"
         },
         "extension": {
-          "queries_per_day": 3000,
+          "queries_per_day": 50000,
           "devices": 4,
           "sites": "enhanced",
-          "advanced_sort": true
+          "advanced_sort": true,
+          "copy": "高额度 · 多端科研无感（对外不写「不限」）"
         }
       }
     }
@@ -300,9 +303,14 @@
       }
     ],
     "monthly_pro_allowance": {
-      "amount": 500,
+      "amount": 1000,
       "rollover": false,
-      "note": "Pro 订阅按自然月发放，月底清零；加油包永不过期；消耗顺序：先月度额度，再加油包"
+      "note": "Max 订阅按自然月发放，月底清零；加油包永不过期；消耗顺序：先月度额度，再加油包"
+    },
+    "pro_monthly_1000_credits": {
+      "full_picks": 100,
+      "worst_case_api_cny_per_month": 0.75,
+      "note": "翻倍后仍远低于 Max 年费；重度用户才触顶，正常使用成本可忽略"
     },
     "data_contribution_reward": {
       "amount_range": [10, 20],
