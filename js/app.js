@@ -5406,8 +5406,22 @@
     }
     window.__regionalShown ||= Object.create(null);
     window.__regionalShown[source] ||= 100;
+    window.__regionalFilter ||= Object.create(null);
+    window.__regionalFilter[source] ||= { points: '__all', match: '__all', network: '__all', hband: '__all' };
+    const filt = window.__regionalFilter[source];
     const q = activeQuery.trim().toLowerCase();
     const filtered = data.records.filter(row => {
+      if (source === 'pbn' && filt.points !== '__all' && String(row.points) !== String(filt.points)) return false;
+      if (source === 'scielo' && filt.network !== '__all' && String(row.network || '') !== String(filt.network)) return false;
+      if (source === 'isc' && filt.hband !== '__all') {
+        const h = Number(row.h_index);
+        if (filt.hband === '0' && !(h >= 0 && h < 20)) return false;
+        if (filt.hband === '20' && !(h >= 20 && h < 50)) return false;
+        if (filt.hband === '50' && !(h >= 50 && h < 100)) return false;
+        if (filt.hband === '100' && !(h >= 100)) return false;
+      }
+      if (filt.match === 'yes' && !row.global_match) return false;
+      if (filt.match === 'no' && row.global_match) return false;
       if (!q) return true;
       return [row.name, row.issn, row.eissn, row.network, row.points, row.h_index]
         .filter(value => value !== undefined && value !== null)
@@ -5426,13 +5440,12 @@
       const nameHtml = `<div class="jname">${escape(rec.name)}</div>`;
       const metaHtml = [
         row.issn ? jMetaChip(`ISSN ${row.issn}`, 'j-meta-id') : '',
+        source === 'scielo' && row.network ? jMetaChip(String(row.network).replace(/^www\./, ''), 'j-meta-pub') : '',
       ].filter(Boolean).join('');
-      // 与全球站一致：来源 pill + 索引/分区分行，禁止直接把 badge 堆成竖条
       const bodyHtml = `<div class="j-card-badges">
         <div class="badges badges-idx"><span class="domsrc-pill regional-source-pill">${escape(config.badge)}</span>${limitBadgeHtml(globalBadges ? renderCoverageBadges(rec) : '', 6)}</div>
         ${globalBadges ? `<div class="badges badges-rank">${limitBadgeHtml(renderLevelBadges(rec), 5)}</div>` : ''}
       </div>`;
-      // 指标进 IF 位（短标签），与全球 IF 同一布局
       let ifHtmlClean = '';
       if (source === 'pbn' && row.points != null) ifHtmlClean = jMetaIf(T('分值', 'Pts'), row.points);
       else if (source === 'isc' && row.h_index != null) ifHtmlClean = jMetaIf('H', row.h_index);
@@ -5445,22 +5458,98 @@
         metaHtml, bodyHtml,
       });
     }).join('');
+
+    // 左侧筛选轨（与中国/印度/韩国同一套 dom-filter-*）
+    const filterGroups = [];
+    if (source === 'pbn') {
+      const pointOpts = [
+        ['__all', T('全部分值', 'All points')],
+        ['200', '200'], ['140', '140'], ['100', '100'], ['70', '70'], ['40', '40'], ['20', '20'],
+      ];
+      filterGroups.push(`
+        <div class="dom-filter-group">
+          <div class="dom-filter-label">${T('部委分值','Ministry points')}</div>
+          <div class="dom-filter-chips">${pointOpts.map(([v, lab]) =>
+            `<button type="button" class="dom-filter-chip${filt.points === v ? ' on' : ''}" data-reg-filter="points" data-value="${escape(v)}">${escape(lab)}</button>`
+          ).join('')}</div>
+        </div>`);
+    }
+    if (source === 'isc') {
+      const hOpts = [
+        ['__all', T('全部 H', 'All H')],
+        ['100', 'H ≥ 100'], ['50', '50–99'], ['20', '20–49'], ['0', 'H < 20'],
+      ];
+      filterGroups.push(`
+        <div class="dom-filter-group">
+          <div class="dom-filter-label">H-index</div>
+          <div class="dom-filter-chips">${hOpts.map(([v, lab]) =>
+            `<button type="button" class="dom-filter-chip${filt.hband === v ? ' on' : ''}" data-reg-filter="hband" data-value="${escape(v)}">${escape(lab)}</button>`
+          ).join('')}</div>
+        </div>`);
+    }
+    if (source === 'scielo') {
+      const netCounts = Object.create(null);
+      data.records.forEach(r => {
+        const n = r.network || '';
+        if (n) netCounts[n] = (netCounts[n] || 0) + 1;
+      });
+      const nets = Object.entries(netCounts).sort((a, b) => b[1] - a[1]).slice(0, 16);
+      const shortNet = (n) => String(n).replace(/^www\./, '').replace(/^scielo\./, '').replace(/\/$/, '');
+      filterGroups.push(`
+        <div class="dom-filter-group is-subject">
+          <div class="dom-filter-label">${T('地区集合','Collection')}</div>
+          <div class="dom-filter-chips is-wrap">
+            <button type="button" class="dom-filter-chip${filt.network === '__all' ? ' on' : ''}" data-reg-filter="network" data-value="__all">${T('全部','All')}</button>
+            ${nets.map(([n, c]) =>
+              `<button type="button" class="dom-filter-chip${filt.network === n ? ' on' : ''}" data-reg-filter="network" data-value="${escape(n)}" title="${escape(n)}">${escape(shortNet(n))}</button>`
+            ).join('')}
+          </div>
+        </div>`);
+    }
+    // 交叉匹配（三站通用）
+    filterGroups.push(`
+      <div class="dom-filter-group">
+        <div class="dom-filter-label">${T('全球库匹配','Global match')}</div>
+        <div class="dom-filter-chips">
+          <button type="button" class="dom-filter-chip${filt.match === '__all' ? ' on' : ''}" data-reg-filter="match" data-value="__all">${T('全部','All')}</button>
+          <button type="button" class="dom-filter-chip${filt.match === 'yes' ? ' on' : ''}" data-reg-filter="match" data-value="yes">${T('有匹配','Matched')}</button>
+          <button type="button" class="dom-filter-chip${filt.match === 'no' ? ' on' : ''}" data-reg-filter="match" data-value="no">${T('无匹配','Unmatched')}</button>
+        </div>
+      </div>`);
+    filterGroups.push(`
+      <div class="dom-filter-group">
+        <a class="source-link" href="${escape(data.source_url)}" target="_blank" rel="noopener nofollow">${T('官方目录', 'Official directory')}</a>
+      </div>`);
+
     const sourceYear = data.directory_year ? ` · ${T('目录年份', 'Directory year')} ${escape(data.directory_year)}` : '';
     box.innerHTML = `<div class="section-block regional-directory-section">
       ${countrySectionHeader(
         `${T(...config.title)} <span class="muted-cell">(${Number(data.record_count || data.records.length).toLocaleString()})</span>`,
-        T(...config.intro),
+        T(...config.intro) + ` · ${T('显示', 'Showing')} ${visible.length.toLocaleString()} / ${filtered.length.toLocaleString()}`,
       )}
-      <div class="india-toolbar country-toolbar">
-        <span class="muted-cell">${T('显示', 'Showing')} ${visible.length.toLocaleString()} / ${filtered.length.toLocaleString()}</span>
-        <a class="source-link" href="${escape(data.source_url)}" target="_blank" rel="noopener nofollow">${T('官方目录', 'Official directory')}</a>
+      <div class="dom-browse">
+        <aside class="dom-filter-rail" aria-label="${T('筛选','Filters')}">
+          ${filterGroups.join('')}
+        </aside>
+        <div class="dom-filter-main">
+          <div class="table-wrap"><table class="journals country-journal-table regional-directory-table" aria-label="${escape(T(...config.title))}"><thead hidden><tr><th></th></tr></thead><tbody>
+            ${rows || `<tr><td class="empty">${T('未找到匹配期刊', 'No matching journals found')}</td></tr>`}
+          </tbody></table></div>
+          ${filtered.length > shown ? `<div class="pager"><button id="${source}-more" class="more-btn">${T('加载更多', 'Load more')} (${(filtered.length - shown).toLocaleString()} ${T('条剩余', 'remaining')})</button></div>` : ''}
+          <div class="source-note">${T('名单成员完全以该机构官方目录为准；全球库仅用于补充交叉收录徽章。', 'Membership follows this institution\'s official directory only; the global database is used solely for optional cross-index badges.')} ${sourceYear}</div>
+        </div>
       </div>
-      <div class="table-wrap"><table class="journals country-journal-table regional-directory-table" aria-label="${escape(T(...config.title))}"><thead hidden><tr><th></th></tr></thead><tbody>
-        ${rows || `<tr><td class="empty">${T('未找到匹配期刊', 'No matching journals found')}</td></tr>`}
-      </tbody></table></div>
-      ${filtered.length > shown ? `<div class="pager"><button id="${source}-more" class="more-btn">${T('加载更多', 'Load more')} (${(filtered.length - shown).toLocaleString()} ${T('条剩余', 'remaining')})</button></div>` : ''}
-      <div class="source-note">${T('名单成员完全以该机构官方目录为准；全球库仅用于补充交叉收录徽章。', 'Membership follows this institution\'s official directory only; the global database is used solely for optional cross-index badges.')} ${sourceYear}</div>
     </div>`;
+    box.querySelectorAll('[data-reg-filter]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const key = btn.getAttribute('data-reg-filter');
+        const value = btn.getAttribute('data-value') || '__all';
+        if (!key) return;
+        window.__regionalFilter[source][key] = value;
+        window.__regionalShown[source] = 100;
+        renderRegionalDirectory(source);
+      });
+    });
     $(`#${source}-more`)?.addEventListener('click', () => {
       window.__regionalShown[source] += 100;
       renderRegionalDirectory(source);
