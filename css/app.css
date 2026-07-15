@@ -7608,7 +7608,7 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 10px 12px;
+  gap: 12px 16px; /* 刊名与右侧 IF/收藏保持距离，禁止重叠 */
   width: 100%;
   min-width: 0;
   padding: 14px 14px 12px;
@@ -7620,26 +7620,34 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   border-radius: 15px;
   flex: 1 1 auto;
 }
+/* 左：刊名区可收缩截断，绝不压到收藏星上 */
 .j-row .j-card-head-main {
-  flex: 1 1 auto;
+  flex: 1 1 0;
   min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
 }
+/* 右：IF + 收藏固定占位，不可被挤扁 */
 .j-row .j-card-head-side {
   flex: 0 0 auto;
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 6px;
-  max-width: 42%;
+  min-width: 36px;
+  max-width: 38%;
 }
 .j-row .j-card-title-block,
 .j-row .j-card-top {
   width: 100%;
   min-width: 0;
+  overflow: hidden;
 }
 .j-row .jname {
   margin: 0;
   min-height: 0;
+  max-width: 100%;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
   font-size: 16px;
   font-weight: 600;
@@ -7651,6 +7659,7 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   -webkit-box-orient: vertical;
   overflow: hidden;
   overflow-wrap: anywhere;
+  word-break: break-word;
 }
 .j-row .jname-cn,
 .j-row .jname-aka {
@@ -7696,14 +7705,20 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   text-overflow: ellipsis;
 }
 
-/* 收藏星：始终圆形底色（收藏前后都有） */
+/* 收藏星：始终圆形底色；占位固定，不与刊名重叠 */
 .j-row .j-card-fav,
 .j-row .col-fav {
   position: static !important;
   top: auto !important;
   right: auto !important;
-  width: auto !important;
+  left: auto !important;
+  width: 36px !important;
+  min-width: 36px;
+  flex: 0 0 36px;
   z-index: 1;
+  margin: 0;
+  padding: 0;
+  pointer-events: auto;
 }
 .j-row .j-card-fav .fav-star,
 .j-row .col-fav .fav-star {
@@ -7718,6 +7733,7 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   align-items: center;
   justify-content: center;
   font-size: 15px;
+  flex-shrink: 0;
 }
 .j-row .j-card-fav .fav-star.on,
 .j-row .col-fav .fav-star.on {
