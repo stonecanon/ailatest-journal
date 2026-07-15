@@ -513,7 +513,7 @@ main.main {
   min-width: 0;
   min-height: 100vh;
   padding: 18px 20px 70px;
-  max-width: 1120px;
+  max-width: 1280px; /* 3 列卡片 + 顶栏筛选需要更宽主栏 */
   margin: 0 auto;
 }
 
@@ -6469,43 +6469,42 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   font-size: 15px;
   font-weight: 700;
 }
-/* 地区/中国站筛选：与全球站左侧 thead 筛选同一套视觉语言 */
+/* 地区/中国站筛选：V10 顶部两栏芯片条（不再左侧竖轨） */
 .dom-browse {
   display: flex;
-  align-items: flex-start;
-  gap: 22px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
   margin-top: 8px;
 }
 .dom-filter-rail {
-  flex: 0 0 230px;
-  width: 230px;
-  min-width: 230px;
-  max-width: 230px;
-  position: sticky;
-  top: var(--th-sticky-top, 64px);
-  max-height: calc(100vh - 86px);
-  overflow-x: hidden;
-  overflow-y: auto;
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
+  flex: none;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  position: static;
+  max-height: none;
+  overflow: visible;
+  padding: 10px 12px;
+  border: 1px solid rgba(90, 70, 50, 0.08);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.55);
   box-sizing: border-box;
   box-shadow: none;
-  display: flex !important; /* 波兰/伊朗/拉美等地区站必须显示 */
-  flex-direction: column;
-  gap: 12px;
+  display: grid !important;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 14px;
   visibility: visible !important;
 }
-/* 地区目录页：保证左轨不被表格挤掉 */
 .regional-directory-section .dom-browse,
 .india-section .dom-browse,
 .korea-section .dom-browse,
 .malaysia-section .dom-browse,
 .dom-layout .dom-browse {
   display: flex;
-  align-items: flex-start;
-  gap: 22px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
 }
 .regional-directory-section .dom-filter-main,
 .india-section .dom-filter-main,
@@ -6514,56 +6513,66 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .dom-layout .dom-filter-main {
   flex: 1 1 auto;
   min-width: 0;
+  width: 100%;
 }
 .dom-filter-main {
   flex: 1 1 auto;
   min-width: 0;
+  width: 100%;
 }
-/* 每组独立卡片（对齐全球站「免费 / 索引 / 分区」分组） */
+/* 每组：标签 + 横向 chips（对齐 V10 filters-2col 行） */
 .dom-filter-group {
   margin: 0;
-  padding: 14px 14px 16px;
-  border: 1px solid var(--rule);
-  border-radius: 14px;
-  background: var(--bg2);
-  box-shadow: 0 1px 0 rgba(43, 42, 39, 0.03), 0 6px 16px -14px rgba(60, 48, 36, 0.2);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+  min-width: 0;
 }
 .dom-filter-group + .dom-filter-group {
   margin-top: 0;
-  padding-top: 14px;
-  border-top: 1px solid var(--rule);
+  padding-top: 0;
+  border-top: 0;
 }
 .dom-filter-label {
-  margin: 0 0 8px;
+  flex: 0 0 auto;
+  min-width: 36px;
+  margin: 0;
   padding: 0;
-  color: var(--ink);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: .04em;
+  color: #a8a29e;
+  font-size: 10.5px;
+  font-weight: 750;
+  letter-spacing: .02em;
   border: 0;
 }
-/* 两列等宽网格：按钮同宽、左右对齐，避免参差不齐 */
 .dom-filter-chips {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  width: auto;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 .dom-filter-chip {
   appearance: none;
   box-sizing: border-box;
-  width: 100%;
+  width: auto;
   min-width: 0;
-  min-height: 34px;
+  min-height: 0;
   margin: 0;
-  padding: 6px 8px;
-  border: 1px solid var(--rule);
-  border-radius: 8px;
-  background: var(--paper);
-  color: var(--ink-soft);
-  font-size: 11.5px;
-  font-weight: 600;
-  line-height: 1.25;
+  padding: 3px 9px;
+  border: 1px solid #ebe9e6;
+  border-radius: 999px;
+  background: #fff;
+  color: #57534e;
+  font-size: 11px;
+  font-weight: 650;
+  line-height: 1.3;
   text-align: center;
   white-space: nowrap;
   overflow: hidden;
@@ -6575,31 +6584,29 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   transition: background .15s ease, border-color .15s ease, color .15s ease;
 }
 .dom-filter-chip:hover {
-  border-color: var(--deep);
-  color: var(--ink);
-  background: var(--paper);
+  border-color: #d6d3d1;
+  color: #1c1917;
+  background: #fffefb;
 }
-/* 选中态：全站统一黑底 */
+/* 选中态：淡橘（V10） */
 .dom-filter-chip.on {
-  background: var(--filter-on);
-  border-color: var(--filter-on);
-  color: var(--filter-on-fg);
+  background: #fff7ed;
+  border-color: transparent;
+  color: #c2410c;
   font-weight: 700;
 }
 .dom-filter-chip:active {
   transform: scale(0.98);
 }
-/* 学科名较长：单元格内可换行，仍保持等宽 */
 .dom-filter-chips.is-wrap .dom-filter-chip,
 .dom-filter-group.is-subject .dom-filter-chip {
-  white-space: normal;
+  white-space: nowrap;
   text-align: center;
   line-height: 1.3;
-  min-height: 38px;
+  min-height: 0;
   hyphens: auto;
 }
 @media (max-width: 900px) {
-  /* 手机/平板：筛选轨横铺全宽，避免「又窄又长」竖条 */
   .dom-browse,
   .regional-directory-section .dom-browse,
   .india-section .dom-browse,
@@ -6615,33 +6622,32 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
     width: 100% !important;
     min-width: 0 !important;
     max-width: 100% !important;
-    max-height: min(42vh, 320px);
-    overflow-x: hidden;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    gap: 10px;
+    max-height: none;
+    overflow: visible;
+    grid-template-columns: 1fr;
+    gap: 8px;
   }
   .dom-filter-group {
-    padding: 12px;
+    padding: 0;
   }
   .dom-filter-chips {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    display: flex;
+    flex-wrap: wrap;
   }
   .dom-filter-chip {
-    min-height: 36px;
+    min-height: 0;
   }
 }
 @media (max-width: 560px) {
   .dom-filter-rail {
-    max-height: min(38vh, 280px);
+    max-height: none;
   }
   .dom-filter-chips {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 7px;
+    gap: 5px;
   }
   .dom-filter-chip {
-    font-size: 11px;
-    padding: 6px 6px;
+    font-size: 10.5px;
+    padding: 3px 8px;
   }
 }
 .dom-source-tabs {
@@ -8400,34 +8406,105 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   display: none !important;
 }
 
-/* ── 国际刊：表头 → 左侧筛选栏 ── */
-.tab-panel[data-panel="int"] table.journals { display: flex; align-items: flex-start; gap: 22px; }
+/* ── 国际刊：筛选在顶部（V10 两栏芯片条）── */
+.tab-panel[data-panel="int"] table.journals {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+}
 .tab-panel[data-panel="int"] table.journals thead {
-  flex: 0 0 230px; align-self: flex-start; position: sticky; top: var(--th-sticky-top, 64px);
-  background: var(--bg2); border: 1px solid var(--rule); border-radius: 14px;
-  padding: 14px 14px 16px; max-height: calc(100vh - 86px); overflow-y: auto;
+  flex: none;
+  width: 100%;
+  max-width: 100%;
+  align-self: stretch;
+  position: static;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(90, 70, 50, 0.08);
+  border-radius: 12px;
+  padding: 10px 12px;
+  max-height: none;
+  overflow: visible;
+  box-sizing: border-box;
 }
 .tab-panel[data-panel="int"] table.journals thead tr {
-  display: flex; flex-direction: column; align-items: stretch; gap: 15px;
-  padding: 0; margin: 0; border: 0; background: none;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: start;
+  gap: 6px 14px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: none;
 }
-.tab-panel[data-panel="int"] table.journals thead th { display: block; width: 100%; white-space: normal; }
+.tab-panel[data-panel="int"] table.journals thead th {
+  display: block;
+  width: 100%;
+  white-space: normal;
+  min-width: 0;
+}
 .tab-panel[data-panel="int"] table.journals thead .col-name,
 .tab-panel[data-panel="int"] table.journals thead .col-cycle,
-.tab-panel[data-panel="int"] table.journals thead .col-fav { display: none; }
-.tab-panel[data-panel="int"] table.journals tbody { flex: 1 1 auto; min-width: 0; padding-top: 0; }
+.tab-panel[data-panel="int"] table.journals thead .col-fav,
+.tab-panel[data-panel="int"] table.journals thead .col-if {
+  display: none;
+}
+/* 主筛选组（索引/分区等）跨满两列，内部再两栏排布 */
+.tab-panel[data-panel="int"] table.journals thead .col-badge {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 14px;
+  width: 100%;
+}
+.tab-panel[data-panel="int"] table.journals thead .col-free {
+  grid-column: 1 / -1;
+  order: -1;
+}
+.tab-panel[data-panel="int"] table.journals thead .col-wos {
+  grid-column: 1 / -1;
+}
+.tab-panel[data-panel="int"] table.journals tbody {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  padding-top: 0;
+}
 
-/* 左栏筛选组：与地区站一致 — 标题 + 两列等宽 chip */
-.tab-panel[data-panel="int"] .th-dropdown { display: block; position: static; width: 100%; }
+/* 筛选行：标签 + 横向 pill chips */
+.tab-panel[data-panel="int"] .th-dropdown {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+  position: static;
+  width: 100%;
+  min-width: 0;
+  border: 0 !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
 .tab-panel[data-panel="int"] .th-dropdown > .th-dropdown-btn {
-  pointer-events: none; width: 100%; justify-content: flex-start;
-  border: 0; padding: 0 0 8px; color: var(--ink); font-size: 12px; font-weight: 700; letter-spacing: .04em;
+  pointer-events: none;
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 36px;
+  justify-content: flex-start;
+  border: 0;
+  padding: 0;
+  color: #a8a29e;
+  font-size: 10.5px;
+  font-weight: 750;
+  letter-spacing: .02em;
+  background: none;
 }
 .tab-panel[data-panel="int"] .th-dropdown > .th-dropdown-btn .dd-arrow { display: none; }
 .tab-panel[data-panel="int"] .th-dropdown-panel {
-  display: grid !important;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 4px;
   position: static;
   min-width: 0;
   max-height: none;
@@ -8436,7 +8513,8 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   background: none;
   border: 0;
   box-shadow: none;
-  width: 100%;
+  width: auto;
+  flex: 1 1 auto;
   box-sizing: border-box;
 }
 .tab-panel[data-panel="int"] .th-chk {
@@ -8444,90 +8522,105 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  width: 100%;
+  width: auto;
   min-width: 0;
-  min-height: 34px;
+  min-height: 0;
   margin: 0;
-  padding: 6px 8px;
-  border: 1px solid var(--rule);
-  border-radius: 8px;
-  background: var(--paper);
-  color: var(--ink-soft);
-  font-size: 11.5px;
-  font-weight: 600;
-  line-height: 1.25;
+  padding: 3px 9px;
+  border: 1px solid #ebe9e6;
+  border-radius: 999px;
+  background: #fff;
+  color: #57534e;
+  font-size: 11px;
+  font-weight: 650;
+  line-height: 1.3;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   gap: 0;
   cursor: pointer;
 }
-.tab-panel[data-panel="int"] .th-chk:hover { border-color: var(--deep); color: var(--ink); }
+.tab-panel[data-panel="int"] .th-chk:hover {
+  border-color: #d6d3d1;
+  color: #1c1917;
+  background: #fffefb;
+}
 .tab-panel[data-panel="int"] .th-chk input { display: none; }
 .tab-panel[data-panel="int"] .th-chk:has(input:checked) {
-  background: var(--filter-on);
-  border-color: var(--filter-on);
-  color: var(--filter-on-fg);
+  background: #fff7ed;
+  border-color: transparent;
+  color: #c2410c;
   font-weight: 700;
 }
-/* 分隔线占满两列 */
 .tab-panel[data-panel="int"] .dd-sep {
-  grid-column: 1 / -1;
-  height: 0;
-  margin: 2px 0;
-  background: none;
-  border: 0;
-  padding: 0;
+  display: none;
 }
-/* IF 滑条整行 */
+/* IF 滑条：整行 */
 .tab-panel[data-panel="int"] #if-panel {
   display: flex !important;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
   gap: 8px;
+  flex: 1 1 auto;
 }
-/* 学科：搜索 + 列表 */
+.tab-panel[data-panel="int"] #if-slider {
+  flex: 1 1 140px;
+  max-width: 220px;
+}
+/* 学科：搜索 + 列表（可滚动） */
 .tab-panel[data-panel="int"] .th-dropdown-panel-search {
   display: flex !important;
   flex-direction: column;
-  gap: 8px;
+  align-items: stretch;
+  gap: 6px;
+  flex: 1 1 100%;
+  width: 100%;
 }
 .tab-panel[data-panel="int"] #topic-dd-search {
   width: 100%; box-sizing: border-box; margin: 0; padding: 6px 10px;
-  border: 1px solid var(--rule); border-radius: 8px; background: var(--paper); font-size: 12px;
+  border: 1px solid #ebe9e6; border-radius: 8px; background: #fff; font-size: 12px;
 }
 .tab-panel[data-panel="int"] #topic-dd-list {
-  display: grid !important;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-  max-height: 200px;
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-height: 120px;
   overflow: auto;
   width: 100%;
 }
 .tab-panel[data-panel="int"] #topic-dd-list .th-chk {
-  white-space: normal;
+  white-space: nowrap;
   text-align: center;
-  min-height: 38px;
-  font-size: 11px;
+  min-height: 0;
+  font-size: 10.5px;
 }
 .tab-panel[data-panel="int"] thead .col-free { order: -1; }
+.tab-panel[data-panel="int"] thead .col-free .free-th-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 650;
+  color: #57534e;
+}
 
 @media (max-width: 900px) {
-  /* 窄屏：国际刊筛选栏回到顶部，宽度拉满 */
-  .tab-panel[data-panel="int"] table.journals { display: block; }
+  .tab-panel[data-panel="int"] table.journals { display: flex; flex-direction: column; }
   .tab-panel[data-panel="int"] table.journals thead {
     position: static;
-    max-height: min(42vh, 320px);
-    overflow-y: auto;
+    max-height: none;
+    overflow: visible;
     flex: none;
     width: 100%;
     max-width: 100%;
-    margin-bottom: 10px;
+    margin-bottom: 0;
     box-sizing: border-box;
   }
-  .tab-panel[data-panel="int"] table.journals thead tr {
-    flex-direction: column;
-    flex-wrap: nowrap;
-    gap: 12px;
+  .tab-panel[data-panel="int"] table.journals thead tr,
+  .tab-panel[data-panel="int"] table.journals thead .col-badge {
+    grid-template-columns: 1fr;
+    gap: 8px;
   }
   .tab-panel[data-panel="int"] table.journals tbody { padding-top: 4px; }
 }
@@ -8990,12 +9083,10 @@ body.journal-route .lang-toggle-wrap { display: none; }
   .j-row .badges, .j-row .col-cross .badges { max-width: 100%; }
 }
 
-/* ═══════ 筛选：每个分类做成独立卡片；隐藏筛选区里的 IF 排序 ═══════ */
-.tab-panel[data-panel="int"] table.journals thead { background: none !important; border: 0 !important; padding: 0 !important; }
-.tab-panel[data-panel="int"] table.journals thead tr { background: none !important; border: 0 !important; padding: 0 !important; }
-.tab-panel[data-panel="int"] .th-dropdown {
-  border: 1px solid var(--rule); border-radius: 12px; padding: 11px 13px;
-  background: var(--paper); box-shadow: 0 1px 0 rgba(43,42,39,.03), 0 6px 16px -14px rgba(60,48,36,.2);
+/* ═══════ 筛选区：顶部条已在上方定义；勿再给 th-dropdown 加独立卡片底 ═══════ */
+.tab-panel[data-panel="int"] table.journals thead tr {
+  background: none !important;
+  border: 0 !important;
 }
 .tab-panel[data-panel="int"] thead .col-if { display: none !important; }
 .tab-panel[data-panel="int"] thead .col-free { width: 100%; }
