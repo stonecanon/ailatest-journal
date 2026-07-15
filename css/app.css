@@ -783,25 +783,201 @@ main.main {
 /* ─────────── Home tab ─────────── */
 .home-hero {
   text-align: center;
-  padding: 28px 20px 0;
+  padding: 20px 16px 0;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
   min-height: auto;
   order: 1;
+  width: 100%;
 }
 body.home-route:not(.home-tab-has-results):not(.topbar-compact) main.main {
   min-height: calc(100vh - 56px);
 }
 body.home-route:not(.home-tab-has-results):not(.topbar-compact) .home-hero {
-  padding-top: clamp(86px, 15vh, 150px);
+  padding-top: clamp(28px, 6vh, 56px);
+  padding-bottom: 28px;
 }
 body:not(.home-route) .home-hero {
   display: none;
 }
 body:not(.home-route) #mode-tabs {
   display: none;
+}
+/* 有搜索结果时收起落地页 */
+body.home-tab-has-results .home-v4 .home-stats,
+body.home-tab-has-results .home-v4 .home-hot,
+body.home-tab-has-results .home-v4 .home-v4-sub {
+  display: none;
+}
+body.home-tab-has-results .home-v4-title {
+  font-size: clamp(18px, 2.2vw, 22px);
+  margin-bottom: 4px;
+}
+body.home-tab-has-results .home-hero {
+  padding-top: 12px;
+  padding-bottom: 0;
+}
+
+/* ── Home V4 落地 ── */
+.home-v4 {
+  width: min(920px, 100%);
+  margin: 0 auto;
+}
+.home-v4-title {
+  font-family: var(--display), var(--sans);
+  font-size: clamp(26px, 3.6vw, 40px);
+  font-weight: 820;
+  letter-spacing: -0.03em;
+  line-height: 1.18;
+  color: #1c1916;
+  margin: 0 auto 12px;
+  text-wrap: balance;
+}
+.home-v4-grad {
+  background: linear-gradient(120deg, #c2410c 0%, #f97316 45%, #fb923c 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.home-v4-sub {
+  color: #5c564f;
+  font-size: 15px;
+  line-height: 1.55;
+  max-width: 520px;
+  margin: 0 auto 36px;
+  font-weight: 500;
+  text-wrap: balance;
+}
+.home-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0 auto;
+  max-width: 880px;
+}
+.home-stat {
+  text-align: left;
+  padding: 16px 14px 14px;
+  border-radius: 14px;
+  min-height: 88px;
+  border: 0;
+  background: linear-gradient(180deg, #fffbf7 0%, #fff3e8 50%, #ffe8d4 100%);
+  box-shadow:
+    0 1px 2px rgba(120, 80, 40, 0.04),
+    0 8px 20px rgba(180, 120, 70, 0.09);
+}
+.home-stat-num {
+  font-size: clamp(20px, 2.4vw, 26px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  margin-bottom: 5px;
+  font-variant-numeric: tabular-nums;
+  color: #b45309;
+}
+.home-stat-label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #78716c;
+}
+.home-hot {
+  margin: 36px auto 0;
+  max-width: 880px;
+  text-align: left;
+}
+.home-hot-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding: 0 2px;
+}
+.home-hot-head h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 750;
+  letter-spacing: -0.01em;
+  color: #1c1916;
+}
+.home-hot-ai {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #c2410c;
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(249, 115, 22, 0.08);
+  border-bottom: none !important;
+}
+.home-hot-ai:hover { background: rgba(249, 115, 22, 0.14); color: #9a3412; }
+.home-hot-list {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(40, 28, 16, 0.05);
+  overflow: hidden;
+}
+.home-hot-row {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) auto auto;
+  gap: 10px 12px;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f3f0ea;
+  text-decoration: none;
+  color: inherit;
+  border-bottom-color: #f3f0ea !important;
+  cursor: pointer;
+}
+.home-hot-row:last-child { border-bottom: 0 !important; }
+.home-hot-row:hover { background: #fffaf5; }
+.home-hot-n {
+  font-size: 13px;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+  color: #d6d3d1;
+  text-align: center;
+}
+.home-hot-row:nth-child(-n+3) .home-hot-n { color: #f97316; }
+.home-hot-name {
+  min-width: 0;
+  font-size: 13.5px;
+  font-weight: 650;
+  color: #1c1917;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.home-hot-if {
+  font-size: 12px;
+  font-weight: 650;
+  color: #78716c;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.home-hot-if em {
+  font-style: normal;
+  color: #b45309;
+  font-weight: 750;
+}
+.home-hot-pill {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: #fff7ed;
+  color: #c2410c;
+  white-space: nowrap;
+}
+@media (max-width: 720px) {
+  .home-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .home-stat { min-height: 76px; padding: 12px 12px 11px; }
+  .home-v4-sub { margin-bottom: 24px; font-size: 14px; }
+  .home-hot { margin-top: 28px; }
+  .home-hot-row { grid-template-columns: 28px minmax(0, 1fr) auto; }
+  .home-hot-if { display: none; }
 }
 .home-title {
   font-family: var(--display);
@@ -814,50 +990,7 @@ body:not(.home-route) #mode-tabs {
   text-wrap: balance;
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
 }
-.home-brand-row {
-  display: none;
-  align-items: center;
-  justify-content: center;
-  gap: clamp(10px, 1.4vw, 16px);
-  flex-wrap: nowrap;
-  white-space: nowrap;
-}
-.home-brand-row [data-i18n="brand_title"] {
-  line-height: 1.15;
-}
-.home-logo-mark {
-  width: clamp(42px, 5vw, 58px);
-  height: clamp(42px, 5vw, 58px);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--accent);
-  border: 2px solid rgba(249,115,22,.72);
-  border-radius: 15px;
-  background: rgba(255,255,255,.56);
-  box-shadow: 0 16px 36px rgba(249,115,22,.11);
-}
-.home-logo-mark svg {
-  width: 72%;
-  height: 72%;
-  stroke: currentColor;
-  stroke-width: 1.8;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-.home-title small {
-  display: block;
-  font-size: inherit;
-  font-weight: 720;
-  color: #6f6962;
-  letter-spacing: 0;
-  margin-top: 0;
-}
-.home-title em {
-  font-family: inherit;
-  font-style: normal;
-  font-weight: inherit;
-}
+.home-brand-row { display: none; }
 .brand-ai {
   color: var(--accent);
 }

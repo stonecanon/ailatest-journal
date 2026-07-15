@@ -42,7 +42,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 })(window,document,'script','dataLayer','GTM-NBNXL7FB');</script>
 <!-- End Google Tag Manager -->
 <link rel="preload" href="/data/journal_aliases.json" as="fetch" crossorigin="anonymous" />
-<link rel="stylesheet" href="/css/app.css?v=20260716-v10-redesign" />
+<link rel="stylesheet" href="/css/app.css?v=20260716-home-v4" />
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json" />
@@ -247,12 +247,26 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <main class="main">
   <section class="home-hero" aria-label="AILatest Journal">
-    <h1 class="home-title">
-      <span class="home-brand-row">
-        <span><em><span class="brand-ai">AI</span>Latest</em> <span data-i18n="brand_title">Journal</span></span>
-      </span>
-      <small data-i18n="home_subtitle">全球期刊检索与推荐平台</small>
-    </h1>
+    <div class="home-v4">
+      <h1 class="home-v4-title">
+        <span data-i18n="home_v4_line1">Find the right journal</span><br>
+        <span class="home-v4-grad" data-i18n="home_v4_line2">with clearer data</span>
+      </h1>
+      <p class="home-v4-sub" data-i18n="home_v4_sub">Search global journals, compare rankings and open access signals — in&nbsp;one&nbsp;place.</p>
+      <div class="home-stats" id="home-stats" aria-label="Platform metrics">
+        <div class="home-stat"><div class="home-stat-num" data-stat="journals">48,000+</div><div class="home-stat-label" data-i18n="home_stat_journals">Journals</div></div>
+        <div class="home-stat"><div class="home-stat-num" data-stat="views">7,000+</div><div class="home-stat-label" data-i18n="home_stat_views">Page views</div></div>
+        <div class="home-stat"><div class="home-stat-num" data-stat="visitors">1,000+</div><div class="home-stat-label" data-i18n="home_stat_visitors">Visitors</div></div>
+        <div class="home-stat"><div class="home-stat-num" data-stat="journal_views">22,000+</div><div class="home-stat-label" data-i18n="home_stat_jviews">Journal views</div></div>
+      </div>
+      <div class="home-hot" id="home-hot">
+        <div class="home-hot-head">
+          <h2 data-i18n="home_hot_title">Hot journals</h2>
+          <a href="/pick/" class="home-hot-ai" data-i18n="home_hot_ai">AI Recommend →</a>
+        </div>
+        <div class="home-hot-list" id="home-hot-list" role="list"></div>
+      </div>
+    </div>
   </section>
 
   <header class="topbar">
@@ -688,7 +702,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <script>
 // Build version for cache busting data files
-window.__BUILD_VER = 'v20260716-v10-redesign';
+window.__BUILD_VER = 'v20260716-home-v4';
 // Service Worker 清理 — 必须在 app.js 加载前运行
 (function() {
   if ('serviceWorker' in navigator) {
@@ -710,7 +724,7 @@ window.__BUILD_VER = 'v20260716-v10-redesign';
 </script>
 <script src="/js/pick-match.js?v=20260716-v10" defer></script>
 <script src="/js/pricing-checkout.js?v=20260716-creem" defer></script>
-<script src="/js/app.js?v=20260716-v10-redesign" defer></script>
+<script src="/js/app.js?v=20260716-home-v4" defer></script>
 
 </body>
 </html>

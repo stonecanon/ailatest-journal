@@ -121,6 +121,15 @@
       search_submit_hint: '搜索',
       search_button: 'Search',
       home_subtitle: '全球期刊检索与推荐平台',
+      home_v4_line1: '用更清晰的数据',
+      home_v4_line2: '找到合适的期刊',
+      home_v4_sub: '检索全球期刊，对比分区、影响因子与开放获取信息 — 一站完成。',
+      home_stat_journals: '收录期刊',
+      home_stat_views: '累计浏览',
+      home_stat_visitors: '服务用户',
+      home_stat_jviews: '期刊详情',
+      home_hot_title: '热点期刊',
+      home_hot_ai: 'AI 荐刊 →',
       showing: '显示', of: '条 / 共', total_items: '条',
       empty: '未找到匹配的期刊',
       empty_fav: '还没有收藏。切到「国际 SCI/SSCI」点任意一行右边的 ★ 就能收藏。',
@@ -217,6 +226,15 @@
       search_submit_hint: 'search',
       search_button: 'Search',
       home_subtitle: 'Journal search & submission decision tool for researchers',
+      home_v4_line1: 'Find the right journal',
+      home_v4_line2: 'with clearer data',
+      home_v4_sub: 'Search global journals, compare rankings and open access signals — in\u00a0one\u00a0place.',
+      home_stat_journals: 'Journals',
+      home_stat_views: 'Page views',
+      home_stat_visitors: 'Visitors',
+      home_stat_jviews: 'Journal views',
+      home_hot_title: 'Hot journals',
+      home_hot_ai: 'AI Recommend →',
       showing: 'Showing', of: 'of', total_items: '',
       empty: 'No journals match.',
       empty_fav: 'No favorites yet. Switch to Int’l SCI/SSCI and click ★ on any row to bookmark.',
@@ -12933,6 +12951,90 @@
     renderPickHistory();
   }
 
+  // ───────── Home V4 landing: stats + hot journals ─────────
+  function formatHomeStat(n) {
+    const num = Number(n) || 0;
+    if (num >= 1_000_000) return `${Math.floor(num / 100_000) / 10}M+`;
+    if (num >= 10_000) return `${Math.floor(num / 1000).toLocaleString()}+`;
+    if (num >= 1000) return `${Math.floor(num / 100) * 100}+`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    if (num > 0) return `${num}+`;
+    return '—';
+  }
+
+  function setHomeStat(key, value) {
+    const el = document.querySelector(`[data-stat="${key}"]`);
+    if (el) el.textContent = formatHomeStat(value);
+  }
+
+  async function loadHomeStats() {
+    try {
+      const [pub, m] = await Promise.all([
+        fetch(`${API_BASE}/analytics/public-total`).then(r => r.ok ? r.json() : null).catch(() => null),
+        meta || fetch('/data/meta.json').then(r => r.json()).catch(() => null),
+      ]);
+      if (m && m.total) setHomeStat('journals', m.total);
+      if (pub && pub.ok !== false) {
+        if (pub.total_pageviews != null) setHomeStat('views', pub.total_pageviews);
+        if (pub.total_visitors != null) setHomeStat('visitors', pub.total_visitors);
+        if (pub.total_journal_views != null) setHomeStat('journal_views', pub.total_journal_views);
+      }
+    } catch (_) { /* keep placeholder */ }
+  }
+
+  function buildHomeHotList() {
+    const box = $('#home-hot-list');
+    if (!box) return;
+    const pool = (journalsReady && journals.length ? journals : (homeJournals || journals || []));
+    if (!pool.length) {
+      box.innerHTML = `<div class="home-hot-row" style="justify-content:center;color:#a8a29e;font-size:13px">${T('加载中…','Loading…')}</div>`;
+      return;
+    }
+    // 优先旗舰 + 高 IF，作「热点」示意（后续可接真实浏览榜）
+    const scored = pool
+      .filter(r => r && (r.name || r.n) && (r.if_2024 != null || r.flagship))
+      .map(r => ({
+        r,
+        score: (r.flagship ? 1000 : 0) + (Number(r.if_2024) || 0) + (r.cas_zone === 1 ? 5 : 0) + (r.if_quartile === 'Q1' ? 3 : 0),
+      }))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 6);
+
+    box.innerHTML = scored.map(({ r }, i) => {
+      const name = titleCase(r.name || r.n || '');
+      const ifv = r.if_2024 != null ? (+r.if_2024).toFixed(1) : '—';
+      const pill = r.if_quartile || (r.cas_zone ? `Z${r.cas_zone}` : (r.flagship ? 'Flag' : '—'));
+      const slug = r.slug || '';
+      const href = slug ? `/journal/${encodeURIComponent(slug)}/` : '#';
+      return `<a class="home-hot-row" role="listitem" href="${href}" data-hot-fid="${escape(favId(r))}">
+        <span class="home-hot-n">${i + 1}</span>
+        <span class="home-hot-name" title="${escape(name)}">${escape(name)}</span>
+        <span class="home-hot-if">IF <em>${escape(ifv)}</em></span>
+        <span class="home-hot-pill">${escape(String(pill))}</span>
+      </a>`;
+    }).join('');
+
+    box.querySelectorAll('[data-hot-fid]').forEach(a => {
+      a.addEventListener('click', (e) => {
+        const fid = a.getAttribute('data-hot-fid');
+        const rec = (journals || []).find(j => favId(j) === fid)
+          || (homeJournals || []).find(j => favId(j) === fid);
+        if (rec && typeof openJournalDrawer === 'function') {
+          // 允许默认跳转 SEO URL；有抽屉则也打开
+          try { openJournalDrawer(rec); } catch (_) {}
+        }
+      });
+    });
+  }
+
+  function initHomeLanding() {
+    loadHomeStats();
+    buildHomeHotList();
+    // 期刊库稍后就绪时刷新热点
+    if (!journalsReady) {
+      ensureJournalsLoaded().then(() => buildHomeHotList()).catch(() => {});
+    }
+  }
+
   // ───────── boot ─────────
   async function boot() {
     // ── Owner unlock: specific URL param sets localStorage bypass ──
@@ -12949,6 +13051,7 @@
     applyI18n();
     applyStations();
     updateFavCount();
+    initHomeLanding();
     await handleAuthCallback();
     refreshCurrentUserProfile();
     // 分享着陆页：/s/<id> 直接接管 main，不走主流程
@@ -12997,6 +13100,8 @@
       journals.forEach(journalSearchMeta);
       buildIntIndex(journals);
       updateFilterCounts();
+      buildHomeHotList();
+      if (meta && meta.total) setHomeStat('journals', meta.total);
       // Refresh stale favsData with live international journal data
       (function refreshFavsData() {
         let dirty = false;
