@@ -49,9 +49,15 @@ import {
 import {
   getEntitlements,
   activateTrialForNewUser,
+  applyPaidSubscription,
   enforceFavoritesWrite,
   enforceListsWrite,
 } from './entitlements.js';
+import {
+  routeCreemCheckout,
+  routeCreemCatalog,
+  routeCreemWebhook,
+} from './creem.js';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -497,33 +503,106 @@ async function routeExtensionDownload(req, env) {
 }
 
 let apiKeysReady = false;
+/**
+ * api_keys 线上曾有旧 schema（INTEGER id、无 key_tail、request_count）。
+ * 启动时探测并迁移到统一结构，避免 INSERT 因缺列 / 类型不匹配 → HTTP 500。
+ */
 async function ensureApiKeyTables(env) {
   if (apiKeysReady || !env?.DB) return;
-  await env.DB.batch([
-    env.DB.prepare(
-      `CREATE TABLE IF NOT EXISTS api_keys (
-        id           TEXT PRIMARY KEY,
-        user_id      INTEGER NOT NULL,
-        name         TEXT NOT NULL DEFAULT 'My API',
-        key_hash     TEXT NOT NULL UNIQUE,
-        key_prefix   TEXT NOT NULL,
-        key_tail     TEXT NOT NULL,
-        created_at   INTEGER NOT NULL,
-        revoked_at   INTEGER,
-        last_used_at INTEGER,
-        call_count   INTEGER NOT NULL DEFAULT 0
-      )`
-    ),
-    env.DB.prepare('CREATE INDEX IF NOT EXISTS idx_api_keys_user ON api_keys(user_id, created_at DESC)'),
-    env.DB.prepare('CREATE INDEX IF NOT EXISTS idx_api_keys_hash ON api_keys(key_hash)'),
-  ]);
+  await env.DB.prepare(
+    `CREATE TABLE IF NOT EXISTS api_keys (
+      id           TEXT PRIMARY KEY,
+      user_id      INTEGER NOT NULL,
+      name         TEXT NOT NULL DEFAULT 'My API',
+      key_hash     TEXT NOT NULL UNIQUE,
+      key_prefix   TEXT NOT NULL,
+      key_tail     TEXT NOT NULL DEFAULT '',
+      created_at   INTEGER NOT NULL,
+      revoked_at   INTEGER,
+      last_used_at INTEGER,
+      call_count   INTEGER NOT NULL DEFAULT 0
+    )`
+  ).run();
+
+  const info = await env.DB.prepare('PRAGMA table_info(api_keys)').all();
+  const cols = new Map((info.results || []).map((r) => [String(r.name), r]));
+  const has = (name) => cols.has(name);
+  const idType = String(cols.get('id')?.type || '').toUpperCase();
+
+  // 旧表：INTEGER AUTOINCREMENT id → 重建为 TEXT id（保留数据）
+  if (has('id') && idType.includes('INT')) {
+    const countExpr = has('call_count')
+      ? 'COALESCE(call_count, 0)'
+      : has('request_count')
+        ? 'COALESCE(request_count, 0)'
+        : '0';
+    const tailExpr = has('key_tail') ? "COALESCE(key_tail, '')" : "''";
+    await env.DB.batch([
+      env.DB.prepare(
+        `CREATE TABLE IF NOT EXISTS api_keys_v2 (
+          id           TEXT PRIMARY KEY,
+          user_id      INTEGER NOT NULL,
+          name         TEXT NOT NULL DEFAULT 'My API',
+          key_hash     TEXT NOT NULL UNIQUE,
+          key_prefix   TEXT NOT NULL,
+          key_tail     TEXT NOT NULL DEFAULT '',
+          created_at   INTEGER NOT NULL,
+          revoked_at   INTEGER,
+          last_used_at INTEGER,
+          call_count   INTEGER NOT NULL DEFAULT 0
+        )`
+      ),
+      env.DB.prepare(
+        `INSERT OR IGNORE INTO api_keys_v2
+           (id, user_id, name, key_hash, key_prefix, key_tail, created_at, revoked_at, last_used_at, call_count)
+         SELECT
+           printf('legacy-%d', id),
+           user_id,
+           COALESCE(name, 'My API'),
+           key_hash,
+           key_prefix,
+           ${tailExpr},
+           created_at,
+           revoked_at,
+           last_used_at,
+           ${countExpr}
+         FROM api_keys`
+      ),
+      env.DB.prepare('DROP TABLE api_keys'),
+      env.DB.prepare('ALTER TABLE api_keys_v2 RENAME TO api_keys'),
+    ]);
+  } else {
+    // 补列（CREATE IF NOT EXISTS 不会改旧表）
+    if (!has('key_tail')) {
+      await env.DB.prepare(`ALTER TABLE api_keys ADD COLUMN key_tail TEXT NOT NULL DEFAULT ''`).run();
+    }
+    if (!has('call_count')) {
+      await env.DB.prepare(`ALTER TABLE api_keys ADD COLUMN call_count INTEGER NOT NULL DEFAULT 0`).run();
+      if (has('request_count')) {
+        await env.DB.prepare(
+          `UPDATE api_keys SET call_count = COALESCE(request_count, 0) WHERE call_count = 0 OR call_count IS NULL`
+        ).run().catch(() => {});
+      }
+    }
+  }
+
+  await env.DB.prepare(
+    'CREATE INDEX IF NOT EXISTS idx_api_keys_user ON api_keys(user_id, created_at)'
+  ).run().catch(() => {});
+  await env.DB.prepare(
+    'CREATE INDEX IF NOT EXISTS idx_api_keys_hash ON api_keys(key_hash)'
+  ).run().catch(() => {});
   apiKeysReady = true;
 }
 
 function apiKeySecret() {
   const bytes = new Uint8Array(24);
   crypto.getRandomValues(bytes);
-  return `aj_live_${b64url(bytes)}`;
+  // 避免 String.fromCharCode(...arr) 在部分 runtime 上的展开问题
+  let bin = '';
+  for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+  const b64 = btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  return `aj_live_${b64}`;
 }
 
 async function apiKeyHash(secret, env) {
@@ -532,14 +611,14 @@ async function apiKeyHash(secret, env) {
 
 function publicApiKey(row) {
   return {
-    id: row.id,
+    id: String(row.id),
     name: row.name,
     key_prefix: row.key_prefix,
-    key_tail: row.key_tail,
+    key_tail: row.key_tail || '',
     created_at: row.created_at,
     revoked_at: row.revoked_at,
     last_used_at: row.last_used_at,
-    call_count: row.call_count || 0,
+    call_count: Number(row.call_count ?? row.request_count ?? 0) || 0,
   };
 }
 
@@ -754,6 +833,7 @@ async function getUserById(env, id) {
 }
 
 function publicUser(u) {
+  const owner = isOwnerUser(u);
   return {
     id: u.id,
     email: u.email,
@@ -761,6 +841,8 @@ function publicUser(u) {
     name: u.name,
     avatar_url: u.avatar_url,
     provider: u.provider,
+    is_owner: owner,
+    plan: owner ? 'owner' : undefined,
   };
 }
 
@@ -779,15 +861,21 @@ function nextUtcMonthStart(sec) {
   return Math.floor(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 1) / 1000);
 }
 
+const OWNER_EMAILS = new Set(['jiantaoweng@gmail.com']);
+
 function isOwnerUser(u) {
-  const email = String(u?.email || '').toLowerCase();
-  const login = String(u?.login || '').toLowerCase();
-  return email === 'jiantaoweng@gmail.com' || login === 'jiantaoweng@gmail.com';
+  const email = String(u?.email || '').toLowerCase().trim();
+  const login = String(u?.login || '').toLowerCase().trim();
+  if (OWNER_EMAILS.has(email) || OWNER_EMAILS.has(login)) return true;
+  // Google 登录 login 常为邮箱本地部分
+  const local = email.includes('@') ? email.split('@')[0] : login;
+  if (local === 'jiantaoweng' && (!email || email.endsWith('@gmail.com'))) return true;
+  return false;
 }
 
-/** Free：终身 10 次；Pro(plus)：每月约 Max 一半（50 次完整荐刊）；Max：monthly_limit/credits（约 100 次） */
+/** Free：终身 10 次；Pro(plus)：月 500 credits ≈ 50 次；Max：1000 credits ≈ 100 次（完整荐刊约 10 credits） */
 const FREE_PICK_LIFETIME_LIMIT = 10;
-const PLUS_PICK_MONTHLY_LIMIT = 50; // Max ≈ 100 次完整荐刊 / 1000 credits → Pro 一半
+const PLUS_PICK_MONTHLY_LIMIT = 50; // 与 500 credits / 10 对齐的荐刊次数上限（兼容 user_quotas）
 
 async function getPickQuota(env, userId) {
   try {
@@ -840,7 +928,7 @@ async function consumePickQuotaForUser(env, u) {
   const hasPaidMonthly = plan !== 'free'
     && Number(quota.monthly_limit || 0) > 0
     && (!quota.paid_until || Number(quota.paid_until) >= now);
-  // plus / trial：月额度（Max 的一半）；free：终身 lifetime；pro/max：库内 monthly_limit
+  // plus / trial：月额度（≈500 credits / 50 次）；free：终身 lifetime；pro/max：库内 monthly_limit
   const isPlusPlan = plan === 'plus' || plan === 'trial';
   let period;
   let periodKey;
@@ -1162,18 +1250,23 @@ async function routeGoogleCallback(req, env) {
     let uid;
     if (existing) {
       uid = existing.id;
+      // 始终用 Google 返回的邮箱覆盖（避免旧账号 email 为空/错误导致站长判定失败）
       await env.DB.prepare(
         `UPDATE users
             SET google_id=?,
-                email=COALESCE(email, ?),
-                login=COALESCE(login, ?),
+                email=CASE WHEN ? != '' THEN ? ELSE email END,
+                login=CASE WHEN ? != '' THEN ? ELSE COALESCE(login, ?) END,
                 name=COALESCE(NULLIF(?, ''), name),
                 avatar_url=COALESCE(NULLIF(?, ''), avatar_url),
+                provider=COALESCE(provider, 'google'),
                 updated_at=?
           WHERE id=?`
       ).bind(
         gg.sub,
+        email || '',
         email || null,
+        email || '',
+        email ? email.split('@')[0] : '',
         email ? email.split('@')[0] : gg.sub,
         gg.name || '',
         gg.picture || '',
@@ -1214,48 +1307,202 @@ async function routeMeEntitlements(req, env) {
   return json(await getEntitlements(env, u, isOwnerUser(u)));
 }
 
+// ───────── gift codes（礼品码：生成 / 兑换） ─────────
+async function ensureGiftTables(env) {
+  await env.DB.batch([
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS gift_codes (
+      code_hash TEXT PRIMARY KEY,
+      code_hint TEXT NOT NULL,
+      plan TEXT NOT NULL,
+      duration_days INTEGER,
+      expires_at INTEGER,
+      created_by TEXT NOT NULL,
+      created_at INTEGER NOT NULL
+    )`),
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS gift_redemptions (
+      code_hash TEXT PRIMARY KEY,
+      user_id INTEGER NOT NULL,
+      redeemed_at INTEGER NOT NULL,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    )`),
+  ]);
+}
+
+function normalizeGiftCode(value) {
+  return String(value || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+}
+
+function createGiftCodeText(plan) {
+  // plan: pro | max（产品文案）；码前缀 JOURNAL-
+  const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const bytes = crypto.getRandomValues(new Uint8Array(12));
+  const token = Array.from(bytes, (b) => alphabet[b % alphabet.length]).join('');
+  const tag = plan === 'max' ? 'MAX' : 'PRO';
+  return `JOURNAL-${tag}-${token.slice(0, 4)}-${token.slice(4, 8)}-${token.slice(8)}`;
+}
+
+/** POST /admin/gift-codes  { plan:'pro'|'max', durationDays:number|null, quantity:1-20 } */
+async function routeAdminGiftCodes(req, env) {
+  const u = await getUser(req, env);
+  if (!u) return err('unauthorized', 401);
+  if (!isOwnerUser(u)) return err('forbidden', 403);
+  const body = await req.json().catch(() => ({}));
+  // 产品档：pro=产品 Pro → 内部 plus；max=产品 Max → 内部 pro
+  const productPlan = body?.plan === 'pro' ? 'pro' : body?.plan === 'max' ? 'max' : null;
+  const durationRaw = body?.durationDays;
+  const durationDays = durationRaw === null || durationRaw === 'permanent'
+    ? null
+    : Math.floor(Number(durationRaw));
+  const quantity = Math.min(20, Math.max(1, Math.floor(Number(body?.quantity ?? 1))));
+  if (!productPlan || (durationDays !== null && (!Number.isFinite(durationDays) || durationDays < 1 || durationDays > 3650))) {
+    return err('invalid_gift_options', 400);
+  }
+  await ensureGiftTables(env);
+  const now = nowSec();
+  const codes = [];
+  const stmts = [];
+  for (let i = 0; i < quantity; i += 1) {
+    const code = createGiftCodeText(productPlan);
+    const canonical = normalizeGiftCode(code);
+    codes.push(code);
+    stmts.push(
+      env.DB.prepare(
+        `INSERT INTO gift_codes (code_hash, code_hint, plan, duration_days, expires_at, created_by, created_at)
+         VALUES (?, ?, ?, ?, NULL, ?, ?)`
+      ).bind(await sha256Hex(canonical), code.slice(-4), productPlan, durationDays, String(u.email || u.login || u.id), now)
+    );
+  }
+  await env.DB.batch(stmts);
+  return json({ codes, plan: productPlan, durationDays, createdAt: now });
+}
+
+/** POST /gift-codes/redeem  { code } */
+async function routeRedeemGiftCode(req, env) {
+  const u = await getUser(req, env);
+  if (!u) return err('unauthorized', 401);
+  const body = await req.json().catch(() => ({}));
+  const canonical = normalizeGiftCode(body?.code || '');
+  if (canonical.length < 12) return err('invalid_gift_code', 400);
+  await ensureGiftTables(env);
+  const codeHash = await sha256Hex(canonical);
+  const gift = await env.DB.prepare(
+    'SELECT plan, duration_days, expires_at, code_hint FROM gift_codes WHERE code_hash = ?'
+  ).bind(codeHash).first();
+  if (!gift || (gift.plan !== 'pro' && gift.plan !== 'max')) {
+    return err('invalid_gift_code', 404);
+  }
+  if (gift.expires_at && Number(gift.expires_at) > 0 && nowSec() > Number(gift.expires_at)) {
+    return err('gift_code_expired', 410);
+  }
+  const redeemed = await env.DB.prepare(
+    'SELECT user_id FROM gift_redemptions WHERE code_hash = ?'
+  ).bind(codeHash).first();
+  if (redeemed) return err('gift_code_used', 409);
+
+  // 产品 max → 内部 pro；产品 pro → 内部 plus
+  const internalTier = gift.plan === 'max' ? 'pro' : 'plus';
+  const now = nowSec();
+  let paidUntil = null;
+  if (gift.duration_days != null && Number(gift.duration_days) > 0) {
+    // 若已有未过期 paid_until，在其上叠加
+    let base = now;
+    try {
+      const row = await env.DB.prepare(
+        'SELECT tier, paid_until FROM user_entitlements WHERE user_id = ?'
+      ).bind(u.id).first();
+      if (row?.paid_until && Number(row.paid_until) > now) base = Number(row.paid_until);
+      // 已是 Max 不降级
+      if (row?.tier === 'pro') {
+        // keep max
+      }
+    } catch (_) {}
+    paidUntil = base + Number(gift.duration_days) * 86400;
+  }
+  try {
+    await env.DB.prepare(
+      'INSERT INTO gift_redemptions (code_hash, user_id, redeemed_at) VALUES (?, ?, ?)'
+    ).bind(codeHash, u.id, now).run();
+  } catch (_) {
+    return err('gift_code_used', 409);
+  }
+  // 若用户已是 Max，礼品是 Pro 也不降级
+  let applyTier = internalTier;
+  try {
+    const cur = await env.DB.prepare(
+      'SELECT tier FROM user_entitlements WHERE user_id = ?'
+    ).bind(u.id).first();
+    if (cur?.tier === 'pro') applyTier = 'pro';
+  } catch (_) {}
+  await applyPaidSubscription(env, u.id, {
+    tier: applyTier,
+    paidUntilSec: paidUntil,
+    productId: `gift:${gift.plan}:${gift.code_hint || ''}`,
+  });
+  const productLabel = applyTier === 'pro' ? 'max' : 'pro';
+  return json({
+    ok: true,
+    plan: productLabel,
+    tier: applyTier,
+    paid_until: paidUntil,
+    status: 'gift_active',
+  });
+}
+
 async function routeApiKeys(req, env) {
   const u = await getUser(req, env);
   if (!u) return err('unauthorized', 401);
-  await ensureApiKeyTables(env);
-  const rows = await env.DB.prepare(
-    `SELECT id, name, key_prefix, key_tail, created_at, revoked_at, last_used_at, call_count
-       FROM api_keys
-      WHERE user_id = ? AND revoked_at IS NULL
-      ORDER BY created_at DESC
-      LIMIT 50`
-  ).bind(u.id).all();
-  return json({ ok: true, keys: (rows.results || []).map(publicApiKey) });
+  try {
+    await ensureApiKeyTables(env);
+    const rows = await env.DB.prepare(
+      `SELECT id, name, key_prefix, key_tail, created_at, revoked_at, last_used_at, call_count
+         FROM api_keys
+        WHERE user_id = ? AND revoked_at IS NULL
+        ORDER BY created_at DESC
+        LIMIT 50`
+    ).bind(u.id).all();
+    return json({ ok: true, keys: (rows.results || []).map(publicApiKey) });
+  } catch (e) {
+    console.error('routeApiKeys', e?.message || e);
+    return err('api keys unavailable: ' + (e?.message || 'error'), 500);
+  }
 }
 
 async function routeCreateApiKey(req, env) {
   const u = await getUser(req, env);
   if (!u) return err('unauthorized', 401);
-  await ensureApiKeyTables(env);
-  const body = await req.json().catch(() => ({}));
-  const name = cleanText(body?.name || 'My API', 80) || 'My API';
-  const existing = await env.DB.prepare(
-    'SELECT COUNT(*) AS n FROM api_keys WHERE user_id = ? AND revoked_at IS NULL'
-  ).bind(u.id).first();
-  if (Number(existing?.n || 0) >= 10) return err('api key limit reached', 429);
-  const secret = apiKeySecret();
-  const now = nowSec();
-  const id = crypto.randomUUID();
-  const row = {
-    id,
-    name,
-    key_prefix: secret.slice(0, 8),
-    key_tail: secret.slice(-6),
-    created_at: now,
-    revoked_at: null,
-    last_used_at: null,
-    call_count: 0,
-  };
-  await env.DB.prepare(
-    `INSERT INTO api_keys (id, user_id, name, key_hash, key_prefix, key_tail, created_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`
-  ).bind(id, u.id, name, await apiKeyHash(secret, env), row.key_prefix, row.key_tail, now).run();
-  return json({ ok: true, secret, key: publicApiKey(row) }, 201);
+  try {
+    await ensureApiKeyTables(env);
+    const body = await req.json().catch(() => ({}));
+    const name = cleanText(body?.name || 'My API', 80) || 'My API';
+    const existing = await env.DB.prepare(
+      'SELECT COUNT(*) AS n FROM api_keys WHERE user_id = ? AND revoked_at IS NULL'
+    ).bind(u.id).first();
+    if (Number(existing?.n || 0) >= 10) return err('api key limit reached', 429);
+    const secret = apiKeySecret();
+    const now = nowSec();
+    const id = crypto.randomUUID();
+    const keyPrefix = secret.slice(0, 8);
+    const keyTail = secret.slice(-6);
+    const hash = await apiKeyHash(secret, env);
+    const row = {
+      id,
+      name,
+      key_prefix: keyPrefix,
+      key_tail: keyTail,
+      created_at: now,
+      revoked_at: null,
+      last_used_at: null,
+      call_count: 0,
+    };
+    await env.DB.prepare(
+      `INSERT INTO api_keys (id, user_id, name, key_hash, key_prefix, key_tail, created_at, call_count)
+       VALUES (?, ?, ?, ?, ?, ?, ?, 0)`
+    ).bind(id, u.id, name, hash, keyPrefix, keyTail, now).run();
+    return json({ ok: true, secret, key: publicApiKey(row) }, 201);
+  } catch (e) {
+    console.error('routeCreateApiKey', e?.message || e);
+    return err('create api key failed: ' + (e?.message || 'error'), 500);
+  }
 }
 
 async function routeRevokeApiKey(req, env, id) {
@@ -1811,8 +2058,10 @@ async function fetchOpenAlexCountryYear(sourceIssn, year, apiKey = '', attempt =
   }
   // 礼貌池限流：短暂退避后重试
   if (resp.status === 429 && attempt < 3) {
-    const wait = Number(resp.headers.get('Retry-After') || 0) * 1000 || (800 * (attempt + 1));
-    await new Promise(r => setTimeout(r, Math.min(wait, 4000)));
+    const raSec = Number(resp.headers.get('Retry-After') || 0);
+    // 封顶 5s：详情页不能等数小时的 Retry-After
+    const wait = Math.min(raSec > 0 ? raSec * 1000 : 800 * (attempt + 1), 5000);
+    await new Promise(r => setTimeout(r, wait));
     return fetchOpenAlexCountryYear(sourceIssn, year, apiKey, attempt + 1);
   }
   if (!resp.ok) return { year, total: 0, groups: [], skipped: true, status: resp.status };
@@ -1838,18 +2087,21 @@ async function fetchOpenAlexCountryYear(sourceIssn, year, apiKey = '', attempt =
 }
 
 function buildCountryOutputPayload(rows) {
-  const usable = rows.filter(row => row.total > 0);
+  const usable = rows
+    .filter(row => row.total > 0 && Array.isArray(row.groups) && row.groups.length)
+    .sort((a, b) => a.year - b.year);
   if (!usable.length) return null;
   const countryTotals = new Map();
   usable.forEach(row => row.groups.forEach(group => {
     countryTotals.set(group.name, (countryTotals.get(group.name) || 0) + group.count);
   }));
-  const topOther = [...countryTotals.entries()]
-    .filter(([name]) => name !== 'China')
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 4)
-    .map(([name]) => name);
-  const top = ['China', ...topOther].filter((name, index, arr) => index === arr.indexOf(name));
+  const ranked = [...countryTotals.entries()].sort((a, b) => b[1] - a[1]).map(([name]) => name);
+  // 有中国数据时置顶；否则用真实 Top，避免空 China 占位导致图空白
+  const top = (ranked.includes('China')
+    ? ['China', ...ranked.filter((n) => n !== 'China')]
+    : ranked
+  ).slice(0, 5);
+  if (!top.length) return null;
   return { ok: true, years: usable, top, source: 'openalex' };
 }
 
@@ -1877,18 +2129,33 @@ async function routeOpenAlexCountryOutput(req, env) {
   const hit = debug ? null : await cache.match(cacheKey);
   if (hit) return new Response(hit.body, { status: 200, headers: { 'Content-Type': 'application/json', ...CORS, 'Cache-Control': 'public, max-age=86400' } });
 
-  // 无 API key 时少查几年，降低礼貌池 429
+  // 无 API key 时少查几年；有 key 时并行拉年，显著缩短详情页等待
   const queryYears = apiKey ? years : years.slice(-3);
   let payload = null;
   const attempts = [];
   for (const sourceIssn of issns) {
-    const rows = [];
-    for (const year of queryYears) {
-      const row = await fetchOpenAlexCountryYear(sourceIssn, year, apiKey);
-      rows.push(row);
-      if (debug || row.skipped) attempts.push({ issn: sourceIssn, year, total: row.total, status: row.status || 200, skipped: !!row.skipped });
-      // 年份之间留空隙，降低限流概率
-      if (!apiKey) await new Promise(r => setTimeout(r, 350));
+    let rows;
+    if (apiKey) {
+      rows = await Promise.all(queryYears.map((year) => fetchOpenAlexCountryYear(sourceIssn, year, apiKey)));
+    } else {
+      rows = [];
+      for (const year of queryYears) {
+        const row = await fetchOpenAlexCountryYear(sourceIssn, year, apiKey);
+        rows.push(row);
+        // 礼貌池串行 + 间隔，降低 429
+        await new Promise((r) => setTimeout(r, 450));
+      }
+    }
+    for (const row of rows) {
+      if (debug || row.skipped) {
+        attempts.push({
+          issn: sourceIssn,
+          year: row.year,
+          total: row.total,
+          status: row.status || 200,
+          skipped: !!row.skipped,
+        });
+      }
     }
     payload = buildCountryOutputPayload(rows);
     if (payload) {
@@ -2219,6 +2486,20 @@ export default {
       if (p === '/extension/download'       && req.method === 'GET') return routeExtensionDownload(req, env);
       if (p === '/me'                  && req.method === 'GET')  return routeMe(req, env);
       if (p === '/me/entitlements'     && req.method === 'GET')  return routeMeEntitlements(req, env);
+      if (p === '/admin/gift-codes'    && req.method === 'POST') return routeAdminGiftCodes(req, env);
+      if (p === '/gift-codes/redeem'   && req.method === 'POST') return routeRedeemGiftCode(req, env);
+      if (p === '/checkout/creem'      && req.method === 'POST') {
+        const out = await routeCreemCheckout(req, env, getUser);
+        return json(out.body, out.status);
+      }
+      if (p === '/checkout/catalog'    && req.method === 'GET') {
+        const out = await routeCreemCatalog(req, env);
+        return json(out.body, out.status);
+      }
+      if ((p === '/webhooks/creem' || p === '/webhooks/creem/') && req.method === 'POST') {
+        const out = await routeCreemWebhook(req, env);
+        return json(out.body, out.status);
+      }
       if (p === '/api-keys'            && req.method === 'GET')  return routeApiKeys(req, env);
       if (p === '/api-keys'            && req.method === 'POST') return routeCreateApiKey(req, env);
       const mApiKey = p.match(/^\/api-keys\/([0-9a-f-]+)$/i);

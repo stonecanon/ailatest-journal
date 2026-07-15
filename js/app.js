@@ -1742,12 +1742,35 @@
   /** free | plus(Pro) | pro(Max) */
   function getProductTier() {
     try {
-      if (user && (user.is_owner || user.plan === 'owner')) return 'pro';
+      if (user && (user.is_owner || user.plan === 'owner' || user.entitlements?.is_owner || user.entitlements?.plan === 'owner')) {
+        return 'pro'; // Max
+      }
+      // product_tier 是产品文案档 free/pro/max
+      const product = String(user?.entitlements?.product_tier || '').toLowerCase();
+      if (product === 'max') return 'pro';
+      if (product === 'pro') return 'plus';
+      const email = String(user?.email || '').toLowerCase().trim();
+      const login = String(user?.login || '').toLowerCase().trim();
+      // 站长邮箱兜底（服务端也会判 owner；避免 Mac 上旧会话未合并 is_owner）
+      if (email === 'jiantaoweng@gmail.com' || login === 'jiantaoweng@gmail.com' || login === 'jiantaoweng') {
+        return 'pro';
+      }
       const tier = String(user?.entitlements?.tier || user?.tier || 'free').toLowerCase();
       if (tier === 'pro' || tier === 'max') return 'pro';
       if (tier === 'plus' || tier === 'trial') return 'plus';
     } catch (_) {}
     return 'free';
+  }
+
+  function isOwnerClient() {
+    try {
+      if (user?.is_owner || user?.plan === 'owner' || user?.entitlements?.is_owner || user?.entitlements?.plan === 'owner') return true;
+      const email = String(user?.email || '').toLowerCase().trim();
+      const login = String(user?.login || '').toLowerCase().trim();
+      return email === 'jiantaoweng@gmail.com' || login === 'jiantaoweng@gmail.com' || login === 'jiantaoweng';
+    } catch (_) {
+      return false;
+    }
   }
 
   /** 发表费用信息（是否免费发表 / APC）— Pro(plus) 与 Max(pro) 可见；Free 不可见 */
@@ -2544,7 +2567,14 @@
       if (!r.ok) return null;
       const ents = await r.json();
       if (!ents || ents.error) return null;
-      user = { ...user, entitlements: ents, tier: ents.tier, credits: ents.credits?.total ?? user.credits };
+      user = {
+        ...user,
+        entitlements: ents,
+        tier: ents.tier,
+        plan: ents.plan || user.plan,
+        is_owner: !!(ents.is_owner || ents.plan === 'owner' || user.is_owner),
+        credits: ents.credits?.total ?? user.credits,
+      };
       if (ents.credits && ents.credits.unlimited) user.credits = null; // display as ∞
       else if (ents.credits && ents.credits.total != null) user.credits = ents.credits.total;
       localStorage.setItem('ailatest.user', JSON.stringify(user));
@@ -8347,6 +8377,47 @@
           <button type="button" class="me-stat-item" data-me-stat="api"><strong>${localPluginCallCount()}</strong><span>${T('插件 / API 调用','Plugin / API calls')}</span></button>
         </div>
         <section class="me-card me-record-panel" data-me-record-panel hidden></section>
+        <section class="me-card me-gift-card">
+          <h2>${T('礼品码','Gift codes')}</h2>
+          <form class="gift-redeem" data-gift-redeem>
+            <div>
+              <strong>${T('兑换礼品码','Redeem a gift code')}</strong>
+              <p>${T('输入礼品码，立即激活对应会员。','Enter a code to activate the included plan.')}</p>
+            </div>
+            <div class="gift-redeem-row">
+              <input name="code" type="text" autocomplete="off" spellcheck="false"
+                placeholder="JOURNAL-MAX-XXXX-XXXX-XXXX"
+                ${signed ? '' : 'disabled'} />
+              <button type="submit" ${signed ? '' : 'disabled'}>${T('兑换','Redeem')}</button>
+            </div>
+            ${signed ? '' : `<small>${T('登录后可兑换礼品码','Sign in to redeem a code')}</small>`}
+          </form>
+          ${isOwnerClient() ? `
+          <form class="gift-admin" data-gift-admin>
+            <header>
+              <div>
+                <strong>${T('站长礼品卡','Owner gift cards')}</strong>
+                <p>${T('生成后只显示一次，请复制后发送给用户。','Codes are shown once. Copy them before leaving.')}</p>
+              </div>
+              <span>OWNER · MAX</span>
+            </header>
+            <div class="gift-admin-controls">
+              <select name="plan" aria-label="plan">
+                <option value="pro">Pro</option>
+                <option value="max" selected>Max</option>
+              </select>
+              <select name="duration" aria-label="duration">
+                <option value="30">${T('30 天','30 days')}</option>
+                <option value="365" selected>${T('1 年','1 year')}</option>
+                <option value="permanent">${T('永久','Permanent')}</option>
+              </select>
+              <input name="quantity" type="number" min="1" max="20" value="1" aria-label="${T('数量','Quantity')}" />
+              <button type="submit">${T('生成礼品码','Generate')}</button>
+            </div>
+            <div class="gift-code-results" data-gift-results hidden></div>
+          </form>` : ''}
+          <p class="gift-message" data-gift-message role="status" hidden></p>
+        </section>
         <section class="me-card me-activity-card">
           <h2>${T('活动记录','Activity')}</h2>
           <div class="me-activity-months"><span>${T('近 12 周','Last 12 weeks')}</span><span>${new Date().toLocaleDateString(uiLocale(), { month: 'long', day: 'numeric' })}</span></div>
@@ -8376,10 +8447,103 @@
         renderMeRecordPanel(box, type);
       });
     });
+    // 礼品码兑换 / 站长生成
+    const giftMsg = box.querySelector('[data-gift-message]');
+    const setGiftMsg = (text, isErr = false) => {
+      if (!giftMsg) return;
+      giftMsg.hidden = !text;
+      giftMsg.textContent = text || '';
+      giftMsg.classList.toggle('is-error', !!isErr);
+    };
+    box.querySelector('[data-gift-redeem]')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!user?.token) { startLogin(); return; }
+      const form = e.currentTarget;
+      const code = String(new FormData(form).get('code') || '').trim();
+      if (!code) return;
+      const btn = form.querySelector('button[type=submit]');
+      if (btn) btn.disabled = true;
+      setGiftMsg(T('兑换中…','Redeeming…'));
+      try {
+        const r = await fetch(`${API_BASE}/gift-codes/redeem`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${user.token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code }),
+        });
+        const d = await r.json().catch(() => ({}));
+        if (!r.ok) {
+          const map = {
+            invalid_gift_code: T('礼品码无效','Invalid gift code'),
+            gift_code_used: T('该礼品码已被使用','This gift code has been used'),
+            gift_code_expired: T('该礼品码已过期','This gift code has expired'),
+            unauthorized: T('请先登录','Sign in first'),
+          };
+          throw new Error(map[d.error] || d.error || `HTTP ${r.status}`);
+        }
+        form.reset();
+        setGiftMsg(T(`兑换成功，已激活 ${(d.plan || '').toUpperCase() || '会员'}`, `Activated ${(d.plan || 'plan').toUpperCase()}`));
+        await fetchAndMergeEntitlements();
+        if (activeTab === 'me') renderMe();
+      } catch (err) {
+        setGiftMsg(err.message || String(err), true);
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    });
+    box.querySelector('[data-gift-admin]')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!user?.token || !isOwnerClient()) return;
+      const form = e.currentTarget;
+      const fd = new FormData(form);
+      const plan = String(fd.get('plan') || 'max');
+      const duration = String(fd.get('duration') || '365');
+      const quantity = Math.min(20, Math.max(1, Number(fd.get('quantity') || 1)));
+      const durationDays = duration === 'permanent' ? null : Number(duration);
+      const btn = form.querySelector('button[type=submit]');
+      if (btn) btn.disabled = true;
+      setGiftMsg(T('生成中…','Generating…'));
+      try {
+        const r = await fetch(`${API_BASE}/admin/gift-codes`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${user.token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ plan, durationDays, quantity }),
+        });
+        const d = await r.json().catch(() => ({}));
+        if (!r.ok) throw new Error(d.error || `HTTP ${r.status}`);
+        const codes = Array.isArray(d.codes) ? d.codes : [];
+        const results = form.querySelector('[data-gift-results]');
+        if (results) {
+          results.hidden = !codes.length;
+          results.innerHTML = codes.map(c =>
+            `<button type="button" class="gift-code-chip" data-code="${escape(c)}" title="${T('点击复制','Click to copy')}">${escape(c)}</button>`
+          ).join('');
+          results.querySelectorAll('[data-code]').forEach(b => {
+            b.addEventListener('click', async () => {
+              try {
+                await navigator.clipboard.writeText(b.dataset.code || b.textContent || '');
+                setGiftMsg(T('已复制','Copied'));
+              } catch (_) {
+                setGiftMsg(T('复制失败，请手动选择','Copy failed'), true);
+              }
+            });
+          });
+        }
+        setGiftMsg(T(`已生成 ${codes.length} 个单次礼品码（请立即复制）`, `${codes.length} single-use codes created — copy now`));
+      } catch (err) {
+        setGiftMsg(err.message || String(err), true);
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    });
     // 登录用户后台拉权益 / 积分
     if (signed) {
       fetchAndMergeEntitlements().then(() => {
         if (activeTab === 'me') {
+          // 若站长判定在拉权益后才成立，重绘以显示礼品卡管理
+          if (isOwnerClient() && !box.querySelector('[data-gift-admin]')) {
+            renderMe();
+            return;
+          }
           const strip = box.querySelector('[data-me-stat="credits"] strong');
           if (strip) strip.textContent = formatCreditValue(accountCreditValue());
           const m = membershipTierLabel();

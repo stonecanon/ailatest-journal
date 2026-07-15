@@ -1,8 +1,8 @@
 /**
  * 服务端 entitlements 判权 — 唯一权威实现。
  * 规则镜像 docs/entitlements.spec.json（SPEC_VERSION），改规则先改 spec 再同步这里。
- * 注意：注册不送 credits（spec 2026-06-12.4 已移除 signup_bonus）；credits 仅来自
- * Pro 月度额度 / 加油包购买 / 投稿记录贡献奖励。
+ * 注意：注册不送 credits（spec 已移除 signup_bonus）；credits 仅来自
+ * Pro(plus)=500 / Max(pro)=1000 月度额度、加油包购买、投稿记录贡献奖励。
  *
  * spec enforcement 四条规则的落点：
  *  1. 限额服务端写入时校验拒绝 → enforceFavoritesWrite / enforceListsWrite
@@ -11,15 +11,17 @@
  *  4. credits 扣减与调用同事务 → spendCredits 单语句条件更新（调用方失败时 refundCredits）
  */
 
-export const SPEC_VERSION = '2026-07-15.4';
+export const SPEC_VERSION = '2026-07-15.9';
 
 const TRIAL_DAYS = 7;
 const SNAPSHOT_TTL_SEC = 24 * 3600;
 const FLASH_OFFER_WINDOW_SEC = 24 * 3600;
-/** Max/Pro 顶档月度 AI credits（DeepSeek V4 Flash：1000 ≈ 100 次完整荐刊，满用 API ≈ ¥0.8/月） */
-const PRO_MONTHLY_CREDITS = 1000;
+/** 月度 AI credits（约 10 credits / 次完整荐刊） */
+const PLUS_MONTHLY_CREDITS = 500;  // 产品名 Pro ≈ 50 次
+const PRO_MONTHLY_CREDITS = 1000;  // 产品名 Max ≈ 100 次
 const UPGRADE_URL = 'https://journal.ailatest.org/pricing.html';
-const PRO_COMING_SOON = true;
+/** 收银台已接通 Creem；仍允许 free 直用（不自动 trial） */
+const PRO_COMING_SOON = false;
 
 const PREMIUM_LABELS_LOCKED = {
   cas_zone: false,
@@ -41,6 +43,18 @@ const PREMIUM_LABELS_OPEN = {
   on_hold: true,
   retraction: true,
   cnkx_tier: true,
+  publish_fee: true,
+};
+/** 插件 Pro：中科院/新锐/发表费用；预警·撤稿·科协 仅 Max */
+const PREMIUM_LABELS_EXT_PLUS = {
+  cas_zone: true,
+  cas_top: true,
+  warning: false,
+  citic_warning: false,
+  under_review: false,
+  on_hold: false,
+  retraction: false,
+  cnkx_tier: false,
   publish_fee: true,
 };
 
@@ -89,10 +103,11 @@ const TIERS = {
     tags: false,
     notes: false,
     submission_history: false,
-    export: { formats: ['csv', 'ris', 'bibtex', 'markdown'] },
-    integrations: ['zotero', 'notion', 'obsidian', 'endnote'],
-    fulltext: { max_total: null },
-    ai: { enabled: false },
+    // 导出 / 文献管理联动仅 Max
+    export: false,
+    integrations: false,
+    fulltext: { max_per_month: 200 }, // 插件原文查找：Pro 每月 200 篇
+    ai: { enabled: true, monthly_credits: PLUS_MONTHLY_CREDITS, credits_rollover: false },
     regions: {
       free_base: ['dom'],
       max_custom_pins: 2,
@@ -102,12 +117,12 @@ const TIERS = {
     extension: {
       queries_per_day: 20000,
       devices: 2,
-      sites: 'enhanced',
+      sites: 'basic', // 全站点增强识别（PubMed 等）仅 Max
       advanced_sort: true,
-      premium_labels: PREMIUM_LABELS_OPEN,
-      fulltext: { max_total: null },
-      export: true,
-      integrations: true,
+      premium_labels: PREMIUM_LABELS_EXT_PLUS,
+      fulltext: { max_per_month: 200 },
+      export: false,
+      integrations: false,
     },
   },
   trial: {
@@ -126,7 +141,7 @@ const TIERS = {
     integrations: ['zotero', 'notion', 'obsidian', 'endnote'],
     fulltext: { max_total: null },
     // trial 继承 pro 但 AI 锁定
-    ai: { enabled: false, ui: 'visible_locked', locked_hint: 'AI 荐刊为 Max 功能，订阅后每月含 1000 credits' },
+    ai: { enabled: false, ui: 'visible_locked', locked_hint: 'AI 荐刊为订阅功能：Pro 500 / Max 1000 credits/月' },
     regions: { free_base: ['dom'], max_custom_pins: null, daily_views: null, unlock_all: true },
     extension: {
       queries_per_day: 50000,
@@ -163,7 +178,7 @@ const TIERS = {
       sites: 'enhanced',
       advanced_sort: true,
       premium_labels: PREMIUM_LABELS_OPEN,
-      fulltext: { max_total: null },
+      fulltext: { max_total: null }, // Max 原文不限
       export: true,
       integrations: true,
     },
@@ -185,6 +200,8 @@ export async function ensureEntitlementsTables(env) {
         trial_expires_at INTEGER,
         trial_used       INTEGER NOT NULL DEFAULT 0,
         edu_verified     INTEGER NOT NULL DEFAULT 0,
+        paid_until       INTEGER,
+        product_id       TEXT,
         updated_at       INTEGER NOT NULL,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
       )`
@@ -213,6 +230,9 @@ export async function ensureEntitlementsTables(env) {
     ),
     env.DB.prepare('CREATE INDEX IF NOT EXISTS idx_credit_ledger_user ON credit_ledger(user_id, created_at)'),
   ]);
+  // 存量表补列
+  try { await env.DB.prepare('ALTER TABLE user_entitlements ADD COLUMN paid_until INTEGER').run(); } catch (_) {}
+  try { await env.DB.prepare('ALTER TABLE user_entitlements ADD COLUMN product_id TEXT').run(); } catch (_) {}
   schemaReady = true;
 }
 
@@ -241,14 +261,23 @@ export async function activateTrialForNewUser(env, userId) {
 async function getOrCreateRow(env, userId) {
   await activateTrialForNewUser(env, userId); // INSERT OR IGNORE：已有行时是空操作
   return env.DB.prepare(
-    'SELECT tier, trial_started_at, trial_expires_at, trial_used, edu_verified FROM user_entitlements WHERE user_id = ?'
+    'SELECT tier, trial_started_at, trial_expires_at, trial_used, edu_verified, paid_until, product_id FROM user_entitlements WHERE user_id = ?'
   ).bind(userId).first();
 }
 
-/** trial 到期 → 降级 free（数据冻结不删除，由写入路径的 enforce 实现） */
+/** trial / 付费到期 → 降级 free（数据冻结不删除，由写入路径的 enforce 实现） */
 async function effectiveTier(env, userId, row) {
   const now = nowSec();
-  // 付费通道未开时，除已手工标 pro/plus 外一律 free
+  if (!row) return 'free';
+  // 付费档：paid_until 到期则降级
+  if ((row.tier === 'plus' || row.tier === 'pro') && row.paid_until && now > Number(row.paid_until)) {
+    await env.DB.prepare(
+      "UPDATE user_entitlements SET tier='free', paid_until=NULL, product_id=NULL, updated_at=? WHERE user_id=? AND tier IN ('plus','pro')"
+    ).bind(now, userId).run();
+    return 'free';
+  }
+  // 付费档无 paid_until（手工开通 / 终身）→ 仍有效
+  if (row.tier === 'plus' || row.tier === 'pro') return row.tier;
   if (PRO_COMING_SOON && row.tier !== 'pro' && row.tier !== 'plus') return 'free';
   if (row.tier === 'trial' && row.trial_expires_at && now > row.trial_expires_at) {
     await env.DB.prepare(
@@ -259,10 +288,82 @@ async function effectiveTier(env, userId, row) {
   return TIERS[row.tier] ? row.tier : 'free';
 }
 
-/** Pro 月度额度：换月时重置为 PRO_MONTHLY_CREDITS（不结转）；free/plus/trial 无月度额度 */
+/**
+ * Creem 支付成功后写入权益。
+ * @param {'plus'|'pro'} tier  产品档：plus=Pro, pro=Max
+ * @param {number|null} paidUntilSec  周期结束 unix 秒；null 表示不设到期
+ */
+export async function applyPaidSubscription(env, userId, {
+  tier,
+  paidUntilSec = null,
+  productId = null,
+  eduVerified = null,
+} = {}) {
+  await ensureEntitlementsTables(env);
+  if (tier !== 'plus' && tier !== 'pro') throw new Error('invalid tier');
+  const now = nowSec();
+  await env.DB.prepare(
+    `INSERT INTO user_entitlements
+       (user_id, tier, trial_started_at, trial_expires_at, trial_used, edu_verified, paid_until, product_id, updated_at)
+     VALUES (?, ?, NULL, NULL, 0, ?, ?, ?, ?)
+     ON CONFLICT(user_id) DO UPDATE SET
+       tier = excluded.tier,
+       paid_until = excluded.paid_until,
+       product_id = excluded.product_id,
+       edu_verified = CASE WHEN excluded.edu_verified = 1 THEN 1 ELSE user_entitlements.edu_verified END,
+       updated_at = excluded.updated_at`
+  ).bind(
+    userId,
+    tier,
+    eduVerified ? 1 : 0,
+    paidUntilSec,
+    productId,
+    now,
+  ).run();
+
+  // 立刻发放当月 credits（若本月尚未发放）
+  const allowance = monthlyCreditsForTier(tier);
+  if (allowance > 0) {
+    const period = monthOf(now);
+    await env.DB.prepare(
+      'INSERT OR IGNORE INTO user_credits (user_id, monthly_credits, monthly_period, pack_credits, updated_at) VALUES (?, 0, ?, 0, ?)'
+    ).bind(userId, period, now).run();
+    const crow = await env.DB.prepare(
+      'SELECT monthly_credits, monthly_period, pack_credits FROM user_credits WHERE user_id = ?'
+    ).bind(userId).first();
+    if (!crow || crow.monthly_period !== period || Number(crow.monthly_credits || 0) < allowance) {
+      await env.DB.prepare(
+        'UPDATE user_credits SET monthly_credits=?, monthly_period=?, updated_at=? WHERE user_id=?'
+      ).bind(allowance, period, now, userId).run();
+      await env.DB.prepare(
+        'INSERT INTO credit_ledger (user_id, delta, balance_after, reason, ref, created_at) VALUES (?, ?, ?, ?, ?, ?)'
+      ).bind(userId, allowance, allowance + Number(crow?.pack_credits || 0), 'subscription_grant', productId || period, now).run();
+    }
+  }
+  return { ok: true, tier, paid_until: paidUntilSec };
+}
+
+/** 订阅过期 / 退款 → free */
+export async function revokePaidSubscription(env, userId) {
+  await ensureEntitlementsTables(env);
+  const now = nowSec();
+  await env.DB.prepare(
+    "UPDATE user_entitlements SET tier='free', paid_until=NULL, product_id=NULL, updated_at=? WHERE user_id=?"
+  ).bind(now, userId).run();
+  return { ok: true, tier: 'free' };
+}
+
+/** 月度 AI credits：plus(Pro)=500 · pro(Max)=1000；换月重置不结转；free/trial 无月度额度 */
+function monthlyCreditsForTier(tier) {
+  if (tier === 'pro') return PRO_MONTHLY_CREDITS;
+  if (tier === 'plus') return PLUS_MONTHLY_CREDITS;
+  return 0;
+}
+
 async function getCredits(env, userId, tier) {
   const now = nowSec();
   const period = monthOf(now);
+  const allowance = monthlyCreditsForTier(tier);
   let row = await env.DB.prepare(
     'SELECT monthly_credits, monthly_period, pack_credits FROM user_credits WHERE user_id = ?'
   ).bind(userId).first();
@@ -272,14 +373,14 @@ async function getCredits(env, userId, tier) {
     ).bind(userId, period, now).run();
     row = { monthly_credits: 0, monthly_period: period, pack_credits: 0 };
   }
-  if (tier === 'pro' && row.monthly_period !== period) {
+  if (allowance > 0 && row.monthly_period !== period) {
     await env.DB.prepare(
       'UPDATE user_credits SET monthly_credits=?, monthly_period=?, updated_at=? WHERE user_id=?'
-    ).bind(PRO_MONTHLY_CREDITS, period, now, userId).run();
+    ).bind(allowance, period, now, userId).run();
     await env.DB.prepare(
       'INSERT INTO credit_ledger (user_id, delta, balance_after, reason, ref, created_at) VALUES (?, ?, ?, ?, ?, ?)'
-    ).bind(userId, PRO_MONTHLY_CREDITS, PRO_MONTHLY_CREDITS + row.pack_credits, 'monthly_refill', period, now).run();
-    row.monthly_credits = PRO_MONTHLY_CREDITS;
+    ).bind(userId, allowance, allowance + row.pack_credits, 'monthly_refill', period, now).run();
+    row.monthly_credits = allowance;
   }
   return { monthly: row.monthly_credits, pack: row.pack_credits, total: row.monthly_credits + row.pack_credits };
 }
@@ -293,11 +394,15 @@ export async function getEntitlements(env, user, isOwner = false) {
   const now = nowSec();
 
   if (isOwner) {
+    // 站长 = 产品 Max（内部 tier=pro）+ 无限 credits
     return {
       spec_version: SPEC_VERSION,
       tier: 'pro',
+      product_tier: 'max',
       plan: 'owner',
+      is_owner: true,
       trial_expires_at: null,
+      paid_until: null,
       edu_verified: true,
       features: TIERS.pro,
       credits: { monthly: null, pack: null, total: null, unlimited: true },
@@ -313,8 +418,11 @@ export async function getEntitlements(env, user, isOwner = false) {
   const snapshot = {
     spec_version: SPEC_VERSION,
     tier,
-    pro_status: PRO_COMING_SOON ? 'coming_soon' : 'active',
+    product_tier: tier === 'pro' ? 'max' : tier === 'plus' ? 'pro' : 'free',
+    pro_status: 'active',
     trial_expires_at: row.trial_expires_at || null,
+    paid_until: row.paid_until || null,
+    product_id: row.product_id || null,
     edu_verified: !!row.edu_verified,
     features: TIERS[tier],
     credits,

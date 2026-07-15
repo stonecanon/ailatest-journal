@@ -2520,6 +2520,100 @@ body.topbar-compact .results-head {
   font-size: 17px;
   line-height: 1.2;
 }
+/* 礼品码：兑换 + 站长生成（对齐 Todo 布局） */
+.me-gift-card { margin: 0 0 18px; display: grid; gap: 14px; }
+.gift-redeem, .gift-admin {
+  display: grid;
+  gap: 10px;
+  padding: 14px 16px;
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  background: rgba(255, 253, 248, 0.88);
+}
+.gift-redeem p, .gift-admin p {
+  margin: 4px 0 0;
+  color: var(--ink-faint);
+  font-size: 12px;
+  line-height: 1.45;
+}
+.gift-redeem-row, .gift-admin-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.gift-redeem input,
+.gift-admin input,
+.gift-admin select {
+  min-width: 0;
+  min-height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+}
+.gift-redeem input { flex: 1 1 180px; text-transform: uppercase; letter-spacing: 0.04em; }
+.gift-admin select { flex: 0 1 auto; }
+.gift-admin input[type="number"] { width: 72px; }
+.gift-redeem button,
+.gift-admin button[type="submit"] {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--accent, #f97316);
+  color: #fff;
+  font: inherit;
+  font-weight: 750;
+  cursor: pointer;
+}
+.gift-redeem button:disabled,
+.gift-admin button:disabled { opacity: 0.5; cursor: not-allowed; }
+.gift-admin header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.gift-admin header > span {
+  flex: 0 0 auto;
+  padding: 4px 8px;
+  border-radius: 7px;
+  background: #1f2c4c;
+  color: #f6e7b2;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+.gift-code-results {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.gift-code-chip {
+  appearance: none;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px dashed #c9b89a;
+  background: #fffaf0;
+  color: #3a2e1f;
+  cursor: pointer;
+}
+.gift-code-chip:hover { border-color: var(--accent); color: var(--accent); }
+.gift-message {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 650;
+  color: #2f6b45;
+}
+.gift-message.is-error { color: #a33a36; }
+.gift-redeem small { color: var(--ink-faint); font-size: 12px; }
 .me-record-panel {
   margin: 0 0 18px;
 }
