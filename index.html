@@ -3,6 +3,16 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
+<script>
+/* 期刊详情深链：首屏前隐藏首页壳，避免「先回首页再进详情」 */
+(function () {
+  try {
+    if (/^\/journal\/[^/]+/i.test(location.pathname || '')) {
+      document.documentElement.classList.add('journal-route-pending');
+    }
+  } catch (_) {}
+})();
+</script>
 <title>AILatest Journal - Journal Finder, Rankings &amp; Impact Factors</title>
 <meta name="description" content="AILatest Journal helps researchers search 40,000+ academic journals, compare impact factors, JCR quartiles, CAS tiers, indexing databases, review cycles, and AI-powered submission matches." />
 <meta name="keywords" content="journal finder, journal search, 期刊查询, SCI期刊查询, 期刊检索, 荐刊推荐, 投稿期刊推荐, 中科院分区查询, 影响因子查询, JCR分区, CCF推荐, CSSCI, 北大核心, journal recommendation, journal matcher, find journal for paper" />
@@ -31,7 +41,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 })(window,document,'script','dataLayer','GTM-NBNXL7FB');</script>
 <!-- End Google Tag Manager -->
 <link rel="preload" href="/data/journal_aliases.json" as="fetch" crossorigin="anonymous" />
-<link rel="stylesheet" href="/css/app.css?v=20260715-footer-unify" />
+<link rel="stylesheet" href="/css/app.css?v=20260715-detail-shell" />
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json" />
@@ -690,7 +700,7 @@ window.__BUILD_VER = 'v20260626-ui-polish';
 })();
 </script>
 <script src="/js/pick-match.js?v=20260715-pick-fast" defer></script>
-<script src="/js/app.js?v=20260715-pick-fast" defer></script>
+<script src="/js/app.js?v=20260715-detail-shell" defer></script>
 
 </body>
 </html>

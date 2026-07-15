@@ -2,6 +2,7 @@
 /mobile.html / 302
 /journal / 302
 /journal/ / 302
+/journal/* /index.html 200
 /journals / 302
 /journals/ / 302
 /journals/* / 302

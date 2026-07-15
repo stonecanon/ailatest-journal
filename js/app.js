@@ -1326,7 +1326,8 @@
     return compact.length === 8 ? `${compact.slice(0, 4)}-${compact.slice(4)}` : '';
   }
 
-  function countryOutputYears(r, limit = 5) {
+  function countryOutputYears(r, limit = 3) {
+    // 默认只查近 3 年，避免 OpenAlex 限流导致长时间卡在「正在加载」
     const points = Array.isArray(r?.publication_history) ? r.publication_history : [];
     const years = points
       .map(p => Number(p.year))
@@ -1595,12 +1596,18 @@
   async function hydrateCountryOutputChart(root, r) {
     const box = root.querySelector('.country-output-card');
     if (!box) return;
+    // 超时必须收尾，避免永远停在「正在加载…」
+    const withTimeout = (p, ms) => Promise.race([
+      p,
+      new Promise((_, rej) => setTimeout(() => rej(new Error('country-output timeout')), ms)),
+    ]);
     try {
-      const payload = await fetchCountryOutputData(r);
+      const payload = await withTimeout(fetchCountryOutputData(r), 14000);
       const html = renderCountryOutputChartData(payload);
       box.innerHTML = html || renderCountryOutputFallback(r);
-      bindCountryOutputSelect(box, payload);
+      if (payload) bindCountryOutputSelect(box, payload);
     } catch (err) {
+      console.warn('country distribution load failed:', err?.message || err);
       box.innerHTML = renderCountryOutputFallback(r);
     }
   }
@@ -5722,12 +5729,14 @@
     recordView(r); // 记录浏览历史，用于学科推荐
     const pageMode = !!(opts && opts.pageMode);
     document.body.classList.toggle('journal-route', pageMode);
+    document.documentElement.classList.toggle('journal-route', pageMode);
+    if (pageMode) document.documentElement.classList.remove('journal-route-pending');
     // 记录抽屉打开时的 tab，关闭时回到原 tab
     if (pageMode) _drawerSourceTab = activeTab;
     const drawer = $('#j-drawer'), scrim = $('#drawer-scrim'), body = $('#drawer-body');
     if (!drawer || !body) return;
-    // Lazy-load OpenAlex data only when a journal detail page actually needs it.
-    await loadOaMap();
+    // 不阻塞详情渲染：OpenAlex 画像后台加载（国家分布 hydrate 会自行拉数据）
+    loadOaMap().catch(() => null);
     // 上报浏览（无需登录），结果回填进 cache
     reportJournalView(r, opts || {});
     // GA4 虚拟浏览 — 期刊详情抽屉打开时通知 GA4（无需 GTM 配置）
@@ -6525,16 +6534,28 @@
       hdrFav.classList.toggle('on', on);
       hdrFav.onclick = () => $('#drawer-fav-big')?.click();
     }
-    // 渲染抽屉副标题标签
+    // 渲染抽屉副标题标签（与左侧品牌分栏，避免重叠）
     const kicker = $('#drawer-kicker');
     if (kicker) {
       const SRC = {
-        int: T('SCI / SSCI 国际期刊','International SCI / SSCI'), cssci: T('CSSCI 来源期刊','CSSCI Source Journals'), cssci_ext: T('CSSCI 扩展版','CSSCI Extended'),
+        int: T('SCI / SSCI · 国际期刊','SCI / SSCI · International'), cssci: T('CSSCI 来源期刊','CSSCI Source Journals'), cssci_ext: T('CSSCI 扩展版','CSSCI Extended'),
         pku: T('北大核心','PKU Core'), cnkx: T('中国科协高质量目录','CAST Tiered Directory'), ccft: T('CCF 推荐中文科技期刊','CCF Recommended Chinese Journals'),
         zju: T('浙江大学 2024','ZJU 2024'), school_a: T('高校自编目录 2023','In-house School Directory 2023'), nsfc_mgmt: T('国自然管理科学部','NSFC Management'), in: 'India UGC-CARE',
       };
       kicker.textContent = SRC[src] || T('期刊详情','Journal Details');
     }
+    // 详情页顶栏品牌：仅 pageMode 显示，与 kicker 并排
+    let brand = document.getElementById('drawer-brand');
+    if (!brand) {
+      brand = document.createElement('a');
+      brand.id = 'drawer-brand';
+      brand.className = 'drawer-brand';
+      brand.href = '/';
+      brand.innerHTML = 'AILatest <em>Journal</em>';
+      const head = document.querySelector('#j-drawer .drawer-head');
+      if (head) head.insertBefore(brand, head.firstChild);
+    }
+    brand.hidden = !pageMode;
 
     drawer.classList.add('open');
     drawer.classList.toggle('journal-page', pageMode);
@@ -6607,14 +6628,18 @@
   function renderJournalRoutePage() {
     const slug = journalPathSlug();
     if (!slug) return false;
+    // 立刻进入详情壳，避免先闪首页再跳转
+    document.body.classList.add('journal-route');
+    document.documentElement.classList.add('journal-route');
+    const drawer = $('#j-drawer'), body = $('#drawer-body'), scrim = $('#drawer-scrim');
+    if (drawer) {
+      drawer.classList.add('open', 'journal-page');
+      scrim?.classList.remove('on');
+      if (scrim) scrim.hidden = true;
+    }
     const rec = findRecByFid(slug);
     if (!rec) {
-      document.body.classList.add('journal-route');
-      const drawer = $('#j-drawer'), body = $('#drawer-body'), scrim = $('#drawer-scrim');
-      if (drawer && body) {
-        drawer.classList.add('open', 'journal-page');
-        scrim?.classList.remove('on');
-        if (scrim) scrim.hidden = true;
+      if (body) {
         body.innerHTML = `<div class="journal-not-found">
           <div class="drawer-kicker">${T('期刊详情','Journal Details')}</div>
           <h1>${T('没有找到这个期刊','Journal not found')}</h1>

@@ -4502,9 +4502,71 @@ body.journal-route .drawer-head {
   top: 0;
   z-index: 20;
   margin: 0;
-  padding: 18px 0;
-  background: color-mix(in srgb, var(--paper, #f7f2e8) 92%, transparent);
+  padding: 14px 0 12px;
+  background: color-mix(in srgb, var(--paper, #f7f2e8) 94%, transparent);
   backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: nowrap;
+}
+
+/* 详情页品牌与「国际期刊」标签分栏，禁止叠在一起 */
+body.journal-route .drawer-brand {
+  display: inline-flex;
+  align-items: baseline;
+  flex: 0 0 auto;
+  font-family: var(--display);
+  font-weight: 780;
+  font-size: 15px;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  text-decoration: none;
+  border: 1.5px solid var(--rule);
+  border-radius: 10px;
+  padding: 4px 11px;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+body.journal-route .drawer-brand em {
+  font-style: italic;
+  font-weight: 500;
+  opacity: 0.88;
+}
+body.journal-route .drawer-brand:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+body.journal-route .drawer-kicker {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  padding: 0 4px 0 8px;
+  border-left: 1px solid var(--rule-soft);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+body.journal-route .drawer-head-actions {
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+/* 详情路由时隐藏主区顶栏品牌，避免与抽屉头叠字 */
+body.journal-route .topbar-brand,
+body.journal-route .home-hero,
+body.journal-route .page-brand,
+html.journal-route-pending .topbar-brand,
+html.journal-route-pending .home-hero {
+  display: none !important;
+}
+html.journal-route-pending main.main {
+  visibility: hidden !important;
+  pointer-events: none;
+}
+html.journal-route-pending #j-drawer {
+  visibility: visible;
 }
 
 body.journal-route .drawer-body {
