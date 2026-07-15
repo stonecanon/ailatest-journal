@@ -4261,7 +4261,7 @@ td.empty,
   }
 
   .tab-panel[data-panel="int"] table.journals .jname {
-    font-size: 16px !important;
+    font-size: 13.5px !important;
   }
 
   .tab-panel[data-panel="int"] table.journals .empty {
@@ -7448,15 +7448,18 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .tab-panel table.journals thead .col-name,
 .tab-panel table.journals thead .col-cycle { display: none; }
 
-/* 每行 2 卡 · 同行等高（矮卡下块留白对齐） */
+/* 每行 3 卡撑满 · 中屏 2 · 手机 1 */
 .tab-panel table.journals tbody {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
   padding-top: 12px;
   align-items: stretch;
 }
-@media (max-width: 760px) {
+@media (max-width: 1100px) {
+  .tab-panel table.journals tbody { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 720px) {
   .tab-panel table.journals tbody { grid-template-columns: 1fr; }
 }
 
@@ -7820,37 +7823,23 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 }
 .j-row .j-card-head {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(72px, auto);
-  column-gap: 12px;
+  grid-template-columns: minmax(0, 1fr) minmax(64px, auto);
+  column-gap: 8px;
   align-items: start;
   width: 100%;
   max-width: 100%;
   min-width: 0;
-  padding: 14px 14px 12px;
+  padding: 10px 11px 8px;
   box-sizing: border-box;
-  /* 金属铜橙光泽：高光更大、上下对比更强 */
-  background:
-    linear-gradient(
-      185deg,
-      rgba(255, 228, 196, 0.28) 0%,
-      rgba(255, 210, 160, 0.1) 18%,
-      transparent 48%
-    ),
-    linear-gradient(
-      152deg,
-      #b8966e 0%,
-      #9e7a55 18%,
-      #7d6146 42%,
-      #5f4a38 72%,
-      #4a3a2e 100%
-    );
-  border-radius: 15px 15px 0 0;
-  border-bottom: 1px solid rgba(40, 28, 18, 0.22);
+  /* V10：浅杏垂直渐变（上浅下深），无金属深色 */
+  background: linear-gradient(180deg, #fff4e8 0%, #ffe8d0 48%, #ffd9b5 100%);
+  border-radius: 13px 13px 0 0;
+  border-bottom: 1px solid rgba(180, 120, 60, 0.12);
   box-shadow:
-    inset 0 1px 0 rgba(255, 236, 210, 0.42),
-    inset 0 -18px 28px rgba(30, 18, 8, 0.18);
+    0 1px 0 rgba(255, 255, 255, 0.55) inset,
+    0 6px 14px rgba(180, 120, 70, 0.06);
   overflow: hidden;
-  color: #fff;
+  color: #1c1917;
 }
 /* 收藏卡有拖动手柄：窄左栏 | 刊名 | IF+星（不挤乱刊名对齐） */
 .j-row.j-card.has-drag .j-card-head {
@@ -7878,7 +7867,7 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   justify-content: center;
   padding: 3px 0 0;
   margin: 0;
-  color: rgba(255, 255, 255, 0.45);
+  color: rgba(120, 100, 80, 0.45);
   font-size: 11px;
   line-height: 1;
   cursor: grab;
@@ -7895,7 +7884,7 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   padding: 0;
   letter-spacing: -1.5px;
   font-size: 11px;
-  color: rgba(255, 255, 255, 0.48);
+  color: rgba(120, 100, 80, 0.48);
 }
 /* 刊名区 */
 .j-row .j-card-head-main {
@@ -7907,20 +7896,28 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .j-row.j-card.has-drag .j-card-head-main {
   grid-column: 2;
 }
-/* 右：IF + 收藏 */
+/* 右：IF 数字与 ★ 同一行垂直居中 */
 .j-row .j-card-head-side {
   grid-column: 2;
-  min-width: 72px;
-  max-width: 110px;
+  min-width: 56px;
+  max-width: 100px;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 6px;
+  gap: 0;
   overflow: hidden;
   box-sizing: border-box;
 }
 .j-row.j-card.has-drag .j-card-head-side {
   grid-column: 3;
+}
+.j-row .j-if-fav-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
+  line-height: 1;
 }
 .j-row .j-card-title-block,
 .j-row .j-card-top {
@@ -7930,14 +7927,14 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 }
 .j-row .jname {
   margin: 0;
-  min-height: 1.28em;
+  min-height: 0;
   max-width: 100%;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-  font-size: 16px;
+  font-size: 13.5px;
   font-weight: 800;
-  line-height: 1.28;
+  line-height: 1.22;
   letter-spacing: -0.015em;
-  color: #ffffff;
+  color: #1c1917;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -7946,73 +7943,56 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   word-break: break-word;
 }
 .j-row .jname.jname-flagship {
-  color: #f6e7b2;
+  color: #9a3412;
 }
 .j-row .jname-cn,
 .j-row .jname-aka {
   display: block;
-  margin-top: 3px;
-  font-size: 13px;
-  font-weight: 400;
-  color: rgba(255, 255, 255, 0.68);
-  line-height: 1.3;
+  margin-top: 1px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #8a7a68;
+  line-height: 1.2;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* IF：与数字同一行，数字更大（深色底用白字） */
-.j-row .j-card-if {
-  position: static !important;
-  top: auto !important;
-  right: auto !important;
-  left: auto !important;
-  width: auto;
-  max-width: 110px;
-  display: inline-flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  align-items: baseline;
-  justify-content: flex-end;
-  gap: 4px;
-  text-align: right;
-  line-height: 1;
-  overflow: hidden;
-  box-sizing: border-box;
-}
-.j-row .j-card-if-label {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  color: rgba(255, 255, 255, 0.55);
-  text-transform: uppercase;
-  flex: 0 0 auto;
-}
-.j-row .j-card-if strong {
+/* IF 数字（与星同行）+ 标签（数字列下方） */
+.j-row .j-card-if-num {
   margin: 0;
-  font-size: 18px;
-  font-weight: 750;
+  font-size: 15px;
+  font-weight: 800;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.03em;
-  color: #ffffff;
+  color: #b45309;
   white-space: nowrap;
-  max-width: 72px;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1;
+}
+.j-row .j-card-if-label {
+  display: block;
+  margin-top: 2px;
+  margin-right: 20px; /* 与星同宽对齐数字列 */
+  font-size: 9px;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  color: #a08b76;
+  text-transform: none;
+  text-align: right;
   line-height: 1;
 }
 
-/* 收藏星：无圆底，仅星形（参考扁平星标） */
+/* 收藏：纯五角星，无圆底 */
 .j-row .j-card-fav,
 .j-row .col-fav {
   position: static !important;
   top: auto !important;
   right: auto !important;
   left: auto !important;
-  width: 28px !important;
-  min-width: 28px;
-  max-width: 28px;
-  flex: 0 0 28px;
+  width: 16px !important;
+  min-width: 16px;
+  max-width: 16px;
+  flex: 0 0 16px;
   z-index: 1;
   margin: 0;
   padding: 0;
@@ -8020,19 +8000,19 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 }
 .j-row .j-card-fav .fav-star,
 .j-row .col-fav .fav-star {
-  width: 28px;
-  height: 28px;
-  min-width: 28px;
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
   padding: 0;
   border-radius: 0;
   background: transparent !important;
   border: 0;
   box-shadow: none;
-  color: rgba(255, 255, 255, 0.72);
+  color: rgba(120, 100, 80, 0.42);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: 15px;
   line-height: 1;
   flex-shrink: 0;
   transition: color .12s, transform .08s;
@@ -8040,17 +8020,17 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .j-row .j-card-fav .fav-star:hover,
 .j-row .col-fav .fav-star:hover {
   background: transparent !important;
-  color: #ffc45c;
+  color: #f97316;
   transform: scale(1.08);
 }
 .j-row .j-card-fav .fav-star.on,
 .j-row .col-fav .fav-star.on {
-  color: #f0a020;
+  color: #f97316;
   background: transparent !important;
 }
 .j-row .j-card-fav .fav-star.on:hover,
 .j-row .col-fav .fav-star.on:hover {
-  color: #ffb840;
+  color: #ea580c;
   background: transparent !important;
 }
 /* 已收藏：上块略深一档；下块仍白 */
@@ -8061,63 +8041,49 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   background: transparent;
 }
 .j-row.j-card:has(.fav-star.on) .j-card-head {
-  background:
-    linear-gradient(
-      185deg,
-      rgba(255, 214, 170, 0.22) 0%,
-      rgba(255, 190, 130, 0.08) 16%,
-      transparent 46%
-    ),
-    linear-gradient(
-      152deg,
-      #a07e58 0%,
-      #866646 20%,
-      #6a523a 45%,
-      #4f3d2e 74%,
-      #3d3026 100%
-    );
+  background: linear-gradient(180deg, #fff0e0 0%, #ffe0c4 50%, #ffd0a8 100%);
   box-shadow:
-    inset 0 1px 0 rgba(255, 228, 190, 0.32),
-    inset 0 -18px 28px rgba(20, 12, 6, 0.22);
+    0 1px 0 rgba(255, 255, 255, 0.5) inset,
+    0 6px 14px rgba(180, 100, 40, 0.08);
 }
 .j-row.j-card:has(.fav-star.on) .j-card-body {
   background: #ffffff;
 }
 
-/* meta：免费发表 + 审稿（深色上块内用浅色字） */
+/* meta：免费 / 审稿 / 学科 / 出版社（浅色上块 · 深字 · 紧凑） */
 .j-row .j-card-meta-row {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px 10px;
-  margin-top: 8px;
+  gap: 4px 8px;
+  margin-top: 4px;
   min-width: 0;
   overflow: visible;
 }
 .j-row .j-meta {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
   max-width: 100%;
   min-width: 0;
   padding: 0;
   border: 0;
   background: none;
-  color: rgba(255, 255, 255, 0.72);
-  font-size: 12px;
+  color: #6b5c4c;
+  font-size: 10.5px;
   line-height: 1.25;
   white-space: nowrap;
 }
 .j-row .j-meta em {
   font-style: normal;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 11px;
+  color: #8a7a68;
+  font-size: 10px;
 }
 .j-row .j-meta strong,
 .j-row .j-meta > span {
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.82);
+  font-weight: 550;
+  color: #4a3f34;
 }
 .j-row .j-meta-free {
   display: inline-flex !important;
@@ -8160,8 +8126,8 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   width: 100%;
   min-width: 0;
   margin: 0;
-  padding: 12px 14px 14px;
-  min-height: 44px;
+  padding: 8px 11px 10px;
+  min-height: 36px;
   flex: 1 1 auto; /* 矮卡用白底留白对齐高卡 */
   background: #ffffff;
   box-sizing: border-box;
@@ -8211,13 +8177,37 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   width: 100%;
   min-width: 0;
 }
-/* 收录 / 分区 / 获取 / 风险 各行明确分行 */
+/* 收录 / 分区 / 获取 / 风险 各行明确分行 + 左侧标签 */
 .j-row .j-card-badges .badges-idx + .badges-rank,
 .j-row .j-card-badges .badges-rank + .badges-access,
 .j-row .j-card-badges .badges-access + .badges-risk,
 .j-row .j-card-badges .badges-idx + .badges-access,
 .j-row .j-card-badges .badges-rank + .badges-risk {
   margin-top: 0; /* gap 已负责间距 */
+}
+/* 标签后 pills 横向换行 */
+.j-row .j-card-badges .badges-idx,
+.j-row .j-card-badges .badges-rank,
+.j-row .j-card-badges .badges-access,
+.j-row .j-card-badges .badges-risk {
+  display: flex !important;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 5px;
+  width: 100%;
+}
+.j-row .j-card-badges .badges-idx::before,
+.j-row .j-card-badges .badges-rank::before,
+.j-row .j-card-badges .badges-access::before,
+.j-row .j-card-badges .badges-risk::before {
+  content: attr(data-label);
+  flex: 0 0 auto;
+  min-width: 26px;
+  font-size: 9.5px;
+  font-weight: 750;
+  color: #a8a29e;
+  font-style: normal;
+  line-height: 1.2;
 }
 .j-row .j-card-badges .badge,
 .j-row .j-card-badges .zone,

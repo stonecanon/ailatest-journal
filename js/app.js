@@ -3765,10 +3765,10 @@
   function renderBadgeCell(indexBadges, rankBadges, accessBadges, riskBadges) {
     // 每类独立 div，CSS 强制分行：收录 / 分区 / 获取 / 风险
     return [
-      indexBadges ? `<div class="badges badges-idx" data-badge-row="index">${indexBadges}</div>` : '',
-      rankBadges  ? `<div class="badges badges-rank" data-badge-row="rank">${rankBadges}</div>`  : '',
-      accessBadges ? `<div class="badges badges-access" data-badge-row="access">${accessBadges}</div>` : '',
-      riskBadges ? `<div class="badges badges-risk" data-badge-row="risk">${riskBadges}</div>` : '',
+      indexBadges ? `<div class="badges badges-idx" data-badge-row="index" data-label="${T('收录','Idx')}">${indexBadges}</div>` : '',
+      rankBadges  ? `<div class="badges badges-rank" data-badge-row="rank" data-label="${T('分区','Rank')}">${rankBadges}</div>`  : '',
+      accessBadges ? `<div class="badges badges-access" data-badge-row="access" data-label="${T('开放','OA')}">${accessBadges}</div>` : '',
+      riskBadges ? `<div class="badges badges-risk" data-badge-row="risk" data-label="${T('风险','Risk')}">${riskBadges}</div>` : '',
     ].filter(Boolean).join('') || '';
   }
 
@@ -3988,6 +3988,15 @@
       ? bodyHtml
       : `<div class="j-card-badges j-card-body-placeholder" aria-hidden="true"></div>`;
     const hasDrag = !!(dragHtml && String(dragHtml).trim());
+    // ifHtml 形如 { num, label } 或旧 HTML；兼容 jMetaIf 返回对象
+    let ifNum = '';
+    let ifLabel = '';
+    if (ifHtml && typeof ifHtml === 'object') {
+      ifNum = ifHtml.num || '';
+      ifLabel = ifHtml.label || '';
+    } else if (ifHtml) {
+      ifNum = ifHtml;
+    }
     return `<tr class="j-row j-card clickable${extraClass ? ` ${extraClass}` : ''}${flagship ? ' row-flagship' : ''}${hasDrag ? ' has-drag' : ''}" data-fid="${escape(fid)}" data-src="${escape(src)}">
       <td class="j-card-main col-name">
         <div class="j-card-head">
@@ -3997,8 +4006,11 @@
             ${metaHtml ? `<div class="j-card-meta-row">${metaHtml}</div>` : ''}
           </div>
           <div class="j-card-head-side">
-            ${ifHtml || ''}
-            <div class="j-card-fav col-fav">${favHtml || ''}</div>
+            <div class="j-if-fav-row">
+              ${ifNum}
+              <div class="j-card-fav col-fav">${favHtml || ''}</div>
+            </div>
+            ${ifLabel}
           </div>
         </div>
         <div class="j-card-body">${bodyInner}</div>
@@ -4007,8 +4019,11 @@
   }
 
   function jMetaIf(label, value) {
-    if (value == null || value === '' || value === '—') return '';
-    return `<div class="j-card-if" title="${escape(label)} ${escape(String(value))}"><span class="j-card-if-label">${escape(label)}</span><strong>${escape(String(value))}</strong></div>`;
+    if (value == null || value === '' || value === '—') return null;
+    return {
+      num: `<strong class="j-card-if-num" title="${escape(label)} ${escape(String(value))}">${escape(String(value))}</strong>`,
+      label: `<span class="j-card-if-label">${escape(label)}</span>`,
+    };
   }
   function jMetaText(label, value, cls = '') {
     if (value == null || value === '' || value === '—') return '';
@@ -4092,16 +4107,21 @@
     const freeMeta = freeHtml && !/muted-cell/.test(freeHtml)
       ? jMetaPlain(freeHtml, 'j-meta-free')
       : '';
+    const subject = (r.wos_categories && r.wos_categories[0])
+      || r.jcr_cat || r.cas_major_cn || r.esi_category || '';
+    const publisher = r.publisher || '';
     const metaHtml = [
       freeMeta,
       cycleLabel ? jMetaText(T('审稿','审稿'), escape(cycleLabel), 'j-meta-cycle') : '',
+      subject ? jMetaChip(subject, 'j-meta-topic-show') : '',
+      publisher ? jMetaChip(publisher, 'j-meta-pub') : '',
     ].filter(Boolean).join('');
     const bodyHtml = `<div class="j-card-badges">${badgeCell}</div>`;
     return journalCardRow({
       fid, src: 'int', flagship: !!r.flagship,
       favHtml: starBtn(r, 'int'),
       nameHtml,
-      ifHtml: ifVal ? jMetaIf('IF', ifVal) : '',
+      ifHtml: ifVal ? jMetaIf('IF', ifVal) : null,
       metaHtml,
       bodyHtml,
     });
@@ -8423,12 +8443,13 @@
           <nav class="settings-nav" aria-label="${T('设置导航','Settings')}">
             <div class="settings-nav-title">${T('设置','Settings')}</div>
             <button type="button" data-settings-nav="account" class="${_settingsSection === 'account' ? 'active' : ''}">${T('账号','Account')}</button>
-            <button type="button" data-settings-nav="regions" class="${_settingsSection === 'regions' ? 'active' : ''}">${T('地区站','Regions')}</button>
             <button type="button" data-settings-nav="billing" class="${_settingsSection === 'billing' ? 'active' : ''}">${T('订阅','Billing')}</button>
+            <button type="button" data-settings-nav="gift" class="${_settingsSection === 'gift' ? 'active' : ''}">${T('礼品码','Gift codes')}</button>
             <button type="button" data-settings-nav="downloads" class="${_settingsSection === 'downloads' ? 'active' : ''}">${T('下载','Downloads')}</button>
             <button type="button" data-settings-nav="rankings" class="${_settingsSection === 'rankings' ? 'active' : ''}">${T('榜单','Rankings')}</button>
-            <button type="button" data-settings-nav="gift" class="${_settingsSection === 'gift' ? 'active' : ''}">${T('礼品码','Gift codes')}</button>
+            <button type="button" data-settings-nav="regions" class="${_settingsSection === 'regions' ? 'active' : ''}">${T('地区站','Regions')}</button>
             <button type="button" data-settings-nav="language" class="${_settingsSection === 'language' ? 'active' : ''}">${T('语言','Language')}</button>
+            <button type="button" data-settings-nav="version" class="${_settingsSection === 'version' ? 'active' : ''}">${T('版本信息','Version')}</button>
           </nav>
           <div class="settings-body">
             <section class="settings-section" data-settings-section="account" ${_settingsSection === 'account' ? '' : 'hidden'}>
@@ -8493,8 +8514,10 @@
 
             <section class="settings-section" data-settings-section="billing" ${_settingsSection === 'billing' ? '' : 'hidden'}>
               <h2 class="settings-section-title">${T('订阅','Billing')}</h2>
-              <a class="settings-link-row" href="/pricing.html">${T('查看套餐与订阅','View plans & subscribe')}<span>↗</span></a>
-              <p class="muted" style="margin:8px 0 0;font-size:13px;color:#78716c">${T('当前档位','Current plan')}：${escape(membershipTierLabel().label || '—')}</p>
+              <p class="settings-hint">${T('当前档位','Current plan')}：<strong>${escape(membershipTierLabel().label || '—')}</strong></p>
+              <a class="settings-link-row" href="/pricing.html">${T('打开订阅页（Creem 支付）','Open pricing (Creem checkout)')}<span>↗</span></a>
+              <button type="button" class="settings-link-row" data-creem-checkout data-plan="pro" data-period="year" style="width:100%">${T('升级 Pro · 年付','Upgrade Pro · yearly')}<span>→</span></button>
+              <button type="button" class="settings-link-row" data-creem-checkout data-plan="max" data-period="year" style="width:100%">${T('升级 Max · 年付','Upgrade Max · yearly')}<span>→</span></button>
             </section>
 
             <section class="settings-section" data-settings-section="downloads" ${_settingsSection === 'downloads' ? '' : 'hidden'}>
@@ -8562,6 +8585,16 @@
                 }).join('')}
               </div>
             </section>
+
+            <section class="settings-section" data-settings-section="version" ${_settingsSection === 'version' ? '' : 'hidden'}>
+              <h2 class="settings-section-title">${T('版本信息','Version')}</h2>
+              <div class="s-row-like settings-link-row" style="cursor:default">
+                <span>${T('客户端构建','Client build')}</span>
+                <span style="color:#a8a29e;font-size:13px">${escape(window.__BUILD_VER || '—')}</span>
+              </div>
+              <a class="settings-link-row" href="/about">${T('关于我们','About')}<span>↗</span></a>
+              <a class="settings-link-row" href="/contact">${T('联系','Contact')}<span>↗</span></a>
+            </section>
           </div>
         </div>
       </div>`;
@@ -8569,6 +8602,17 @@
     box.querySelectorAll('[data-settings-close]').forEach((el) => {
       el.addEventListener('click', () => closeSettingsShell());
     });
+    // 设置内 Creem 结账（与 pricing 页同一脚本逻辑）
+    if (typeof window.__bindCreemCheckout === 'function') {
+      window.__bindCreemCheckout(box);
+    } else {
+      box.querySelectorAll('[data-creem-checkout]').forEach((el) => {
+        el.addEventListener('click', (e) => {
+          e.preventDefault();
+          location.href = '/pricing.html';
+        });
+      });
+    }
     box.querySelectorAll('[data-settings-nav]').forEach((btn) => {
       btn.addEventListener('click', () => showSettingsSection(btn.getAttribute('data-settings-nav')));
     });
@@ -9838,7 +9882,7 @@
       favHtml: starBtn(r, r.__src),
       dragHtml: `<span class="drag-handle" title="${T('拖动排序','Drag to reorder')}">⋮⋮</span>`,
       nameHtml,
-      ifHtml: ifVal ? jMetaIf('IF', ifVal) : '',
+      ifHtml: ifVal ? jMetaIf('IF', ifVal) : null,
       metaHtml,
       bodyHtml,
     });
@@ -12496,8 +12540,12 @@
         let aiProfile = null;
         const useAi = !!document.getElementById('pick-ai-toggle')?.checked;
         if (useAi && !(user && user.token)) {
-          // AI 需要登录：提示后自动改用本地匹配，而不是直接中断。
-          statusNotice = t('pick_ai_login');
+          // AI 需要登录：提示后自动改用本地匹配，并给出登录入口。
+          statusNotice = t('pick_ai_login') || T(
+            'AI 荐刊需登录（Free 有次数额度）。正在用本地匹配… 登录后可开 AI。',
+            'AI recommend needs sign-in. Using local match… Sign in for AI.'
+          );
+          setPickProgress(statusNotice, 20);
         } else if (useAi) {
           try {
             setPickProgress(T('AI 正在分析研究语义并匹配期刊…','AI is analyzing the topic and matching journals…'), 30);
