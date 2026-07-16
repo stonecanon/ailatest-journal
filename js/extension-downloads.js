@@ -65,8 +65,37 @@
     });
   }
 
+  function bindCopyButtons() {
+    document.addEventListener('click', async (event) => {
+      const button = event.target && event.target.closest && event.target.closest('[data-copy-text]');
+      if (!button) return;
+      const text = button.getAttribute('data-copy-text') || '';
+      if (!text) return;
+      event.preventDefault();
+      const original = button.textContent;
+      try {
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(text);
+        } else {
+          const ta = document.createElement('textarea');
+          ta.value = text;
+          ta.style.cssText = 'position:fixed;left:-9999px;top:0';
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          ta.remove();
+        }
+        button.textContent = /[a-z]/i.test(original) && !/[\u4e00-\u9fff]/.test(original) ? 'Copied' : '已复制';
+      } catch {
+        button.textContent = /[a-z]/i.test(original) && !/[\u4e00-\u9fff]/.test(original) ? 'Copy failed' : '复制失败';
+      }
+      window.setTimeout(() => { button.textContent = original; }, 1600);
+    });
+  }
+
   function boot() {
     decorateDownloadLinks();
+    bindCopyButtons();
     const refresh = () => visibleAssets().forEach(asset => loadCount(asset).catch(() => null));
     refresh();
     window.setInterval(refresh, 15000);

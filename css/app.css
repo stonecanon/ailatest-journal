@@ -1118,7 +1118,7 @@ body.home-route:not(.home-tab-has-results) .home-v4-grad {
 }
 .home-dl-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
 }
 .home-dl-card {
@@ -1129,13 +1129,43 @@ body.home-route:not(.home-tab-has-results) .home-v4-grad {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  min-width: 0;
+}
+.home-dl-badge {
+  align-self: flex-start;
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: .04em;
+  color: #b45309;
+  background: #fff7ed;
+  padding: 2px 7px;
+  border-radius: 999px;
 }
 .home-dl-card b { font-size: 13.5px; color: #1c1917; }
-.home-dl-card span {
+.home-dl-card > span:not(.home-dl-badge) {
   font-size: 12px;
   color: #8a837a;
   line-height: 1.45;
   flex: 1 1 auto;
+}
+.home-dl-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.home-dl-stat {
+  margin: 0;
+  font-size: 11px;
+  color: #a8a29e;
+  line-height: 1.4;
+}
+.home-dl-stat b { color: #78716c; font-weight: 700; }
+.home-dl-stat a { color: #c2410c; font-weight: 650; text-decoration: none; }
+.home-dl-stat a:hover { text-decoration: underline; }
+.home-dl-card-soon { opacity: .92; }
+.home-dl-card .home-btn[disabled] {
+  opacity: .55;
+  cursor: not-allowed;
 }
 .home-contact-box {
   display: grid;
@@ -1210,15 +1240,14 @@ a.home-btn-primary { color: #fff; }
   }
   .home-top-nav a { padding: 5px 7px; font-size: 11.5px; }
   .home-feat-grid,
-  .home-plans,
-  .home-dl-grid { grid-template-columns: 1fr 1fr; }
+  .home-plans { grid-template-columns: 1fr 1fr; }
+  .home-dl-grid { grid-template-columns: 1fr; }
   .home-steps { grid-template-columns: 1fr 1fr; }
   .home-contact-box { grid-template-columns: 1fr; }
 }
 @media (max-width: 560px) {
   .home-feat-grid,
   .home-plans,
-  .home-dl-grid,
   .home-steps { grid-template-columns: 1fr; }
 }
 
@@ -2738,10 +2767,7 @@ body.simple-top-route .topbar-brand {
   overflow: visible;
 }
 
-.site-foot {
-  flex: 0 0 auto;
-  margin-top: auto;
-}
+/* .site-foot removed — display:none below */
 @media (min-width: 901px) {
   main.main { padding-bottom: 0; }
 }
@@ -4394,20 +4420,11 @@ body.share-mode main.main { max-width: 760px; margin: 0 auto; padding: 28px 20px
 }
 .pager button:hover { background: var(--paper); color: var(--accent); border-color: var(--accent); }
 
-/* site-foot — single compact line */
-.site-foot {
-  width: 100%;
-  margin: auto 0 0;
-  padding: 12px 12px max(14px, calc(10px + env(safe-area-inset-bottom, 0px)));
-  border-top: 1px solid var(--rule-soft);
-  color: rgba(117,111,104,.68);
-  font-family: var(--sans);
-  font-size: 12px;
-  font-weight: 560;
-  line-height: 1.45;
-  text-align: center;
+/* site-foot / page-foot 已下线：关于·联系·条款·隐私见首页联系区 */
+.site-foot,
+.page-foot {
+  display: none !important;
 }
-.site-foot p { margin: 0; }
 .site-foot .visitor-footnote {
   display: none !important; /* keep stats out of footer chrome */
 }

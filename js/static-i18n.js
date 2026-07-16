@@ -120,22 +120,10 @@
     return detectBrowserLang();
   }
 
-  /** 全站静态页统一页脚：与主站产品信息一致 */
-  function unifiedFooterHtml(dict) {
-    return `<p class="site-foot-line">© 2026 AILatest Journal ·
-      <a href="/about" data-static-i18n="footer_about">${dict.footer_about}</a> ·
-      <a href="/contact" data-static-i18n="footer_contact">${dict.footer_contact}</a> ·
-      <a href="/terms" data-static-i18n="footer_terms">${dict.footer_terms}</a> ·
-      <a href="/privacy" data-static-i18n="footer_privacy">${dict.footer_privacy}</a> ·
-      <a href="/refund" data-static-i18n="footer_refund">${dict.footer_refund}</a> ·
-      <a href="/pricing.html" data-static-i18n="footer_pricing">${dict.footer_pricing}</a> ·
-      <a href="/extension.html" data-static-i18n="footer_download">${dict.footer_download}</a></p>`;
-  }
-
-  function applyUnifiedFooter(lang) {
-    const dict = STRINGS[lang] || STRINGS.en;
-    document.querySelectorAll('footer.page-foot').forEach((foot) => {
-      foot.innerHTML = unifiedFooterHtml(dict);
+  /** 页脚已下线：移除静态页 footer 节点 */
+  function applyUnifiedFooter() {
+    document.querySelectorAll('footer.page-foot, footer.site-foot').forEach((foot) => {
+      foot.remove();
     });
   }
 
@@ -179,8 +167,7 @@
     document.documentElement.dataset.staticLang = lang;
     try { localStorage.setItem('ailatest.lang', lang); } catch {}
 
-    // 先统一页脚结构，再跑 i18n 文本（页脚内节点会被重建）
-    applyUnifiedFooter(lang);
+    applyUnifiedFooter();
 
     document.querySelectorAll('[data-static-i18n]').forEach((el) => {
       const key = el.dataset.staticI18n;

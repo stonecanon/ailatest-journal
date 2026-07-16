@@ -813,22 +813,10 @@ td.c, th.c { text-align: center; }
 }
 .divider::before, .divider::after { content: ""; flex: 1; border-top: 1px solid var(--line); }
 
-/* page-foot — one line */
-.page-foot {
-  flex: 0 0 auto;
-  border-top: 1px solid var(--line);
-  margin-top: auto;
-  padding: 22px 20px max(34px, calc(22px + env(safe-area-inset-bottom, 0px)));
-  text-align: center;
-  font-size: 13px;
-  color: var(--muted);
-  line-height: 1.6;
-}
-.page-foot p { margin: 0; }
-.page-foot a { color: var(--muted); margin: 0 2px; text-decoration: none; }
-.page-foot a:hover { color: var(--ink); text-decoration: none; }
-.page-foot .site-foot-line {
-  display: inline;
+/* page-foot 已下线（产品信息见首页联系区） */
+.page-foot,
+.site-foot {
+  display: none !important;
 }
 
 @media (max-width: 900px) {

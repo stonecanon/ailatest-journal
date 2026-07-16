@@ -42,7 +42,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 })(window,document,'script','dataLayer','GTM-NBNXL7FB');</script>
 <!-- End Google Tag Manager -->
 <link rel="preload" href="/data/journal_aliases.json" as="fetch" crossorigin="anonymous" />
-<link rel="stylesheet" href="/css/app.css?v=20260716-free-under-if" />
+<link rel="stylesheet" href="/css/app.css?v=20260716-home-dl" />
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json" />
@@ -239,7 +239,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </aside>
 <!-- 隐藏的旧入口 id 保留，供设置页 / 其它脚本引用 -->
 <a id="pricing-rail-link" href="/pricing.html" hidden aria-hidden="true"></a>
-<a id="download-center-rail-link" href="/extension.html" hidden aria-hidden="true"></a>
+<a id="download-center-rail-link" href="/#download" hidden aria-hidden="true"></a>
 <button type="button" id="rankings-btn" data-tab="rank" hidden aria-hidden="true"></button>
 <div class="lang-toggle-wrap">
   <button class="lang-toggle" id="lang-toggle" aria-label="Switch language">中文</button>
@@ -390,23 +390,38 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
         <section class="home-sec" id="download">
           <span class="home-sec-id" data-i18n="home_dl_kicker">Download</span>
-          <h2 class="home-sec-title" data-i18n="home_dl_title">下载与入口</h2>
-          <p class="home-sec-lead" data-i18n="home_dl_lead">网页版无需安装。插件把分区徽章带到你常去的文献页。</p>
+          <h2 class="home-sec-title" data-i18n="home_dl_title">下载</h2>
+          <p class="home-sec-lead" data-i18n="home_dl_lead">网页版无需安装。插件、Skill 与 MCP 可直接在此获取。</p>
           <div class="home-dl-grid">
             <article class="home-dl-card">
-              <b data-i18n="home_dl_web_t">网页版</b>
-              <span data-i18n="home_dl_web_d">浏览器直接使用查刊与荐刊，登录后同步收藏。</span>
-              <button type="button" class="home-btn home-btn-primary" data-home-focus-search data-i18n="home_dl_web_cta">打开应用</button>
+              <span class="home-dl-badge" data-i18n="home_dl_ext_badge">插件</span>
+              <b data-i18n="home_dl_ext_t">Chrome / Edge 内测版</b>
+              <span data-i18n="home_dl_ext_d">在 Google Scholar、PubMed、知网等页面显示分区徽章，并支持文献卡片保存。</span>
+              <a class="home-btn home-btn-primary" href="/api/extension/download?asset=latest&amp;source=home" data-extension-download-link download="ailatest-journal-extension-latest.zip" data-i18n="home_dl_ext_cta">下载 ZIP</a>
+              <p class="home-dl-stat"><span data-i18n="home_dl_ext_stat_pre">累计下载</span> <b data-extension-download-count="latest">—</b> <span data-i18n="home_dl_ext_stat_post">次</span></p>
             </article>
             <article class="home-dl-card">
-              <b data-i18n="home_dl_ext_t">浏览器扩展</b>
-              <span data-i18n="home_dl_ext_d">Chrome / Edge：Scholar、PubMed、知网等页面徽章。</span>
-              <a class="home-btn home-btn-ghost" href="/extension.html" data-i18n="home_dl_ext_cta">去下载页</a>
+              <span class="home-dl-badge" data-i18n="home_dl_skill_badge">Skill</span>
+              <b data-i18n="home_dl_skill_t">写作与荐刊工作流</b>
+              <span data-i18n="home_dl_skill_d">给 Codex / AI 助手接入期刊搜索与荐刊接口，适合写作和投稿。</span>
+              <div class="home-dl-actions">
+                <button class="home-btn home-btn-ghost" type="button" data-copy-text="请从 GitHub 安装 AILatest Journal Skill：https://github.com/stonecanon/ailatest-journal/tree/main/skills/ailatest-journal" data-i18n="home_dl_skill_copy">复制安装文本</button>
+                <a class="home-btn home-btn-primary" href="/api/extension/download?asset=skill&amp;source=home" data-extension-download-link download="ailatest-journal-skill-latest.zip" data-i18n="home_dl_skill_cta">下载安装包</a>
+              </div>
+              <p class="home-dl-stat"><span data-i18n="home_dl_skill_stat_pre">下载</span> <b data-extension-download-count="skill">—</b> <span data-i18n="home_dl_skill_stat_post">次</span> · <a href="https://github.com/stonecanon/ailatest-journal/tree/main/skills/ailatest-journal" target="_blank" rel="noopener" data-i18n="home_dl_skill_src">源码</a></p>
             </article>
             <article class="home-dl-card">
-              <b data-i18n="home_dl_api_t">Skill / API</b>
-              <span data-i18n="home_dl_api_d">给写作助手接入检索与荐刊接口（开发者入口）。</span>
-              <a class="home-btn home-btn-ghost" href="/extension.html" data-i18n="home_dl_api_cta">查看说明</a>
+              <span class="home-dl-badge" data-i18n="home_dl_mcp_badge">MCP</span>
+              <b data-i18n="home_dl_mcp_t">在线内测服务</b>
+              <span data-i18n="home_dl_mcp_d">无需下载，即可连接 Codex、Claude 等客户端。</span>
+              <button class="home-btn home-btn-primary" type="button" data-copy-text="codex mcp add ailatest-journal --url https://journal.ailatest.org/api/mcp" data-i18n="home_dl_mcp_cta">复制运行代码</button>
+              <p class="home-dl-stat" data-i18n="home_dl_mcp_stat">在线服务 · 复制后运行</p>
+            </article>
+            <article class="home-dl-card home-dl-card-soon">
+              <span class="home-dl-badge" data-i18n="home_dl_soon_badge">更多</span>
+              <b data-i18n="home_dl_soon_t">微信 / 安卓 / iOS</b>
+              <span data-i18n="home_dl_soon_d">小程序与原生客户端规划中，上线后将在此提供入口。</span>
+              <button class="home-btn home-btn-ghost" type="button" disabled data-i18n="home_dl_soon_cta">敬请期待</button>
             </article>
           </div>
         </section>
@@ -814,20 +829,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </footer>
   </section>
 
-  <footer class="site-foot">
-    <p id="journal-view-total" class="visitor-footnote" hidden></p>
-    <p class="site-foot-line">
-      <span>© 2026 AILatest Journal</span>
-      <span class="site-foot-sep">·</span>
-      <a href="/about" data-i18n="nav_about">关于</a>
-      <span class="site-foot-sep">·</span>
-      <a href="/contact" data-i18n="nav_contact">联系</a>
-      <span class="site-foot-sep">·</span>
-      <a href="/terms" data-i18n="nav_terms">条款</a>
-      <span class="site-foot-sep">·</span>
-      <a href="/privacy" data-i18n="nav_privacy">隐私</a>
-    </p>
-  </footer>
 </main>
 
 
@@ -882,7 +883,8 @@ window.__BUILD_VER = 'v20260716-stats-fix';
 </script>
 <script src="/js/pick-match.js?v=20260716-v10" defer></script>
 <script src="/js/pricing-checkout.js?v=20260716-creem" defer></script>
-<script src="/js/app.js?v=20260716-free-under-if" defer></script>
+<script src="/js/extension-downloads.js?v=20260716-home-dl" defer></script>
+<script src="/js/app.js?v=20260716-home-dl" defer></script>
 
 </body>
 </html>
