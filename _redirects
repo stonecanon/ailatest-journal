@@ -53,7 +53,6 @@
 # 下载并入首页；订阅独立页 /pricing
 /extension / 302
 /extension/ / 302
-/pricing /pricing.html 200
-/pricing/ /pricing.html 200
-# 勿把 /about、/contact 再 rewrite 到 *.html —— Cloudflare Pages 会自动提供
-# about.html → /about，再 rewrite 回 about.html 会触发 308 无限重定向。
+# 勿把 /pricing、/about、/contact 再 rewrite 到 *.html ——
+# Cloudflare Pages 会自动把 pricing.html 提供为 /pricing；
+# 再 rewrite 回 pricing.html 会触发 308 无限重定向（线上表现为「页面上不了」）。
