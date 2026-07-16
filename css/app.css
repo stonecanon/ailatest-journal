@@ -927,17 +927,7 @@ body.home-tab-has-results .home-hero {
   letter-spacing: -0.01em;
   color: #1c1916;
 }
-.home-hot-ai {
-  font-size: 12.5px;
-  font-weight: 700;
-  color: #c2410c;
-  text-decoration: none;
-  padding: 6px 12px;
-  border-radius: 999px;
-  background: rgba(249, 115, 22, 0.08);
-  border-bottom: none !important;
-}
-.home-hot-ai:hover { background: rgba(249, 115, 22, 0.14); color: #9a3412; }
+.home-hot-ai { display: none !important; }
 .home-hot-list {
   background: #fff;
   border-radius: 14px;
