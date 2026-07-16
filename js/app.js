@@ -6687,27 +6687,31 @@
   async function openDrawer(r, opts) {
     // 未登录：每日 10 个期刊详情（去重）；登录后不限
     const fid = favId(r);
-    if (!user) {
-      if (!canViewJournalDetail(fid)) {
-        requireLogin(T(
-          `今日免费可查看 ${DAILY_VIEW_LIMIT} 个期刊详情，登录后不限次数。`,
-          `Free: ${DAILY_VIEW_LIMIT} journal pages per day. Sign in for unlimited viewing.`
-        ));
-        return;
+    // soft 刷新：full 库升级 / OA 补绘，不再二次计次、打点
+    const softRefresh = !!(opts && (opts.source === 'full_upgrade' || opts.source === 'oa_hydrate'));
+    if (!softRefresh) {
+      if (!user) {
+        if (!canViewJournalDetail(fid)) {
+          requireLogin(T(
+            `今日免费可查看 ${DAILY_VIEW_LIMIT} 个期刊详情，登录后不限次数。`,
+            `Free: ${DAILY_VIEW_LIMIT} journal pages per day. Sign in for unlimited viewing.`
+          ));
+          return;
+        }
+        if (!consumeJournalDetailView(fid)) {
+          requireLogin(T(
+            `今日免费可查看 ${DAILY_VIEW_LIMIT} 个期刊详情，登录后不限次数。`,
+            `Free: ${DAILY_VIEW_LIMIT} journal pages per day. Sign in for unlimited viewing.`
+          ));
+          return;
+        }
+      } else {
+        incrementUsage('views');
       }
-      if (!consumeJournalDetailView(fid)) {
-        requireLogin(T(
-          `今日免费可查看 ${DAILY_VIEW_LIMIT} 个期刊详情，登录后不限次数。`,
-          `Free: ${DAILY_VIEW_LIMIT} journal pages per day. Sign in for unlimited viewing.`
-        ));
-        return;
-      }
-    } else {
-      incrementUsage('views');
     }
 
     _currentDrawerRec = r;
-    recordView(r); // 记录浏览历史，用于学科推荐
+    if (!softRefresh) recordView(r); // 记录浏览历史，用于学科推荐
     const pageMode = !!(opts && opts.pageMode);
     document.body.classList.toggle('journal-route', pageMode);
     document.documentElement.classList.toggle('journal-route', pageMode);
@@ -6716,22 +6720,23 @@
     if (pageMode) _drawerSourceTab = activeTab;
     const drawer = $('#j-drawer'), scrim = $('#drawer-scrim'), body = $('#drawer-body');
     if (!drawer || !body) return;
-    // 不阻塞详情渲染：OpenAlex 画像 + 国家分布预置后台加载
-    loadOaMap().catch(() => null);
-    loadCountryOutputMap().catch(() => null);
-    // 上报浏览（无需登录），结果回填进 cache
-    reportJournalView(r, opts || {});
-    // GA4 虚拟浏览 — 期刊详情抽屉打开时通知 GA4（无需 GTM 配置）
-    try {
-      if (typeof gtag === 'function') {
-        var jvPath = '/journal/' + (favId(r) || '');
-        gtag('event', 'page_view', {
-          'page_title': (r.name || r.cn_name || '期刊详情').slice(0, 200),
-          'page_location': window.location.origin + jvPath,
-          'page_path': jvPath,
-        });
-      }
-    } catch(_) {}
+    // OA map ~10MB：等首屏 DOM 后再空闲加载，避免与详情首绘抢带宽
+    // 国家分布图由 hydrateCountryOutputChart 按需拉取（预置极小）
+    if (!softRefresh) {
+      // 上报浏览（无需登录），结果回填进 cache
+      reportJournalView(r, opts || {});
+      // GA4 虚拟浏览 — 期刊详情抽屉打开时通知 GA4（无需 GTM 配置）
+      try {
+        if (typeof gtag === 'function') {
+          var jvPath = '/journal/' + (favId(r) || '');
+          gtag('event', 'page_view', {
+            'page_title': (r.name || r.cn_name || '期刊详情').slice(0, 200),
+            'page_location': window.location.origin + jvPath,
+            'page_path': jvPath,
+          });
+        }
+      } catch(_) {}
+    }
     const src = r.__src || 'int';
     const titleRaw = r.name || r.cn_name || '';
     const title = titleCase(titleRaw);
@@ -7537,6 +7542,12 @@
     // init rating widget
     setTimeout(() => initRatingWidget(favId(r)), 0);
     hydrateCountryOutputChart(body, ir);
+    // 首屏后再预热 OA map（~10MB），不打断当前详情；下次打开/相关刊可即时用
+    if (!oaMap && !oaMapPromise) {
+      const warmOa = () => loadOaMap().catch(() => null);
+      if ('requestIdleCallback' in window) requestIdleCallback(warmOa, { timeout: 4000 });
+      else setTimeout(warmOa, 800);
+    }
     body.querySelectorAll('.trend-point').forEach(point => {
       const activate = () => {
         const card = point.closest('.trend-card');
@@ -13463,14 +13474,15 @@
     }).join('');
 
     box.querySelectorAll('[data-hot-fid]').forEach((a) => {
-      a.addEventListener('click', () => {
+      a.addEventListener('click', (e) => {
         const fid = a.getAttribute('data-hot-fid');
         if (!fid) return;
         const rec = (journals || []).find((j) => favId(j) === fid)
           || (homeJournals || []).find((j) => favId(j) === fid);
-        if (rec && typeof openJournalDrawer === 'function') {
-          try { openJournalDrawer(rec); } catch (_) {}
-        }
+        if (!rec) return;
+        // SPA 打开详情，避免整页重载 + 再拉 full 库
+        e.preventDefault();
+        openDrawer(rec, { pageMode: true, source: 'home_hot' });
       });
     });
   }
@@ -13481,9 +13493,9 @@
     if (!_homeHotItems) {
       box.innerHTML = `<div class="home-hot-row home-hot-empty" style="justify-content:center;color:#a8a29e;font-size:13px;border:0">${escape(t('home_hot_loading'))}</div>`;
       try {
+        // 允许浏览器缓存（Worker 已设 max-age≈300），避免每次首页都穿透
         const data = await fetch(
-          `${API_BASE}/analytics/hot-journals?days=30&limit=5`,
-          { cache: 'no-store' }
+          `${API_BASE}/analytics/hot-journals?days=30&limit=5`
         ).then((r) => (r.ok ? r.json() : null)).catch(() => null);
         _homeHotItems = Array.isArray(data?.items) ? data.items : [];
       } catch (_) {
@@ -13496,10 +13508,8 @@
   function initHomeLanding() {
     loadHomeStats();
     loadHomeHotList();
-    // 期刊库稍后就绪时重新解析刊名 / 链接
-    if (!journalsReady) {
-      ensureJournalsLoaded().then(() => loadHomeHotList()).catch(() => {});
-    }
+    // 热点榜只依赖 light 池（boot 完成后 loadHomeHotList 会再解析一次）
+    // 切勿在此 ensureJournalsLoaded：会立刻抢 8MB+ full 库，拖垮首页与热点
     // 首页介绍区 CTA：聚焦搜索 / 切到荐刊
     document.querySelectorAll('[data-home-focus-search]').forEach((el) => {
       if (el.__homeBound) return;
@@ -13573,12 +13583,12 @@
       const pendingInitialTab = consumePendingTab();
       const initialTab = pendingInitialTab || tabFromPath();
       const initialPath = location.pathname.replace(/\/+$/, '') || '/';
-      const initialNeedsFull = !!journalPathSlug()
-        || initialPath === '/import'
+      const isJournalPath = !!journalPathSlug();
+      // int/fav/pick/import 最终需要 full；首页与详情深链先用 light 首屏（~3MB vs ~9MB）
+      const needsFullForTab = initialPath === '/import'
         || ['int', 'fav', 'pick'].includes(initialTab);
-      const initialJournalUrl = initialNeedsFull ? 'data/journals.json.gz' : 'data/journals_light.json.gz';
       const [j, m, esi, aliases, underReviewIssns, onHoldIssns] = await Promise.all([
-        fetchJSON(initialJournalUrl),
+        fetchJSON('data/journals_light.json.gz'),
         fetch('/data/meta.json').then(r => r.json()).catch(() => null),
         fetch('/data/esi_categories.json').then(r => r.json()).catch(() => []),
         fetch('/data/journal_aliases.json').then(r => r.json()).catch(() => DEFAULT_JOURNAL_ALIASES),
@@ -13588,31 +13598,11 @@
       setJournalAliases(aliases);
       window.__underReviewIssns = underReviewIssns || [];
       window.__onHoldIssns = onHoldIssns || [];
-      journals = j; meta = m; esiCats = esi;
-      if (!initialNeedsFull) homeJournals = Array.isArray(j) ? j : [];
-      finalizeJournalDataset(j, { full: initialNeedsFull, underReviewIssns, onHoldIssns });
+      meta = m; esiCats = esi;
+      homeJournals = Array.isArray(j) ? j : [];
+      // finalize 已含 mark / searchMeta / index / filterCounts / topicList（light 路径不标 journalsReady）
+      finalizeJournalDataset(j, { full: false, underReviewIssns, onHoldIssns });
       journalUpdates = { updated_at: '', items: [] };
-      // Build Under Review lookup set
-      const underReviewSet = new Set((underReviewIssns||[]).filter(Boolean).map(s => s.replace(/[^0-9xX]/gi,'').toLowerCase()));
-      journals.forEach(r => {
-        const issnClean = (r.issn||'').replace(/[^0-9xX]/gi,'').toLowerCase();
-        const eissnClean = (r.eissn||'').replace(/[^0-9xX]/gi,'').toLowerCase();
-        if (underReviewSet.has(issnClean) || underReviewSet.has(eissnClean)) {
-          r.under_review = true;
-        }
-      });
-      // Build On Hold lookup set
-      const onHoldSet = new Set((onHoldIssns||[]).filter(Boolean).map(s => s.replace(/[^0-9xX]/gi,'').toLowerCase()));
-      journals.forEach(r => {
-        const issnClean = (r.issn||'').replace(/[^0-9xX]/gi,'').toLowerCase();
-        const eissnClean = (r.eissn||'').replace(/[^0-9xX]/gi,'').toLowerCase();
-        if (onHoldSet.has(issnClean) || onHoldSet.has(eissnClean)) {
-          r.on_hold = true;
-        }
-      });
-      journals.forEach(journalSearchMeta);
-      buildIntIndex(journals);
-      updateFilterCounts();
       loadHomeHotList();
       if (meta && meta.total) setHomeStat('journals', meta.total);
       // Refresh stale favsData with live international journal data
@@ -13637,12 +13627,10 @@
         }
         if (dirty) localStorage.setItem(STORAGE_PREFIX + 'favsData', JSON.stringify(favsData));
       })();
-      // 计算合并的 topicList（WoS 学科 + OpenAlex subfield）
-      const _wc = Object.create(null);
-      for (const r of journals) for (const c of (r.wos_categories||[])) _wc[c] = (_wc[c]||0)+1;
-      topicList = Object.entries(_wc).map(([name,count])=>({name,count})).sort((a,b)=>a.name.localeCompare(b.name,'en'));
       if (meta?.total && $('#total')) $('#total').textContent = meta.total.toLocaleString();
-      $('#hint').textContent = `${T('已加载','Loaded')} ${journals.length.toLocaleString()} ${T('本期刊','journals')}`;
+      const hintEl = $('#hint');
+      if (hintEl) hintEl.textContent = `${T('已加载','Loaded')} ${(meta?.total || journals.length).toLocaleString()} ${T('本期刊','journals')}`;
+      // 侧栏筛选列表：轻量路径 finalize 不画，这里补一次（量小）
       renderCatList();
       renderTopicList();
       updatePublicPulse();
@@ -13699,14 +13687,34 @@
         slider.addEventListener('input', () => { sync(); shown = PAGE; renderInt(); });
         sync();
       })();
+      // 详情深链：light 即可首屏；后台再补 full 以填充趋势图等重字段
       if (renderJournalRoutePage()) {
         window.addEventListener('hashchange', applyHashRoute);
+        const openFid = _currentDrawerRec ? favId(_currentDrawerRec) : '';
+        ensureJournalsLoaded()
+          .then(() => {
+            if (!openFid || !_currentDrawerRec || favId(_currentDrawerRec) !== openFid) return;
+            const live = journals.find((row) => favId(row) === openFid);
+            if (live) openDrawer(live, { pageMode: true, fromPath: true, source: 'full_upgrade' });
+          })
+          .catch(() => {});
         if (user) await pullFavs();
         return;
       }
-      if (window.__activateJournalTab) window.__activateJournalTab(initialTab, { skipPath: !pendingInitialTab });
-      else renderInt();
-      if (!initialNeedsFull) scheduleFullJournalWarmup();
+      // 列表类入口需要 full：先切 tab，再等 full 后渲染
+      if (needsFullForTab) {
+        if (window.__activateJournalTab) window.__activateJournalTab(initialTab, { skipPath: !pendingInitialTab });
+        try {
+          await ensureJournalsLoaded();
+          renderAfterFullJournalLoad(initialTab);
+        } catch (err) {
+          console.error(err);
+        }
+      } else {
+        if (window.__activateJournalTab) window.__activateJournalTab(initialTab, { skipPath: !pendingInitialTab });
+        else if (initialTab === 'int') renderInt();
+        scheduleFullJournalWarmup();
+      }
       // 启用 #j/<id> 深链
       window.addEventListener('hashchange', applyHashRoute);
       applyHashRoute();
