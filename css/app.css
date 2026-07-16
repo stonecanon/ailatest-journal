@@ -10930,14 +10930,14 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   grid-column: 1 / -1;
   grid-template-columns: 3.6em minmax(0, 1fr);
 }
-/* IF | 预警：与上方两栏对齐（左 IF，右预警） */
+/* IF | 预警：与上方两栏对齐（左 IF，右预警）；不要横分割线 */
 .tab-panel[data-panel="int"] #if-dropdown.th-if-row,
 .tab-panel[data-panel="int"] #warn-dropdown.th-warn-row {
   display: grid !important;
   grid-template-columns: 3.6em minmax(0, 1fr);
-  margin-top: 4px;
-  padding-top: 8px !important;
-  border-top: 1px solid rgba(90, 70, 50, 0.06) !important;
+  margin-top: 2px;
+  padding-top: 2px !important;
+  border-top: 0 !important;
   column-gap: 8px;
   row-gap: 4px;
   min-width: 0;
