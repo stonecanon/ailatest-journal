@@ -5437,6 +5437,11 @@ body.journal-route .j-drawer.journal-page {
   padding: 2px 7px !important;
   border-radius: 5px !important;
   margin: 0 !important;
+  border: 1px solid rgba(28, 25, 23, 0.06) !important;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.65) inset,
+    0 1px 2px rgba(40, 28, 16, 0.08),
+    0 2px 6px rgba(40, 28, 16, 0.05) !important;
 }
 .d-none {
   font-size: 12px;
@@ -9499,7 +9504,7 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   content: none !important;
   display: none !important;
 }
-/* V10 pill：9.5px · 浅字 · 小圆角 */
+/* V10 pill：9.5px · 浅字 · 小圆角 · 轻阴影勾边 */
 .j-row .j-card-badges .badge,
 .j-row .j-card-badges .zone,
 .j-row .j-card-badges .xr-pill,
@@ -9509,6 +9514,7 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .j-row .j-card-badges .ccf-pill,
 .j-row .j-card-badges .tier-pill,
 .j-row .j-card-badges .warn-pill,
+.j-row .j-card-badges .flagship-pill,
 .j-row .col-badge .badge,
 .j-row .col-badge .zone,
 .j-row .col-badge .domsrc-pill,
@@ -9521,13 +9527,18 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   font-weight: 650 !important;
   line-height: 1.3 !important;
   letter-spacing: 0 !important;
-  padding: 1px 5px !important;
+  padding: 2px 6px !important;
   margin: 0 !important;
-  border-radius: 4px !important;
+  border-radius: 5px !important;
+  border: 1px solid rgba(28, 25, 23, 0.06) !important;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   box-sizing: border-box;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.65) inset,
+    0 1px 2px rgba(40, 28, 16, 0.08),
+    0 2px 6px rgba(40, 28, 16, 0.05) !important;
 }
 .j-row .j-card-subline {
   margin-top: 2px;
