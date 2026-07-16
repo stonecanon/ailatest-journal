@@ -811,8 +811,14 @@ body.home-route:not(.home-tab-has-results):not(.topbar-compact) main.main {
 }
 body.home-route:not(.home-tab-has-results):not(.topbar-compact) .home-hero-head {
   order: 1;
-  padding-top: clamp(28px, 5vh, 48px);
+  /* 标题略下移，避免顶栏/导航太挤 */
+  padding-top: clamp(52px, 9vh, 88px);
   padding-bottom: 0;
+}
+/* 搜索记录芯片：产品层不再展示 */
+.home-search-chips,
+#home-search-chips {
+  display: none !important;
 }
 body.home-route:not(.home-tab-has-results):not(.topbar-compact) .topbar {
   order: 2;

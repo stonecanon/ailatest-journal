@@ -10702,46 +10702,12 @@
     }
 
     function renderHomeSearchChips() {
+      // 搜索记录/建议芯片已下线：始终隐藏
       const box = $('#home-search-chips');
-      if (!box) return;
-      if (activeTab !== 'home') {
+      if (box) {
         box.hidden = true;
-        return;
+        box.innerHTML = '';
       }
-      const seen = new Set();
-      const history = getHomeSearchHistory().slice(0, 3);
-      const suggestions = latestHighImpactSuggestions().slice(0, Math.max(0, 3 - history.length));
-      const terms = [...history, ...suggestions]
-        .map(x => String(x || '').trim())
-        .filter(x => {
-          if (!x) return false;
-          const key = x.toLowerCase();
-          if (seen.has(key)) return false;
-          seen.add(key);
-          return true;
-        })
-        .slice(0, 3);
-      if (!terms.length) {
-        box.hidden = true;
-        return;
-      }
-      box.hidden = false;
-      const current = (activeQuery || '').trim().toLowerCase();
-      box.innerHTML = terms.map(term => {
-        const active = current && term.toLowerCase() === current ? ' active' : '';
-        return `<button class="home-search-chip${active}" type="button" data-home-search-term="${escape(term)}">${escape(term)}</button>`;
-      }).join('');
-      box.querySelectorAll('[data-home-search-term]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const term = btn.dataset.homeSearchTerm || '';
-          const qEl = $('#q');
-          activeQuery = term;
-          if (qEl) qEl.value = term;
-          saveHomeSearchHistory(term);
-          trackInteraction('journal_search', { tab: 'home', query: term, source: 'chip' });
-          showHomeSearchResults();
-        });
-      });
     }
 
     function showHomeSearchResults() {
