@@ -42,7 +42,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 })(window,document,'script','dataLayer','GTM-NBNXL7FB');</script>
 <!-- End Google Tag Manager -->
 <link rel="preload" href="/data/journal_aliases.json" as="fetch" crossorigin="anonymous" />
-<link rel="stylesheet" href="/css/app.css?v=20260716-settings-desk" />
+<link rel="stylesheet" href="/css/app.css?v=20260716-home-rank" />
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json" />
@@ -134,10 +134,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 (() => {
   const path = location.pathname.replace(/\/+$/, '') || '/';
   const homeRoutes = new Set(['/', '/en', '/zh']);
-  const simpleRoutes = new Set(['/favorites', '/account', '/me', '/profile', '/rankings']);
+  const simpleRoutes = new Set(['/favorites', '/account', '/me', '/profile']);
   const pathTab = ({
     '/favorites': 'fav', '/account': 'me', '/me': 'me', '/profile': 'me',
-    '/rankings': 'rank', '/pick': 'pick', '/global': 'int', '/international': 'int',
+    '/rankings': 'home', '/pick': 'pick', '/global': 'int', '/international': 'int',
     '/cn': 'dom', '/china': 'dom', '/in': 'in', '/india': 'in',
     '/my': 'my', '/malaysia': 'my', '/kr': 'kr', '/korea': 'kr',
     '/pbn': 'pbn', '/poland': 'pbn', '/isc': 'isc', '/scielo': 'scielo',
@@ -255,6 +255,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <nav class="home-top-nav" aria-label="首页导航">
     <a href="#feat" data-i18n="nav_features">功能</a>
     <a href="#how" data-i18n="nav_how">怎么用</a>
+    <a href="#rankings" data-i18n="rail_rank">榜单</a>
     <a href="#pricing" data-i18n="nav_pricing">订阅</a>
     <a href="#download" data-i18n="download_center">下载</a>
     <a href="#contact" data-i18n="nav_contact">联系</a>
@@ -338,6 +339,32 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <div class="home-cta-row">
             <button type="button" class="home-btn home-btn-primary" data-home-focus-search data-i18n="home_cta_search">打开查刊</button>
             <button type="button" class="home-btn home-btn-ghost" data-home-mode-pick data-i18n="home_cta_pick">试用荐刊</button>
+          </div>
+        </section>
+
+        <section class="home-sec" id="rankings">
+          <span class="home-sec-id" data-i18n="home_rank_kicker">Rankings</span>
+          <h2 class="home-sec-title" data-i18n="home_rank_title">榜单</h2>
+          <p class="home-sec-lead" data-i18n="home_rank_lead">按索引、学科与风险名单浏览期刊列表；点进二级页查看完整目录。</p>
+          <div class="home-rank-grid">
+            <a class="home-rank-card" href="/indexes/">
+              <span class="home-rank-badge" data-i18n="home_rank_idx_badge">索引</span>
+              <b data-i18n="nav_index_rank">索引排行榜</b>
+              <span data-i18n="home_rank_idx_d">SCIE / SSCI / AHCI / ESCI / EI / Scopus / MEDLINE 等收录入口。</span>
+              <em data-i18n="home_rank_enter">进入 →</em>
+            </a>
+            <a class="home-rank-card" href="/subjects/">
+              <span class="home-rank-badge" data-i18n="home_rank_sub_badge">学科</span>
+              <b data-i18n="nav_subject_rank">学科排行榜</b>
+              <span data-i18n="home_rank_sub_d">按 Web of Science 学科浏览 IF 靠前期刊与主题榜单。</span>
+              <em data-i18n="home_rank_enter">进入 →</em>
+            </a>
+            <a class="home-rank-card home-rank-card-warn" href="/indexes/warning/">
+              <span class="home-rank-badge" data-i18n="home_rank_warn_badge">风险</span>
+              <b data-i18n="nav_warn_rank">预警名单</b>
+              <span data-i18n="home_rank_warn_d">中科院预警、中信所预警、On Hold / Under Review 等信号。</span>
+              <em data-i18n="home_rank_enter">进入 →</em>
+            </a>
           </div>
         </section>
 
@@ -648,20 +675,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div id="fav-content"></div>
   </section>
 
-  <!-- ─── Rankings tab ─── -->
-  <section class="tab-panel" data-panel="rank" hidden>
-    <div class="rank-panel">
-      <a class="rank-choice" href="/indexes/">
-        <strong data-i18n="nav_index_rank">索引排行榜</strong>
-      </a>
-      <a class="rank-choice" href="/subjects/">
-        <strong data-i18n="nav_subject_rank">学科排行榜</strong>
-      </a>
-      <a class="rank-choice" href="/indexes/warning/">
-        <strong data-i18n="nav_warn_rank">预警名单</strong>
-      </a>
-    </div>
-  </section>
+  <!-- 榜单已并入首页 #rankings；二级页仍为 /indexes/ · /subjects/ · /indexes/warning/ -->
 
   <!-- ─── Pick-for-me tab ─── -->
   <section class="tab-panel" data-panel="pick" hidden>
@@ -886,7 +900,7 @@ window.__BUILD_VER = 'v20260716-stats-fix';
 <script src="/js/pick-match.js?v=20260716-v10" defer></script>
 <script src="/js/pricing-checkout.js?v=20260716-home" defer></script>
 <script src="/js/extension-downloads.js?v=20260716-home-dl" defer></script>
-<script src="/js/app.js?v=20260716-lang-nav" defer></script>
+<script src="/js/app.js?v=20260716-home-rank" defer></script>
 
 </body>
 </html>

@@ -166,6 +166,13 @@
       home_how_3_t: '看详情与风险', home_how_3_d: '影响因子、审稿周期、OA / 预警信息一页看清。',
       home_how_4_t: '收藏或导出', home_how_4_d: '加入清单；插件在阅读页继续对照徽章。',
       home_cta_search: '打开查刊', home_cta_pick: '试用荐刊',
+      home_rank_kicker: 'Rankings', home_rank_title: '榜单',
+      home_rank_lead: '按索引、学科与风险名单浏览期刊列表；点进二级页查看完整目录。',
+      home_rank_idx_badge: '索引', home_rank_sub_badge: '学科', home_rank_warn_badge: '风险',
+      home_rank_idx_d: 'SCIE / SSCI / AHCI / ESCI / EI / Scopus / MEDLINE 等收录入口。',
+      home_rank_sub_d: '按 Web of Science 学科浏览 IF 靠前期刊与主题榜单。',
+      home_rank_warn_d: '中科院预警、中信所预警、On Hold / Under Review 等信号。',
+      home_rank_enter: '进入 →',
       home_price_kicker: 'Pricing', home_price_title: '订阅方案',
       home_price_lead: '网站查刊 Free 永久可用。Pro / Max 提升插件深度、额度与 AI 荐刊配额。教育邮箱另享教育价（登录后解锁）。',
       home_price_billing: '价格 USD · 年付 · Creem 收银台 · 下方划线为原价',
@@ -345,6 +352,13 @@
       home_how_3_t: 'Review details', home_how_3_d: 'IF, review cycle, OA and risk signals on one page.',
       home_how_4_t: 'Save or export', home_how_4_d: 'Add to lists; keep badges with you in the extension.',
       home_cta_search: 'Start searching', home_cta_pick: 'Try recommend',
+      home_rank_kicker: 'Rankings', home_rank_title: 'Rankings',
+      home_rank_lead: 'Browse by index, subject and risk lists; open a card for the full directory.',
+      home_rank_idx_badge: 'Index', home_rank_sub_badge: 'Subject', home_rank_warn_badge: 'Risk',
+      home_rank_idx_d: 'SCIE / SSCI / AHCI / ESCI / EI / Scopus / MEDLINE and more.',
+      home_rank_sub_d: 'Browse top journals by Web of Science subject.',
+      home_rank_warn_d: 'CAS / CITIC warnings, On Hold and Under Review signals.',
+      home_rank_enter: 'Open →',
       home_price_kicker: 'Pricing', home_price_title: 'Plans',
       home_price_lead: 'Website search stays Free forever. Pro / Max unlock extension depth, quotas and AI picks. Edu emails get edu pricing after sign-in.',
       home_price_billing: 'USD · yearly · Creem checkout · strikethrough = list price',
@@ -2100,7 +2114,6 @@
     scielo: '/scielo/',
     fav: '/favorites/',
     me: '/account/',
-    rank: '/rankings/',
     pick: '/pick/',
   };
   const PATH_TABS = {
@@ -2114,7 +2127,8 @@
     '/isc': 'isc', '/scielo': 'scielo',
     '/favorites': 'fav',
     '/account': 'me', '/me': 'me', '/profile': 'me',
-    '/rankings': 'rank', '/rankings/': 'rank',
+    // 榜单入口已并入首页 #rankings；二级页仍为 /indexes/ · /subjects/
+    '/rankings': 'home', '/rankings/': 'home',
     '/pick': 'pick',
   };
   const TAB_SEO = {
@@ -2165,10 +2179,6 @@
     fav: {
       title: '期刊收藏清单 | Journal Favorites - AILatest Journal',
       desc: '保存、同步、排序并分享你的目标期刊清单，支持跨设备收藏和期刊清单分享。'
-    },
-    rank: {
-      title: '期刊榜单 | AILatest Journal',
-      desc: 'AILatest Journal 期刊榜单入口：索引排行榜、学科排行榜和预警名单。'
     },
     pick: {
       title: '荐刊推荐工具 | Journal Finder for Paper Title and Keywords - AILatest Journal',
@@ -8807,7 +8817,11 @@
 
             <section class="settings-section" data-settings-section="rankings" ${_settingsSection === 'rankings' ? '' : 'hidden'}>
               <h2 class="settings-section-title">${T('榜单','Rankings')}</h2>
-              <button type="button" class="settings-link-row" data-open-rankings style="width:100%">${T('索引 / 学科排行榜与预警','Indexes, rankings & warnings')}<span>→</span></button>
+              <p class="settings-hint">${T('榜单入口在首页；点卡片进入索引 / 学科 / 预警二级页。','Rankings live on the home page; open a card for indexes, subjects or warnings.')}</p>
+              <a class="settings-link-row" href="/#rankings">${T('打开首页榜单','Open home rankings')}<span>↗</span></a>
+              <a class="settings-link-row" href="/indexes/">${T('索引排行榜','Index rankings')}<span>→</span></a>
+              <a class="settings-link-row" href="/subjects/">${T('学科排行榜','Subject rankings')}<span>→</span></a>
+              <a class="settings-link-row" href="/indexes/warning/">${T('预警名单','Warning lists')}<span>→</span></a>
             </section>
 
             <section class="settings-section" data-settings-section="gift" ${_settingsSection === 'gift' ? '' : 'hidden'}>
@@ -8914,10 +8928,16 @@
     } else {
       showSettingsSection(_settingsSection, { subpage: false });
     }
-    box.querySelector('[data-open-rankings]')?.addEventListener('click', () => {
-      closeSettingsShell({ keepTab: true });
-      if (typeof window.__activateJournalTab === 'function') window.__activateJournalTab('rank', { push: true });
-      else activateTab('rank', { push: true });
+    box.querySelectorAll('a[href="/#rankings"]').forEach((a) => {
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        closeSettingsShell({ keepTab: true });
+        if (typeof window.__activateJournalTab === 'function') window.__activateJournalTab('home', { push: true });
+        else activateTab('home', { push: true });
+        requestAnimationFrame(() => {
+          document.getElementById('rankings')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      });
     });
     // 语言：直接 setUiLanguage，不依赖页面角落下拉（设置浮层下原点击无效）
     box.querySelectorAll('[data-set-lang]').forEach((btn) => {
@@ -11646,7 +11666,7 @@
       if (document.body.dataset.bootTab) delete document.body.dataset.bootTab;
       document.body.classList.toggle('update-reading-mode', activeTab === 'updates');
       document.body.classList.toggle('home-route', activeTab === 'home');
-      document.body.classList.toggle('simple-top-route', activeTab === 'updates' || activeTab === 'fav' || activeTab === 'rank');
+      document.body.classList.toggle('simple-top-route', activeTab === 'updates' || activeTab === 'fav');
       placeLangToggle();
       updateSearchSubmitLabel();
       $$('.tab-panel').forEach(p => {
@@ -11781,22 +11801,26 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // 榜单：SPA 内切 tab，禁止整页刷新
-    document.getElementById('rankings-btn')?.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      activateTab('rank');
-    });
-    // 侧栏注入后的榜单链接（listing 页 / 动态 rail）同样拦截
+    // 榜单：回首页并滚到 #rankings（二级页 /indexes · /subjects 仍整页打开）
+    function openHomeRankings(e) {
+      if (e) { e.preventDefault(); e.stopPropagation(); }
+      if (typeof window.__activateJournalTab === 'function') window.__activateJournalTab('home', { push: true });
+      else activateTab('home', { push: true });
+      requestAnimationFrame(() => {
+        document.getElementById('rankings')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        try {
+          if (normalizeAppPath(location.pathname) === '/' || normalizeAppPath(location.pathname) === '/rankings') {
+            history.replaceState(history.state || {}, '', '/#rankings');
+          }
+        } catch (_) {}
+      });
+    }
+    document.getElementById('rankings-btn')?.addEventListener('click', openHomeRankings);
     document.addEventListener('click', (e) => {
-      const a = e.target.closest?.('a#rankings-btn, a.rail-nav-btn[href="/rankings/"], a.rail-nav-btn[href="/rankings"]');
+      const a = e.target.closest?.('a#rankings-btn, a.rail-nav-btn[href="/rankings/"], a.rail-nav-btn[href="/rankings"], a[href="/rankings"], a[href="/rankings/"]');
       if (!a) return;
-      // 仅本站 SPA 内处理
-      if (!document.getElementById('mode-tabs') && !document.querySelector('.tab-panel')) return;
-      e.preventDefault();
-      e.stopPropagation();
-      if (typeof window.__activateJournalTab === 'function') window.__activateJournalTab('rank');
-      else activateTab('rank');
+      if (!document.querySelector('.tab-panel[data-panel="home"]')) return;
+      openHomeRankings(e);
     }, true);
     document.querySelector('[data-topbar-home]')?.addEventListener('click', (e) => {
       e.preventDefault();
@@ -13471,6 +13495,17 @@
     updateFavCount();
     initHomeLanding();
     placeLangToggle();
+    // /rankings 旧入口 → 首页榜单区
+    if (normalizeAppPath(location.pathname) === '/rankings') {
+      try { history.replaceState(history.state || {}, '', '/#rankings'); } catch (_) {}
+      requestAnimationFrame(() => {
+        document.getElementById('rankings')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    } else if (location.hash === '#rankings') {
+      requestAnimationFrame(() => {
+        document.getElementById('rankings')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
     await handleAuthCallback();
     refreshCurrentUserProfile();
     // 分享着陆页：/s/<id> 直接接管 main，不走主流程
