@@ -872,6 +872,11 @@ body.home-route.topbar-compact .home-search-chips {
   order: 2;
   margin: 0 auto 12px;
 }
+/* 紧凑模式：落地内容 order 必须 > topbar，否则默认 order:0 会把搜索挤到整页底部
+   （表现为 About 区下方多出一条搜索框） */
+body.home-route.topbar-compact:not(.home-tab-has-results) .home-hero-body {
+  order: 3;
+}
 /* 仅有搜索结果时收起落地内容；topbar-compact 只收紧搜索条，不藏榜单/介绍 */
 body.home-route.home-tab-has-results .home-hero-body {
   display: none;
