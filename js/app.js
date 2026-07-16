@@ -9201,10 +9201,10 @@
 
   /**
    * GitHub 风格热力图：列=周、行=星期（日→六），每天一格。
-   * 近 12 周，含本周，不足的周前用空白格对齐。
+   * 近 52 周（约 1 年），含本周；CSS 按容器宽度铺满。
    */
   function renderActivityDots() {
-    const weeks = 12;
+    const weeks = 52;
     const today = new Date();
     today.setHours(12, 0, 0, 0);
     // 周起始：周日（与常见贡献图一致）
@@ -9256,7 +9256,7 @@
     }).join('');
 
     return `<div class="me-activity-heat" style="--activity-weeks:${weeks}">
-      <div class="me-activity-grid settings-activity-grid" role="img" aria-label="${escape(T('近 12 周每日活动', 'Daily activity · last 12 weeks'))}">${cells.join('')}</div>
+      <div class="me-activity-grid settings-activity-grid" role="img" aria-label="${escape(T('近 1 年每日活动', 'Daily activity · last 12 months'))}">${cells.join('')}</div>
       <div class="me-activity-month-row" aria-hidden="true">${monthRow}</div>
     </div>`;
   }
@@ -9381,7 +9381,7 @@
               ${renderUsageSummaryHtml()}
               <section class="me-card me-activity-card settings-activity-card">
                 <h3 class="settings-subhead">${T('活动记录','Activity')}</h3>
-                <div class="me-activity-months"><span>${T('近 12 周 · 每天一格','Last 12 weeks · one cell per day')}</span><span>${new Date().toLocaleDateString(uiLocale(), { month: 'short', day: 'numeric' })}</span></div>
+                <div class="me-activity-months"><span>${T('近 1 年 · 每天一格','Last 12 months · one cell per day')}</span><span>${new Date().toLocaleDateString(uiLocale(), { month: 'short', day: 'numeric' })}</span></div>
                 ${renderActivityDots()}
               </section>
             </section>

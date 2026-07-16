@@ -4062,49 +4062,55 @@ button.me-record-row {
   font-size: 12px;
   margin-bottom: 12px;
 }
-/* 贡献图：列=周 · 行=日→六 · 每天一格 */
+/* 贡献图：列=周 · 行=日→六 · 每天一格 · 铺满容器宽 */
 .me-activity-heat {
-  --activity-weeks: 12;
-  --activity-cell: 11px;
-  --activity-gap: 3px;
+  --activity-weeks: 52;
+  --activity-gap: 2px;
   width: 100%;
   max-width: 100%;
-  overflow-x: auto;
+  overflow-x: hidden;
   overflow-y: hidden;
   padding-bottom: 2px;
+  box-sizing: border-box;
 }
 .me-activity-grid,
 .me-activity-grid.settings-activity-grid {
   display: grid !important;
-  grid-template-rows: repeat(7, var(--activity-cell));
+  width: 100%;
+  max-width: 100%;
+  grid-template-columns: repeat(var(--activity-weeks), minmax(0, 1fr));
+  grid-template-rows: repeat(7, auto);
   grid-auto-flow: column;
-  grid-auto-columns: var(--activity-cell);
   gap: var(--activity-gap);
-  width: max-content;
-  max-width: none;
   align-items: stretch;
-  justify-content: start;
+  justify-content: stretch;
+  box-sizing: border-box;
 }
 .me-activity-month-row {
   display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: var(--activity-cell);
+  width: 100%;
+  max-width: 100%;
+  grid-template-columns: repeat(var(--activity-weeks), minmax(0, 1fr));
   gap: var(--activity-gap);
   margin-top: 6px;
-  width: max-content;
+  box-sizing: border-box;
 }
 .me-activity-month-cell {
-  width: var(--activity-cell);
+  width: auto;
+  min-width: 0;
   font-size: 10px;
   line-height: 1.2;
   color: #a8a29e;
   font-weight: 650;
-  overflow: visible;
+  overflow: hidden;
   white-space: nowrap;
+  text-overflow: clip;
 }
 .me-activity-dot {
-  width: var(--activity-cell);
-  height: var(--activity-cell);
+  width: 100%;
+  min-width: 0;
+  aspect-ratio: 1;
+  height: auto;
   border-radius: 2px;
   background: #ebe6df;
   box-sizing: border-box;
@@ -11253,9 +11259,8 @@ body.journal-route .lang-toggle-wrap { display: none; }
     font-size: 11px;
   }
   .me-activity-heat {
-    --activity-cell: 9px;
-    --activity-gap: 2px;
-    overflow-x: auto;
+    --activity-gap: 1.5px;
+    overflow-x: hidden;
     padding-bottom: 4px;
   }
 }
@@ -12107,29 +12112,33 @@ body[data-boot-tab="me"] .tab-panel[data-panel="me"] {
   margin-bottom: 10px;
 }
 .me-page.settings-me .me-activity-heat {
-  --activity-cell: 10px;
-  --activity-gap: 3px;
+  --activity-weeks: 52;
+  --activity-gap: 2px;
+  width: 100%;
 }
 .me-page.settings-me .settings-activity-grid,
 .me-page.settings-me .me-activity-grid {
   display: grid !important;
-  grid-template-columns: none;
-  grid-template-rows: repeat(7, var(--activity-cell));
+  width: 100%;
+  max-width: 100%;
+  grid-template-columns: repeat(var(--activity-weeks), minmax(0, 1fr));
+  grid-template-rows: repeat(7, auto);
   grid-auto-flow: column;
-  grid-auto-columns: var(--activity-cell);
   gap: var(--activity-gap);
-  width: max-content;
-  max-width: none;
   overflow: visible;
   box-sizing: border-box;
 }
 .me-page.settings-me .me-activity-dot {
-  width: var(--activity-cell);
-  height: var(--activity-cell);
-  min-width: var(--activity-cell);
-  aspect-ratio: auto;
+  width: 100%;
+  min-width: 0;
+  aspect-ratio: 1;
+  height: auto;
   border-radius: 2px;
   box-sizing: border-box;
+}
+.me-page.settings-me .me-activity-month-row {
+  width: 100%;
+  grid-template-columns: repeat(var(--activity-weeks), minmax(0, 1fr));
 }
 .me-page.settings-me .gift-code-results {
   max-width: 100%;
