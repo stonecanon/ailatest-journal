@@ -9498,16 +9498,6 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
     transform: none;
     font-size: 16px;
   }
-  .rank-panel {
-    width: calc(100vw - 24px);
-    margin-top: 12px;
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-  .rank-choice {
-    min-height: 74px;
-    padding: 16px;
-  }
 }
 
 /* ═══════════ 去掉期刊封面（详情页 + 荐刊卡片，很多无数据） ═══════════ */
