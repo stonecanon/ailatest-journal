@@ -12977,24 +12977,32 @@
   }
 
   // ───────── Home V4 landing: stats + hot journals ─────────
+  /** 首页指标展示：始终带完整千分位，避免 48722 →「48+」 */
   function formatHomeStat(n) {
-    const num = Number(n) || 0;
+    const raw = typeof n === 'string' ? n.replace(/[^\d.]/g, '') : n;
+    const num = Math.floor(Number(raw) || 0);
     if (num <= 0) return '—';
     if (num >= 1_000_000) {
       const m = Math.floor(num / 100_000) / 10;
       return `${m}M+`;
     }
-    // 48,722 → 48,000+ ；7,266 → 7,000+ （整千向下取整）
-    if (num >= 1000) {
-      const rounded = Math.floor(num / 1000) * 1000;
-      return `${rounded.toLocaleString('en-US')}+`;
-    }
-    return `${num}+`;
+    // ≥1万：向下整千 → 48,000+ / 23,000+
+    // 1千–1万：向下整百 → 7,400+ / 1,000+
+    let rounded;
+    if (num >= 10000) rounded = Math.floor(num / 1000) * 1000;
+    else if (num >= 1000) rounded = Math.floor(num / 100) * 100;
+    else rounded = num;
+    // 手动千分位，不依赖运行环境 locale
+    const s = String(rounded).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return `${s}+`;
   }
 
   function setHomeStat(key, value) {
     const el = document.querySelector(`[data-stat="${key}"]`);
-    if (el) el.textContent = formatHomeStat(value);
+    if (!el) return;
+    const text = formatHomeStat(value);
+    el.textContent = text;
+    el.setAttribute('data-raw', String(value));
   }
 
   async function loadHomeStats() {
@@ -13003,11 +13011,15 @@
         fetch(`${API_BASE}/analytics/public-total`).then(r => r.ok ? r.json() : null).catch(() => null),
         meta || fetch('/data/meta.json').then(r => r.json()).catch(() => null),
       ]);
-      if (m && m.total) setHomeStat('journals', m.total);
+      // 期刊数优先 meta.total，否则用已加载库长度
+      const jTotal = (m && m.total) || (meta && meta.total) || (journals && journals.length) || 0;
+      if (jTotal) setHomeStat('journals', jTotal);
       if (pub && pub.ok !== false) {
         if (pub.total_pageviews != null) setHomeStat('views', pub.total_pageviews);
         if (pub.total_visitors != null) setHomeStat('visitors', pub.total_visitors);
-        if (pub.total_journal_views != null) setHomeStat('journal_views', pub.total_journal_views);
+        // 期刊详情浏览：优先 total_journal_views，避免误用其它字段
+        const jv = pub.total_journal_views != null ? pub.total_journal_views : pub.viewed_journals;
+        if (jv != null) setHomeStat('journal_views', jv);
       }
     } catch (_) { /* keep placeholder */ }
   }

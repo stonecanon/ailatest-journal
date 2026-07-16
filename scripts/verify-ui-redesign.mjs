@@ -22,16 +22,27 @@ function ok(name, cond, detail = '') {
 
 console.log('1) formatHomeStat');
 function formatHomeStat(n) {
-  const num = Number(n) || 0;
+  const raw = typeof n === 'string' ? n.replace(/[^\d.]/g, '') : n;
+  const num = Math.floor(Number(raw) || 0);
   if (num <= 0) return '—';
   if (num >= 1_000_000) return `${Math.floor(num / 100_000) / 10}M+`;
-  if (num >= 1000) return `${(Math.floor(num / 1000) * 1000).toLocaleString('en-US')}+`;
-  return `${num}+`;
+  let rounded;
+  if (num >= 10000) rounded = Math.floor(num / 1000) * 1000;
+  else if (num >= 1000) rounded = Math.floor(num / 100) * 100;
+  else rounded = num;
+  return `${String(rounded).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}+`;
 }
-for (const [n, exp] of [[48722, '48,000+'], [7267, '7,000+'], [1056, '1,000+']]) {
+for (const [n, exp] of [
+  [48722, '48,000+'],
+  [23006, '23,000+'],
+  [7412, '7,400+'],
+  [1056, '1,000+'],
+  [0, '—'],
+]) {
   ok(`${n} → ${exp}`, formatHomeStat(n) === exp, `got ${formatHomeStat(n)}`);
 }
-ok('source has floor(/1000)*1000', /Math\.floor\(num\s*\/\s*1000\)\s*\*\s*1000/.test(js));
+ok('source floors to thousands for >=10k', /num >= 10000\)\s*rounded = Math\.floor\(num \/ 1000\) \* 1000/.test(js)
+  || /if \(num >= 10000\) rounded = Math\.floor/.test(js));
 
 console.log('2) Settings full-screen two-level');
 ok('settings-panel full width', /settings-panel\s*\{[^}]*width:\s*100%/.test(css));
