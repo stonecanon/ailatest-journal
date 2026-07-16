@@ -42,7 +42,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 })(window,document,'script','dataLayer','GTM-NBNXL7FB');</script>
 <!-- End Google Tag Manager -->
 <link rel="preload" href="/data/journal_aliases.json" as="fetch" crossorigin="anonymous" />
-<link rel="stylesheet" href="/css/app.css?v=20260716-home-dl" />
+<link rel="stylesheet" href="/css/app.css?v=20260716-no-pricing-page" />
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json" />
@@ -238,7 +238,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 </aside>
 <!-- 隐藏的旧入口 id 保留，供设置页 / 其它脚本引用 -->
-<a id="pricing-rail-link" href="/pricing.html" hidden aria-hidden="true"></a>
+<a id="pricing-rail-link" href="/#pricing" hidden aria-hidden="true"></a>
 <a id="download-center-rail-link" href="/#download" hidden aria-hidden="true"></a>
 <button type="button" id="rankings-btn" data-tab="rank" hidden aria-hidden="true"></button>
 <div class="lang-toggle-wrap">
@@ -346,6 +346,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <span class="home-sec-id" data-i18n="home_price_kicker">Pricing</span>
           <h2 class="home-sec-title" data-i18n="home_price_title">订阅方案</h2>
           <p class="home-sec-lead" data-i18n="home_price_lead">网站查刊 Free 永久可用。Pro / Max 提升插件深度、额度与 AI 荐刊配额。教育邮箱另享教育价（登录后解锁）。</p>
+          <p class="home-sec-note home-price-billing" data-i18n="home_price_billing">价格 USD · 年付 · Creem 收银台 · 下方划线为原价</p>
+          <p class="home-edu-status" data-edu-status hidden></p>
           <div class="home-plans">
             <article class="home-plan">
               <h3>Free</h3>
@@ -361,31 +363,32 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <article class="home-plan">
               <h3>Pro</h3>
               <div class="home-plan-price">$7.99 <small data-i18n="home_price_year">/ 年</small></div>
+              <p class="home-plan-was" data-i18n="home_price_pro_was">原价 $11.99</p>
               <p class="home-plan-desc" data-i18n="home_price_pro_d">高频刷刊 · 插件进阶</p>
               <ul>
                 <li data-i18n="home_price_pro_1">中科院 / TOP / 新锐徽章</li>
                 <li data-i18n="home_price_pro_2">云收藏 50 · 清单 5</li>
                 <li data-i18n="home_price_pro_3">AI 荐刊 500 credits/月</li>
               </ul>
-              <a class="home-btn home-btn-primary home-btn-block" href="/pricing.html" data-i18n="home_price_pro_cta">升级 Pro</a>
+              <button type="button" class="home-btn home-btn-primary home-btn-block" data-creem-checkout data-plan="pro" data-period="year" data-i18n="home_price_pro_cta">订阅 Pro · 年付</button>
+              <button type="button" class="home-btn home-btn-ghost home-btn-block home-btn-edu" data-creem-checkout data-plan="pro" data-period="year" data-edu="1">教育价 $4.99 · 需机构邮箱</button>
             </article>
             <article class="home-plan home-plan-hot">
               <span class="home-plan-tag" data-i18n="home_price_rec">推荐</span>
               <h3>Max</h3>
               <div class="home-plan-price">$9.99 <small data-i18n="home_price_year">/ 年</small></div>
+              <p class="home-plan-was" data-i18n="home_price_max_was">原价 $14.99</p>
               <p class="home-plan-desc" data-i18n="home_price_max_d">完整工作流 · 高额度 AI</p>
               <ul>
                 <li data-i18n="home_price_max_1">预警 / 撤稿 / 科协风险</li>
                 <li data-i18n="home_price_max_2">导出与高额度荐刊</li>
                 <li data-i18n="home_price_max_3">地区站与设备额度更高</li>
               </ul>
-              <a class="home-btn home-btn-primary home-btn-block" href="/pricing.html" data-i18n="home_price_max_cta">升级 Max</a>
+              <button type="button" class="home-btn home-btn-primary home-btn-block" data-creem-checkout data-plan="max" data-period="year" data-i18n="home_price_max_cta">订阅 Max · 年付</button>
+              <button type="button" class="home-btn home-btn-ghost home-btn-block home-btn-edu" data-creem-checkout data-plan="max" data-period="year" data-edu="1">教育价 $5.99 · 需机构邮箱</button>
             </article>
           </div>
-          <p class="home-sec-note" data-i18n="home_price_note">完整对照与教育价见订阅页 · 价格 USD · Creem 收银台</p>
-          <div class="home-cta-row">
-            <a class="home-btn home-btn-ghost" href="/pricing.html" data-i18n="home_price_more">打开完整订阅页 →</a>
-          </div>
+          <p class="home-sec-note" data-i18n="home_price_note">教育价仅限 .edu / .edu.cn / .ac.* 等机构邮箱登录后支付</p>
         </section>
 
         <section class="home-sec" id="download">
@@ -882,9 +885,9 @@ window.__BUILD_VER = 'v20260716-stats-fix';
 })();
 </script>
 <script src="/js/pick-match.js?v=20260716-v10" defer></script>
-<script src="/js/pricing-checkout.js?v=20260716-creem" defer></script>
+<script src="/js/pricing-checkout.js?v=20260716-home" defer></script>
 <script src="/js/extension-downloads.js?v=20260716-home-dl" defer></script>
-<script src="/js/app.js?v=20260716-home-dl" defer></script>
+<script src="/js/app.js?v=20260716-no-pricing-page" defer></script>
 
 </body>
 </html>

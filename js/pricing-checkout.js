@@ -164,7 +164,7 @@
         if (elig.reason === 'login') {
           const go = confirm(eduBlockMessage('login'));
           if (go) {
-            location.href = '/signup.html?next=' + encodeURIComponent('/pricing.html');
+            location.href = '/signup.html?next=' + encodeURIComponent('/#pricing');
           }
         } else {
           alert(eduBlockMessage('not_edu'));
@@ -184,7 +184,7 @@
           : 'Please sign in so entitlements can sync to your account.\n\nContinue to checkout?\n(Cancel opens sign-in.)'
       );
       if (!go) {
-        location.href = '/signup.html?next=' + encodeURIComponent('/pricing.html');
+        location.href = '/signup.html?next=' + encodeURIComponent('/#pricing');
         return;
       }
       openUrl(fb);
@@ -213,7 +213,7 @@
             : eduBlockMessage('not_edu'))
         );
         if (data.error === 'login_required') {
-          location.href = '/signup.html?next=' + encodeURIComponent('/pricing.html');
+          location.href = '/signup.html?next=' + encodeURIComponent('/#pricing');
         }
         return;
       }

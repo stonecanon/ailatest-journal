@@ -168,18 +168,21 @@
       home_cta_search: '打开查刊', home_cta_pick: '试用荐刊',
       home_price_kicker: 'Pricing', home_price_title: '订阅方案',
       home_price_lead: '网站查刊 Free 永久可用。Pro / Max 提升插件深度、额度与 AI 荐刊配额。教育邮箱另享教育价（登录后解锁）。',
+      home_price_billing: '价格 USD · 年付 · Creem 收银台 · 下方划线为原价',
+      home_price_pro_was: '原价 $11.99',
+      home_price_max_was: '原价 $14.99',
       home_price_forever: '/ 永久', home_price_year: '/ 年', home_price_rec: '推荐',
       home_price_free_d: '适合日常检索与轻量试用',
       home_price_free_1: '网站完整检索与详情', home_price_free_2: '基础插件徽章', home_price_free_3: 'AI 荐刊试用次数',
       home_price_free_cta: '继续免费使用',
       home_price_pro_d: '高频刷刊 · 插件进阶',
       home_price_pro_1: '中科院 / TOP / 新锐徽章', home_price_pro_2: '云收藏 50 · 清单 5', home_price_pro_3: 'AI 荐刊 500 credits/月',
-      home_price_pro_cta: '升级 Pro',
+      home_price_pro_cta: '订阅 Pro · 年付',
       home_price_max_d: '完整工作流 · 高额度 AI',
       home_price_max_1: '预警 / 撤稿 / 科协风险', home_price_max_2: '导出与高额度荐刊', home_price_max_3: '地区站与设备额度更高',
-      home_price_max_cta: '升级 Max',
-      home_price_note: '完整对照与教育价见订阅页 · 价格 USD · Creem 收银台',
-      home_price_more: '打开完整订阅页 →',
+      home_price_max_cta: '订阅 Max · 年付',
+      home_price_note: '教育价仅限 .edu / .edu.cn / .ac.* 等机构邮箱登录后支付',
+      home_price_more: '',
       home_dl_kicker: 'Download', home_dl_title: '下载',
       home_dl_lead: '网页版无需安装。插件、Skill 与 MCP 可直接在此获取。',
       home_dl_ext_badge: '插件', home_dl_ext_t: 'Chrome / Edge 内测版',
@@ -344,18 +347,21 @@
       home_cta_search: 'Start searching', home_cta_pick: 'Try recommend',
       home_price_kicker: 'Pricing', home_price_title: 'Plans',
       home_price_lead: 'Website search stays Free forever. Pro / Max unlock extension depth, quotas and AI picks. Edu emails get edu pricing after sign-in.',
+      home_price_billing: 'USD · yearly · Creem checkout · strikethrough = list price',
+      home_price_pro_was: 'Was $11.99',
+      home_price_max_was: 'Was $14.99',
       home_price_forever: '/ forever', home_price_year: '/ year', home_price_rec: 'Best',
       home_price_free_d: 'Everyday search & light trials',
       home_price_free_1: 'Full website search & details', home_price_free_2: 'Basic extension badges', home_price_free_3: 'Limited AI pick trial',
       home_price_free_cta: 'Stay on Free',
       home_price_pro_d: 'Power users · extension upgrades',
       home_price_pro_1: 'CAS / TOP / emerging badges', home_price_pro_2: '50 cloud favorites · 5 lists', home_price_pro_3: '500 AI credits / month',
-      home_price_pro_cta: 'Upgrade Pro',
+      home_price_pro_cta: 'Subscribe Pro · yearly',
       home_price_max_d: 'Full workflow · high AI quota',
       home_price_max_1: 'Warning / retraction / CAST risk', home_price_max_2: 'Export & high AI quota', home_price_max_3: 'More regions & devices',
-      home_price_max_cta: 'Upgrade Max',
-      home_price_note: 'Full comparison & edu pricing on the pricing page · USD · Creem checkout',
-      home_price_more: 'Open full pricing →',
+      home_price_max_cta: 'Subscribe Max · yearly',
+      home_price_note: 'Edu pricing requires institutional email (.edu / .edu.cn / .ac.*) after sign-in',
+      home_price_more: '',
       home_dl_kicker: 'Download', home_dl_title: 'Downloads',
       home_dl_lead: 'No install for the web app. Get the extension, Skill, and MCP right here.',
       home_dl_ext_badge: 'Extension', home_dl_ext_t: 'Chrome / Edge beta',
@@ -7752,7 +7758,7 @@
           <p class="region-paywall-desc" id="region-paywall-desc"></p>
           <ul class="region-paywall-perks" id="region-paywall-perks"></ul>
           <div class="region-paywall-actions">
-            <a class="region-paywall-btn primary" id="region-paywall-cta" href="/pricing.html">${T('查看订阅方案','View plans')}</a>
+            <a class="region-paywall-btn primary" id="region-paywall-cta" href="/#pricing">${T('查看订阅方案','View plans')}</a>
             <button type="button" class="region-paywall-btn ghost" id="region-paywall-later">${T('暂不升级','Not now')}</button>
           </div>
           <p class="region-paywall-note" id="region-paywall-note"></p>
@@ -8546,7 +8552,7 @@
           </div>` : ''}
         </div>`;
       panel.querySelector('[data-me-open-pricing]')?.addEventListener('click', () => {
-        location.href = '/pricing.html';
+        location.href = '/#pricing';
       });
       return;
     }
@@ -8766,7 +8772,7 @@
             <section class="settings-section" data-settings-section="billing" ${_settingsSection === 'billing' ? '' : 'hidden'}>
               <h2 class="settings-section-title">${T('订阅','Billing')}</h2>
               <p class="settings-hint">${T('当前档位','Current plan')}：<strong>${escape(membershipTierLabel().label || '—')}</strong></p>
-              <a class="settings-link-row" href="/pricing.html">${T('打开订阅页（Creem 支付）','Open pricing (Creem checkout)')}<span>↗</span></a>
+              <a class="settings-link-row" href="/#pricing">${T('订阅方案（Creem 支付）','Plans (Creem checkout)')}<span>↗</span></a>
               <button type="button" class="settings-link-row" data-creem-checkout data-plan="pro" data-period="year" style="width:100%">${T('升级 Pro · 年付','Upgrade Pro · yearly')}<span>→</span></button>
               <button type="button" class="settings-link-row" data-creem-checkout data-plan="max" data-period="year" style="width:100%">${T('升级 Max · 年付','Upgrade Max · yearly')}<span>→</span></button>
             </section>
@@ -8863,7 +8869,7 @@
       box.querySelectorAll('[data-creem-checkout]').forEach((el) => {
         el.addEventListener('click', (e) => {
           e.preventDefault();
-          location.href = '/pricing.html';
+          location.href = '/#pricing';
         });
       });
     }

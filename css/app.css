@@ -1096,10 +1096,55 @@ body.home-route:not(.home-tab-has-results) .home-v4-grad {
   font-weight: 650;
   color: #8a837a;
 }
+.home-plan-was {
+  margin: 0 0 6px;
+  font-size: 11.5px;
+  color: #a8a29e;
+  text-decoration: line-through;
+}
 .home-plan-desc {
   font-size: 12px;
   color: #8a837a;
   margin: 0 0 10px;
+}
+.home-plan .home-btn + .home-btn { margin-top: 6px; }
+.home-btn-edu {
+  font-size: 12px !important;
+  min-height: 34px !important;
+  color: #047857 !important;
+  border-color: rgba(4, 120, 87, .22) !important;
+  background: #f0fdf6 !important;
+}
+.home-btn-edu.edu-locked {
+  opacity: .72;
+  color: #78716c !important;
+  border-color: rgba(90, 70, 50, .12) !important;
+  background: #fafaf9 !important;
+}
+.home-edu-status {
+  margin: 0 auto 12px;
+  max-width: 640px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: #fff7ed;
+  border: 1px solid rgba(249, 115, 22, .18);
+  color: #9a3412;
+  font-size: 12.5px;
+  line-height: 1.45;
+  text-align: center;
+}
+.home-edu-status[data-state="ok"] {
+  background: #ecfdf5;
+  border-color: rgba(4, 120, 87, .18);
+  color: #047857;
+}
+.home-edu-status[data-state="blocked"] {
+  background: #fff7ed;
+  color: #9a3412;
+}
+.home-price-billing {
+  margin-top: -4px;
+  margin-bottom: 12px;
 }
 .home-plan ul {
   list-style: none;

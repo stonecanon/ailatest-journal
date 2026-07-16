@@ -19,7 +19,7 @@ const FLASH_OFFER_WINDOW_SEC = 24 * 3600;
 /** 月度 AI credits（约 10 credits / 次完整荐刊） */
 const PLUS_MONTHLY_CREDITS = 500;  // 产品名 Pro ≈ 50 次
 const PRO_MONTHLY_CREDITS = 1000;  // 产品名 Max ≈ 100 次
-const UPGRADE_URL = 'https://journal.ailatest.org/pricing.html';
+const UPGRADE_URL = 'https://journal.ailatest.org/#pricing';
 /** 收银台已接通 Creem；仍允许 free 直用（不自动 trial） */
 const PRO_COMING_SOON = false;
 
