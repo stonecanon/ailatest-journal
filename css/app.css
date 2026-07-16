@@ -6315,8 +6315,36 @@ body.journal-route .badge.b-retraction,
   font-weight: 600 !important;
   font-size: 12px !important;
 }
-.side-rating-card { padding: 10px !important; }
-.side-rating-card .muted { font-size: 11px; color: #a8a29e; margin-top: 4px; }
+.side-rating-card {
+  padding: 12px 12px 14px !important;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.side-rating-card .rating-my-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.side-rating-card .rating-stars-input {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+.side-rating-card .rating-my-hint,
+.side-rating-card .muted {
+  font-size: 11px;
+  color: #a8a29e;
+  line-height: 1.4;
+  margin: 0;
+}
+.side-rating-card .rating-pill {
+  margin-top: 0;
+  align-self: flex-start;
+  max-width: 100%;
+  flex-wrap: wrap;
+}
 .side-related .side-link { cursor: pointer; }
 
 /* 页模式：drawer-body / detail-layout 单层铺满，禁止再套第二套 grid 列 */

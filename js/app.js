@@ -7625,18 +7625,6 @@
             ${malaysiaHTML}
             ${lockedSrcHTML}
             ${!pageMode ? renderRelatedHTML(r) : ''}
-            <div class="drawer-section rating-section" data-rating-key="${escape(favId(r))}">
-              <h4>${T('我的评分','My Rating')}</h4>
-              <div class="rating-my-wrap">
-                <div class="rating-stars-input" id="rating-input" role="radiogroup" aria-label="${T('评分','Rating')}"></div>
-                <div class="rating-my-hint muted-cell" id="rating-hint">${T('登录后可打分 · 半星可评 · 可随时修改','Sign in to rate · half-stars supported · editable anytime')}</div>
-              </div>
-              <div class="rating-pill" data-rating-key="${escape(favId(r))}" title="${T('综合推荐评分','Overall rating')}" style="margin-top:10px">
-                <span class="rating-avg" id="rating-avg">—</span><span class="rating-avg-suffix">/ 5</span>
-                <span class="rating-avg-stars" id="rating-avg-stars"></span>
-                <span class="rating-count muted-cell" id="rating-count">${T('暂无评分','No ratings yet')}</span>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -7648,10 +7636,17 @@
             ${siteUrl ? `<a class="side-link" href="${escape(siteUrl)}" target="_blank" rel="noopener">${T('官网','Website')} <span>→</span></a>` : ''}
             ${submitUrl ? `<a class="side-link" href="${escape(submitUrl)}" target="_blank" rel="noopener">${T('投稿','Submit')} <span>→</span></a>` : ''}
           </div>
-          <div class="side-h">${T('评分','Rating')}</div>
-          <div class="side-card side-rating-card">
-            <div class="rating-avg-stars" id="side-rating-stars"></div>
-            <div class="muted" id="side-rating-label">—</div>
+          <div class="side-h">${T('我的评分','My Rating')}</div>
+          <div class="side-card side-rating-card rating-section" data-rating-key="${escape(favId(r))}">
+            <div class="rating-my-wrap">
+              <div class="rating-stars-input" id="rating-input" role="radiogroup" aria-label="${T('评分','Rating')}"></div>
+              <div class="rating-my-hint muted-cell" id="rating-hint">${T('登录后可打分 · 半星可评 · 可随时修改','Sign in to rate · half-stars supported · editable anytime')}</div>
+            </div>
+            <div class="rating-pill" data-rating-key="${escape(favId(r))}" title="${T('综合推荐评分','Overall rating')}">
+              <span class="rating-avg" id="rating-avg">—</span><span class="rating-avg-suffix">/ 5</span>
+              <span class="rating-avg-stars" id="rating-avg-stars"></span>
+              <span class="rating-count muted-cell" id="rating-count">${T('暂无评分','No ratings yet')}</span>
+            </div>
           </div>
           ${relatedSide ? `<div class="side-h">${T('相关','Related')}</div><div class="side-card side-related">${relatedSide}</div>` : ''}
         </aside>
