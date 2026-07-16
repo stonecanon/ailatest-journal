@@ -7,43 +7,59 @@
 <meta name="description" content="联系 AILatest Journal：产品反馈、数据纠错、商务合作与媒体联系。" />
 <link rel="canonical" href="https://journal.ailatest.org/contact" />
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
-<link rel="stylesheet" href="/css/static.css?v=20260715-foot-line" />
+<link rel="stylesheet" href="/css/static.css?v=20260716-shell-main" />
 </head>
 <body data-static-page="contact">
 <aside class="app-rail" aria-label="Primary navigation">
   <nav class="rail-top" aria-label="站点">
     <a class="rail-nav-btn" href="/global" aria-label="全球期刊" title="全球期刊">
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 3.4 9A14 14 0 0 1 12 21a14 14 0 0 1-3.4-9A14 14 0 0 1 12 3Z"/></svg>
-      <span data-static-i18n="rail_global">全球</span>
+      <span>全球</span>
     </a>
     <a class="rail-nav-btn rail-region-station" data-region-station="dom" href="/cn" aria-label="中国期刊" title="中国期刊">
       <span class="rail-flag" aria-hidden="true">CN</span>
-      <span data-static-i18n="rail_china">中国</span>
+      <span>中国</span>
+    </a>
+    <a class="rail-nav-btn rail-region-station" data-region-station="in" href="/in" aria-label="印度期刊" title="印度期刊" hidden>
+      <span class="rail-flag" aria-hidden="true">IN</span>
+      <span>印度</span>
+    </a>
+    <a class="rail-nav-btn rail-region-station" data-region-station="my" href="/my" aria-label="马来西亚期刊" title="马来西亚期刊" hidden>
+      <span class="rail-flag" aria-hidden="true">MY</span>
+      <span>马来西亚</span>
+    </a>
+    <a class="rail-nav-btn rail-region-station" data-region-station="kr" href="/kr" aria-label="韩国期刊" title="韩国期刊" hidden>
+      <span class="rail-flag" aria-hidden="true">KR</span>
+      <span>韩国</span>
+    </a>
+    <a class="rail-nav-btn rail-region-station" data-region-station="pbn" href="/pbn" aria-label="波兰期刊" title="波兰期刊" hidden>
+      <span class="rail-flag" aria-hidden="true">PL</span>
+      <span>波兰</span>
+    </a>
+    <a class="rail-nav-btn rail-region-station" data-region-station="isc" href="/isc" aria-label="伊朗期刊" title="伊朗期刊" hidden>
+      <span class="rail-flag" aria-hidden="true">IR</span>
+      <span>伊朗</span>
+    </a>
+    <a class="rail-nav-btn rail-region-station" data-region-station="scielo" href="/scielo" aria-label="拉美期刊" title="拉美期刊" hidden>
+      <span class="rail-flag" aria-hidden="true">LA</span>
+      <span>拉美</span>
     </a>
     <div class="rail-region-picker">
       <button class="rail-nav-btn rail-region-toggle" type="button" aria-label="地区站点" title="地区站点" aria-expanded="false">
         <span class="rail-flag rail-region-symbol" aria-hidden="true">···</span>
-        <span><span data-static-i18n="rail_regions">地区</span><b class="rail-caret" aria-hidden="true">▾</b></span>
+        <span><span>地区</span><b class="rail-caret" aria-hidden="true">▾</b></span>
       </button>
       <div class="rail-region-menu" aria-label="地区站点"></div>
     </div>
   </nav>
-  <div class="rail-bottom" aria-label="账户与工具">
-    <a class="rail-nav-btn" href="/extension.html" aria-label="下载" title="下载">
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 20h14"/></svg>
-      <span data-static-i18n="download_center">下载</span>
-    </a>
-    <a class="rail-nav-btn" href="/rankings" aria-label="榜单" title="榜单">
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 21V11"/><path d="M12 21V7"/><path d="M16 21V3"/><path d="M4 21h16"/></svg>
-      <span data-static-i18n="rail_rankings">榜单</span>
-    </a>
-    <a class="rail-nav-btn" href="/favorites" aria-label="收藏" title="收藏">
+  <div class="rail-bottom" aria-label="账户">
+    <a class="rail-nav-btn" id="fav-header-btn" href="/favorites" aria-label="我的收藏" title="我的收藏">
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.7l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3.7z"/></svg>
-      <span data-static-i18n="rail_saved">收藏</span>
+      <span>收藏</span>
     </a>
-    <a class="rail-nav-btn" href="/account" aria-label="我的" title="我的">
-      <span class="rail-avatar" aria-hidden="true">我</span>
-      <span data-static-i18n="rail_account">我的</span>
+    <a class="rail-nav-btn" id="account-credit-badge" href="/account" aria-label="我的" title="我的">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="9" r="3.5"/><path d="M5 19c1.5-3 4-4.5 7-4.5S17.5 16 19 19"/></svg>
+      <span>我的</span>
     </a>
   </div>
 </aside>
@@ -172,14 +188,19 @@
 </main>
 
 <footer class="page-foot">
-  <p>© 2026 AILatest Journal ·
-    <a href="/about" data-static-i18n="footer_about">关于</a> ·
-    <a href="/contact" data-static-i18n="footer_contact">联系</a> ·
-    <a href="/terms.html" data-static-i18n="footer_terms">条款</a> ·
-    <a href="/privacy.html" data-static-i18n="footer_privacy">隐私</a> ·
-    <a href="/refund.html" data-static-i18n="footer_refund">退款</a></p>
+  <p class="site-foot-line">
+    <span>© 2026 AILatest Journal</span>
+    <span class="site-foot-sep">·</span>
+    <a href="/about">关于</a>
+    <span class="site-foot-sep">·</span>
+    <a href="/contact">联系</a>
+    <span class="site-foot-sep">·</span>
+    <a href="/terms">条款</a>
+    <span class="site-foot-sep">·</span>
+    <a href="/privacy">隐私</a>
+  </p>
 </footer>
-<script src="/js/site-rail.js?v=20260715-download-subscribe" defer></script>
+<script src="/js/site-rail.js?v=20260716-shell-main" defer></script>
 <script src="/js/static-i18n.js?v=20260715-download-subscribe" defer></script>
 </body>
 </html>
