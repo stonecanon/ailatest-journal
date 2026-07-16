@@ -233,9 +233,70 @@
     });
   }
 
+  function isEduCheckoutEl(el) {
+    return el.getAttribute('data-edu') === '1' || el.getAttribute('data-edu') === 'true';
+  }
+
+  /** 普通价按钮：机构邮箱用户禁用，避免误付标准价 */
+  function syncStandardCtaUi(elig, cycle) {
+    document.querySelectorAll('[data-creem-checkout]').forEach((el) => {
+      if (isEduCheckoutEl(el)) return;
+      const plan = (el.getAttribute('data-plan') || '').toLowerCase();
+      if (plan !== 'pro' && plan !== 'max') return;
+      const name = plan === 'max' ? 'Max' : 'Pro';
+      const isSettings = el.classList.contains('settings-link-row');
+
+      if (elig.ok) {
+        el.classList.add('std-price-locked');
+        el.setAttribute('aria-disabled', 'true');
+        el.setAttribute('data-std-locked', '1');
+        if (el.tagName === 'BUTTON') el.disabled = true;
+        el.title = L(
+          `您已登录机构邮箱 ${elig.email}，请使用下方教育价，避免按标准价付款`,
+          `Signed in with institutional email ${elig.email}. Use education pricing below to avoid full-price checkout`
+        );
+        const lockedText = L(
+          `标准价不可用 · 请用教育价`,
+          `Standard price locked · use edu price`
+        );
+        if (isSettings) el.innerHTML = `${lockedText}<span>—</span>`;
+        else el.textContent = lockedText;
+        // 视觉降级：去掉主 CTA 强调
+        el.classList.remove('home-btn-primary', 'plan-btn-primary');
+        el.classList.add('home-btn-ghost', 'plan-btn-ghost');
+      } else {
+        el.classList.remove('std-price-locked');
+        el.removeAttribute('aria-disabled');
+        el.removeAttribute('data-std-locked');
+        if (el.tagName === 'BUTTON') el.disabled = false;
+        el.removeAttribute('title');
+        // 恢复主 CTA（非 settings）
+        if (!isSettings) {
+          el.classList.add('home-btn-primary', 'plan-btn-primary');
+          el.classList.remove('home-btn-ghost');
+          // plan 页 ghost 不用于标准主按钮
+          if (el.classList.contains('plan-btn')) el.classList.remove('plan-btn-ghost');
+        }
+        // 文案由 syncPlanPrices 已写好；若刚从锁定恢复再写一遍
+        const text = cycle === 'month'
+          ? (isSettings
+            ? L(`升级 ${name} · 月付`, `Upgrade ${name} · monthly`)
+            : L(`订阅 ${name} · 月付`, `Subscribe ${name} · monthly`))
+          : (isSettings
+            ? L(`升级 ${name} · 年付`, `Upgrade ${name} · yearly`)
+            : L(`订阅 ${name} · 年付`, `Subscribe ${name} · yearly`));
+        if (isSettings) el.innerHTML = `${text}<span>→</span>`;
+        else el.textContent = text;
+      }
+    });
+  }
+
   function syncEduCtaUi() {
     const elig = eduEligibility();
     const cycle = getBillingCycle();
+
+    document.body?.classList.toggle('edu-eligible', !!elig.ok);
+    document.body?.classList.toggle('edu-not-eligible', !elig.ok && elig.reason === 'not_edu');
 
     document.querySelectorAll('[data-creem-checkout][data-edu="1"], [data-creem-checkout][data-edu="true"]').forEach((el) => {
       el.setAttribute('data-period', cycle === 'month' ? 'month' : 'year');
@@ -243,34 +304,51 @@
       const price = EDU_PRICES[plan][cycle];
       const unitZh = cycle === 'month' ? '月付' : '年付';
       const unitEn = cycle === 'month' ? 'monthly' : 'yearly';
+      const name = plan === 'max' ? 'Max' : 'Pro';
+      const isSettings = el.classList.contains('settings-link-row');
 
       if (elig.ok) {
         el.classList.remove('edu-locked');
+        el.classList.add('edu-ready');
         el.removeAttribute('aria-disabled');
-        el.title = L(`机构邮箱已验证：${elig.email}`, `Institutional email verified: ${elig.email}`);
-        el.textContent = L(`教育价 ${price} · ${unitZh}`, `Edu ${price} · ${unitEn}`);
+        if (el.tagName === 'BUTTON') el.disabled = false;
+        el.title = L(`机构邮箱已验证：${elig.email} · 教育价结账`, `Institutional email verified: ${elig.email} · edu checkout`);
+        const readyText = L(`教育价 ${price} · ${unitZh}`, `Edu ${price} · ${unitEn}`);
+        if (isSettings) el.innerHTML = `${L(`教育价升级 ${name} · ${price}`, `Edu upgrade ${name} · ${price}`)}<span>→</span>`;
+        else el.textContent = readyText;
+        // 突出：升级为主按钮样式
+        el.classList.add('home-btn-primary', 'plan-btn-primary');
+        el.classList.remove('home-btn-ghost', 'plan-btn-ghost');
       } else {
         el.classList.add('edu-locked');
+        el.classList.remove('edu-ready', 'home-btn-primary', 'plan-btn-primary');
         el.setAttribute('aria-disabled', 'true');
+        // 教育价按钮保持可点以弹出登录/提示；不 disabled
         if (elig.reason === 'login') {
           el.title = L('请使用机构邮箱登录后购买教育价', 'Sign in with an institutional email for education pricing');
-          el.textContent = L(`教育价 ${price} · 登录解锁`, `Edu ${price} · sign in`);
+          const t = L(`教育价 ${price} · 登录解锁`, `Edu ${price} · sign in`);
+          if (isSettings) el.innerHTML = `${t}<span>→</span>`;
+          else el.textContent = t;
         } else {
           el.title = L(
             `当前邮箱 ${elig.email || '—'} 不是机构域名，无法使用教育价`,
             `Current email ${elig.email || '—'} is not institutional; education checkout is locked`
           );
-          el.textContent = L(`教育价 ${price} · 需机构邮箱`, `Edu ${price} · institutional email`);
+          const t = L(`教育价 ${price} · 需机构邮箱`, `Edu ${price} · institutional email`);
+          if (isSettings) el.innerHTML = `${t}<span>—</span>`;
+          else el.textContent = t;
         }
       }
     });
+
+    syncStandardCtaUi(elig, cycle);
 
     document.querySelectorAll('[data-edu-status]').forEach((node) => {
       if (elig.ok) {
         node.hidden = false;
         node.textContent = L(
-          `已验证机构邮箱 ${elig.email}，可使用教育价。`,
-          `Institutional email verified (${elig.email}). Education pricing is unlocked.`
+          `已验证机构邮箱 ${elig.email}：请使用教育价按钮订阅，标准价已锁定以防误付。`,
+          `Institutional email verified (${elig.email}): use education pricing. Standard price is locked to prevent full-price checkout.`
         );
         node.dataset.state = 'ok';
       } else if (elig.reason === 'not_edu') {
@@ -319,12 +397,25 @@
   async function startCheckout(el) {
     const plan = (el.getAttribute('data-plan') || 'pro').toLowerCase();
     const period = (el.getAttribute('data-period') || getBillingCycle() || 'year').toLowerCase();
-    const edu = el.getAttribute('data-edu') === '1' || el.getAttribute('data-edu') === 'true';
+    const edu = isEduCheckoutEl(el);
     const fb = FALLBACK[fallbackKey(plan, period, edu)] || FALLBACK.pro_year;
     const nextPath = location.pathname.includes('pricing') ? '/pricing' : '/#pricing';
+    const elig = eduEligibility();
+
+    // 机构邮箱用户：禁止走标准价，避免误付
+    if (!edu && elig.ok) {
+      alert(L(
+        `您已使用机构邮箱 ${elig.email} 登录，请点击「教育价」按钮订阅，标准价已锁定。`,
+        `You are signed in with institutional email ${elig.email}. Please use the education pricing button; standard checkout is locked.`
+      ));
+      return;
+    }
+
+    if (el.getAttribute('data-std-locked') === '1' || el.classList.contains('std-price-locked')) {
+      return;
+    }
 
     if (edu) {
-      const elig = eduEligibility();
       if (!elig.ok) {
         if (elig.reason === 'login') {
           const go = confirm(eduBlockMessage('login'));
@@ -419,6 +510,21 @@
       el.__creemBound = true;
       el.addEventListener('click', (e) => {
         e.preventDefault();
+        // 机构的标准价不可点（再拦一层；disabled 按钮多数浏览器不会触发 click）
+        if (
+          el.classList.contains('std-price-locked')
+          || el.getAttribute('data-std-locked') === '1'
+          || (el.disabled && !isEduCheckoutEl(el))
+        ) {
+          const elig = eduEligibility();
+          if (elig.ok) {
+            alert(L(
+              `您已使用机构邮箱 ${elig.email} 登录，请使用教育价按钮。`,
+              `Signed in with ${elig.email}. Please use the education pricing button.`
+            ));
+          }
+          return;
+        }
         startCheckout(el);
       });
     });

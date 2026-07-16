@@ -3716,6 +3716,9 @@
     await pullFavs();
     applyI18n();
     updateAccountCreditBadge();
+    try {
+      if (typeof window.__syncEduCheckoutUi === 'function') window.__syncEduCheckoutUi();
+    } catch (_) {}
   }
 
   async function refreshCurrentUserProfile() {
@@ -3744,6 +3747,9 @@
     localStorage.removeItem('ailatest.user');
     applyI18n();
     updateAccountCreditBadge();
+    try {
+      if (typeof window.__syncEduCheckoutUi === 'function') window.__syncEduCheckoutUi();
+    } catch (_) {}
   }
 
   async function handleAuthCallback() {
@@ -9586,8 +9592,11 @@
                 </div>
                 <p class="settings-hint" style="margin:-4px 0 0" data-plan-was="max">${T('原价 $14.99','Was $14.99')}</p>
               </div>
+              <p class="settings-hint" data-edu-status hidden style="margin:0 0 10px"></p>
               <button type="button" class="settings-link-row" data-creem-checkout data-plan="pro" data-period="year" style="width:100%">${T('升级 Pro · 年付','Upgrade Pro · yearly')}<span>→</span></button>
+              <button type="button" class="settings-link-row settings-edu-cta" data-creem-checkout data-plan="pro" data-period="year" data-edu="1" style="width:100%">${T('教育价升级 Pro','Edu upgrade Pro')}<span>→</span></button>
               <button type="button" class="settings-link-row" data-creem-checkout data-plan="max" data-period="year" style="width:100%">${T('升级 Max · 年付','Upgrade Max · yearly')}<span>→</span></button>
+              <button type="button" class="settings-link-row settings-edu-cta" data-creem-checkout data-plan="max" data-period="year" data-edu="1" style="width:100%">${T('教育价升级 Max','Edu upgrade Max')}<span>→</span></button>
               <a class="settings-link-row" href="/pricing">${T('查看完整方案对比','Full plan comparison')}<span>↗</span></a>
             </section>
 

@@ -1175,6 +1175,48 @@ body.home-route:not(.home-tab-has-results) .home-v4-grad {
   border-color: rgba(90, 70, 50, .12) !important;
   background: #fafaf9 !important;
 }
+/* 机构邮箱已验证：教育价升为主 CTA，标准价灰显不可点 */
+.home-btn-edu.edu-ready,
+button.home-btn.edu-ready {
+  font-size: 13.5px !important;
+  min-height: 42px !important;
+  font-weight: 780 !important;
+  color: #fff !important;
+  border-color: transparent !important;
+  background: linear-gradient(180deg, #34d399, #059669) !important;
+  box-shadow: 0 8px 18px rgba(5, 150, 105, .28) !important;
+  order: -1; /* 排到标准价上方（flex/grid 子项） */
+}
+.home-btn.std-price-locked,
+button.std-price-locked[data-creem-checkout] {
+  opacity: .48 !important;
+  cursor: not-allowed !important;
+  pointer-events: none;
+  filter: grayscale(.35);
+  box-shadow: none !important;
+  background: #f5f5f4 !important;
+  color: #a8a29e !important;
+  border-color: rgba(90, 70, 50, .1) !important;
+}
+body.edu-eligible .home-plan .home-btn-edu.edu-ready {
+  margin-bottom: 2px;
+}
+.settings-link-row.std-price-locked {
+  opacity: .45;
+  cursor: not-allowed !important;
+  pointer-events: none;
+  color: #a8a29e !important;
+}
+.settings-link-row.settings-edu-cta.edu-ready {
+  background: linear-gradient(180deg, rgba(16,185,129,.12), rgba(5,150,105,.08));
+  border: 1px solid rgba(5, 150, 105, .28);
+  color: #047857 !important;
+  font-weight: 780;
+}
+.settings-link-row.settings-edu-cta.edu-locked {
+  opacity: .72;
+  color: #78716c !important;
+}
 .home-edu-status {
   margin: 0 auto 12px;
   max-width: 640px;
