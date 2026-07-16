@@ -4238,8 +4238,8 @@
               ${ifNum}
               <div class="j-card-fav col-fav">${favHtml || ''}</div>
             </div>
-            ${freeUnderIf}
             ${ifLabel}
+            ${freeUnderIf}
           </div>
         </div>
         <div class="j-card-body">${bodyInner}</div>
@@ -9403,7 +9403,7 @@
 
     // 单一有序表格 + 拖动
     const tbody = rows.map(r => renderFavRow(r)).join('');
-    const hint = activeQuery ? '' : `<div class="fav-drag-hint">${T('按住','Hold')} <span class="drag-ico">⋮⋮</span> ${T('拖动排序 · 长按手机端同样支持','to drag-reorder · long-press on mobile')}</div>`;
+    const hint = activeQuery ? '' : `<div class="fav-drag-hint">${T('左侧色条可拖动排序 · 手机长按同样支持','Drag the left bar to reorder · long-press on mobile')}</div>`;
     box.innerHTML = toolbar + hint + `
       <div class="table-wrap" style="margin-top:10px">
         <table class="journals fav-table">
@@ -10287,7 +10287,7 @@
     return journalCardRow({
       fid, src: r.__src,
       favHtml: starBtn(r, r.__src),
-      dragHtml: `<span class="drag-handle" title="${T('拖动排序','Drag to reorder')}">⋮⋮</span>`,
+      dragHtml: `<span class="drag-handle" title="${T('长按或拖动排序','Long-press or drag to reorder')}" aria-label="${T('拖动排序','Drag to reorder')}"></span>`,
       nameHtml,
       ifHtml: ifVal ? jMetaIf('IF', ifVal) : null,
       freeHtml,
