@@ -4235,10 +4235,10 @@
           </div>
           <div class="j-card-head-side">
             <div class="j-if-fav-row">
+              ${ifLabel}
               ${ifNum}
               <div class="j-card-fav col-fav">${favHtml || ''}</div>
             </div>
-            ${ifLabel}
             ${freeUnderIf}
           </div>
         </div>

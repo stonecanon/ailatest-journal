@@ -9243,7 +9243,23 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   text-overflow: ellipsis;
 }
 
-/* IF 数字（与星同行）+ 标签（数字列下方） */
+/* IF 在数字左侧同行：IF 47.8 ★；免费在整行下方 */
+.j-row .j-if-fav-row {
+  gap: 4px;
+  align-items: baseline;
+}
+.j-row .j-card-if-label {
+  display: inline;
+  margin: 0;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #a08b76;
+  text-transform: none;
+  text-align: left;
+  line-height: 1;
+  flex-shrink: 0;
+}
 .j-row .j-card-if-num {
   margin: 0;
   font-size: 15px;
@@ -9254,24 +9270,15 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   white-space: nowrap;
   line-height: 1;
 }
-/* IF 标签贴数值下；免费再往下，不隔开 IF 与数值 */
-.j-row .j-card-if-label {
-  display: block;
-  margin-top: 2px;
-  margin-right: 20px; /* 与星同宽对齐数字列 */
-  font-size: 9px;
-  font-weight: 650;
-  letter-spacing: 0.02em;
-  color: #a08b76;
-  text-transform: none;
-  text-align: right;
-  line-height: 1;
+.j-row .j-if-fav-row .j-card-fav {
+  align-self: center;
+  margin-left: 2px;
 }
 .j-row .j-card-if-free {
   display: flex;
   justify-content: flex-end;
   margin-top: 4px;
-  margin-right: 20px; /* 与 IF 数字列对齐，避开 ★ */
+  margin-right: 0;
   max-width: 100%;
   line-height: 1;
 }
