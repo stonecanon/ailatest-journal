@@ -2012,16 +2012,17 @@
     return label === 'diamond' || label === 'hybrid' || label === 'subscription_paid_read';
   }
 
-  /** free | plus(Pro) | pro(Max) */
+  /** free | trial | plus(Pro) | pro(Max) — 权益门闸用；试用与 Pro 能力接近但不等于付费 Pro */
   function getProductTier() {
     try {
       if (user && (user.is_owner || user.plan === 'owner' || user.entitlements?.is_owner || user.entitlements?.plan === 'owner')) {
         return 'pro'; // Max
       }
-      // product_tier 是产品文案档 free/pro/max
+      // product_tier 是产品文案档 free/trial/pro/max
       const product = String(user?.entitlements?.product_tier || '').toLowerCase();
       if (product === 'max') return 'pro';
       if (product === 'pro') return 'plus';
+      if (product === 'trial') return 'trial';
       const email = String(user?.email || '').toLowerCase().trim();
       const login = String(user?.login || '').toLowerCase().trim();
       // 站长邮箱兜底（服务端也会判 owner；避免 Mac 上旧会话未合并 is_owner）
@@ -2030,9 +2031,17 @@
       }
       const tier = String(user?.entitlements?.tier || user?.tier || 'free').toLowerCase();
       if (tier === 'pro' || tier === 'max') return 'pro';
-      if (tier === 'plus' || tier === 'trial') return 'plus';
+      if (tier === 'plus') return 'plus';
+      // 试用：权益接近 Pro，但展示必须是「试用」而非 Pro
+      if (tier === 'trial') return 'trial';
     } catch (_) {}
     return 'free';
+  }
+
+  /** 门闸：是否具备 Pro 级能力（含试用；不含 Free） */
+  function hasProLevelAccess() {
+    const t = getProductTier();
+    return t === 'plus' || t === 'trial' || t === 'pro';
   }
 
   function isOwnerClient() {
@@ -2046,9 +2055,9 @@
     }
   }
 
-  /** 发表费用信息（是否免费发表 / APC）— Pro(plus) 与 Max(pro) 可见；Free 不可见 */
+  /** 发表费用信息（是否免费发表 / APC）— Pro / 试用 / Max 可见；Free 不可见 */
   function canSeePublishFeeInfo() {
-    if (getProductTier() !== 'free') return true;
+    if (hasProLevelAccess()) return true;
     try {
       const labels = user?.entitlements?.features?.premium_labels
         || user?.entitlements?.premium_labels;
@@ -2058,9 +2067,9 @@
     return false;
   }
 
-  /** 收藏 / 清单 / 分享 — Pro 起；导出联动见 canUseExportIntegrations */
+  /** 收藏 / 清单 / 分享 — 试用 / Pro / Max；导出联动见 canUseExportIntegrations */
   function canUseFavoritesWorkflow() {
-    return getProductTier() !== 'free';
+    return hasProLevelAccess();
   }
   /** 导出 RIS/BibTeX · Zotero / Notion / Obsidian — 仅 Max */
   function canUseExportIntegrations() {
@@ -2076,7 +2085,7 @@
   }
   function getFulltextLimit() {
     const tier = getProductTier();
-    if (tier === 'pro') return null; // Max 不限
+    if (tier === 'pro' || tier === 'trial') return null; // Max / 试用：不限（与服务端 trial 一致）
     if (tier === 'plus') return PRO_FULLTEXT_LIMIT;
     return FREE_FULLTEXT_LIMIT;
   }
@@ -2842,9 +2851,25 @@
   }
 
   function membershipTierLabel() {
+    // 展示以服务端 raw tier 为准，避免试用被误标成 Pro
+    try {
+      if (isOwnerClient()) return { id: 'max', label: 'Max', cls: 'tier-max' };
+      const raw = String(user?.entitlements?.tier || user?.tier || '').toLowerCase();
+      const product = String(user?.entitlements?.product_tier || '').toLowerCase();
+      if (product === 'max' || raw === 'pro' || raw === 'max') {
+        return { id: 'max', label: 'Max', cls: 'tier-max' };
+      }
+      if (product === 'pro' || raw === 'plus') {
+        return { id: 'pro', label: 'Pro', cls: 'tier-pro' };
+      }
+      if (product === 'trial' || raw === 'trial') {
+        return { id: 'trial', label: T('试用', 'Trial'), cls: 'tier-trial' };
+      }
+    } catch (_) {}
     const tier = getProductTier();
     if (tier === 'pro') return { id: 'max', label: 'Max', cls: 'tier-max' };
     if (tier === 'plus') return { id: 'pro', label: 'Pro', cls: 'tier-pro' };
+    if (tier === 'trial') return { id: 'trial', label: T('试用', 'Trial'), cls: 'tier-trial' };
     return { id: 'free', label: 'Free', cls: 'tier-free' };
   }
 
@@ -2854,7 +2879,8 @@
     const title = opts.title
       || (m.id === 'max' ? T('Max 会员', 'Max plan')
         : m.id === 'pro' ? T('Pro 会员', 'Pro plan')
-          : T('Free 基础版', 'Free plan'));
+          : m.id === 'trial' ? T('试用中（非付费 Pro）', 'Trial (not paid Pro)')
+            : T('Free 基础版', 'Free plan'));
     return `<span class="me-tier-badge ${m.cls}" title="${escape(title)}" aria-label="${escape(title)}">${escape(m.label)}</span>`;
   }
 
@@ -2889,12 +2915,13 @@
     const badge = $('#account-credit-badge');
     if (!badge) return;
     badge.hidden = false;
-    // 侧栏「我的」下方展示 Free / Pro / Max 徽章，不展示 Credits
+    // 侧栏「我的」下方展示 Free / 试用 / Pro / Max 徽章，不展示 Credits
     const m = membershipTierLabel();
-    const tierLabel = m.label; // Free | Pro | Max
+    const tierLabel = m.label; // Free | 试用 | Pro | Max
     const planTitle = m.id === 'max' ? T('Max 会员', 'Max plan')
       : m.id === 'pro' ? T('Pro 会员', 'Pro plan')
-        : T('Free 基础版', 'Free plan');
+        : m.id === 'trial' ? T('试用中（非付费 Pro）', 'Trial (not paid Pro)')
+          : T('Free 基础版', 'Free plan');
     badge.innerHTML = `<span class="rail-me-label">${T('设置','Settings')}</span><span class="rail-tier-chip ${m.cls}" aria-hidden="true">${escape(tierLabel)}</span>`;
     badge.title = user
       ? `${T('设置与账号','Settings & account')} · ${planTitle}`

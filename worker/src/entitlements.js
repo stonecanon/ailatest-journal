@@ -418,13 +418,18 @@ export async function getEntitlements(env, user, isOwner = false) {
   const snapshot = {
     spec_version: SPEC_VERSION,
     tier,
-    product_tier: tier === 'pro' ? 'max' : tier === 'plus' ? 'pro' : 'free',
-    pro_status: 'active',
+    // 产品文案档：free / trial / pro(产品 Pro) / max(产品 Max)
+    // 切勿把 trial 映射成 pro，否则客户端会显示成付费 Pro
+    product_tier: tier === 'pro' ? 'max'
+      : tier === 'plus' ? 'pro'
+        : tier === 'trial' ? 'trial'
+          : 'free',
+    pro_status: (tier === 'plus' || tier === 'pro') ? 'active' : (tier === 'trial' ? 'trial' : 'free'),
     trial_expires_at: row.trial_expires_at || null,
     paid_until: row.paid_until || null,
     product_id: row.product_id || null,
     edu_verified: !!row.edu_verified,
-    features: TIERS[tier],
+    features: TIERS[tier] || TIERS.free,
     credits,
     generated_at: now,
     expires_at: now + SNAPSHOT_TTL_SEC,

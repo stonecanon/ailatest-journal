@@ -369,6 +369,11 @@ body.share-mode .app-rail { display: none !important; }
   color: #5c5348;
   border-color: #cfc6b6;
 }
+.app-rail .account-credit-badge .rail-tier-chip.tier-trial {
+  background: linear-gradient(180deg, #e0f2fe 0%, #bae6fd 100%);
+  color: #0369a1;
+  border-color: #7dd3fc;
+}
 .app-rail .account-credit-badge .rail-tier-chip.tier-pro {
   background: linear-gradient(180deg, #ff9a3c 0%, #f97316 100%);
   color: #fff;
@@ -3838,6 +3843,19 @@ button.me-record-row {
 }
 .me-tier-badge.tier-free::before {
   background: #8a8174;
+  box-shadow: none;
+  opacity: 1;
+}
+/* 试用：浅蓝，与付费 Pro 区分 */
+.me-tier-badge.tier-trial {
+  background: linear-gradient(180deg, #e0f2fe 0%, #bae6fd 100%);
+  color: #0369a1;
+  border-color: #7dd3fc;
+  box-shadow: none;
+  text-shadow: none;
+}
+.me-tier-badge.tier-trial::before {
+  background: #0ea5e9;
   box-shadow: none;
   opacity: 1;
 }
