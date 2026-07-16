@@ -7372,75 +7372,164 @@
     const cycleHTML = '';
 
     const on = isFav(r);
+    // ── V9 详情：主列（头+双栏信息+图表）| 右侧快捷栏 ──
+    const jcrQ = ir.if_quartile ? String(ir.if_quartile).toUpperCase() : '';
+    const casZoneLabel = ir.cas_zone != null && ir.cas_zone !== ''
+      ? `${ir.cas_zone}${T('区','')}${ir.cas_top ? ' TOP' : ''}`
+      : '';
+    let cycleShort = '';
+    {
+      const weeks = parseFloat(r.doaj?.review_weeks || ir.doaj?.review_weeks);
+      if (weeks > 0) cycleShort = `~${Math.round(weeks * 7)}d`;
+      else if (r.crossref?.median_days) cycleShort = `~${Math.round(+r.crossref.median_days)}d`;
+    }
+    const isOaMark = !!(ir.cas_oa || r.cas_oa || r.doaj || ir.doaj || r.oaj || ir.oaj || (ir.oa && ir.oa.l));
+    const ifNum = ir.if_2024 != null ? (+ir.if_2024).toFixed(1) : '';
+    const ifYearLabel = ir.if_2024 != null
+      ? `IF ${Number(ir.if_latest_year || ir.jcr_year || 2025)}`
+      : 'IF';
+    const subjectLine = (Array.isArray(ir.wos_categories) && ir.wos_categories[0])
+      || ir.jcr_cat || ir.cas_major_cn || ir.esi_category || r.discipline || '';
+    const publisherLine = r.publisher || ir.publisher || '';
+    const siteUrl = r.homepage || ir.homepage || r.url || ir.url || r.website || '';
+    const submitUrl = r.submit_url || ir.submit_url || siteUrl || '';
+    const heroMetrics = [
+      jcrQ ? `<div class="d-m"><div class="n">${escape(jcrQ)}</div><div class="l">JCR</div></div>` : '',
+      casZoneLabel ? `<div class="d-m"><div class="n">${escape(casZoneLabel)}</div><div class="l">${T('中科院','CAS')}</div></div>` : '',
+      cycleShort ? `<div class="d-m"><div class="n">${escape(cycleShort)}</div><div class="l">${T('审稿','Review')}</div></div>` : '',
+      isOaMark ? `<div class="d-m"><div class="n">OA</div><div class="l">${T('开放','Open')}</div></div>` : '',
+    ].filter(Boolean).join('');
+    const kvExtras = [
+      issn ? [T('ISSN','ISSN'), issn] : null,
+      eissn ? [T('eISSN','eISSN'), eissn] : null,
+      siteUrl ? [T('官网','Website'), siteUrl] : null,
+      subjectLine ? [T('学科','Subject'), subjectLine] : null,
+    ].filter(Boolean);
+    const seenKeys = new Set(meta.map(([k]) => k));
+    const kvAll = [
+      ...kvExtras.filter(([k]) => !seenKeys.has(k)),
+      ...meta,
+    ].map(([k, v]) =>
+      `<div class="kv-item"><div class="k">${k}</div><div class="v">${
+        (k === T('官网','Website') || String(v).startsWith('http'))
+          ? `<a href="${escape(String(v))}" target="_blank" rel="noopener">${escape(String(v).replace(/^https?:\/\//, '').slice(0, 48))}</a>`
+          : escape(String(v))
+      }</div></div>`
+    ).join('');
+    const relatedSide = (() => {
+      const related = getRelatedJournals(r, 4);
+      if (!related.length) return '';
+      return related.map(j => {
+        const name = titleCase(j.name || j.cn_name || '');
+        const ifv = j.if_2024 != null ? (+j.if_2024).toFixed(1) : '—';
+        return `<div class="side-link related-card" data-fid="${escape(favId(j))}" role="button" tabindex="0"><span class="side-link-name">${escape(name)}</span><span>${escape(ifv)}</span></div>`;
+      }).join('');
+    })();
+    const riskEmpty = !drawerRiskBadges
+      ? `<div class="d-none">${T('暂无预警 / On-hold','No warning / On-hold')}</div>`
+      : `<div class="pills badges">${drawerRiskBadges}</div>`;
+    const accessEmpty = !drawerAccessBadges
+      ? `<div class="d-none">—</div>`
+      : `<div class="pills badges">${drawerAccessBadges}</div>`;
+
     body.innerHTML = `
-      <div class="drawer-hero">
-        <div class="drawer-titlebar">
-          <div class="drawer-title-main">
-            <div class="drawer-title-line">
-              <div class="drawer-title">${escape(title.replace(/\*$/,''))}</div>
-              ${titleFeatureBadges ? `<div class="drawer-title-badges">${titleFeatureBadges}</div>` : ''}
+      <div class="detail-layout${pageMode ? ' is-page' : ' is-drawer'}">
+        <div class="detail-main-col">
+          <div class="d-hero">
+            <div class="d-hero-row">
+              <div class="d-hero-text">
+                <h1 class="drawer-title">${escape(title.replace(/\*$/,''))}</h1>
+                ${sub ? `<div class="d-cn drawer-sub">${escape(sub)}</div>` : ''}
+                ${(subjectLine || publisherLine) ? `<div class="d-subj">${subjectLine ? `<b>${escape(subjectLine)}</b>` : ''}${subjectLine && publisherLine ? ' · ' : ''}${publisherLine ? escape(publisherLine) : ''}</div>` : ''}
+                ${titleFeatureBadges ? `<div class="d-hero-free">${titleFeatureBadges}</div>` : ''}
+                <div class="drawer-issn d-issn">
+                  ${issn ? 'ISSN ' + escape(issn) : ''}${eissn ? (issn ? ' · ' : '') + 'eISSN ' + escape(eissn) : ''}
+                  <span class="drawer-views" id="drawer-views" data-fid="${escape(favId(r))}"></span>
+                </div>
+              </div>
+              <div class="d-actions">
+                ${ifNum ? `<div class="d-if"><strong>${escape(ifNum)}</strong><span>${escape(ifYearLabel)}</span></div>` : ''}
+                <div class="d-btns">
+                  <button type="button" class="d-btn star ${on ? 'on' : ''}" id="drawer-fav-big" aria-label="${on ? T('已收藏','Favorited') : T('收藏','Favorite')}">${on ? '★' : '☆'}</button>
+                  ${siteUrl ? `<a class="d-btn ghost" href="${escape(siteUrl)}" target="_blank" rel="noopener">${T('官网','Site')}</a>` : ''}
+                  ${submitUrl ? `<a class="d-btn primary" href="${escape(submitUrl)}" target="_blank" rel="noopener">${T('投稿','Submit')}</a>` : ''}
+                </div>
+                ${favLists.length > 1 ? `<div class="drawer-fav-select">
+                  <select id="drawer-fav-list-select" aria-label="${T('保存到清单','Save to list')}">${favLists.map(l => `<option value="${escape(l.id)}" ${l.id===activeListId?'selected':''}>${escape(favListDisplayName(l))} (${l.ids.length})</option>`).join('')}</select>
+                </div>` : ''}
+              </div>
             </div>
-            ${sub ? `<div class="drawer-sub">${escape(sub)}</div>` : ''}
+            ${heroMetrics ? `<div class="d-metrics">${heroMetrics}</div>` : ''}
           </div>
-          <div class="drawer-actions">
-            <div class="rating-pill" data-rating-key="${escape(favId(r))}" title="${T('综合推荐评分','Overall rating')}">
-              <span class="rating-avg" id="rating-avg">—</span><span class="rating-avg-suffix">/ 5</span>
-              <span class="rating-avg-stars" id="rating-avg-stars"></span>
-              <span class="rating-count muted-cell" id="rating-count">${T('暂无评分','No ratings yet')}</span>
+
+          <div class="info-grid">
+            ${drawerCoverageBadges ? `<div class="block"><h3>${T('收录','Indexed')}</h3><div class="pills badges">${drawerCoverageBadges}</div></div>` : ''}
+            ${(drawerLevelBadges || tierBadge || crossBadges) ? `<div class="block"><h3>${T('分区','Ranking')}</h3><div class="pills badges">${drawerLevelBadges || ''}${tierBadge || ''}${crossBadges || ''}</div></div>` : ''}
+            <div class="block"><h3>${T('风险','Risk')}</h3>${riskEmpty}</div>
+            <div class="block"><h3>${T('开放与费用','Access & fees')}</h3>${accessEmpty}</div>
+            ${kvAll ? `<div class="block span2"><h3>${T('基本信息','Basics')}</h3><div class="kv2">${kvAll}</div></div>` : ''}
+            ${journalIntroHTML ? `<div class="block span2 d-overview-wrap">${journalIntroHTML}</div>` : ''}
+          </div>
+
+          ${trendsHTML || countryOutputHTML ? `<div class="section-title">${T('数据图表','Charts')}</div>
+          <div class="detail-charts">${trendsHTML}${countryOutputHTML}</div>` : ''}
+
+          <div class="detail-more journal-detail-masonry">
+            ${jcrHTML}
+            ${casHTML}
+            ${xrHTML}
+            ${wosHTML}
+            ${scopusHTML}
+            ${eiHTML}
+            ${oajHTML}
+            ${doajHTML}
+            ${pubmedHTML}
+            ${pmcHTML}
+            ${cycleHTML}
+            ${oaHTML}
+            ${topicsHTML}
+            ${warnHTML}
+            ${cnkiHTML}
+            ${cnkxHTML}
+            ${indiaHTML}
+            ${malaysiaHTML}
+            ${lockedSrcHTML}
+            ${!pageMode ? renderRelatedHTML(r) : ''}
+            <div class="drawer-section rating-section" data-rating-key="${escape(favId(r))}">
+              <h4>${T('我的评分','My Rating')}</h4>
+              <div class="rating-my-wrap">
+                <div class="rating-stars-input" id="rating-input" role="radiogroup" aria-label="${T('评分','Rating')}"></div>
+                <div class="rating-my-hint muted-cell" id="rating-hint">${T('登录后可打分 · 半星可评 · 可随时修改','Sign in to rate · half-stars supported · editable anytime')}</div>
+              </div>
+              <div class="rating-pill" data-rating-key="${escape(favId(r))}" title="${T('综合推荐评分','Overall rating')}" style="margin-top:10px">
+                <span class="rating-avg" id="rating-avg">—</span><span class="rating-avg-suffix">/ 5</span>
+                <span class="rating-avg-stars" id="rating-avg-stars"></span>
+                <span class="rating-count muted-cell" id="rating-count">${T('暂无评分','No ratings yet')}</span>
+              </div>
             </div>
-            <button class="big-btn ${on?'ghost':'primary'}" id="drawer-fav-big">${on ? T('★ 已收藏（点击取消）','★ Favorited (click to remove)') : T('☆ 加入收藏','☆ Add to favorites')}</button>
-            ${favLists.length > 1 ? `<div class="drawer-fav-select">
-              <span class="muted-cell" style="font-size:12px">${T('保存到：','Save to:')}</span>
-              <select id="drawer-fav-list-select">${favLists.map(l => `<option value="${escape(l.id)}" ${l.id===activeListId?'selected':''}>${escape(favListDisplayName(l))} (${l.ids.length})</option>`).join('')}</select>
-            </div>` : ''}
           </div>
         </div>
-	        <div class="drawer-issn">
-	          ${issn ? 'ISSN ' + escape(issn) : ''}${eissn ? ' · eISSN ' + escape(eissn) : ''}
-	          <span class="drawer-views" id="drawer-views" data-fid="${escape(favId(r))}"></span>
-	        </div>
-	        ${journalIntroHTML}
-	        ${(drawerCoverageBadges || drawerLevelBadges || tierBadge || crossBadges || drawerAccessBadges || drawerRiskBadges) ? `<div class="hero-badge-grid">
-	          ${drawerCoverageBadges ? `<div class="drawer-section badges-section"><h4>${T('收录','Indexed')}</h4><div class="badges">${drawerCoverageBadges}</div></div>` : ''}
-	          ${(drawerLevelBadges || tierBadge || crossBadges) ? `<div class="drawer-section badges-section"><h4>${T('等级','Ranking')}</h4><div class="badges">${drawerLevelBadges}${tierBadge}${crossBadges}</div></div>` : ''}
-	          ${drawerAccessBadges ? `<div class="drawer-section badges-section"><h4>${T('开放费用','Access & Fees')}</h4><div class="badges">${drawerAccessBadges}</div></div>` : ''}
-	          ${drawerRiskBadges ? `<div class="drawer-section badges-section"><h4>${T('风险提示','Caution')}</h4><div class="badges">${drawerRiskBadges}</div></div>` : ''}
-	        </div>` : ''}
-	      </div>
-	      ${statsHTML}
-	      <div class="journal-detail-masonry">
-	        ${trendsHTML}
-	        ${countryOutputHTML}
-	        ${jcrHTML}
-	        ${casHTML}
-	        ${xrHTML}
-	        ${wosHTML}
-	        ${scopusHTML}
-	        ${eiHTML}
-	        ${oajHTML}
-	        ${doajHTML}
-	        ${pubmedHTML}
-	        ${pmcHTML}
-	        ${cycleHTML}
-	        ${oaHTML}
-	        ${topicsHTML}
-		        ${warnHTML}
-		        ${cnkiHTML}
-        ${metaHTML ? `<div class="meta-block">${metaHTML}</div>` : ''}
-        ${cnkxHTML}
-        ${indiaHTML}
-        ${malaysiaHTML}
-        ${lockedSrcHTML}
-	        <div class="drawer-section rating-section" data-rating-key="${escape(favId(r))}">
-	          <h4>${T('我的评分','My Rating')}</h4>
-	          <div class="rating-my-wrap">
-	            <div class="rating-stars-input" id="rating-input" role="radiogroup" aria-label="${T('评分','Rating')}"></div>
-	            <div class="rating-my-hint muted-cell" id="rating-hint">${T('登录后可打分 · 半星可评 · 可随时修改','Sign in to rate · half-stars supported · editable anytime')}</div>
-	          </div>
-	        </div>
-	      </div>
-	      ${renderRelatedHTML(r)}
+
+        <aside class="detail-side-col" aria-label="${T('快捷','Shortcuts')}">
+          <div class="side-h">${T('快捷','Shortcuts')}</div>
+          <div class="side-card">
+            <button type="button" class="side-link" id="side-fav-proxy">${on ? T('已收藏','Favorited') : T('收藏','Favorite')} <span>${on ? '★' : '☆'}</span></button>
+            <button type="button" class="side-link" id="side-share-proxy">${T('分享','Share')} <span>↗</span></button>
+            ${siteUrl ? `<a class="side-link" href="${escape(siteUrl)}" target="_blank" rel="noopener">${T('官网','Website')} <span>→</span></a>` : ''}
+            ${submitUrl ? `<a class="side-link" href="${escape(submitUrl)}" target="_blank" rel="noopener">${T('投稿','Submit')} <span>→</span></a>` : ''}
+          </div>
+          <div class="side-h">${T('评分','Rating')}</div>
+          <div class="side-card side-rating-card">
+            <div class="rating-avg-stars" id="side-rating-stars"></div>
+            <div class="muted" id="side-rating-label">—</div>
+          </div>
+          ${relatedSide ? `<div class="side-h">${T('相关','Related')}</div><div class="side-card side-related">${relatedSide}</div>` : ''}
+        </aside>
+      </div>
     `;
+    // 侧栏收藏/分享代理到头部按钮
+    body.querySelector('#side-fav-proxy')?.addEventListener('click', () => $('#drawer-fav-big')?.click());
+    body.querySelector('#side-share-proxy')?.addEventListener('click', () => $('#drawer-share')?.click());
     // init rating widget
     setTimeout(() => initRatingWidget(favId(r)), 0);
     hydrateCountryOutputChart(body, ir);
