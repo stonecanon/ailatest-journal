@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Journal 预览 · 首页 + 静态页顶栏（本地稿）</title>
+<style>
+  :root {
+    --bg: #f3efe7;
+    --paper: #fffdf9;
+    --ink: #1c1916;
+    --ink-soft: #5c564f;
+    --ink-faint: #8a837a;
+    --line: rgba(43, 40, 36, 0.08);
+    --accent: #f97316;
+    --accent-deep: #c2410c;
+    --accent-soft: #fff3e8;
+    --rail: rgba(255,255,255,.55);
+    --sans: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--sans);
+    background: #e8e1d5;
+    color: var(--ink);
+    padding: 28px 18px 64px;
+    line-height: 1.5;
+  }
+  .doc {
+    width: min(1120px, 100%);
+    margin: 0 auto 18px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+  .doc h1 { font-size: 18px; font-weight: 780; letter-spacing: -0.02em; }
+  .doc p { font-size: 13px; color: #6b6359; max-width: 56ch; }
+  .doc code {
+    font-size: 12px;
+    background: rgba(255,255,255,.7);
+    padding: 2px 7px;
+    border-radius: 6px;
+    border: 1px solid rgba(0,0,0,.06);
+  }
+  .tabs {
+    width: min(1120px, 100%);
+    margin: 0 auto 14px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .tabs button {
+    border: 1px solid rgba(90,70,50,.12);
+    background: rgba(255,255,255,.72);
+    color: var(--ink-soft);
+    border-radius: 999px;
+    padding: 8px 14px;
+    font: 700 13px/1 var(--sans);
+    cursor: pointer;
+  }
+  .tabs button.active {
+    background: var(--ink);
+    color: #fff;
+    border-color: var(--ink);
+  }
+  .screen { display: none; width: min(1120px, 100%); margin: 0 auto; }
+  .screen.show { display: block; }
+
+  /* ─── 设备框 ─── */
+  .device {
+    background:
+      radial-gradient(900px 380px at 50% -10%, rgba(255, 190, 130, .28), transparent 55%),
+      linear-gradient(180deg, #fffefb 0%, #fffdf9 42%, #f7f2ea 100%);
+    border-radius: 24px;
+    border: 1px solid rgba(90, 70, 50, .08);
+    box-shadow: 0 28px 64px rgba(40, 28, 16, .12);
+    overflow: hidden;
+    position: relative;
+    min-height: 720px;
+  }
+  .device-label {
+    display: none; /* 避免挡住右上角导航 */
+  }
+
+  /* 侧栏 */
+  .shell { display: grid; grid-template-columns: 72px 1fr; min-height: 720px; }
+  .rail {
+    background: var(--rail);
+    border-right: 1px solid var(--line);
+    backdrop-filter: blur(16px);
+    display: flex; flex-direction: column; justify-content: space-between;
+    align-items: center; padding: 16px 8px;
+  }
+  .rail-btn {
+    width: 52px; min-height: 52px; border-radius: 16px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 3px; color: var(--ink-faint); font-size: 11px; font-weight: 650;
+  }
+  .rail-btn strong { font-size: 13px; font-weight: 850; letter-spacing: -0.02em; }
+  .rail-btn.active {
+    background: #fff; color: var(--accent);
+    border: 1px solid rgba(249,115,22,.22);
+    box-shadow: 0 8px 18px rgba(249,115,22,.12);
+  }
+  .rail-top, .rail-bottom { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+  .content { min-width: 0; position: relative; }
+
+  /* 顶栏：左品牌 · 右导航（功能 / 怎么用 / 订阅 / 下载 / 联系） */
+  .home-chrome {
+    position: sticky;
+    top: 0;
+    z-index: 6;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 22px 12px;
+    background: linear-gradient(180deg, rgba(255,253,249,.96) 40%, rgba(255,253,249,.82));
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid transparent;
+  }
+  .brand-fixed {
+    flex: 0 0 auto;
+    font-weight: 820; font-size: 17px; letter-spacing: -0.02em;
+    color: var(--ink) !important;
+    text-decoration: none !important;
+    white-space: nowrap;
+  }
+  .brand-fixed:visited,
+  .brand-fixed:hover,
+  .brand-fixed:active {
+    color: var(--ink) !important;
+    text-decoration: none !important;
+  }
+  .brand-fixed em {
+    font-style: italic; font-weight: 650;
+    color: rgba(117,111,104,.88);
+  }
+  .top-nav {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px 2px;
+  }
+  .top-nav a {
+    font-size: 12.5px;
+    font-weight: 680;
+    color: var(--ink-soft);
+    text-decoration: none;
+    padding: 6px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .top-nav a:hover {
+    color: #c2410c;
+    background: rgba(249,115,22,.08);
+  }
+
+  /* ─── 首页：Journal 自有风格 ─── */
+  .home {
+    padding: 28px 28px 48px;
+    max-width: 920px;
+    margin: 0 auto;
+  }
+  /* 主文案：一句即可，高级克制（品牌只在左上） */
+  .home-title {
+    font-size: clamp(26px, 3.8vw, 38px);
+    font-weight: 720;
+    letter-spacing: -.028em;
+    line-height: 1.28;
+    margin: 8px auto 28px;
+    max-width: 16em;
+    text-wrap: balance;
+    color: var(--ink);
+  }
+  .home-title em {
+    font-style: normal;
+    font-weight: 780;
+    letter-spacing: -.03em;
+    background: linear-gradient(120deg, #9a3412 0%, #c2410c 40%, #ea580c 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .device { max-height: none; }
+  .shell { min-height: auto; }
+  .home-scroll {
+    max-height: min(88vh, 1100px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+  .home-sub {
+    display: none; /* 不再堆副标题，主文案只保留一句 */
+  }
+  .home-center { text-align: center; }
+
+  /* 搜索：在标题下方（不在最顶） */
+  .search-wrap {
+    margin: 0 auto 28px;
+    max-width: 640px;
+    position: relative;
+    background: #fff;
+    border-radius: 999px;
+    border: 1px solid rgba(60,45,30,.08);
+    box-shadow: 0 10px 28px rgba(40,28,16,.07);
+    min-height: 52px;
+    display: flex; align-items: center;
+  }
+  .search-wrap input {
+    flex: 1; border: 0; outline: 0; background: transparent;
+    height: 52px; padding: 0 8px 0 20px; font: 500 15px/1 var(--sans);
+    color: var(--ink); min-width: 0;
+  }
+  .search-wrap input::placeholder { color: #b0a89e; }
+  .mode-switch {
+    display: inline-flex; gap: 2px; margin-right: 8px; padding: 3px;
+    border-radius: 999px; background: rgba(39,35,31,.06);
+  }
+  .mode-switch button {
+    border: 0; background: transparent; cursor: pointer;
+    font: 720 12.5px/1 var(--sans); color: var(--ink-faint);
+    padding: 8px 12px; border-radius: 999px;
+  }
+  .mode-switch button.active {
+    color: #fff;
+    background: linear-gradient(135deg, #fb923c, #f97316 55%, #ea580c);
+    box-shadow: 0 4px 12px rgba(249,115,22,.28);
+  }
+
+  .stats {
+    display: grid; grid-template-columns: repeat(4, minmax(0,1fr));
+    gap: 10px; margin-bottom: 28px;
+  }
+  .stat {
+    text-align: left; padding: 14px 12px 12px; border-radius: 14px;
+    background: linear-gradient(180deg, #fffbf7, #fff3e8 55%, #ffe8d4);
+    box-shadow: 0 8px 18px rgba(180,120,70,.08);
+  }
+  .stat b {
+    display: block; font-size: 22px; font-weight: 820; color: #b45309;
+    letter-spacing: -.03em; margin-bottom: 4px;
+  }
+  .stat span { font-size: 12px; font-weight: 600; color: #78716c; }
+
+  .hot {
+    background: #fff; border-radius: 14px;
+    box-shadow: 0 8px 24px rgba(40,28,16,.05); overflow: hidden;
+    margin-bottom: 36px; text-align: left;
+  }
+  .hot-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 16px 10px;
+  }
+  .hot-head h2 { font-size: 14px; font-weight: 760; }
+  .hot-head small { display: block; font-size: 11.5px; color: var(--ink-faint); font-weight: 550; margin-top: 2px; }
+  .hot-ai {
+    font-size: 12px; font-weight: 720; color: #c2410c;
+    background: rgba(249,115,22,.08); padding: 6px 11px; border-radius: 999px;
+    text-decoration: none;
+  }
+  .hot-row {
+    display: grid; grid-template-columns: 28px 1fr auto;
+    gap: 10px; align-items: center; padding: 11px 16px;
+    border-top: 1px solid #f3f0ea; font-size: 13px;
+  }
+  .hot-row .n { font-weight: 760; color: #d6d3d1; text-align: center; }
+  .hot-row:nth-child(-n+4) .n { color: var(--accent); }
+  .hot-row .name { font-weight: 650; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hot-row .views { color: #78716c; font-weight: 650; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .hot-row .views em { font-style: normal; color: #b45309; font-weight: 780; margin-left: 3px; }
+
+  /* 产品区块：学术工具风，非 Todo 深色营销 */
+  .section {
+    text-align: left; margin: 0 0 28px;
+    padding: 20px 18px;
+    border: 1px solid rgba(90,70,50,.07);
+    border-radius: 16px;
+    background: rgba(255,255,255,.55);
+  }
+  .section h3 {
+    font-size: 15px; font-weight: 780; margin-bottom: 6px;
+    letter-spacing: -.01em;
+  }
+  .section > p.lead {
+    font-size: 13px; color: var(--ink-soft); margin-bottom: 14px; max-width: 48em;
+  }
+  .section-id {
+    display: block; font-size: 11px; font-weight: 780; letter-spacing: .06em;
+    text-transform: uppercase; color: #c2410c; margin-bottom: 6px;
+  }
+  .feat-grid {
+    display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px;
+  }
+  .feat {
+    padding: 14px 12px; border-radius: 12px;
+    background: #fff; border: 1px solid rgba(90,70,50,.06);
+    text-align: left;
+  }
+  .feat .ico {
+    width: 28px; height: 28px; border-radius: 9px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: #fff7ed; color: #c2410c; font-size: 13px; font-weight: 850;
+    margin-bottom: 8px;
+  }
+  .feat b { display: block; font-size: 13.5px; margin-bottom: 5px; }
+  .feat span { font-size: 12.5px; color: var(--ink-faint); line-height: 1.5; }
+
+  .steps {
+    display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px;
+    text-align: left;
+  }
+  .step {
+    padding: 12px; border-radius: 12px; background: #fff;
+    border: 1px solid rgba(90,70,50,.06);
+  }
+  .step em {
+    display: block; font-style: normal; font-size: 11px; font-weight: 800;
+    color: #f97316; margin-bottom: 6px;
+  }
+  .step b { display: block; font-size: 13px; margin-bottom: 4px; }
+  .step span { font-size: 12px; color: var(--ink-faint); line-height: 1.45; }
+
+  .plans {
+    display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px;
+    text-align: left;
+  }
+  .plan {
+    padding: 16px 14px; border-radius: 14px; background: #fff;
+    border: 1px solid rgba(90,70,50,.08); position: relative;
+  }
+  .plan.hot {
+    border-color: rgba(249,115,22,.35);
+    box-shadow: 0 10px 28px rgba(249,115,22,.1);
+    background: linear-gradient(180deg, #fffdf9, #fff7ed);
+  }
+  .plan .tag {
+    position: absolute; top: 12px; right: 12px;
+    font-size: 10px; font-weight: 800; color: #fff;
+    background: #f97316; border-radius: 999px; padding: 3px 8px;
+  }
+  .plan h4 { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
+  .plan .price {
+    font-size: 22px; font-weight: 840; color: #b45309;
+    letter-spacing: -.03em; margin: 8px 0 4px;
+  }
+  .plan .price small { font-size: 12px; font-weight: 650; color: var(--ink-faint); }
+  .plan .desc { font-size: 12px; color: var(--ink-faint); margin-bottom: 10px; }
+  .plan ul {
+    list-style: none; font-size: 12.5px; color: var(--ink-soft);
+    display: grid; gap: 5px; margin-bottom: 12px;
+  }
+  .plan ul li::before { content: "✓ "; color: #ea580c; font-weight: 900; }
+
+  .dl-grid {
+    display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px;
+    text-align: left;
+  }
+  .dl-card {
+    padding: 14px; border-radius: 12px; background: #fff;
+    border: 1px solid rgba(90,70,50,.06);
+  }
+  .dl-card b { display: block; font-size: 13.5px; margin-bottom: 4px; }
+  .dl-card span { display: block; font-size: 12px; color: var(--ink-faint); margin-bottom: 10px; line-height: 1.45; }
+
+  .contact-box {
+    display: grid; grid-template-columns: 1.2fr 1fr; gap: 12px; text-align: left;
+  }
+  .contact-box .block {
+    padding: 14px; border-radius: 12px; background: #fff;
+    border: 1px solid rgba(90,70,50,.06);
+  }
+  .contact-box .block b { display: block; margin-bottom: 6px; font-size: 13.5px; }
+  .contact-box .block p, .contact-box .block a {
+    font-size: 12.5px; color: var(--ink-soft); line-height: 1.5;
+  }
+  .contact-box .block a { color: #c2410c; text-decoration: none; font-weight: 650; }
+
+  .cta-row {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px;
+  }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-height: 38px; padding: 0 16px; border-radius: 999px;
+    font: 720 13px/1 var(--sans); text-decoration: none; border: 0; cursor: pointer;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, #fb923c, #f97316 55%, #ea580c);
+    color: #fff; box-shadow: 0 6px 14px rgba(249,115,22,.28);
+  }
+  .btn-ghost {
+    background: #fff; color: var(--ink);
+    border: 1px solid rgba(90,70,50,.12);
+  }
+  .btn-soft {
+    background: var(--accent-soft); color: #9a3412;
+    border: 1px solid rgba(249,115,22,.16);
+  }
+  .btn.block { width: 100%; }
+
+  .home-foot {
+    margin-top: 8px; padding: 18px 4px 8px;
+    border-top: 1px solid rgba(90,70,50,.08);
+    text-align: center; font-size: 12.5px; color: var(--ink-faint);
+  }
+  .home-foot a {
+    color: var(--ink-soft); text-decoration: none; margin: 0 4px; font-weight: 650;
+  }
+  .home-foot a:hover { color: var(--accent-deep); }
+  .home-foot .sep { margin: 0 2px; opacity: .5; }
+
+
+
+  /* ─── 静态页 about 预览 ─── */
+  .static-shell { display: grid; grid-template-columns: 72px 1fr; min-height: 640px; }
+  .page-head {
+    position: sticky; top: 0; z-index: 3;
+    display: flex; align-items: center; justify-content: space-between;
+    min-height: 58px; padding: 0 22px 0 18px;
+    border-bottom: 1px solid var(--line);
+    background: rgba(250,247,242,.9);
+    backdrop-filter: blur(16px);
+  }
+  .page-head .brand {
+    font-weight: 820; font-size: 16px;
+    text-decoration: none !important;
+    color: var(--ink) !important;
+  }
+  .page-head .brand:visited,
+  .page-head .brand:hover { color: var(--ink) !important; }
+  .page-head .brand span { font-style: italic; font-weight: 650; color: rgba(117,111,104,.88); }
+  .page-head nav {
+    display: flex; flex-wrap: wrap; gap: 6px; align-items: center; justify-content: flex-end;
+  }
+  .page-head nav a, .page-head nav button {
+    min-height: 32px; padding: 0 12px; border-radius: 999px;
+    border: 1px solid rgba(90,70,50,.1);
+    background: rgba(255,255,255,.86);
+    color: var(--ink); font: 650 12.5px/1 var(--sans);
+    text-decoration: none; cursor: pointer;
+    display: inline-flex; align-items: center;
+  }
+  .page-head nav a.primary {
+    background: var(--ink); color: #fff; border-color: var(--ink);
+  }
+  .page-head nav a.active {
+    border-color: rgba(249,115,22,.35);
+    color: var(--accent-deep);
+    background: #fff7ed;
+  }
+  .static-main {
+    max-width: 720px; margin: 0 auto; padding: 28px 22px 48px;
+  }
+  .static-main h1 { font-size: 28px; font-weight: 820; margin-bottom: 6px; }
+  .static-main .sub { color: var(--ink-faint); margin-bottom: 18px; font-size: 14px; }
+  .static-main p { font-size: 14.5px; color: var(--ink-soft); margin-bottom: 12px; }
+  .static-main h2 { font-size: 17px; margin: 22px 0 8px; }
+  .static-main ul { padding-left: 1.2em; color: var(--ink-soft); font-size: 14px; }
+  .static-main li { margin: 4px 0; }
+
+  .note {
+    width: min(1120px, 100%);
+    margin: 16px auto 0;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: rgba(255,255,255,.55);
+    border: 1px solid rgba(90,70,50,.08);
+    font-size: 12.5px; color: #5c564f;
+  }
+  .note b { color: var(--ink); }
+
+  @media (max-width: 760px) {
+    .shell, .static-shell { grid-template-columns: 1fr; }
+    .rail { display: none; }
+    .stats, .feat-grid, .plans, .dl-grid, .steps { grid-template-columns: 1fr 1fr; }
+    .steps { grid-template-columns: 1fr 1fr; }
+    .contact-box { grid-template-columns: 1fr; }
+    .home { padding: 48px 16px 36px; }
+    .home-chrome { padding: 12px 14px 10px; }
+    .brand-fixed { font-size: 15px; }
+    .top-nav a { padding: 5px 7px; font-size: 11.5px; }
+    .search-wrap { max-width: 100%; }
+    .mode-switch button { padding: 7px 10px; font-size: 12px; }
+  }
+  @media (max-width: 520px) {
+    .feat-grid, .plans, .dl-grid, .steps, .stats { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+  <div class="doc">
+    <div>
+      <h1>本地预览稿（未上线）· 首页完整结构</h1>
+      <p>去掉顶栏小标签。首页 = 标题 + 搜索 + 数据/热点 + <b>功能 · 怎么用 · 订阅 · 下载 · 联系</b>。Journal 纸色风格，可滚动查看全页。</p>
+    </div>
+    <code>docs/mockups/journal-home-static-nav-preview.html</code>
+  </div>
+
+  <div class="tabs" role="tablist">
+    <button type="button" class="active" data-tab="home">1. 首页</button>
+    <button type="button" data-tab="about">2. 关于页顶栏</button>
+  </div>
+
+  <!-- ═══════ 首页 ═══════ -->
+  <section class="screen show" id="screen-home">
+    <div class="device">
+      <span class="device-label">Home mock</span>
+      <div class="shell">
+        <aside class="rail" aria-hidden="true">
+          <div class="rail-top">
+            <div class="rail-btn active"><strong>◎</strong>全球</div>
+            <div class="rail-btn"><strong>CN</strong>中国</div>
+            <div class="rail-btn"><strong>···</strong>地区</div>
+          </div>
+          <div class="rail-bottom">
+            <div class="rail-btn"><strong>☆</strong>收藏</div>
+            <div class="rail-btn"><strong>我</strong>我的</div>
+          </div>
+        </aside>
+        <div class="content home-scroll">
+          <header class="home-chrome">
+            <a class="brand-fixed" href="#">AILatest <em>Journal</em></a>
+            <nav class="top-nav" aria-label="本页导航">
+              <a href="#feat">功能</a>
+              <a href="#how">怎么用</a>
+              <a href="#pricing">订阅</a>
+              <a href="#download">下载</a>
+              <a href="#contact">联系</a>
+            </nav>
+          </header>
+          <div class="home home-center">
+            <h1 class="home-title">
+              投稿之前，先把期刊<em>看清楚</em>。
+            </h1>
+
+            <!-- 搜索：标题下方 -->
+            <div class="search-wrap">
+              <input type="text" placeholder="搜索期刊名、ISSN…" readonly />
+              <div class="mode-switch" role="group">
+                <button type="button" class="active">查刊</button>
+                <button type="button">荐刊</button>
+              </div>
+            </div>
+
+            <div class="stats" aria-label="指标">
+              <div class="stat"><b>48,000+</b><span>收录期刊</span></div>
+              <div class="stat"><b>7,400+</b><span>累计浏览</span></div>
+              <div class="stat"><b>1,000+</b><span>服务用户</span></div>
+              <div class="stat"><b>23,000+</b><span>期刊详情</span></div>
+            </div>
+
+            <div class="hot">
+              <div class="hot-head">
+                <div>
+                  <h2>热点期刊</h2>
+                  <small>近 30 天浏览量 Top 5</small>
+                </div>
+                <a class="hot-ai" href="#">AI 荐刊 →</a>
+              </div>
+              <div class="hot-row"><span class="n">1</span><span class="name">CA-A Cancer Journal for Clinicians</span><span class="views">IF <em>232.4</em></span></div>
+              <div class="hot-row"><span class="n">2</span><span class="name">Computers &amp; Chemical Engineering</span><span class="views">IF <em>3.9</em></span></div>
+              <div class="hot-row"><span class="n">3</span><span class="name">Journal of Asian Architecture…</span><span class="views">IF <em>1.8</em></span></div>
+              <div class="hot-row"><span class="n">4</span><span class="name">Nature</span><span class="views">IF <em>50.5</em></span></div>
+              <div class="hot-row"><span class="n">5</span><span class="name">Scientific Reports</span><span class="views">IF <em>3.8</em></span></div>
+            </div>
+
+            <!-- 功能介绍 -->
+            <section class="section" id="feat">
+              <span class="section-id">Features</span>
+              <h3>功能介绍</h3>
+              <p class="lead">检索全球期刊，对比分区、影响因子与开放获取信息 — 一站完成。库、分区、风险信号、荐刊与插件徽章在同一条工作流里。</p>
+              <div class="feat-grid">
+                <div class="feat">
+                  <div class="ico">◎</div>
+                  <b>全球与地区期刊库</b>
+                  <span>SCIE / SSCI / AHCI / ESCI / EI、Scopus、DOAJ、MEDLINE；中国、印度、韩国、马来西亚等地区站。</span>
+                </div>
+                <div class="feat">
+                  <div class="ico">▣</div>
+                  <b>分区 · 指标 · 风险</b>
+                  <span>JCR 影响因子与 Quartile、中科院分区（含 TOP）、CCF / ABDC / ABS；预警与撤稿提示。</span>
+                </div>
+                <div class="feat">
+                  <div class="ico">★</div>
+                  <b>收藏与清单</b>
+                  <span>登录后云端收藏、多清单整理；对比时随时回看目标刊。</span>
+                </div>
+                <div class="feat">
+                  <div class="ico">AI</div>
+                  <b>智能荐刊</b>
+                  <span>输入论文标题 / 摘要 / 关键词，按主题与库覆盖匹配目标期刊（搜索框切到「荐刊」）。</span>
+                </div>
+                <div class="feat">
+                  <div class="ico">⌘</div>
+                  <b>浏览器插件</b>
+                  <span>Scholar / PubMed / 知网等页面展示分区与收录徽章，少开一个标签页。</span>
+                </div>
+                <div class="feat">
+                  <div class="ico">↔</div>
+                  <b>开放获取与 APC</b>
+                  <span>OAJ / DOAJ 信号与是否可免费发表路径（按订阅档位展示深度字段）。</span>
+                </div>
+              </div>
+            </section>
+
+            <!-- 怎么用 -->
+            <section class="section" id="how">
+              <span class="section-id">How it works</span>
+              <h3>怎么用</h3>
+              <p class="lead">从打开首页到定稿目标刊，四步走完。</p>
+              <div class="steps">
+                <div class="step">
+                  <em>01</em>
+                  <b>搜索或荐刊</b>
+                  <span>刊名 / ISSN 直接查；或切换「荐刊」贴标题摘要。</span>
+                </div>
+                <div class="step">
+                  <em>02</em>
+                  <b>筛选分区与库</b>
+                  <span>按 JCR、中科院、索引、学科收窄候选列表。</span>
+                </div>
+                <div class="step">
+                  <em>03</em>
+                  <b>看详情与风险</b>
+                  <span>影响因子、审稿周期、OA / 预警信息一页看清。</span>
+                </div>
+                <div class="step">
+                  <em>04</em>
+                  <b>收藏或导出</b>
+                  <span>加入清单；插件在阅读页继续对照徽章。</span>
+                </div>
+              </div>
+              <div class="cta-row" style="margin-top:14px; justify-content:center">
+                <a class="btn btn-primary" href="#">打开查刊</a>
+                <a class="btn btn-ghost" href="#">试用荐刊</a>
+              </div>
+            </section>
+
+            <!-- 订阅 -->
+            <section class="section" id="pricing">
+              <span class="section-id">Pricing</span>
+              <h3>订阅方案</h3>
+              <p class="lead">网站查刊 Free 永久可用。Pro / Max 提升插件深度、额度与 AI 荐刊配额。教育邮箱另享教育价（登录后解锁）。</p>
+              <div class="plans">
+                <article class="plan">
+                  <h4>Free</h4>
+                  <div class="price">$0 <small>/ 永久</small></div>
+                  <p class="desc">适合日常检索与轻量试用</p>
+                  <ul>
+                    <li>网站完整检索与详情</li>
+                    <li>基础插件徽章</li>
+                    <li>AI 荐刊试用次数</li>
+                  </ul>
+                  <a class="btn btn-ghost block" href="#">继续免费使用</a>
+                </article>
+                <article class="plan">
+                  <h4>Pro</h4>
+                  <div class="price">$7.99 <small>/ 年</small></div>
+                  <p class="desc">高频刷刊 · 插件进阶</p>
+                  <ul>
+                    <li>中科院 / TOP / 新锐徽章</li>
+                    <li>云收藏 50 · 清单 5</li>
+                    <li>AI 荐刊 500 credits/月</li>
+                  </ul>
+                  <a class="btn btn-primary block" href="#">升级 Pro</a>
+                </article>
+                <article class="plan hot">
+                  <span class="tag">推荐</span>
+                  <h4>Max</h4>
+                  <div class="price">$9.99 <small>/ 年</small></div>
+                  <p class="desc">完整工作流 · 高额度 AI</p>
+                  <ul>
+                    <li>预警 / 撤稿 / 科协风险</li>
+                    <li>导出与高额度荐刊</li>
+                    <li>地区站与设备额度更高</li>
+                  </ul>
+                  <a class="btn btn-primary block" href="#">升级 Max</a>
+                </article>
+              </div>
+              <p class="lead" style="margin:12px 0 0; text-align:center">完整对照与教育价见订阅页 · 价格 USD · Creem 收银台</p>
+              <div class="cta-row" style="justify-content:center; margin-top:10px">
+                <a class="btn btn-ghost" href="#">打开完整订阅页 →</a>
+              </div>
+            </section>
+
+            <!-- 下载 -->
+            <section class="section" id="download">
+              <span class="section-id">Download</span>
+              <h3>下载与入口</h3>
+              <p class="lead">网页版无需安装。插件把分区徽章带到你常去的文献页。</p>
+              <div class="dl-grid">
+                <div class="dl-card">
+                  <b>网页版</b>
+                  <span>浏览器直接使用查刊与荐刊，登录后同步收藏。</span>
+                  <a class="btn btn-primary" href="#">打开应用</a>
+                </div>
+                <div class="dl-card">
+                  <b>浏览器扩展</b>
+                  <span>Chrome / Edge：Scholar、PubMed、知网等页面徽章。</span>
+                  <a class="btn btn-ghost" href="#">去下载页</a>
+                </div>
+                <div class="dl-card">
+                  <b>Skill / API</b>
+                  <span>给写作助手接入检索与荐刊接口（开发者入口）。</span>
+                  <a class="btn btn-ghost" href="#">查看说明</a>
+                </div>
+              </div>
+            </section>
+
+            <!-- 联系 / 关于 -->
+            <section class="section" id="contact">
+              <span class="section-id">About &amp; contact</span>
+              <h3>关于与联系</h3>
+              <p class="lead">AILatest Journal 聚合公开评级与元数据，供学术检索与投稿参考。数据以各评价机构官方发布为准。</p>
+              <div class="contact-box">
+                <div class="block">
+                  <b>产品信息</b>
+                  <p>数据来源与截止时间、免责声明见关于页。问题与纠错欢迎来信。</p>
+                  <p style="margin-top:8px">
+                    <a href="#">关于我们</a> ·
+                    <a href="#">数据说明</a> ·
+                    <a href="#">条款</a> ·
+                    <a href="#">隐私</a> ·
+                    <a href="#">退款</a>
+                  </p>
+                </div>
+                <div class="block">
+                  <b>联系</b>
+                  <p>邮箱：contact@ailatest.org</p>
+                  <p style="margin-top:8px"><a href="#">打开联系页 →</a></p>
+                </div>
+              </div>
+            </section>
+
+            <footer class="home-foot">
+              <span>© 2026 AILatest Journal</span>
+              <span class="sep">·</span>
+              <a href="#">关于</a>
+              <span class="sep">·</span>
+              <a href="#">联系</a>
+              <span class="sep">·</span>
+              <a href="#">条款</a>
+              <span class="sep">·</span>
+              <a href="#">隐私</a>
+              <span class="sep">·</span>
+              <a href="#">订阅</a>
+              <span class="sep">·</span>
+              <a href="#">下载</a>
+            </footer>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ 关于页顶栏 ═══════ -->
+  <section class="screen" id="screen-about">
+    <div class="device">
+      <span class="device-label">About · static shell</span>
+      <div class="static-shell">
+        <aside class="rail" aria-hidden="true">
+          <div class="rail-top">
+            <div class="rail-btn"><strong>◎</strong>全球</div>
+            <div class="rail-btn"><strong>CN</strong>中国</div>
+            <div class="rail-btn"><strong>···</strong>地区</div>
+          </div>
+          <div class="rail-bottom">
+            <div class="rail-btn"><strong>☆</strong>收藏</div>
+            <div class="rail-btn"><strong>我</strong>我的</div>
+          </div>
+        </aside>
+        <div>
+          <!-- 新顶栏：统一产品导航（替换仅「下载 · 联系」旧版） -->
+          <header class="page-head">
+            <a class="brand" href="#">AILatest <span>Journal</span></a>
+            <nav>
+              <a href="#">首页</a>
+              <a href="#">查刊</a>
+              <a href="#">订阅</a>
+              <a href="#">下载</a>
+              <a class="active" href="#">关于</a>
+              <a href="#">联系</a>
+              <a class="primary" href="#">登录</a>
+              <button type="button">English</button>
+            </nav>
+          </header>
+          <main class="static-main">
+            <h1>关于 AILatest Journal</h1>
+            <p class="sub">期刊检索与投稿决策工具 · 数据来源与更新时间说明</p>
+            <p>顶栏从旧版「下载 · 联系」升级为与产品一致的导航：首页 / 查刊 / 订阅 / 下载 / 关于 / 联系 / 登录 / 语言。</p>
+            <h2>我们提供什么</h2>
+            <ul>
+              <li>全球与地区期刊库、JCR / 中科院 / CCF 等评级</li>
+              <li>检索、收藏、AI 荐刊、浏览器插件徽章</li>
+            </ul>
+            <p style="margin-top:18px;font-size:12.5px;color:#8a837a">（正文仍用现有 about 数据表，此处仅示意壳层）</p>
+          </main>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="note">
+    <b>怎么看：</b>浏览器打开本文件 · 首页可滚动看完整内容 · Tab 可切「关于页顶栏」。
+    <br><br>
+    <b>本版首页结构：</b>
+    标题（无 kicker）→ 搜索（查刊|荐刊）→ 页内锚点 → 数据卡 → 热点 Top5 →
+    <b>功能介绍</b> → <b>怎么用</b> → <b>订阅 Free/Pro/Max</b> → <b>下载</b> → <b>关于与联系</b> → 页脚。
+  </div>
+
+<script>
+  document.querySelectorAll('.tabs button').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tabs button').forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.screen').forEach((s) => s.classList.remove('show'));
+      document.getElementById('screen-' + btn.dataset.tab).classList.add('show');
+    });
+  });
+  document.querySelectorAll('.mode-switch').forEach((sw) => {
+    sw.querySelectorAll('button').forEach((b) => {
+      b.addEventListener('click', () => {
+        sw.querySelectorAll('button').forEach((x) => x.classList.remove('active'));
+        b.classList.add('active');
+      });
+    });
+  });
+</script>
+</body>
+</html>
