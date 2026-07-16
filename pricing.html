@@ -391,6 +391,40 @@
     color: #ea580c;
     border-bottom-color: #ea580c;
   }
+  .plan-cta-links a.edu-locked,
+  .plan-cta-links a[aria-disabled="true"] {
+    color: #9a9288;
+    border-bottom-style: dashed;
+    border-bottom-color: rgba(154,146,136,.45);
+    cursor: not-allowed;
+  }
+  .plan-cta-links a.edu-locked:hover,
+  .plan-cta-links a[aria-disabled="true"]:hover {
+    color: #7a7268;
+    border-bottom-color: rgba(122,114,104,.55);
+  }
+  .edu-gate-note {
+    max-width: 720px;
+    margin: 0 auto 14px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid #d8e8dc;
+    background: #f4faf6;
+    color: #2f6b4a;
+    font-size: 12.5px;
+    line-height: 1.45;
+    text-align: center;
+  }
+  .edu-gate-note[data-state="blocked"] {
+    border-color: #edd9c4;
+    background: #fff8f0;
+    color: #8a4b12;
+  }
+  .edu-gate-note[data-state="ok"] {
+    border-color: #b9dfc8;
+    background: #eefaf3;
+    color: #0f6b3c;
+  }
 
   /* 周期切换时显隐 */
   [data-show-cycle="month"] { display: none !important; }
@@ -570,7 +604,8 @@
         <button type="button" data-billing-set="month">月付</button>
         <button type="button" class="active" data-billing-set="year">年付 <span>更划算</span></button>
       </div>
-      <p class="pricing-edu">价格以 <b>USD</b> 结算（Creem 收银台）· 下方划线为产品原价 · 教育邮箱另享更低价</p>
+      <p class="pricing-edu">价格以 <b>USD</b> 结算（Creem 收银台）· 下方划线为产品原价 · 教育价仅限机构邮箱登录后支付</p>
+      <p class="edu-gate-note" data-edu-status data-state="login">教育价仅限机构邮箱（.edu.cn / .edu / .ac.uk 等）登录后购买；普通邮箱无法支付。</p>
     </header>
 
     <div class="plans plans-3">
@@ -641,7 +676,7 @@
         </ul>
         <button class="btn ghost" type="button" data-creem-checkout data-plan="pro" data-period="year" data-billing-cta>订阅 Pro · 年付</button>
         <div class="plan-cta-links">
-          <a href="#" data-creem-checkout data-plan="pro" data-period="year" data-edu="1">教育年付 $4.99</a>
+          <a href="#" class="edu-locked" data-creem-checkout data-plan="pro" data-period="year" data-edu="1" aria-disabled="true">教育年付 $4.99 · 登录解锁</a>
         </div>
       </article>
 
@@ -689,7 +724,7 @@
         </ul>
         <button class="btn" type="button" data-creem-checkout data-plan="max" data-period="year" data-billing-cta>订阅 Max · 年付</button>
         <div class="plan-cta-links">
-          <a href="#" data-creem-checkout data-plan="max" data-period="year" data-edu="1">教育年付 $5.99</a>
+          <a href="#" class="edu-locked" data-creem-checkout data-plan="max" data-period="year" data-edu="1" aria-disabled="true">教育年付 $5.99 · 登录解锁</a>
         </div>
       </article>
     </div>
@@ -733,8 +768,8 @@
       <h3>Free 能看中科院和预警吗？</h3>
       <p>网站上可以。插件侧：中科院 / TOP / 新锐自 Pro 起；预警 · 撤稿 · 科协仅 Max；APC 自 Pro 起。</p>
       <h3>教育优惠怎么用？</h3>
-      <p>用机构邮箱（.edu.cn / .edu / .ac.uk 等）认证后，可走教育价链接：Pro $4.99/年、Max $5.99/年。</p>
-      <p class="edu-note">与 AILatest Todo 教育价规则一致。</p>
+      <p>使用机构邮箱（.edu.cn / .edu / .ac.uk / .edu.hk 等）<b>登录本站</b>后，教育价按钮才会解锁。Gmail / QQ 等普通邮箱看不到可支付入口，也无法完成教育价结账。Pro 教育价 $4.99/年、$0.69/月；Max 教育价 $5.99/年、$0.89/月。</p>
+      <p class="edu-note">服务端与支付回执也会校验付款邮箱域名；非机构邮箱无法获得教育价权益。</p>
     </div>
   </section>
 
@@ -748,7 +783,8 @@
         <button type="button" data-billing-set="month">Monthly</button>
         <button type="button" class="active" data-billing-set="year">Yearly <span>Best value</span></button>
       </div>
-      <p class="pricing-edu">Prices in <b>USD</b> (Creem checkout) · Strikethrough = list price · Edu emails get deeper discounts</p>
+      <p class="pricing-edu">Prices in <b>USD</b> (Creem checkout) · Strikethrough = list price · Edu pricing only after institutional sign-in</p>
+      <p class="edu-gate-note" data-edu-status data-state="login">Education pricing is only for institutional emails (.edu / .edu.cn / .ac.uk, etc.) after sign-in.</p>
     </header>
 
     <div class="plans plans-3">
@@ -819,7 +855,7 @@
         </ul>
         <button class="btn ghost" type="button" data-creem-checkout data-plan="pro" data-period="year" data-billing-cta>Subscribe Pro · yearly</button>
         <div class="plan-cta-links">
-          <a href="#" data-creem-checkout data-plan="pro" data-period="year" data-edu="1">Edu yearly $4.99</a>
+          <a href="#" class="edu-locked" data-creem-checkout data-plan="pro" data-period="year" data-edu="1" aria-disabled="true">Edu yearly $4.99 · sign in</a>
         </div>
       </article>
 
@@ -867,7 +903,7 @@
         </ul>
         <button class="btn" type="button" data-creem-checkout data-plan="max" data-period="year" data-billing-cta>Subscribe Max · yearly</button>
         <div class="plan-cta-links">
-          <a href="#" data-creem-checkout data-plan="max" data-period="year" data-edu="1">Edu yearly $5.99</a>
+          <a href="#" class="edu-locked" data-creem-checkout data-plan="max" data-period="year" data-edu="1" aria-disabled="true">Edu yearly $5.99 · sign in</a>
         </div>
       </article>
     </div>
@@ -911,7 +947,7 @@
       <h3>Can Free see CAS and warnings?</h3>
       <p>Yes on the website. Extension: CAS from Pro; risk badges only on Max; APC from Pro.</p>
       <h3>Education pricing?</h3>
-      <p>Verify with an institutional email, then use the edu checkout links: Pro $4.99/yr, Max $5.99/yr.</p>
+      <p>Sign in with an institutional email (.edu / .edu.cn / .ac.uk / .edu.hk, etc.). Only then can you click edu checkout. Consumer emails (Gmail, etc.) stay locked. Pro edu: $4.99/yr · $0.69/mo; Max edu: $5.99/yr · $0.89/mo. The API and webhook also enforce domain checks.</p>
     </div>
   </section>
 </main>
@@ -931,7 +967,7 @@
 </footer>
 <script src="/js/static-i18n.js?v=20260715-download-subscribe" defer></script>
 <script src="/js/site-rail.js?v=20260716-shell-main" defer></script>
-<script src="/js/pricing-checkout.js?v=20260715-creem" defer></script>
+<script src="/js/pricing-checkout.js?v=20260716-edu-gate" defer></script>
 <script>
 (() => {
   const labels = {
@@ -939,7 +975,10 @@
     month: { zh: '月付', en: 'monthly' },
   };
   function isEn() {
-    return (document.documentElement.lang || '').toLowerCase().startsWith('en');
+    const lang = (document.documentElement.getAttribute('data-static-lang')
+      || document.documentElement.lang
+      || '').toLowerCase();
+    return lang.startsWith('en');
   }
   function setBilling(cycle) {
     const c = cycle === 'month' ? 'month' : 'year';
@@ -956,6 +995,8 @@
         ? `Subscribe ${name} · ${unit}`
         : `订阅 ${name} · ${unit}`;
     });
+    // 教育 CTA 的周期与锁定态由 pricing-checkout 统一刷新
+    if (typeof window.__syncEduCheckoutUi === 'function') window.__syncEduCheckoutUi();
   }
   document.querySelectorAll('[data-billing-set]').forEach((btn) => {
     btn.addEventListener('click', () => setBilling(btn.getAttribute('data-billing-set')));
