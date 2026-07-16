@@ -285,9 +285,9 @@ body[data-static-page="pricing"] {
   color: #1c1917 !important;
 }
 .plan-btn-edu {
-  background: #f0fdf6;
-  border-color: rgba(4, 120, 87, 0.2);
-  color: #047857 !important;
+  background: #fff7ed;
+  border-color: rgba(249, 115, 22, 0.28);
+  color: #c2410c !important;
   font-size: 13px;
   min-height: 40px;
 }
@@ -297,16 +297,20 @@ body[data-static-page="pricing"] {
   border-color: rgba(90, 70, 50, 0.12);
   background: #fafaf9;
 }
+/* 教育价解锁后：橙色主按钮，不改变按钮顺序 */
 .plan-btn-edu.edu-ready,
 .plan-btn.edu-ready {
-  order: -1;
-  background: linear-gradient(180deg, #34d399, #059669) !important;
+  order: unset !important;
+  background: linear-gradient(180deg, #fb923c, #f97316) !important;
   color: #fff !important;
   border-color: transparent !important;
   font-size: 14px;
   min-height: 44px;
   font-weight: 800;
-  box-shadow: 0 8px 18px rgba(5, 150, 105, 0.28);
+  box-shadow: 0 8px 18px rgba(249, 115, 22, 0.28);
+}
+.plan-btn-edu.edu-ready:hover {
+  box-shadow: 0 10px 22px rgba(249, 115, 22, 0.34);
 }
 .plan-btn.std-price-locked {
   opacity: 0.45;

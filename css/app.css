@@ -1165,9 +1165,9 @@ body.home-route:not(.home-tab-has-results) .home-v4-grad {
 .home-btn-edu {
   font-size: 12px !important;
   min-height: 34px !important;
-  color: #047857 !important;
-  border-color: rgba(4, 120, 87, .22) !important;
-  background: #f0fdf6 !important;
+  color: #c2410c !important;
+  border-color: rgba(249, 115, 22, .28) !important;
+  background: #fff7ed !important;
 }
 .home-btn-edu.edu-locked {
   opacity: .72;
@@ -1175,7 +1175,7 @@ body.home-route:not(.home-tab-has-results) .home-v4-grad {
   border-color: rgba(90, 70, 50, .12) !important;
   background: #fafaf9 !important;
 }
-/* 机构邮箱已验证：教育价升为主 CTA，标准价灰显不可点 */
+/* 机构邮箱已验证：教育价用橙色主 CTA，保持 DOM 顺序（在标准价下方，不 order 上移） */
 .home-btn-edu.edu-ready,
 button.home-btn.edu-ready {
   font-size: 13.5px !important;
@@ -1183,9 +1183,9 @@ button.home-btn.edu-ready {
   font-weight: 780 !important;
   color: #fff !important;
   border-color: transparent !important;
-  background: linear-gradient(180deg, #34d399, #059669) !important;
-  box-shadow: 0 8px 18px rgba(5, 150, 105, .28) !important;
-  order: -1; /* 排到标准价上方（flex/grid 子项） */
+  background: linear-gradient(180deg, #fb923c, #f97316) !important;
+  box-shadow: 0 8px 18px rgba(249, 115, 22, .28) !important;
+  order: unset !important;
 }
 .home-btn.std-price-locked,
 button.std-price-locked[data-creem-checkout] {
@@ -1198,9 +1198,6 @@ button.std-price-locked[data-creem-checkout] {
   color: #a8a29e !important;
   border-color: rgba(90, 70, 50, .1) !important;
 }
-body.edu-eligible .home-plan .home-btn-edu.edu-ready {
-  margin-bottom: 2px;
-}
 .settings-link-row.std-price-locked {
   opacity: .45;
   cursor: not-allowed !important;
@@ -1208,9 +1205,9 @@ body.edu-eligible .home-plan .home-btn-edu.edu-ready {
   color: #a8a29e !important;
 }
 .settings-link-row.settings-edu-cta.edu-ready {
-  background: linear-gradient(180deg, rgba(16,185,129,.12), rgba(5,150,105,.08));
-  border: 1px solid rgba(5, 150, 105, .28);
-  color: #047857 !important;
+  background: linear-gradient(180deg, #fff7ed, #ffedd5);
+  border: 1px solid rgba(249, 115, 22, .28);
+  color: #c2410c !important;
   font-weight: 780;
 }
 .settings-link-row.settings-edu-cta.edu-locked {
