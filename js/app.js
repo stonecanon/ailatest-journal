@@ -13256,9 +13256,9 @@
     box.innerHTML = list.map((item, i) => {
       const rec = resolveHotJournal(item, pool);
       const name = titleCase(rec?.name || rec?.n || item.journal_name || item.journal_key || '—');
-      // 右侧只展示 IF + 数值（不显示浏览量 / 分区徽章）
+      // 右侧只展示 IF + 数值；固定 1 位小数便于列对齐
       const ifRaw = rec?.if_2024 != null ? Number(rec.if_2024) : NaN;
-      const ifv = Number.isFinite(ifRaw) ? (ifRaw >= 100 ? ifRaw.toFixed(1) : ifRaw.toFixed(1)) : '—';
+      const ifv = Number.isFinite(ifRaw) ? ifRaw.toFixed(1) : '—';
       const slug = rec?.slug || '';
       const fid = rec ? favId(rec) : (item.journal_key || '');
       const href = slug
@@ -13267,7 +13267,7 @@
       return `<a class="home-hot-row" role="listitem" href="${href}" data-hot-fid="${escape(fid)}" data-hot-views="${escape(String(item.views || 0))}">
         <span class="home-hot-n">${i + 1}</span>
         <span class="home-hot-name" title="${escape(name)}">${escape(name)}</span>
-        <span class="home-hot-if" title="Impact Factor">IF <em>${escape(ifv)}</em></span>
+        <span class="home-hot-if" title="Impact Factor"><span class="home-hot-if-k">IF</span><em>${escape(ifv)}</em></span>
       </a>`;
     }).join('');
 
