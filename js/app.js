@@ -9407,7 +9407,14 @@
     document.body.classList.add('settings-open');
     document.documentElement.classList.add('settings-open');
     const panel = document.querySelector('.tab-panel[data-panel="me"]');
-    if (panel) panel.hidden = false;
+    if (panel) {
+      panel.hidden = false;
+      panel.removeAttribute('hidden');
+      panel.style.display = 'flex';
+      panel.style.visibility = 'visible';
+      panel.style.pointerEvents = 'auto';
+    }
+    activeTab = 'me';
     renderMe();
   }
 
@@ -9415,7 +9422,12 @@
     document.body.classList.remove('settings-open');
     document.documentElement.classList.remove('settings-open');
     const panel = document.querySelector('.tab-panel[data-panel="me"]');
-    if (panel) panel.hidden = true;
+    if (panel) {
+      panel.hidden = true;
+      panel.style.display = '';
+      panel.style.visibility = '';
+      panel.style.pointerEvents = '';
+    }
     // 关闭后回到打开设置前的页面
     if (!opts.keepTab && activeTab === 'me') {
       let back = window.__settingsReturnTab || 'int';
@@ -12274,18 +12286,30 @@
         }
       }
 
-      // 设置页：磨砂浮层，底层页面保持可见
+      // 设置页：磨砂浮层（桌面）/ 全屏两级（手机），底层页面保持可见
       if (tab === 'me') {
         if (previousTab && previousTab !== 'me') window.__settingsReturnTab = previousTab;
         $$('[data-tab]').forEach(x => x.classList.toggle('active', x.dataset.tab === 'me'));
         activeTab = 'me';
         if (document.body.dataset.bootTab) delete document.body.dataset.bootTab;
         document.body.classList.add('settings-open');
+        document.documentElement.classList.add('settings-open');
         document.body.classList.remove('simple-top-route', 'fav-route', 'topbar-compact');
+        // 手机：默认进一级全屏设置列表（勿直接 subpage，否则像「打不开」）
+        if (window.matchMedia('(max-width: 900px)').matches && !opts.settingsSection) {
+          window.__settingsOpenAsRoot = true;
+          _settingsSection = 'account';
+        } else if (opts.settingsSection) {
+          _settingsSection = opts.settingsSection;
+          window.__settingsOpenAsRoot = false;
+        }
         const mePanel = document.querySelector('.tab-panel[data-panel="me"]');
         if (mePanel) {
           mePanel.hidden = false;
-          mePanel.style.display = '';
+          mePanel.removeAttribute('hidden');
+          mePanel.style.display = 'flex';
+          mePanel.style.visibility = 'visible';
+          mePanel.style.pointerEvents = 'auto';
         }
         if (!opts.skipPath) {
           const nextPath = TAB_PATHS.me || '/account';
@@ -12543,10 +12567,16 @@
       window.addEventListener('resize', close);
     })();
 
-    // Home entry pills → switch tab
+    // Home entry pills → switch tab（设置入口单独处理，避免与登录门禁双绑）
     document.querySelectorAll('.home-pill[data-tab], .rail-nav-btn[data-tab], .page-brand[data-tab], .rail-brand-mobile[data-tab]').forEach(b => {
       b.addEventListener('click', (e) => {
         e.preventDefault();
+        // 账号/设置按钮：交给 #account-credit-badge 专用逻辑
+        if (b.id === 'account-credit-badge' || b.dataset.tab === 'me') {
+          e.stopPropagation();
+          openSettingsFromRail();
+          return;
+        }
         activateTab(b.dataset.tab);
         if (window.matchMedia('(max-width: 900px)').matches) closeSidebar();
       });
@@ -12879,17 +12909,31 @@
         startLogin();
       }
     });
-    $('#account-credit-badge')?.addEventListener('click', () => {
-      if (!user) {
-        startLogin();
-        return;
+    function openSettingsFromRail() {
+      // 访客也可进设置（语言 / 版本等）；登录只在账号操作时需要
+      try {
+        if (window.matchMedia('(max-width: 900px)').matches) {
+          window.__settingsOpenAsRoot = true;
+        }
+        activateTab('me', { push: true });
+      } catch (err) {
+        console.error('[settings] open failed', err);
+        // 兜底：直接开壳
+        try { openSettingsShell(); } catch (_) {}
       }
-      activateTab('me', { push: true });
+      if (window.matchMedia('(max-width: 900px)').matches) {
+        try { closeSidebar(); } catch (_) {}
+      }
+    }
+    $('#account-credit-badge')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      openSettingsFromRail();
     });
     $('#account-credit-badge')?.addEventListener('keydown', (e) => {
       if (e.key !== 'Enter' && e.key !== ' ') return;
       e.preventDefault();
-      $('#account-credit-badge')?.click();
+      openSettingsFromRail();
     });
 
     // 边缘滑动返回：左缘 → 右滑 / 右缘 → 左滑

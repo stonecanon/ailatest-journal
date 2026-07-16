@@ -11979,26 +11979,33 @@ body.settings-open {
 }
 /* 桌面保留侧栏在遮罩后可见；手机再隐藏（见 max-width:900） */
 .tab-panel[data-panel="me"] {
-  position: fixed;
-  inset: 0;
-  z-index: 260;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 400 !important; /* 高于顶栏品牌/语言 160–165 */
   display: none !important;
   align-items: center;
   justify-content: center;
   padding: 28px 20px;
-  margin: 0;
-  max-width: none;
-  width: 100%;
-  height: 100%;
+  margin: 0 !important;
+  max-width: none !important;
+  width: 100% !important;
+  height: 100% !important;
   min-height: 0;
   background: transparent;
   pointer-events: none;
   box-sizing: border-box;
+  /* 避免被 main overflow 裁切；fixed 相对视口 */
+  transform: none !important;
+  visibility: hidden;
 }
 body.settings-open .tab-panel[data-panel="me"],
+body.settings-open .tab-panel[data-panel="me"][hidden],
+html.settings-open .tab-panel[data-panel="me"],
 body[data-boot-tab="me"] .tab-panel[data-panel="me"] {
   display: flex !important;
-  pointer-events: auto;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  opacity: 1 !important;
 }
 .settings-scrim {
   display: block;
@@ -12576,16 +12583,33 @@ body[data-boot-tab="me"] .tab-panel[data-panel="me"] {
     visibility: hidden !important;
     pointer-events: none !important;
   }
-  .tab-panel[data-panel="me"] {
-    align-items: stretch;
-    justify-content: stretch;
-    top: 0; right: 0; bottom: 0; left: 0;
+  /* 打开时一并藏顶栏品牌/语言，避免叠在设置白屏上像「没打开」 */
+  body.settings-open .topbar-brand,
+  body.settings-open .home-top-nav,
+  body.settings-open .lang-toggle-wrap {
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+  body.settings-open .tab-panel[data-panel="me"],
+  body.settings-open .tab-panel[data-panel="me"][hidden] {
+    align-items: stretch !important;
+    justify-content: stretch !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
     padding: 0 !important;
-    width: 100dvw;
-    height: 100dvh;
-    min-height: 100dvh;
-    max-height: 100dvh;
-    background: #fff;
+    width: 100vw !important;
+    width: 100dvw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    max-height: 100dvh !important;
+    background: #fff !important;
+    z-index: 500 !important;
+    display: flex !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
   }
   .settings-scrim {
     display: none !important; /* 全屏无需遮罩 */
