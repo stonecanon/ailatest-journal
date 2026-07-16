@@ -10619,23 +10619,25 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   box-sizing: border-box;
   align-items: center;
 }
-/* 整行筛选（IF / 预警）：同样左右对齐 */
+/* 整行筛选（兼容旧 class；IF/预警已改为左右两栏） */
 .tab-panel[data-panel="int"] .th-dropdown-wide {
   grid-column: 1 / -1;
   grid-template-columns: 3.6em minmax(0, 1fr);
 }
-/* IF 独立整行：与「开放」分行，上下留白不挤（沿用 grid 标签列） */
-.tab-panel[data-panel="int"] #if-dropdown.th-if-row {
+/* IF | 预警：与上方两栏对齐（左 IF，右预警） */
+.tab-panel[data-panel="int"] #if-dropdown.th-if-row,
+.tab-panel[data-panel="int"] #warn-dropdown.th-warn-row {
   display: grid !important;
-  grid-column: 1 / -1;
   grid-template-columns: 3.6em minmax(0, 1fr);
   margin-top: 4px;
   padding-top: 8px !important;
   border-top: 1px solid rgba(90, 70, 50, 0.06) !important;
   column-gap: 8px;
   row-gap: 4px;
+  min-width: 0;
 }
-.tab-panel[data-panel="int"] #if-dropdown.th-if-row > .th-dropdown-btn {
+.tab-panel[data-panel="int"] #if-dropdown.th-if-row > .th-dropdown-btn,
+.tab-panel[data-panel="int"] #warn-dropdown.th-warn-row > .th-dropdown-btn {
   max-width: none;
   min-width: 0;
 }
@@ -10649,12 +10651,6 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .tab-panel[data-panel="int"] #if-dropdown #if-slider,
 .tab-panel[data-panel="int"] #if-dropdown #if-slider-val {
   display: none !important;
-}
-/* 预警行与 IF 再隔一点 */
-.tab-panel[data-panel="int"] #warn-dropdown {
-  margin-top: 2px;
-  padding-top: 6px !important;
-  border-top: 1px solid rgba(90, 70, 50, 0.05) !important;
 }
 /* 学科行：搜索框已写「筛选学科」，隐藏左侧重复「学科」标签 */
 .tab-panel[data-panel="int"] #topic-dropdown > .th-dropdown-btn {

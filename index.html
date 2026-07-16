@@ -42,7 +42,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 })(window,document,'script','dataLayer','GTM-NBNXL7FB');</script>
 <!-- End Google Tag Manager -->
 <link rel="preload" href="/data/journal_aliases.json" as="fetch" crossorigin="anonymous" />
-<link rel="stylesheet" href="/css/app.css?v=20260716-home-scroll" />
+<link rel="stylesheet" href="/css/app.css?v=20260716-warn-right" />
 <link rel="stylesheet" href="/css/journal-detail-wide.css?v=20260716-detail-force2" />
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
 <!-- PWA -->
@@ -716,8 +716,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <label class="th-chk" data-filter="feat" data-value="doaj"><input type="checkbox"><span>DOAJ</span></label>
                   </div>
                 </div>
-                <!-- IF 独立整行：与「开放」分开，选项更全 -->
-                <div class="th-dropdown th-dropdown-wide th-if-row" id="if-dropdown">
+                <!-- IF | 预警：左右两栏（与 JCR / 开放 同列对齐） -->
+                <div class="th-dropdown th-if-row" id="if-dropdown">
                   <button class="th-dropdown-btn" type="button" tabindex="-1"><span class="dd-label">IF</span></button>
                   <div class="th-dropdown-panel" id="if-panel">
                     <button type="button" class="th-chk th-if-chip" data-if-min="1" aria-pressed="false" title="IF ≥ 1">≥1</button>
@@ -733,8 +733,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <input type="range" id="if-slider" min="0" max="50" step="0.5" value="0" tabindex="-1" aria-hidden="true" hidden style="display:none!important">
                   </div>
                 </div>
-                <!-- 预警整行 -->
-                <div class="th-dropdown th-dropdown-wide" id="warn-dropdown">
+                <div class="th-dropdown th-warn-row" id="warn-dropdown">
                   <button class="th-dropdown-btn" type="button"><span class="dd-label" data-i18n="filter_warning">预警</span></button>
                   <div class="th-dropdown-panel" id="warn-panel">
                     <label class="th-chk" data-filter="feat" data-value="warning"><input type="checkbox"><span>中科院预警</span></label>
