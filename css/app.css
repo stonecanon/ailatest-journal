@@ -9317,15 +9317,22 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   background: #fffaf5 !important;
 }
 .tab-panel[data-panel="int"] .th-chk input { display: none !important; }
-/* 选中：杏橙浅底 + 橙字，禁止黑底白字 */
+/* 选中：加深杏橙底 + 橙边，点选一眼可见（避免 #fff7ed 过淡） */
 .tab-panel[data-panel="int"] .th-chk:has(input:checked),
 .tab-panel[data-panel="int"] .th-chk.active,
 .tab-panel[data-panel="int"] button.th-chk.active {
-  background: #fff7ed !important;
-  border-color: transparent !important;
-  color: #c2410c !important;
-  font-weight: 700;
-  box-shadow: none !important;
+  background: #ffedd5 !important;
+  border-color: #fb923c !important;
+  color: #9a3412 !important;
+  font-weight: 750;
+  box-shadow: 0 0 0 1px rgba(249, 115, 22, 0.12) !important;
+}
+.tab-panel[data-panel="int"] .th-chk:has(input:checked):hover,
+.tab-panel[data-panel="int"] .th-chk.active:hover,
+.tab-panel[data-panel="int"] button.th-chk.active:hover {
+  background: #fed7aa !important;
+  border-color: #f97316 !important;
+  color: #9a3412 !important;
 }
 /* 数量默认隐藏，悬停/聚焦 chip 再显示 */
 .tab-panel[data-panel="int"] .th-chk .dd-count {
