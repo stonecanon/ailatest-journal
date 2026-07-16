@@ -2873,15 +2873,116 @@
     return { id: 'free', label: 'Free', cls: 'tier-free' };
   }
 
+  /** 解析权益到期时间（unix 秒或 ms / ISO）→ Date 或 null */
+  function parseEntitlementExpiryTs(raw) {
+    if (raw == null || raw === '') return null;
+    if (typeof raw === 'number' && Number.isFinite(raw)) {
+      const ms = raw < 1e12 ? raw * 1000 : raw;
+      const d = new Date(ms);
+      return Number.isNaN(d.getTime()) ? null : d;
+    }
+    const n = Number(raw);
+    if (Number.isFinite(n) && n > 0) {
+      const ms = n < 1e12 ? n * 1000 : n;
+      const d = new Date(ms);
+      return Number.isNaN(d.getTime()) ? null : d;
+    }
+    const d = new Date(raw);
+    return Number.isNaN(d.getTime()) ? null : d;
+  }
+
+  function formatMembershipDate(d) {
+    if (!d) return '';
+    try {
+      return d.toLocaleDateString(uiLocale(), { year: 'numeric', month: '2-digit', day: '2-digit' });
+    } catch (_) {
+      return d.toISOString().slice(0, 10);
+    }
+  }
+
+  /**
+   * 会员有效期文案：试用 → trial_expires_at；付费 → paid_until；站长 / 无期限 → 永久
+   * @returns {{ short: string, long: string, until: Date|null, kind: string }}
+   */
+  function membershipExpiryInfo() {
+    const empty = { short: '', long: '', until: null, kind: 'none' };
+    if (!user) return empty;
+    const m = membershipTierLabel();
+    const ents = user.entitlements || {};
+    if (isOwnerClient() || ents.plan === 'owner' || ents.is_owner) {
+      return {
+        short: T('永久', 'Lifetime'),
+        long: T('站长权益 · 永久有效', 'Owner access · lifetime'),
+        until: null,
+        kind: 'lifetime',
+      };
+    }
+    if (m.id === 'free') {
+      return {
+        short: '',
+        long: T('Free 基础版 · 无订阅到期日', 'Free plan · no subscription end date'),
+        until: null,
+        kind: 'free',
+      };
+    }
+    let until = null;
+    let kind = 'paid';
+    if (m.id === 'trial') {
+      until = parseEntitlementExpiryTs(ents.trial_expires_at);
+      kind = 'trial';
+    } else {
+      until = parseEntitlementExpiryTs(ents.paid_until);
+      kind = 'paid';
+    }
+    if (!until) {
+      // 付费档但无 paid_until：视为长期有效（手工开通 / 终身）
+      if (m.id === 'pro' || m.id === 'max') {
+        return {
+          short: T('长期有效', 'Long-term'),
+          long: T('当前订阅无固定到期日（长期有效）', 'No fixed end date on this subscription'),
+          until: null,
+          kind: 'open',
+        };
+      }
+      return empty;
+    }
+    const dateStr = formatMembershipDate(until);
+    const now = Date.now();
+    const daysLeft = Math.ceil((until.getTime() - now) / 86400000);
+    let remain = '';
+    if (daysLeft < 0) {
+      remain = T('已过期', 'Expired');
+    } else if (daysLeft === 0) {
+      remain = T('今天到期', 'Ends today');
+    } else if (daysLeft <= 30) {
+      remain = T(`剩余 ${daysLeft} 天`, `${daysLeft}d left`);
+    }
+    const short = remain
+      ? T(`至 ${dateStr} · ${remain}`, `Until ${dateStr} · ${remain}`)
+      : T(`至 ${dateStr}`, `Until ${dateStr}`);
+    const long = m.id === 'trial'
+      ? T(`试用有效期至 ${dateStr}${remain ? `（${remain}）` : ''}`, `Trial ends ${dateStr}${remain ? ` (${remain})` : ''}`)
+      : T(`订阅有效期至 ${dateStr}${remain ? `（${remain}）` : ''}`, `Subscription ends ${dateStr}${remain ? ` (${remain})` : ''}`);
+    return { short, long, until, kind };
+  }
+
   function membershipBadgeHtml(opts = {}) {
     if (!user && !opts.force) return '';
     const m = membershipTierLabel();
-    const title = opts.title
+    const exp = membershipExpiryInfo();
+    const baseTitle = opts.title
       || (m.id === 'max' ? T('Max 会员', 'Max plan')
         : m.id === 'pro' ? T('Pro 会员', 'Pro plan')
           : m.id === 'trial' ? T('试用中（非付费 Pro）', 'Trial (not paid Pro)')
             : T('Free 基础版', 'Free plan'));
-    return `<span class="me-tier-badge ${m.cls}" title="${escape(title)}" aria-label="${escape(title)}">${escape(m.label)}</span>`;
+    const title = exp.long ? `${baseTitle} · ${exp.long}` : baseTitle;
+    const expiryHtml = exp.short
+      ? `<span class="me-tier-expiry" title="${escape(exp.long || exp.short)}">${escape(exp.short)}</span>`
+      : '';
+    return `<span class="me-tier-wrap">
+      <span class="me-tier-badge ${m.cls}" title="${escape(title)}" aria-label="${escape(title)}">${escape(m.label)}</span>
+      ${expiryHtml}
+    </span>`;
   }
 
   async function fetchAndMergeEntitlements() {
@@ -2917,17 +3018,19 @@
     badge.hidden = false;
     // 侧栏「我的」下方展示 Free / 试用 / Pro / Max 徽章，不展示 Credits
     const m = membershipTierLabel();
+    const exp = membershipExpiryInfo();
     const tierLabel = m.label; // Free | 试用 | Pro | Max
     const planTitle = m.id === 'max' ? T('Max 会员', 'Max plan')
       : m.id === 'pro' ? T('Pro 会员', 'Pro plan')
         : m.id === 'trial' ? T('试用中（非付费 Pro）', 'Trial (not paid Pro)')
           : T('Free 基础版', 'Free plan');
+    const fullTitle = exp.long ? `${planTitle} · ${exp.long}` : planTitle;
     badge.innerHTML = `<span class="rail-me-label">${T('设置','Settings')}</span><span class="rail-tier-chip ${m.cls}" aria-hidden="true">${escape(tierLabel)}</span>`;
     badge.title = user
-      ? `${T('设置与账号','Settings & account')} · ${planTitle}`
+      ? `${T('设置与账号','Settings & account')} · ${fullTitle}`
       : T('登录后查看会员与设置', 'Sign in for membership & settings');
     badge.setAttribute('aria-label', user
-      ? `${T('设置','Settings')}，${planTitle}`
+      ? `${T('设置','Settings')}，${fullTitle}`
       : T('设置，登录或注册', 'Settings, sign in or sign up'));
   }
 
@@ -9441,7 +9544,11 @@
 
             <section class="settings-section" data-settings-section="billing" ${_settingsSection === 'billing' ? '' : 'hidden'}>
               <h2 class="settings-section-title">${T('订阅','Billing')}</h2>
-              <p class="settings-hint">${T('当前档位','Current plan')}：<strong>${escape(membershipTierLabel().label || '—')}</strong></p>
+              <p class="settings-hint">${T('当前档位','Current plan')}：<strong>${escape(membershipTierLabel().label || '—')}</strong>${(() => {
+                const exp = membershipExpiryInfo();
+                if (!exp.short && !exp.long) return '';
+                return ` · <span class="settings-plan-expiry" title="${escape(exp.long || exp.short)}">${escape(exp.short || exp.long)}</span>`;
+              })()}</p>
               <div class="billing-toggle-wrap settings-billing-toggle">
                 <div class="billing-toggle" role="group" aria-label="${T('计费周期','Billing period')}">
                   <button type="button" class="billing-toggle-btn is-on" data-billing-toggle="year" aria-pressed="true">
