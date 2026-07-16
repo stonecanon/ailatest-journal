@@ -8427,7 +8427,7 @@
     }
   }
 
-  function showSettingsSection(id) {
+  function showSettingsSection(id, opts = {}) {
     if (id === 'activity') id = 'account';
     _settingsSection = id || 'account';
     const root = $('#me-content');
@@ -8438,9 +8438,20 @@
     root.querySelectorAll('[data-settings-nav]').forEach((btn) => {
       btn.classList.toggle('active', btn.getAttribute('data-settings-nav') === _settingsSection);
     });
-    // 切换分区时滚回顶部，避免内容被裁切后看不见
+    // 移动端两级：进入具体分区 = 二级页
+    const layout = root.querySelector('.settings-layout');
+    if (layout) {
+      const goSub = opts.subpage !== false && (opts.subpage === true || window.matchMedia('(max-width: 900px)').matches);
+      layout.classList.toggle('settings-subpage', !!goSub && !!id);
+    }
     const body = root.querySelector('.settings-body');
     if (body) body.scrollTop = 0;
+  }
+
+  function exitSettingsSubpage() {
+    const root = $('#me-content');
+    const layout = root && root.querySelector('.settings-layout');
+    if (layout) layout.classList.remove('settings-subpage');
   }
 
   function renderMe() {
@@ -8470,6 +8481,7 @@
             <button type="button" data-settings-nav="version" class="${_settingsSection === 'version' ? 'active' : ''}">${T('版本信息','Version')}</button>
           </nav>
           <div class="settings-body">
+            <button type="button" class="settings-back" data-settings-back>← ${T('设置','Settings')}</button>
             <section class="settings-section" data-settings-section="account" ${_settingsSection === 'account' ? '' : 'hidden'}>
               <h2 class="settings-section-title">${T('账号与活动','Account & activity')}</h2>
               <header class="me-hero settings-account-hero">
@@ -8620,6 +8632,9 @@
     box.querySelectorAll('[data-settings-close]').forEach((el) => {
       el.addEventListener('click', () => closeSettingsShell());
     });
+    box.querySelector('[data-settings-back]')?.addEventListener('click', () => {
+      exitSettingsSubpage();
+    });
     // 设置内 Creem 结账（与 pricing 页同一脚本逻辑）
     if (typeof window.__bindCreemCheckout === 'function') {
       window.__bindCreemCheckout(box);
@@ -8632,8 +8647,18 @@
       });
     }
     box.querySelectorAll('[data-settings-nav]').forEach((btn) => {
-      btn.addEventListener('click', () => showSettingsSection(btn.getAttribute('data-settings-nav')));
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-settings-nav');
+        // 手机：进入二级；桌面：同屏切换
+        showSettingsSection(id, { subpage: window.matchMedia('(max-width: 900px)').matches });
+      });
     });
+    // 桌面默认显示当前分区；手机打开时先落在一级菜单
+    if (window.matchMedia('(max-width: 900px)').matches) {
+      exitSettingsSubpage();
+    } else {
+      showSettingsSection(_settingsSection, { subpage: false });
+    }
     box.querySelector('[data-open-rankings]')?.addEventListener('click', () => {
       closeSettingsShell({ keepTab: true });
       if (typeof window.__activateJournalTab === 'function') window.__activateJournalTab('rank', { push: true });
@@ -12954,11 +12979,17 @@
   // ───────── Home V4 landing: stats + hot journals ─────────
   function formatHomeStat(n) {
     const num = Number(n) || 0;
-    if (num >= 1_000_000) return `${Math.floor(num / 100_000) / 10}M+`;
-    if (num >= 10_000) return `${Math.floor(num / 1000).toLocaleString()}+`;
-    if (num >= 1000) return `${Math.floor(num / 100) * 100}+`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    if (num > 0) return `${num}+`;
-    return '—';
+    if (num <= 0) return '—';
+    if (num >= 1_000_000) {
+      const m = Math.floor(num / 100_000) / 10;
+      return `${m}M+`;
+    }
+    // 48,722 → 48,000+ ；7,266 → 7,000+ （整千向下取整）
+    if (num >= 1000) {
+      const rounded = Math.floor(num / 1000) * 1000;
+      return `${rounded.toLocaleString('en-US')}+`;
+    }
+    return `${num}+`;
   }
 
   function setHomeStat(key, value) {
