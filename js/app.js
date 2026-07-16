@@ -7552,7 +7552,7 @@
       return related.map(j => {
         const name = titleCase(j.name || j.cn_name || '');
         const ifv = j.if_2024 != null ? (+j.if_2024).toFixed(1) : '—';
-        return `<div class="side-link related-card" data-fid="${escape(favId(j))}" role="button" tabindex="0"><span class="side-link-name">${escape(name)}</span><span>${escape(ifv)}</span></div>`;
+        return `<div class="side-link related-card" data-fid="${escape(favId(j))}" role="button" tabindex="0"><span class="side-link-name">${escape(name)}</span><span class="side-link-if">${escape(ifv)}</span></div>`;
       }).join('');
     })();
     const riskEmpty = !drawerRiskBadges
