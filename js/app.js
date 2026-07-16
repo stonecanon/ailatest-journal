@@ -9367,17 +9367,21 @@
       colDay.setDate(start.getDate() + w * 7);
       const m = colDay.getMonth();
       if (w === 0 || m !== prevMonth) {
-        monthMarks.push({
-          col: w,
-          label: colDay.toLocaleDateString(uiLocale(), { month: 'short' }),
-        });
+        // 中文用「M月」，避免 short 被窄列裁成「7 」
+        const label = uiLocale().startsWith('zh')
+          ? `${m + 1}${T('月', '月')}`
+          : colDay.toLocaleDateString(uiLocale(), { month: 'short' });
+        monthMarks.push({ col: w, label });
         prevMonth = m;
       }
     }
 
-    const monthRow = Array.from({ length: weeks }, (_, w) => {
-      const hit = monthMarks.find((x) => x.col === w);
-      return `<span class="me-activity-month-cell">${hit ? escape(hit.label) : ''}</span>`;
+    // 每月占多列（到下一月前），避免 52 周一列宽把「7月」裁掉
+    const monthRow = monthMarks.map((mark, i) => {
+      const nextCol = i + 1 < monthMarks.length ? monthMarks[i + 1].col : weeks;
+      const span = Math.max(1, nextCol - mark.col);
+      const startCol = mark.col + 1; // CSS grid 1-based
+      return `<span class="me-activity-month-cell" style="grid-column:${startCol} / span ${span}">${escape(mark.label)}</span>`;
     }).join('');
 
     return `<div class="me-activity-heat" style="--activity-weeks:${weeks}">
