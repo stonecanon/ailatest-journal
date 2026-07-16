@@ -1525,23 +1525,58 @@ a.home-btn-primary { color: #fff; }
     font-size: 12px;
     min-height: 30px;
   }
-  /* 品牌缩短：手机只显示 AILatest，避免与语言按钮抢位 */
+  /* 手机品牌：完整 AILatest Journal，给右侧语言按钮留空 */
   body.home-route .topbar-brand em,
   body.topbar-compact .topbar-brand em {
-    display: none !important;
+    display: inline !important;
   }
   body.home-route .topbar-brand,
   body.topbar-compact .topbar-brand {
     left: 52px !important;
     top: 14px !important;
-    max-width: calc(100vw - 120px) !important;
-    font-size: 16px !important;
+    max-width: calc(100vw - 148px) !important;
+    font-size: 14px !important;
     overflow: hidden;
     text-overflow: ellipsis;
   }
   /* 首页落地标题少一点顶距（顶栏已简化） */
   body.home-route:not(.home-tab-has-results):not(.topbar-compact) .home-hero-head {
     padding-top: clamp(28px, 6vh, 48px);
+  }
+  /* 手机首页：后半段与搜索同宽，去掉嵌套缩进 */
+  body.home-route .home-hero {
+    padding-left: 0;
+    padding-right: 0;
+    width: 100%;
+    align-items: stretch;
+  }
+  body.home-route .home-v4,
+  body.home-route .home-intro,
+  body.home-route .home-stats,
+  body.home-route .home-hot {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    box-sizing: border-box;
+  }
+  body.home-route .home-sec {
+    padding: 16px 14px;
+    border-radius: 14px;
+  }
+  body.home-route .home-feat,
+  body.home-route .home-step {
+    padding: 12px 12px;
+  }
+  body.home-route .home-sec-lead {
+    max-width: none;
+  }
+  body.home-route:not(.home-tab-has-results):not(.topbar-compact) .home-hero-body {
+    padding-left: 0;
+    padding-right: 0;
+    width: 100%;
   }
   .home-feat-grid,
   .home-plans { grid-template-columns: 1fr 1fr; }
@@ -1553,6 +1588,9 @@ a.home-btn-primary { color: #fff; }
   .home-feat-grid,
   .home-plans,
   .home-steps { grid-template-columns: 1fr; }
+  body.home-route .home-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .home-stats {
@@ -1589,8 +1627,9 @@ a.home-btn-primary { color: #fff; }
   color: #78716c;
 }
 .home-hot {
-  margin: 36px auto 0;
-  max-width: 880px;
+  margin: 36px 0 0;
+  width: 100%;
+  max-width: 100%;
   text-align: left;
 }
 .home-hot-titles {
@@ -3081,8 +3120,8 @@ body.home-route .topbar-brand em {
   body.home-route .topbar-brand {
     top: 14px !important;
     left: 52px !important; /* 汉堡右侧 */
-    font-size: 15px;
-    max-width: calc(100vw - 140px) !important;
+    font-size: 14px;
+    max-width: calc(100vw - 148px) !important;
   }
 }
 
@@ -5526,8 +5565,8 @@ td.empty,
   .topbar-brand {
     top: 14px;
     left: 52px; /* 汉堡右侧 */
-    font-size: 15px;
-    max-width: calc(100vw - 140px);
+    font-size: 14px;
+    max-width: calc(100vw - 148px);
   }
   .side-toggle {
     position: fixed !important;
@@ -12015,18 +12054,21 @@ html.journal-route-pending .topbar-brand {
   body.fav-route .topbar-brand {
     top: 14px !important;
     left: 52px !important;
-    font-size: 16px !important;
-    max-width: calc(100vw - 120px) !important;
+    font-size: 14px !important;
+    max-width: calc(100vw - 148px) !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
   }
-  /* 手机顶栏简化：隐藏 Journal 斜体，避免与语言按钮叠字 */
+  /* 手机完整品牌：AILatest + Journal 斜体均显示 */
   .topbar-brand em,
   body.topbar-compact .topbar-brand em,
   body.home-route .topbar-brand em,
   body.fav-route .topbar-brand em,
   body.simple-top-route .topbar-brand em {
-    display: none !important;
+    display: inline !important;
+    color: rgba(117,111,104,.88) !important;
+    font-style: italic;
+    font-weight: 650;
   }
   /* 再次压过：手机首页不要展示落地导航链接 */
   body.home-route .home-top-nav > a {
