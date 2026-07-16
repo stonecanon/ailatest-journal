@@ -705,54 +705,66 @@ main.main {
 .aside-foot a { color: var(--ink-faint); }
 
 /* ─────────── Top bar & tabs ─────────── */
-/* ─── Mode toggle (DeepSeek style) ─── */
-#mode-tabs {
-  order: 2; /* 搜索栏之下：查刊 / AI 荐刊 */
-  display: flex; align-items: center; justify-content: center; gap: 6px;
-  margin: 12px auto 20px;
-  padding: 5px;
-  border: 1px solid rgba(39,35,31,.08);
-  background: rgba(255,255,255,.72);
-  border-radius: 999px;
-  width: fit-content;
-  min-width: 0;
-  align-self: center;
-  box-shadow: 0 10px 30px rgba(39,35,31,.07);
-  backdrop-filter: blur(16px);
+/* 查刊 / 荐刊 已迁入搜索框右侧；保留 #mode-tabs 空壳兼容脚本检测 */
+#mode-tabs,
+#mode-tabs.mode-tabs-legacy {
+  display: none !important;
 }
-#mode-tabs .tab {
-  font-family: var(--sans);
+.mobile-nav-brand { display: none; }
+
+/* 搜索框右侧：查刊 | 推荐期刊 切换 */
+.search-mode-switch {
+  pointer-events: auto;
+  display: none;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 999px;
+  background: rgba(39, 35, 31, 0.06);
+  border: 1px solid rgba(39, 35, 31, 0.06);
+  flex: 0 0 auto;
+}
+body.home-route .search-mode-switch {
+  display: inline-flex;
+}
+body.home-route .search-submit {
+  display: none !important;
+}
+body:not(.home-route) .search-mode-switch {
+  display: none !important;
+}
+.search-mode-btn {
   appearance: none;
   -webkit-appearance: none;
-  padding: 11px 34px;
-  background: transparent;
-  border: 0;
-  color: var(--ink-faint);
-  cursor: pointer;
-  text-decoration: none;
-  letter-spacing: 0.02em;
-  border: 0;
   margin: 0;
-  transition: background-color .2s, border-color .2s, color .2s;
-  display: flex; align-items: center; justify-content: center;
-  min-width: 0;
-  position: relative;
-  border-radius: 999px;
-  font-size: 15px;
+  border: 0;
+  background: transparent;
+  color: var(--ink-faint);
+  font-family: var(--sans);
+  font-size: 12.5px;
   font-weight: 680;
-  line-height: 1.3;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  padding: 7px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color .15s, color .15s, box-shadow .15s;
 }
-#mode-tabs .tab:visited { color: var(--ink-faint); }
-#mode-tabs .tab:hover { color: var(--ink); background: rgba(249,115,22,.08); }
-#mode-tabs .tab.active {
+.search-mode-btn:hover {
   color: var(--ink);
-  background: #fff;
-  font-weight: 650;
-  box-shadow: 0 2px 12px rgba(39,35,31,.10);
+  background: rgba(255, 255, 255, 0.55);
 }
-#mode-tabs .tab.active:visited { color: var(--ink); }
-#mode-tabs .tab .tab-icon { display: none; }
-.mobile-nav-brand { display: none; }
+.search-mode-btn.active {
+  color: #fff;
+  background: linear-gradient(135deg, #fb923c, #f97316 55%, #ea580c);
+  font-weight: 740;
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.28);
+}
+.search-mode-btn.active:hover {
+  color: #fff;
+  background: linear-gradient(135deg, #fb923c, #ea580c);
+}
 
 /* Sub-navigation bar */
 .subnav {
@@ -2175,7 +2187,7 @@ body.home-route:not(.home-tab-has-results):not(.topbar-compact) .search-wrap {
 body.home-route:not(.home-tab-has-results):not(.topbar-compact) .search-wrap > #q {
   height: 52px;
   min-height: 52px;
-  padding: 0 120px 0 20px;
+  padding: 0 188px 0 20px;
   line-height: 52px;
   font-size: 15px;
 }
@@ -2192,14 +2204,9 @@ body.home-route:not(.home-tab-has-results):not(.topbar-compact) .search-actions 
   bottom: auto;
   transform: translateY(-50%);
 }
-body.home-route:not(.home-tab-has-results):not(.topbar-compact) .search-submit {
-  min-height: 38px;
-  border-radius: 999px;
-  padding: 0 18px;
-  background: linear-gradient(135deg, #fb923c, #f97316 55%, #ea580c);
-  color: #fff;
-  font-weight: 700;
-  box-shadow: 0 6px 14px rgba(249, 115, 22, 0.28);
+body.home-route:not(.home-tab-has-results):not(.topbar-compact) .search-mode-btn {
+  padding: 8px 13px;
+  font-size: 13px;
 }
 
 body.topbar-compact .topbar {
@@ -2243,6 +2250,9 @@ body.topbar-compact .search-wrap > #q {
   padding: 0 118px 0 16px;
   font-size: 15px;
 }
+body.home-route.topbar-compact .search-wrap > #q {
+  padding-right: 176px;
+}
 
 body.topbar-compact .search-actions {
   left: auto;
@@ -2263,6 +2273,10 @@ body.topbar-compact .search-submit {
   border-radius: 14px;
   font-size: 13px;
   box-shadow: none;
+}
+body.topbar-compact .search-mode-btn {
+  padding: 6px 10px;
+  font-size: 12px;
 }
 
 body.simple-top-route .topbar {
@@ -4286,11 +4300,9 @@ td.empty,
     max-width: 100%;
     display: flex; flex-direction: column;
   }
-  main.main #mode-tabs { order: 2; margin: 18px auto 18px; padding: 4px; overflow-x: hidden; gap: 4px; width: fit-content; max-width: 100%; }
-  main.main #mode-tabs .tab { flex: 0 0 auto; padding: 8px 24px; font-size: 14px; min-width: 0; }
-  main.main #mode-tabs .tab .tab-icon { display: none; }
+  #mode-tabs { display: none !important; }
   .mobile-nav-brand { display: none !important; }
-  main.main .topbar     { order: 3; margin-bottom: 18px; }
+  main.main .topbar     { order: 1; margin-bottom: 18px; }
   .topbar { top: 0; z-index: 80; gap: 8px; }
   .topbar-brand { top: 14px; left: 16px; font-size: 15px; }
   body.topbar-compact .topbar { margin-bottom: 10px; }
@@ -4309,7 +4321,9 @@ td.empty,
   .home-card-title { font-size: 15.5px; }
   .home-card-fav .fav-star { width: 30px; height: 30px; min-width: 30px; background: transparent; }
   body.topbar-compact .search-wrap > #q { height: 46px; min-height: 46px; padding: 0 86px 0 14px; font-size: 14px; }
+  body.home-route.topbar-compact .search-wrap > #q { padding-right: 148px; }
   body.topbar-compact .search-submit { min-width: 74px; min-height: 34px; padding: 0 10px; }
+  body.home-route .search-mode-btn { padding: 6px 9px; font-size: 11.5px; }
   .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
   .top-actions { order: 0; justify-content: flex-end; gap: 4px; padding: 2px 0; }
   .tab-panel { order: 4; }

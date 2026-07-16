@@ -2424,27 +2424,43 @@
   function updateSearchSubmitLabel() {
     const btn = $('#search-submit');
     const label = $('#search-submit [data-i18n]');
-    if (!label) return;
-    const key = isPickSearchContext() ? 'pick_search_btn' : 'search_button';
-    label.dataset.i18n = key;
-    label.textContent = t(key);
-    btn?.setAttribute('aria-label', t(key));
+    if (label) {
+      const key = isPickSearchContext() ? 'pick_search_btn' : 'search_button';
+      label.dataset.i18n = key;
+      label.textContent = t(key);
+      btn?.setAttribute('aria-label', t(key));
+    }
+    // 首页切换钮文案随语言刷新（查刊 / 推荐期刊）
+    document.querySelectorAll('.search-mode-btn [data-i18n]').forEach((el) => {
+      const k = el.dataset.i18n;
+      const v = t(k);
+      if (v) el.textContent = v;
+    });
   }
 
   function syncHomeModeTabs() {
     document.querySelectorAll('[data-home-mode]').forEach(btn => {
-      const active = btn.dataset.homeMode === homeMode;
+      const mode = btn.dataset.homeMode;
+      const active = mode === homeMode;
       btn.classList.toggle('active', active);
       btn.setAttribute('aria-pressed', active ? 'true' : 'false');
     });
+    document.body.classList.toggle('home-mode-pick', homeMode === 'pick');
+    document.body.classList.toggle('home-mode-search', homeMode !== 'pick');
   }
 
-  function setHomeMode(mode) {
-    homeMode = mode === 'pick' ? 'pick' : 'search';
+  function setHomeMode(mode, { fromClick = false } = {}) {
+    const next = mode === 'pick' ? 'pick' : 'search';
+    const same = homeMode === next;
+    homeMode = next;
     syncHomeModeTabs();
     const qEl = $('#q');
     if (qEl) qEl.placeholder = t(currentSearchPlaceholderKey());
     updateSearchSubmitLabel();
+    if (!fromClick) return;
+    const q = String(qEl?.value || '').trim();
+    // 再点当前模式 → 提交；切换模式且已有内容 → 直接按新模式提交
+    if (same || q) $('#search-submit')?.click();
   }
 
   // ───────── favorites (multi-list + drag sort) ─────────
@@ -11592,7 +11608,8 @@
     }));
     $$('[data-home-mode]').forEach(b => b.addEventListener('click', (e) => {
       e.preventDefault();
-      setHomeMode(b.dataset.homeMode);
+      // 点当前模式 → 提交；点另一侧 → 切换（有输入则直接按新模式提交）
+      setHomeMode(b.dataset.homeMode, { fromClick: true });
     }));
     window.addEventListener('popstate', () => {
       if (renderJournalRoutePage()) return;

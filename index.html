@@ -42,7 +42,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 })(window,document,'script','dataLayer','GTM-NBNXL7FB');</script>
 <!-- End Google Tag Manager -->
 <link rel="preload" href="/data/journal_aliases.json" as="fetch" crossorigin="anonymous" />
-<link rel="stylesheet" href="/css/app.css?v=20260716-stats-fix" />
+<link rel="stylesheet" href="/css/app.css?v=20260716-search-mode" />
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json" />
@@ -275,6 +275,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="search-wrap">
       <input id="q" type="text" maxlength="200" aria-label="Search journals by title, abbreviation, or ISSN" placeholder="Search: journal title / abbr / ISSN" autocomplete="off" spellcheck="false" />
       <div class="search-actions">
+        <!-- 首页：查刊 / 推荐期刊 切换（替代搜索按钮 + 下方重复 Tab） -->
+        <div class="search-mode-switch" role="group" aria-label="Search or recommend" data-i18n-aria="search_mode_group">
+          <button type="button" class="search-mode-btn active" data-home-mode="search" aria-pressed="true" id="search-mode-search">
+            <span data-i18n="tab_home">查刊</span>
+          </button>
+          <button type="button" class="search-mode-btn" data-home-mode="pick" aria-pressed="false" id="search-mode-pick">
+            <span data-i18n="pick_search_btn">推荐期刊</span>
+          </button>
+        </div>
+        <!-- 非首页 Tab 仍用单按钮搜索 -->
         <button class="search-submit" id="search-submit" type="button" aria-label="Search">
           <span data-i18n="search_button">Search</span>
         </button>
@@ -287,15 +297,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </header>
   <div id="home-search-chips" class="home-search-chips" hidden></div>
 
-  <div id="mode-tabs">
-    <button class="tab active" type="button" data-home-mode="search" aria-pressed="true">
-      <span class="tab-label" data-i18n="tab_home">查刊</span>
-    </button>
-    <button class="tab tab-ai-pick" type="button" data-home-mode="pick" aria-pressed="false">
-      <span class="tab-label" data-i18n="tab_pick">AI 荐刊</span>
-    </button>
-    <a class="mobile-nav-brand" href="/" aria-label="AILatest Journal"><em data-i18n="brand_title">Journal</em><span>.ailatest</span></a>
-  </div>
+  <!-- 兼容旧脚本对 #mode-tabs 的存在检测；UI 已迁入搜索框右侧 -->
+  <div id="mode-tabs" class="mode-tabs-legacy" hidden aria-hidden="true"></div>
 
 
   <!-- ─── Home tab ─── -->
@@ -724,7 +727,7 @@ window.__BUILD_VER = 'v20260716-stats-fix';
 </script>
 <script src="/js/pick-match.js?v=20260716-v10" defer></script>
 <script src="/js/pricing-checkout.js?v=20260716-creem" defer></script>
-<script src="/js/app.js?v=20260716-stats-fix" defer></script>
+<script src="/js/app.js?v=20260716-search-mode" defer></script>
 
 </body>
 </html>
