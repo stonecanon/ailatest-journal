@@ -2404,6 +2404,61 @@ async function routeOpenAlexCountryOutput(req, env) {
   return new Response(bodyText, { status: 200, headers });
 }
 
+// GET /analytics/hot-journals?days=30&limit=5
+// 公开：最近 N 天人类真实浏览量最高的期刊（首页「热点期刊」）
+async function routeHotJournals(req, env) {
+  const url = new URL(req.url);
+  const daysRaw = Number(url.searchParams.get('days') || 30);
+  const days = Number.isFinite(daysRaw) ? Math.min(90, Math.max(1, Math.floor(daysRaw))) : 30;
+  const limitRaw = Number(url.searchParams.get('limit') || 5);
+  const limit = Number.isFinite(limitRaw) ? Math.min(20, Math.max(1, Math.floor(limitRaw))) : 5;
+  const startSec = Math.floor(Date.now() / 1000) - days * 86400;
+  const humanTrafficSql = "COALESCE(traffic_type, CASE WHEN is_bot=1 THEN 'scraper' ELSE 'human' END) = 'human'";
+
+  try {
+    const rows = await env.DB.prepare(
+      `SELECT journal_key,
+        MAX(CASE WHEN journal_name IS NOT NULL AND journal_name != '' THEN journal_name END) AS journal_name,
+        MAX(CASE WHEN journal_issn IS NOT NULL AND journal_issn != '' THEN journal_issn END) AS journal_issn,
+        COUNT(*) AS views,
+        MAX(COALESCE(NULLIF(event_time,0), viewed_at)) AS latest_viewed
+       FROM journal_view_events
+       WHERE viewed_at >= ?
+         AND journal_key IS NOT NULL AND TRIM(journal_key) != ''
+         AND ${humanTrafficSql}
+       GROUP BY journal_key
+       ORDER BY views DESC, latest_viewed DESC, journal_key ASC
+       LIMIT ?`
+    ).bind(startSec, limit).all();
+
+    const items = (rows.results || []).map((r, i) => ({
+      rank: i + 1,
+      journal_key: r.journal_key,
+      journal_name: r.journal_name || '',
+      journal_issn: r.journal_issn || '',
+      views: Number(r.views || 0),
+      latest_viewed: r.latest_viewed || null,
+    }));
+
+    return json({
+      ok: true,
+      days,
+      limit,
+      start_sec: startSec,
+      items,
+    }, 200, { 'Cache-Control': 'public, max-age=300' });
+  } catch (e) {
+    console.error('hot-journals query failed', e?.message || e);
+    return json({
+      ok: false,
+      days,
+      limit,
+      items: [],
+      error: 'query_failed',
+    }, 200, { 'Cache-Control': 'public, max-age=60' });
+  }
+}
+
 // GET /analytics/public-total  (public aggregate, no user-level detail)
 async function routePublicTrafficTotal(req, env) {
   const url = new URL(req.url);
@@ -2858,6 +2913,9 @@ export default {
       if (p === '/analytics/journal-view-trend' && req.method === 'GET') return routeJournalViewTrend(req, env);
       if (p === '/analytics/site-traffic-trend' && req.method === 'GET') return routeSiteTrafficTrend(req, env);
       if (p === '/analytics/public-total' && req.method === 'GET') return routePublicTrafficTotal(req, env);
+      if ((p === '/analytics/hot-journals' || p === '/analytics/hot-journals/') && req.method === 'GET') {
+        return routeHotJournals(req, env);
+      }
       if (p === '/openalex/country-output' && req.method === 'GET') return routeOpenAlexCountryOutput(req, env);
       if (p === '/extension/download-stats' && req.method === 'GET') return routeExtensionDownloadStats(req, env);
       if (p === '/extension/download'       && req.method === 'GET') return routeExtensionDownload(req, env);

@@ -899,9 +899,22 @@ body.home-tab-has-results .home-hero {
   max-width: 880px;
   text-align: left;
 }
+.home-hot-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.home-hot-sub {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 550;
+  color: #a8a29e;
+  letter-spacing: 0.01em;
+}
 .home-hot-head {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 12px;

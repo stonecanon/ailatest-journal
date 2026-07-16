@@ -129,6 +129,10 @@
       home_stat_visitors: '服务用户',
       home_stat_jviews: '期刊详情',
       home_hot_title: '热点期刊',
+      home_hot_sub: '近 30 天浏览量 Top 5',
+      home_hot_views: '次浏览',
+      home_hot_empty: '近 30 天暂无足够浏览数据',
+      home_hot_loading: '加载热点中…',
       home_hot_ai: 'AI 荐刊 →',
       showing: '显示', of: '条 / 共', total_items: '条',
       empty: '未找到匹配的期刊',
@@ -234,6 +238,10 @@
       home_stat_visitors: 'Visitors',
       home_stat_jviews: 'Journal views',
       home_hot_title: 'Hot journals',
+      home_hot_sub: 'Top 5 by views · last 30 days',
+      home_hot_views: 'views',
+      home_hot_empty: 'Not enough view data for the last 30 days',
+      home_hot_loading: 'Loading hot journals…',
       home_hot_ai: 'AI Recommend →',
       showing: 'Showing', of: 'of', total_items: '',
       empty: 'No journals match.',
@@ -13041,57 +13049,105 @@
     } catch (_) { /* keep placeholder */ }
   }
 
-  function buildHomeHotList() {
+  let _homeHotItems = null; // 缓存近 30 天 API 榜单
+
+  function formatHotViews(n) {
+    const v = Math.max(0, Math.floor(Number(n) || 0));
+    if (v >= 1000) return `${(v / 1000).toFixed(v >= 10000 ? 0 : 1).replace(/\.0$/, '')}k`;
+    return String(v);
+  }
+
+  function resolveHotJournal(item, pool) {
+    const key = String(item?.journal_key || '').trim();
+    const issnRaw = String(item?.journal_issn || '').toUpperCase().replace(/[^0-9X]/g, '');
+    const name = String(item?.journal_name || '').trim();
+    if (key) {
+      const byKey = pool.find((j) => favId(j) === key || j.slug === key);
+      if (byKey) return byKey;
+    }
+    if (issnRaw) {
+      const byIssn = pool.find((j) => {
+        const a = String(j.issn || '').toUpperCase().replace(/[^0-9X]/g, '');
+        const b = String(j.eissn || '').toUpperCase().replace(/[^0-9X]/g, '');
+        return a === issnRaw || b === issnRaw;
+      });
+      if (byIssn) return byIssn;
+    }
+    if (name) {
+      const nn = normTitle(name);
+      const byName = pool.find((j) => normTitle(j.name || j.n || j.cn_name || '') === nn);
+      if (byName) return byName;
+    }
+    return null;
+  }
+
+  function renderHomeHotList(items) {
     const box = $('#home-hot-list');
     if (!box) return;
     const pool = (journalsReady && journals.length ? journals : (homeJournals || journals || []));
-    if (!pool.length) {
-      box.innerHTML = `<div class="home-hot-row" style="justify-content:center;color:#a8a29e;font-size:13px">${T('加载中…','Loading…')}</div>`;
+    const list = Array.isArray(items) ? items.slice(0, 5) : [];
+
+    if (!list.length) {
+      box.innerHTML = `<div class="home-hot-row home-hot-empty" style="justify-content:center;color:#a8a29e;font-size:13px;border:0">${escape(t('home_hot_empty'))}</div>`;
       return;
     }
-    // 优先旗舰 + 高 IF，作「热点」示意（后续可接真实浏览榜）
-    const scored = pool
-      .filter(r => r && (r.name || r.n) && (r.if_2024 != null || r.flagship))
-      .map(r => ({
-        r,
-        score: (r.flagship ? 1000 : 0) + (Number(r.if_2024) || 0) + (r.cas_zone === 1 ? 5 : 0) + (r.if_quartile === 'Q1' ? 3 : 0),
-      }))
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 6);
 
-    box.innerHTML = scored.map(({ r }, i) => {
-      const name = titleCase(r.name || r.n || '');
-      const ifv = r.if_2024 != null ? (+r.if_2024).toFixed(1) : '—';
-      const pill = r.if_quartile || (r.cas_zone ? `Z${r.cas_zone}` : (r.flagship ? 'Flag' : '—'));
-      const slug = r.slug || '';
-      const href = slug ? `/journal/${encodeURIComponent(slug)}/` : '#';
-      return `<a class="home-hot-row" role="listitem" href="${href}" data-hot-fid="${escape(favId(r))}">
+    box.innerHTML = list.map((item, i) => {
+      const rec = resolveHotJournal(item, pool);
+      const name = titleCase(rec?.name || rec?.n || item.journal_name || item.journal_key || '—');
+      const views = formatHotViews(item.views);
+      const ifv = rec?.if_2024 != null ? (+rec.if_2024).toFixed(1) : '';
+      const pill = rec?.if_quartile || (rec?.cas_zone ? `Z${rec.cas_zone}` : '');
+      const slug = rec?.slug || '';
+      const fid = rec ? favId(rec) : (item.journal_key || '');
+      const href = slug
+        ? `/journal/${encodeURIComponent(slug)}/`
+        : (fid ? `#j/${encodeURIComponent(fid)}` : '#');
+      return `<a class="home-hot-row" role="listitem" href="${href}" data-hot-fid="${escape(fid)}" data-hot-views="${escape(String(item.views || 0))}">
         <span class="home-hot-n">${i + 1}</span>
         <span class="home-hot-name" title="${escape(name)}">${escape(name)}</span>
-        <span class="home-hot-if">IF <em>${escape(ifv)}</em></span>
-        <span class="home-hot-pill">${escape(String(pill))}</span>
+        <span class="home-hot-if" title="${escape(t('home_hot_views'))}"><em>${escape(views)}</em> ${escape(t('home_hot_views'))}</span>
+        <span class="home-hot-pill">${escape(pill || (ifv ? `IF ${ifv}` : '—'))}</span>
       </a>`;
     }).join('');
 
-    box.querySelectorAll('[data-hot-fid]').forEach(a => {
-      a.addEventListener('click', (e) => {
+    box.querySelectorAll('[data-hot-fid]').forEach((a) => {
+      a.addEventListener('click', () => {
         const fid = a.getAttribute('data-hot-fid');
-        const rec = (journals || []).find(j => favId(j) === fid)
-          || (homeJournals || []).find(j => favId(j) === fid);
+        if (!fid) return;
+        const rec = (journals || []).find((j) => favId(j) === fid)
+          || (homeJournals || []).find((j) => favId(j) === fid);
         if (rec && typeof openJournalDrawer === 'function') {
-          // 允许默认跳转 SEO URL；有抽屉则也打开
           try { openJournalDrawer(rec); } catch (_) {}
         }
       });
     });
   }
 
+  async function loadHomeHotList() {
+    const box = $('#home-hot-list');
+    if (!box) return;
+    if (!_homeHotItems) {
+      box.innerHTML = `<div class="home-hot-row home-hot-empty" style="justify-content:center;color:#a8a29e;font-size:13px;border:0">${escape(t('home_hot_loading'))}</div>`;
+      try {
+        const data = await fetch(
+          `${API_BASE}/analytics/hot-journals?days=30&limit=5`,
+          { cache: 'no-store' }
+        ).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+        _homeHotItems = Array.isArray(data?.items) ? data.items : [];
+      } catch (_) {
+        _homeHotItems = [];
+      }
+    }
+    renderHomeHotList(_homeHotItems);
+  }
+
   function initHomeLanding() {
     loadHomeStats();
-    buildHomeHotList();
-    // 期刊库稍后就绪时刷新热点
+    loadHomeHotList();
+    // 期刊库稍后就绪时重新解析刊名 / 链接
     if (!journalsReady) {
-      ensureJournalsLoaded().then(() => buildHomeHotList()).catch(() => {});
+      ensureJournalsLoaded().then(() => loadHomeHotList()).catch(() => {});
     }
   }
 
@@ -13160,7 +13216,7 @@
       journals.forEach(journalSearchMeta);
       buildIntIndex(journals);
       updateFilterCounts();
-      buildHomeHotList();
+      loadHomeHotList();
       if (meta && meta.total) setHomeStat('journals', meta.total);
       // Refresh stale favsData with live international journal data
       (function refreshFavsData() {
