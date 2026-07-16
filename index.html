@@ -42,7 +42,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 })(window,document,'script','dataLayer','GTM-NBNXL7FB');</script>
 <!-- End Google Tag Manager -->
 <link rel="preload" href="/data/journal_aliases.json" as="fetch" crossorigin="anonymous" />
-<link rel="stylesheet" href="/css/app.css?v=20260716-no-hot-ai" />
+<link rel="stylesheet" href="/css/app.css?v=20260716-v10-filters" />
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json" />
@@ -246,13 +246,45 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </div>
 
 <main class="main">
-  <section class="home-hero" aria-label="AILatest Journal">
+  <!-- 首页标题（搜索之上） -->
+  <section class="home-hero home-hero-head" aria-label="AILatest Journal">
     <div class="home-v4">
       <h1 class="home-v4-title">
-        <span data-i18n="home_v4_line1">Find the right journal</span><br>
-        <span class="home-v4-grad" data-i18n="home_v4_line2">with clearer data</span>
+        <span data-i18n="home_v4_line1">投稿之前，先把期刊</span><span class="home-v4-grad" data-i18n="home_v4_line2">看清楚</span><span data-i18n="home_v4_line3">。</span>
       </h1>
-      <p class="home-v4-sub" data-i18n="home_v4_sub">Search global journals, compare rankings and open access signals — in&nbsp;one&nbsp;place.</p>
+    </div>
+  </section>
+
+  <header class="topbar">
+    <button class="side-toggle" id="side-toggle" aria-label="Open navigation">☰</button>
+    <a class="topbar-brand" href="/" data-topbar-home aria-label="AILatest Journal">AILatest <em>Journal</em></a>
+    <div class="search-wrap">
+      <input id="q" type="text" maxlength="200" aria-label="Search journals by title, abbreviation, or ISSN" placeholder="Search: journal title / abbr / ISSN" autocomplete="off" spellcheck="false" />
+      <div class="search-actions">
+        <div class="search-mode-switch" role="group" aria-label="Search or recommend" data-i18n-aria="search_mode_group">
+          <button type="button" class="search-mode-btn active" data-home-mode="search" aria-pressed="true" id="search-mode-search">
+            <span data-i18n="tab_home">查刊</span>
+          </button>
+          <button type="button" class="search-mode-btn" data-home-mode="pick" aria-pressed="false" id="search-mode-pick">
+            <span data-i18n="pick_search_btn">荐刊</span>
+          </button>
+        </div>
+        <button class="search-submit" id="search-submit" type="button" aria-label="Search">
+          <span data-i18n="search_button">Search</span>
+        </button>
+      </div>
+      <span class="hint" id="hint" data-i18n="loading">加载中…</span>
+    </div>
+    <nav class="topbar-links" aria-label="Language">
+      <button type="button" id="topbar-lang-proxy">中文</button>
+    </nav>
+  </header>
+  <!-- 搜索记录：紧贴搜索框下方 -->
+  <div id="home-search-chips" class="home-search-chips" hidden></div>
+
+  <!-- 首页数据 / 热点（搜索与记录之下） -->
+  <section class="home-hero home-hero-body" aria-label="Home metrics">
+    <div class="home-v4">
       <div class="home-stats" id="home-stats" aria-label="Platform metrics">
         <div class="home-stat"><div class="home-stat-num" data-stat="journals">48,000+</div><div class="home-stat-label" data-i18n="home_stat_journals">收录期刊</div></div>
         <div class="home-stat"><div class="home-stat-num" data-stat="views">7,400+</div><div class="home-stat-label" data-i18n="home_stat_views">累计浏览</div></div>
@@ -270,34 +302,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </div>
     </div>
   </section>
-
-  <header class="topbar">
-    <button class="side-toggle" id="side-toggle" aria-label="Open navigation">☰</button>
-    <a class="topbar-brand" href="/" data-topbar-home aria-label="AILatest Journal">AILatest <em>Journal</em></a>
-    <div class="search-wrap">
-      <input id="q" type="text" maxlength="200" aria-label="Search journals by title, abbreviation, or ISSN" placeholder="Search: journal title / abbr / ISSN" autocomplete="off" spellcheck="false" />
-      <div class="search-actions">
-        <!-- 首页：查刊 / 推荐期刊 切换（替代搜索按钮 + 下方重复 Tab） -->
-        <div class="search-mode-switch" role="group" aria-label="Search or recommend" data-i18n-aria="search_mode_group">
-          <button type="button" class="search-mode-btn active" data-home-mode="search" aria-pressed="true" id="search-mode-search">
-            <span data-i18n="tab_home">查刊</span>
-          </button>
-          <button type="button" class="search-mode-btn" data-home-mode="pick" aria-pressed="false" id="search-mode-pick">
-            <span data-i18n="pick_search_btn">推荐期刊</span>
-          </button>
-        </div>
-        <!-- 非首页 Tab 仍用单按钮搜索 -->
-        <button class="search-submit" id="search-submit" type="button" aria-label="Search">
-          <span data-i18n="search_button">Search</span>
-        </button>
-      </div>
-      <span class="hint" id="hint" data-i18n="loading">加载中…</span>
-    </div>
-    <nav class="topbar-links" aria-label="Language">
-      <button type="button" id="topbar-lang-proxy">中文</button>
-    </nav>
-  </header>
-  <div id="home-search-chips" class="home-search-chips" hidden></div>
 
   <!-- 兼容旧脚本对 #mode-tabs 的存在检测；UI 已迁入搜索框右侧 -->
   <div id="mode-tabs" class="mode-tabs-legacy" hidden aria-hidden="true"></div>
@@ -729,7 +733,7 @@ window.__BUILD_VER = 'v20260716-stats-fix';
 </script>
 <script src="/js/pick-match.js?v=20260716-v10" defer></script>
 <script src="/js/pricing-checkout.js?v=20260716-creem" defer></script>
-<script src="/js/app.js?v=20260716-hot-if" defer></script>
+<script src="/js/app.js?v=20260716-v10-filters" defer></script>
 
 </body>
 </html>
