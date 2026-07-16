@@ -861,8 +861,8 @@ body.home-route.topbar-compact .home-search-chips {
   order: 2;
   margin: 0 auto 12px;
 }
-body.home-route.home-tab-has-results .home-hero-body,
-body.home-route.topbar-compact .home-hero-body {
+/* 仅有搜索结果时收起落地内容；topbar-compact 只收紧搜索条，不藏榜单/介绍 */
+body.home-route.home-tab-has-results .home-hero-body {
   display: none;
 }
 body:not(.home-route) .home-hero {

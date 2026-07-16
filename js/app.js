@@ -4666,17 +4666,16 @@
       || activeTab === 'pick';
     const homeLanding = activeTab === 'home'
       && !document.body.classList.contains('home-tab-has-results');
-    const isMobile = typeof window.matchMedia === 'function'
-      ? window.matchMedia('(max-width: 900px)').matches
-      : window.innerWidth <= 900;
     const isCompact = document.body.classList.contains('topbar-compact');
     const y = window.scrollY;
-    // 首页落地：滚动后收紧；其它业务页（含收藏）始终紧凑 = 全球站标准
+    // 首页落地：大搜索；滚动后收紧搜索条，但落地内容（榜单/介绍）始终可见
+    // 其它业务页（含收藏）始终紧凑 = 全球站标准
+    // 注意：勿在移动端首页落地强制 compact——否则配合旧 CSS 会藏掉整块 hero-body，页面无内容可滚
     let shouldCompact = false;
     if (alwaysCompactTab) {
       shouldCompact = true;
     } else if (activeTab === 'home') {
-      if (!homeLanding || isMobile) shouldCompact = true;
+      if (!homeLanding) shouldCompact = true;
       else shouldCompact = isCompact ? y > 2 : y > 132;
     }
     const changed = document.body.classList.toggle('topbar-compact', shouldCompact);
