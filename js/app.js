@@ -9942,16 +9942,24 @@
           }
           const strip = box.querySelector('[data-me-stat="credits"] strong');
           if (strip) strip.textContent = formatCreditValue(accountCreditValue());
-          const m = membershipTierLabel();
-          box.querySelectorAll('.me-tier-badge').forEach((badge) => {
-            badge.textContent = m.label;
-            badge.className = `me-tier-badge ${m.cls}`;
-            const title = m.id === 'max' ? T('Max 会员', 'Max plan')
-              : m.id === 'pro' ? T('Pro 会员', 'Pro plan')
-                : T('Free 基础版', 'Free plan');
-            badge.title = title;
-            badge.setAttribute('aria-label', title);
+          // 权益拉取后刷新档位徽章 + 有效期
+          box.querySelectorAll('.me-tier-wrap').forEach((wrap) => {
+            wrap.outerHTML = membershipBadgeHtml();
           });
+          // 兼容旧节点（仅 badge、无 wrap）
+          box.querySelectorAll('h1 > .me-tier-badge').forEach((badge) => {
+            badge.outerHTML = membershipBadgeHtml();
+          });
+          const billHint = box.querySelector('[data-settings-section="billing"] .settings-hint');
+          if (billHint && billHint.textContent && /当前档位|Current plan/i.test(billHint.textContent)) {
+            const m = membershipTierLabel();
+            const exp = membershipExpiryInfo();
+            billHint.innerHTML = `${T('当前档位','Current plan')}：<strong>${escape(m.label || '—')}</strong>${
+              exp.short || exp.long
+                ? ` · <span class="settings-plan-expiry" title="${escape(exp.long || exp.short)}">${escape(exp.short || exp.long)}</span>`
+                : ''
+            }`;
+          }
         }
         updateAccountCreditBadge();
       });
