@@ -4537,13 +4537,16 @@
   }
 
   function updateStickySearchState() {
-    // 全球 / 中国 / 地区站（含波兰、伊朗、拉美）滚动后顶部搜索收成紧凑条
-    const enabled = !document.body.classList.contains('journal-route')
-      && ['int', 'dom', 'in', 'my', 'kr', 'pbn', 'isc', 'scielo'].includes(activeTab);
+    // 全球 / 中国 / 地区站：滚动后收成紧凑条；手机端始终紧凑单行，避免大空框
+    const stationTab = ['int', 'dom', 'in', 'my', 'kr', 'pbn', 'isc', 'scielo'].includes(activeTab);
+    const enabled = !document.body.classList.contains('journal-route') && stationTab;
+    const isMobile = typeof window.matchMedia === 'function'
+      ? window.matchMedia('(max-width: 900px)').matches
+      : window.innerWidth <= 900;
     // 迟滞（hysteresis）：缩小搜索框会改变页面高度，阈值必须拉开，避免临界点反复抖动。
     const isCompact = document.body.classList.contains('topbar-compact');
     const y = window.scrollY;
-    const shouldCompact = enabled && (isCompact ? y > 2 : y > 132);
+    const shouldCompact = enabled && (isMobile || (isCompact ? y > 2 : y > 132));
     const changed = document.body.classList.toggle('topbar-compact', shouldCompact);
     if (changed) requestAnimationFrame(updateThStickyTop);
     else updateThStickyTop();

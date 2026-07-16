@@ -4749,33 +4749,119 @@ td.empty,
   }
   #mode-tabs { display: none !important; }
   .mobile-nav-brand { display: none !important; }
-  main.main .topbar     { order: 1; margin-bottom: 18px; }
-  .topbar { top: 0; z-index: 80; gap: 8px; }
-  .topbar-brand { top: 14px; left: 16px; font-size: 15px; }
-  body.topbar-compact .topbar { margin-bottom: 10px; }
+  /* 手机顶栏：品牌固定左上 + 语言右上；搜索为单行胶囊（勿用 132px 高框） */
+  main.main .topbar { order: 1; margin-bottom: 12px; }
+  .topbar {
+    top: 0;
+    z-index: 80;
+    gap: 8px;
+    width: 100%;
+    max-width: none;
+    margin: 0 0 12px;
+    padding: 52px 0 0; /* 给固定品牌 / 语言让位 */
+    background: transparent;
+    box-shadow: none;
+    border: 0;
+    align-items: stretch;
+    flex-wrap: nowrap;
+  }
+  .topbar-brand {
+    top: 14px;
+    left: 52px; /* 汉堡右侧 */
+    font-size: 15px;
+    max-width: calc(100vw - 140px);
+  }
+  .side-toggle {
+    position: fixed !important;
+    top: 10px;
+    left: 10px;
+    z-index: 150;
+    width: 36px;
+    height: 36px;
+  }
+  .lang-toggle-wrap {
+    top: 10px !important;
+    right: 10px !important;
+  }
+  /* 各站点 + 首页：统一紧凑单行搜索 */
+  .search-wrap {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: 100%;
+    order: 1;
+    min-height: 44px !important;
+    max-height: 48px;
+    border-radius: 999px !important;
+    box-shadow: 0 4px 14px rgba(40, 28, 16, 0.06);
+  }
+  .search-wrap > #q {
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+    line-height: 44px !important;
+    padding: 0 96px 0 14px !important;
+    font-size: 14px !important;
+  }
+  body.home-route:not(.home-tab-has-results):not(.topbar-compact) .search-wrap {
+    min-height: 46px !important;
+    max-height: 48px;
+  }
+  body.home-route:not(.home-tab-has-results):not(.topbar-compact) .search-wrap > #q {
+    height: 46px !important;
+    min-height: 46px !important;
+    max-height: 46px !important;
+    line-height: 46px !important;
+    padding: 0 148px 0 14px !important;
+    font-size: 14px !important;
+  }
+  body.home-route:not(.home-tab-has-results):not(.topbar-compact) .search-mode-btn {
+    padding: 5px 9px;
+    font-size: 11.5px;
+  }
   body.topbar-compact .topbar {
-    padding: 8px 10px 10px;
+    margin-bottom: 10px;
+    padding: 52px 0 0;
+    min-height: 0;
+    border-bottom: 0;
+    background: transparent;
+    backdrop-filter: none;
   }
   body.topbar-compact .search-wrap {
     flex: 1 1 auto;
     width: 100%;
     min-width: 0;
+    max-width: none;
+    border-radius: 999px !important;
   }
-  .home-search-chips { width: 100%; margin: -8px auto 18px; justify-content: flex-start; padding: 0 4px; }
+  body.topbar-compact .search-wrap > #q {
+    height: 44px !important;
+    min-height: 44px !important;
+    padding: 0 88px 0 14px !important;
+    font-size: 14px !important;
+  }
+  body.home-route.topbar-compact .search-wrap > #q {
+    padding-right: 148px !important;
+  }
+  body.topbar-compact .search-submit,
+  .search-submit {
+    min-width: 72px;
+    min-height: 32px;
+    padding: 0 12px;
+    border-radius: 999px;
+    font-size: 12.5px;
+  }
+  body.home-route .search-mode-btn { padding: 5px 8px; font-size: 11.5px; }
+  .home-search-chips { width: 100%; margin: -4px auto 14px; justify-content: flex-start; padding: 0 2px; }
   .home-search-chip { font-size: 11.5px; padding: 4px 9px; }
   .home-card-grid { grid-template-columns: minmax(0, 1fr); gap: 10px; }
   .home-journal-card { min-height: 0; padding: 14px 14px 13px; }
   .home-card-title { font-size: 15.5px; }
   .home-card-fav .fav-star { width: 30px; height: 30px; min-width: 30px; background: transparent; }
-  body.topbar-compact .search-wrap > #q { height: 46px; min-height: 46px; padding: 0 86px 0 14px; font-size: 14px; }
-  body.home-route.topbar-compact .search-wrap > #q { padding-right: 148px; }
-  body.topbar-compact .search-submit { min-width: 74px; min-height: 34px; padding: 0 10px; }
-  body.home-route .search-mode-btn { padding: 6px 9px; font-size: 11.5px; }
   .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
   .top-actions { order: 0; justify-content: flex-end; gap: 4px; padding: 2px 0; }
   .tab-panel { order: 4; }
   .tab-panel[data-panel="home"] { order: 4; }
-  .home-hero { padding: 28px 4px 0; }
+  .home-hero { padding: 20px 4px 0; }
   .home-title {
     margin-top: 8px;
     font-size: 18px;
@@ -4787,35 +4873,25 @@ td.empty,
     white-space: nowrap;
   }
   .home-logo-mark { width: 36px; height: 36px; border-radius: 11px; }
-  .search-wrap {
-    flex: 1 1 auto;
-    min-width: 0;
-    width: auto;
-    order: 1;
-  }
   .top-actions .lang-toggle, .top-actions .auth-btn {
     padding: 6px 10px;
     font-size: 12px;
     height: 32px;
     display: inline-flex; align-items: center;
   }
-  .search-wrap > #q { min-height: 132px; padding: 18px 18px 64px; font-size: 16px; }
   .hint { display: none; }
   .search-actions {
     left: auto;
-    right: 6px;
+    right: 5px;
     top: 50%;
     bottom: auto;
     transform: translateY(-50%);
+    gap: 4px;
   }
   .search-meta { font-size: 10.5px; }
   .search-meta-group {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
-    max-width: calc(100% - 118px);
+    display: none !important; /* 手机不在搜索条内塞 meta，避免撑高 */
   }
-  .search-submit { min-width: 86px; min-height: 42px; padding: 0 12px; border-radius: 15px; font-size: 13px; }
   .col-name { min-width: 130px; width: 26%; }
   .jname { font-size: 13px !important; }
   table.journals th, table.journals td { padding: 6px 5px; }
@@ -9553,8 +9629,8 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 /* ═══════ 手机端：筛选菜单按钮(☰)固定到左上角 ═══════ */
 @media (max-width: 900px) {
   .side-toggle {
-    position: fixed; top: 12px; left: 12px; z-index: 61;
-    width: 40px; height: 40px; border-radius: 999px;
+    position: fixed !important; top: 10px !important; left: 10px !important; z-index: 150 !important;
+    width: 36px; height: 36px; border-radius: 999px;
     background: var(--paper); border: 1px solid var(--rule);
     box-shadow: 0 2px 8px -3px rgba(60,48,36,.25);
   }
