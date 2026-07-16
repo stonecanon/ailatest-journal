@@ -1,6 +1,6 @@
 {
   "$schema_note": "AILatest Journal 插件/网站共用权限配置。服务端为唯一权威来源，客户端只读不判权。版本号变更时客户端需重新拉取。",
-  "version": "2026-07-15.4",
+  "version": "2026-07-15.9",
   "status": "pro_coming_soon",
   "model": {
     "provider": "DeepSeek",
@@ -104,7 +104,7 @@
             "retraction": false,
             "cnkx_tier": false,
             "publish_fee": false,
-            "note": "插件仅基础 IF/JCR/收录；中科院/预警/发表费用/导出联动 Pro 起开放；原文查找终身 30 篇"
+            "note": "插件仅基础 IF/JCR/收录；中科院/发表费用 Pro 起；预警·撤稿·科协与导出联动 Max；原文终身 30 篇"
           }
         }
       }
@@ -135,7 +135,7 @@
       }
     },
     "plus": {
-      "note": "高频刷刊 / 插件重度用户；含中科院与预警；不含 AI credits",
+      "note": "高频刷刊；插件中科院/新锐；预警·撤稿·科协仅 Max；AI 500 credits；原文每月 200",
       "features": {
         "badge_display": true,
         "journal_detail": true,
@@ -161,21 +161,36 @@
         "tags": false,
         "notes": false,
         "submission_history": false,
-        "export": {
-          "formats": ["csv", "ris", "bibtex", "markdown"]
+        "export": false,
+        "integrations": false,
+        "fulltext": { "max_per_month": 200 },
+        "ai": {
+          "enabled": true,
+          "monthly_credits": 500,
+          "credits_rollover": false,
+          "note": "500 credits ≈ 50 次完整荐刊（10 credits/次）；Max 为 1000"
         },
-        "integrations": ["zotero", "notion", "obsidian", "endnote"],
-        "fulltext": { "max_total": null },
-        "ai": false,
         "extension": {
           "queries_per_day": 20000,
           "devices": 2,
-          "sites": "enhanced",
+          "sites": "basic",
           "advanced_sort": true,
-          "export": true,
-          "integrations": true,
-          "fulltext": { "max_total": null },
-          "copy": "高额度 · 日常刷刊无压力（对外不写「不限」；服务端保留防护上限）"
+          "export": false,
+          "integrations": false,
+          "fulltext": { "max_per_month": 200 },
+          "premium_labels": {
+            "cas_zone": true,
+            "cas_top": true,
+            "warning": false,
+            "citic_warning": false,
+            "under_review": false,
+            "on_hold": false,
+            "retraction": false,
+            "cnkx_tier": false,
+            "publish_fee": true,
+            "note": "插件中科院/TOP/新锐/发表费用 Pro 起；预警·撤稿·科协与全站增强识别仅 Max"
+          },
+          "copy": "高额度 · 日常刷刊无压力；原文每月 200 篇（按月重置）；站点识别 basic"
         }
       }
     },
@@ -212,6 +227,7 @@
           "formats": ["csv", "ris", "bibtex", "markdown", "xlsx"]
         },
         "integrations": ["zotero", "notion", "obsidian", "endnote"],
+        "fulltext": { "max_total": null },
         "ai": {
           "enabled": true,
           "monthly_credits": 1000,
@@ -223,15 +239,31 @@
           "devices": 4,
           "sites": "enhanced",
           "advanced_sort": true,
-          "copy": "高额度 · 多端科研无感（对外不写「不限」）"
+          "export": true,
+          "integrations": true,
+          "fulltext": { "max_total": null },
+          "premium_labels": {
+            "cas_zone": true,
+            "cas_top": true,
+            "warning": true,
+            "citic_warning": true,
+            "under_review": true,
+            "on_hold": true,
+            "retraction": true,
+            "cnkx_tier": true,
+            "publish_fee": true,
+            "note": "含预警 · 撤稿 · 科协等风险与分级徽章"
+          },
+          "copy": "高额度 · 多端科研无感；原文不限；风险徽章；全站增强识别；导出联动"
         }
       }
     }
   },
   "pricing": {
-    "currency": "CNY",
+    "currency": "USD",
+    "display": "主价 USD；中文界面括号内显示 CNY 参考价",
     "align_with": "AILatest Todo (docs/PRICING.md)",
-    "note": "与 Todo 同价：Pro ¥58/年、Max ¥68/年；教育 Pro ¥35、Max ¥42",
+    "note": "主价 USD：Pro $7.99/年、Max $9.99/年；教育 Pro $4.99、Max $5.99。CNY 对照：¥58 / ¥68 / 教育 ¥35 / ¥42",
     "plans": [
       {
         "id": "plus_monthly",
@@ -335,26 +367,17 @@
         "note": "即使用满 50 次荐刊，API 成本仍远低于 ¥1；6000 credits 按 Flash 计费过于虚高，故改为 500"
       }
     },
-    "packs": [
-      {
-        "id": "credits_300",
-        "price": 12,
-        "amount": 300,
-        "expires": false,
-        "note": "≈30 次完整荐刊；¥0.04/credit，略高于订阅内含单价"
-      },
-      {
-        "id": "credits_1000",
-        "price": 36,
-        "amount": 1000,
-        "expires": false,
-        "note": "≈100 次完整荐刊"
-      }
-    ],
+    "packs": [],
+    "packs_note": "不做 credits 加油包（需求弱，产品侧不开放）",
+    "monthly_plus_allowance": {
+      "amount": 500,
+      "rollover": false,
+      "note": "产品名 Pro：按自然月发放 500 credits，月底清零"
+    },
     "monthly_pro_allowance": {
       "amount": 1000,
       "rollover": false,
-      "note": "Max 订阅按自然月发放，月底清零；加油包永不过期；消耗顺序：先月度额度，再加油包"
+      "note": "产品名 Max：按自然月发放 1000 credits，月底清零；不提供加油包"
     },
     "pro_monthly_1000_credits": {
       "full_picks": 100,

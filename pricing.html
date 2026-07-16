@@ -2,17 +2,734 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>订阅 | AILatest Journal</title>
-<meta name="description" content="AILatest Journal 订阅方案已并入首页。" />
-<link rel="canonical" href="https://journal.ailatest.org/#pricing" />
-<meta http-equiv="refresh" content="0;url=/#pricing" />
-<script>location.replace('/#pricing');</script>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>订阅与定价 | AILatest Journal</title>
+<meta name="description" content="AILatest Journal 订阅：Free / Pro / Max。网站查刊永久免费；Pro 提升插件与额度；Max 含高额度 AI 荐刊与完整工作流。支持年付 / 月付与教育价。" />
+<link rel="canonical" href="https://journal.ailatest.org/pricing" />
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
+<link rel="stylesheet" href="/css/static.css?v=20260716-pricing-v2" />
+<style>
+  :root {
+    --ink: #1c1917;
+    --muted: #78716c;
+    --faint: #a8a29e;
+    --line: rgba(90, 70, 50, .1);
+    --accent: #f97316;
+    --deep: #c2410c;
+    --paper: #f7f2e8;
+  }
+
+  body[data-static-page="pricing"] {
+    background:
+      linear-gradient(90deg, rgba(164,143,107,.05) 1px, transparent 1px),
+      linear-gradient(180deg, rgba(164,143,107,.04) 1px, transparent 1px),
+      linear-gradient(180deg, #fffefb 0%, #f7f2e8 100%);
+    background-size: 96px 96px, 96px 96px, auto;
+  }
+
+  .pricing-page {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 28px 20px 72px;
+  }
+
+  /* Hero */
+  .pricing-hero {
+    text-align: center;
+    max-width: 720px;
+    margin: 8px auto 28px;
+  }
+  .pricing-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: #c2410c;
+    background: rgba(249,115,22,.08);
+    border: 1px solid rgba(249,115,22,.16);
+    border-radius: 999px;
+    padding: 5px 12px;
+    margin-bottom: 14px;
+  }
+  .pricing-hero h1 {
+    margin: 0 0 12px;
+    font-size: clamp(26px, 4vw, 36px);
+    font-weight: 820;
+    letter-spacing: -.03em;
+    line-height: 1.15;
+    color: var(--ink);
+  }
+  .pricing-hero .sub {
+    margin: 0 auto;
+    max-width: 560px;
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.65;
+  }
+
+  /* Billing toggle */
+  .billing-bar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 18px;
+  }
+  .billing-toggle {
+    display: inline-flex;
+    gap: 4px;
+    padding: 4px;
+    border-radius: 999px;
+    background: #fff;
+    border: 1px solid var(--line);
+    box-shadow: 0 6px 18px rgba(40,28,16,.05);
+  }
+  .billing-toggle-btn {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    font: inherit;
+    font-size: 13.5px;
+    font-weight: 720;
+    color: #78716c;
+    padding: 9px 20px;
+    border-radius: 999px;
+    min-width: 84px;
+    transition: background .15s, color .15s, box-shadow .15s;
+  }
+  .billing-toggle-btn.is-on {
+    background: linear-gradient(180deg, #fb923c, #f97316);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(249,115,22,.28);
+  }
+  .billing-note {
+    font-size: 12.5px;
+    color: var(--faint);
+    margin: 0;
+    text-align: center;
+  }
+  .billing-save {
+    display: inline-flex;
+    margin-left: 6px;
+    font-size: 10.5px;
+    font-weight: 800;
+    color: #c2410c;
+    background: #fff7ed;
+    border-radius: 999px;
+    padding: 2px 7px;
+    vertical-align: middle;
+  }
+
+  /* Edu status */
+  .edu-status {
+    max-width: 720px;
+    margin: 0 auto 20px;
+    padding: 12px 16px;
+    border-radius: 14px;
+    background: #fff7ed;
+    border: 1px solid rgba(249,115,22,.2);
+    color: #9a3412;
+    font-size: 13.5px;
+    line-height: 1.55;
+    text-align: center;
+  }
+  .edu-status[data-state="ok"] {
+    background: #ecfdf5;
+    border-color: rgba(4,120,87,.2);
+    color: #047857;
+  }
+  .edu-status[data-state="login"] {
+    background: #fafaf9;
+    border-color: rgba(90,70,50,.1);
+    color: #57534e;
+  }
+  .edu-status[hidden] { display: none !important; }
+
+  /* Plans */
+  .plans {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin: 0 0 36px;
+    align-items: stretch;
+  }
+  .plan {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 22px 20px 18px;
+    border-radius: 20px;
+    background: #fff;
+    border: 1px solid rgba(90,70,50,.08);
+    box-shadow: 0 10px 28px rgba(40,28,16,.05);
+    transition: transform .15s, box-shadow .15s;
+  }
+  .plan:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 36px rgba(40,28,16,.08);
+  }
+  .plan-hot {
+    border-color: rgba(249,115,22,.38);
+    background: linear-gradient(180deg, #fffdfb 0%, #fff7ed 100%);
+    box-shadow: 0 14px 36px rgba(249,115,22,.12);
+  }
+  .plan-tag {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    font-size: 11px;
+    font-weight: 800;
+    color: #fff;
+    background: linear-gradient(135deg, #fb923c, #ea580c);
+    border-radius: 999px;
+    padding: 4px 10px;
+    box-shadow: 0 4px 10px rgba(249,115,22,.25);
+  }
+  .plan-name {
+    margin: 0 0 2px;
+    font-size: 20px;
+    font-weight: 820;
+    letter-spacing: -.02em;
+    color: var(--ink);
+  }
+  .plan-desc {
+    margin: 0 0 14px;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.45;
+  }
+  .plan-price {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin: 0 0 4px;
+  }
+  .plan-price .amt {
+    font-size: 34px;
+    font-weight: 840;
+    color: #b45309;
+    letter-spacing: -.04em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .plan-price .unit {
+    font-size: 14px;
+    font-weight: 650;
+    color: var(--faint);
+  }
+  .plan-was {
+    margin: 0 0 16px;
+    font-size: 12.5px;
+    color: var(--faint);
+    text-decoration: line-through;
+  }
+  .plan-was[hidden] { display: none !important; }
+  .plan ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 18px;
+    display: grid;
+    gap: 9px;
+    flex: 1;
+  }
+  .plan ul li {
+    position: relative;
+    padding-left: 22px;
+    font-size: 13.5px;
+    color: #44403c;
+    line-height: 1.4;
+  }
+  .plan ul li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 5px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: rgba(249,115,22,.12);
+    box-shadow: inset 0 0 0 1px rgba(249,115,22,.2);
+  }
+  .plan ul li::after {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 8px;
+    width: 5px;
+    height: 3px;
+    border-left: 1.6px solid #ea580c;
+    border-bottom: 1.6px solid #ea580c;
+    transform: rotate(-45deg);
+  }
+  .plan-actions {
+    display: grid;
+    gap: 8px;
+    margin-top: auto;
+  }
+  .plan-btn {
+    appearance: none;
+    width: 100%;
+    min-height: 44px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 750;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    transition: transform .12s, box-shadow .12s, opacity .12s;
+  }
+  .plan-btn:active { transform: scale(.98); }
+  .plan-btn-primary {
+    background: linear-gradient(180deg, #fb923c, #f97316);
+    color: #fff;
+    box-shadow: 0 8px 18px rgba(249,115,22,.28);
+  }
+  .plan-btn-ghost {
+    background: #fff;
+    border-color: rgba(90,70,50,.14);
+    color: var(--ink);
+  }
+  .plan-btn-edu {
+    background: #f0fdf6;
+    border-color: rgba(4,120,87,.2);
+    color: #047857;
+    font-size: 13px;
+    min-height: 40px;
+  }
+  .plan-btn-edu.edu-locked {
+    opacity: .78;
+    color: #78716c;
+    border-color: rgba(90,70,50,.12);
+    background: #fafaf9;
+  }
+
+  /* Section titles */
+  .sec-head {
+    margin: 8px 0 14px;
+  }
+  .sec-head h2 {
+    margin: 0 0 6px;
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -.02em;
+    color: var(--ink);
+  }
+  .sec-head p {
+    margin: 0;
+    font-size: 13.5px;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+
+  /* Compare table */
+  .compare-wrap {
+    overflow-x: auto;
+    margin: 0 0 28px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 8px 24px rgba(40,28,16,.04);
+  }
+  .compare {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+    min-width: 640px;
+  }
+  .compare th,
+  .compare td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid #f0ebe3;
+    vertical-align: top;
+  }
+  .compare th {
+    background: #faf7f0;
+    font-weight: 750;
+    white-space: nowrap;
+    color: #44403c;
+  }
+  .compare tr:last-child td { border-bottom: 0; }
+  .compare td.y { color: #c2410c; font-weight: 750; }
+  .compare td.n { color: #a8a29e; }
+  .compare .feat {
+    color: #44403c;
+    font-weight: 650;
+    min-width: 168px;
+  }
+  .compare tbody tr:hover td { background: #fffcf7; }
+
+  /* Guide cards */
+  .guide-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin: 0 0 28px;
+  }
+  .guide-card {
+    padding: 16px;
+    border-radius: 14px;
+    background: #fff;
+    border: 1px solid var(--line);
+  }
+  .guide-card strong {
+    display: block;
+    font-size: 14px;
+    font-weight: 780;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .guide-card p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+  .guide-card .who {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 750;
+    color: #c2410c;
+    background: #fff7ed;
+    border-radius: 999px;
+    padding: 2px 8px;
+    margin-bottom: 8px;
+  }
+
+  /* Note */
+  .note-box {
+    padding: 16px 18px;
+    border-radius: 14px;
+    background: #fff;
+    border: 1px solid var(--line);
+    font-size: 13.5px;
+    color: #57534e;
+    line-height: 1.65;
+    margin-bottom: 24px;
+  }
+  .note-box b { color: var(--ink); }
+  .note-box a { color: #c2410c; font-weight: 650; }
+
+  .back-row {
+    text-align: center;
+    margin-top: 8px;
+  }
+  .back-home {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 720;
+    color: #c2410c;
+    text-decoration: none;
+  }
+  .back-home:hover { text-decoration: underline; }
+
+  /* 仅隐藏非当前语言面板，保留 grid/table 自身 display */
+  html[lang="en"] [data-lang-panel="zh-CN"],
+  html[data-static-lang="en"] [data-lang-panel="zh-CN"],
+  html[data-ui-lang="en"] [data-lang-panel="zh-CN"] {
+    display: none !important;
+  }
+  html[lang="zh-CN"] [data-lang-panel="en"],
+  html[lang="zh"] [data-lang-panel="en"],
+  html[data-static-lang="zh-CN"] [data-lang-panel="en"],
+  html[data-ui-lang="zh-CN"] [data-lang-panel="en"],
+  html:not([lang="en"]):not([data-static-lang="en"]):not([data-ui-lang="en"]) [data-lang-panel="en"] {
+    display: none !important;
+  }
+
+  @media (max-width: 900px) {
+    .plans,
+    .guide-grid {
+      grid-template-columns: 1fr;
+      max-width: 420px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .pricing-page { padding: 18px 14px 56px; }
+  }
+</style>
 </head>
-<body>
-  <p style="font:14px/1.5 system-ui,sans-serif;padding:24px;color:#57534e">
-    订阅方案已移至首页。若未自动跳转，请打开
-    <a href="/#pricing">journal.ailatest.org/#pricing</a>。
+<body data-static-page="pricing" data-billing="year">
+<aside class="app-rail" aria-label="Primary navigation">
+  <nav class="rail-top" aria-label="站点">
+    <a class="rail-nav-btn" href="/global" aria-label="全球期刊" title="全球期刊">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 3.4 9A14 14 0 0 1 12 21a14 14 0 0 1-3.4-9A14 14 0 0 1 12 3Z"/></svg>
+      <span>全球</span>
+    </a>
+    <a class="rail-nav-btn rail-region-station" data-region-station="dom" href="/cn" aria-label="中国期刊" title="中国期刊">
+      <span class="rail-flag" aria-hidden="true">CN</span>
+      <span>中国</span>
+    </a>
+  </nav>
+  <div class="rail-bottom" aria-label="账户">
+    <a class="rail-nav-btn" href="/favorites" aria-label="我的收藏" title="我的收藏">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.7l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3.7z"/></svg>
+      <span>收藏</span>
+    </a>
+    <a class="rail-nav-btn" href="/account" aria-label="我的" title="我的">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="9" r="3.5"/><path d="M5 19c1.5-3 4-4.5 7-4.5S17.5 16 19 19"/></svg>
+      <span>我的</span>
+    </a>
+  </div>
+</aside>
+
+<header class="page-head">
+  <a class="brand" href="/">AILatest <span>Journal</span></a>
+  <nav class="page-head-nav" aria-label="Site">
+    <a href="/" data-static-i18n="nav_home" data-nav="home">首页</a>
+    <a href="/#feat" data-static-i18n="nav_features" data-nav="features">功能</a>
+    <a href="/pricing" data-static-i18n="nav_pricing" data-nav="pricing">订阅</a>
+    <a href="/#download" data-static-i18n="download_center" data-nav="download">下载</a>
+    <a href="/about" data-static-i18n="nav_about" data-nav="about">关于</a>
+    <a href="/contact" data-static-i18n="nav_contact" data-nav="contact">联系</a>
+    <a class="cta" href="/signup.html?next=%2Fpricing" data-static-i18n="nav_login">注册 / 登录</a>
+    <button class="static-lang-toggle" type="button" data-static-lang-toggle>English</button>
+  </nav>
+</header>
+
+<main class="pricing-page">
+  <div class="pricing-hero">
+    <div class="pricing-kicker">Pricing</div>
+    <div data-lang-panel="zh-CN">
+      <h1>选择适合你的方案</h1>
+      <p class="sub">网站查刊 Free 永久可用。升级 Pro / Max 解锁插件深度徽章、云收藏、AI 荐刊配额与完整研究工作流。支持年付 / 月付；机构邮箱可享教育价。</p>
+    </div>
+    <div data-lang-panel="en">
+      <h1>Choose a plan that fits</h1>
+      <p class="sub">Website search stays Free forever. Upgrade to Pro / Max for deeper extension badges, cloud favorites, AI pick quotas and a fuller research workflow. Yearly or monthly; institutional emails get education pricing.</p>
+    </div>
+  </div>
+
+  <div class="billing-bar">
+    <div class="billing-toggle" role="group" aria-label="Billing period">
+      <button type="button" class="billing-toggle-btn is-on" data-billing-toggle="year" aria-pressed="true">
+        <span data-lang-panel="zh-CN">年付</span><span data-lang-panel="en">Yearly</span>
+        <span class="billing-save" data-lang-panel="zh-CN">更划算</span>
+        <span class="billing-save" data-lang-panel="en">Save</span>
+      </button>
+      <button type="button" class="billing-toggle-btn" data-billing-toggle="month" aria-pressed="false">
+        <span data-lang-panel="zh-CN">月付</span><span data-lang-panel="en">Monthly</span>
+      </button>
+    </div>
+    <p class="billing-note" data-billing-note>价格 USD · 年付 · 下方划线为原价（更划算）</p>
+  </div>
+
+  <p class="edu-status" data-edu-status hidden></p>
+
+  <div class="plans">
+    <article class="plan">
+      <h2 class="plan-name">Free</h2>
+      <p class="plan-desc" data-lang-panel="zh-CN">日常检索与轻量试用</p>
+      <p class="plan-desc" data-lang-panel="en">Everyday search &amp; light trials</p>
+      <div class="plan-price">
+        <span class="amt">$0</span>
+        <span class="unit" data-lang-panel="zh-CN">/ 永久</span>
+        <span class="unit" data-lang-panel="en">/ forever</span>
+      </div>
+      <p class="plan-was" hidden aria-hidden="true"></p>
+      <ul data-lang-panel="zh-CN">
+        <li>网站完整检索与期刊详情</li>
+        <li>基础插件徽章（IF / JCR / 收录）</li>
+        <li>有限的 AI 荐刊试用</li>
+      </ul>
+      <ul data-lang-panel="en">
+        <li>Full website search &amp; journal pages</li>
+        <li>Basic extension badges (IF / JCR / indexes)</li>
+        <li>Limited AI journal-pick trials</li>
+      </ul>
+      <div class="plan-actions">
+        <a class="plan-btn plan-btn-ghost" href="/">
+          <span data-lang-panel="zh-CN">继续免费使用</span>
+          <span data-lang-panel="en">Stay on Free</span>
+        </a>
+      </div>
+    </article>
+
+    <article class="plan">
+      <h2 class="plan-name">Pro</h2>
+      <p class="plan-desc" data-lang-panel="zh-CN">高频刷刊 · 插件进阶</p>
+      <p class="plan-desc" data-lang-panel="en">Power users · extension upgrades</p>
+      <div class="plan-price" data-plan-price="pro">
+        <span class="amt" data-price-amt>$7.99</span>
+        <span class="unit" data-price-unit>/ 年</span>
+      </div>
+      <p class="plan-was" data-plan-was="pro">原价 $11.99</p>
+      <ul data-lang-panel="zh-CN">
+        <li>插件：中科院 / TOP / 新锐徽章</li>
+        <li>云收藏 50 本 · 清单 5 个</li>
+        <li>AI 荐刊 500 credits / 月</li>
+        <li>发表费用（APC）信息可见</li>
+        <li>更高原文额度（按月）</li>
+      </ul>
+      <ul data-lang-panel="en">
+        <li>Extension: CAS / TOP / Emerging badges</li>
+        <li>50 cloud favorites · 5 lists</li>
+        <li>500 AI credits / month</li>
+        <li>Publish-fee (APC) details visible</li>
+        <li>Higher full-text monthly quota</li>
+      </ul>
+      <div class="plan-actions">
+        <button type="button" class="plan-btn plan-btn-primary" data-creem-checkout data-plan="pro" data-period="year">订阅 Pro · 年付</button>
+        <button type="button" class="plan-btn plan-btn-edu" data-creem-checkout data-plan="pro" data-period="year" data-edu="1">教育价 · 需机构邮箱</button>
+      </div>
+    </article>
+
+    <article class="plan plan-hot">
+      <span class="plan-tag" data-lang-panel="zh-CN">推荐</span>
+      <span class="plan-tag" data-lang-panel="en">Best</span>
+      <h2 class="plan-name">Max</h2>
+      <p class="plan-desc" data-lang-panel="zh-CN">完整工作流 · 高额度 AI</p>
+      <p class="plan-desc" data-lang-panel="en">Full workflow · high AI quota</p>
+      <div class="plan-price" data-plan-price="max">
+        <span class="amt" data-price-amt>$9.99</span>
+        <span class="unit" data-price-unit>/ 年</span>
+      </div>
+      <p class="plan-was" data-plan-was="max">原价 $14.99</p>
+      <ul data-lang-panel="zh-CN">
+        <li>插件：预警 / 撤稿 / 科协风险徽章</li>
+        <li>云收藏与清单不设上限</li>
+        <li>AI 荐刊 1000 credits / 月</li>
+        <li>导出（CSV / RIS / BibTeX 等）</li>
+        <li>更多地区站与设备额度</li>
+      </ul>
+      <ul data-lang-panel="en">
+        <li>Extension: warning / retraction / CAST risk badges</li>
+        <li>Unlimited cloud favorites &amp; lists</li>
+        <li>1000 AI credits / month</li>
+        <li>Export (CSV / RIS / BibTeX, etc.)</li>
+        <li>More regions &amp; device slots</li>
+      </ul>
+      <div class="plan-actions">
+        <button type="button" class="plan-btn plan-btn-primary" data-creem-checkout data-plan="max" data-period="year">订阅 Max · 年付</button>
+        <button type="button" class="plan-btn plan-btn-edu" data-creem-checkout data-plan="max" data-period="year" data-edu="1">教育价 · 需机构邮箱</button>
+      </div>
+    </article>
+  </div>
+
+  <div class="sec-head" data-lang-panel="zh-CN">
+    <h2>怎么选？</h2>
+    <p>按使用场景快速判断，网站查刊三档均可使用。</p>
+  </div>
+  <div class="sec-head" data-lang-panel="en">
+    <h2>Which plan?</h2>
+    <p>Pick by workflow. Website journal search is available on every plan.</p>
+  </div>
+
+  <div class="guide-grid" data-lang-panel="zh-CN">
+    <div class="guide-card">
+      <span class="who">Free</span>
+      <strong>只在网页查刊</strong>
+      <p>看 IF、分区、收录与详情即可，无需插件深度徽章或云收藏。</p>
+    </div>
+    <div class="guide-card">
+      <span class="who">Pro</span>
+      <strong>日常刷刊 + 插件</strong>
+      <p>Scholar / PubMed 刷刊需要中科院徽章，并希望有云收藏与 AI 荐刊额度。</p>
+    </div>
+    <div class="guide-card">
+      <span class="who">Max</span>
+      <strong>风险信号 + 导出</strong>
+      <p>需要预警 / 撤稿信号、导出到文献库，以及更高 AI 与设备额度。</p>
+    </div>
+  </div>
+  <div class="guide-grid" data-lang-panel="en">
+    <div class="guide-card">
+      <span class="who">Free</span>
+      <strong>Web-only lookup</strong>
+      <p>Check IF, quartiles, indexes and journal pages without extension depth or cloud lists.</p>
+    </div>
+    <div class="guide-card">
+      <span class="who">Pro</span>
+      <strong>Daily browsing + extension</strong>
+      <p>Need CAS badges on Scholar / PubMed, plus cloud favorites and AI pick quota.</p>
+    </div>
+    <div class="guide-card">
+      <span class="who">Max</span>
+      <strong>Risk signals + export</strong>
+      <p>Want warning / retraction signals, export to reference managers, and higher AI / device limits.</p>
+    </div>
+  </div>
+
+  <div class="sec-head" data-lang-panel="zh-CN">
+    <h2>方案对比</h2>
+    <p>按当前产品权益整理，便于投稿前选型。</p>
+  </div>
+  <div class="sec-head" data-lang-panel="en">
+    <h2>Compare plans</h2>
+    <p>Current product entitlements at a glance.</p>
+  </div>
+
+  <div class="compare-wrap">
+    <table class="compare" data-lang-panel="zh-CN">
+      <thead>
+        <tr><th class="feat">能力</th><th>Free</th><th>Pro</th><th>Max</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="feat">网站检索与详情</td><td class="y">完整</td><td class="y">完整</td><td class="y">完整</td></tr>
+        <tr><td class="feat">插件基础徽章（IF / JCR / 收录）</td><td class="y">有</td><td class="y">有</td><td class="y">有</td></tr>
+        <tr><td class="feat">插件中科院 / TOP / 新锐</td><td class="n">—</td><td class="y">有</td><td class="y">有</td></tr>
+        <tr><td class="feat">插件预警 / 撤稿 / 科协风险</td><td class="n">—</td><td class="n">—</td><td class="y">有</td></tr>
+        <tr><td class="feat">发表费用 / APC 详情</td><td class="n">—</td><td class="y">有</td><td class="y">有</td></tr>
+        <tr><td class="feat">云收藏与清单</td><td class="n">—</td><td class="y">50 本 · 5 清单</td><td class="y">不限</td></tr>
+        <tr><td class="feat">AI 荐刊 credits / 月</td><td class="n">试用</td><td class="y">500</td><td class="y">1000</td></tr>
+        <tr><td class="feat">导出与文献联动</td><td class="n">—</td><td class="n">—</td><td class="y">有</td></tr>
+        <tr><td class="feat">插件查询额度 / 设备数</td><td class="n">基础</td><td class="y">更高 · 2 台</td><td class="y">最高 · 4 台</td></tr>
+        <tr><td class="feat">年付参考价（USD）</td><td class="y">$0</td><td class="y">$7.99</td><td class="y">$9.99</td></tr>
+        <tr><td class="feat">教育年付（机构邮箱）</td><td class="n">—</td><td class="y">$4.99</td><td class="y">$5.99</td></tr>
+      </tbody>
+    </table>
+    <table class="compare" data-lang-panel="en">
+      <thead>
+        <tr><th class="feat">Capability</th><th>Free</th><th>Pro</th><th>Max</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="feat">Website search &amp; detail</td><td class="y">Full</td><td class="y">Full</td><td class="y">Full</td></tr>
+        <tr><td class="feat">Extension basic badges (IF / JCR / indexes)</td><td class="y">Yes</td><td class="y">Yes</td><td class="y">Yes</td></tr>
+        <tr><td class="feat">Extension CAS / TOP / Emerging</td><td class="n">—</td><td class="y">Yes</td><td class="y">Yes</td></tr>
+        <tr><td class="feat">Extension warning / retraction / CAST risk</td><td class="n">—</td><td class="n">—</td><td class="y">Yes</td></tr>
+        <tr><td class="feat">Publish fee / APC details</td><td class="n">—</td><td class="y">Yes</td><td class="y">Yes</td></tr>
+        <tr><td class="feat">Cloud favorites &amp; lists</td><td class="n">—</td><td class="y">50 · 5 lists</td><td class="y">Unlimited</td></tr>
+        <tr><td class="feat">AI pick credits / month</td><td class="n">Trial</td><td class="y">500</td><td class="y">1000</td></tr>
+        <tr><td class="feat">Export &amp; integrations</td><td class="n">—</td><td class="n">—</td><td class="y">Yes</td></tr>
+        <tr><td class="feat">Extension query quota / devices</td><td class="n">Basic</td><td class="y">Higher · 2 devices</td><td class="y">Highest · 4 devices</td></tr>
+        <tr><td class="feat">Yearly price (USD)</td><td class="y">$0</td><td class="y">$7.99</td><td class="y">$9.99</td></tr>
+        <tr><td class="feat">Edu yearly (institutional email)</td><td class="n">—</td><td class="y">$4.99</td><td class="y">$5.99</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note-box" data-lang-panel="zh-CN">
+    <b>教育价与支付说明</b><br>
+    · 机构邮箱（.edu / .edu.cn / .ac.* 等）登录后可解锁教育价；普通个人邮箱无法支付教育价。<br>
+    · 年付通常比月付更划算。支付由安全收银台完成；退款政策见 <a href="/refund">退款页</a>。<br>
+    · 已登录非机构邮箱时，教育价按钮会锁定，请改用机构邮箱重新登录。
+  </div>
+  <div class="note-box" data-lang-panel="en">
+    <b>Education pricing &amp; checkout</b><br>
+    · Institutional emails (.edu / .edu.cn / .ac.*, etc.) unlock education pricing after sign-in. Personal emails cannot use edu checkout.<br>
+    · Yearly is usually better value than monthly. Checkout is handled securely; see the <a href="/refund">refund policy</a>.<br>
+    · If you are signed in with a non-institutional email, education buttons stay locked until you switch accounts.
+  </div>
+
+  <p class="back-row">
+    <a class="back-home" href="/">← <span data-lang-panel="zh-CN">返回首页</span><span data-lang-panel="en">Back to home</span></a>
   </p>
+</main>
+
+<script src="/js/static-i18n.js?v=20260716-pricing-v2" defer></script>
+<script src="/js/pricing-checkout.js?v=20260716-billing-toggle" defer></script>
+<script src="/js/site-rail.js" defer></script>
 </body>
 </html>

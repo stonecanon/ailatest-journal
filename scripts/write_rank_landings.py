@@ -1,0 +1,183 @@
+# -*- coding: utf-8 -*-
+"""Rewrite /indexes/ and /indexes/warning/ landings as clean UTF-8 V7 board pages.
+Run: python scripts/write_rank_landings.py
+"""
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+CACHE = "20260716-rank-rebuild"
+
+SHELL = r'''<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{title}</title>
+<meta name="description" content="{desc}">
+<link rel="canonical" href="{canonical}">
+<meta name="robots" content="index,follow">
+<meta name="theme-color" content="#f97316">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
+<link rel="stylesheet" href="/css/listing.css?v={cache}">
+<link rel="stylesheet" href="/css/rank-landing.css?v={cache}">
+</head>
+<body class="rank-landing" data-page="{page}">
+<aside class="app-rail" aria-label="Primary">
+  <nav class="rail-top">
+    <a class="rail-nav-btn" href="/global" title="Global">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 3.4 9A14 14 0 0 1 12 21a14 14 0 0 1-3.4-9A14 14 0 0 1 12 3Z"/></svg>
+      <span data-zh="全球" data-en="Global">全球</span>
+    </a>
+    <a class="rail-nav-btn" href="/cn" title="China">
+      <span class="rail-flag">CN</span>
+      <span data-zh="中国" data-en="China">中国</span>
+    </a>
+  </nav>
+  <div class="rail-bottom">
+    <a class="rail-nav-btn active" href="/#rankings" title="Rankings">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 21V11"/><path d="M12 21V7"/><path d="M16 21V3"/><path d="M4 21h16"/></svg>
+      <span data-zh="榜单" data-en="Rank">榜单</span>
+    </a>
+    <a class="rail-nav-btn" href="/favorites" title="Saved">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.7l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3.7z"/></svg>
+      <span data-zh="收藏" data-en="Saved">收藏</span>
+    </a>
+    <a class="rail-nav-btn" href="/account" title="Account">
+      <span class="rail-account-mark" data-zh="我" data-en="Me">我</span>
+      <b data-zh="我的" data-en="Me">我的</b>
+    </a>
+  </div>
+</aside>
+
+<header class="rl-top">
+  <a class="rl-brand" href="/">AILatest <em>Journal</em></a>
+  <span class="rl-kicker" data-zh="期刊榜单" data-en="Rankings">期刊榜单</span>
+  <nav class="rl-nav">
+    <a href="/" data-zh="首页" data-en="Home">首页</a>
+    <a href="/#rankings" data-zh="榜单" data-en="Rankings">榜单</a>
+    <a href="/#download" data-zh="下载" data-en="Download">下载</a>
+    <a href="/pricing" data-zh="订阅" data-en="Pricing">订阅</a>
+    <button type="button" class="rl-lang" id="rl-lang" aria-label="Language">EN</button>
+  </nav>
+</header>
+
+<main class="rl-main">
+  <header class="rl-hero">
+    <h1 data-zh="{h1_zh}" data-en="{h1_en}">{h1_zh}</h1>
+    <p class="rl-crumb">
+      <a href="/" data-zh="首页" data-en="Home">首页</a>
+      <span aria-hidden="true">·</span>
+      <a href="/#rankings" data-zh="榜单" data-en="Rankings">榜单</a>
+      {crumb_extra}
+    </p>
+    <p class="rl-lead" data-zh="{lead_zh}" data-en="{lead_en}">{lead_zh}</p>
+  </header>
+
+  {body}
+
+  <p class="rl-back">
+    <a href="/#rankings" data-zh="← 返回首页榜单" data-en="← Back to rankings">← 返回首页榜单</a>
+  </p>
+</main>
+
+<footer class="rl-foot">
+  <span>© 2026 AILatest Journal</span>
+  <a href="/about" data-zh="关于" data-en="About">关于</a>
+  <a href="/contact" data-zh="联系" data-en="Contact">联系</a>
+  <a href="/terms.html">Terms</a>
+  <a href="/privacy.html">Privacy</a>
+  <a href="/refund.html">Refund</a>
+</footer>
+
+<script src="/js/site-rail.js?v={cache}" defer></script>
+<script src="/js/rank-landing.js?v={cache}" defer></script>
+</body>
+</html>
+'''
+
+INDEX_BODY = r'''
+  <div class="rank-board-grid">
+    <section class="rank-board">
+      <header class="rank-board-head">
+        <h3 data-zh="索引看板" data-en="Index boards">索引看板</h3>
+        <a href="/#rankings" data-zh="全部 →" data-en="All →">全部 →</a>
+      </header>
+      <a class="rank-row" href="/indexes/scie/"><span class="rank-n">1</span><strong>SCIE by IF</strong><span class="rank-pill">Board</span></a>
+      <a class="rank-row" href="/indexes/ssci/"><span class="rank-n">2</span><strong>SSCI by IF</strong><span class="rank-pill">Board</span></a>
+      <a class="rank-row" href="/indexes/ahci/"><span class="rank-n">3</span><strong>AHCI by IF</strong><span class="rank-pill">Board</span></a>
+      <a class="rank-row" href="/indexes/esci/"><span class="rank-n">4</span><strong>ESCI by IF</strong><span class="rank-pill">Board</span></a>
+      <a class="rank-row" href="/indexes/ei/"><span class="rank-n">5</span><strong>EI by IF</strong><span class="rank-pill">Board</span></a>
+      <a class="rank-row" href="/indexes/scopus/"><span class="rank-n">6</span><strong>Scopus</strong><span class="rank-pill">Board</span></a>
+      <a class="rank-row" href="/indexes/medline/"><span class="rank-n">7</span><strong>MEDLINE</strong><span class="rank-pill">Board</span></a>
+    </section>
+    <section class="rank-board rank-board-risk">
+      <header class="rank-board-head">
+        <h3 data-zh="预警 / 风险" data-en="Warning / risk">预警 / 风险</h3>
+        <a href="/indexes/warning/" data-zh="全部 →" data-en="All →">全部 →</a>
+      </header>
+      <a class="rank-row" href="/indexes/cas-warning/"><span class="rank-n rank-n-risk">!</span><strong data-zh="中科院预警" data-en="CAS warning">中科院预警</strong><span class="rank-pill rank-pill-risk">Risk</span></a>
+      <a class="rank-row" href="/indexes/citic-warning/"><span class="rank-n rank-n-risk">!</span><strong data-zh="中信所预警" data-en="CITIC warning">中信所预警</strong><span class="rank-pill rank-pill-risk">Risk</span></a>
+      <a class="rank-row" href="/indexes/on-hold/"><span class="rank-n rank-n-risk">!</span><strong>On Hold</strong><span class="rank-pill rank-pill-risk">Risk</span></a>
+      <a class="rank-row" href="/indexes/under-review/"><span class="rank-n rank-n-risk">!</span><strong>Under Review</strong><span class="rank-pill rank-pill-info">Info</span></a>
+    </section>
+  </div>
+'''
+
+WARN_BODY = r'''
+  <div class="rank-board-grid rank-board-grid-1">
+    <section class="rank-board rank-board-risk">
+      <header class="rank-board-head">
+        <h3 data-zh="预警 / 风险" data-en="Warning / risk">预警 / 风险</h3>
+        <a href="/indexes/" data-zh="索引看板 →" data-en="Indexes →">索引看板 →</a>
+      </header>
+      <a class="rank-row" href="/indexes/cas-warning/"><span class="rank-n rank-n-risk">!</span><strong data-zh="中科院预警" data-en="CAS warning list">中科院预警</strong><span class="rank-pill rank-pill-risk">Risk</span></a>
+      <a class="rank-row" href="/indexes/citic-warning/"><span class="rank-n rank-n-risk">!</span><strong data-zh="中信所预警" data-en="CITIC warning list">中信所预警</strong><span class="rank-pill rank-pill-risk">Risk</span></a>
+      <a class="rank-row" href="/indexes/on-hold/"><span class="rank-n rank-n-risk">!</span><strong>WoS On Hold</strong><span class="rank-pill rank-pill-risk">Risk</span></a>
+      <a class="rank-row" href="/indexes/under-review/"><span class="rank-n rank-n-risk">!</span><strong>Under Review</strong><span class="rank-pill rank-pill-info">Info</span></a>
+    </section>
+  </div>
+'''
+
+
+def write(path: Path, **kwargs):
+    html = SHELL.format(cache=CACHE, **kwargs)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(html, encoding="utf-8", newline="\n")
+    # verify
+    raw = path.read_bytes()
+    assert "索引".encode("utf-8") in raw or "Warning".encode("utf-8") in raw
+    print(f"  wrote {path.relative_to(ROOT)} ({len(raw)} bytes, utf-8)")
+
+
+def main():
+    write(
+        ROOT / "indexes" / "index.html",
+        page="indexes",
+        title="索引排行榜 | AILatest Journal",
+        desc="SCIE / SSCI / AHCI / ESCI / EI / Scopus / MEDLINE 索引榜单与预警名单入口。",
+        canonical="https://journal.ailatest.org/indexes/",
+        h1_zh="索引排行榜",
+        h1_en="Index rankings",
+        lead_zh="索引看板 · 预警名单 · 与主站设计一致，按影响因子浏览期刊。",
+        lead_en="Index boards and warning lists — same layout as the home rankings.",
+        crumb_extra="",
+        body=INDEX_BODY,
+    )
+    write(
+        ROOT / "indexes" / "warning" / "index.html",
+        page="warning",
+        title="预警名单 | AILatest Journal",
+        desc="中科院预警、中信所预警、WoS On Hold、Under Review 名单入口。",
+        canonical="https://journal.ailatest.org/indexes/warning/",
+        h1_zh="预警名单",
+        h1_en="Warning lists",
+        lead_zh="选择一种预警或审查状态，浏览对应期刊。",
+        lead_en="Open a warning or review list to browse matching journals.",
+        crumb_extra='<span aria-hidden="true">·</span> <a href="/indexes/" data-zh="索引" data-en="Indexes">索引</a>',
+        body=WARN_BODY,
+    )
+    print("done")
+
+
+if __name__ == "__main__":
+    main()

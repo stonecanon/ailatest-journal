@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>注册 / 登录 | AILatest Journal</title>
-<meta name="description" content="注册 AILatest Journal：邮箱验证码或 GitHub / Google 一键登录，免费同步收藏与插件登录状态。" />
+<meta name="description" content="注册 AILatest Journal：邮箱验证码�?GitHub / Google 一键登录，免费同步收藏与插件登录状态�? />
 <link rel="canonical" href="https://journal.ailatest.org/signup.html" />
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
 <link rel="stylesheet" href="/css/static.css?v=20260716-base-pages" />
@@ -48,7 +48,7 @@
     <div class="rail-region-picker">
       <button class="rail-nav-btn rail-region-toggle" type="button" aria-label="地区站点" title="地区站点" aria-expanded="false">
         <span class="rail-flag rail-region-symbol" aria-hidden="true">···</span>
-        <span><span>地区</span><b class="rail-caret" aria-hidden="true">▾</b></span>
+        <span><span>地区</span><b class="rail-caret" aria-hidden="true">�?/b></span>
       </button>
       <div class="rail-region-menu" aria-label="地区站点"></div>
     </div>
@@ -69,7 +69,7 @@
   <nav class="page-head-nav" aria-label="Site">
     <a href="/" data-static-i18n="nav_home" data-nav="home">首页</a>
     <a href="/#feat" data-static-i18n="nav_features" data-nav="features">功能</a>
-    <a href="/#pricing" data-static-i18n="nav_pricing" data-nav="pricing">订阅</a>
+    <a href="/pricing" data-static-i18n="nav_pricing" data-nav="pricing">订阅</a>
     <a href="/#download" data-static-i18n="download_center" data-nav="download">下载</a>
     <a href="/about" data-static-i18n="nav_about" data-nav="about">关于</a>
     <a href="/contact" data-static-i18n="nav_contact" data-nav="contact">联系</a>
@@ -79,7 +79,7 @@
 </header>
 <main class="narrow" style="max-width:480px">
   <h1>注册 / 登录</h1>
-  <p class="sub">新邮箱即注册，老邮箱即登录。当前为 Free 版本：云端收藏 5 本、2 个清单；浏览器插件内测版已开放下载。</p>
+  <p class="sub">新邮箱即注册，老邮箱即登录。当前为 Free 版本：云端收�?5 本�? 个清单；浏览器插件内测版已开放下载�?/p>
 
   <div class="card" id="auth-card">
     <form id="email-form" novalidate>
@@ -88,8 +88,8 @@
         <input type="email" id="email" name="email" required autocomplete="email" placeholder="you@university.edu.cn" />
       </div>
       <div class="form-row" id="code-row" hidden>
-        <label for="code">验证码（已发送至上方邮箱，10 分钟内有效）</label>
-        <input type="text" id="code" name="code" inputmode="numeric" pattern="\d{6}" maxlength="6" placeholder="6 位数字" autocomplete="one-time-code" />
+        <label for="code">验证码（已发送至上方邮箱�?0 分钟内有效）</label>
+        <input type="text" id="code" name="code" inputmode="numeric" pattern="\d{6}" maxlength="6" placeholder="6 位数�? autocomplete="one-time-code" />
       </div>
       <button class="btn" type="submit" id="submit-btn" data-step="request">发送验证码</button>
       <p class="form-msg" id="form-msg"></p>
@@ -106,18 +106,17 @@
         Google
       </button>
     </div>
-    <p class="small muted" style="margin-bottom:0">注册即表示同意 <a href="/terms.html">Terms of Service</a> 与 <a href="/privacy.html">Privacy Policy</a>。</p>
+    <p class="small muted" style="margin-bottom:0">注册即表示同�?<a href="/terms.html">Terms of Service</a> �?<a href="/privacy.html">Privacy Policy</a>�?/p>
   </div>
 
   <div class="card" id="done-card" hidden>
-    <h3 style="margin-top:0">✅ 登录成功</h3>
-    <p id="done-msg">正在返回首页…</p>
+    <h3 style="margin-top:0">�?登录成功</h3>
+    <p id="done-msg">正在返回首页�?/p>
   </div>
 </main>
 <script>
 (function () {
-  // 与 js/app.js 保持一致：API 和 OAuth 都使用 api.ailatest.org。
-  const API_BASE = location.hostname === 'localhost' ? 'http://localhost:8787' : 'https://api.ailatest.org';
+  // �?js/app.js 保持一致：API �?OAuth 都使�?api.ailatest.org�?  const API_BASE = location.hostname === 'localhost' ? 'http://localhost:8787' : 'https://api.ailatest.org';
   const AUTH_BASE = API_BASE;
 
   const params   = new URLSearchParams(location.search);
@@ -145,8 +144,7 @@
   }
 
   function finishLogin(token, user) {
-    // 与 SPA 共用同一份本地登录态
-    localStorage.setItem('ailatest.user', JSON.stringify({ ...(user || {}), token }));
+    // �?SPA 共用同一份本地登录�?    localStorage.setItem('ailatest.user', JSON.stringify({ ...(user || {}), token }));
     showDone(user);
   }
 
@@ -157,7 +155,7 @@
     return d;
   }
 
-  // OAuth 回跳：?token=xxx
+  // OAuth 回跳�?token=xxx
   const tokenParam = params.get('token');
   if (tokenParam) {
     fetch(`${API_BASE}/me`, { headers: { Authorization: `Bearer ${tokenParam}` } })
@@ -166,8 +164,7 @@
       .catch((e) => { msg.textContent = e.message; msg.className = 'form-msg err'; });
   }
 
-  // 已登录则直接显示完成态
-  try {
+  // 已登录则直接显示完成�?  try {
     const saved = JSON.parse(localStorage.getItem('ailatest.user') || 'null');
     if (!tokenParam && saved && saved.token) showDone(saved);
   } catch (_) {}
@@ -177,7 +174,7 @@
     const step = btn.dataset.step;
     const email = (form.dataset.email || emailEl.value).trim().toLowerCase();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      msg.textContent = '请输入有效邮箱'; msg.className = 'form-msg err'; return;
+      msg.textContent = '请输入有效邮�?; msg.className = 'form-msg err'; return;
     }
     btn.disabled = true; msg.textContent = ''; msg.className = 'form-msg';
     try {
@@ -192,13 +189,13 @@
         document.getElementById('code-row').hidden = false;
         codeEl.required = true; codeEl.focus();
         btn.dataset.step = 'verify'; btn.textContent = '登录 / 注册';
-        msg.textContent = '验证码已发送，10 分钟内有效'; msg.className = 'form-msg ok';
+        msg.textContent = '验证码已发送，10 分钟内有�?; msg.className = 'form-msg ok';
       } else {
         const r = await fetch(`${API_BASE}/auth/email/verify`, {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, code: codeEl.value.trim() }),
         });
-        const d = await readJson(r, '验证码验证失败');
+        const d = await readJson(r, '验证码验证失�?);
         if (!d.token) throw new Error('验证失败：未收到登录凭证');
         finishLogin(d.token, d.user);
       }
@@ -215,8 +212,7 @@
     }
   });
 
-  // OAuth：回跳到本页以便处理 ?token=（同时保留 ext 标记）
-  document.querySelectorAll('.oauth-row button').forEach((b) => {
+  // OAuth：回跳到本页以便处理 ?token=（同时保�?ext 标记�?  document.querySelectorAll('.oauth-row button').forEach((b) => {
     b.addEventListener('click', () => {
       const back = new URL(location.origin + '/signup.html');
       if (fromExt) back.searchParams.set('ext', '1');

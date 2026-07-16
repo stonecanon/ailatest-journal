@@ -1,6 +1,6 @@
 /**
- * 定价页 Creem 结账：优先走 API（带 userId metadata），失败则回退公开产品链接。
- * 教育价：必须登录且账号为机构邮箱（.edu / .edu.cn / .ac.* 等）才可支付。
+ * 定价 / 结账：年付·月付切换、Creem 结账、教育价校验。
+ * 首页 #pricing 与 /pricing 订阅页共用。
  */
 (() => {
   const FALLBACK = {
@@ -14,27 +14,77 @@
     max_month_edu: 'https://creem.io/product/prod_2Il9sgrjBPMbgCA4eALdCz?discount_code=JNEMAXM',
   };
 
-  /** 与 docs/entitlements.spec.json → billing.edu_verification.domain_whitelist 一致 */
   const EDU_DOMAIN_SUFFIXES = [
     '.edu.cn', '.edu', '.ac.uk', '.ac.jp', '.ac.kr',
     '.edu.au', '.edu.sg', '.edu.hk', '.edu.mo', '.edu.tw',
   ];
 
+  /** 售价 / 原价（划线） */
+  const PLAN_PRICES = {
+    pro: {
+      year: { pay: '$7.99', was: '$11.99' },
+      month: { pay: '$0.99', was: '$1.99' },
+    },
+    max: {
+      year: { pay: '$9.99', was: '$14.99' },
+      month: { pay: '$1.49', was: '$2.99' },
+    },
+  };
   const EDU_PRICES = {
     pro: { year: '$4.99', month: '$0.69' },
     max: { year: '$5.99', month: '$0.89' },
   };
 
+  const BILLING_KEY = 'ailatest.billing.cycle';
   const API_BASE = (window.AILATEST_API_BASE
     || (location.hostname === 'localhost' || location.hostname === '127.0.0.1'
       ? 'http://localhost:8787'
       : 'https://api.ailatest.org'));
 
+  function normalizeLangCode(code) {
+    return String(code || '').trim().toLowerCase().replace(/_/g, '-');
+  }
+
+  function currentUiLang() {
+    // 优先：SPA 实时语言 → 页面 data 属性 → localStorage → html lang
+    const candidates = [];
+    try {
+      if (typeof window.__getJournalUiLang === 'function') {
+        const live = window.__getJournalUiLang();
+        if (live) candidates.push(live);
+      }
+    } catch (_) {}
+    try {
+      if (window.__journalUiLang) candidates.push(window.__journalUiLang);
+    } catch (_) {}
+    candidates.push(
+      document.documentElement.getAttribute('data-ui-lang'),
+      document.documentElement.getAttribute('data-static-lang'),
+      document.documentElement.lang
+    );
+    try {
+      const stored = localStorage.getItem('ailatest.lang');
+      if (stored) candidates.push(stored);
+    } catch (_) {}
+    for (const c of candidates) {
+      const n = normalizeLangCode(c);
+      if (n) return n;
+    }
+    return '';
+  }
+
+  /** 中文界面（简/繁）用中文文案；其它语言用英文结账文案 */
   function isZh() {
-    const lang = (document.documentElement.getAttribute('data-static-lang')
-      || document.documentElement.lang
-      || '').toLowerCase();
-    return lang.startsWith('zh');
+    const raw = currentUiLang();
+    if (raw === 'zh' || raw.startsWith('zh-') || raw.startsWith('zh')) return true;
+    // 静态订阅页默认 lang=zh-CN，且无明确英文信号时按中文
+    const html = normalizeLangCode(document.documentElement.lang);
+    if ((html === 'zh' || html.startsWith('zh')) && !(raw === 'en' || raw.startsWith('en-'))) return true;
+    return false;
+  }
+
+  function L(zh, en) {
+    return isZh() ? zh : en;
   }
 
   function readUser() {
@@ -49,7 +99,6 @@
     const m = String(email || '').trim().toLowerCase().match(/^[^@\s]+@([^@\s]+)$/);
     if (!m) return false;
     const domain = m[1];
-    // 长后缀优先；.edu 匹配 mit.edu，不匹配 foo.education
     return EDU_DOMAIN_SUFFIXES.some((suf) => domain === suf.slice(1) || domain.endsWith(suf));
   }
 
@@ -77,20 +126,116 @@
     location.href = url;
   }
 
+  function getBillingCycle() {
+    const body = document.body?.getAttribute('data-billing');
+    if (body === 'month' || body === 'year') return body;
+    try {
+      const s = localStorage.getItem(BILLING_KEY);
+      if (s === 'month' || s === 'year') return s;
+    } catch (_) {}
+    return 'year';
+  }
+
+  function setBillingCycle(cycle) {
+    const c = cycle === 'month' ? 'month' : 'year';
+    document.body?.setAttribute('data-billing', c);
+    try { localStorage.setItem(BILLING_KEY, c); } catch (_) {}
+    document.querySelectorAll('[data-billing-toggle]').forEach((btn) => {
+      const on = btn.getAttribute('data-billing-toggle') === c;
+      btn.classList.toggle('is-on', on);
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    syncAllPricingUi();
+  }
+
+  function unitLabel(cycle) {
+    if (cycle === 'month') return L('/ 月', '/ month');
+    return L('/ 年', '/ year');
+  }
+
+  function billingNote(cycle) {
+    if (cycle === 'month') {
+      return L(
+        '价格 USD · 月付 · 下方划线为原价',
+        'USD · monthly · strikethrough = list price'
+      );
+    }
+    return L(
+      '价格 USD · 年付 · 下方划线为原价（更划算）',
+      'USD · yearly · strikethrough = list price (best value)'
+    );
+  }
+
   function eduBlockMessage(reason) {
     if (reason === 'login') {
-      return isZh()
-        ? '教育价需使用机构邮箱登录后购买（如 .edu.cn / .edu / .ac.uk）。\n\n前往登录？'
-        : 'Education pricing requires sign-in with an institutional email (.edu / .edu.cn / .ac.uk, etc.).\n\nGo to sign-in?';
+      return L(
+        '教育价需使用机构邮箱登录后购买（如 .edu.cn / .edu / .ac.uk）。\n\n前往登录？',
+        'Education pricing requires sign-in with an institutional email (.edu / .edu.cn / .ac.uk, etc.).\n\nGo to sign-in?'
+      );
     }
-    return isZh()
-      ? '当前登录邮箱不是教育/机构域名，无法使用教育价。\n请改用 .edu.cn、.edu、.ac.uk 等机构邮箱重新登录后再试。'
-      : 'Your signed-in email is not an institutional domain, so education pricing is locked.\nPlease sign in with .edu / .edu.cn / .ac.uk (etc.) and try again.';
+    return L(
+      '当前登录邮箱不是教育/机构域名，无法使用教育价。\n请改用 .edu.cn、.edu、.ac.uk 等机构邮箱重新登录后再试。',
+      'Your signed-in email is not an institutional domain, so education pricing is locked.\nPlease sign in with .edu / .edu.cn / .ac.uk (etc.) and try again.'
+    );
+  }
+
+  /** 普通价卡片金额、CTA、周期文案 */
+  function syncPlanPrices(cycle) {
+    document.querySelectorAll('[data-plan-price]').forEach((el) => {
+      const plan = (el.getAttribute('data-plan-price') || '').toLowerCase();
+      const row = PLAN_PRICES[plan];
+      if (!row) return;
+      const pack = row[cycle] || row.year;
+      const amt = el.querySelector('[data-price-amt]');
+      const unit = el.querySelector('[data-price-unit]');
+      if (amt) amt.textContent = pack.pay;
+      if (unit) unit.textContent = unitLabel(cycle);
+    });
+
+    document.querySelectorAll('[data-plan-was]').forEach((el) => {
+      const plan = (el.getAttribute('data-plan-was') || '').toLowerCase();
+      const row = PLAN_PRICES[plan];
+      if (!row) return;
+      const pack = row[cycle] || row.year;
+      el.textContent = L(`原价 ${pack.was}`, `Was ${pack.was}`);
+      el.hidden = !pack.was;
+    });
+
+    // 含 settings 里的升级按钮：按周期改文案与 data-period
+    document.querySelectorAll('[data-creem-checkout]').forEach((el) => {
+      const isEdu = el.getAttribute('data-edu') === '1' || el.getAttribute('data-edu') === 'true';
+      if (isEdu) return;
+      const plan = (el.getAttribute('data-plan') || '').toLowerCase();
+      if (plan !== 'pro' && plan !== 'max') return;
+      el.setAttribute('data-period', cycle);
+      const name = plan === 'max' ? 'Max' : 'Pro';
+      const isSettings = el.classList.contains('settings-link-row');
+      const text = cycle === 'month'
+        ? (isSettings
+          ? L(`升级 ${name} · 月付`, `Upgrade ${name} · monthly`)
+          : L(`订阅 ${name} · 月付`, `Subscribe ${name} · monthly`))
+        : (isSettings
+          ? L(`升级 ${name} · 年付`, `Upgrade ${name} · yearly`)
+          : L(`订阅 ${name} · 年付`, `Subscribe ${name} · yearly`));
+      if (isSettings) el.innerHTML = `${text}<span>→</span>`;
+      else el.textContent = text;
+    });
+
+    document.querySelectorAll('[data-billing-note]').forEach((node) => {
+      node.textContent = billingNote(cycle);
+    });
+
+    // 同步所有切换按钮选中态
+    document.querySelectorAll('[data-billing-toggle]').forEach((btn) => {
+      const on = btn.getAttribute('data-billing-toggle') === cycle;
+      btn.classList.toggle('is-on', on);
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
   }
 
   function syncEduCtaUi() {
     const elig = eduEligibility();
-    const cycle = document.body.getAttribute('data-billing') === 'month' ? 'month' : 'year';
+    const cycle = getBillingCycle();
 
     document.querySelectorAll('[data-creem-checkout][data-edu="1"], [data-creem-checkout][data-edu="true"]').forEach((el) => {
       el.setAttribute('data-period', cycle === 'month' ? 'month' : 'year');
@@ -102,29 +247,20 @@
       if (elig.ok) {
         el.classList.remove('edu-locked');
         el.removeAttribute('aria-disabled');
-        el.title = isZh()
-          ? `教育邮箱已验证：${elig.email}`
-          : `Edu email verified: ${elig.email}`;
-        el.textContent = isZh()
-          ? `教育${unitZh} ${price}`
-          : `Edu ${unitEn} ${price}`;
+        el.title = L(`机构邮箱已验证：${elig.email}`, `Institutional email verified: ${elig.email}`);
+        el.textContent = L(`教育价 ${price} · ${unitZh}`, `Edu ${price} · ${unitEn}`);
       } else {
         el.classList.add('edu-locked');
         el.setAttribute('aria-disabled', 'true');
         if (elig.reason === 'login') {
-          el.title = isZh()
-            ? '请使用机构邮箱登录后购买教育价'
-            : 'Sign in with an institutional email for edu pricing';
-          el.textContent = isZh()
-            ? `教育价 ${price} · 登录解锁`
-            : `Edu ${price} · sign in`;
+          el.title = L('请使用机构邮箱登录后购买教育价', 'Sign in with an institutional email for education pricing');
+          el.textContent = L(`教育价 ${price} · 登录解锁`, `Edu ${price} · sign in`);
         } else {
-          el.title = isZh()
-            ? `当前邮箱 ${elig.email || '—'} 非教育域名，不可支付教育价`
-            : `Current email ${elig.email || '—'} is not institutional; edu checkout locked`;
-          el.textContent = isZh()
-            ? `教育价 ${price} · 需机构邮箱`
-            : `Edu ${price} · need .edu email`;
+          el.title = L(
+            `当前邮箱 ${elig.email || '—'} 不是机构域名，无法使用教育价`,
+            `Current email ${elig.email || '—'} is not institutional; education checkout is locked`
+          );
+          el.textContent = L(`教育价 ${price} · 需机构邮箱`, `Edu ${price} · institutional email`);
         }
       }
     });
@@ -132,31 +268,60 @@
     document.querySelectorAll('[data-edu-status]').forEach((node) => {
       if (elig.ok) {
         node.hidden = false;
-        node.textContent = isZh()
-          ? `已验证教育邮箱 ${elig.email}，可购买教育价。`
-          : `Institutional email verified (${elig.email}). Edu checkout unlocked.`;
+        node.textContent = L(
+          `已验证机构邮箱 ${elig.email}，可使用教育价。`,
+          `Institutional email verified (${elig.email}). Education pricing is unlocked.`
+        );
         node.dataset.state = 'ok';
       } else if (elig.reason === 'not_edu') {
         node.hidden = false;
-        node.textContent = isZh()
-          ? `当前账号 ${elig.email || ''} 非机构邮箱，教育价按钮已锁定。请改用 .edu / .edu.cn 等邮箱登录。`
-          : `Signed in as ${elig.email || 'non-edu'}; education checkout is locked. Use an institutional email.`;
+        const mail = elig.email || '—';
+        node.textContent = L(
+          `当前登录：${mail}。这不是机构邮箱，教育价暂不可用。请改用 .edu / .edu.cn / .ac.* 等邮箱登录后再试。`,
+          `Signed in as ${mail}. This is not an institutional email, so education pricing is locked. Please sign in with .edu / .edu.cn / .ac.* and try again.`
+        );
         node.dataset.state = 'blocked';
       } else {
         node.hidden = false;
-        node.textContent = isZh()
-          ? '教育价仅限机构邮箱（.edu.cn / .edu / .ac.uk 等）登录后购买；普通邮箱无法支付。'
-          : 'Education pricing is only for institutional emails (.edu / .edu.cn / .ac.uk, etc.) after sign-in.';
+        node.textContent = L(
+          '教育价需使用机构邮箱（.edu / .edu.cn / .ac.uk 等）登录后购买；普通个人邮箱无法支付教育价。',
+          'Education pricing requires sign-in with an institutional email (.edu / .edu.cn / .ac.uk, etc.). Personal emails cannot use edu checkout.'
+        );
         node.dataset.state = 'login';
       }
     });
   }
 
+  function syncAllPricingUi() {
+    const cycle = getBillingCycle();
+    document.body?.setAttribute('data-billing', cycle);
+    document.querySelectorAll('[data-billing-toggle]').forEach((btn) => {
+      const on = btn.getAttribute('data-billing-toggle') === cycle;
+      btn.classList.toggle('is-on', on);
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    syncPlanPrices(cycle);
+    syncEduCtaUi();
+  }
+
+  function bindBillingToggles(scope) {
+    (scope || document).querySelectorAll('[data-billing-toggle]').forEach((btn) => {
+      if (btn.__billingBound) return;
+      btn.__billingBound = true;
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const c = btn.getAttribute('data-billing-toggle') === 'month' ? 'month' : 'year';
+        setBillingCycle(c);
+      });
+    });
+  }
+
   async function startCheckout(el) {
     const plan = (el.getAttribute('data-plan') || 'pro').toLowerCase();
-    const period = (el.getAttribute('data-period') || 'year').toLowerCase();
+    const period = (el.getAttribute('data-period') || getBillingCycle() || 'year').toLowerCase();
     const edu = el.getAttribute('data-edu') === '1' || el.getAttribute('data-edu') === 'true';
     const fb = FALLBACK[fallbackKey(plan, period, edu)] || FALLBACK.pro_year;
+    const nextPath = location.pathname.includes('pricing') ? '/pricing' : '/#pricing';
 
     if (edu) {
       const elig = eduEligibility();
@@ -164,7 +329,7 @@
         if (elig.reason === 'login') {
           const go = confirm(eduBlockMessage('login'));
           if (go) {
-            location.href = '/signup.html?next=' + encodeURIComponent('/#pricing');
+            location.href = '/signup.html?next=' + encodeURIComponent(nextPath);
           }
         } else {
           alert(eduBlockMessage('not_edu'));
@@ -176,15 +341,13 @@
     const user = readUser();
     const token = user && user.token;
 
-    // 普通价：未登录可继续公开链接（webhook 靠邮箱匹配）；教育价绝不通此路径
     if (!token) {
-      const go = confirm(
-        isZh()
-          ? '建议先登录后再订阅，以便权益自动到账。\n\n确定继续前往收银台？\n（取消将跳转登录页）'
-          : 'Please sign in so entitlements can sync to your account.\n\nContinue to checkout?\n(Cancel opens sign-in.)'
-      );
+      const go = confirm(L(
+        '建议先登录后再订阅，以便权益自动到账。\n\n确定继续前往收银台？\n（取消将跳转登录页）',
+        'Please sign in so entitlements can sync to your account.\n\nContinue to checkout?\n(Cancel opens sign-in.)'
+      ));
       if (!go) {
-        location.href = '/signup.html?next=' + encodeURIComponent('/#pricing');
+        location.href = '/signup.html?next=' + encodeURIComponent(nextPath);
         return;
       }
       openUrl(fb);
@@ -213,16 +376,16 @@
             : eduBlockMessage('not_edu'))
         );
         if (data.error === 'login_required') {
-          location.href = '/signup.html?next=' + encodeURIComponent('/#pricing');
+          location.href = '/signup.html?next=' + encodeURIComponent(nextPath);
         }
         return;
       }
 
-      // 教育价：服务端未放行时绝不回退公开 EDU 链接
       if (edu && !data.checkout_url) {
-        alert(isZh()
-          ? '无法创建教育价订单，请确认已用机构邮箱登录后重试。'
-          : 'Could not start edu checkout. Sign in with an institutional email and try again.');
+        alert(L(
+          '无法创建教育价订单，请确认已用机构邮箱登录后重试。',
+          'Could not start edu checkout. Sign in with an institutional email and try again.'
+        ));
         return;
       }
 
@@ -231,9 +394,10 @@
       openUrl(url);
     } catch (_) {
       if (edu) {
-        alert(isZh()
-          ? '网络异常，教育价结账失败。请稍后重试（需机构邮箱登录）。'
-          : 'Network error starting edu checkout. Please retry while signed in with an institutional email.');
+        alert(L(
+          '网络异常，教育价结账失败。请稍后重试（需机构邮箱登录）。',
+          'Network error starting edu checkout. Please retry while signed in with an institutional email.'
+        ));
         return;
       }
       openUrl(fb);
@@ -243,12 +407,13 @@
         el.disabled = false;
         el.textContent = prev;
       }
-      syncEduCtaUi();
+      syncAllPricingUi();
     }
   }
 
   function bind(root) {
     const scope = root && root.querySelectorAll ? root : document;
+    bindBillingToggles(scope);
     scope.querySelectorAll('[data-creem-checkout]').forEach((el) => {
       if (el.__creemBound) return;
       el.__creemBound = true;
@@ -257,21 +422,29 @@
         startCheckout(el);
       });
     });
-    syncEduCtaUi();
+    syncAllPricingUi();
   }
 
   window.__bindCreemCheckout = bind;
-  window.__syncEduCheckoutUi = syncEduCtaUi;
+  window.__syncEduCheckoutUi = syncAllPricingUi;
+  window.__syncPricingUi = syncAllPricingUi;
+  window.__setBillingCycle = setBillingCycle;
+  window.__getBillingCycle = getBillingCycle;
   window.__isEduEmail = isEduEmail;
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => bind());
   else bind();
 
-  // 登录态可能异步写入 localStorage
   window.addEventListener('storage', (ev) => {
-    if (!ev.key || ev.key === 'ailatest.user') syncEduCtaUi();
+    if (!ev.key || ev.key === 'ailatest.user' || ev.key === 'ailatest.lang' || ev.key === BILLING_KEY) {
+      syncAllPricingUi();
+    }
   });
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') syncEduCtaUi();
+    if (document.visibilityState === 'visible') syncAllPricingUi();
   });
+  window.addEventListener('ailatest:langchange', () => syncAllPricingUi());
+  setTimeout(() => syncAllPricingUi(), 0);
+  setTimeout(() => syncAllPricingUi(), 200);
+  setTimeout(() => syncAllPricingUi(), 800);
 })();

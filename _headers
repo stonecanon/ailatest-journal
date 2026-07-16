@@ -4,6 +4,18 @@
   Cache-Control: no-cache, no-store, must-revalidate
 /css/*
   Cache-Control: no-cache, no-store, must-revalidate
+# Ensure HTML is always served as UTF-8 (avoids mojibake on listing pages)
+/indexes/*
+  Content-Type: text/html; charset=utf-8
+  Cache-Control: no-cache, no-store, must-revalidate
+/indexes
+  Content-Type: text/html; charset=utf-8
+  Cache-Control: no-cache, no-store, must-revalidate
+/subjects/*
+  Content-Type: text/html; charset=utf-8
+  Cache-Control: no-cache, no-store, must-revalidate
+/*.html
+  Content-Type: text/html; charset=utf-8
 /data/*.json.gz
   Cache-Control: public, max-age=31536000, immutable
 /data/*.gz

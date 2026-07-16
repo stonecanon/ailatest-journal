@@ -129,7 +129,7 @@ def load_citic_warning_rows(journals):
         rows.append(row)
     return rows
 
-CACHE_VERSION = '20260702-region-rank-shell'
+CACHE_VERSION = '20260716-index-v7'
 
 APP_RAIL_HTML = '''<aside class="app-rail" aria-label="Primary navigation">
   <nav class="rail-top" aria-label="站点">
@@ -196,38 +196,48 @@ APP_RAIL_HTML = '''<aside class="app-rail" aria-label="Primary navigation">
 
 SKELETON = '''<!doctype html>
 <html lang="zh-CN">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>__TITLE__</title>
 <meta name="description" content="__DESC__" />
 <link rel="canonical" href="__CANONICAL__" />
 <meta property="og:title" content="__TITLE__" />
 <meta property="og:description" content="__DESC__" />
 <meta name="robots" content="index,follow" />
-<meta name="theme-color" content="#b4531f" />
+<meta name="theme-color" content="#f97316" />
 __JSONLD__
 <link rel="stylesheet" href="/css/listing.css?v=__CACHE_VERSION__" />
-</head><body>
+</head>
+<body>
 __APP_RAIL__
 <header class="listing-topbar">
   <a href="/" class="listing-brand">AILatest <em>Journal</em></a>
   <span class="listing-section-title">期刊榜单</span>
   <nav>
-    <a href="/extension.html">下载中心</a>
-    <span>中文</span>
+    <a href="/">首页</a>
+    <a href="/#rankings">榜单</a>
+    <a href="/#download">下载</a>
+    <a href="/about">关于</a>
+    <a href="/contact">联系</a>
   </nav>
 </header>
 <div class="wrap">
-<h1>__HEADING__</h1>
-<p class="breadcrumb"><a href="/">首页</a> · <a href="/rankings/">榜单</a> · <a href="__BACK__">__BACK_LABEL__</a></p>
-<p class="sub">__DESC__</p>
-<p class="count">__COUNT__</p>
-<div class="card"><div class="table-wrap"><table><thead><tr>__HEADERS__</tr></thead>
-<tbody>__ROWS__</tbody></table></div></div>
-<p class="back-wrap"><a class="back" href="__BACK__">← 返回</a></p>
+  <h1>__HEADING__</h1>
+  <p class="breadcrumb"><a href="/">首页</a> · <a href="/#rankings">榜单</a> · <a href="__BACK__">__BACK_LABEL__</a></p>
+  <p class="sub">__DESC__</p>
+  <p class="count">__COUNT__</p>
+  <div class="card"><div class="table-wrap"><table>
+    <thead><tr>__HEADERS__</tr></thead>
+    <tbody>__ROWS__</tbody>
+  </table></div></div>
+  <p class="back-wrap"><a class="back" href="__BACK__">← 返回</a></p>
 </div>
-<footer class="footer">© 2026 <a href="/">AILatest Journal</a> · <a href="/about.html">关于</a> · <a href="/contact.html">联系</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a> · <a href="/refund.html">Refund</a></footer>
+<footer class="footer">© 2026 <a href="/">AILatest Journal</a> · <a href="/about">关于</a> · <a href="/contact">联系</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a> · <a href="/refund.html">Refund</a></footer>
 <script src="/js/site-rail.js?v=__CACHE_VERSION__" defer></script>
-</body></html>'''
+</body>
+</html>
+'''
 
 def make_slug(r):
     s = r.get('slug', '').strip()
@@ -286,14 +296,14 @@ def generate_subjects(journals, origin):
         top = matched[:100]
 
         headers = ['num', 'name', 'if', 'q', 'z', 'idx', 'pub']
-        th_html = ''.join(f'<th>{esc(h)}</th>' for h in ['#', 'Journal Name', 'IF', 'JCR Q', 'CAS', 'Indexing', 'Publisher'])
+        th_html = ''.join(f'<th>{esc(h)}</th>' for h in ['#', '期刊', '影响因子', 'JCR 分区', '中科院', '索引', '出版商'])
         rows_html = '\n'.join(build_table_row(j, origin, headers, seq=i+1) for i, j in enumerate(top))
 
         total = len(matched)
-        seo_title = f'{title} Journals — Impact Factor & Quartile | AILatest Journal'
-        seo_desc = f'{desc} Browse {total} journals sorted by Impact Factor.'
+        seo_title = f'{title} 期刊 — 影响因子与分区 | AILatest Journal'
+        seo_desc = f'{desc} 共 {total} 种期刊，按影响因子排序。'
         canonical = f'{origin}/subjects/{slug}/'
-        count = f'Showing top {len(top)} of {total} journals sorted by Impact Factor (descending).'
+        count = f'按影响因子降序展示前 {len(top)} / 共 {total} 种期刊（字段与主站一致：IF · JCR · 中科院 · 索引 · 出版商）。'
 
         item_list = [{'@type': 'ListItem', 'position': i+1,
             'item': {'@type': 'Periodical', 'name': j.get('name',''), 'url': f'{origin}/journal/{esc(make_slug(j))}/'}}
@@ -310,7 +320,7 @@ def generate_subjects(journals, origin):
         html = html.replace('__COUNT__', esc(count)).replace('__HEADERS__', th_html)
         html = html.replace('__ROWS__', rows_html).replace('__BACK__', f'{origin}/subjects/').replace('__BACK_LABEL__', '学科排行榜')
         (ROOT / 'subjects' / slug).mkdir(parents=True, exist_ok=True)
-        (ROOT / 'subjects' / slug / 'index.html').write_text(html, encoding='utf-8')
+        (ROOT / 'subjects' / slug / 'index.html').write_text(html, encoding='utf-8', newline='\n')
         print(f'  /subjects/{slug}/ → {len(top)}/{total} journals')
 
 def generate_indexes(journals, origin):
@@ -333,10 +343,10 @@ def generate_indexes(journals, origin):
             # 状态列表：加 Status 徽章列
             if slug == 'citic-warning':
                 headers = ['num', 'name', 'issn', 'if', 'q', 'z', 'status', 'pub']
-                th_labels = ['#', 'Journal Name', 'ISSN / EISSN', 'IF', 'JCR Q', 'CAS', 'Status', 'Publisher']
+                th_labels = ['#', '期刊', 'ISSN / EISSN', '影响因子', 'JCR 分区', '中科院', '状态', '出版商']
             else:
                 headers = ['num', 'name', 'if', 'q', 'z', 'status', 'pub']
-                th_labels = ['#', 'Journal Name', 'IF', 'JCR Q', 'CAS', 'Status', 'Publisher']
+                th_labels = ['#', '期刊', '影响因子', 'JCR 分区', '中科院', '状态', '出版商']
             th_html = ''.join(f'<th>{esc(h)}</th>' for h in th_labels)
             def status_badge(j):
                 if slug == 'under-review': return '<span class="pill pill-under-review">新锐 Under Review</span>'
@@ -363,16 +373,16 @@ def generate_indexes(journals, origin):
             seo_title = f'{title} | AILatest Journal'
         else:
             headers = ['num', 'name', 'if', 'q', 'z', 'issn', 'pub']
-            th_html = ''.join(f'<th>{esc(h)}</th>' for h in ['#', 'Journal Name', 'IF', 'JCR Q', 'CAS', 'ISSN', 'Publisher'])
+            th_html = ''.join(f'<th>{esc(h)}</th>' for h in ['#', '期刊', '影响因子', 'JCR 分区', '中科院', 'ISSN', '出版商'])
             rows_html = '\n'.join(build_table_row(j, origin, headers, seq=i+1) for i, j in enumerate(top))
-            seo_title = f'{title} Indexed Journals | AILatest Journal'
+            seo_title = f'{title} 收录期刊 | AILatest Journal'
         seo_desc = desc
         canonical = f'{origin}/indexes/{slug}/'
         if table_type == 'status':
-            count = f'共 {len(top)} 本{title}标记的期刊（按原列表排序）'
+            count = f'共 {len(top)} 本{title}期刊（按原列表排序；字段：影响因子 · JCR · 中科院 · 状态 · 出版商）'
             jsonld_name = f'{title}'
         else:
-            count = f'Showing {len(top)} {title} indexed journals sorted by Impact Factor (descending).'
+            count = f'按影响因子降序展示 {len(top)} 种 {title} 收录期刊（字段与主站一致：IF · JCR · 中科院 · ISSN · 出版商）。'
             jsonld_name = f'{title} Indexed Journals'
 
         item_list = []
@@ -395,7 +405,7 @@ def generate_indexes(journals, origin):
         back_label = '预警名单' if table_type == 'status' else '索引排行榜'
         html = html.replace('__ROWS__', rows_html).replace('__BACK__', back_path).replace('__BACK_LABEL__', back_label)
         (ROOT / 'indexes' / slug).mkdir(parents=True, exist_ok=True)
-        (ROOT / 'indexes' / slug / 'index.html').write_text(html, encoding='utf-8')
+        (ROOT / 'indexes' / slug / 'index.html').write_text(html, encoding='utf-8', newline='\n')
         print(f'  /indexes/{slug}/ → {len(top)} journals')
 
 def generate_landing(origin):
@@ -404,31 +414,36 @@ def generate_landing(origin):
     warning_lists = WARNING_LISTS
 
     def shell(page_title, meta_desc, canonical, heading, sub, body_html, back_href=None, minimal=False):
-        back = f'<p class="back-wrap"><a class="back" href="{back_href}">← 返回</a></p>' if back_href and not minimal else ''
+        back = f'<p class="back-wrap"><a class="back" href="{esc(back_href)}">← 返回榜单</a></p>' if back_href and not minimal else ''
         intro = '' if minimal else f'''  <h1>{esc(heading)}</h1>
-  <p class="breadcrumb"><a href="/">首页</a> · <a href="/rankings/">榜单</a></p>
+  <p class="breadcrumb"><a href="/">首页</a> · <a href="/#rankings">榜单</a></p>
   <p class="sub">{esc(sub)}</p>'''
         wrap_class = 'wrap ranking-entry-wrap' if minimal else 'wrap'
-        redirect = '''<script>
-try { sessionStorage.setItem('ailatest.pendingTab', 'rank'); } catch (_) {}
-location.replace('/');
-</script>''' if minimal else ''
-        return f'''<!doctype html><html lang="zh-CN">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+        redirect = ''
+        return f'''<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>{esc(page_title)}</title>
 <meta name="description" content="{esc(meta_desc)}" />
-<link rel="canonical" href="{esc(canonical)}" /><meta name="robots" content="index,follow" />
+<link rel="canonical" href="{esc(canonical)}" />
+<meta name="robots" content="index,follow" />
 <meta name="theme-color" content="#f97316" />
 <link rel="stylesheet" href="/css/listing.css?v={CACHE_VERSION}" />
 {redirect}
-</head><body>
+</head>
+<body>
 {APP_RAIL_HTML}
 <header class="listing-topbar">
   <a href="/" class="listing-brand">AILatest <em>Journal</em></a>
   <span class="listing-section-title">期刊榜单</span>
   <nav>
-    <a href="/extension.html">下载中心</a>
-    <span>中文</span>
+    <a href="/">首页</a>
+    <a href="/#rankings">榜单</a>
+    <a href="/#download">下载</a>
+    <a href="/about">关于</a>
+    <a href="/contact">联系</a>
   </nav>
 </header>
 <div class="{wrap_class}">
@@ -436,9 +451,11 @@ location.replace('/');
   {body_html}
   {back}
 </div>
-<footer class="footer">© 2026 <a href="/">AILatest Journal</a> · <a href="/about.html">关于</a> · <a href="/contact.html">联系</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a> · <a href="/refund.html">Refund</a></footer>
+<footer class="footer">© 2026 <a href="/">AILatest Journal</a> · <a href="/about">关于</a> · <a href="/contact">联系</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a> · <a href="/refund.html">Refund</a></footer>
 <script src="/js/site-rail.js?v={CACHE_VERSION}" defer></script>
-</body></html>'''
+</body>
+</html>
+'''
 
     # Subjects landing
     r_list = '\n'.join(f'<li><a href="{origin}/subjects/{s}/" class="cat-link"><strong>{esc(t)}</strong></a></li>' for s, t, _, _ in subjects)
@@ -449,44 +466,18 @@ location.replace('/');
         '学科排行榜',
         '选择一个 Web of Science 学科，浏览该学科影响因子靠前的期刊。',
         f'<div class="card"><ul class="cat-list">{r_list}</ul></div>',
-        f'{origin}/rankings/',
+        f'{origin}/#rankings',
     )
     (ROOT / 'subjects').mkdir(parents=True, exist_ok=True)
-    (ROOT / 'subjects' / 'index.html').write_text(r_html, encoding='utf-8')
+    (ROOT / 'subjects' / 'index.html').write_text(r_html, encoding='utf-8', newline='\n')
     print('  /subjects/ (landing)')
 
-    # Indexes landing
-    i_list = '\n'.join(f'<li><a href="{origin}/indexes/{s}/" class="cat-link"><strong>{esc(t)}</strong></a></li>' for s, t, _, _, _ in indexes)
-    i_html = shell(
-        '索引排行榜 | AILatest Journal',
-        '按 SCIE、SSCI、EI、Scopus、MEDLINE 等索引浏览期刊榜单。',
-        f'{origin}/indexes/',
-        '索引排行榜',
-        '选择一个收录索引，浏览对应期刊。',
-        f'<div class="card"><ul class="cat-list">{i_list}</ul></div>',
-        f'{origin}/rankings/',
-    )
-    (ROOT / 'indexes' / 'index.html').write_text(i_html, encoding='utf-8')
-    print('  /indexes/ (landing)')
-
-    # Warning landing: risk/status lists live together and stay out of the
-    # indexing directory, which is reserved for actual bibliographic indexes.
-    warning_list = '\n'.join(
-        f'<li><a href="{origin}/indexes/{s}/" class="cat-link"><strong>{esc(t)}</strong></a></li>'
-        for s, t, _, _, _ in warning_lists
-    )
-    warning_html = shell(
-        '预警名单 | AILatest Journal',
-        '集中浏览新锐 Under Review、WoS On Hold、中科院预警和中信所预警期刊名单。',
-        f'{origin}/indexes/warning/',
-        '预警名单',
-        '选择一种审查或预警状态，浏览对应期刊。',
-        f'<div class="card"><ul class="cat-list">{warning_list}</ul></div>',
-        f'{origin}/rankings/',
-    )
-    (ROOT / 'indexes' / 'warning').mkdir(parents=True, exist_ok=True)
-    (ROOT / 'indexes' / 'warning' / 'index.html').write_text(warning_html, encoding='utf-8')
-    print('  /indexes/warning/ (landing)')
+    # 索引 / 预警落地页：统一由 write_rank_landings.py 输出（UTF-8 + 新设计）
+    # 避免旧 shell 模板编码损坏；勿再写 index-card-grid 旧布局
+    import subprocess, sys
+    script = ROOT / 'scripts' / 'write_rank_landings.py'
+    subprocess.check_call([sys.executable, str(script)], cwd=str(ROOT / 'scripts'))
+    print('  /indexes/ + /indexes/warning/ via write_rank_landings.py')
 
     # 榜单入口由 SPA 接管（_redirects → index.html）。
     # 切勿再生成 rankings/index.html + location.replace('/')，否则侧栏点「榜单」
@@ -521,7 +512,7 @@ location.replace('/');
             f'{origin}/subjects/',
         )
         (ROOT / 'subjects' / slug).mkdir(parents=True, exist_ok=True)
-        (ROOT / 'subjects' / slug / 'index.html').write_text(legacy_html, encoding='utf-8')
+        (ROOT / 'subjects' / slug / 'index.html').write_text(legacy_html, encoding='utf-8', newline='\n')
     print(f'  legacy /subjects/* bridge pages: {len(LEGACY_SUBJECT_PAGES)}')
 
 def update_sitemap(origin):

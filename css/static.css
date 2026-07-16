@@ -486,10 +486,21 @@ main > [data-lang-panel] {
   box-shadow: 0 10px 28px rgba(40, 28, 16, .05);
   padding: 28px 28px 32px;
 }
-[data-lang-panel] { display: none; }
+[data-lang-panel] { display: none !important; }
 html:not([data-static-lang]) [data-lang-panel="zh-CN"],
 html[data-static-lang="zh-CN"] [data-lang-panel="zh-CN"],
-html[data-static-lang="en"] [data-lang-panel="en"] { display: block; }
+html[data-static-lang="en"] [data-lang-panel="en"] { display: block !important; }
+/* 行内片段（按钮 / 价格单位等） */
+html:not([data-static-lang]) span[data-lang-panel="zh-CN"],
+html:not([data-static-lang]) small[data-lang-panel="zh-CN"],
+html[data-static-lang="zh-CN"] span[data-lang-panel="zh-CN"],
+html[data-static-lang="zh-CN"] small[data-lang-panel="zh-CN"],
+html[data-static-lang="en"] span[data-lang-panel="en"],
+html[data-static-lang="en"] small[data-lang-panel="en"] { display: inline !important; }
+/* 对照表 */
+html:not([data-static-lang]) table[data-lang-panel="zh-CN"],
+html[data-static-lang="zh-CN"] table[data-lang-panel="zh-CN"],
+html[data-static-lang="en"] table[data-lang-panel="en"] { display: table !important; }
 h1 {
   font-size: clamp(24px, 3.2vw, 30px);
   line-height: 1.25;

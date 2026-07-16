@@ -42,7 +42,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 })(window,document,'script','dataLayer','GTM-NBNXL7FB');</script>
 <!-- End Google Tag Manager -->
 <link rel="preload" href="/data/journal_aliases.json" as="fetch" crossorigin="anonymous" />
-<link rel="stylesheet" href="/css/app.css?v=20260716-home-space" />
+<link rel="stylesheet" href="/css/app.css?v=20260716-billing-toggle" />
+<link rel="stylesheet" href="/css/journal-detail-wide.css?v=20260716-detail-force2" />
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json" />
@@ -134,7 +135,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 (() => {
   const path = location.pathname.replace(/\/+$/, '') || '/';
   const homeRoutes = new Set(['/', '/en', '/zh']);
-  const simpleRoutes = new Set(['/favorites', '/account', '/me', '/profile']);
+  // 账户页无搜索；收藏与各站统一用全球站紧凑顶栏（topbar-compact）
+  const simpleRoutes = new Set(['/account', '/me', '/profile']);
+  const compactRoutes = new Set([
+    '/favorites', '/global', '/international', '/cn', '/china',
+    '/in', '/india', '/my', '/malaysia', '/kr', '/korea',
+    '/pbn', '/poland', '/isc', '/scielo', '/pick',
+  ]);
   const pathTab = ({
     '/favorites': 'fav', '/account': 'me', '/me': 'me', '/profile': 'me',
     '/rankings': 'home', '/pick': 'pick', '/global': 'int', '/international': 'int',
@@ -144,6 +151,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   })[path] || (homeRoutes.has(path) ? 'home' : '');
   document.body.classList.toggle('home-route', homeRoutes.has(path));
   document.body.classList.toggle('simple-top-route', simpleRoutes.has(path));
+  document.body.classList.toggle('fav-route', path === '/favorites');
+  document.body.classList.toggle('topbar-compact', compactRoutes.has(path));
   if (pathTab) document.body.dataset.bootTab = pathTab;
 })();
 </script>
@@ -238,7 +247,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 </aside>
 <!-- 隐藏的旧入口 id 保留，供设置页 / 其它脚本引用 -->
-<a id="pricing-rail-link" href="/#pricing" hidden aria-hidden="true"></a>
+<a id="pricing-rail-link" href="/pricing" hidden aria-hidden="true"></a>
 <a id="download-center-rail-link" href="/#download" hidden aria-hidden="true"></a>
 <button type="button" id="rankings-btn" data-tab="rank" hidden aria-hidden="true"></button>
 <main class="main">
@@ -246,7 +255,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <section class="home-hero home-hero-head" aria-label="AILatest Journal">
     <div class="home-v4">
       <h1 class="home-v4-title">
-        <span data-i18n="home_v4_line1">投稿之前，先把期刊</span><span class="home-v4-grad" data-i18n="home_v4_line2">看清楚</span><span data-i18n="home_v4_line3">。</span>
+        <span data-i18n="home_v4_line1">投稿之前，先把期刊</span><span class="home-v4-grad" data-i18n="home_v4_line2">看清楚</span>
       </h1>
     </div>
   </section>
@@ -256,7 +265,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <a href="#feat" data-i18n="nav_features">功能</a>
     <a href="#how" data-i18n="nav_how">怎么用</a>
     <a href="#rankings" data-i18n="rail_rank">榜单</a>
-    <a href="#pricing" data-i18n="nav_pricing">订阅</a>
+    <a href="/pricing" data-i18n="nav_pricing">订阅</a>
     <a href="#download" data-i18n="download_center">下载</a>
     <a href="#contact" data-i18n="nav_contact">联系</a>
     <div class="lang-toggle-wrap" id="lang-toggle-host">
@@ -317,12 +326,48 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <h2 class="home-sec-title" data-i18n="home_feat_title">功能介绍</h2>
           <p class="home-sec-lead" data-i18n="home_feat_lead">检索全球期刊，对比分区、影响因子与开放获取信息 — 一站完成。库、分区、风险信号、荐刊与插件徽章在同一条工作流里。</p>
           <div class="home-feat-grid">
-            <article class="home-feat"><div class="home-feat-ico" aria-hidden="true">◎</div><b data-i18n="home_feat_1_t">全球与地区期刊库</b><span data-i18n="home_feat_1_d">SCIE / SSCI / AHCI / ESCI / EI、Scopus、DOAJ、MEDLINE；中国、印度、韩国、马来西亚等地区站。</span></article>
-            <article class="home-feat"><div class="home-feat-ico" aria-hidden="true">▣</div><b data-i18n="home_feat_2_t">分区 · 指标 · 风险</b><span data-i18n="home_feat_2_d">JCR 影响因子与 Quartile、中科院分区（含 TOP）、CCF / ABDC / ABS；预警与撤稿提示。</span></article>
-            <article class="home-feat"><div class="home-feat-ico" aria-hidden="true">★</div><b data-i18n="home_feat_3_t">收藏与清单</b><span data-i18n="home_feat_3_d">登录后云端收藏、多清单整理；对比时随时回看目标刊。</span></article>
-            <article class="home-feat"><div class="home-feat-ico" aria-hidden="true">AI</div><b data-i18n="home_feat_4_t">智能荐刊</b><span data-i18n="home_feat_4_d">输入论文标题 / 摘要 / 关键词，按主题与库覆盖匹配目标期刊（搜索框切到「荐刊」）。</span></article>
-            <article class="home-feat"><div class="home-feat-ico" aria-hidden="true">⌘</div><b data-i18n="home_feat_5_t">浏览器插件</b><span data-i18n="home_feat_5_d">Scholar / PubMed / 知网等页面展示分区与收录徽章，少开一个标签页。</span></article>
-            <article class="home-feat"><div class="home-feat-ico" aria-hidden="true">↔</div><b data-i18n="home_feat_6_t">开放获取与 APC</b><span data-i18n="home_feat_6_d">OAJ / DOAJ 信号与是否可免费发表路径（按订阅档位展示深度字段）。</span></article>
+            <article class="home-feat">
+              <div class="home-feat-ico" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 4 9 14 14 0 0 1-4 9 14 14 0 0 1-4-9 14 14 0 0 1 4-9z"/></svg>
+              </div>
+              <b data-i18n="home_feat_1_t">全球与地区期刊库</b>
+              <span data-i18n="home_feat_1_d">SCIE / SSCI / AHCI / ESCI / EI、Scopus、DOAJ、MEDLINE；中国、印度、韩国、马来西亚等地区站。</span>
+            </article>
+            <article class="home-feat">
+              <div class="home-feat-ico" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V9"/><path d="M10 19V5"/><path d="M16 19v-7"/><path d="M22 19V8"/><path d="M2 19h20"/></svg>
+              </div>
+              <b data-i18n="home_feat_2_t">分区 · 指标 · 风险</b>
+              <span data-i18n="home_feat_2_d">JCR 影响因子与 Quartile、中科院分区（含 TOP）、CCF / ABDC / ABS；预警与撤稿提示。</span>
+            </article>
+            <article class="home-feat">
+              <div class="home-feat-ico" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6l2.3 4.7 5.2.8-3.8 3.7.9 5.2L12 15.5l-4.6 2.5.9-5.2-3.8-3.7 5.2-.8L12 3.6z"/></svg>
+              </div>
+              <b data-i18n="home_feat_3_t">收藏与清单</b>
+              <span data-i18n="home_feat_3_d">登录后云端收藏、多清单整理；对比时随时回看目标刊。</span>
+            </article>
+            <article class="home-feat">
+              <div class="home-feat-ico" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3"/><path d="M12 18v3"/><path d="M3 12h3"/><path d="M18 12h3"/><path d="m6.3 6.3 2.1 2.1"/><path d="m15.6 15.6 2.1 2.1"/><path d="m6.3 17.7 2.1-2.1"/><path d="m15.6 8.4 2.1-2.1"/><circle cx="12" cy="12" r="3.2"/></svg>
+              </div>
+              <b data-i18n="home_feat_4_t">智能荐刊</b>
+              <span data-i18n="home_feat_4_d">输入论文标题 / 摘要 / 关键词，按主题与库覆盖匹配目标期刊（搜索框切到「荐刊」）。</span>
+            </article>
+            <article class="home-feat">
+              <div class="home-feat-ico" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 4.5h-4A2.5 2.5 0 0 0 4 7v4.5"/><path d="M4 14v3a2.5 2.5 0 0 0 2.5 2.5H10"/><path d="M14 19.5h3.5A2.5 2.5 0 0 0 20 17v-3.5"/><path d="M20 10V7a2.5 2.5 0 0 0-2.5-2.5H14"/><path d="M9 12h6"/><path d="M12 9v6"/></svg>
+              </div>
+              <b data-i18n="home_feat_5_t">浏览器插件</b>
+              <span data-i18n="home_feat_5_d">Scholar / PubMed / 知网等页面展示分区与收录徽章，少开一个标签页。</span>
+            </article>
+            <article class="home-feat">
+              <div class="home-feat-ico" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M8 11V7.5a4 4 0 0 1 7.6-1.7"/><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M12 15v2"/></svg>
+              </div>
+              <b data-i18n="home_feat_6_t">开放获取与 APC</b>
+              <span data-i18n="home_feat_6_d">OAJ / DOAJ 信号与是否可免费发表路径（按订阅档位展示深度字段）。</span>
+            </article>
           </div>
         </section>
 
@@ -342,29 +387,92 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           </div>
         </section>
 
-        <section class="home-sec" id="rankings">
-          <span class="home-sec-id" data-i18n="home_rank_kicker">Rankings</span>
-          <h2 class="home-sec-title" data-i18n="home_rank_title">榜单</h2>
-          <p class="home-sec-lead" data-i18n="home_rank_lead">按索引、学科与风险名单浏览期刊列表；点进二级页查看完整目录。</p>
-          <div class="home-rank-grid">
-            <a class="home-rank-card" href="/indexes/">
-              <span class="home-rank-badge" data-i18n="home_rank_idx_badge">索引</span>
-              <b data-i18n="nav_index_rank">索引排行榜</b>
-              <span data-i18n="home_rank_idx_d">SCIE / SSCI / AHCI / ESCI / EI / Scopus / MEDLINE 等收录入口。</span>
-              <em data-i18n="home_rank_enter">进入 →</em>
-            </a>
-            <a class="home-rank-card" href="/subjects/">
-              <span class="home-rank-badge" data-i18n="home_rank_sub_badge">学科</span>
-              <b data-i18n="nav_subject_rank">学科排行榜</b>
-              <span data-i18n="home_rank_sub_d">按 Web of Science 学科浏览 IF 靠前期刊与主题榜单。</span>
-              <em data-i18n="home_rank_enter">进入 →</em>
-            </a>
-            <a class="home-rank-card home-rank-card-warn" href="/indexes/warning/">
-              <span class="home-rank-badge" data-i18n="home_rank_warn_badge">风险</span>
-              <b data-i18n="nav_warn_rank">预警名单</b>
-              <span data-i18n="home_rank_warn_d">中科院预警、中信所预警、On Hold / Under Review 等信号。</span>
-              <em data-i18n="home_rank_enter">进入 →</em>
-            </a>
+        <section class="home-sec rank-sec" id="rankings">
+          <h2 class="rank-page-title" data-i18n="home_rank_title">榜单</h2>
+          <p class="rank-page-lead" data-i18n="home_rank_lead">索引看板 · 学科榜 · 预警 · 热门浏览</p>
+          <div class="rank-tabs" role="tablist" aria-label="Rankings">
+            <button type="button" class="rank-tab is-on" role="tab" aria-selected="true" data-rank-tab="index" data-i18n="home_rank_tab_index">索引</button>
+            <button type="button" class="rank-tab" role="tab" aria-selected="false" data-rank-tab="subject" data-i18n="home_rank_tab_subject">学科</button>
+            <button type="button" class="rank-tab" role="tab" aria-selected="false" data-rank-tab="warn" data-i18n="home_rank_tab_warn">预警</button>
+            <button type="button" class="rank-tab" role="tab" aria-selected="false" data-rank-tab="hot" data-i18n="home_rank_tab_hot">热门</button>
+          </div>
+
+          <!-- 索引：双栏看板 -->
+          <div class="rank-panel is-on" data-rank-panel="index" role="tabpanel">
+            <div class="rank-board-grid">
+              <section class="rank-board">
+                <header class="rank-board-head">
+                  <h3 data-i18n="home_rank_board_index">索引看板</h3>
+                  <a href="/indexes/" data-i18n="home_rank_all">全部 →</a>
+                </header>
+                <a class="rank-row" href="/indexes/scie/"><span class="rank-n">1</span><strong>SCIE by IF</strong><span class="rank-pill" data-i18n="home_rank_pill_board">Board</span></a>
+                <a class="rank-row" href="/indexes/ssci/"><span class="rank-n">2</span><strong>SSCI by IF</strong><span class="rank-pill" data-i18n="home_rank_pill_board">Board</span></a>
+                <a class="rank-row" href="/indexes/esci/"><span class="rank-n">3</span><strong>ESCI by IF</strong><span class="rank-pill" data-i18n="home_rank_pill_board">Board</span></a>
+                <a class="rank-row" href="/indexes/ei/"><span class="rank-n">4</span><strong>EI by IF</strong><span class="rank-pill" data-i18n="home_rank_pill_board">Board</span></a>
+                <a class="rank-row" href="/indexes/scopus/"><span class="rank-n">5</span><strong>Scopus</strong><span class="rank-pill" data-i18n="home_rank_pill_board">Board</span></a>
+                <a class="rank-row" href="/indexes/medline/"><span class="rank-n">6</span><strong>MEDLINE</strong><span class="rank-pill" data-i18n="home_rank_pill_board">Board</span></a>
+                <a class="rank-row" href="/indexes/ahci/"><span class="rank-n">7</span><strong>AHCI by IF</strong><span class="rank-pill" data-i18n="home_rank_pill_board">Board</span></a>
+              </section>
+              <section class="rank-board rank-board-risk">
+                <header class="rank-board-head">
+                  <h3 data-i18n="home_rank_board_risk">预警 / 风险</h3>
+                  <a href="/indexes/warning/" data-i18n="home_rank_all">全部 →</a>
+                </header>
+                <a class="rank-row" href="/indexes/cas-warning/"><span class="rank-n rank-n-risk">!</span><strong data-i18n="home_rank_risk_cas">中科院预警</strong><span class="rank-pill rank-pill-risk">Risk</span></a>
+                <a class="rank-row" href="/indexes/citic-warning/"><span class="rank-n rank-n-risk">!</span><strong data-i18n="home_rank_risk_citic">中信所预警</strong><span class="rank-pill rank-pill-risk">Risk</span></a>
+                <a class="rank-row" href="/indexes/on-hold/"><span class="rank-n rank-n-risk">!</span><strong>On Hold</strong><span class="rank-pill rank-pill-risk">Risk</span></a>
+                <a class="rank-row" href="/indexes/under-review/"><span class="rank-n rank-n-risk">!</span><strong>Under Review</strong><span class="rank-pill rank-pill-info">Info</span></a>
+              </section>
+            </div>
+          </div>
+
+          <!-- 学科 -->
+          <div class="rank-panel" data-rank-panel="subject" role="tabpanel" hidden>
+            <div class="rank-board-grid rank-board-grid-1">
+              <section class="rank-board">
+                <header class="rank-board-head">
+                  <h3 data-i18n="home_rank_board_subject">学科榜</h3>
+                  <a href="/subjects/" data-i18n="home_rank_all">全部 →</a>
+                </header>
+                <a class="rank-row" href="/subjects/computer-science-artificial-intelligence/"><span class="rank-n">1</span><strong>Computer Science, AI</strong><span class="rank-pill" data-i18n="home_rank_pill_board">Board</span></a>
+                <a class="rank-row" href="/subjects/materials-science-multidisciplinary/"><span class="rank-n">2</span><strong>Materials Science</strong><span class="rank-pill" data-i18n="home_rank_pill_board">Board</span></a>
+                <a class="rank-row" href="/subjects/oncology/"><span class="rank-n">3</span><strong>Oncology</strong><span class="rank-pill" data-i18n="home_rank_pill_board">Board</span></a>
+                <a class="rank-row" href="/subjects/economics/"><span class="rank-n">4</span><strong>Economics</strong><span class="rank-pill" data-i18n="home_rank_pill_board">Board</span></a>
+                <a class="rank-row" href="/subjects/environmental-sciences/"><span class="rank-n">5</span><strong>Environmental Sciences</strong><span class="rank-pill" data-i18n="home_rank_pill_board">Board</span></a>
+                <a class="rank-row" href="/subjects/neurosciences/"><span class="rank-n">6</span><strong>Neurosciences</strong><span class="rank-pill" data-i18n="home_rank_pill_board">Board</span></a>
+                <a class="rank-row" href="/subjects/chemistry-multidisciplinary/"><span class="rank-n">7</span><strong>Chemistry, Multidisciplinary</strong><span class="rank-pill" data-i18n="home_rank_pill_board">Board</span></a>
+                <a class="rank-row" href="/subjects/education-educational-research/"><span class="rank-n">8</span><strong>Education &amp; Educational Research</strong><span class="rank-pill" data-i18n="home_rank_pill_board">Board</span></a>
+              </section>
+            </div>
+          </div>
+
+          <!-- 预警 -->
+          <div class="rank-panel" data-rank-panel="warn" role="tabpanel" hidden>
+            <div class="rank-board-grid rank-board-grid-1">
+              <section class="rank-board rank-board-risk">
+                <header class="rank-board-head">
+                  <h3 data-i18n="home_rank_board_risk">预警 / 风险</h3>
+                  <a href="/indexes/warning/" data-i18n="home_rank_all">全部 →</a>
+                </header>
+                <a class="rank-row" href="/indexes/cas-warning/"><span class="rank-n rank-n-risk">!</span><strong data-i18n="home_rank_risk_cas">中科院预警</strong><span class="rank-pill rank-pill-risk">Risk</span></a>
+                <a class="rank-row" href="/indexes/citic-warning/"><span class="rank-n rank-n-risk">!</span><strong data-i18n="home_rank_risk_citic">中信所预警</strong><span class="rank-pill rank-pill-risk">Risk</span></a>
+                <a class="rank-row" href="/indexes/on-hold/"><span class="rank-n rank-n-risk">!</span><strong>WoS On Hold</strong><span class="rank-pill rank-pill-risk">Risk</span></a>
+                <a class="rank-row" href="/indexes/under-review/"><span class="rank-n rank-n-risk">!</span><strong>新锐 Under Review</strong><span class="rank-pill rank-pill-info">Info</span></a>
+              </section>
+            </div>
+          </div>
+
+          <!-- 热门 -->
+          <div class="rank-panel" data-rank-panel="hot" role="tabpanel" hidden>
+            <div class="rank-board-grid rank-board-grid-1">
+              <section class="rank-board">
+                <header class="rank-board-head">
+                  <h3 data-i18n="home_hot_title">热点期刊</h3>
+                  <span class="rank-board-sub" data-i18n="home_hot_sub">近 30 天浏览量 Top 5</span>
+                </header>
+                <div id="rank-hot-list" class="rank-hot-list" aria-live="polite"></div>
+              </section>
+            </div>
           </div>
         </section>
 
@@ -372,7 +480,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <span class="home-sec-id" data-i18n="home_price_kicker">Pricing</span>
           <h2 class="home-sec-title" data-i18n="home_price_title">订阅方案</h2>
           <p class="home-sec-lead" data-i18n="home_price_lead">网站查刊 Free 永久可用。Pro / Max 提升插件深度、额度与 AI 荐刊配额。教育邮箱另享教育价（登录后解锁）。</p>
-          <p class="home-sec-note home-price-billing" data-i18n="home_price_billing">价格 USD · 年付 · Creem 收银台 · 下方划线为原价</p>
+          <div class="billing-toggle-wrap">
+            <div class="billing-toggle" role="group" aria-label="Billing period" data-i18n-aria="home_price_billing_group">
+              <button type="button" class="billing-toggle-btn is-on" data-billing-toggle="year" aria-pressed="true">
+                <span data-i18n="home_price_toggle_year">年付</span>
+                <em class="billing-save-tag" data-i18n="home_price_save">更划算</em>
+              </button>
+              <button type="button" class="billing-toggle-btn" data-billing-toggle="month" aria-pressed="false">
+                <span data-i18n="home_price_toggle_month">月付</span>
+              </button>
+            </div>
+          </div>
+          <p class="home-sec-note home-price-billing" data-billing-note>价格 USD · 年付 · 下方划线为原价（更划算）</p>
           <p class="home-edu-status" data-edu-status hidden></p>
           <div class="home-plans">
             <article class="home-plan">
@@ -388,71 +507,80 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </article>
             <article class="home-plan">
               <h3>Pro</h3>
-              <div class="home-plan-price">$7.99 <small data-i18n="home_price_year">/ 年</small></div>
-              <p class="home-plan-was" data-i18n="home_price_pro_was">原价 $11.99</p>
+              <div class="home-plan-price" data-plan-price="pro"><span data-price-amt>$7.99</span> <small data-price-unit>/ 年</small></div>
+              <p class="home-plan-was" data-plan-was="pro">原价 $11.99</p>
               <p class="home-plan-desc" data-i18n="home_price_pro_d">高频刷刊 · 插件进阶</p>
               <ul>
                 <li data-i18n="home_price_pro_1">中科院 / TOP / 新锐徽章</li>
                 <li data-i18n="home_price_pro_2">云收藏 50 · 清单 5</li>
                 <li data-i18n="home_price_pro_3">AI 荐刊 500 credits/月</li>
               </ul>
-              <button type="button" class="home-btn home-btn-primary home-btn-block" data-creem-checkout data-plan="pro" data-period="year" data-i18n="home_price_pro_cta">订阅 Pro · 年付</button>
+              <button type="button" class="home-btn home-btn-primary home-btn-block" data-creem-checkout data-plan="pro" data-period="year">订阅 Pro · 年付</button>
               <button type="button" class="home-btn home-btn-ghost home-btn-block home-btn-edu" data-creem-checkout data-plan="pro" data-period="year" data-edu="1">教育价 $4.99 · 需机构邮箱</button>
             </article>
             <article class="home-plan home-plan-hot">
               <span class="home-plan-tag" data-i18n="home_price_rec">推荐</span>
               <h3>Max</h3>
-              <div class="home-plan-price">$9.99 <small data-i18n="home_price_year">/ 年</small></div>
-              <p class="home-plan-was" data-i18n="home_price_max_was">原价 $14.99</p>
+              <div class="home-plan-price" data-plan-price="max"><span data-price-amt>$9.99</span> <small data-price-unit>/ 年</small></div>
+              <p class="home-plan-was" data-plan-was="max">原价 $14.99</p>
               <p class="home-plan-desc" data-i18n="home_price_max_d">完整工作流 · 高额度 AI</p>
               <ul>
                 <li data-i18n="home_price_max_1">预警 / 撤稿 / 科协风险</li>
                 <li data-i18n="home_price_max_2">导出与高额度荐刊</li>
                 <li data-i18n="home_price_max_3">地区站与设备额度更高</li>
               </ul>
-              <button type="button" class="home-btn home-btn-primary home-btn-block" data-creem-checkout data-plan="max" data-period="year" data-i18n="home_price_max_cta">订阅 Max · 年付</button>
+              <button type="button" class="home-btn home-btn-primary home-btn-block" data-creem-checkout data-plan="max" data-period="year">订阅 Max · 年付</button>
               <button type="button" class="home-btn home-btn-ghost home-btn-block home-btn-edu" data-creem-checkout data-plan="max" data-period="year" data-edu="1">教育价 $5.99 · 需机构邮箱</button>
             </article>
           </div>
           <p class="home-sec-note" data-i18n="home_price_note">教育价仅限 .edu / .edu.cn / .ac.* 等机构邮箱登录后支付</p>
+          <p class="home-sec-note home-price-more"><a href="/pricing" data-i18n="home_price_more">查看完整方案对比 →</a></p>
         </section>
 
-        <section class="home-sec" id="download">
+        <section class="home-sec home-dl-sec" id="download">
           <span class="home-sec-id" data-i18n="home_dl_kicker">Download</span>
           <h2 class="home-sec-title" data-i18n="home_dl_title">下载</h2>
-          <p class="home-sec-lead" data-i18n="home_dl_lead">网页版无需安装。插件、Skill 与 MCP 可直接在此获取。</p>
-          <div class="home-dl-grid">
-            <article class="home-dl-card">
-              <span class="home-dl-badge" data-i18n="home_dl_ext_badge">插件</span>
-              <b data-i18n="home_dl_ext_t">Chrome / Edge 内测版</b>
-              <span data-i18n="home_dl_ext_d">在 Google Scholar、PubMed、知网等页面显示分区徽章，并支持文献卡片保存。</span>
-              <a class="home-btn home-btn-primary" href="/api/extension/download?asset=latest&amp;source=home" data-extension-download-link download="ailatest-journal-extension-latest.zip" data-i18n="home_dl_ext_cta">下载 ZIP</a>
-              <p class="home-dl-stat"><span data-i18n="home_dl_ext_stat_pre">累计下载</span> <b data-extension-download-count="latest">—</b> <span data-i18n="home_dl_ext_stat_post">次</span></p>
-            </article>
-            <article class="home-dl-card">
-              <span class="home-dl-badge" data-i18n="home_dl_skill_badge">Skill</span>
-              <b data-i18n="home_dl_skill_t">写作与荐刊工作流</b>
-              <span data-i18n="home_dl_skill_d">给 Codex / AI 助手接入期刊搜索与荐刊接口，适合写作和投稿。</span>
-              <div class="home-dl-actions">
-                <button class="home-btn home-btn-ghost" type="button" data-copy-text="请从 GitHub 安装 AILatest Journal Skill：https://github.com/stonecanon/ailatest-journal/tree/main/skills/ailatest-journal" data-i18n="home_dl_skill_copy">复制安装文本</button>
-                <a class="home-btn home-btn-primary" href="/api/extension/download?asset=skill&amp;source=home" data-extension-download-link download="ailatest-journal-skill-latest.zip" data-i18n="home_dl_skill_cta">下载安装包</a>
+          <p class="home-sec-lead" data-i18n="home_dl_lead">网页可直接用。需要时再装插件、Skill 或 MCP。</p>
+
+          <div class="dl-strip" role="list">
+            <div class="dl-strip-item" role="listitem">
+              <div class="dl-strip-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2"/></svg>
               </div>
-              <p class="home-dl-stat"><span data-i18n="home_dl_skill_stat_pre">下载</span> <b data-extension-download-count="skill">—</b> <span data-i18n="home_dl_skill_stat_post">次</span> · <a href="https://github.com/stonecanon/ailatest-journal/tree/main/skills/ailatest-journal" target="_blank" rel="noopener" data-i18n="home_dl_skill_src">源码</a></p>
-            </article>
-            <article class="home-dl-card">
-              <span class="home-dl-badge" data-i18n="home_dl_mcp_badge">MCP</span>
-              <b data-i18n="home_dl_mcp_t">在线内测服务</b>
-              <span data-i18n="home_dl_mcp_d">无需下载，即可连接 Codex、Claude 等客户端。</span>
-              <button class="home-btn home-btn-primary" type="button" data-copy-text="codex mcp add ailatest-journal --url https://journal.ailatest.org/api/mcp" data-i18n="home_dl_mcp_cta">复制运行代码</button>
-              <p class="home-dl-stat" data-i18n="home_dl_mcp_stat">在线服务 · 复制后运行</p>
-            </article>
-            <article class="home-dl-card home-dl-card-soon">
-              <span class="home-dl-badge" data-i18n="home_dl_soon_badge">更多</span>
-              <b data-i18n="home_dl_soon_t">微信 / 安卓 / iOS</b>
-              <span data-i18n="home_dl_soon_d">小程序与原生客户端规划中，上线后将在此提供入口。</span>
-              <button class="home-btn home-btn-ghost" type="button" disabled data-i18n="home_dl_soon_cta">敬请期待</button>
-            </article>
+              <div class="dl-strip-name" data-i18n="home_dl_plat_browser">Browser</div>
+              <a class="dl-strip-btn" href="/api/extension/download?asset=latest&amp;source=home" data-extension-download-link download="ailatest-journal-extension-latest.zip" data-i18n="home_dl_plat_browser_cta">添加插件</a>
+              <p class="dl-strip-meta"><span data-extension-download-count="latest">—</span> <span data-i18n="home_dl_ext_stat_post">次</span></p>
+            </div>
+            <div class="dl-strip-item" role="listitem">
+              <div class="dl-strip-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3"/><path d="M12 18v3"/><path d="M3 12h3"/><path d="M18 12h3"/><circle cx="12" cy="12" r="3.2"/><path d="m6.3 6.3 2 2M15.7 15.7l2 2M6.3 17.7l2-2M15.7 8.3l2-2"/></svg>
+              </div>
+              <div class="dl-strip-name">Skill</div>
+              <a class="dl-strip-btn" href="/api/extension/download?asset=skill&amp;source=home" data-extension-download-link download="ailatest-journal-skill-latest.zip" data-i18n="home_dl_plat_skill_cta">下载</a>
+              <p class="dl-strip-meta"><span data-extension-download-count="skill">—</span> <span data-i18n="home_dl_ext_stat_post">次</span></p>
+            </div>
+            <div class="dl-strip-item" role="listitem">
+              <div class="dl-strip-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 7h8v4H8z"/><path d="M6 17h12"/><path d="M9 11v6M15 11v6"/><path d="M4 7h16"/></svg>
+              </div>
+              <div class="dl-strip-name">MCP</div>
+              <button type="button" class="dl-strip-btn" data-copy-text="codex mcp add ailatest-journal --url https://journal.ailatest.org/api/mcp" data-i18n="home_dl_plat_mcp_cta">复制命令</button>
+              <p class="dl-strip-meta" data-i18n="home_dl_plat_mcp_meta">在线 · 复制即用</p>
+            </div>
+            <div class="dl-strip-item dl-strip-item-soon" role="listitem">
+              <div class="dl-strip-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg>
+              </div>
+              <div class="dl-strip-name" data-i18n="home_dl_plat_mobile">Mobile</div>
+              <button type="button" class="dl-strip-btn" disabled data-i18n="home_dl_plat_mobile_cta">即将推出</button>
+              <p class="dl-strip-meta" data-i18n="home_dl_plat_mobile_meta">iOS / Android</p>
+            </div>
           </div>
+          <p class="home-sec-note home-dl-note">
+            <button type="button" class="home-dl-linkish" data-copy-text="请从 GitHub 安装 AILatest Journal Skill：https://github.com/stonecanon/ailatest-journal/tree/main/skills/ailatest-journal" data-i18n="home_dl_skill_copy">复制 Skill 安装文本</button>
+            <span class="home-dl-dot">·</span>
+            <a href="https://github.com/stonecanon/ailatest-journal/tree/main/skills/ailatest-journal" target="_blank" rel="noopener" data-i18n="home_dl_skill_src">Skill 源码</a>
+          </p>
         </section>
 
         <section class="home-sec" id="contact">
@@ -526,6 +654,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <label class="th-chk" data-filter="index" data-value="ESCI"><input type="checkbox"><span>ESCI</span></label>
                     <label class="th-chk" data-filter="index" data-value="EI"><input type="checkbox"><span>EI</span></label>
                     <label class="th-chk" data-filter="feat" data-value="scopus"><input type="checkbox"><span>Scopus</span></label>
+                    <label class="th-chk" data-filter="feat" data-value="medline"><input type="checkbox"><span>MEDLINE</span></label>
+                    <label class="th-chk" data-filter="feat" data-value="cscd"><input type="checkbox"><span>CSCD</span></label>
+                    <label class="th-chk" data-filter="feat" data-value="cstpcd"><input type="checkbox"><span>科技核心</span></label>
                   </div>
                 </div>
                 <div class="th-dropdown" id="jcr-dropdown">
@@ -539,7 +670,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </div>
                 <!-- 中科院 | 新锐 -->
                 <div class="th-dropdown" id="cas-dropdown">
-                  <button class="th-dropdown-btn" type="button"><span class="dd-label" data-i18n="cas_zone">中科院</span></button>
+                  <button class="th-dropdown-btn" type="button"><span class="dd-label" data-i18n="filter_cas">中科院</span></button>
                   <div class="th-dropdown-panel" id="cas-panel">
                     <label class="th-chk" data-filter="zone" data-value="1"><input type="checkbox"><span>1区</span></label>
                     <label class="th-chk" data-filter="zone" data-value="2"><input type="checkbox"><span>2区</span></label>
@@ -558,7 +689,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <label class="th-chk" data-filter="xr" data-value="xr-top"><input type="checkbox"><span>TOP</span></label>
                   </div>
                 </div>
-                <!-- ABDC+ABS | 开放（免费/OA/DOAJ）+ IF 快捷 -->
+                <!-- ABDC+ABS | 开放（免费/OA/DOAJ，IF 单独一行） -->
                 <div class="th-dropdown" id="abdc-dropdown">
                   <button class="th-dropdown-btn" type="button"><span class="dd-label" data-i18n="abdc_label">ABDC</span></button>
                   <div class="th-dropdown-panel" id="abdc-panel">
@@ -583,9 +714,23 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     </label>
                     <label class="th-chk" data-filter="feat" data-value="oaj"><input type="checkbox"><span>OA</span></label>
                     <label class="th-chk" data-filter="feat" data-value="doaj"><input type="checkbox"><span>DOAJ</span></label>
-                    <span class="dd-inline-k" aria-hidden="true">IF</span>
+                  </div>
+                </div>
+                <!-- IF 独立整行：与「开放」分开，选项更全 -->
+                <div class="th-dropdown th-dropdown-wide th-if-row" id="if-dropdown">
+                  <button class="th-dropdown-btn" type="button" tabindex="-1"><span class="dd-label">IF</span></button>
+                  <div class="th-dropdown-panel" id="if-panel">
+                    <button type="button" class="th-chk th-if-chip" data-if-min="1" aria-pressed="false" title="IF ≥ 1">≥1</button>
+                    <button type="button" class="th-chk th-if-chip" data-if-min="2" aria-pressed="false" title="IF ≥ 2">≥2</button>
+                    <button type="button" class="th-chk th-if-chip" data-if-min="3" aria-pressed="false" title="IF ≥ 3">≥3</button>
                     <button type="button" class="th-chk th-if-chip" data-if-min="5" aria-pressed="false" title="IF ≥ 5">≥5</button>
                     <button type="button" class="th-chk th-if-chip" data-if-min="10" aria-pressed="false" title="IF ≥ 10">≥10</button>
+                    <button type="button" class="th-chk th-if-chip" data-if-min="15" aria-pressed="false" title="IF ≥ 15">≥15</button>
+                    <button type="button" class="th-chk th-if-chip" data-if-min="20" aria-pressed="false" title="IF ≥ 20">≥20</button>
+                    <button type="button" class="th-chk th-if-chip" data-if-min="30" aria-pressed="false" title="IF ≥ 30">≥30</button>
+                    <!-- 兼容旧滑块脚本，不展示 -->
+                    <span class="if-slider-val" id="if-slider-val" hidden>不限</span>
+                    <input type="range" id="if-slider" min="0" max="50" step="0.5" value="0" tabindex="-1" aria-hidden="true" hidden style="display:none!important">
                   </div>
                 </div>
                 <!-- 预警整行 -->
@@ -596,17 +741,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <label class="th-chk" data-filter="feat" data-value="citic_warning"><input type="checkbox"><span>中信所预警</span></label>
                     <label class="th-chk" data-filter="feat" data-value="under_review"><input type="checkbox"><span>Under Review</span></label>
                     <label class="th-chk" data-filter="feat" data-value="on_hold"><input type="checkbox"><span>On Hold</span></label>
-                    <label class="th-chk" data-filter="feat" data-value="medline"><input type="checkbox"><span>MEDLINE</span></label>
-                    <label class="th-chk" data-filter="feat" data-value="cscd"><input type="checkbox"><span>CSCD</span></label>
-                    <label class="th-chk" data-filter="feat" data-value="cstpcd"><input type="checkbox"><span>科技核心</span></label>
-                  </div>
-                </div>
-                <!-- IF 滑块已废弃（V10 用开放行 ≥5/≥10）；DOM 仅保留 id 供脚本兼容，CSS 强制不渲染 -->
-                <div class="th-dropdown th-dropdown-wide" id="if-dropdown" hidden aria-hidden="true" style="display:none!important">
-                  <button class="th-dropdown-btn" type="button" tabindex="-1"><span class="dd-label" data-i18n="filter_if_range">影响因子</span></button>
-                  <div class="th-dropdown-panel" id="if-panel">
-                    <span class="if-slider-val" id="if-slider-val" hidden>不限</span>
-                    <input type="range" id="if-slider" min="0" max="50" step="0.5" value="0" tabindex="-1" aria-hidden="true">
                   </div>
                 </div>
               </th>
@@ -898,9 +1032,9 @@ window.__BUILD_VER = 'v20260716-stats-fix';
 })();
 </script>
 <script src="/js/pick-match.js?v=20260716-v10" defer></script>
-<script src="/js/pricing-checkout.js?v=20260716-home" defer></script>
+<script src="/js/pricing-checkout.js?v=20260716-billing-toggle" defer></script>
 <script src="/js/extension-downloads.js?v=20260716-home-dl" defer></script>
-<script src="/js/app.js?v=20260716-perf-home" defer></script>
+<script src="/js/app.js?v=20260716-billing-toggle" defer></script>
 
 </body>
 </html>

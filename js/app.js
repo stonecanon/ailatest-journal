@@ -41,7 +41,8 @@
       indices: '索引', cas_zone: '中科院 2025 分区', filters: '附加筛选',
       esi: 'ESI 学科大类', all: '全部',
       z1: '1 区', z2: '2 区', z3: '3 区', z4: '4 区',
-      filter_xinrui: '新锐分区', filter_warning: '预警',
+      filter_cas: '中科院',
+      filter_xinrui: '新锐', filter_warning: '预警',
       domestic_sources: '国内分级来源',
       src_nsfc_mgmt: '国自然管理科学部',
       src_cnkx: '中国科协高质量目录',
@@ -98,6 +99,7 @@
       col_index: '索引收录', col_cas: '学科分区',
       filter_idx: '收录', filter_tier: '分区', filter_extra: '其他',
       filter_open: '开放', filter_free_only: '免费发表',
+      /* filter_cas / filter_xinrui 见上方短标签 */
       filter_topic: '学科',
       filter_free: '免费发表', filter_nsc: 'Nature/Science/Cell',
       jcr_label: 'JCR 分区', abdc_label: 'ABDC', abs_label: 'ABS',
@@ -124,7 +126,7 @@
       home_subtitle: '全球期刊检索与推荐平台',
       home_v4_line1: '投稿之前，先把期刊',
       home_v4_line2: '看清楚',
-      home_v4_line3: '。',
+      home_v4_line3: '',
       home_v4_sub: '检索全球期刊，对比分区、影响因子与开放获取信息 — 一站完成。',
       home_stat_journals: '收录期刊',
       home_stat_views: '累计浏览',
@@ -167,7 +169,14 @@
       home_how_4_t: '收藏或导出', home_how_4_d: '加入清单；插件在阅读页继续对照徽章。',
       home_cta_search: '打开查刊', home_cta_pick: '试用荐刊',
       home_rank_kicker: 'Rankings', home_rank_title: '榜单',
-      home_rank_lead: '按索引、学科与风险名单浏览期刊列表；点进二级页查看完整目录。',
+      home_rank_lead: '索引看板 · 学科榜 · 预警 · 热门浏览',
+      home_rank_tab_index: '索引', home_rank_tab_subject: '学科',
+      home_rank_tab_warn: '预警', home_rank_tab_hot: '热门',
+      home_rank_board_index: '索引看板', home_rank_board_risk: '预警 / 风险',
+      home_rank_board_subject: '学科榜',
+      home_rank_all: '全部 →',
+      home_rank_pill_board: 'Board',
+      home_rank_risk_cas: '中科院预警', home_rank_risk_citic: '中信所预警',
       home_rank_idx_badge: '索引', home_rank_sub_badge: '学科', home_rank_warn_badge: '风险',
       home_rank_idx_d: 'SCIE / SSCI / AHCI / ESCI / EI / Scopus / MEDLINE 等收录入口。',
       home_rank_sub_d: '按 Web of Science 学科浏览 IF 靠前期刊与主题榜单。',
@@ -175,10 +184,15 @@
       home_rank_enter: '进入 →',
       home_price_kicker: 'Pricing', home_price_title: '订阅方案',
       home_price_lead: '网站查刊 Free 永久可用。Pro / Max 提升插件深度、额度与 AI 荐刊配额。教育邮箱另享教育价（登录后解锁）。',
-      home_price_billing: '价格 USD · 年付 · Creem 收银台 · 下方划线为原价',
+      home_price_billing: '价格 USD · 年付 · 下方划线为原价（更划算）',
+      home_price_toggle_year: '年付',
+      home_price_toggle_month: '月付',
+      home_price_save: '更划算',
+      home_price_billing_group: '计费周期',
       home_price_pro_was: '原价 $11.99',
       home_price_max_was: '原价 $14.99',
-      home_price_forever: '/ 永久', home_price_year: '/ 年', home_price_rec: '推荐',
+      home_price_forever: '/ 永久', home_price_year: '/ 年', home_price_month: '/ 月', home_price_rec: '推荐',
+      home_price_more: '查看完整方案对比 →',
       home_price_free_d: '适合日常检索与轻量试用',
       home_price_free_1: '网站完整检索与详情', home_price_free_2: '基础插件徽章', home_price_free_3: 'AI 荐刊试用次数',
       home_price_free_cta: '继续免费使用',
@@ -191,14 +205,22 @@
       home_price_note: '教育价仅限 .edu / .edu.cn / .ac.* 等机构邮箱登录后支付',
       home_price_more: '',
       home_dl_kicker: 'Download', home_dl_title: '下载',
-      home_dl_lead: '网页版无需安装。插件、Skill 与 MCP 可直接在此获取。',
+      home_dl_lead: '网页可直接用。需要时再装插件、Skill 或 MCP。',
+      home_dl_plat_browser: 'Browser',
+      home_dl_plat_browser_cta: '添加插件',
+      home_dl_plat_skill_cta: '下载',
+      home_dl_plat_mcp_cta: '复制命令',
+      home_dl_plat_mcp_meta: '在线 · 复制即用',
+      home_dl_plat_mobile: 'Mobile',
+      home_dl_plat_mobile_cta: '即将推出',
+      home_dl_plat_mobile_meta: 'iOS / Android',
       home_dl_ext_badge: '插件', home_dl_ext_t: 'Chrome / Edge 内测版',
       home_dl_ext_d: '在 Google Scholar、PubMed、知网等页面显示分区徽章，并支持文献卡片保存。',
       home_dl_ext_cta: '下载 ZIP',
       home_dl_ext_stat_pre: '累计下载', home_dl_ext_stat_post: '次',
       home_dl_skill_badge: 'Skill', home_dl_skill_t: '写作与荐刊工作流',
       home_dl_skill_d: '给 Codex / AI 助手接入期刊搜索与荐刊接口，适合写作和投稿。',
-      home_dl_skill_copy: '复制安装文本', home_dl_skill_cta: '下载安装包', home_dl_skill_src: '源码',
+      home_dl_skill_copy: '复制 Skill 安装文本', home_dl_skill_cta: '下载安装包', home_dl_skill_src: 'Skill 源码',
       home_dl_skill_stat_pre: '下载', home_dl_skill_stat_post: '次',
       home_dl_mcp_badge: 'MCP', home_dl_mcp_t: '在线内测服务',
       home_dl_mcp_d: '无需下载，即可连接 Codex、Claude 等客户端。',
@@ -227,7 +249,8 @@
       indices: 'Indices', cas_zone: 'CAS 2025 Tier', filters: 'Filters',
       esi: 'ESI Categories', all: 'All',
       z1: 'T1', z2: 'T2', z3: 'T3', z4: 'T4',
-      filter_xinrui: 'Emerging Tier', filter_warning: 'Warning List',
+      filter_cas: 'CAS',
+      filter_xinrui: 'Emerging', filter_warning: 'Risk',
       domestic_sources: 'Domestic Sources',
       src_nsfc_mgmt: 'NSFC Management',
       src_cnkx: 'CAST Tiered Directory',
@@ -309,7 +332,7 @@
       home_subtitle: 'Journal search & submission decision tool for researchers',
       home_v4_line1: 'See the journal clearly ',
       home_v4_line2: 'before you submit',
-      home_v4_line3: '.',
+      home_v4_line3: '',
       home_v4_sub: 'Search global journals, compare rankings and open access signals — in\u00a0one\u00a0place.',
       pick_search_btn: 'Recommend',
       home_stat_journals: 'Journals',
@@ -353,7 +376,14 @@
       home_how_4_t: 'Save or export', home_how_4_d: 'Add to lists; keep badges with you in the extension.',
       home_cta_search: 'Start searching', home_cta_pick: 'Try recommend',
       home_rank_kicker: 'Rankings', home_rank_title: 'Rankings',
-      home_rank_lead: 'Browse by index, subject and risk lists; open a card for the full directory.',
+      home_rank_lead: 'Index boards · subjects · warnings · hot views',
+      home_rank_tab_index: 'Indexes', home_rank_tab_subject: 'Subjects',
+      home_rank_tab_warn: 'Warnings', home_rank_tab_hot: 'Hot',
+      home_rank_board_index: 'Index boards', home_rank_board_risk: 'Warning / risk',
+      home_rank_board_subject: 'Subject boards',
+      home_rank_all: 'All →',
+      home_rank_pill_board: 'Board',
+      home_rank_risk_cas: 'CAS warning list', home_rank_risk_citic: 'CITIC warning list',
       home_rank_idx_badge: 'Index', home_rank_sub_badge: 'Subject', home_rank_warn_badge: 'Risk',
       home_rank_idx_d: 'SCIE / SSCI / AHCI / ESCI / EI / Scopus / MEDLINE and more.',
       home_rank_sub_d: 'Browse top journals by Web of Science subject.',
@@ -361,10 +391,15 @@
       home_rank_enter: 'Open →',
       home_price_kicker: 'Pricing', home_price_title: 'Plans',
       home_price_lead: 'Website search stays Free forever. Pro / Max unlock extension depth, quotas and AI picks. Edu emails get edu pricing after sign-in.',
-      home_price_billing: 'USD · yearly · Creem checkout · strikethrough = list price',
+      home_price_billing: 'USD · yearly · strikethrough = list price (best value)',
+      home_price_toggle_year: 'Yearly',
+      home_price_toggle_month: 'Monthly',
+      home_price_save: 'Save',
+      home_price_billing_group: 'Billing period',
       home_price_pro_was: 'Was $11.99',
       home_price_max_was: 'Was $14.99',
-      home_price_forever: '/ forever', home_price_year: '/ year', home_price_rec: 'Best',
+      home_price_forever: '/ forever', home_price_year: '/ year', home_price_month: '/ month', home_price_rec: 'Best',
+      home_price_more: 'Full plan comparison →',
       home_price_free_d: 'Everyday search & light trials',
       home_price_free_1: 'Full website search & details', home_price_free_2: 'Basic extension badges', home_price_free_3: 'Limited AI pick trial',
       home_price_free_cta: 'Stay on Free',
@@ -377,14 +412,22 @@
       home_price_note: 'Edu pricing requires institutional email (.edu / .edu.cn / .ac.*) after sign-in',
       home_price_more: '',
       home_dl_kicker: 'Download', home_dl_title: 'Downloads',
-      home_dl_lead: 'No install for the web app. Get the extension, Skill, and MCP right here.',
+      home_dl_lead: 'Use the web app as-is. Add the extension, Skill, or MCP when you need them.',
+      home_dl_plat_browser: 'Browser',
+      home_dl_plat_browser_cta: 'Add extension',
+      home_dl_plat_skill_cta: 'Download',
+      home_dl_plat_mcp_cta: 'Copy command',
+      home_dl_plat_mcp_meta: 'Online · paste & run',
+      home_dl_plat_mobile: 'Mobile',
+      home_dl_plat_mobile_cta: 'Coming soon',
+      home_dl_plat_mobile_meta: 'iOS / Android',
       home_dl_ext_badge: 'Extension', home_dl_ext_t: 'Chrome / Edge beta',
       home_dl_ext_d: 'Ranking badges on Google Scholar, PubMed, CNKI and more; save literature cards.',
       home_dl_ext_cta: 'Download ZIP',
       home_dl_ext_stat_pre: 'Downloads', home_dl_ext_stat_post: '',
       home_dl_skill_badge: 'Skill', home_dl_skill_t: 'Writing & recommend workflow',
       home_dl_skill_d: 'Connect Codex / AI assistants to journal search and recommend APIs.',
-      home_dl_skill_copy: 'Copy install text', home_dl_skill_cta: 'Download package', home_dl_skill_src: 'Source',
+      home_dl_skill_copy: 'Copy Skill install text', home_dl_skill_cta: 'Download package', home_dl_skill_src: 'Source',
       home_dl_skill_stat_pre: 'Downloads', home_dl_skill_stat_post: '',
       home_dl_mcp_badge: 'MCP', home_dl_mcp_t: 'Online beta service',
       home_dl_mcp_d: 'No download — connect Codex, Claude and other MCP clients.',
@@ -783,6 +826,9 @@
     return detectBrowserLang();
   }
   let lang = normalizeLang(initialLangFromPath());
+  // 供 pricing-checkout 等外挂脚本读「真实 UI 语言」，避免与 html lang / 旧缓存不一致
+  window.__journalUiLang = lang;
+  window.__getJournalUiLang = () => lang;
   const UI_LOCALES = {
     'zh-CN': 'zh-CN',
     'zh-TW': 'zh-TW',
@@ -926,8 +972,24 @@
     },
   };
   const T = (zh_, en_) => {
-    if (lang === 'zh-CN' || lang === 'zh-TW') return zh_;
-    return INLINE_I18N[lang]?.[zh_] || INLINE_I18N[lang]?.[en_] || en_;
+    // 简中：中文
+    if (lang === 'zh-CN') return zh_;
+    // 繁中：有 INLINE 用 INLINE，否则用简中
+    if (lang === 'zh-TW') {
+      return INLINE_I18N['zh-TW']?.[zh_] || INLINE_I18N['zh-TW']?.[en_] || zh_;
+    }
+    // 其它语言：INLINE → 英文；禁止回落到中文
+    const pack = INLINE_I18N[lang];
+    if (pack) {
+      if (pack[zh_] != null && pack[zh_] !== '') return pack[zh_];
+      if (en_ && pack[en_] != null && pack[en_] !== '') return pack[en_];
+    }
+    if (en_ != null && en_ !== '' && !/[\u4e00-\u9fff]/.test(String(en_))) return en_;
+    // 误写成 T('中文','中文') 时，非中文界面至少给出可辨识的英文占位
+    if (en_ != null && en_ !== '' && en_ === zh_ && /[\u4e00-\u9fff]/.test(String(zh_))) {
+      return String(zh_);
+    }
+    return (en_ != null && en_ !== '') ? en_ : zh_;
   };
   // ── Domestic field-value translations (CAST domains, CSSCI/PKU disciplines, ZJU tiers) ──
   const DOM_I18N = {
@@ -2421,7 +2483,16 @@
     window.addEventListener('hashchange', scheduleRoutePageview);
   }
 
-  function t(k) { return (I18N[lang] && I18N[lang][k]) ?? I18N.en[k] ?? I18N['zh-CN'][k] ?? k; }
+  function t(k) {
+    // 非中文界面：禁止最终回落到中文包（缺 key 时用英文或 key 本身）
+    const pack = I18N[lang];
+    if (pack && pack[k] != null && pack[k] !== '') return pack[k];
+    if (lang === 'zh-CN' || lang === 'zh-TW') {
+      return (I18N['zh-CN'] && I18N['zh-CN'][k]) ?? (I18N.zh && I18N.zh[k]) ?? k;
+    }
+    if (I18N.en && I18N.en[k] != null && I18N.en[k] !== '') return I18N.en[k];
+    return k;
+  }
 
   function canonicalTitle(s) {
     return String(s || '').trim().replace(/\s+/g, ' ').toUpperCase();
@@ -2608,6 +2679,12 @@
     if (authBtn) authBtn.textContent = user ? (user.name || user.login || t('logout')) : t('login');
     updateAccountCreditBadge();
     document.documentElement.lang = LANG_META[lang]?.html || 'zh-CN';
+    document.documentElement.setAttribute('data-ui-lang', lang);
+    window.__journalUiLang = lang;
+    // 首页教育价提示 / 按钮：必须跟当前 lang，不能用过期 localStorage 判断
+    try {
+      if (typeof window.__syncEduCheckoutUi === 'function') window.__syncEduCheckoutUi();
+    } catch (_) {}
   }
 
   function updateSearchSubmitLabel() {
@@ -3986,12 +4063,23 @@
     return [renderLevelBadges(r), renderRiskBadges(r)].filter(Boolean).join('');
   }
   function renderBadgeCell(indexBadges, rankBadges, accessBadges, riskBadges) {
-    // 每类独立 div，CSS 强制分行：收录 / 分区 / 获取 / 风险
+    // 收录 / 分区各占一行；开放 + 风险并排（中间细竖线），避免卡片被两行撑高
+    let oaRiskHtml = '';
+    if (accessBadges && riskBadges) {
+      oaRiskHtml = `<div class="badges-oa-risk" data-badge-row="oa-risk">
+        <div class="badges badges-access" data-badge-row="access" data-label="${T('开放','OA')}">${accessBadges}</div>
+        <span class="badge-vsep" aria-hidden="true"></span>
+        <div class="badges badges-risk" data-badge-row="risk" data-label="${T('风险','Risk')}">${riskBadges}</div>
+      </div>`;
+    } else if (accessBadges) {
+      oaRiskHtml = `<div class="badges badges-access" data-badge-row="access" data-label="${T('开放','OA')}">${accessBadges}</div>`;
+    } else if (riskBadges) {
+      oaRiskHtml = `<div class="badges badges-risk" data-badge-row="risk" data-label="${T('风险','Risk')}">${riskBadges}</div>`;
+    }
     return [
       indexBadges ? `<div class="badges badges-idx" data-badge-row="index" data-label="${T('收录','Idx')}">${indexBadges}</div>` : '',
       rankBadges  ? `<div class="badges badges-rank" data-badge-row="rank" data-label="${T('分区','Rank')}">${rankBadges}</div>`  : '',
-      accessBadges ? `<div class="badges badges-access" data-badge-row="access" data-label="${T('开放','OA')}">${accessBadges}</div>` : '',
-      riskBadges ? `<div class="badges badges-risk" data-badge-row="risk" data-label="${T('风险','Risk')}">${riskBadges}</div>` : '',
+      oaRiskHtml,
     ].filter(Boolean).join('') || '';
   }
 
@@ -4140,18 +4228,27 @@
   }
   function renderDomCrossBadges(r, excludeSource) {
     const rankSources = new Set(['vhb', 'cnrs', 'fms', 'abdc', 'abs', 'ft50', 'utd24']);
-    const hits = lookupDom(r).filter(h => h.source !== excludeSource && !rankSources.has(h.source));
+    // 全球站收录行已画 CSCD / 科技核心（renderCoverageBadges），交叉徽章勿再重复
+    const coveredOnRecord = new Set();
+    if (r?.cscd) coveredOnRecord.add('cscd');
+    if (r?.cstpcd) coveredOnRecord.add('cstpcd');
+    if (excludeSource) coveredOnRecord.add(excludeSource);
+    const hits = lookupDom(r).filter(h => h.source && !coveredOnRecord.has(h.source) && !rankSources.has(h.source));
     if (!hits.length) return '';
     const out = [];
     const castHits = [];
     const vhbHits = [];
     const hasEmbeddedVhb = Array.isArray(r.vhb) && r.vhb.length;
+    const seenSourceLabel = new Set();
     for (const h of hits) {
       if (h.source === 'cnkx') { castHits.push(h); continue; }
       if (h.source === 'vhb') {
         if (!hasEmbeddedVhb) vhbHits.push(h);
         continue;
       }
+      const dedupeKey = `${h.source}|${h.label || ''}`;
+      if (seenSourceLabel.has(dedupeKey)) continue;
+      seenSourceLabel.add(dedupeKey);
       out.push(`<span class="domsrc-pill ds-${h.source}" title="${escape(h.domain||h.discipline||h.category||h.org||'')}">${escape(h.label)}</span>`);
     }
     if (vhbHits.length) {
@@ -4338,7 +4435,7 @@
       || r.jcr_cat || r.cas_major_cn || r.esi_category || '';
     const publisher = r.publisher || '';
     const metaHtml = [
-      cycleLabel ? jMetaText(T('审稿','审稿'), escape(cycleLabel), 'j-meta-cycle') : '',
+      cycleLabel ? jMetaText(T('审稿','Review'), escape(cycleLabel), 'j-meta-cycle') : '',
       subject ? jMetaChip(subject, 'j-meta-topic-show') : '',
       publisher ? jMetaChip(publisher, 'j-meta-pub') : '',
     ].filter(Boolean).join('');
@@ -4547,16 +4644,41 @@
   }
 
   function updateStickySearchState() {
-    // 全球 / 中国 / 地区站：滚动后收成紧凑条；手机端始终紧凑单行，避免大空框
+    // 统一顶栏搜索：以全球站紧凑条（topbar-compact）为唯一标准
+    // — 全球 / 中国 / 地区站 / 收藏 / 荐刊：始终同一位置与尺寸
+    // — 首页落地（无搜索结果）：大搜索；有结果或滚动后也收成同一紧凑条
+    // — 动态 / 详情：无顶栏搜索
+    if (document.body.classList.contains('journal-route')) {
+      document.body.classList.remove('topbar-compact');
+      updateThStickyTop();
+      placeLangToggle();
+      return;
+    }
+    if (document.body.classList.contains('update-reading-mode') || activeTab === 'updates') {
+      document.body.classList.remove('topbar-compact');
+      updateThStickyTop();
+      placeLangToggle();
+      return;
+    }
     const stationTab = ['int', 'dom', 'in', 'my', 'kr', 'pbn', 'isc', 'scielo'].includes(activeTab);
-    const enabled = !document.body.classList.contains('journal-route') && stationTab;
+    const alwaysCompactTab = stationTab
+      || activeTab === 'fav'
+      || activeTab === 'pick';
+    const homeLanding = activeTab === 'home'
+      && !document.body.classList.contains('home-tab-has-results');
     const isMobile = typeof window.matchMedia === 'function'
       ? window.matchMedia('(max-width: 900px)').matches
       : window.innerWidth <= 900;
-    // 迟滞（hysteresis）：缩小搜索框会改变页面高度，阈值必须拉开，避免临界点反复抖动。
     const isCompact = document.body.classList.contains('topbar-compact');
     const y = window.scrollY;
-    const shouldCompact = enabled && (isMobile || (isCompact ? y > 2 : y > 132));
+    // 首页落地：滚动后收紧；其它业务页（含收藏）始终紧凑 = 全球站标准
+    let shouldCompact = false;
+    if (alwaysCompactTab) {
+      shouldCompact = true;
+    } else if (activeTab === 'home') {
+      if (!homeLanding || isMobile) shouldCompact = true;
+      else shouldCompact = isCompact ? y > 2 : y > 132;
+    }
     const changed = document.body.classList.toggle('topbar-compact', shouldCompact);
     if (changed) requestAnimationFrame(updateThStickyTop);
     else updateThStickyTop();
@@ -7671,10 +7793,39 @@
 
     drawer.classList.add('open');
     drawer.classList.toggle('journal-page', pageMode);
+    // 页模式：内联 + 独立 CSS 双重强制全宽（解决「布局没变」）
     if (pageMode) {
+      document.body.classList.add('journal-route');
+      document.documentElement.classList.add('journal-route');
+      applyJournalPageShellStyles(drawer, body);
+      requestAnimationFrame(() => {
+        const layout = body?.querySelector?.('.detail-layout');
+        if (layout) {
+          layout.classList.add('is-page');
+          layout.style.cssText = [
+            'display:grid',
+            'grid-template-columns:minmax(0,1fr) minmax(260px,320px)',
+            'column-gap:clamp(20px,2.5vw,40px)',
+            'align-items:start',
+            'width:100%',
+            'max-width:none',
+            'margin:0',
+            'padding:0',
+            'box-sizing:border-box',
+          ].join(';');
+          const mainCol = layout.querySelector('.detail-main-col');
+          const sideCol = layout.querySelector('.detail-side-col');
+          if (mainCol) mainCol.style.cssText = 'min-width:0;width:auto;max-width:none';
+          if (sideCol) {
+            sideCol.style.cssText = 'width:min(320px,28vw);max-width:320px;min-width:240px;position:sticky;top:72px;align-self:start';
+          }
+        }
+      });
       scrim?.classList.remove('on');
       if (scrim) scrim.hidden = true;
     } else {
+      drawer.style.cssText = '';
+      if (body) body.style.cssText = '';
       scrim?.classList.add('on');
       scrim && (scrim.hidden = false);
     }
@@ -7696,13 +7847,18 @@
   }
   function closeDrawer(skipHashClear) {
     if (!drawerOpen) return;
-    $('#j-drawer')?.classList.remove('open', 'journal-page');
+    const drawerEl = $('#j-drawer');
+    const bodyEl = $('#drawer-body');
+    drawerEl?.classList.remove('open', 'journal-page');
+    if (drawerEl) drawerEl.style.cssText = '';
+    if (bodyEl) bodyEl.style.cssText = '';
     const scrim = $('#drawer-scrim');
     scrim?.classList.remove('on');
     if (scrim) scrim.hidden = true;
     drawerOpen = false;
     _currentDrawerRec = null;
     document.body.classList.remove('journal-route');
+    document.documentElement.classList.remove('journal-route');
     document.body.style.overflow = '';
     // 清掉 #j/<id> hash（避免回到列表后浏览器仍显示旧 hash）
     if (!skipHashClear && /^#j\//.test(location.hash || '')) {
@@ -7737,6 +7893,25 @@
     if (ogUrl) ogUrl.setAttribute('content', 'https://journal.ailatest.org' + journalPublicPath(r));
   }
 
+  function applyJournalPageShellStyles(drawer, body) {
+    if (!drawer) return;
+    drawer.classList.add('open', 'journal-page');
+    drawer.style.cssText = [
+      'position:relative', 'inset:auto', 'top:auto', 'right:auto', 'bottom:auto', 'left:auto',
+      'width:100%', 'max-width:none', 'min-width:0', 'height:auto', 'min-height:100vh',
+      'margin:0', 'padding:0 16px 32px', 'border:0', 'box-shadow:none', 'background:transparent',
+      'transform:none', 'overflow:visible', 'z-index:1', 'display:flex', 'flex-direction:column',
+      'box-sizing:border-box',
+    ].join(';');
+    if (body) {
+      body.style.cssText = [
+        'display:block', 'width:100%', 'max-width:none', 'min-width:0', 'margin:0',
+        'padding:4px 0 48px', 'overflow:visible', 'background:transparent',
+        'box-sizing:border-box', 'flex:1 1 auto',
+      ].join(';');
+    }
+  }
+
   function renderJournalRoutePage() {
     const slug = journalPathSlug();
     if (!slug) return false;
@@ -7745,7 +7920,7 @@
     document.documentElement.classList.add('journal-route');
     const drawer = $('#j-drawer'), body = $('#drawer-body'), scrim = $('#drawer-scrim');
     if (drawer) {
-      drawer.classList.add('open', 'journal-page');
+      applyJournalPageShellStyles(drawer, body);
       scrim?.classList.remove('on');
       if (scrim) scrim.hidden = true;
     }
@@ -7895,7 +8070,7 @@
           <p class="region-paywall-desc" id="region-paywall-desc"></p>
           <ul class="region-paywall-perks" id="region-paywall-perks"></ul>
           <div class="region-paywall-actions">
-            <a class="region-paywall-btn primary" id="region-paywall-cta" href="/#pricing">${T('查看订阅方案','View plans')}</a>
+            <a class="region-paywall-btn primary" id="region-paywall-cta" href="/pricing">${T('查看订阅方案','View plans')}</a>
             <button type="button" class="region-paywall-btn ghost" id="region-paywall-later">${T('暂不升级','Not now')}</button>
           </div>
           <p class="region-paywall-note" id="region-paywall-note"></p>
@@ -8206,42 +8381,104 @@
     if (creditBadge) creditBadge.style.order = '9';
     applyRegionPinState();
   }
+  /** 非中文语言包：用英文补齐缺失 key（ja/ko 等是 en 的薄覆盖，创建后 en 新增的 key 不会自动带上） */
+  function hydrateLangPack(code) {
+    if (!code || code === 'zh-CN' || code === 'zh-TW') return;
+    const en = I18N.en || {};
+    if (!I18N[code]) {
+      I18N[code] = { ...en };
+      return;
+    }
+    const pack = I18N[code];
+    for (const k of Object.keys(en)) {
+      if (pack[k] == null) pack[k] = en[k];
+    }
+  }
+
+  // 首页搜索结果渲染在 bind() 内定义，经此钩子在语言切换时重刷
+  let refreshHomeForLang = null;
+
+  function refreshActiveTabContent() {
+    try {
+      // 清掉可复用标记，强制按新语言重绘
+      try {
+        const p = document.querySelector(`.tab-panel[data-panel="${activeTab}"]`);
+        if (p) delete p.dataset.renderKey;
+      } catch (_) {}
+      if (activeTab === 'dom') renderDomestic();
+      else if (activeTab === 'fav') renderFav();
+      else if (activeTab === 'int') renderInt();
+      else if (activeTab === 'pick') refreshPickI18n();
+      else if (activeTab === 'in') renderIndia();
+      else if (activeTab === 'my') renderMalaysia();
+      else if (activeTab === 'kr') renderKorea();
+      else if (REGIONAL_DIRECTORY_CONFIG[activeTab]) renderRegionalDirectory(activeTab);
+      else if (activeTab === 'updates') renderJournalUpdates();
+      else if (activeTab === 'home' && typeof refreshHomeForLang === 'function') {
+        refreshHomeForLang();
+      }
+    } catch (err) {
+      console.error('[setUiLanguage] refresh tab failed', err);
+    }
+  }
+
   function setUiLanguage(code) {
-    if (!LANG_META[code]) return;
-    lang = code;
+    const next = normalizeLang(code);
+    if (!LANG_META[next]) return;
+    // 即使点同一语言，也允许强制刷新（修复「点了没变」的卡死态）
+    const changed = next !== lang;
+    lang = next;
+    hydrateLangPack(lang);
     try {
       localStorage.setItem('ailatest.lang', lang);
       // 标记为用户主动选择，后续不再被浏览器语言覆盖
       localStorage.setItem('ailatest.lang.userSet', '1');
     } catch (_) {}
-    localizeDefaultFavListName();
-    persistFavLists(false);
-    applyI18n();
-    if (domestic) buildDomIndex(domestic);
+    window.__journalUiLang = lang;
+    try {
+      document.documentElement.lang = LANG_META[lang]?.html || lang;
+      document.documentElement.setAttribute('data-ui-lang', lang);
+    } catch (_) {}
+    try { localizeDefaultFavListName(); } catch (_) {}
+    try { persistFavLists(false); } catch (_) {}
+    try { applyI18n(); } catch (err) { console.error(err); }
+    // 教育价 / 结账 CTA 不在 data-i18n 里，需显式按当前语言重刷
+    try {
+      if (typeof window.__syncEduCheckoutUi === 'function') window.__syncEduCheckoutUi();
+    } catch (_) {}
+    try {
+      if (domestic) buildDomIndex(domestic);
+    } catch (_) {}
     const wosSel2 = $('#wos-col-filter');
     if (wosSel2) wosSel2.__bound = false;
-    renderCatList();
-    // 设置页语言切换：保留当前设置分区（手机保持二级全屏）
+    try { renderCatList(); } catch (_) {}
+
+    // 关键：无论设置浮层是否打开，都要刷新当前业务页（列表卡 T() 文案）
+    // 旧逻辑在 settings-open 时 early-branch，导致收藏/全球列表仍残留中文
+    if (activeTab !== 'me') refreshActiveTabContent();
+
+    // 设置页语言切换：强制停在语言分区并重绘
     if (activeTab === 'me' || document.body.classList.contains('settings-open')) {
-      if (!_settingsSection || _settingsSection === 'activity') _settingsSection = 'language';
-      const keep = _settingsSection;
+      _settingsSection = 'language';
       window.__settingsOpenAsRoot = false;
-      renderMe();
-      showSettingsSection(keep === 'language' ? 'language' : keep, {
-        subpage: window.matchMedia('(max-width: 900px)').matches,
-      });
-    } else if (activeTab === 'dom') renderDomestic();
-    else if (activeTab === 'fav') renderFav();
-    else if (activeTab === 'int') renderInt();
-    else if (activeTab === 'pick') refreshPickI18n();
-    else if (activeTab === 'in') renderIndia();
-    else if (activeTab === 'my') renderMalaysia();
-    else if (activeTab === 'kr') renderKorea();
-    else if (REGIONAL_DIRECTORY_CONFIG[activeTab]) renderRegionalDirectory(activeTab);
-    window.dispatchEvent(new CustomEvent('ailatest:langchange'));
-    loadJournalViewTotalFootnote();
+      try {
+        renderMe();
+        showSettingsSection('language', {
+          subpage: window.matchMedia('(max-width: 900px)').matches,
+        });
+      } catch (err) {
+        console.error('[setUiLanguage] settings refresh failed', err);
+      }
+    }
+
+    try {
+      window.dispatchEvent(new CustomEvent('ailatest:langchange', { detail: { lang, changed } }));
+    } catch (_) {}
+    try { loadJournalViewTotalFootnote(); } catch (_) {}
     if (_currentDrawerRec) {
-      openDrawer(_currentDrawerRec, { pageMode: document.body.classList.contains('journal-route') });
+      try {
+        openDrawer(_currentDrawerRec, { pageMode: document.body.classList.contains('journal-route') });
+      } catch (_) {}
     }
   }
   window.__setJournalLanguage = setUiLanguage;
@@ -8737,18 +8974,292 @@
     return T('Free 账号 · AI 荐刊终身共 10 次 · 升级可解锁更多。','Free plan · 10 lifetime AI picks · upgrade for more.');
   }
 
-  function renderActivityDots() {
-    const usage = getDailyUsage();
+  /** 本地日历日 YYYY-MM-DD（避免 toISOString UTC 错日） */
+  function localDateKey(d) {
+    const x = d instanceof Date ? d : new Date(d);
+    if (!Number.isFinite(x.getTime())) return '';
+    const y = x.getFullYear();
+    const m = String(x.getMonth() + 1).padStart(2, '0');
+    const day = String(x.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
+  /** 按日汇总本机活动次数（浏览 + 当日用量）→ 热力图色阶 */
+  function activityCountsByDay() {
+    const map = Object.create(null);
+    const bump = (ts, n = 1) => {
+      const t = Number(ts);
+      if (!Number.isFinite(t) || t <= 0) return;
+      const key = localDateKey(new Date(t));
+      if (!key) return;
+      map[key] = (map[key] || 0) + n;
+    };
+    try {
+      const views = JSON.parse(localStorage.getItem(VIEWHIST_KEY || 'ailatest.viewhist') || '[]');
+      if (Array.isArray(views)) {
+        views.forEach((e) => {
+          if (!e) return;
+          bump(e.t || e.time || recordTimeMs(e), 1);
+        });
+      }
+    } catch (_) {}
+    try {
+      // 首页搜索历史无时间戳时不计入历史格，仅用今日 usage
+      const usage = getDailyUsage();
+      if (usage?.date) {
+        const n = Number(usage.views || 0) + Number(usage.searches || 0);
+        if (n > 0) map[usage.date] = Math.max(map[usage.date] || 0, n);
+      }
+    } catch (_) {}
+    const todayKey = localDateKey(new Date());
+    if (todayKey) {
+      map[todayKey] = Math.max(map[todayKey] || 0, todayViewCount() + Number(getDailyUsage().searches || 0));
+    }
+    return map;
+  }
+
+  function activityLevelFromCount(c) {
+    const n = Number(c) || 0;
+    if (n <= 0) return 0;
+    if (n === 1) return 1;
+    if (n <= 3) return 2;
+    if (n <= 6) return 3;
+    return 4;
+  }
+
+  /** 个人使用汇总：连续天数、峰值、常看刊 / 学科等（本机记录） */
+  function computeUsageSummary() {
+    const counts = activityCountsByDay();
     const today = new Date();
-    const dots = [];
-    for (let i = 83; i >= 0; i--) {
+    today.setHours(12, 0, 0, 0);
+    const todayKey = localDateKey(today);
+
+    let totalActivity = 0;
+    let peakCount = 0;
+    let peakDate = '';
+    let activeDays = 0;
+    Object.keys(counts).forEach((k) => {
+      const n = Number(counts[k]) || 0;
+      if (n <= 0) return;
+      totalActivity += n;
+      activeDays += 1;
+      if (n > peakCount) {
+        peakCount = n;
+        peakDate = k;
+      }
+    });
+
+    // 从今天往前算当前连续；全量扫描最长连续
+    let currentStreak = 0;
+    for (let i = 0; i < 400; i++) {
       const d = new Date(today);
       d.setDate(today.getDate() - i);
-      const key = d.toISOString().slice(0, 10);
-      const active = usage.date === key ? Math.min(4, Math.max(1, todayViewCount() + Number(usage.searches || 0))) : 0;
-      dots.push(`<span class="me-activity-dot level-${active}" title="${escape(key)}"></span>`);
+      const key = localDateKey(d);
+      if ((counts[key] || 0) > 0) currentStreak += 1;
+      else break;
     }
-    return dots.join('');
+    let longestStreak = 0;
+    let run = 0;
+    for (let i = 400; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(today.getDate() - i);
+      const key = localDateKey(d);
+      if ((counts[key] || 0) > 0) {
+        run += 1;
+        if (run > longestStreak) longestStreak = run;
+      } else {
+        run = 0;
+      }
+    }
+    if (currentStreak > longestStreak) longestStreak = currentStreak;
+
+    let viewHist = [];
+    try {
+      viewHist = JSON.parse(localStorage.getItem(VIEWHIST_KEY || 'ailatest.viewhist') || '[]');
+      if (!Array.isArray(viewHist)) viewHist = [];
+    } catch (_) { viewHist = []; }
+
+    const uniqueJournals = viewHist.filter((e) => e && (e.k || e.n)).length;
+    const topJournals = viewHist.slice(0, 8).map((e) => ({
+      name: e.n || e.name || e.k || '—',
+      fid: e.k || '',
+      path: e.p || '',
+      cats: Array.isArray(e.c) ? e.c : [],
+    }));
+
+    const subjectScore = Object.create(null);
+    viewHist.forEach((e, i) => {
+      const w = 1 / (1 + i * 0.08);
+      (e && e.c || []).forEach((c) => {
+        if (!c) return;
+        subjectScore[c] = (subjectScore[c] || 0) + w;
+      });
+    });
+    const topSubjects = Object.entries(subjectScore)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([name, score]) => ({ name, score }));
+
+    let pickCount = 0;
+    try {
+      const ph = JSON.parse(localStorage.getItem('ailatest.pick.history') || '[]');
+      if (Array.isArray(ph)) pickCount = ph.length;
+    } catch (_) {}
+
+    return {
+      totalActivity,
+      peakCount,
+      peakDate,
+      activeDays,
+      currentStreak,
+      longestStreak,
+      uniqueJournals,
+      favCount: allFavIds().size,
+      searchCount: localSearchCount(),
+      pickCount,
+      pluginCalls: localPluginCallCount(),
+      todayViews: todayViewCount(),
+      todayKey,
+      topJournals,
+      topSubjects,
+    };
+  }
+
+  function renderUsageSummaryHtml() {
+    const s = computeUsageSummary();
+    const daysUnit = T('天', 'd');
+    const peakLabel = s.peakDate
+      ? `${s.peakCount} · ${s.peakDate.slice(5).replace('-', '/')}`
+      : String(s.peakCount || 0);
+
+    const insightRows = [
+      [T('今日浏览', 'Views today'), String(s.todayViews)],
+      [T('累计浏览期刊', 'Journals viewed'), String(s.uniqueJournals)],
+      [T('搜索记录', 'Searches'), String(s.searchCount)],
+      [T('AI 荐刊记录', 'AI picks'), String(s.pickCount)],
+      [T('活跃天数', 'Active days'), String(s.activeDays)],
+      [T('插件 / API', 'Plugin / API'), String(s.pluginCalls)],
+    ];
+
+    const topSubjectRows = s.topSubjects.length
+      ? s.topSubjects.map((x, i) => {
+          const pct = Math.round((x.score / (s.topSubjects[0].score || 1)) * 100);
+          return `<div class="me-insight-row">
+            <span class="me-insight-k">${escape(x.name)}</span>
+            <span class="me-insight-v">${pct}%</span>
+          </div>`;
+        }).join('')
+      : `<div class="me-insight-empty">${T('浏览期刊后，这里会显示常看学科', 'Subjects appear after you open journals')}</div>`;
+
+    const topJournalRows = s.topJournals.length
+      ? s.topJournals.slice(0, 5).map((j) => {
+          const href = j.path || (j.fid ? `#j/${encodeURIComponent(j.fid)}` : '');
+          const inner = `<span class="me-insight-k" title="${escape(j.name)}">${escape(titleCase(j.name))}</span>`;
+          return `<div class="me-insight-row me-insight-journal">
+            ${href ? `<a href="${escape(href)}" data-me-open-fid="${escape(j.fid || '')}">${inner}</a>` : inner}
+          </div>`;
+        }).join('')
+      : `<div class="me-insight-empty">${T('打开期刊详情后会出现在这里', 'Recently opened journals show up here')}</div>`;
+
+    return `
+      <div class="me-summary-strip" role="group" aria-label="${escape(T('使用摘要', 'Usage summary'))}">
+        <div class="me-summary-item">
+          <strong>${s.totalActivity.toLocaleString()}</strong>
+          <span>${T('累计活动', 'Total activity')}</span>
+        </div>
+        <div class="me-summary-item">
+          <strong>${escape(peakLabel)}</strong>
+          <span>${T('峰值日活动', 'Peak day')}</span>
+        </div>
+        <div class="me-summary-item">
+          <strong>${s.favCount.toLocaleString()}</strong>
+          <span>${T('收藏期刊', 'Saved')}</span>
+        </div>
+        <div class="me-summary-item">
+          <strong>${s.currentStreak}${daysUnit}</strong>
+          <span>${T('当前连续', 'Current streak')}</span>
+        </div>
+        <div class="me-summary-item">
+          <strong>${s.longestStreak}${daysUnit}</strong>
+          <span>${T('最长连续', 'Longest streak')}</span>
+        </div>
+      </div>
+      <div class="me-insight-grid">
+        <section class="me-insight-card">
+          <h4 class="me-insight-title">${T('活动洞察', 'Activity insights')}</h4>
+          ${insightRows.map(([k, v]) => `<div class="me-insight-row"><span class="me-insight-k">${escape(k)}</span><span class="me-insight-v">${escape(v)}</span></div>`).join('')}
+        </section>
+        <section class="me-insight-card">
+          <h4 class="me-insight-title">${T('常看学科', 'Top subjects')}</h4>
+          ${topSubjectRows}
+        </section>
+        <section class="me-insight-card me-insight-card-wide">
+          <h4 class="me-insight-title">${T('最近打开', 'Recently opened')}</h4>
+          ${topJournalRows}
+        </section>
+      </div>`;
+  }
+
+  /**
+   * GitHub 风格热力图：列=周、行=星期（日→六），每天一格。
+   * 近 12 周，含本周，不足的周前用空白格对齐。
+   */
+  function renderActivityDots() {
+    const weeks = 12;
+    const today = new Date();
+    today.setHours(12, 0, 0, 0);
+    // 周起始：周日（与常见贡献图一致）
+    const endSundayOffset = today.getDay(); // 0=Sun … 6=Sat
+    const start = new Date(today);
+    start.setDate(today.getDate() - endSundayOffset - (weeks - 1) * 7);
+    start.setHours(12, 0, 0, 0);
+
+    const counts = activityCountsByDay();
+    const cells = [];
+    const monthMarks = []; // { col, label }
+    let prevMonth = -1;
+
+    for (let w = 0; w < weeks; w++) {
+      for (let dow = 0; dow < 7; dow++) {
+        const d = new Date(start);
+        d.setDate(start.getDate() + w * 7 + dow);
+        d.setHours(12, 0, 0, 0);
+        const key = localDateKey(d);
+        const isFuture = d.getTime() > today.getTime() + 12 * 3600 * 1000;
+        const count = isFuture ? 0 : (counts[key] || 0);
+        const level = isFuture ? 0 : activityLevelFromCount(count);
+        const label = d.toLocaleDateString(uiLocale(), {
+          year: 'numeric', month: 'short', day: 'numeric', weekday: 'short',
+        });
+        const tip = count
+          ? `${label} · ${count} ${T('次活动', 'activities')}`
+          : (isFuture ? label : `${label} · ${T('无记录', 'No activity')}`);
+        cells.push(
+          `<span class="me-activity-dot level-${level}${isFuture ? ' is-future' : ''}" title="${escape(tip)}" data-date="${escape(key)}" data-count="${count}"></span>`
+        );
+      }
+      // 月初或首列标注月份
+      const colDay = new Date(start);
+      colDay.setDate(start.getDate() + w * 7);
+      const m = colDay.getMonth();
+      if (w === 0 || m !== prevMonth) {
+        monthMarks.push({
+          col: w,
+          label: colDay.toLocaleDateString(uiLocale(), { month: 'short' }),
+        });
+        prevMonth = m;
+      }
+    }
+
+    const monthRow = Array.from({ length: weeks }, (_, w) => {
+      const hit = monthMarks.find((x) => x.col === w);
+      return `<span class="me-activity-month-cell">${hit ? escape(hit.label) : ''}</span>`;
+    }).join('');
+
+    return `<div class="me-activity-heat" style="--activity-weeks:${weeks}">
+      <div class="me-activity-grid settings-activity-grid" role="img" aria-label="${escape(T('近 12 周每日活动', 'Daily activity · last 12 weeks'))}">${cells.join('')}</div>
+      <div class="me-activity-month-row" aria-hidden="true">${monthRow}</div>
+    </div>`;
   }
 
   let _settingsSection = 'account';
@@ -8868,10 +9379,11 @@
                 <button type="button" class="me-stat-item" data-me-stat="api"><strong>${localPluginCallCount()}</strong><span>${T('API','API')}</span></button>
               </div>
               <section class="me-card me-record-panel" data-me-record-panel hidden></section>
+              ${renderUsageSummaryHtml()}
               <section class="me-card me-activity-card settings-activity-card">
                 <h3 class="settings-subhead">${T('活动记录','Activity')}</h3>
-                <div class="me-activity-months"><span>${T('近 12 周','Last 12 weeks')}</span><span>${new Date().toLocaleDateString(uiLocale(), { month: 'short', day: 'numeric' })}</span></div>
-                <div class="me-activity-grid settings-activity-grid">${renderActivityDots()}</div>
+                <div class="me-activity-months"><span>${T('近 12 周 · 每天一格','Last 12 weeks · one cell per day')}</span><span>${new Date().toLocaleDateString(uiLocale(), { month: 'short', day: 'numeric' })}</span></div>
+                ${renderActivityDots()}
               </section>
             </section>
 
@@ -8909,9 +9421,33 @@
             <section class="settings-section" data-settings-section="billing" ${_settingsSection === 'billing' ? '' : 'hidden'}>
               <h2 class="settings-section-title">${T('订阅','Billing')}</h2>
               <p class="settings-hint">${T('当前档位','Current plan')}：<strong>${escape(membershipTierLabel().label || '—')}</strong></p>
-              <a class="settings-link-row" href="/#pricing">${T('订阅方案（Creem 支付）','Plans (Creem checkout)')}<span>↗</span></a>
+              <div class="billing-toggle-wrap settings-billing-toggle">
+                <div class="billing-toggle" role="group" aria-label="${T('计费周期','Billing period')}">
+                  <button type="button" class="billing-toggle-btn is-on" data-billing-toggle="year" aria-pressed="true">
+                    <span>${T('年付','Yearly')}</span>
+                    <em class="billing-save-tag">${T('更划算','Save')}</em>
+                  </button>
+                  <button type="button" class="billing-toggle-btn" data-billing-toggle="month" aria-pressed="false">
+                    <span>${T('月付','Monthly')}</span>
+                  </button>
+                </div>
+              </div>
+              <p class="settings-hint settings-billing-note" data-billing-note>${T('价格 USD · 年付 · 下方划线为原价（更划算）','USD · yearly · strikethrough = list price (best value)')}</p>
+              <div class="settings-plan-prices" style="display:grid;gap:8px;margin:0 0 12px">
+                <div class="s-row-like" style="cursor:default">
+                  <span>Pro</span>
+                  <strong data-plan-price="pro"><span data-price-amt>$7.99</span> <span data-price-unit>/ ${T('年','year')}</span></strong>
+                </div>
+                <p class="settings-hint" style="margin:-4px 0 0" data-plan-was="pro">${T('原价 $11.99','Was $11.99')}</p>
+                <div class="s-row-like" style="cursor:default">
+                  <span>Max</span>
+                  <strong data-plan-price="max"><span data-price-amt>$9.99</span> <span data-price-unit>/ ${T('年','year')}</span></strong>
+                </div>
+                <p class="settings-hint" style="margin:-4px 0 0" data-plan-was="max">${T('原价 $14.99','Was $14.99')}</p>
+              </div>
               <button type="button" class="settings-link-row" data-creem-checkout data-plan="pro" data-period="year" style="width:100%">${T('升级 Pro · 年付','Upgrade Pro · yearly')}<span>→</span></button>
               <button type="button" class="settings-link-row" data-creem-checkout data-plan="max" data-period="year" style="width:100%">${T('升级 Max · 年付','Upgrade Max · yearly')}<span>→</span></button>
+              <a class="settings-link-row" href="/pricing">${T('查看完整方案对比','Full plan comparison')}<span>↗</span></a>
             </section>
 
             <section class="settings-section" data-settings-section="downloads" ${_settingsSection === 'downloads' ? '' : 'hidden'}>
@@ -9043,21 +9579,15 @@
         });
       });
     });
-    // 语言：直接 setUiLanguage，不依赖页面角落下拉（设置浮层下原点击无效）
+    // 语言芯片：点击即切换（允许重复点当前语言以强制刷新）
     box.querySelectorAll('[data-set-lang]').forEach((btn) => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         const code = btn.getAttribute('data-set-lang');
-        if (!code || code === lang) return;
-        setUiLanguage(code);
-        // setUiLanguage 在 me tab 会 renderMe；确保仍停留在语言分区
+        if (!code) return;
         _settingsSection = 'language';
-        if (activeTab === 'me') {
-          // renderMe 已由 setUiLanguage 触发时保持 language；否则补一次
-          const still = $('#me-content [data-settings-section="language"]');
-          if (!still || still.hidden) {
-            showSettingsSection('language');
-          }
-        }
+        setUiLanguage(code);
       });
     });
     // 地区站固定 / 取消（只改侧栏钉选，不强制跳转）
@@ -9110,6 +9640,16 @@
           return;
         }
         renderMeRecordPanel(box, type);
+      });
+    });
+    // 使用摘要：最近打开期刊
+    box.querySelectorAll('[data-me-open-fid]').forEach((a) => {
+      a.addEventListener('click', (e) => {
+        const fid = a.getAttribute('data-me-open-fid') || '';
+        const href = a.getAttribute('href') || '';
+        if (!fid && !href) return;
+        e.preventDefault();
+        openJournalFromMeHistory({ fid, href, title: a.textContent || '' });
       });
     });
     // 礼品码兑换 / 站长生成
@@ -9401,7 +9941,8 @@
       const q = activeQuery.toLowerCase();
       rows = rows.filter(r => scoreRecord(r, activeQuery) > 0 || (
         (r.name||'') + ' ' + (r.cn_name||'') + ' ' + (r.en_name||'') + ' ' +
-        (r.issn||'') + ' ' + (r.cn_code||'')
+        (r.issn||'') + ' ' + (r.cn_code||'') + ' ' +
+        (r.publisher||'') + ' ' + (r.org||'') + ' ' + (r.sponsor||'')
       ).toLowerCase().includes(q));
     }
     rows = sortByIF(rows, favIfSort);
@@ -9412,21 +9953,18 @@
       return;
     }
 
-    // 单一有序表格 + 拖动
+    // 卡片网格：不再渲染表头（INDICES/IF/SOURCE 在卡片布局下不可用）
     const tbody = rows.map(r => renderFavRow(r)).join('');
-    const hint = activeQuery ? '' : `<div class="fav-drag-hint">${T('左侧色条可拖动排序 · 手机长按同样支持','Drag the left bar to reorder · long-press on mobile')}</div>`;
+    const ifSortLabel = favIfSort === 'asc' ? 'IF ▲' : favIfSort === 'desc' ? 'IF ▼' : `IF ${T('排序','sort')}`;
+    const hint = activeQuery
+      ? ''
+      : `<div class="fav-drag-hint">
+          <span>${T('左侧色条可拖动排序 · 手机长按同样支持','Drag the left bar to reorder · long-press on mobile')}</span>
+          <button type="button" class="btn-mini fav-if-sort ${favIfSort ? 'is-on' : ''}" data-if-sort="fav" title="${T('按影响因子排序','Sort by Impact Factor')}">${ifSortLabel}</button>
+        </div>`;
     box.innerHTML = toolbar + hint + `
-      <div class="table-wrap" style="margin-top:10px">
+      <div class="table-wrap fav-card-wrap" style="margin-top:10px">
         <table class="journals fav-table">
-          <thead><tr>
-            <th class="col-drag" style="width:28px"></th>
-            <th class="col-fav" aria-label="Favorite"></th>
-            <th class="col-name">${T('期刊 Title','Journal Title')}</th>
-            <th class="col-badge">${T('索引 / 分区','Indices / Tier')}</th>
-            <th class="col-if sortable ${favIfSort === 'desc' ? 'sort-desc' : favIfSort === 'asc' ? 'sort-asc' : ''}" data-if-sort="fav">IF <span class="sort-arrow">${favIfSort === 'asc' ? '▲' : '▼'}</span></th>
-            <th class="col-cycle">${T('审稿周期','Review')}</th>
-            <th class="col-src" style="width:90px">${T('来源','Source')}</th>
-          </tr></thead>
           <tbody id="fav-tbody">${tbody}</tbody>
         </table>
       </div>
@@ -10290,9 +10828,11 @@
     }
     const cycleLabel = cycleDays ? `${Math.round(cycleDays / 30.4)}${T('个月','mo')}` : '';
     const freeHtml = freeBadgeCell(r, { compact: true });
+    const publisher = r.publisher || r.org || r.sponsor || '';
     const metaHtml = [
       jMetaPlain(`<span class="src-tag src-${escape(r.__src)}">${SRC_LABEL[r.__src] || r.__src}</span>`, 'j-meta-src'),
-      cycleLabel ? jMetaText(T('审稿','审稿'), escape(cycleLabel), 'j-meta-cycle') : '',
+      cycleLabel ? jMetaText(T('审稿','Review'), escape(cycleLabel), 'j-meta-cycle') : '',
+      publisher ? jMetaChip(publisher, 'j-meta-pub') : '',
     ].filter(Boolean).join('');
     const bodyHtml = `<div class="j-card-badges">${badgeCell}</div>`;
     return journalCardRow({
@@ -10476,7 +11016,7 @@
     document.querySelectorAll('#free-chip-proxy, .th-chk-free input').forEach((input) => {
       input.addEventListener('change', (e) => setFreeFilter(!!e.target.checked));
     });
-    // IF 快捷芯片 ≥5 / ≥10（与滑块共用 activeIfMin）
+    // IF 快捷芯片（独立一行：≥1/2/3/5/10/15/20/30，与 activeIfMin 共用）
     const syncIfChips = () => {
       document.querySelectorAll('.th-if-chip[data-if-min]').forEach((btn) => {
         const v = Number(btn.getAttribute('data-if-min') || 0);
@@ -10649,14 +11189,16 @@
     $('#more').addEventListener('click', () => { shown += PAGE; renderInt(); });
 
     document.addEventListener('click', (e) => {
-      const th = e.target.closest('th.col-if[data-if-sort]');
-      if (!th) return;
-      const target = th.dataset.ifSort;
+      const sortEl = e.target.closest('[data-if-sort]');
+      if (!sortEl) return;
+      const target = sortEl.getAttribute('data-if-sort');
       if (target === 'int') {
         intIfSort = intIfSort === 'desc' ? 'asc' : 'desc';
         shown = PAGE;
         renderInt();
       } else if (target === 'fav') {
+        e.preventDefault();
+        // null → desc → asc → desc …
         favIfSort = favIfSort === 'desc' ? 'asc' : 'desc';
         renderFav();
       }
@@ -10738,6 +11280,10 @@
       renderHomeIntResults();
       placeLangToggle();
     }
+    // 供 setUiLanguage 在语言切换后重刷首页动态结果
+    refreshHomeForLang = () => {
+      try { showHomeSearchResults(); } catch (_) {}
+    };
 
     function homeCycleText(r) {
       const cr = r.crossref;
@@ -11703,7 +12249,7 @@
         activeTab = 'me';
         if (document.body.dataset.bootTab) delete document.body.dataset.bootTab;
         document.body.classList.add('settings-open');
-        document.body.classList.remove('simple-top-route');
+        document.body.classList.remove('simple-top-route', 'fav-route', 'topbar-compact');
         const mePanel = document.querySelector('.tab-panel[data-panel="me"]');
         if (mePanel) {
           mePanel.hidden = false;
@@ -11736,7 +12282,10 @@
       if (document.body.dataset.bootTab) delete document.body.dataset.bootTab;
       document.body.classList.toggle('update-reading-mode', activeTab === 'updates');
       document.body.classList.toggle('home-route', activeTab === 'home');
-      document.body.classList.toggle('simple-top-route', activeTab === 'updates' || activeTab === 'fav');
+      // 仅「动态」用无搜索简洁顶栏；收藏与各站统一全球站紧凑搜索顶栏
+      document.body.classList.toggle('simple-top-route', activeTab === 'updates');
+      document.body.classList.toggle('fav-route', activeTab === 'fav');
+      updateStickySearchState();
       placeLangToggle();
       updateSearchSubmitLabel();
       $$('.tab-panel').forEach(p => {
@@ -11779,6 +12328,8 @@
           qEl.placeholder = t('pick_placeholder');
         } else if (activeTab === 'home') {
           qEl.placeholder = t('search_home_ph');
+        } else if (activeTab === 'fav') {
+          qEl.placeholder = t('search_fav');
         } else if (activeTab === 'updates') {
           qEl.placeholder = t('search_updates_ph');
         } else if (activeTab === 'in') {
@@ -12021,6 +12572,23 @@
       else activeDomBadges.delete(val);
       renderDomestic();
     });
+
+    // 设置页语言芯片：全局委托（避免 renderMe 重绑时机问题）
+    if (!document.__langChipDelegateBound) {
+      document.__langChipDelegateBound = true;
+      document.addEventListener('click', (e) => {
+        const chip = e.target.closest('[data-set-lang]');
+        if (!chip) return;
+        // 仅处理设置面板内的芯片，避免误触
+        if (!chip.closest('#me-content') && !chip.closest('.settings-panel')) return;
+        e.preventDefault();
+        e.stopPropagation();
+        const code = chip.getAttribute('data-set-lang');
+        if (!code) return;
+        _settingsSection = 'language';
+        setUiLanguage(code);
+      }, true);
+    }
 
     // ─── 语言切换下拉菜单 ───
     (function initLangDropdown() {
@@ -13444,21 +14012,30 @@
     return null;
   }
 
+  function bindHotFidClicks(root) {
+    if (!root) return;
+    root.querySelectorAll('[data-hot-fid]').forEach((a) => {
+      a.addEventListener('click', (e) => {
+        const fid = a.getAttribute('data-hot-fid');
+        if (!fid) return;
+        const rec = (journals || []).find((j) => favId(j) === fid)
+          || (homeJournals || []).find((j) => favId(j) === fid);
+        if (!rec) return;
+        e.preventDefault();
+        openDrawer(rec, { pageMode: true, source: 'home_hot' });
+      });
+    });
+  }
+
   function renderHomeHotList(items) {
-    const box = $('#home-hot-list');
-    if (!box) return;
     const pool = (journalsReady && journals.length ? journals : (homeJournals || journals || []));
     const list = Array.isArray(items) ? items.slice(0, 5) : [];
+    const emptyHtml = `<div class="home-hot-row home-hot-empty rank-hot-empty">${escape(t('home_hot_empty'))}</div>`;
+    const loadingHtml = `<div class="home-hot-row home-hot-empty rank-hot-empty">${escape(t('home_hot_loading'))}</div>`;
 
-    if (!list.length) {
-      box.innerHTML = `<div class="home-hot-row home-hot-empty" style="justify-content:center;color:#a8a29e;font-size:13px;border:0">${escape(t('home_hot_empty'))}</div>`;
-      return;
-    }
-
-    box.innerHTML = list.map((item, i) => {
+    const homeRows = !list.length ? emptyHtml : list.map((item, i) => {
       const rec = resolveHotJournal(item, pool);
       const name = titleCase(rec?.name || rec?.n || item.journal_name || item.journal_key || '—');
-      // 右侧只展示 IF + 数值；固定 1 位小数便于列对齐
       const ifRaw = rec?.if_2024 != null ? Number(rec.if_2024) : NaN;
       const ifv = Number.isFinite(ifRaw) ? ifRaw.toFixed(1) : '—';
       const slug = rec?.slug || '';
@@ -13473,27 +14050,44 @@
       </a>`;
     }).join('');
 
-    box.querySelectorAll('[data-hot-fid]').forEach((a) => {
-      a.addEventListener('click', (e) => {
-        const fid = a.getAttribute('data-hot-fid');
-        if (!fid) return;
-        const rec = (journals || []).find((j) => favId(j) === fid)
-          || (homeJournals || []).find((j) => favId(j) === fid);
-        if (!rec) return;
-        // SPA 打开详情，避免整页重载 + 再拉 full 库
-        e.preventDefault();
-        openDrawer(rec, { pageMode: true, source: 'home_hot' });
-      });
-    });
+    const rankRows = !list.length ? emptyHtml : list.map((item, i) => {
+      const rec = resolveHotJournal(item, pool);
+      const name = titleCase(rec?.name || rec?.n || item.journal_name || item.journal_key || '—');
+      const ifRaw = rec?.if_2024 != null ? Number(rec.if_2024) : NaN;
+      const ifv = Number.isFinite(ifRaw) ? ifRaw.toFixed(1) : '—';
+      const slug = rec?.slug || '';
+      const fid = rec ? favId(rec) : (item.journal_key || '');
+      const href = slug
+        ? `/journal/${encodeURIComponent(slug)}/`
+        : (fid ? `#j/${encodeURIComponent(fid)}` : '#');
+      const views = item.views != null ? Number(item.views).toLocaleString() : '';
+      return `<a class="rank-row" href="${href}" data-hot-fid="${escape(fid)}">
+        <span class="rank-n">${i + 1}</span>
+        <strong title="${escape(name)}">${escape(name)}</strong>
+        <span class="rank-if">${views ? `${views}` : `IF ${escape(ifv)}`}</span>
+      </a>`;
+    }).join('');
+
+    const homeBox = $('#home-hot-list');
+    if (homeBox) {
+      homeBox.innerHTML = homeRows;
+      bindHotFidClicks(homeBox);
+    }
+    const rankBox = $('#rank-hot-list');
+    if (rankBox) {
+      rankBox.innerHTML = rankRows;
+      bindHotFidClicks(rankBox);
+    }
   }
 
   async function loadHomeHotList() {
-    const box = $('#home-hot-list');
-    if (!box) return;
+    const homeBox = $('#home-hot-list');
+    const rankBox = $('#rank-hot-list');
+    if (!homeBox && !rankBox) return;
     if (!_homeHotItems) {
-      box.innerHTML = `<div class="home-hot-row home-hot-empty" style="justify-content:center;color:#a8a29e;font-size:13px;border:0">${escape(t('home_hot_loading'))}</div>`;
+      if (homeBox) homeBox.innerHTML = `<div class="home-hot-row home-hot-empty">${escape(t('home_hot_loading'))}</div>`;
+      if (rankBox) rankBox.innerHTML = `<div class="rank-hot-empty">${escape(t('home_hot_loading'))}</div>`;
       try {
-        // 允许浏览器缓存（Worker 已设 max-age≈300），避免每次首页都穿透
         const data = await fetch(
           `${API_BASE}/analytics/hot-journals?days=30&limit=5`
         ).then((r) => (r.ok ? r.json() : null)).catch(() => null);
@@ -13505,9 +14099,32 @@
     renderHomeHotList(_homeHotItems);
   }
 
+  function initRankBoards() {
+    const root = document.getElementById('rankings');
+    if (!root || root.__rankBound) return;
+    root.__rankBound = true;
+    root.querySelectorAll('[data-rank-tab]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const key = btn.getAttribute('data-rank-tab') || 'index';
+        root.querySelectorAll('[data-rank-tab]').forEach((b) => {
+          const on = b === btn;
+          b.classList.toggle('is-on', on);
+          b.setAttribute('aria-selected', on ? 'true' : 'false');
+        });
+        root.querySelectorAll('[data-rank-panel]').forEach((p) => {
+          const on = p.getAttribute('data-rank-panel') === key;
+          p.classList.toggle('is-on', on);
+          p.hidden = !on;
+        });
+        if (key === 'hot') loadHomeHotList();
+      });
+    });
+  }
+
   function initHomeLanding() {
     loadHomeStats();
     loadHomeHotList();
+    initRankBoards();
     // 热点榜只依赖 light 池（boot 完成后 loadHomeHotList 会再解析一次）
     // 切勿在此 ensureJournalsLoaded：会立刻抢 8MB+ full 库，拖垮首页与热点
     // 首页介绍区 CTA：聚焦搜索 / 切到荐刊

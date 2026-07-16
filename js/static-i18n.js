@@ -165,6 +165,11 @@
     const dict = STRINGS[lang] || STRINGS.en;
     document.documentElement.lang = lang;
     document.documentElement.dataset.staticLang = lang;
+    document.documentElement.setAttribute('data-ui-lang', lang);
+    try {
+      window.__journalUiLang = lang;
+      window.__getJournalUiLang = () => lang;
+    } catch (_) {}
     try { localStorage.setItem('ailatest.lang', lang); } catch {}
 
     applyUnifiedFooter();
@@ -192,6 +197,12 @@
     }
     syncStaticAuth(lang);
     markActiveNav();
+    // 订阅页等：语言切换后重刷年/月付与教育价文案
+    try {
+      if (typeof window.__syncPricingUi === 'function') window.__syncPricingUi();
+      else if (typeof window.__syncEduCheckoutUi === 'function') window.__syncEduCheckoutUi();
+      window.dispatchEvent(new CustomEvent('ailatest:langchange', { detail: { lang } }));
+    } catch (_) {}
   }
 
   function readStaticUser() {
