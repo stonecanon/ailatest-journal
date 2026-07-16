@@ -1494,26 +1494,52 @@ a.home-btn { color: inherit; }
 a.home-btn-primary { color: #fff; }
 
 @media (max-width: 900px) {
-  .home-top-nav {
-    right: 8px;
+  /* 手机首页：隐藏落地顶栏链接（功能/榜单/订阅…），只留语言；避免与品牌/搜索叠字 */
+  body.home-route .home-top-nav a {
+    display: none !important;
+  }
+  body.home-route:not(.home-tab-has-results):not(.topbar-compact) .home-top-nav {
+    display: flex !important;
+    position: fixed;
     top: 10px;
+    right: 10px;
     left: auto;
-    max-width: calc(100vw - 56px); /* 左侧留给汉堡 */
-    flex-wrap: wrap;
-    row-gap: 4px;
-    justify-content: flex-end;
+    max-width: none;
+    width: auto;
+    z-index: 165;
+    gap: 0;
+    flex-wrap: nowrap;
+    pointer-events: none; /* 空导航不挡点击；语言按钮再开 */
   }
-  .home-top-nav a { padding: 5px 7px; font-size: 11.5px; }
-  .home-top-nav .lang-toggle {
-    padding: 4px 10px;
-    font-size: 11.5px;
-    min-height: 28px;
-  }
-  /* 手机首页：语言在导航最右，勿再 fixed 叠一层 */
-  body.home-route:not(.home-tab-has-results):not(.topbar-compact) .lang-toggle-wrap {
+  body.home-route .home-top-nav .lang-toggle-wrap {
+    pointer-events: auto;
     position: static !important;
     top: auto !important;
     right: auto !important;
+    margin: 0 !important;
+  }
+  body.home-route .home-top-nav .lang-toggle {
+    padding: 5px 12px;
+    font-size: 12px;
+    min-height: 30px;
+  }
+  /* 品牌缩短：手机只显示 AILatest，避免与语言按钮抢位 */
+  body.home-route .topbar-brand em,
+  body.topbar-compact .topbar-brand em {
+    display: none !important;
+  }
+  body.home-route .topbar-brand,
+  body.topbar-compact .topbar-brand {
+    left: 52px !important;
+    top: 14px !important;
+    max-width: calc(100vw - 120px) !important;
+    font-size: 16px !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  /* 首页落地标题少一点顶距（顶栏已简化） */
+  body.home-route:not(.home-tab-has-results):not(.topbar-compact) .home-hero-head {
+    padding-top: clamp(28px, 6vh, 48px);
   }
   .home-feat-grid,
   .home-plans { grid-template-columns: 1fr 1fr; }
@@ -11922,7 +11948,22 @@ html.journal-route-pending .topbar-brand {
   body.fav-route .topbar-brand {
     top: 14px !important;
     left: 52px !important;
-    font-size: 15px !important;
+    font-size: 16px !important;
+    max-width: calc(100vw - 120px) !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+  /* 手机顶栏简化：隐藏 Journal 斜体，避免与语言按钮叠字 */
+  .topbar-brand em,
+  body.topbar-compact .topbar-brand em,
+  body.home-route .topbar-brand em,
+  body.fav-route .topbar-brand em,
+  body.simple-top-route .topbar-brand em {
+    display: none !important;
+  }
+  /* 再次压过：手机首页不要展示落地导航链接 */
+  body.home-route .home-top-nav > a {
+    display: none !important;
   }
 }
 
