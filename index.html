@@ -42,7 +42,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 })(window,document,'script','dataLayer','GTM-NBNXL7FB');</script>
 <!-- End Google Tag Manager -->
 <link rel="preload" href="/data/journal_aliases.json" as="fetch" crossorigin="anonymous" />
-<link rel="stylesheet" href="/css/app.css?v=20260716-mobile-search" />
+<link rel="stylesheet" href="/css/app.css?v=20260716-lang-nav" />
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json" />
@@ -241,10 +241,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <a id="pricing-rail-link" href="/#pricing" hidden aria-hidden="true"></a>
 <a id="download-center-rail-link" href="/#download" hidden aria-hidden="true"></a>
 <button type="button" id="rankings-btn" data-tab="rank" hidden aria-hidden="true"></button>
-<div class="lang-toggle-wrap">
-  <button class="lang-toggle" id="lang-toggle" aria-label="Switch language">中文</button>
-</div>
-
 <main class="main">
   <!-- 首页标题（搜索之上） -->
   <section class="home-hero home-hero-head" aria-label="AILatest Journal">
@@ -255,13 +251,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
   </section>
 
-  <!-- 首页落地顶栏导航（右上） -->
+  <!-- 首页落地顶栏导航（右上）；语言切换嵌在最右，避免与链接重叠 -->
   <nav class="home-top-nav" aria-label="首页导航">
     <a href="#feat" data-i18n="nav_features">功能</a>
     <a href="#how" data-i18n="nav_how">怎么用</a>
     <a href="#pricing" data-i18n="nav_pricing">订阅</a>
     <a href="#download" data-i18n="download_center">下载</a>
     <a href="#contact" data-i18n="nav_contact">联系</a>
+    <div class="lang-toggle-wrap" id="lang-toggle-host">
+      <button class="lang-toggle" id="lang-toggle" aria-label="Switch language">中文</button>
+    </div>
   </nav>
 
   <header class="topbar">
@@ -887,7 +886,7 @@ window.__BUILD_VER = 'v20260716-stats-fix';
 <script src="/js/pick-match.js?v=20260716-v10" defer></script>
 <script src="/js/pricing-checkout.js?v=20260716-home" defer></script>
 <script src="/js/extension-downloads.js?v=20260716-home-dl" defer></script>
-<script src="/js/app.js?v=20260716-mobile-search" defer></script>
+<script src="/js/app.js?v=20260716-lang-nav" defer></script>
 
 </body>
 </html>

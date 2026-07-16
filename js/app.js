@@ -4550,6 +4550,26 @@
     const changed = document.body.classList.toggle('topbar-compact', shouldCompact);
     if (changed) requestAnimationFrame(updateThStickyTop);
     else updateThStickyTop();
+    placeLangToggle();
+  }
+
+  /** 首页落地：语言切嵌入 .home-top-nav 最右；其它页固定右上角 */
+  function placeLangToggle() {
+    const wrap = document.getElementById('lang-toggle-host')
+      || document.querySelector('.lang-toggle-wrap');
+    if (!wrap) return;
+    const nav = document.querySelector('.home-top-nav');
+    const inHomeLanding = document.body.classList.contains('home-route')
+      && !document.body.classList.contains('home-tab-has-results')
+      && !document.body.classList.contains('topbar-compact')
+      && nav
+      && getComputedStyle(nav).display !== 'none';
+    if (inHomeLanding) {
+      if (wrap.parentElement !== nav) nav.appendChild(wrap);
+    } else {
+      const host = document.querySelector('main.main') || document.body;
+      if (wrap.parentElement !== host) host.appendChild(wrap);
+    }
   }
 
   // 统计每个筛选项对应的期刊数量，注入到左侧筛选栏的 chip 里（参考图那样）
@@ -10615,14 +10635,18 @@
       if (!activeQuery) {
         if (homeResults) homeResults.hidden = true;
         if (homePanel) homePanel.classList.remove('home-tab-has-results');
+        document.body.classList.remove('home-tab-has-results');
         renderHomeSearchChips();
+        placeLangToggle();
         return;
       }
       if (homeUpdatesPreview) homeUpdatesPreview.hidden = true;
       if (homePanel) homePanel.classList.add('home-tab-has-results');
+      document.body.classList.add('home-tab-has-results');
       if (homeResults) homeResults.hidden = false;
       renderHomeSearchChips();
       renderHomeIntResults();
+      placeLangToggle();
     }
 
     function homeCycleText(r) {
@@ -11623,6 +11647,7 @@
       document.body.classList.toggle('update-reading-mode', activeTab === 'updates');
       document.body.classList.toggle('home-route', activeTab === 'home');
       document.body.classList.toggle('simple-top-route', activeTab === 'updates' || activeTab === 'fav' || activeTab === 'rank');
+      placeLangToggle();
       updateSearchSubmitLabel();
       $$('.tab-panel').forEach(p => {
         const on = p.dataset.panel === activeTab;
@@ -13445,6 +13470,7 @@
     applyStations();
     updateFavCount();
     initHomeLanding();
+    placeLangToggle();
     await handleAuthCallback();
     refreshCurrentUserProfile();
     // 分享着陆页：/s/<id> 直接接管 main，不走主流程

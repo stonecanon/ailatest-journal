@@ -914,17 +914,19 @@ body.home-route:not(.home-tab-has-results) .home-v4-grad {
   font-weight: 780;
 }
 
-/* 首页右上导航 */
+/* 首页右上导航：链接 + 最右语言切换 */
 .home-top-nav {
   display: none;
   position: fixed;
   top: 16px;
-  right: 20px;
-  z-index: 95;
-  flex-wrap: wrap;
+  right: 16px;
+  z-index: 160;
+  flex-wrap: nowrap;
+  align-items: center;
   justify-content: flex-end;
-  gap: 2px;
-  max-width: min(520px, calc(100vw - 200px));
+  gap: 2px 4px;
+  max-width: min(640px, calc(100vw - 88px));
+  overflow: visible;
 }
 .home-top-nav a {
   font-size: 12.5px;
@@ -934,10 +936,26 @@ body.home-route:not(.home-tab-has-results) .home-v4-grad {
   padding: 6px 10px;
   border-radius: 999px;
   white-space: nowrap;
+  flex: 0 0 auto;
 }
 .home-top-nav a:hover {
   color: #c2410c;
   background: rgba(249, 115, 22, 0.08);
+}
+/* 嵌在导航内时：取消 fixed，跟在「联系」右侧 */
+.home-top-nav .lang-toggle-wrap {
+  position: static;
+  top: auto;
+  right: auto;
+  z-index: auto;
+  margin: 0 0 0 4px;
+  flex: 0 0 auto;
+}
+.home-top-nav .lang-toggle {
+  padding: 5px 12px;
+  font-size: 12px;
+  min-height: 30px;
+  box-shadow: 0 1px 4px rgba(60, 48, 36, 0.08);
 }
 
 /* 首页产品介绍区块 */
@@ -1279,11 +1297,26 @@ a.home-btn-primary { color: #fff; }
 
 @media (max-width: 900px) {
   .home-top-nav {
-    right: 10px;
-    top: 12px;
-    max-width: calc(100vw - 120px);
+    right: 8px;
+    top: 10px;
+    left: auto;
+    max-width: calc(100vw - 56px); /* 左侧留给汉堡 */
+    flex-wrap: wrap;
+    row-gap: 4px;
+    justify-content: flex-end;
   }
   .home-top-nav a { padding: 5px 7px; font-size: 11.5px; }
+  .home-top-nav .lang-toggle {
+    padding: 4px 10px;
+    font-size: 11.5px;
+    min-height: 28px;
+  }
+  /* 手机首页：语言在导航最右，勿再 fixed 叠一层 */
+  body.home-route:not(.home-tab-has-results):not(.topbar-compact) .lang-toggle-wrap {
+    position: static !important;
+    top: auto !important;
+    right: auto !important;
+  }
   .home-feat-grid,
   .home-plans { grid-template-columns: 1fr 1fr; }
   .home-dl-grid { grid-template-columns: 1fr; }
@@ -4779,7 +4812,11 @@ td.empty,
     width: 36px;
     height: 36px;
   }
-  .lang-toggle-wrap {
+  /* 非首页落地：语言固定右上；首页落地由 .home-top-nav 内嵌规则接管 */
+  body:not(.home-route) .lang-toggle-wrap,
+  body.home-route.home-tab-has-results .lang-toggle-wrap,
+  body.home-route.topbar-compact .lang-toggle-wrap {
+    position: fixed !important;
     top: 10px !important;
     right: 10px !important;
   }
@@ -9466,11 +9503,11 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   .tab-panel[data-panel="int"] table.journals .col-free:has(.muted-cell) { display: none; }
 }
 
-/* ═══════ 语言切换移到右上角 ═══════ */
+/* ═══════ 语言切换：非首页落地时固定右上；首页落地嵌在 .home-top-nav 最右 ═══════ */
 .lang-toggle-wrap {
   position: fixed;
   top: 14px;
-  right: 18px;
+  right: 14px;
   z-index: 220;
   display: flex;
   align-items: center;
@@ -9478,10 +9515,19 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   margin: 0;
   pointer-events: auto;
 }
+/* 离开 body 后（浮在 body 下）仍固定右上 */
+body > .lang-toggle-wrap,
+main.main > .lang-toggle-wrap {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 220;
+}
 .app-rail .lang-toggle, .lang-toggle {
   background: var(--paper); border: 1px solid var(--rule); border-radius: 999px;
   padding: 5px 15px; font-size: 13px; font-weight: 600; color: var(--ink-soft);
   box-shadow: 0 2px 8px -3px rgba(60,48,36,.25); cursor: pointer;
+  white-space: nowrap;
 }
 .lang-toggle:hover { color: var(--ink); border-color: var(--accent); }
 
