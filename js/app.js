@@ -11284,130 +11284,17 @@
       try { showHomeSearchResults(); } catch (_) {}
     };
 
-    function homeCycleText(r) {
-      const cr = r.crossref;
-      const doaj = r.doaj;
-      let cycleDays = null;
-      if (cr && cr.median_days) cycleDays = +cr.median_days;
-      else if (doaj && typeof doaj === 'object' && doaj.review_weeks) cycleDays = +doaj.review_weeks * 7;
-      return cycleDays ? `${Math.round(cycleDays / 30.4)}${T('个月','mo')}` : '';
-    }
-
-    function homeTopicText(r) {
-      const wosVals = Array.isArray(r.wos_categories) ? r.wos_categories.filter(Boolean) : [];
-      if (wosVals.length) return wosVals.slice(0, 2).join(' / ');
-      return r.esi_category || r.cas_major_cn || '';
-    }
-
-    const HOME_INDEX_BADGE_CLASSES = [
-      'b-scie', 'b-ssci', 'b-ahci', 'b-esci', 'b-ei',
-      'b-scopus', 'b-medline', 'b-pubmed', 'b-pmc',
-      'b-nature-index', 'b-cscd', 'b-cstpcd', 'b-scd'
-    ];
-
-    function homeBadgeItems(html) {
-      const raw = String(html || '').trim();
-      if (!raw || typeof document === 'undefined') return [];
-      const tpl = document.createElement('template');
-      tpl.innerHTML = raw;
-      return [...tpl.content.children].filter(el => String(el.textContent || '').trim());
-    }
-
-    function homeBadgeOuterHtml(el) {
-      if (el.matches && el.matches('details')) {
-        const summary = el.querySelector('summary');
-        if (summary) return summary.outerHTML;
-      }
-      return el.outerHTML;
-    }
-
-    function compactHomeBadges(html, { limit = 4, includeClasses = [] } = {}) {
-      const items = homeBadgeItems(html);
-      if (!items.length) return '';
-      const filtered = includeClasses.length
-        ? items.filter(el => includeClasses.some(cls => el.classList && el.classList.contains(cls)))
-        : items;
-      const usable = filtered.length ? filtered : items;
-      const shown = usable.slice(0, limit).map(homeBadgeOuterHtml).join('');
-      const extra = usable.length - limit;
-      if (extra <= 0) return shown;
-      const extraTitle = usable.slice(limit)
-        .map(el => String(el.textContent || '').replace(/\s+/g, ' ').trim())
-        .filter(Boolean)
-        .join(' / ');
-      return `${shown}<span class="home-more-badge" title="${escape(extraTitle)}">+${extra}</span>`;
-    }
-
-    function renderHomeBadgeLine(html, cls = '', options = {}) {
-      const compact = compactHomeBadges(html, options);
-      return compact ? `<div class="home-card-badges ${cls}">${compact}</div>` : '';
-    }
-
+    /** 首页搜索：与全球站 / 中国站同一套 j-card（renderRow / renderDomRow） */
     function renderHomeJournalCard(r) {
-      const fid = favId(r);
-      rowRecordsByFid[fid] = { ...r, __src: 'int' };
-      const title = titleCase((r.name || '').replace(/\*$/,''));
-      const alias = r.abbr20 && r.abbr20 !== r.name ? r.abbr20 : '';
-      const crossBadges = renderDomCrossBadges(r, 'int');
-      const indexBadges = renderCoverageBadges(r);
-      const rankBadges = [renderLevelBadges(r), crossBadges].filter(Boolean).join('');
-      const riskBadges = renderRiskBadges(r);
-      const ifVal = r.if_2024 != null ? (+r.if_2024).toFixed(1) : '';
-      const cycle = homeCycleText(r);
-      const topic = homeTopicText(r);
-      const metrics = [
-        ifVal ? `<span class="home-metric home-if">IF ${escape(ifVal)}</span>` : '',
-        cycle ? `<span class="home-metric">${escape(cycle)}</span>` : '',
-        topic ? `<span class="home-card-topic">${escape(topic)}</span>` : '',
-      ].filter(Boolean).join('');
-      return `<article class="home-journal-card j-row clickable ${r.flagship ? 'row-flagship' : ''}" data-fid="${escape(fid)}" data-src="int">
-        <div class="home-card-head">
-          <div class="home-card-title-wrap">
-            <h3 class="home-card-title">${escape(title)}</h3>
-            ${alias ? `<div class="home-card-alias">aka: ${escape(alias)}</div>` : ''}
-            ${r.cn_name ? `<div class="home-card-alias">${escape(r.cn_name)}</div>` : ''}
-          </div>
-          <div class="home-card-fav">${starBtn(r, 'int')}</div>
-        </div>
-        ${renderHomeBadgeLine(indexBadges, 'home-card-indexes', { limit: 5, includeClasses: HOME_INDEX_BADGE_CLASSES })}
-        ${renderHomeBadgeLine(rankBadges, 'home-card-ranks', { limit: 3 })}
-        ${renderHomeBadgeLine(riskBadges, 'home-card-risks', { limit: 2 })}
-        ${metrics ? `<div class="home-card-meta">${metrics}</div>` : ''}
-      </article>`;
+      return renderRow(r);
     }
 
     function renderHomeDomesticCard(r) {
-      const fid = favId(r);
-      rowRecordsByFid[fid] = { ...r, __src: r.__src };
-      const name = r.name || r.cn_name || r.title || '';
-      const cnName = r.en_name ? titleCase(r.en_name) : '';
-      const crossBadges = renderDomCrossBadges({ name, issn: r.issn, cn_code: r.cn_code }, r.__src);
-      const sourceLabel = {
-        cnki_major: T('中文期刊目录','Chinese Journal Directory'),
-        cnkx: T('中国科协','CAST'),
-        nsfc_mgmt: T('国自然管理科学部','NSFC Management'),
-        zju: T('浙大目录','ZJU'),
-        cscd: 'CSCD',
-        cstpcd: T('中国科技核心','CSTPCD'),
-        cssci_core: 'CSSCI',
-        cssci_ext: T('CSSCI 扩展','CSSCI Ext'),
-        pku_core: T('北大核心','PKU Core')
-      }[r.__src] || T('国内来源','Domestic Source');
-      const tierText = r.tier ? `<span class="home-metric">${escape(r.tier)}</span>` : '';
-      return `<article class="home-journal-card home-domestic-card j-row clickable" data-fid="${escape(fid)}" data-src="${escape(r.__src)}">
-        <div class="home-card-head">
-          <div class="home-card-title-wrap">
-            <h3 class="home-card-title">${escape(titleCase(name.replace(/\*$/,'')))}</h3>
-            ${cnName ? `<div class="home-card-alias">${escape(cnName)}</div>` : ''}
-          </div>
-          <div class="home-card-fav">${starBtn(r, r.__src)}</div>
-        </div>
-        ${renderHomeBadgeLine(crossBadges, 'home-card-ranks', { limit: 3 })}
-        <div class="home-card-meta">
-          <span class="home-card-topic">${escape(sourceLabel)}</span>
-          ${tierText}
-        </div>
-      </article>`;
+      return renderDomRow(r, {
+        src: r.__src || 'cnki_major',
+        showTier: !!(r.tier || r.__src === 'cnkx'),
+        tierValue: r.tier,
+      });
     }
 
     function renderHomeIntResults() {
@@ -11538,7 +11425,12 @@
             </div>`
           : '';
         html += `<div class="home-section-label">${sec.label}</div>
-          <div class="home-results-wrap"><div class="home-card-grid" data-home-kind="${sec.kind}">${sec.html}</div></div>${more}`;
+          <div class="home-results-wrap">
+            <table class="journals home-journals" data-home-kind="${sec.kind}">
+              <thead hidden aria-hidden="true"><tr><th></th></tr></thead>
+              <tbody>${sec.html}</tbody>
+            </table>
+          </div>${more}`;
       }
       if (totalCount > intLimit + domLimit) {
         html += `<div class="pager"><button class="big-btn primary" id="home-more-btn" data-i18n="load_more">${t('load_more')}</button></div>`;
