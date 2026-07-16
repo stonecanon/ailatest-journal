@@ -83,8 +83,29 @@
   };
 
   function normalize(code) {
-    const value = String(code || '').toLowerCase();
-    return value.startsWith('zh') ? 'zh-CN' : 'en';
+    const value = String(code || '').trim().toLowerCase();
+    if (!value) return 'en';
+    if (value === 'zh' || value.startsWith('zh-cn') || value.startsWith('zh-hans')) return 'zh-CN';
+    if (value.startsWith('zh-tw') || value.startsWith('zh-hk') || value.startsWith('zh-mo') || value.startsWith('zh-hant')) {
+      return 'zh-CN'; // 静态页暂仅中/英，繁中回落简中
+    }
+    if (value.startsWith('zh')) return 'zh-CN';
+    return 'en';
+  }
+
+  function detectBrowserLang() {
+    const list = [];
+    try {
+      if (Array.isArray(navigator.languages)) list.push(...navigator.languages);
+    } catch (_) {}
+    try {
+      if (navigator.language) list.push(navigator.language);
+    } catch (_) {}
+    for (const item of list) {
+      const n = normalize(item);
+      if (n) return n;
+    }
+    return 'en';
   }
 
   function initialLang() {
@@ -95,7 +116,8 @@
       const saved = localStorage.getItem('ailatest.lang');
       if (saved) return normalize(saved);
     } catch {}
-    return normalize(navigator.language || 'en');
+    // 首次访问：跟浏览器语言；用户在设置里改过会写入 ailatest.lang
+    return detectBrowserLang();
   }
 
   /** 全站静态页统一页脚：与主站产品信息一致 */

@@ -586,16 +586,48 @@
     ja: { label: '日本語', html: 'ja' }, ko: { label: '한국어', html: 'ko' }, en: { label: 'English', html: 'en' },
     es: { label: 'Español', html: 'es' }, pt: { label: 'Português', html: 'pt' }, fr: { label: 'Français', html: 'fr' }
   };
-  const normalizeLang = (code) => code === 'zh' ? 'zh-CN' : (I18N[code] ? code : 'zh-CN');
+  const normalizeLang = (code) => {
+    const raw = String(code || '').trim();
+    if (!raw) return 'en';
+    if (raw === 'zh' || /^zh[-_]?cn/i.test(raw) || /^zh[-_]?hans/i.test(raw)) return 'zh-CN';
+    if (/^zh[-_]?tw/i.test(raw) || /^zh[-_]?hk/i.test(raw) || /^zh[-_]?mo/i.test(raw) || /^zh[-_]?hant/i.test(raw)) {
+      return I18N['zh-TW'] ? 'zh-TW' : 'zh-CN';
+    }
+    const base = raw.toLowerCase().split(/[-_]/)[0];
+    if (I18N[raw]) return raw;
+    if (I18N[base]) return base;
+    // ja-JP → ja, ko-KR → ko, etc.
+    const hit = LANG_ORDER.find((k) => k.toLowerCase() === base || k.toLowerCase().startsWith(base + '-'));
+    return hit && I18N[hit] ? hit : 'en';
+  };
+
+  /** 浏览器首选语言（仅首次 / 未手动设置时用） */
+  function detectBrowserLang() {
+    const list = [];
+    try {
+      if (Array.isArray(navigator.languages)) list.push(...navigator.languages);
+    } catch (_) {}
+    try {
+      if (navigator.language) list.push(navigator.language);
+    } catch (_) {}
+    for (const item of list) {
+      const n = normalizeLang(item);
+      if (n && I18N[n]) return n;
+    }
+    return 'en';
+  }
 
   // ───────── state ─────────
   function initialLangFromPath() {
     const path = location.pathname.replace(/\/+$/, '') || '/';
     if (path === '/zh' || path.startsWith('/zh/')) return 'zh-CN';
     if (path === '/en' || path.startsWith('/en/')) return 'en';
-    const saved = localStorage.getItem('ailatest.lang');
-    if (saved) return saved;
-    return /^zh/i.test(navigator.language || '') ? 'zh-CN' : 'en';
+    // 用户曾手动选过语言 → 永久尊重（setUiLanguage 会写 userSet）
+    try {
+      const saved = localStorage.getItem('ailatest.lang');
+      if (saved && I18N[normalizeLang(saved)]) return normalizeLang(saved);
+    } catch (_) {}
+    return detectBrowserLang();
   }
   let lang = normalizeLang(initialLangFromPath());
   const UI_LOCALES = {
@@ -7884,7 +7916,11 @@
   function setUiLanguage(code) {
     if (!LANG_META[code]) return;
     lang = code;
-    localStorage.setItem('ailatest.lang', lang);
+    try {
+      localStorage.setItem('ailatest.lang', lang);
+      // 标记为用户主动选择，后续不再被浏览器语言覆盖
+      localStorage.setItem('ailatest.lang.userSet', '1');
+    } catch (_) {}
     localizeDefaultFavListName();
     persistFavLists(false);
     applyI18n();
@@ -7892,12 +7928,15 @@
     const wosSel2 = $('#wos-col-filter');
     if (wosSel2) wosSel2.__bound = false;
     renderCatList();
-    // 设置页语言切换：保留当前设置分区
+    // 设置页语言切换：保留当前设置分区（手机保持二级全屏）
     if (activeTab === 'me' || document.body.classList.contains('settings-open')) {
       if (!_settingsSection || _settingsSection === 'activity') _settingsSection = 'language';
       const keep = _settingsSection;
+      window.__settingsOpenAsRoot = false;
       renderMe();
-      showSettingsSection(keep === 'language' ? 'language' : keep);
+      showSettingsSection(keep === 'language' ? 'language' : keep, {
+        subpage: window.matchMedia('(max-width: 900px)').matches,
+      });
     } else if (activeTab === 'dom') renderDomestic();
     else if (activeTab === 'fav') renderFav();
     else if (activeTab === 'int') renderInt();
@@ -8424,7 +8463,15 @@
   function openSettingsShell(section) {
     // 活动已并入账号，旧 hash/状态兼容
     if (section === 'activity') section = 'account';
-    if (section) _settingsSection = section;
+    const mobile = window.matchMedia('(max-width: 900px)').matches;
+    // 手机：默认进一级全屏菜单；若显式指定 section 则进二级全屏
+    if (mobile && !section) {
+      _settingsSection = 'account';
+      window.__settingsOpenAsRoot = true;
+    } else {
+      if (section) _settingsSection = section;
+      window.__settingsOpenAsRoot = false;
+    }
     document.body.classList.add('settings-open');
     document.documentElement.classList.add('settings-open');
     const panel = document.querySelector('.tab-panel[data-panel="me"]');
@@ -8677,9 +8724,14 @@
         showSettingsSection(id, { subpage: window.matchMedia('(max-width: 900px)').matches });
       });
     });
-    // 桌面默认显示当前分区；手机打开时先落在一级菜单
+    // 桌面：侧栏+内容同屏；手机：一级全屏列表 / 二级全屏详情（固定 100dvh，无半屏）
     if (window.matchMedia('(max-width: 900px)').matches) {
-      exitSettingsSubpage();
+      if (window.__settingsOpenAsRoot) {
+        exitSettingsSubpage();
+        window.__settingsOpenAsRoot = false;
+      } else {
+        showSettingsSection(_settingsSection, { subpage: true });
+      }
     } else {
       showSettingsSection(_settingsSection, { subpage: false });
     }
