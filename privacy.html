@@ -1,152 +1,124 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Privacy Policy | AILatest Journal</title>
-<meta name="description" content="Privacy Policy for AILatest Journal �?what we collect, how we use it, and your rights. Includes the browser extension privacy statement." />
-<link rel="canonical" href="https://journal.ailatest.org/privacy.html" />
+<title>隐私政策 | AILatest Journal</title>
+<meta name="description" content="AILatest Journal 隐私政策：我们收集什么、如何使用、你的权利，以及浏览器插件说明。" />
+<link rel="canonical" href="https://journal.ailatest.org/privacy" />
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
-<link rel="stylesheet" href="/css/static.css?v=20260716-base-pages" />
+<link rel="stylesheet" href="/css/static.css?v=20260716-info-v1" />
+<link rel="stylesheet" href="/css/info-pages.css?v=20260716-info-v1" />
 </head>
 <body data-static-page="privacy">
 <aside class="app-rail" aria-label="Primary navigation">
   <nav class="rail-top" aria-label="站点">
-    <a class="rail-nav-btn" href="/global" aria-label="全球期刊" title="全球期刊">
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 3.4 9A14 14 0 0 1 12 21a14 14 0 0 1-3.4-9A14 14 0 0 1 12 3Z"/></svg>
-      <span>全球</span>
-    </a>
-    <a class="rail-nav-btn rail-region-station" data-region-station="dom" href="/cn" aria-label="中国期刊" title="中国期刊">
-      <span class="rail-flag" aria-hidden="true">CN</span>
-      <span>中国</span>
-    </a>
-    <a class="rail-nav-btn rail-region-station" data-region-station="in" href="/in" aria-label="印度期刊" title="印度期刊" hidden>
-      <span class="rail-flag" aria-hidden="true">IN</span>
-      <span>印度</span>
-    </a>
-    <a class="rail-nav-btn rail-region-station" data-region-station="my" href="/my" aria-label="马来西亚期刊" title="马来西亚期刊" hidden>
-      <span class="rail-flag" aria-hidden="true">MY</span>
-      <span>马来西亚</span>
-    </a>
-    <a class="rail-nav-btn rail-region-station" data-region-station="kr" href="/kr" aria-label="韩国期刊" title="韩国期刊" hidden>
-      <span class="rail-flag" aria-hidden="true">KR</span>
-      <span>韩国</span>
-    </a>
-    <a class="rail-nav-btn rail-region-station" data-region-station="pbn" href="/pbn" aria-label="波兰期刊" title="波兰期刊" hidden>
-      <span class="rail-flag" aria-hidden="true">PL</span>
-      <span>波兰</span>
-    </a>
-    <a class="rail-nav-btn rail-region-station" data-region-station="isc" href="/isc" aria-label="伊朗期刊" title="伊朗期刊" hidden>
-      <span class="rail-flag" aria-hidden="true">IR</span>
-      <span>伊朗</span>
-    </a>
-    <a class="rail-nav-btn rail-region-station" data-region-station="scielo" href="/scielo" aria-label="拉美期刊" title="拉美期刊" hidden>
-      <span class="rail-flag" aria-hidden="true">LA</span>
-      <span>拉美</span>
-    </a>
+    <a class="rail-nav-btn" href="/global"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 3.4 9A14 14 0 0 1 12 21a14 14 0 0 1-3.4-9A14 14 0 0 1 12 3Z"/></svg><span>全球</span></a>
+    <a class="rail-nav-btn rail-region-station" data-region-station="dom" href="/cn"><span class="rail-flag">CN</span><span>中国</span></a>
     <div class="rail-region-picker">
-      <button class="rail-nav-btn rail-region-toggle" type="button" aria-label="地区站点" title="地区站点" aria-expanded="false">
-        <span class="rail-flag rail-region-symbol" aria-hidden="true">···</span>
-        <span><span>地区</span><b class="rail-caret" aria-hidden="true">�?/b></span>
-      </button>
-      <div class="rail-region-menu" aria-label="地区站点"></div>
+      <button class="rail-nav-btn rail-region-toggle" type="button" aria-expanded="false"><span class="rail-flag rail-region-symbol">···</span><span><span>地区</span><b class="rail-caret">▾</b></span></button>
+      <div class="rail-region-menu"></div>
     </div>
   </nav>
-  <div class="rail-bottom" aria-label="账户">
-    <a class="rail-nav-btn" id="fav-header-btn" href="/favorites" aria-label="我的收藏" title="我的收藏">
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.7l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3.7z"/></svg>
-      <span>收藏</span>
-    </a>
-    <a class="rail-nav-btn" id="account-credit-badge" href="/account" aria-label="我的" title="我的">
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="9" r="3.5"/><path d="M5 19c1.5-3 4-4.5 7-4.5S17.5 16 19 19"/></svg>
-      <span>我的</span>
-    </a>
+  <div class="rail-bottom">
+    <a class="rail-nav-btn" href="/favorites"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.7l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3.7z"/></svg><span>收藏</span></a>
+    <a class="rail-nav-btn" href="/account"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="9" r="3.5"/><path d="M5 19c1.5-3 4-4.5 7-4.5S17.5 16 19 19"/></svg><span>设置</span></a>
   </div>
 </aside>
-
 <header class="page-head">
   <a class="brand" href="/">AILatest <span>Journal</span></a>
-  <nav class="page-head-nav" aria-label="Site">
-    <a href="/" data-static-i18n="nav_home" data-nav="home">首页</a>
-    <a href="/#feat" data-static-i18n="nav_features" data-nav="features">功能</a>
-    <a href="/pricing" data-static-i18n="nav_pricing" data-nav="pricing">订阅</a>
-    <a href="/#download" data-static-i18n="download_center" data-nav="download">下载</a>
-    <a href="/about" data-static-i18n="nav_about" data-nav="about">关于</a>
-    <a href="/contact" data-static-i18n="nav_contact" data-nav="contact">联系</a>
-    <a class="cta" href="/signup.html" data-static-i18n="nav_login">注册 / 登录</a>
+  <nav class="page-head-nav">
+    <a href="/">首页</a><a href="/pricing">订阅</a><a href="/about">关于</a><a href="/contact">联系</a>
+    <a class="cta" href="/signup.html">注册 / 登录</a>
     <button class="static-lang-toggle" type="button" data-static-lang-toggle>English</button>
   </nav>
 </header>
-<main class="narrow">
-  <h1>Privacy Policy</h1>
-  <p class="sub">Last updated: June 12, 2026</p>
-  <div class="note">中文摘要：我们只收集提供服务所必需的数据——账号邮箱、收�?笔记等你主动保存的内容、匿名化的使用统计。浏览器插件会优先使用本地缓存；未缓存时，仅�?AILatest 接口发送期刊名、ISSN 等识别所需字段，不上传你的浏览记录、检索关键词或论文阅读内容。支付由第三方收单方（Merchant of Record）处理，我们不接触你的银行卡信息。如中英文有出入，以英文版为准�?/div>
+<main class="info-page">
+  <div class="info-hero">
+    <div class="info-kicker">Privacy</div>
+    <div data-lang-panel="zh-CN"><h1>隐私政策</h1><p class="sub">我们只收集提供服务所必需的数据，不出售个人信息，也不用你的笔记训练模型。</p><p class="info-meta">最近更新：<b>2026-07-16</b></p></div>
+    <div data-lang-panel="en"><h1>Privacy Policy</h1><p class="sub">We collect only what we need to run the Service. We do not sell personal data or train models on your notes.</p><p class="info-meta">Last updated: <b>2026-07-16</b></p></div>
+  </div>
+  <nav class="info-toc">
+    <a href="/about">关于</a><a href="/about#data">数据</a><a href="/terms">条款</a><a href="/privacy" aria-current="page">隐私</a><a href="/refund">退款</a><a href="/contact">联系</a>
+  </nav>
 
-  <h2>1. What We Collect</h2>
-  <h3>Account data</h3>
-  <ul>
-    <li>Email address (for email-code sign-in and account notices).</li>
-    <li>If you sign in with GitHub or Google: your public profile name, avatar and the email address shared by the provider. We never receive your password.</li>
-  </ul>
-  <h3>Content you save</h3>
-  <ul>
-    <li>Favorites, lists, tags, notes and submission records you create. Stored to provide cross-device sync.</li>
-  </ul>
-  <h3>Usage data</h3>
-  <ul>
-    <li>Server logs and aggregated analytics (pages viewed, country-level location derived from IP, browser type) used to operate and improve the Service. We use Google Tag Manager / analytics; you can opt out via standard browser controls or our <code>?noanalytics</code> flag.</li>
-  </ul>
-  <h3>Payment data</h3>
-  <ul>
-    <li>Payments are processed by our Merchant of Record (e.g. Lemon Squeezy / Paddle). They collect and process your payment details under their own privacy policies. We only receive order metadata (plan, amount, status) �?never card numbers.</li>
-  </ul>
+  <section class="info-sec" data-lang-panel="zh-CN">
+    <h2>1. 我们收集什么</h2>
+    <h3>账号</h3>
+    <ul>
+      <li>邮箱（登录验证码与通知）。</li>
+      <li>若使用 GitHub / Google 登录：对方共享的公开名称、头像与邮箱；我们不会获得你的密码。</li>
+    </ul>
+    <h3>你主动保存的内容</h3>
+    <ul><li>收藏、清单、标签、笔记与投稿记录，用于跨设备同步。</li></ul>
+    <h3>使用数据</h3>
+    <ul><li>服务日志与汇总分析（页面访问、大致地区、浏览器类型），用于运维与改进。可使用浏览器控件或 <code>?noanalytics</code> 减少分析。</li></ul>
+    <h3>支付</h3>
+    <ul><li>由收单方（Merchant of Record，如 Creem）处理支付信息；我们只收到订单元数据（方案、金额、状态），不接触银行卡号。</li></ul>
+    <h2>2. 浏览器插件</h2>
+    <ul>
+      <li>优先本地缓存；未命中时仅向我们的接口发送期刊名、ISSN 等识别所需字段。</li>
+      <li>不会上传你的浏览历史、检索关键词或论文阅读正文用于查刊。</li>
+      <li>登录后令牌仅用于调用我们的 API（收藏同步、权益）。</li>
+    </ul>
+    <h2>3. 如何使用</h2>
+    <ul>
+      <li>提供与保障服务（登录、同步、防滥用、限流）。</li>
+      <li>运营订阅与试用权益。</li>
+      <li>汇总统计以改进产品。</li>
+      <li>发送事务性邮件（登录码、重要账户/账单通知）。营销邮件仅在你同意时发送，并可随时退订。</li>
+    </ul>
+    <h2>4. 存储与第三方</h2>
+    <p>我们使用 localStorage 等保存登录态与偏好。处理方可能包括 Cloudflare（托管/CDN）、邮件服务、OAuth 提供方与支付收单方，且仅获得完成职能所需数据。</p>
+    <h2>5. 保留、删除与权利</h2>
+    <ul>
+      <li>账号存续期间保留账户数据；你可邮件申请删除，我们将在 30 日内删除或匿名化（法律要求保留的除外）。</li>
+      <li>你可依法请求访问、更正、导出或删除个人数据：<a href="mailto:contact@ailatest.org">contact@ailatest.org</a>。</li>
+    </ul>
+    <h2>6. 联系</h2>
+    <p><a href="mailto:contact@ailatest.org">contact@ailatest.org</a> · <a href="/contact">联系页</a></p>
+  </section>
 
-  <h2>2. Browser Extension</h2>
-  <ul>
-    <li>The extension uses local cache first. When a journal is not cached, it sends only the journal name, ISSN and other fields necessary for journal identification to the AILatest lookup API.</li>
-    <li>Pages you visit, search queries and article reading content are <b>not</b> sent to our servers for journal lookup.</li>
-    <li>If you sign in inside the extension, your account token is stored in the browser's extension storage and used only to call our API (favorites sync, entitlements).</li>
-    <li>The extension does not collect browsing history and does not inject ads or trackers.</li>
-  </ul>
-
-  <h2>3. How We Use Data</h2>
-  <ul>
-    <li>Provide and secure the Service (authentication, sync, abuse prevention, rate limiting).</li>
-    <li>Operate subscriptions (trial status, entitlements, billing events from the Merchant of Record).</li>
-    <li>Improve the product through aggregated, non-identifying statistics.</li>
-    <li>Send transactional email (sign-in codes, important account or billing notices). Marketing email is sent only with your consent and always has an unsubscribe link.</li>
-  </ul>
-  <p>We do <b>not</b> sell personal data, and we do not use your notes or saved content to train AI models.</p>
-
-  <h2>4. Cookies and Local Storage</h2>
-  <p>We use localStorage and similar technologies to keep you signed in, remember preferences (language, favorites before sign-in), and measure usage. Essential storage cannot be disabled without breaking sign-in.</p>
-
-  <h2>5. Service Providers</h2>
-  <p>We rely on a small set of processors to run the Service: Cloudflare (hosting, CDN, database), Resend (transactional email), Google (OAuth sign-in, analytics), GitHub (OAuth sign-in), and our Merchant of Record (payments). Each receives only what is necessary for its function.</p>
-
-  <h2>6. Data Retention and Deletion</h2>
-  <ul>
-    <li>Account data is kept while your account is active.</li>
-    <li>You may delete your account by contacting <a href="mailto:contact@ailatest.org">contact@ailatest.org</a>; we delete or anonymize personal data within 30 days, except records we must keep for legal or accounting reasons.</li>
-    <li>Sign-in codes expire within 10 minutes and are stored only as salted hashes.</li>
-  </ul>
-
-  <h2>7. Your Rights</h2>
-  <p>Depending on your jurisdiction (e.g. GDPR, CCPA, PIPL), you may have the right to access, correct, export or delete your personal data, and to object to or restrict certain processing. Contact us at <a href="mailto:contact@ailatest.org">contact@ailatest.org</a> and we will respond within 30 days.</p>
-
-  <h2>8. Security</h2>
-  <p>Data is encrypted in transit (TLS). Authentication uses signed tokens; verification codes are stored hashed with a server-side secret. No method of transmission or storage is 100% secure, but we follow industry practices to protect your data.</p>
-
-  <h2>9. Children</h2>
-  <p>The Service is not directed at children under 16, and we do not knowingly collect their data.</p>
-
-  <h2>10. Changes</h2>
-  <p>We may update this Policy; material changes will be announced on the Service. The "Last updated" date above reflects the current version.</p>
-
-  <h2>11. Contact</h2>
-  <p>Privacy questions and requests: <a href="mailto:contact@ailatest.org">contact@ailatest.org</a> · <a href="/contact.html">Contact page</a></p>
+  <section class="info-sec" data-lang-panel="en">
+    <h2>1. What we collect</h2>
+    <h3>Account</h3>
+    <ul>
+      <li>Email for sign-in codes and notices.</li>
+      <li>If you use GitHub / Google: public name, avatar and email shared by the provider—never your password.</li>
+    </ul>
+    <h3>Content you save</h3>
+    <ul><li>Favorites, lists, tags, notes and submission records for cross-device sync.</li></ul>
+    <h3>Usage</h3>
+    <ul><li>Server logs and aggregated analytics to operate and improve the Service. Opt out via browser controls or <code>?noanalytics</code>.</li></ul>
+    <h3>Payments</h3>
+    <ul><li>Processed by our Merchant of Record (e.g. Creem). We receive order metadata only—never card numbers.</li></ul>
+    <h2>2. Browser extension</h2>
+    <ul>
+      <li>Local cache first; otherwise only journal name / ISSN (and similar IDs) are sent for lookup.</li>
+      <li>We do not upload browsing history, search queries or article body for journal lookup.</li>
+      <li>Signed-in tokens are used only for our API (sync, entitlements).</li>
+    </ul>
+    <h2>3. How we use data</h2>
+    <ul>
+      <li>Provide and secure the Service.</li>
+      <li>Operate subscriptions and trials.</li>
+      <li>Improve the product with aggregated stats.</li>
+      <li>Send transactional email; marketing only with consent.</li>
+    </ul>
+    <h2>4. Storage &amp; processors</h2>
+    <p>We use localStorage for session/preferences. Processors may include Cloudflare, email, OAuth and payment partners—each only what is needed.</p>
+    <h2>5. Retention, deletion &amp; rights</h2>
+    <ul>
+      <li>Account data while active; email us to delete—we delete or anonymize within 30 days except where law requires retention.</li>
+      <li>Access, correction, export or deletion requests: <a href="mailto:contact@ailatest.org">contact@ailatest.org</a>.</li>
+    </ul>
+    <h2>6. Contact</h2>
+    <p><a href="mailto:contact@ailatest.org">contact@ailatest.org</a> · <a href="/contact">Contact page</a></p>
+  </section>
+  <p class="info-back"><a href="/">← 返回首页 · Back home</a></p>
 </main>
-<script src="/js/site-rail.js?v=20260716-shell-main" defer></script>
-<script src="/js/static-i18n.js?v=20260716-site-shell" defer></script>
+<script src="/js/site-rail.js?v=20260716-info-v1" defer></script>
+<script src="/js/static-i18n.js?v=20260716-info-v1" defer></script>
 </body>
 </html>

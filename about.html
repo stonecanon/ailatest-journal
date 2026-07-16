@@ -3,21 +3,12 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>关于我们 About | AILatest Journal</title>
-<meta name="description" content="AILatest Journal 数据来源与更新时间：WoS、JCR、中科院分区、EI、Scopus、DOAJ、OpenAlex 等公开评级与元数据汇总说明。" />
+<title>关于与数据说明 | AILatest Journal</title>
+<meta name="description" content="AILatest Journal 产品说明与数据来源：WoS、JCR、中科院分区、EI、Scopus、DOAJ、OpenAlex 等公开评级与元数据汇总。" />
 <link rel="canonical" href="https://journal.ailatest.org/about" />
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
-<link rel="stylesheet" href="/css/static.css?v=20260716-base-pages" />
-<style>
-  .source-table-wrap { overflow-x: auto; margin: 16px 0 28px; border: 1px solid var(--rule, #e8dfd2); border-radius: 10px; }
-  .source-table { width: 100%; border-collapse: collapse; font-size: 13.5px; line-height: 1.45; }
-  .source-table th, .source-table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--rule, #eee5d8); vertical-align: top; }
-  .source-table th { background: var(--paper-soft, #faf7f0); font-weight: 700; white-space: nowrap; }
-  .source-table tr:last-child td { border-bottom: 0; }
-  .source-table .col-cut { white-space: nowrap; font-variant-numeric: tabular-nums; color: var(--ink-soft, #5c5348); font-weight: 600; }
-  .source-table .col-note { color: var(--muted, #6f675f); font-size: 12.5px; }
-  .meta-stamp { font-size: 13px; color: var(--muted, #6f675f); margin: 0 0 18px; }
-</style>
+<link rel="stylesheet" href="/css/static.css?v=20260716-info-v1" />
+<link rel="stylesheet" href="/css/info-pages.css?v=20260716-info-v1" />
 </head>
 <body data-static-page="about">
 <aside class="app-rail" aria-label="Primary navigation">
@@ -30,32 +21,14 @@
       <span class="rail-flag" aria-hidden="true">CN</span>
       <span>中国</span>
     </a>
-    <a class="rail-nav-btn rail-region-station" data-region-station="in" href="/in" aria-label="印度期刊" title="印度期刊" hidden>
-      <span class="rail-flag" aria-hidden="true">IN</span>
-      <span>印度</span>
-    </a>
-    <a class="rail-nav-btn rail-region-station" data-region-station="my" href="/my" aria-label="马来西亚期刊" title="马来西亚期刊" hidden>
-      <span class="rail-flag" aria-hidden="true">MY</span>
-      <span>马来西亚</span>
-    </a>
-    <a class="rail-nav-btn rail-region-station" data-region-station="kr" href="/kr" aria-label="韩国期刊" title="韩国期刊" hidden>
-      <span class="rail-flag" aria-hidden="true">KR</span>
-      <span>韩国</span>
-    </a>
-    <a class="rail-nav-btn rail-region-station" data-region-station="pbn" href="/pbn" aria-label="波兰期刊" title="波兰期刊" hidden>
-      <span class="rail-flag" aria-hidden="true">PL</span>
-      <span>波兰</span>
-    </a>
-    <a class="rail-nav-btn rail-region-station" data-region-station="isc" href="/isc" aria-label="伊朗期刊" title="伊朗期刊" hidden>
-      <span class="rail-flag" aria-hidden="true">IR</span>
-      <span>伊朗</span>
-    </a>
-    <a class="rail-nav-btn rail-region-station" data-region-station="scielo" href="/scielo" aria-label="拉美期刊" title="拉美期刊" hidden>
-      <span class="rail-flag" aria-hidden="true">LA</span>
-      <span>拉美</span>
-    </a>
+    <a class="rail-nav-btn rail-region-station" data-region-station="in" href="/in" hidden><span class="rail-flag">IN</span><span>印度</span></a>
+    <a class="rail-nav-btn rail-region-station" data-region-station="my" href="/my" hidden><span class="rail-flag">MY</span><span>马来西亚</span></a>
+    <a class="rail-nav-btn rail-region-station" data-region-station="kr" href="/kr" hidden><span class="rail-flag">KR</span><span>韩国</span></a>
+    <a class="rail-nav-btn rail-region-station" data-region-station="pbn" href="/pbn" hidden><span class="rail-flag">PL</span><span>波兰</span></a>
+    <a class="rail-nav-btn rail-region-station" data-region-station="isc" href="/isc" hidden><span class="rail-flag">IR</span><span>伊朗</span></a>
+    <a class="rail-nav-btn rail-region-station" data-region-station="scielo" href="/scielo" hidden><span class="rail-flag">LA</span><span>拉美</span></a>
     <div class="rail-region-picker">
-      <button class="rail-nav-btn rail-region-toggle" type="button" aria-label="地区站点" title="地区站点" aria-expanded="false">
+      <button class="rail-nav-btn rail-region-toggle" type="button" aria-label="地区站点" aria-expanded="false">
         <span class="rail-flag rail-region-symbol" aria-hidden="true">···</span>
         <span><span>地区</span><b class="rail-caret" aria-hidden="true">▾</b></span>
       </button>
@@ -63,13 +36,13 @@
     </div>
   </nav>
   <div class="rail-bottom" aria-label="账户">
-    <a class="rail-nav-btn" id="fav-header-btn" href="/favorites" aria-label="我的收藏" title="我的收藏">
+    <a class="rail-nav-btn" href="/favorites" aria-label="我的收藏" title="我的收藏">
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.7l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3.7z"/></svg>
       <span>收藏</span>
     </a>
-    <a class="rail-nav-btn" id="account-credit-badge" href="/account" aria-label="我的" title="我的">
+    <a class="rail-nav-btn" href="/account" aria-label="设置" title="设置">
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="9" r="3.5"/><path d="M5 19c1.5-3 4-4.5 7-4.5S17.5 16 19 19"/></svg>
-      <span>我的</span>
+      <span>设置</span>
     </a>
   </div>
 </aside>
@@ -77,334 +50,175 @@
 <header class="page-head">
   <a class="brand" href="/">AILatest <span>Journal</span></a>
   <nav class="page-head-nav" aria-label="Site">
-    <a href="/" data-static-i18n="nav_home" data-nav="home">首页</a>
-    <a href="/#feat" data-static-i18n="nav_features" data-nav="features">功能</a>
-    <a href="/pricing" data-static-i18n="nav_pricing" data-nav="pricing">订阅</a>
-    <a href="/#download" data-static-i18n="download_center" data-nav="download">下载</a>
-    <a href="/about" data-static-i18n="nav_about" data-nav="about">关于</a>
-    <a href="/contact" data-static-i18n="nav_contact" data-nav="contact">联系</a>
+    <a href="/" data-static-i18n="nav_home">首页</a>
+    <a href="/#feat" data-static-i18n="nav_features">功能</a>
+    <a href="/pricing" data-static-i18n="nav_pricing">订阅</a>
+    <a href="/#download" data-static-i18n="download_center">下载</a>
+    <a href="/about" data-static-i18n="nav_about" aria-current="page">关于</a>
+    <a href="/contact" data-static-i18n="nav_contact">联系</a>
     <a class="cta" href="/signup.html" data-static-i18n="nav_login">注册 / 登录</a>
     <button class="static-lang-toggle" type="button" data-static-lang-toggle>English</button>
   </nav>
 </header>
 
-<main class="narrow">
-  <div data-lang-panel="zh-CN">
-    <h1>关于 AILatest Journal</h1>
-    <p class="sub">期刊检索与投稿决策工具 · 数据来源与更新时间说明</p>
-    <p class="meta-stamp">本站聚合库规模约 <b>48,700+</b> 条期刊记录（以 <code>meta.json</code> 为准）。页面标注的「截止时间」为上游公开版本或本站最近一次纳入该数据源的日期，不是实时爬虫时刻。</p>
+<main class="info-page info-page-wide">
+  <div class="info-hero">
+    <div class="info-kicker">About</div>
+    <div data-lang-panel="zh-CN">
+      <h1>关于 AILatest Journal</h1>
+      <p class="sub">期刊检索与投稿决策工具。聚合公开评级与元数据，帮你在投稿前把目标刊看清楚。</p>
+      <p class="info-meta">库规模约 <b>48,700+</b> 条 · 数据以各评价机构官方发布为准</p>
+    </div>
+    <div data-lang-panel="en">
+      <h1>About AILatest Journal</h1>
+      <p class="sub">A journal finder for researchers. We aggregate public ratings and metadata so you can compare venues before submission.</p>
+      <p class="info-meta">≈ <b>48,700+</b> records · official sources remain the source of truth</p>
+    </div>
+  </div>
 
-    <p><b>AILatest Journal</b>（journal.ailatest.org）面向科研人员，把分散的期刊评级与元数据整合到免费、快速的检索界面，帮助投稿前快速看清一本期刊的全貌。</p>
+  <nav class="info-toc" aria-label="Legal pages">
+    <a href="/about" aria-current="page" data-lang-panel="zh-CN">关于</a>
+    <a href="/about" aria-current="page" data-lang-panel="en">About</a>
+    <a href="/about#data" data-lang-panel="zh-CN">数据说明</a>
+    <a href="/about#data" data-lang-panel="en">Data</a>
+    <a href="/terms" data-lang-panel="zh-CN">条款</a>
+    <a href="/terms" data-lang-panel="en">Terms</a>
+    <a href="/privacy" data-lang-panel="zh-CN">隐私</a>
+    <a href="/privacy" data-lang-panel="en">Privacy</a>
+    <a href="/refund" data-lang-panel="zh-CN">退款</a>
+    <a href="/refund" data-lang-panel="en">Refund</a>
+    <a href="/contact" data-lang-panel="zh-CN">联系</a>
+    <a href="/contact" data-lang-panel="en">Contact</a>
+  </nav>
 
+  <section class="info-sec" data-lang-panel="zh-CN">
     <h2>我们提供什么</h2>
-    <ul>
-      <li><b>全球与地区期刊库</b>：SCIE / SSCI / AHCI / ESCI / EI、Scopus、DOAJ、MEDLINE，以及中国、印度、韩国、马来西亚等地区目录。</li>
-      <li><b>评级与指标</b>：JCR 影响因子与 Quartile、中科院分区（含 TOP）、ESI、CCF、ABDC、ABS、中国科协分级、CSSCI / 北大核心 / CSCD、预警名单等。</li>
-      <li><b>检索、收藏、荐刊、插件</b>：多维筛选；登录后跨设备收藏；AI 荐刊；Scholar / PubMed / 知网等页面徽章。</li>
-    </ul>
+    <div class="info-grid">
+      <div class="info-card">
+        <h3>全球与地区库</h3>
+        <p>SCIE / SSCI / AHCI / ESCI / EI、Scopus、DOAJ、MEDLINE；中国、印度、韩国、马来西亚等地区站。</p>
+      </div>
+      <div class="info-card">
+        <h3>分区 · 指标 · 风险</h3>
+        <p>JCR IF 与 Quartile、中科院分区（含 TOP）、CCF / ABDC / ABS；预警与撤稿提示。</p>
+      </div>
+      <div class="info-card">
+        <h3>检索 · 收藏 · 荐刊</h3>
+        <p>多维筛选；登录后云端收藏；输入标题摘要做智能荐刊匹配。</p>
+      </div>
+      <div class="info-card">
+        <h3>浏览器插件</h3>
+        <p>在 Scholar / PubMed / 知网等页面展示分区与收录徽章，少开一个标签页。</p>
+      </div>
+    </div>
+  </section>
+  <section class="info-sec" data-lang-panel="en">
+    <h2>What you get</h2>
+    <div class="info-grid">
+      <div class="info-card">
+        <h3>Global &amp; regional coverage</h3>
+        <p>SCIE / SSCI / AHCI / ESCI / EI, Scopus, DOAJ, MEDLINE, plus China, India, Korea, Malaysia and more.</p>
+      </div>
+      <div class="info-card">
+        <h3>Metrics &amp; risk signals</h3>
+        <p>JCR IF &amp; quartiles, CAS tiers (incl. TOP), CCF / ABDC / ABS, warning and retraction cues.</p>
+      </div>
+      <div class="info-card">
+        <h3>Search, favorites, AI pick</h3>
+        <p>Multi-filter search, cloud favorites after sign-in, title/abstract journal matching.</p>
+      </div>
+      <div class="info-card">
+        <h3>Browser extension</h3>
+        <p>Badges on Scholar / PubMed / CNKI so you compare venues without extra tabs.</p>
+      </div>
+    </div>
+  </section>
 
-    <h2>数据来源与截止时间</h2>
-    <p>下表按数据类型列出<strong>来源机构 / 产品</strong>与<strong>本站当前采用版本或数据截止日</strong>。著作权归原发布机构；本站仅做聚合检索与展示。个别字段可能因上游滞后而与官网最新稿存在差异——欢迎通过<a href="/contact">联系页</a>纠错。</p>
+  <section class="info-sec" id="data">
+    <div data-lang-panel="zh-CN">
+      <h2>数据说明</h2>
+      <p>下表列出主要数据类型、来源机构与本站当前采用版本 / 截止日。著作权归原发布机构；本站仅做聚合检索与展示。「截止时间」指上游公开版本或本站最近一次纳入该源的日期，不是实时爬虫时刻。</p>
+    </div>
+    <div data-lang-panel="en">
+      <h2>Data sources &amp; cutoffs</h2>
+      <p>Copyright stays with the original publishers. We only aggregate for search and display. “Cutoff” means the upstream public edition or the date we last ingested that source—not a live crawl.</p>
+    </div>
 
-    <div class="source-table-wrap">
-      <table class="source-table">
+    <div class="info-table-wrap" data-lang-panel="zh-CN">
+      <table class="info-table">
         <thead>
-          <tr>
-            <th>数据类型</th>
-            <th>来源</th>
-            <th>版本 / 截止</th>
-            <th>说明</th>
-          </tr>
+          <tr><th>数据类型</th><th>来源</th><th>版本 / 截止</th><th>说明</th></tr>
         </thead>
         <tbody>
-          <tr>
-            <td>WoS 核心库收录（SCIE/SSCI/AHCI/ESCI）</td>
-            <td>Clarivate Web of Science Core Collection</td>
-            <td class="col-cut">2026-04-20</td>
-            <td class="col-note">主库收录状态；站点 meta 中 <code>last_updated_source</code></td>
-          </tr>
-          <tr>
-            <td>JCR 影响因子 / Quartile / IF 排名</td>
-            <td>Journal Citation Reports（JCR）</td>
-            <td class="col-cut">指标年 2025 · 发布年 2026</td>
-            <td class="col-note">IF 2025 等字段；历史 IF 序列来自多期 JCR 汇总</td>
-          </tr>
-          <tr>
-            <td>ESI 学科</td>
-            <td>Essential Science Indicators</td>
-            <td class="col-cut">随主库更新</td>
-            <td class="col-note">22 个 ESI 高被引学科分类</td>
-          </tr>
-          <tr>
-            <td>中科院分区（大类/小类/TOP）</td>
-            <td>中科院文献情报中心分区表 · ShowJCR 等公开整理</td>
-            <td class="col-cut">2025 版</td>
-            <td class="col-note">含 TOP 标识；预警名单单独成表</td>
-          </tr>
-          <tr>
-            <td>中科院国际期刊预警</td>
-            <td>中科院文献情报中心预警名单</td>
-            <td class="col-cut">2025 版（约 105 种）</td>
-            <td class="col-note">页面以「预警」徽章展示</td>
-          </tr>
-          <tr>
-            <td>EI Compendex 收录</td>
-            <td>Elsevier Engineering Village · Compendex 列表</td>
-            <td class="col-cut">2026-07-09</td>
-            <td class="col-note">官方列表更新日期；见 meta <code>ei_source_updated</code></td>
-          </tr>
-          <tr>
-            <td>Scopus 收录 / ASJC</td>
-            <td>Elsevier Scopus Source List</td>
-            <td class="col-cut">持续自动更新</td>
-            <td class="col-note">无 WoS 覆盖的 Scopus 刊亦纳入检索</td>
-          </tr>
-          <tr>
-            <td>DOAJ 开放获取</td>
-            <td>Directory of Open Access Journals（CSV）</td>
-            <td class="col-cut">2025 数据批次</td>
-            <td class="col-note">与 OpenAlex OA 标签交叉展示</td>
-          </tr>
-          <tr>
-            <td>OA / APC / 主页 / 发文量趋势</td>
-            <td>OpenAlex</td>
-            <td class="col-cut">快照 2026-05</td>
-            <td class="col-note">作者机构国家分布优先读站内预置快照，缺省时再尝试补全</td>
-          </tr>
-          <tr>
-            <td>CCF 推荐目录</td>
-            <td>中国计算机学会</td>
-            <td class="col-cut">2026 版 A/B/C</td>
-            <td class="col-note">计算机类期刊分级</td>
-          </tr>
-          <tr>
-            <td>ABDC</td>
-            <td>Australian Business Deans Council</td>
-            <td class="col-cut">2025 版</td>
-            <td class="col-note">A* / A / B / C</td>
-          </tr>
-          <tr>
-            <td>ABS / AJG</td>
-            <td>Chartered Association of Business Schools</td>
-            <td class="col-cut">2024 版</td>
-            <td class="col-note">英国商科期刊评级</td>
-          </tr>
-          <tr>
-            <td>中国科协高质量科技期刊分级</td>
-            <td>中国科协 T1–T3 目录</td>
-            <td class="col-cut">2025 版</td>
-            <td class="col-note">领域分级目录</td>
-          </tr>
-          <tr>
-            <td>CSSCI / 北大核心 / CSCD / 科技核心等</td>
-            <td>国内核心目录公开数据与整理表</td>
-            <td class="col-cut">按各目录现行版</td>
-            <td class="col-note">中国站目录检索；具体以各评价机构最新公布为准</td>
-          </tr>
-          <tr>
-            <td>印度期刊</td>
-            <td>UGC-CARE 等公开目录</td>
-            <td class="col-cut">地区站独立数据包</td>
-            <td class="col-note">见 /in 印度站</td>
-          </tr>
-          <tr>
-            <td>韩国期刊</td>
-            <td>韩国研究财团 KCI 等</td>
-            <td class="col-cut">地区站独立数据包</td>
-            <td class="col-note">见 /kr 韩国站</td>
-          </tr>
-          <tr>
-            <td>马来西亚期刊</td>
-            <td>MyCite 等公开目录</td>
-            <td class="col-cut">地区站独立数据包</td>
-            <td class="col-note">见 /my 马来西亚站</td>
-          </tr>
-          <tr>
-            <td>Retraction Watch 撤稿指标</td>
-            <td>Retraction Watch 公开数据整理</td>
-            <td class="col-cut">随库更新</td>
-            <td class="col-note">仅作风险提示，不作排名</td>
-          </tr>
-          <tr>
-            <td>审稿周期</td>
-            <td>公开披露 / 第三方整理（含 ScienceDirect 等）</td>
-            <td class="col-cut">样本覆盖有限</td>
-            <td class="col-note">有数据的期刊才显示周期字段</td>
-          </tr>
+          <tr><td>WoS 核心库收录（SCIE/SSCI/AHCI/ESCI）</td><td>Clarivate Web of Science Core Collection</td><td class="col-cut">2026-04-20</td><td class="col-note">主库收录状态</td></tr>
+          <tr><td>JCR 影响因子 / Quartile</td><td>Journal Citation Reports</td><td class="col-cut">指标年 2025 · 发布 2026</td><td class="col-note">IF 与分区字段</td></tr>
+          <tr><td>ESI 学科</td><td>Essential Science Indicators</td><td class="col-cut">随主库更新</td><td class="col-note">22 个 ESI 分类</td></tr>
+          <tr><td>中科院分区（大类/小类/TOP）</td><td>中科院文献情报中心分区表</td><td class="col-cut">2025 版</td><td class="col-note">含 TOP 标识</td></tr>
+          <tr><td>中科院国际期刊预警</td><td>中科院预警名单</td><td class="col-cut">2025 版</td><td class="col-note">预警徽章</td></tr>
+          <tr><td>EI Compendex</td><td>Elsevier Engineering Village</td><td class="col-cut">2026-07-09</td><td class="col-note">Compendex 列表</td></tr>
+          <tr><td>Scopus 收录 / ASJC</td><td>Elsevier Scopus Source List</td><td class="col-cut">持续更新</td><td class="col-note">含无 WoS 覆盖刊</td></tr>
+          <tr><td>DOAJ 开放获取</td><td>Directory of Open Access Journals</td><td class="col-cut">2025 批次</td><td class="col-note">与 OA 标签交叉</td></tr>
+          <tr><td>OA / APC / 发文趋势</td><td>OpenAlex</td><td class="col-cut">快照 2026-05</td><td class="col-note">元数据补全</td></tr>
+          <tr><td>CCF 推荐目录</td><td>中国计算机学会</td><td class="col-cut">2026 版 A/B/C</td><td class="col-note">计算机类分级</td></tr>
+          <tr><td>ABDC</td><td>Australian Business Deans Council</td><td class="col-cut">2025 版</td><td class="col-note">A* / A / B / C</td></tr>
+          <tr><td>ABS / AJG</td><td>Chartered ABS</td><td class="col-cut">2024 版</td><td class="col-note">商科评级</td></tr>
+          <tr><td>中国科协分级目录</td><td>中国科协 T1–T3</td><td class="col-cut">2025 版</td><td class="col-note">领域分级</td></tr>
+          <tr><td>CSSCI / 北大核心 / CSCD 等</td><td>国内核心目录公开数据</td><td class="col-cut">各目录现行版</td><td class="col-note">中国站检索</td></tr>
+          <tr><td>地区站（IN / KR / MY 等）</td><td>UGC-CARE / KCI / MyCite 等</td><td class="col-cut">独立数据包</td><td class="col-note">见对应地区站</td></tr>
+          <tr><td>撤稿指标</td><td>Retraction Watch 公开整理</td><td class="col-cut">随库更新</td><td class="col-note">仅作风险提示</td></tr>
+          <tr><td>审稿周期</td><td>公开披露 / 第三方整理</td><td class="col-cut">样本有限</td><td class="col-note">有数据才展示</td></tr>
         </tbody>
       </table>
     </div>
 
-    <div class="note">
-      <b>如何理解「截止时间」：</b>例如 JCR「指标年 2025」表示影响因子对应的计量年度；EI「2026-07-09」表示本站纳入的 Compendex 列表官方日期。站点会在上游发布后分批更新，不会保证与每个机构官网同一天同步。
+    <div class="info-table-wrap" data-lang-panel="en">
+      <table class="info-table">
+        <thead>
+          <tr><th>Data type</th><th>Source</th><th>Edition / cutoff</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>WoS Core indexing</td><td>Clarivate Web of Science</td><td class="col-cut">2026-04-20</td><td class="col-note">SCIE/SSCI/AHCI/ESCI</td></tr>
+          <tr><td>JCR IF / Quartile</td><td>Journal Citation Reports</td><td class="col-cut">Metric 2025 · Release 2026</td><td class="col-note">Impact metrics</td></tr>
+          <tr><td>ESI fields</td><td>Essential Science Indicators</td><td class="col-cut">With main corpus</td><td class="col-note">22 categories</td></tr>
+          <tr><td>CAS journal zones</td><td>CAS / NSDLC zone tables</td><td class="col-cut">2025 edition</td><td class="col-note">Incl. TOP flag</td></tr>
+          <tr><td>CAS early-warning list</td><td>CAS warning list</td><td class="col-cut">2025</td><td class="col-note">Warning badges</td></tr>
+          <tr><td>EI Compendex</td><td>Elsevier Engineering Village</td><td class="col-cut">2026-07-09</td><td class="col-note">Compendex list</td></tr>
+          <tr><td>Scopus / ASJC</td><td>Elsevier Scopus Source List</td><td class="col-cut">Ongoing</td><td class="col-note">Includes non-WoS titles</td></tr>
+          <tr><td>DOAJ OA</td><td>Directory of Open Access Journals</td><td class="col-cut">2025 batch</td><td class="col-note">OA signals</td></tr>
+          <tr><td>OA / APC / output trends</td><td>OpenAlex</td><td class="col-cut">Snapshot 2026-05</td><td class="col-note">Metadata enrichment</td></tr>
+          <tr><td>CCF recommended list</td><td>China Computer Federation</td><td class="col-cut">2026 A/B/C</td><td class="col-note">CS venues</td></tr>
+          <tr><td>ABDC</td><td>Australian Business Deans Council</td><td class="col-cut">2025</td><td class="col-note">A*–C</td></tr>
+          <tr><td>ABS / AJG</td><td>Chartered ABS</td><td class="col-cut">2024</td><td class="col-note">Business journals</td></tr>
+          <tr><td>CAST graded lists</td><td>China Association for Science and Technology</td><td class="col-cut">2025 T1–T3</td><td class="col-note">Field grades</td></tr>
+          <tr><td>CSSCI / Peking Core / CSCD</td><td>Public domestic core lists</td><td class="col-cut">Current editions</td><td class="col-note">China station</td></tr>
+          <tr><td>Regional stations</td><td>UGC-CARE / KCI / MyCite etc.</td><td class="col-cut">Separate packs</td><td class="col-note">See /in /kr /my</td></tr>
+          <tr><td>Retraction signals</td><td>Retraction Watch (public)</td><td class="col-cut">With corpus</td><td class="col-note">Risk cue only</td></tr>
+          <tr><td>Review cycle</td><td>Public disclosures / third-party</td><td class="col-cut">Limited sample</td><td class="col-note">Shown when available</td></tr>
+        </tbody>
+      </table>
     </div>
 
+    <p class="info-note muted" data-lang-panel="zh-CN"><b>如何理解截止时间：</b>例如 JCR「指标年 2025」表示影响因子对应的计量年度；EI 日期表示本站纳入的 Compendex 列表官方日期。上游发布后会分批更新，不保证与官网同一天同步。发现错误请 <a href="/contact">联系我们</a>。</p>
+    <p class="info-note muted" data-lang-panel="en"><b>How to read cutoffs:</b> e.g. JCR “metric year 2025” is the measurement year for IF; EI dates refer to the Compendex list we ingested. We batch-update after upstream releases—report errors via the <a href="/contact">contact page</a>.</p>
+  </section>
+
+  <section class="info-sec" data-lang-panel="zh-CN">
     <h2>免责声明</h2>
     <p>本站数据仅供学术检索与投稿参考，不构成任何投稿保证。最终以期刊官网、出版社政策与各评价机构官方发布为准。</p>
-
-    <h2>运营者</h2>
-    <p>AILatest Journal 是 AILatest 旗下独立产品。反馈与纠错请见 <a href="/contact">联系我们</a>。</p>
-  </div>
-
-  <div data-lang-panel="en">
-    <h1>About AILatest Journal</h1>
-    <p class="sub">Journal finder &amp; submission decision tool · Data sources and cutoff dates</p>
-    <p class="meta-stamp">Aggregated catalogue size ≈ <b>48,700+</b> journal records (see <code>meta.json</code>). “Cutoff” means the upstream public edition or the date we last ingested that source—not a live crawl timestamp.</p>
-
-    <p><b>AILatest Journal</b> (journal.ailatest.org) helps researchers search and compare journals before submission: indexing, impact metrics, regional lists, favorites, AI matching, and a browser extension.</p>
-
-    <h2>What we provide</h2>
-    <ul>
-      <li><b>Global &amp; regional coverage</b>: SCIE / SSCI / AHCI / ESCI / EI, Scopus, DOAJ, MEDLINE, plus China, India, Korea, Malaysia and other regional directories.</li>
-      <li><b>Metrics &amp; ratings</b>: JCR IF &amp; quartiles, CAS tiers (incl. TOP), ESI, CCF, ABDC, ABS, CAST lists, CSSCI / Peking Core / CSCD, warning lists, and more.</li>
-      <li><b>Search, favorites, pick tool, extension</b>: multi-filter search; cloud favorites after sign-in; AI journal matching; badges on Scholar / PubMed / CNKI.</li>
-    </ul>
-
-    <h2>Data sources &amp; cutoffs</h2>
-    <p>Copyright remains with the original publishers. We only aggregate for search/display. Report errors via the <a href="/contact">contact page</a>.</p>
-
-    <div class="source-table-wrap">
-      <table class="source-table">
-        <thead>
-          <tr>
-            <th>Data type</th>
-            <th>Source</th>
-            <th>Edition / cutoff</th>
-            <th>Notes</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>WoS Core indexing (SCIE/SSCI/AHCI/ESCI)</td>
-            <td>Clarivate Web of Science Core Collection</td>
-            <td class="col-cut">2026-04-20</td>
-            <td class="col-note">Main indexing status; <code>last_updated_source</code> in meta</td>
-          </tr>
-          <tr>
-            <td>JCR IF / Quartile / IF rank</td>
-            <td>Journal Citation Reports</td>
-            <td class="col-cut">Metric year 2025 · Release year 2026</td>
-            <td class="col-note">IF 2025 fields; multi-year IF history where available</td>
-          </tr>
-          <tr>
-            <td>ESI fields</td>
-            <td>Essential Science Indicators</td>
-            <td class="col-cut">Updated with main corpus</td>
-            <td class="col-note">22 ESI categories</td>
-          </tr>
-          <tr>
-            <td>CAS journal zones (major/minor/TOP)</td>
-            <td>CAS / NSDLC zone tables · public consolidations (e.g. ShowJCR)</td>
-            <td class="col-cut">2025 edition</td>
-            <td class="col-note">Includes TOP flag; warning list separate</td>
-          </tr>
-          <tr>
-            <td>CAS early-warning journals</td>
-            <td>CAS warning list</td>
-            <td class="col-cut">2025 (~105 titles)</td>
-            <td class="col-note">Shown as warning badges</td>
-          </tr>
-          <tr>
-            <td>EI Compendex</td>
-            <td>Elsevier Engineering Village Compendex list</td>
-            <td class="col-cut">2026-07-09</td>
-            <td class="col-note">Official list date; meta <code>ei_source_updated</code></td>
-          </tr>
-          <tr>
-            <td>Scopus / ASJC</td>
-            <td>Elsevier Scopus Source List</td>
-            <td class="col-cut">Auto-updated</td>
-            <td class="col-note">Includes Scopus-only titles not in WoS</td>
-          </tr>
-          <tr>
-            <td>DOAJ open access</td>
-            <td>Directory of Open Access Journals (CSV)</td>
-            <td class="col-cut">2025 batch</td>
-            <td class="col-note">Cross-shown with OpenAlex OA labels</td>
-          </tr>
-          <tr>
-            <td>OA / APC / homepage / output trends</td>
-            <td>OpenAlex</td>
-            <td class="col-cut">Snapshot 2026-05</td>
-            <td class="col-note">Author-country shares may query OpenAlex Works live</td>
-          </tr>
-          <tr>
-            <td>CCF recommended list</td>
-            <td>China Computer Federation</td>
-            <td class="col-cut">2026 A/B/C</td>
-            <td class="col-note">CS journals</td>
-          </tr>
-          <tr>
-            <td>ABDC</td>
-            <td>Australian Business Deans Council</td>
-            <td class="col-cut">2025</td>
-            <td class="col-note">A* / A / B / C</td>
-          </tr>
-          <tr>
-            <td>ABS / AJG</td>
-            <td>Chartered ABS</td>
-            <td class="col-cut">2024</td>
-            <td class="col-note">UK business school journal guide</td>
-          </tr>
-          <tr>
-            <td>CAST high-quality journal tiers</td>
-            <td>China Association for Science and Technology T1–T3</td>
-            <td class="col-cut">2025</td>
-            <td class="col-note">Field tier catalogues</td>
-          </tr>
-          <tr>
-            <td>CSSCI / Peking Core / CSCD / CSTPC etc.</td>
-            <td>Domestic core lists (public)</td>
-            <td class="col-cut">Current official editions</td>
-            <td class="col-note">China station directories; always verify against official releases</td>
-          </tr>
-          <tr>
-            <td>India journals</td>
-            <td>UGC-CARE and related public lists</td>
-            <td class="col-cut">Regional pack</td>
-            <td class="col-note">See /in</td>
-          </tr>
-          <tr>
-            <td>Korea journals</td>
-            <td>NRF KCI and related lists</td>
-            <td class="col-cut">Regional pack</td>
-            <td class="col-note">See /kr</td>
-          </tr>
-          <tr>
-            <td>Malaysia journals</td>
-            <td>MyCite and related lists</td>
-            <td class="col-cut">Regional pack</td>
-            <td class="col-note">See /my</td>
-          </tr>
-          <tr>
-            <td>Retraction Watch metrics</td>
-            <td>Retraction Watch public data</td>
-            <td class="col-cut">Updated with corpus</td>
-            <td class="col-note">Risk signal only, not a ranking</td>
-          </tr>
-          <tr>
-            <td>Review cycles</td>
-            <td>Publisher disclosures / third-party digests</td>
-            <td class="col-cut">Partial coverage</td>
-            <td class="col-note">Shown only when data exists</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="note">
-      <b>How to read cutoffs:</b> JCR “metric year 2025” is the year the IF measures; EI “2026-07-09” is the Compendex list date we ingested. We batch-update after upstream releases and do not guarantee same-day parity with every official site.
-    </div>
-
+    <h3>运营者</h3>
+    <p>AILatest Journal 是 AILatest 旗下独立产品。反馈与纠错见 <a href="/contact">联系页</a>。</p>
+  </section>
+  <section class="info-sec" data-lang-panel="en">
     <h2>Disclaimer</h2>
-    <p>Data is for academic search and submission planning only. Always confirm with the journal website, publisher policy, and official rating bodies.</p>
+    <p>Data is for research discovery only and is not a guarantee of acceptance. Always verify against the journal’s site, publisher policy and the official rating body.</p>
+    <h3>Operator</h3>
+    <p>AILatest Journal is a product of AILatest. Feedback: <a href="/contact">contact page</a>.</p>
+  </section>
 
-    <h2>Operator</h2>
-    <p>AILatest Journal is an AILatest product. Feedback and corrections: <a href="/contact">Contact</a>.</p>
-  </div>
+  <p class="info-back"><a href="/">← 返回首页 · Back home</a></p>
 </main>
 
-<script src="/js/site-rail.js?v=20260716-shell-main" defer></script>
-<script src="/js/static-i18n.js?v=20260716-site-shell" defer></script>
+<script src="/js/site-rail.js?v=20260716-info-v1" defer></script>
+<script src="/js/static-i18n.js?v=20260716-info-v1" defer></script>
 </body>
 </html>

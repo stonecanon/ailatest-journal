@@ -1,126 +1,102 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Refund Policy | AILatest Journal</title>
-<meta name="description" content="Refund Policy for AILatest Journal. Paid plans are not open yet; this policy is retained for future billing." />
-<link rel="canonical" href="https://journal.ailatest.org/refund.html" />
+<title>退款政策 | AILatest Journal</title>
+<meta name="description" content="AILatest Journal 退款政策：年付、月付与订单问题的处理方式。" />
+<link rel="canonical" href="https://journal.ailatest.org/refund" />
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
-<link rel="stylesheet" href="/css/static.css?v=20260716-base-pages" />
+<link rel="stylesheet" href="/css/static.css?v=20260716-info-v1" />
+<link rel="stylesheet" href="/css/info-pages.css?v=20260716-info-v1" />
 </head>
 <body data-static-page="refund">
 <aside class="app-rail" aria-label="Primary navigation">
   <nav class="rail-top" aria-label="站点">
-    <a class="rail-nav-btn" href="/global" aria-label="全球期刊" title="全球期刊">
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 3.4 9A14 14 0 0 1 12 21a14 14 0 0 1-3.4-9A14 14 0 0 1 12 3Z"/></svg>
-      <span>全球</span>
-    </a>
-    <a class="rail-nav-btn rail-region-station" data-region-station="dom" href="/cn" aria-label="中国期刊" title="中国期刊">
-      <span class="rail-flag" aria-hidden="true">CN</span>
-      <span>中国</span>
-    </a>
-    <a class="rail-nav-btn rail-region-station" data-region-station="in" href="/in" aria-label="印度期刊" title="印度期刊" hidden>
-      <span class="rail-flag" aria-hidden="true">IN</span>
-      <span>印度</span>
-    </a>
-    <a class="rail-nav-btn rail-region-station" data-region-station="my" href="/my" aria-label="马来西亚期刊" title="马来西亚期刊" hidden>
-      <span class="rail-flag" aria-hidden="true">MY</span>
-      <span>马来西亚</span>
-    </a>
-    <a class="rail-nav-btn rail-region-station" data-region-station="kr" href="/kr" aria-label="韩国期刊" title="韩国期刊" hidden>
-      <span class="rail-flag" aria-hidden="true">KR</span>
-      <span>韩国</span>
-    </a>
-    <a class="rail-nav-btn rail-region-station" data-region-station="pbn" href="/pbn" aria-label="波兰期刊" title="波兰期刊" hidden>
-      <span class="rail-flag" aria-hidden="true">PL</span>
-      <span>波兰</span>
-    </a>
-    <a class="rail-nav-btn rail-region-station" data-region-station="isc" href="/isc" aria-label="伊朗期刊" title="伊朗期刊" hidden>
-      <span class="rail-flag" aria-hidden="true">IR</span>
-      <span>伊朗</span>
-    </a>
-    <a class="rail-nav-btn rail-region-station" data-region-station="scielo" href="/scielo" aria-label="拉美期刊" title="拉美期刊" hidden>
-      <span class="rail-flag" aria-hidden="true">LA</span>
-      <span>拉美</span>
-    </a>
+    <a class="rail-nav-btn" href="/global"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 3.4 9A14 14 0 0 1 12 21a14 14 0 0 1-3.4-9A14 14 0 0 1 12 3Z"/></svg><span>全球</span></a>
+    <a class="rail-nav-btn rail-region-station" data-region-station="dom" href="/cn"><span class="rail-flag">CN</span><span>中国</span></a>
     <div class="rail-region-picker">
-      <button class="rail-nav-btn rail-region-toggle" type="button" aria-label="地区站点" title="地区站点" aria-expanded="false">
-        <span class="rail-flag rail-region-symbol" aria-hidden="true">···</span>
-        <span><span>地区</span><b class="rail-caret" aria-hidden="true">�?/b></span>
-      </button>
-      <div class="rail-region-menu" aria-label="地区站点"></div>
+      <button class="rail-nav-btn rail-region-toggle" type="button" aria-expanded="false"><span class="rail-flag rail-region-symbol">···</span><span><span>地区</span><b class="rail-caret">▾</b></span></button>
+      <div class="rail-region-menu"></div>
     </div>
   </nav>
-  <div class="rail-bottom" aria-label="账户">
-    <a class="rail-nav-btn" id="fav-header-btn" href="/favorites" aria-label="我的收藏" title="我的收藏">
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.7l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3.7z"/></svg>
-      <span>收藏</span>
-    </a>
-    <a class="rail-nav-btn" id="account-credit-badge" href="/account" aria-label="我的" title="我的">
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="9" r="3.5"/><path d="M5 19c1.5-3 4-4.5 7-4.5S17.5 16 19 19"/></svg>
-      <span>我的</span>
-    </a>
+  <div class="rail-bottom">
+    <a class="rail-nav-btn" href="/favorites"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.7l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3.7z"/></svg><span>收藏</span></a>
+    <a class="rail-nav-btn" href="/account"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="9" r="3.5"/><path d="M5 19c1.5-3 4-4.5 7-4.5S17.5 16 19 19"/></svg><span>设置</span></a>
   </div>
 </aside>
-
 <header class="page-head">
   <a class="brand" href="/">AILatest <span>Journal</span></a>
-  <nav class="page-head-nav" aria-label="Site">
-    <a href="/" data-static-i18n="nav_home" data-nav="home">首页</a>
-    <a href="/#feat" data-static-i18n="nav_features" data-nav="features">功能</a>
-    <a href="/pricing" data-static-i18n="nav_pricing" data-nav="pricing">订阅</a>
-    <a href="/#download" data-static-i18n="download_center" data-nav="download">下载</a>
-    <a href="/about" data-static-i18n="nav_about" data-nav="about">关于</a>
-    <a href="/contact" data-static-i18n="nav_contact" data-nav="contact">联系</a>
-    <a class="cta" href="/signup.html" data-static-i18n="nav_login">注册 / 登录</a>
+  <nav class="page-head-nav">
+    <a href="/">首页</a><a href="/pricing">订阅</a><a href="/about">关于</a><a href="/contact">联系</a>
+    <a class="cta" href="/signup.html">注册 / 登录</a>
     <button class="static-lang-toggle" type="button" data-static-lang-toggle>English</button>
   </nav>
 </header>
-<main class="narrow">
-  <h1>Refund Policy</h1>
-  <p class="sub">Last updated: June 12, 2026</p>
-  <div class="note">中文摘要：当前付费通道尚未开放，暂无订阅订单。未来开放后，年付订阅首次购买后 <b>14 天内</b>可无理由全额退款；月付订阅可随时取消（当期不退）。退款请发邮件至 <a href="mailto:contact@ailatest.org">contact@ailatest.org</a>，注明注册邮箱与订单号。如中英文有出入，以英文版为准�?/div>
+<main class="info-page">
+  <div class="info-hero">
+    <div class="info-kicker">Refund</div>
+    <div data-lang-panel="zh-CN"><h1>退款政策</h1><p class="sub">年付有冷静期，月付可随时取消。有订单问题请邮件联系，我们尽快处理。</p><p class="info-meta">最近更新：<b>2026-07-16</b></p></div>
+    <div data-lang-panel="en"><h1>Refund Policy</h1><p class="sub">Annual plans have a cooling-off window; monthly plans can be cancelled anytime. Email us for order issues.</p><p class="info-meta">Last updated: <b>2026-07-16</b></p></div>
+  </div>
+  <nav class="info-toc">
+    <a href="/about">关于</a><a href="/about#data">数据</a><a href="/terms">条款</a><a href="/privacy">隐私</a><a href="/refund" aria-current="page">退款</a><a href="/contact">联系</a>
+  </nav>
 
-  <h2>1. Annual Subscriptions</h2>
-  <ul>
-    <li><b>14-day money-back guarantee.</b> If this is your first purchase of an annual Pro plan, you may request a full refund within 14 days of purchase, no questions asked.</li>
-    <li>After 14 days, annual plans are non-refundable for the remainder of the billing year, but you can cancel auto-renewal at any time and keep access until the period ends.</li>
-    <li>Renewal charges: if you forgot to cancel, contact us within 14 days of an annual renewal and we will refund the renewal in full, provided Pro features saw no material use in the new period.</li>
-  </ul>
+  <section class="info-sec" data-lang-panel="zh-CN">
+    <h2>1. 年付订阅</h2>
+    <ul>
+      <li><b>14 天无理由退款：</b>首次购买年付 Pro / Max 后 14 天内，可申请全额退款。</li>
+      <li>超过 14 天，年付当期一般不退，但可随时取消自动续费，权益用至当期结束。</li>
+      <li>若因忘记取消导致年付续费，可在续费后 14 天内联系我们；若新周期几乎未使用付费权益，我们可全额退还该笔续费。</li>
+    </ul>
+    <h2>2. 月付订阅</h2>
+    <ul>
+      <li>可随时取消，当期结束后不再扣款；已开始的月份一般不退。</li>
+      <li>若因我方故障导致服务在当月实质不可用，可申请退还或抵扣该月费用。</li>
+    </ul>
+    <h2>3. 试用</h2>
+    <p>限时试用通常无需预留支付方式，试用结束自动回到 Free，不产生扣款，故无「试用退款」。</p>
+    <h2>4. 重复扣款与差错</h2>
+    <p>重复扣款或与展示价格不符的账单，核实后全额退回。</p>
+    <h2>5. 如何申请</h2>
+    <ol>
+      <li>发邮件至 <a href="mailto:contact@ailatest.org"><b>contact@ailatest.org</b></a>，主题写「退款申请」。</li>
+      <li>写明注册邮箱与订单号（支付方收据上）。</li>
+      <li>我们通常 2 个工作日内确认；批准后退回原支付方式，到账时间取决于银行（常见 5–10 个工作日）。</li>
+    </ol>
+    <h2>6. 法定权利</h2>
+    <p>本政策不限制你所在地消费者保护法赋予的不可放弃权利。方案说明见 <a href="/pricing">订阅页</a>。</p>
+  </section>
 
-  <h2>2. Monthly Subscriptions</h2>
-  <ul>
-    <li>Monthly plans can be cancelled at any time; access continues until the end of the paid month. Started months are not refunded.</li>
-    <li>Exception: if a technical fault on our side made the Service substantially unusable during the month, contact us and we will refund or credit that month.</li>
-  </ul>
-
-  <h2>3. Credit Packs</h2>
-  <ul>
-    <li>Credit packs are refundable in full within 14 days of purchase <b>if no credits from the pack have been used</b>.</li>
-    <li>Partially used packs are not refundable, except where required by law or in case of billing errors.</li>
-  </ul>
-
-  <h2>4. Free Trial</h2>
-  <p>The 7-day Pro trial requires no payment method and never converts to a charge automatically �?so there is nothing to refund. When the trial ends your account simply moves to the free tier; your data is kept (read-only where it exceeds free-tier limits).</p>
-
-  <h2>5. Billing Errors and Duplicates</h2>
-  <p>Duplicate charges and amounts that don't match the displayed price are always refunded in full �?just let us know.</p>
-
-  <h2>6. How to Request a Refund</h2>
-  <ol>
-    <li>Email <a href="mailto:contact@ailatest.org"><b>contact@ailatest.org</b></a> with the subject "Refund request".</li>
-    <li>Include your account email and the order number from your receipt (issued by our payment partner).</li>
-    <li>We confirm within 2 business days. Approved refunds are issued to the original payment method by our Merchant of Record; banks typically post them within 5�?0 business days.</li>
-  </ol>
-
-  <h2>7. Statutory Rights</h2>
-  <p>Nothing in this policy limits any non-waivable refund or withdrawal rights you have under the consumer-protection laws of your country of residence.</p>
-
-  <h2>8. Contact</h2>
-  <p><a href="mailto:contact@ailatest.org">contact@ailatest.org</a> · <a href="/contact.html">Contact page</a></p>
+  <section class="info-sec" data-lang-panel="en">
+    <h2>1. Annual subscriptions</h2>
+    <ul>
+      <li><b>14-day money-back:</b> first annual Pro / Max purchase may be fully refunded within 14 days.</li>
+      <li>After 14 days, the current annual period is generally non-refundable; you can cancel renewal and keep access until period end.</li>
+      <li>If an annual renewal charged because you forgot to cancel, contact us within 14 days of renewal—if paid features saw no material use, we refund that renewal in full.</li>
+    </ul>
+    <h2>2. Monthly subscriptions</h2>
+    <ul>
+      <li>Cancel anytime; access continues to month end. Started months are generally not refunded.</li>
+      <li>If a fault on our side made the Service substantially unusable that month, we refund or credit it.</li>
+    </ul>
+    <h2>3. Trials</h2>
+    <p>Trials typically require no payment method and drop to Free without a charge—nothing to refund.</p>
+    <h2>4. Billing errors</h2>
+    <p>Duplicate charges or amounts that don’t match the listed price are refunded in full after verification.</p>
+    <h2>5. How to request</h2>
+    <ol>
+      <li>Email <a href="mailto:contact@ailatest.org"><b>contact@ailatest.org</b></a> with subject “Refund request”.</li>
+      <li>Include account email and order number from the receipt.</li>
+      <li>We confirm within ~2 business days; approved refunds return to the original method (banks often take 5–10 business days).</li>
+    </ol>
+    <h2>6. Statutory rights</h2>
+    <p>Nothing here limits non-waivable consumer rights. Plans: <a href="/pricing">Pricing</a>.</p>
+  </section>
+  <p class="info-back"><a href="/">← 返回首页 · Back home</a></p>
 </main>
-<script src="/js/site-rail.js?v=20260716-shell-main" defer></script>
-<script src="/js/static-i18n.js?v=20260716-site-shell" defer></script>
+<script src="/js/site-rail.js?v=20260716-info-v1" defer></script>
+<script src="/js/static-i18n.js?v=20260716-info-v1" defer></script>
 </body>
 </html>

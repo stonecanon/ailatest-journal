@@ -1,141 +1,104 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Terms of Service | AILatest Journal</title>
-<meta name="description" content="Terms of Service for AILatest Journal �?journal search, browser extension and account services." />
-<link rel="canonical" href="https://journal.ailatest.org/terms.html" />
+<title>服务条款 | AILatest Journal</title>
+<meta name="description" content="AILatest Journal 服务条款：网站、浏览器插件与账号服务的使用规则。" />
+<link rel="canonical" href="https://journal.ailatest.org/terms" />
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
-<link rel="stylesheet" href="/css/static.css?v=20260716-base-pages" />
+<link rel="stylesheet" href="/css/static.css?v=20260716-info-v1" />
+<link rel="stylesheet" href="/css/info-pages.css?v=20260716-info-v1" />
 </head>
 <body data-static-page="terms">
 <aside class="app-rail" aria-label="Primary navigation">
   <nav class="rail-top" aria-label="站点">
-    <a class="rail-nav-btn" href="/global" aria-label="全球期刊" title="全球期刊">
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 3.4 9A14 14 0 0 1 12 21a14 14 0 0 1-3.4-9A14 14 0 0 1 12 3Z"/></svg>
-      <span>全球</span>
-    </a>
-    <a class="rail-nav-btn rail-region-station" data-region-station="dom" href="/cn" aria-label="中国期刊" title="中国期刊">
-      <span class="rail-flag" aria-hidden="true">CN</span>
-      <span>中国</span>
-    </a>
-    <a class="rail-nav-btn rail-region-station" data-region-station="in" href="/in" aria-label="印度期刊" title="印度期刊" hidden>
-      <span class="rail-flag" aria-hidden="true">IN</span>
-      <span>印度</span>
-    </a>
-    <a class="rail-nav-btn rail-region-station" data-region-station="my" href="/my" aria-label="马来西亚期刊" title="马来西亚期刊" hidden>
-      <span class="rail-flag" aria-hidden="true">MY</span>
-      <span>马来西亚</span>
-    </a>
-    <a class="rail-nav-btn rail-region-station" data-region-station="kr" href="/kr" aria-label="韩国期刊" title="韩国期刊" hidden>
-      <span class="rail-flag" aria-hidden="true">KR</span>
-      <span>韩国</span>
-    </a>
-    <a class="rail-nav-btn rail-region-station" data-region-station="pbn" href="/pbn" aria-label="波兰期刊" title="波兰期刊" hidden>
-      <span class="rail-flag" aria-hidden="true">PL</span>
-      <span>波兰</span>
-    </a>
-    <a class="rail-nav-btn rail-region-station" data-region-station="isc" href="/isc" aria-label="伊朗期刊" title="伊朗期刊" hidden>
-      <span class="rail-flag" aria-hidden="true">IR</span>
-      <span>伊朗</span>
-    </a>
-    <a class="rail-nav-btn rail-region-station" data-region-station="scielo" href="/scielo" aria-label="拉美期刊" title="拉美期刊" hidden>
-      <span class="rail-flag" aria-hidden="true">LA</span>
-      <span>拉美</span>
-    </a>
+    <a class="rail-nav-btn" href="/global"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 3.4 9A14 14 0 0 1 12 21a14 14 0 0 1-3.4-9A14 14 0 0 1 12 3Z"/></svg><span>全球</span></a>
+    <a class="rail-nav-btn rail-region-station" data-region-station="dom" href="/cn"><span class="rail-flag">CN</span><span>中国</span></a>
     <div class="rail-region-picker">
-      <button class="rail-nav-btn rail-region-toggle" type="button" aria-label="地区站点" title="地区站点" aria-expanded="false">
-        <span class="rail-flag rail-region-symbol" aria-hidden="true">···</span>
-        <span><span>地区</span><b class="rail-caret" aria-hidden="true">�?/b></span>
-      </button>
-      <div class="rail-region-menu" aria-label="地区站点"></div>
+      <button class="rail-nav-btn rail-region-toggle" type="button" aria-expanded="false"><span class="rail-flag rail-region-symbol">···</span><span><span>地区</span><b class="rail-caret">▾</b></span></button>
+      <div class="rail-region-menu"></div>
     </div>
   </nav>
-  <div class="rail-bottom" aria-label="账户">
-    <a class="rail-nav-btn" id="fav-header-btn" href="/favorites" aria-label="我的收藏" title="我的收藏">
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.7l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3.7z"/></svg>
-      <span>收藏</span>
-    </a>
-    <a class="rail-nav-btn" id="account-credit-badge" href="/account" aria-label="我的" title="我的">
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="9" r="3.5"/><path d="M5 19c1.5-3 4-4.5 7-4.5S17.5 16 19 19"/></svg>
-      <span>我的</span>
-    </a>
+  <div class="rail-bottom">
+    <a class="rail-nav-btn" href="/favorites"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.7l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3.7z"/></svg><span>收藏</span></a>
+    <a class="rail-nav-btn" href="/account"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="9" r="3.5"/><path d="M5 19c1.5-3 4-4.5 7-4.5S17.5 16 19 19"/></svg><span>设置</span></a>
   </div>
 </aside>
-
 <header class="page-head">
   <a class="brand" href="/">AILatest <span>Journal</span></a>
-  <nav class="page-head-nav" aria-label="Site">
-    <a href="/" data-static-i18n="nav_home" data-nav="home">首页</a>
-    <a href="/#feat" data-static-i18n="nav_features" data-nav="features">功能</a>
-    <a href="/pricing" data-static-i18n="nav_pricing" data-nav="pricing">订阅</a>
-    <a href="/#download" data-static-i18n="download_center" data-nav="download">下载</a>
-    <a href="/about" data-static-i18n="nav_about" data-nav="about">关于</a>
-    <a href="/contact" data-static-i18n="nav_contact" data-nav="contact">联系</a>
-    <a class="cta" href="/signup.html" data-static-i18n="nav_login">注册 / 登录</a>
+  <nav class="page-head-nav">
+    <a href="/">首页</a><a href="/pricing">订阅</a><a href="/about">关于</a><a href="/contact">联系</a>
+    <a class="cta" href="/signup.html">注册 / 登录</a>
     <button class="static-lang-toggle" type="button" data-static-lang-toggle>English</button>
   </nav>
 </header>
-<main class="narrow">
-  <h1>Terms of Service</h1>
-  <p class="sub">Last updated: June 12, 2026</p>
-  <div class="note">中文摘要：本条款约定您使�?AILatest Journal 网站、浏览器插件与账号服务的规则。核心检索功能免费；付费通道暂未开放，未来退款规则见 <a href="/refund.html">Refund Policy</a>。注册即表示同意本条款与<a href="/privacy.html">隐私政策</a>。如中英文有出入，以英文版为准�?/div>
+<main class="info-page">
+  <div class="info-hero">
+    <div class="info-kicker">Terms</div>
+    <div data-lang-panel="zh-CN"><h1>服务条款</h1><p class="sub">使用 AILatest Journal 网站、插件与账号服务即表示你同意本条款与隐私政策。</p><p class="info-meta">最近更新：<b>2026-07-16</b></p></div>
+    <div data-lang-panel="en"><h1>Terms of Service</h1><p class="sub">By using AILatest Journal (site, extension and accounts) you agree to these Terms and our Privacy Policy.</p><p class="info-meta">Last updated: <b>2026-07-16</b></p></div>
+  </div>
+  <nav class="info-toc">
+    <a href="/about">关于</a><a href="/about#data">数据</a><a href="/terms" aria-current="page">条款</a><a href="/privacy">隐私</a><a href="/refund">退款</a><a href="/contact">联系</a>
+  </nav>
 
-  <h2>1. Acceptance of Terms</h2>
-  <p>These Terms of Service ("Terms") govern your access to and use of AILatest Journal �?the website at journal.ailatest.org, our browser extensions, and related services (collectively, the "Service"), operated by AILatest ("we", "us"). By accessing the Service or creating an account, you agree to be bound by these Terms and our <a href="/privacy.html">Privacy Policy</a>. If you do not agree, do not use the Service.</p>
+  <section class="info-sec" data-lang-panel="zh-CN">
+    <h2>1. 服务说明</h2>
+    <p>AILatest Journal（journal.ailatest.org）提供学术期刊检索、评级与元数据对照、收藏同步、浏览器插件徽章与 AI 荐刊等功能。数据来自公开来源与官方发布，仅供参考，不构成投稿保证。</p>
+    <h2>2. 账号</h2>
+    <ul>
+      <li>你可通过邮箱验证码或第三方登录注册，并妥善保管账号。</li>
+      <li>你须提供真实可用信息，并满 16 周岁（或所在地法定最低年龄）。</li>
+      <li>我们可对滥用、爬取、转售访问或安全风险账号暂停或终止服务。</li>
+    </ul>
+    <h2>3. 订阅与计费</h2>
+    <ul>
+      <li>核心网站检索长期免费。Pro / Max 等付费档位通过安全收银台（Merchant of Record）结算，可能按年或按月自动续费，可随时取消，当期结束后停止续订。</li>
+      <li>教育价需使用符合规则的机构邮箱登录验证。</li>
+      <li>退款规则见 <a href="/refund">退款政策</a>。</li>
+    </ul>
+    <h2>4. 合理使用</h2>
+    <p>禁止批量抓取或再分发本站数据集、绕过额度与访问控制、破坏服务安全，或用于违法用途。</p>
+    <h2>5. 第三方数据与知识产权</h2>
+    <p>期刊评级与商标归各发布机构所有；本站不隶属于这些机构。软件与界面归我们所有。你提交的笔记等内容仍归你所有，但授权我们为提供服务而存储与处理。</p>
+    <h2>6. AI 功能</h2>
+    <p>AI 荐刊与相关输出仅为辅助决策，可能不准确；投稿前请核对官方信息。付费 AI 额度可能按 credits 计量。</p>
+    <h2>7. 免责与责任限制</h2>
+    <p>服务按「现状」提供。在法律允许范围内，我们对间接损失不承担责任；对任一索赔的总责任不超过你过去 12 个月向我们支付的费用（若未付费则为 10 美元）。</p>
+    <h2>8. 变更与联系</h2>
+    <p>我们可能更新本条款；重大变更会在站内提示。继续使用即视为接受。问题请发 <a href="mailto:contact@ailatest.org">contact@ailatest.org</a> 或 <a href="/contact">联系页</a>。中英文不一致时，以中文版为准（面向中文用户界面）。</p>
+  </section>
 
-  <h2>2. The Service</h2>
-  <p>AILatest Journal is a search and decision-support tool for academic journals. It aggregates publicly available journal metadata and rating information (e.g. impact factors, JCR quartiles, CAS tiers, indexing status) and provides search, favorites, browser-extension badges, and AI-assisted journal recommendation.</p>
-  <p>Core search and badge display are free. Paid productivity features, if launched later, will be announced separately. They are not currently available for purchase.</p>
-
-  <h2>3. Accounts</h2>
-  <ul>
-    <li>You may register with an email address or via third-party sign-in (GitHub, Google). You are responsible for safeguarding your account and for all activity under it.</li>
-    <li>You must provide accurate information and be at least 16 years old (or the minimum age required in your jurisdiction).</li>
-    <li>We may suspend or terminate accounts that violate these Terms, abuse the Service (including automated scraping, quota circumvention, or reselling access), or pose a security risk.</li>
-  </ul>
-
-  <h2>4. Future Subscriptions, Trials and Billing</h2>
-  <ul>
-    <li>Paid subscriptions are not currently available for purchase.</li>
-    <li>New registered accounts may receive a one-time free trial of Pro features. Trials convert to the free tier automatically �?no payment method is required and you will not be charged when a trial ends.</li>
-    <li>Paid subscriptions are billed in advance on a monthly or annual basis through our payment partner (a Merchant of Record), which handles payment processing, invoicing and applicable taxes.</li>
-    <li>Subscriptions renew automatically unless cancelled before the end of the current billing period. You can cancel at any time; access continues until the period ends.</li>
-    <li>Educational discounts require verification of an eligible academic email address and may need re-verification on renewal.</li>
-    <li>Refunds are handled per our <a href="/refund.html">Refund Policy</a>.</li>
-    <li>We may change prices with prior notice; changes apply from your next billing period.</li>
-  </ul>
-
-  <h2>5. Acceptable Use</h2>
-  <p>You agree not to: (a) scrape, bulk-download or redistribute the Service's datasets; (b) circumvent usage limits, paywalls or access controls; (c) reverse engineer the Service except where permitted by law; (d) use the Service to violate any law or third-party right; (e) interfere with the operation or security of the Service.</p>
-
-  <h2>6. Third-Party Data and Intellectual Property</h2>
-  <ul>
-    <li>Journal ratings and indexing data are compiled from public sources and official releases. All trademarks and rating systems (e.g. Web of Science, JCR, Scopus, CAS tiers, CCF, ABDC, ABS) belong to their respective owners. AILatest Journal is not affiliated with or endorsed by these organizations.</li>
-    <li>The Service's software, design and original content are owned by us and protected by applicable intellectual-property laws. We grant you a personal, non-exclusive, non-transferable licence to use the Service.</li>
-    <li>You retain ownership of content you submit (e.g. notes, submission records) and grant us a licence to store and process it to provide the Service.</li>
-  </ul>
-
-  <h2>7. AI Features</h2>
-  <p>AI-generated recommendations are decision aids, not professional advice. Outputs may be inaccurate or incomplete �?always verify journal information against official sources before submitting a manuscript. Future paid AI usage may be metered by credits after billing is available.</p>
-
-  <h2>8. Disclaimer of Warranties</h2>
-  <p>The Service is provided "as is" and "as available", without warranties of any kind, express or implied, including accuracy, completeness, merchantability, fitness for a particular purpose and non-infringement. Rating data may lag upstream releases or contain errors; publication decisions remain your responsibility.</p>
-
-  <h2>9. Limitation of Liability</h2>
-  <p>To the maximum extent permitted by law, we shall not be liable for any indirect, incidental, special, consequential or punitive damages, or any loss of data, profits or research opportunities, arising from your use of the Service. Our aggregate liability for any claim shall not exceed the amount you paid us in the 12 months preceding the claim (or USD 10 if you paid nothing).</p>
-
-  <h2>10. Termination</h2>
-  <p>You may stop using the Service or delete your account at any time. We may suspend or terminate the Service or your access with reasonable notice, or immediately for material breach. Sections 6, 8, 9 and 11 survive termination.</p>
-
-  <h2>11. Changes and Governing Law</h2>
-  <p>We may update these Terms from time to time; material changes will be announced on the Service. Continued use after the effective date constitutes acceptance. These Terms are governed by applicable law in our place of operation, without regard to conflict-of-law rules; mandatory consumer-protection rules of your country of residence remain unaffected.</p>
-
-  <h2>12. Contact</h2>
-  <p>Questions about these Terms: <a href="mailto:contact@ailatest.org">contact@ailatest.org</a> · <a href="/contact.html">Contact page</a></p>
+  <section class="info-sec" data-lang-panel="en">
+    <h2>1. The Service</h2>
+    <p>AILatest Journal provides journal search, public ratings/metadata, favorites sync, browser-extension badges and AI-assisted journal matching. Data is compiled from public/official sources for reference only and is not a submission guarantee.</p>
+    <h2>2. Accounts</h2>
+    <ul>
+      <li>Register with email codes or third-party sign-in and keep credentials secure.</li>
+      <li>Provide accurate information; you must be at least 16 (or the minimum age in your jurisdiction).</li>
+      <li>We may suspend accounts for abuse, scraping, reselling access or security risk.</li>
+    </ul>
+    <h2>3. Subscriptions &amp; billing</h2>
+    <ul>
+      <li>Core website search remains free. Paid plans (Pro / Max) are billed via a secure Merchant of Record, may renew monthly or yearly, and can be cancelled anytime (access continues until period end).</li>
+      <li>Education pricing requires a verified institutional email.</li>
+      <li>Refunds follow our <a href="/refund">Refund Policy</a>.</li>
+    </ul>
+    <h2>4. Acceptable use</h2>
+    <p>Do not bulk-scrape or redistribute our datasets, bypass quotas/controls, attack security, or use the Service unlawfully.</p>
+    <h2>5. Third-party data &amp; IP</h2>
+    <p>Rating systems and trademarks belong to their owners; we are not affiliated with them. Our software and UI are ours. You keep ownership of content you submit and grant us a licence to store/process it to run the Service.</p>
+    <h2>6. AI features</h2>
+    <p>AI outputs are decision aids and may be incomplete—verify official sources before submission. Paid AI may be metered by credits.</p>
+    <h2>7. Disclaimer &amp; liability</h2>
+    <p>Service is provided “as is”. To the fullest extent permitted by law we are not liable for indirect damages; aggregate liability is capped at amounts you paid us in the prior 12 months (or USD 10 if none).</p>
+    <h2>8. Changes &amp; contact</h2>
+    <p>We may update these Terms; material changes will be announced on the Service. Contact: <a href="mailto:contact@ailatest.org">contact@ailatest.org</a> · <a href="/contact">Contact page</a>. For the English UI, the English version controls if texts conflict.</p>
+  </section>
+  <p class="info-back"><a href="/">← 返回首页 · Back home</a></p>
 </main>
-<script src="/js/site-rail.js?v=20260716-shell-main" defer></script>
-<script src="/js/static-i18n.js?v=20260716-site-shell" defer></script>
+<script src="/js/site-rail.js?v=20260716-info-v1" defer></script>
+<script src="/js/static-i18n.js?v=20260716-info-v1" defer></script>
 </body>
 </html>
