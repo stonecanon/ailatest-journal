@@ -8239,7 +8239,7 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   min-height: 42px;
 }
 .home-results-wrap .j-row .jname {
-  font-size: 14px;
+  font-size: 14.5px;
   line-height: 1.28;
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -8248,7 +8248,8 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 }
 .home-results-wrap .j-row .jname-cn,
 .home-results-wrap .j-row .jname-aka {
-  font-size: 11px;
+  font-size: 10.5px;
+  color: #a39382;
 }
 .home-results-wrap .j-row .col-badge,
 .home-results-wrap .j-row .col-cross {
@@ -8277,9 +8278,10 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .home-results-wrap .j-row .col-badge .zone,
 .home-results-wrap .j-row .col-badge .xr-pill,
 .home-results-wrap .j-row .col-badge .if-pill {
-  font-size: 9.5px;
-  line-height: 1.45;
-  padding: 2px 6px;
+  font-size: 9.5px !important;
+  line-height: 1.3 !important;
+  padding: 1px 5px !important;
+  color: #78716c;
 }
 .home-card-grid {
   display: grid;
@@ -8606,7 +8608,7 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   min-height: 0;
   max-width: 100%;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-  font-size: 13.5px;
+  font-size: 14.5px; /* 略大于 V10 13px，更易扫读 */
   font-weight: 800;
   line-height: 1.22;
   letter-spacing: -0.015em;
@@ -8621,13 +8623,14 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .j-row .jname.jname-flagship {
   color: #9a3412;
 }
+/* 刊名下中文/别名：淡于标题（V10 j-cn） */
 .j-row .jname-cn,
 .j-row .jname-aka {
   display: block;
-  margin-top: 1px;
-  font-size: 11px;
+  margin-top: 2px;
+  font-size: 10.5px;
   font-weight: 500;
-  color: #8a7a68;
+  color: #a39382;
   line-height: 1.2;
   white-space: nowrap;
   overflow: hidden;
@@ -8726,13 +8729,13 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   background: #ffffff;
 }
 
-/* meta：免费 / 审稿 / 学科 / 出版社（浅色上块 · 深字 · 紧凑） */
+/* meta：免费 / 审稿 / 学科 / 出版社 — V10 浅字、小字阶 */
 .j-row .j-card-meta-row {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 4px 8px;
-  margin-top: 4px;
+  gap: 4px 7px;
+  margin-top: 3px;
   min-width: 0;
   overflow: visible;
 }
@@ -8745,21 +8748,21 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   padding: 0;
   border: 0;
   background: none;
-  color: #6b5c4c;
-  font-size: 10.5px;
-  line-height: 1.25;
+  color: #9a8b7a;
+  font-size: 10px;
+  line-height: 1.2;
   white-space: nowrap;
 }
 .j-row .j-meta em {
   font-style: normal;
-  font-weight: 600;
-  color: #8a7a68;
+  font-weight: 500;
+  color: #a89a8a;
   font-size: 10px;
 }
 .j-row .j-meta strong,
 .j-row .j-meta > span {
-  font-weight: 550;
-  color: #4a3f34;
+  font-weight: 500;
+  color: #8a7a68;
 }
 .j-row .j-meta-free {
   display: inline-flex !important;
@@ -8767,29 +8770,29 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .j-row .j-meta-free .badge,
 .j-row .j-meta-free .b-free,
 .j-row .j-meta-free .b-free-lock {
-  font-size: 11px !important;
-  padding: 2px 8px !important;
-  border-radius: 6px !important;
+  font-size: 9.5px !important;
+  padding: 1px 5px !important;
+  border-radius: 4px !important;
   margin: 0 !important;
   line-height: 1.3 !important;
 }
-/* 免费发表：浅底，避免实心深绿 */
+/* 免费发表：V10 浅绿底 */
 .j-row .j-meta-free .badge.b-free,
 .j-row .j-card-badges .badge.b-free,
 .j-row .badges-access .badge.b-free {
-  background: #e6f3ea !important;
-  color: #2f6b45 !important;
-  font-weight: 650 !important;
+  background: rgba(236, 253, 245, 0.85) !important;
+  color: #047857 !important;
+  font-weight: 700 !important;
   border: 0 !important;
 }
 .j-row .j-meta-src .src-tag {
   display: inline-flex;
-  padding: 2px 8px;
-  border-radius: 6px;
-  background: #ebe8e2;
-  color: rgba(60, 60, 67, 0.72);
-  font-size: 11px;
-  font-weight: 600;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #9a8b7a;
+  font-size: 10px;
+  font-weight: 500;
 }
 .j-row .j-meta-topic { display: none; }
 .j-row .j-meta-topic-show { display: inline-flex; }
@@ -8819,7 +8822,7 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 10px; /* 收录行 ↔ 分区行 间距 */
+  gap: 4px; /* V10 bline 行距紧凑 */
   width: 100%;
   min-width: 0;
   max-height: none !important;
@@ -8830,7 +8833,7 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   flex-direction: row;
   flex-wrap: wrap;
   align-items: center;
-  gap: 6px 6px;
+  gap: 2px 3px;
 }
 .j-row .j-card-badges .badge-cell,
 .j-row .j-card-badges .badge-line {
@@ -8849,7 +8852,7 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   display: flex !important;
   flex-wrap: wrap;
   align-items: center;
-  gap: 5px 6px;
+  gap: 2px 3px;
   width: 100%;
   min-width: 0;
 }
@@ -8861,7 +8864,7 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   display: flex !important;
   flex-wrap: wrap;
   align-items: center;
-  gap: 4px 5px;
+  gap: 2px 3px;
   width: 100%;
 }
 .j-row .j-card-badges .badges-idx::before,
@@ -8871,6 +8874,7 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   content: none !important;
   display: none !important;
 }
+/* V10 pill：9.5px · 浅字 · 小圆角 */
 .j-row .j-card-badges .badge,
 .j-row .j-card-badges .zone,
 .j-row .j-card-badges .xr-pill,
@@ -8888,11 +8892,13 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   width: auto !important;
   max-width: 100%;
   flex: 0 0 auto !important;
-  font-size: 11px !important;
-  line-height: 1.25 !important;
-  padding: 3px 8px !important;
+  font-size: 9.5px !important;
+  font-weight: 650 !important;
+  line-height: 1.3 !important;
+  letter-spacing: 0 !important;
+  padding: 1px 5px !important;
   margin: 0 !important;
-  border-radius: 6px !important;
+  border-radius: 4px !important;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -8901,9 +8907,9 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .j-row .j-card-subline {
   margin-top: 2px;
   padding-top: 0;
-  color: rgba(60, 60, 67, 0.45);
-  font-size: 12px;
-  line-height: 1.35;
+  color: #a89a8a;
+  font-size: 10px;
+  line-height: 1.25;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -9232,7 +9238,9 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   .tab-panel table.journals tbody tr.j-row { padding: 0; }
   .j-row .j-card-head { padding: 12px 12px 10px; }
   .j-row .j-card-body { padding: 10px 12px 12px; }
-  .j-row .jname { font-size: 14.5px; }
+  .j-row .jname { font-size: 15px; }
+  .j-row .jname-cn,
+  .j-row .jname-aka { font-size: 10.5px; color: #a39382; }
 }
 
 @media (max-width: 900px) {
@@ -9315,7 +9323,7 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .rail-nav-btn[data-station-hidden],
 .rail-nav-btn[data-station-hidden="1"] { display: none !important; }
 
-/* ═══════ 卡片徽章配色统一（收录=冷蓝、分区=暖棕、预警=红、免费=绿），不再花 ═══════ */
+/* ═══════ 卡片徽章 · 对齐 V10 pill（小字 · 浅字 · 浅底） ═══════ */
 .j-row .col-badge .badge,
 .j-row .col-badge .zone,
 .j-row .col-badge .xr-pill,
@@ -9324,25 +9332,31 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .j-row .col-badge .warn-pill,
 .j-row .col-badge .on-hold-pill,
 .j-row .col-badge .citic-warning-pill {
-  font-size: 10px; padding: 2px 7px; border-radius: 4px;
-  font-weight: 700; letter-spacing: .02em; line-height: 1.55; border: 0; box-shadow: none;
+  font-size: 9.5px !important;
+  padding: 1px 5px !important;
+  border-radius: 4px !important;
+  font-weight: 650 !important;
+  letter-spacing: 0 !important;
+  line-height: 1.3 !important;
+  border: 0;
+  box-shadow: none;
 }
-/* 收录：浅色底 + 深字（降低饱和，更轻） */
+/* 收录：stone 浅灰底 + 中灰字（V10 #f5f5f4 / #57534e） */
 .j-row .badges-idx .badge,
 .j-row .j-card-badges .badges-idx .badge {
-  background: #eef1f6 !important;
-  color: #3d4f66 !important;
+  background: #f5f5f4 !important;
+  color: #78716c !important;
   font-weight: 650 !important;
 }
 .j-row .badges-idx .badge.b-scie,
 .j-row .badges-idx .badge.b-ssci,
 .j-row .badges-idx .badge.b-ahci,
 .j-row .badges-idx .badge.b-medline {
-  background: #e3ebf5 !important;
-  color: #2c4566 !important;
+  background: #f0f2f5 !important;
+  color: #6b7280 !important;
 }
-.j-row .badges-idx .badge.b-nature-index { background: #efebe3 !important; color: #4a4336 !important; }
-/* Nature/Science/Cell 子刊·正刊：浅棕底，避免实心深色 */
+.j-row .badges-idx .badge.b-nature-index { background: #f5f5f4 !important; color: #78716c !important; }
+/* Nature/Science/Cell 子刊·正刊：与收录同阶，略暖 */
 .j-row .j-card-badges .flagship-pill,
 .j-row .badges-idx .flagship-pill,
 .j-row .j-card-badges .flag-nature-main,
@@ -9351,36 +9365,36 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
 .j-row .j-card-badges .flag-science-sub,
 .j-row .j-card-badges .flag-cell-main,
 .j-row .j-card-badges .flag-cell-sub {
-  background: #f0ebe3 !important;
-  color: #5c4a32 !important;
+  background: #f5f5f4 !important;
+  color: #78716c !important;
   font-weight: 650 !important;
   border: 0 !important;
 }
-.j-row .badges-idx .badge.b-cscd { background: #e6eef1 !important; color: #3a555e !important; }
-.j-row .badges-idx .badge.b-cstpcd { background: #f0ebe3 !important; color: #5a4a32 !important; }
-.j-row .badges-idx .badge.b-scd { background: #e8f0ea !important; color: #3d5a42 !important; }
+.j-row .badges-idx .badge.b-cscd { background: #f5f5f4 !important; color: #78716c !important; }
+.j-row .badges-idx .badge.b-cstpcd { background: #f5f5f4 !important; color: #78716c !important; }
+.j-row .badges-idx .badge.b-scd { background: #f5f5f4 !important; color: #78716c !important; }
 .j-row .badges-idx .badge.b-pubmed,
-.j-row .badges-idx .badge.b-pmc { background: #e4eef3 !important; color: #2d5568 !important; }
-.j-row .badges-idx .badge.b-inspec { background: #e6edf2 !important; color: #355064 !important; }
-.j-row .badges-idx .badge.b-fsta { background: #f0ede6 !important; color: #5a523c !important; }
-.j-row .badges-idx .domsrc-pill { background: #eef1f6 !important; color: #3d4f66 !important; }
+.j-row .badges-idx .badge.b-pmc { background: #f0f2f5 !important; color: #6b7280 !important; }
+.j-row .badges-idx .badge.b-inspec { background: #f5f5f4 !important; color: #78716c !important; }
+.j-row .badges-idx .badge.b-fsta { background: #f5f5f4 !important; color: #78716c !important; }
+.j-row .badges-idx .domsrc-pill { background: #f5f5f4 !important; color: #78716c !important; }
 
-/* 分区：浅暖色底，单独一行 */
+/* 分区：浅暖底 + 中灰棕字；Q1/TOP 用 V10 杏橙浅字 */
 .j-row .badges-rank .zone,
 .j-row .badges-rank .xr-pill,
 .j-row .badges-rank .abdc-pill,
 .j-row .badges-rank .abs-pill,
 .j-row .badges-rank .badge,
 .j-row .badges-rank .domsrc-pill {
-  background: #f5efe6 !important;
-  color: #6b5336 !important;
+  background: #f5f5f4 !important;
+  color: #78716c !important;
   font-weight: 650 !important;
 }
 .j-row .badges-rank .ztop,
 .j-row .badges-rank .jcr-q1,
 .j-row .badges-rank .xr-top {
-  background: #efe4d4 !important;
-  color: #5a4228 !important;
+  background: #fff7ed !important;
+  color: #c2410c !important;
 }
 /* 预警：浅红底 */
 .j-row .badges-rank .warn-pill,
@@ -9402,52 +9416,51 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   background: #f0eeeb !important;
   color: #5c564c !important;
 }
+/* 开放获取：V10 浅绿 */
 .j-row .badges-access .badge {
-  background: #e8f5ec !important;
-  color: #2a6b42 !important;
+  background: #ecfdf5 !important;
+  color: #059669 !important;
 }
 .j-row .badges-access .badge.b-doaj,
 .j-row .badges-access .badge.b-oaj {
-  background: #e6f2ec !important;
-  color: #356b52 !important;
+  background: #ecfdf5 !important;
+  color: #047857 !important;
 }
-/* 通用 domsrc 浅色 */
+/* 通用 domsrc / 科协：与收录同阶浅字 */
 .j-row .j-card-badges .domsrc-pill {
-  background: #f0eeeb !important;
-  color: #5c564c !important;
+  background: #f5f5f4 !important;
+  color: #78716c !important;
   font-weight: 650 !important;
 }
-/* 科协：浅棕底（降低饱和，与 Nature 子刊同级轻量） */
 .j-row .j-card-badges .domsrc-pill.ds-cnkx,
 .j-row .j-card-badges .tier-pill,
 .j-row .j-card-badges .tier-pill.t1,
 .j-row .j-card-badges .tier-pill.t2,
 .j-row .j-card-badges .tier-pill.t3 {
-  background: #f2ebe2 !important;
-  color: #5c4a36 !important;
+  background: #f5f5f4 !important;
+  color: #78716c !important;
   font-weight: 650 !important;
   border: 0 !important;
 }
-/* 深色上块内的来源胶囊：半透明白底 */
-.j-row .j-meta-src .src-tag {
-  background: rgba(255, 255, 255, 0.14) !important;
-  color: rgba(255, 255, 255, 0.9) !important;
-  font-weight: 650 !important;
-}
+/* 上块 meta 来源：纯文字、无色块（浅杏头已是暖底） */
+.j-row .j-meta-src .src-tag,
 .j-row .j-meta-src .src-tag.src-cnkx,
 .j-row .j-meta-src .src-tag.src-int {
-  background: rgba(255, 255, 255, 0.16) !important;
-  color: #fff !important;
+  background: transparent !important;
+  color: #9a8b7a !important;
+  font-weight: 500 !important;
+  font-size: 10px !important;
+  padding: 0 !important;
 }
-/* 免费发表在深色上块：略提亮绿底 */
+/* 免费发表在上块：V10 浅绿小标签 */
 .j-row .j-card-head .j-meta-free .badge.b-free {
-  background: rgba(180, 230, 195, 0.92) !important;
-  color: #1f5a36 !important;
+  background: rgba(236, 253, 245, 0.9) !important;
+  color: #047857 !important;
 }
 
-/* 免费发表：小号绿色标，紧挨 IF */
+/* 免费发表列（若仍显示）：小号绿标 */
 .j-row .col-free .badge.b-free {
-  background: #2d8a4e; color: #fff; font-size: 10px; padding: 2px 8px; border-radius: 999px; font-weight: 700;
+  background: #ecfdf5; color: #047857; font-size: 9.5px; padding: 1px 5px; border-radius: 4px; font-weight: 700;
 }
 .j-row .col-if { margin-left: 2px; }
 
