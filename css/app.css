@@ -12594,6 +12594,7 @@ body[data-boot-tab="me"] .tab-panel[data-panel="me"] {
   body.settings-open .tab-panel[data-panel="me"][hidden] {
     align-items: stretch !important;
     justify-content: stretch !important;
+    flex-direction: column !important;
     top: 0 !important;
     right: 0 !important;
     bottom: 0 !important;
@@ -12610,11 +12611,31 @@ body[data-boot-tab="me"] .tab-panel[data-panel="me"] {
     display: flex !important;
     visibility: visible !important;
     pointer-events: auto !important;
+    overflow: hidden !important;
+  }
+  /* 关键：#me-content 必须有实高，否则内部 absolute 导航高度为 0 → 全白屏 */
+  body.settings-open .tab-panel[data-panel="me"] #me-content {
+    display: block !important;
+    position: relative !important;
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100dvh !important;
+    max-height: 100dvh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    background: #fff !important;
+    box-sizing: border-box !important;
   }
   .settings-scrim {
     display: none !important; /* 全屏无需遮罩 */
   }
-  .settings-panel {
+  body.settings-open .tab-panel[data-panel="me"] .settings-panel {
+    display: flex !important;
+    flex-direction: column !important;
+    position: absolute !important;
+    inset: 0 !important;
     width: 100% !important;
     height: 100% !important;
     min-height: 100% !important;
@@ -12624,39 +12645,48 @@ body[data-boot-tab="me"] .tab-panel[data-panel="me"] {
     box-shadow: none !important;
     animation: none !important;
     transform: none !important;
-    background: #fff;
+    background: #fff !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
   }
   .settings-handle { display: none !important; }
-  .settings-layout {
-    display: block;
-    position: relative;
-    width: 100%;
-    height: 100%;
-    min-height: 100%;
-    grid-template-columns: none;
-    grid-template-rows: none;
-    overflow: hidden;
-    background: #fff;
+  body.settings-open .tab-panel[data-panel="me"] .settings-layout {
+    display: block !important;
+    position: relative !important;
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    grid-template-columns: none !important;
+    grid-template-rows: none !important;
+    overflow: hidden !important;
+    background: #fff !important;
+    box-sizing: border-box !important;
   }
   /* 一级：全屏设置列表（不是侧边栏） */
+  body.settings-open .settings-layout:not(.settings-subpage) .settings-nav,
   .settings-layout:not(.settings-subpage) .settings-nav {
     display: flex !important;
-    position: absolute;
-    inset: 0;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    overflow-x: hidden;
-    overflow-y: auto;
-    border-right: 0;
-    border-bottom: 0;
-    background: #ffffff;
-    gap: 0;
-    padding: calc(12px + env(safe-area-inset-top, 0px)) 16px calc(24px + env(safe-area-inset-bottom, 0px));
-    width: 100%;
-    height: 100%;
-    min-height: 100%;
-    box-sizing: border-box;
+    position: absolute !important;
+    inset: 0 !important;
+    flex-direction: column !important;
+    flex-wrap: nowrap !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    border-right: 0 !important;
+    border-bottom: 0 !important;
+    background: #ffffff !important;
+    gap: 0 !important;
+    padding: calc(12px + env(safe-area-inset-top, 0px)) 16px calc(24px + env(safe-area-inset-bottom, 0px)) !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    box-sizing: border-box !important;
     -webkit-overflow-scrolling: touch;
+    z-index: 2 !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    color: #1c1917 !important;
   }
   .settings-layout:not(.settings-subpage) .settings-body {
     display: none !important;
@@ -12695,20 +12725,23 @@ body[data-boot-tab="me"] .tab-panel[data-panel="me"] {
   .settings-layout.settings-subpage .settings-nav {
     display: none !important;
   }
+  body.settings-open .settings-layout.settings-subpage .settings-body,
   .settings-layout.settings-subpage .settings-body {
     display: block !important;
-    position: absolute;
-    inset: 0;
+    position: absolute !important;
+    inset: 0 !important;
     max-width: none !important;
-    width: 100%;
-    height: 100%;
-    min-height: 100%;
-    overflow-x: hidden;
-    overflow-y: auto;
-    padding: calc(12px + env(safe-area-inset-top, 0px)) 16px calc(28px + env(safe-area-inset-bottom, 0px));
-    box-sizing: border-box;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    padding: calc(12px + env(safe-area-inset-top, 0px)) 16px calc(28px + env(safe-area-inset-bottom, 0px)) !important;
+    box-sizing: border-box !important;
     -webkit-overflow-scrolling: touch;
-    background: #ffffff;
+    background: #ffffff !important;
+    z-index: 2 !important;
+    visibility: visible !important;
   }
   .settings-layout.settings-subpage .settings-back {
     display: inline-flex;

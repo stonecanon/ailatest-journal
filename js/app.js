@@ -9701,13 +9701,14 @@
         showSettingsSection(id, { subpage: window.matchMedia('(max-width: 900px)').matches });
       });
     });
-    // 桌面：侧栏+内容同屏；手机：一级全屏列表 / 二级全屏详情（固定 100dvh，无半屏）
+    // 桌面：侧栏+内容同屏；手机：一级全屏列表 / 二级全屏详情
     if (window.matchMedia('(max-width: 900px)').matches) {
-      if (window.__settingsOpenAsRoot) {
+      // 从侧栏/账号入口进入：始终先一级列表（须配合 CSS 给 #me-content 实高，否则 absolute 导航高度为 0 全白）
+      if (window.__settingsOpenAsRoot !== false) {
         exitSettingsSubpage();
         window.__settingsOpenAsRoot = false;
       } else {
-        showSettingsSection(_settingsSection, { subpage: true });
+        showSettingsSection(_settingsSection || 'account', { subpage: true });
       }
     } else {
       showSettingsSection(_settingsSection, { subpage: false });
