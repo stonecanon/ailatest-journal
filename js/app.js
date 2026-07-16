@@ -4776,7 +4776,8 @@
   function updateStickySearchState() {
     // 统一顶栏搜索：以全球站紧凑条（topbar-compact）为唯一标准
     // — 全球 / 中国 / 地区站 / 收藏 / 荐刊：始终同一位置与尺寸
-    // — 首页落地（无搜索结果）：大搜索；有结果或滚动后也收成同一紧凑条
+    // — 首页落地（无搜索结果）：只保留首屏大搜索，滚动不吸顶、不往下挂搜索条
+    // — 首页有搜索结果：收成紧凑顶栏
     // — 动态 / 详情：无顶栏搜索
     if (document.body.classList.contains('journal-route')) {
       document.body.classList.remove('topbar-compact');
@@ -4796,17 +4797,13 @@
       || activeTab === 'pick';
     const homeLanding = activeTab === 'home'
       && !document.body.classList.contains('home-tab-has-results');
-    const isCompact = document.body.classList.contains('topbar-compact');
-    const y = window.scrollY;
-    // 首页落地：大搜索；滚动后收紧搜索条，但落地内容（榜单/介绍）始终可见
-    // 其它业务页（含收藏）始终紧凑 = 全球站标准
-    // 注意：勿在移动端首页落地强制 compact——否则配合旧 CSS 会藏掉整块 hero-body，页面无内容可滚
+    // 首页落地：永不 compact（避免滚到 About 时搜索条被 order 挤到页面底部）
+    // 其它业务页（含收藏、有结果的首页）始终紧凑 = 全球站标准
     let shouldCompact = false;
     if (alwaysCompactTab) {
       shouldCompact = true;
     } else if (activeTab === 'home') {
-      if (!homeLanding) shouldCompact = true;
-      else shouldCompact = isCompact ? y > 2 : y > 132;
+      shouldCompact = !homeLanding;
     }
     const changed = document.body.classList.toggle('topbar-compact', shouldCompact);
     if (changed) requestAnimationFrame(updateThStickyTop);
