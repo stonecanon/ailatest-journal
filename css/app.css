@@ -5465,23 +5465,29 @@ body.journal-route .j-drawer.journal-page {
 .kv-item .v a { color: #c2410c; font-weight: 600; text-decoration: none; }
 .kv-item .v a:hover { text-decoration: underline; }
 
-.d-overview-wrap .journal-overview {
-  display: block !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  background: transparent !important;
-  border: 0 !important;
-  box-shadow: none !important;
+/* 期刊概览：与收录/分区同套 info-grid 色块 */
+.info-grid .d-overview-block {
+  background: #fff;
+  border-radius: 12px;
+  padding: 12px 13px;
+  box-shadow: 0 4px 14px rgba(40, 28, 16, 0.04);
+  border: 1px solid rgba(90, 70, 50, 0.05);
 }
-.d-overview-wrap .journal-overview h4 {
-  display: none;
+.info-grid .d-overview-block h3 {
+  margin: 0 0 8px;
+  font-size: 11px;
+  font-weight: 750;
+  color: #a8a29e;
+  letter-spacing: .02em;
 }
-.d-overview-wrap .journal-overview p {
-  max-width: none !important;
-  font-size: 13px !important;
-  line-height: 1.65 !important;
-  color: #57534e !important;
-  text-align: left !important;
+.info-grid .d-overview-text {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.65;
+  color: #57534e;
+  font-weight: 500;
+  text-align: left;
+  max-width: none;
 }
 
 .section-title {

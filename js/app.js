@@ -6876,12 +6876,16 @@
             `${oaText}${apcText ? `; ${apcText}` : ''}${reviewText ? `; ${reviewText}` : ''}.`,
             `${topicList.length ? `Focus areas include ${topicList.join(', ')}. ` : ''}${indexText ? `Indexed in ${indexText}.` : ''}`,
           ].filter(Boolean).join(' ');
-      return `<div class="journal-overview">
-        <div class="journal-overview-copy">
-          <h4>${officialText ? T('官方介绍','Official Description') : T('期刊概览','Journal Overview')}</h4>
-          <p>${officialText ? escape(officialText) : escape(fallbackText)}</p>
-        </div>
-      </div>`;
+      const overviewTitle = officialText ? T('官方介绍','Official Description') : T('期刊概览','Journal Overview');
+      const overviewBody = officialText ? escape(officialText) : escape(fallbackText);
+      // 与收录/分区同级 info-grid 色块
+      return {
+        title: overviewTitle,
+        html: `<div class="block span2 d-overview-block">
+          <h3>${overviewTitle}</h3>
+          <p class="d-overview-text">${overviewBody}</p>
+        </div>`,
+      };
     })();
 
     const cnkiHTML = (() => {
@@ -7468,7 +7472,7 @@
             <div class="block"><h3>${T('风险','Risk')}</h3>${riskEmpty}</div>
             <div class="block"><h3>${T('开放与费用','Access & fees')}</h3>${accessEmpty}</div>
             ${kvAll ? `<div class="block span2"><h3>${T('基本信息','Basics')}</h3><div class="kv2">${kvAll}</div></div>` : ''}
-            ${journalIntroHTML ? `<div class="block span2 d-overview-wrap">${journalIntroHTML}</div>` : ''}
+            ${journalIntroHTML && journalIntroHTML.html ? journalIntroHTML.html : ''}
           </div>
 
           ${trendsHTML || countryOutputHTML ? `<div class="section-title">${T('数据图表','Charts')}</div>
