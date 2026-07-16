@@ -894,8 +894,10 @@ body.home-tab-has-results .home-hero {
 
 /* ── Home V4 落地 ── */
 .home-v4 {
-  width: min(920px, 100%);
+  width: min(1120px, 100%);
   margin: 0 auto;
+  box-sizing: border-box;
+  padding: 0 12px;
 }
 .home-v4-title {
   font-family: var(--display), var(--sans);
@@ -972,12 +974,14 @@ body.home-route:not(.home-tab-has-results) .home-v4-grad {
 
 /* 首页产品介绍区块 */
 .home-intro {
-  width: min(920px, 100%);
+  width: min(1120px, 100%);
   margin: 36px auto 0;
   text-align: left;
   display: flex;
   flex-direction: column;
   gap: 14px;
+  box-sizing: border-box;
+  padding: 0 12px;
 }
 .home-sec {
   padding: 20px 18px;
@@ -985,6 +989,9 @@ body.home-route:not(.home-tab-has-results) .home-v4-grad {
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.62);
   scroll-margin-top: 24px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 .home-sec-id {
   display: block;
@@ -3194,12 +3201,15 @@ body.simple-top-route .tab-panel[data-panel="me"] {
   padding-top: 0;
 }
 
-/* 首页榜单（V7 看板：标签 + 双栏列表） */
+/* 首页榜单（V7 看板：标签 + 双栏列表 · 撑满 intro 宽） */
+.home-sec.rank-sec,
 .rank-sec {
   text-align: left;
-  max-width: 920px;
-  margin-left: auto;
-  margin-right: auto;
+  width: 100%;
+  max-width: none;
+  margin-left: 0;
+  margin-right: 0;
+  box-sizing: border-box;
 }
 .rank-page-title {
   margin: 0 0 6px;
@@ -3241,11 +3251,18 @@ body.simple-top-route .tab-panel[data-panel="me"] {
   color: #fff;
 }
 .rank-panel[hidden] { display: none !important; }
+.rank-panel {
+  width: 100%;
+  min-width: 0;
+}
 .rank-board-grid {
   display: grid;
-  grid-template-columns: 1.35fr 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 12px;
-  align-items: start;
+  align-items: stretch;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 .rank-board-grid-1 { grid-template-columns: 1fr; }
 .rank-board {
@@ -3255,6 +3272,9 @@ body.simple-top-route .tab-panel[data-panel="me"] {
   box-shadow: 0 8px 24px rgba(40, 28, 16, 0.05);
   padding: 14px 14px 10px;
   min-width: 0;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
 }
 .rank-board-head {
   display: flex;
