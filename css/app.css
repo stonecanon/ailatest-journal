@@ -902,7 +902,8 @@ body.home-tab-has-results .home-hero {
   width: min(1120px, 100%);
   margin: 0 auto;
   box-sizing: border-box;
-  padding: 0 12px;
+  padding: 0;
+  max-width: 100%;
 }
 .home-v4-title {
   font-family: var(--display), var(--sans);
@@ -977,16 +978,17 @@ body.home-route:not(.home-tab-has-results) .home-v4-grad {
   box-shadow: 0 1px 4px rgba(60, 48, 36, 0.08);
 }
 
-/* 首页产品介绍区块 */
+/* 首页产品介绍区块（嵌在 .home-v4 内：宽度跟父级，勿再 min(1120) 套一层） */
 .home-intro {
-  width: min(1120px, 100%);
-  margin: 36px auto 0;
+  width: 100%;
+  max-width: 100%;
+  margin: 36px 0 0;
   text-align: left;
   display: flex;
   flex-direction: column;
   gap: 14px;
   box-sizing: border-box;
-  padding: 0 12px;
+  padding: 0;
 }
 .home-sec {
   padding: 20px 18px;
@@ -1557,8 +1559,9 @@ a.home-btn-primary { color: #fff; }
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
-  margin: 0 auto;
-  max-width: 880px;
+  margin: 0;
+  width: 100%;
+  max-width: 100%;
 }
 .home-stat {
   text-align: left;
