@@ -29,15 +29,100 @@ a:hover { text-decoration: underline; }
   top: 0;
   z-index: 80;
   display: flex; align-items: center; justify-content: space-between;
+  gap: 16px;
   min-height: 60px;
-  max-width: none; margin: 0; padding: 0 32px 0 24px;
+  max-width: none; margin: 0; padding: 0 28px 0 24px;
   border-bottom: 1px solid rgba(43, 40, 36, .08);
-  background: rgba(250, 247, 242, .88);
+  background: rgba(250, 247, 242, .92);
   backdrop-filter: blur(18px);
 }
-.brand { display: inline-flex; align-items: baseline; gap: 4px; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; font-weight: 820; font-size: 18px; color: var(--ink); letter-spacing: 0; line-height: 1; white-space: nowrap; }
+.brand {
+  display: inline-flex; align-items: baseline; gap: 4px;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-weight: 820; font-size: 18px;
+  color: var(--ink) !important;
+  letter-spacing: 0; line-height: 1; white-space: nowrap;
+  text-decoration: none !important;
+  flex: 0 0 auto;
+}
 .brand span { color: rgba(117,111,104,.88); font-family: inherit; font-style: italic; font-weight: 650; }
-.brand:hover { text-decoration: none; }
+.brand:hover,
+.brand:visited,
+.brand:active { color: var(--ink) !important; text-decoration: none !important; }
+
+/* 与主站一致的顶栏产品导航 */
+.page-head-nav,
+.page-head nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+  justify-content: flex-end;
+  font-size: 13px;
+}
+.page-head-nav a,
+.page-head nav a {
+  min-height: 32px;
+  padding: 0 11px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  font-weight: 650;
+  line-height: 1.2;
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none !important;
+  box-shadow: none;
+}
+.page-head-nav a:hover,
+.page-head nav a:hover {
+  color: #c2410c;
+  background: rgba(249, 115, 22, .08);
+  text-decoration: none !important;
+}
+.page-head-nav a.active,
+.page-head nav a.active,
+.page-head-nav a[aria-current="page"],
+.page-head nav a[aria-current="page"] {
+  color: #c2410c;
+  background: #fff7ed;
+  border-color: rgba(249, 115, 22, .28);
+}
+.page-head-nav a.cta,
+.page-head nav a.cta {
+  min-height: 32px;
+  padding: 0 14px;
+  background: var(--ink);
+  color: #fff !important;
+  border-color: var(--ink);
+  font-weight: 700;
+}
+.page-head-nav a.cta:hover,
+.page-head nav a.cta:hover {
+  background: #1a1612;
+  color: #fff !important;
+  opacity: .92;
+}
+.static-lang-toggle {
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 6px 12px;
+  min-height: 32px;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 650;
+  line-height: 1.2;
+  cursor: pointer;
+  box-shadow: none;
+}
+.static-lang-toggle:hover {
+  border-color: #f0ddc2;
+  color: #c2410c;
+  background: #fffaf5;
+}
 .site-rail {
   position: fixed;
   left: 0;
@@ -379,47 +464,6 @@ a:hover { text-decoration: underline; }
   font: 850 13px/1 var(--sans);
 }
 .app-rail .rail-nav-btn[data-station-hidden="1"] { display: none !important; }
-
-.page-head nav { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: flex-end; font-size: 14px; }
-.page-head nav a {
-  min-height: 33px;
-  padding: 6px 14px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, .86);
-  color: var(--ink);
-  font-weight: 650;
-  line-height: 1.2;
-  box-shadow: 0 4px 14px rgba(66, 49, 27, .06);
-}
-.page-head nav a.cta {
-  min-height: 33px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--ink);
-  color: #fff;
-  padding: 6px 14px;
-  border-radius: 6px;
-  font-weight: 700;
-}
-.page-head nav a.cta:hover { text-decoration: none; opacity: .88; }
-.static-lang-toggle {
-  border: 1px solid var(--line);
-  background: #fff;
-  color: var(--ink);
-  border-radius: 999px;
-  padding: 6px 12px;
-  font: inherit;
-  font-size: 13px;
-  line-height: 1.2;
-  cursor: pointer;
-  box-shadow: 0 4px 14px rgba(66, 49, 27, .08);
-}
-.static-lang-toggle:hover {
-  border-color: var(--accent-line);
-  color: var(--link);
-}
 
 main { max-width: 880px; margin: 0 auto; padding: 12px 20px 56px; flex: 1 0 auto; width: 100%; }
 main.narrow { max-width: 720px; }

@@ -3,6 +3,7 @@
     'zh-CN': {
       nav_about: '关于',
       nav_home: '首页',
+      nav_features: '功能',
       download_center: '下载',
       rail_global: '全球',
       rail_china: '中国',
@@ -16,7 +17,7 @@
       nav_pricing: '订阅',
       nav_extension: '插件内测',
       nav_contact: '联系',
-      nav_login: '注册 / 登录',
+      nav_login: '登录',
       footer_about: '关于',
       footer_pricing: '订阅',
       footer_contact: '联系',
@@ -33,11 +34,16 @@
       about_title: '关于我们 | AILatest Journal',
       about_desc: 'AILatest Journal 数据来源与更新时间：WoS、JCR、中科院分区、EI、Scopus、DOAJ、OpenAlex 等公开评级与元数据汇总说明。',
       contact_title: '联系我们 | AILatest Journal',
-      contact_desc: '联系 AILatest Journal：产品反馈、数据纠错、商务合作与媒体联系。'
+      contact_desc: '联系 AILatest Journal：产品反馈、数据纠错、商务合作与媒体联系。',
+      terms_title: '使用条款 | AILatest Journal',
+      privacy_title: '隐私政策 | AILatest Journal',
+      refund_title: '退款政策 | AILatest Journal',
+      signup_title: '登录 | AILatest Journal'
     },
     en: {
       nav_about: 'About',
       nav_home: 'Home',
+      nav_features: 'Features',
       download_center: 'Download',
       rail_global: 'Global',
       rail_china: 'China',
@@ -47,13 +53,13 @@
       rail_regions: 'Regions',
       rail_rankings: 'Rankings',
       rail_saved: 'Saved',
-      rail_account: 'Account',
-      nav_pricing: 'Subscribe',
-      nav_extension: 'Extension beta',
+      rail_account: 'Me',
+      nav_pricing: 'Pricing',
+      nav_extension: 'Extension',
       nav_contact: 'Contact',
       nav_login: 'Sign in',
       footer_about: 'About',
-      footer_pricing: 'Subscribe',
+      footer_pricing: 'Pricing',
       footer_contact: 'Contact',
       footer_terms: 'Terms',
       footer_privacy: 'Privacy',
@@ -68,7 +74,11 @@
       about_title: 'About | AILatest Journal',
       about_desc: 'AILatest Journal data sources and cutoffs: WoS, JCR, CAS zones, EI, Scopus, DOAJ, OpenAlex and more.',
       contact_title: 'Contact | AILatest Journal',
-      contact_desc: 'Contact AILatest Journal for product feedback, data corrections, business and media.'
+      contact_desc: 'Contact AILatest Journal for product feedback, data corrections, business and media.',
+      terms_title: 'Terms | AILatest Journal',
+      privacy_title: 'Privacy | AILatest Journal',
+      refund_title: 'Refund | AILatest Journal',
+      signup_title: 'Sign in | AILatest Journal'
     }
   };
 
@@ -88,22 +98,56 @@
     return normalize(navigator.language || 'en');
   }
 
-  /** 全站静态页统一页脚：一行即可 */
+  /** 全站静态页统一页脚：与主站产品信息一致 */
   function unifiedFooterHtml(dict) {
     return `<p class="site-foot-line">© 2026 AILatest Journal ·
-      <a href="/pricing.html" data-static-i18n="footer_pricing">${dict.footer_pricing}</a> ·
       <a href="/about" data-static-i18n="footer_about">${dict.footer_about}</a> ·
       <a href="/contact" data-static-i18n="footer_contact">${dict.footer_contact}</a> ·
       <a href="/terms" data-static-i18n="footer_terms">${dict.footer_terms}</a> ·
       <a href="/privacy" data-static-i18n="footer_privacy">${dict.footer_privacy}</a> ·
       <a href="/refund" data-static-i18n="footer_refund">${dict.footer_refund}</a> ·
-      <a href="/llms.txt" data-static-i18n="footer_llms" title="For AI assistants">${dict.footer_llms}</a></p>`;
+      <a href="/pricing.html" data-static-i18n="footer_pricing">${dict.footer_pricing}</a> ·
+      <a href="/extension.html" data-static-i18n="footer_download">${dict.footer_download}</a></p>`;
   }
 
   function applyUnifiedFooter(lang) {
     const dict = STRINGS[lang] || STRINGS.en;
     document.querySelectorAll('footer.page-foot').forEach((foot) => {
       foot.innerHTML = unifiedFooterHtml(dict);
+    });
+  }
+
+  /** 顶栏当前页高亮：about/contact/pricing/download/… */
+  function markActiveNav() {
+    const page = String(document.body?.dataset?.staticPage || '').toLowerCase();
+    const path = (location.pathname || '').replace(/\/+$/, '').toLowerCase() || '/';
+    let key = page;
+    if (!key) {
+      if (path.endsWith('/about') || path.endsWith('/about.html')) key = 'about';
+      else if (path.endsWith('/contact') || path.endsWith('/contact.html')) key = 'contact';
+      else if (path.includes('pricing')) key = 'pricing';
+      else if (path.includes('extension')) key = 'download';
+      else if (path.includes('signup') || path.includes('login')) key = 'signup';
+      else if (path.includes('terms')) key = 'terms';
+      else if (path.includes('privacy')) key = 'privacy';
+      else if (path.includes('refund')) key = 'refund';
+    }
+    // 条款 / 隐私 / 退款归在「关于」产品信息下高亮
+    const navKey = (key === 'terms' || key === 'privacy' || key === 'refund') ? 'about' : key;
+    const map = {
+      about: 'about',
+      contact: 'contact',
+      pricing: 'pricing',
+      download: 'download',
+      extension: 'download',
+      signup: 'home',
+    };
+    const active = map[navKey] || navKey;
+    document.querySelectorAll('.page-head [data-nav]').forEach((a) => {
+      const on = a.getAttribute('data-nav') === active;
+      a.classList.toggle('active', on);
+      if (on) a.setAttribute('aria-current', 'page');
+      else a.removeAttribute('aria-current');
     });
   }
 
@@ -138,6 +182,7 @@
       toggle.setAttribute('aria-label', lang === 'zh-CN' ? 'Switch to English' : '切换到中文');
     }
     syncStaticAuth(lang);
+    markActiveNav();
   }
 
   function readStaticUser() {
