@@ -42,7 +42,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 })(window,document,'script','dataLayer','GTM-NBNXL7FB');</script>
 <!-- End Google Tag Manager -->
 <link rel="preload" href="/data/journal_aliases.json" as="fetch" crossorigin="anonymous" />
-<link rel="stylesheet" href="/css/app.css?v=20260716-if-align" />
+<link rel="stylesheet" href="/css/app.css?v=20260716-filter-clean" />
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json" />
@@ -464,42 +464,28 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <tr>
               <th class="col-fav" aria-label="Favorite"></th>
               <th class="col-name" data-i18n="col_name">期刊 Title</th>
-              <th class="col-free">
+              <th class="col-free" hidden aria-hidden="true">
+                <!-- 免费筛选已并入「开放」行，保留 id 供脚本兼容 -->
                 <label class="free-th-filter" id="free-col-filter-label" data-i18n-title="filter_free_only" title="只看免费发表 / FREE only">
                   <input type="checkbox" id="free-col-filter" data-i18n-aria="filter_free_only" aria-label="只看免费发表">
                   <span data-i18n="col_free">FREE</span>
                 </label>
               </th>
               <th class="col-badge">
+                <!-- V10 两栏：收录 | JCR -->
                 <div class="th-dropdown" id="idx-dropdown">
-                  <button class="th-dropdown-btn"><span class="dd-label" data-i18n="filter_idx">索引</span><span class="dd-arrow">▼</span></button>
+                  <button class="th-dropdown-btn" type="button"><span class="dd-label" data-i18n="filter_idx">收录</span></button>
                   <div class="th-dropdown-panel" id="idx-panel">
-                  <label class="th-chk" data-filter="index" data-value="SCIE"><input type="checkbox"><span>SCIE</span></label>
+                    <label class="th-chk" data-filter="index" data-value="SCIE"><input type="checkbox"><span>SCIE</span></label>
                     <label class="th-chk" data-filter="index" data-value="SSCI"><input type="checkbox"><span>SSCI</span></label>
                     <label class="th-chk" data-filter="index" data-value="AHCI"><input type="checkbox"><span>AHCI</span></label>
                     <label class="th-chk" data-filter="index" data-value="ESCI"><input type="checkbox"><span>ESCI</span></label>
                     <label class="th-chk" data-filter="index" data-value="EI"><input type="checkbox"><span>EI</span></label>
-                    <div class="dd-sep"></div>
                     <label class="th-chk" data-filter="feat" data-value="scopus"><input type="checkbox"><span>Scopus</span></label>
-                    <label class="th-chk" data-filter="feat" data-value="oaj"><input type="checkbox"><span>OAJ</span></label>
-                    <label class="th-chk" data-filter="feat" data-value="doaj"><input type="checkbox"><span>DOAJ</span></label>
-                    <label class="th-chk" data-filter="feat" data-value="medline"><input type="checkbox"><span>MEDLINE</span></label>
-                    <label class="th-chk" data-filter="feat" data-value="cscd"><input type="checkbox"><span>CSCD</span></label>
-                    <label class="th-chk" data-filter="feat" data-value="cstpcd"><input type="checkbox"><span>科技核心</span></label>
-                  </div>
-                </div>
-                <div class="th-dropdown" id="if-dropdown">
-                  <button class="th-dropdown-btn"><span class="dd-label" data-i18n="filter_if_range">影响因子</span><span class="dd-arrow">▼</span></button>
-                  <div class="th-dropdown-panel" id="if-panel">
-                    <div class="if-slider-row">
-                      <span class="if-slider-val" id="if-slider-val" data-i18n="if_any">不限</span>
-                    </div>
-                    <input type="range" id="if-slider" min="0" max="50" step="0.5" value="0" aria-label="最低影响因子">
-                    <div class="if-slider-ticks"><span>0</span><span>10</span><span>20</span><span>30</span><span>40</span><span>50+</span></div>
                   </div>
                 </div>
                 <div class="th-dropdown" id="jcr-dropdown">
-                  <button class="th-dropdown-btn"><span class="dd-label" data-i18n="jcr_label">JCR 分区</span><span class="dd-arrow">▼</span></button>
+                  <button class="th-dropdown-btn" type="button"><span class="dd-label">JCR</span></button>
                   <div class="th-dropdown-panel" id="jcr-panel">
                     <label class="th-chk" data-filter="jcr" data-value="Q1"><input type="checkbox"><span>Q1</span></label>
                     <label class="th-chk" data-filter="jcr" data-value="Q2"><input type="checkbox"><span>Q2</span></label>
@@ -507,8 +493,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <label class="th-chk" data-filter="jcr" data-value="Q4"><input type="checkbox"><span>Q4</span></label>
                   </div>
                 </div>
+                <!-- 中科院 | 新锐 -->
                 <div class="th-dropdown" id="cas-dropdown">
-                  <button class="th-dropdown-btn"><span class="dd-label" data-i18n="cas_zone">中科院分区</span><span class="dd-arrow">▼</span></button>
+                  <button class="th-dropdown-btn" type="button"><span class="dd-label" data-i18n="cas_zone">中科院</span></button>
                   <div class="th-dropdown-panel" id="cas-panel">
                     <label class="th-chk" data-filter="zone" data-value="1"><input type="checkbox"><span>1区</span></label>
                     <label class="th-chk" data-filter="zone" data-value="2"><input type="checkbox"><span>2区</span></label>
@@ -518,7 +505,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                   </div>
                 </div>
                 <div class="th-dropdown" id="xr-dropdown">
-                  <button class="th-dropdown-btn"><span class="dd-label" data-i18n="filter_xinrui">新锐分区</span><span class="dd-arrow">▼</span></button>
+                  <button class="th-dropdown-btn" type="button"><span class="dd-label" data-i18n="filter_xinrui">新锐</span></button>
                   <div class="th-dropdown-panel" id="xr-panel">
                     <label class="th-chk" data-filter="xr" data-value="1"><input type="checkbox"><span>1区</span></label>
                     <label class="th-chk" data-filter="xr" data-value="2"><input type="checkbox"><span>2区</span></label>
@@ -527,18 +514,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <label class="th-chk" data-filter="xr" data-value="xr-top"><input type="checkbox"><span>TOP</span></label>
                   </div>
                 </div>
+                <!-- ABDC+ABS | 开放（免费/OA/DOAJ）+ IF 快捷 -->
                 <div class="th-dropdown" id="abdc-dropdown">
-                  <button class="th-dropdown-btn"><span class="dd-label" data-i18n="abdc_label">ABDC</span><span class="dd-arrow">▼</span></button>
+                  <button class="th-dropdown-btn" type="button"><span class="dd-label" data-i18n="abdc_label">ABDC</span></button>
                   <div class="th-dropdown-panel" id="abdc-panel">
                     <label class="th-chk" data-filter="abdc" data-value="A*"><input type="checkbox"><span>A*</span></label>
                     <label class="th-chk" data-filter="abdc" data-value="A"><input type="checkbox"><span>A</span></label>
                     <label class="th-chk" data-filter="abdc" data-value="B"><input type="checkbox"><span>B</span></label>
                     <label class="th-chk" data-filter="abdc" data-value="C"><input type="checkbox"><span>C</span></label>
-                  </div>
-                </div>
-                <div class="th-dropdown" id="abs-dropdown">
-                  <button class="th-dropdown-btn"><span class="dd-label" data-i18n="abs_label">ABS</span><span class="dd-arrow">▼</span></button>
-                  <div class="th-dropdown-panel" id="abs-panel">
+                    <span class="dd-inline-k">ABS</span>
                     <label class="th-chk" data-filter="abs" data-value="4*"><input type="checkbox"><span>4*</span></label>
                     <label class="th-chk" data-filter="abs" data-value="4"><input type="checkbox"><span>4</span></label>
                     <label class="th-chk" data-filter="abs" data-value="3"><input type="checkbox"><span>3</span></label>
@@ -546,13 +530,42 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <label class="th-chk" data-filter="abs" data-value="1"><input type="checkbox"><span>1</span></label>
                   </div>
                 </div>
-                <div class="th-dropdown" id="warn-dropdown">
-                  <button class="th-dropdown-btn"><span class="dd-label" data-i18n="filter_warning">预警名单</span><span class="dd-arrow">▼</span></button>
+                <div class="th-dropdown" id="open-dropdown">
+                  <button class="th-dropdown-btn" type="button"><span class="dd-label" data-i18n="filter_open">开放</span></button>
+                  <div class="th-dropdown-panel" id="open-panel">
+                    <label class="th-chk th-chk-free" data-filter="feat" data-value="free" id="free-chip-label">
+                      <input type="checkbox" id="free-chip-proxy" aria-label="只看免费发表">
+                      <span data-i18n="filter_free_only">免费发表</span>
+                    </label>
+                    <label class="th-chk" data-filter="feat" data-value="oaj"><input type="checkbox"><span>OA</span></label>
+                    <label class="th-chk" data-filter="feat" data-value="doaj"><input type="checkbox"><span>DOAJ</span></label>
+                    <span class="dd-inline-k">IF</span>
+                    <button type="button" class="th-chk th-if-chip" data-if-min="5">≥5</button>
+                    <button type="button" class="th-chk th-if-chip" data-if-min="10">≥10</button>
+                  </div>
+                </div>
+                <!-- 预警整行 -->
+                <div class="th-dropdown th-dropdown-wide" id="warn-dropdown">
+                  <button class="th-dropdown-btn" type="button"><span class="dd-label" data-i18n="filter_warning">预警</span></button>
                   <div class="th-dropdown-panel" id="warn-panel">
                     <label class="th-chk" data-filter="feat" data-value="warning"><input type="checkbox"><span>中科院预警</span></label>
                     <label class="th-chk" data-filter="feat" data-value="citic_warning"><input type="checkbox"><span>中信所预警</span></label>
-                    <label class="th-chk" data-filter="feat" data-value="under_review"><input type="checkbox"><span>新锐 Under Review</span></label>
-                    <label class="th-chk" data-filter="feat" data-value="on_hold"><input type="checkbox"><span>WoS On Hold</span></label>
+                    <label class="th-chk" data-filter="feat" data-value="under_review"><input type="checkbox"><span>Under Review</span></label>
+                    <label class="th-chk" data-filter="feat" data-value="on_hold"><input type="checkbox"><span>On Hold</span></label>
+                    <label class="th-chk" data-filter="feat" data-value="medline"><input type="checkbox"><span>MEDLINE</span></label>
+                    <label class="th-chk" data-filter="feat" data-value="cscd"><input type="checkbox"><span>CSCD</span></label>
+                    <label class="th-chk" data-filter="feat" data-value="cstpcd"><input type="checkbox"><span>科技核心</span></label>
+                  </div>
+                </div>
+                <!-- 隐藏滑块，保留 id 兼容；快捷 IF 芯片优先 -->
+                <div class="th-dropdown th-dropdown-wide" id="if-dropdown" hidden>
+                  <button class="th-dropdown-btn" type="button"><span class="dd-label" data-i18n="filter_if_range">影响因子</span></button>
+                  <div class="th-dropdown-panel" id="if-panel">
+                    <div class="if-slider-row">
+                      <span class="if-slider-val" id="if-slider-val" data-i18n="if_any">不限</span>
+                    </div>
+                    <input type="range" id="if-slider" min="0" max="50" step="0.5" value="0" aria-label="最低影响因子">
+                    <div class="if-slider-ticks"><span>0</span><span>10</span><span>20</span><span>30</span><span>40</span><span>50+</span></div>
                   </div>
                 </div>
               </th>
@@ -872,7 +885,7 @@ window.__BUILD_VER = 'v20260716-stats-fix';
 </script>
 <script src="/js/pick-match.js?v=20260716-v10" defer></script>
 <script src="/js/pricing-checkout.js?v=20260716-creem" defer></script>
-<script src="/js/app.js?v=20260716-if-align" defer></script>
+<script src="/js/app.js?v=20260716-filter-clean" defer></script>
 
 </body>
 </html>

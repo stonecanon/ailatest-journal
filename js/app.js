@@ -96,7 +96,8 @@
       col_name: '期刊 Title', col_free: '免费', col_abbr: '缩写 Abbr', col_badges: '索引 / 分区',
       col_if: 'IF', col_cycle: '审稿周期',
       col_index: '索引收录', col_cas: '学科分区',
-      filter_idx: '索引', filter_tier: '分区', filter_extra: '其他',
+      filter_idx: '收录', filter_tier: '分区', filter_extra: '其他',
+      filter_open: '开放', filter_free_only: '免费发表',
       filter_topic: '学科',
       filter_free: '免费发表', filter_nsc: 'Nature/Science/Cell',
       jcr_label: 'JCR 分区', abdc_label: 'ABDC', abs_label: 'ABS',
@@ -260,6 +261,7 @@
       col_if: 'IF', col_cycle: 'Review Cycle',
       col_index: 'Indexed', col_cas: 'Categories',
       filter_idx: 'Index', filter_tier: 'Tier', filter_extra: 'More',
+      filter_open: 'Access', filter_free_only: 'Free to publish',
       filter_topic: 'Topics',
       filter_free: 'FREE to Publish', filter_nsc: 'Nature/Science/Cell',
       jcr_label: 'JCR Quartile', abdc_label: 'ABDC', abs_label: 'ABS',
@@ -4544,7 +4546,16 @@
       const n = counts[label.dataset.filter + ':' + label.dataset.value] || 0;
       let badge = label.querySelector('.dd-count');
       if (!badge) { badge = document.createElement('span'); badge.className = 'dd-count'; label.appendChild(badge); }
+      // 数量写入 data 与 title，默认隐藏，悬停再显示（避免按钮太乱）
       badge.textContent = n ? n.toLocaleString() : '';
+      badge.hidden = !n;
+      if (n) {
+        label.title = `${label.querySelector('span:not(.dd-count)')?.textContent || label.dataset.value || ''} · ${n.toLocaleString()}`;
+        badge.setAttribute('data-count', String(n));
+      } else {
+        label.removeAttribute('title');
+        badge.removeAttribute('data-count');
+      }
     });
   }
 
@@ -10261,13 +10272,13 @@
         showRegionPaywallModal('publish_fee');
         const freeCol = document.getElementById('free-col-filter');
         if (freeCol) freeCol.checked = false;
-        document.querySelectorAll('.feat-row input[value="free"]').forEach(input => { input.checked = false; });
+        document.querySelectorAll('.feat-row input[value="free"], #free-chip-proxy, .th-chk-free input').forEach(input => { input.checked = false; });
         activeFeats.delete('free');
         return;
       }
       const freeCol = document.getElementById('free-col-filter');
       if (freeCol) freeCol.checked = checked;
-      document.querySelectorAll('.feat-row input[value="free"]').forEach(input => { input.checked = checked; });
+      document.querySelectorAll('.feat-row input[value="free"], #free-chip-proxy, .th-chk-free input').forEach(input => { input.checked = checked; });
       if (checked) activeFeats.add('free');
       else activeFeats.delete('free');
       shown = PAGE;
@@ -10281,6 +10292,42 @@
       e.preventDefault();
       setFreeFilter(!activeFeats.has('free'));
     });
+    // V10「开放」行里的免费发表 chip
+    document.querySelectorAll('#free-chip-proxy, .th-chk-free input').forEach((input) => {
+      input.addEventListener('change', (e) => setFreeFilter(!!e.target.checked));
+    });
+    // IF 快捷芯片 ≥5 / ≥10（与滑块共用 activeIfMin）
+    const syncIfChips = () => {
+      document.querySelectorAll('.th-if-chip[data-if-min]').forEach((btn) => {
+        const v = Number(btn.getAttribute('data-if-min') || 0);
+        btn.classList.toggle('active', activeIfMin > 0 && activeIfMin === v);
+        btn.setAttribute('aria-pressed', activeIfMin === v ? 'true' : 'false');
+      });
+      const slider = document.getElementById('if-slider');
+      const label = document.getElementById('if-slider-val');
+      if (slider) {
+        slider.value = String(activeIfMin || 0);
+        const pct = Math.min(100, Math.max(0, ((activeIfMin || 0) / 50) * 100));
+        slider.style.setProperty('--pct', pct + '%');
+      }
+      if (label) {
+        label.textContent = activeIfMin > 0
+          ? `≥ ${activeIfMin}`
+          : (typeof t === 'function' ? t('if_any') : '不限');
+      }
+    };
+    document.querySelectorAll('.th-if-chip[data-if-min]').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const v = Number(btn.getAttribute('data-if-min') || 0);
+        activeIfMin = activeIfMin === v ? 0 : v;
+        syncIfChips();
+        shown = PAGE;
+        renderInt();
+      });
+    });
+    syncIfChips();
     // 侧栏「免费发表」筛选
     document.querySelectorAll('.feat-row input[value="free"]').forEach((input) => {
       input.addEventListener('change', (e) => {
