@@ -9281,6 +9281,10 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   overflow: hidden !important;
   grid-column: auto !important;
 }
+/* 学科行：搜索框已写「筛选学科」，隐藏左侧重复「学科」标签 */
+.tab-panel[data-panel="int"] #topic-dropdown > .th-dropdown-btn {
+  display: none !important;
+}
 .tab-panel[data-panel="int"] #topic-dropdown {
   /* topic is in col-wos */
 }
