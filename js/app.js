@@ -4167,6 +4167,7 @@
     metaHtml = '',
     bodyHtml = '',
     ifHtml = '',
+    freeHtml = '',
     dragHtml = '',
   }) {
     const bodyInner = (bodyHtml && String(bodyHtml).replace(/\s+/g, ''))
@@ -4182,6 +4183,10 @@
     } else if (ifHtml) {
       ifNum = ifHtml;
     }
+    // 免费发表 / Pro 锁：贴在 IF 正下方（不展示 muted 破折号）
+    const freeUnderIf = freeHtml && !/muted-cell/.test(String(freeHtml))
+      ? `<div class="j-card-if-free">${freeHtml}</div>`
+      : '';
     return `<tr class="j-row j-card clickable${extraClass ? ` ${extraClass}` : ''}${flagship ? ' row-flagship' : ''}${hasDrag ? ' has-drag' : ''}" data-fid="${escape(fid)}" data-src="${escape(src)}">
       <td class="j-card-main col-name">
         <div class="j-card-head">
@@ -4195,6 +4200,7 @@
               ${ifNum}
               <div class="j-card-fav col-fav">${favHtml || ''}</div>
             </div>
+            ${freeUnderIf}
             ${ifLabel}
           </div>
         </div>
@@ -4288,15 +4294,12 @@
     const cycleLabel = cycleDays
       ? `${Math.round(cycleDays / 30.4)}${T('个月','mo')}`
       : '';
-    const freeHtml = freeBadgeCell(r);
-    const freeMeta = freeHtml && !/muted-cell/.test(freeHtml)
-      ? jMetaPlain(freeHtml, 'j-meta-free')
-      : '';
+    // 免费发表贴 IF 下方，不再塞进刊名 meta 行
+    const freeHtml = freeBadgeCell(r, { compact: true });
     const subject = (r.wos_categories && r.wos_categories[0])
       || r.jcr_cat || r.cas_major_cn || r.esi_category || '';
     const publisher = r.publisher || '';
     const metaHtml = [
-      freeMeta,
       cycleLabel ? jMetaText(T('审稿','审稿'), escape(cycleLabel), 'j-meta-cycle') : '',
       subject ? jMetaChip(subject, 'j-meta-topic-show') : '',
       publisher ? jMetaChip(publisher, 'j-meta-pub') : '',
@@ -4307,19 +4310,24 @@
       favHtml: starBtn(r, 'int'),
       nameHtml,
       ifHtml: ifVal ? jMetaIf('IF', ifVal) : null,
+      freeHtml,
       metaHtml,
       bodyHtml,
     });
   }
 
   /* ───────── FREE badge helper（Pro+ 可见是否付费发表） ───────── */
-  function freeBadgeCell(r) {
+  function freeBadgeCell(r, opts = {}) {
+    const compact = !!opts.compact;
     if (!canSeePublishFeeInfo()) {
       return `<button type="button" class="badge b-free-lock" data-publish-fee-lock title="${T('升级 Pro 后可查看是否付费发表','Upgrade to Pro to see publish-fee info')}">${T('Pro','Pro')}</button>`;
     }
-    return isFreeToPublish(r)
-      ? `<span class="badge b-free" title="${T('作者可选择免费发表路径（Diamond / Hybrid / 订阅制等）','Author-free publishing path available (Diamond / Hybrid / subscription, etc.)')}">${T('免费发表','FREE TO PUBLISH')}</span>`
-      : '<span class="muted-cell">&mdash;</span>';
+    if (!isFreeToPublish(r)) return '<span class="muted-cell">&mdash;</span>';
+    // IF 下方空间紧：中文「免费」、英文 FREE；完整语义放 title
+    const label = compact
+      ? T('免费', 'FREE')
+      : T('免费发表', 'FREE TO PUBLISH');
+    return `<span class="badge b-free" title="${T('作者可选择免费发表路径（Diamond / Hybrid / 订阅制等）','Author-free publishing path available (Diamond / Hybrid / subscription, etc.)')}">${label}</span>`;
   }
 
   function escape(s) {
@@ -10106,13 +10114,9 @@
       cycleDays = +doaj.review_weeks * 7;
     }
     const cycleLabel = cycleDays ? `${Math.round(cycleDays / 30.4)}${T('个月','mo')}` : '';
-    const freeHtml = freeBadgeCell(r);
-    const freeMeta = freeHtml && !/muted-cell/.test(freeHtml)
-      ? jMetaPlain(freeHtml, 'j-meta-free')
-      : '';
+    const freeHtml = freeBadgeCell(r, { compact: true });
     const metaHtml = [
       jMetaPlain(`<span class="src-tag src-${escape(r.__src)}">${SRC_LABEL[r.__src] || r.__src}</span>`, 'j-meta-src'),
-      freeMeta,
       cycleLabel ? jMetaText(T('审稿','审稿'), escape(cycleLabel), 'j-meta-cycle') : '',
     ].filter(Boolean).join('');
     const bodyHtml = `<div class="j-card-badges">${badgeCell}</div>`;
@@ -10122,6 +10126,7 @@
       dragHtml: `<span class="drag-handle" title="${T('拖动排序','Drag to reorder')}">⋮⋮</span>`,
       nameHtml,
       ifHtml: ifVal ? jMetaIf('IF', ifVal) : null,
+      freeHtml,
       metaHtml,
       bodyHtml,
     });

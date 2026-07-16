@@ -8660,6 +8660,44 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   text-align: right;
   line-height: 1;
 }
+/* 免费发表：紧贴 IF 数字下方（右对齐，避开 ★ 列） */
+.j-row .j-card-if-free {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 3px;
+  margin-right: 20px; /* 与 IF 数字列对齐 */
+  max-width: 100%;
+  line-height: 1;
+}
+.j-row .j-card-if-free .badge,
+.j-row .j-card-if-free .b-free,
+.j-row .j-card-if-free .b-free-lock {
+  font-size: 9px !important;
+  font-weight: 700 !important;
+  line-height: 1.25 !important;
+  padding: 1px 5px !important;
+  border-radius: 4px !important;
+  margin: 0 !important;
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.j-row .j-card-if-free .badge.b-free {
+  background: rgba(236, 253, 245, 0.95) !important;
+  color: #047857 !important;
+  border: 0 !important;
+}
+.j-row .j-card-if-free .badge.b-free-lock {
+  background: #faf6ee !important;
+  color: #8b6914 !important;
+  border: 1px solid #e8d9b0 !important;
+  cursor: pointer;
+}
+/* 有免费标时，IF 标签可再压一点间距 */
+.j-row .j-card-if-free + .j-card-if-label {
+  margin-top: 2px;
+}
 
 /* 收藏：纯五角星，无圆底 */
 .j-row .j-card-fav,
@@ -8764,20 +8802,10 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   font-weight: 500;
   color: #8a7a68;
 }
+/* 免费发表主位置在 IF 下；meta 行遗留兼容 */
 .j-row .j-meta-free {
-  display: inline-flex !important;
+  display: none !important;
 }
-.j-row .j-meta-free .badge,
-.j-row .j-meta-free .b-free,
-.j-row .j-meta-free .b-free-lock {
-  font-size: 9.5px !important;
-  padding: 1px 5px !important;
-  border-radius: 4px !important;
-  margin: 0 !important;
-  line-height: 1.3 !important;
-}
-/* 免费发表：V10 浅绿底 */
-.j-row .j-meta-free .badge.b-free,
 .j-row .j-card-badges .badge.b-free,
 .j-row .badges-access .badge.b-free {
   background: rgba(236, 253, 245, 0.85) !important;
@@ -9452,12 +9480,6 @@ tr.j-row.clickable:hover { background: rgba(0,0,0,0.03); }
   font-size: 10px !important;
   padding: 0 !important;
 }
-/* 免费发表在上块：V10 浅绿小标签 */
-.j-row .j-card-head .j-meta-free .badge.b-free {
-  background: rgba(236, 253, 245, 0.9) !important;
-  color: #047857 !important;
-}
-
 /* 免费发表列（若仍显示）：小号绿标 */
 .j-row .col-free .badge.b-free {
   background: #ecfdf5; color: #047857; font-size: 9.5px; padding: 1px 5px; border-radius: 4px; font-weight: 700;
