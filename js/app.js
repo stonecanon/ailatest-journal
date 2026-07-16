@@ -135,6 +135,59 @@
       home_hot_empty: '近 30 天暂无足够浏览数据',
       home_hot_loading: '加载热点中…',
       home_hot_ai: 'AI 荐刊 →',
+      nav_features: '功能',
+      nav_how: '怎么用',
+      nav_pricing: '订阅',
+      nav_terms: '条款',
+      nav_privacy: '隐私',
+      nav_refund: '退款',
+      download_center: '下载',
+      home_feat_kicker: 'Features',
+      home_feat_title: '功能介绍',
+      home_feat_lead: '检索全球期刊，对比分区、影响因子与开放获取信息 — 一站完成。库、分区、风险信号、荐刊与插件徽章在同一条工作流里。',
+      home_feat_1_t: '全球与地区期刊库',
+      home_feat_1_d: 'SCIE / SSCI / AHCI / ESCI / EI、Scopus、DOAJ、MEDLINE；中国、印度、韩国、马来西亚等地区站。',
+      home_feat_2_t: '分区 · 指标 · 风险',
+      home_feat_2_d: 'JCR 影响因子与 Quartile、中科院分区（含 TOP）、CCF / ABDC / ABS；预警与撤稿提示。',
+      home_feat_3_t: '收藏与清单',
+      home_feat_3_d: '登录后云端收藏、多清单整理；对比时随时回看目标刊。',
+      home_feat_4_t: '智能荐刊',
+      home_feat_4_d: '输入论文标题 / 摘要 / 关键词，按主题与库覆盖匹配目标期刊（搜索框切到「荐刊」）。',
+      home_feat_5_t: '浏览器插件',
+      home_feat_5_d: 'Scholar / PubMed / 知网等页面展示分区与收录徽章，少开一个标签页。',
+      home_feat_6_t: '开放获取与 APC',
+      home_feat_6_d: 'OAJ / DOAJ 信号与是否可免费发表路径（按订阅档位展示深度字段）。',
+      home_how_kicker: 'How it works',
+      home_how_title: '怎么用',
+      home_how_lead: '从打开首页到定稿目标刊，四步走完。',
+      home_how_1_t: '搜索或荐刊', home_how_1_d: '刊名 / ISSN 直接查；或切换「荐刊」贴标题摘要。',
+      home_how_2_t: '筛选分区与库', home_how_2_d: '按 JCR、中科院、索引、学科收窄候选列表。',
+      home_how_3_t: '看详情与风险', home_how_3_d: '影响因子、审稿周期、OA / 预警信息一页看清。',
+      home_how_4_t: '收藏或导出', home_how_4_d: '加入清单；插件在阅读页继续对照徽章。',
+      home_cta_search: '打开查刊', home_cta_pick: '试用荐刊',
+      home_price_kicker: 'Pricing', home_price_title: '订阅方案',
+      home_price_lead: '网站查刊 Free 永久可用。Pro / Max 提升插件深度、额度与 AI 荐刊配额。教育邮箱另享教育价（登录后解锁）。',
+      home_price_forever: '/ 永久', home_price_year: '/ 年', home_price_rec: '推荐',
+      home_price_free_d: '适合日常检索与轻量试用',
+      home_price_free_1: '网站完整检索与详情', home_price_free_2: '基础插件徽章', home_price_free_3: 'AI 荐刊试用次数',
+      home_price_free_cta: '继续免费使用',
+      home_price_pro_d: '高频刷刊 · 插件进阶',
+      home_price_pro_1: '中科院 / TOP / 新锐徽章', home_price_pro_2: '云收藏 50 · 清单 5', home_price_pro_3: 'AI 荐刊 500 credits/月',
+      home_price_pro_cta: '升级 Pro',
+      home_price_max_d: '完整工作流 · 高额度 AI',
+      home_price_max_1: '预警 / 撤稿 / 科协风险', home_price_max_2: '导出与高额度荐刊', home_price_max_3: '地区站与设备额度更高',
+      home_price_max_cta: '升级 Max',
+      home_price_note: '完整对照与教育价见订阅页 · 价格 USD · Creem 收银台',
+      home_price_more: '打开完整订阅页 →',
+      home_dl_kicker: 'Download', home_dl_title: '下载与入口',
+      home_dl_lead: '网页版无需安装。插件把分区徽章带到你常去的文献页。',
+      home_dl_web_t: '网页版', home_dl_web_d: '浏览器直接使用查刊与荐刊，登录后同步收藏。', home_dl_web_cta: '打开应用',
+      home_dl_ext_t: '浏览器扩展', home_dl_ext_d: 'Chrome / Edge：Scholar、PubMed、知网等页面徽章。', home_dl_ext_cta: '去下载页',
+      home_dl_api_t: 'Skill / API', home_dl_api_d: '给写作助手接入检索与荐刊接口（开发者入口）。', home_dl_api_cta: '查看说明',
+      home_ct_kicker: 'About & contact', home_ct_title: '关于与联系',
+      home_ct_lead: 'AILatest Journal 聚合公开评级与元数据，供学术检索与投稿参考。数据以各评价机构官方发布为准。',
+      home_ct_info_t: '产品信息', home_ct_info_d: '数据来源与截止时间、免责声明见关于页。问题与纠错欢迎来信。',
+      home_ct_data: '数据说明', home_ct_email: '邮箱：contact@ailatest.org', home_ct_page: '打开联系页 →',
       showing: '显示', of: '条 / 共', total_items: '条',
       empty: '未找到匹配的期刊',
       empty_fav: '还没有收藏。切到「国际 SCI/SSCI」点任意一行右边的 ★ 就能收藏。',
@@ -246,6 +299,59 @@
       home_hot_empty: 'Not enough view data for the last 30 days',
       home_hot_loading: 'Loading hot journals…',
       home_hot_ai: 'AI Recommend →',
+      nav_features: 'Features',
+      nav_how: 'How it works',
+      nav_pricing: 'Pricing',
+      nav_terms: 'Terms',
+      nav_privacy: 'Privacy',
+      nav_refund: 'Refund',
+      download_center: 'Download',
+      home_feat_kicker: 'Features',
+      home_feat_title: 'What you get',
+      home_feat_lead: 'Search global journals and compare rankings, impact factors and open-access signals — in one place.',
+      home_feat_1_t: 'Global & regional catalogs',
+      home_feat_1_d: 'SCIE / SSCI / AHCI / ESCI / EI, Scopus, DOAJ, MEDLINE; China, India, Korea, Malaysia and more.',
+      home_feat_2_t: 'Rankings · metrics · risk',
+      home_feat_2_d: 'JCR IF & quartiles, CAS zones (incl. TOP), CCF / ABDC / ABS; warning and retraction signals.',
+      home_feat_3_t: 'Favorites & lists',
+      home_feat_3_d: 'Cloud favorites after sign-in; organize shortlists while comparing targets.',
+      home_feat_4_t: 'AI journal picks',
+      home_feat_4_d: 'Paste a title / abstract / keywords and switch the search bar to Recommend.',
+      home_feat_5_t: 'Browser extension',
+      home_feat_5_d: 'Badges on Scholar / PubMed / CNKI pages so you open fewer tabs.',
+      home_feat_6_t: 'OA & APC signals',
+      home_feat_6_d: 'OAJ / DOAJ and free-to-publish paths (deeper fields by plan).',
+      home_how_kicker: 'How it works',
+      home_how_title: 'How it works',
+      home_how_lead: 'From the homepage to a shortlist — four steps.',
+      home_how_1_t: 'Search or recommend', home_how_1_d: 'Search by title / ISSN, or switch to Recommend with your abstract.',
+      home_how_2_t: 'Filter rankings', home_how_2_d: 'Narrow by JCR, CAS, index and subject.',
+      home_how_3_t: 'Review details', home_how_3_d: 'IF, review cycle, OA and risk signals on one page.',
+      home_how_4_t: 'Save or export', home_how_4_d: 'Add to lists; keep badges with you in the extension.',
+      home_cta_search: 'Start searching', home_cta_pick: 'Try recommend',
+      home_price_kicker: 'Pricing', home_price_title: 'Plans',
+      home_price_lead: 'Website search stays Free forever. Pro / Max unlock extension depth, quotas and AI picks. Edu emails get edu pricing after sign-in.',
+      home_price_forever: '/ forever', home_price_year: '/ year', home_price_rec: 'Best',
+      home_price_free_d: 'Everyday search & light trials',
+      home_price_free_1: 'Full website search & details', home_price_free_2: 'Basic extension badges', home_price_free_3: 'Limited AI pick trial',
+      home_price_free_cta: 'Stay on Free',
+      home_price_pro_d: 'Power users · extension upgrades',
+      home_price_pro_1: 'CAS / TOP / emerging badges', home_price_pro_2: '50 cloud favorites · 5 lists', home_price_pro_3: '500 AI credits / month',
+      home_price_pro_cta: 'Upgrade Pro',
+      home_price_max_d: 'Full workflow · high AI quota',
+      home_price_max_1: 'Warning / retraction / CAST risk', home_price_max_2: 'Export & high AI quota', home_price_max_3: 'More regions & devices',
+      home_price_max_cta: 'Upgrade Max',
+      home_price_note: 'Full comparison & edu pricing on the pricing page · USD · Creem checkout',
+      home_price_more: 'Open full pricing →',
+      home_dl_kicker: 'Download', home_dl_title: 'Downloads',
+      home_dl_lead: 'No install for the web app. The extension brings ranking badges to the pages you already use.',
+      home_dl_web_t: 'Web app', home_dl_web_d: 'Search and recommend in the browser; sync favorites after sign-in.', home_dl_web_cta: 'Open app',
+      home_dl_ext_t: 'Browser extension', home_dl_ext_d: 'Chrome / Edge badges on Scholar, PubMed, CNKI and more.', home_dl_ext_cta: 'Download page',
+      home_dl_api_t: 'Skill / API', home_dl_api_d: 'Connect writing assistants to search and recommend APIs.', home_dl_api_cta: 'Learn more',
+      home_ct_kicker: 'About & contact', home_ct_title: 'About & contact',
+      home_ct_lead: 'AILatest Journal aggregates public rankings and metadata for academic search. Always verify with official sources.',
+      home_ct_info_t: 'Product info', home_ct_info_d: 'Data sources, cutoffs and disclaimer live on the About page.',
+      home_ct_data: 'Data notes', home_ct_email: 'Email: contact@ailatest.org', home_ct_page: 'Contact page →',
       showing: 'Showing', of: 'of', total_items: '',
       empty: 'No journals match.',
       empty_fav: 'No favorites yet. Switch to Int’l SCI/SSCI and click ★ on any row to bookmark.',
@@ -13203,6 +13309,40 @@
     if (!journalsReady) {
       ensureJournalsLoaded().then(() => loadHomeHotList()).catch(() => {});
     }
+    // 首页介绍区 CTA：聚焦搜索 / 切到荐刊
+    document.querySelectorAll('[data-home-focus-search]').forEach((el) => {
+      if (el.__homeBound) return;
+      el.__homeBound = true;
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+        setHomeMode('search');
+        const qEl = $('#q');
+        qEl?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        qEl?.focus();
+      });
+    });
+    document.querySelectorAll('[data-home-mode-pick]').forEach((el) => {
+      if (el.__homeBound) return;
+      el.__homeBound = true;
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+        setHomeMode('pick');
+        const qEl = $('#q');
+        qEl?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        qEl?.focus();
+      });
+    });
+    document.querySelectorAll('.home-top-nav a[href^="#"]').forEach((a) => {
+      if (a.__homeBound) return;
+      a.__homeBound = true;
+      a.addEventListener('click', (e) => {
+        const id = a.getAttribute('href')?.slice(1);
+        const target = id && document.getElementById(id);
+        if (!target) return;
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
   }
 
   // ───────── boot ─────────

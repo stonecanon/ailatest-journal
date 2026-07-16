@@ -42,7 +42,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 })(window,document,'script','dataLayer','GTM-NBNXL7FB');</script>
 <!-- End Google Tag Manager -->
 <link rel="preload" href="/data/journal_aliases.json" as="fetch" crossorigin="anonymous" />
-<link rel="stylesheet" href="/css/app.css?v=20260716-v10-filters" />
+<link rel="stylesheet" href="/css/app.css?v=20260716-home-intro" />
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json" />
@@ -255,6 +255,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
   </section>
 
+  <!-- 首页落地顶栏导航（右上） -->
+  <nav class="home-top-nav" aria-label="首页导航">
+    <a href="#feat" data-i18n="nav_features">功能</a>
+    <a href="#how" data-i18n="nav_how">怎么用</a>
+    <a href="#pricing" data-i18n="nav_pricing">订阅</a>
+    <a href="#download" data-i18n="download_center">下载</a>
+    <a href="#contact" data-i18n="nav_contact">联系</a>
+  </nav>
+
   <header class="topbar">
     <button class="side-toggle" id="side-toggle" aria-label="Open navigation">☰</button>
     <a class="topbar-brand" href="/" data-topbar-home aria-label="AILatest Journal">AILatest <em>Journal</em></a>
@@ -299,6 +308,136 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           </div>
         </div>
         <div class="home-hot-list" id="home-hot-list" role="list"></div>
+      </div>
+
+      <!-- 产品介绍：功能 / 怎么用 / 订阅 / 下载 / 联系 -->
+      <div class="home-intro" id="home-intro">
+        <section class="home-sec" id="feat">
+          <span class="home-sec-id" data-i18n="home_feat_kicker">Features</span>
+          <h2 class="home-sec-title" data-i18n="home_feat_title">功能介绍</h2>
+          <p class="home-sec-lead" data-i18n="home_feat_lead">检索全球期刊，对比分区、影响因子与开放获取信息 — 一站完成。库、分区、风险信号、荐刊与插件徽章在同一条工作流里。</p>
+          <div class="home-feat-grid">
+            <article class="home-feat"><div class="home-feat-ico" aria-hidden="true">◎</div><b data-i18n="home_feat_1_t">全球与地区期刊库</b><span data-i18n="home_feat_1_d">SCIE / SSCI / AHCI / ESCI / EI、Scopus、DOAJ、MEDLINE；中国、印度、韩国、马来西亚等地区站。</span></article>
+            <article class="home-feat"><div class="home-feat-ico" aria-hidden="true">▣</div><b data-i18n="home_feat_2_t">分区 · 指标 · 风险</b><span data-i18n="home_feat_2_d">JCR 影响因子与 Quartile、中科院分区（含 TOP）、CCF / ABDC / ABS；预警与撤稿提示。</span></article>
+            <article class="home-feat"><div class="home-feat-ico" aria-hidden="true">★</div><b data-i18n="home_feat_3_t">收藏与清单</b><span data-i18n="home_feat_3_d">登录后云端收藏、多清单整理；对比时随时回看目标刊。</span></article>
+            <article class="home-feat"><div class="home-feat-ico" aria-hidden="true">AI</div><b data-i18n="home_feat_4_t">智能荐刊</b><span data-i18n="home_feat_4_d">输入论文标题 / 摘要 / 关键词，按主题与库覆盖匹配目标期刊（搜索框切到「荐刊」）。</span></article>
+            <article class="home-feat"><div class="home-feat-ico" aria-hidden="true">⌘</div><b data-i18n="home_feat_5_t">浏览器插件</b><span data-i18n="home_feat_5_d">Scholar / PubMed / 知网等页面展示分区与收录徽章，少开一个标签页。</span></article>
+            <article class="home-feat"><div class="home-feat-ico" aria-hidden="true">↔</div><b data-i18n="home_feat_6_t">开放获取与 APC</b><span data-i18n="home_feat_6_d">OAJ / DOAJ 信号与是否可免费发表路径（按订阅档位展示深度字段）。</span></article>
+          </div>
+        </section>
+
+        <section class="home-sec" id="how">
+          <span class="home-sec-id" data-i18n="home_how_kicker">How it works</span>
+          <h2 class="home-sec-title" data-i18n="home_how_title">怎么用</h2>
+          <p class="home-sec-lead" data-i18n="home_how_lead">从打开首页到定稿目标刊，四步走完。</p>
+          <div class="home-steps">
+            <div class="home-step"><em>01</em><b data-i18n="home_how_1_t">搜索或荐刊</b><span data-i18n="home_how_1_d">刊名 / ISSN 直接查；或切换「荐刊」贴标题摘要。</span></div>
+            <div class="home-step"><em>02</em><b data-i18n="home_how_2_t">筛选分区与库</b><span data-i18n="home_how_2_d">按 JCR、中科院、索引、学科收窄候选列表。</span></div>
+            <div class="home-step"><em>03</em><b data-i18n="home_how_3_t">看详情与风险</b><span data-i18n="home_how_3_d">影响因子、审稿周期、OA / 预警信息一页看清。</span></div>
+            <div class="home-step"><em>04</em><b data-i18n="home_how_4_t">收藏或导出</b><span data-i18n="home_how_4_d">加入清单；插件在阅读页继续对照徽章。</span></div>
+          </div>
+          <div class="home-cta-row">
+            <button type="button" class="home-btn home-btn-primary" data-home-focus-search data-i18n="home_cta_search">打开查刊</button>
+            <button type="button" class="home-btn home-btn-ghost" data-home-mode-pick data-i18n="home_cta_pick">试用荐刊</button>
+          </div>
+        </section>
+
+        <section class="home-sec" id="pricing">
+          <span class="home-sec-id" data-i18n="home_price_kicker">Pricing</span>
+          <h2 class="home-sec-title" data-i18n="home_price_title">订阅方案</h2>
+          <p class="home-sec-lead" data-i18n="home_price_lead">网站查刊 Free 永久可用。Pro / Max 提升插件深度、额度与 AI 荐刊配额。教育邮箱另享教育价（登录后解锁）。</p>
+          <div class="home-plans">
+            <article class="home-plan">
+              <h3>Free</h3>
+              <div class="home-plan-price">$0 <small data-i18n="home_price_forever">/ 永久</small></div>
+              <p class="home-plan-desc" data-i18n="home_price_free_d">适合日常检索与轻量试用</p>
+              <ul>
+                <li data-i18n="home_price_free_1">网站完整检索与详情</li>
+                <li data-i18n="home_price_free_2">基础插件徽章</li>
+                <li data-i18n="home_price_free_3">AI 荐刊试用次数</li>
+              </ul>
+              <button type="button" class="home-btn home-btn-ghost home-btn-block" data-home-focus-search data-i18n="home_price_free_cta">继续免费使用</button>
+            </article>
+            <article class="home-plan">
+              <h3>Pro</h3>
+              <div class="home-plan-price">$7.99 <small data-i18n="home_price_year">/ 年</small></div>
+              <p class="home-plan-desc" data-i18n="home_price_pro_d">高频刷刊 · 插件进阶</p>
+              <ul>
+                <li data-i18n="home_price_pro_1">中科院 / TOP / 新锐徽章</li>
+                <li data-i18n="home_price_pro_2">云收藏 50 · 清单 5</li>
+                <li data-i18n="home_price_pro_3">AI 荐刊 500 credits/月</li>
+              </ul>
+              <a class="home-btn home-btn-primary home-btn-block" href="/pricing.html" data-i18n="home_price_pro_cta">升级 Pro</a>
+            </article>
+            <article class="home-plan home-plan-hot">
+              <span class="home-plan-tag" data-i18n="home_price_rec">推荐</span>
+              <h3>Max</h3>
+              <div class="home-plan-price">$9.99 <small data-i18n="home_price_year">/ 年</small></div>
+              <p class="home-plan-desc" data-i18n="home_price_max_d">完整工作流 · 高额度 AI</p>
+              <ul>
+                <li data-i18n="home_price_max_1">预警 / 撤稿 / 科协风险</li>
+                <li data-i18n="home_price_max_2">导出与高额度荐刊</li>
+                <li data-i18n="home_price_max_3">地区站与设备额度更高</li>
+              </ul>
+              <a class="home-btn home-btn-primary home-btn-block" href="/pricing.html" data-i18n="home_price_max_cta">升级 Max</a>
+            </article>
+          </div>
+          <p class="home-sec-note" data-i18n="home_price_note">完整对照与教育价见订阅页 · 价格 USD · Creem 收银台</p>
+          <div class="home-cta-row">
+            <a class="home-btn home-btn-ghost" href="/pricing.html" data-i18n="home_price_more">打开完整订阅页 →</a>
+          </div>
+        </section>
+
+        <section class="home-sec" id="download">
+          <span class="home-sec-id" data-i18n="home_dl_kicker">Download</span>
+          <h2 class="home-sec-title" data-i18n="home_dl_title">下载与入口</h2>
+          <p class="home-sec-lead" data-i18n="home_dl_lead">网页版无需安装。插件把分区徽章带到你常去的文献页。</p>
+          <div class="home-dl-grid">
+            <article class="home-dl-card">
+              <b data-i18n="home_dl_web_t">网页版</b>
+              <span data-i18n="home_dl_web_d">浏览器直接使用查刊与荐刊，登录后同步收藏。</span>
+              <button type="button" class="home-btn home-btn-primary" data-home-focus-search data-i18n="home_dl_web_cta">打开应用</button>
+            </article>
+            <article class="home-dl-card">
+              <b data-i18n="home_dl_ext_t">浏览器扩展</b>
+              <span data-i18n="home_dl_ext_d">Chrome / Edge：Scholar、PubMed、知网等页面徽章。</span>
+              <a class="home-btn home-btn-ghost" href="/extension.html" data-i18n="home_dl_ext_cta">去下载页</a>
+            </article>
+            <article class="home-dl-card">
+              <b data-i18n="home_dl_api_t">Skill / API</b>
+              <span data-i18n="home_dl_api_d">给写作助手接入检索与荐刊接口（开发者入口）。</span>
+              <a class="home-btn home-btn-ghost" href="/extension.html" data-i18n="home_dl_api_cta">查看说明</a>
+            </article>
+          </div>
+        </section>
+
+        <section class="home-sec" id="contact">
+          <span class="home-sec-id" data-i18n="home_ct_kicker">About &amp; contact</span>
+          <h2 class="home-sec-title" data-i18n="home_ct_title">关于与联系</h2>
+          <p class="home-sec-lead" data-i18n="home_ct_lead">AILatest Journal 聚合公开评级与元数据，供学术检索与投稿参考。数据以各评价机构官方发布为准。</p>
+          <div class="home-contact-box">
+            <div class="home-contact-block">
+              <b data-i18n="home_ct_info_t">产品信息</b>
+              <p data-i18n="home_ct_info_d">数据来源与截止时间、免责声明见关于页。问题与纠错欢迎来信。</p>
+              <p class="home-contact-links">
+                <a href="/about" data-i18n="nav_about">关于</a>
+                <span>·</span>
+                <a href="/about" data-i18n="home_ct_data">数据说明</a>
+                <span>·</span>
+                <a href="/terms" data-i18n="nav_terms">条款</a>
+                <span>·</span>
+                <a href="/privacy" data-i18n="nav_privacy">隐私</a>
+                <span>·</span>
+                <a href="/refund" data-i18n="nav_refund">退款</a>
+              </p>
+            </div>
+            <div class="home-contact-block">
+              <b data-i18n="nav_contact">联系</b>
+              <p data-i18n="home_ct_email">邮箱：contact@ailatest.org</p>
+              <p class="home-contact-links"><a href="/contact" data-i18n="home_ct_page">打开联系页 →</a></p>
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   </section>
@@ -733,7 +872,7 @@ window.__BUILD_VER = 'v20260716-stats-fix';
 </script>
 <script src="/js/pick-match.js?v=20260716-v10" defer></script>
 <script src="/js/pricing-checkout.js?v=20260716-creem" defer></script>
-<script src="/js/app.js?v=20260716-v10-filters" defer></script>
+<script src="/js/app.js?v=20260716-home-intro" defer></script>
 
 </body>
 </html>
