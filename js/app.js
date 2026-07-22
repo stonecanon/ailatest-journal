@@ -1,4 +1,4 @@
-﻿/* AILatest Journal — front-end app (i18n + tabs + favorites + auth) */
+/* AILatest Journal — front-end app (i18n + tabs + favorites + auth) */
 (() => {
   const $ = (s, r=document) => r.querySelector(s);
   const $$ = (s, r=document) => [...r.querySelectorAll(s)];
@@ -194,7 +194,7 @@
       home_price_forever: '/ 永久', home_price_year: '/ 年', home_price_month: '/ 月', home_price_rec: '推荐',
       home_price_more: '查看完整方案对比 →',
       home_price_free_d: '适合日常检索与轻量试用',
-      home_price_free_1: '网站完整检索与详情', home_price_free_2: '基础插件徽章', home_price_free_3: 'AI 荐刊试用次数',
+      home_price_free_1: '网站完整检索与详情', home_price_free_2: '本站收藏最多 5 本期刊', home_price_free_3: 'AI 荐刊试用次数',
       home_price_free_cta: '继续免费使用',
       home_price_pro_d: '高频刷刊 · 插件进阶',
       home_price_pro_1: '中科院 / TOP / 新锐徽章', home_price_pro_2: '云收藏 50 · 清单 5', home_price_pro_3: 'AI 荐刊 500 credits/月',
@@ -401,7 +401,7 @@
       home_price_forever: '/ forever', home_price_year: '/ year', home_price_month: '/ month', home_price_rec: 'Best',
       home_price_more: 'Full plan comparison →',
       home_price_free_d: 'Everyday search & light trials',
-      home_price_free_1: 'Full website search & details', home_price_free_2: 'Basic extension badges', home_price_free_3: 'Limited AI pick trial',
+      home_price_free_1: 'Full website search & details', home_price_free_2: 'Save up to 5 journals', home_price_free_3: 'Limited AI pick trial',
       home_price_free_cta: 'Stay on Free',
       home_price_pro_d: 'Power users · extension upgrades',
       home_price_pro_1: 'CAS / TOP / emerging badges', home_price_pro_2: '50 cloud favorites · 5 lists', home_price_pro_3: '500 AI credits / month',
@@ -1799,38 +1799,43 @@
         if (timer) clearTimeout(timer);
       }
     };
-    const promise = (async () => {
-      const apiResult = await fetchFromApi();
-      if (apiResult.handled && apiResult.payload?.years?.length) return apiResult.payload;
-      // Worker 无 key 或空结果时：浏览器直连 OpenAlex 公开接口（mailto 礼貌池）
-      // 仅取近 3 年，并串行间隔，降低 429
+    const buildFromRows = (usable) => {
+      if (!usable?.length) return null;
+      const countryTotals = new Map();
+      usable.forEach(row => row.groups.forEach(g => {
+        const key = g.name;
+        countryTotals.set(key, (countryTotals.get(key) || 0) + g.count);
+      }));
+      const ranked = [...countryTotals.entries()].sort((a, b) => b[1] - a[1]).map(([n]) => n);
+      const top = (ranked.includes('China')
+        ? ['China', ...ranked.filter(n => n !== 'China')]
+        : ranked
+      ).slice(0, 5);
+      if (!top.length) return null;
+      return { years: usable, top, source: 'openalex-client' };
+    };
+    const fetchFromClient = async () => {
+      // Worker 常被 OpenAlex 公共池 429；浏览器直连往往仍可用
       const clientYears = years.slice(-3);
       for (const sourceIssn of issns) {
         const rows = [];
         for (const year of clientYears) {
           rows.push(await fetchYear(sourceIssn, year));
-          await new Promise(r => setTimeout(r, 280));
+          await new Promise(r => setTimeout(r, 180));
         }
-        const usable = rows.filter(row => row.total > 0);
-        if (!usable.length) continue;
-        const countryTotals = new Map();
-        usable.forEach(row => row.groups.forEach(g => {
-          const key = g.name;
-          countryTotals.set(key, (countryTotals.get(key) || 0) + g.count);
-        }));
-        const topOther = [...countryTotals.entries()]
-          .filter(([name]) => name !== 'China')
-          .sort((a, b) => b[1] - a[1])
-          .slice(0, 4)
-          .map(([name]) => name);
-        // 不必强行把 China 放第一；无中国数据时用真实 top
-        const ranked = [...countryTotals.entries()].sort((a, b) => b[1] - a[1]).map(([n]) => n);
-        const top = (ranked.includes('China')
-          ? ['China', ...ranked.filter(n => n !== 'China')]
-          : ranked
-        ).slice(0, 5);
-        return { years: usable, top: top.length ? top : topOther };
+        const payload = buildFromRows(rows.filter(row => row.total > 0));
+        if (payload) return payload;
       }
+      return null;
+    };
+    const promise = (async () => {
+      // API 与浏览器直连并行：谁先有有效 years 用谁，避免卡在「正在拉取…」
+      const apiP = fetchFromApi().catch(() => ({ handled: false, payload: null }));
+      const clientP = fetchFromClient().catch(() => null);
+      const apiResult = await apiP;
+      if (apiResult.handled && apiResult.payload?.years?.length) return apiResult.payload;
+      const clientResult = await clientP;
+      if (clientResult?.years?.length) return clientResult;
       return null;
     })().catch(err => {
       countryOutputCache.delete(cacheKey);
@@ -1981,13 +1986,13 @@
       new Promise((_, rej) => setTimeout(() => rej(new Error('country-output timeout')), ms)),
     ]);
     try {
-      // 1) 静态预置优先：命中即出图
-      const preseed = await withTimeout(fetchCountryOutputData(r, { preseedOnly: true }), 4000);
+      // 1) 静态预置优先：命中即出图（空 map 很快返回 null）
+      const preseed = await withTimeout(fetchCountryOutputData(r, { preseedOnly: true }), 2500);
       if (paint(preseed)) return;
       // 2) 无预置：先展示出版地，并提示正在补全作者机构分布
       box.innerHTML = renderCountryOutputFallback(r, { loading: true });
-      // 3) 实时补全：拉长超时；失败仍保留出版地
-      withTimeout(fetchCountryOutputData(r), 28000)
+      // 3) 实时补全（API∥浏览器 OpenAlex）；超时后保留出版地，避免永远转圈
+      withTimeout(fetchCountryOutputData(r), 16000)
         .then((payload) => {
           if (!box.isConnected) return;
           if (!paint(payload)) {
@@ -2067,7 +2072,32 @@
     return false;
   }
 
-  /** 收藏 / 清单 / 分享 — 试用 / Pro / Max；导出联动见 canUseExportIntegrations */
+  /**
+   * 收藏额度：
+   *  Free（含未登录本地）→ 5 本
+   *  Pro / 试用 → 50 本
+   *  Max / 站长 → 不限
+   *  多清单、分享仍走 canUseFavoritesWorkflow（Pro+）
+   */
+  const FREE_FAV_LIMIT = 5;
+  const PRO_FAV_LIMIT = 50;
+
+  function favLimitForUser() {
+    try {
+      if (isOwnerClient()) return Infinity;
+      const t = getProductTier();
+      if (t === 'pro') return Infinity; // Max
+      if (t === 'plus' || t === 'trial') return PRO_FAV_LIMIT;
+    } catch (_) {}
+    return FREE_FAV_LIMIT;
+  }
+
+  /** 基础收藏（点 ★）：所有用户可用，受 favLimitForUser 限制 */
+  function canUseBasicFavorites() {
+    return true;
+  }
+
+  /** 多清单 / 分享等进阶工作流 — 试用 / Pro / Max */
   function canUseFavoritesWorkflow() {
     return hasProLevelAccess();
   }
@@ -3039,7 +3069,8 @@
   /** 未登录每日可打开期刊详情页数（按期刊去重） */
   const DAILY_VIEW_LIMIT = 10;
   const DAILY_SEARCH_LIMIT = 2;
-  const LOCAL_FAV_LIMIT = 5;
+  /** @deprecated 使用 FREE_FAV_LIMIT / favLimitForUser() */
+  const LOCAL_FAV_LIMIT = FREE_FAV_LIMIT;
   const USAGE_KEY = 'ailatest.daily_usage';
 
   function getDailyUsage() {
@@ -3119,7 +3150,8 @@
   }
 
   function toggleFav(r, meta = {}) {
-    if (!canUseFavoritesWorkflow()) {
+    // Free 也可收藏；多清单 / 导出等仍需 Pro
+    if (!canUseBasicFavorites()) {
       showRegionPaywallModal('workflow');
       return;
     }
@@ -3131,13 +3163,48 @@
       list.ids.splice(idx, 1);
       // 其他 list 都不含它 → 从 favsData 移除
       if (!favLists.some(l => l.ids.includes(id))) delete favsData[id];
-    } else {
-      list.ids.push(id);
-      favsData[id] = { ...r, __src: meta.src || 'int', __savedAt: Date.now() };
+      localStorage.setItem(STORAGE_PREFIX + 'favsData', JSON.stringify(favsData));
+      persistFavLists();
+      updateFavCount();
+      try { showFavToast(T('已取消收藏', 'Removed from favorites')); } catch (_) {}
+      return;
     }
+
+    // 新增收藏：检查额度
+    const limit = favLimitForUser();
+    const total = allFavIds().size;
+    if (Number.isFinite(limit) && total >= limit) {
+      const isFreeTier = !hasProLevelAccess();
+      if (isFreeTier) {
+        try {
+          showFavToast(T(
+            `Free 可收藏 ${FREE_FAV_LIMIT} 本期刊，已达上限。升级 Pro 可收藏更多并管理清单。`,
+            `Free plan allows ${FREE_FAV_LIMIT} favorites. Upgrade to Pro for more and lists.`
+          ));
+        } catch (_) {}
+        // 轻提示即可；需要升级时再点收藏页/方案
+        showRegionPaywallModal('fav_limit');
+      } else {
+        try {
+          showFavToast(T(`收藏已达上限（${limit} 本）`, `Favorite limit reached (${limit})`));
+        } catch (_) {}
+      }
+      return;
+    }
+
+    list.ids.push(id);
+    favsData[id] = { ...r, __src: meta.src || 'int', __savedAt: Date.now() };
     localStorage.setItem(STORAGE_PREFIX + 'favsData', JSON.stringify(favsData));
     persistFavLists();
     updateFavCount();
+    try {
+      const left = Number.isFinite(limit) ? Math.max(0, limit - allFavIds().size) : null;
+      showFavToast(
+        left != null && !hasProLevelAccess()
+          ? T(`已收藏（还可 ${left} 本）`, `Saved (${left} left on Free)`)
+          : T('已收藏', 'Saved')
+      );
+    } catch (_) {}
   }
 
   function updateFavCount() {
@@ -4092,6 +4159,23 @@
       function badgeOnHold() {
         return `<span class="on-hold-pill">WoS On Hold</span>`;
       }
+      function badgeEiHistorical(value) {
+        if (!value) return '';
+        const year = value.final_year || '';
+        const tip = year
+          ? T(`EI Compendex 收录截至 ${year}，目前已停止收录`, `Indexed by EI Compendex through ${year}; no longer indexed`)
+          : T('EI Compendex 历史收录，目前已停止收录', 'Historically indexed by EI Compendex; no longer indexed');
+        return `<span class="warn-pill ei-discontinued-pill" title="${escape(tip)}">${T('EI 已停止','EI discontinued')}</span>`;
+      }
+      function badgeWosHistorical(value) {
+        if (!value) return '';
+        const indexes = Array.isArray(value.indices) ? value.indices.join(' / ') : 'WoS';
+        const active = Array.isArray(value.current_indices) ? value.current_indices.filter(Boolean) : [];
+        const tip = active.length
+          ? T(`曾由 ${indexes} 收录，当前转入 ${active.join(' / ')}`, `Previously indexed in ${indexes}; now indexed in ${active.join(' / ')}`)
+          : T(`曾由 ${indexes} 收录，当前不在最新 Master Journal List`, `Previously indexed in ${indexes}; absent from the current Master Journal List`);
+        return `<span class="warn-pill wos-history-pill" title="${escape(tip)}">${T('WoS 历史收录','WoS historical')}</span>`;
+      }
       function badgeCiticWarning() {
         return `<span class="citic-warning-pill">${T('中信所预警','CITIC Warning')}</span>`;
       }
@@ -4171,6 +4255,8 @@
       r.warning ? badgeWarn(r.warning, true) : '',
       r.under_review ? badgeUnderReview() : '',
       r.on_hold ? badgeOnHold() : '',
+      r.wos_historical ? badgeWosHistorical(r.wos_historical) : '',
+      r.ei_historical ? badgeEiHistorical(r.ei_historical) : '',
       r.citic_warning ? badgeCiticWarning() : '',
       badgeRetraction(r.retraction),
     ].filter(Boolean).join('');
@@ -4221,11 +4307,15 @@
 
   function starBtn(r, src = 'int') {
     const on = isFav(r);
-    const locked = !canUseFavoritesWorkflow();
-    const title = locked
-      ? T('收藏 · Pro 起开放', 'Favorites · from Pro')
-      : (on ? t('fav_removed') : t('fav_added'));
-    return `<button class="fav-star ${on?'on':''}${locked?' is-locked':''}" data-fav="${escape(favId(r))}" data-fav-src="${escape(src)}" aria-label="toggle favorite" title="${title}">${on?'★':'☆'}</button>`;
+    const limit = favLimitForUser();
+    const atLimit = !on && Number.isFinite(limit) && allFavIds().size >= limit;
+    const title = on
+      ? t('fav_removed')
+      : (atLimit
+        ? T(`Free 收藏上限 ${FREE_FAV_LIMIT} 本`, `Free limit: ${FREE_FAV_LIMIT} favorites`)
+        : t('fav_added'));
+    // Free 可收藏，不再整站锁定星标
+    return `<button class="fav-star ${on?'on':''}${atLimit?' is-at-limit':''}" data-fav="${escape(favId(r))}" data-fav-src="${escape(src)}" aria-label="toggle favorite" title="${title}">${on?'★':'☆'}</button>`;
   }
 
   // row-record 映射，供 star click / 详情抽屉查找完整记录
@@ -7350,13 +7440,23 @@
       })();
       const countryCard = (normalizeIssnForOpenAlex(ir.issn) || normalizeIssnForOpenAlex(ir.eissn))
         ? `<div class="trend-card country-output-card">
-            <div class="muted-cell country-empty">${T('正在读取国家/地区分布…','Reading country/region distribution...')}</div>
+            <div class="muted-cell country-empty">${T('正在拉取作者机构国家/地区占比…','Loading author-affiliation country/region shares…')}</div>
           </div>`
         : '';
+      const pendingCard = (titleText, unitText) => `<div class="trend-card">
+          <div class="trend-head"><div><div class="trend-title">${escape(titleText)}</div><div class="trend-unit">${escape(unitText)}</div></div></div>
+          <div class="muted-cell country-empty">${T('正在加载完整指标…','Loading full metrics…')}</div>
+        </div>`;
+      const ifCard = chart(ifPoints, T('近 5 年影响因子','5-Year Impact Factor Trend'), T('JIF by metric year','JIF by metric year'), 'if-trend', { limit: 5 })
+        || pendingCard(T('近 5 年影响因子','5-Year Impact Factor Trend'), T('JIF by metric year','JIF by metric year'));
+      const pubCard = chart(pubPoints, T('近 10 年逐年发文量','10-Year Annual Publication Output'), T('源自 OpenAlex','From OpenAlex'), 'pub-trend', { partialYear: 2026, limit: 10 })
+        || pendingCard(T('近 10 年逐年发文量','10-Year Annual Publication Output'), T('源自 OpenAlex','From OpenAlex'));
+      const selfCard = selfCitationCard
+        || pendingCard(T('自引用率变化','Self-Citation Rate Trend'), T('JIF 自引贡献占比 (%)','JIF self-citation contribution (%)'));
       const cards = [
-        chart(ifPoints, T('近 5 年影响因子','5-Year Impact Factor Trend'), T('JIF by metric year','JIF by metric year'), 'if-trend', { limit: 5 }),
-        chart(pubPoints, T('近 10 年逐年发文量','10-Year Annual Publication Output'), T('源自 OpenAlex','From OpenAlex'), 'pub-trend', { partialYear: 2026, limit: 10 }),
-        selfCitationCard,
+        ifCard,
+        pubCard,
+        selfCard,
         countryCard,
       ].filter(Boolean);
       if (!cards.length) return '';
@@ -7399,6 +7499,20 @@
       : '';
 
     // Scopus ASJC 顶层学科（来自 Scopus Source List Mar.2026）
+    const wosHistoryHTML = (() => {
+      const historical = ir.wos_historical;
+      if (!historical) return '';
+      const oldIndexes = Array.isArray(historical.indices) ? historical.indices.filter(Boolean) : [];
+      const currentIndexes = Array.isArray(historical.current_indices) ? historical.current_indices.filter(Boolean) : [];
+      if (!oldIndexes.length) return '';
+      return `<div class="drawer-section">
+        <h4>${T('Web of Science 历史收录','Web of Science Historical Coverage')}</h4>
+        <div class="meta-row"><div class="meta-k">${T('历史索引','Previous indexes')}</div><div class="meta-v"><strong>${escape(oldIndexes.join(' / '))}</strong></div></div>
+        <div class="meta-row"><div class="meta-k">${T('当前状态','Current status')}</div><div class="meta-v">${currentIndexes.length ? `${T('已转入','Transferred to')} ${escape(currentIndexes.join(' / '))}` : T('当前不在最新 Master Journal List','Not in the current Master Journal List')}</div></div>
+        ${historical.as_of ? `<div class="muted-cell" style="margin-top:8px">${T('名单日期','List date')}: ${escape(historical.as_of)}</div>` : ''}
+      </div>`;
+    })();
+
     const scopusTopList = (() => {
       const sc = ir.scopus;
       if (!sc) return [];
@@ -7418,12 +7532,24 @@
       : '';
 
     // Ei Compendex 主题分类
-    const eiHTML = (Array.isArray(ir.ei_subjects) && ir.ei_subjects.length)
-      ? `<div class="drawer-section">
-           <h4>${T('Ei Compendex 主题','Ei Compendex Subjects')}</h4>
-           <div class="cat-chips">${ir.ei_subjects.map(c => `<span class="cat-chip">${escape(c)}</span>`).join('')}</div>
-         </div>`
-      : '';
+    const eiHTML = (() => {
+      const subjects = Array.isArray(ir.ei_subjects) ? ir.ei_subjects : [];
+      const historical = ir.ei_historical || null;
+      if (!subjects.length && !historical) return '';
+      const year = historical && historical.final_year ? historical.final_year : '';
+      const finalIssue = historical
+        ? [historical.final_volume ? `${T('卷','Vol.')} ${historical.final_volume}` : '', historical.final_issue ? `${T('期','Issue')} ${historical.final_issue}` : ''].filter(Boolean).join(' · ')
+        : '';
+      const statusHTML = historical
+        ? `<div class="meta-row"><div class="meta-k">${T('收录状态','Indexing status')}</div><div class="meta-v"><strong>${T('已停止收录','Discontinued')}</strong>${year ? ` · ${T('收录截至','Covered through')} ${escape(year)}` : ''}${finalIssue ? ` · ${escape(finalIssue)}` : ''}</div></div>
+           <div class="muted-cell" style="margin-top:8px">${T('本刊仅保留 EI 历史收录记录，不属于当前活跃 EI 期刊。','This title is retained as a historical EI record and is not currently indexed by EI.')}</div>`
+        : '';
+      return `<div class="drawer-section">
+        <h4>${T('EI Compendex 收录信息','EI Compendex Coverage')}</h4>
+        ${statusHTML}
+        ${subjects.length ? `<div class="cat-chips">${subjects.map(c => `<span class="cat-chip">${escape(c)}</span>`).join('')}</div>` : ''}
+      </div>`;
+    })();
 
     // 中科院完整层级（2025 大类分区）— 大类 + 小类列表
     const casHTML = (() => {
@@ -7742,6 +7868,7 @@
             ${casHTML}
             ${xrHTML}
             ${wosHTML}
+            ${wosHistoryHTML}
             ${scopusHTML}
             ${eiHTML}
             ${oajHTML}
@@ -7791,6 +7918,31 @@
     // init rating widget
     setTimeout(() => initRatingWidget(favId(r)), 0);
     hydrateCountryOutputChart(body, ir);
+    // light 库无 if_history / publication_history / 自引史 → 趋势图空白。
+    // 打开详情后立刻补 full，再 soft 重绘四张图（full_upgrade 不计次）。
+    if (!softRefresh && (src === 'int' || intRec)) {
+      const needFullCharts = !Array.isArray(ir.if_history) || !ir.if_history.length
+        || !Array.isArray(ir.publication_history || r.publication_history)
+        || !(ir.publication_history || r.publication_history || []).length;
+      if (needFullCharts || !journalsReady) {
+        const openFid = favId(r);
+        const pageModeNow = pageMode;
+        ensureJournalsLoaded()
+          .then(() => {
+            if (!_currentDrawerRec || favId(_currentDrawerRec) !== openFid) return;
+            const live = journals.find((row) => favId(row) === openFid);
+            if (!live) return;
+            const liveHasCharts = Array.isArray(live.if_history) && live.if_history.length;
+            if (liveHasCharts || live !== r) {
+              openDrawer(live, {
+                pageMode: pageModeNow || document.body.classList.contains('journal-route'),
+                source: 'full_upgrade',
+              });
+            }
+          })
+          .catch((err) => console.warn('detail full upgrade skipped:', err));
+      }
+    }
     // 首屏后再预热 OA map（~10MB），不打断当前详情；下次打开/相关刊可即时用
     if (!oaMap && !oaMapPromise) {
       const warmOa = () => loadOaMap().catch(() => null);
@@ -8226,18 +8378,32 @@
     if (ctaEl) ctaEl.textContent = T('查看订阅方案', 'View plans');
     if (laterEl) laterEl.textContent = T('暂不升级', 'Not now');
 
-    if (reason === 'workflow') {
-      if (eyebrowEl) eyebrowEl.textContent = T('工作流 · 升级解锁', 'Workflow · Upgrade');
-      if (titleEl) titleEl.textContent = T('收藏与清单 · Pro 起开放', 'Favorites & lists · from Pro');
+    if (reason === 'fav_limit') {
+      if (eyebrowEl) eyebrowEl.textContent = T('收藏额度', 'Favorite limit');
+      if (titleEl) titleEl.textContent = T(`Free 可收藏 ${FREE_FAV_LIMIT} 本期刊`, `Free plan: ${FREE_FAV_LIMIT} favorites`);
       if (descEl) descEl.textContent = T(
-        'Free 不包含云收藏、清单与分享。升级 Pro 后可收藏期刊并管理清单；导出与 Zotero / Notion / Obsidian 联动为 Max 权益。',
-        'Free does not include cloud favorites, lists, or sharing. Upgrade to Pro to save journals; export and Zotero / Notion / Obsidian are Max features.'
+        `本站 Free 账户最多收藏 ${FREE_FAV_LIMIT} 本期刊。升级 Pro 可收藏更多并管理多清单；导出联动为 Max 权益。`,
+        `Free accounts can save up to ${FREE_FAV_LIMIT} journals here. Upgrade to Pro for more favorites and lists; export is Max.`
       );
       if (perksEl) {
         perksEl.innerHTML = [
+          T(`<b>Free</b> · 收藏最多 ${FREE_FAV_LIMIT} 本`, `<b>Free</b> · Up to ${FREE_FAV_LIMIT} favorites`),
+          T('<b>Pro</b> · 云收藏 50 · 清单 5', '<b>Pro</b> · 50 cloud favorites · 5 lists'),
+          T('<b>Max</b> · 收藏不限 · 导出联动', '<b>Max</b> · Unlimited favorites · Export'),
+        ].map((html) => `<li>${html}</li>`).join('');
+      }
+    } else if (reason === 'workflow') {
+      if (eyebrowEl) eyebrowEl.textContent = T('工作流 · 升级解锁', 'Workflow · Upgrade');
+      if (titleEl) titleEl.textContent = T('多清单与分享 · Pro 起', 'Lists & sharing · from Pro');
+      if (descEl) descEl.textContent = T(
+        `Free 可收藏最多 ${FREE_FAV_LIMIT} 本期刊。升级 Pro 后可建多清单、云同步与分享；导出与 Zotero / Notion / Obsidian 为 Max 权益。`,
+        `Free can save up to ${FREE_FAV_LIMIT} journals. Upgrade to Pro for multiple lists, cloud sync and sharing; export is Max.`
+      );
+      if (perksEl) {
+        perksEl.innerHTML = [
+          T(`<b>Free</b> · 收藏最多 ${FREE_FAV_LIMIT} 本`, `<b>Free</b> · Up to ${FREE_FAV_LIMIT} favorites`),
           T('<b>Pro</b> · 云收藏与清单 · 插件中科院徽章', '<b>Pro</b> · Cloud favorites & lists · Extension CAS badges'),
-          T('<b>Max</b> · 插件预警 · 撤稿 · 科协风险徽章', '<b>Max</b> · Extension warning · retraction · CAST badges'),
-          T('<b>Max</b> · 导出联动 · 高额度 AI · 原文不限', '<b>Max</b> · Export · High AI quota · Unlimited full-text'),
+          T('<b>Max</b> · 导出联动 · 高额度 AI', '<b>Max</b> · Export · High AI quota'),
         ].map((html) => `<li>${html}</li>`).join('');
       }
     } else if (reason === 'export') {
@@ -10028,18 +10194,19 @@
 
   function renderFav() {
     const box = $('#fav-content');
-    if (!canUseFavoritesWorkflow()) {
-      box.innerHTML = `
-        <div class="empty workflow-lock" style="padding:48px 20px;text-align:center;color:var(--muted)">
-          <div style="font-size:18px;font-weight:700;color:var(--ink,#3a2e1f);margin-bottom:10px">${T('收藏与清单 · Pro 起开放','Favorites & lists · from Pro')}</div>
-          <p style="max-width:420px;margin:0 auto 16px;line-height:1.55">${T('Free 不提供云收藏、清单与分享。升级 Pro 后可收藏期刊并管理清单；导出与 Zotero / Notion / Obsidian 为 Max 权益。','Free does not include favorites, lists, or sharing. Upgrade to Pro to save journals; export and Zotero / Notion / Obsidian are Max features.')}</p>
-          <button type="button" class="btn-mini" data-workflow-upgrade style="padding:10px 16px;font-size:14px">${T('查看订阅方案','View plans')}</button>
-        </div>`;
-      box.querySelector('[data-workflow-upgrade]')?.addEventListener('click', () => showRegionPaywallModal('workflow'));
-      return;
-    }
+    // Free 可看/可管基础收藏；多清单与导出仍限 Pro/Max
+    const proWorkflow = canUseFavoritesWorkflow();
     const list = getActiveList();
     if (!list) { box.innerHTML = `<div class="empty" style="padding:60px 20px;text-align:center;color:var(--muted)">${T('还没有收藏。切到「国际 SCI/SSCI」点任意一行右边的 ★ 就能收藏。','No favorites yet. Go to "International" and click the ★ on any row.')}</div>`; return; }
+
+    const lim = favLimitForUser();
+    const total = allFavIds().size;
+    const freeHint = !proWorkflow
+      ? `<p class="fav-free-hint" style="margin:0 0 12px;font-size:13px;color:var(--muted);line-height:1.5">${T(
+          `Free 可收藏最多 ${FREE_FAV_LIMIT} 本（当前 ${total}/${FREE_FAV_LIMIT}）。升级 Pro 可建多清单、云同步更多收藏。`,
+          `Free: up to ${FREE_FAV_LIMIT} favorites (now ${total}/${FREE_FAV_LIMIT}). Upgrade to Pro for lists and higher limits.`
+        )} <button type="button" class="btn-mini" data-fav-upgrade style="margin-left:6px">${T('查看方案','Plans')}</button></p>`
+      : '';
 
     // list 管理栏（全列表切换 + 新建/重命名/删除）
     const bar = favLists.map(l => `
@@ -10047,11 +10214,8 @@
         <span class="lname">${escape(favListDisplayName(l))}</span>
         <span class="lcount">${l.ids.length}</span>
       </button>`).join('');
-    const toolbar = `
-      <div class="fav-toolbar">
-        <div class="fav-list-chips">${bar}</div>
-        <div class="fav-list-ops">
-          <button class="btn-mini" id="fav-list-new" title="${T('新建清单','New list')}">＋ ${T('新建','New')}</button>
+    const listOps = proWorkflow
+      ? `<button class="btn-mini" id="fav-list-new" title="${T('新建清单','New list')}">＋ ${T('新建','New')}</button>
           <button class="btn-mini" id="fav-list-rename" title="${T('重命名当前','Rename current')}">✎ ${T('重命名','Rename')}</button>
           <div class="fav-export-wrap">
             <button class="btn-mini" id="fav-list-export" title="${T('导出到 Zotero / Notion / Obsidian 等','Export for Zotero / Notion / Obsidian')}">⬇ ${T('导出','Export')}</button>
@@ -10065,9 +10229,16 @@
             </div>
           </div>
           <button class="btn-mini" id="fav-list-share" title="${T('生成分享短链','Generate share link')}">🔗 ${T('分享','Share')}</button>
-          <button class="btn-mini btn-danger" id="fav-list-del" title="${T('删除当前','Delete current')}" ${favLists.length<=1?'disabled':''}>🗑 ${T('删除','Delete')}</button>
+          <button class="btn-mini btn-danger" id="fav-list-del" title="${T('删除当前','Delete current')}" ${favLists.length<=1?'disabled':''}>🗑 ${T('删除','Delete')}</button>`
+      : `<button class="btn-mini" id="fav-list-new-locked" title="${T('多清单 · Pro','Lists · Pro')}">＋ ${T('多清单 · Pro','Lists · Pro')}</button>`;
+    const toolbar = `
+      <div class="fav-toolbar">
+        <div class="fav-list-chips">${bar}</div>
+        <div class="fav-list-ops">
+          ${listOps}
         </div>
-      </div>`;
+      </div>
+      ${freeHint}`;
 
     // 取当前 list 的有序记录（实时库 + favsData 合并，刊名永不丢）
     let rows = [];
@@ -10158,6 +10329,12 @@
         btn.addEventListener('click', () => switchList(btn.dataset.list));
       });
     }
+    // Free 升级入口
+    document.querySelectorAll('[data-fav-upgrade], #fav-list-new-locked').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        showRegionPaywallModal(btn.id === 'fav-list-new-locked' ? 'workflow' : 'fav_limit');
+      });
+    });
     const newBtn = document.getElementById('fav-list-new');
     if (newBtn) newBtn.addEventListener('click', () => {
       const name = prompt(T('新清单名称：','New list name:'), T('新清单','New list'));
@@ -12432,6 +12609,20 @@
       syncHomeModeTabs();
       if (['int', 'fav', 'pick'].includes(activeTab) && !journalsReady) {
         const hint = $('#hint');
+        // 全球列表：light 库（~3MB）字段已够表格首屏；勿卡在 full（~9MB）下载上，否则慢网表现为「列表一直不出来」
+        if (activeTab === 'int' && journals.length) {
+          try { renderInt(); } catch (err) { console.error(err); }
+          if (hint) {
+            hint.textContent = `${T('已加载','Loaded')} ${(meta?.total || journals.length).toLocaleString()} ${T('本期刊','journals')} · ${T('完整库后台加载中…','Full database loading…')}`;
+          }
+          ensureJournalsLoaded()
+            .then(() => renderAfterFullJournalLoad(activeTab))
+            .catch(err => {
+              if (hint) hint.textContent = `${T('已加载','Loaded')} ${journals.length.toLocaleString()} ${T('本期刊','journals')} · full: ${err.message}`;
+              console.error(err);
+            });
+          return;
+        }
         if (hint) hint.textContent = T('正在加载完整期刊库…', 'Loading full journal database…');
         ensureJournalsLoaded()
           .then(() => renderAfterFullJournalLoad(activeTab))
@@ -14036,12 +14227,19 @@
     return `${s}+`;
   }
 
+  // 仅「期刊详情」有展示下限（真实 total_journal_views ≈ 23k）；服务用户用实时访客数，勿抬高
+  const HOME_STAT_FLOOR = { journal_views: 23000 };
+
   function setHomeStat(key, value) {
     const el = document.querySelector(`[data-stat="${key}"]`);
     if (!el) return;
-    const text = formatHomeStat(value);
+    let n = Number(value);
+    if (!Number.isFinite(n)) n = 0;
+    const floor = HOME_STAT_FLOOR[key];
+    if (floor != null) n = Math.max(n, floor);
+    const text = formatHomeStat(n);
     el.textContent = text;
-    el.setAttribute('data-raw', String(value));
+    el.setAttribute('data-raw', String(n));
   }
 
   async function loadHomeStats() {
@@ -14055,12 +14253,18 @@
       if (jTotal) setHomeStat('journals', jTotal);
       if (pub && pub.ok !== false) {
         if (pub.total_pageviews != null) setHomeStat('views', pub.total_pageviews);
+        // 服务用户 = 访客 total_visitors（约 1k+），不是期刊详情 23k
         if (pub.total_visitors != null) setHomeStat('visitors', pub.total_visitors);
-        // 期刊详情浏览：优先 total_journal_views，避免误用其它字段
+        // 期刊详情浏览：优先 total_journal_views
         const jv = pub.total_journal_views != null ? pub.total_journal_views : pub.viewed_journals;
         if (jv != null) setHomeStat('journal_views', jv);
+        else setHomeStat('journal_views', HOME_STAT_FLOOR.journal_views);
+      } else if (HOME_STAT_FLOOR.journal_views) {
+        setHomeStat('journal_views', HOME_STAT_FLOOR.journal_views);
       }
-    } catch (_) { /* keep placeholder */ }
+    } catch (_) {
+      /* keep HTML placeholders */
+    }
   }
 
   let _homeHotItems = null; // 缓存近 30 天 API 榜单
@@ -14401,14 +14605,22 @@
         if (user) await pullFavs();
         return;
       }
-      // 列表类入口需要 full：先切 tab，再等 full 后渲染
+      // 列表类入口：全球站用 light 立刻出表，full 后台升级；收藏/荐刊仍等 full
       if (needsFullForTab) {
         if (window.__activateJournalTab) window.__activateJournalTab(initialTab, { skipPath: !pendingInitialTab });
-        try {
-          await ensureJournalsLoaded();
-          renderAfterFullJournalLoad(initialTab);
-        } catch (err) {
-          console.error(err);
+        else if (initialTab === 'int' && journals.length) renderInt();
+        if (initialTab === 'int' && journals.length) {
+          // light 已在 activateTab 内 renderInt；full 不阻塞首屏
+          ensureJournalsLoaded()
+            .then(() => renderAfterFullJournalLoad(initialTab))
+            .catch(err => console.error(err));
+        } else {
+          try {
+            await ensureJournalsLoaded();
+            renderAfterFullJournalLoad(initialTab);
+          } catch (err) {
+            console.error(err);
+          }
         }
       } else {
         if (window.__activateJournalTab) window.__activateJournalTab(initialTab, { skipPath: !pendingInitialTab });

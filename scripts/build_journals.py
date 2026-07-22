@@ -253,9 +253,19 @@ def parse_jcr(path, store, by_title):
                 by_title[nt] = rec
             if abbr20 and not rec.get('abbr20'): rec['abbr20'] = abbr20
             if country and not rec.get('country'): rec['country'] = country
-            for idx, mark in flags.items():
-                if mark.upper() == 'X' and idx not in rec['indices']:
-                    rec['indices'].append(idx)
+            # JCR is an enrichment snapshot, not the authority for current
+            # WoS membership. Active flags come only from the latest Master
+            # Journal List CSV files parsed above.
+            historical = [idx for idx, mark in flags.items()
+                          if mark.upper() == 'X' and idx not in rec['indices']]
+            if historical:
+                rec['wos_historical'] = {
+                    'status': 'not_in_current_index',
+                    'indices': historical,
+                    'current_indices': [idx for idx in rec['indices'] if idx in flags],
+                    'as_of': '2026-06-15',
+                    'source': 'Clarivate Master Journal List / JCR 2025 snapshot',
+                }
             hits += 1
     return hits
 
@@ -1153,7 +1163,12 @@ def parse_scopus(path, by_title, by_issn, store=None):
 # ───────────────────────── EI Compendex Source List ─────────────────────────
 
 def parse_ei_compendex(path, by_title, by_issn, store=None):
-    """EI/Compendex Source List (updated July 9, 2026) journal rows + Chinese journals sheet."""
+    """Import current and discontinued EI/Compendex journal records.
+
+    Current SERIALS rows receive the active ``EI`` index badge.  Rows from the
+    official DISCONTINUED sheet remain searchable, but only carry historical
+    coverage metadata so they cannot be mistaken for currently indexed titles.
+    """
     if not path.exists() or not openpyxl:
         return 0, 0, 0
     wb = openpyxl.load_workbook(path, read_only=True, data_only=True)
@@ -1201,6 +1216,46 @@ def parse_ei_compendex(path, by_title, by_issn, store=None):
             rec['cn_name'] = cn_name
             chinese_hits += 1
 
+    def apply_historical(title, issn, eissn, publisher='', final_year='', final_volume='', final_issue='', final_pages=''):
+        nonlocal matched, standalone
+        if not title:
+            return
+        issn = clean_issn(issn); eissn = clean_issn(eissn)
+        nt = norm_title(title)
+        rec = (issn and by_issn.get(issn)) or (eissn and by_issn.get(eissn)) or by_title.get(nt)
+        if rec is None and store is not None:
+            key = 'ei-historical:' + (issn or eissn or nt)
+            rec = store.get(key)
+            if rec is None:
+                rec = {
+                    'name': title, 'issn': issn, 'eissn': eissn,
+                    'publisher': publisher or '', 'address': '', 'languages': '',
+                    'wos_categories': [], 'esi_category': '',
+                    'abbr20': '', 'country': '', 'indices': [],
+                    'ei_historical_only': True,
+                }
+                store[key] = rec
+                by_title.setdefault(nt, rec)
+                for k in (issn, eissn):
+                    if k: by_issn.setdefault(k, rec)
+            standalone += 1
+        elif rec is not None:
+            matched += 1
+        if rec is None or 'EI' in rec.setdefault('indices', []):
+            return
+        if publisher and not rec.get('publisher'):
+            rec['publisher'] = publisher
+        year = str(final_year or '').strip()
+        rec['ei_historical'] = {
+            'status': 'discontinued',
+            'final_year': year,
+            'final_volume': str(final_volume or '').strip(),
+            'final_issue': str(final_issue or '').strip(),
+            'final_pages': str(final_pages or '').strip(),
+            'source': 'Compendex Source List Jul. 9, 2026',
+        }
+        rec['ei_status'] = f'Discontinued{f" (final coverage {year})" if year else ""}'
+
     if 'SERIALS' in wb.sheetnames:
         ws = wb['SERIALS']
         for raw in ws.iter_rows(min_row=3, values_only=True):
@@ -1222,6 +1277,22 @@ def parse_ei_compendex(path, by_title, by_issn, store=None):
                   language=str(raw[5] or '').strip() if len(raw)>5 else '',
                   status=str(raw[6] or '').strip() if len(raw)>6 else '',
                   cn_name=str(raw[2] or '').strip() if len(raw)>2 else '')
+
+    if 'DISCONTINUED' in wb.sheetnames:
+        ws = wb['DISCONTINUED']
+        for raw in ws.iter_rows(min_row=4, values_only=True):
+            if not raw or not raw[0]:
+                continue
+            apply_historical(
+                raw[0],
+                raw[1] if len(raw) > 1 else '',
+                raw[2] if len(raw) > 2 else '',
+                publisher=str(raw[3] or '').strip() if len(raw) > 3 else '',
+                final_year=raw[4] if len(raw) > 4 else '',
+                final_volume=raw[5] if len(raw) > 5 else '',
+                final_issue=raw[6] if len(raw) > 6 else '',
+                final_pages=raw[7] if len(raw) > 7 else '',
+            )
     return matched, standalone, chinese_hits
 
 
@@ -1950,7 +2021,7 @@ def main():
     # meta
     meta = {
         'source': 'WoS Core + JCR 2025 + ESI + 中科院 2025 + 长江大学 + ShowJCR (JCR/FQB/XR/CCF/Warning) + Scopus (auto-updated) + EI Compendex Jul. 9, 2026 + ABDC optional + ABS AJG + 中国科协 + CSCD + 中国科技核心 + OAJ 2025 + DOAJ Journal CSV',
-        'last_updated_source': 'WoS Core 2026-04-20',
+        'last_updated_source': 'WoS Core 2026-06-15',
         'total': len(journals),
         'indices': dict(idx_c),
         'with_if_2024': if_count,

@@ -5,7 +5,7 @@
    - data JSON / JSON.GZ: cache versioned data first, network fallback for fresh data
    - everything else: network only
 */
-const VERSION = '20260624-perf-data-gz';
+const VERSION = '20260722-wos-core-v1';
 const SHELL_CACHE = `shell-${VERSION}`;
 const DATA_CACHE = `data-${VERSION}`;
 

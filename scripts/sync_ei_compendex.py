@@ -90,6 +90,27 @@ def load_source(path: Path) -> list[dict]:
     return records
 
 
+def load_discontinued_source(path: Path) -> list[dict]:
+    book = openpyxl.load_workbook(path, read_only=True, data_only=True)
+    if "DISCONTINUED" not in book.sheetnames:
+        return []
+    records = []
+    for row in book["DISCONTINUED"].iter_rows(min_row=4, values_only=True):
+        if not row or not row[0]:
+            continue
+        records.append({
+            "title": str(row[0] or "").strip(),
+            "issn": clean_issn(row[1] if len(row) > 1 else ""),
+            "eissn": clean_issn(row[2] if len(row) > 2 else ""),
+            "publisher": str(row[3] or "").strip() if len(row) > 3 else "",
+            "final_year": str(row[4] or "").strip() if len(row) > 4 else "",
+            "final_volume": str(row[5] or "").strip() if len(row) > 5 else "",
+            "final_issue": str(row[6] or "").strip() if len(row) > 6 else "",
+            "final_pages": str(row[7] or "").strip() if len(row) > 7 else "",
+        })
+    return records
+
+
 def read_json(path: Path):
     if path.suffix == ".gz":
         with gzip.open(path, "rt", encoding="utf-8") as handle:
@@ -107,15 +128,16 @@ def write_json(path: Path, payload) -> None:
         path.write_bytes(raw)
 
 
-def sync_records(records: list[dict], source_rows: list[dict]) -> tuple[list[dict], dict]:
+def sync_records(records: list[dict], source_rows: list[dict], historical_rows: list[dict]) -> tuple[list[dict], dict]:
     old_ei = sum("EI" in (rec.get("indices") or []) for rec in records)
     used_slugs = {str(rec.get("slug") or "") for rec in records if rec.get("slug")}
     by_issn, by_title = {}, {}
 
     for rec in records:
         rec["indices"] = [item for item in (rec.get("indices") or []) if item != "EI"]
-        for key in ("ei_subjects", "ei_status"):
+        for key in ("ei_subjects", "ei_status", "ei_historical"):
             rec.pop(key, None)
+        rec.pop("ei_historical_only", None)
         for key in (clean_issn(rec.get("issn")), clean_issn(rec.get("eissn"))):
             if key:
                 by_issn.setdefault(key, rec)
@@ -163,10 +185,58 @@ def sync_records(records: list[dict], source_rows: list[dict]) -> tuple[list[dic
                 by_issn.setdefault(key, rec)
         by_title.setdefault(norm_title(row["title"]), rec)
 
+    historical_matched = historical_added = 0
+    for row in historical_rows:
+        rec = next((by_issn[key] for key in (row["issn"], row["eissn"])
+                    if key and key in by_issn), None)
+        if rec is None:
+            rec = by_title.get(norm_title(row["title"]))
+        if rec is not None and "EI" in (rec.get("indices") or []):
+            continue
+        if rec is None:
+            rec = {
+                "name": row["title"],
+                "issn": row["issn"],
+                "eissn": row["eissn"],
+                "publisher": row["publisher"],
+                "country": "",
+                "abbr20": "",
+                "indices": [],
+                "wos_categories": [],
+                "esi_category": "",
+                "ei_historical_only": True,
+            }
+            rec["slug"] = slugify(row["title"], row["issn"] or row["eissn"], used_slugs)
+            records.append(rec)
+            historical_added += 1
+        else:
+            historical_matched += 1
+        year = row["final_year"]
+        rec["ei_historical"] = {
+            "status": "discontinued",
+            "final_year": year,
+            "final_volume": row["final_volume"],
+            "final_issue": row["final_issue"],
+            "final_pages": row["final_pages"],
+            "source": SOURCE_LABEL,
+        }
+        rec["ei_status"] = f"Discontinued{f' (final coverage {year})' if year else ''}"
+        if row["publisher"] and not rec.get("publisher"):
+            rec["publisher"] = row["publisher"]
+        for key in (row["issn"], row["eissn"]):
+            if key:
+                by_issn.setdefault(key, rec)
+        by_title.setdefault(norm_title(row["title"]), rec)
+
     retained = []
     removed = 0
     for rec in records:
         if rec.get("ei_only") and "EI" not in (rec.get("indices") or []):
+            if rec.get("ei_historical"):
+                rec.pop("ei_only", None)
+                rec["ei_historical_only"] = True
+                retained.append(rec)
+                continue
             has_other_source = any(rec.get(key) for key in (
                 "scopus", "doaj", "oaj", "fsta", "cabi", "inspec", "specialty_only",
             ))
@@ -182,6 +252,9 @@ def sync_records(records: list[dict], source_rows: list[dict]) -> tuple[list[dic
         "matched_source_rows": matched,
         "added": added,
         "removed_obsolete_ei_only": removed,
+        "historical_source_rows": len(historical_rows),
+        "historical_matched": historical_matched,
+        "historical_added": historical_added,
     }
 
 
@@ -190,7 +263,7 @@ def update_index(records: list[dict]) -> int:
     index = read_json(path)
     added = 0
     for rec in records:
-        if not rec.get("ei_only"):
+        if not (rec.get("ei_only") or rec.get("ei_historical_only")):
             continue
         slug = str(rec.get("slug") or "")
         if not slug:
@@ -201,7 +274,7 @@ def update_index(records: list[dict]) -> int:
                 "i": rec.get("issn") or "",
                 "is": rec.get("eissn") or "",
                 "p": rec.get("publisher") or "",
-                "ix": ["EI"],
+                "ix": ["EI"] if rec.get("ei_only") else [],
             }
             index[slug] = {key: value for key, value in entry.items() if value not in ("", [])}
             added += 1
@@ -215,11 +288,12 @@ def update_index(records: list[dict]) -> int:
 
 def main() -> None:
     source_rows = load_source(DEFAULT_SOURCE)
+    historical_rows = load_discontinued_source(DEFAULT_SOURCE)
     results = {}
     full_records = None
     for filename in ("journals.json.gz", "journals_light.json.gz"):
         path = DATA / filename
-        records, stats = sync_records(read_json(path), source_rows)
+        records, stats = sync_records(read_json(path), source_rows, historical_rows)
         if filename == "journals_light.json.gz" and full_records is not None:
             full_slugs = {str(rec.get("slug") or "") for rec in full_records}
             before_align = len(records)
@@ -229,6 +303,12 @@ def main() -> None:
         results[filename] = {"records": len(records), **stats}
         if filename == "journals.json.gz":
             full_records = records
+
+    plain_path = DATA / "journals.json"
+    if plain_path.exists():
+        plain_records, plain_stats = sync_records(read_json(plain_path), source_rows, historical_rows)
+        write_json(plain_path, plain_records)
+        results[plain_path.name] = {"records": len(plain_records), **plain_stats}
 
     meta_path = DATA / "meta.json"
     meta = read_json(meta_path)
