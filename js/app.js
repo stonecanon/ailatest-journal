@@ -4171,10 +4171,14 @@
         if (!value) return '';
         const indexes = Array.isArray(value.indices) ? value.indices.join(' / ') : 'WoS';
         const active = Array.isArray(value.current_indices) ? value.current_indices.filter(Boolean) : [];
+        const firstAbsent = value.first_absent || value.as_of || '';
         const tip = active.length
-          ? T(`曾由 ${indexes} 收录，当前转入 ${active.join(' / ')}`, `Previously indexed in ${indexes}; now indexed in ${active.join(' / ')}`)
-          : T(`曾由 ${indexes} 收录，当前不在最新 Master Journal List`, `Previously indexed in ${indexes}; absent from the current Master Journal List`);
-        return `<span class="warn-pill wos-history-pill" title="${escape(tip)}">${T('WoS 历史收录','WoS historical')}</span>`;
+          ? T(`曾由 ${indexes} 收录，现已转入 ${active.join(' / ')}`, `Previously indexed in ${indexes}; now indexed in ${active.join(' / ')}`)
+          : T(`${indexes} 当前未收录${firstAbsent ? `；最迟自 ${firstAbsent} 名单起已缺席` : ''}；具体剔除日及原因未公开`, `${indexes} is not currently indexed${firstAbsent ? `; absent no later than the ${firstAbsent} list` : ''}; exact removal date and reason are not public`);
+        const label = active.length
+          ? `${indexes} → ${active.join(' / ')}`
+          : T(`${indexes} 当前未收录`, `${indexes} not current`);
+        return `<span class="warn-pill wos-history-pill" title="${escape(tip)}">${escape(label)}</span>`;
       }
       function badgeCiticWarning() {
         return `<span class="citic-warning-pill">${T('中信所预警','CITIC Warning')}</span>`;
@@ -7505,11 +7509,20 @@
       const oldIndexes = Array.isArray(historical.indices) ? historical.indices.filter(Boolean) : [];
       const currentIndexes = Array.isArray(historical.current_indices) ? historical.current_indices.filter(Boolean) : [];
       if (!oldIndexes.length) return '';
+      const firstAbsent = historical.first_absent || historical.as_of || '';
+      const verifiedOn = historical.current_verified_on || '';
+      const currentStatus = currentIndexes.length
+        ? `${T('已转入','Transferred to')} ${escape(currentIndexes.join(' / '))}`
+        : T('当前不在 Web of Science Core Collection','Not currently in the Web of Science Core Collection');
       return `<div class="drawer-section">
-        <h4>${T('Web of Science 历史收录','Web of Science Historical Coverage')}</h4>
-        <div class="meta-row"><div class="meta-k">${T('历史索引','Previous indexes')}</div><div class="meta-v"><strong>${escape(oldIndexes.join(' / '))}</strong></div></div>
-        <div class="meta-row"><div class="meta-k">${T('当前状态','Current status')}</div><div class="meta-v">${currentIndexes.length ? `${T('已转入','Transferred to')} ${escape(currentIndexes.join(' / '))}` : T('当前不在最新 Master Journal List','Not in the current Master Journal List')}</div></div>
-        ${historical.as_of ? `<div class="muted-cell" style="margin-top:8px">${T('名单日期','List date')}: ${escape(historical.as_of)}</div>` : ''}
+        <h4>${T('Web of Science 收录变更','Web of Science Coverage Change')}</h4>
+        <div class="meta-row"><div class="meta-k">${T('原收录索引','Previous indexes')}</div><div class="meta-v"><strong>${escape(oldIndexes.join(' / '))}</strong></div></div>
+        <div class="meta-row"><div class="meta-k">${T('当前状态','Current status')}</div><div class="meta-v"><strong>${currentStatus}</strong></div></div>
+        ${firstAbsent ? `<div class="meta-row"><div class="meta-k">${T('首次确认缺席','First confirmed absent')}</div><div class="meta-v">${escape(firstAbsent)} ${T('版名单','list')}</div></div>` : ''}
+        ${verifiedOn ? `<div class="meta-row"><div class="meta-k">${T('最近再次核对','Latest recheck')}</div><div class="meta-v">${escape(verifiedOn)} ${T('版 MJL 仍无现行记录','MJL still has no current record')}</div></div>` : ''}
+        ${historical.last_jcr_year ? `<div class="meta-row"><div class="meta-k">${T('最近 JCR 指标年度','Latest JCR metric year')}</div><div class="meta-v">${escape(historical.last_jcr_year)} <span class="muted-cell">${T('不代表当前仍收录','does not imply current coverage')}</span></div></div>` : ''}
+        <div class="meta-row"><div class="meta-k">${T('剔除日期 / 原因','Removal date / reason')}</div><div class="meta-v">${T('Clarivate 公开名单未披露','Not disclosed in Clarivate’s public list')}</div></div>
+        <div class="muted-cell" style="margin-top:8px">${T('说明：这里的日期是本站首次确认其不在现行名单中的日期，不等同于 Clarivate 的内部决定日期。','Note: this is the first list where we confirmed the title absent, not Clarivate’s internal decision date.')}</div>
       </div>`;
     })();
 

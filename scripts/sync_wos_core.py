@@ -32,6 +32,19 @@ SOURCE_FILES = {
     "ESCI": "Emerging Sources Citation Index (ESCI).csv",
 }
 
+# Public MJL checks that can be reproduced without treating a JCR metric year
+# as proof of current coverage. The collection files establish the first list
+# in our archive where a title is absent; Clarivate's public search can confirm
+# that it remains absent, but does not expose the exact editorial decision date
+# or reason.
+PUBLIC_STATUS_CHECKS = {
+    "0921-7126": {
+        "current_verified_on": "2026-07-20",
+        "verification_date": "2026-07-23",
+        "verification_result": "no_current_mjl_result",
+    },
+}
+
 
 def clean_issn(value: object) -> str:
     match = re.search(r"\b(\d{4})-?(\d{3}[\dX])\b", str(value or "").upper())
@@ -201,13 +214,24 @@ def sync_records(records: list[dict], sources: list[dict]) -> tuple[list[dict], 
         prior_indices = set(prior.get("indices") or []) if isinstance(prior, dict) else set()
         historical = [idx for idx in WOS_INDEXES if idx in (prior_indices | removed) and idx not in active]
         if historical:
-            rec["wos_historical"] = {
-                "status": "not_in_current_index",
+            first_absent = prior.get("first_absent") if isinstance(prior, dict) else ""
+            history = {
+                "status": "transferred" if active else "not_in_current_index",
                 "indices": historical,
                 "current_indices": [idx for idx in WOS_INDEXES if idx in active],
                 "as_of": SOURCE_UPDATED,
+                "first_absent": first_absent or SOURCE_UPDATED,
+                "event": "index_transfer" if active else "no_longer_in_current_list",
+                "reason": "not_disclosed",
                 "source": "Clarivate Master Journal List / prior JCR snapshot",
+                "source_url": SOURCE_URL,
             }
+            if rec.get("jcr_year"):
+                history["last_jcr_year"] = rec["jcr_year"]
+            public_check = PUBLIC_STATUS_CHECKS.get(clean_issn(rec.get("issn"))) or PUBLIC_STATUS_CHECKS.get(clean_issn(rec.get("eissn")))
+            if public_check:
+                history.update(public_check)
+            rec["wos_historical"] = history
             historical_records += 1
             if active:
                 transitioned_records += 1
