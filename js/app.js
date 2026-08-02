@@ -2594,6 +2594,10 @@
       const compact = compactIssnKey(v);
       if (compact) keys.add(compact);
     });
+    // 记录可声明额外路由别名（如短刊名），供深链 /journal/<slug>/ 匹配
+    (Array.isArray(r?.routeAliases) ? r.routeAliases : []).forEach(a => {
+      journalRouteKeys(a).forEach(k => keys.add(k));
+    });
     return keys;
   }
 
@@ -6957,17 +6961,31 @@
   function findRecByFid(id) {
     if (!id) return null;
     const wantedList = journalRouteKeyList(id);
+    const completeness = (r) => {
+      // 信息完整度评分：有 ISSN / 索引 / IF 的记录优先于空壳（仅目录来源）
+      let score = 0;
+      if (r?.issn || r?.eissn) score += 4;
+      if (Array.isArray(r?.indices) && r.indices.length) score += 3;
+      if (r?.if_2024 != null) score += 2;
+      if (r?.scopus?.active || r?.doaj) score += 1;
+      if (r?.abs_only || r?.abdc_only || r?.specialty_only) score -= 2; // 空壳目录条目降权
+      return score;
+    };
     const findIn = (arr, src) => {
+      let best = null, bestScore = -Infinity;
       for (const wantedKey of wantedList) {
         for (const r of arr || []) {
           if (recordRouteKeys(r).has(wantedKey)) {
-            const rr = Object.assign({}, r);
-            if (src && !rr.__src) rr.__src = src;
-            return rr;
+            const s = completeness(r);
+            if (s > bestScore) { best = r; bestScore = s; }
           }
         }
+        if (best && bestScore >= 4) break; // 已找到足够完整的记录，不必继续搜其他 key
       }
-      return null;
+      if (!best) return null;
+      const rr = Object.assign({}, best);
+      if (src && !rr.__src) rr.__src = src;
+      return rr;
     };
     if (Array.isArray(journals)) {
       const rr = findIn(journals, 'int');
