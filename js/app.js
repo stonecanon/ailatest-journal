@@ -4607,7 +4607,7 @@
 
   // 通用中文期刊行渲染
   function renderDomRow(r, opts = {}) {
-    const { src, showTier, tierValue, extraCols = '', extraBadges = '' } = opts;
+    const { src, showTier, tierValue, extraCols = '', extraBadges = '', metaHtml: extraMeta = '' } = opts;
     const fid = favId(r);
     rowRecordsByFid[fid] = { ...r, __src: src };
     const name = r.name || r.cn_name || '';
@@ -4624,6 +4624,7 @@
     const metaHtml = [
       r.issn ? jMetaChip(`ISSN ${r.issn}`, 'j-meta-id') : '',
       (src === 'cnkx' && r.domain) ? jMetaChip(tn(r.domain, 'domain') || r.domain, 'j-meta-topic-show') : '',
+      extraMeta,
     ].filter(Boolean).join('');
     // extraCols 可能是旧 <td>…，卡片体里只放徽章
     const bodyHtml = `<div class="j-card-badges badges">${limitBadgeHtml([castBadge, tierBadge, extraBadges, crossBadges].filter(Boolean).join(''), 8)}</div>`;
@@ -5485,14 +5486,12 @@
         sections.push({
           title: T('中国科协高质量目录','CAST Tiered Directory'),
           count: recs.length,
-          html: `<div class="table-wrap"><table class="journals"><thead><tr>
-            <th class="col-fav" aria-label="Favorite"></th><th style="width:60px">${T('T级','Tier')}</th><th class="col-name">${T('期刊','Journal')}</th><th>${T('交叉收录','Also In')}</th><th style="width:100px">ISSN</th><th style="width:110px">${T('学科 / 细分','Domain / Sub')}</th>
-          </tr></thead><tbody>
+          html: `<div class="table-wrap"><table class="journals"><thead hidden><tr><th></th></tr></thead><tbody>
           ${recs.slice(0, 200).map(r => renderDomRow(r, {
             src: 'cnkx', showTier: true, tierValue: r.tier,
-            extraCols: `<td class="muted-cell" style="width:110px">${escape(tn(r.domain || '', 'domain'))}${r.subdomain ? ' · '+escape(tn(r.subdomain,'sub')) : ''}</td>`,
+            metaHtml: (r.subdomain ? jMetaChip(tn(r.subdomain, 'sub') || r.subdomain, 'j-meta-topic-show') : ''),
           })).join('')}
-          ${recs.length > 200 ? `<tr><td colspan="6" class="empty">${T('仅显示前 200 条','First 200 only')}</td></tr>` : ''}
+          ${recs.length > 200 ? `<tr><td class="empty">${T('仅显示前 200 条','First 200 only')}</td></tr>` : ''}
           </tbody></table></div>`
         });
       }
@@ -5505,13 +5504,12 @@
         sections.push({
           title: T('国自然管理科学部期刊目录','NSFC Management Science Journal List'),
           count: recs.length,
-          html: `<div class="table-wrap"><table class="journals"><thead><tr>
-            <th class="col-fav" aria-label="Favorite"></th><th style="width:60px">${T('级别','Tier')}</th><th class="col-name">${T('期刊','Journal')}</th><th>${T('交叉收录','Also In')}</th><th style="width:110px">${T('刊期','Frequency')}</th>
-          </tr></thead><tbody>
+          html: `<div class="table-wrap"><table class="journals"><thead hidden><tr><th></th></tr></thead><tbody>
           ${recs.slice(0, 200).map(r => renderDomRow(r, {
             src: 'nsfc_mgmt', showTier: true, tierValue: r.tier,
-            extraCols: `<td class="muted-cell" style="width:110px">${escape(r.frequency||'—')}</td>`,
+            metaHtml: (r.frequency ? jMetaChip(r.frequency, 'j-meta-freq') : ''),
           })).join('')}
+          ${recs.length > 200 ? `<tr><td class="empty">${T('仅显示前 200 条','First 200 only')}</td></tr>` : ''}
           </tbody></table></div>`
         });
       }
@@ -5526,24 +5524,25 @@
         sections.push({
           title: 'CSCD 来源期刊目录',
           count: recs.length,
-          html: `<div class="table-wrap"><table class="journals"><thead><tr>
-            <th class="col-fav" aria-label="Favorite"></th><th class="col-name">${T('期刊','Journal')}</th><th>${T('收录索引','Indices')}</th><th style="width:110px">ISSN</th><th style="width:110px">CN</th>
-          </tr></thead><tbody>
+          html: `<div class="table-wrap"><table class="journals"><thead hidden><tr><th></th></tr></thead><tbody>
           ${recs.slice(0, 200).map(r => {
             const fid = favId(r);
             rowRecordsByFid[fid] = { ...r, __src: 'cscd' };
             const code = String(r.database || '').toUpperCase();
             const label = code === 'C' ? 'CSCD-C' : (code === 'E' ? 'CSCD-E' : 'CSCD');
             const crossBadges = renderDomCrossBadges(r, 'cscd');
-            return `<tr class="j-row clickable" data-fid="${escape(fid)}" data-src="cscd">
-              <td style="width:36px">${starBtn(r, 'cscd')}</td>
-              <td class="jname" style="font-size:13.5px">${escape(r.name||'')}</td>
-              <td class="col-cross"><div class="badges"><span class="domsrc-pill ds-cscd">${label}</span>${crossBadges}</div></td>
-              <td class="muted-cell" style="width:110px">${escape(r.issn||'—')}</td>
-              <td class="muted-cell" style="width:110px">${escape(r.cn_code||'—')}</td>
-            </tr>`;
+            return journalCardRow({
+              fid, src: 'cscd',
+              favHtml: starBtn(r, 'cscd'),
+              nameHtml: `<div class="jname">${escape(r.name||'')}</div>`,
+              metaHtml: [
+                r.issn ? jMetaChip(`ISSN ${r.issn}`, 'j-meta-id') : '',
+                r.cn_code ? jMetaChip(`CN ${r.cn_code}`, 'j-meta-id') : '',
+              ].filter(Boolean).join(''),
+              bodyHtml: `<div class="j-card-badges badges"><span class="domsrc-pill ds-cscd">${label}</span>${limitBadgeHtml(crossBadges, 5)}</div>`,
+            });
           }).join('')}
-          ${recs.length > 200 ? `<tr><td colspan="5" class="empty">${T('仅显示前 200 条','First 200 only')}</td></tr>` : ''}
+          ${recs.length > 200 ? `<tr><td class="empty">${T('仅显示前 200 条','First 200 only')}</td></tr>` : ''}
           </tbody></table></div>`
         });
       }
@@ -5558,22 +5557,21 @@
         sections.push({
           title: T('中国科技核心期刊目录','Chinese Science and Technology Core Journals'),
           count: recs.length,
-          html: `<div class="table-wrap"><table class="journals"><thead><tr>
-            <th class="col-fav" aria-label="Favorite"></th><th class="col-name">${T('期刊','Journal')}</th><th>${T('收录索引','Indices')}</th><th style="width:110px">${T('期刊代码','Code')}</th>
-          </tr></thead><tbody>
+          html: `<div class="table-wrap"><table class="journals"><thead hidden><tr><th></th></tr></thead><tbody>
           ${recs.slice(0, 200).map(r => {
             const fid = favId(r);
             rowRecordsByFid[fid] = { ...r, __src: 'cstpcd' };
             const label = r.kind === 'popular_science' ? T('中国科技核心·科普','CSTPCD Popular') : T('中国科技核心','CSTPCD');
             const crossBadges = renderDomCrossBadges(r, 'cstpcd');
-            return `<tr class="j-row clickable" data-fid="${escape(fid)}" data-src="cstpcd">
-              <td style="width:36px">${starBtn(r, 'cstpcd')}</td>
-              <td class="jname" style="font-size:13.5px">${escape(r.name||'')}</td>
-              <td class="col-cross"><div class="badges"><span class="domsrc-pill ds-cstpcd">${label}</span>${crossBadges}</div></td>
-              <td class="muted-cell" style="width:110px">${escape(r.code||'—')}</td>
-            </tr>`;
+            return journalCardRow({
+              fid, src: 'cstpcd',
+              favHtml: starBtn(r, 'cstpcd'),
+              nameHtml: `<div class="jname">${escape(r.name||'')}</div>`,
+              metaHtml: r.code ? jMetaChip(r.code, 'j-meta-id') : '',
+              bodyHtml: `<div class="j-card-badges badges"><span class="domsrc-pill ds-cstpcd">${label}</span>${limitBadgeHtml(crossBadges, 5)}</div>`,
+            });
           }).join('')}
-          ${recs.length > 200 ? `<tr><td colspan="4" class="empty">${T('仅显示前 200 条','First 200 only')}</td></tr>` : ''}
+          ${recs.length > 200 ? `<tr><td class="empty">${T('仅显示前 200 条','First 200 only')}</td></tr>` : ''}
           </tbody></table></div>`
         });
       }
@@ -5588,33 +5586,25 @@
         sections.push({
           title: T('中文期刊目录','Chinese Journal Directory'),
           count: list.length,
-          html: `<div class="table-wrap"><table class="journals"><thead><tr>
-            <th class="col-fav" aria-label="Favorite"></th><th class="col-name">${T('期刊名称','Journal')}</th><th>${T('收录索引','Indices')}</th><th style="width:110px">ISSN</th><th style="width:100px">CN</th><th style="width:110px">${T('学科分类','Category')}</th>
-          </tr></thead><tbody>
+          html: `<div class="table-wrap"><table class="journals"><thead hidden><tr><th></th></tr></thead><tbody>
           ${list.slice(0, 200).map(r => {
-            const hits = lookupDom(r);
-            const badges = [
-              ...hits.filter(h => h.source === 'cssci').map(() => `<span class="domsrc-pill ds-cssci">CSSCI</span>`),
-              ...hits.filter(h => h.source === 'cssci_ext').map(() => `<span class="domsrc-pill ds-cssci-ext">${T('CSSCI 扩展','CSSCI Ext')}</span>`),
-              ...hits.filter(h => h.source === 'pku').map(() => `<span class="domsrc-pill ds-pku">${T('北大核心','PKU Core')}</span>`),
-              ...hits.filter(h => h.source === 'ccft').map(h => `<span class="domsrc-pill ds-ccft">CCF-${h.tag||'T'}</span>`),
-              ...hits.filter(h => h.source === 'zju').map(h => `<span class="domsrc-pill ds-zju">${escape(h.label)}</span>`),
-              ...hits.filter(h => h.source === 'school_a').map(h => `<span class="domsrc-pill ds-school-a">${escape(h.label)}</span>`),
-              ...hits.filter(h => h.source === 'nsfc_mgmt').map(h => `<span class="domsrc-pill ds-nsfc_mgmt">${escape(h.label)}</span>`),
-              ...hits.filter(h => h.source === 'cscd').map(h => `<span class="domsrc-pill ds-cscd">${escape(h.label)}</span>`),
-              ...hits.filter(h => h.source === 'cstpcd').map(h => `<span class="domsrc-pill ds-cstpcd">${escape(h.label)}</span>`),
-              ...hits.filter(h => h.source.startsWith('cnkx')).map(h => `<span class="domsrc-pill ds-cnkx">${escape(h.label)}</span>`),
-            ].filter(Boolean).join('');
-            return `<tr class="j-row clickable" data-fid="${escape(favId(r))}" data-src="cnki_major">
-              <td style="width:36px">${starBtn(r, 'cnki_major')}</td>
-              <td class="jname" style="font-size:13.5px">${escape(r.name||'')}</td>
-              <td class="col-cross"><div class="badges">${badges || '<span class="muted-cell">—</span>'}</div></td>
-              <td class="muted-cell" style="width:110px">${escape(r.issn||'—')}</td>
-              <td class="muted-cell" style="width:100px">${escape(r.cn_code||'—')}</td>
-              <td class="muted-cell" style="width:110px">${escape(((r.major_categories||[]).length ? r.major_categories : (r.categories||[])).join(' · ') || '—')}</td>
-            </tr>`;
+            const cnkiBadge = `<span class="domsrc-pill ds-cnki_major" title="${T('中国知网中文期刊目录收录','Listed in CNKI Chinese journal directory')}">${T('知网','CNKI')}</span>`;
+            const crossBadges = renderDomCrossBadges(r, 'cnki_major');
+            const displayCats = (r.major_categories || []).length ? r.major_categories : (r.categories || []);
+            const catLine = displayCats.slice(0, 2).join(' · ');
+            return journalCardRow({
+              fid: favId(r), src: 'cnki_major',
+              favHtml: starBtn(r, 'cnki_major'),
+              nameHtml: `<div class="jname">${escape(r.name||'')}</div>`,
+              metaHtml: [
+                catLine ? jMetaChip(catLine, 'j-meta-topic-show') : '',
+                r.issn ? jMetaChip(`ISSN ${r.issn}`, 'j-meta-id') : '',
+                r.cn_code ? jMetaChip(`CN ${r.cn_code}`, 'j-meta-id') : '',
+              ].filter(Boolean).join(''),
+              bodyHtml: `<div class="j-card-badges badges">${cnkiBadge}${limitBadgeHtml(crossBadges, 6)}</div>`,
+            });
           }).join('')}
-          ${list.length > 200 ? `<tr><td colspan="6" class="empty">${T('仅显示前 200 条','First 200 only')}</td></tr>` : ''}
+          ${list.length > 200 ? `<tr><td class="empty">${T('仅显示前 200 条','First 200 only')}</td></tr>` : ''}
           </tbody></table></div>`
         });
       }
@@ -5628,20 +5618,19 @@
         sections.push({
           title: T('浙江大学 2024 期刊分级','ZJU 2024 Journal Tiers'),
           count: list.length,
-          html: `<div class="table-wrap"><table class="journals"><thead><tr>
-            <th style="width:36px" aria-label="Favorite"></th><th style="width:70px">${T('级别','Tier')}</th><th>${T('期刊','Journal')}</th><th>${T('交叉收录','Also In')}</th><th style="width:110px">ISSN / CN</th><th style="width:150px">${T('备注','Note')}</th>
-          </tr></thead><tbody>
+          html: `<div class="table-wrap"><table class="journals"><thead hidden><tr><th></th></tr></thead><tbody>
           ${list.slice(0, 200).map(r => {
             const tierBadge = `<span class="tier-pill ${tierClass[r.tier]||'t3'}">${escape(tn(r.tier, 'tier'))}</span>${(r.name||'').includes('*') ? ' <span class="warn-pill" style="background:var(--gold);color:#fff">★</span>' : ''}`;
             return renderDomRow(
               { ...r, name: (r.name||'').replace(/\*$/,'') },
-              { src: 'zju', extraCols: `<td class="muted-cell" style="width:150px">${escape(r.note||'')}</td>` }
-            ).replace(
-              /(<td class="col-fav"[^>]*>.*?<\/td>)/,
-              `$1<td style="width:70px">${tierBadge}</td>`
+              {
+                src: 'zju',
+                extraBadges: tierBadge,
+                metaHtml: r.note ? jMetaChip(r.note, 'j-meta-note') : '',
+              }
             );
           }).join('')}
-          ${list.length > 200 ? `<tr><td colspan="6" class="empty">${T('仅显示前 200 条','First 200 only')}</td></tr>` : ''}
+          ${list.length > 200 ? `<tr><td class="empty">${T('仅显示前 200 条','First 200 only')}</td></tr>` : ''}
           </tbody></table></div>`
         });
       }
@@ -5656,16 +5645,15 @@
         sections.push({
           title: T('高校自编目录 · 2023','School A · 2023'),
           count: f.length,
-          html: `<div class="table-wrap"><table class="journals"><thead><tr>
-            <th style="width:36px" aria-label="Favorite"></th><th style="width:70px">${T('级别','Tier')}</th><th>${T('期刊','Journal')}</th><th>${T('交叉收录','Also In')}</th><th style="width:110px">ISSN / CN</th>
-          </tr></thead><tbody>
+          html: `<div class="table-wrap"><table class="journals"><thead hidden><tr><th></th></tr></thead><tbody>
           ${f.slice(0, 200).map(r => {
             const tierBadge = `<span class="tier-pill ${tierClass[r.tier]||'t3'}">${escape(tn(r.tier, 'tier'))}</span>`;
             return renderDomRow(
               { ...r, name: (r.name||'').replace(/\*$/,'') },
-              { src: 'school_a', extraCols: '' }
-            ).replace(/<tr class="j-row clickable" /, `<tr class="j-row clickable" ><td style="width:70px">${tierBadge}</td>`);
+              { src: 'school_a', extraBadges: tierBadge }
+            );
           }).join('')}
+          ${f.length > 200 ? `<tr><td class="empty">${T('仅显示前 200 条','First 200 only')}</td></tr>` : ''}
           </tbody></table></div>`
         });
       }
@@ -6765,26 +6753,19 @@
         const recs = byTier[tier]; if (!recs || !recs.length) continue;
         html.push(`<details class="section-block" style="margin-top:14px" ${q?'open':(tier==='一级'?'open':'')}>
           <summary>${T('国内','Domestic ')}${escape(tn(tier, "tier"))}${T('学术期刊',' Journals')} <span class="muted-cell">(${recs.length})</span></summary>
-          <div class="table-wrap" style="margin-top:10px"><table class="journals"><thead><tr>
-            <th style="width:70px">${T('级别','Tier')}</th><th>${T('期刊','Journal')}</th><th style="width:110px">ISSN / CN</th><th style="width:150px">${T('备注','Note')}</th><th>${T('交叉收录','Also In')}</th><th style="width:40px"></th>
-          </tr></thead><tbody>
+          <div class="table-wrap" style="margin-top:10px"><table class="journals"><thead hidden><tr><th></th></tr></thead><tbody>
           ${recs.slice(0, 1500).map(r => {
             const tierBadge = `<span class="tier-pill ${tierClass[r.tier]||'t3'}">${escape(tn(r.tier, "tier"))}</span>${r.name.includes('*') ? ' <span class="warn-pill" style="background:var(--gold);color:#fff">★</span>' : ''}`;
             return renderDomRow(
               { ...r, name: r.name.replace(/\*$/,'') },
               {
                 src: 'zju',
-                extraCols: `<td class="muted-cell" style="width:150px">${escape(r.note||'')}</td>`,
-                extraBadges: '',
+                extraBadges: tierBadge,
+                metaHtml: r.note ? jMetaChip(r.note, 'j-meta-note') : '',
               }
-            ).replace(
-              /<td style="width:60px">[^<]*<\/td>/, ''
-            ).replace(
-              /<tr class="j-row clickable" (data-fid=[^>]+)>/,
-              `<tr class="j-row clickable" $1><td style="width:70px">${tierBadge}</td>`
             );
           }).join('')}
-          ${recs.length > 1500 ? `<tr><td colspan="6" class="empty">${T('仅显示前 1500 条，请在搜索框内精确查找','Showing first 1500 — please refine search')}</td></tr>` : ''}
+          ${recs.length > 1500 ? `<tr><td class="empty">${T('仅显示前 1500 条，请在搜索框内精确查找','Showing first 1500 — please refine search')}</td></tr>` : ''}
           </tbody></table></div>
         </details>`);
       }
@@ -6818,17 +6799,12 @@
           const recs = byTier[tier]; if (!recs || !recs.length) continue;
           html.push(`<details class="section-block" style="margin-top:14px" ${q?'open':(tier==='一级'?'open':'')}>
             <summary>${T('国内','Domestic ')}${escape(tn(tier, "tier"))}${T('学术期刊',' Journals')} <span class="muted-cell">(${recs.length})</span></summary>
-            <div class="table-wrap" style="margin-top:10px"><table class="journals"><thead><tr>
-              <th style="width:70px">${T('级别','Tier')}</th><th>${T('期刊','Journal')}</th><th style="width:110px">ISSN / CN</th><th style="width:150px">${T('备注','Note')}</th><th>${T('交叉收录','Also In')}</th><th style="width:40px"></th>
-            </tr></thead><tbody>
+            <div class="table-wrap" style="margin-top:10px"><table class="journals"><thead hidden><tr><th></th></tr></thead><tbody>
             ${recs.slice(0, 1500).map(r => {
               const tierBadge = `<span class="tier-pill ${tierClass[r.tier]||'t3'}">${escape(tn(r.tier, "tier"))}</span>${r.name.includes('*') ? ' <span class="warn-pill" style="background:var(--gold);color:#fff">★</span>' : ''}`;
               return renderDomRow(
                 { ...r, name: r.name.replace(/\*$/,'') },
-                { src: 'school_a', extraCols: `<td class="muted-cell" style="width:150px">${escape(r.note||'')}</td>` }
-              ).replace(
-                /<tr class="j-row clickable" (data-fid=[^>]+)>/,
-                `<tr class="j-row clickable" $1><td style="width:70px">${tierBadge}</td>`
+                { src: 'school_a', extraBadges: tierBadge }
               );
             }).join('')}
             </tbody></table></div>
