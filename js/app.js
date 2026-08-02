@@ -14517,7 +14517,7 @@
       const needsFullForTab = initialPath === '/import'
         || ['int', 'fav', 'pick'].includes(initialTab);
       const [j, m, esi, aliases, underReviewIssns, onHoldIssns] = await Promise.all([
-        fetchJSON('data/journals_light.json.gz'),
+        fetchJSON('data/journals_light_v2.json.gz'),
         fetch('/data/meta.json').then(r => r.json()).catch(() => null),
         fetch('/data/esi_categories.json').then(r => r.json()).catch(() => []),
         fetch('/data/journal_aliases.json').then(r => r.json()).catch(() => DEFAULT_JOURNAL_ALIASES),
