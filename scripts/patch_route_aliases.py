@@ -17,6 +17,7 @@ ROOT = Path(__file__).resolve().parent.parent
 DATA_GZ = ROOT / "data" / "journals.json.gz"
 DATA_JSON = ROOT / "data" / "journals.json"
 LIGHT_FILES = [
+    (ROOT / "data" / "journals_light.json.gz", None),
     (ROOT / "data" / "jm.json.gz", ROOT / "data" / "jm.json"),
     (ROOT / "data" / "journals_mobile.json.gz", ROOT / "data" / "journals_mobile.json"),
 ]
