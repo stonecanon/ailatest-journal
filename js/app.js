@@ -2783,7 +2783,20 @@
   let activeListId = null;
   const DEFAULT_FAV_LIST_NAMES = ['默认收藏', 'My Favorites'];
   function defaultFavListName() { return T('默认收藏', 'My Favorites'); }
-  function isDefaultFavListName(name) { return DEFAULT_FAV_LIST_NAMES.includes(String(name || '').trim()); }
+  /** 收集所有语言包中「默认收藏」的翻译，用于识别跨语言残留的默认清单名 */
+  function allDefaultFavListNames() {
+    const names = new Set(DEFAULT_FAV_LIST_NAMES);
+    try {
+      for (const pack of Object.values(INLINE_I18N)) {
+        const v = pack && pack['默认收藏'];
+        if (v) names.add(String(v).trim());
+      }
+    } catch (_) {}
+    return names;
+  }
+  function isDefaultFavListName(name) {
+    return allDefaultFavListNames().has(String(name || '').trim());
+  }
   function favListDisplayName(list) {
     if (list && list.id === 'default' && isDefaultFavListName(list.name)) return defaultFavListName();
     return String((list && list.name) || T('未命名','Untitled'));
