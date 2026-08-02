@@ -1743,10 +1743,13 @@
         issn: issns.join(','),
         years: years.join(','),
       });
+      const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      const timer = controller ? setTimeout(() => controller.abort(), 8000) : null;
       try {
         // 勿 force-cache：空结果（缺 key / 上游失败）会被永久缓存成「无分布」
         const resp = await fetch(`${API_BASE}/openalex/country-output?${params.toString()}`, {
           cache: 'default',
+          ...(controller ? { signal: controller.signal } : {}),
         });
         if (!resp.ok) return { handled: false, payload: null };
         const raw = await resp.json();
@@ -1756,6 +1759,8 @@
         return { handled: false, payload: null, reason: raw?.reason || 'empty' };
       } catch (_) {
         return { handled: false, payload: null };
+      } finally {
+        if (timer) clearTimeout(timer);
       }
     };
     const fetchYear = async (sourceIssn, year, attempt = 0) => {
@@ -1992,7 +1997,7 @@
       // 2) 无预置：先展示出版地，并提示正在补全作者机构分布
       box.innerHTML = renderCountryOutputFallback(r, { loading: true });
       // 3) 实时补全（API∥浏览器 OpenAlex）；超时后保留出版地，避免永远转圈
-      withTimeout(fetchCountryOutputData(r), 16000)
+      withTimeout(fetchCountryOutputData(r), 9000)
         .then((payload) => {
           if (!box.isConnected) return;
           if (!paint(payload)) {
