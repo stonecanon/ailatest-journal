@@ -4,6 +4,8 @@
       nav_about: '关于',
       nav_home: '首页',
       nav_features: '功能',
+      nav_how: '怎么用',
+      nav_rank: '榜单',
       download_center: '下载',
       rail_global: '全球',
       rail_china: '中国',
@@ -44,6 +46,8 @@
       nav_about: 'About',
       nav_home: 'Home',
       nav_features: 'Features',
+      nav_how: 'How it works',
+      nav_rank: 'Rankings',
       download_center: 'Download',
       rail_global: 'Global',
       rail_china: 'China',
@@ -153,7 +157,7 @@
       signup: 'home',
     };
     const active = map[navKey] || navKey;
-    document.querySelectorAll('.page-head [data-nav]').forEach((a) => {
+    document.querySelectorAll('.page-head [data-nav], .pricing-head [data-nav]').forEach((a) => {
       const on = a.getAttribute('data-nav') === active;
       a.classList.toggle('active', on);
       if (on) a.setAttribute('aria-current', 'page');

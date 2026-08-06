@@ -11,8 +11,9 @@
 <meta property="og:url" content="https://journal.ailatest.org/pricing" />
 <meta property="og:type" content="website" />
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
+<link rel="stylesheet" href="/css/app.css?v=20260806-rmb-estimate-v1" />
 <link rel="stylesheet" href="/css/static.css?v=20260806-rail-consistency" />
-<link rel="stylesheet" href="/css/pricing-page.css?v=20260806-rmb-estimate-v1" />
+<link rel="stylesheet" href="/css/pricing-page.css?v=20260806-home-shell-v1" />
 </head>
 <body data-static-page="pricing" data-billing="year">
 <aside class="app-rail" aria-label="Primary navigation">
@@ -51,21 +52,20 @@
   </div>
 </aside>
 
-<header class="page-head">
-  <a class="brand" href="/">AILatest <span>Journal</span></a>
-  <nav class="page-head-nav" aria-label="Site">
-    <a href="/" data-static-i18n="nav_home">首页</a>
-    <a href="/#feat" data-static-i18n="nav_features">功能</a>
-    <a href="/pricing" data-static-i18n="nav_pricing" aria-current="page">订阅</a>
-    <a href="/#download" data-static-i18n="download_center">下载</a>
-    <a href="/about" data-static-i18n="nav_about">关于</a>
-    <a href="/contact" data-static-i18n="nav_contact">联系</a>
-    <a class="cta" href="/signup.html?next=%2Fpricing" data-static-i18n="nav_login">注册 / 登录</a>
-    <button class="static-lang-toggle" type="button" data-static-lang-toggle>English</button>
+<header class="pricing-head">
+  <a class="topbar-brand" href="/" data-topbar-home aria-label="AILatest Journal">AILatest <em>Journal</em></a>
+  <nav class="home-top-nav pricing-top-nav" aria-label="Site">
+    <a href="/#feat" data-static-i18n="nav_features" data-nav="features">功能</a>
+    <a href="/#how" data-static-i18n="nav_how" data-nav="how">怎么用</a>
+    <a href="/#rankings" data-static-i18n="nav_rank" data-nav="rank">榜单</a>
+    <a href="/pricing" data-static-i18n="nav_pricing" data-nav="pricing" aria-current="page">订阅</a>
+    <a href="/#download" data-static-i18n="download_center" data-nav="download">下载</a>
+    <a href="/#contact" data-static-i18n="nav_contact" data-nav="contact">联系</a>
+    <button class="lang-toggle" type="button" data-static-lang-toggle>English</button>
   </nav>
 </header>
 
-<main class="px-page">
+<main class="px-page home-v4">
   <div class="px-hero">
     <div class="px-kicker">Pricing</div>
     <div data-lang-panel="zh-CN">
@@ -420,7 +420,7 @@
   </p>
 </main>
 
-<script src="/js/static-i18n.js?v=20260716-pricing-v4" defer></script>
+<script src="/js/static-i18n.js?v=20260806-home-shell-v1" defer></script>
 <script src="/js/pricing-checkout.js?v=20260806-rmb-estimate-v3" defer></script>
 <script src="/js/site-rail.js?v=20260716-pricing-v4" defer></script>
 </body>

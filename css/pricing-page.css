@@ -1,23 +1,49 @@
-/* AILatest Journal — 订阅详情页（全新设计，不复用旧版 pricing 内联样式） */
+/* AILatest Journal — pricing content on the shared home application shell. */
 
 body[data-static-page="pricing"] {
   background-color: #fffdf9;
   background-image:
-    radial-gradient(ellipse 720px 460px at 50% 6%, rgba(249, 115, 22, 0.13), transparent 70%),
-    radial-gradient(ellipse 640px 480px at 90% 70%, rgba(16, 185, 129, 0.06), transparent 72%),
-    linear-gradient(rgba(39, 35, 31, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(39, 35, 31, 0.035) 1px, transparent 1px),
-    linear-gradient(180deg, #fffefa 0%, #fffaf2 40%, #fffdf9 100%);
+    radial-gradient(ellipse 680px 440px at 52% 18%, rgba(249, 115, 22, .13), transparent 72%),
+    radial-gradient(ellipse 780px 520px at 86% 80%, rgba(31, 44, 76, .055), transparent 72%),
+    linear-gradient(rgba(39, 35, 31, .035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(39, 35, 31, .035) 1px, transparent 1px),
+    linear-gradient(180deg, #fffefa 0%, #fffaf2 42%, #fffdf9 100%);
+  background-repeat: no-repeat, no-repeat, repeat, repeat, no-repeat;
   background-size: cover, cover, 60px 60px, 60px 60px, cover;
   background-attachment: fixed;
   color: #1c1917;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
 }
 
-.px-page {
-  width: min(1100px, 100%);
+/* static.css gives all <main> elements an 880px reading width. Pricing is a
+   product surface, so it follows the homepage's 1120px content rail instead. */
+main.px-page {
+  width: 100%;
+  max-width: 1120px;
   margin: 0 auto;
   padding: 28px 20px 96px;
   box-sizing: border-box;
+  flex: 1 0 auto;
+}
+
+/* Reuse the homepage brand and top navigation instead of a second static-page
+   header treatment. The static page script keeps a dedicated pricing-head
+   hook so active navigation still works without static-page overrides. */
+body[data-static-page="pricing"] .pricing-head {
+  position: static;
+  display: block;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  backdrop-filter: none;
+}
+body[data-static-page="pricing"] .pricing-top-nav {
+  display: flex !important;
+}
+body[data-static-page="pricing"] .pricing-top-nav .lang-toggle {
+  margin-left: 4px;
 }
 
 /* Hero */
@@ -550,8 +576,27 @@ html:not([lang="en"]):not([data-static-lang="en"]):not([data-ui-lang="en"]) [dat
     padding-left: 0;
     background-attachment: scroll;
   }
-  .px-page {
+  main.px-page {
     padding: 18px 14px 80px;
+  }
+  body[data-static-page="pricing"] .pricing-top-nav {
+    top: 10px;
+    right: 10px;
+    max-width: calc(100vw - 20px);
+    gap: 1px;
+  }
+  body[data-static-page="pricing"] .pricing-top-nav a {
+    padding: 5px 6px;
+    font-size: 11px;
+  }
+  body[data-static-page="pricing"] .pricing-top-nav .lang-toggle {
+    padding: 5px 9px;
+    font-size: 11px;
+  }
+  body[data-static-page="pricing"] .topbar-brand {
+    left: 14px;
+    top: 14px;
+    font-size: 14px;
   }
   .px-plans,
   .px-guide {
