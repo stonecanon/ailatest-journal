@@ -499,7 +499,10 @@
         // 教育价按钮保持可点以弹出登录/提示；不 disabled
         if (elig.reason === 'login') {
           el.title = L('请使用机构邮箱登录后购买教育价', 'Sign in with an institutional email for education pricing');
-          const t = L(`教育价 ${price} · 登录解锁`, `Edu ${price} · sign in`);
+          // Do not advertise the discounted amount as if it were available to a
+          // guest.  The exact amount is shown only after the institutional email
+          // has been verified by eduEligibility().
+          const t = L('教育价 · 登录后解锁', 'Edu pricing · sign in to unlock');
           if (isSettings) el.innerHTML = `${t}<span>→</span>`;
           else el.textContent = t;
         } else {
@@ -507,7 +510,7 @@
             `当前邮箱 ${elig.email || '—'} 不是机构域名，无法使用教育价`,
             `Current email ${elig.email || '—'} is not institutional; education checkout is locked`
           );
-          const t = L(`教育价 ${price} · 需机构邮箱`, `Edu ${price} · institutional email`);
+          const t = L('教育价 · 需机构邮箱', 'Edu pricing · institutional email required');
           if (isSettings) el.innerHTML = `${t}<span>—</span>`;
           else el.textContent = t;
         }
