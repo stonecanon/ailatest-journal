@@ -39,6 +39,7 @@ import { handleChat } from './chat.js';
 import { handlePick } from './pick.js';
 import { handleExtLookup } from './ext-lookup.js';
 import { renderSitesDashboard } from './sites-dashboard.js';
+import { renderAdmin, routeAdminApi } from './admin.js';
 import { classifyRequestTraffic } from './traffic-classifier.js';
 import {
   buildPublicSearchResponse,
@@ -223,10 +224,21 @@ async function getUser(req, env) {
   const token = h.startsWith('Bearer ') ? h.slice(7) : '';
   const payload = await verifyJWT(token, env.JWT_SECRET);
   if (!payload || payload.uid == null) return null;
-  const row = await env.DB.prepare(
-    'SELECT id, email, github_id, google_id, login, name, avatar_url, provider FROM users WHERE id = ?'
-  ).bind(payload.uid).first();
+  let row;
+  try {
+    row = await env.DB.prepare(
+      'SELECT id, email, github_id, google_id, login, name, avatar_url, provider, status FROM users WHERE id = ?'
+    ).bind(payload.uid).first();
+  } catch (_) {
+    // The status column is added lazily by the owner console for older D1s.
+    row = await env.DB.prepare(
+      'SELECT id, email, github_id, google_id, login, name, avatar_url, provider FROM users WHERE id = ?'
+    ).bind(payload.uid).first();
+  }
   if (!row) return null;
+  // Admin soft-deletes users instead of removing rows.  A disabled account
+  // must not be able to keep using a previously issued JWT.
+  if (String(row.status || 'active').toLowerCase() !== 'active') return null;
   // JWT 可能带 email（Google/邮箱登录）；DB 为空时回填，避免站长判定失败
   const jwtEmail = String(payload.email || '').toLowerCase().trim();
   if (jwtEmail && isEmail(jwtEmail) && !String(row.email || '').trim()) {
@@ -929,9 +941,15 @@ async function routeAiUsageSummary(req, env) {
 }
 
 async function getUserById(env, id) {
-  return env.DB.prepare(
-    'SELECT id, email, github_id, google_id, login, name, avatar_url, provider FROM users WHERE id = ?'
-  ).bind(id).first();
+  try {
+    return await env.DB.prepare(
+      'SELECT id, email, github_id, google_id, login, name, avatar_url, provider, status FROM users WHERE id = ?'
+    ).bind(id).first();
+  } catch (_) {
+    return env.DB.prepare(
+      'SELECT id, email, github_id, google_id, login, name, avatar_url, provider FROM users WHERE id = ?'
+    ).bind(id).first();
+  }
 }
 
 function publicUser(u) {
@@ -2960,6 +2978,11 @@ function routeApiPortal() {
     <a class="btn" href="/analytics/sites">打开看板 →</a>
   </div>
   <div class="card">
+    <h2>统一后台管理</h2>
+    <p>站长专用：项目、用户、权益、会员、礼品码、API Key、支付记录、覆盖配置与审计日志。</p>
+    <a class="btn" href="/admin">打开后台 →</a>
+  </div>
+  <div class="card">
     <h2>已接入站点</h2>
     <ul>
       <li><code>journal.ailatest.org</code></li>
@@ -3188,6 +3211,10 @@ export default {
       if ((p === '/analytics/sites' || p === '/analytics/sites/') && req.method === 'GET') return routeSitesDashboard('overview');
       const mAnalyticsSite = p.match(/^\/analytics\/sites\/([a-z0-9_-]+)\/?$/i);
       if (mAnalyticsSite && req.method === 'GET') return routeSitesDashboard(mAnalyticsSite[1]);
+      // Unified owner console.  The HTML shell is intentionally lightweight;
+      // every data read/write below is gated again by routeAdminApi.
+      if ((p === '/admin' || p === '/admin/') && req.method === 'GET') return renderAdmin();
+      if (p.startsWith('/admin/api/')) return routeAdminApi(req, env, { getUser, isOwnerUser });
       if (p === '/analytics/journal-view-trend' && req.method === 'GET') return routeJournalViewTrend(req, env);
       if (p === '/analytics/site-traffic-trend' && req.method === 'GET') return routeSiteTrafficTrend(req, env);
       if (p === '/analytics/public-total' && req.method === 'GET') return routePublicTrafficTotal(req, env);

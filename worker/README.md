@@ -44,6 +44,25 @@ Email code, GitHub OAuth, Google OAuth login + journal favorites, persisted in D
    npx wrangler deploy
    ```
 
+## 统一后台
+
+部署后从 `https://api.ailatest.org/admin` 进入站长后台，使用
+`jiantaoweng@gmail.com` 的 Google 账号登录。后台覆盖 Journal、Grant、Path、
+Major、Todo 与 Studio：项目注册表、用户、权益、跨产品会员、礼品码、API Key、
+Creem 会员/回调记录、D1 覆盖配置和审计日志。
+
+所有接口都在 Worker 端再次校验站长邮箱；后台的“删除”只执行停用或归档，
+不会物理删除用户、付款或历史统计。付款退款仍需在 Creem 完成。期刊主体数据
+目前继续由 Pages 的静态数据发布，后台的覆盖配置用于逐步添加隐藏、风险标记和
+补充字段，不直接改写大型静态数据文件。
+
+首次打开后台会自动补齐旧 D1 的管理表和 `users.status` / `users.admin_note` 字段。
+如需显式执行迁移，可运行：
+
+```bash
+npx wrangler d1 migrations apply ailatest-journal --remote
+```
+
 **5. 绑定自定义域（可选）**
    - Cloudflare → Workers → ailatest-journal-api → Triggers → Custom Domains
    - 添加 `api.ailatest.org`

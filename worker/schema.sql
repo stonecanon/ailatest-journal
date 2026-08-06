@@ -8,6 +8,8 @@ CREATE TABLE IF NOT EXISTS users (
   name        TEXT,
   avatar_url  TEXT,
   provider    TEXT,                    -- 'email' | 'github' | 'google'
+  status      TEXT NOT NULL DEFAULT 'active',
+  admin_note  TEXT NOT NULL DEFAULT '',
   created_at  INTEGER NOT NULL,
   updated_at  INTEGER NOT NULL
 );
@@ -98,6 +100,44 @@ CREATE TABLE IF NOT EXISTS pick_usage (
 );
 
 CREATE INDEX IF NOT EXISTS idx_fav_lists_user ON fav_lists(user_id);
+
+-- Owner console (soft-delete/override records; all writes are owner-gated).
+CREATE TABLE IF NOT EXISTS admin_audit_log (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  actor_user_id INTEGER,
+  actor_email TEXT,
+  action TEXT NOT NULL,
+  resource_type TEXT NOT NULL,
+  resource_id TEXT,
+  before_json TEXT,
+  after_json TEXT,
+  created_at INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_admin_audit_created ON admin_audit_log(created_at DESC);
+
+CREATE TABLE IF NOT EXISTS project_registry (
+  project_id TEXT PRIMARY KEY,
+  label TEXT NOT NULL,
+  host TEXT NOT NULL,
+  kind TEXT NOT NULL DEFAULT 'product',
+  status TEXT NOT NULL DEFAULT 'active',
+  note TEXT NOT NULL DEFAULT '',
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_project_registry_status ON project_registry(status, updated_at DESC);
+
+CREATE TABLE IF NOT EXISTS content_overrides (
+  project_id TEXT NOT NULL,
+  record_key TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'active',
+  payload_json TEXT NOT NULL DEFAULT '{}',
+  note TEXT NOT NULL DEFAULT '',
+  updated_by INTEGER,
+  updated_at INTEGER NOT NULL,
+  PRIMARY KEY (project_id, record_key)
+);
+CREATE INDEX IF NOT EXISTS idx_content_overrides_project ON content_overrides(project_id, updated_at DESC);
 CREATE INDEX IF NOT EXISTS idx_favorites_user ON favorites(user_id);
 CREATE INDEX IF NOT EXISTS idx_users_email    ON users(email);
 CREATE INDEX IF NOT EXISTS idx_users_google   ON users(google_id);
