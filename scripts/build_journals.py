@@ -2018,9 +2018,28 @@ def main():
     with open(DATA_DIR / 'domestic.json', 'w', encoding='utf-8') as f:
         json.dump(domestic, f, ensure_ascii=False)
 
+    def load_optional_meta(name):
+        path = LIST_DIR / name
+        if not path.exists():
+            return {}
+        try:
+            return json.loads(path.read_text(encoding='utf-8'))
+        except Exception:
+            return {}
+
+    doaj_meta = load_optional_meta('doaj_meta.json')
+    medline_meta = load_optional_meta('medline_meta.json')
+    oaj_updated = ''
+    if OAJ_FILE.exists():
+        try:
+            oaj_rows = json.loads(OAJ_FILE.read_text(encoding='utf-8'))
+            oaj_updated = max((str(row.get('fetched_at') or '')[:10] for row in oaj_rows), default='')
+        except Exception:
+            pass
+
     # meta
     meta = {
-        'source': 'WoS Core + JCR 2025 + ESI + 中科院 2025 + 长江大学 + ShowJCR (JCR/FQB/XR/CCF/Warning) + Scopus (auto-updated) + EI Compendex Jul. 9, 2026 + ABDC optional + ABS AJG + 中国科协 + CSCD + 中国科技核心 + OAJ 2025 + DOAJ Journal CSV',
+        'source': 'WoS Core + JCR 2025 + ESI + 中科院 2025 + 长江大学 + ShowJCR (JCR/FQB/XR/CCF/Warning) + Scopus + EI Compendex Jul. 9, 2026 + ABDC + ABS AJG + 中国科协 + CSCD + 中国科技核心 + OAJ + DOAJ Journal CSV + NCBI MEDLINE',
         'last_updated_source': 'WoS Core 2026-06-15',
         'total': len(journals),
         'indices': dict(idx_c),
@@ -2040,6 +2059,9 @@ def main():
         'with_cas_mega': cas_mega_count,
         'with_oaj': oaj_count,
         'with_doaj': doaj_count,
+        'with_medline': medline_count,
+        'with_pubmed': pubmed_count,
+        'with_pmc': pmc_count,
         'with_cnkx': cnkx_count,
         'with_cscd': cscd_count,
         'with_cstpcd': cstpcd_count,
@@ -2050,6 +2072,11 @@ def main():
         'with_ei': ei_count,
         'wos_categories': len(wos_c),
         'esi_categories': len(esi_c),
+        'doaj_source_updated': doaj_meta.get('source_updated') or '',
+        'doaj_source_url': doaj_meta.get('source_url') or 'https://doaj.org/csv',
+        'oaj_source_updated': oaj_updated,
+        'medline_source_updated': str(medline_meta.get('fetched_at') or '')[:10],
+        'medline_source_url': medline_meta.get('source_url') or 'https://www.ncbi.nlm.nih.gov/nlmcatalog/journals/',
     }
     with open(DATA_DIR / 'meta.json', 'w', encoding='utf-8') as f:
         json.dump(meta, f, ensure_ascii=False, indent=2)

@@ -1,7 +1,7 @@
 {
-  "source": "WoS Core + JCR 2025 + ESI + 中科院 2025 + 长江大学 + ShowJCR (JCR/FQB/XR/CCF/Warning) + Scopus (auto-updated) + EI Compendex Jul. 9, 2026 + ABDC optional + ABS AJG + 中国科协 + CSCD + 中国科技核心 + OAJ 2025 + DOAJ Journal CSV",
+  "source": "WoS Core 2026-06-15 + JCR 2025 + ESI + 中科院 2025 + Scopus 2026-05 + EI Compendex 2026-07-09 + DOAJ 2026-07-06 + OAJ current + NCBI MEDLINE current + regional and specialty indexes",
   "last_updated_source": "WoS Core 2026-06-15",
-  "total": 48818,
+  "total": 50350,
   "indices": {
     "ESCI": 9356,
     "AHCI": 1799,
@@ -9,7 +9,7 @@
     "EI": 4887,
     "SSCI": 3538
   },
-  "with_if_2024": 21525,
+  "with_if_2024": 22520,
   "with_cas_zone": 21695,
   "with_cas_top": 1788,
   "with_warning": 105,
@@ -23,8 +23,8 @@
   "with_vhb": 1039,
   "with_cnrs": 839,
   "with_cas_mega": 76,
-  "with_oaj": 765,
-  "with_doaj": 21398,
+  "with_oaj": 838,
+  "with_doaj": 22975,
   "with_cnkx": 6038,
   "with_cscd": 1072,
   "with_cstpcd": 259,
@@ -38,27 +38,27 @@
   "oa_enriched": true,
   "oa_source": "OpenAlex snapshot 2026-05",
   "oa_stats": {
-    "matched_issns": 67933,
-    "has_homepage": 53348,
-    "has_apc": 17263,
+    "matched_issns": 67910,
+    "has_homepage": 53326,
+    "has_apc": 17299,
     "labels": {
-      "diamond": 23075,
-      "subscription_paid_read": 22922,
-      "gold_apc": 11974,
-      "hybrid": 9962
+      "diamond": 22984,
+      "gold_apc": 11977,
+      "subscription_paid_read": 22949,
+      "hybrid": 10000
     },
-    "is_oa": 35049,
-    "in_doaj": 30223,
-    "annual_outputs": 41604
+    "is_oa": 34961,
+    "in_doaj": 30130,
+    "annual_outputs": 41631
   },
   "annual_outputs_source": "OpenAlex sources counts_by_year",
-  "annual_outputs_count": 51881,
+  "annual_outputs_count": 41631,
   "with_retraction": 5228,
   "jcr_latest_metric_year": 2025,
   "jcr_latest_release_year": 2026,
-  "with_if_2025": 22643,
+  "with_if_2025": 21975,
   "with_publication_history": 29886,
-  "with_free_to_publish": 33326,
+  "with_free_to_publish": 33256,
   "with_if_history_by_year": {
     "2021": 12134,
     "2022": 20417,
@@ -73,5 +73,20 @@
   "wos_source_updated": "2026-06-15",
   "wos_source_url": "https://mjl.clarivate.com/collection-list-downloads",
   "wos_historical_records": 277,
-  "with_self_citation_2024": 2188
+  "with_self_citation_2024": 2188,
+  "with_medline": 5368,
+  "with_pubmed": 16591,
+  "with_pmc": 10154,
+  "doaj_source_updated": "2026-07-06",
+  "doaj_source_url": "https://doaj.org/csv",
+  "oaj_source_updated": "2026-08-06",
+  "medline_source_updated": "2026-08-06",
+  "medline_source_url": "https://www.ncbi.nlm.nih.gov/nlmcatalog/journals/",
+  "data_bundle_updated": "2026-08-06",
+  "with_jcr_quartile": 22834,
+  "with_cas_major": 22592,
+  "with_review_cycle": 26070,
+  "with_on_hold": 19,
+  "with_under_review": 44,
+  "with_citic_warning": 39
 }

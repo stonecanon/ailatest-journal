@@ -4,6 +4,7 @@
  * 为微信小程序提供的搜索API，数据源来自 journal.ailatest.org 的静态构建产物。
  *
  * Endpoints:
+ *   GET /api/stats
  *   GET /api/search?q=&page=1&limit=20&indices=&zone=&topic=
  *   GET /api/journal/:issn
  *   GET /api/journals/batch?ids=issn1,issn2
@@ -230,6 +231,18 @@ async function handleFilters() {
   };
 }
 
+async function handleStats() {
+  const response = await fetch('https://journal.ailatest.org/data/meta.json');
+  if (!response.ok) throw new Error(`Failed to fetch metadata: ${response.status}`);
+  const meta = await response.json();
+  return {
+    journals: Number(meta.total || 0),
+    last_updated: meta.last_updated_source || '',
+    indices: meta.indices || {},
+    with_if: Number(meta.with_if_2025 || meta.with_if_2024 || 0),
+  };
+}
+
 // ───────── main entry ─────────
 export async function onRequest(context) {
   const { request } = context;
@@ -246,6 +259,8 @@ export async function onRequest(context) {
     let result;
     if (path === '/api/search') {
       result = await handleSearch(url);
+    } else if (path === '/api/stats') {
+      result = await handleStats();
     } else if (path === '/api/filters') {
       result = await handleFilters();
     } else if (path === '/api/journals/batch') {

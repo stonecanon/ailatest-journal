@@ -11,6 +11,7 @@ The published compact data lives at data/korea.json.
 from __future__ import annotations
 
 import csv
+import gzip
 import json
 import re
 import urllib.request
@@ -98,10 +99,11 @@ def source_key(row: dict[str, str]) -> tuple[str, str]:
 def load_global_index() -> tuple[dict[str, dict], dict[str, dict]]:
     by_issn: dict[str, dict] = {}
     by_name: dict[str, dict] = {}
-    path = DATA_DIR / "journals_deploy.json"
+    path = DATA_DIR / "journals.json.gz"
     if not path.exists():
         return by_issn, by_name
-    records = json.loads(path.read_text(encoding="utf-8"))
+    with gzip.open(path, "rt", encoding="utf-8") as handle:
+        records = json.load(handle)
     for row in records:
         for key in (row.get("issn"), row.get("eissn")):
             key = clean_issn(key)

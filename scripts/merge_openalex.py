@@ -12,14 +12,16 @@ Label derivation (5-class subscription/OA model):
   unknown                  — fallback
 """
 import json
+import gzip
+import io
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 JOURNALS = ROOT / "data" / "journals.json"
 CACHE = ROOT / "data" / "openalex_cache.json"
 OUT = ROOT / "data" / "oa.json"
+OUT_GZ = ROOT / "data" / "oa.json.gz"
 ANNUAL_OUT = ROOT / "data" / "annual_outputs.json"
-ANNUAL_GZ = ROOT / "data" / "annual_outputs.json.gz"
 META = ROOT / "data" / "meta.json"
 
 
@@ -126,10 +128,12 @@ def main():
     # But JSON can't represent refs, so leave as-is; gzip will collapse them.
 
     OUT.write_text(json.dumps(out_map, ensure_ascii=False, separators=(',', ':')), encoding="utf-8")
+    out_raw = OUT.read_bytes()
+    out_buffer = io.BytesIO()
+    with gzip.GzipFile(fileobj=out_buffer, mode="wb", compresslevel=9, mtime=0) as handle:
+        handle.write(out_raw)
+    OUT_GZ.write_bytes(out_buffer.getvalue())
     ANNUAL_OUT.write_text(json.dumps(annual_map, ensure_ascii=False, separators=(',', ':')), encoding="utf-8")
-    import gzip
-    with gzip.open(ANNUAL_GZ, "wt", encoding="utf-8", compresslevel=9) as f:
-        json.dump(annual_map, f, ensure_ascii=False, separators=(',', ':'))
     size_kb = OUT.stat().st_size / 1024
     annual_size_kb = ANNUAL_OUT.stat().st_size / 1024
     print(f"oa.json written: {len(out_map):,} ISSN keys, {size_kb:.0f} KB")

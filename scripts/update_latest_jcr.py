@@ -325,7 +325,7 @@ def main() -> int:
         meta = {}
     meta["jcr_latest_metric_year"] = 2025
     meta["jcr_latest_release_year"] = 2026
-    meta["with_if_2025"] = matched
+    meta["with_if_2025"] = sum(rec.get("if_2025") not in (None, "") for rec in journals)
     meta["with_publication_history"] = pub_attached
     meta["with_free_to_publish"] = free_attached
     meta_path.write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")

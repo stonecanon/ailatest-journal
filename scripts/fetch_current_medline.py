@@ -18,6 +18,7 @@ Usage:
 """
 
 import json, time, os, sys
+from datetime import datetime, timezone
 from pathlib import Path
 from urllib.request import urlopen, Request
 from urllib.parse import quote
@@ -25,6 +26,7 @@ from urllib.parse import quote
 ROOT = Path(__file__).resolve().parent.parent
 LIST_DIR = ROOT / 'list'
 LIST_DIR.mkdir(parents=True, exist_ok=True)
+META_FILE = LIST_DIR / 'medline_meta.json'
 
 # NCBI expects email + tool name for fair use
 EMAIL = 'jiantaoweng@gmail.com'
@@ -64,7 +66,7 @@ def parse_issns_from_nlm_xml(xml):
     import re
     issns = set()
     # Pattern: <ISSN type="Print">xxxx-xxxx</ISSN> or <ISSN>xxxx-xxxx</ISSN>
-    for m in re.finditer(r'<ISSN[^>]*>(\\d{4}-\\d{3}[\\dxX])</ISSN>', xml):
+    for m in re.finditer(r'<ISSN[^>]*>(\d{4}-\d{3}[\dxX])</ISSN>', xml):
         issn = m.group(1).replace('-', '')
         if len(issn) == 8:
             issns.add(issn)
@@ -74,26 +76,33 @@ def save_list(issns, filename):
     """Save sorted unique ISSN list to JSON."""
     issns = sorted(set(issns))
     path = LIST_DIR / filename
-    with open(path, 'w', encoding='utf-8') as f:
+    temp = path.with_suffix(path.suffix + '.tmp')
+    with open(temp, 'w', encoding='utf-8') as f:
         json.dump(issns, f, ensure_ascii=False)
+    os.replace(temp, path)
     print(f'  {path.name}: {len(issns)} ISSNs ({path.stat().st_size:,} bytes)')
     return issns
 
 def main():
+    old_file = LIST_DIR / 'pubmed_issns.json'
+    old_count = 0
+    if old_file.exists():
+        try:
+            old_count = len(json.loads(old_file.read_text(encoding='utf-8')))
+        except Exception:
+            pass
+
     print('=== Step 1: Search NLM Catalog for currently indexed MEDLINE journals ===')
-    ids, total = esearch('"currently indexed in medline"[All]')
+    # NLM Catalog documents this filter as the literal term
+    # `currentlyindexed`. The older phrase query now returns zero results.
+    query = 'currentlyindexed'
+    ids, total = esearch(query)
     print(f'  Found {total} currently indexed journals')
     print(f'  Retrieved {len(ids)} IDs')
     
-    if total == 0:
-        print('  WARNING: No results! Try alternative query...')
-        # Fallback: search by MEDLINE subset in citations
-        ids, total = esearch('medline[sb]')
-        print(f'  Alternative query gave: {total}')
-        # This gives ~5,200-5,300
-        if total == 0:
-            print('  ERROR: NCBI API not reachable. Exiting.')
-            sys.exit(1)
+    if total < 4000:
+        print(f'  ERROR: Implausible NLM result count ({total}). Refusing to overwrite the source list.')
+        sys.exit(1)
     
     if not ids or len(ids) < total:
         print(f'  Incomplete results ({len(ids)}/{total}). Need pagination.')
@@ -101,7 +110,7 @@ def main():
         all_ids = list(ids)
         retstart = len(ids)
         while retstart < total:
-            more_ids, _ = esearch('"currently indexed in medline"[All]', retmax=99999, retstart=retstart)
+            more_ids, _ = esearch(query, retmax=99999, retstart=retstart)
             if not more_ids:
                 break
             all_ids.extend(more_ids)
@@ -110,26 +119,35 @@ def main():
             time.sleep(0.35)
         ids = all_ids
     
-    # If we still have < total, or total was 0, try the journal count approach
-    # The NLM catalog for "currently indexed" should return ~5,300
-    if len(ids) < 1000:
-        print('  WARNING: Too few results. Trying different query...')
-        ids, total = esearch('"currently indexed"[All]')
-        print(f'  Alternative: {total} journals')
+    if len(ids) < total:
+        print(f'  ERROR: Incomplete NLM result set ({len(ids)}/{total}). Refusing to overwrite.')
+        sys.exit(1)
     
     print(f'\n=== Step 2: Fetch ISSNs for {len(ids)} journals ===')
     medline_issns = efetch_nlm_details(ids)
+    if len(set(medline_issns)) < 5000:
+        print(f'  ERROR: Implausible ISSN count ({len(set(medline_issns))}). Refusing to overwrite.')
+        sys.exit(1)
     
     print(f'\n=== Step 3: Save results ===')
     save_list(medline_issns, 'pubmed_issns.json')
     
-    # Also show the old file for reference
-    old_file = LIST_DIR / 'pubmed_issns.json'
-    if old_file.exists():
-        old_data = json.load(open(old_file))
-        print(f'\n  OLD file had {len(old_data)} ISSNs (was: J_Medline.txt full list)')
+    fetched_at = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+    meta = {
+        'source': 'NCBI NLM Catalog',
+        'source_url': 'https://www.ncbi.nlm.nih.gov/nlmcatalog/journals/',
+        'query': query,
+        'fetched_at': fetched_at,
+        'journal_count': total,
+        'issn_count': len(set(medline_issns)),
+    }
+    temp_meta = META_FILE.with_suffix('.json.tmp')
+    temp_meta.write_text(json.dumps(meta, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    os.replace(temp_meta, META_FILE)
+    print(f'  Previous source list: {old_count} ISSNs')
+    print(f'  Wrote {META_FILE}')
     
-    print(f'\nDone! Run rebuild to update journal badges:\n  python3 scripts/build_journals.py')
+    print(f'\nDone! Sync the current directories into the production bundle:\n  python3 scripts/sync_current_directories.py')
 
 if __name__ == '__main__':
     main()

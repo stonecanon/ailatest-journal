@@ -303,6 +303,7 @@ def main() -> None:
     meta_path = DATA / "meta.json"
     meta = read_json(meta_path)
     counts = results["journals.json.gz"]["after"]
+    meta["total"] = len(full_records or [])
     for idx in WOS_INDEXES:
         meta.setdefault("indices", {})[idx] = counts.get(idx, 0)
     meta["last_updated_source"] = f"WoS Core {SOURCE_UPDATED}"

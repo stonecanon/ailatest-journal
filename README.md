@@ -18,14 +18,14 @@
   </p>
   <p>
     <a href="https://github.com/stonecanon/ailatest-journal/actions"><img src="https://img.shields.io/github/last-commit/stonecanon/ailatest-journal" alt="Last commit"></a>
-    <a href="https://journal.ailatest.org"><img src="https://img.shields.io/badge/dynamic/json?color=blue&label=journals&query=journals&suffix=%2B&url=https://journal.ailatest.org/api/stats" alt="Journals"></a>
+    <a href="https://journal.ailatest.org"><img src="https://img.shields.io/badge/dynamic/json?color=blue&label=journals&query=total&url=https://journal.ailatest.org/data/meta.json" alt="Journals"></a>
     <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License"></a>
   </p>
 </div>
 
 ---
 
-**AILatest Journal (知刊)** 是一个免费、开源的学术期刊检索与推荐平台，收录 **44,844 本**国际期刊，覆盖 **SCIE / SSCI / AHCI / ESCI / EI / Scopus / DOAJ / MEDLINE** 等主流索引，提供影响因子、中科院/JCR分区、审稿周期、预警信息等关键投稿指标。
+**AILatest Journal (知刊)** 是一个免费、开源的学术期刊检索与推荐平台，收录 **50,350 本**国际期刊，覆盖 **SCIE / SSCI / AHCI / ESCI / EI / Scopus / DOAJ / MEDLINE** 等主流索引，提供影响因子、中科院/JCR分区、审稿周期、预警信息等关键投稿指标。
 
 纯前端 SPA，数据全部客户端搜索，毫秒级响应。无需后端服务器，部署于 Cloudflare Pages。
 
@@ -51,31 +51,31 @@
 
 | 指标 | Metric | 数量 |
 |------|--------|-----:|
-| **总期刊数** | **Total journals** | **44,844** |
-| 🟢 **SCIE** | Science Citation Index Expanded | **9,527** |
-| 🟡 **SSCI** | Social Sciences Citation Index | **3,557** |
-| 🔵 **AHCI** | Arts & Humanities Citation Index | **1,819** |
-| 🟣 **ESCI** | Emerging Sources Citation Index | **9,449** |
-| 🟠 **EI** | Engineering Index (Compendex) | **4,503** |
-| 📘 **Scopus** | Scopus (无 WoS 覆盖) | **30,445** |
-| 📗 **DOAJ** | Directory of Open Access Journals | **21,395** |
-| 📕 **MEDLINE** | MEDLINE Indexed | **7,181** |
+| **总期刊数** | **Total journals** | **50,350** |
+| 🟢 **SCIE** | Science Citation Index Expanded | **9,433** |
+| 🟡 **SSCI** | Social Sciences Citation Index | **3,538** |
+| 🔵 **AHCI** | Arts & Humanities Citation Index | **1,799** |
+| 🟣 **ESCI** | Emerging Sources Citation Index | **9,356** |
+| 🟠 **EI** | Engineering Index (Compendex) | **4,887** |
+| 📘 **Scopus** | Scopus | **29,887** |
+| 📗 **DOAJ** | Directory of Open Access Journals | **22,975** |
+| 📕 **MEDLINE** | NLM Current Journals | **5,368** |
 
 ### 期刊指标
 
 | 指标 | Metric | 数量 |
 |------|--------|-----:|
-| 有 JCR IF 2024 | With Impact Factor | **21,525** |
-| JCR 分区 | JCR Quartile | **22,247** |
+| 有 JCR IF 2025 | With Impact Factor | **21,975** |
+| JCR 分区 | JCR Quartile | **22,834** |
 | 中科院分区 | CAS Zone | **21,695** |
-| 中科院大类 | CAS Major Category | **21,733** |
+| 中科院大类 | CAS Major Category | **22,592** |
 | ESI 学科 | ESI 22 Categories | **12,272** |
 | WoS 学科 | WoS Subject Categories | **22,929** |
-| 审稿周期 | Review Cycle Data | **5,363** |
-| ABDC (澳大利亚) | ABDC 2024 | **2,651** |
+| 审稿周期 | Review Cycle Data | **26,070** |
+| ABDC (澳大利亚) | ABDC 2025 | **2,651** |
 | ABS (英国) | ABS 2024 | **1,822** |
 | CCF 推荐 | CCF 2026 | **279** |
-| CNKI 核心 | CNKI Major Chinese Journals | **1,202** |
+| CNKI 核心 | CNKI Major Chinese Journals | **6,038** |
 
 ### 预警与异常状态
 
@@ -83,7 +83,7 @@
 |------|--------|-----:|
 | 🟠 中科院预警 | CAS Warning List 2025 | **105** |
 | 🔴 中信所预警 | CITIC Warning List | **39** |
-| 🟡 On Hold (WoS) | WoS On Hold | **15** |
+| 🟡 On Hold (WoS) | WoS On Hold | **19** |
 | ⏸️ Under Review | Under Review (topeditsci) | **44** |
 
 ---
@@ -116,7 +116,7 @@
 每个期刊的详情抽屉包含：
 - **索引标识**: SCIE / SSCI / AHCI / ESCI / EI / Scopus / MEDLINE / DOAJ
 - **分区信息**: 中科院 2025 大类分区 + TOP 标志、JCR Quartile
-- **指标**: JCR 2024 影响因子 (IF)、Eigenfactor、排名百分位
+- **指标**: JCR 2025 影响因子 (IF)、Eigenfactor、排名百分位
 - **学科分类**: ESI 22 大类、WoS 细分学科
 - **核心信息**: ISSN、EISSN、出版商、语种、出版周期
 - **OA 信息**: 开放获取状态、APC 费用、DOAJ 认证
@@ -131,23 +131,24 @@
 
 | 数据 | Data Source | 说明 |
 |------|-------------|------|
-| WoS 五大索引 | Clarivate 公开列表 | SCIE/SSCI/AHCI/ESCI, 定期更新 |
-| JCR 指标 | [ShowJCR](https://github.com/hitfyd/ShowJCR) (GPL-3.0) | IF 2024、JCR Quartile、Eigenfactor |
+| WoS 核心索引 | Clarivate 公开列表 | SCIE/SSCI/AHCI/ESCI，更新至 2026-06-15 |
+| JCR 指标 | [ShowJCR](https://github.com/hitfyd/ShowJCR) (GPL-3.0) | IF 2025、JCR Quartile、Eigenfactor |
 | 中科院分区 | ShowJCR | 2025 大类分区 (1-4 区, TOP 标志) |
-| EI Compendex | Elsevier 公开列表 | 2025 年版 |
-| Scopus | Elsevier 公开列表 | 自动月度更新（cron job） |
+| EI Compendex | Elsevier 公开列表 | 更新至 2026-07-09 |
+| Scopus | Elsevier 公开列表 | 2026-05 来源快照 |
 | ESI 22 学科 | 高校图书馆公开发布 | 12,272 本期刊匹配 |
-| DOAJ | Directory of Open Access Journals | 21,395 本 OA 期刊 |
-| 审稿周期 | CrossRef + 自收集 | 5,363 个期刊实测数据 |
+| DOAJ | Directory of Open Access Journals | 2026-07-06 公共 CSV，匹配 22,975 本 |
+| MEDLINE | NLM Catalog | 2026-08-06 当前收录查询，匹配 5,368 本 |
+| 审稿周期 | CrossRef + 自收集 | 26,070 个期刊实测数据 |
 | CCF 推荐 | 中国计算机学会 | 2026 版 A/B/C |
 | ABDC | Australian Business Deans' Council | 2025 版 A*/A/B/C |
 | ABS | Chartered ABS | Academic Journal Guide 2024 |
 | 预警名单 | 中科院文献情报中心 | 2025 版 105 条 |
 | 中信所预警 | 中信所 | 39 条预警期刊 |
 | Under Review | [topeditsci](https://topeditsci.com) | 44 本考察期期刊 |
-| On Hold | Clarivate / 自跟踪 | 15 本月刊 |
+| On Hold | Clarivate / 自跟踪 | 19 本期刊 |
 | OpenAlex | OpenAlex API | Topics、OA、APC 元数据 |
-| CNKI 中文期刊 | 知网 | 1,202 种中文核心期刊 |
+| CNKI 中文期刊 | 知网 | 6,038 种中文核心期刊 |
 
 ---
 
@@ -171,8 +172,14 @@
 git clone https://github.com/stonecanon/ailatest-journal.git
 cd ailatest-journal
 
-# 2. 构建数据（需 Python 3）
-python3 scripts/build_journals.py
+# 2. 更新公开目录数据（需 Python 3）
+python3 scripts/refresh_doaj.py
+python3 scripts/fetch_oaj_journals.py
+python3 scripts/fetch_current_medline.py
+python3 scripts/sync_current_directories.py
+
+# build_journals.py 仅用于所有历史源文件齐备时的完整重建；
+# 日常更新请使用上面的增量流程，以保留一次性榜单和地区索引字段。
 
 # 3. 本地预览
 python3 -m http.server 8080

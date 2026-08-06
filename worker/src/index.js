@@ -2875,6 +2875,18 @@ export default {
     try {
       if (p === '/llms.txt' && req.method === 'GET') return routeApiLlmsTxt();
       if (p === '/robots.txt' && req.method === 'GET') return routeApiRobotsTxt();
+      if (p === '/stats' && req.method === 'GET') {
+        const siteUrl = String(env.SITE_URL || 'https://journal.ailatest.org').replace(/\/$/, '');
+        const metaResponse = await fetch(`${siteUrl}/data/meta.json`);
+        if (!metaResponse.ok) return err(`metadata unavailable: ${metaResponse.status}`, 503);
+        const meta = await metaResponse.json();
+        return json({
+          journals: Number(meta.total || 0),
+          last_updated: meta.last_updated_source || '',
+          indices: meta.indices || {},
+          with_if: Number(meta.with_if_2025 || meta.with_if_2024 || 0),
+        }, 200, { 'Cache-Control': 'public, max-age=300' });
+      }
       if (p === '/' || p === '') {
         const accept = String(req.headers.get('Accept') || '');
         if (accept.includes('text/html')) return routeApiPortal();

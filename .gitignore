@@ -26,6 +26,7 @@ __pycache__/
 data/*.bak
 data/sources/
 data/journals.json
+data/journals_deploy.json
 data/journal_index.json
 data/oa.json
 data/annual_outputs.json

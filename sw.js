@@ -5,7 +5,7 @@
    - data JSON / JSON.GZ: cache versioned data first, network fallback for fresh data
    - everything else: network only
 */
-const VERSION = 'v20260802-route-v2';
+const VERSION = 'v20260806-data-v1';
 const SHELL_CACHE = `shell-${VERSION}`;
 const DATA_CACHE = `data-${VERSION}`;
 

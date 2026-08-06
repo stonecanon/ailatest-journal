@@ -18,6 +18,7 @@ DATA_GZ = ROOT / "data" / "journals.json.gz"
 DATA_JSON = ROOT / "data" / "journals.json"
 LIGHT_FILES = [
     (ROOT / "data" / "journals_light.json.gz", None),
+    (ROOT / "data" / "journals_light_v2.json.gz", None),
     (ROOT / "data" / "jm.json.gz", ROOT / "data" / "jm.json"),
     (ROOT / "data" / "journals_mobile.json.gz", ROOT / "data" / "journals_mobile.json"),
 ]
@@ -40,7 +41,7 @@ def read_gz(path: Path):
 def write_gz(path: Path, data) -> None:
     raw = json.dumps(data, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
     buf = io.BytesIO()
-    with gzip.GzipFile(fileobj=buf, mode="wb", compresslevel=9) as f:
+    with gzip.GzipFile(fileobj=buf, mode="wb", compresslevel=9, mtime=0) as f:
         f.write(raw)
     path.write_bytes(buf.getvalue())
 
@@ -72,7 +73,8 @@ def main() -> int:
                     if norm_issn(rec.get("issn")) == issn or norm_issn(rec.get("eissn")) == issn:
                         rec["routeAliases"] = list(dict.fromkeys([*(rec.get("routeAliases") or []), *aliases]))
             write_gz(gz, light)
-            js.write_text(json.dumps(light, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+            if js is not None:
+                js.write_text(json.dumps(light, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     print(f"patched {patched} records with routeAliases")
     return 0
 
