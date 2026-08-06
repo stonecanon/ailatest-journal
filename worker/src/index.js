@@ -519,6 +519,10 @@ async function routeExtensionDownload(req, env) {
     ).bind(asset.key, now),
   ]);
   const target = new URL(asset.path, env.SITE_URL || 'https://journal.ailatest.org');
+  // The ZIP path is intentionally immutable at the edge. Bump this query
+  // when the packaged extension changes so the redirect cannot serve an old
+  // cached archive after a Pages deployment.
+  target.searchParams.set('v', '20260806-ext-v2');
   return new Response(null, {
     status: 302,
     headers: {
