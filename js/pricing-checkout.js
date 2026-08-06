@@ -16,8 +16,8 @@
   // 中国区一次性 365 天产品的直达链接；登录用户优先走 Worker Checkout
   // Session，未登录/本地预览时使用此产品页。
   const CN_FALLBACK = {
-    pro: 'https://creem.io/product/prod_3Mea8BVSYJ5nbVJeYQ3qWN',
-    max: 'https://creem.io/product/prod_2OXrWFSu1RSxeJddAHUxcL',
+    pro: 'https://creem.io/product/prod_7B4QDM7nYfKnbaRGqWv0nq',
+    max: 'https://creem.io/product/prod_1Z00jwp1xaJB4nN5zbDU32',
   };
 
   const EDU_DOMAIN_SUFFIXES = [
@@ -37,8 +37,10 @@
     },
   };
   const CN_PRICES = {
-    pro: { pay: '$4.99' },
-    max: { pay: '$5.99' },
+    // Chinese UI: regular users get the original standard price, but as a
+    // one-time 365-day pass (no monthly/auto-renewing checkout).
+    pro: { pay: '$7.99' },
+    max: { pay: '$9.99' },
   };
   const EDU_PRICES = {
     pro: { year: '$4.99', month: '$0.69' },

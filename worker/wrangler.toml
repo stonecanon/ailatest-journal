@@ -26,8 +26,8 @@ CF_ZONE_ID       = "435525fb783ba7bf4c686a9734e26124"  # journal.ailatest.org zo
 GA4_PROPERTY_ID  = "537014253"                          # Google Analytics 4 property
 # Creem Journal products（与 Todo 分离；可被 secret 外的 vars 覆盖）
 # China one-time 365-day SKUs: fill these only after creating one-time products in Creem.
-CREEM_PRO_CN_365_PRODUCT_ID       = "prod_3Mea8BVSYJ5nbVJeYQ3qWN"
-CREEM_MAX_CN_365_PRODUCT_ID       = "prod_2OXrWFSu1RSxeJddAHUxcL"
+CREEM_PRO_CN_365_PRODUCT_ID       = "prod_7B4QDM7nYfKnbaRGqWv0nq"
+CREEM_MAX_CN_365_PRODUCT_ID       = "prod_1Z00jwp1xaJB4nN5zbDU32"
 CREEM_PRO_MONTHLY_PRODUCT_ID     = "prod_4U7xCv0XuvaQwngA8GzAwk"
 CREEM_PRO_YEARLY_PRODUCT_ID      = "prod_4qPTXwWFki7H97CnEGg0UU"
 CREEM_MAX_MONTHLY_PRODUCT_ID     = "prod_4dQ8oxI13n13UujKijvupS"

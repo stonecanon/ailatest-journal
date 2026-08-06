@@ -26,7 +26,7 @@ export function isEduEmail(email) {
 export const CREEM_PRODUCTS = {
   // 中国区：一次性 365 天通行证；与月付/年付 SKU 完全分开。
   pro_cn_365: {
-    product_id: 'prod_3Mea8BVSYJ5nbVJeYQ3qWN',
+    product_id: 'prod_7B4QDM7nYfKnbaRGqWv0nq',
     discount_code: '',
     tier: 'plus',
     period: 'one_time',
@@ -35,6 +35,29 @@ export const CREEM_PRODUCTS = {
     edu: false,
   },
   max_cn_365: {
+    product_id: 'prod_1Z00jwp1xaJB4nN5zbDU32',
+    discount_code: '',
+    tier: 'pro',
+    period: 'one_time',
+    duration_days: 365,
+    one_time: true,
+    edu: false,
+  },
+  // Legacy China launch-price products remain recognizable so historical
+  // purchases can still be reconciled by webhook, but they are no longer
+  // selected for new checkout sessions.
+  pro_cn_365_legacy: {
+    product_id: 'prod_3Mea8BVSYJ5nbVJeYQ3qWN',
+    discount_code: '',
+    tier: 'plus',
+    period: 'one_time',
+    duration_days: 365,
+    one_time: true,
+    edu: false,
+    market: 'cn',
+    legacy: true,
+  },
+  max_cn_365_legacy: {
     product_id: 'prod_2OXrWFSu1RSxeJddAHUxcL',
     discount_code: '',
     tier: 'pro',
@@ -42,6 +65,8 @@ export const CREEM_PRODUCTS = {
     duration_days: 365,
     one_time: true,
     edu: false,
+    market: 'cn',
+    legacy: true,
   },
   pro_monthly: {
     product_id: 'prod_4U7xCv0XuvaQwngA8GzAwk',
@@ -330,6 +355,7 @@ export function listCreemCatalog(env, appFilter) {
     const catalog = catalogForApp(app);
     for (const key of Object.keys(catalog)) {
       const base = catalog[key];
+      if (base.legacy) continue;
       const product_id = productIdFromEnv(env, key, app) || base.product_id || '';
       out.push({
         app,

@@ -14,8 +14,8 @@
 | Pro EDU Yearly | $11.99 | `JNEPROY` (−$7.00) | **$4.99** | year |
 | Max EDU Monthly | $2.99 | `JNEMAXM` (−$2.10) | **$0.89** | month |
 | Max EDU Yearly | $14.99 | `JNEMAXY` (−$9.00) | **$5.99** | year |
-| Pro China 365-day | **$4.99** | — | **$4.99** | one-time / 365 days |
-| Max China 365-day | **$5.99** | — | **$5.99** | one-time / 365 days |
+| Pro China standard 365-day | **$7.99** | — | **$7.99** | one-time / 365 days |
+| Max China standard 365-day | **$9.99** | — | **$9.99** | one-time / 365 days |
 
 折扣 `duration=forever`，仅绑定对应 Journal 产品。
 
@@ -44,8 +44,8 @@ Webhook：教育产品若付款邮箱非机构域，**不写权益**（`ignored:
 | pro_edu_yearly | `prod_2KUfnQxKKFYS2zIRX8bIyD` | https://creem.io/product/prod_2KUfnQxKKFYS2zIRX8bIyD?discount_code=JNEPROY |
 | max_edu_monthly | `prod_2Il9sgrjBPMbgCA4eALdCz` | https://creem.io/product/prod_2Il9sgrjBPMbgCA4eALdCz?discount_code=JNEMAXM |
 | max_edu_yearly | `prod_1a4d3MaM7X10XbTUP6ixCW` | https://creem.io/product/prod_1a4d3MaM7X10XbTUP6ixCW?discount_code=JNEMAXY |
-| pro_cn_365 | `prod_3Mea8BVSYJ5nbVJeYQ3qWN` | https://creem.io/product/prod_3Mea8BVSYJ5nbVJeYQ3qWN |
-| max_cn_365 | `prod_2OXrWFSu1RSxeJddAHUxcL` | https://creem.io/product/prod_2OXrWFSu1RSxeJddAHUxcL |
+| pro_cn_365 | `prod_7B4QDM7nYfKnbaRGqWv0nq` | https://creem.io/product/prod_7B4QDM7nYfKnbaRGqWv0nq |
+| max_cn_365 | `prod_1Z00jwp1xaJB4nN5zbDU32` | https://creem.io/product/prod_1Z00jwp1xaJB4nN5zbDU32 |
 
 机器可读清单：`docs/creem-journal-products.json`
 
@@ -53,7 +53,7 @@ Webhook：教育产品若付款邮箱非机构域，**不写权益**（`ignored:
 
 Journal 使用 Creem 托管产品链接 / Checkout Session，代码不传固定的支付方式参数。Creem 会按产品类型、买家所在地区、账单地址、金额和设备，在结账页自动展示符合条件的方式；支付宝只在符合 Creem 条件的产品/订单中出现。
 
-中国区已经单独创建一次性 365 天产品（Pro $4.99 / Max $5.99），不与月付/年付 SKU 混用。用户点击普通按钮后进入对应 Creem 产品页，再由 Creem 决定是否显示支付宝；成交仍沿用 product ID + webhook 权益同步流程。
+中国区普通用户使用原标准价的一次性 365 天产品（Pro $7.99 / Max $9.99），不与月付/年付 SKU 混用，也不自动续费。用户点击普通按钮后进入对应 Creem 产品页，再由 Creem 决定是否显示支付宝；成交仍沿用 product ID + webhook 权益同步流程。旧的 $4.99 / $5.99 中国测试 SKU 仅保留用于历史订单识别，不再用于新订单。
 
 ## Worker 环境变量建议
 
@@ -66,8 +66,8 @@ CREEM_PRO_EDU_MONTHLY_PRODUCT_ID=prod_2UjZDHaflN6qnqyPKsSWzu
 CREEM_PRO_EDU_YEARLY_PRODUCT_ID=prod_2KUfnQxKKFYS2zIRX8bIyD
 CREEM_MAX_EDU_MONTHLY_PRODUCT_ID=prod_2Il9sgrjBPMbgCA4eALdCz
 CREEM_MAX_EDU_YEARLY_PRODUCT_ID=prod_1a4d3MaM7X10XbTUP6ixCW
-CREEM_PRO_CN_365_PRODUCT_ID=prod_3Mea8BVSYJ5nbVJeYQ3qWN
-CREEM_MAX_CN_365_PRODUCT_ID=prod_2OXrWFSu1RSxeJddAHUxcL
+CREEM_PRO_CN_365_PRODUCT_ID=prod_7B4QDM7nYfKnbaRGqWv0nq
+CREEM_MAX_CN_365_PRODUCT_ID=prod_1Z00jwp1xaJB4nN5zbDU32
 CREEM_WEBHOOK_SECRET=<from Creem dashboard>
 ```
 
