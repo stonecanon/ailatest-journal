@@ -23,6 +23,12 @@ AILatest Journal helps researchers and students:
 - Save favorites, share lists, use browser extension lookups
 - Run AI-assisted journal picks (quota depends on Free / Pro / Max plan)
 
+The web `/pick` page uses DeepSeek for semantic profile extraction and then
+ranks against the auditable AILatest journal bundle. It requires sign-in for
+the server-side AI quota; guests are kept on the local matcher and can use the
+public Skill/API endpoints below. Skill/API `recommend` is a structured-data
+keyword recommender, not a direct DeepSeek proxy.
+
 ## Key public routes
 
 - Home / search: https://journal.ailatest.org/

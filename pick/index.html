@@ -828,6 +828,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div class="pick-filter-bar">
         <div class="pick-filter-group">
           <label class="pick-opt pick-ai-opt"><input type="checkbox" id="pick-ai-toggle" checked> <span data-i18n="pick_ai_toggle">AI 推荐</span><small data-i18n="pick_ai_hint">语义增强，默认开启</small></label>
+          <button type="button" id="pick-ai-login" class="pick-ai-login" hidden>登录后启用 AI</button>
           <label class="pick-opt"><input type="checkbox" id="pick-filter-sci" checked> <span data-i18n="pick_filter_sci">SCIE</span></label>
           <label class="pick-opt"><input type="checkbox" id="pick-filter-ssci" checked> <span data-i18n="pick_filter_ssci">SSCI</span></label>
           <label class="pick-opt"><input type="checkbox" id="pick-filter-ahci" checked> <span data-i18n="pick_filter_ahci">AHCI</span></label>
@@ -1013,7 +1014,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <script>
 // Build version for cache busting data files
-window.__BUILD_VER = 'v20260806-data-v1';
+window.__BUILD_VER = 'v20260806-pick-links-v1';
 // Service Worker 清理 — 必须在 app.js 加载前运行
 (function() {
   if ('serviceWorker' in navigator) {
@@ -1036,7 +1037,7 @@ window.__BUILD_VER = 'v20260806-data-v1';
 <script src="/js/pick-match.js?v=20260716-v10" defer></script>
 <script src="/js/pricing-checkout.js?v=20260716-edu-lock-std" defer></script>
 <script src="/js/extension-downloads.js?v=20260716-home-dl" defer></script>
-<script src="/js/app.js?v=20260806-data-v1" defer></script>
+<script src="/js/app.js?v=20260806-pick-links-v1" defer></script>
 
 </body>
 </html>

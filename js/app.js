@@ -13217,6 +13217,16 @@
     const progressBar = $('#pick-progress-bar');
     const progressPct = $('#pick-progress-pct');
     const charCount = $('#pick-char-count');
+    const aiLogin = $('#pick-ai-login');
+
+    function syncPickAiLogin(visible) {
+      if (!aiLogin) return;
+      aiLogin.hidden = !visible;
+      aiLogin.textContent = T('登录后启用 AI', 'Sign in to enable AI');
+    }
+
+    aiLogin?.addEventListener('click', () => startLogin());
+    syncPickAiLogin(false);
 
     function setPickProgress(text, pct = 0, visible = true) {
       if (progress) progress.hidden = !visible;
@@ -13240,6 +13250,25 @@
     let pickJournalLookup = null;
     let pickLastReportState = null;
 
+    // Report rows use the same journal IDs as the normal cards, but a direct
+    // click handler keeps them reliable even when the hash route is changing
+    // while the full journal bundle is still hydrating.
+    function bindPickReportLinks(root = results) {
+      if (!root) return;
+      root.querySelectorAll('a[data-pick-report-fid]').forEach((link) => {
+        if (link.dataset.pickReportBound === '1') return;
+        link.dataset.pickReportBound = '1';
+        link.addEventListener('click', (ev) => {
+          if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.button === 1) return;
+          const fid = link.dataset.pickReportFid || '';
+          const rec = rowRecordsByFid[fid] || findRecByFid(fid);
+          if (!rec) return; // preserve the hash fallback for unresolved names
+          ev.preventDefault();
+          openDrawer(rec, { pageMode: true, source: 'recommendation' });
+        });
+      });
+    }
+
     function refreshRenderedPickReport() {
       if (!results || !pickLastReportState) return;
       const html = renderPickAiReport(
@@ -13251,6 +13280,7 @@
       if (current && html) current.outerHTML = html;
       else if (current) current.remove();
       else if (html) results.insertAdjacentHTML('afterbegin', html);
+      bindPickReportLinks();
     }
     window.__refreshPickReportI18n = refreshRenderedPickReport;
 
@@ -13794,8 +13824,10 @@
         let aiReport = null;
         let aiProfile = null;
         const useAi = !!document.getElementById('pick-ai-toggle')?.checked;
+        syncPickAiLogin(false);
         if (useAi && !(user && user.token)) {
           // AI 需要登录：提示后自动改用本地匹配，并给出登录入口。
+          syncPickAiLogin(true);
           statusNotice = t('pick_ai_login') || T(
             'AI 荐刊需登录（Free 有次数额度）。正在用本地匹配… 登录后可开 AI。',
             'AI recommend needs sign-in. Using local match… Sign in for AI.'
@@ -13816,6 +13848,7 @@
           } catch (e) {
             // AI 失败（网络/额度/配置）→ 自动回退本地匹配，并在状态栏说明原因。
             statusNotice = pickAiErrorMessage(e);
+            if (!user || !user.token) syncPickAiLogin(true);
             setPickProgress(statusNotice, 42);
           }
         }
@@ -14058,6 +14091,7 @@
             </div>
           </div>`;
         }).join('');
+        bindPickReportLinks();
         if (allFiltered.length > filtered.length) {
           results.innerHTML += `<button id="pick-more" class="pick-more" type="button">${T('再显示 30 本','Show 30 more')} <span>${allFiltered.length - filtered.length} ${T('本剩余','left')}</span></button>`;
         }

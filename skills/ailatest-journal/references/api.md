@@ -68,6 +68,11 @@ Response fields:
 
 `POST /api/skill/recommend`
 
+This endpoint is a public-beta structured keyword/metadata recommender. It is
+deliberately separate from the signed-in web `/pick` route, which uses DeepSeek
+semantic profile extraction before local ranking. Do not describe Skill/API
+results as a DeepSeek answer unless you call a model yourself around this API.
+
 Request:
 
 ```json

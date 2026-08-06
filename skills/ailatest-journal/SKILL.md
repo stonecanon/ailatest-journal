@@ -44,6 +44,11 @@ Report:
 
 Use `recommend` with the title. Add abstract or keywords if available. The recommender ranks against subject categories, indexes, IF/JCR/CAS, open access data, review-cycle signals, and risk flags.
 
+This Skill/API route is the public-beta structured-data path. The website's
+`/pick` page has a separate signed-in DeepSeek semantic mode; guests can still
+use the site's local matcher, while Skill/API callers should not assume that a
+DeepSeek-generated interpretation is being applied.
+
 When explaining recommendations:
 - say results are a data-backed shortlist, not acceptance advice
 - mention the strongest matched terms or subject categories
