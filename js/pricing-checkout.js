@@ -188,6 +188,9 @@
       node.title = rmbRateTitle();
       node.setAttribute('aria-label', L(`人民币估算：约 ¥${rmb}`, `Estimated CNY price: about ¥${rmb}`));
     });
+    // The education amount is informational on the Chinese surface as well;
+    // keep its CNY estimate in lockstep with the standard-price estimate.
+    syncEduPriceLabels(getBillingCycle());
   }
 
   async function loadUsdCnyRate() {
@@ -386,6 +389,38 @@
     });
   }
 
+  /**
+   * Keep the institutional price visible even when the current account is not
+   * eligible. Eligibility controls checkout, not price discovery: visitors
+   * should be able to see the lower price before they sign in.
+   */
+  function syncEduPriceLabels(cycle) {
+    const market = getMarket();
+    const effectiveCycle = market === 'cn' ? 'year' : cycle;
+    document.querySelectorAll('[data-edu-price]').forEach((el) => {
+      const plan = (el.getAttribute('data-edu-price') || '').toLowerCase();
+      const row = EDU_PRICES[plan];
+      const price = row && (row[effectiveCycle] || row.year);
+      if (!price) {
+        el.hidden = true;
+        return;
+      }
+      const unitZh = effectiveCycle === 'month' ? '月付' : '年付';
+      const unitEn = effectiveCycle === 'month' ? 'monthly' : 'yearly';
+      const usd = parseUsdAmount(price);
+      const rmb = market === 'cn' && Number.isFinite(usd) && usd > 0
+        ? `（约 ¥${(usd * usdCnyRate).toFixed(2)}）`
+        : '';
+      el.textContent = market === 'cn'
+        ? L(`教育价 ${price}${rmb} · 年付 · 需机构邮箱`, `Edu ${price} · yearly · institutional email`)
+        : L(`教育价 ${price} · ${unitZh} · 需机构邮箱`, `Edu ${price} · ${unitEn} · institutional email`);
+      if (market === 'cn') el.title = rmbRateTitle();
+      else el.removeAttribute('title');
+      el.hidden = false;
+      el.dataset.price = price;
+    });
+  }
+
   function isEduCheckoutEl(el) {
     return el.getAttribute('data-edu') === '1' || el.getAttribute('data-edu') === 'true';
   }
@@ -463,6 +498,8 @@
     const elig = eduEligibility();
     const cycle = getBillingCycle();
 
+    syncEduPriceLabels(cycle);
+
     if (getMarket() === 'cn') {
       document.querySelectorAll('[data-creem-checkout][data-edu="1"], [data-creem-checkout][data-edu="true"]').forEach((el) => { el.hidden = true; });
       document.querySelectorAll('[data-edu-status]').forEach((node) => { node.hidden = true; });
@@ -501,10 +538,7 @@
         // 教育价按钮保持可点以弹出登录/提示；不 disabled
         if (elig.reason === 'login') {
           el.title = L('请使用机构邮箱登录后购买教育价', 'Sign in with an institutional email for education pricing');
-          // Do not advertise the discounted amount as if it were available to a
-          // guest.  The exact amount is shown only after the institutional email
-          // has been verified by eduEligibility().
-          const t = L('教育价 · 登录后解锁', 'Edu pricing · sign in to unlock');
+          const t = L(`教育价 ${price} · 登录后解锁`, `Edu ${price} · sign in to unlock`);
           if (isSettings) el.innerHTML = `${t}<span>→</span>`;
           else el.textContent = t;
         } else {
@@ -512,7 +546,7 @@
             `当前邮箱 ${elig.email || '—'} 不是机构域名，无法使用教育价`,
             `Current email ${elig.email || '—'} is not institutional; education checkout is locked`
           );
-          const t = L('教育价 · 需机构邮箱', 'Edu pricing · institutional email required');
+          const t = L(`教育价 ${price} · 需机构邮箱`, `Edu ${price} · institutional email required`);
           if (isSettings) el.innerHTML = `${t}<span>—</span>`;
           else el.textContent = t;
         }
