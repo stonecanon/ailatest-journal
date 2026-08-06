@@ -217,7 +217,7 @@ html[data-ui-lang] [data-market-panel][hidden] {
 .px-plan-price {
   display: flex;
   align-items: baseline;
-  gap: 6px;
+  gap: 2px;
   margin: 0 0 4px;
 }
 .px-plan-price .amt {
@@ -231,6 +231,20 @@ html[data-ui-lang] [data-market-panel][hidden] {
   font-size: 14px;
   font-weight: 650;
   color: #a8a29e;
+  white-space: nowrap;
+}
+.price-rmb-estimate {
+  display: inline-block;
+  margin-left: -1px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #78716c;
+  letter-spacing: 0;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.price-rmb-estimate[hidden] {
+  display: none !important;
 }
 .px-plan-was {
   margin: 0 0 14px;

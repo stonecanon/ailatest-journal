@@ -1142,6 +1142,19 @@ body.home-route:not(.home-tab-has-results) .home-v4-grad {
   font-weight: 650;
   color: #8a837a;
 }
+.home-plan-price .price-rmb-estimate {
+  display: inline-block;
+  margin-left: 2px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #78716c;
+  letter-spacing: 0;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.price-rmb-estimate[hidden] {
+  display: none !important;
+}
 .home-plan-was {
   margin: 0 0 6px;
   font-size: 11.5px;

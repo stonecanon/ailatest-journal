@@ -12,7 +12,7 @@
 <meta property="og:type" content="website" />
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
 <link rel="stylesheet" href="/css/static.css?v=20260806-rail-consistency" />
-<link rel="stylesheet" href="/css/pricing-page.css?v=20260806-lang-cn-pass" />
+<link rel="stylesheet" href="/css/pricing-page.css?v=20260806-rmb-estimate-v1" />
 </head>
 <body data-static-page="pricing" data-billing="year">
 <aside class="app-rail" aria-label="Primary navigation">
@@ -193,9 +193,10 @@
       <h2 class="px-plan-name">Pro</h2>
       <p class="px-plan-desc" data-lang-panel="zh-CN">一次性购买 · 365 天访问</p>
       <p class="px-plan-desc" data-lang-panel="en">One-time purchase · 365 days</p>
-      <div class="px-plan-price">
-        <span class="amt">$4.99</span>
-        <span class="unit" data-lang-panel="zh-CN">/ 365 天</span>
+      <div class="px-plan-price" data-plan-price="pro">
+        <span class="amt" data-price-amt>$4.99</span>
+        <span class="price-rmb-estimate" data-rmb-estimate data-usd="4.99" hidden aria-label="人民币估算"></span>
+        <span class="unit" data-price-unit data-lang-panel="zh-CN">/ 365 天</span>
         <span class="unit" data-lang-panel="en">/ 365 days</span>
       </div>
       <p class="px-cn-plan-note" data-lang-panel="zh-CN">不自动续费 · 到期后可重新购买</p>
@@ -227,9 +228,10 @@
       <h2 class="px-plan-name">Max</h2>
       <p class="px-plan-desc" data-lang-panel="zh-CN">一次性购买 · 365 天访问</p>
       <p class="px-plan-desc" data-lang-panel="en">One-time purchase · 365 days</p>
-      <div class="px-plan-price">
-        <span class="amt">$5.99</span>
-        <span class="unit" data-lang-panel="zh-CN">/ 365 天</span>
+      <div class="px-plan-price" data-plan-price="max">
+        <span class="amt" data-price-amt>$5.99</span>
+        <span class="price-rmb-estimate" data-rmb-estimate data-usd="5.99" hidden aria-label="人民币估算"></span>
+        <span class="unit" data-price-unit data-lang-panel="zh-CN">/ 365 天</span>
         <span class="unit" data-lang-panel="en">/ 365 days</span>
       </div>
       <p class="px-cn-plan-note" data-lang-panel="zh-CN">不自动续费 · 到期后可重新购买</p>
@@ -259,11 +261,11 @@
   <div class="px-note px-cn-banner" data-market-panel="cn" hidden>
     <div data-lang-panel="zh-CN">
       <b>中国区一次性年卡</b><br>
-      一次性支付，权益有效 365 天，不自动扣款。当前为本地预览，Creem 产品创建后再接入真实结账链接。功能、额度及退款以最终条款为准。
+      一次性支付，权益有效 365 天，不自动扣款。人民币金额为按页面加载时公开汇率的估算，实际扣款/结算以 Creem 收银台、支付机构及发卡行显示为准。功能、额度及退款以最终条款为准。
     </div>
     <div data-lang-panel="en">
       <b>China one-time passes</b><br>
-      One payment unlocks 365 days with no automatic charge. This is a local preview; live checkout will be connected after the Creem products are created. Features, quotas and refunds follow the final terms.
+      One payment unlocks 365 days with no automatic charge. The CNY amount is an estimate from the public rate loaded on this page; the final charge and settlement follow the Creem checkout, payment provider and card issuer. Features, quotas and refunds follow the final terms.
     </div>
   </div>
 
@@ -419,7 +421,7 @@
 </main>
 
 <script src="/js/static-i18n.js?v=20260716-pricing-v4" defer></script>
-<script src="/js/pricing-checkout.js?v=20260806-lang-cn-pass" defer></script>
+<script src="/js/pricing-checkout.js?v=20260806-rmb-estimate-v1" defer></script>
 <script src="/js/site-rail.js?v=20260716-pricing-v4" defer></script>
 </body>
 </html>

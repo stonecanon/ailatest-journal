@@ -45,6 +45,15 @@
     max: { year: '$5.99', month: '$0.89' },
   };
 
+  // CNY is shown as an estimate beside the USD price on the Chinese UI.
+  // Frankfurter serves the latest ECB reference rate; keep a small fallback so
+  // a transient network/CORS failure never removes the price context.
+  const FX_URL = 'https://api.frankfurter.dev/v1/latest?base=USD&symbols=CNY';
+  const FX_FALLBACK_USD_CNY = 6.75;
+  let usdCnyRate = FX_FALLBACK_USD_CNY;
+  let usdCnyRateDate = '';
+  let fxStarted = false;
+
   const BILLING_KEY = 'ailatest.billing.cycle';
   const API_BASE = (window.AILATEST_API_BASE
     || (location.hostname === 'localhost' || location.hostname === '127.0.0.1'
@@ -120,6 +129,95 @@
 
   function L(zh, en) {
     return isZh() ? zh : en;
+  }
+
+  function parseUsdAmount(value) {
+    const match = String(value || '').replace(/,/g, '').match(/\d+(?:\.\d+)?/);
+    return match ? Number(match[0]) : NaN;
+  }
+
+  function ensureRmbEstimateNode(priceEl, usd) {
+    let node = priceEl.querySelector('[data-rmb-estimate]');
+    if (!node && Number.isFinite(usd) && usd > 0) {
+      const amount = priceEl.querySelector('[data-price-amt]');
+      if (!amount) return null;
+      node = document.createElement('span');
+      node.className = 'price-rmb-estimate';
+      node.setAttribute('data-rmb-estimate', '');
+      amount.insertAdjacentElement('afterend', node);
+    }
+    if (!node) return null;
+    node.classList.add('price-rmb-estimate');
+    if (Number.isFinite(usd) && usd > 0) node.dataset.usd = usd.toFixed(2);
+    return node;
+  }
+
+  function rmbRateTitle() {
+    if (usdCnyRateDate) {
+      return L(
+        `按 ${usdCnyRateDate} 公开汇率估算：1 USD ≈ ${usdCnyRate.toFixed(4)} CNY`,
+        `Estimate using the ${usdCnyRateDate} public rate: 1 USD ≈ ${usdCnyRate.toFixed(4)} CNY`
+      );
+    }
+    return L(
+      `按内置兜底汇率估算：1 USD ≈ ${usdCnyRate.toFixed(4)} CNY`,
+      `Estimate using the built-in fallback rate: 1 USD ≈ ${usdCnyRate.toFixed(4)} CNY`
+    );
+  }
+
+  function syncRmbEstimates() {
+    const market = getMarket();
+    document.querySelectorAll('[data-plan-price]').forEach((el) => {
+      const plan = (el.getAttribute('data-plan-price') || '').toLowerCase();
+      if (plan !== 'pro' && plan !== 'max') return;
+      const usd = parseUsdAmount(el.querySelector('[data-price-amt]')?.textContent);
+      const node = ensureRmbEstimateNode(el, usd);
+      if (!node) return;
+      const currentUsd = parseUsdAmount(node.dataset.usd);
+      const panelMarket = normalizeMarket(el.closest('[data-market-panel]')?.getAttribute('data-market-panel'));
+      const visible = market === 'cn'
+        && (!el.closest('[data-market-panel]') || panelMarket === market)
+        && Number.isFinite(currentUsd)
+        && currentUsd > 0;
+      node.hidden = !visible;
+      if (!visible) return;
+      const rmb = (currentUsd * usdCnyRate).toFixed(2);
+      node.textContent = L(`（约 ¥${rmb}）`, `(≈ ¥${rmb})`);
+      node.title = rmbRateTitle();
+      node.setAttribute('aria-label', L(`人民币估算：约 ¥${rmb}`, `Estimated CNY price: about ¥${rmb}`));
+    });
+  }
+
+  async function loadUsdCnyRate() {
+    let controller = null;
+    let timeoutId = null;
+    try {
+      syncRmbEstimates();
+      controller = typeof AbortController === 'function' ? new AbortController() : null;
+      if (controller) timeoutId = setTimeout(() => controller.abort(), 4500);
+      const response = await fetch(FX_URL, {
+        cache: 'no-store',
+        credentials: 'omit',
+        ...(controller ? { signal: controller.signal } : {}),
+      });
+      const data = await response.json().catch(() => ({}));
+      const rate = Number(data?.rates?.CNY);
+      if (!response.ok || !Number.isFinite(rate) || rate < 5 || rate > 9) return;
+      usdCnyRate = rate;
+      usdCnyRateDate = String(data?.date || '').trim();
+      syncRmbEstimates();
+    } catch (_) {
+      // Keep the visible fallback estimate when the public rate endpoint fails.
+    } finally {
+      if (timeoutId) clearTimeout(timeoutId);
+    }
+  }
+
+  function startFxRateLoad() {
+    if (fxStarted) return;
+    fxStarted = true;
+    syncRmbEstimates();
+    loadUsdCnyRate();
   }
 
   function readUser() {
@@ -456,6 +554,7 @@
     });
     syncPlanPrices(cycle);
     syncEduCtaUi();
+    syncRmbEstimates();
   }
 
   function bindBillingToggles(scope) {
@@ -674,6 +773,7 @@
       });
     });
     syncAllPricingUi();
+    startFxRateLoad();
   }
 
   window.__bindCreemCheckout = bind;
