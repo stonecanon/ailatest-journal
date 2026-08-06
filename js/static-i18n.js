@@ -157,7 +157,7 @@
       signup: 'home',
     };
     const active = map[navKey] || navKey;
-    document.querySelectorAll('.page-head [data-nav], .pricing-head [data-nav]').forEach((a) => {
+    document.querySelectorAll('.page-head [data-nav], .pricing-head [data-nav], .pricing-route .home-top-nav [data-nav]').forEach((a) => {
       const on = a.getAttribute('data-nav') === active;
       a.classList.toggle('active', on);
       if (on) a.setAttribute('aria-current', 'page');

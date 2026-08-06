@@ -11,11 +11,10 @@
 <meta property="og:url" content="https://journal.ailatest.org/pricing" />
 <meta property="og:type" content="website" />
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
-<link rel="stylesheet" href="/css/app.css?v=20260806-edu-visible-v1" />
-<link rel="stylesheet" href="/css/static.css?v=20260806-rail-consistency" />
-<link rel="stylesheet" href="/css/pricing-page.css?v=20260806-edu-visible-v1" />
+<link rel="stylesheet" href="/css/app.css?v=20260807-home-shell-v1" />
+<link rel="stylesheet" href="/css/pricing-page.css?v=20260807-home-shell-v1" />
 </head>
-<body data-static-page="pricing" data-billing="year">
+<body class="home-route pricing-route" data-static-page="pricing" data-billing="year">
 <aside class="app-rail" aria-label="Primary navigation">
   <nav class="rail-top" aria-label="站点">
     <a class="rail-nav-btn" href="/global" aria-label="全球期刊" title="全球期刊">
@@ -33,7 +32,7 @@
     <a class="rail-nav-btn rail-region-station" data-region-station="isc" href="/isc" hidden><span class="rail-flag">IR</span><span>伊朗</span></a>
     <a class="rail-nav-btn rail-region-station" data-region-station="scielo" href="/scielo" hidden><span class="rail-flag">LA</span><span>拉美</span></a>
     <div class="rail-region-picker">
-      <button class="rail-nav-btn rail-region-toggle" type="button" aria-label="地区站点" aria-expanded="false">
+      <button class="rail-nav-btn rail-region-toggle" type="button" aria-label="地区站点" title="地区站点" aria-expanded="false">
         <span class="rail-flag rail-region-symbol" aria-hidden="true">···</span>
         <span><span>地区</span><b class="rail-caret" aria-hidden="true">▾</b></span>
       </button>
@@ -52,380 +51,131 @@
   </div>
 </aside>
 
-<header class="pricing-head">
-  <a class="topbar-brand" href="/" data-topbar-home aria-label="AILatest Journal">AILatest <em>Journal</em></a>
-  <nav class="home-top-nav pricing-top-nav" aria-label="Site">
-    <a href="/#feat" data-static-i18n="nav_features" data-nav="features">功能</a>
-    <a href="/#how" data-static-i18n="nav_how" data-nav="how">怎么用</a>
-    <a href="/#rankings" data-static-i18n="nav_rank" data-nav="rank">榜单</a>
-    <a href="/pricing" data-static-i18n="nav_pricing" data-nav="pricing" aria-current="page">订阅</a>
-    <a href="/#download" data-static-i18n="download_center" data-nav="download">下载</a>
-    <a href="/#contact" data-static-i18n="nav_contact" data-nav="contact">联系</a>
+<nav class="home-top-nav pricing-home-nav" aria-label="首页导航">
+  <a href="/#feat" data-static-i18n="nav_features" data-nav="features">功能</a>
+  <a href="/#how" data-static-i18n="nav_how" data-nav="how">怎么用</a>
+  <a href="/#rankings" data-static-i18n="nav_rank" data-nav="rank">榜单</a>
+  <a href="/pricing" data-static-i18n="nav_pricing" data-nav="pricing" aria-current="page">订阅</a>
+  <a href="/#download" data-static-i18n="download_center" data-nav="download">下载</a>
+  <a href="/#contact" data-static-i18n="nav_contact" data-nav="contact">联系</a>
+  <div class="lang-toggle-wrap">
     <button class="lang-toggle" type="button" data-static-lang-toggle>English</button>
-  </nav>
+  </div>
+</nav>
+<header class="topbar pricing-topbar" aria-label="AILatest Journal">
+  <a class="topbar-brand" href="/" data-topbar-home aria-label="AILatest Journal">AILatest <em>Journal</em></a>
 </header>
 
-<main class="px-page home-v4">
-  <div class="px-hero">
-    <div class="px-kicker">Pricing</div>
-    <div data-lang-panel="zh-CN">
-      <h1>选择适合你的方案</h1>
-      <p class="sub" data-market-panel="intl">网站查刊 Free 永久可用。升级 Pro / Max 解锁插件深度徽章、云收藏、AI 荐刊与完整工作流。支持年付 / 月付；机构邮箱可享教育价。</p>
-      <p class="sub" data-market-panel="cn" hidden>网站查刊 Free 永久可用。中国区 Pro / Max 提供一次性 365 天访问权，不自动续费。</p>
-    </div>
-    <div data-lang-panel="en">
-      <h1>Choose a plan that fits</h1>
-      <p class="sub" data-market-panel="intl">Website search stays Free forever. Upgrade to Pro / Max for deeper extension badges, cloud favorites, AI picks and a fuller research workflow. Yearly or monthly; institutional emails get education pricing.</p>
-      <p class="sub" data-market-panel="cn" hidden>Website search stays Free forever. China plans are one-time 365-day passes with no auto-renewal.</p>
-    </div>
+<main class="main pricing-main">
+  <div class="home-v4 pricing-content">
+    <section class="home-sec" id="pricing">
+      <span class="home-sec-id">Pricing</span>
+      <h1 class="home-sec-title" data-lang-panel="zh-CN">订阅方案</h1>
+      <h1 class="home-sec-title" data-lang-panel="en">Plans &amp; pricing</h1>
+      <p class="home-sec-lead" data-market-panel="intl" data-lang-panel="zh-CN">网站查刊 Free 永久可用。Pro / Max 提升插件深度、额度与 AI 荐刊配额。教育邮箱另享教育价（登录后解锁）。</p>
+      <p class="home-sec-lead" data-market-panel="intl" data-lang-panel="en">Website search stays Free forever. Pro / Max add deeper extension badges, higher quotas and AI journal picks. Institutional emails get education pricing after sign-in.</p>
+      <p class="home-sec-lead" data-market-panel="cn" data-lang-panel="zh-CN" hidden>网站查刊 Free 永久可用。中国区 Pro / Max 为一次性 365 天访问权，不自动续费。</p>
+      <p class="home-sec-lead" data-market-panel="cn" data-lang-panel="en" hidden>Website search stays Free forever. China Pro / Max plans are one-time 365-day passes with no auto-renewal.</p>
+
+      <div class="billing-toggle-wrap" data-market-intl-only>
+        <div class="billing-toggle" role="group" aria-label="Billing period">
+          <button type="button" class="billing-toggle-btn is-on" data-billing-toggle="year" aria-pressed="true">
+            <span data-lang-panel="zh-CN">年付</span><span data-lang-panel="en">Yearly</span>
+            <em class="billing-save-tag" data-lang-panel="zh-CN">更划算</em><em class="billing-save-tag" data-lang-panel="en">Save</em>
+          </button>
+          <button type="button" class="billing-toggle-btn" data-billing-toggle="month" aria-pressed="false">
+            <span data-lang-panel="zh-CN">月付</span><span data-lang-panel="en">Monthly</span>
+          </button>
+        </div>
+      </div>
+      <p class="home-sec-note home-price-billing" data-billing-note>价格 USD · 年付 · 下方划线为原价（更划算）</p>
+      <p class="home-edu-status" data-edu-status data-market-intl-only hidden></p>
+
+      <div class="home-plans">
+        <article class="home-plan">
+          <h3>Free</h3>
+          <div class="home-plan-price">$0 <small data-lang-panel="zh-CN">/ 永久</small><small data-lang-panel="en">/ forever</small></div>
+          <p class="home-plan-desc" data-lang-panel="zh-CN">适合日常检索与轻量试用</p>
+          <p class="home-plan-desc" data-lang-panel="en">Everyday search &amp; light trials</p>
+          <ul data-lang-panel="zh-CN">
+            <li>网站完整检索与详情</li><li>本站收藏最多 5 本期刊</li><li>AI 荐刊试用次数</li>
+          </ul>
+          <ul data-lang-panel="en">
+            <li>Full website search &amp; journal pages</li><li>Up to 5 saved journals</li><li>AI journal-pick trials</li>
+          </ul>
+          <a class="home-btn home-btn-ghost home-btn-block" href="/"><span data-lang-panel="zh-CN">继续免费使用</span><span data-lang-panel="en">Stay on Free</span></a>
+        </article>
+
+        <article class="home-plan">
+          <h3>Pro</h3>
+          <div class="home-plan-price" data-plan-price="pro"><span data-price-amt>$7.99</span><span class="price-rmb-estimate" data-rmb-estimate data-usd="7.99" hidden aria-label="人民币估算"></span> <small data-price-unit>/ 年</small></div>
+          <p class="home-plan-was" data-plan-was="pro">原价 $11.99</p>
+          <p class="home-edu-price" data-edu-price="pro" aria-label="教育价">教育价 $4.99 · 年付 · 需机构邮箱</p>
+          <p class="home-plan-desc" data-lang-panel="zh-CN">高频刷刊 · 插件进阶</p><p class="home-plan-desc" data-lang-panel="en">Power users · extension upgrades</p>
+          <ul data-lang-panel="zh-CN"><li>中科院 / TOP / 新锐徽章</li><li>云收藏 50 · 清单 5</li><li>AI 荐刊 500 credits/月</li></ul>
+          <ul data-lang-panel="en"><li>CAS / TOP / Emerging badges</li><li>50 cloud favorites · 5 lists</li><li>500 AI credits / month</li></ul>
+          <button type="button" class="home-btn home-btn-primary home-btn-block" data-creem-checkout data-plan="pro" data-period="year">订阅 Pro · 年付</button>
+          <button type="button" class="home-btn home-btn-ghost home-btn-block home-btn-edu" data-creem-checkout data-plan="pro" data-period="year" data-edu="1">教育价 · 需机构邮箱</button>
+        </article>
+
+        <article class="home-plan home-plan-hot">
+          <span class="home-plan-tag" data-lang-panel="zh-CN">推荐</span><span class="home-plan-tag" data-lang-panel="en">Best</span>
+          <h3>Max</h3>
+          <div class="home-plan-price" data-plan-price="max"><span data-price-amt>$9.99</span><span class="price-rmb-estimate" data-rmb-estimate data-usd="9.99" hidden aria-label="人民币估算"></span> <small data-price-unit>/ 年</small></div>
+          <p class="home-plan-was" data-plan-was="max">原价 $14.99</p>
+          <p class="home-edu-price" data-edu-price="max" aria-label="教育价">教育价 $5.99 · 年付 · 需机构邮箱</p>
+          <p class="home-plan-desc" data-lang-panel="zh-CN">完整工作流 · 高额度 AI</p><p class="home-plan-desc" data-lang-panel="en">Full workflow · high AI quota</p>
+          <ul data-lang-panel="zh-CN"><li>预警 / 撤稿 / 科协风险</li><li>导出与高额度荐刊</li><li>地区站与设备额度更高</li></ul>
+          <ul data-lang-panel="en"><li>Warning / retraction / CAST risk</li><li>Export &amp; high-quota journal picks</li><li>More regional sites &amp; device quota</li></ul>
+          <button type="button" class="home-btn home-btn-primary home-btn-block" data-creem-checkout data-plan="max" data-period="year">订阅 Max · 年付</button>
+          <button type="button" class="home-btn home-btn-ghost home-btn-block home-btn-edu" data-creem-checkout data-plan="max" data-period="year" data-edu="1">教育价 · 需机构邮箱</button>
+        </article>
+
+      </div>
+      <p class="home-sec-note" data-market-panel="intl" data-lang-panel="zh-CN">教育价仅限 .edu / .edu.cn / .ac.* 等机构邮箱登录后支付</p>
+      <p class="home-sec-note" data-market-panel="intl" data-lang-panel="en">Education pricing requires an institutional email such as .edu / .edu.cn / .ac.*</p>
+      <p class="home-sec-note" data-market-panel="cn" data-lang-panel="zh-CN" hidden>中国区一次性购买：365 天到期后可重新购买；人民币金额按页面加载时公开汇率估算，实际结算以 Creem 收银台为准；功能、额度与退款以条款为准。</p>
+      <p class="home-sec-note" data-market-panel="cn" data-lang-panel="en" hidden>China plans are one-time purchases for 365 days; the final charge follows Creem checkout.</p>
+    </section>
+
+    <section class="home-sec pricing-detail" id="guide">
+      <span class="home-sec-id">Guide</span>
+      <h2 class="home-sec-title" data-lang-panel="zh-CN">怎么选？</h2><h2 class="home-sec-title" data-lang-panel="en">Which plan?</h2>
+      <p class="home-sec-lead" data-lang-panel="zh-CN">按使用场景快速判断。网站查刊三档均可；徽章显示「试用」是限时体验，不等于付费 Pro。</p>
+      <p class="home-sec-lead" data-lang-panel="en">Pick by workflow. Website search is on every plan. A “Trial” badge is a limited-time perk — not paid Pro.</p>
+      <div class="px-guide" data-lang-panel="zh-CN"><div class="px-guide-card"><span class="who">Free</span><strong>只在网页查刊</strong><p>看 IF、分区、收录与详情即可，无需插件深度徽章或云收藏。</p></div><div class="px-guide-card"><span class="who">Pro</span><strong>日常刷刊 + 插件</strong><p>Scholar / PubMed 需要中科院徽章，并希望有云收藏与 AI 荐刊额度。</p></div><div class="px-guide-card"><span class="who">Max</span><strong>风险信号 + 导出</strong><p>需要预警 / 撤稿信号、导出到文献库，以及更高 AI 与设备额度。</p></div></div>
+      <div class="px-guide" data-lang-panel="en"><div class="px-guide-card"><span class="who">Free</span><strong>Web-only lookup</strong><p>Check IF, quartiles, indexes and journal pages without extension depth or cloud lists.</p></div><div class="px-guide-card"><span class="who">Pro</span><strong>Daily browsing + extension</strong><p>Need CAS badges on Scholar / PubMed, plus cloud favorites and AI pick quota.</p></div><div class="px-guide-card"><span class="who">Max</span><strong>Risk signals + export</strong><p>Want warning / retraction signals, export to reference managers, and higher AI / device limits.</p></div></div>
+    </section>
+
+    <section class="home-sec pricing-detail" id="compare">
+      <span class="home-sec-id">Compare</span>
+      <h2 class="home-sec-title" data-lang-panel="zh-CN">方案对比</h2><h2 class="home-sec-title" data-lang-panel="en">Compare plans</h2>
+      <p class="home-sec-lead" data-lang-panel="zh-CN">按当前产品权益整理，便于投稿前选型。</p><p class="home-sec-lead" data-lang-panel="en">Current product entitlements at a glance.</p>
+      <div class="px-compare-wrap">
+        <table class="px-compare" data-lang-panel="zh-CN"><thead><tr><th class="feat">能力</th><th>Free</th><th>Pro</th><th>Max</th></tr></thead><tbody>
+          <tr><td class="feat">网站检索与详情</td><td class="y">完整</td><td class="y">完整</td><td class="y">完整</td></tr><tr><td class="feat">插件基础徽章（IF / JCR / 收录）</td><td class="y">有</td><td class="y">有</td><td class="y">有</td></tr><tr><td class="feat">插件中科院 / TOP / 新锐</td><td class="n">—</td><td class="y">有</td><td class="y">有</td></tr><tr><td class="feat">插件预警 / 撤稿 / 科协风险</td><td class="n">—</td><td class="n">—</td><td class="y">有</td></tr><tr><td class="feat">发表费用 / APC 详情</td><td class="n">—</td><td class="y">有</td><td class="y">有</td></tr><tr><td class="feat">云收藏与清单</td><td class="n">—</td><td class="y">50 本 · 5 清单</td><td class="y">不限</td></tr><tr><td class="feat">AI 荐刊 credits / 月</td><td class="n">试用</td><td class="y">500</td><td class="y">1000</td></tr><tr><td class="feat">导出与文献联动</td><td class="n">—</td><td class="n">—</td><td class="y">有</td></tr><tr><td class="feat">插件查询额度 / 设备数</td><td class="n">基础</td><td class="y">更高 · 2 台</td><td class="y">最高 · 4 台</td></tr><tr><td class="feat">Skill / API（搜索、荐刊）</td><td class="y">公测</td><td class="y">公测</td><td class="y">公测</td></tr><tr><td class="feat">MCP 连接</td><td class="y">在线公测</td><td class="y">在线公测</td><td class="y">在线公测</td></tr><tr data-market-panel="intl"><td class="feat">年付参考价（USD）</td><td class="y">$0</td><td class="y">$7.99</td><td class="y">$9.99</td></tr><tr data-market-panel="intl"><td class="feat">教育年付（机构邮箱）</td><td class="n">—</td><td class="y">$4.99</td><td class="y">$5.99</td></tr><tr data-market-panel="cn" hidden><td class="feat">中国区一次性 365 天（USD）</td><td class="y">$0</td><td class="y">$7.99</td><td class="y">$9.99</td></tr><tr data-market-panel="cn" hidden><td class="feat">自动续费</td><td class="n">—</td><td class="y">无</td><td class="y">无</td></tr>
+        </tbody></table>
+        <table class="px-compare" data-lang-panel="en"><thead><tr><th class="feat">Capability</th><th>Free</th><th>Pro</th><th>Max</th></tr></thead><tbody>
+          <tr><td class="feat">Website search &amp; detail</td><td class="y">Full</td><td class="y">Full</td><td class="y">Full</td></tr><tr><td class="feat">Extension basic badges (IF / JCR / indexes)</td><td class="y">Yes</td><td class="y">Yes</td><td class="y">Yes</td></tr><tr><td class="feat">Extension CAS / TOP / Emerging</td><td class="n">—</td><td class="y">Yes</td><td class="y">Yes</td></tr><tr><td class="feat">Extension warning / retraction / CAST risk</td><td class="n">—</td><td class="n">—</td><td class="y">Yes</td></tr><tr><td class="feat">Publish fee / APC details</td><td class="n">—</td><td class="y">Yes</td><td class="y">Yes</td></tr><tr><td class="feat">Cloud favorites &amp; lists</td><td class="n">—</td><td class="y">50 · 5 lists</td><td class="y">Unlimited</td></tr><tr><td class="feat">AI pick credits / month</td><td class="n">Trial</td><td class="y">500</td><td class="y">1000</td></tr><tr><td class="feat">Export &amp; integrations</td><td class="n">—</td><td class="n">—</td><td class="y">Yes</td></tr><tr><td class="feat">Extension query quota / devices</td><td class="n">Basic</td><td class="y">Higher · 2 devices</td><td class="y">Highest · 4 devices</td></tr><tr><td class="feat">Skill / API (search &amp; recommend)</td><td class="y">Public beta</td><td class="y">Public beta</td><td class="y">Public beta</td></tr><tr><td class="feat">MCP connection</td><td class="y">Online beta</td><td class="y">Online beta</td><td class="y">Online beta</td></tr><tr data-market-panel="intl"><td class="feat">Yearly price (USD)</td><td class="y">$0</td><td class="y">$7.99</td><td class="y">$9.99</td></tr><tr data-market-panel="intl"><td class="feat">Edu yearly (institutional email)</td><td class="n">—</td><td class="y">$4.99</td><td class="y">$5.99</td></tr><tr data-market-panel="cn" hidden><td class="feat">China one-time 365-day pass (USD)</td><td class="y">$0</td><td class="y">$7.99</td><td class="y">$9.99</td></tr><tr data-market-panel="cn" hidden><td class="feat">Auto-renewal</td><td class="n">—</td><td class="y">No</td><td class="y">No</td></tr>
+        </tbody></table>
+      </div>
+    </section>
+
+    <section class="home-sec pricing-detail">
+      <span class="home-sec-id">Notes</span>
+      <div class="px-note" data-lang-panel="zh-CN" data-market-panel="intl"><b>教育价与支付</b><br>· 机构邮箱（.edu / .edu.cn / .ac.* 等）登录后可解锁教育价；普通个人邮箱无法支付教育价。<br>· 已用机构邮箱登录时，标准价会锁定，请点「教育价」按钮，避免按全价付款。<br>· 年付通常比月付更划算。支付由安全收银台完成；退款见 <a href="/refund">退款政策</a>。<br>· Skill / API 与 MCP 目前为公测；可匿名调用，登录后可在账户中创建 API Key，接口和额度可能调整。</div>
+      <div class="px-note" data-lang-panel="en" data-market-panel="intl"><b>Education pricing &amp; checkout</b><br>· Institutional emails (.edu / .edu.cn / .ac.*, etc.) unlock education pricing after sign-in.<br>· When signed in with an institutional email, standard-price buttons are locked—use the edu CTA.<br>· Yearly is usually better value. Checkout is secure; see the <a href="/refund">refund policy</a>.<br>· Skill / API and MCP are public beta. Anonymous calls are allowed; signed-in users can create an API Key. Limits and fields may change.</div>
+      <div class="px-note" data-lang-panel="zh-CN" data-market-panel="cn" hidden><b>中国区一次性产品与支付</b><br>· Pro / Max 为一次性 365 天访问权，不自动续费；到期后可重新购买。<br>· 填写邮箱、姓名和账单信息后继续，Creem 收银台会按产品、地区、设备和账单信息显示可用方式；符合条件时可选择支付宝，也可能显示 Apple Pay / Google Pay，具体以 Creem 收银台为准。<br>· 功能、额度、退款与服务中止安排以<a href="/terms">条款</a>及<a href="/refund">退款政策</a>为准。</div>
+      <div class="px-note" data-lang-panel="en" data-market-panel="cn" hidden><b>China one-time products &amp; checkout</b><br>· Pro / Max are one-time 365-day passes with no auto-renewal; users may buy again after expiry.<br>· After entering your email, name and billing details, continue to Creem; the checkout shows available methods based on the product, location, device and billing details. Alipay may appear, and Apple Pay / Google Pay may also be offered; the checkout is authoritative.<br>· Features, quotas, refunds and service changes follow the <a href="/terms">Terms</a> and <a href="/refund">Refund policy</a>.</div>
+    </section>
+
+    <nav class="px-legal" aria-label="Policies"><a href="/about">关于</a><a href="/about#data">数据说明</a><a href="/terms">条款</a><a href="/privacy">隐私</a><a href="/refund">退款</a><a href="/contact">联系</a></nav>
+    <p class="px-back"><a href="/">← <span data-lang-panel="zh-CN">返回首页</span><span data-lang-panel="en">Back to home</span></a></p>
   </div>
-
-  <div class="px-billing" data-market-intl-only>
-    <div class="billing-toggle" role="group" aria-label="Billing period">
-      <button type="button" class="billing-toggle-btn is-on" data-billing-toggle="year" aria-pressed="true">
-        <span data-lang-panel="zh-CN">年付</span><span data-lang-panel="en">Yearly</span>
-        <em class="billing-save-tag" data-lang-panel="zh-CN">更划算</em>
-        <em class="billing-save-tag" data-lang-panel="en">Save</em>
-      </button>
-      <button type="button" class="billing-toggle-btn" data-billing-toggle="month" aria-pressed="false">
-        <span data-lang-panel="zh-CN">月付</span><span data-lang-panel="en">Monthly</span>
-      </button>
-    </div>
-    <p class="px-billing-note" data-billing-note>价格 USD · 年付 · 下方划线为原价（更划算）</p>
-  </div>
-
-  <p class="edu-status" data-edu-status data-market-intl-only hidden></p>
-
-  <div class="px-plans">
-    <article class="px-plan">
-      <h2 class="px-plan-name">Free</h2>
-      <p class="px-plan-desc" data-lang-panel="zh-CN">日常检索与轻量试用</p>
-      <p class="px-plan-desc" data-lang-panel="en">Everyday search &amp; light trials</p>
-      <div class="px-plan-price">
-        <span class="amt">$0</span>
-        <span class="unit" data-lang-panel="zh-CN">/ 永久</span>
-        <span class="unit" data-lang-panel="en">/ forever</span>
-      </div>
-      <p class="px-plan-was" hidden aria-hidden="true"></p>
-      <ul data-lang-panel="zh-CN">
-        <li>网站完整检索与期刊详情</li>
-        <li>基础插件徽章（IF / JCR / 收录）</li>
-        <li>有限的 AI 荐刊试用</li>
-        <li>新账号可享限时试用权益</li>
-      </ul>
-      <ul data-lang-panel="en">
-        <li>Full website search &amp; journal pages</li>
-        <li>Basic extension badges (IF / JCR / indexes)</li>
-        <li>Limited AI journal-pick trials</li>
-        <li>Limited-time trial perks for new accounts</li>
-      </ul>
-      <div class="px-actions">
-        <a class="plan-btn plan-btn-ghost" href="/">
-          <span data-lang-panel="zh-CN">继续免费使用</span>
-          <span data-lang-panel="en">Stay on Free</span>
-        </a>
-      </div>
-    </article>
-
-    <article class="px-plan" data-market-panel="intl">
-      <h2 class="px-plan-name">Pro</h2>
-      <p class="px-plan-desc" data-lang-panel="zh-CN">高频刷刊 · 插件进阶</p>
-      <p class="px-plan-desc" data-lang-panel="en">Power users · extension upgrades</p>
-      <div class="px-plan-price" data-plan-price="pro">
-        <span class="amt" data-price-amt>$7.99</span>
-        <span class="unit" data-price-unit>/ 年</span>
-      </div>
-      <p class="px-plan-was" data-plan-was="pro">原价 $11.99</p>
-      <p class="px-edu-price" data-edu-price="pro" aria-label="教育价">教育价 $4.99 · 年付 · 需机构邮箱</p>
-      <ul data-lang-panel="zh-CN">
-        <li>插件：中科院 / TOP / 新锐徽章</li>
-        <li>云收藏 50 本 · 清单 5 个</li>
-        <li>AI 荐刊 500 credits / 月</li>
-        <li>发表费用（APC）信息可见</li>
-        <li>更高原文额度（按月）</li>
-      </ul>
-      <ul data-lang-panel="en">
-        <li>Extension: CAS / TOP / Emerging badges</li>
-        <li>50 cloud favorites · 5 lists</li>
-        <li>500 AI credits / month</li>
-        <li>Publish-fee (APC) details visible</li>
-        <li>Higher full-text monthly quota</li>
-      </ul>
-      <div class="px-actions">
-        <button type="button" class="plan-btn plan-btn-primary" data-creem-checkout data-plan="pro" data-period="year">订阅 Pro · 年付</button>
-        <button type="button" class="plan-btn plan-btn-edu" data-creem-checkout data-plan="pro" data-period="year" data-edu="1">教育价 · 需机构邮箱</button>
-      </div>
-    </article>
-
-    <article class="px-plan px-plan-hot" data-market-panel="intl">
-      <span class="px-plan-tag" data-lang-panel="zh-CN">推荐</span>
-      <span class="px-plan-tag" data-lang-panel="en">Best</span>
-      <h2 class="px-plan-name">Max</h2>
-      <p class="px-plan-desc" data-lang-panel="zh-CN">完整工作流 · 高额度 AI</p>
-      <p class="px-plan-desc" data-lang-panel="en">Full workflow · high AI quota</p>
-      <div class="px-plan-price" data-plan-price="max">
-        <span class="amt" data-price-amt>$9.99</span>
-        <span class="unit" data-price-unit>/ 年</span>
-      </div>
-      <p class="px-plan-was" data-plan-was="max">原价 $14.99</p>
-      <p class="px-edu-price" data-edu-price="max" aria-label="教育价">教育价 $5.99 · 年付 · 需机构邮箱</p>
-      <ul data-lang-panel="zh-CN">
-        <li>插件：预警 / 撤稿 / 科协风险徽章</li>
-        <li>云收藏与清单不设上限</li>
-        <li>AI 荐刊 1000 credits / 月</li>
-        <li>导出（CSV / RIS / BibTeX 等）</li>
-        <li>更多地区站与设备额度</li>
-      </ul>
-      <ul data-lang-panel="en">
-        <li>Extension: warning / retraction / CAST risk badges</li>
-        <li>Unlimited cloud favorites &amp; lists</li>
-        <li>1000 AI credits / month</li>
-        <li>Export (CSV / RIS / BibTeX, etc.)</li>
-        <li>More regions &amp; device slots</li>
-      </ul>
-      <div class="px-actions">
-        <button type="button" class="plan-btn plan-btn-primary" data-creem-checkout data-plan="max" data-period="year">订阅 Max · 年付</button>
-        <button type="button" class="plan-btn plan-btn-edu" data-creem-checkout data-plan="max" data-period="year" data-edu="1">教育价 · 需机构邮箱</button>
-      </div>
-    </article>
-
-    <article class="px-plan px-cn-plan" data-market-panel="cn" hidden>
-      <span class="px-plan-tag" data-lang-panel="zh-CN">中国区标准价</span>
-      <span class="px-plan-tag" data-lang-panel="en">China standard price</span>
-      <h2 class="px-plan-name">Pro</h2>
-      <p class="px-plan-desc" data-lang-panel="zh-CN">一次性购买 · 365 天访问</p>
-      <p class="px-plan-desc" data-lang-panel="en">One-time purchase · 365 days</p>
-      <div class="px-plan-price" data-plan-price="pro">
-        <span class="amt" data-price-amt>$7.99</span>
-        <span class="price-rmb-estimate" data-rmb-estimate data-usd="7.99" hidden aria-label="人民币估算"></span>
-        <span class="unit" data-price-unit data-lang-panel="zh-CN">/ 365 天</span>
-        <span class="unit" data-lang-panel="en">/ 365 days</span>
-      </div>
-      <p class="px-edu-price" data-edu-price="pro" aria-label="教育价">教育价 $4.99 · 年付 · 需机构邮箱</p>
-      <p class="px-cn-plan-note" data-lang-panel="zh-CN">不自动续费 · 到期后可重新购买</p>
-      <p class="px-cn-plan-note" data-lang-panel="en">No auto-renewal · buy again after expiry</p>
-      <ul data-lang-panel="zh-CN">
-        <li>插件：中科院 / TOP / 新锐徽章</li>
-        <li>云收藏 50 本 · 清单 5 个</li>
-        <li>AI 荐刊 500 credits / 月</li>
-        <li>发表费用（APC）信息可见</li>
-        <li>更高原文额度（按月）</li>
-      </ul>
-      <ul data-lang-panel="en">
-        <li>Extension: CAS / TOP / Emerging badges</li>
-        <li>50 cloud favorites · 5 lists</li>
-        <li>500 AI credits / month</li>
-        <li>Publish-fee (APC) details visible</li>
-        <li>Higher full-text monthly quota</li>
-      </ul>
-      <div class="px-actions">
-        <button type="button" class="plan-btn plan-btn-primary" data-creem-checkout data-market="cn" data-cn-checkout data-plan="pro" data-period="one_time">
-          <span data-lang-panel="zh-CN">购买 Pro · 365 天</span>
-        </button>
-      </div>
-    </article>
-
-    <article class="px-plan px-plan-hot px-cn-plan" data-market-panel="cn" hidden>
-      <span class="px-plan-tag" data-lang-panel="zh-CN">中国区标准价</span>
-      <span class="px-plan-tag" data-lang-panel="en">China standard price</span>
-      <h2 class="px-plan-name">Max</h2>
-      <p class="px-plan-desc" data-lang-panel="zh-CN">一次性购买 · 365 天访问</p>
-      <p class="px-plan-desc" data-lang-panel="en">One-time purchase · 365 days</p>
-      <div class="px-plan-price" data-plan-price="max">
-        <span class="amt" data-price-amt>$9.99</span>
-        <span class="price-rmb-estimate" data-rmb-estimate data-usd="9.99" hidden aria-label="人民币估算"></span>
-        <span class="unit" data-price-unit data-lang-panel="zh-CN">/ 365 天</span>
-        <span class="unit" data-lang-panel="en">/ 365 days</span>
-      </div>
-      <p class="px-edu-price" data-edu-price="max" aria-label="教育价">教育价 $5.99 · 年付 · 需机构邮箱</p>
-      <p class="px-cn-plan-note" data-lang-panel="zh-CN">不自动续费 · 到期后可重新购买</p>
-      <p class="px-cn-plan-note" data-lang-panel="en">No auto-renewal · buy again after expiry</p>
-      <ul data-lang-panel="zh-CN">
-        <li>插件：预警 / 撤稿 / 科协风险徽章</li>
-        <li>云收藏与清单不设上限</li>
-        <li>AI 荐刊 1000 credits / 月</li>
-        <li>导出（CSV / RIS / BibTeX 等）</li>
-        <li>更多地区站与设备额度</li>
-      </ul>
-      <ul data-lang-panel="en">
-        <li>Extension: warning / retraction / CAST risk badges</li>
-        <li>Unlimited cloud favorites &amp; lists</li>
-        <li>1000 AI credits / month</li>
-        <li>Export (CSV / RIS / BibTeX, etc.)</li>
-        <li>More regions &amp; device slots</li>
-      </ul>
-      <div class="px-actions">
-        <button type="button" class="plan-btn plan-btn-primary" data-creem-checkout data-market="cn" data-cn-checkout data-plan="max" data-period="one_time">
-          <span data-lang-panel="zh-CN">购买 Max · 365 天</span>
-        </button>
-      </div>
-    </article>
-  </div>
-
-  <div class="px-note px-cn-banner" data-market-panel="cn" hidden>
-    <div data-lang-panel="zh-CN">
-      <b>中国区一次性年卡</b><br>
-      一次性支付，权益有效 365 天，不自动扣款。填写邮箱、姓名和账单信息并继续到 Creem 收银台后，系统会显示可用支付方式；符合条件时可选择支付宝，也可能显示 Apple Pay / Google Pay，具体以 Creem 收银台为准。人民币金额为按页面加载时公开汇率的估算，实际扣款/结算以 Creem 收银台、支付机构及发卡行显示为准。功能、额度及退款以最终条款为准。
-    </div>
-    <div data-lang-panel="en">
-      <b>China one-time passes</b><br>
-      One payment unlocks 365 days with no automatic charge. After entering your email, name and billing details, continue to Creem to see the payment methods available for your checkout; Alipay may appear, and Apple Pay / Google Pay may also be offered. The Creem checkout is authoritative. The CNY amount is an estimate from the public rate loaded on this page; the final charge and settlement follow the Creem checkout, payment provider and card issuer. Features, quotas and refunds follow the final terms.
-    </div>
-  </div>
-
-  <section class="px-sec">
-    <div class="px-sec-head" data-lang-panel="zh-CN">
-      <span class="kicker">Guide</span>
-      <h2>怎么选？</h2>
-      <p>按使用场景快速判断。网站查刊三档均可；徽章显示「试用」是限时体验，不等于付费 Pro。</p>
-    </div>
-    <div class="px-sec-head" data-lang-panel="en">
-      <span class="kicker">Guide</span>
-      <h2>Which plan?</h2>
-      <p>Pick by workflow. Website search is on every plan. A “Trial” badge is a limited-time perk — not paid Pro.</p>
-    </div>
-    <div class="px-guide" data-lang-panel="zh-CN">
-      <div class="px-guide-card">
-        <span class="who">Free</span>
-        <strong>只在网页查刊</strong>
-        <p>看 IF、分区、收录与详情即可，无需插件深度徽章或云收藏。</p>
-      </div>
-      <div class="px-guide-card">
-        <span class="who">Pro</span>
-        <strong>日常刷刊 + 插件</strong>
-        <p>Scholar / PubMed 需要中科院徽章，并希望有云收藏与 AI 荐刊额度。</p>
-      </div>
-      <div class="px-guide-card">
-        <span class="who">Max</span>
-        <strong>风险信号 + 导出</strong>
-        <p>需要预警 / 撤稿信号、导出到文献库，以及更高 AI 与设备额度。</p>
-      </div>
-    </div>
-    <div class="px-guide" data-lang-panel="en">
-      <div class="px-guide-card">
-        <span class="who">Free</span>
-        <strong>Web-only lookup</strong>
-        <p>Check IF, quartiles, indexes and journal pages without extension depth or cloud lists.</p>
-      </div>
-      <div class="px-guide-card">
-        <span class="who">Pro</span>
-        <strong>Daily browsing + extension</strong>
-        <p>Need CAS badges on Scholar / PubMed, plus cloud favorites and AI pick quota.</p>
-      </div>
-      <div class="px-guide-card">
-        <span class="who">Max</span>
-        <strong>Risk signals + export</strong>
-        <p>Want warning / retraction signals, export to reference managers, and higher AI / device limits.</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="px-sec">
-    <div class="px-sec-head" data-lang-panel="zh-CN">
-      <span class="kicker">Compare</span>
-      <h2>方案对比</h2>
-      <p>按当前产品权益整理，便于投稿前选型。</p>
-    </div>
-    <div class="px-sec-head" data-lang-panel="en">
-      <span class="kicker">Compare</span>
-      <h2>Compare plans</h2>
-      <p>Current product entitlements at a glance.</p>
-    </div>
-    <div class="px-compare-wrap">
-      <table class="px-compare" data-lang-panel="zh-CN">
-        <thead>
-          <tr><th class="feat">能力</th><th>Free</th><th>Pro</th><th>Max</th></tr>
-        </thead>
-        <tbody>
-          <tr><td class="feat">网站检索与详情</td><td class="y">完整</td><td class="y">完整</td><td class="y">完整</td></tr>
-          <tr><td class="feat">插件基础徽章（IF / JCR / 收录）</td><td class="y">有</td><td class="y">有</td><td class="y">有</td></tr>
-          <tr><td class="feat">插件中科院 / TOP / 新锐</td><td class="n">—</td><td class="y">有</td><td class="y">有</td></tr>
-          <tr><td class="feat">插件预警 / 撤稿 / 科协风险</td><td class="n">—</td><td class="n">—</td><td class="y">有</td></tr>
-          <tr><td class="feat">发表费用 / APC 详情</td><td class="n">—</td><td class="y">有</td><td class="y">有</td></tr>
-          <tr><td class="feat">云收藏与清单</td><td class="n">—</td><td class="y">50 本 · 5 清单</td><td class="y">不限</td></tr>
-          <tr><td class="feat">AI 荐刊 credits / 月</td><td class="n">试用</td><td class="y">500</td><td class="y">1000</td></tr>
-          <tr><td class="feat">导出与文献联动</td><td class="n">—</td><td class="n">—</td><td class="y">有</td></tr>
-          <tr><td class="feat">插件查询额度 / 设备数</td><td class="n">基础</td><td class="y">更高 · 2 台</td><td class="y">最高 · 4 台</td></tr>
-          <tr><td class="feat">Skill / API（搜索、荐刊）</td><td class="y">公测</td><td class="y">公测</td><td class="y">公测</td></tr>
-          <tr><td class="feat">MCP 连接</td><td class="y">在线公测</td><td class="y">在线公测</td><td class="y">在线公测</td></tr>
-          <tr data-market-panel="intl"><td class="feat">年付参考价（USD）</td><td class="y">$0</td><td class="y">$7.99</td><td class="y">$9.99</td></tr>
-          <tr data-market-panel="intl"><td class="feat">教育年付（机构邮箱）</td><td class="n">—</td><td class="y">$4.99</td><td class="y">$5.99</td></tr>
-          <tr data-market-panel="cn" hidden><td class="feat">中国区一次性 365 天（USD）</td><td class="y">$0</td><td class="y">$7.99</td><td class="y">$9.99</td></tr>
-          <tr data-market-panel="cn" hidden><td class="feat">自动续费</td><td class="n">—</td><td class="y">无</td><td class="y">无</td></tr>
-        </tbody>
-      </table>
-      <table class="px-compare" data-lang-panel="en">
-        <thead>
-          <tr><th class="feat">Capability</th><th>Free</th><th>Pro</th><th>Max</th></tr>
-        </thead>
-        <tbody>
-          <tr><td class="feat">Website search &amp; detail</td><td class="y">Full</td><td class="y">Full</td><td class="y">Full</td></tr>
-          <tr><td class="feat">Extension basic badges (IF / JCR / indexes)</td><td class="y">Yes</td><td class="y">Yes</td><td class="y">Yes</td></tr>
-          <tr><td class="feat">Extension CAS / TOP / Emerging</td><td class="n">—</td><td class="y">Yes</td><td class="y">Yes</td></tr>
-          <tr><td class="feat">Extension warning / retraction / CAST risk</td><td class="n">—</td><td class="n">—</td><td class="y">Yes</td></tr>
-          <tr><td class="feat">Publish fee / APC details</td><td class="n">—</td><td class="y">Yes</td><td class="y">Yes</td></tr>
-          <tr><td class="feat">Cloud favorites &amp; lists</td><td class="n">—</td><td class="y">50 · 5 lists</td><td class="y">Unlimited</td></tr>
-          <tr><td class="feat">AI pick credits / month</td><td class="n">Trial</td><td class="y">500</td><td class="y">1000</td></tr>
-          <tr><td class="feat">Export &amp; integrations</td><td class="n">—</td><td class="n">—</td><td class="y">Yes</td></tr>
-          <tr><td class="feat">Extension query quota / devices</td><td class="n">Basic</td><td class="y">Higher · 2 devices</td><td class="y">Highest · 4 devices</td></tr>
-          <tr><td class="feat">Skill / API (search &amp; recommend)</td><td class="y">Public beta</td><td class="y">Public beta</td><td class="y">Public beta</td></tr>
-          <tr><td class="feat">MCP connection</td><td class="y">Online beta</td><td class="y">Online beta</td><td class="y">Online beta</td></tr>
-          <tr data-market-panel="intl"><td class="feat">Yearly price (USD)</td><td class="y">$0</td><td class="y">$7.99</td><td class="y">$9.99</td></tr>
-          <tr data-market-panel="intl"><td class="feat">Edu yearly (institutional email)</td><td class="n">—</td><td class="y">$4.99</td><td class="y">$5.99</td></tr>
-          <tr data-market-panel="cn" hidden><td class="feat">China one-time 365-day pass (USD)</td><td class="y">$0</td><td class="y">$7.99</td><td class="y">$9.99</td></tr>
-          <tr data-market-panel="cn" hidden><td class="feat">Auto-renewal</td><td class="n">—</td><td class="y">No</td><td class="y">No</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <section class="px-sec">
-    <div class="px-note" data-lang-panel="zh-CN" data-market-panel="intl">
-      <b>教育价与支付</b><br>
-      · 机构邮箱（.edu / .edu.cn / .ac.* 等）登录后可解锁教育价；普通个人邮箱无法支付教育价。<br>
-      · 已用机构邮箱登录时，标准价会锁定，请点「教育价」按钮，避免按全价付款。<br>
-      · 年付通常比月付更划算。支付由安全收银台完成；退款见 <a href="/refund">退款政策</a>。<br>
-      · 新账号若显示「试用」，为限时体验，不是付费 Pro。<br>
-      · Skill / API 与 MCP 目前为公测；可匿名调用，登录后可在账户中创建 API Key，接口和额度可能调整。
-    </div>
-    <div class="px-note" data-lang-panel="en" data-market-panel="intl">
-      <b>Education pricing &amp; checkout</b><br>
-      · Institutional emails (.edu / .edu.cn / .ac.*, etc.) unlock education pricing after sign-in.<br>
-      · When signed in with an institutional email, standard-price buttons are locked—use the edu CTA.<br>
-      · Yearly is usually better value. Checkout is secure; see the <a href="/refund">refund policy</a>.<br>
-      · A “Trial” badge is a limited-time trial — not a paid Pro subscription.<br>
-      · Skill / API and MCP are public beta. Anonymous calls are allowed; signed-in users can create an API Key. Limits and fields may change.
-    </div>
-    <div class="px-note" data-lang-panel="zh-CN" data-market-panel="cn" hidden>
-      <b>中国区一次性产品与支付</b><br>
-      · Pro / Max 为一次性 365 天访问权，不自动续费；到期后可重新购买。<br>
-      · 填写邮箱、姓名和账单信息后继续，Creem 收银台会按产品、地区、设备和账单信息显示可用方式；符合条件时可选择支付宝，也可能显示 Apple Pay / Google Pay，具体以收银台为准。<br>
-      · 功能、额度、退款与服务中止安排以<a href="/terms">条款</a>及<a href="/refund">退款政策</a>为准。
-    </div>
-    <div class="px-note" data-lang-panel="en" data-market-panel="cn" hidden>
-      <b>China one-time products &amp; checkout</b><br>
-      · Pro / Max are one-time 365-day passes with no auto-renewal; users may buy again after expiry.<br>
-      · After entering your email, name and billing details, continue to Creem; the checkout shows available methods based on the product, location, device and billing details. Alipay may appear, and Apple Pay / Google Pay may also be offered; the checkout is authoritative.<br>
-      · Features, quotas, refunds and service changes follow the <a href="/terms">Terms</a> and <a href="/refund">Refund policy</a>.
-    </div>
-  </section>
-
-  <nav class="px-legal" aria-label="Policies">
-    <a href="/about">关于</a>
-    <a href="/about#data">数据说明</a>
-    <a href="/terms">条款</a>
-    <a href="/privacy">隐私</a>
-    <a href="/refund">退款</a>
-    <a href="/contact">联系</a>
-  </nav>
-
-  <p class="px-back">
-    <a href="/">← <span data-lang-panel="zh-CN">返回首页</span><span data-lang-panel="en">Back to home</span></a>
-  </p>
 </main>
 
-<script src="/js/static-i18n.js?v=20260806-home-shell-v1" defer></script>
-<script src="/js/pricing-checkout.js?v=20260806-edu-visible-v1" defer></script>
-<script src="/js/site-rail.js?v=20260716-pricing-v4" defer></script>
+<script src="/js/static-i18n.js?v=20260807-home-shell-v1" defer></script>
+<script src="/js/pricing-checkout.js?v=20260807-home-shell-v1" defer></script>
+<script src="/js/site-rail.js?v=20260807-home-shell-v1" defer></script>
 </body>
 </html>

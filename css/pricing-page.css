@@ -1,493 +1,105 @@
-/* AILatest Journal — pricing content on the shared home application shell. */
+/* Pricing uses the homepage shell and tokens verbatim. This file only adds
+   spacing/table treatment that does not exist on the homepage. */
 
-body[data-static-page="pricing"] {
-  background-color: #fffdf9;
-  background-image:
-    radial-gradient(ellipse 680px 440px at 52% 18%, rgba(249, 115, 22, .13), transparent 72%),
-    radial-gradient(ellipse 780px 520px at 86% 80%, rgba(31, 44, 76, .055), transparent 72%),
-    linear-gradient(rgba(39, 35, 31, .035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(39, 35, 31, .035) 1px, transparent 1px),
-    linear-gradient(180deg, #fffefa 0%, #fffaf2 42%, #fffdf9 100%);
-  background-repeat: no-repeat, no-repeat, repeat, repeat, no-repeat;
-  background-size: cover, cover, 60px 60px, 60px 60px, cover;
-  background-attachment: fixed;
-  color: #1c1917;
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-    'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+.pricing-main {
+  padding-top: 72px;
 }
 
-/* static.css gives all <main> elements an 880px reading width. Pricing is a
-   product surface, so it follows the homepage's 1120px content rail instead. */
-main.px-page {
-  width: 100%;
-  max-width: 1120px;
-  margin: 0 auto;
-  padding: 28px 20px 96px;
-  box-sizing: border-box;
-  flex: 1 0 auto;
-}
-
-/* Reuse the homepage brand and top navigation instead of a second static-page
-   header treatment. The static page script keeps a dedicated pricing-head
-   hook so active navigation still works without static-page overrides. */
-body[data-static-page="pricing"] .pricing-head {
-  position: static;
-  display: block;
+/* Keep the homepage brand markup and fixed position; pricing has no search
+   field, so the empty topbar only provides the same shell anchor. */
+.pricing-topbar {
+  width: 0;
+  height: 0;
   min-height: 0;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  backdrop-filter: none;
-}
-body[data-static-page="pricing"] .pricing-top-nav {
-  display: flex !important;
-}
-body[data-static-page="pricing"] .pricing-top-nav .lang-toggle {
-  margin-left: 4px;
-}
-
-/* Hero */
-.px-hero {
-  text-align: center;
-  max-width: 680px;
-  margin: 0 auto 26px;
-}
-.px-kicker {
-  display: inline-block;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #c2410c;
-  margin-bottom: 10px;
-}
-.px-hero h1 {
-  margin: 0 0 12px;
-  font-size: clamp(28px, 4.2vw, 40px);
-  font-weight: 820;
-  letter-spacing: -0.03em;
-  line-height: 1.15;
-  color: #1c1917;
-}
-.px-hero .sub {
-  margin: 0 auto;
-  color: #78716c;
-  font-size: 15.5px;
-  line-height: 1.65;
-  max-width: 560px;
-}
-
-/* Billing */
-.px-billing {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  margin: 0 0 18px;
-}
-.billing-toggle {
-  display: inline-flex;
-  gap: 4px;
-  padding: 4px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid rgba(90, 70, 50, 0.1);
-  box-shadow: 0 8px 22px rgba(40, 28, 16, 0.06);
-}
-.billing-toggle-btn {
-  appearance: none;
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-  font: inherit;
-  font-size: 13.5px;
-  font-weight: 720;
-  color: #78716c;
-  padding: 10px 20px;
-  border-radius: 999px;
-  min-width: 96px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
-}
-.billing-toggle-btn.is-on {
-  background: linear-gradient(180deg, #fb923c, #f97316);
-  color: #fff;
-  box-shadow: 0 4px 14px rgba(249, 115, 22, 0.3);
-}
-.billing-save-tag {
-  display: inline-flex;
-  font-size: 10px;
-  font-weight: 800;
-  font-style: normal;
-  padding: 2px 7px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.22);
-  color: inherit;
-  line-height: 1.2;
-}
-.billing-toggle-btn:not(.is-on) .billing-save-tag {
-  background: #fff7ed;
-  color: #c2410c;
-}
-.px-billing-note {
   margin: 0;
-  font-size: 12.5px;
-  color: #a8a29e;
-  text-align: center;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+  pointer-events: none;
+}
+.pricing-topbar .topbar-brand {
+  pointer-events: auto;
 }
 
-/* Payment mode follows the current UI language. */
-.px-cn-plan-note {
-  margin: 0 0 14px;
-  font-size: 12.5px;
-  color: #c2410c;
-  line-height: 1.45;
-}
-.px-plan[data-market-panel][hidden],
-[data-market-panel][hidden],
-[data-market-intl-only][hidden] {
-  display: none !important;
-}
-html[data-static-lang] [data-market-panel][hidden],
-html[data-ui-lang] [data-market-panel][hidden] {
-  display: none !important;
-}
-.px-cn-banner {
-  margin: -18px 0 36px;
-}
-
-/* Edu banner */
-.edu-status {
-  max-width: 720px;
-  margin: 0 auto 20px;
-  padding: 12px 16px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.85);
-  border: 1px solid rgba(90, 70, 50, 0.1);
-  color: #57534e;
-  font-size: 13.5px;
-  line-height: 1.55;
-  text-align: center;
-}
-.edu-status[data-state="ok"] {
-  background: #ecfdf5;
-  border-color: rgba(4, 120, 87, 0.2);
-  color: #047857;
-}
-.edu-status[data-state="blocked"] {
-  background: #fff7ed;
-  border-color: rgba(249, 115, 22, 0.2);
-  color: #9a3412;
-}
-.edu-status[hidden] {
-  display: none !important;
-}
-
-/* Plans */
-.px-plans {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-  margin: 0 0 36px;
-  align-items: stretch;
-}
-.px-plan {
-  position: relative;
+/* Home section spacing is the source of truth for the pricing cards. */
+.pricing-content {
   display: flex;
   flex-direction: column;
-  min-width: 0;
-  padding: 24px 18px 18px;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(90, 70, 50, 0.08);
-  box-shadow: 0 12px 32px rgba(40, 28, 16, 0.05);
-  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  gap: 14px;
 }
-.px-plan:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 18px 40px rgba(40, 28, 16, 0.08);
-  border-color: rgba(249, 115, 22, 0.22);
+.pricing-content > .home-sec {
+  margin: 0;
 }
-.px-plan-hot {
-  border-color: rgba(249, 115, 22, 0.42);
-  background: linear-gradient(180deg, #fffdfb 0%, #fff7ed 100%);
-  box-shadow: 0 16px 40px rgba(249, 115, 22, 0.12);
+.pricing-detail {
+  text-align: left;
 }
-.px-plan-tag {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  font-size: 11px;
-  font-weight: 800;
-  color: #fff;
-  background: linear-gradient(135deg, #fb923c, #ea580c);
-  border-radius: 999px;
-  padding: 4px 10px;
-  box-shadow: 0 4px 10px rgba(249, 115, 22, 0.25);
-}
-.px-plan-name {
-  margin: 0 0 4px;
-  font-size: 22px;
-  font-weight: 820;
-  letter-spacing: -0.02em;
-}
-.px-plan-desc {
-  margin: 0 0 14px;
-  font-size: 13px;
-  color: #78716c;
-  line-height: 1.45;
-}
-.px-plan-price {
-  display: flex;
-  align-items: baseline;
-  gap: 2px;
-  margin: 0 0 4px;
-}
-.px-plan-price .amt {
-  font-size: 34px;
-  font-weight: 820;
-  letter-spacing: -0.03em;
-  color: #1c1917;
-  line-height: 1;
-}
-.px-plan-price .unit {
-  font-size: 14px;
-  font-weight: 650;
-  color: #a8a29e;
-  white-space: nowrap;
-}
-.price-rmb-estimate {
-  display: inline-block;
-  margin-left: -1px;
-  font-size: 12px;
-  font-weight: 700;
-  color: #78716c;
-  letter-spacing: 0;
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
-}
-.price-rmb-estimate[hidden] {
-  display: none !important;
-}
-.px-plan-was {
-  margin: 0 0 14px;
-  font-size: 12.5px;
-  color: #a8a29e;
-  text-decoration: line-through;
-}
-.px-plan-was[hidden] {
-  display: none !important;
-}
-.px-edu-price {
-  margin: 0 0 14px;
-  color: #c2410c;
-  font-size: 12.5px;
-  font-weight: 700;
-  line-height: 1.35;
-}
-.px-edu-price[hidden] {
-  display: none !important;
-}
-.px-plan ul {
-  margin: 0 0 18px;
-  padding: 0;
-  list-style: none;
-  flex: 1;
-}
-.px-plan li {
-  position: relative;
-  padding: 0 0 0 18px;
-  margin: 0 0 8px;
-  font-size: 13.5px;
-  line-height: 1.45;
-  color: #57534e;
-}
-.px-plan li::before {
-  content: "✓";
-  position: absolute;
-  left: 0;
-  top: 0;
-  color: #ea580c;
-  font-weight: 900;
-  font-size: 12px;
-}
-.px-actions {
-  display: grid;
-  gap: 8px;
-  margin-top: auto;
+.pricing-detail > .home-sec-id,
+.pricing-detail > .home-sec-title,
+.pricing-detail > .home-sec-lead {
+  text-align: left;
 }
 
-/* Buttons */
-.plan-btn {
-  appearance: none;
-  width: 100%;
-  min-height: 44px;
-  border-radius: 999px;
-  border: 1px solid transparent;
-  font: inherit;
-  font-size: 14px;
-  font-weight: 750;
-  cursor: pointer;
-  text-decoration: none !important;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  transition: transform 0.12s, box-shadow 0.12s, opacity 0.12s;
-}
-.plan-btn:active {
-  transform: scale(0.98);
-}
-.plan-btn-primary {
-  background: linear-gradient(180deg, #fb923c, #f97316);
-  color: #fff !important;
-  box-shadow: 0 8px 18px rgba(249, 115, 22, 0.28);
-}
-.plan-btn-primary:hover {
-  box-shadow: 0 10px 22px rgba(249, 115, 22, 0.34);
-}
-.plan-btn-ghost {
-  background: #fff;
-  border-color: rgba(90, 70, 50, 0.14);
-  color: #1c1917 !important;
-}
-.plan-btn-edu {
-  background: #fff7ed;
-  border-color: rgba(249, 115, 22, 0.28);
-  color: #c2410c !important;
-  font-size: 13px;
-  min-height: 40px;
-}
-.plan-btn-edu.edu-locked {
-  opacity: 0.78;
-  color: #78716c !important;
-  border-color: rgba(90, 70, 50, 0.12);
-  background: #fafaf9;
-}
-/* 教育价解锁后：橙色主按钮，不改变按钮顺序 */
-.plan-btn-edu.edu-ready,
-.plan-btn.edu-ready {
-  order: unset !important;
-  background: linear-gradient(180deg, #fb923c, #f97316) !important;
-  color: #fff !important;
-  border-color: transparent !important;
-  font-size: 14px;
-  min-height: 44px;
-  font-weight: 800;
-  box-shadow: 0 8px 18px rgba(249, 115, 22, 0.28);
-}
-.plan-btn-edu.edu-ready:hover {
-  box-shadow: 0 10px 22px rgba(249, 115, 22, 0.34);
-}
-.plan-btn.std-price-locked {
-  opacity: 0.45;
-  cursor: not-allowed !important;
-  pointer-events: none;
-  filter: grayscale(0.3);
-  background: #f5f5f4 !important;
-  color: #a8a29e !important;
-  border-color: rgba(90, 70, 50, 0.1) !important;
-  box-shadow: none !important;
-}
-
-/* Sections */
-.px-sec {
-  margin: 0 0 16px;
-  padding: 24px 22px;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.78);
-  border: 1px solid rgba(90, 70, 50, 0.07);
-  box-shadow: 0 10px 28px rgba(40, 28, 16, 0.04);
-  box-sizing: border-box;
-}
-.px-sec-head {
-  margin: 0 0 16px;
-  text-align: center;
-}
-.px-sec-head .kicker {
-  display: block;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: #c2410c;
-  margin-bottom: 6px;
-}
-.px-sec-head h2 {
-  margin: 0 0 6px;
-  font-size: 22px;
-  font-weight: 820;
-  letter-spacing: -0.02em;
-}
-.px-sec-head p {
-  margin: 0 auto;
-  max-width: 520px;
-  font-size: 13.5px;
-  color: #78716c;
-  line-height: 1.55;
-}
-
-/* Guide cards */
+/* Guide cards use the same density, border and type scale as home feature
+   cards. They are content-only variants, not a second visual system. */
 .px-guide {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+  gap: 10px;
 }
 .px-guide-card {
-  padding: 16px;
-  border-radius: 14px;
+  padding: 14px 12px;
+  border-radius: 12px;
   background: #fff;
-  border: 1px solid rgba(90, 70, 50, 0.08);
+  border: 1px solid rgba(90, 70, 50, 0.06);
 }
 .px-guide-card .who {
   display: inline-block;
+  margin-bottom: 6px;
+  color: #c2410c;
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #c2410c;
-  margin-bottom: 6px;
 }
 .px-guide-card strong {
   display: block;
-  font-size: 15px;
-  font-weight: 800;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
   color: #1c1917;
+  font-size: 13px;
+  font-weight: 800;
 }
 .px-guide-card p {
   margin: 0;
-  font-size: 13px;
-  line-height: 1.5;
-  color: #78716c;
+  color: #8a837a;
+  font-size: 12px;
+  line-height: 1.45;
 }
 
-/* Compare table */
+/* The comparison table is the only genuinely new component on this page;
+   its shell still inherits the homepage card surface. */
 .px-compare-wrap {
   overflow-x: auto;
-  border-radius: 14px;
-  border: 1px solid rgba(90, 70, 50, 0.08);
+  border: 1px solid rgba(90, 70, 50, 0.06);
+  border-radius: 12px;
   background: #fff;
 }
 .px-compare {
   width: 100%;
-  border-collapse: collapse;
-  font-size: 13.5px;
   min-width: 560px;
+  border-collapse: collapse;
+  color: #5c564f;
+  font-size: 12.5px;
 }
 .px-compare th,
 .px-compare td {
-  padding: 12px 14px;
+  padding: 10px 12px;
   text-align: center;
   border-bottom: 1px solid rgba(90, 70, 50, 0.06);
 }
 .px-compare th {
   background: #faf7f0;
-  font-weight: 750;
   color: #44403c;
+  font-weight: 750;
   white-space: nowrap;
 }
 .px-compare tr:last-child td {
@@ -501,24 +113,24 @@ html[data-ui-lang] [data-market-panel][hidden] {
   color: #a8a29e;
 }
 .px-compare .feat {
-  text-align: left;
+  min-width: 160px;
   color: #44403c;
   font-weight: 650;
-  min-width: 160px;
+  text-align: left;
 }
 .px-compare tbody tr:hover td {
   background: #fffcf7;
 }
 
-/* Note */
+/* Notes and policy links keep the same inner spacing as home-sec-note. */
 .px-note {
-  padding: 16px 18px;
-  border-radius: 14px;
+  padding: 14px;
+  border: 1px solid rgba(90, 70, 50, 0.06);
+  border-radius: 12px;
   background: #fff;
-  border: 1px solid rgba(90, 70, 50, 0.08);
-  font-size: 13.5px;
-  color: #57534e;
-  line-height: 1.7;
+  color: #5c564f;
+  font-size: 12.5px;
+  line-height: 1.65;
 }
 .px-note b {
   color: #1c1917;
@@ -526,48 +138,33 @@ html[data-ui-lang] [data-market-panel][hidden] {
 .px-note a {
   color: #c2410c;
   font-weight: 650;
-  text-decoration: none;
 }
-.px-note a:hover {
-  text-decoration: underline;
-}
-
-/* Legal strip */
 .px-legal {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 8px 14px;
-  margin: 20px 0 0;
-  font-size: 13px;
+  margin: 2px 0 0;
+  font-size: 12.5px;
 }
 .px-legal a {
   color: #78716c;
   font-weight: 650;
-  text-decoration: none;
 }
-.px-legal a:hover {
-  color: #c2410c;
-}
-
 .px-back {
+  margin: 0;
   text-align: center;
-  margin-top: 28px;
 }
 .px-back a {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 14px;
-  font-weight: 720;
   color: #c2410c;
-  text-decoration: none !important;
-}
-.px-back a:hover {
-  text-decoration: underline !important;
+  font-size: 13px;
+  font-weight: 720;
 }
 
-/* i18n */
+/* Static-page language panels use the same two-language behavior as before. */
 html[lang="en"] [data-lang-panel="zh-CN"],
 html[data-static-lang="en"] [data-lang-panel="zh-CN"],
 html[data-ui-lang="en"] [data-lang-panel="zh-CN"] {
@@ -582,40 +179,10 @@ html:not([lang="en"]):not([data-static-lang="en"]):not([data-ui-lang="en"]) [dat
 }
 
 @media (max-width: 900px) {
-  body[data-static-page="pricing"] {
-    padding-left: 0;
-    background-attachment: scroll;
+  .pricing-main {
+    padding-top: 56px;
   }
-  main.px-page {
-    padding: 18px 14px 80px;
-  }
-  body[data-static-page="pricing"] .pricing-top-nav {
-    top: 10px;
-    right: 10px;
-    max-width: calc(100vw - 20px);
-    gap: 1px;
-  }
-  body[data-static-page="pricing"] .pricing-top-nav a {
-    padding: 5px 6px;
-    font-size: 11px;
-  }
-  body[data-static-page="pricing"] .pricing-top-nav .lang-toggle {
-    padding: 5px 9px;
-    font-size: 11px;
-  }
-  body[data-static-page="pricing"] .topbar-brand {
-    left: 14px;
-    top: 14px;
-    font-size: 14px;
-  }
-  .px-plans,
   .px-guide {
     grid-template-columns: 1fr;
-    max-width: 420px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  .px-plans {
-    margin-bottom: 28px;
   }
 }
