@@ -1071,6 +1071,12 @@ td.c, th.c { text-align: center; }
   -webkit-tap-highlight-color: rgba(180, 83, 31, .16);
 }
 
+/* Static pages use the same rail state as the main app. Region stations are
+   user-pinned; the picker itself is intentionally not a default rail item. */
+.app-rail .rail-region-picker {
+  display: none !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     scroll-behavior: auto !important;

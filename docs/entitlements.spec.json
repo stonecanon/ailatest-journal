@@ -1,7 +1,20 @@
 {
   "$schema_note": "AILatest Journal 插件/网站共用权限配置。服务端为唯一权威来源，客户端只读不判权。版本号变更时客户端需重新拉取。",
-  "version": "2026-07-15.9",
-  "status": "pro_coming_soon",
+  "version": "2026-08-06.1",
+  "status": "paid_live_api_beta",
+  "interfaces": {
+    "skill_api": {
+      "status": "public_beta",
+      "anonymous": true,
+      "api_key_headers": ["X-API-Key", "Authorization: ApiKey", "Authorization: Bearer aj_live_"],
+      "endpoints": ["/api/skill/search", "/api/skill/recommend", "/api/skill/quota"]
+    },
+    "mcp": {
+      "status": "public_beta",
+      "endpoint": "/api/mcp",
+      "tools": ["search_journals", "recommend_journals", "quota"]
+    }
+  },
   "model": {
     "provider": "DeepSeek",
     "api_model": "deepseek-v4-flash",
@@ -30,7 +43,8 @@
           "under_review": false,
           "on_hold": false,
           "retraction": false,
-          "cnkx_tier": false
+          "cnkx_tier": false,
+          "cas_xr": false
         },
         "favorites": {
           "enabled": true,
@@ -68,6 +82,7 @@
           "on_hold": true,
           "retraction": true,
           "cnkx_tier": true,
+          "cas_xr": true,
           "publish_fee": false,
           "note": "网站侧中科院/预警开放；发表费用对 Free 关闭；插件侧见 extension.premium_labels"
         },
@@ -110,7 +125,7 @@
       }
     },
     "trial": {
-      "note": "付费通道上线后启用。当前 PRO_COMING_SOON 时新注册不自动 trial，统一 Free。",
+      "note": "新注册可获得 7 天权益预览；AI 荐刊 credits 仍需 Pro / Max。",
       "duration_days": 7,
       "inherits": "pro",
       "overrides": {
@@ -148,6 +163,7 @@
           "on_hold": true,
           "retraction": true,
           "cnkx_tier": true,
+          "cas_xr": true,
           "publish_fee": true
         },
         "publish_fee_info": true,
@@ -187,6 +203,7 @@
             "on_hold": false,
             "retraction": false,
             "cnkx_tier": false,
+            "cas_xr": true,
             "publish_fee": true,
             "note": "插件中科院/TOP/新锐/发表费用 Pro 起；预警·撤稿·科协与全站增强识别仅 Max"
           },
@@ -208,6 +225,7 @@
           "on_hold": true,
           "retraction": true,
           "cnkx_tier": true,
+          "cas_xr": true,
           "publish_fee": true
         },
         "publish_fee_info": true,
@@ -251,6 +269,7 @@
             "on_hold": true,
             "retraction": true,
             "cnkx_tier": true,
+            "cas_xr": true,
             "publish_fee": true,
             "note": "含预警 · 撤稿 · 科协等风险与分级徽章"
           },

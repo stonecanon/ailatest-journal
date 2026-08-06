@@ -25,6 +25,9 @@ MAIL_FROM        = "noreply@ailatest.org"   # must be a Resend-verified sender
 CF_ZONE_ID       = "435525fb783ba7bf4c686a9734e26124"  # journal.ailatest.org zone (Cloudflare Analytics)
 GA4_PROPERTY_ID  = "537014253"                          # Google Analytics 4 property
 # Creem Journal products（与 Todo 分离；可被 secret 外的 vars 覆盖）
+# China one-time 365-day SKUs: fill these only after creating one-time products in Creem.
+CREEM_PRO_CN_365_PRODUCT_ID       = "prod_3Mea8BVSYJ5nbVJeYQ3qWN"
+CREEM_MAX_CN_365_PRODUCT_ID       = "prod_2OXrWFSu1RSxeJddAHUxcL"
 CREEM_PRO_MONTHLY_PRODUCT_ID     = "prod_4U7xCv0XuvaQwngA8GzAwk"
 CREEM_PRO_YEARLY_PRODUCT_ID      = "prod_4qPTXwWFki7H97CnEGg0UU"
 CREEM_MAX_MONTHLY_PRODUCT_ID     = "prod_4dQ8oxI13n13UujKijvupS"
@@ -33,6 +36,16 @@ CREEM_PRO_EDU_MONTHLY_PRODUCT_ID = "prod_2UjZDHaflN6qnqyPKsSWzu"
 CREEM_PRO_EDU_YEARLY_PRODUCT_ID  = "prod_2KUfnQxKKFYS2zIRX8bIyD"
 CREEM_MAX_EDU_MONTHLY_PRODUCT_ID = "prod_2Il9sgrjBPMbgCA4eALdCz"
 CREEM_MAX_EDU_YEARLY_PRODUCT_ID  = "prod_1a4d3MaM7X10XbTUP6ixCW"
+# Creem Grant products（2026-07-17 建品）
+CREEM_GRANT_PRO_MONTHLY_PRODUCT_ID     = "prod_wqMlq44x2Z1mmOGhIyyxi"
+CREEM_GRANT_PRO_YEARLY_PRODUCT_ID      = "prod_1FKHL9bMk6mVSwNpYOB5pB"
+CREEM_GRANT_MAX_MONTHLY_PRODUCT_ID     = "prod_4WLAmX8fyShA0rav8X8kPo"
+CREEM_GRANT_MAX_YEARLY_PRODUCT_ID      = "prod_4DW4yl3zfcQR8SPDuzWz1u"
+CREEM_GRANT_PRO_EDU_MONTHLY_PRODUCT_ID = "prod_2DhAXcFRYCyHoi2aJSinhJ"
+CREEM_GRANT_PRO_EDU_YEARLY_PRODUCT_ID  = "prod_5J2FqPO8k4bssN4KKh3Lp6"
+CREEM_GRANT_MAX_EDU_MONTHLY_PRODUCT_ID = "prod_4kuY9jhjzsqdDmFo1IFhJe"
+CREEM_GRANT_MAX_EDU_YEARLY_PRODUCT_ID  = "prod_2DWHbc7FvP3iPM7o8YkljH"
+GRANT_SITE_URL                         = "https://grant.ailatest.org"
 
 [[d1_databases]]
 binding = "DB"

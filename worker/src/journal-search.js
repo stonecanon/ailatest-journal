@@ -350,13 +350,17 @@ function skillFields(journal, env, match = {}) {
   };
 }
 
-function quotaPolicy() {
+function quotaPolicy(context = {}) {
+  const auth = context?.apiKey ? 'api_key' : (context?.user ? 'account' : 'public');
   return {
+    status: 'public_beta',
+    access: auth,
+    api_key_supported: true,
     free_trial: true,
     free_search: 'limited initial credits per account',
     accounting: 'account-level credits, not daily reset',
     paid_modes: ['pay_as_you_go', 'subscription'],
-    note: 'Current beta policy may change before paid launch.',
+    note: 'Skill/API and MCP are in public beta. Limits and response fields may change before general availability.',
   };
 }
 
@@ -458,7 +462,7 @@ export async function buildPublicSearchResponse(request, env) {
   };
 }
 
-export async function buildSkillSearchResponse(request, env) {
+export async function buildSkillSearchResponse(request, env, context = {}) {
   const filters = await parseSearchInput(request);
   const journals = await loadJournals(env);
   const { query, results } = runSearch(journals, filters);
@@ -481,11 +485,11 @@ export async function buildSkillSearchResponse(request, env) {
       matched_terms: query ? [query] : [],
       basis: query ? ['text_match'] : ['structured_filter'],
     })),
-    quota_policy: quotaPolicy(),
+    quota_policy: quotaPolicy(context),
   };
 }
 
-export async function buildSkillRecommendResponse(request, env) {
+export async function buildSkillRecommendResponse(request, env, context = {}) {
   const filters = await parseSearchInput(request);
   const terms = extractRecommendTerms(filters);
   const journals = await loadJournals(env);
@@ -511,14 +515,14 @@ export async function buildSkillRecommendResponse(request, env) {
       'Structured-data recommendation only; verify scope and author instructions on the journal website.',
       'Use exclude_warning=true to remove warning, on-hold and under-review journals.',
     ],
-    quota_policy: quotaPolicy(),
+    quota_policy: quotaPolicy(context),
   };
 }
 
-export function buildSkillQuotaResponse() {
+export function buildSkillQuotaResponse(context = {}) {
   return {
     ok: true,
     mode: 'quota',
-    quota_policy: quotaPolicy(),
+    quota_policy: quotaPolicy(context),
   };
 }

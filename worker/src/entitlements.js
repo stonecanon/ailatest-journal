@@ -11,7 +11,7 @@
  *  4. credits 扣减与调用同事务 → spendCredits 单语句条件更新（调用方失败时 refundCredits）
  */
 
-export const SPEC_VERSION = '2026-07-15.9';
+export const SPEC_VERSION = '2026-08-06.1';
 
 const TRIAL_DAYS = 7;
 const SNAPSHOT_TTL_SEC = 24 * 3600;
@@ -26,6 +26,7 @@ const PRO_COMING_SOON = false;
 const PREMIUM_LABELS_LOCKED = {
   cas_zone: false,
   cas_top: false,
+  cas_xr: false,
   warning: false,
   citic_warning: false,
   under_review: false,
@@ -37,6 +38,7 @@ const PREMIUM_LABELS_LOCKED = {
 const PREMIUM_LABELS_OPEN = {
   cas_zone: true,
   cas_top: true,
+  cas_xr: true,
   warning: true,
   citic_warning: true,
   under_review: true,
@@ -49,6 +51,7 @@ const PREMIUM_LABELS_OPEN = {
 const PREMIUM_LABELS_EXT_PLUS = {
   cas_zone: true,
   cas_top: true,
+  cas_xr: true,
   warning: false,
   citic_warning: false,
   under_review: false,

@@ -1,6 +1,6 @@
 /**
- * 定价 / 结账：年付·月付切换、Creem 结账、教育价校验。
- * 首页 #pricing 与 /pricing 订阅页共用。
+ * 定价 / 结账：英文界面保留月付·年付；中文界面使用一次性 365 天方案。
+ * 首页 #pricing 与 /pricing 订阅页共用，支付模式跟随当前 UI 语言。
  */
 (() => {
   const FALLBACK = {
@@ -12,6 +12,12 @@
     max_month: 'https://creem.io/product/prod_4dQ8oxI13n13UujKijvupS?discount_code=JNMAXM',
     max_year_edu: 'https://creem.io/product/prod_1a4d3MaM7X10XbTUP6ixCW?discount_code=JNEMAXY',
     max_month_edu: 'https://creem.io/product/prod_2Il9sgrjBPMbgCA4eALdCz?discount_code=JNEMAXM',
+  };
+  // 中国区一次性 365 天产品的直达链接；登录用户优先走 Worker Checkout
+  // Session，未登录/本地预览时使用此产品页。
+  const CN_FALLBACK = {
+    pro: 'https://creem.io/product/prod_3Mea8BVSYJ5nbVJeYQ3qWN',
+    max: 'https://creem.io/product/prod_2OXrWFSu1RSxeJddAHUxcL',
   };
 
   const EDU_DOMAIN_SUFFIXES = [
@@ -29,6 +35,10 @@
       year: { pay: '$9.99', was: '$14.99' },
       month: { pay: '$1.49', was: '$2.99' },
     },
+  };
+  const CN_PRICES = {
+    pro: { pay: '$4.99' },
+    max: { pay: '$5.99' },
   };
   const EDU_PRICES = {
     pro: { year: '$4.99', month: '$0.69' },
@@ -73,7 +83,7 @@
     return '';
   }
 
-  /** 中文界面（简/繁）用中文文案；其它语言用英文结账文案 */
+  /** 中文界面用中文文案并进入中国区；其它语言统一使用英文国际方案 */
   function isZh() {
     const raw = currentUiLang();
     if (raw === 'zh' || raw.startsWith('zh-') || raw.startsWith('zh')) return true;
@@ -81,6 +91,31 @@
     const html = normalizeLangCode(document.documentElement.lang);
     if ((html === 'zh' || html.startsWith('zh')) && !(raw === 'en' || raw.startsWith('en-'))) return true;
     return false;
+  }
+
+  function normalizeMarket(value) {
+    return String(value || '').trim().toLowerCase() === 'cn' ? 'cn' : 'intl';
+  }
+
+  function getMarket() {
+    return isZh() ? 'cn' : 'intl';
+  }
+
+  function syncMarketUi() {
+    const market = getMarket();
+    document.body?.setAttribute('data-market', market);
+    if (market === 'cn') document.body?.setAttribute('data-billing', 'year');
+
+    document.querySelectorAll('[data-market-panel]').forEach((el) => {
+      const panelMarket = normalizeMarket(el.getAttribute('data-market-panel'));
+      el.hidden = panelMarket !== market;
+    });
+    document.querySelectorAll('[data-market-intl-only]').forEach((el) => {
+      el.hidden = market !== 'intl';
+    });
+    document.querySelectorAll('[data-creem-checkout][data-edu="1"], [data-creem-checkout][data-edu="true"]').forEach((el) => {
+      el.hidden = market === 'cn';
+    });
   }
 
   function L(zh, en) {
@@ -149,11 +184,18 @@
   }
 
   function unitLabel(cycle) {
+    if (getMarket() === 'cn') return L('/ 365 天', '/ 365 days');
     if (cycle === 'month') return L('/ 月', '/ month');
     return L('/ 年', '/ year');
   }
 
   function billingNote(cycle) {
+    if (getMarket() === 'cn') {
+      return L(
+        '价格 USD · 一次性 365 天 · 不自动续费',
+        'USD · one-time 365-day pass · no auto-renewal'
+      );
+    }
     if (cycle === 'month') {
       return L(
         '价格 USD · 月付 · 下方划线为原价',
@@ -181,22 +223,28 @@
 
   /** 普通价卡片金额、CTA、周期文案 */
   function syncPlanPrices(cycle) {
+    const market = getMarket();
+    const effectiveCycle = market === 'cn' ? 'year' : cycle;
     document.querySelectorAll('[data-plan-price]').forEach((el) => {
       const plan = (el.getAttribute('data-plan-price') || '').toLowerCase();
-      const row = PLAN_PRICES[plan];
+      const row = market === 'cn' ? CN_PRICES[plan] : PLAN_PRICES[plan];
       if (!row) return;
-      const pack = row[cycle] || row.year;
+      const pack = market === 'cn' ? row : (row[effectiveCycle] || row.year);
       const amt = el.querySelector('[data-price-amt]');
       const unit = el.querySelector('[data-price-unit]');
       if (amt) amt.textContent = pack.pay;
-      if (unit) unit.textContent = unitLabel(cycle);
+      if (unit) unit.textContent = unitLabel(effectiveCycle);
     });
 
     document.querySelectorAll('[data-plan-was]').forEach((el) => {
       const plan = (el.getAttribute('data-plan-was') || '').toLowerCase();
       const row = PLAN_PRICES[plan];
       if (!row) return;
-      const pack = row[cycle] || row.year;
+      if (market === 'cn') {
+        el.hidden = true;
+        return;
+      }
+      const pack = row[effectiveCycle] || row.year;
       el.textContent = L(`原价 ${pack.was}`, `Was ${pack.was}`);
       el.hidden = !pack.was;
     });
@@ -205,18 +253,23 @@
     document.querySelectorAll('[data-creem-checkout]').forEach((el) => {
       const isEdu = el.getAttribute('data-edu') === '1' || el.getAttribute('data-edu') === 'true';
       if (isEdu) return;
+      if (normalizeMarket(el.getAttribute('data-market')) === 'cn') return;
       const plan = (el.getAttribute('data-plan') || '').toLowerCase();
       if (plan !== 'pro' && plan !== 'max') return;
-      el.setAttribute('data-period', cycle);
+      el.setAttribute('data-period', market === 'cn' ? 'one_time' : effectiveCycle);
       const name = plan === 'max' ? 'Max' : 'Pro';
       const isSettings = el.classList.contains('settings-link-row');
-      const text = cycle === 'month'
+      const text = market === 'cn'
         ? (isSettings
-          ? L(`升级 ${name} · 月付`, `Upgrade ${name} · monthly`)
-          : L(`订阅 ${name} · 月付`, `Subscribe ${name} · monthly`))
-        : (isSettings
-          ? L(`升级 ${name} · 年付`, `Upgrade ${name} · yearly`)
-          : L(`订阅 ${name} · 年付`, `Subscribe ${name} · yearly`));
+          ? L(`升级 ${name} · 365 天`, `Upgrade ${name} · 365 days`)
+          : L(`购买 ${name} · 365 天`, `Buy ${name} · 365 days`))
+        : effectiveCycle === 'month'
+          ? (isSettings
+            ? L(`升级 ${name} · 月付`, `Upgrade ${name} · monthly`)
+            : L(`订阅 ${name} · 月付`, `Subscribe ${name} · monthly`))
+          : (isSettings
+            ? L(`升级 ${name} · 年付`, `Upgrade ${name} · yearly`)
+            : L(`订阅 ${name} · 年付`, `Subscribe ${name} · yearly`));
       if (isSettings) el.innerHTML = `${text}<span>→</span>`;
       else el.textContent = text;
     });
@@ -227,7 +280,7 @@
 
     // 同步所有切换按钮选中态
     document.querySelectorAll('[data-billing-toggle]').forEach((btn) => {
-      const on = btn.getAttribute('data-billing-toggle') === cycle;
+      const on = btn.getAttribute('data-billing-toggle') === effectiveCycle;
       btn.classList.toggle('is-on', on);
       btn.setAttribute('aria-pressed', on ? 'true' : 'false');
     });
@@ -241,10 +294,25 @@
   function syncStandardCtaUi(elig, cycle) {
     document.querySelectorAll('[data-creem-checkout]').forEach((el) => {
       if (isEduCheckoutEl(el)) return;
+      if (normalizeMarket(el.getAttribute('data-market')) === 'cn') return;
       const plan = (el.getAttribute('data-plan') || '').toLowerCase();
       if (plan !== 'pro' && plan !== 'max') return;
       const name = plan === 'max' ? 'Max' : 'Pro';
       const isSettings = el.classList.contains('settings-link-row');
+
+      if (getMarket() === 'cn') {
+        el.classList.remove('std-price-locked', 'home-btn-ghost', 'plan-btn-ghost');
+        el.removeAttribute('aria-disabled');
+        el.removeAttribute('data-std-locked');
+        if (el.tagName === 'BUTTON') el.disabled = false;
+        el.title = L('中国区一次性 365 天产品 · 不自动续费', 'China one-time 365-day pass · no auto-renewal');
+        const text = isSettings
+          ? L(`升级 ${name} · 365 天`, `Upgrade ${name} · 365 days`)
+          : L(`购买 ${name} · 365 天`, `Buy ${name} · 365 days`);
+        if (isSettings) el.innerHTML = `${text}<span>→</span>`;
+        else el.textContent = text;
+        return;
+      }
 
       if (elig.ok) {
         el.classList.add('std-price-locked');
@@ -295,10 +363,17 @@
     const elig = eduEligibility();
     const cycle = getBillingCycle();
 
+    if (getMarket() === 'cn') {
+      document.querySelectorAll('[data-creem-checkout][data-edu="1"], [data-creem-checkout][data-edu="true"]').forEach((el) => { el.hidden = true; });
+      document.querySelectorAll('[data-edu-status]').forEach((node) => { node.hidden = true; });
+      return;
+    }
+
     document.body?.classList.toggle('edu-eligible', !!elig.ok);
     document.body?.classList.toggle('edu-not-eligible', !elig.ok && elig.reason === 'not_edu');
 
     document.querySelectorAll('[data-creem-checkout][data-edu="1"], [data-creem-checkout][data-edu="true"]').forEach((el) => {
+      el.hidden = false;
       el.setAttribute('data-period', cycle === 'month' ? 'month' : 'year');
       const plan = (el.getAttribute('data-plan') || 'pro').toLowerCase() === 'max' ? 'max' : 'pro';
       const price = EDU_PRICES[plan][cycle];
@@ -371,6 +446,7 @@
   }
 
   function syncAllPricingUi() {
+    syncMarketUi();
     const cycle = getBillingCycle();
     document.body?.setAttribute('data-billing', cycle);
     document.querySelectorAll('[data-billing-toggle]').forEach((btn) => {
@@ -394,10 +470,79 @@
     });
   }
 
+  function cnCheckoutUrl(plan, el) {
+    const attrUrl = String(el?.getAttribute('data-cn-checkout-url') || '').trim();
+    if (attrUrl) return attrUrl;
+    try {
+      const configured = window.AILATEST_CN_CHECKOUT || {};
+      if (configured[plan]) return String(configured[plan]).trim();
+    } catch (_) {}
+    return CN_FALLBACK[plan] || '';
+  }
+
+  async function startChinaCheckout(el) {
+    const plan = (el.getAttribute('data-plan') || 'pro').toLowerCase() === 'max' ? 'max' : 'pro';
+    const fallback = cnCheckoutUrl(plan, el);
+    const user = readUser();
+    const token = user && user.token;
+    const prev = el.textContent;
+    if (el.tagName === 'BUTTON') el.disabled = true;
+    el.setAttribute('aria-busy', 'true');
+    try {
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers.Authorization = `Bearer ${token}`;
+      const resp = await fetch(`${API_BASE}/checkout/creem`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ plan, period: 'one_time', market: 'cn', edu: false }),
+      });
+      const data = await resp.json().catch(() => ({}));
+      if (data.checkout_url) {
+        openUrl(data.checkout_url);
+        return;
+      }
+      if (data.error === 'product_not_configured') {
+        alert(L(
+          '中国区一次性产品尚未在后台配置。请先在 Creem 创建 Pro / Max 的一次性 365 天产品并填入对应 SKU；不能复用月付产品。',
+          'The China one-time product is not configured yet. Create the Pro/Max one-time 365-day SKU in Creem and set its product ID; recurring SKUs cannot be reused.'
+        ));
+        return;
+      }
+      if (fallback) {
+        openUrl(fallback);
+        return;
+      }
+      throw new Error(data.message || `HTTP ${resp.status}`);
+    } catch (_) {
+      if (fallback) {
+        openUrl(fallback);
+        return;
+      }
+      alert(L(
+        '暂时无法连接中国区收银台，请稍后重试。支付方式会在 Creem 收银台内按条件显示。',
+        'The China checkout is temporarily unavailable. Please retry later; Creem shows the available payment methods on its checkout page.'
+      ));
+    } finally {
+      el.removeAttribute('aria-busy');
+      if (el.tagName === 'BUTTON') {
+        el.disabled = false;
+        el.textContent = prev;
+      }
+      syncAllPricingUi();
+    }
+  }
+
   async function startCheckout(el) {
     const plan = (el.getAttribute('data-plan') || 'pro').toLowerCase();
     const period = (el.getAttribute('data-period') || getBillingCycle() || 'year').toLowerCase();
+    const market = normalizeMarket(el.getAttribute('data-market') || getMarket());
     const edu = isEduCheckoutEl(el);
+
+    if (market === 'cn') {
+      await startChinaCheckout(el);
+      return;
+    }
+
     const fb = FALLBACK[fallbackKey(plan, period, edu)] || FALLBACK.pro_year;
     const nextPath = location.pathname.includes('pricing') ? '/pricing' : '/#pricing';
     const elig = eduEligibility();
@@ -536,6 +681,7 @@
   window.__syncPricingUi = syncAllPricingUi;
   window.__setBillingCycle = setBillingCycle;
   window.__getBillingCycle = getBillingCycle;
+  window.__getPricingMarket = getMarket;
   window.__isEduEmail = isEduEmail;
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => bind());

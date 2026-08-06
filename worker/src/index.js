@@ -50,18 +50,21 @@ import {
   getEntitlements,
   activateTrialForNewUser,
   applyPaidSubscription,
+  spendCredits,
+  refundCredits,
   enforceFavoritesWrite,
   enforceListsWrite,
 } from './entitlements.js';
 import {
   routeCreemCheckout,
   routeCreemCatalog,
+  routeCreemConfirm,
   routeCreemWebhook,
 } from './creem.js';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'Authorization, Content-Type, X-AJ-Install',
+  'Access-Control-Allow-Headers': 'Authorization, Content-Type, X-AJ-Install, X-API-Key',
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
   'Access-Control-Max-Age': '86400',
 };
@@ -646,6 +649,77 @@ function publicApiKey(row) {
   };
 }
 
+/**
+ * API Key 统一入口：支持 X-API-Key、Authorization: ApiKey <key>，以及
+ * Authorization: Bearer aj_live_<...>。JWT Bearer 仍由 getUser 处理。
+ */
+function requestApiKey(req) {
+  const explicit = cleanText(req.headers.get('X-API-Key') || '', 300);
+  if (explicit) return explicit;
+  const auth = String(req.headers.get('Authorization') || '').trim();
+  if (/^ApiKey\s+/i.test(auth)) return cleanText(auth.replace(/^ApiKey\s+/i, ''), 300);
+  if (/^Bearer\s+aj_live_/i.test(auth)) return cleanText(auth.replace(/^Bearer\s+/i, ''), 300);
+  return '';
+}
+
+/**
+ * 解析 API Key 或登录 JWT。无凭证时返回匿名上下文（Skill/API 处于公测，
+ * 允许公开调用）；明确携带了错误 API Key 时必须拒绝，避免把 typo 当匿名请求。
+ */
+async function resolveRequestPrincipal(req, env, { allowJwt = true } = {}) {
+  const secret = requestApiKey(req);
+  if (secret) {
+    try {
+      await ensureApiKeyTables(env);
+      const hash = await apiKeyHash(secret, env);
+      const row = await env.DB.prepare(
+        `SELECT k.id, k.user_id, k.name, k.key_prefix, k.key_tail,
+                u.email, u.github_id, u.google_id, u.login, u.name AS user_name, u.avatar_url, u.provider
+           FROM api_keys k
+           JOIN users u ON u.id = k.user_id
+          WHERE k.key_hash = ? AND k.revoked_at IS NULL
+          LIMIT 1`
+      ).bind(hash).first();
+      if (!row) return { error: err('invalid api key', 401), provided: true };
+      const user = {
+        id: row.user_id,
+        email: row.email,
+        github_id: row.github_id,
+        google_id: row.google_id,
+        login: row.login,
+        name: row.user_name,
+        avatar_url: row.avatar_url,
+        provider: row.provider,
+      };
+      const owner = isOwnerUser(user, env);
+      const entitlements = await getEntitlements(env, user, owner);
+      await env.DB.prepare(
+        'UPDATE api_keys SET last_used_at = ?, call_count = COALESCE(call_count, 0) + 1 WHERE id = ? AND revoked_at IS NULL'
+      ).bind(nowSec(), row.id).run().catch(() => {});
+      return {
+        user,
+        isOwner: owner,
+        entitlements,
+        apiKey: { id: String(row.id), name: row.name || 'My API', prefix: row.key_prefix || '', tail: row.key_tail || '' },
+        auth: 'api_key',
+      };
+    } catch (e) {
+      console.error('resolve api key failed', e?.message || e);
+      return { error: err('api key unavailable', 503), provided: true };
+    }
+  }
+
+  if (allowJwt) {
+    const user = await getUser(req, env).catch(() => null);
+    if (user) {
+      const owner = isOwnerUser(user, env);
+      const entitlements = await getEntitlements(env, user, owner).catch(() => null);
+      return { user, isOwner: owner, entitlements, apiKey: null, auth: 'jwt' };
+    }
+  }
+  return { user: null, isOwner: false, entitlements: null, apiKey: null, auth: 'public' };
+}
+
 async function routeInteraction(req, env) {
   const body = await req.json().catch(() => null);
   if (!body) return err('invalid json');
@@ -902,20 +976,9 @@ function isOwnerUser(u, env) {
   return false;
 }
 
-/** Free：终身 10 次；Pro(plus)：月 500 credits ≈ 50 次；Max：1000 credits ≈ 100 次（完整荐刊约 10 credits） */
+/** Free：终身 10 次；Pro：500 credits/月；Max：1000 credits/月。每次完整荐刊消耗 10 credits。 */
 const FREE_PICK_LIFETIME_LIMIT = 10;
-const PLUS_PICK_MONTHLY_LIMIT = 50; // 与 500 credits / 10 对齐的荐刊次数上限（兼容 user_quotas）
-
-async function getPickQuota(env, userId) {
-  try {
-    const row = await env.DB.prepare(
-      'SELECT plan, daily_limit, monthly_limit, paid_until FROM user_quotas WHERE user_id = ?'
-    ).bind(userId).first();
-    return row || { plan: 'free', daily_limit: FREE_PICK_LIFETIME_LIMIT, monthly_limit: null, paid_until: null };
-  } catch (e) {
-    return { plan: 'free', daily_limit: FREE_PICK_LIFETIME_LIMIT, monthly_limit: null, paid_until: null };
-  }
-}
+const AI_PICK_COST = 10;
 
 async function ensurePickQuotaTables(env) {
   await env.DB.batch([
@@ -948,42 +1011,79 @@ async function ensurePickQuotaTables(env) {
 async function consumePickQuotaForUser(env, u) {
   const now = nowSec();
   if (isOwnerUser(u)) {
-    return { ok: true, allowed: true, plan: 'owner', unlimited: true, used: 0, limit: null, remaining: null, period: 'none', period_key: '', reset_at: null };
+    return { ok: true, allowed: true, plan: 'owner', unlimited: true, unit: 'credits', cost: 0, used: 0, limit: null, remaining: null, period: 'none', period_key: '', reset_at: null };
+  }
+
+  // 付费档统一走 user_credits；不再读取旧 user_quotas，避免「权益显示 500/1000
+  // credits、实际却只有 10 次」的分裂状态。
+  const ents = await getEntitlements(env, u, false);
+  const tier = String(ents?.tier || 'free').toLowerCase();
+  if (tier === 'plus' || tier === 'pro') {
+    const allowance = Number(ents?.features?.ai?.monthly_credits || 0);
+    const resetAt = nextUtcMonthStart(now);
+    const spent = await spendCredits(env, u, false, AI_PICK_COST, 'ai_pick', `pick:${u.id}:${now}`);
+    if (!spent.ok) {
+      const current = Number(ents?.credits?.total || 0);
+      return {
+        ok: false,
+        allowed: false,
+        plan: tier,
+        unit: 'credits',
+        cost: AI_PICK_COST,
+        used: Math.max(0, allowance - current),
+        limit: allowance,
+        remaining: current,
+        period: 'month',
+        period_key: monthFromSec(now),
+        reset_at: resetAt,
+        lifetime: false,
+        error: 'AI credits exhausted',
+        code: 'insufficient_credits',
+      };
+    }
+    const total = Number(spent.total || 0);
+    return {
+      ok: true,
+      allowed: true,
+      plan: tier,
+      unit: 'credits',
+      cost: AI_PICK_COST,
+      used: Math.max(0, allowance - total),
+      limit: allowance,
+      remaining: total,
+      period: 'month',
+      period_key: monthFromSec(now),
+      reset_at: resetAt,
+      lifetime: false,
+      credits: spent,
+    };
+  }
+
+  // Trial 明确是「权益预览」而不是付费 AI 额度；Free 的 10 次是独立试用。
+  if (tier === 'trial') {
+    return {
+      ok: false,
+      allowed: false,
+      plan: 'trial',
+      unit: 'credits',
+      cost: AI_PICK_COST,
+      used: 0,
+      limit: 0,
+      remaining: 0,
+      period: 'none',
+      period_key: '',
+      reset_at: null,
+      lifetime: false,
+      error: 'AI trial is not enabled for this account',
+      code: 'ai_locked',
+    };
   }
 
   await ensurePickQuotaTables(env);
-  const quota = await getPickQuota(env, u.id);
-  const plan = String(quota.plan || 'free').toLowerCase();
-  const hasPaidMonthly = plan !== 'free'
-    && Number(quota.monthly_limit || 0) > 0
-    && (!quota.paid_until || Number(quota.paid_until) >= now);
-  // plus / trial：月额度（≈500 credits / 50 次）；free：终身 lifetime；pro/max：库内 monthly_limit
-  const isPlusPlan = plan === 'plus' || plan === 'trial';
-  let period;
-  let periodKey;
-  let limit;
-  let resetAt;
-
-  if (hasPaidMonthly) {
-    period = 'month';
-    periodKey = monthFromSec(now);
-    limit = Number(quota.monthly_limit);
-    resetAt = nextUtcMonthStart(now);
-  } else if (isPlusPlan) {
-    period = 'month';
-    periodKey = monthFromSec(now);
-    // 优先库内 monthly_limit；否则固定为 Max 一半
-    limit = Number(quota.monthly_limit) > 0
-      ? Number(quota.monthly_limit)
-      : PLUS_PICK_MONTHLY_LIMIT;
-    resetAt = nextUtcMonthStart(now);
-  } else {
-    // Free：终身 10 次，用完即止（不按日重置）
-    period = 'lifetime';
-    periodKey = 'total';
-    limit = FREE_PICK_LIFETIME_LIMIT;
-    resetAt = null;
-  }
+  const period = 'lifetime';
+  const periodKey = 'total';
+  const limit = FREE_PICK_LIFETIME_LIMIT;
+  const resetAt = null;
 
   await env.DB.prepare(
     `INSERT OR IGNORE INTO pick_usage (user_id, period, period_key, used, updated_at)
@@ -998,7 +1098,9 @@ async function consumePickQuotaForUser(env, u) {
     return {
       ok: false,
       allowed: false,
-      plan: hasPaidMonthly || isPlusPlan ? plan : 'free',
+      plan: 'free',
+      unit: 'picks',
+      cost: 1,
       used,
       limit,
       remaining: 0,
@@ -1019,7 +1121,9 @@ async function consumePickQuotaForUser(env, u) {
   return {
     ok: true,
     allowed: true,
-    plan: hasPaidMonthly || isPlusPlan ? plan : 'free',
+    plan: 'free',
+    unit: 'picks',
+    cost: 1,
     used: nextUsed,
     limit,
     remaining: Math.max(0, limit - nextUsed),
@@ -1047,7 +1151,17 @@ async function consumePickQuotaForRequest(req, env) {
 
 // Give back one pick credit (used when the AI call fails after the quota was consumed).
 async function refundPickQuota(env, quota) {
-  if (!quota || quota.unlimited || !quota.period_key) return;
+  if (!quota || quota.unlimited) return;
+  if (quota.unit === 'credits') {
+    if (!quota.user_id || !quota.cost) return;
+    try {
+      await refundCredits(env, quota.user_id, quota.cost, `pick_refund:${quota.period_key || nowSec()}`);
+    } catch (e) {
+      console.warn('pick credit refund failed:', e?.message || e);
+    }
+    return;
+  }
+  if (!quota.period_key) return;
   try {
     await env.DB.prepare(
       `UPDATE pick_usage SET used = MAX(used - 1, 0), updated_at = ?
@@ -2743,6 +2857,14 @@ function routeApiLlmsTxt() {
 - Suite AI index: https://ailatest.org/llms.txt
 - Suite full context: https://ailatest.org/llms-full.txt
 
+## Journal public-beta interfaces
+
+- Skill search: POST https://journal.ailatest.org/api/skill/search
+- Skill recommend: POST https://journal.ailatest.org/api/skill/recommend
+- Quota policy: GET https://journal.ailatest.org/api/skill/quota
+- MCP Streamable HTTP: POST https://journal.ailatest.org/api/mcp
+- Optional account/API-key headers: \`X-API-Key: aj_live_...\` or \`Authorization: ApiKey aj_live_...\`
+
 ## Products using this API
 
 - Journal: https://journal.ailatest.org/
@@ -2756,6 +2878,7 @@ function routeApiLlmsTxt() {
 - Prefer product \`llms.txt\` files for user-facing product facts.
 - This host is primarily an API; do not invent private endpoints.
 - Public product documentation lives on each product domain.
+- Skill/API and MCP are public beta; limits and fields may change.
 `;
   return new Response(body, {
     status: 200,
@@ -2862,6 +2985,144 @@ function routeApiPortal() {
   });
 }
 
+function mcpResponse(id, result) {
+  return { jsonrpc: '2.0', id: id ?? null, result };
+}
+
+function mcpError(id, code, message, data) {
+  const error = { code, message };
+  if (data !== undefined) error.data = data;
+  return { jsonrpc: '2.0', id: id ?? null, error };
+}
+
+const MCP_TOOLS = [
+  {
+    name: 'search_journals',
+    description: 'Search AILatest journal records by title, ISSN, subject, index, JCR or CAS filters.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        q: { type: 'string', description: 'Journal title, ISSN, or keyword.' },
+        subjects: { type: ['string', 'array'], items: { type: 'string' } },
+        indexes: { type: ['string', 'array'], items: { type: 'string' } },
+        jcr_quartile: { type: ['string', 'array'], items: { type: 'string' } },
+        cas_zone: { type: ['string', 'array'], items: { type: 'string' } },
+        exclude_warning: { type: 'boolean' },
+        page: { type: 'integer', minimum: 1 },
+        page_size: { type: 'integer', minimum: 1, maximum: 100 },
+      },
+      additionalProperties: true,
+    },
+  },
+  {
+    name: 'recommend_journals',
+    description: 'Recommend journals from a title, abstract, keywords, and optional structured filters.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        title: { type: 'string' },
+        abstract: { type: 'string' },
+        keywords: { type: ['string', 'array'], items: { type: 'string' } },
+        exclude_warning: { type: 'boolean' },
+        page: { type: 'integer', minimum: 1 },
+        page_size: { type: 'integer', minimum: 1, maximum: 100 },
+      },
+      additionalProperties: true,
+    },
+  },
+  {
+    name: 'quota',
+    description: 'Show the current public-beta Skill/API quota policy and authentication mode.',
+    inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+  },
+];
+
+function mcpTextResult(value, isError = false) {
+  return {
+    content: [{ type: 'text', text: JSON.stringify(value) }],
+    ...(isError ? { isError: true } : {}),
+  };
+}
+
+async function mcpCallTool(name, args, req, env, principal) {
+  const input = args && typeof args === 'object' ? args : {};
+  if (name === 'quota') return mcpTextResult(buildSkillQuotaResponse(principal));
+  const request = new Request(req.url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(input),
+  });
+  if (name === 'search_journals') {
+    return mcpTextResult(await buildSkillSearchResponse(request, env, principal));
+  }
+  if (name === 'recommend_journals') {
+    return mcpTextResult(await buildSkillRecommendResponse(request, env, principal));
+  }
+  return mcpTextResult({ ok: false, error: `unknown MCP tool: ${name}` }, true);
+}
+
+async function handleMcpRpc(message, req, env, principal) {
+  if (!message || typeof message !== 'object' || Array.isArray(message)) {
+    return mcpError(null, -32600, 'Invalid Request');
+  }
+  const id = Object.prototype.hasOwnProperty.call(message, 'id') ? message.id : null;
+  const method = String(message.method || '');
+  if (!method) return mcpError(id, -32600, 'Invalid Request');
+  if (method === 'notifications/initialized' || method === 'notifications/cancelled') return null;
+  if (method === 'ping') return mcpResponse(id, {});
+  if (method === 'initialize') {
+    const requested = String(message.params?.protocolVersion || '').trim();
+    return mcpResponse(id, {
+      protocolVersion: requested || '2025-06-18',
+      capabilities: { tools: {} },
+      serverInfo: { name: 'ailatest-journal', version: '0.2.17' },
+      instructions: 'AILatest Journal public-beta MCP. Use search_journals or recommend_journals and verify final scope on the journal website.',
+    });
+  }
+  if (method === 'tools/list') return mcpResponse(id, { tools: MCP_TOOLS });
+  if (method === 'tools/call') {
+    const name = String(message.params?.name || '').trim();
+    if (!MCP_TOOLS.some((tool) => tool.name === name)) return mcpError(id, -32602, 'Unknown tool', { name });
+    try {
+      return mcpResponse(id, await mcpCallTool(name, message.params?.arguments, req, env, principal));
+    } catch (e) {
+      return mcpResponse(id, mcpTextResult({ ok: false, error: e?.message || 'tool failed' }, true));
+    }
+  }
+  if (id == null) return null;
+  return mcpError(id, -32601, `Method not found: ${method}`);
+}
+
+async function routeMcp(req, env) {
+  const principal = await resolveRequestPrincipal(req, env);
+  if (principal.error) return principal.error;
+  if (req.method === 'GET') {
+    return json({
+      ok: true,
+      name: 'ailatest-journal',
+      protocol: 'MCP Streamable HTTP',
+      status: 'public_beta',
+      tools: MCP_TOOLS.map((tool) => tool.name),
+      authentication: 'Optional X-API-Key / Authorization: ApiKey for account-scoped beta access.',
+    }, 200, { 'Cache-Control': 'no-store' });
+  }
+  if (req.method !== 'POST') return err('MCP requires POST', 405);
+  const body = await req.json().catch(() => null);
+  if (!body) return err('invalid json', 400);
+  if (Array.isArray(body)) {
+    const replies = [];
+    for (const message of body) {
+      const reply = await handleMcpRpc(message, req, env, principal);
+      if (reply) replies.push(reply);
+    }
+    if (!replies.length) return new Response(null, { status: 202, headers: CORS });
+    return json(replies, 200, { 'Cache-Control': 'no-store' });
+  }
+  const reply = await handleMcpRpc(body, req, env, principal);
+  if (!reply) return new Response(null, { status: 202, headers: CORS });
+  return json(reply, 200, { 'Cache-Control': 'no-store' });
+}
+
 export default {
   async fetch(req, env) {
     if (req.method === 'OPTIONS') {
@@ -2875,6 +3136,7 @@ export default {
     try {
       if (p === '/llms.txt' && req.method === 'GET') return routeApiLlmsTxt();
       if (p === '/robots.txt' && req.method === 'GET') return routeApiRobotsTxt();
+      if (p === '/mcp') return routeMcp(req, env);
       if (p === '/stats' && req.method === 'GET') {
         const siteUrl = String(env.SITE_URL || 'https://journal.ailatest.org').replace(/\/$/, '');
         const metaResponse = await fetch(`${siteUrl}/data/meta.json`);
@@ -2942,6 +3204,11 @@ export default {
         const out = await routeCreemCheckout(req, env, getUser);
         return json(out.body, out.status);
       }
+      if ((p === '/checkout/creem/confirm' || p === '/checkout/creem/confirm/')
+        && (req.method === 'POST' || req.method === 'GET')) {
+        const out = await routeCreemConfirm(req, env, getUser);
+        return json(out.body, out.status);
+      }
       if (p === '/checkout/catalog'    && req.method === 'GET') {
         const out = await routeCreemCatalog(req, env);
         return json(out.body, out.status);
@@ -2955,12 +3222,30 @@ export default {
       const mApiKey = p.match(/^\/api-keys\/([0-9a-f-]+)$/i);
       if (mApiKey && req.method === 'DELETE') return routeRevokeApiKey(req, env, mApiKey[1]);
       if (p === '/search' && (req.method === 'GET' || req.method === 'POST')) return json(await buildPublicSearchResponse(req, env));
-      if (p === '/skill/search' && (req.method === 'GET' || req.method === 'POST')) return json(await buildSkillSearchResponse(req, env));
-      if (p === '/skill/recommend' && (req.method === 'GET' || req.method === 'POST')) return json(await buildSkillRecommendResponse(req, env));
-      if (p === '/skill/quota' && req.method === 'GET') return json(buildSkillQuotaResponse());
+      if (p === '/skill/search' && (req.method === 'GET' || req.method === 'POST')) {
+        const principal = await resolveRequestPrincipal(req, env);
+        if (principal.error) return principal.error;
+        return json(await buildSkillSearchResponse(req, env, principal), 200, { 'Cache-Control': 'no-store' });
+      }
+      if (p === '/skill/recommend' && (req.method === 'GET' || req.method === 'POST')) {
+        const principal = await resolveRequestPrincipal(req, env);
+        if (principal.error) return principal.error;
+        return json(await buildSkillRecommendResponse(req, env, principal), 200, { 'Cache-Control': 'no-store' });
+      }
+      if (p === '/skill/quota' && req.method === 'GET') {
+        const principal = await resolveRequestPrincipal(req, env);
+        if (principal.error) return principal.error;
+        return json(buildSkillQuotaResponse(principal), 200, { 'Cache-Control': 'no-store' });
+      }
       if (p === '/pick'                && req.method === 'POST') return handlePick(req, env, { consumeQuota: () => consumePickQuotaForRequest(req, env) });
       if (p === '/pick/quota/consume'  && req.method === 'POST') return routeConsumePickQuota(req, env);
-      if (p === '/ext/lookup') { const exU = await getUser(req, env).catch(() => null); return handleExtLookup(req, env, exU); }
+      if (p === '/ext/lookup') {
+        const principal = await resolveRequestPrincipal(req, env);
+        if (principal.error) return principal.error;
+        const installId = cleanText(req.headers.get('X-AJ-Install') || '', 160);
+        const ipHash = await requestIpHash(req, env);
+        return handleExtLookup(req, env, { ...principal, installId, ipHash });
+      }
       if (p === '/favorites'           && req.method === 'GET')  return routeGetFavs(req, env);
       if (p === '/favorites'           && req.method === 'PUT')  return routePutFavs(req, env);
       if (p === '/lists'               && req.method === 'GET')  return routeGetLists(req, env);

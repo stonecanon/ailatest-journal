@@ -35,7 +35,7 @@ function compactJournal(j) {
     'if_quartile', 'cas_zone', 'cas_top', 'if_2024', 'if_latest',
     'cas_xr', 'ccf', 'abdc', 'abs', 'free',
     'inspec', 'fsta', 'fsta_full_text', 'cabi',
-    'warning', 'citic_warning', 'on_hold', 'under_review',
+    'warning', 'citic_warning', 'on_hold', 'under_review', 'retraction',
   ];
   fields.forEach((key) => {
     if (j[key] !== undefined && j[key] !== null && j[key] !== '') out[key] = j[key];

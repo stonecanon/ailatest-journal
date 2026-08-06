@@ -5,6 +5,10 @@
 - Site: https://journal.ailatest.org/
 - Studio hub: https://ailatest.org/
 - Pricing: https://journal.ailatest.org/pricing.html
+- Skill search: POST https://journal.ailatest.org/api/skill/search
+- Skill recommend: POST https://journal.ailatest.org/api/skill/recommend
+- Skill quota: GET https://journal.ailatest.org/api/skill/quota
+- MCP (public beta): POST https://journal.ailatest.org/api/mcp
 - Extension / downloads: https://journal.ailatest.org/extension.html
 - Sitemap: https://journal.ailatest.org/sitemap.xml
 - Suite AI index: https://ailatest.org/llms.txt
@@ -35,6 +39,9 @@ AILatest Journal helps researchers and students:
 - Max: full workflow features, highest AI pick credits
 
 Exact prices change; always check the pricing page. Education discounts may apply.
+
+Skill/API and MCP are public beta. Anonymous calls are available; signed-in
+accounts may use an API Key (`X-API-Key: aj_live_...`) for account-scoped access.
 
 ## Data note
 

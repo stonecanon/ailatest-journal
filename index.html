@@ -482,8 +482,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <section class="home-sec" id="pricing">
           <span class="home-sec-id" data-i18n="home_price_kicker">Pricing</span>
           <h2 class="home-sec-title" data-i18n="home_price_title">订阅方案</h2>
-          <p class="home-sec-lead" data-i18n="home_price_lead">网站查刊 Free 永久可用。Pro / Max 提升插件深度、额度与 AI 荐刊配额。教育邮箱另享教育价（登录后解锁）。</p>
-          <div class="billing-toggle-wrap">
+          <p class="home-sec-lead" data-market-panel="intl" data-i18n="home_price_lead">网站查刊 Free 永久可用。Pro / Max 提升插件深度、额度与 AI 荐刊配额。教育邮箱另享教育价（登录后解锁）。</p>
+          <p class="home-sec-lead" data-market-panel="cn" data-i18n="home_price_lead_cn" hidden>网站查刊 Free 永久可用。中国区 Pro / Max 为一次性 365 天访问权，不自动续费。</p>
+          <div class="billing-toggle-wrap" data-market-intl-only>
             <div class="billing-toggle" role="group" aria-label="Billing period" data-i18n-aria="home_price_billing_group">
               <button type="button" class="billing-toggle-btn is-on" data-billing-toggle="year" aria-pressed="true">
                 <span data-i18n="home_price_toggle_year">年付</span>
@@ -495,7 +496,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
           </div>
           <p class="home-sec-note home-price-billing" data-billing-note>价格 USD · 年付 · 下方划线为原价（更划算）</p>
-          <p class="home-edu-status" data-edu-status hidden></p>
+          <p class="home-edu-status" data-edu-status data-market-intl-only hidden></p>
           <div class="home-plans">
             <article class="home-plan">
               <h3>Free</h3>
@@ -536,7 +537,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               <button type="button" class="home-btn home-btn-ghost home-btn-block home-btn-edu" data-creem-checkout data-plan="max" data-period="year" data-edu="1">教育价 $5.99 · 需机构邮箱</button>
             </article>
           </div>
-          <p class="home-sec-note" data-i18n="home_price_note">教育价仅限 .edu / .edu.cn / .ac.* 等机构邮箱登录后支付</p>
+          <p class="home-sec-note" data-market-panel="intl" data-i18n="home_price_note">教育价仅限 .edu / .edu.cn / .ac.* 等机构邮箱登录后支付</p>
+          <p class="home-sec-note" data-market-panel="cn" data-i18n="home_price_note_cn" hidden>中国区一次性购买：365 天到期后可重新购买；功能、额度与退款以条款为准。</p>
           <p class="home-sec-note home-price-more"><a href="/pricing" data-i18n="home_price_more">查看完整方案对比 →</a></p>
         </section>
 
@@ -568,7 +570,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               </div>
               <div class="dl-strip-name">MCP</div>
               <button type="button" class="dl-strip-btn" data-copy-text="codex mcp add ailatest-journal --url https://journal.ailatest.org/api/mcp" data-i18n="home_dl_plat_mcp_cta">复制命令</button>
-              <p class="dl-strip-meta" data-i18n="home_dl_plat_mcp_meta">在线 · 复制即用</p>
+              <p class="dl-strip-meta" data-i18n="home_dl_plat_mcp_meta">在线公测 · 复制即用</p>
             </div>
             <div class="dl-strip-item dl-strip-item-soon" role="listitem">
               <div class="dl-strip-icon" aria-hidden="true">
@@ -1034,9 +1036,9 @@ window.__BUILD_VER = 'v20260806-data-v1';
 })();
 </script>
 <script src="/js/pick-match.js?v=20260716-v10" defer></script>
-<script src="/js/pricing-checkout.js?v=20260716-edu-lock-std" defer></script>
+<script src="/js/pricing-checkout.js?v=20260806-lang-cn-pass" defer></script>
 <script src="/js/extension-downloads.js?v=20260716-home-dl" defer></script>
-<script src="/js/app.js?v=20260806-data-v1" defer></script>
+<script src="/js/app.js?v=20260806-lang-cn-pass" defer></script>
 
 </body>
 </html>

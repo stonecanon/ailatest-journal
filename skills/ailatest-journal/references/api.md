@@ -2,6 +2,22 @@
 
 Base URL: `https://journal.ailatest.org`
 
+## Public beta and authentication
+
+Skill/API and MCP are currently public beta. Anonymous search and recommendation
+remain available. Signed-in calls may use the normal JWT; account/API-key calls
+may send one of:
+
+```text
+X-API-Key: aj_live_...
+Authorization: ApiKey aj_live_...
+Authorization: Bearer aj_live_...
+```
+
+Create and revoke keys from the signed-in account page (`/api-keys`). Do not
+publish a secret key in client-side code. Every response includes a
+`quota_policy` object describing the current beta policy.
+
 ## Search
 
 `POST /api/skill/search`
@@ -44,6 +60,9 @@ Response fields:
 - `page`, `page_size`, `total_pages`: pagination metadata
 - `items`: journal records in the skill schema
 - `quota_policy`: recommended free quota policy
+
+`quota_policy.status` is `public_beta`; `access` is `public`, `account`, or
+`api_key` depending on the request.
 
 ## Recommend
 
@@ -94,3 +113,15 @@ For simple integrations, both skill endpoints also accept query strings:
 /api/skill/search?q=1759-5045&limit=3
 /api/skill/recommend?title=urban%20heat%20island%20remote%20sensing&limit=8
 ```
+
+## MCP
+
+Use the same service from an MCP client:
+
+```text
+https://journal.ailatest.org/api/mcp
+```
+
+The Streamable HTTP endpoint exposes `search_journals`, `recommend_journals`,
+and `quota`. It accepts the API-key headers above, but remains callable without
+one during the public beta.

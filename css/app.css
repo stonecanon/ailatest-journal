@@ -474,14 +474,6 @@ body.share-mode .app-rail { display: none !important; }
   color: var(--accent);
   box-shadow: 0 10px 24px rgba(249,115,22,.12);
 }
-.app-rail .lang-toggle-wrap { position: relative; }
-.app-rail .lang-dropdown {
-  top: auto;
-  bottom: 0;
-  left: calc(100% + 10px);
-  right: auto;
-}
-
 #sidebar {
   display: none !important;
 }
@@ -1316,6 +1308,13 @@ button.std-price-locked[data-creem-checkout] {
 }
 .home-sec#pricing .billing-toggle {
   display: inline-flex !important;
+}
+.home-sec#pricing [data-market-intl-only][hidden],
+.settings-billing-toggle[data-market-intl-only][hidden],
+.home-sec#pricing [data-market-panel][hidden],
+[data-creem-checkout][data-edu][hidden] {
+  display: none !important;
+  visibility: hidden !important;
 }
 .home-price-more {
   margin-top: 10px !important;
@@ -3585,37 +3584,6 @@ body.topbar-compact .results-head {
 .lang-toggle:hover,
 .auth-btn:hover { color: var(--accent); background: #fff; transform: translateY(-1px); }
 
-/* 语言切换下拉菜单 */
-.lang-toggle-wrap { position: relative; display: inline-block; }
-.lang-dropdown {
-  position: absolute; top: calc(100% + 4px); right: 0; z-index: 100;
-  min-width: 150px;
-  background: var(--paper);
-  border: 1px solid var(--rule);
-  border-radius: 4px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-  display: none;
-  flex-direction: column;
-  padding: 4px;
-}
-.lang-dropdown.open { display: flex; }
-.lang-dropdown button {
-  display: flex; align-items: center; gap: 8px;
-  padding: 6px 10px;
-  border: 0; border-radius: 3px;
-  background: transparent;
-  font-family: var(--sans); font-size: 13px;
-  color: var(--ink-soft);
-  cursor: pointer;
-  white-space: nowrap;
-}
-.lang-dropdown button:hover { background: var(--paper-deeper); }
-.lang-dropdown button.active { color: var(--accent); font-weight: 700; background: var(--paper-soft); }
-.lang-dropdown button .lang-code { font-size: 11px; opacity: 0.6; font-family: var(--sans); min-width: 24px; text-align: center; }
-@media (max-width: 720px) {
-  .lang-dropdown { right: auto; left: 0; }
-}
-
 /* ───────── Account page ───────── */
 .me-page {
   width: min(960px, calc(100vw - 56px));
@@ -5576,12 +5544,6 @@ td.empty,
     font-size: 13px;
   }
   .rail-nav-btn svg { width: 19px; height: 19px; }
-  .app-rail .lang-dropdown {
-    top: calc(100% + 8px);
-    bottom: auto;
-    left: auto;
-    right: 0;
-  }
   #sidebar {
     display: none !important;
   }

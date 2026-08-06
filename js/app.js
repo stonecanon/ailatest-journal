@@ -184,6 +184,7 @@
       home_rank_enter: '进入 →',
       home_price_kicker: 'Pricing', home_price_title: '订阅方案',
       home_price_lead: '网站查刊 Free 永久可用。Pro / Max 提升插件深度、额度与 AI 荐刊配额。教育邮箱另享教育价（登录后解锁）。',
+      home_price_lead_cn: '网站查刊 Free 永久可用。中国区 Pro / Max 为一次性 365 天访问权，不自动续费。',
       home_price_billing: '价格 USD · 年付 · 下方划线为原价（更划算）',
       home_price_toggle_year: '年付',
       home_price_toggle_month: '月付',
@@ -203,6 +204,7 @@
       home_price_max_1: '预警 / 撤稿 / 科协风险', home_price_max_2: '导出与高额度荐刊', home_price_max_3: '地区站与设备额度更高',
       home_price_max_cta: '订阅 Max · 年付',
       home_price_note: '教育价仅限 .edu / .edu.cn / .ac.* 等机构邮箱登录后支付',
+      home_price_note_cn: '中国区一次性购买：365 天到期后可重新购买；功能、额度与退款以条款为准。',
       home_price_more: '',
       home_dl_kicker: 'Download', home_dl_title: '下载',
       home_dl_lead: '网页可直接用。需要时再装插件、Skill 或 MCP。',
@@ -210,7 +212,7 @@
       home_dl_plat_browser_cta: '添加插件',
       home_dl_plat_skill_cta: '下载',
       home_dl_plat_mcp_cta: '复制命令',
-      home_dl_plat_mcp_meta: '在线 · 复制即用',
+      home_dl_plat_mcp_meta: '在线公测 · 复制即用',
       home_dl_plat_mobile: 'Mobile',
       home_dl_plat_mobile_cta: '即将推出',
       home_dl_plat_mobile_meta: 'iOS / Android',
@@ -222,7 +224,7 @@
       home_dl_skill_d: '给 Codex / AI 助手接入期刊搜索与荐刊接口，适合写作和投稿。',
       home_dl_skill_copy: '复制 Skill 安装文本', home_dl_skill_cta: '下载安装包', home_dl_skill_src: 'Skill 源码',
       home_dl_skill_stat_pre: '下载', home_dl_skill_stat_post: '次',
-      home_dl_mcp_badge: 'MCP', home_dl_mcp_t: '在线内测服务',
+      home_dl_mcp_badge: 'MCP', home_dl_mcp_t: '在线公测服务',
       home_dl_mcp_d: '无需下载，即可连接 Codex、Claude 等客户端。',
       home_dl_mcp_cta: '复制运行代码', home_dl_mcp_stat: '在线服务 · 复制后运行',
       home_dl_soon_badge: '更多', home_dl_soon_t: '微信 / 安卓 / iOS',
@@ -391,6 +393,7 @@
       home_rank_enter: 'Open →',
       home_price_kicker: 'Pricing', home_price_title: 'Plans',
       home_price_lead: 'Website search stays Free forever. Pro / Max unlock extension depth, quotas and AI picks. Edu emails get edu pricing after sign-in.',
+      home_price_lead_cn: 'Website search stays Free forever. China Pro / Max plans are one-time 365-day passes with no auto-renewal.',
       home_price_billing: 'USD · yearly · strikethrough = list price (best value)',
       home_price_toggle_year: 'Yearly',
       home_price_toggle_month: 'Monthly',
@@ -410,6 +413,7 @@
       home_price_max_1: 'Warning / retraction / CAST risk', home_price_max_2: 'Export & high AI quota', home_price_max_3: 'More regions & devices',
       home_price_max_cta: 'Subscribe Max · yearly',
       home_price_note: 'Edu pricing requires institutional email (.edu / .edu.cn / .ac.*) after sign-in',
+      home_price_note_cn: 'China one-time passes last 365 days and can be purchased again after expiry; features, quotas and refunds follow the Terms.',
       home_price_more: '',
       home_dl_kicker: 'Download', home_dl_title: 'Downloads',
       home_dl_lead: 'Use the web app as-is. Add the extension, Skill, or MCP when you need them.',
@@ -417,7 +421,7 @@
       home_dl_plat_browser_cta: 'Add extension',
       home_dl_plat_skill_cta: 'Download',
       home_dl_plat_mcp_cta: 'Copy command',
-      home_dl_plat_mcp_meta: 'Online · paste & run',
+      home_dl_plat_mcp_meta: 'Online public beta · paste & run',
       home_dl_plat_mobile: 'Mobile',
       home_dl_plat_mobile_cta: 'Coming soon',
       home_dl_plat_mobile_meta: 'iOS / Android',
@@ -454,7 +458,7 @@
 
 
 
-  // 8-language UI layer. Journal titles / ISSN / ranking values remain source-language data.
+  // Two-language UI layer. Journal titles / ISSN / ranking values remain source-language data.
   I18N['zh-CN'] = I18N.zh;
   I18N['zh-TW'] = {
     ...I18N.zh,
@@ -534,6 +538,8 @@
     pick_ai_unavailable: 'AI 推荐暂不可用，已自动改用本地匹配；该次不扣 AI 额度，可稍后重试。',
     pick_ai_auth_error: 'AI 推荐登录已失效，请重新登录；本次已自动改用本地匹配。',
     pick_ai_quota_error: 'Free AI 荐刊 10 次额度已用完，已自动改用本地匹配。升级 Pro / Max 可继续使用。',
+    pick_ai_credits_error: '本月 AI credits 已用完，已自动改用本地匹配；下月额度会重置。',
+    pick_ai_locked: '当前账号的 AI 荐刊尚未解锁，已自动改用本地匹配。升级 Pro / Max 可使用每月 credits。',
     pick_ai_config_error: 'AI 推荐接口还没有正确读取 DeepSeek 密钥，请重新部署 Worker 后再试。',
     pick_mode_ai: 'AI 语义匹配',
     pick_mode_local: '本地匹配',
@@ -565,6 +571,8 @@
     pick_ai_unavailable: 'AI 推薦暫不可用，已自動改用本地匹配；該次不扣 AI 額度，可稍後重試。',
     pick_ai_auth_error: 'AI 推薦登入已失效，請重新登入；本次已自動改用本地匹配。',
     pick_ai_quota_error: 'Free AI 薦刊 10 次額度已用完，已自動改用本地匹配。升級 Pro / Max 可繼續使用。',
+    pick_ai_credits_error: '本月 AI credits 已用完，已自動改用本地匹配；下月額度會重置。',
+    pick_ai_locked: '目前帳號尚未解鎖 AI 薦刊，已自動改用本地匹配。升級 Pro / Max 可使用每月 credits。',
     pick_ai_config_error: 'AI 推薦接口還沒有正確讀取 DeepSeek 密鑰，請重新部署 Worker 後再試。',
     pick_mode_ai: 'AI 語義匹配',
     pick_mode_local: '本地匹配',
@@ -596,6 +604,8 @@
     pick_ai_unavailable: 'AI Match is temporarily unavailable; switched to local matching. No AI credit was used — retry later.',
     pick_ai_auth_error: 'Your AI Match sign-in has expired. Sign in again; switched to local matching for this search.',
     pick_ai_quota_error: 'Free AI Match (10 total) is used up; switched to local matching. Upgrade Pro/Max to continue.',
+    pick_ai_credits_error: 'This month’s AI credits are used up; switched to local matching. Credits reset next month.',
+    pick_ai_locked: 'AI Match is not enabled for this account; switched to local matching. Upgrade Pro/Max for monthly credits.',
     pick_ai_config_error: 'AI Match cannot read the DeepSeek key yet. Redeploy the Worker and try again.',
     pick_mode_ai: 'AI semantic match',
     pick_mode_local: 'Local match',
@@ -776,25 +786,19 @@
     update_cat_policy: '投稿方針',
     update_cat_report: 'レポート'
   });
-  const LANG_ORDER = ['zh-CN', 'zh-TW', 'ja', 'ko', 'en', 'es', 'pt', 'fr'];
+  const LANG_ORDER = ['zh-CN', 'en'];
   const LANG_META = {
-    'zh-CN': { label: '中文', html: 'zh-CN' }, 'zh-TW': { label: '繁中', html: 'zh-TW' },
-    ja: { label: '日本語', html: 'ja' }, ko: { label: '한국어', html: 'ko' }, en: { label: 'English', html: 'en' },
-    es: { label: 'Español', html: 'es' }, pt: { label: 'Português', html: 'pt' }, fr: { label: 'Français', html: 'fr' }
+    'zh-CN': { label: '中文', html: 'zh-CN' },
+    en: { label: 'English', html: 'en' },
   };
   const normalizeLang = (code) => {
     const raw = String(code || '').trim();
     if (!raw) return 'en';
     if (raw === 'zh' || /^zh[-_]?cn/i.test(raw) || /^zh[-_]?hans/i.test(raw)) return 'zh-CN';
     if (/^zh[-_]?tw/i.test(raw) || /^zh[-_]?hk/i.test(raw) || /^zh[-_]?mo/i.test(raw) || /^zh[-_]?hant/i.test(raw)) {
-      return I18N['zh-TW'] ? 'zh-TW' : 'zh-CN';
+      return 'zh-CN';
     }
-    const base = raw.toLowerCase().split(/[-_]/)[0];
-    if (I18N[raw]) return raw;
-    if (I18N[base]) return base;
-    // ja-JP → ja, ko-KR → ko, etc.
-    const hit = LANG_ORDER.find((k) => k.toLowerCase() === base || k.toLowerCase().startsWith(base + '-'));
-    return hit && I18N[hit] ? hit : 'en';
+    return 'en';
   };
 
   /** 浏览器首选语言（仅首次 / 未手动设置时用） */
@@ -815,6 +819,10 @@
 
   // ───────── state ─────────
   function initialLangFromPath() {
+    try {
+      const queryLang = new URLSearchParams(location.search).get('lang');
+      if (queryLang) return normalizeLang(queryLang);
+    } catch (_) {}
     const path = location.pathname.replace(/\/+$/, '') || '/';
     if (path === '/zh' || path.startsWith('/zh/')) return 'zh-CN';
     if (path === '/en' || path.startsWith('/en/')) return 'en';
@@ -831,13 +839,7 @@
   window.__getJournalUiLang = () => lang;
   const UI_LOCALES = {
     'zh-CN': 'zh-CN',
-    'zh-TW': 'zh-TW',
-    ja: 'ja-JP',
-    ko: 'ko-KR',
     en: 'en-US',
-    es: 'es-ES',
-    pt: 'pt-PT',
-    fr: 'fr-FR',
   };
   function uiLocale() {
     return UI_LOCALES[lang] || 'en-US';
@@ -2717,9 +2719,16 @@
     }
     updateSearchSubmitLabel();
     const langToggle = $('#lang-toggle');
-    if (langToggle) langToggle.textContent = LANG_META[lang]?.label || '中文';
+    const nextLangLabel = lang === 'zh-CN' ? 'English' : '中文';
+    if (langToggle) {
+      langToggle.textContent = nextLangLabel;
+      langToggle.setAttribute('aria-label', lang === 'zh-CN' ? 'Switch to English' : '切换到中文');
+    }
     const topbarLang = $('#topbar-lang-proxy');
-    if (topbarLang) topbarLang.textContent = LANG_META[lang]?.label || '中文';
+    if (topbarLang) {
+      topbarLang.textContent = nextLangLabel;
+      topbarLang.setAttribute('aria-label', lang === 'zh-CN' ? 'Switch to English' : '切换到中文');
+    }
     $$('[data-lang-choice]').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.langChoice === lang);
     });
@@ -2729,9 +2738,10 @@
     document.documentElement.lang = LANG_META[lang]?.html || 'zh-CN';
     document.documentElement.setAttribute('data-ui-lang', lang);
     window.__journalUiLang = lang;
-    // 首页教育价提示 / 按钮：必须跟当前 lang，不能用过期 localStorage 判断
+    // 首页定价与教育价提示 / 按钮：必须跟当前 lang，不能用过期 localStorage 判断
     try {
-      if (typeof window.__syncEduCheckoutUi === 'function') window.__syncEduCheckoutUi();
+      if (typeof window.__syncPricingUi === 'function') window.__syncPricingUi();
+      else if (typeof window.__syncEduCheckoutUi === 'function') window.__syncEduCheckoutUi();
     } catch (_) {}
   }
 
@@ -8760,9 +8770,10 @@
     try { localizeDefaultFavListName(); } catch (_) {}
     try { persistFavLists(false); } catch (_) {}
     try { applyI18n(); } catch (err) { console.error(err); }
-    // 教育价 / 结账 CTA 不在 data-i18n 里，需显式按当前语言重刷
+    // 定价 / 教育价 / 结账 CTA 不在 data-i18n 里，需显式按当前语言重刷
     try {
-      if (typeof window.__syncEduCheckoutUi === 'function') window.__syncEduCheckoutUi();
+      if (typeof window.__syncPricingUi === 'function') window.__syncPricingUi();
+      else if (typeof window.__syncEduCheckoutUi === 'function') window.__syncEduCheckoutUi();
     } catch (_) {}
     try {
       if (domestic) buildDomIndex(domestic);
@@ -9759,7 +9770,7 @@
                 if (!exp.short && !exp.long) return '';
                 return ` · <span class="settings-plan-expiry" title="${escape(exp.long || exp.short)}">${escape(exp.short || exp.long)}</span>`;
               })()}</p>
-              <div class="billing-toggle-wrap settings-billing-toggle">
+              <div class="billing-toggle-wrap settings-billing-toggle" data-market-intl-only>
                 <div class="billing-toggle" role="group" aria-label="${T('计费周期','Billing period')}">
                   <button type="button" class="billing-toggle-btn is-on" data-billing-toggle="year" aria-pressed="true">
                     <span>${T('年付','Yearly')}</span>
@@ -12875,72 +12886,16 @@
       }, true);
     }
 
-    // ─── 语言切换下拉菜单 ───
-    (function initLangDropdown() {
+    // ─── 语言切换：只保留中文 / English，一次点击直接切换 ───
+    (function initLangToggle() {
       const btn = $('#lang-toggle');
-      if (!btn) return;
-      const wrap = btn.closest('.lang-toggle-wrap');
-      if (!wrap) return;
-      let dropdown;
-
-      function buildDropdown() {
-        dropdown = document.createElement('div');
-        dropdown.className = 'lang-dropdown';
-        LANG_ORDER.forEach(code => {
-          const opt = document.createElement('button');
-          opt.dataset.lang = code;
-          const meta = LANG_META[code];
-          opt.innerHTML = meta.label;
-          if (code === lang) opt.classList.add('active');
-          opt.addEventListener('click', (e) => {
-            e.stopPropagation();
-            setUiLanguage(code);
-            closeDropdown();
-          });
-          dropdown.appendChild(opt);
-        });
-        wrap.appendChild(dropdown);
-      }
-
-      function openDropdown() {
-        if (!dropdown) buildDropdown();
-        dropdown.classList.add('open');
-        // update active state
-        dropdown.querySelectorAll('button').forEach(b => {
-          b.classList.toggle('active', b.dataset.lang === lang);
-        });
-      }
-
-      function closeDropdown() {
-        if (dropdown) dropdown.classList.remove('open');
-      }
-
+      if (!btn || btn.__langToggleBound) return;
+      btn.__langToggleBound = true;
       btn.addEventListener('click', (e) => {
+        e.preventDefault();
         e.stopPropagation();
-        if (dropdown && dropdown.classList.contains('open')) {
-          closeDropdown();
-        } else {
-          openDropdown();
-        }
+        setUiLanguage(lang === 'zh-CN' ? 'en' : 'zh-CN');
       });
-
-      document.addEventListener('click', (e) => {
-        if (dropdown && dropdown.classList.contains('open') && !wrap.contains(e.target)) {
-          closeDropdown();
-        }
-      });
-
-      // update button text when lang changes
-      const origSetText = btn.textContent;
-      const origApply = applyI18n;
-      applyI18n = function() {
-        origApply.call(this);
-        const meta = LANG_META[lang];
-        btn.textContent = meta ? meta.label : lang;
-      };
-      // trigger initial label
-      const meta = LANG_META[lang];
-      if (meta) btn.textContent = meta.label;
     })();
   // ──── favorite star delegation (国际 + 国内全覆盖) ────
     let activePicker = null;
@@ -13427,6 +13382,8 @@
         doLogout();
         return t('pick_ai_auth_error');
       }
+      if (error?.data?.code === 'ai_locked') return t('pick_ai_locked');
+      if (error?.data?.code === 'insufficient_credits') return t('pick_ai_credits_error');
       if (error?.status === 429) return t('pick_ai_quota_error');
       if (error?.name === 'AbortError') {
         return T('AI 分析超时，已改用本地匹配。','AI analysis timed out; switched to local matching.');

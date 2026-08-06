@@ -52,7 +52,7 @@ When explaining recommendations:
 
 ### 3. Quota And Pricing
 
-Use `quota` or read `references/quota-pricing.md` when discussing limits or monetization. The current public online API reports the recommended policy; hard enforcement should be added through user login or API keys before paid launch.
+Use `quota` or read `references/quota-pricing.md` when discussing limits or monetization. Skill/API and MCP are public beta: anonymous calls remain available, while signed-in accounts and API Keys are recognized by the service. Browser-extension quotas, device slots, and paid AI credits are enforced server-side; limits and response fields may change during beta.
 
 ## Public Endpoints
 
@@ -61,6 +61,7 @@ The script calls:
 - `POST https://journal.ailatest.org/api/skill/search`
 - `POST https://journal.ailatest.org/api/skill/recommend`
 - `GET https://journal.ailatest.org/api/skill/quota`
+- `POST https://journal.ailatest.org/api/mcp` (MCP Streamable HTTP; `initialize`, `tools/list`, `tools/call`)
 
 Read `references/api.md` for request/response shapes if you need to integrate directly.
 
