@@ -5,6 +5,11 @@
 
 const DEEPSEEK_BASE = 'https://api.deepseek.com/v1';
 const DEFAULT_JOURNALS_URL = 'https://journal.ailatest.org/data/journals.json.gz';
+// The full public data set is intentionally rich for the browser, but it is
+// too expensive for a cold Worker isolate to parse and normalize during an AI
+// recommendation request.  This compact, pre-tokenized asset contains only
+// the fields used by /pick.
+const DEFAULT_PICK_JOURNALS_URL = 'https://journal.ailatest.org/data/pick-index.json.gz';
 
 export const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -50,6 +55,9 @@ export async function deepseekChat(apiKey, messages, opts = {}) {
 let journalsCache = null;
 let journalsLoadPromise = null;
 
+let pickJournalsCache = null;
+let pickJournalsLoadPromise = null;
+
 export async function loadJournals(env) {
   if (journalsCache) return journalsCache;
   if (!journalsLoadPromise) {
@@ -68,4 +76,25 @@ export async function loadJournals(env) {
     });
   }
   return journalsLoadPromise;
+}
+
+/** Load the compact pre-tokenized data set used by the AI picker. */
+export async function loadPickJournals(env) {
+  if (pickJournalsCache) return pickJournalsCache;
+  if (!pickJournalsLoadPromise) {
+    pickJournalsLoadPromise = (async () => {
+      const url = env.PICK_JOURNALS_URL || DEFAULT_PICK_JOURNALS_URL;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`pick journal data ${res.status}`);
+      const text = await new Response(res.body.pipeThrough(new DecompressionStream('gzip'))).text();
+      const data = JSON.parse(text);
+      if (!Array.isArray(data)) throw new Error('pick journal data is not an array');
+      pickJournalsCache = data;
+      return pickJournalsCache;
+    })().catch(e => {
+      pickJournalsLoadPromise = null;
+      throw e;
+    });
+  }
+  return pickJournalsLoadPromise;
 }

@@ -10,7 +10,7 @@
  *         (best-effort: ranking results are returned even if this step fails).
  */
 
-import { CORS, json, deepseekChat, loadJournals } from './deepseek-common.js';
+import { CORS, json, deepseekChat, loadPickJournals } from './deepseek-common.js';
 import PickMatch from '../../js/pick-match.js';
 
 const { makeHay, hitHay } = PickMatch;
@@ -251,13 +251,23 @@ function journalNameParts(j) {
 
 // Per-isolate haystack cache keyed on the journal object itself.
 const HAYS = new WeakMap();
+function compactHay(value) {
+  const text = PickMatch.norm(value || '');
+  const set = Object.create(null);
+  for (const token of text.split(' ')) {
+    if (token) set[token] = true;
+  }
+  return { text, set };
+}
+
 function journalHays(j) {
   let hays = HAYS.get(j);
   if (!hays) {
-    hays = {
-      subject: makeHay(journalSubjectParts(j)),
-      name: makeHay(journalNameParts(j)),
-    };
+    // Records from pick-index.json.gz already contain stemmed haystacks.  Do
+    // not rebuild/normalize the large subject arrays on a cold isolate.
+    hays = j.subject_hay != null || j.name_hay != null
+      ? { subject: compactHay(j.subject_hay), name: compactHay(j.name_hay) }
+      : { subject: makeHay(journalSubjectParts(j)), name: makeHay(journalNameParts(j)) };
     HAYS.set(j, hays);
   }
   return hays;
@@ -515,7 +525,12 @@ function rankJournals(journals, profile, filters, limit) {
       slug: j.slug || '',
       score: Math.max(1, Math.round(row.score / maxScore * 100)),
       matched: row.matched,
-      topics: unique([...(j.wos_categories || []), j.esi_category, j.cas_major_cn].filter(Boolean), 6),
+      topics: unique([
+        ...(j.topics || []),
+        ...(j.wos_categories || []),
+        j.esi_category,
+        j.cas_major_cn,
+      ].filter(Boolean), 6),
       if_2024: j.if_2024 ?? null,
       if_quartile: j.if_quartile || '',
       cas_zone: j.cas_zone || '',
@@ -678,7 +693,7 @@ export async function handlePick(req, env, opts = {}) {
   let profileError = '';
   try {
     const pair = await Promise.all([
-      loadJournals(env),
+      loadPickJournals(env),
       extractProfile(apiKey, query, usageContext).catch((e) => {
         profileError = e?.message || String(e);
         console.warn('pick semantic extraction failed:', profileError);
