@@ -537,6 +537,7 @@
     pick_ai_running: '正在用 AI 解析研究语境…',
     pick_ai_unavailable: 'AI 推荐暂不可用，已自动改用本地匹配；该次不扣 AI 额度，可稍后重试。',
     pick_ai_auth_error: 'AI 推荐登录已失效，请重新登录；本次已自动改用本地匹配。',
+    pick_ai_deepseek_auth_error: 'DeepSeek 密钥验证失败，请在 Worker 的 Secrets 中重新保存密钥；本次已自动改用本地匹配。',
     pick_ai_quota_error: 'Free AI 荐刊 10 次额度已用完，已自动改用本地匹配。升级 Pro / Max 可继续使用。',
     pick_ai_credits_error: '本月 AI credits 已用完，已自动改用本地匹配；下月额度会重置。',
     pick_ai_locked: '当前账号的 AI 荐刊尚未解锁，已自动改用本地匹配。升级 Pro / Max 可使用每月 credits。',
@@ -570,6 +571,7 @@
     pick_ai_running: '正在用 AI 解析研究語境…',
     pick_ai_unavailable: 'AI 推薦暫不可用，已自動改用本地匹配；該次不扣 AI 額度，可稍後重試。',
     pick_ai_auth_error: 'AI 推薦登入已失效，請重新登入；本次已自動改用本地匹配。',
+    pick_ai_deepseek_auth_error: 'DeepSeek 密鑰驗證失敗，請在 Worker 的 Secrets 中重新儲存密鑰；本次已自動改用本地匹配。',
     pick_ai_quota_error: 'Free AI 薦刊 10 次額度已用完，已自動改用本地匹配。升級 Pro / Max 可繼續使用。',
     pick_ai_credits_error: '本月 AI credits 已用完，已自動改用本地匹配；下月額度會重置。',
     pick_ai_locked: '目前帳號尚未解鎖 AI 薦刊，已自動改用本地匹配。升級 Pro / Max 可使用每月 credits。',
@@ -603,6 +605,7 @@
     pick_ai_running: 'Analyzing research context with AI…',
     pick_ai_unavailable: 'AI Match is temporarily unavailable; switched to local matching. No AI credit was used — retry later.',
     pick_ai_auth_error: 'Your AI Match sign-in has expired. Sign in again; switched to local matching for this search.',
+    pick_ai_deepseek_auth_error: 'The DeepSeek key failed authentication. Re-save it in the Worker Secrets; switched to local matching for this search.',
     pick_ai_quota_error: 'Free AI Match (10 total) is used up; switched to local matching. Upgrade Pro/Max to continue.',
     pick_ai_credits_error: 'This month’s AI credits are used up; switched to local matching. Credits reset next month.',
     pick_ai_locked: 'AI Match is not enabled for this account; switched to local matching. Upgrade Pro/Max for monthly credits.',
@@ -717,6 +720,7 @@
     pick_ai_running: 'AI で研究文脈を解析中…',
     pick_ai_unavailable: 'AI 推薦は一時的に利用できません。今回はローカル照合に切り替えました。',
     pick_ai_auth_error: 'AI 推薦のログインが失効しました。今回はローカル照合に切り替えました。',
+    pick_ai_deepseek_auth_error: 'DeepSeek キーの認証に失敗しました。Worker Secrets に保存し直してください。今回はローカル照合に切り替えました。',
     pick_ai_quota_error: '本日の AI 推薦無料枠を使い切りました。ローカル照合に切り替えます。',
     pick_ai_config_error: 'AI 推薦 API の設定が未完了です。Worker を再デプロイしてください。',
     pick_mode_ai: 'AI セマンティック照合',
@@ -13404,11 +13408,15 @@
     function pickAiErrorMessage(error) {
       const msg = String(error?.message || error?.data?.error || '');
       const detail = String(error?.data?.detail || '');
+      const code = String(error?.data?.code || error?.data?.error || '').toLowerCase();
+      if (code === 'ai_key_missing' || /ai service not configured|deepseek_api_key missing/i.test(msg + detail)) {
+        return t('pick_ai_config_error');
+      }
+      if (code === 'deepseek_auth_failed' || /deepseek\s+(401|403)|invalid.*key|authentication|unauthorized/i.test(msg + detail)) {
+        return t('pick_ai_deepseek_auth_error');
+      }
+      if (code === 'ai_unavailable') return t('pick_ai_unavailable');
       if (error?.status === 401 || error?.status === 403) {
-        // 登录失效 vs DeepSeek 密钥失败
-        if (/deepseek|api.?key|not configured/i.test(msg + detail)) {
-          return t('pick_ai_config_error');
-        }
         doLogout();
         return t('pick_ai_auth_error');
       }
@@ -13418,12 +13426,7 @@
       if (error?.name === 'AbortError') {
         return T('AI 分析超时，已改用本地匹配。','AI analysis timed out; switched to local matching.');
       }
-      if (
-        error?.status === 503
-        || /deepseek_auth_failed|not configured|DEEPSEEK|invalid.*key|authentication/i.test(msg + detail)
-      ) {
-        return t('pick_ai_config_error');
-      }
+      if (error?.status === 503) return t('pick_ai_unavailable');
       if (error instanceof TypeError && /fetch|network/i.test(msg)) {
         return T('AI 推荐网络请求失败（请检查网络或代理），已自动改用本地匹配。','AI request failed at network level (check connection/proxy); switched to local matching.');
       }

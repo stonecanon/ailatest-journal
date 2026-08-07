@@ -629,7 +629,9 @@ export async function handlePick(req, env, opts = {}) {
   if (!apiKey || apiKey.length < 12) {
     return json({
       ok: false,
-      error: 'AI service not configured',
+      error: 'ai_key_missing',
+      code: 'ai_key_missing',
+      message: 'AI 推荐接口还没有正确读取 DeepSeek 密钥，请重新部署 Worker 后再试。',
       detail: 'DEEPSEEK_API_KEY missing or empty on Worker',
     }, 503);
   }
@@ -693,10 +695,12 @@ export async function handlePick(req, env, opts = {}) {
   if (!profile) {
     if (refund) await refund();
     const authFail = /401|403|invalid.*key|authentication|unauthorized/i.test(profileError);
+    const errorCode = authFail ? 'deepseek_auth_failed' : 'ai_unavailable';
     return json({
       ok: false,
-      error: authFail ? 'deepseek_auth_failed' : 'ai_unavailable',
-      detail: profileError.slice(0, 200),
+      error: errorCode,
+      code: errorCode,
+      detail: profileError.slice(0, 240) || 'DeepSeek did not return a valid recommendation profile',
       fallback: 'local',
     }, authFail ? 503 : 502);
   }
