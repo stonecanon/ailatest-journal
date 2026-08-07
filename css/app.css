@@ -11998,6 +11998,24 @@ body.journal-route .lang-toggle-wrap { display: none; }
   font-size: 11px;
   line-height: 1.35;
 }
+.pick-report-journal-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 3px 9px;
+  margin-top: 5px;
+  color: var(--ink-faint);
+  font-size: 10.5px;
+  line-height: 1.35;
+}
+.pick-report-journal-meta-item {
+  white-space: nowrap;
+}
+.pick-report-journal-fee .pick-apc {
+  margin: 0;
+  font-size: 10px;
+  line-height: 1.3;
+}
 .pick-report-num {
   color: var(--ink-faint);
   font-variant-numeric: tabular-nums;
@@ -12016,19 +12034,13 @@ body.journal-route .lang-toggle-wrap { display: none; }
 .pick-report-tier-table th:nth-child(1),
 .pick-report-tier-table td:nth-child(1) { width: 38px; }
 .pick-report-tier-table th:nth-child(2),
-.pick-report-tier-table td:nth-child(2) { width: 250px; }
+.pick-report-tier-table td:nth-child(2) { width: 300px; }
 .pick-report-tier-table th:nth-child(3),
-.pick-report-tier-table td:nth-child(3) { width: 56px; color: #5f422a; font-weight: 820; }
+.pick-report-tier-table td:nth-child(3) { width: 62px; color: #5f422a; font-weight: 820; }
 .pick-report-tier-table th:nth-child(4),
-.pick-report-tier-table td:nth-child(4) { width: 54px; color: #5f422a; font-weight: 820; }
+.pick-report-tier-table td:nth-child(4) { width: 112px; }
 .pick-report-tier-table th:nth-child(5),
-.pick-report-tier-table td:nth-child(5) { width: 78px; color: #5f422a; font-weight: 820; }
-.pick-report-tier-table th:nth-child(6),
-.pick-report-tier-table td:nth-child(6) { width: 108px; }
-.pick-report-tier-table th:nth-child(7),
-.pick-report-tier-table td:nth-child(7) { width: auto; }
-.pick-report-tier-table th:nth-child(8),
-.pick-report-tier-table td:nth-child(8) { width: auto; }
+.pick-report-tier-table td:nth-child(5) { width: auto; }
 .pick-report-table .pick-apc,
 .pick-report-table .pick-apc-free,
 .pick-report-table .pick-apc-paid {

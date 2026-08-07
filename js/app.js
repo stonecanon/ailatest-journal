@@ -11489,7 +11489,26 @@
       shown = PAGE; renderInt();
     });
     let homeSearchDebounce = null;
-    $('#q').addEventListener('input', (e) => {
+    const queryInput = $('#q');
+    // IME confirmation Enter is not a search submission.  On macOS/Chrome
+    // the event may arrive with isComposing=false, so keep a short guard after
+    // compositionend as well as checking the traditional keyCode 229 signal.
+    const isImeEnterEvent = (event, field = queryInput) => Boolean(
+      event?.isComposing
+      || event?.keyCode === 229
+      || event?.which === 229
+      || field?.__pickCompositionActive
+      || performance.now() < Number(field?.__pickIgnoreEnterUntil || 0)
+    );
+    queryInput?.addEventListener('compositionstart', () => {
+      queryInput.__pickCompositionActive = true;
+      queryInput.__pickIgnoreEnterUntil = 0;
+    });
+    queryInput?.addEventListener('compositionend', () => {
+      queryInput.__pickCompositionActive = false;
+      queryInput.__pickIgnoreEnterUntil = performance.now() + 220;
+    });
+    queryInput.addEventListener('input', (e) => {
       if (activeTab === 'updates') activeUpdateQuery = e.target.value.trim();
       else activeQuery = e.target.value.trim();
       shown = PAGE;
@@ -11509,8 +11528,9 @@
           : null;
       }
     });
-    $('#q').addEventListener('keydown', (e) => {
+    queryInput.addEventListener('keydown', (e) => {
       if (e.key !== 'Enter') return;
+      if (isImeEnterEvent(e, e.currentTarget)) return;
       e.preventDefault();
       if (isPickSearchContext()) {
         submitPickSearchFromTopbar(e.currentTarget.value.trim());
@@ -13629,8 +13649,10 @@
     }
 
     function pickFallbackReport(profile, entries = []) {
-      const primary = entries.filter(e => pickQuartileBand(e.jcr_q || e.journalRec?.if_quartile) === 'primary').slice(0, 6);
-      const backup = entries.filter(e => pickQuartileBand(e.jcr_q || e.journalRec?.if_quartile) === 'backup').slice(0, 8);
+      // Keep the ranked order but expose a real shortlist.  The previous
+      // 6 + 8 caps made the report look incomplete for broad topics.
+      const primary = entries.filter(e => pickQuartileBand(e.jcr_q || e.journalRec?.if_quartile) === 'primary').slice(0, 8);
+      const backup = entries.filter(e => pickQuartileBand(e.jcr_q || e.journalRec?.if_quartile) === 'backup').slice(0, 12);
       const defs = pickIsZhLang()
         ? [['primary', '优选推荐（Q1/Q2）', primary], ['backup', '备选（Q3/Q4）', backup]]
         : [['primary', 'Primary (Q1/Q2)', primary], ['backup', 'Backup (Q3/Q4)', backup]];
@@ -13673,6 +13695,21 @@
       const fallback = pickFallbackReport(profile, fallbackEntries);
       const out = localized ? { ...fallback, ...localized } : fallback;
       if (!Array.isArray(out.tiers) || !out.tiers.length) out.tiers = fallback.tiers;
+      // AI report text is optional; always backfill sparse tiers from the
+      // deterministic ranked list while keeping the same two-band order.
+      out.tiers = (fallback.tiers || []).map(baseTier => {
+        const current = (out.tiers || []).find(t => String(t?.id || '').toLowerCase() === baseTier.id) || {};
+        const seen = new Set();
+        const items = [];
+        const tierLimit = baseTier.id === 'primary' ? 8 : baseTier.id === 'backup' ? 12 : (baseTier.items || []).length;
+        for (const item of [...(Array.isArray(current.items) ? current.items : []), ...(baseTier.items || [])]) {
+          const key = pickNormText(item?.name || '');
+          if (!key || seen.has(key) || items.length >= tierLimit) continue;
+          seen.add(key);
+          items.push(item);
+        }
+        return { ...baseTier, ...current, items };
+      }).filter(tier => tier.items.length);
       if (!Array.isArray(out.chinese)) out.chinese = [];
       const intro = String(out.intro || '').trim();
       if (!intro || (pickIsZhLang() ? !pickHasCjk(intro) : pickHasCjk(intro))) out.intro = fallback.intro;
@@ -13702,7 +13739,7 @@
         return `<tr>
           <td class="pick-report-num">${i + 1}</td>
           <td>${escape(titleCase(item.name))} <span class="pick-report-missing">${T('站内未收录','not in site data')}</span></td>
-          <td colspan="5"><span class="muted-cell">&mdash;</span></td>
+          <td colspan="2"><span class="muted-cell">&mdash;</span></td>
           <td class="pick-report-reason">${escape(reason)}</td>
         </tr>`;
       }
@@ -13712,18 +13749,21 @@
       const feeHtml = pickFeeBadge(rec);
       const riskHtml = pickRiskBadge(rec);
       const difficultyHtml = pickDifficultyHtml(rec);
+      const journalMeta = [
+        idxText ? `<span class="pick-report-journal-meta-item">${escape(idxText)}</span>` : '',
+        rec.if_quartile ? `<span class="pick-report-journal-meta-item">JCR ${escape(rec.if_quartile)}</span>` : '',
+        pickMetricCas(rec) ? `<span class="pick-report-journal-meta-item">${escape(T('中科院','CAS'))} ${escape(pickMetricCas(rec))}</span>` : '',
+        feeHtml ? `<span class="pick-report-journal-meta-item pick-report-journal-fee">${feeHtml}</span>` : '',
+      ].filter(Boolean).join('');
       return `<tr>
         <td class="pick-report-num">${i + 1}</td>
         <td>
           <a href="#j/${escape(fid)}" data-pick-report-fid="${escape(fid)}">${escape(titleCase(rec.name || item.name))}</a>
           ${riskHtml}
-          ${idxText ? `<span class="pick-report-meta">${escape(idxText)}</span>` : ''}
+          ${journalMeta ? `<div class="pick-report-journal-meta">${journalMeta}</div>` : ''}
         </td>
         <td>${pickMetricIf(rec) || '<span class="muted-cell">&mdash;</span>'}</td>
-        <td>${escape(rec.if_quartile || '') || '<span class="muted-cell">&mdash;</span>'}</td>
-        <td>${pickMetricCas(rec) ? escape(pickMetricCas(rec)) : '<span class="muted-cell">&mdash;</span>'}</td>
         <td>${difficultyHtml}</td>
-        <td>${feeHtml || '<span class="muted-cell">&mdash;</span>'}</td>
         <td class="pick-report-reason">${escape(reason)}</td>
       </tr>`;
     }
@@ -13778,7 +13818,7 @@
         </div>
         <div class="pick-report-table-wrap">
           <table class="pick-report-table pick-report-tier-table">
-            <thead><tr><th>#</th><th>${T('期刊','Journal')}</th><th>IF</th><th>JCR</th><th>${T('中科院','CAS')}</th><th>${T('投稿难度','Difficulty')}</th><th>${T('费用参考','Fee note')}</th><th>${T('推荐理由','Why')}</th></tr></thead>
+            <thead><tr><th>#</th><th>${T('期刊','Journal')}</th><th>IF</th><th>${T('投稿难度','Difficulty')}</th><th>${T('推荐理由','Why')}</th></tr></thead>
             <tbody>${items.map((item, i) => renderPickReportEnRow(item, i)).join('')}</tbody>
           </table>
         </div>
@@ -14180,7 +14220,14 @@
 
     _runPickSearch = doSearch;
 
-    input.addEventListener('keydown', (e) => { if (!isPickSearchContext()) return; if (e.key === 'Enter') { e.preventDefault(); doSearch(); } });
+    input.addEventListener('keydown', (e) => {
+      if (!isPickSearchContext() || e.key !== 'Enter') return;
+      if (e.isComposing || e.keyCode === 229 || e.which === 229
+        || input.__pickCompositionActive
+        || performance.now() < Number(input.__pickIgnoreEnterUntil || 0)) return;
+      e.preventDefault();
+      doSearch();
+    });
     document.querySelectorAll('.pick-filter-bar input').forEach(el => {
       el.addEventListener('change', () => {
         if (!input.value.trim()) return;

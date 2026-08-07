@@ -419,6 +419,12 @@ function difficultyStars(row) {
 
 /** 无第二次大模型调用：按 JCR 分区生成两档简单报告。 */
 function buildFastReport(profile, ranked, lang = 'zh') {
+  // Keep the report useful as a shortlist: rank first, then split the same
+  // ordered candidates into the two quartile bands.  The old 6 + 8 caps made
+  // a good query look artificially sparse even when the matcher had more
+  // valid candidates.
+  const PRIMARY_LIMIT = 8;
+  const BACKUP_LIMIT = 12;
   const zh = lang !== 'en';
   const reasonOf = (r) => {
     const m = (r.matched || []).slice(0, 3).join(zh ? '、' : ', ');
@@ -427,8 +433,8 @@ function buildFastReport(profile, ranked, lang = 'zh') {
   const items = (slice) => slice.map(r => ({ name: r.name, reason: reasonOf(r) }));
   const clean = ranked.filter(r => !r.warning);
   const pool = clean.length ? clean : ranked;
-  const primary = pool.filter(r => quartileBand(r.if_quartile) === 'primary').slice(0, 6);
-  const backup = pool.filter(r => quartileBand(r.if_quartile) === 'backup').slice(0, 8);
+  const primary = pool.filter(r => quartileBand(r.if_quartile) === 'primary').slice(0, PRIMARY_LIMIT);
+  const backup = pool.filter(r => quartileBand(r.if_quartile) === 'backup').slice(0, BACKUP_LIMIT);
   return {
     intro: zh
       ? `按 JCR 分区分为两档：Q1/Q2 优先推荐，Q3/Q4 备选。${profile.explanation || ''}`.trim()
@@ -598,7 +604,7 @@ function sanitizeReport(raw) {
   const tiers = (Array.isArray(raw.tiers) ? raw.tiers : []).map(t => ({
     id: cleanText(t?.id || '', 24) || 'tier',
     label: cleanText(t?.label || '', 40) || '推荐',
-    items: sanitizeReportItems(t?.items, 10),
+    items: sanitizeReportItems(t?.items, 16),
   })).filter(t => t.items.length).slice(0, 4);
   const chinese = sanitizeReportItems(raw.chinese, 8);
   const strategy = (Array.isArray(raw.strategy) ? raw.strategy : [])
@@ -632,7 +638,8 @@ async function generateReport(apiKey, query, profile, ranked, context) {
 
 要求：
  - 只输出两档：primary 和 backup。primary 只能选 Q1/Q2，backup 只能选 Q3/Q4；不要把 N/A 或没有 JCR 分区的期刊放进这两档。
- - primary 4-6 本，backup 4-8 本，主要从候选列表中选择（使用候选列表中的精确期刊名），不要重复。
+ - primary 最多 8 本，backup 最多 12 本，按候选列表顺序选择（使用候选列表中的精确期刊名），不要重复。
+ - 候选列表中有至少 15 本符合条件的期刊时，报告至少列出 15 本；不要为了凑数引入候选列表之外的期刊。
 - 如果你确信某本不在候选列表的英文期刊高度对口，最多可补充 3 本，理由中注明"候选外补充"。
 - chinese：如论文主题适合中文发表，推荐 4-8 本对口的中文核心期刊（如 CSSCI/北大核心），否则给空数组。
 - reason 简洁说明为什么对口（学科方向、定位），不要复述 IF/分区等指标——指标由系统数据补全。
@@ -647,7 +654,7 @@ async function generateReport(apiKey, query, profile, ranked, context) {
         wos_categories: profile.wos_categories,
       })}\n\n候选期刊(按匹配度排序):\n${lines}`,
     },
-  ], { temperature: 0.2, maxTokens: 1800, jsonOutput: true, model: context.model }, { ...context, step: 'report', feature: 'pick_report', evidenceCount: ranked.length });
+  ], { temperature: 0.2, maxTokens: 2600, jsonOutput: true, model: context.model }, { ...context, step: 'report', feature: 'pick_report', evidenceCount: ranked.length });
   const content = res?.choices?.[0]?.message?.content || '';
   return sanitizeReport(JSON.parse(content));
 }
@@ -663,8 +670,8 @@ function enforceQuartileReport(report, profile, ranked, lang) {
     if (key && !byName.has(key)) byName.set(key, row);
   }
   const definitions = [
-    ['primary', lang === 'en' ? 'Primary (Q1/Q2)' : '优选推荐（Q1/Q2）', 6],
-    ['backup', lang === 'en' ? 'Backup (Q3/Q4)' : '备选（Q3/Q4）', 8],
+    ['primary', lang === 'en' ? 'Primary (Q1/Q2)' : '优选推荐（Q1/Q2）', 8],
+    ['backup', lang === 'en' ? 'Backup (Q3/Q4)' : '备选（Q3/Q4）', 12],
   ];
   const rawTiers = Array.isArray(report.tiers) ? report.tiers : [];
   const tiers = definitions.map(([id, label, max]) => {
@@ -678,7 +685,17 @@ function enforceQuartileReport(report, profile, ranked, lang) {
       return { name: row.name, reason: item.reason || (lang === 'en' ? 'Field match' : '学科方向匹配') };
     }).filter(Boolean);
     const fallback = base.tiers.find(t => t.id === id);
-    return { id, label, items: valid.length ? valid : (fallback?.items || []) };
+    // AI reasons are optional polish.  If the model only returned a handful
+    // of rows, fill the rest from the same deterministic ranked shortlist so
+    // the visible report does not shrink unexpectedly.
+    const merged = [...valid];
+    for (const item of fallback?.items || []) {
+      const key = PickMatch.norm(item.name);
+      if (!key || seen.has(key) || merged.length >= max) continue;
+      seen.add(key);
+      merged.push(item);
+    }
+    return { id, label, items: merged };
   }).filter(t => t.items.length);
 
   return {
