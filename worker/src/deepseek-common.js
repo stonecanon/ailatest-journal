@@ -9,7 +9,10 @@ const DEFAULT_JOURNALS_URL = 'https://journal.ailatest.org/data/journals.json.gz
 // too expensive for a cold Worker isolate to parse and normalize during an AI
 // recommendation request.  This compact, pre-tokenized asset contains only
 // the fields used by /pick.
-const DEFAULT_PICK_JOURNALS_URL = 'https://journal.ailatest.org/data/pick-index.json.gz';
+// Keep a version query on this new asset: an earlier missing-file response may
+// be cached by the site's SPA fallback, so the first production fetch must not
+// reuse that HTML response.
+const DEFAULT_PICK_JOURNALS_URL = 'https://journal.ailatest.org/data/pick-index.json.gz?v=20260807-pick-index-v1';
 
 export const CORS = {
   'Access-Control-Allow-Origin': '*',
