@@ -2399,6 +2399,117 @@ function normalizeOpenAlexCountry(group) {
   return { code, name };
 }
 
+// Crossref affiliations are free-text, so keep a conservative alias table and
+// only accept a country when it appears as the final comma/semicolon-delimited
+// part of an affiliation. This avoids mistaking university or department names
+// for countries while still covering the common forms used by Crossref deposits.
+const CROSSREF_COUNTRY_ALIASES = [
+  ['united states of america', 'United States'], ['united states', 'United States'], ['usa', 'United States'], ['us', 'United States'],
+  ['united kingdom', 'United Kingdom'], ['great britain', 'United Kingdom'], ['england', 'United Kingdom'], ['scotland', 'United Kingdom'], ['wales', 'United Kingdom'], ['northern ireland', 'United Kingdom'], ['uk', 'United Kingdom'],
+  ['people\'s republic of china', 'China'], ['people’s republic of china', 'China'], ['pr china', 'China'], ['china', 'China'], ['taiwan', 'China'], ['hong kong', 'China'], ['macao', 'China'], ['macau', 'China'],
+  ['south korea', 'South Korea'], ['republic of korea', 'South Korea'], ['korea, republic of', 'South Korea'], ['korea', 'South Korea'],
+  ['the netherlands', 'Netherlands'], ['netherlands', 'Netherlands'], ['russian federation', 'Russia'], ['russia', 'Russia'], ['iran, islamic republic of', 'Iran'], ['islamic republic of iran', 'Iran'], ['iran', 'Iran'],
+  ['czech republic', 'Czechia'], ['czechia', 'Czechia'], ['turkey', 'Türkiye'], ['türkiye', 'Türkiye'], ['uae', 'United Arab Emirates'], ['united arab emirates', 'United Arab Emirates'],
+  ['australia', 'Australia'], ['new zealand', 'New Zealand'], ['canada', 'Canada'], ['germany', 'Germany'], ['france', 'France'], ['italy', 'Italy'], ['spain', 'Spain'], ['portugal', 'Portugal'],
+  ['belgium', 'Belgium'], ['switzerland', 'Switzerland'], ['austria', 'Austria'], ['poland', 'Poland'], ['slovakia', 'Slovakia'], ['hungary', 'Hungary'], ['romania', 'Romania'], ['bulgaria', 'Bulgaria'],
+  ['greece', 'Greece'], ['sweden', 'Sweden'], ['norway', 'Norway'], ['denmark', 'Denmark'], ['finland', 'Finland'], ['iceland', 'Iceland'], ['ireland', 'Ireland'], ['ukraine', 'Ukraine'],
+  ['israel', 'Israel'], ['iraq', 'Iraq'], ['saudi arabia', 'Saudi Arabia'], ['qatar', 'Qatar'], ['jordan', 'Jordan'], ['egypt', 'Egypt'], ['lebanon', 'Lebanon'], ['syria', 'Syria'], ['yemen', 'Yemen'],
+  ['south africa', 'South Africa'], ['nigeria', 'Nigeria'], ['kenya', 'Kenya'], ['ethiopia', 'Ethiopia'], ['ghana', 'Ghana'], ['morocco', 'Morocco'], ['tunisia', 'Tunisia'], ['algeria', 'Algeria'],
+  ['india', 'India'], ['pakistan', 'Pakistan'], ['bangladesh', 'Bangladesh'], ['sri lanka', 'Sri Lanka'], ['nepal', 'Nepal'], ['japan', 'Japan'], ['vietnam', 'Vietnam'], ['thailand', 'Thailand'],
+  ['malaysia', 'Malaysia'], ['singapore', 'Singapore'], ['indonesia', 'Indonesia'], ['philippines', 'Philippines'], ['myanmar', 'Myanmar'], ['cambodia', 'Cambodia'], ['brunei', 'Brunei'], ['mongolia', 'Mongolia'],
+  ['kazakhstan', 'Kazakhstan'], ['uzbekistan', 'Uzbekistan'], ['colombia', 'Colombia'], ['brazil', 'Brazil'], ['argentina', 'Argentina'], ['chile', 'Chile'], ['peru', 'Peru'], ['mexico', 'Mexico'],
+  ['ecuador', 'Ecuador'], ['costa rica', 'Costa Rica'], ['panama', 'Panama'], ['cuba', 'Cuba'], ['jamaica', 'Jamaica'], ['uruguay', 'Uruguay'], ['venezuela', 'Venezuela'], ['bolivia', 'Bolivia'],
+  ['paraguay', 'Paraguay'], ['dominican republic', 'Dominican Republic'], ['albania', 'Albania'], ['armenia', 'Armenia'], ['azerbaijan', 'Azerbaijan'], ['georgia', 'Georgia'], ['serbia', 'Serbia'],
+  ['croatia', 'Croatia'], ['slovenia', 'Slovenia'], ['bosnia and herzegovina', 'Bosnia and Herzegovina'], ['north macedonia', 'North Macedonia'], ['montenegro', 'Montenegro'], ['moldova', 'Moldova'],
+  ['belarus', 'Belarus'], ['lithuania', 'Lithuania'], ['latvia', 'Latvia'], ['estonia', 'Estonia'], ['cyprus', 'Cyprus'], ['malta', 'Malta'], ['luxembourg', 'Luxembourg'], ['liechtenstein', 'Liechtenstein'],
+  ['palestine', 'Palestine'], ['bahrain', 'Bahrain'], ['kuwait', 'Kuwait'], ['oman', 'Oman'], ['sudan', 'Sudan'], ['tanzania', 'Tanzania'], ['uganda', 'Uganda'], ['zimbabwe', 'Zimbabwe'],
+  ['zambia', 'Zambia'], ['botswana', 'Botswana'], ['namibia', 'Namibia'], ['mauritius', 'Mauritius'], ['rwanda', 'Rwanda'], ['senegal', 'Senegal'], ['cameroon', 'Cameroon'], ['malawi', 'Malawi'],
+  ['mozambique', 'Mozambique'], ['madagascar', 'Madagascar'], ['eswatini', 'Eswatini'], ['lesotho', 'Lesotho'], ['fiji', 'Fiji'], ['papua new guinea', 'Papua New Guinea'], ['samoa', 'Samoa'],
+].sort((a, b) => b[0].length - a[0].length);
+
+function normalizeCrossrefCountry(affiliation) {
+  const text = String(affiliation || '')
+    .replace(/&amp;/gi, '&')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/[.;:)\]]+$/g, '');
+  if (!text) return null;
+  const parts = text.split(/[,;|\n]+/).map((part) => part.trim().replace(/^[\[({]+|[\]})]+$/g, '')).filter(Boolean);
+  const candidates = parts.slice(Math.max(0, parts.length - 3));
+  for (const candidate of candidates.reverse()) {
+    const key = candidate.toLowerCase().replace(/[.]+$/g, '').trim();
+    const match = CROSSREF_COUNTRY_ALIASES.find(([alias]) => alias === key);
+    if (match) return normalizeOpenAlexCountry({ name: match[1] });
+  }
+  const lower = text.toLowerCase();
+  for (const [alias, name] of CROSSREF_COUNTRY_ALIASES) {
+    if (lower.endsWith(` ${alias}`) || lower.endsWith(`,${alias}`)) {
+      return normalizeOpenAlexCountry({ name });
+    }
+  }
+  return null;
+}
+
+async function fetchCrossrefCountryYear(sourceIssn, year, attempt = 0) {
+  const params = new URLSearchParams({
+    filter: `from-pub-date:${year}-01-01,until-pub-date:${year}-12-31`,
+    rows: '1000',
+    select: 'DOI,title,author,issued',
+    mailto: 'ailatest@ailatest.org',
+  });
+  let resp;
+  const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+  const timer = controller ? setTimeout(() => controller.abort(), 8000) : null;
+  try {
+    resp = await fetch(`https://api.crossref.org/journals/${encodeURIComponent(sourceIssn)}/works?${params.toString()}`, {
+      headers: {
+        Accept: 'application/json',
+        'User-Agent': 'AILatest Journal Crossref country-output fallback (mailto:ailatest@ailatest.org)',
+      },
+      ...(controller ? { signal: controller.signal } : {}),
+    });
+  } catch (_) {
+    return { year, total: 0, groups: [], skipped: true, status: 0 };
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+  if (resp.status === 429 && attempt < 2) {
+    const raSec = Number(resp.headers.get('Retry-After') || 0);
+    const wait = Math.min(raSec > 0 ? raSec * 1000 : 800 * (attempt + 1), 5000);
+    await new Promise((resolve) => setTimeout(resolve, wait));
+    return fetchCrossrefCountryYear(sourceIssn, year, attempt + 1);
+  }
+  if (!resp.ok) return { year, total: 0, groups: [], skipped: true, status: resp.status };
+  const data = await resp.json().catch(() => ({}));
+  const items = Array.isArray(data?.message?.items) ? data.message.items : [];
+  const groups = new Map();
+  for (const item of items) {
+    const countries = new Map();
+    for (const author of (Array.isArray(item?.author) ? item.author : [])) {
+      const affiliations = Array.isArray(author?.affiliation) ? author.affiliation : [];
+      for (const affiliation of affiliations) {
+        const raw = typeof affiliation === 'string' ? affiliation : affiliation?.name;
+        const country = normalizeCrossrefCountry(raw);
+        if (country?.name) countries.set(country.name, country);
+      }
+    }
+    for (const country of countries.values()) {
+      const current = groups.get(country.name) || { ...country, count: 0 };
+      current.count += 1;
+      groups.set(country.name, current);
+    }
+  }
+  return {
+    year,
+    // Keep all Crossref works in the denominator; missing/unparseable
+    // affiliations remain visible as the chart's “Other” segment.
+    total: items.length,
+    groups: [...groups.values()],
+    skipped: false,
+    status: resp.status,
+  };
+}
+
 async function fetchOpenAlexCountryYear(sourceIssn, year, apiKey = '', attempt = 0) {
   const params = new URLSearchParams({
     filter: `primary_location.source.issn:${sourceIssn},from_publication_date:${year}-01-01,to_publication_date:${year}-12-31`,
@@ -2445,7 +2556,7 @@ async function fetchOpenAlexCountryYear(sourceIssn, year, apiKey = '', attempt =
   return { year, total, groups: mergedGroups };
 }
 
-function buildCountryOutputPayload(rows) {
+function buildCountryOutputPayload(rows, source = 'openalex') {
   const usable = rows
     .filter(row => row.total > 0 && Array.isArray(row.groups) && row.groups.length)
     .sort((a, b) => a.year - b.year);
@@ -2461,10 +2572,28 @@ function buildCountryOutputPayload(rows) {
     : ranked
   ).slice(0, 5);
   if (!top.length) return null;
-  return { ok: true, years: usable, top, source: 'openalex' };
+  return { ok: true, years: usable, top, source };
+}
+
+async function fetchCrossrefCountryOutput(issns, years, attempts = []) {
+  for (const sourceIssn of issns) {
+    const rows = await Promise.all(years.map((year) => fetchCrossrefCountryYear(sourceIssn, year)));
+    for (const row of rows) {
+      if (row.skipped) {
+        attempts.push({ source: 'crossref', issn: sourceIssn, year: row.year, total: row.total, status: row.status || 200, skipped: true });
+      }
+    }
+    const payload = buildCountryOutputPayload(rows, 'crossref');
+    if (payload) {
+      payload.issn = sourceIssn;
+      return payload;
+    }
+  }
+  return null;
 }
 
 // GET /openalex/country-output?issn=1474-760X[,1474-760X]&years=2022,2023,2024,2025,2026
+// OpenAlex is preferred when configured; Crossref is the no-key fallback.
 async function routeOpenAlexCountryOutput(req, env) {
   const url = new URL(req.url);
   const debug = url.searchParams.get('debug') === '1';
@@ -2484,7 +2613,7 @@ async function routeOpenAlexCountryOutput(req, env) {
   const apiKey = cleanText(env.OPENALEX_API_KEY || '', 256);
 
   const cache = caches.default;
-  const cacheKey = new Request(`https://cache.internal/openalex-country-output/v3?issn=${encodeURIComponent(issns.join(','))}&years=${encodeURIComponent(years.join(','))}&k=${apiKey ? '1' : '0'}`);
+  const cacheKey = new Request(`https://cache.internal/openalex-country-output/v4?issn=${encodeURIComponent(issns.join(','))}&years=${encodeURIComponent(years.join(','))}&k=${apiKey ? '1' : '0'}`);
   const hit = debug ? null : await cache.match(cacheKey);
   if (hit) return new Response(hit.body, { status: 200, headers: { 'Content-Type': 'application/json', ...CORS, 'Cache-Control': 'public, max-age=86400' } });
 
@@ -2492,7 +2621,12 @@ async function routeOpenAlexCountryOutput(req, env) {
   const queryYears = apiKey ? years : years.slice(-3);
   let payload = null;
   const attempts = [];
+  // OpenAlex now requires a funded API budget for many requests. Crossref
+  // deposits carry author affiliations for a large share of journals and are a
+  // useful server-side fallback when OPENALEX_API_KEY is absent or exhausted.
+  if (!apiKey) payload = await fetchCrossrefCountryOutput(issns, queryYears, attempts);
   for (const sourceIssn of issns) {
+    if (payload) break;
     let rows;
     if (apiKey) {
       rows = await Promise.all(queryYears.map((year) => fetchOpenAlexCountryYear(sourceIssn, year, apiKey)));
@@ -2516,12 +2650,13 @@ async function routeOpenAlexCountryOutput(req, env) {
         });
       }
     }
-    payload = buildCountryOutputPayload(rows);
+    payload = buildCountryOutputPayload(rows, 'openalex');
     if (payload) {
       payload.issn = sourceIssn;
       break;
     }
   }
+  if (!payload && apiKey) payload = await fetchCrossrefCountryOutput(issns, queryYears, attempts);
   if (!payload) {
     payload = {
       ok: true,

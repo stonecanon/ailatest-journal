@@ -1733,7 +1733,9 @@
       const usable = (Array.isArray(payload?.years) ? payload.years : [])
         .filter(row => Number(row?.total || 0) > 0 && Array.isArray(row?.groups));
       if (!usable.length) return null;
-      if (Array.isArray(payload?.top) && payload.top.length) return { years: usable, top: payload.top };
+      if (Array.isArray(payload?.top) && payload.top.length) {
+        return { years: usable, top: payload.top, source: payload.source || 'openalex' };
+      }
       const countryTotals = new Map();
       usable.forEach(row => row.groups.forEach(g => {
         const key = g.name;
@@ -1744,7 +1746,7 @@
         ? ['China', ...ranked.filter((n) => n !== 'China')]
         : ranked
       ).slice(0, 5);
-      return { years: usable, top };
+      return { years: usable, top, source: payload?.source || 'openalex' };
     };
     const fetchFromApi = async () => {
       const params = new URLSearchParams({
@@ -1762,7 +1764,7 @@
         if (!resp.ok) return { handled: false, payload: null };
         const raw = await resp.json();
         const payload = normalizePayload(raw);
-        // 有有效年份数据才算成功；否则继续走 OpenAlex 直连回退
+        // 有有效年份数据才算成功；否则按原因决定是否走浏览器回退
         if (payload?.years?.length) return { handled: true, payload };
         return { handled: false, payload: null, reason: raw?.reason || 'empty' };
       } catch (_) {
@@ -1847,6 +1849,10 @@
       const clientP = fetchFromClient().catch(() => null);
       const apiResult = await apiP;
       if (apiResult.handled && apiResult.payload?.years?.length) return apiResult.payload;
+      // The worker reports this when the anonymous OpenAlex budget is empty;
+      // retrying the same request directly from the browser only produces more
+      // 429s, so keep the publication-region fallback instead.
+      if (['public_pool_empty', 'no_data'].includes(apiResult.reason)) return null;
       const clientResult = await clientP;
       if (clientResult?.years?.length) return clientResult;
       return null;
@@ -1928,7 +1934,10 @@
     }).join('');
     const trendPath = trendPoints.map((p, i) => `${i ? 'L' : 'M'}${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
     const trendDots = trendPoints.map(p => `<circle class="country-line-dot" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="2.4"><title>${p.year}: ${p.pct.toFixed(p.pct >= 10 ? 0 : 1)}%</title></circle>`).join('');
-    return `<div class="country-output-head"><div><div class="trend-title">${T('国家/地区比例','Country/Region Shares')}</div><div class="trend-unit">${T('OpenAlex 作者机构占比','OpenAlex author affiliation share')}</div></div>${select}</div>
+    const sourceUnit = payload.source === 'crossref'
+      ? T('Crossref 作者机构占比', 'Crossref author affiliation share')
+      : T('OpenAlex 作者机构占比', 'OpenAlex author affiliation share');
+    return `<div class="country-output-head"><div><div class="trend-title">${T('国家/地区比例','Country/Region Shares')}</div><div class="trend-unit">${sourceUnit}</div></div>${select}</div>
       <div class="country-output-chart">
         ${rows}
         <svg class="country-line-svg" viewBox="0 0 ${w} ${h}" aria-label="${escape(countryDisplay(selected))}">
