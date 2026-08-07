@@ -13599,36 +13599,59 @@
       return pickReportFallbackReason(source);
     }
 
+    function pickQuartileBand(value) {
+      const q = String(value || '').trim().toUpperCase();
+      if (q === 'Q1' || q === 'Q2') return 'primary';
+      if (q === 'Q3' || q === 'Q4') return 'backup';
+      return '';
+    }
+
+    function pickQuartileRank(value) {
+      const band = pickQuartileBand(value);
+      return band === 'primary' ? 0 : band === 'backup' ? 1 : 2;
+    }
+
+    function pickDifficultyStars(source) {
+      const r = source?.journalRec || source || {};
+      const q = String(r.if_quartile || source?.jcr_q || '').trim().toUpperCase();
+      let stars = q === 'Q1' ? 4 : q === 'Q2' ? 3 : q === 'Q3' ? 2 : q === 'Q4' ? 1 : 2;
+      if (Number(r.cas_zone) === 1) stars += 1;
+      if (r.cas_top) stars += 1;
+      const impact = Number(r.if_2025 != null ? r.if_2025 : r.if_2024);
+      if (impact >= 10) stars += 1;
+      return Math.max(1, Math.min(5, Math.round(stars)));
+    }
+
+    function pickDifficultyHtml(source) {
+      const stars = pickDifficultyStars(source);
+      const label = pickIsZhLang() ? `投稿难度参考 ${stars}/5（基于 JCR、CAS 与 IF，不代表录用概率）` : `Submission difficulty reference ${stars}/5 (based on JCR, CAS and IF; not an acceptance probability)`;
+      return `<span class="pick-difficulty" title="${escape(label)}" aria-label="${escape(label)}">${'★'.repeat(stars)}${'☆'.repeat(5 - stars)}</span>`;
+    }
+
     function pickFallbackReport(profile, entries = []) {
+      const primary = entries.filter(e => pickQuartileBand(e.jcr_q || e.journalRec?.if_quartile) === 'primary').slice(0, 6);
+      const backup = entries.filter(e => pickQuartileBand(e.jcr_q || e.journalRec?.if_quartile) === 'backup').slice(0, 8);
       const defs = pickIsZhLang()
-        ? [
-            ['primary', '重点推荐', 0, 6],
-            ['backup', '稳妥备选', 6, 14],
-            ['fallback', '补充候选', 14, 20],
-          ]
-        : [
-            ['primary', 'Primary targets', 0, 6],
-            ['backup', 'Solid alternatives', 6, 14],
-            ['fallback', 'Safer fallbacks', 14, 20],
-          ];
+        ? [['primary', '优选推荐（Q1/Q2）', primary], ['backup', '备选（Q3/Q4）', backup]]
+        : [['primary', 'Primary (Q1/Q2)', primary], ['backup', 'Backup (Q3/Q4)', backup]];
       const fields = pickUnique([...(profile?.research_fields || []), ...(profile?.wos_categories || [])], 4)
         .map(pickReadableField).filter(Boolean);
       return {
         intro: pickIsZhLang()
-          ? `该论文主要落在${fields.join('、') || '相关交叉学科'}方向，以下推荐按主题匹配度与站内期刊指标分层。`
-          : `This paper is positioned around ${fields.join(', ') || 'the identified research field'}; recommendations are tiered by topic fit and site metrics.`,
-        tiers: defs.map(([id, label, start, end]) => ({
+          ? `按 JCR 分区分为两档：Q1/Q2 优选推荐，Q3/Q4 备选。论文方向：${fields.join('、') || '相关交叉学科'}。`
+          : `Two tiers by JCR quartile: Q1/Q2 primary and Q3/Q4 backup. Field: ${fields.join(', ') || 'the identified research field'}.`,
+        tiers: defs.map(([id, label, source]) => ({
           id,
           label,
-          items: entries.slice(start, end).map(e => ({
+          items: source.map(e => ({
             name: e.journalRec?.name || e.srcName || e.issn || '',
             reason: pickReportFallbackReason(e),
           })).filter(x => x.name),
         })).filter(t => t.items.length),
         chinese: [],
         strategy: pickIsZhLang()
-          ? ['优先选择主题贴合且分区稳定的期刊。', '补充候选用于扩大备选范围，不建议把预警期刊放入主投。']
-          : ['Prioritize journals with strong topic fit and stable rankings.', 'Use fallback journals to manage review risk; avoid warning-list journals as primary targets.'],
+          ? ['先从 Q1/Q2 里选主题最贴合的期刊。', '不合适时再从 Q3/Q4 备选中选择。']
+          : ['Choose the best-fitting Q1/Q2 journal first.', 'If needed, move to the Q3/Q4 backup list.'],
       };
     }
 
@@ -13679,7 +13702,7 @@
         return `<tr>
           <td class="pick-report-num">${i + 1}</td>
           <td>${escape(titleCase(item.name))} <span class="pick-report-missing">${T('站内未收录','not in site data')}</span></td>
-          <td colspan="4"><span class="muted-cell">&mdash;</span></td>
+          <td colspan="5"><span class="muted-cell">&mdash;</span></td>
           <td class="pick-report-reason">${escape(reason)}</td>
         </tr>`;
       }
@@ -13688,6 +13711,7 @@
       const idxText = (rec.indices || []).join(' / ');
       const feeHtml = pickFeeBadge(rec);
       const riskHtml = pickRiskBadge(rec);
+      const difficultyHtml = pickDifficultyHtml(rec);
       return `<tr>
         <td class="pick-report-num">${i + 1}</td>
         <td>
@@ -13698,6 +13722,7 @@
         <td>${pickMetricIf(rec) || '<span class="muted-cell">&mdash;</span>'}</td>
         <td>${escape(rec.if_quartile || '') || '<span class="muted-cell">&mdash;</span>'}</td>
         <td>${pickMetricCas(rec) ? escape(pickMetricCas(rec)) : '<span class="muted-cell">&mdash;</span>'}</td>
+        <td>${difficultyHtml}</td>
         <td>${feeHtml || '<span class="muted-cell">&mdash;</span>'}</td>
         <td class="pick-report-reason">${escape(reason)}</td>
       </tr>`;
@@ -13753,7 +13778,7 @@
         </div>
         <div class="pick-report-table-wrap">
           <table class="pick-report-table pick-report-tier-table">
-            <thead><tr><th>#</th><th>${T('期刊','Journal')}</th><th>IF</th><th>JCR</th><th>${T('中科院','CAS')}</th><th>${T('费用参考','Fee note')}</th><th>${T('推荐理由','Why')}</th></tr></thead>
+            <thead><tr><th>#</th><th>${T('期刊','Journal')}</th><th>IF</th><th>JCR</th><th>${T('中科院','CAS')}</th><th>${T('投稿难度','Difficulty')}</th><th>${T('费用参考','Fee note')}</th><th>${T('推荐理由','Why')}</th></tr></thead>
             <tbody>${items.map((item, i) => renderPickReportEnRow(item, i)).join('')}</tbody>
           </table>
         </div>
@@ -13958,13 +13983,16 @@
         if (document.getElementById('pick-filter-free')?.checked && canSeePublishFeeInfo()) {
           filtered = filtered.filter(e => pickIsDoajNoApc(e.journalRec));
         }
-        filtered.sort((a, b) => b.score - a.score || (b.journalRec.if_2024 || 0) - (a.journalRec.if_2024 || 0));
+        filtered.sort((a, b) => pickQuartileRank(a.jcr_q || a.journalRec?.if_quartile)
+          - pickQuartileRank(b.jcr_q || b.journalRec?.if_quartile)
+          || b.score - a.score
+          || (b.journalRec.if_2024 || 0) - (a.journalRec.if_2024 || 0));
         if (query !== pickLastQuery) {
           pickLastQuery = query;
           window.__pickShown = 30;
         }
         const allFiltered = filtered;
-        const maxScore = allFiltered.length > 0 ? allFiltered[0].score : 1;
+        const maxScore = allFiltered.reduce((max, entry) => Math.max(max, Number(entry.score) || 0), 1);
         allFiltered.forEach(e => e.score = maxScore > 0 ? e.score / maxScore : 0);
         const shownLimit = Math.max(30, window.__pickShown || 30);
         filtered = allFiltered.slice(0, shownLimit);

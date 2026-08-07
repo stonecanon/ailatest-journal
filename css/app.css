@@ -11835,6 +11835,8 @@ body.journal-route .lang-toggle-wrap { display: none; }
   .pick-report-tier-table td:nth-child(2) { width: 245px; }
   .pick-report-tier-table th:nth-child(6),
   .pick-report-tier-table td:nth-child(6) { width: 108px; }
+  .pick-report-tier-table th:nth-child(7),
+  .pick-report-tier-table td:nth-child(7) { width: 108px; }
 }
 
 /* ── recommendation report: global repair (not scoped to mobile media) ── */
@@ -12000,6 +12002,12 @@ body.journal-route .lang-toggle-wrap { display: none; }
   color: var(--ink-faint);
   font-variant-numeric: tabular-nums;
 }
+.pick-difficulty {
+  color: var(--accent);
+  letter-spacing: .06em;
+  white-space: nowrap;
+  font-size: 12px;
+}
 .pick-report-reason {
   color: var(--ink-soft);
   line-height: 1.58;
@@ -12019,6 +12027,8 @@ body.journal-route .lang-toggle-wrap { display: none; }
 .pick-report-tier-table td:nth-child(6) { width: 108px; }
 .pick-report-tier-table th:nth-child(7),
 .pick-report-tier-table td:nth-child(7) { width: auto; }
+.pick-report-tier-table th:nth-child(8),
+.pick-report-tier-table td:nth-child(8) { width: auto; }
 .pick-report-table .pick-apc,
 .pick-report-table .pick-apc-free,
 .pick-report-table .pick-apc-paid {

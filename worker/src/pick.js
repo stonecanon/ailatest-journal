@@ -395,7 +395,29 @@ research_fields, wos_categories, target_indices, domain_keywords, negative_keywo
   return null;
 }
 
-/** 无第二次大模型调用：用排序结果快速生成三档报告，显著降低时延 */
+function quartileBand(value) {
+  const q = String(value || '').trim().toUpperCase();
+  if (q === 'Q1' || q === 'Q2') return 'primary';
+  if (q === 'Q3' || q === 'Q4') return 'backup';
+  return '';
+}
+
+function quartileOrder(value) {
+  const band = quartileBand(value);
+  return band === 'primary' ? 0 : band === 'backup' ? 1 : 2;
+}
+
+function difficultyStars(row) {
+  const q = String(row?.if_quartile || '').trim().toUpperCase();
+  let stars = q === 'Q1' ? 4 : q === 'Q2' ? 3 : q === 'Q3' ? 2 : q === 'Q4' ? 1 : 2;
+  if (Number(row?.cas_zone) === 1) stars += 1;
+  if (row?.cas_top) stars += 1;
+  const impact = Number(row?.if_2025 != null ? row.if_2025 : row?.if_2024);
+  if (impact >= 10) stars += 1;
+  return Math.max(1, Math.min(5, Math.round(stars)));
+}
+
+/** 无第二次大模型调用：按 JCR 分区生成两档简单报告。 */
 function buildFastReport(profile, ranked, lang = 'zh') {
   const zh = lang !== 'en';
   const reasonOf = (r) => {
@@ -404,28 +426,26 @@ function buildFastReport(profile, ranked, lang = 'zh') {
   };
   const items = (slice) => slice.map(r => ({ name: r.name, reason: reasonOf(r) }));
   const clean = ranked.filter(r => !r.warning);
-  const pool = clean.length >= 8 ? clean : ranked;
+  const pool = clean.length ? clean : ranked;
+  const primary = pool.filter(r => quartileBand(r.if_quartile) === 'primary').slice(0, 6);
+  const backup = pool.filter(r => quartileBand(r.if_quartile) === 'backup').slice(0, 8);
   return {
-    intro: profile.explanation
-      || (zh
-        ? `根据语义画像（${(profile.research_fields || []).slice(0, 3).join('、') || '研究主题'}）匹配的目标期刊梯度。`
-        : `Tiered targets matched to the semantic profile (${(profile.research_fields || []).slice(0, 3).join(', ') || 'topic'}).`),
+    intro: zh
+      ? `按 JCR 分区分为两档：Q1/Q2 优先推荐，Q3/Q4 备选。${profile.explanation || ''}`.trim()
+      : `Two tiers by JCR quartile: Q1/Q2 primary recommendations and Q3/Q4 backup options. ${profile.explanation || ''}`.trim(),
     tiers: [
-      { id: 'primary', label: zh ? '优先主投' : 'Primary targets', items: items(pool.slice(0, 6)) },
-      { id: 'backup', label: zh ? '稳妥备选' : 'Solid backups', items: items(pool.slice(6, 14)) },
-      { id: 'fallback', label: zh ? '保底期刊' : 'Safer fallbacks', items: items(pool.slice(14, 20)) },
+      { id: 'primary', label: zh ? '优选推荐（Q1/Q2）' : 'Primary (Q1/Q2)', items: items(primary) },
+      { id: 'backup', label: zh ? '备选（Q3/Q4）' : 'Backup (Q3/Q4)', items: items(backup) },
     ].filter(t => t.items.length),
     chinese: [],
     strategy: zh
       ? [
-          '按「主投 → 备选 → 保底」梯度投稿，主投优先选学科最贴合且分区合理的刊。',
-          '若审稿周期或 APC 敏感，在备选中优先看 FREE/低 APC 与非预警刊。',
-          '交叉学科可主投交叉类目期刊，备选覆盖各单学科顶刊/二区。',
+          '优先从 Q1/Q2 中选择主题最贴合的期刊。',
+          '若优选不合适，再从 Q3/Q4 备选中选择。',
         ]
       : [
-          'Submit in tiers: primary → backup → fallback; prioritize best field fit.',
-          'If APC or review time matters, prefer FREE/low-APC non-warning titles in backups.',
-          'For interdisciplinary work, keep primary at the intersection and backups in each parent field.',
+          'Choose the best-fitting Q1/Q2 journal first.',
+          'If needed, move to the Q3/Q4 backup list.',
         ],
   };
 }
@@ -514,8 +534,10 @@ function rankJournals(journals, profile, filters, limit) {
     if (s.score <= 5 || !s.matched.length) continue;
     scored.push({ j, ...s });
   }
-  scored.sort((a, b) => b.score - a.score || (b.j.if_2024 || 0) - (a.j.if_2024 || 0));
-  const maxScore = scored[0]?.score || 1;
+  const maxScore = scored.reduce((max, row) => Math.max(max, row.score), 1);
+  scored.sort((a, b) => quartileOrder(a.j.if_quartile) - quartileOrder(b.j.if_quartile)
+    || b.score - a.score
+    || (b.j.if_2024 || 0) - (a.j.if_2024 || 0));
   return scored.slice(0, limit).map(row => {
     const j = row.j;
     return {
@@ -533,6 +555,7 @@ function rankJournals(journals, profile, filters, limit) {
       ].filter(Boolean), 6),
       if_2024: j.if_2024 ?? null,
       if_quartile: j.if_quartile || '',
+      difficulty: difficultyStars(j),
       cas_zone: j.cas_zone || '',
       cas_top: !!j.cas_top,
       indices: j.indices || [],
@@ -554,6 +577,7 @@ function candidateLine(r, i) {
     `IF=${r.if_2024 ?? '-'}`,
     r.if_quartile || '-',
     r.cas_zone ? `中科院${r.cas_zone}区${r.cas_top ? 'TOP' : ''}` : '-',
+    `投稿难度:${'★'.repeat(r.difficulty || 2)}`,
     (r.indices || []).join('/') || '-',
     r.publisher || '-',
     `APC:${apc}`,
@@ -599,21 +623,20 @@ async function generateReport(apiKey, query, profile, ranked, context) {
 {
   "intro": "一两句话解读论文的学科定位",
   "tiers": [
-    {"id": "primary", "label": "优先主投", "items": [{"name": "期刊名", "reason": "≤40字推荐理由"}]},
-    {"id": "backup", "label": "稳妥备选", "items": [...]},
-    {"id": "fallback", "label": "保底期刊", "items": [...]}
+    {"id": "primary", "label": "优选推荐（Q1/Q2）", "items": [{"name": "期刊名", "reason": "≤40字推荐理由"}]},
+    {"id": "backup", "label": "备选（Q3/Q4）", "items": [...]}
   ],
   "chinese": [{"name": "中文期刊名", "reason": "≤40字理由"}],
-  "strategy": ["投稿策略建议1", "建议2", "建议3"]
+  "strategy": ["投稿策略建议1", "建议2"]
 }
 
 要求：
-- tiers 共三档：primary 4-6 本、backup 6-10 本、fallback 3-5 本，主要从候选列表中选择（用候选列表中的精确期刊名）。推荐量比保守模式多约 30%，但不要重复。
-- fallback 是更稳妥的保底期刊：匹配度可以略低，但接收范围更宽、定位更稳，不要选预警期刊。
+ - 只输出两档：primary 和 backup。primary 只能选 Q1/Q2，backup 只能选 Q3/Q4；不要把 N/A 或没有 JCR 分区的期刊放进这两档。
+ - primary 4-6 本，backup 4-8 本，主要从候选列表中选择（使用候选列表中的精确期刊名），不要重复。
 - 如果你确信某本不在候选列表的英文期刊高度对口，最多可补充 3 本，理由中注明"候选外补充"。
 - chinese：如论文主题适合中文发表，推荐 4-8 本对口的中文核心期刊（如 CSSCI/北大核心），否则给空数组。
 - reason 简洁说明为什么对口（学科方向、定位），不要复述 IF/分区等指标——指标由系统数据补全。
-- strategy 给 2-4 条具体投稿策略（梯度、叙事侧重、风险提示）。
+ - strategy 给 1-2 条简单投稿策略。
 - 候选列表中标 ⚠预警 的期刊不要放进 primary。
 - 全部用中文。只输出 JSON。`,
     },
@@ -627,6 +650,44 @@ async function generateReport(apiKey, query, profile, ranked, context) {
   ], { temperature: 0.2, maxTokens: 1800, jsonOutput: true, model: context.model }, { ...context, step: 'report', feature: 'pick_report', evidenceCount: ranked.length });
   const content = res?.choices?.[0]?.message?.content || '';
   return sanitizeReport(JSON.parse(content));
+}
+
+/** Keep even an optional AI-polished report inside the two quartile bands. */
+function enforceQuartileReport(report, profile, ranked, lang) {
+  const base = buildFastReport(profile, ranked, lang);
+  if (!report) return base;
+
+  const byName = new Map();
+  for (const row of ranked) {
+    const key = PickMatch.norm(row.name || '');
+    if (key && !byName.has(key)) byName.set(key, row);
+  }
+  const definitions = [
+    ['primary', lang === 'en' ? 'Primary (Q1/Q2)' : '优选推荐（Q1/Q2）', 6],
+    ['backup', lang === 'en' ? 'Backup (Q3/Q4)' : '备选（Q3/Q4）', 8],
+  ];
+  const rawTiers = Array.isArray(report.tiers) ? report.tiers : [];
+  const tiers = definitions.map(([id, label, max]) => {
+    const raw = rawTiers.find(t => String(t?.id || '').toLowerCase() === id);
+    const seen = new Set();
+    const valid = sanitizeReportItems(raw?.items, max).map(item => {
+      const row = byName.get(PickMatch.norm(item.name));
+      const key = PickMatch.norm(row?.name || '');
+      if (!row || !key || seen.has(key) || row.warning || quartileBand(row.if_quartile) !== id) return null;
+      seen.add(key);
+      return { name: row.name, reason: item.reason || (lang === 'en' ? 'Field match' : '学科方向匹配') };
+    }).filter(Boolean);
+    const fallback = base.tiers.find(t => t.id === id);
+    return { id, label, items: valid.length ? valid : (fallback?.items || []) };
+  }).filter(t => t.items.length);
+
+  return {
+    ...base,
+    ...report,
+    tiers,
+    intro: report.intro || base.intro,
+    strategy: Array.isArray(report.strategy) && report.strategy.length ? report.strategy : base.strategy,
+  };
 }
 
 // ─── handler ───
@@ -739,6 +800,7 @@ export async function handlePick(req, env, opts = {}) {
       console.warn('pick report generation failed:', e?.message || e);
     }
   }
+  report = enforceQuartileReport(report, profile, results, lang);
 
   return json({
     ok: true,
