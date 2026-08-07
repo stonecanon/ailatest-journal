@@ -1178,6 +1178,20 @@ body.home-route:not(.home-tab-has-results) .home-v4-grad {
   margin: 0 0 10px;
 }
 .home-plan .home-btn + .home-btn { margin-top: 6px; }
+.home-payment-note {
+  box-sizing: border-box;
+  height: 32px;
+  margin: 8px 0 0;
+  color: #8a837a;
+  font-size: 10.5px;
+  font-weight: 650;
+  line-height: 16px;
+  text-align: center;
+  overflow: visible;
+}
+.home-payment-note-empty {
+  visibility: hidden;
+}
 .home-btn-edu {
   font-size: 12px !important;
   min-height: 34px !important;
