@@ -75,10 +75,16 @@
 
     const isLegacy = rail.classList.contains('site-rail');
     const missingPicker = !rail.querySelector('.rail-region-picker');
+    const canonical = rail.classList.contains('app-rail')
+      && !!rail.querySelector('.rail-top')
+      && !!rail.querySelector('.rail-region-picker')
+      && !!rail.querySelector('.rail-region-menu')
+      && !!rail.querySelector('.rail-bottom .rail-nav-btn');
     const staticPage = isStaticShellPage();
-    // Static shells always match main. Legacy site-rail always upgrades.
-    // Incomplete app-rails (no region picker) also rebuild.
-    if (staticPage || isLegacy || missingPicker) {
+    // Static shells that already ship the app-rail are enhanced in place.
+    // Replacing a complete rail after first paint causes a visible font/size
+    // jump. Legacy and incomplete rails still get rebuilt.
+    if (!canonical && (staticPage || isLegacy || missingPicker)) {
       rail.className = 'app-rail';
       rail.setAttribute('aria-label', 'Primary navigation');
       rail.innerHTML = canonicalRailMarkup();

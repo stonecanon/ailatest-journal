@@ -11,30 +11,30 @@
 <meta property="og:url" content="https://journal.ailatest.org/pricing" />
 <meta property="og:type" content="website" />
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
-<link rel="stylesheet" href="/css/app.css?v=20260807-home-shell-v1" />
-<link rel="stylesheet" href="/css/pricing-page.css?v=20260807-home-shell-v1" />
+<link rel="stylesheet" href="/css/app.css?v=20260807-rail-no-rebuild-v3" />
+<link rel="stylesheet" href="/css/pricing-page.css?v=20260807-rail-no-rebuild-v3" />
 </head>
 <body class="home-route pricing-route" data-static-page="pricing" data-billing="year">
 <aside class="app-rail" aria-label="Primary navigation">
   <nav class="rail-top" aria-label="站点">
     <a class="rail-nav-btn" href="/global" aria-label="全球期刊" title="全球期刊">
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 3.4 9A14 14 0 0 1 12 21a14 14 0 0 1-3.4-9A14 14 0 0 1 12 3Z"/></svg>
-      <span>全球</span>
+      <span data-static-i18n="rail_global">全球</span>
     </a>
     <a class="rail-nav-btn rail-region-station" data-region-station="dom" href="/cn" aria-label="中国期刊" title="中国期刊">
       <span class="rail-flag" aria-hidden="true">CN</span>
-      <span>中国</span>
+      <span data-static-i18n="rail_china">中国</span>
     </a>
-    <a class="rail-nav-btn rail-region-station" data-region-station="in" href="/in" hidden><span class="rail-flag">IN</span><span>印度</span></a>
-    <a class="rail-nav-btn rail-region-station" data-region-station="my" href="/my" hidden><span class="rail-flag">MY</span><span>马来西亚</span></a>
-    <a class="rail-nav-btn rail-region-station" data-region-station="kr" href="/kr" hidden><span class="rail-flag">KR</span><span>韩国</span></a>
+    <a class="rail-nav-btn rail-region-station" data-region-station="in" href="/in" hidden><span class="rail-flag">IN</span><span data-static-i18n="rail_india">印度</span></a>
+    <a class="rail-nav-btn rail-region-station" data-region-station="my" href="/my" hidden><span class="rail-flag">MY</span><span data-static-i18n="rail_malaysia">马来西亚</span></a>
+    <a class="rail-nav-btn rail-region-station" data-region-station="kr" href="/kr" hidden><span class="rail-flag">KR</span><span data-static-i18n="rail_korea">韩国</span></a>
     <a class="rail-nav-btn rail-region-station" data-region-station="pbn" href="/pbn" hidden><span class="rail-flag">PL</span><span>波兰</span></a>
     <a class="rail-nav-btn rail-region-station" data-region-station="isc" href="/isc" hidden><span class="rail-flag">IR</span><span>伊朗</span></a>
     <a class="rail-nav-btn rail-region-station" data-region-station="scielo" href="/scielo" hidden><span class="rail-flag">LA</span><span>拉美</span></a>
     <div class="rail-region-picker">
       <button class="rail-nav-btn rail-region-toggle" type="button" aria-label="地区站点" title="地区站点" aria-expanded="false">
         <span class="rail-flag rail-region-symbol" aria-hidden="true">···</span>
-        <span><span>地区</span><b class="rail-caret" aria-hidden="true">▾</b></span>
+        <span><span data-static-i18n="rail_regions">地区</span><b class="rail-caret" aria-hidden="true">▾</b></span>
       </button>
       <div class="rail-region-menu" aria-label="地区站点"></div>
     </div>
@@ -42,11 +42,11 @@
   <div class="rail-bottom" aria-label="账户">
     <a class="rail-nav-btn" href="/favorites" aria-label="我的收藏" title="我的收藏">
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.7l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3.7z"/></svg>
-      <span>收藏</span>
+      <span data-static-i18n="rail_saved">收藏</span>
     </a>
     <a class="rail-nav-btn" href="/account" aria-label="设置" title="设置">
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="9" r="3.5"/><path d="M5 19c1.5-3 4-4.5 7-4.5S17.5 16 19 19"/></svg>
-      <span>设置</span>
+      <span data-static-i18n="rail_account">设置</span>
     </a>
   </div>
 </aside>
@@ -176,6 +176,6 @@
 
 <script src="/js/static-i18n.js?v=20260807-home-shell-v1" defer></script>
 <script src="/js/pricing-checkout.js?v=20260807-home-shell-v1" defer></script>
-<script src="/js/site-rail.js?v=20260807-home-shell-v1" defer></script>
+<script src="/js/site-rail.js?v=20260807-rail-no-rebuild-v1" defer></script>
 </body>
 </html>
