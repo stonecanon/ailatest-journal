@@ -2592,9 +2592,66 @@ async function fetchCrossrefCountryOutput(issns, years, attempts = []) {
   return null;
 }
 
+// The edge Cache API is useful for hot traffic, but it is not a durable
+// journal-level cache: a cold POP can still re-query the upstream provider.
+// Keep the successful result in D1 as well, so a temporary OpenAlex/Crossref
+// outage does not turn every new detail-page request into another upstream
+// request.  The table is added by migration 0024; all helpers are deliberately
+// best-effort so an older database can continue serving live fallbacks.
+const COUNTRY_OUTPUT_D1_TTL = 7 * 86400;
+
+function countryOutputD1Key(issns, years) {
+  return `${issns.join(',')}|${years.join(',')}`;
+}
+
+async function readCountryOutputD1(env, cacheKey) {
+  if (!env?.DB) return null;
+  try {
+    const row = await env.DB.prepare(
+      'SELECT payload_json, expires_at FROM country_output_cache WHERE cache_key = ?1'
+    ).bind(cacheKey).first();
+    if (!row || Number(row.expires_at || 0) <= nowSec()) return null;
+    const payload = JSON.parse(String(row.payload_json || ''));
+    return payload?.years?.length ? payload : null;
+  } catch (_) {
+    // Migration may not have reached an older environment yet.
+    return null;
+  }
+}
+
+async function writeCountryOutputD1(env, cacheKey, issns, years, payload) {
+  if (!env?.DB || !payload?.years?.length) return;
+  const now = nowSec();
+  try {
+    await env.DB.prepare(
+      `INSERT INTO country_output_cache
+        (cache_key, issns, years, payload_json, source, fetched_at, expires_at, updated_at)
+       VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?6)
+       ON CONFLICT(cache_key) DO UPDATE SET
+        issns = excluded.issns,
+        years = excluded.years,
+        payload_json = excluded.payload_json,
+        source = excluded.source,
+        fetched_at = excluded.fetched_at,
+        expires_at = excluded.expires_at,
+        updated_at = excluded.updated_at`
+    ).bind(
+      cacheKey,
+      issns.join(','),
+      years.join(','),
+      JSON.stringify(payload),
+      cleanText(payload.source || '', 32),
+      now,
+      now + COUNTRY_OUTPUT_D1_TTL,
+    ).run();
+  } catch (_) {
+    // A cache write must never make the public data endpoint fail.
+  }
+}
+
 // GET /openalex/country-output?issn=1474-760X[,1474-760X]&years=2022,2023,2024,2025,2026
-// OpenAlex is preferred when configured; Crossref is the no-key fallback.
-async function routeOpenAlexCountryOutput(req, env) {
+// OpenAlex is an optional enrichment source; Crossref is the no-key fallback.
+async function routeOpenAlexCountryOutput(req, env, ctx) {
   const url = new URL(req.url);
   const debug = url.searchParams.get('debug') === '1';
   const issns = cleanText(url.searchParams.get('issn') || '', 120)
@@ -2609,7 +2666,8 @@ async function routeOpenAlexCountryOutput(req, env) {
     .slice(-8);
   if (!issns.length || !years.length) return err('missing issn or years', 400);
 
-  // api_key 可选：无 key 时走 OpenAlex 礼貌池（mailto），不再返回空壳阻断前端
+  // api_key 可选：没有 key 时不再反复撞 OpenAlex 公共池，优先使用
+  // Crossref + D1 缓存；如需调试公共池，可显式加 public_openalex=1。
   const apiKey = cleanText(env.OPENALEX_API_KEY || '', 256);
 
   const cache = caches.default;
@@ -2619,14 +2677,27 @@ async function routeOpenAlexCountryOutput(req, env) {
 
   // 无 API key 时少查几年；有 key 时并行拉年，显著缩短详情页等待
   const queryYears = apiKey ? years : years.slice(-3);
+  const durableKey = countryOutputD1Key(issns, queryYears);
+  const bypassDurableCache = debug || url.searchParams.get('fresh') === '1';
+  const durableHit = bypassDurableCache ? null : await readCountryOutputD1(env, durableKey);
+  if (durableHit) {
+    const bodyText = JSON.stringify({ ...durableHit, cache: 'd1' });
+    return new Response(bodyText, {
+      status: 200,
+      headers: { 'Content-Type': 'application/json', ...CORS, 'Cache-Control': 'public, max-age=86400' },
+    });
+  }
+
   let payload = null;
   const attempts = [];
   // OpenAlex now requires a funded API budget for many requests. Crossref
   // deposits carry author affiliations for a large share of journals and are a
   // useful server-side fallback when OPENALEX_API_KEY is absent or exhausted.
   if (!apiKey) payload = await fetchCrossrefCountryOutput(issns, queryYears, attempts);
+  const allowPublicOpenAlex = url.searchParams.get('public_openalex') === '1';
   for (const sourceIssn of issns) {
     if (payload) break;
+    if (!apiKey && !allowPublicOpenAlex) break;
     let rows;
     if (apiKey) {
       rows = await Promise.all(queryYears.map((year) => fetchOpenAlexCountryYear(sourceIssn, year, apiKey)));
@@ -2663,10 +2734,16 @@ async function routeOpenAlexCountryOutput(req, env) {
       years: [],
       top: [],
       source: 'openalex',
-      reason: apiKey ? 'no_data' : 'public_pool_empty',
+      reason: apiKey ? 'no_data' : 'sources_exhausted',
     };
   }
   if (debug) payload.attempts = attempts;
+
+  if (payload.years.length) {
+    const persist = writeCountryOutputD1(env, durableKey, issns, queryYears, payload);
+    if (ctx?.waitUntil) ctx.waitUntil(persist);
+    else await persist;
+  }
 
   const bodyText = JSON.stringify(payload);
   const ttl = payload.years.length ? 86400 : 60;
@@ -3286,7 +3363,7 @@ async function routeMcp(req, env) {
 }
 
 export default {
-  async fetch(req, env) {
+  async fetch(req, env, ctx) {
     if (req.method === 'OPTIONS') {
       return new Response(null, { status: 204, headers: CORS });
     }
@@ -3356,7 +3433,7 @@ export default {
       if ((p === '/analytics/hot-journals' || p === '/analytics/hot-journals/') && req.method === 'GET') {
         return routeHotJournals(req, env);
       }
-      if (p === '/openalex/country-output' && req.method === 'GET') return routeOpenAlexCountryOutput(req, env);
+      if (p === '/openalex/country-output' && req.method === 'GET') return routeOpenAlexCountryOutput(req, env, ctx);
       if (p === '/extension/download-stats' && req.method === 'GET') return routeExtensionDownloadStats(req, env);
       if (p === '/extension/download'       && req.method === 'GET') return routeExtensionDownload(req, env);
       if (p === '/me'                  && req.method === 'GET')  return routeMe(req, env);

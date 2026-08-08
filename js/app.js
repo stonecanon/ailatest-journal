@@ -1852,7 +1852,7 @@
       // The worker reports this when the anonymous OpenAlex budget is empty;
       // retrying the same request directly from the browser only produces more
       // 429s, so keep the publication-region fallback instead.
-      if (['public_pool_empty', 'no_data'].includes(apiResult.reason)) return null;
+      if (['public_pool_empty', 'no_data', 'sources_exhausted'].includes(apiResult.reason)) return null;
       const clientResult = await clientP;
       if (clientResult?.years?.length) return clientResult;
       return null;
