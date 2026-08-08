@@ -2655,7 +2655,7 @@ async function writeCountryOutputD1(env, cacheKey, issns, years, payload, ttlSec
 }
 
 // The preloader stores one target year at a time.  A detail page may ask for
-// a different three-year window, so merge any still-valid rows for the same
+// a different five-year window, so merge any still-valid rows for the same
 // ISSN pair before going back to an upstream provider.
 async function readCountryOutputD1Partial(env, issns, years) {
   if (!env?.DB || !issns.length || !years.length) return null;
@@ -2697,9 +2697,9 @@ const COUNTRY_PRELOAD_QUEUE_VERSION = 2;
 // about the full 10,000 list/filter calls for the active key, then move to
 // the next key in sequence.
 const COUNTRY_PRELOAD_PER_KEY_DAILY_LIMIT = 10000;
-// Four 15-minute invocations per hour can process about 1,000 jobs/hour at
-// the current batch size; the active key is rotated only after its budget is
-// reserved in full.
+// The five-minute trigger can process about 3,000 jobs/hour at the current
+// batch size; the active key is rotated only after its budget is reserved in
+// full.
 const COUNTRY_PRELOAD_BATCH_LIMIT = 250;
 // Seed about 5,000 year-jobs per tick (1,000 journals × five years) so D1
 // writes stay comfortably below the Cron invocation wall-time limit.
