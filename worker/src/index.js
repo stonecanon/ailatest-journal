@@ -2687,9 +2687,9 @@ async function readCountryOutputD1Partial(env, issns, years) {
 }
 
 const COUNTRY_PRELOAD_YEAR = 2025;
-const COUNTRY_PRELOAD_DAILY_JOB_LIMIT = 200;
-const COUNTRY_PRELOAD_SEED_PER_RUN = 500;
-const COUNTRY_PRELOAD_CONCURRENCY = 4;
+const COUNTRY_PRELOAD_DAILY_JOB_LIMIT = 50;
+const COUNTRY_PRELOAD_SEED_PER_RUN = 100;
+const COUNTRY_PRELOAD_CONCURRENCY = 2;
 const COUNTRY_PRELOAD_LOCK_SECONDS = 20 * 60;
 const COUNTRY_PRELOAD_CACHE_TTL = 45 * 86400;
 const COUNTRY_PRELOAD_MANIFEST_PATH = '/data/country_preload_top_2025.json';
@@ -3803,6 +3803,10 @@ export default {
       }
       return result;
     };
-    ctx.waitUntil(run().catch(e => console.error('analytics rollup failed:', e?.stack || e?.message || e)));
+    const task = run().catch(e => console.error('analytics rollup failed:', e?.stack || e?.message || e));
+    // Keep the promise in waitUntil for production and also await it so local
+    // cron tests cannot exit before the preload batch has committed to D1.
+    ctx.waitUntil(task);
+    await task;
   },
 };
