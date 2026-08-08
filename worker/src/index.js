@@ -2558,7 +2558,7 @@ async function fetchOpenAlexCountryYear(sourceIssn, year, apiKey = '', attempt =
   }
   const mergedGroups = [...merged.values()];
   const total = mergedGroups.reduce((sum, group) => sum + group.count, 0);
-  return { year, total, groups: mergedGroups };
+  return { year, total, groups: mergedGroups, status: resp.status };
 }
 
 function buildCountryOutputPayload(rows, source = 'openalex') {
