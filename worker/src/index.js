@@ -2696,9 +2696,9 @@ const COUNTRY_PRELOAD_YEAR = 2025;
 // about the full 10,000 list/filter calls for the active key, then move to
 // the next key in sequence.
 const COUNTRY_PRELOAD_PER_KEY_DAILY_LIMIT = 10000;
-// Four 15-minute invocations per hour can process about 1,000 jobs/hour.
-// This uses the daily allowance within roughly eight hours while leaving the
-// explicit 8,000-attempt guard in place for quota safety.
+// Four 15-minute invocations per hour can process about 1,000 jobs/hour at
+// the current batch size; the active key is rotated only after its budget is
+// reserved in full.
 const COUNTRY_PRELOAD_BATCH_LIMIT = 250;
 const COUNTRY_PRELOAD_SEED_PER_RUN = 5000;
 const COUNTRY_PRELOAD_CONCURRENCY = 8;
