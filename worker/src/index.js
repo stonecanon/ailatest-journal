@@ -2816,6 +2816,11 @@ async function updateCountryPreloadJob(env, job, result, now) {
 async function processCountryPreloadJob(env, job, apiKey, now) {
   const sourceIssns = [normalizeOpenAlexIssn(job.issn), normalizeOpenAlexIssn(job.eissn)]
     .filter((value, index, arr) => value && arr.indexOf(value) === index);
+  const cached = await readCountryOutputD1(env, countryOutputD1Key(sourceIssns, [COUNTRY_PRELOAD_YEAR]))
+    || await readCountryOutputD1Partial(env, sourceIssns, [COUNTRY_PRELOAD_YEAR]);
+  if (cached?.years?.length) {
+    return { status: 'completed', httpStatus: 200, source: cached.source || 'openalex' };
+  }
   let transient = false;
   let lastStatus = 0;
   for (const sourceIssn of sourceIssns) {
