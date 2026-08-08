@@ -3014,7 +3014,9 @@ async function routeOpenAlexCountryOutput(req, env, ctx) {
     if (!apiKey && !allowPublicOpenAlex) break;
     let rows;
     if (apiKey) {
-      rows = await Promise.all(queryYears.map((year) => fetchOpenAlexCountryYear(sourceIssn, year, apiKey)));
+      rows = await Promise.all(queryYears.map((year, index) => (
+        fetchOpenAlexCountryYear(sourceIssn, year, apiKeys[index % apiKeys.length])
+      )));
     } else {
       rows = [];
       for (const year of queryYears) {
