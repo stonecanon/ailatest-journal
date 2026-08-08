@@ -1694,14 +1694,9 @@
     return compact.length === 8 ? `${compact.slice(0, 4)}-${compact.slice(4)}` : '';
   }
 
-  function countryOutputYears(r, limit = 3) {
-    // 默认只查近 3 年，避免 OpenAlex 限流导致长时间卡在「正在加载」
-    const points = Array.isArray(r?.publication_history) ? r.publication_history : [];
-    const years = points
-      .map(p => Number(p.year))
-      .filter(y => Number.isFinite(y) && y >= 1900)
-      .sort((a, b) => a - b);
-    if (years.length) return years.slice(-limit);
+  function countryOutputYears(r, limit = 5) {
+    // Keep the chart aligned with the background preload window: five recent
+    // calendar years, including the current year as YTD when available.
     const now = new Date().getFullYear();
     return Array.from({ length: limit }, (_, i) => now - limit + 1 + i);
   }
@@ -1719,14 +1714,18 @@
     const issns = [normalizeIssnForOpenAlex(r?.issn), normalizeIssnForOpenAlex(r?.eissn)]
       .filter((value, index, arr) => value && arr.indexOf(value) === index);
     if (!issns.length) return null;
+    const years = countryOutputYears(r);
+    let preseed = null;
     // 1) 静态预置：详情页立刻出图，不再等 OpenAlex
     try {
       await loadCountryOutputMap();
-      const preseed = lookupCountryOutputPreseed(r);
-      if (preseed) return preseed;
+      preseed = lookupCountryOutputPreseed(r);
     } catch (_) { /* continue live path */ }
+    if (preseed) {
+      const preseedYears = new Set((preseed.years || []).map(row => Number(row.year)));
+      if (years.every(year => preseedYears.has(year))) return Promise.resolve(preseed);
+    }
     if (opts.preseedOnly) return null;
-    const years = countryOutputYears(r);
     const cacheKey = `${issns.join('|')}|${years.join(',')}`;
     if (countryOutputCache.has(cacheKey)) return countryOutputCache.get(cacheKey);
     const normalizePayload = (payload) => {
@@ -1831,7 +1830,7 @@
     };
     const fetchFromClient = async () => {
       // Worker 常被 OpenAlex 公共池 429；浏览器直连往往仍可用
-      const clientYears = years.slice(-3);
+      const clientYears = years.slice(-5);
       for (const sourceIssn of issns) {
         const rows = [];
         for (const year of clientYears) {

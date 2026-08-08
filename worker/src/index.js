@@ -2691,7 +2691,8 @@ async function readCountryOutputD1Partial(env, issns, years) {
   }
 }
 
-const COUNTRY_PRELOAD_YEAR = 2025;
+const COUNTRY_PRELOAD_YEARS = [2022, 2023, 2024, 2025, 2026];
+const COUNTRY_PRELOAD_QUEUE_VERSION = 2;
 // OpenAlex's free-key allowance is tracked independently per key. Consume
 // about the full 10,000 list/filter calls for the active key, then move to
 // the next key in sequence.
@@ -2700,7 +2701,9 @@ const COUNTRY_PRELOAD_PER_KEY_DAILY_LIMIT = 10000;
 // the current batch size; the active key is rotated only after its budget is
 // reserved in full.
 const COUNTRY_PRELOAD_BATCH_LIMIT = 250;
-const COUNTRY_PRELOAD_SEED_PER_RUN = 5000;
+// Seed about 5,000 year-jobs per tick (1,000 journals × five years) so D1
+// writes stay comfortably below the Cron invocation wall-time limit.
+const COUNTRY_PRELOAD_SEED_PER_RUN = 1000;
 const COUNTRY_PRELOAD_CONCURRENCY = 8;
 const COUNTRY_PRELOAD_LOCK_SECONDS = 20 * 60;
 const COUNTRY_PRELOAD_CACHE_TTL = 45 * 86400;
@@ -2734,10 +2737,13 @@ async function loadCountryPreloadManifest(env) {
   return Array.isArray(data) ? data : [];
 }
 
-function preloadJobKey(item) {
+function preloadJobKey(item, year) {
   const issn = normalizeOpenAlexIssn(item?.issn) || normalizeOpenAlexIssn(item?.eissn);
   const eissn = normalizeOpenAlexIssn(item?.eissn);
-  return issn ? `${COUNTRY_PRELOAD_YEAR}:${issn}|${eissn && eissn !== issn ? eissn : ''}` : '';
+  const targetYear = Number(year);
+  return issn && COUNTRY_PRELOAD_YEARS.includes(targetYear)
+    ? `${targetYear}:${issn}|${eissn && eissn !== issn ? eissn : ''}`
+    : '';
 }
 
 async function seedCountryPreloadJobs(env, manifest, state, now) {
@@ -2745,24 +2751,36 @@ async function seedCountryPreloadJobs(env, manifest, state, now) {
   if (cursor >= manifest.length) return { seeded: 0, cursor };
   const slice = manifest.slice(cursor, cursor + COUNTRY_PRELOAD_SEED_PER_RUN);
   const statements = [];
-  for (const item of slice) {
-    const jobKey = preloadJobKey(item);
+  for (const [itemOffset, item] of slice.entries()) {
     const issn = normalizeOpenAlexIssn(item?.issn) || normalizeOpenAlexIssn(item?.eissn);
     const eissn = normalizeOpenAlexIssn(item?.eissn);
-    if (!jobKey || !issn) continue;
-    statements.push(env.DB.prepare(
-      `INSERT OR IGNORE INTO country_output_preload_jobs
-        (job_key, issn, eissn, year, rank, journal_name, status, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, 'pending', ?)`
-    ).bind(
-      jobKey,
-      issn,
-      eissn && eissn !== issn ? eissn : '',
-      COUNTRY_PRELOAD_YEAR,
-      Number(item?.rank || cursor + statements.length + 1),
-      cleanText(item?.name || '', 240),
-      now,
-    ));
+    const manifestRank = Number(item?.rank || cursor + itemOffset + 1);
+    if (!issn) continue;
+    for (const [yearOffset, year] of COUNTRY_PRELOAD_YEARS.entries()) {
+      const jobKey = preloadJobKey(item, year);
+      if (!jobKey) continue;
+      const rank = (manifestRank - 1) * COUNTRY_PRELOAD_YEARS.length + yearOffset + 1;
+      statements.push(env.DB.prepare(
+        `INSERT INTO country_output_preload_jobs
+          (job_key, issn, eissn, year, rank, journal_name, status, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, 'pending', ?)
+         ON CONFLICT(job_key) DO UPDATE SET
+           issn = excluded.issn,
+           eissn = excluded.eissn,
+           year = excluded.year,
+           rank = excluded.rank,
+           journal_name = excluded.journal_name,
+           updated_at = excluded.updated_at`
+      ).bind(
+        jobKey,
+        issn,
+        eissn && eissn !== issn ? eissn : '',
+        year,
+        rank,
+        cleanText(item?.name || '', 240),
+        now,
+      ));
+    }
   }
   for (let i = 0; i < statements.length; i += 100) {
     await env.DB.batch(statements.slice(i, i + 100));
@@ -2813,13 +2831,14 @@ async function reserveCountryPreloadJobs(env, now, keyCount) {
     Math.max(0, COUNTRY_PRELOAD_PER_KEY_DAILY_LIMIT - keyReserved),
   );
   if (!remaining) return { jobs: [], keyIndex: null };
+  const yearPlaceholders = COUNTRY_PRELOAD_YEARS.map(() => '?').join(',');
   const candidates = await env.DB.prepare(
     `SELECT job_key, issn, eissn, year, rank, journal_name, attempts
        FROM country_output_preload_jobs
-      WHERE year = ?1 AND status = 'pending' AND next_attempt_at <= ?2
+      WHERE year IN (${yearPlaceholders}) AND status = ? AND next_attempt_at <= ?
       ORDER BY rank ASC
-      LIMIT ?3`
-  ).bind(COUNTRY_PRELOAD_YEAR, now, remaining).all();
+      LIMIT ?`
+  ).bind(...COUNTRY_PRELOAD_YEARS, 'pending', now, remaining).all();
   const jobs = candidates.results || [];
   if (!jobs.length) return { jobs: [], keyIndex: null };
   const count = jobs.length;
@@ -2875,8 +2894,9 @@ async function processCountryPreloadJob(env, job, apiKeys, keyIndex, now) {
   // budget predictable; the public detail endpoint can still try eISSN as a
   // live fallback when a preload has no result.
   const sourceIssns = [normalizeOpenAlexIssn(job.issn)].filter(Boolean);
-  const cached = await readCountryOutputD1(env, countryOutputD1Key(sourceIssns, [COUNTRY_PRELOAD_YEAR]))
-    || await readCountryOutputD1Partial(env, sourceIssns, [COUNTRY_PRELOAD_YEAR]);
+  const year = Number(job.year || 0);
+  const cached = await readCountryOutputD1(env, countryOutputD1Key(sourceIssns, [year]))
+    || await readCountryOutputD1Partial(env, sourceIssns, [year]);
   if (cached?.years?.length) {
     return { status: 'completed', httpStatus: 200, source: cached.source || 'openalex' };
   }
@@ -2885,15 +2905,15 @@ async function processCountryPreloadJob(env, job, apiKeys, keyIndex, now) {
   const keys = Array.isArray(apiKeys) ? apiKeys.filter(Boolean) : [cleanText(apiKeys || '', 256)].filter(Boolean);
   const apiKey = keys.length ? keys[Math.max(0, Number(keyIndex || 0)) % keys.length] : '';
   for (const sourceIssn of sourceIssns) {
-    const row = await fetchOpenAlexCountryYear(sourceIssn, COUNTRY_PRELOAD_YEAR, apiKey, 0, 0);
+    const row = await fetchOpenAlexCountryYear(sourceIssn, year, apiKey, 0, 0);
     lastStatus = Number(row.status || 200);
     if (!row.skipped && row.total > 0 && row.groups?.length) {
       const payload = buildCountryOutputPayload([row], 'openalex');
       if (payload) {
         payload.issn = sourceIssn;
         const cacheIssns = sourceIssns;
-        const cacheKey = countryOutputD1Key(cacheIssns, [COUNTRY_PRELOAD_YEAR]);
-        await writeCountryOutputD1(env, cacheKey, cacheIssns, [COUNTRY_PRELOAD_YEAR], payload, COUNTRY_PRELOAD_CACHE_TTL);
+        const cacheKey = countryOutputD1Key(cacheIssns, [year]);
+        await writeCountryOutputD1(env, cacheKey, cacheIssns, [year], payload, COUNTRY_PRELOAD_CACHE_TTL);
         return { status: 'completed', httpStatus: lastStatus, source: 'openalex' };
       }
     }
@@ -2923,9 +2943,17 @@ async function runCountryOutputPreload(env, now) {
     if (!Number(lock?.meta?.changes || 0)) return { skipped: true, reason: 'locked' };
     locked = true;
 
-    const state = await env.DB.prepare(
-      'SELECT seed_cursor, lock_until, last_run_at FROM country_output_preload_state WHERE state_key = \'global\''
+    let state = await env.DB.prepare(
+      'SELECT seed_cursor, seed_version, lock_until, last_run_at FROM country_output_preload_state WHERE state_key = \'global\''
     ).first();
+    if (Number(state?.seed_version || 1) !== COUNTRY_PRELOAD_QUEUE_VERSION) {
+      await env.DB.prepare(
+        `UPDATE country_output_preload_state
+            SET seed_cursor = 0, seed_version = ?1, updated_at = ?2
+          WHERE state_key = 'global'`
+      ).bind(COUNTRY_PRELOAD_QUEUE_VERSION, now).run();
+      state = { ...state, seed_cursor: 0, seed_version: COUNTRY_PRELOAD_QUEUE_VERSION };
+    }
     const needsSeed = Number(state?.seed_cursor || 0) < COUNTRY_PRELOAD_MANIFEST_COUNT;
     const manifest = needsSeed ? await loadCountryPreloadManifest(env) : [];
     const seed = needsSeed
@@ -2962,7 +2990,7 @@ async function runCountryOutputPreload(env, now) {
       `UPDATE country_output_preload_state SET last_run_at = ?1, updated_at = ?1 WHERE state_key = 'global'`
     ).bind(now).run();
     return {
-      year: COUNTRY_PRELOAD_YEAR,
+      years: COUNTRY_PRELOAD_YEARS,
       per_key_daily_job_limit: COUNTRY_PRELOAD_PER_KEY_DAILY_LIMIT,
       daily_job_limit: COUNTRY_PRELOAD_PER_KEY_DAILY_LIMIT * apiKeys.length,
       key_index: keyIndex,
@@ -3010,31 +3038,42 @@ async function routeOpenAlexCountryOutput(req, env, ctx) {
   const apiKeys = getOpenAlexApiKeys(env);
   const apiKey = apiKeys[0] || '';
 
+  // With a key we can request the exact client window.  Without one, keep the
+  // live fallback bounded to five years; the preloaded D1 rows still cover the
+  // same window without spending an upstream request.
+  const requestedYears = apiKey ? years : years.slice(-5);
   const cache = caches.default;
-  const cacheKey = new Request(`https://cache.internal/openalex-country-output/v4?issn=${encodeURIComponent(issns.join(','))}&years=${encodeURIComponent(years.join(','))}&k=${apiKey ? '1' : '0'}`);
+  const cacheKey = new Request(`https://cache.internal/openalex-country-output/v4?issn=${encodeURIComponent(issns.join(','))}&years=${encodeURIComponent(requestedYears.join(','))}&k=${apiKey ? '1' : '0'}`);
   const hit = debug ? null : await cache.match(cacheKey);
   if (hit) return new Response(hit.body, { status: 200, headers: { 'Content-Type': 'application/json', ...CORS, 'Cache-Control': 'public, max-age=86400' } });
 
-  // 无 API key 时少查几年；有 key 时并行拉年，显著缩短详情页等待
-  const queryYears = apiKey ? years : years.slice(-3);
-  const durableKey = countryOutputD1Key(issns, queryYears);
+  const durableKey = countryOutputD1Key(issns, requestedYears);
   const bypassDurableCache = debug || url.searchParams.get('fresh') === '1';
   const durableHit = bypassDurableCache ? null : await readCountryOutputD1(env, durableKey);
-  if (durableHit) {
+  const durableComplete = durableHit?.years?.length
+    && requestedYears.every((year) => durableHit.years.some((point) => Number(point?.year) === Number(year)));
+  if (durableHit && durableComplete) {
     const bodyText = JSON.stringify({ ...durableHit, cache: 'd1' });
     return new Response(bodyText, {
       status: 200,
       headers: { 'Content-Type': 'application/json', ...CORS, 'Cache-Control': 'public, max-age=86400' },
     });
   }
-  const partialDurableHit = bypassDurableCache ? null : await readCountryOutputD1Partial(env, issns, queryYears);
-  if (partialDurableHit) {
+  const partialDurableHit = bypassDurableCache ? null : await readCountryOutputD1Partial(env, issns, requestedYears);
+  const cachedYears = new Set((partialDurableHit?.years || []).map((point) => Number(point?.year)));
+  const missingYears = requestedYears.filter((year) => !cachedYears.has(Number(year)));
+  if (partialDurableHit && !missingYears.length) {
     const bodyText = JSON.stringify({ ...partialDurableHit, cache: 'd1-partial' });
     return new Response(bodyText, {
       status: 200,
       headers: { 'Content-Type': 'application/json', ...CORS, 'Cache-Control': 'public, max-age=86400' },
     });
   }
+
+  // Fetch only the years absent from the durable cache, then merge them back
+  // with the already-preloaded rows before responding.  This prevents a single
+  // cached year (for example 2025) from masking the other four years.
+  const queryYears = missingYears.length ? missingYears : requestedYears;
 
   let payload = null;
   const attempts = [];
@@ -3078,6 +3117,7 @@ async function routeOpenAlexCountryOutput(req, env, ctx) {
     }
   }
   if (!payload && apiKey) payload = await fetchCrossrefCountryOutput(issns, queryYears, attempts);
+  if (!payload && partialDurableHit) payload = partialDurableHit;
   if (!payload) {
     payload = {
       ok: true,
@@ -3087,18 +3127,34 @@ async function routeOpenAlexCountryOutput(req, env, ctx) {
       reason: apiKey ? 'no_data' : 'sources_exhausted',
     };
   }
+  if (partialDurableHit && payload?.years?.length) {
+    const byYear = new Map();
+    for (const point of partialDurableHit.years) byYear.set(Number(point?.year), point);
+    for (const point of payload.years) byYear.set(Number(point?.year), point);
+    const source = [partialDurableHit.source, payload.source].some((value) => String(value || '').toLowerCase() === 'openalex')
+      ? 'openalex'
+      : (payload.source || partialDurableHit.source || 'crossref');
+    const merged = buildCountryOutputPayload([...byYear.values()], source);
+    if (merged) {
+      merged.issn = payload.issn || partialDurableHit.issn || issns[0];
+      payload = merged;
+    }
+  }
   if (debug) payload.attempts = attempts;
 
   if (payload.years.length) {
-    const persist = writeCountryOutputD1(env, durableKey, issns, queryYears, payload);
+    const persistYears = [...new Set(payload.years.map((point) => Number(point?.year)).filter(Number.isFinite))].sort((a, b) => a - b);
+    const persistKey = countryOutputD1Key(issns, persistYears);
+    const persist = writeCountryOutputD1(env, persistKey, issns, persistYears, payload);
     if (ctx?.waitUntil) ctx.waitUntil(persist);
     else await persist;
   }
 
   const bodyText = JSON.stringify(payload);
-  const ttl = payload.years.length ? 86400 : 60;
+  const complete = requestedYears.every((year) => payload.years.some((point) => Number(point?.year) === Number(year)));
+  const ttl = complete ? 86400 : (payload.years.length ? 300 : 60);
   const headers = { 'Content-Type': 'application/json', ...CORS, 'Cache-Control': `public, max-age=${ttl}` };
-  if (payload.years.length && !debug) await cache.put(cacheKey, new Response(bodyText, { status: 200, headers }));
+  if (complete && payload.years.length && !debug) await cache.put(cacheKey, new Response(bodyText, { status: 200, headers }));
   return new Response(bodyText, { status: 200, headers });
 }
 
