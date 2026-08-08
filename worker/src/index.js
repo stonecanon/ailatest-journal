@@ -2693,7 +2693,10 @@ async function readCountryOutputD1Partial(env, issns, years) {
 
 const COUNTRY_PRELOAD_YEAR = 2025;
 const COUNTRY_PRELOAD_DAILY_JOB_LIMIT = 8000;
-const COUNTRY_PRELOAD_BATCH_LIMIT = 100;
+// Four 15-minute invocations per hour can process about 1,000 jobs/hour.
+// This uses the daily allowance within roughly eight hours while leaving the
+// explicit 8,000-attempt guard in place for quota safety.
+const COUNTRY_PRELOAD_BATCH_LIMIT = 250;
 const COUNTRY_PRELOAD_SEED_PER_RUN = 5000;
 const COUNTRY_PRELOAD_CONCURRENCY = 8;
 const COUNTRY_PRELOAD_LOCK_SECONDS = 20 * 60;
