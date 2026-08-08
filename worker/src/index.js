@@ -3871,12 +3871,15 @@ export default {
   async scheduled(event, env, ctx) {
     const run = async () => {
       const now = nowSec();
-      const shouldPreloadCountry = event.cron === '*/15 * * * *' || event.cron === '12 16 * * *';
+      const preloadOnlyTick = event.cron === '*/5 * * * *';
+      const rollupTick = event.cron === '*/15 * * * *' || event.cron === '12 16 * * *';
+      const shouldPreloadCountry = preloadOnlyTick || event.cron === '12 16 * * *';
       const countryPreload = shouldPreloadCountry ? await runCountryOutputPreload(env, now) : null;
-      // Run the bounded journal preload first. The analytics rollup scans
-      // many historical windows and must not delay the quota-controlled
-      // OpenAlex work at the start of a scheduled invocation.
-      const result = await aggregateRecentStats(env, now);
+      // The preload-only trigger keeps the OpenAlex work independent from the
+      // heavier historical analytics rollup.
+      const result = rollupTick
+        ? await aggregateRecentStats(env, now)
+        : { ok: true, mode: 'preload-only' };
       if (event.cron === '12 16 * * *') {
         const finalized = await recalibrateYesterday(env, now);
         return { ...result, finalized, countryPreload };

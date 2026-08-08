@@ -12,7 +12,9 @@ routes = [
 
 [triggers]
 crons = [
-  # Every 15 minutes: analytics rollup + a country-output preload slice.
+  # Every 5 minutes: preload-only slice; the bounded job lock prevents overlap.
+  "*/5 * * * *",
+  # Every 15 minutes: analytics rollup only.
   "*/15 * * * *",
   # 00:12 Asia/Shanghai (16:12 UTC): finalize yesterday after GA/edge data settles.
   "12 16 * * *"
