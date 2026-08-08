@@ -2510,7 +2510,7 @@ async function fetchCrossrefCountryYear(sourceIssn, year, attempt = 0) {
   };
 }
 
-async function fetchOpenAlexCountryYear(sourceIssn, year, apiKey = '', attempt = 0) {
+async function fetchOpenAlexCountryYear(sourceIssn, year, apiKey = '', attempt = 0, maxRetries = 3) {
   const params = new URLSearchParams({
     filter: `primary_location.source.issn:${sourceIssn},from_publication_date:${year}-01-01,to_publication_date:${year}-12-31`,
     group_by: 'authorships.institutions.country_code',
@@ -2532,12 +2532,12 @@ async function fetchOpenAlexCountryYear(sourceIssn, year, apiKey = '', attempt =
     if (timer) clearTimeout(timer);
   }
   // 礼貌池限流：短暂退避后重试
-  if (resp.status === 429 && attempt < 3) {
+  if (resp.status === 429 && attempt < maxRetries) {
     const raSec = Number(resp.headers.get('Retry-After') || 0);
     // 封顶 5s：详情页不能等数小时的 Retry-After
     const wait = Math.min(raSec > 0 ? raSec * 1000 : 800 * (attempt + 1), 5000);
     await new Promise(r => setTimeout(r, wait));
-    return fetchOpenAlexCountryYear(sourceIssn, year, apiKey, attempt + 1);
+    return fetchOpenAlexCountryYear(sourceIssn, year, apiKey, attempt + 1, maxRetries);
   }
   if (!resp.ok) return { year, total: 0, groups: [], skipped: true, status: resp.status };
   const data = await resp.json();
@@ -2692,9 +2692,10 @@ async function readCountryOutputD1Partial(env, issns, years) {
 }
 
 const COUNTRY_PRELOAD_YEAR = 2025;
-const COUNTRY_PRELOAD_DAILY_JOB_LIMIT = 50;
-const COUNTRY_PRELOAD_SEED_PER_RUN = 100;
-const COUNTRY_PRELOAD_CONCURRENCY = 2;
+const COUNTRY_PRELOAD_DAILY_JOB_LIMIT = 8000;
+const COUNTRY_PRELOAD_BATCH_LIMIT = 100;
+const COUNTRY_PRELOAD_SEED_PER_RUN = 500;
+const COUNTRY_PRELOAD_CONCURRENCY = 8;
 const COUNTRY_PRELOAD_LOCK_SECONDS = 20 * 60;
 const COUNTRY_PRELOAD_CACHE_TTL = 45 * 86400;
 const COUNTRY_PRELOAD_MANIFEST_PATH = '/data/country_preload_top_2025.json';
@@ -2771,7 +2772,10 @@ async function reserveCountryPreloadJobs(env, now) {
   const usage = await env.DB.prepare(
     'SELECT reserved_jobs FROM country_output_preload_usage WHERE usage_day = ?1'
   ).bind(usageDay).first();
-  const remaining = Math.max(0, COUNTRY_PRELOAD_DAILY_JOB_LIMIT - Number(usage?.reserved_jobs || 0));
+  const remaining = Math.min(
+    COUNTRY_PRELOAD_BATCH_LIMIT,
+    Math.max(0, COUNTRY_PRELOAD_DAILY_JOB_LIMIT - Number(usage?.reserved_jobs || 0)),
+  );
   if (!remaining) return [];
   const candidates = await env.DB.prepare(
     `SELECT job_key, issn, eissn, year, rank, journal_name, attempts
@@ -2826,8 +2830,10 @@ async function updateCountryPreloadJob(env, job, result, now) {
 }
 
 async function processCountryPreloadJob(env, job, apiKey, now) {
-  const sourceIssns = [normalizeOpenAlexIssn(job.issn), normalizeOpenAlexIssn(job.eissn)]
-    .filter((value, index, arr) => value && arr.indexOf(value) === index);
+  // One reserved job equals one OpenAlex request.  This keeps the daily
+  // budget predictable; the public detail endpoint can still try eISSN as a
+  // live fallback when a preload has no result.
+  const sourceIssns = [normalizeOpenAlexIssn(job.issn)].filter(Boolean);
   const cached = await readCountryOutputD1(env, countryOutputD1Key(sourceIssns, [COUNTRY_PRELOAD_YEAR]))
     || await readCountryOutputD1Partial(env, sourceIssns, [COUNTRY_PRELOAD_YEAR]);
   if (cached?.years?.length) {
@@ -2836,7 +2842,7 @@ async function processCountryPreloadJob(env, job, apiKey, now) {
   let transient = false;
   let lastStatus = 0;
   for (const sourceIssn of sourceIssns) {
-    const row = await fetchOpenAlexCountryYear(sourceIssn, COUNTRY_PRELOAD_YEAR, apiKey);
+    const row = await fetchOpenAlexCountryYear(sourceIssn, COUNTRY_PRELOAD_YEAR, apiKey, 0, 0);
     lastStatus = Number(row.status || 200);
     if (!row.skipped && row.total > 0 && row.groups?.length) {
       const payload = buildCountryOutputPayload([row], 'openalex');
@@ -3813,12 +3819,13 @@ export default {
     const run = async () => {
       const now = nowSec();
       const result = await aggregateRecentStats(env, now);
+      const shouldPreloadCountry = event.cron === '*/15 * * * *' || event.cron === '12 16 * * *';
+      const countryPreload = shouldPreloadCountry ? await runCountryOutputPreload(env, now) : null;
       if (event.cron === '12 16 * * *') {
         const finalized = await recalibrateYesterday(env, now);
-        const countryPreload = await runCountryOutputPreload(env, now);
         return { ...result, finalized, countryPreload };
       }
-      return result;
+      return { ...result, countryPreload };
     };
     const task = run().catch(e => console.error('analytics rollup failed:', e?.stack || e?.message || e));
     // Keep the promise in waitUntil for production and also await it so local
