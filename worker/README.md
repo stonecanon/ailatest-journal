@@ -36,6 +36,7 @@ Email code, GitHub OAuth, Google OAuth login + journal favorites, persisted in D
    npx wrangler secret put GOOGLE_CLIENT_SECRET
    npx wrangler secret put JWT_SECRET   # openssl rand -base64 48
    npx wrangler secret put OPENALEX_API_KEY   # 国家/地区作者机构占比
+   npx wrangler secret put OPENALEX_API_KEY_2 # 可选：第二把 OpenAlex key，预加载轮换使用
    ```
    在 `wrangler.toml` 填 `GITHUB_CLIENT_ID` 和 `GOOGLE_CLIENT_ID`。`GOOGLE_CLIENT_ID` 不是 secret；如果不想写进仓库，也可以在 Cloudflare Dashboard → Workers → `ailatest-journal-api` → Settings → Variables 里添加同名变量。
 

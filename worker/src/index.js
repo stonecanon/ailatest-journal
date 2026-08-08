@@ -2711,6 +2711,13 @@ function countryPreloadUsageDay(sec) {
   return new Date((sec + 8 * 3600) * 1000).toISOString().slice(0, 10);
 }
 
+function getOpenAlexApiKeys(env) {
+  return [...new Set([
+    cleanText(env?.OPENALEX_API_KEY || '', 256),
+    cleanText(env?.OPENALEX_API_KEY_2 || '', 256),
+  ].filter(Boolean))];
+}
+
 async function loadCountryPreloadManifest(env) {
   const base = (cleanText(env?.SITE_URL || 'https://journal.ailatest.org', 200) || 'https://journal.ailatest.org').replace(/\/+$/, '');
   const resp = await fetch(`${base}${COUNTRY_PRELOAD_MANIFEST_PATH}?v=${COUNTRY_PRELOAD_MANIFEST_COUNT}`, {
@@ -2833,7 +2840,7 @@ async function updateCountryPreloadJob(env, job, result, now) {
   ).run();
 }
 
-async function processCountryPreloadJob(env, job, apiKey, now) {
+async function processCountryPreloadJob(env, job, apiKeys, now) {
   // One reserved job equals one OpenAlex request.  This keeps the daily
   // budget predictable; the public detail endpoint can still try eISSN as a
   // live fallback when a preload has no result.
@@ -2845,6 +2852,8 @@ async function processCountryPreloadJob(env, job, apiKey, now) {
   }
   let transient = false;
   let lastStatus = 0;
+  const keys = Array.isArray(apiKeys) ? apiKeys.filter(Boolean) : [cleanText(apiKeys || '', 256)].filter(Boolean);
+  const apiKey = keys.length ? keys[Math.max(0, Number(job.rank || 1) - 1) % keys.length] : '';
   for (const sourceIssn of sourceIssns) {
     const row = await fetchOpenAlexCountryYear(sourceIssn, COUNTRY_PRELOAD_YEAR, apiKey, 0, 0);
     lastStatus = Number(row.status || 200);
@@ -2867,8 +2876,8 @@ async function processCountryPreloadJob(env, job, apiKey, now) {
 }
 
 async function runCountryOutputPreload(env, now) {
-  const apiKey = cleanText(env?.OPENALEX_API_KEY || '', 256);
-  if (!apiKey || !env?.DB) return { skipped: true, reason: apiKey ? 'no_db' : 'missing_openalex_key' };
+  const apiKeys = getOpenAlexApiKeys(env);
+  if (!apiKeys.length || !env?.DB) return { skipped: true, reason: apiKeys.length ? 'no_db' : 'missing_openalex_key' };
   let locked = false;
   try {
     await env.DB.prepare(
@@ -2905,7 +2914,7 @@ async function runCountryOutputPreload(env, now) {
       const group = jobs.slice(i, i + COUNTRY_PRELOAD_CONCURRENCY);
       const results = await Promise.all(group.map(async (job) => {
         try {
-          return await processCountryPreloadJob(env, job, apiKey, now);
+          return await processCountryPreloadJob(env, job, apiKeys, now);
         } catch (error) {
           return { status: Number(job.attempts || 0) < 3 ? 'pending' : 'no_data', error: cleanText(error?.message || 'preload_error', 240) };
         }
@@ -2964,7 +2973,8 @@ async function routeOpenAlexCountryOutput(req, env, ctx) {
 
   // api_key 可选：没有 key 时不再反复撞 OpenAlex 公共池，优先使用
   // Crossref + D1 缓存；如需调试公共池，可显式加 public_openalex=1。
-  const apiKey = cleanText(env.OPENALEX_API_KEY || '', 256);
+  const apiKeys = getOpenAlexApiKeys(env);
+  const apiKey = apiKeys[0] || '';
 
   const cache = caches.default;
   const cacheKey = new Request(`https://cache.internal/openalex-country-output/v4?issn=${encodeURIComponent(issns.join(','))}&years=${encodeURIComponent(years.join(','))}&k=${apiKey ? '1' : '0'}`);
