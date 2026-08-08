@@ -2716,6 +2716,7 @@ function getOpenAlexApiKeys(env) {
     cleanText(env?.OPENALEX_API_KEY || '', 256),
     cleanText(env?.OPENALEX_API_KEY_2 || '', 256),
     cleanText(env?.OPENALEX_API_KEY_3 || '', 256),
+    cleanText(env?.OPENALEX_API_KEY_4 || '', 256),
   ].filter(Boolean))];
 }
 
@@ -2854,7 +2855,8 @@ async function processCountryPreloadJob(env, job, apiKeys, now) {
   let transient = false;
   let lastStatus = 0;
   const keys = Array.isArray(apiKeys) ? apiKeys.filter(Boolean) : [cleanText(apiKeys || '', 256)].filter(Boolean);
-  const apiKey = keys.length ? keys[Math.max(0, Number(job.rank || 1) - 1) % keys.length] : '';
+  const rotationOffset = Math.max(0, Number(job.rank || 1) - 1) + Math.max(0, Number(job.attempts || 0));
+  const apiKey = keys.length ? keys[rotationOffset % keys.length] : '';
   for (const sourceIssn of sourceIssns) {
     const row = await fetchOpenAlexCountryYear(sourceIssn, COUNTRY_PRELOAD_YEAR, apiKey, 0, 0);
     lastStatus = Number(row.status || 200);
