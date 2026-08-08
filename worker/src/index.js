@@ -2710,9 +2710,9 @@ function countryPreloadUsageDay(sec) {
 
 async function loadCountryPreloadManifest(env) {
   const base = (cleanText(env?.SITE_URL || 'https://journal.ailatest.org', 200) || 'https://journal.ailatest.org').replace(/\/+$/, '');
-  const resp = await fetch(`${base}${COUNTRY_PRELOAD_MANIFEST_PATH}`, {
+  const resp = await fetch(`${base}${COUNTRY_PRELOAD_MANIFEST_PATH}?v=${COUNTRY_PRELOAD_MANIFEST_COUNT}`, {
     headers: { Accept: 'application/json' },
-    cf: { cacheTtl: 86400, cacheEverything: true },
+    cf: { cacheTtl: 300, cacheEverything: true },
   });
   if (!resp.ok) throw new Error(`country preload manifest ${resp.status}`);
   const data = await resp.json();
