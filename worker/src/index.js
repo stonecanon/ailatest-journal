@@ -2699,6 +2699,13 @@ const COUNTRY_PRELOAD_LOCK_SECONDS = 20 * 60;
 const COUNTRY_PRELOAD_CACHE_TTL = 45 * 86400;
 const COUNTRY_PRELOAD_MANIFEST_PATH = '/data/country_preload_top_2025.json';
 
+function countryPreloadUsageDay(sec) {
+  // The cron is scheduled at 00:12 Asia/Shanghai; use the same business day
+  // for the quota guard instead of UTC so a manual run before midnight does
+  // not suppress the next calendar day's batch.
+  return new Date((sec + 8 * 3600) * 1000).toISOString().slice(0, 10);
+}
+
 async function loadCountryPreloadManifest(env) {
   const base = (cleanText(env?.SITE_URL || 'https://journal.ailatest.org', 200) || 'https://journal.ailatest.org').replace(/\/+$/, '');
   const resp = await fetch(`${base}${COUNTRY_PRELOAD_MANIFEST_PATH}`, {
@@ -2756,7 +2763,7 @@ function preloadTransientStatus(status) {
 }
 
 async function reserveCountryPreloadJobs(env, now) {
-  const usageDay = dayFromSec(now);
+  const usageDay = countryPreloadUsageDay(now);
   await env.DB.prepare(
     `INSERT OR IGNORE INTO country_output_preload_usage (usage_day, reserved_jobs, updated_at)
      VALUES (?1, 0, ?2)`
