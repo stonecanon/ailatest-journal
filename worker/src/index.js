@@ -2699,6 +2699,7 @@ const COUNTRY_PRELOAD_CONCURRENCY = 8;
 const COUNTRY_PRELOAD_LOCK_SECONDS = 20 * 60;
 const COUNTRY_PRELOAD_CACHE_TTL = 45 * 86400;
 const COUNTRY_PRELOAD_MANIFEST_PATH = '/data/country_preload_top_2025.json';
+const COUNTRY_PRELOAD_MANIFEST_COUNT = 49836;
 
 function countryPreloadUsageDay(sec) {
   // The cron is scheduled at 00:12 Asia/Shanghai; use the same business day
@@ -2880,11 +2881,14 @@ async function runCountryOutputPreload(env, now) {
     if (!Number(lock?.meta?.changes || 0)) return { skipped: true, reason: 'locked' };
     locked = true;
 
-    const manifest = await loadCountryPreloadManifest(env);
     const state = await env.DB.prepare(
       'SELECT seed_cursor, lock_until, last_run_at FROM country_output_preload_state WHERE state_key = \'global\''
     ).first();
-    const seed = await seedCountryPreloadJobs(env, manifest, state, now);
+    const needsSeed = Number(state?.seed_cursor || 0) < COUNTRY_PRELOAD_MANIFEST_COUNT;
+    const manifest = needsSeed ? await loadCountryPreloadManifest(env) : [];
+    const seed = needsSeed
+      ? await seedCountryPreloadJobs(env, manifest, state, now)
+      : { seeded: 0, cursor: Number(state?.seed_cursor || 0) };
     await env.DB.prepare(
       `UPDATE country_output_preload_jobs
           SET status = 'pending', claimed_at = 0, next_attempt_at = ?1, updated_at = ?1
@@ -2922,7 +2926,7 @@ async function runCountryOutputPreload(env, now) {
       completed,
       no_data: noData,
       retried,
-      manifest: manifest.length,
+      manifest: needsSeed ? manifest.length : COUNTRY_PRELOAD_MANIFEST_COUNT,
     };
   } catch (error) {
     console.error('country output preload failed:', error?.stack || error?.message || error);

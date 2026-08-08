@@ -18,7 +18,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SOURCE = ROOT / "data" / "journals.json.gz"
 OUTPUT = ROOT / "data" / "country_preload_top_2025.json"
-LIMIT = 1000
+LIMIT = 50000
 
 
 def norm_issn(value: object) -> str:
