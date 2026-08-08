@@ -2692,9 +2692,10 @@ async function readCountryOutputD1Partial(env, issns, years) {
 }
 
 const COUNTRY_PRELOAD_YEAR = 2025;
-// OpenAlex's free-key allowance is tracked independently per key. Keep an
-// 8,000-attempt safety budget per key, then move to the next key.
-const COUNTRY_PRELOAD_PER_KEY_DAILY_LIMIT = 8000;
+// OpenAlex's free-key allowance is tracked independently per key. Consume
+// about the full 10,000 list/filter calls for the active key, then move to
+// the next key in sequence.
+const COUNTRY_PRELOAD_PER_KEY_DAILY_LIMIT = 10000;
 // Four 15-minute invocations per hour can process about 1,000 jobs/hour.
 // This uses the daily allowance within roughly eight hours while leaving the
 // explicit 8,000-attempt guard in place for quota safety.
