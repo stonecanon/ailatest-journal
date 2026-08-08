@@ -2692,7 +2692,9 @@ async function readCountryOutputD1Partial(env, issns, years) {
 }
 
 const COUNTRY_PRELOAD_YEAR = 2025;
-const COUNTRY_PRELOAD_DAILY_JOB_LIMIT = 8000;
+// OpenAlex's free-key allowance is tracked independently per key. Keep an
+// 8,000-attempt safety budget per key, then move to the next key.
+const COUNTRY_PRELOAD_PER_KEY_DAILY_LIMIT = 8000;
 // Four 15-minute invocations per hour can process about 1,000 jobs/hour.
 // This uses the daily allowance within roughly eight hours while leaving the
 // explicit 8,000-attempt guard in place for quota safety.
@@ -2776,20 +2778,40 @@ function preloadTransientStatus(status) {
   return code === 0 || code === 408 || code === 425 || code === 429 || code >= 500;
 }
 
-async function reserveCountryPreloadJobs(env, now) {
+async function reserveCountryPreloadJobs(env, now, keyCount) {
   const usageDay = countryPreloadUsageDay(now);
   await env.DB.prepare(
     `INSERT OR IGNORE INTO country_output_preload_usage (usage_day, reserved_jobs, updated_at)
      VALUES (?1, 0, ?2)`
   ).bind(usageDay, now).run();
-  const usage = await env.DB.prepare(
-    'SELECT reserved_jobs FROM country_output_preload_usage WHERE usage_day = ?1'
-  ).bind(usageDay).first();
+  const keyRows = await env.DB.prepare(
+    `SELECT key_index, reserved_jobs
+       FROM country_output_preload_key_usage
+      WHERE usage_day = ?1
+      ORDER BY key_index`
+  ).bind(usageDay).all();
+  const byKey = new Map((keyRows.results || []).map(row => [Number(row.key_index), Number(row.reserved_jobs || 0)]));
+  let keyIndex = -1;
+  let keyReserved = 0;
+  for (let i = 0; i < Math.max(0, Number(keyCount || 0)); i += 1) {
+    const reserved = byKey.get(i) || 0;
+    if (reserved < COUNTRY_PRELOAD_PER_KEY_DAILY_LIMIT) {
+      keyIndex = i;
+      keyReserved = reserved;
+      break;
+    }
+  }
+  if (keyIndex < 0) return { jobs: [], keyIndex: null };
+  await env.DB.prepare(
+    `INSERT OR IGNORE INTO country_output_preload_key_usage
+      (usage_day, key_index, reserved_jobs, updated_at)
+     VALUES (?1, ?2, 0, ?3)`
+  ).bind(usageDay, keyIndex, now).run();
   const remaining = Math.min(
     COUNTRY_PRELOAD_BATCH_LIMIT,
-    Math.max(0, COUNTRY_PRELOAD_DAILY_JOB_LIMIT - Number(usage?.reserved_jobs || 0)),
+    Math.max(0, COUNTRY_PRELOAD_PER_KEY_DAILY_LIMIT - keyReserved),
   );
-  if (!remaining) return [];
+  if (!remaining) return { jobs: [], keyIndex: null };
   const candidates = await env.DB.prepare(
     `SELECT job_key, issn, eissn, year, rank, journal_name, attempts
        FROM country_output_preload_jobs
@@ -2798,22 +2820,27 @@ async function reserveCountryPreloadJobs(env, now) {
       LIMIT ?3`
   ).bind(COUNTRY_PRELOAD_YEAR, now, remaining).all();
   const jobs = candidates.results || [];
-  if (!jobs.length) return [];
+  if (!jobs.length) return { jobs: [], keyIndex: null };
   const count = jobs.length;
   const reserve = await env.DB.prepare(
+    `UPDATE country_output_preload_key_usage
+        SET reserved_jobs = reserved_jobs + ?1, updated_at = ?2
+      WHERE usage_day = ?3 AND key_index = ?4
+        AND reserved_jobs + ?1 <= ?5`
+  ).bind(count, now, usageDay, keyIndex, COUNTRY_PRELOAD_PER_KEY_DAILY_LIMIT).run();
+  if (!Number(reserve?.meta?.changes || 0)) return { jobs: [], keyIndex: null };
+  await env.DB.prepare(
     `UPDATE country_output_preload_usage
         SET reserved_jobs = reserved_jobs + ?1, updated_at = ?2
-      WHERE usage_day = ?3
-        AND reserved_jobs + ?1 <= ?4`
-  ).bind(count, now, usageDay, COUNTRY_PRELOAD_DAILY_JOB_LIMIT).run();
-  if (!Number(reserve?.meta?.changes || 0)) return [];
+      WHERE usage_day = ?3`
+  ).bind(count, now, usageDay).run();
   const claims = jobs.map((job) => env.DB.prepare(
     `UPDATE country_output_preload_jobs
         SET status = 'running', attempts = attempts + 1, claimed_at = ?1, updated_at = ?1
       WHERE job_key = ?2 AND status = 'pending'`
   ).bind(now, job.job_key));
   await env.DB.batch(claims);
-  return jobs;
+  return { jobs, keyIndex };
 }
 
 async function updateCountryPreloadJob(env, job, result, now) {
@@ -2842,7 +2869,7 @@ async function updateCountryPreloadJob(env, job, result, now) {
   ).run();
 }
 
-async function processCountryPreloadJob(env, job, apiKeys, now) {
+async function processCountryPreloadJob(env, job, apiKeys, keyIndex, now) {
   // One reserved job equals one OpenAlex request.  This keeps the daily
   // budget predictable; the public detail endpoint can still try eISSN as a
   // live fallback when a preload has no result.
@@ -2855,8 +2882,7 @@ async function processCountryPreloadJob(env, job, apiKeys, now) {
   let transient = false;
   let lastStatus = 0;
   const keys = Array.isArray(apiKeys) ? apiKeys.filter(Boolean) : [cleanText(apiKeys || '', 256)].filter(Boolean);
-  const rotationOffset = Math.max(0, Number(job.rank || 1) - 1) + Math.max(0, Number(job.attempts || 0));
-  const apiKey = keys.length ? keys[rotationOffset % keys.length] : '';
+  const apiKey = keys.length ? keys[Math.max(0, Number(keyIndex || 0)) % keys.length] : '';
   for (const sourceIssn of sourceIssns) {
     const row = await fetchOpenAlexCountryYear(sourceIssn, COUNTRY_PRELOAD_YEAR, apiKey, 0, 0);
     lastStatus = Number(row.status || 200);
@@ -2909,7 +2935,9 @@ async function runCountryOutputPreload(env, now) {
           SET status = 'pending', claimed_at = 0, next_attempt_at = ?1, updated_at = ?1
         WHERE status = 'running' AND claimed_at < ?2`
     ).bind(now, now - COUNTRY_PRELOAD_LOCK_SECONDS).run();
-    const jobs = await reserveCountryPreloadJobs(env, now);
+    const reservation = await reserveCountryPreloadJobs(env, now, apiKeys.length);
+    const jobs = reservation.jobs;
+    const keyIndex = reservation.keyIndex;
     let completed = 0;
     let noData = 0;
     let retried = 0;
@@ -2917,7 +2945,7 @@ async function runCountryOutputPreload(env, now) {
       const group = jobs.slice(i, i + COUNTRY_PRELOAD_CONCURRENCY);
       const results = await Promise.all(group.map(async (job) => {
         try {
-          return await processCountryPreloadJob(env, job, apiKeys, now);
+          return await processCountryPreloadJob(env, job, apiKeys, keyIndex, now);
         } catch (error) {
           return { status: Number(job.attempts || 0) < 3 ? 'pending' : 'no_data', error: cleanText(error?.message || 'preload_error', 240) };
         }
@@ -2934,7 +2962,9 @@ async function runCountryOutputPreload(env, now) {
     ).bind(now).run();
     return {
       year: COUNTRY_PRELOAD_YEAR,
-      daily_job_limit: COUNTRY_PRELOAD_DAILY_JOB_LIMIT,
+      per_key_daily_job_limit: COUNTRY_PRELOAD_PER_KEY_DAILY_LIMIT,
+      daily_job_limit: COUNTRY_PRELOAD_PER_KEY_DAILY_LIMIT * apiKeys.length,
+      key_index: keyIndex,
       seeded: seed.seeded,
       seed_cursor: seed.cursor,
       reserved: jobs.length,
