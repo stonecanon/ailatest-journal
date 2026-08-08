@@ -2715,6 +2715,7 @@ function getOpenAlexApiKeys(env) {
   return [...new Set([
     cleanText(env?.OPENALEX_API_KEY || '', 256),
     cleanText(env?.OPENALEX_API_KEY_2 || '', 256),
+    cleanText(env?.OPENALEX_API_KEY_3 || '', 256),
   ].filter(Boolean))];
 }
 

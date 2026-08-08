@@ -61,6 +61,7 @@ database_id = "861dd053-c23a-4363-b62b-2559c06ec3fd"
 #   wrangler secret put DEEPSEEK_API_KEY
 #   wrangler secret put OPENALEX_API_KEY
 #   wrangler secret put OPENALEX_API_KEY_2  # optional secondary key for preload rotation
+#   wrangler secret put OPENALEX_API_KEY_3  # optional third key for preload rotation
 #   wrangler secret put CODE_PEPPER
 #   wrangler secret put CF_ANALYTICS_TOKEN   # Cloudflare API token, Analytics:Read (dashboard)
 #   wrangler secret put GA4_SA_KEY           # GA4 service-account JSON (dashboard)
