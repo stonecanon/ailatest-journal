@@ -2519,12 +2519,17 @@ async function fetchOpenAlexCountryYear(sourceIssn, year, apiKey = '', attempt =
   });
   if (apiKey) params.set('api_key', apiKey);
   let resp;
+  const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+  const timer = controller ? setTimeout(() => controller.abort(), 15000) : null;
   try {
     resp = await fetch(`https://api.openalex.org/works?${params.toString()}`, {
       headers: { Accept: 'application/json', 'User-Agent': 'AILatest Journal country-output cache (mailto:ailatest@ailatest.org)' },
+      ...(controller ? { signal: controller.signal } : {}),
     });
   } catch (_) {
     return { year, total: 0, groups: [], skipped: true, status: 0 };
+  } finally {
+    if (timer) clearTimeout(timer);
   }
   // 礼貌池限流：短暂退避后重试
   if (resp.status === 429 && attempt < 3) {
@@ -2867,6 +2872,11 @@ async function runCountryOutputPreload(env, now) {
       'SELECT seed_cursor, lock_until, last_run_at FROM country_output_preload_state WHERE state_key = \'global\''
     ).first();
     const seed = await seedCountryPreloadJobs(env, manifest, state, now);
+    await env.DB.prepare(
+      `UPDATE country_output_preload_jobs
+          SET status = 'pending', claimed_at = 0, next_attempt_at = ?1, updated_at = ?1
+        WHERE status = 'running' AND claimed_at < ?2`
+    ).bind(now, now - COUNTRY_PRELOAD_LOCK_SECONDS).run();
     const jobs = await reserveCountryPreloadJobs(env, now);
     let completed = 0;
     let noData = 0;
