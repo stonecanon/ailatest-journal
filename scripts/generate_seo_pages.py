@@ -269,6 +269,27 @@ def generate_all():
     build_related(index)
 
     static_urls = [(SITE_URL + "/", "1.0")]
+    # Keep the primary product, regional, and policy entry points discoverable
+    # alongside the generated subject/index landing pages.  These routes are
+    # stable and intentionally remain outside the journal URL chunks.
+    core_routes = (
+        ("/pick/", "0.9"),
+        ("/global/", "0.8"),
+        ("/pricing", "0.7"),
+        ("/about", "0.6"),
+        ("/terms", "0.4"),
+        ("/privacy", "0.4"),
+        ("/refund", "0.4"),
+        ("/contact", "0.4"),
+        ("/cn/", "0.7"),
+        ("/in/", "0.6"),
+        ("/my/", "0.6"),
+        ("/kr/", "0.6"),
+        ("/pbn/", "0.5"),
+        ("/isc/", "0.5"),
+        ("/scielo/", "0.5"),
+    )
+    static_urls.extend((f"{SITE_URL}{path}", priority) for path, priority in core_routes)
     # Preserve the generated, crawlable directory pages when the journal
     # bundle is refreshed.  The listing generator may add more entries later,
     # but a SEO-only refresh should not erase them from the sitemap index.
