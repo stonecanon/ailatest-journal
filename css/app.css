@@ -13801,6 +13801,48 @@ html[lang] body :is(.zone.fms-tier, .domsrc-pill.ds-cnkx)[class] {
   }
 }
 
+/* ═══════ 手机端筛选标签与选项留出明确间距 ═══════
+   中文分类词（收录 / 中科院 / 新锐）不能和右侧徽章共用过窄的固定列。
+   让标签按自身文字取宽，并给选项保留间隔，避免不同字体或系统字号下重叠。 */
+@media (max-width: 900px) {
+  .tab-panel[data-panel="int"] .th-dropdown:not(#if-dropdown):not(#warn-dropdown):not(#topic-dropdown) {
+    grid-template-columns: max-content minmax(0, 1fr) !important;
+    column-gap: 10px !important;
+  }
+  .tab-panel[data-panel="int"] .th-dropdown:not(#if-dropdown):not(#warn-dropdown):not(#topic-dropdown) > .th-dropdown-btn {
+    width: auto !important;
+    min-width: max-content !important;
+    max-width: max-content !important;
+    justify-content: flex-start !important;
+    white-space: nowrap !important;
+    overflow: visible !important;
+  }
+  .tab-panel[data-panel="int"] .th-dropdown:not(#if-dropdown):not(#warn-dropdown):not(#topic-dropdown) > .th-dropdown-panel {
+    min-width: 0 !important;
+    width: auto !important;
+  }
+
+  /* 详情页移动端快捷区改为单列，收藏、评分和相关期刊都撑满内容区。 */
+  body.journal-route .detail-layout.is-page .detail-side-col {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    grid-template-columns: none !important;
+  }
+  body.journal-route .detail-layout.is-page .detail-side-col > .side-h,
+  body.journal-route .detail-layout.is-page .detail-side-col > .side-card,
+  body.journal-route .detail-layout.is-page .detail-side-col > .side-rating-card {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+}
+
 /* 分享名片：移动端内容可滚动，但关闭按钮始终留在卡片顶部。 */
 .share-modal-card {
   display: flex;
