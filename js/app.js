@@ -1708,6 +1708,32 @@
     return { code, name };
   }
 
+  function rankCountryOutputTop(years, suppliedTop = []) {
+    const totals = new Map();
+    const names = new Set();
+    (Array.isArray(years) ? years : []).forEach((row) => {
+      (Array.isArray(row?.groups) ? row.groups : []).forEach((group) => {
+        const name = String(group?.name || '').trim();
+        const count = Number(group?.count || 0);
+        if (!name || name === 'Other' || count <= 0) return;
+        names.add(name);
+        totals.set(name, (totals.get(name) || 0) + count);
+      });
+    });
+    // Keep API/preseed names available when a partial row omits a group, but
+    // always rank the final list by the actual aggregate count.
+    (Array.isArray(suppliedTop) ? suppliedTop : []).forEach((name) => {
+      const value = String(name || '').trim();
+      if (value && value !== 'Other') names.add(value);
+    });
+    return [...names]
+      .sort((a, b) => {
+        const diff = (totals.get(b) || 0) - (totals.get(a) || 0);
+        return diff || a.localeCompare(b, 'en');
+      })
+      .slice(0, 5);
+  }
+
   async function fetchCountryOutputData(r, opts = {}) {
     const issns = [normalizeIssnForOpenAlex(r?.issn), normalizeIssnForOpenAlex(r?.eissn)]
       .filter((value, index, arr) => value && arr.indexOf(value) === index);
@@ -1730,19 +1756,8 @@
       const usable = (Array.isArray(payload?.years) ? payload.years : [])
         .filter(row => Number(row?.total || 0) > 0 && Array.isArray(row?.groups));
       if (!usable.length) return null;
-      if (Array.isArray(payload?.top) && payload.top.length) {
-        return { years: usable, top: payload.top, source: payload.source || 'openalex' };
-      }
-      const countryTotals = new Map();
-      usable.forEach(row => row.groups.forEach(g => {
-        const key = g.name;
-        countryTotals.set(key, (countryTotals.get(key) || 0) + Number(g.count || 0));
-      }));
-      const ranked = [...countryTotals.entries()].sort((a, b) => b[1] - a[1]).map(([n]) => n);
-      const top = (ranked.includes('China')
-        ? ['China', ...ranked.filter((n) => n !== 'China')]
-        : ranked
-      ).slice(0, 5);
+      const top = rankCountryOutputTop(usable, payload?.top);
+      if (!top.length) return null;
       return { years: usable, top, source: payload?.source || 'openalex' };
     };
     const fetchFromApi = async () => {
@@ -1813,16 +1828,7 @@
     };
     const buildFromRows = (usable) => {
       if (!usable?.length) return null;
-      const countryTotals = new Map();
-      usable.forEach(row => row.groups.forEach(g => {
-        const key = g.name;
-        countryTotals.set(key, (countryTotals.get(key) || 0) + g.count);
-      }));
-      const ranked = [...countryTotals.entries()].sort((a, b) => b[1] - a[1]).map(([n]) => n);
-      const top = (ranked.includes('China')
-        ? ['China', ...ranked.filter(n => n !== 'China')]
-        : ranked
-      ).slice(0, 5);
+      const top = rankCountryOutputTop(usable);
       if (!top.length) return null;
       return { years: usable, top, source: 'openalex-client' };
     };
@@ -1863,46 +1869,138 @@
 
   function renderCountryOutputChartData(payload, selectedCountry = 'China') {
     if (!payload || !payload.years?.length || !payload.top?.length) return '';
-    const countryDisplay = (name) => {
-      const zh = {
-        'China': '中国（含港澳台）',
-        'United States of America': '美国',
-        'United States': '美国',
-        'United Kingdom of Great Britain and Northern Ireland': '英国',
-        'United Kingdom': '英国',
-        'Australia': '澳大利亚',
-        'Canada': '加拿大',
-        'Germany': '德国',
-        'France': '法国',
-        'Japan': '日本',
-        'India': '印度',
-        'Italy': '意大利',
-        'Spain': '西班牙',
-        'Netherlands': '荷兰',
-        'Brazil': '巴西',
-        'Russian Federation': '俄罗斯',
-        'Iran (Islamic Republic of)': '伊朗',
-        'Korea, Republic of': '韩国',
-        'South Korea': '韩国',
-      };
-      const en = {
-        'China': 'China incl. HK/Macao/Taiwan',
-        'United States of America': 'United States',
-        'United Kingdom of Great Britain and Northern Ireland': 'United Kingdom',
-        'Russian Federation': 'Russia',
-        'Iran (Islamic Republic of)': 'Iran',
-        'Korea, Republic of': 'South Korea',
-      };
-      return T(zh[name] || name, en[name] || name);
+    const rankedTop = rankCountryOutputTop(payload.years, payload.top);
+    if (!rankedTop.length) return '';
+    const codeByName = new Map();
+    payload.years.forEach((row) => (Array.isArray(row.groups) ? row.groups : []).forEach((group) => {
+      const name = String(group?.name || '').trim();
+      const code = String(group?.code || '').trim().toUpperCase();
+      if (name && code && !codeByName.has(name)) codeByName.set(name, code);
+    }));
+    const countryLabels = {
+      'China': ['中国（含港澳台）', 'China incl. HK/Macao/Taiwan'],
+      'United States of America': ['美国', 'United States'],
+      'United States': ['美国', 'United States'],
+      'United Kingdom of Great Britain and Northern Ireland': ['英国', 'United Kingdom'],
+      'United Kingdom': ['英国', 'United Kingdom'],
+      'Australia': ['澳大利亚', 'Australia'],
+      'Canada': ['加拿大', 'Canada'],
+      'Germany': ['德国', 'Germany'],
+      'France': ['法国', 'France'],
+      'Japan': ['日本', 'Japan'],
+      'India': ['印度', 'India'],
+      'Italy': ['意大利', 'Italy'],
+      'Spain': ['西班牙', 'Spain'],
+      'Netherlands': ['荷兰', 'Netherlands'],
+      'Brazil': ['巴西', 'Brazil'],
+      'Russian Federation': ['俄罗斯', 'Russia'],
+      'Russia': ['俄罗斯', 'Russia'],
+      'Iran (Islamic Republic of)': ['伊朗', 'Iran'],
+      'Iran': ['伊朗', 'Iran'],
+      'Korea, Republic of': ['韩国', 'South Korea'],
+      'South Korea': ['韩国', 'South Korea'],
+      'Colombia': ['哥伦比亚', 'Colombia'],
+      'Mexico': ['墨西哥', 'Mexico'],
+      'Argentina': ['阿根廷', 'Argentina'],
+      'Chile': ['智利', 'Chile'],
+      'Peru': ['秘鲁', 'Peru'],
+      'Ecuador': ['厄瓜多尔', 'Ecuador'],
+      'Venezuela': ['委内瑞拉', 'Venezuela'],
+      'Bolivia': ['玻利维亚', 'Bolivia'],
+      'Uruguay': ['乌拉圭', 'Uruguay'],
+      'Paraguay': ['巴拉圭', 'Paraguay'],
+      'Costa Rica': ['哥斯达黎加', 'Costa Rica'],
+      'Panama': ['巴拿马', 'Panama'],
+      'New Zealand': ['新西兰', 'New Zealand'],
+      'Switzerland': ['瑞士', 'Switzerland'],
+      'Sweden': ['瑞典', 'Sweden'],
+      'Norway': ['挪威', 'Norway'],
+      'Denmark': ['丹麦', 'Denmark'],
+      'Finland': ['芬兰', 'Finland'],
+      'Ireland': ['爱尔兰', 'Ireland'],
+      'Belgium': ['比利时', 'Belgium'],
+      'Austria': ['奥地利', 'Austria'],
+      'Poland': ['波兰', 'Poland'],
+      'Czechia': ['捷克', 'Czechia'],
+      'Czech Republic': ['捷克', 'Czechia'],
+      'Slovakia': ['斯洛伐克', 'Slovakia'],
+      'Hungary': ['匈牙利', 'Hungary'],
+      'Romania': ['罗马尼亚', 'Romania'],
+      'Bulgaria': ['保加利亚', 'Bulgaria'],
+      'Greece': ['希腊', 'Greece'],
+      'Portugal': ['葡萄牙', 'Portugal'],
+      'Türkiye': ['土耳其', 'Türkiye'],
+      'Turkey': ['土耳其', 'Türkiye'],
+      'Ukraine': ['乌克兰', 'Ukraine'],
+      'Israel': ['以色列', 'Israel'],
+      'Saudi Arabia': ['沙特阿拉伯', 'Saudi Arabia'],
+      'United Arab Emirates': ['阿拉伯联合酋长国', 'United Arab Emirates'],
+      'Qatar': ['卡塔尔', 'Qatar'],
+      'Egypt': ['埃及', 'Egypt'],
+      'South Africa': ['南非', 'South Africa'],
+      'Nigeria': ['尼日利亚', 'Nigeria'],
+      'Kenya': ['肯尼亚', 'Kenya'],
+      'Morocco': ['摩洛哥', 'Morocco'],
+      'Tunisia': ['突尼斯', 'Tunisia'],
+      'Pakistan': ['巴基斯坦', 'Pakistan'],
+      'Bangladesh': ['孟加拉国', 'Bangladesh'],
+      'Sri Lanka': ['斯里兰卡', 'Sri Lanka'],
+      'Nepal': ['尼泊尔', 'Nepal'],
+      'Vietnam': ['越南', 'Vietnam'],
+      'Thailand': ['泰国', 'Thailand'],
+      'Malaysia': ['马来西亚', 'Malaysia'],
+      'Singapore': ['新加坡', 'Singapore'],
+      'Indonesia': ['印度尼西亚', 'Indonesia'],
+      'Philippines': ['菲律宾', 'Philippines'],
+      'Kazakhstan': ['哈萨克斯坦', 'Kazakhstan'],
+      'Uzbekistan': ['乌兹别克斯坦', 'Uzbekistan'],
     };
-    const countries = [...payload.top, 'Other'];
-    const selected = payload.top.includes(selectedCountry)
+    const displayNamesCache = new Map();
+    const countryDisplay = (name) => {
+      if (name === 'Other') return T('其他', 'Other');
+      const pair = countryLabels[name];
+      if (pair) return lang === 'en' ? pair[1] : pair[0];
+      const code = codeByName.get(name);
+      if (code) {
+        const locale = lang === 'en' ? 'en' : 'zh-CN';
+        const cacheKey = `${locale}:${code}`;
+        if (!displayNamesCache.has(cacheKey)) {
+          let display = '';
+          try {
+            display = new Intl.DisplayNames([locale], { type: 'region' }).of(code) || '';
+          } catch (_) { /* older browser */ }
+          displayNamesCache.set(cacheKey, display);
+        }
+        const display = displayNamesCache.get(cacheKey);
+        if (display) return display;
+      }
+      // The OpenAlex country code normally makes the Intl fallback above
+      // sufficient. Keep the canonical name as a final, data-preserving
+      // fallback for an unrecognised provider value.
+      return name;
+    };
+    const countries = [...rankedTop, 'Other'];
+    const selected = rankedTop.includes(selectedCountry)
       ? selectedCountry
-      : (payload.top[0] || 'China');
-    const select = `<label class="country-select-wrap"><span>${T('显示趋势','Trend')}</span><select class="country-select" aria-label="${T('选择国家/地区','Select country/region')}">${payload.top.map(name => `<option value="${escape(name)}"${name === selected ? ' selected' : ''}>${escape(countryDisplay(name))}</option>`).join('')}</select></label>`;
-    const legend = countries.map((name, i) => (
-      `<span class="country-legend-item"><span class="country-swatch" style="background:${countryOutputColors[i % countryOutputColors.length]}"></span>${escape(name === 'Other' ? T('其他','Other') : countryDisplay(name))}</span>`
-    )).join('');
+      : (rankedTop[0] || 'China');
+    const select = `<label class="country-select-wrap"><span>${T('显示趋势','Trend')}</span><select class="country-select" aria-label="${T('选择国家/地区','Select country/region')}">${rankedTop.map(name => `<option value="${escape(name)}"${name === selected ? ' selected' : ''}>${escape(countryDisplay(name))}</option>`).join('')}</select></label>`;
+    const aggregateTotals = new Map(countries.map(name => [name, 0]));
+    payload.years.forEach((row) => {
+      const byName = new Map((Array.isArray(row.groups) ? row.groups : []).map(g => [g.name, Number(g.count || 0)]));
+      const topTotal = rankedTop.reduce((sum, name) => sum + (byName.get(name) || 0), 0);
+      rankedTop.forEach(name => aggregateTotals.set(name, (aggregateTotals.get(name) || 0) + (byName.get(name) || 0)));
+      aggregateTotals.set('Other', (aggregateTotals.get('Other') || 0) + Math.max(0, Number(row.total || 0) - topTotal));
+    });
+    const legendNames = countries.slice().sort((a, b) => {
+      const diff = (aggregateTotals.get(b) || 0) - (aggregateTotals.get(a) || 0);
+      return diff || countries.indexOf(a) - countries.indexOf(b);
+    });
+    const legend = legendNames.map((name) => {
+      const colorIndex = countries.indexOf(name);
+      return (
+      `<span class="country-legend-item"><span class="country-swatch" style="background:${countryOutputColors[colorIndex % countryOutputColors.length]}"></span>${escape(countryDisplay(name))}</span>`
+      );
+    }).join('');
     const rowH = 29;
     const w = 320, h = Math.max(rowH, payload.years.length * rowH);
     const barX = 46, barW = 228;
@@ -1910,18 +2008,23 @@
     const yFor = (i) => i * rowH + rowH / 2;
     const trendPoints = [];
     const rows = payload.years.map(row => {
-      const byName = new Map(row.groups.map(g => [g.name, g.count]));
-      const topCounts = payload.top.map(name => ({ name, count: byName.get(name) || 0 }));
+      const byName = new Map((Array.isArray(row.groups) ? row.groups : []).map(g => [g.name, g.count]));
+      const topCounts = rankedTop.map(name => ({ name, count: byName.get(name) || 0 }));
       const topTotal = topCounts.reduce((sum, item) => sum + item.count, 0);
       const selectedCount = byName.get(selected) || 0;
       const selectedPct = row.total ? selectedCount / row.total * 100 : 0;
       trendPoints.push({ year: row.year, pct: selectedPct, x: xFor(selectedPct), y: yFor(trendPoints.length) });
       const segments = [...topCounts, { name: 'Other', count: Math.max(0, row.total - topTotal) }]
         .filter(item => item.count > 0)
+        .sort((a, b) => {
+          const diff = b.count - a.count;
+          return diff || countries.indexOf(a.name) - countries.indexOf(b.name);
+        })
         .map((item) => {
           const pct = row.total ? (item.count / row.total) * 100 : 0;
-          const label = `${item.name === 'Other' ? T('其他','Other') : countryDisplay(item.name)} ${pct.toFixed(pct >= 10 ? 0 : 1)}%`;
-          return `<div class="country-segment" style="width:${pct.toFixed(3)}%;background:${countryOutputColors[(item.name === 'Other' ? countries.length - 1 : countries.indexOf(item.name)) % countryOutputColors.length]}" title="${escape(`${row.year} · ${label} · ${item.count}`)}">${pct >= 18 ? `<span>${escape(`${pct.toFixed(0)}%`)}</span>` : ''}</div>`;
+          const label = `${countryDisplay(item.name)} ${pct.toFixed(pct >= 10 ? 0 : 1)}%`;
+          const colorIndex = countries.indexOf(item.name);
+          return `<div class="country-segment" style="width:${pct.toFixed(3)}%;background:${countryOutputColors[colorIndex % countryOutputColors.length]}" title="${escape(`${row.year} · ${label} · ${item.count}`)}">${pct >= 18 ? `<span>${escape(`${pct.toFixed(0)}%`)}</span>` : ''}</div>`;
         }).join('');
       return `<div class="country-bar-row">
         <div class="country-year">${row.year}${row.year >= 2026 ? `<span>${T('快照','YTD')}</span>` : ''}</div>
@@ -1932,8 +2035,8 @@
     const trendPath = trendPoints.map((p, i) => `${i ? 'L' : 'M'}${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
     const trendDots = trendPoints.map(p => `<circle class="country-line-dot" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="2.4"><title>${p.year}: ${p.pct.toFixed(p.pct >= 10 ? 0 : 1)}%</title></circle>`).join('');
     const sourceUnit = payload.source === 'crossref'
-      ? T('Crossref 作者机构占比', 'Crossref author affiliation share')
-      : T('OpenAlex 作者机构占比', 'OpenAlex author affiliation share');
+      ? T('Crossref 作者机构国家/地区占比', 'Crossref author-affiliation country/region share')
+      : T('OpenAlex 作者机构国家/地区占比', 'OpenAlex author-affiliation country/region share');
     return `<div class="country-output-head"><div><div class="trend-title">${T('国家/地区比例','Country/Region Shares')}</div><div class="trend-unit">${sourceUnit}</div></div>${select}</div>
       <div class="country-output-chart">
         ${rows}

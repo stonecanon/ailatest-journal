@@ -2571,11 +2571,9 @@ function buildCountryOutputPayload(rows, source = 'openalex') {
     countryTotals.set(group.name, (countryTotals.get(group.name) || 0) + group.count);
   }));
   const ranked = [...countryTotals.entries()].sort((a, b) => b[1] - a[1]).map(([name]) => name);
-  // 有中国数据时置顶；否则用真实 Top，避免空 China 占位导致图空白
-  const top = (ranked.includes('China')
-    ? ['China', ...ranked.filter((n) => n !== 'China')]
-    : ranked
-  ).slice(0, 5);
+  // Keep the payload in the same descending order used by the chart. China is
+  // no longer forced to the first slot when another country has a larger share.
+  const top = ranked.slice(0, 5);
   if (!top.length) return null;
   return { ok: true, years: usable, top, source };
 }
