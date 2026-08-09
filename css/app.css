@@ -13545,3 +13545,174 @@ body.journal-route .drawer-head {
   .j-row .col-badge,
   .j-row .badges-idx
 ) .badge.b-pmc { background: #2f6f68 !important; color: #fff !important; }
+
+/* ═══════ 徽章扁平浅色层（2026-08） ═══════
+   徽章只做信息分组，不使用深色实心块、内侧高光或投影。这里放在
+   文件末尾，统一覆盖历史页面、详情抽屉、列表卡和荐刊卡的旧色板。 */
+:root {
+  --badge-edge: none;
+  --badge-border: 1px solid rgba(90, 70, 50, 0.16);
+}
+
+html[lang] body :is(
+  .badge,
+  .zone,
+  .xr-pill,
+  .if-pill,
+  .domsrc-pill,
+  .abdc-pill,
+  .abs-pill,
+  .ccf-pill,
+  .tier-pill,
+  .warn-pill,
+  .flagship-pill,
+  .on-hold-pill,
+  .under-review-pill,
+  .citic-warning-pill,
+  .retraction-pill,
+  .share-idx,
+  .share-jcr,
+  .pick-zone-badge,
+  .oa-pill,
+  .oa-chip,
+  .badge-oa,
+  .rank-pill,
+  .pill-under-review,
+  .pill-on-hold,
+  .pill-warning,
+  .pill-citic-warning,
+  .home-more-badge
+)[class] {
+  display: inline-flex !important;
+  align-items: center !important;
+  min-height: 21px;
+  padding: 3px 8px !important;
+  border-radius: 999px !important;
+  font-family: var(--sans);
+  font-size: 10.5px !important;
+  font-weight: 650 !important;
+  line-height: 1.25 !important;
+  letter-spacing: 0 !important;
+  white-space: nowrap;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  border: 1px solid rgba(90, 70, 50, 0.16) !important;
+  background: #f4f2ee !important;
+  color: #655f58 !important;
+}
+
+/* 收录：浅蓝 / 浅灰蓝 */
+html[lang] body :is(.badge.b-scie, .badge.b-ssci, .badge.b-ahci, .share-idx.idx-scie, .share-idx.idx-ssci, .share-idx.idx-ahci)[class] {
+  background: #e8eef8 !important;
+  color: #3e5a7a !important;
+  border-color: #cbd8eb !important;
+}
+html[lang] body :is(.badge.b-esci, .badge.b-ei, .badge.b-scopus, .badge.b-inspec, .badge.b-fsta, .badge.b-cabi, .share-idx.idx-esci, .share-idx.idx-ei)[class] {
+  background: #edf2f4 !important;
+  color: #506372 !important;
+  border-color: #d3dfe4 !important;
+}
+html[lang] body :is(.badge.b-medline, .badge.b-pubmed, .badge.b-pmc)[class] {
+  background: #e7f1f4 !important;
+  color: #356574 !important;
+  border-color: #c9dfe5 !important;
+}
+html[lang] body :is(.badge.b-cscd, .badge.b-cstpcd, .badge.b-scd)[class] {
+  background: #edf6ef !important;
+  color: #467055 !important;
+  border-color: #cfe4d4 !important;
+}
+html[lang] body :is(.badge.b-doaj, .badge.b-oaj, .badge.b-free)[class] {
+  background: #eaf6ec !important;
+  color: #32764a !important;
+  border-color: #cce5d2 !important;
+}
+html[lang] body :is(.oa-pill, .oa-chip, .badge-oa)[class] {
+  background: #eaf6ec !important;
+  color: #32764a !important;
+  border-color: #cce5d2 !important;
+}
+html[lang] body :is(.oa-pill.oa-gold, .oa-chip.oa-isoa, .badge-oa.oa-gold)[class] {
+  background: #fbf1d9 !important;
+  color: #806227 !important;
+  border-color: #ead9a9 !important;
+}
+html[lang] body :is(.oa-pill.oa-hybrid, .badge-oa.oa-hybrid)[class] {
+  background: #edf1fa !important;
+  color: #50658b !important;
+  border-color: #d3dcef !important;
+}
+html[lang] body :is(.oa-pill.oa-sub, .oa-pill.oa-unk)[class] {
+  background: #f4f2ee !important;
+  color: #655f58 !important;
+  border-color: #ded8cf !important;
+}
+
+/* 分区、等级：浅暖色 / 浅紫色 */
+html[lang] body :is(.zone, .if-pill, .badge.b-jcr, .flagship-pill, .share-idx.jcr-q1, .share-idx.jcr-q2, .share-idx.jcr-q3, .share-idx.jcr-q4, .share-jcr.jcr-q1, .share-jcr.jcr-q2, .share-jcr.jcr-q3, .share-jcr.jcr-q4)[class] {
+  background: #f8efe2 !important;
+  color: #7b603e !important;
+  border-color: #ead7bd !important;
+}
+html[lang] body :is(.zone.z1, .pick-zone-badge.z1)[class] {
+  background: #e8eef8 !important;
+  color: #3e5a7a !important;
+  border-color: #cbd8eb !important;
+}
+html[lang] body :is(.zone.z2, .pick-zone-badge.z2)[class] {
+  background: #edf2f4 !important;
+  color: #506372 !important;
+  border-color: #d3dfe4 !important;
+}
+html[lang] body :is(.zone.z3, .zone.z4, .pick-zone-badge.z3, .pick-zone-badge.z4)[class] {
+  background: #f4f2ee !important;
+  color: #655f58 !important;
+  border-color: #ded8cf !important;
+}
+html[lang] body :is(.zone.ztop, .pick-zone-badge.ztop)[class] {
+  background: #f8efe2 !important;
+  color: #7b603e !important;
+  border-color: #ead7bd !important;
+}
+html[lang] body :is(.xr-pill, .ccf-pill, .zone.vhb-tier)[class] {
+  background: #f0edf8 !important;
+  color: #67598d !important;
+  border-color: #ddd5ef !important;
+}
+html[lang] body :is(.abdc-pill, .abs-pill, .zone.abs-g4s, .zone.abs-g4, .zone.abs-g3, .zone.abs-g2, .zone.abs-g1)[class] {
+  background: #f5eaee !important;
+  color: #7b5260 !important;
+  border-color: #ead3db !important;
+}
+html[lang] body :is(.tier-pill, .domsrc-pill, .zone.cnrs-tier)[class] {
+  background: #edf1f4 !important;
+  color: #5c6c79 !important;
+  border-color: #d5dfe5 !important;
+}
+html[lang] body :is(.zone.fms-tier, .domsrc-pill.ds-cnkx)[class] {
+  background: #f5ece3 !important;
+  color: #8a5b3c !important;
+  border-color: #ead6c3 !important;
+}
+
+/* 风险：保留红/橙语义，但改成浅底；撤稿数量不再使用拟物高光。 */
+html[lang] body :is(.warn-pill, .badge.b-warn, .badge.b-warn-high, .badge.b-retraction, .retraction-pill, .rank-pill-risk, .pill-warning, .pill-citic-warning)[class] {
+  background: #faecea !important;
+  color: #9e4e47 !important;
+  border-color: #efcfcb !important;
+}
+html[lang] body :is(.under-review-pill, .on-hold-pill, .pill-under-review, .pill-on-hold)[class] {
+  background: #fbefe3 !important;
+  color: #9a623f !important;
+  border-color: #ecd6c2 !important;
+}
+html[lang] body :is(.rank-pill-info)[class] {
+  background: #edf2f8 !important;
+  color: #526b83 !important;
+  border-color: #d3dfe9 !important;
+}
+html[lang] body :is(.citic-warning-pill)[class] {
+  background: #f1efeb !important;
+  color: #6e665d !important;
+  border-color: #ded8cf !important;
+}
