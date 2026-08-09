@@ -13,7 +13,7 @@
   </p>
   <p>
     <a href="https://journal.ailatest.org">
-      <img src="screenshots/preview-202606.png" alt="AILatest Journal main interface" width="800">
+      <img src="screenshots/preview.png" alt="AILatest Journal current home page" width="800">
     </a>
   </p>
   <p>
@@ -25,9 +25,9 @@
 
 ---
 
-**AILatest Journal (知刊)** 是一个免费、开源的学术期刊检索与推荐平台，收录 **50,350 本**国际期刊，覆盖 **SCIE / SSCI / AHCI / ESCI / EI / Scopus / DOAJ / MEDLINE** 等主流索引，提供影响因子、中科院/JCR分区、审稿周期、预警信息等关键投稿指标。
+**AILatest Journal（知刊）** 是一个面向科研人员的学术期刊检索、投稿选刊与数据分析平台，覆盖 **5 万+** 国际期刊及 **SCIE / SSCI / AHCI / ESCI / EI / Scopus / DOAJ / MEDLINE** 等主流索引，集中展示影响因子、JCR/中科院分区、审稿周期、开放获取、APC 与预警风险等投稿参考信息。
 
-纯前端 SPA，数据全部客户端搜索，毫秒级响应。无需后端服务器，部署于 Cloudflare Pages。
+基础检索在浏览器端完成，配合 Cloudflare Pages、Workers 与 D1 提供搜索 API、账户同步、动态期刊数据和地区统计。项目支持中文与英文界面，并持续更新数据和功能。
 
 ---
 
@@ -36,16 +36,18 @@
 | 功能 | Feature | 说明 |
 |------|---------|------|
 | 🔍 **期刊检索** | Search | 全称/缩写/ISSN 实时搜索，多维度筛选（索引、分区、学科、状态），毫秒级响应 |
-| 🎯 **智能荐刊** | Pick for Me | 输入论文标题/摘要，AI 算法自动推荐最匹配的目标期刊 |
+| 🎯 **智能荐刊** | Pick for Me | 输入论文标题/摘要/关键词，生成候选期刊清单；本地匹配可直接试用，AI 语义增强按权限开放 |
 | ⭐ **收藏同步** | Favorites | 登录后跨设备收藏同步，管理投稿清单 |
-| 🏛️ **期刊详情** | Details | IF 趋势图、中科院/JCR 分区、审稿周期、OA/APC、OpenAlex Topics |
-| 🌐 **多语言** | i18n | 中/英/日/韩/西/葡/法/德 8 种语言 |
+| 🏛️ **期刊详情** | Details | 影响因子、中科院/JCR 分区、审稿周期、OA/APC、出版地区与风险提示 |
+| 🌐 **双语界面** | i18n | 中文 / English |
 | 📱 **PWA 支持** | PWA | 可安装到手机主屏，离线基本可用 |
-| ⚠️ **预警监控** | Warnings | 中科院预警名单、中信所预警、WoS On Hold、Under Review 实时标记 |
+| ⚠️ **预警监控** | Warnings | 中科院预警、中信所预警、WoS On Hold、Under Review 与撤稿风险标记 |
 
 ---
 
 ## 📊 数据统计
+
+以下为仓库当前数据包的统计快照，数据包更新时间为 **2026-08-06**；各指标的发布日期和更新周期不同，页面会标注对应来源与年份。
 
 ### 覆盖范围
 
@@ -93,27 +95,30 @@
 <div align="center">
   <table>
     <tr>
-      <td><a href="https://journal.ailatest.org"><img src="screenshots/pick-tool.png" alt="Pick for Me tool" width="390"></a></td>
-      <td><a href="https://journal.ailatest.org"><img src="screenshots/pick-results.png" alt="Pick results" width="390"></a></td>
+      <td><a href="https://journal.ailatest.org/pick"><img src="screenshots/pick-tool.png" alt="AI journal recommendation form" width="390"></a></td>
+      <td><a href="https://journal.ailatest.org/pick"><img src="screenshots/pick-results.png" alt="AI journal recommendation results" width="390"></a></td>
     </tr>
   </table>
 </div>
 
-输入论文标题或摘要，系统自动：
-1. 提取关键词，多维度搜索 OpenAlex
-2. 按期刊聚合论文，多因子打分（论文数 60% + 关键词匹配 30% + Topic 匹配 10%）
-3. IF 筛选、分区过滤、排除综合性期刊等条件叠加
-4. 推荐最匹配的目标期刊，附带审稿周期数据
+输入论文标题、摘要或关键词后，系统会：
+
+1. 提取研究主题和关键词，匹配本地期刊目录与相关论文信号；
+2. 按索引、分区、学科、开放获取和综合性期刊等条件筛选；
+3. 生成优选推荐与备选期刊清单，并展示匹配方向、分区、影响因子和投稿参考信息；
+4. 在用户启用 AI 语义增强时进一步优化匹配结果。
+
+荐刊结果用于缩小检索范围，不能替代作者对期刊 scope、最新目录和投稿要求的人工核验。
 
 ---
 
-## 🏛️ 期刊详情抽屉
+## 🏛️ 期刊详情页
 
 <div align="center">
-  <a href="https://journal.ailatest.org"><img src="screenshots/drawer.png" alt="Journal detail drawer" width="800"></a>
+  <a href="https://journal.ailatest.org"><img src="screenshots/drawer.png" alt="Current journal detail page" width="800"></a>
 </div>
 
-每个期刊的详情抽屉包含：
+每个期刊的详情页包含：
 - **索引标识**: SCIE / SSCI / AHCI / ESCI / EI / Scopus / MEDLINE / DOAJ
 - **分区信息**: 中科院 2025 大类分区 + TOP 标志、JCR Quartile
 - **指标**: JCR 2025 影响因子 (IF)、Eigenfactor、排名百分位
@@ -123,7 +128,8 @@
 - **预警标记**: 中科院预警、中信所预警、WoS On Hold、Under Review
 - **学术评价**: CCF、ABDC、ABS 分级
 - **审稿周期**: CrossRef 数据推导的平均审稿周期
-- **OpenAlex Topics**: 主要研究领域标签
+- **出版与地区信息**: 出版商、出版国家/地区、作者机构国家/地区趋势（有数据时展示）
+- **OpenAlex Topics**: 主要研究领域标签与相关论文信号
 
 ---
 
@@ -140,6 +146,7 @@
 | DOAJ | Directory of Open Access Journals | 2026-07-06 公共 CSV，匹配 22,975 本 |
 | MEDLINE | NLM Catalog | 2026-08-06 当前收录查询，匹配 5,368 本 |
 | 审稿周期 | CrossRef + 自收集 | 26,070 个期刊实测数据 |
+| 作者机构国家/地区 | [OpenAlex](https://openalex.org/) API + Crossref 兜底 | 按期刊和年份缓存到 Cloudflare D1，逐步补齐 |
 | CCF 推荐 | 中国计算机学会 | 2026 版 A/B/C |
 | ABDC | Australian Business Deans' Council | 2025 版 A*/A/B/C |
 | ABS | Chartered ABS | Academic Journal Guide 2024 |
@@ -147,7 +154,7 @@
 | 中信所预警 | 中信所 | 39 条预警期刊 |
 | Under Review | [topeditsci](https://topeditsci.com) | 44 本考察期期刊 |
 | On Hold | Clarivate / 自跟踪 | 19 本期刊 |
-| OpenAlex | OpenAlex API | Topics、OA、APC 元数据 |
+| OpenAlex | OpenAlex API / snapshot | Topics、OA、APC 元数据，以及作者机构国家/地区统计 |
 | CNKI 中文期刊 | 知网 | 6,038 种中文核心期刊 |
 
 ---
@@ -158,9 +165,10 @@
 |------|------|------|
 | **HTML/CSS/JS** | Vanilla SPA | 零框架，纯原生实现 |
 | **Python** | Pandas, openpyxl | 数据清洗、合并、构建 |
-| **Cloudflare Pages** | Edge CDN | 全球部署，零服务器 |
-| **GitHub → CF** | Auto Deploy | CI/CD 自动发布 |
-| **Hermes Agent** | Cron Jobs | Scopus/DOAJ 月度自动更新 |
+| **Cloudflare Pages** | Edge CDN | 静态前端全球部署 |
+| **Cloudflare Workers + D1** | Edge API / Database | 搜索、账户、支付回调、动态地区数据与定时预加载 |
+| **GitHub → Cloudflare** | Auto Deploy | 网站与 Worker 的持续发布 |
+| **OpenAlex / Crossref** | Scholarly APIs | 期刊元数据、主题和作者机构地区统计 |
 | **PWA** | Service Worker | 离线缓存、主屏安装 |
 
 ---
@@ -184,6 +192,11 @@ python3 scripts/sync_current_directories.py
 # 3. 本地预览
 python3 -m http.server 8080
 # 浏览器打开 http://localhost:8080
+
+# 4. （可选）本地运行 Worker API
+cd worker
+npm install
+npx wrangler dev
 ```
 
 ---
@@ -202,6 +215,7 @@ python3 -m http.server 8080
 ├── screenshots/            # README 截图
 ├── icons/                  # PWA 图标 + OG 图
 ├── functions/api/          # Cloudflare Pages Functions（搜索 API）
+├── worker/                 # Cloudflare Worker、D1 migrations 与定时任务
 ├── weapp/                  # 微信小程序（预留）
 ├── robots.txt              # SEO
 └── sitemap.xml             # SEO
