@@ -67,9 +67,9 @@
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.7l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3.7z"/></svg>
           <span data-static-i18n="rail_saved">收藏</span>
         </a>
-        <a class="rail-nav-btn${current('/account')}" id="account-credit-badge" href="/account"${ariaCurrent('/account')} aria-label="我的" title="我的">
+        <a class="rail-nav-btn${current('/account')}" id="account-credit-badge" data-tab="me" href="/account"${ariaCurrent('/account')} aria-label="设置" title="设置">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="9" r="3.5"/><path d="M5 19c1.5-3 4-4.5 7-4.5S17.5 16 19 19"/></svg>
-          <span data-static-i18n="rail_account">我的</span>
+          <span data-static-i18n="rail_account">设置</span>
         </a>
       </div>`;
   }
@@ -217,6 +217,10 @@
     if (account) {
       account.id = 'account-credit-badge';
       account.classList.add('account-credit-badge');
+      // Keep the rail entry on the settings surface.  The href remains as a
+      // no-JS fallback for static shells, while the SPA click handler uses
+      // data-tab=me and opens the in-place settings panel on mobile.
+      account.dataset.tab = 'me';
       const icon = account.querySelector('svg');
       let label = account.querySelector('.rail-me-label');
       let chip = account.querySelector('.rail-tier-chip');
@@ -232,6 +236,8 @@
         if (label.textContent !== nextLabel) label.textContent = nextLabel;
         label.dataset.railLabel = 'settings';
       }
+      account.setAttribute('aria-label', railLabel('设置', 'Settings'));
+      account.title = railLabel('设置', 'Settings');
       if (chip && !chip.textContent.trim()) chip.textContent = 'FREE';
     }
   }

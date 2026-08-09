@@ -71,7 +71,7 @@
       nav_terms: '条款', nav_privacy: '隐私', nav_refund: '退款',
       nav_index_rank: '索引排行榜', nav_subject_rank: '学科排行榜', nav_warn_rank: '预警名单', nav_extension_beta: '插件内测', nav_subscription: '订阅',
       filter_if_range: '影响因子', if_any: '不限',
-      rail_int: '全球', rail_dom: '中国', rail_region: '地区', rail_in: '印度', rail_my: '马来西亚', rail_kr: '韩国', rail_pbn: '波兰', rail_isc: '伊朗', rail_scielo: '拉美', rail_rank: '榜单', rail_fav: '收藏', rail_me: '我的',
+      rail_int: '全球', rail_dom: '中国', rail_region: '地区', rail_in: '印度', rail_my: '马来西亚', rail_kr: '韩国', rail_pbn: '波兰', rail_isc: '伊朗', rail_scielo: '拉美', rail_rank: '榜单', rail_fav: '收藏', rail_me: '设置',
       download_center: '下载',
       loading: '加载中…',
       hero_title_int: 'SCI / SSCI 国际期刊检索',
@@ -282,7 +282,7 @@
       nav_terms: 'Terms', nav_privacy: 'Privacy', nav_refund: 'Refund',
       nav_index_rank: 'Index Rankings', nav_subject_rank: 'Subject Rankings', nav_warn_rank: 'Warning List', nav_extension_beta: 'Extension beta', nav_subscription: 'Subscribe',
       filter_if_range: 'Impact Factor', if_any: 'Any',
-      rail_int: 'Global', rail_dom: 'China', rail_region: 'Regions', rail_in: 'India', rail_my: 'Malaysia', rail_kr: 'Korea', rail_pbn: 'Poland', rail_isc: 'Iran', rail_scielo: 'LatAm', rail_rank: 'Rankings', rail_fav: 'Saved', rail_me: 'Me',
+      rail_int: 'Global', rail_dom: 'China', rail_region: 'Regions', rail_in: 'India', rail_my: 'Malaysia', rail_kr: 'Korea', rail_pbn: 'Poland', rail_isc: 'Iran', rail_scielo: 'LatAm', rail_rank: 'Rankings', rail_fav: 'Saved', rail_me: 'Settings',
       download_center: 'Download',
       loading: 'Loading…',
       hero_title_int: 'International SCI / SSCI Search',
@@ -468,7 +468,7 @@
     filter_xinrui: '新銳分區', filter_warning: '預警', domestic_sources: '中國分級來源',
     src_cnkx: '中國科協高品質目錄', src_cssci_core: 'CSSCI 來源期刊', src_cssci_ext: 'CSSCI 擴展版', src_pku: '北大核心 (2023)', src_zju: '浙江大學 2024', src_ccft: 'CCF 中文 T 分區', nav_sub_inhouse: '院校自編目錄', paid_label: '付費', drawer_kicker: '期刊詳情',
         tab_home: '查刊', tab_int: '國際', tab_dom: '中國', tab_fav: '收藏', tab_pick: '薦刊',
-    rail_int: '國際期刊', rail_dom: '中國期刊', rail_fav: '收藏', rail_me: '我的',
+    rail_int: '國際期刊', rail_dom: '中國期刊', rail_fav: '收藏', rail_me: '設定',
     download_center: '下載',
     loading: '載入中…',
     hero_title_int: 'SCI / SSCI 國際期刊檢索',
@@ -679,7 +679,7 @@
     rail_kr: '韓国',
     rail_rank: 'ランキング',
     rail_fav: '保存',
-    rail_me: 'マイページ',
+      rail_me: '設定',
     rail_updates: '動向',
     download_center: 'ダウンロード',
     loading: '読み込み中…',
@@ -10929,10 +10929,10 @@
           <div class="share-modal-foot"><button id="share-close-btn" class="share-foot-link">${T('关闭','Close')}</button></div>
         </div>`;
     }
-    modal.innerHTML = `<div class="share-card share-modal-card">${body}</div>`;
+    modal.innerHTML = `<div class="share-card share-modal-card"><button type="button" class="share-modal-close" data-share-close aria-label="${T('关闭','Close')}">×</button>${body}</div>`;
     modal.classList.add('open');
-    const closeBtn = document.getElementById('share-close-btn');
-    if (closeBtn) closeBtn.addEventListener('click', () => { modal.classList.remove('open'); restoreTopbarSearch(); });
+    const closeShare = () => { modal.classList.remove('open'); restoreTopbarSearch(); };
+    modal.querySelectorAll('[data-share-close], #share-close-btn').forEach(btn => btn.addEventListener('click', closeShare));
     const copyBtn = document.getElementById('share-copy-btn');
     if (copyBtn) copyBtn.addEventListener('click', async () => {
       const inp = document.getElementById('share-url-input');
@@ -11039,6 +11039,7 @@
 
     modal.innerHTML = `
       <div class="share-card share-modal-card jcard-modal">
+        <button type="button" class="share-modal-close" data-share-close aria-label="${T('关闭','Close')}">×</button>
         <div class="share-modal-body">
           <div class="jcard-export" id="jcard-canvas">
             <div class="jcard-header">
@@ -11070,10 +11071,11 @@
       </div>`;
     modal.classList.add('open');
 
-    document.getElementById('share-close-btn').addEventListener('click', () => {
+    const closeShare = () => {
       modal.classList.remove('open');
       restoreTopbarSearch();
-    });
+    };
+    modal.querySelectorAll('[data-share-close], #share-close-btn').forEach(btn => btn.addEventListener('click', closeShare));
 
     document.getElementById('jcard-copy-btn').addEventListener('click', async () => {
       const ok = await copyToClipboard(url);
@@ -13265,7 +13267,11 @@
     });
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
-        if (document.body.classList.contains('settings-open')) closeSettingsShell();
+        const shareModal = document.getElementById('share-modal');
+        if (shareModal?.classList.contains('open')) {
+          shareModal.classList.remove('open');
+          restoreTopbarSearch();
+        } else if (document.body.classList.contains('settings-open')) closeSettingsShell();
         else { closeDrawer(); closeSidebar(); }
       }
     });

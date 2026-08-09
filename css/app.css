@@ -13695,6 +13695,168 @@ html[lang] body :is(.zone.fms-tier, .domsrc-pill.ds-cnkx)[class] {
   border-color: #ead6c3 !important;
 }
 
+/* ─────────── 手机全球站最终布局修正 ───────────
+   筛选器改为单列自然流，避免末尾旧的横向规则把 thead 压到首张卡片上。 */
+@media (max-width: 900px) {
+  .tab-panel[data-panel="int"] .table-wrap {
+    overflow: visible !important;
+    isolation: isolate;
+  }
+  .tab-panel[data-panel="int"] table.journals {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 14px !important;
+    width: 100% !important;
+    margin: 0 !important;
+  }
+  .tab-panel[data-panel="int"] table.journals thead {
+    display: block !important;
+    position: relative !important;
+    z-index: 4;
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    padding: 10px !important;
+    box-sizing: border-box;
+  }
+  .tab-panel[data-panel="int"] table.journals thead tr {
+    display: flex !important;
+    flex-direction: column !important;
+    flex-wrap: nowrap !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    width: 100% !important;
+    max-height: none !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .tab-panel[data-panel="int"] table.journals thead .col-badge {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 10px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+  .tab-panel[data-panel="int"] table.journals thead .col-wos {
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+  .tab-panel[data-panel="int"] .th-dropdown {
+    position: static !important;
+    display: grid !important;
+    grid-template-columns: 3.2em minmax(0, 1fr) !important;
+    align-items: start !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+  }
+  .tab-panel[data-panel="int"] .th-dropdown-panel {
+    position: static !important;
+    display: flex !important;
+    grid-column: 2 !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    align-content: flex-start !important;
+    gap: 5px !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    box-sizing: border-box;
+  }
+  .tab-panel[data-panel="int"] #topic-dropdown {
+    display: block !important;
+    width: 100% !important;
+  }
+  .tab-panel[data-panel="int"] #topic-dropdown .th-dropdown-panel {
+    display: flex !important;
+    grid-column: 1 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .tab-panel[data-panel="int"] #topic-dd-list {
+    max-height: 180px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+  .tab-panel[data-panel="int"] table.journals tbody {
+    display: grid !important;
+    position: relative;
+    z-index: 1;
+    clear: both;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 12px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+}
+
+/* 分享名片：移动端内容可滚动，但关闭按钮始终留在卡片顶部。 */
+.share-modal-card {
+  display: flex;
+  flex-direction: column;
+  max-height: min(760px, calc(100dvh - 32px));
+  overflow: hidden;
+}
+.share-modal-card .share-modal-body {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.share-modal-close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  z-index: 5;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid rgba(90, 70, 50, 0.16);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.84);
+  color: #6e6256;
+  font: 500 22px/27px var(--sans);
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(60, 40, 20, 0.12);
+}
+.share-modal-close:hover {
+  background: #fff;
+  color: #1f1a10;
+}
+@media (max-width: 600px) {
+  .share-modal {
+    align-items: flex-start;
+    overflow-y: auto;
+    padding: 12px;
+  }
+  .share-modal-card {
+    width: 100%;
+    max-width: calc(100vw - 24px);
+    max-height: calc(100dvh - 24px);
+  }
+  .share-modal-card .share-modal-body,
+  .jcard-modal .share-modal-body {
+    padding-top: 44px;
+  }
+  .jcard-export { padding: 14px 12px 11px; }
+  .jcard { padding: 16px 14px 14px; }
+  .jcard-title { font-size: 18px; }
+  .jcard-meta-row { gap: 8px; font-size: 12px; line-height: 1.55; }
+  .jcard-meta-k { min-width: 68px; }
+  .jcard-stats { gap: 6px; margin: 8px 0; padding: 8px 0; }
+  .jcard-stat-v { font-size: 17px; }
+}
+
 /* 风险：保留红/橙语义，但改成浅底；撤稿数量不再使用拟物高光。 */
 html[lang] body :is(.warn-pill, .badge.b-warn, .badge.b-warn-high, .badge.b-retraction, .retraction-pill, .rank-pill-risk, .pill-warning, .pill-citic-warning)[class] {
   background: #faecea !important;
