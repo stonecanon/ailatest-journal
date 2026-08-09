@@ -13230,3 +13230,318 @@ body.journal-route .drawer-head {
     min-width: 0 !important;
   }
 }
+
+/* ═══════ 期刊徽章对比度：卡片/详情页统一主页色板 ═══════
+   详情页和列表卡之前单独覆写成接近底色的浅芯片，扫描期刊信息时不易分辨。
+   这里沿用主页的色板，只提升信息层级，不改变字号、间距或布局。 */
+:is(
+  .info-grid .pills,
+  .info-grid .badges,
+  body.journal-route .pills,
+  body.journal-route .badges,
+  .j-drawer .pills,
+  .j-drawer .badges,
+  .j-row .j-card-badges,
+  .j-row .col-badge,
+  .j-row .badges-idx,
+  .j-row .badges-rank,
+  .j-row .badges-access,
+  .j-row .badges-risk
+) :is(
+  .badge,
+  .zone,
+  .xr-pill,
+  .if-pill,
+  .domsrc-pill,
+  .abdc-pill,
+  .abs-pill,
+  .ccf-pill,
+  .tier-pill,
+  .warn-pill,
+  .flagship-pill,
+  .on-hold-pill,
+  .under-review-pill,
+  .citic-warning-pill,
+  .retraction-pill
+) {
+  background: #735a3e !important;
+  color: #fff !important;
+  border-color: rgba(90, 70, 50, 0.3) !important;
+}
+
+/* 收录类：与主页 .badge.* 保持一一对应 */
+:is(
+  .info-grid .pills,
+  .info-grid .badges,
+  body.journal-route .pills,
+  body.journal-route .badges,
+  .j-drawer .pills,
+  .j-drawer .badges,
+  .j-row .j-card-badges,
+  .j-row .col-badge,
+  .j-row .badges-idx,
+  .j-row .badges-access
+) :is(.badge.b-scie, .badge.b-ssci, .badge.b-ahci) {
+  background: #1f3a5f !important;
+  color: #fff !important;
+}
+:is(
+  .info-grid .pills,
+  .info-grid .badges,
+  body.journal-route .pills,
+  body.journal-route .badges,
+  .j-drawer .pills,
+  .j-drawer .badges,
+  .j-row .j-card-badges,
+  .j-row .col-badge,
+  .j-row .badges-idx,
+  .j-row .badges-access
+) .badge.b-esci { background: #6a7a6a !important; color: #fff !important; }
+:is(
+  .info-grid .pills,
+  .info-grid .badges,
+  body.journal-route .pills,
+  body.journal-route .badges,
+  .j-drawer .pills,
+  .j-drawer .badges,
+  .j-row .j-card-badges,
+  .j-row .col-badge,
+  .j-row .badges-idx,
+  .j-row .badges-access
+) .badge.b-ei { background: #7a7a6a !important; color: #fff !important; }
+:is(
+  .info-grid .pills,
+  .info-grid .badges,
+  body.journal-route .pills,
+  body.journal-route .badges,
+  .j-drawer .pills,
+  .j-drawer .badges,
+  .j-row .j-card-badges,
+  .j-row .col-badge,
+  .j-row .badges-idx,
+  .j-row .badges-access
+) :is(.badge.b-scopus, .badge.b-cabi) { background: #8a706a !important; color: #fff !important; }
+:is(
+  .info-grid .pills,
+  .info-grid .badges,
+  body.journal-route .pills,
+  body.journal-route .badges,
+  .j-drawer .pills,
+  .j-drawer .badges,
+  .j-row .j-card-badges,
+  .j-row .col-badge,
+  .j-row .badges-idx,
+  .j-row .badges-access
+) .badge.b-inspec { background: #395f78 !important; color: #fff !important; }
+:is(
+  .info-grid .pills,
+  .info-grid .badges,
+  body.journal-route .pills,
+  body.journal-route .badges,
+  .j-drawer .pills,
+  .j-drawer .badges,
+  .j-row .j-card-badges,
+  .j-row .col-badge,
+  .j-row .badges-idx,
+  .j-row .badges-access
+) :is(.badge.b-medline, .badge.b-pubmed, .badge.b-pmc) {
+  background: #285f7a !important;
+  color: #fff !important;
+}
+:is(
+  .info-grid .pills,
+  .info-grid .badges,
+  body.journal-route .pills,
+  body.journal-route .badges,
+  .j-drawer .pills,
+  .j-drawer .badges,
+  .j-row .j-card-badges,
+  .j-row .col-badge,
+  .j-row .badges-idx,
+  .j-row .badges-access
+) :is(.badge.b-doaj, .badge.b-oaj, .badge.b-free) {
+  background: #2d8a4e !important;
+  color: #fff !important;
+}
+:is(
+  .info-grid .pills,
+  .info-grid .badges,
+  body.journal-route .pills,
+  body.journal-route .badges,
+  .j-drawer .pills,
+  .j-drawer .badges,
+  .j-row .j-card-badges,
+  .j-row .col-badge,
+  .j-row .badges-idx,
+  .j-row .badges-access
+) :is(.badge.b-cscd, .badge.b-cstpcd, .badge.b-scd) {
+  background: #4f6f7c !important;
+  color: #fff !important;
+}
+
+/* 分区与跨源标签：沿用主页的暖棕、酒红、钢蓝灰和紫灰 */
+:is(
+  .info-grid .pills,
+  .info-grid .badges,
+  body.journal-route .pills,
+  body.journal-route .badges,
+  .j-drawer .pills,
+  .j-drawer .badges,
+  .j-row .j-card-badges,
+  .j-row .col-badge,
+  .j-row .badges-rank
+) :is(.abdc-pill, .abs-pill) { background: #724a58 !important; color: #fff !important; }
+:is(
+  .info-grid .pills,
+  .info-grid .badges,
+  body.journal-route .pills,
+  body.journal-route .badges,
+  .j-drawer .pills,
+  .j-drawer .badges,
+  .j-row .j-card-badges,
+  .j-row .col-badge,
+  .j-row .badges-rank
+) .zone.fms-tier { background: #7b4f24 !important; color: #fff !important; }
+:is(
+  .info-grid .pills,
+  .info-grid .badges,
+  body.journal-route .pills,
+  body.journal-route .badges,
+  .j-drawer .pills,
+  .j-drawer .badges,
+  .j-row .j-card-badges,
+  .j-row .col-badge,
+  .j-row .badges-rank
+) .zone.vhb-tier { background: #624a82 !important; color: #fff !important; }
+:is(
+  .info-grid .pills,
+  .info-grid .badges,
+  body.journal-route .pills,
+  body.journal-route .badges,
+  .j-drawer .pills,
+  .j-drawer .badges,
+  .j-row .j-card-badges,
+  .j-row .col-badge,
+  .j-row .badges-rank
+) :is(.tier-pill, .domsrc-pill.ds-cnki_major) { background: #72849b !important; color: #fff !important; }
+:is(
+  .info-grid .pills,
+  .info-grid .badges,
+  body.journal-route .pills,
+  body.journal-route .badges,
+  .j-drawer .pills,
+  .j-drawer .badges,
+  .j-row .j-card-badges,
+  .j-row .col-badge,
+  .j-row .badges-rank
+) :is(.ccf-pill, .xr-pill, .if-pill, .flagship-pill) { background: #735a3e !important; color: #fff !important; }
+
+/* 风险/预警也使用主页的高对比色，避免与底色混成一片 */
+:is(
+  .info-grid .pills,
+  .info-grid .badges,
+  body.journal-route .pills,
+  body.journal-route .badges,
+  .j-drawer .pills,
+  .j-drawer .badges,
+  .j-row .j-card-badges,
+  .j-row .col-badge,
+  .j-row .badges-rank,
+  .j-row .badges-risk
+) .warn-pill { background: var(--crimson) !important; color: #fff !important; }
+:is(
+  .info-grid .pills,
+  .info-grid .badges,
+  body.journal-route .pills,
+  body.journal-route .badges,
+  .j-drawer .pills,
+  .j-drawer .badges,
+  .j-row .j-card-badges,
+  .j-row .col-badge,
+  .j-row .badges-rank,
+  .j-row .badges-risk
+) .under-review-pill { background: #e67e22 !important; color: #fff !important; }
+:is(
+  .info-grid .pills,
+  .info-grid .badges,
+  body.journal-route .pills,
+  body.journal-route .badges,
+  .j-drawer .pills,
+  .j-drawer .badges,
+  .j-row .j-card-badges,
+  .j-row .col-badge,
+  .j-row .badges-rank,
+  .j-row .badges-risk
+) .on-hold-pill { background: #d94a1e !important; color: #fff !important; }
+:is(
+  .info-grid .pills,
+  .info-grid .badges,
+  body.journal-route .pills,
+  body.journal-route .badges,
+  .j-drawer .pills,
+  .j-drawer .badges,
+  .j-row .j-card-badges,
+  .j-row .col-badge,
+  .j-row .badges-rank,
+  .j-row .badges-risk
+) :is(.citic-warning-pill, .retraction-pill) { background: #6f665d !important; color: #fff !important; }
+
+/* 主页色板中的少数细分标签在详情/列表里也保持原有专色 */
+:is(
+  .info-grid .pills,
+  .info-grid .badges,
+  body.journal-route .pills,
+  body.journal-route .badges,
+  .j-drawer .pills,
+  .j-drawer .badges,
+  .j-row .j-card-badges,
+  .j-row .col-badge,
+  .j-row .badges-rank
+) :is(.zone.abs-g4s, .zone.abs-g4, .zone.abs-g3, .zone.abs-g2, .zone.abs-g1, .abdc-pill) {
+  background: #724a58 !important;
+  color: #fff !important;
+}
+:is(
+  .info-grid .pills,
+  .info-grid .badges,
+  body.journal-route .pills,
+  body.journal-route .badges,
+  .j-drawer .pills,
+  .j-drawer .badges,
+  .j-row .j-card-badges,
+  .j-row .col-badge,
+  .j-row .badges-rank
+) .zone.cnrs-tier { background: #5f6470 !important; color: #fff !important; }
+:is(
+  .info-grid .pills,
+  .info-grid .badges,
+  body.journal-route .pills,
+  body.journal-route .badges,
+  .j-drawer .pills,
+  .j-drawer .badges,
+  .j-row .j-card-badges,
+  .j-row .col-badge,
+  .j-row .badges-rank
+) .domsrc-pill.ds-cnkx { background: #8b4513 !important; color: #fff !important; }
+:is(
+  .info-grid .pills,
+  .info-grid .badges,
+  body.journal-route .pills,
+  body.journal-route .badges,
+  .j-drawer .pills,
+  .j-drawer .badges,
+  .j-row .j-card-badges,
+  .j-row .col-badge,
+  .j-row .badges-rank
+) .ccf-pill { background: #72728d !important; color: #fff !important; }
+:is(
+  .info-grid .pills,
+  .info-grid .badges,
+  body.journal-route .pills,
+  body.journal-route .badges,
+  .j-drawer .pills,
+  .j-drawer .badges,
+  .j-row .j-card-badges,
+  .j-row .col-badge,
+  .j-row .badges-idx
+) .badge.b-pmc { background: #2f6f68 !important; color: #fff !important; }
