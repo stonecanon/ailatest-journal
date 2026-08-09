@@ -1507,8 +1507,8 @@ button.dl-strip-btn:hover:not(:disabled) {
   left: 50%;
   bottom: calc(100% + 10px);
   z-index: 20;
-  width: 236px;
-  padding: 7px;
+  width: 118px;
+  padding: 4px;
   border: 1px solid rgba(90, 70, 50, 0.14);
   border-radius: 14px;
   background: #fff;
@@ -1523,9 +1523,9 @@ button.dl-strip-btn:hover:not(:disabled) {
   content: "";
   position: absolute;
   left: 50%;
-  bottom: -7px;
-  width: 12px;
-  height: 12px;
+  bottom: -5px;
+  width: 8px;
+  height: 8px;
   background: #fff;
   border-right: 1px solid rgba(90, 70, 50, 0.14);
   border-bottom: 1px solid rgba(90, 70, 50, 0.14);
@@ -1533,11 +1533,11 @@ button.dl-strip-btn:hover:not(:disabled) {
 }
 .wechat-mini-popover img {
   display: block;
-  width: 220px;
-  height: 220px;
-  max-width: calc(100vw - 48px);
+  width: 110px;
+  height: 110px;
+  max-width: calc(100vw - 52px);
   object-fit: contain;
-  border-radius: 9px;
+  border-radius: 6px;
 }
 .dl-strip-item-wechat:hover .wechat-mini-popover,
 .dl-strip-item-wechat:focus-within .wechat-mini-popover {
@@ -1547,8 +1547,8 @@ button.dl-strip-btn:hover:not(:disabled) {
   pointer-events: auto;
 }
 @media (max-width: 720px) {
-  .wechat-mini-popover { width: min(236px, calc(100vw - 32px)); }
-  .wechat-mini-popover img { width: min(220px, calc(100vw - 48px)); height: auto; }
+  .wechat-mini-popover { width: min(118px, calc(100vw - 32px)); }
+  .wechat-mini-popover img { width: min(110px, calc(100vw - 52px)); height: auto; }
   .dl-strip {
     grid-template-columns: 1fr 1fr;
     padding: 14px 8px;
