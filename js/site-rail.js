@@ -122,6 +122,164 @@
     bottom.insertBefore(link, bottom.firstElementChild || null);
   }
 
+  function readStoredJson(key, fallback) {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (_) {
+      return fallback;
+    }
+  }
+
+  function railLanguage() {
+    try {
+      const saved = String(localStorage.getItem('ailatest.lang') || '').toLowerCase();
+      if (saved === 'en' || saved === 'en-us') return 'en';
+      if (document.documentElement.lang.toLowerCase() === 'en') return 'en';
+    } catch (_) {}
+    return 'zh';
+  }
+
+  function railLabel(zh, en) {
+    return railLanguage() === 'en' ? en : zh;
+  }
+
+  function storedFavoriteCount() {
+    const lists = readStoredJson('ailatest.favLists', null);
+    if (Array.isArray(lists) && lists.length) {
+      const ids = new Set();
+      lists.forEach((list) => {
+        if (Array.isArray(list?.ids)) list.ids.forEach((id) => ids.add(String(id)));
+      });
+      return ids.size;
+    }
+    const flat = readStoredJson('ailatest.favs', []);
+    if (Array.isArray(flat)) return new Set(flat.map(String)).size;
+    const data = readStoredJson('ailatest.favsData', {});
+    return data && typeof data === 'object' ? Object.keys(data).length : 0;
+  }
+
+  function storedMembership() {
+    const user = readStoredJson('ailatest.user', null);
+    const ents = user?.entitlements || {};
+    const raw = String(ents.tier || user?.tier || '').toLowerCase();
+    const product = String(ents.product_tier || '').toLowerCase();
+    const owner = !!(user?.is_owner || user?.plan === 'owner' || ents.is_owner || ents.plan === 'owner'
+      || String(user?.email || '').toLowerCase() === 'jiantaoweng@gmail.com');
+    if (owner || product === 'max' || raw === 'pro' || raw === 'max') {
+      return { id: 'max', label: 'Max', cls: 'tier-max', user };
+    }
+    if (product === 'pro' || raw === 'plus') {
+      return { id: 'pro', label: 'Pro', cls: 'tier-pro', user };
+    }
+    if (product === 'trial' || raw === 'trial') {
+      return { id: 'trial', label: railLabel('试用', 'Trial'), cls: 'tier-trial', user };
+    }
+    return { id: 'free', label: 'Free', cls: 'tier-free', user };
+  }
+
+  function ensureRailStateMarkup(rail) {
+    const bottom = rail?.querySelector('.rail-bottom');
+    if (!bottom) return;
+
+    const rankings = bottom.querySelector('#rankings-btn, a[href="/#rankings"], a[href="/rankings"], a[href="/rankings/"], a[href="/indexes"], a[href="/indexes/"]');
+    if (rankings) {
+      rankings.id = 'rankings-btn';
+      const label = rankings.querySelector('[data-rail-label]') || rankings.querySelector('span:not(.rail-flag):not(.fav-count-badge)');
+      if (label) {
+        label.dataset.railLabel = 'rankings';
+        label.textContent = railLabel('榜单', 'Rankings');
+      }
+      rankings.setAttribute('aria-label', railLabel('榜单', 'Rankings'));
+      rankings.title = railLabel('索引排行榜与预警名单', 'Index rankings and warning lists');
+    }
+
+    const fav = bottom.querySelector('#fav-header-btn, a[href="/favorites"], [data-tab="fav"]');
+    if (fav) {
+      fav.id = 'fav-header-btn';
+      if (!fav.querySelector('.fav-count-badge')) {
+        const badge = document.createElement('span');
+        badge.id = 'fav-count-badge';
+        badge.className = 'fav-count-badge';
+        badge.hidden = true;
+        fav.appendChild(badge);
+      }
+      const label = fav.querySelector('[data-rail-label]') || fav.querySelector('span:not(.rail-flag):not(.fav-count-badge)');
+      if (label && !label.classList.contains('fav-count-badge')) {
+        label.dataset.railLabel = 'saved';
+        label.textContent = railLabel('收藏', 'Saved');
+      }
+      fav.setAttribute('aria-label', railLabel('我的收藏', 'Saved journals'));
+      fav.title = railLabel('我的收藏', 'Saved journals');
+    }
+
+    const account = bottom.querySelector('#account-credit-badge, a[href="/account"], [data-tab="me"]');
+    if (account) {
+      account.id = 'account-credit-badge';
+      account.classList.add('account-credit-badge');
+      account.innerHTML = `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="9" r="3.5"/><path d="M5 19c1.5-3 4-4.5 7-4.5S17.5 16 19 19"/></svg><span class="rail-me-label" data-rail-label="settings">${railLabel('设置', 'Settings')}</span><span class="rail-tier-chip tier-free" aria-hidden="true">FREE</span>`;
+    }
+  }
+
+  function updateRailState(rail) {
+    const bottom = rail?.querySelector('.rail-bottom');
+    if (!bottom) return;
+    const fav = bottom.querySelector('#fav-header-btn');
+    const badge = fav?.querySelector('.fav-count-badge');
+    if (badge) {
+      const count = storedFavoriteCount();
+      badge.textContent = count > 99 ? '99+' : String(count);
+      badge.hidden = count < 1;
+      badge.style.display = count > 0 ? 'inline-flex' : 'none';
+    }
+    const account = bottom.querySelector('#account-credit-badge');
+    if (account) {
+      const membership = storedMembership();
+      const chip = account.querySelector('.rail-tier-chip');
+      if (chip) {
+        chip.className = `rail-tier-chip ${membership.cls}`;
+        chip.textContent = membership.label;
+      }
+      const title = membership.user
+        ? railLabel('设置与账号', 'Settings & account')
+        : railLabel('登录后查看会员与设置', 'Sign in for membership & settings');
+      account.title = title;
+      account.setAttribute('aria-label', title);
+    }
+  }
+
+  function ensureHomeShellNav() {
+    const nav = document.querySelector('.page-head-nav') || document.querySelector('.listing-topbar nav');
+    if (!nav) return;
+    const staticShell = !!nav.closest('.page-head');
+    const langButton = staticShell ? nav.querySelector('[data-static-lang-toggle]') : null;
+    const items = [
+      ['/#feat', 'nav_features', 'features', '功能', 'Features'],
+      ['/#how', 'nav_how', 'how', '怎么用', 'How it works'],
+      ['/#rankings', 'nav_rank', 'rankings', '榜单', 'Rankings'],
+      ['/pricing', 'nav_pricing', 'pricing', '订阅', 'Pricing'],
+      ['/#download', 'download_center', 'download', '下载', 'Download'],
+      ['/#contact', 'nav_contact', 'contact', '联系', 'Contact'],
+    ];
+    nav.replaceChildren();
+    items.forEach(([href, key, dataNav, zh, en]) => {
+      const link = document.createElement('a');
+      link.href = href;
+      link.dataset.nav = dataNav;
+      if (staticShell) link.dataset.staticI18n = key;
+      link.textContent = railLanguage() === 'en' ? en : zh;
+      nav.appendChild(link);
+    });
+    if (staticShell) {
+      const toggle = langButton || document.createElement('button');
+      toggle.className = 'static-lang-toggle';
+      toggle.type = 'button';
+      toggle.dataset.staticLangToggle = '';
+      toggle.textContent = railLanguage() === 'en' ? '中文' : 'English';
+      nav.appendChild(toggle);
+    }
+  }
+
   function readPinned() {
     try {
       const raw = localStorage.getItem(KEY);
@@ -279,6 +437,16 @@
   function bind() {
     const rail = ensureCanonicalRail();
     ensureRankLink(rail);
+    ensureRailStateMarkup(rail);
+    updateRailState(rail);
+    ensureHomeShellNav();
+    const refreshRailState = () => {
+      ensureRailStateMarkup(rail);
+      updateRailState(rail);
+      ensureHomeShellNav();
+    };
+    window.addEventListener('storage', refreshRailState);
+    window.addEventListener('ailatest:langchange', refreshRailState);
     const parts = railParts();
     if (!parts) return;
     const menu = parts.rail.querySelector(`.${parts.menuClass}`);

@@ -21,7 +21,8 @@
       if (t != null && t !== "") el.textContent = t;
     });
     const btn = document.getElementById("rl-lang");
-    if (btn) btn.textContent = en ? "中文" : "EN";
+    if (btn) btn.textContent = en ? "中文" : "English";
+    window.dispatchEvent(new CustomEvent('ailatest:langchange', { detail: { lang: en ? 'en' : 'zh-CN' } }));
   }
 
   function boot() {

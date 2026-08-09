@@ -1106,6 +1106,9 @@ body[data-static-page] {
   color: #1c1917;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
 }
 
 body[data-static-page] .page-head {
@@ -1222,7 +1225,69 @@ body[data-static-page="signup"] main.narrow {
 body[data-static-page] main > [data-lang-panel] {
   box-shadow: 0 10px 28px rgba(40,28,16,.05);
 }
-body[data-static-page] .app-rail #rankings-btn { order: 2; }
+body[data-static-page] .app-rail #rankings-btn { order: 7; }
+body[data-static-page] .app-rail #fav-header-btn { order: 8; }
+body[data-static-page] .app-rail #account-credit-badge { order: 9; }
+body[data-static-page] .fav-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: #a07a2a;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  vertical-align: top;
+  margin-left: 2px;
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+body[data-static-page] .fav-count-badge[hidden] { display: none !important; }
+body[data-static-page] .app-rail .account-credit-badge {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  width: 52px;
+  min-width: 52px;
+  min-height: 52px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 18px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 750;
+  line-height: 1.15;
+  text-align: center;
+}
+body[data-static-page] .app-rail .account-credit-badge .rail-tier-chip,
+body[data-static-page] .app-rail .account-credit-badge .rail-me-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+body[data-static-page] .app-rail .account-credit-badge .rail-tier-chip {
+  min-width: 28px;
+  height: 16px;
+  padding: 0 6px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: .04em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+body[data-static-page] .rail-tier-chip.tier-free { background: #ebe6dc; color: #5c5348; border-color: #cfc6b6; }
+body[data-static-page] .rail-tier-chip.tier-trial { background: linear-gradient(180deg, #e0f2fe 0%, #bae6fd 100%); color: #0369a1; border-color: #7dd3fc; }
+body[data-static-page] .rail-tier-chip.tier-pro { background: linear-gradient(180deg, #ff9a3c 0%, #f97316 100%); color: #fff; border-color: #e85d04; }
+body[data-static-page] .rail-tier-chip.tier-max { background: linear-gradient(135deg, #1f2c4c 0%, #0f172a 100%); color: #f6e7b2; border-color: #c9a227; }
 
 @media (max-width: 900px) {
   body[data-static-page] {
