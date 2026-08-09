@@ -9,10 +9,10 @@
 <meta name="robots" content="index,follow">
 <meta name="theme-color" content="#f97316">
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
-<link rel="stylesheet" href="/css/listing.css?v=20260716-rank-rebuild">
-<link rel="stylesheet" href="/css/rank-landing.css?v=20260716-rank-rebuild">
+<link rel="stylesheet" href="/css/app.css?v=20260809-mobile-filters-rank-shell-v1">
+<link rel="stylesheet" href="/css/rank-landing.css?v=20260809-home-rank-shell-v1">
 </head>
-<body class="rank-landing" data-page="warning">
+<body class="home-route rank-landing" data-page="warning">
 <aside class="app-rail" aria-label="Primary">
   <nav class="rail-top">
     <a class="rail-nav-btn" href="/global" title="Global">
@@ -40,20 +40,24 @@
   </div>
 </aside>
 
-<header class="rl-top">
-  <a class="rl-brand" href="/">AILatest <em>Journal</em></a>
-  <span class="rl-kicker" data-zh="期刊榜单" data-en="Rankings">期刊榜单</span>
-  <nav class="rl-nav">
-    <a href="/" data-zh="首页" data-en="Home">首页</a>
-    <a href="/#rankings" data-zh="榜单" data-en="Rankings">榜单</a>
-    <a href="/#download" data-zh="下载" data-en="Download">下载</a>
-    <a href="/pricing" data-zh="订阅" data-en="Pricing">订阅</a>
-    <button type="button" class="rl-lang" id="rl-lang" aria-label="Language">EN</button>
-  </nav>
+<nav class="home-top-nav rank-home-nav" aria-label="首页导航">
+  <a href="/" data-zh="首页" data-en="Home">首页</a>
+  <a href="/#feat" data-zh="功能" data-en="Features">功能</a>
+  <a href="/#how" data-zh="怎么用" data-en="How it works">怎么用</a>
+  <a href="/#rankings" data-zh="榜单" data-en="Rankings">榜单</a>
+  <a href="/pricing" data-zh="订阅" data-en="Pricing">订阅</a>
+  <a href="/#download" data-zh="下载" data-en="Download">下载</a>
+  <div class="lang-toggle-wrap">
+    <button type="button" class="lang-toggle rl-lang" id="rl-lang" aria-label="Language">EN</button>
+  </div>
+</nav>
+<header class="topbar rank-topbar" aria-label="AILatest Journal">
+  <a class="topbar-brand" href="/">AILatest <em>Journal</em></a>
 </header>
 
-<main class="rl-main">
-  <header class="rl-hero">
+<main class="main rank-main">
+<div class="home-v4 rank-content">
+  <header class="rl-hero home-sec">
     <h1 data-zh="预警名单" data-en="Warning lists">预警名单</h1>
     <p class="rl-crumb">
       <a href="/" data-zh="首页" data-en="Home">首页</a>
@@ -82,6 +86,7 @@
   <p class="rl-back">
     <a href="/#rankings" data-zh="← 返回首页榜单" data-en="← Back to rankings">← 返回首页榜单</a>
   </p>
+</div>
 </main>
 
 <footer class="rl-foot">
@@ -93,7 +98,7 @@
   <a href="/refund.html">Refund</a>
 </footer>
 
-<script src="/js/site-rail.js?v=20260716-rank-rebuild" defer></script>
-<script src="/js/rank-landing.js?v=20260716-rank-rebuild" defer></script>
+<script src="/js/site-rail.js?v=20260809-home-rank-shell-v1" defer></script>
+<script src="/js/rank-landing.js?v=20260809-home-rank-shell-v1" defer></script>
 </body>
 </html>

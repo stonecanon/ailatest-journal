@@ -42,7 +42,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 })(window,document,'script','dataLayer','GTM-NBNXL7FB');</script>
 <!-- End Google Tag Manager -->
 <link rel="preload" href="/data/journal_aliases.json" as="fetch" crossorigin="anonymous" />
-<link rel="stylesheet" href="/css/app.css?v=20260807-pick-shortlist-v2" />
+<link rel="stylesheet" href="/css/app.css?v=20260809-mobile-filters-rank-shell-v1" />
 <link rel="stylesheet" href="/css/journal-detail-wide.css?v=20260716-detail-force2" />
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
 <!-- PWA -->
@@ -236,7 +236,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
   </nav>
   <div class="rail-bottom">
-    <!-- 订阅 / 下载 / 榜单 已迁入「我的」设置，底部仅保留收藏与账号 -->
+    <!-- 榜单常驻侧栏：点击后回到首页榜单区 -->
+    <button class="rail-nav-btn" id="rankings-btn" type="button" aria-label="榜单" title="索引排行榜与预警名单" data-i18n-aria="rail_rank" data-i18n-title="rail_rank">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 21V11"/><path d="M12 21V7"/><path d="M16 21V3"/><path d="M4 21h16"/></svg>
+      <span data-i18n="rail_rank">榜单</span>
+    </button>
     <button class="rail-nav-btn" id="fav-header-btn" data-tab="fav" aria-label="我的收藏" title="我的收藏" data-i18n-aria="hero_title_fav" data-i18n-title="hero_title_fav">
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.7l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3.7z"/></svg>
       <span data-i18n="rail_fav">收藏</span>
@@ -252,7 +256,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- 隐藏的旧入口 id 保留，供设置页 / 其它脚本引用 -->
 <a id="pricing-rail-link" href="/pricing" hidden aria-hidden="true"></a>
 <a id="download-center-rail-link" href="/#download" hidden aria-hidden="true"></a>
-<button type="button" id="rankings-btn" data-tab="rank" hidden aria-hidden="true"></button>
 <main class="main">
   <!-- 首页标题（搜索之上） -->
   <section class="home-hero home-hero-head" aria-label="AILatest Journal">
@@ -1037,7 +1040,7 @@ window.__BUILD_VER = 'v20260806-pick-links-v1';
 <script src="/js/pick-match.js?v=20260716-v10" defer></script>
 <script src="/js/pricing-checkout.js?v=20260806-rmb-estimate-v3" defer></script>
 <script src="/js/extension-downloads.js?v=20260716-home-dl" defer></script>
-<script src="/js/app.js?v=20260809-home-price-copy-v1" defer></script>
+<script src="/js/app.js?v=20260809-mobile-filters-rank-shell-v1" defer></script>
 
 </body>
 </html>

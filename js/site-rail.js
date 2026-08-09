@@ -23,7 +23,8 @@
 
   /**
    * Main app rail (index.html): Global + pinned regions + region picker |
-   * Fav + Me only. Pricing / download / rankings live under Settings.
+   * Rankings + Fav + Me stay in the rail; pricing and download remain in
+   * the shared home navigation.
    */
   function canonicalRailMarkup() {
     const path = location.pathname.replace(/\/+$/, '') || '/';
@@ -58,6 +59,10 @@
         </div>
       </nav>
       <div class="rail-bottom" aria-label="账户">
+        <a class="rail-nav-btn${current('/rankings') || current('/indexes') ? ' active' : ''}" id="rankings-btn" href="/#rankings" aria-label="榜单" title="索引排行榜与预警名单">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 21V11"/><path d="M12 21V7"/><path d="M16 21V3"/><path d="M4 21h16"/></svg>
+          <span data-static-i18n="rail_rankings">榜单</span>
+        </a>
         <a class="rail-nav-btn${current('/favorites')}" id="fav-header-btn" href="/favorites"${ariaCurrent('/favorites')} aria-label="我的收藏" title="我的收藏">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.7l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3.7z"/></svg>
           <span data-static-i18n="rail_saved">收藏</span>
@@ -90,6 +95,21 @@
       rail.innerHTML = canonicalRailMarkup();
     }
     return rail;
+  }
+
+  function ensureRankLink(rail) {
+    const bottom = rail?.querySelector('.rail-bottom');
+    if (!bottom || bottom.querySelector('#rankings-btn, a[href="/#rankings"]')) return;
+    const link = document.createElement('a');
+    link.className = 'rail-nav-btn';
+    link.id = 'rankings-btn';
+    link.href = '/#rankings';
+    link.setAttribute('aria-label', '榜单');
+    link.title = '索引排行榜与预警名单';
+    link.innerHTML = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 21V11"/><path d="M12 21V7"/><path d="M16 21V3"/><path d="M4 21h16"/></svg><span data-static-i18n="rail_rankings">榜单</span>';
+    const path = (location.pathname || '').replace(/\/+$/, '') || '/';
+    if (path === '/rankings' || path === '/indexes' || path.startsWith('/indexes/')) link.classList.add('active');
+    bottom.insertBefore(link, bottom.firstElementChild || null);
   }
 
   function readPinned() {
@@ -247,7 +267,8 @@
   }
 
   function bind() {
-    ensureCanonicalRail();
+    const rail = ensureCanonicalRail();
+    ensureRankLink(rail);
     const parts = railParts();
     if (!parts) return;
     const menu = parts.rail.querySelector(`.${parts.menuClass}`);

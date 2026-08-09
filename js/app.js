@@ -12542,7 +12542,7 @@
       // 设置页：磨砂浮层（桌面）/ 全屏两级（手机），底层页面保持可见
       if (tab === 'me') {
         if (previousTab && previousTab !== 'me') window.__settingsReturnTab = previousTab;
-        $$('[data-tab]').forEach(x => x.classList.toggle('active', x.dataset.tab === 'me'));
+        $$('[data-tab], #rankings-btn').forEach(x => x.classList.toggle('active', x.id === 'rankings-btn' ? false : x.dataset.tab === 'me'));
         activeTab = 'me';
         if (document.body.dataset.bootTab) delete document.body.dataset.bootTab;
         document.body.classList.add('settings-open');
@@ -12585,7 +12585,7 @@
       document.documentElement.classList.remove('settings-open');
 
       // 先切面板 / 路由壳，再关详情页，避免 journal-route 卸掉后短暂露出首页
-      $$('[data-tab]').forEach(x => x.classList.toggle('active', x.dataset.tab === tab));
+      $$('[data-tab], #rankings-btn').forEach(x => x.classList.toggle('active', x.id === 'rankings-btn' ? tab === 'home' : x.dataset.tab === tab));
       activeTab = tab;
       // 首屏 boot-tab 防闪用完即清，之后交给 .hidden 控制
       if (document.body.dataset.bootTab) delete document.body.dataset.bootTab;

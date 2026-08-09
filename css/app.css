@@ -13159,3 +13159,62 @@ body.journal-route .drawer-head {
     padding-right: 12px !important;
   }
 }
+
+/* ═══════ 手机端国际刊筛选：每组按上下流排列，避免右侧选项被误认为隐藏 ═══════ */
+@media (max-width: 900px) {
+  .tab-panel[data-panel="int"] table.journals thead,
+  .tab-panel[data-panel="int"] table.journals thead tr {
+    overflow: visible !important;
+  }
+  .tab-panel[data-panel="int"] table.journals thead .col-badge {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+  .tab-panel[data-panel="int"] .th-dropdown,
+  .tab-panel[data-panel="int"] #if-dropdown.th-if-row,
+  .tab-panel[data-panel="int"] #warn-dropdown.th-warn-row {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    row-gap: 6px !important;
+    column-gap: 0 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 0 8px !important;
+    border: 0 !important;
+    border-bottom: 1px solid rgba(90, 70, 50, 0.08) !important;
+  }
+  .tab-panel[data-panel="int"] .th-dropdown:last-child,
+  .tab-panel[data-panel="int"] #warn-dropdown.th-warn-row {
+    border-bottom: 0 !important;
+  }
+  .tab-panel[data-panel="int"] .th-dropdown > .th-dropdown-btn,
+  .tab-panel[data-panel="int"] #if-dropdown.th-if-row > .th-dropdown-btn,
+  .tab-panel[data-panel="int"] #warn-dropdown.th-warn-row > .th-dropdown-btn {
+    grid-column: 1 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    padding: 0 !important;
+    justify-content: flex-start !important;
+    text-align: left !important;
+    border: 0 !important;
+    background: transparent !important;
+  }
+  .tab-panel[data-panel="int"] .th-dropdown-panel,
+  .tab-panel[data-panel="int"] #if-dropdown.th-if-row .th-dropdown-panel,
+  .tab-panel[data-panel="int"] #warn-dropdown.th-warn-row .th-dropdown-panel {
+    grid-column: 1 !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 6px !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+  }
+}
