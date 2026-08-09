@@ -1,3 +1,12 @@
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: .12s;
+}
+
 :root {
   --paper: #fffdf9;
   --paper-soft: #faf7f0;

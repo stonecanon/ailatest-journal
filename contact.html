@@ -7,7 +7,7 @@
 <meta name="description" content="联系 AILatest Journal：产品反馈、数据纠错、商务合作。邮箱 contact@ailatest.org。" />
 <link rel="canonical" href="https://journal.ailatest.org/contact" />
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
-<link rel="stylesheet" href="/css/static.css?v=20260809-home-shell-v4" />
+<link rel="stylesheet" href="/css/static.css?v=20260809-home-shell-v5" />
 <link rel="stylesheet" href="/css/info-pages.css?v=20260809-home-shell-v3" />
 </head>
 <body data-static-page="contact">
@@ -36,13 +36,17 @@
     </div>
   </nav>
   <div class="rail-bottom" aria-label="账户">
+    <a class="rail-nav-btn" id="rankings-btn" href="/#rankings" aria-label="榜单" title="索引排行榜与预警名单">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 21V11"/><path d="M12 21V7"/><path d="M16 21V3"/><path d="M4 21h16"/></svg>
+      <span data-static-i18n="rail_rankings">榜单</span>
+    </a>
     <a class="rail-nav-btn" href="/favorites" aria-label="我的收藏" title="我的收藏">
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.7l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3.7z"/></svg>
-      <span>收藏</span>
+      <span>收藏</span><span id="fav-count-badge" class="fav-count-badge" hidden>0</span>
     </a>
-    <a class="rail-nav-btn" href="/account" aria-label="设置" title="设置">
+    <a class="rail-nav-btn account-credit-badge" id="account-credit-badge" href="/account" aria-label="设置" title="设置">
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="9" r="3.5"/><path d="M5 19c1.5-3 4-4.5 7-4.5S17.5 16 19 19"/></svg>
-      <span>设置</span>
+      <span class="rail-me-label" data-rail-label="settings">设置</span><span class="rail-tier-chip tier-free" aria-hidden="true">FREE</span>
     </a>
   </div>
 </aside>
@@ -50,13 +54,12 @@
 <header class="page-head">
   <a class="brand" href="/">AILatest <span>Journal</span></a>
   <nav class="page-head-nav" aria-label="Site">
-    <a href="/" data-static-i18n="nav_home">首页</a>
-    <a href="/#feat" data-static-i18n="nav_features">功能</a>
-    <a href="/pricing" data-static-i18n="nav_pricing">订阅</a>
-    <a href="/#download" data-static-i18n="download_center">下载</a>
-    <a href="/about" data-static-i18n="nav_about">关于</a>
-    <a href="/contact" data-static-i18n="nav_contact" aria-current="page">联系</a>
-    <a class="cta" href="/signup.html" data-static-i18n="nav_login">注册 / 登录</a>
+    <a href="/#feat" data-static-i18n="nav_features" data-nav="features">功能</a>
+    <a href="/#how" data-static-i18n="nav_how" data-nav="how">怎么用</a>
+    <a href="/#rankings" data-static-i18n="nav_rank" data-nav="rankings">榜单</a>
+    <a href="/pricing" data-static-i18n="nav_pricing" data-nav="pricing">订阅</a>
+    <a href="/#download" data-static-i18n="download_center" data-nav="download">下载</a>
+    <a href="/#contact" data-static-i18n="nav_contact" data-nav="contact">联系</a>
     <button class="static-lang-toggle" type="button" data-static-lang-toggle>English</button>
   </nav>
 </header>
@@ -151,7 +154,7 @@
   <p class="info-back"><a href="/">← 返回首页 · Back home</a></p>
 </main>
 
-<script src="/js/site-rail.js?v=20260809-home-shell-v6" defer></script>
+<script src="/js/site-rail.js?v=20260809-home-shell-v8" defer></script>
 <script src="/js/static-i18n.js?v=20260716-info-v1" defer></script>
 </body>
 </html>

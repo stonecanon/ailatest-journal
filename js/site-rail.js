@@ -175,7 +175,7 @@
     if (product === 'trial' || raw === 'trial') {
       return { id: 'trial', label: railLabel('试用', 'Trial'), cls: 'tier-trial', user };
     }
-    return { id: 'free', label: 'Free', cls: 'tier-free', user };
+    return { id: 'free', label: 'FREE', cls: 'tier-free', user };
   }
 
   function ensureRailStateMarkup(rail) {
@@ -217,7 +217,22 @@
     if (account) {
       account.id = 'account-credit-badge';
       account.classList.add('account-credit-badge');
-      account.innerHTML = `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="9" r="3.5"/><path d="M5 19c1.5-3 4-4.5 7-4.5S17.5 16 19 19"/></svg><span class="rail-me-label" data-rail-label="settings">${railLabel('设置', 'Settings')}</span><span class="rail-tier-chip tier-free" aria-hidden="true">FREE</span>`;
+      const icon = account.querySelector('svg');
+      let label = account.querySelector('.rail-me-label');
+      let chip = account.querySelector('.rail-tier-chip');
+      // The shell is present in the HTML on current pages. Keep those nodes
+      // in place so a deferred enhancement never causes a visible reflow.
+      if (!icon || !label || !chip) {
+        account.innerHTML = `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="9" r="3.5"/><path d="M5 19c1.5-3 4-4.5 7-4.5S17.5 16 19 19"/></svg><span class="rail-me-label" data-rail-label="settings"></span><span class="rail-tier-chip tier-free" aria-hidden="true">FREE</span>`;
+        label = account.querySelector('.rail-me-label');
+        chip = account.querySelector('.rail-tier-chip');
+      }
+      if (label) {
+        const nextLabel = railLabel('设置', 'Settings');
+        if (label.textContent !== nextLabel) label.textContent = nextLabel;
+        label.dataset.railLabel = 'settings';
+      }
+      if (chip && !chip.textContent.trim()) chip.textContent = 'FREE';
     }
   }
 
@@ -261,6 +276,49 @@
       ['/#download', 'download_center', 'download', '下载', 'Download'],
       ['/#contact', 'nav_contact', 'contact', '联系', 'Contact'],
     ];
+
+    const links = [...nav.children].filter((el) => el.tagName === 'A');
+    const canonical = links.length === items.length
+      && items.every(([href, key, dataNav], index) => {
+        const link = links[index];
+        return link
+          && link.getAttribute('href') === href
+          && link.dataset.nav === dataNav
+          && (!staticShell || link.dataset.staticI18n === key);
+      })
+      && (!staticShell || (langButton && nav.lastElementChild === langButton));
+
+    const currentNav = (() => {
+      const page = String(document.body?.dataset?.staticPage || '').toLowerCase();
+      if (page === 'terms' || page === 'privacy' || page === 'refund') return 'about';
+      if (page === 'about' || page === 'contact' || page === 'pricing') return page;
+      const path = (location.pathname || '').toLowerCase();
+      if (path.includes('/pricing')) return 'pricing';
+      if (path.includes('/about') || path.includes('/terms') || path.includes('/privacy') || path.includes('/refund')) return 'about';
+      if (path.includes('/contact')) return 'contact';
+      if (path.includes('/indexes') || path.includes('/subjects')) return 'rankings';
+      return '';
+    })();
+
+    // Do not clear and recreate a shell that is already canonical. Clearing
+    // nav children after first paint is the source of the click-to-page flash
+    // on static and listing pages.
+    if (canonical) {
+      links.forEach((link, index) => {
+        const [, , dataNav, zh, en] = items[index];
+        const text = railLanguage() === 'en' ? en : zh;
+        if (link.textContent !== text) link.textContent = text;
+        const active = dataNav === currentNav;
+        link.classList.toggle('active', active);
+        if (active) link.setAttribute('aria-current', 'page');
+        else link.removeAttribute('aria-current');
+      });
+      if (staticShell && langButton) {
+        langButton.textContent = railLanguage() === 'en' ? '中文' : 'English';
+      }
+      return;
+    }
+
     nav.replaceChildren();
     items.forEach(([href, key, dataNav, zh, en]) => {
       const link = document.createElement('a');

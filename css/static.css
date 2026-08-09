@@ -1,5 +1,14 @@
 /* 静态信息页共享样式（about/contact/terms/privacy/refund/pricing/signup）
    设计令牌与主站一致：纸色背景 + 深墨文字 */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: .12s;
+}
+
 :root {
   --bg: #faf7f2;
   --ink: #2b2824;

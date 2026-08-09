@@ -835,7 +835,8 @@
     if (document.visibilityState === 'visible') syncAllPricingUi();
   });
   window.addEventListener('ailatest:langchange', () => syncAllPricingUi());
-  setTimeout(() => syncAllPricingUi(), 0);
-  setTimeout(() => syncAllPricingUi(), 200);
-  setTimeout(() => syncAllPricingUi(), 800);
+  // `bind()` performs the initial sync. Repeating it after 0/200/800 ms made
+  // pricing cards reflow after navigation (especially when the language or
+  // market panel changed), which looked like a brief page flash. Subsequent
+  // changes are covered by the storage, visibility and language listeners.
 })();

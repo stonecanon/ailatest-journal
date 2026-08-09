@@ -8,7 +8,7 @@
 <link rel="canonical" href="https://journal.ailatest.org/subjects/biology-biochemistry/" />
 <meta name="robots" content="index,follow" />
 <meta name="theme-color" content="#f97316" />
-<link rel="stylesheet" href="/css/listing.css?v=20260809-home-shell-v4" />
+<link rel="stylesheet" href="/css/listing.css?v=20260809-home-shell-v5" />
 
 </head>
 <body>
@@ -66,11 +66,11 @@
     </a>
     <a class="rail-nav-btn" href="/favorites" aria-label="我的收藏" title="我的收藏">
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.7l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3.7z"/></svg>
-      <span>收藏</span>
+      <span>收藏</span><span id="fav-count-badge" class="fav-count-badge" hidden>0</span>
     </a>
-    <a class="rail-nav-btn account-credit-badge" href="/account" aria-label="我的" title="我的">
-      <span class="rail-account-mark">我</span>
-      <b>我的</b>
+    <a class="rail-nav-btn account-credit-badge" id="account-credit-badge" href="/account" aria-label="我的" title="我的">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="9" r="3.5"/><path d="M5 19c1.5-3 4-4.5 7-4.5S17.5 16 19 19"/></svg>
+      <span class="rail-me-label" data-rail-label="settings">设置</span><span class="rail-tier-chip tier-free" aria-hidden="true">FREE</span>
     </a>
   </div>
 </aside>
@@ -78,11 +78,12 @@
   <a href="/" class="listing-brand">AILatest <em>Journal</em></a>
   <span class="listing-section-title">期刊榜单</span>
   <nav>
-    <a href="/">首页</a>
-    <a href="/#rankings">榜单</a>
-    <a href="/#download">下载</a>
-    <a href="/about">关于</a>
-    <a href="/contact">联系</a>
+    <a href="/#feat" data-nav="features">功能</a>
+    <a href="/#how" data-nav="how">怎么用</a>
+    <a href="/#rankings" data-nav="rankings">榜单</a>
+    <a href="/pricing" data-nav="pricing">订阅</a>
+    <a href="/#download" data-nav="download">下载</a>
+    <a href="/#contact" data-nav="contact">联系</a>
   </nav>
 </header>
 <div class="wrap">
@@ -97,6 +98,6 @@
   <p class="back-wrap"><a class="back" href="https://journal.ailatest.org/subjects/">← 返回榜单</a></p>
 </div>
 <footer class="footer">© 2026 <a href="/">AILatest Journal</a> · <a href="/about">关于</a> · <a href="/contact">联系</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a> · <a href="/refund.html">Refund</a></footer>
-<script src="/js/site-rail.js?v=20260809-home-shell-v6" defer></script>
+<script src="/js/site-rail.js?v=20260809-home-shell-v8" defer></script>
 </body>
 </html>
