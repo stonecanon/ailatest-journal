@@ -14500,8 +14500,8 @@
       const m = Math.floor(num / 100_000) / 10;
       return `${m}M+`;
     }
-    // ≥1万：向下整千 → 48,000+ / 23,000+
-    // 1千–1万：向下整百 → 7,400+ / 1,000+
+    // ≥1万：向下整千 → 50,000+ / 24,000+ / 10,000+
+    // 1千–1万：向下整百 → 1,500+
     let rounded;
     if (num >= 10000) rounded = Math.floor(num / 1000) * 1000;
     else if (num >= 1000) rounded = Math.floor(num / 100) * 100;
@@ -14511,8 +14511,15 @@
     return `${s}+`;
   }
 
-  // 仅「期刊详情」有展示下限（真实 total_journal_views ≈ 23k）；服务用户用实时访客数，勿抬高
-  const HOME_STAT_FLOOR = { journal_views: 23000 };
+  // 首屏 HTML 使用最近一次 public-total 采样，异步请求只负责校正增长中的数字。
+  // 这样网络请求尚未完成时也不会先显示已经过期的旧占位值。
+  const HOME_STAT_DEFAULTS = Object.freeze({
+    journals: 50350,
+    journal_views: 24067,
+    views: 10330,
+    visitors: 1513,
+  });
+  const HOME_STAT_FLOOR = { journal_views: HOME_STAT_DEFAULTS.journal_views };
 
   function setHomeStat(key, value) {
     const el = document.querySelector(`[data-stat="${key}"]`);
@@ -14532,22 +14539,30 @@
         fetch(`${API_BASE}/analytics/public-total`).then(r => r.ok ? r.json() : null).catch(() => null),
         meta || fetch('/data/meta.json').then(r => r.json()).catch(() => null),
       ]);
-      // 期刊数优先 meta.total，否则用已加载库长度
-      const jTotal = (m && m.total) || (meta && meta.total) || (journals && journals.length) || 0;
+      // 期刊数优先 meta.total，否则用已加载库长度，再回退到首屏快照
+      const jTotal = (m && m.total) || (meta && meta.total) || (journals && journals.length) || HOME_STAT_DEFAULTS.journals;
       if (jTotal) setHomeStat('journals', jTotal);
       if (pub && pub.ok !== false) {
         if (pub.total_pageviews != null) setHomeStat('views', pub.total_pageviews);
-        // 服务用户 = 访客 total_visitors（约 1k+），不是期刊详情 23k
+        else setHomeStat('views', HOME_STAT_DEFAULTS.views);
+        // 服务用户 = 访客 total_visitors，不是期刊详情浏览次数
         if (pub.total_visitors != null) setHomeStat('visitors', pub.total_visitors);
+        else setHomeStat('visitors', HOME_STAT_DEFAULTS.visitors);
         // 期刊详情浏览：优先 total_journal_views
         const jv = pub.total_journal_views != null ? pub.total_journal_views : pub.viewed_journals;
         if (jv != null) setHomeStat('journal_views', jv);
-        else setHomeStat('journal_views', HOME_STAT_FLOOR.journal_views);
-      } else if (HOME_STAT_FLOOR.journal_views) {
-        setHomeStat('journal_views', HOME_STAT_FLOOR.journal_views);
+        else setHomeStat('journal_views', HOME_STAT_DEFAULTS.journal_views);
+      } else {
+        setHomeStat('views', HOME_STAT_DEFAULTS.views);
+        setHomeStat('visitors', HOME_STAT_DEFAULTS.visitors);
+        setHomeStat('journal_views', HOME_STAT_DEFAULTS.journal_views);
       }
     } catch (_) {
-      /* keep HTML placeholders */
+      // API 暂时不可用时保留最近一次快照，而不是回到旧的 7,400+/1,000+ 占位值
+      setHomeStat('journals', HOME_STAT_DEFAULTS.journals);
+      setHomeStat('views', HOME_STAT_DEFAULTS.views);
+      setHomeStat('visitors', HOME_STAT_DEFAULTS.visitors);
+      setHomeStat('journal_views', HOME_STAT_DEFAULTS.journal_views);
     }
   }
 
