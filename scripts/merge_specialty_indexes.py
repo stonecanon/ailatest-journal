@@ -15,6 +15,8 @@ import argparse
 import gzip
 import json
 import re
+import subprocess
+import sys
 import unicodedata
 import urllib.request
 from html.parser import HTMLParser
@@ -285,7 +287,12 @@ def write_json(path: Path, data):
 
 
 def update_routing(records: list[dict]) -> dict:
-    """Make newly added specialty journals resolvable by detail URL and sitemap."""
+    """Make newly added specialty journals resolvable by detail URL and sitemap.
+
+    The canonical sitemap is now an index with bounded journal chunks.  Let the
+    SEO generator rebuild those files instead of appending ``<url>`` nodes to
+    ``sitemap.xml`` (which would corrupt the index after a specialty refresh).
+    """
     index_path = DATA / "journal_index.json"
     index = read_json(index_path) if index_path.exists() else {}
     added_index = 0
@@ -311,25 +318,20 @@ def update_routing(records: list[dict]) -> dict:
             }
             index[slug] = {k: v for k, v in entry.items() if v not in ("", [], None)}
             added_index += 1
+            sitemap_urls.append(f"https://journal.ailatest.org/journal/{slug}/")
         for value in (rec.get("issn"), rec.get("eissn")):
             compact = re.sub(r"[^0-9X]", "", str(value or "").upper())
             if compact and compact not in index:
                 index[compact] = {"_r": slug}
-        sitemap_urls.append(f"https://journal.ailatest.org/journal/{slug}/")
     write_json(index_path, index)
 
-    sitemap_path = ROOT / "sitemap.xml"
-    added_sitemap = 0
-    if sitemap_path.exists():
-        xml = sitemap_path.read_text(encoding="utf-8")
-        additions = []
-        for url in sitemap_urls:
-            if f"<loc>{url}</loc>" not in xml:
-                additions.append(f"  <url><loc>{url}</loc><priority>0.8</priority></url>")
-        if additions:
-            xml = xml.replace("</urlset>", "\n".join(additions) + "\n</urlset>")
-            sitemap_path.write_text(xml, encoding="utf-8")
-            added_sitemap = len(additions)
+    added_sitemap = len(sitemap_urls)
+    if sitemap_urls:
+        subprocess.run(
+            [sys.executable, str(ROOT / "scripts" / "generate_seo_pages.py")],
+            cwd=ROOT,
+            check=True,
+        )
     return {"journal_index_added": added_index, "sitemap_added": added_sitemap}
 
 

@@ -2,12 +2,13 @@
 """Generate sitemap.xml and the compact journal index used by Pages Functions.
 
 Default mode writes:
-  - sitemap.xml
-  - data/journal_index.json
+  - sitemap.xml (a sitemap index)
+  - sitemap-static.xml and bounded sitemap-journals-*.xml urlsets
+  - data/journal_index.json (local compatibility cache)
+  - data/journal_seo.json.gz (deployable Pages Function data)
 
-The old static journal HTML output is intentionally not the default anymore:
-/journal/<slug>/ is rendered by functions/[[path]].js as a visible SEO landing
-page that does not load the SPA drawer.
+Journal detail HTML is rendered at request time by
+functions/journal/[[slug]].js while retaining the app shell for hydration.
 """
 
 from __future__ import annotations
@@ -24,7 +25,11 @@ JOURNALS_GZ = DATA_DIR / "journals.json.gz"
 OA_GZ = DATA_DIR / "oa.json.gz"
 ANNUAL_GZ = DATA_DIR / "annual_outputs.json.gz"
 SITEMAP = ROOT / "sitemap.xml"
+STATIC_SITEMAP = ROOT / "sitemap-static.xml"
+SITEMAP_CHUNK_PREFIX = "sitemap-journals-"
+SITEMAP_CHUNK_SIZE = 20000
 INDEX_FILE = DATA_DIR / "journal_index.json"
+SEO_DATA_FILE = DATA_DIR / "journal_seo.json.gz"
 SITE_URL = "https://journal.ailatest.org"
 
 
@@ -112,7 +117,10 @@ def entry_for(r: dict, oa_rec: dict, annual_rec: dict) -> dict:
         "e": r.get("en_name") or "",
         "i": r.get("issn") or "",
         "is": r.get("eissn") or "",
-        "f": r.get("if_2024"),
+        "country": r.get("country") or "",
+        # Use the latest JCR value available in the bundle.  Keep the legacy
+        # compact key names because the Pages Function consumes this shape.
+        "f": r.get("if_latest", r.get("if_2025", r.get("if_2024"))),
         "q": r.get("if_quartile") or "",
         "z": r.get("cas_zone"),
         "zt": bool(r.get("cas_top")),
@@ -129,7 +137,11 @@ def entry_for(r: dict, oa_rec: dict, annual_rec: dict) -> dict:
         "hp": oa_rec.get("hp") or oa_rec.get("homepage") or "",
         "apc": oa_rec.get("apc") or oa_rec.get("apc_usd"),
         "tier": tier_label(r),
-        "ann": ann,
+        "ann": ann or [
+            {"y": int(item.get("year")), "c": int(item.get("count"))}
+            for item in (r.get("publication_history") or [])[-3:]
+            if str(item.get("year", "")).isdigit() and str(item.get("count", "")).isdigit()
+        ],
         "rt": {
             "total": ret.get("retractions_total") or 0,
             "r5": ret.get("r5") or ret.get("retractions_5y") or 0,
@@ -192,6 +204,45 @@ def build_related(entries: dict):
         e["rel"] = [c for score, c in ranked if score > 0][:8]
 
 
+def write_urlset(path: Path, urls: list[tuple[str, str]]) -> None:
+    parts = [
+        '<?xml version="1.0" encoding="UTF-8"?>',
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+    ]
+    parts.extend(f"  <url><loc>{url}</loc><priority>{priority}</priority></url>" for url, priority in urls)
+    parts.append("</urlset>")
+    path.write_text("\n".join(parts) + "\n", encoding="utf-8")
+
+
+def write_sitemap_files(static_urls: list[tuple[str, str]], journal_urls: list[tuple[str, str]]) -> None:
+    """Write a sitemap index with bounded urlset chunks.
+
+    Google limits one urlset to 50,000 URLs.  Keeping journal pages in
+    predictable 20k chunks also leaves room for future listing pages without
+    silently pushing a sitemap over the limit.
+    """
+    write_urlset(STATIC_SITEMAP, static_urls)
+
+    old_chunks = sorted(ROOT.glob(f"{SITEMAP_CHUNK_PREFIX}*.xml"))
+    chunks = []
+    for i in range(0, len(journal_urls), SITEMAP_CHUNK_SIZE):
+        path = ROOT / f"{SITEMAP_CHUNK_PREFIX}{i // SITEMAP_CHUNK_SIZE + 1}.xml"
+        write_urlset(path, journal_urls[i:i + SITEMAP_CHUNK_SIZE])
+        chunks.append(path)
+    for path in old_chunks:
+        if path not in chunks:
+            path.unlink(missing_ok=True)
+
+    refs = [STATIC_SITEMAP.name, *(p.name for p in chunks)]
+    parts = [
+        '<?xml version="1.0" encoding="UTF-8"?>',
+        '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+        *(f"  <sitemap><loc>{SITE_URL}/{name}</loc></sitemap>" for name in refs),
+        "</sitemapindex>",
+    ]
+    SITEMAP.write_text("\n".join(parts) + "\n", encoding="utf-8")
+
+
 def generate_all():
     journals = load_journals()
     oa = load_gzip_json(OA_GZ, {})
@@ -199,7 +250,7 @@ def generate_all():
     print(f"Loaded {len(journals)} journals")
 
     index = {}
-    sitemap_urls = [(SITE_URL + "/", "1.0")]
+    sitemap_urls = []
     skipped = 0
 
     for r in journals:
@@ -217,20 +268,41 @@ def generate_all():
     print("Building related journal links...")
     build_related(index)
 
-    print(f"Writing {SITEMAP} with {len(sitemap_urls)} URLs")
-    xml_parts = [
-        '<?xml version="1.0" encoding="UTF-8"?>',
-        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
-    ]
-    xml_parts.extend(f"  <url><loc>{url}</loc><priority>{priority}</priority></url>" for url, priority in sitemap_urls)
-    xml_parts.append("</urlset>")
-    SITEMAP.write_text("\n".join(xml_parts) + "\n", encoding="utf-8")
+    static_urls = [(SITE_URL + "/", "1.0")]
+    # Preserve the generated, crawlable directory pages when the journal
+    # bundle is refreshed.  The listing generator may add more entries later,
+    # but a SEO-only refresh should not erase them from the sitemap index.
+    for base in ("subjects", "indexes"):
+        base_dir = ROOT / base
+        if not base_dir.exists():
+            continue
+        static_urls.append((f"{SITE_URL}/{base}/", "0.7"))
+        static_urls.extend(
+            (f"{SITE_URL}/{base}/{path.parent.name}/", "0.7")
+            for path in sorted(base_dir.glob("*/index.html"))
+        )
+    static_urls = list(dict.fromkeys(static_urls))
+    print(f"Writing sitemap index and journal chunks for {len(sitemap_urls)} journal URLs")
+    write_sitemap_files(static_urls, sitemap_urls)
 
     with open(INDEX_FILE, "w", encoding="utf-8") as f:
         json.dump(index, f, ensure_ascii=False, separators=(",", ":"))
 
+    # Keep a deployable, compressed copy for the journal Pages Function.  The
+    # old uncompressed journal_index.json is intentionally ignored because it
+    # is too large for routine local/deploy workflows; this file contains the
+    # same compact records without the duplicate ISSN alias entries.
+    seo_items = [
+        {"s": slug, **entry}
+        for slug, entry in index.items()
+        if "_r" not in entry
+    ]
+    with gzip.open(SEO_DATA_FILE, "wt", encoding="utf-8", compresslevel=9) as f:
+        json.dump({"version": "2026-08", "items": seo_items}, f, ensure_ascii=False, separators=(",", ":"))
+
     primary_count = sum(1 for v in index.values() if "_r" not in v)
     print(f"Journal index: {INDEX_FILE.stat().st_size / 1024 / 1024:.1f} MB, {len(index)} keys, {primary_count} primary")
+    print(f"SEO data: {SEO_DATA_FILE.stat().st_size / 1024 / 1024:.1f} MB compressed")
     print(f"Done: {primary_count} sitemap journal URLs, {skipped} skipped")
 
 

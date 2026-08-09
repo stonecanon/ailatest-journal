@@ -4,9 +4,10 @@ Allow: /
 Allow: /llms.txt
 Allow: /ai.txt
 Allow: /sitemap.xml
-Allow: /pricing.html
-Allow: /extension.html
-Allow: /rankings/
+Allow: /sitemap-static.xml
+Allow: /sitemap-journals-*.xml
+Allow: /journal/
+Allow: /pricing
 Allow: /subjects/
 Allow: /indexes/
 Disallow: /api/

@@ -2,7 +2,8 @@
 /mobile.html / 302
 /journal / 302
 /journal/ / 302
-/journal/* /index.html 200
+# Journal detail URLs are rendered by functions/journal/[[slug]].js so each
+# sitemap URL returns a unique canonical document instead of the home shell.
 /journals / 302
 /journals/ / 302
 /journals/* / 302

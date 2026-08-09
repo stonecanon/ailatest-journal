@@ -516,12 +516,18 @@ def generate_landing(origin):
     print(f'  legacy /subjects/* bridge pages: {len(LEGACY_SUBJECT_PAGES)}')
 
 def update_sitemap(origin):
-    sitemap_path = ROOT / 'sitemap.xml'
+    # Journal detail URLs live in a sitemap index (split into bounded chunks).
+    # Keep the small, frequently changing landing-page set in its own urlset
+    # so this script never makes the journal chunks exceed Google's limit.
+    sitemap_path = ROOT / 'sitemap-static.xml'
     if not sitemap_path.exists():
-        print('  sitemap.xml not found, skipping'); return
+        sitemap_path.write_text(
+            '<?xml version="1.0" encoding="UTF-8"?>\n'
+            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+            '</urlset>\n', encoding='utf-8'
+        )
     existing = sitemap_path.read_text(encoding='utf-8')
     new_urls = []
-    new_urls.append(f'  <url><loc>{origin}/rankings/</loc><priority>0.7</priority></url>')
     new_urls.append(f'  <url><loc>{origin}/indexes/</loc><priority>0.7</priority></url>')
     for slug, _, _, _, _ in ALL_INDEX_PAGES:
         new_urls.append(f'  <url><loc>{origin}/indexes/{slug}/</loc><priority>0.7</priority></url>')
@@ -536,7 +542,7 @@ def update_sitemap(origin):
     if '</urlset>' in existing:
         existing = existing.replace('</urlset>', '\n'.join(new_urls) + '\n</urlset>')
     sitemap_path.write_text(existing, encoding='utf-8')
-    print(f'  sitemap.xml: updated with {len(new_urls)} new URLs')
+    print(f'  sitemap-static.xml: updated with {len(new_urls)} new URLs')
 
 def main():
     global SUBJECTS

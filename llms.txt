@@ -4,12 +4,12 @@
 
 - Site: https://journal.ailatest.org/
 - Studio hub: https://ailatest.org/
-- Pricing: https://journal.ailatest.org/pricing.html
+- Pricing: https://journal.ailatest.org/pricing
 - Skill search: POST https://journal.ailatest.org/api/skill/search
 - Skill recommend: POST https://journal.ailatest.org/api/skill/recommend
 - Skill quota: GET https://journal.ailatest.org/api/skill/quota
 - MCP (public beta): POST https://journal.ailatest.org/api/mcp
-- Extension / downloads: https://journal.ailatest.org/extension.html
+- Extension / downloads: https://journal.ailatest.org/#download
 - Sitemap: https://journal.ailatest.org/sitemap.xml
 - Suite AI index: https://ailatest.org/llms.txt
 
@@ -32,11 +32,17 @@ keyword recommender, not a direct DeepSeek proxy.
 ## Key public routes
 
 - Home / search: https://journal.ailatest.org/
-- Global browse: https://journal.ailatest.org/global
+- Global browse: https://journal.ailatest.org/global/
 - China directory: https://journal.ailatest.org/cn
-- Rankings & warnings: https://journal.ailatest.org/rankings/
+- Subject directories: https://journal.ailatest.org/subjects/
+- Index and warning directories: https://journal.ailatest.org/indexes/
 - Account: https://journal.ailatest.org/account
-- Pricing: https://journal.ailatest.org/pricing.html
+- Pricing: https://journal.ailatest.org/pricing
+
+Journal detail URLs use the canonical form
+`https://journal.ailatest.org/journal/<name-slug>/` and expose a server-rendered
+summary, metadata, JSON-LD, and links to the interactive catalogue. The sitemap
+index splits these URLs into bounded chunks for reliable crawler processing.
 
 ## Plans (USD via Creem)
 

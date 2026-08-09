@@ -217,10 +217,11 @@ npx wrangler dev
 ├── screenshots/            # README 截图
 ├── icons/                  # PWA 图标 + OG 图
 ├── functions/api/          # Cloudflare Pages Functions（搜索 API）
+├── functions/journal/      # 期刊详情 SSR / SEO canonical 页面
 ├── worker/                 # Cloudflare Worker、D1 migrations 与定时任务
 ├── weapp/                  # 微信小程序（预留）
 ├── robots.txt              # SEO
-└── sitemap.xml             # SEO
+└── sitemap.xml             # SEO sitemap index（期刊 URL 分片在 sitemap-journals-*.xml）
 ```
 
 ---
