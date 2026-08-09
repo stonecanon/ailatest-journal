@@ -214,9 +214,9 @@
       home_dl_plat_skill_cta: '下载',
       home_dl_plat_mcp_cta: '复制命令',
       home_dl_plat_mcp_meta: '在线公测 · 复制即用',
-      home_dl_plat_mobile: 'Mobile',
-      home_dl_plat_mobile_cta: '即将推出',
-      home_dl_plat_mobile_meta: 'iOS / Android',
+      home_dl_plat_wechat: '微信小程序',
+      home_dl_plat_wechat_cta: '查看小程序码',
+      home_dl_plat_wechat_meta: '点击显示二维码',
       home_dl_ext_badge: '插件', home_dl_ext_t: 'Chrome / Edge 内测版',
       home_dl_ext_d: '在 Google Scholar、PubMed、知网等页面显示分区徽章，并支持文献卡片保存。',
       home_dl_ext_cta: '下载 ZIP',
@@ -424,9 +424,9 @@
       home_dl_plat_skill_cta: 'Download',
       home_dl_plat_mcp_cta: 'Copy command',
       home_dl_plat_mcp_meta: 'Online public beta · paste & run',
-      home_dl_plat_mobile: 'Mobile',
-      home_dl_plat_mobile_cta: 'Coming soon',
-      home_dl_plat_mobile_meta: 'iOS / Android',
+      home_dl_plat_wechat: 'WeChat Mini Program',
+      home_dl_plat_wechat_cta: 'Show mini program code',
+      home_dl_plat_wechat_meta: 'Click to view the QR code',
       home_dl_ext_badge: 'Extension', home_dl_ext_t: 'Chrome / Edge beta',
       home_dl_ext_d: 'Ranking badges on Google Scholar, PubMed, CNKI and more; save literature cards.',
       home_dl_ext_cta: 'Download ZIP',
@@ -10988,6 +10988,46 @@
       return true;
     } catch (_) { return false; }
   }
+
+  // WeChat mini-program entry: keep the popup deliberately image-only so the
+  // scan code is immediately usable on both desktop and mobile.
+  function showWeChatMiniProgramModal() {
+    let modal = document.getElementById('wechat-mini-program-modal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'wechat-mini-program-modal';
+      modal.className = 'wechat-mini-modal';
+      modal.setAttribute('role', 'dialog');
+      modal.setAttribute('aria-modal', 'true');
+      modal.innerHTML = `
+        <div class="wechat-mini-modal-card">
+          <button type="button" class="wechat-mini-modal-close" aria-label="${escape(T('关闭', 'Close'))}">×</button>
+          <img src="/icons/wechat-mini-program-code.jpg" width="344" height="344" decoding="async" alt="${escape(T('微信小程序码', 'WeChat mini program code'))}">
+        </div>`;
+      document.body.appendChild(modal);
+      const close = () => {
+        modal.classList.remove('open');
+        document.body.classList.remove('wechat-mini-modal-open');
+        document.removeEventListener('keydown', modal.__onEsc);
+        try { modal.__opener?.focus(); } catch (_) {}
+      };
+      modal.__close = close;
+      modal.__onEsc = (event) => { if (event.key === 'Escape') close(); };
+      modal.addEventListener('click', (event) => {
+        if (event.target === modal) close();
+      });
+      modal.querySelector('.wechat-mini-modal-close')?.addEventListener('click', close);
+    }
+    modal.querySelector('.wechat-mini-modal-close')?.setAttribute('aria-label', T('关闭', 'Close'));
+    modal.querySelector('img')?.setAttribute('alt', T('微信小程序码', 'WeChat mini program code'));
+    modal.__opener = document.activeElement;
+    modal.classList.add('open');
+    document.body.classList.add('wechat-mini-modal-open');
+    document.removeEventListener('keydown', modal.__onEsc);
+    document.addEventListener('keydown', modal.__onEsc);
+    modal.querySelector('.wechat-mini-modal-close')?.focus();
+  }
+
   function flashBtn(id, label) {
     const btn = (typeof id === 'string') ? document.getElementById(id) : id;
     if (!btn) return;
@@ -11341,6 +11381,9 @@
 
   // ───────── bindings ─────────
   function bind() {
+    document.querySelectorAll('[data-wechat-mini-program]').forEach((button) => {
+      button.addEventListener('click', () => showWeChatMiniProgramModal());
+    });
     $('#index-toggles').addEventListener('change', () => {
       activeIndices = new Set($$('#index-toggles input:checked').map(i => i.value));
       shown = PAGE; renderInt();

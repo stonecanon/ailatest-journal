@@ -1499,6 +1499,51 @@ button.dl-strip-btn:hover:not(:disabled) {
 }
 .home-dl-note a:hover { text-decoration: underline; }
 .home-dl-dot { color: #d6d3d1; }
+
+/* 微信小程序码：弹层只保留可扫码图片 */
+.wechat-mini-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 3600;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(28, 22, 12, 0.58);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.wechat-mini-modal.open { display: flex; }
+.wechat-mini-modal-open { overflow: hidden; }
+.wechat-mini-modal-card {
+  position: relative;
+  padding: 8px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 24px 70px rgba(30, 22, 12, 0.34);
+}
+.wechat-mini-modal-card img {
+  display: block;
+  width: min(344px, calc(100vw - 72px));
+  height: auto;
+  border-radius: 9px;
+}
+.wechat-mini-modal-close {
+  position: absolute;
+  top: -14px;
+  right: -14px;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid rgba(90, 70, 50, 0.18);
+  border-radius: 50%;
+  background: #fff;
+  color: #5c5148;
+  font: 24px/28px system-ui, sans-serif;
+  cursor: pointer;
+  box-shadow: 0 5px 16px rgba(30, 22, 12, 0.18);
+}
+.wechat-mini-modal-close:hover { color: #1c1917; background: #fffdf9; }
 @media (max-width: 720px) {
   .dl-strip {
     grid-template-columns: 1fr 1fr;
