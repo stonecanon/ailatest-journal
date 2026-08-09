@@ -183,7 +183,14 @@ function serverDetailBody(journal, slug, origin) {
 
 function notFound(origin) {
   const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Journal not found | AILatest Journal</title><meta name="robots" content="noindex,follow"><link rel="canonical" href="${origin}/"></head><body><h1>Journal not found</h1><p><a href="${origin}/">Back to AILatest Journal</a></p></body></html>`;
-  return new Response(html, { status: 404, headers: { 'Content-Type': 'text/html;charset=utf-8' } });
+  return new Response(html, {
+    status: 404,
+    headers: {
+      'Content-Type': 'text/html;charset=utf-8',
+      'Cache-Control': 'public, max-age=60, s-maxage=300',
+      'X-Robots-Tag': 'noindex, follow',
+    },
+  });
 }
 
 async function render(ctx, journal, slug) {
