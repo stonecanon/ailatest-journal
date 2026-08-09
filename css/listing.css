@@ -848,3 +848,133 @@ tr:hover td { background: rgba(249,115,22,.035); }
 @media (max-width: 720px) {
   .rank-board-grid { grid-template-columns: 1fr; }
 }
+
+/* ───────────────── Home shell parity (2026-08) ─────────────────
+   Index and subject catalogues keep their data tables, but use the same
+   fixed brand/nav, background, rail rhythm and content width as the home SPA.
+   This replaces the old in-flow 60px listing header without touching the
+   already-refactored `/indexes/` landing boards. */
+body {
+  display: block;
+  background-color: #fffdf9;
+  background-image:
+    radial-gradient(ellipse 680px 440px at 52% 18%, rgba(249,115,22,.13), transparent 72%),
+    radial-gradient(ellipse 780px 520px at 86% 80%, rgba(31,44,76,.055), transparent 72%),
+    linear-gradient(rgba(39,35,31,.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(39,35,31,.035) 1px, transparent 1px),
+    linear-gradient(180deg, #fffefa 0%, #fffaf2 42%, #fffdf9 100%);
+  background-attachment: fixed;
+  background-repeat: no-repeat, no-repeat, repeat, repeat, no-repeat;
+  background-size: cover, cover, 60px 60px, 60px 60px, cover;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+}
+.listing-topbar {
+  position: fixed;
+  inset: 0 0 auto 72px;
+  z-index: 150;
+  display: block;
+  height: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  backdrop-filter: none;
+  pointer-events: none;
+}
+.listing-brand {
+  position: fixed;
+  top: 20px;
+  left: 96px;
+  z-index: 160;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  color: #1c1917;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 18px;
+  font-weight: 820;
+  line-height: 1;
+  pointer-events: auto;
+}
+.listing-brand em {
+  color: rgba(117,111,104,.88);
+  font-family: inherit;
+  font-style: italic;
+  font-weight: 650;
+}
+.listing-section-title { display: none; }
+.listing-topbar nav {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 160;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px 4px;
+  margin: 0;
+  max-width: min(640px, calc(100vw - 88px));
+  pointer-events: auto;
+}
+.listing-topbar nav a,
+.listing-topbar nav span {
+  min-height: 0;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #5c564f;
+  font-size: 12.5px;
+  font-weight: 680;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.listing-topbar nav a:hover {
+  color: #c2410c;
+  background: rgba(249,115,22,.08);
+}
+.wrap {
+  width: min(1120px, calc(100vw - 112px));
+  max-width: none;
+  padding: 88px 0 80px;
+}
+.card,
+.ranking-choice-grid {
+  border-radius: 18px;
+  border-color: rgba(90,70,50,.07);
+  background: rgba(255,255,255,.82);
+  box-shadow: 0 10px 28px rgba(40,28,16,.05);
+}
+.table-wrap { background: rgba(255,255,255,.88); }
+.footer { display: none !important; }
+.app-rail .rail-region-picker { display: none !important; }
+
+@media (max-width: 900px) {
+  body {
+    padding-left: 0;
+    padding-bottom: calc(76px + env(safe-area-inset-bottom));
+    background-attachment: scroll;
+  }
+  .listing-topbar { inset: 0; }
+  .listing-brand {
+    top: 14px;
+    left: 52px;
+    font-size: 14px;
+  }
+  .listing-topbar nav {
+    top: 10px;
+    right: 10px;
+    display: none;
+  }
+  .wrap {
+    width: 100%;
+    padding: 72px 14px 80px;
+  }
+  .ranking-entry-wrap { padding-top: 72px; }
+  .card,
+  .ranking-choice-grid { border-radius: 16px; }
+}

@@ -99,7 +99,17 @@
 
   function ensureRankLink(rail) {
     const bottom = rail?.querySelector('.rail-bottom');
-    if (!bottom || bottom.querySelector('#rankings-btn, a[href="/#rankings"]')) return;
+    if (!bottom) return;
+    // Listing pages already ship a rankings entry with a canonical path. Do
+    // not inject a second button just because the link is `/rankings/` (or a
+    // legacy `/indexes/` URL) instead of the home hash URL.
+    const existing = bottom.querySelector(
+      '#rankings-btn, a[href="/#rankings"], a[href="/rankings"], a[href="/rankings/"], a[href="/indexes"], a[href="/indexes/"]'
+    );
+    if (existing) {
+      if (!existing.id) existing.id = 'rankings-btn';
+      return;
+    }
     const link = document.createElement('a');
     link.className = 'rail-nav-btn';
     link.id = 'rankings-btn';

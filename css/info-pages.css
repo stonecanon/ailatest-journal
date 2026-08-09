@@ -398,3 +398,21 @@ html:not([lang="en"]):not([data-static-lang="en"]):not([data-ui-lang="en"]) [dat
     padding: 18px 16px;
   }
 }
+
+/* Keep the information pages on the exact home background after the
+   page-specific stylesheet is loaded after static.css. */
+body[data-static-page] {
+  background-color: #fffdf9;
+  background-image:
+    radial-gradient(ellipse 680px 440px at 52% 18%, rgba(249,115,22,.13), transparent 72%),
+    radial-gradient(ellipse 780px 520px at 86% 80%, rgba(31,44,76,.055), transparent 72%),
+    linear-gradient(rgba(39,35,31,.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(39,35,31,.035) 1px, transparent 1px),
+    linear-gradient(180deg, #fffefa 0%, #fffaf2 42%, #fffdf9 100%);
+  background-attachment: fixed;
+  background-repeat: no-repeat, no-repeat, repeat, repeat, no-repeat;
+  background-size: cover, cover, 60px 60px, 60px 60px, cover;
+}
+@media (max-width: 900px) {
+  body[data-static-page] { background-attachment: scroll; }
+}
