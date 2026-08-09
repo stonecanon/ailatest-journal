@@ -12817,11 +12817,16 @@ body[data-boot-tab="me"] .tab-panel[data-panel="me"] {
 
 @media (max-width: 900px) {
   /* 设置：手机全屏两级（非桌面弹层） */
-  body.settings-open .app-rail,
   body.settings-open .sidebar-scrim,
   body.settings-open #sidebar-scrim {
     visibility: hidden !important;
     pointer-events: none !important;
+  }
+  /* 设置页仍保留底部主导航；点击其它按钮即可直接切换页面。 */
+  body.settings-open .app-rail {
+    visibility: visible !important;
+    pointer-events: auto !important;
+    z-index: 600 !important;
   }
   /* 打开时一并藏顶栏品牌/语言，避免叠在设置白屏上像「没打开」 */
   body.settings-open .topbar-brand,
@@ -12917,7 +12922,7 @@ body[data-boot-tab="me"] .tab-panel[data-panel="me"] {
     border-bottom: 0 !important;
     background: #ffffff !important;
     gap: 0 !important;
-    padding: calc(12px + env(safe-area-inset-top, 0px)) 16px calc(24px + env(safe-area-inset-bottom, 0px)) !important;
+    padding: calc(12px + env(safe-area-inset-top, 0px)) 16px calc(88px + env(safe-area-inset-bottom, 0px)) !important;
     width: 100% !important;
     height: 100% !important;
     min-height: 100% !important;
@@ -12976,7 +12981,7 @@ body[data-boot-tab="me"] .tab-panel[data-panel="me"] {
     min-height: 100% !important;
     overflow-x: hidden !important;
     overflow-y: auto !important;
-    padding: calc(12px + env(safe-area-inset-top, 0px)) 16px calc(28px + env(safe-area-inset-bottom, 0px)) !important;
+    padding: calc(12px + env(safe-area-inset-top, 0px)) 16px calc(92px + env(safe-area-inset-bottom, 0px)) !important;
     box-sizing: border-box !important;
     -webkit-overflow-scrolling: touch;
     background: #ffffff !important;
@@ -12992,10 +12997,8 @@ body[data-boot-tab="me"] .tab-panel[data-panel="me"] {
     padding: 8px 0 12px;
     background: #ffffff;
   }
-  .settings-close {
-    top: calc(8px + env(safe-area-inset-top, 0px));
-    right: 10px;
-  }
+  /* 手机端不再提供右上角关闭；用底部导航切换即可。 */
+  .settings-close { display: none !important; }
   .settings-body {
     max-width: none;
     padding: 14px 16px calc(28px + env(safe-area-inset-bottom, 0px));
