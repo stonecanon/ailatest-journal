@@ -2763,6 +2763,17 @@
     if (!r || typeof r !== 'object') return { acronym: '', aliases: [], aliasKeys: new Set() };
     const cached = searchMetaCache.get(r);
     if (cached) return cached;
+    // These values are stable for a journal but were previously rebuilt for
+    // every keypress.  Cache them once when the dataset is finalized so a
+    // search only needs to normalize the query itself.
+    const name = String(r.name || '').toLowerCase();
+    const abbr = String(r.abbr20 || '').toLowerCase();
+    const cn = String(r.cn_name || '').toLowerCase();
+    const en = String(r.en_name || '').toLowerCase();
+    const issn = String(r.issn || '').toLowerCase();
+    const eissn = String(r.eissn || '').toLowerCase();
+    const publisher = String(r.publisher || '').toLowerCase();
+    const country = String(r.country || '').toLowerCase();
     const title = canonicalTitle(r.name || r.en_name || r.cn_name || '');
     const acronym = makeJournalAcronym(r);
     const aliases = [];
@@ -2771,7 +2782,12 @@
       if (!aliases.includes(a)) aliases.push(a);
     });
     const aliasKeys = new Set(aliases.map(normalizeAliasKey));
-    const meta = { acronym, aliases, aliasKeys };
+    const meta = {
+      acronym, aliases, aliasKeys, title,
+      name, abbr, cn, en, issn, eissn, publisher, country,
+      issnCompact: issn.replace(/[^0-9x]/g, ''),
+      eissnCompact: eissn.replace(/[^0-9x]/g, ''),
+    };
     searchMetaCache.set(r, meta);
     return meta;
   }
@@ -4849,13 +4865,14 @@
   }
 
   // ───────── filtering ─────────
-  function matches(r) {
+  function matches(r, includeQuery = true, filterContext = null) {
     // 预警名单：合并所有预警信号（任意命中即可，OR 语义）
     if (activeWarnList && !(r.warning || r.citic_warning || r.under_review || r.on_hold)) return false;
     // Index filter: exclude ESI from indices[] check (ESI stored as esi_category)
     // ESI adds another OR condition — journal with esi_category also shows
-    const esiActive = activeIndices.has('ESI');
-    const idxOnly = new Set([...activeIndices].filter(v => v !== 'ESI'));
+    const esiActive = filterContext ? filterContext.esiActive : activeIndices.has('ESI');
+    const idxOnly = filterContext ? filterContext.idxOnly
+      : (esiActive ? new Set([...activeIndices].filter(v => v !== 'ESI')) : activeIndices);
     const matchesAny = !idxOnly.size || (r.indices || []).some(i => idxOnly.has(i));
     if (!matchesAny && !(esiActive && r.esi_category)) {
       // When OAJ / DOAJ / MEDLINE / PubMed / PMC is checked, those journals bypass the
@@ -4931,32 +4948,36 @@
       }
       if (!ok) return false;
     }
-    if (activeQuery) {
+    if (includeQuery && activeQuery) {
       return scoreRecord(r, activeQuery) > 0;
     }
     return true;
   }
 
   // 搜索排序：精确名 > ISSN > 手动 alias > 自动 acronym > 官方缩写 > 前缀 > 包含
-  function scoreRecord(r, query) {
-    const raw = (query||'').trim();
+  function makeSearchContext(query) {
+    const raw = String(query || '').trim();
     const q = raw.toLowerCase();
+    return {
+      raw,
+      q,
+      aliasTarget: aliasTargetForQuery(raw),
+      acronymQuery: normalizeAcronymQuery(raw),
+      compactIssn: raw.replace(/[^0-9x]/gi, '').toLowerCase(),
+      aliasKey: normalizeAliasKey(raw),
+      wordRe: q ? new RegExp('\\b' + escapeRegExp(q) + '\\b') : null,
+    };
+  }
+
+  function scoreRecord(r, query, context = null) {
+    const search = context || makeSearchContext(query);
+    const raw = search.raw;
+    const q = search.q;
     if (!q) return 1;
-    const name = (r.name||'').toLowerCase();
-    const abbr = (r.abbr20||'').toLowerCase();
-    const cn = (r.cn_name||'').toLowerCase();
-    const en = (r.en_name||'').toLowerCase();
-    const issn = (r.issn||'').toLowerCase();
-    const eissn = (r.eissn||'').toLowerCase();
-    const publisher = (r.publisher||'').toLowerCase();
-    const country = (r.country||'').toLowerCase();
     const meta = journalSearchMeta(r);
-    const title = canonicalTitle(r.name || r.en_name || r.cn_name || '');
-    const aliasTarget = aliasTargetForQuery(raw);
-    const acronymQuery = normalizeAcronymQuery(raw);
-    const compactIssn = raw.replace(/[^0-9x]/gi, '').toLowerCase();
-    const issnCompact = issn.replace(/[^0-9x]/g, '');
-    const eissnCompact = eissn.replace(/[^0-9x]/g, '');
+    const { name, abbr, cn, en, issn, eissn, publisher, country, title,
+      issnCompact, eissnCompact } = meta;
+    const { aliasTarget, acronymQuery, compactIssn, aliasKey, wordRe } = search;
 
     // 精确匹配（最高优先级）
     if (name === q) return 1000;
@@ -4981,16 +5002,15 @@
     if (acronymQuery && acronymQuery.length >= 2 && acronymQuery.length <= 6 && meta.acronym.startsWith(acronymQuery)) return 660;
 
     // 词边界匹配（"cell"在"Cell Reports"中出现在词首）
-    const wordRe = new RegExp('\\b' + escapeRegExp(q) + '\\b', 'i');
-    if (wordRe.test(r.name||'')) return 500;
-    if (wordRe.test(r.cn_name||'')) return 480;
-    if (wordRe.test(r.en_name||'')) return 460;
+    if (wordRe && wordRe.test(name)) return 500;
+    if (wordRe && wordRe.test(cn)) return 480;
+    if (wordRe && wordRe.test(en)) return 460;
 
     // 包含
     if (name.includes(q)) return 200;
     if (cn.includes(q)) return 180;
     if (en.includes(q)) return 160;
-    if (acronymQuery && meta.aliasKeys.has(normalizeAliasKey(raw))) return 140;
+    if (acronymQuery && meta.aliasKeys.has(aliasKey)) return 140;
     if (publisher.includes(q)) return 100;
     if (country.includes(q)) return 50;
     return 0;
@@ -5225,12 +5245,22 @@
   function renderInt() {
     updateThStickyTop();
     if (activeQuery) activeWarnList = false; // 搜索即退出预警名单
-    let filtered = journals.filter(matches);
+    const filterContext = {
+      esiActive: activeIndices.has('ESI'),
+      idxOnly: activeIndices.has('ESI')
+        ? new Set([...activeIndices].filter(v => v !== 'ESI'))
+        : activeIndices,
+    };
+    let filtered;
     if (activeQuery) {
       // 按相关性排序
       const q = activeQuery;
-      filtered = filtered
-        .map(r => ({ r, s: scoreRecord(r, q) }))
+      const searchContext = makeSearchContext(q);
+      filtered = journals
+        // 结构化筛选与文本匹配分开，避免 scoreRecord 被 matches 和排序各算一遍。
+        .filter(r => matches(r, false, filterContext))
+        .map(r => ({ r, s: scoreRecord(r, q, searchContext) }))
+        .filter(x => x.s > 0)
         .sort((a, b) => {
           if (b.s !== a.s) return b.s - a.s;
           // 同分时：旗舰刊在前，再按 IF 倒序，最后按字母
@@ -5243,6 +5273,8 @@
           return (a.r.name||'').localeCompare(b.r.name||'');
         })
         .map(x => x.r);
+    } else {
+      filtered = journals.filter(r => matches(r, true, filterContext));
     }
     if (activeQuery) {
       intIfSort = '';
@@ -5554,15 +5586,18 @@
          <span class="wos-count">${c.count}</span>
        </label>`
     ).join('');
-    // bind change
-    box.querySelectorAll('input[type=checkbox]').forEach(cb => {
-      cb.addEventListener('change', () => {
+    // 事件委托：搜索时只替换 HTML，不为每个学科复选框重复创建监听器。
+    if (!box.__topicChangeBound) {
+      box.__topicChangeBound = true;
+      box.addEventListener('change', (event) => {
+        const cb = event.target;
+        if (!cb || cb.tagName !== 'INPUT' || cb.type !== 'checkbox') return;
         if (cb.checked) activeTopics.add(cb.value); else activeTopics.delete(cb.value);
-        cb.closest('.wos-item').classList.toggle('on', cb.checked);
+        cb.closest('.wos-item')?.classList.toggle('on', cb.checked);
         shown = PAGE;
         renderInt();
       });
-    });
+    }
   }
 
   /** 中国站目录列表（仅左侧筛选，不再放顶栏横排按钮） */
@@ -10420,7 +10455,8 @@
     }
     if (activeQuery) {
       const q = activeQuery.toLowerCase();
-      rows = rows.filter(r => scoreRecord(r, activeQuery) > 0 || (
+      const searchContext = makeSearchContext(activeQuery);
+      rows = rows.filter(r => scoreRecord(r, activeQuery, searchContext) > 0 || (
         (r.name||'') + ' ' + (r.cn_name||'') + ' ' + (r.en_name||'') + ' ' +
         (r.issn||'') + ' ' + (r.cn_code||'') + ' ' +
         (r.publisher||'') + ' ' + (r.org||'') + ' ' + (r.sponsor||'')
@@ -11560,11 +11596,18 @@
       e.stopPropagation();
       showRegionPaywallModal('publish_fee');
     });
-    $('#topic-dd-search')?.addEventListener('input', () => {
+    let topicDropdownSearchDebounce = null;
+    let topicListSearchDebounce = null;
+    let homeSearchDebounce = null;
+    let searchRenderDebounce = null;
+    const renderTopicDropdownSearch = () => {
       const raw = ($('#topic-dd-search')?.value || '').trim().toLowerCase();
       const panel = $('#topic-dd-list');
       if (!panel) return;
-      const filtered = !raw ? topicList : topicList.filter(t => t.name.toLowerCase().includes(raw));
+      const tokens = expandWosQuery(raw);
+      const filtered = !tokens.length
+        ? topicList
+        : topicList.filter(t => tokens.some(tok => t.name.toLowerCase().includes(tok)));
       panel.innerHTML = filtered.map(t =>
         `<label class="th-chk" data-filter="topic" data-value="${escape(t.name)}">
            <input type="checkbox" ${activeTopics.has(t.name) ? 'checked' : ''}>
@@ -11572,22 +11615,31 @@
            <span class="count">${t.count.toLocaleString()}</span>
          </label>`
       ).join('');
-      // Re-bind change events for new checkboxes
-      // (the generic handler in renderCatList uses __bound which only binds once,
-      //  but these checkboxes are new DOM nodes so the events need re-binding)
-      panel.querySelectorAll('label.th-chk').forEach(label => {
-        const cb = label.querySelector('input[type=checkbox]');
-        if (!cb || cb.__topicBound) return;
-        cb.__topicBound = true;
-        cb.addEventListener('change', () => {
-          const val = label.dataset.value;
-          if (cb.checked) activeTopics.add(val);
-          else activeTopics.delete(val);
-          shown = PAGE;
-          renderInt();
-        });
+    };
+    const topicDdSearch = $('#topic-dd-search');
+    if (topicDdSearch && !topicDdSearch.__searchInputBound) {
+      topicDdSearch.__searchInputBound = true;
+      topicDdSearch.addEventListener('input', () => {
+        clearTimeout(topicDropdownSearchDebounce);
+        const valueAtInput = topicDdSearch.value;
+        topicDropdownSearchDebounce = setTimeout(() => {
+          if (topicDdSearch.value !== valueAtInput) return;
+          renderTopicDropdownSearch();
+        }, 100);
       });
-    });
+    }
+    const topicSearchInput = $('#topic-search');
+    if (topicSearchInput && !topicSearchInput.__searchInputBound) {
+      topicSearchInput.__searchInputBound = true;
+      topicSearchInput.addEventListener('input', () => {
+        clearTimeout(topicListSearchDebounce);
+        const valueAtInput = topicSearchInput.value;
+        topicListSearchDebounce = setTimeout(() => {
+          if (topicSearchInput.value !== valueAtInput) return;
+          renderTopicList();
+        }, 100);
+      });
+    }
     $('#topic-clear')?.addEventListener('click', () => {
       activeTopics.clear();
       const inp = $('#topic-search'); if (inp) inp.value = '';
@@ -11600,7 +11652,6 @@
       renderTopicList();
       shown = PAGE; renderInt();
     });
-    let homeSearchDebounce = null;
     const queryInput = $('#q');
     // IME confirmation Enter is not a search submission.  On macOS/Chrome
     // the event may arrive with isComposing=false, so keep a short guard after
@@ -11620,6 +11671,22 @@
       queryInput.__pickCompositionActive = false;
       queryInput.__pickIgnoreEnterUntil = performance.now() + 220;
     });
+    const renderQueryTarget = (tab) => {
+      if (tab === 'int') renderInt();
+      else if (tab === 'fav') renderFav();
+      else if (tab === 'dom') renderDomestic();
+      else if (tab === 'in') renderIndia();
+      else if (tab === 'my') renderMalaysia();
+      else if (tab === 'kr') renderKorea();
+      else if (REGIONAL_DIRECTORY_CONFIG[tab]) renderRegionalDirectory(tab);
+      else if (tab === 'updates') renderJournalUpdates();
+    };
+    const clearPendingSearch = () => {
+      clearTimeout(homeSearchDebounce);
+      clearTimeout(searchRenderDebounce);
+      homeSearchDebounce = null;
+      searchRenderDebounce = null;
+    };
     queryInput.addEventListener('input', (e) => {
       if (activeTab === 'updates') activeUpdateQuery = e.target.value.trim();
       else activeQuery = e.target.value.trim();
@@ -11627,23 +11694,27 @@
       if (isPickSearchContext()) return; // pick mode uses Enter / submit
       if (activeTab === 'home') {
         clearTimeout(homeSearchDebounce);
-        homeSearchDebounce = setTimeout(showHomeSearchResults, 90);
+        const valueAtInput = activeQuery;
+        homeSearchDebounce = setTimeout(() => {
+          homeSearchDebounce = null;
+          if (activeTab === 'home' && activeQuery === valueAtInput) showHomeSearchResults();
+        }, 150);
       } else {
-        activeTab === 'int' ? renderInt()
-          : activeTab === 'fav' ? renderFav()
-          : activeTab === 'dom' ? renderDomestic()
-          : activeTab === 'in' ? renderIndia()
-          : activeTab === 'my' ? renderMalaysia()
-          : activeTab === 'kr' ? renderKorea()
-          : REGIONAL_DIRECTORY_CONFIG[activeTab] ? renderRegionalDirectory(activeTab)
-          : activeTab === 'updates' ? renderJournalUpdates()
-          : null;
+        clearTimeout(searchRenderDebounce);
+        const tabAtInput = activeTab;
+        const valueAtInput = tabAtInput === 'updates' ? activeUpdateQuery : activeQuery;
+        searchRenderDebounce = setTimeout(() => {
+          searchRenderDebounce = null;
+          const currentValue = tabAtInput === 'updates' ? activeUpdateQuery : activeQuery;
+          if (activeTab === tabAtInput && currentValue === valueAtInput) renderQueryTarget(tabAtInput);
+        }, 160);
       }
     });
     queryInput.addEventListener('keydown', (e) => {
       if (e.key !== 'Enter') return;
       if (isImeEnterEvent(e, e.currentTarget)) return;
       e.preventDefault();
+      clearPendingSearch();
       if (isPickSearchContext()) {
         submitPickSearchFromTopbar(e.currentTarget.value.trim());
         return;
@@ -11652,20 +11723,21 @@
       else activeQuery = e.currentTarget.value.trim();
       shown = PAGE;
       const currentQuery = activeTab === 'updates' ? activeUpdateQuery : activeQuery;
-      if (!currentQuery) return;
+      if (!currentQuery) {
+        if (activeTab === 'home') showHomeSearchResults();
+        else renderQueryTarget(activeTab);
+        return;
+      }
       if (activeTab === 'home') saveHomeSearchHistory(currentQuery);
       trackInteraction('journal_search', { tab: activeTab, query: currentQuery });
       if (activeTab === 'home') showHomeSearchResults();
-      else if (activeTab === 'int') renderInt();
-      else if (activeTab === 'fav') renderFav();
-      else if (activeTab === 'dom') renderDomestic();
-      else if (REGIONAL_DIRECTORY_CONFIG[activeTab]) renderRegionalDirectory(activeTab);
-      else if (activeTab === 'updates') renderJournalUpdates();
+      else renderQueryTarget(activeTab);
     });
     $('#search-submit')?.addEventListener('click', async () => {
       const qEl = $('#q');
       if (!qEl) return;
       const query = qEl.value.trim();
+      clearPendingSearch();
       if (isPickSearchContext()) {
         if (!query) {
           qEl.focus();
@@ -11680,6 +11752,8 @@
       const currentQuery = activeTab === 'updates' ? activeUpdateQuery : activeQuery;
       if (!currentQuery) {
         qEl.focus();
+        if (activeTab === 'home') showHomeSearchResults();
+        else renderQueryTarget(activeTab);
         return;
       }
       if (activeTab === 'pick') {
@@ -11688,11 +11762,13 @@
         saveHomeSearchHistory(activeQuery);
         trackInteraction('journal_search', { tab: activeTab, query: activeQuery });
         showHomeSearchResults();
-      } else if (activeTab === 'int') { trackInteraction('journal_search', { tab: activeTab, query: activeQuery }); renderInt(); }
-      else if (activeTab === 'fav') { trackInteraction('journal_search', { tab: activeTab, query: activeQuery }); renderFav(); }
-      else if (activeTab === 'dom') { trackInteraction('journal_search', { tab: activeTab, query: activeQuery }); renderDomestic(); }
-      else if (REGIONAL_DIRECTORY_CONFIG[activeTab]) { trackInteraction('journal_search', { tab: activeTab, query: activeQuery }); renderRegionalDirectory(activeTab); }
-      else if (activeTab === 'updates') { trackInteraction('journal_search', { tab: activeTab, query: activeUpdateQuery }); renderJournalUpdates(); }
+      } else {
+        trackInteraction('journal_search', {
+          tab: activeTab,
+          query: activeTab === 'updates' ? activeUpdateQuery : activeQuery,
+        });
+        renderQueryTarget(activeTab);
+      }
     });
     $('#more').addEventListener('click', () => { shown += PAGE; renderInt(); });
 
@@ -11827,9 +11903,10 @@
         homeResults.innerHTML = `<div class="empty-state">${T('正在准备期刊索引…','Preparing journal index…')}</div>`;
         return;
       }
-      let intFiltered = homeSource.filter(r => scoreRecord(r, q) > 0);
-      intFiltered = intFiltered
-        .map(r => ({ r, s: scoreRecord(r, q) }))
+      const searchContext = makeSearchContext(q);
+      let intFiltered = homeSource
+        .map(r => ({ r, s: scoreRecord(r, q, searchContext) }))
+        .filter(x => x.s > 0)
         .sort((a, b) => {
           if (b.s !== a.s) return b.s - a.s;
           const fa = a.r.flagship ? 1 : 0;
