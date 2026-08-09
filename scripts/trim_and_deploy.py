@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
-"""Compatibility entrypoint for Cloudflare Pages build settings.
+"""Compatibility entrypoint for legacy Cloudflare Pages build settings.
 
-Older Pages settings may still run `python scripts/trim_and_deploy.py`.
-The deployed site now serves `data/journals.json.gz` directly, so the trim step
-is optional and should never fail a static deployment.
+The deployed site serves ``data/journals.json.gz`` directly, so no trimming
+step is required.  Keep this script because older Pages settings may still
+invoke ``python scripts/trim_and_deploy.py``.
 """
-from __future__ import annotations
 
-import runpy
-from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
-runpy.run_path(str(ROOT / "trim_and_deploy.py"), run_name="__main__")
+def main() -> None:
+    print("data/journals.json.gz is the production bundle; no trim step is required.")
+
+
+if __name__ == "__main__":
+    main()

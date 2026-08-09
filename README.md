@@ -203,6 +203,8 @@ npx wrangler dev
 
 ## 📁 项目结构
 
+根目录保留的 HTML、`_headers`、`_redirects`、`robots.txt`、`sitemap.xml`、`manifest.json` 和 `sw.js` 都是 Cloudflare Pages 的公开入口或部署配置，直接对应网站 URL；数据、样式、脚本和生成器分别放在 `data/`、`css/`、`js/` 和 `scripts/` 中。
+
 ```
 ├── index.html              # SPA 主入口
 ├── css/app.css             # 样式（~5,400 行）
