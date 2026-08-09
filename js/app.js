@@ -1684,7 +1684,8 @@
   }
 
   const countryOutputCache = new Map();
-  const countryOutputColors = ['#b64b3f', '#2c6c8f', '#7a5a24', '#3f7d57', '#6c5a92', '#b7a27b'];
+  // 柔和的学术报告配色：保持国家之间的辨识度，降低饱和度和明度对比。
+  const countryOutputColors = ['#c7766c', '#6f98b2', '#a98c5e', '#72a182', '#8b7ca7', '#c1b18d'];
 
   function normalizeIssnForOpenAlex(value) {
     const text = String(value || '').trim().toUpperCase();

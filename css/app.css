@@ -7473,12 +7473,12 @@ body.journal-route .country-line-path {
   stroke-width: 1.8;
   stroke-linecap: round;
   stroke-linejoin: round;
-  filter: drop-shadow(0 1px 2px rgba(31, 109, 72, 0.66));
+  filter: drop-shadow(0 1px 2px rgba(81, 125, 98, 0.34));
 }
 
 body.journal-route .country-line-dot {
   fill: #fff;
-  stroke: #1f6d48;
+  stroke: #5a936f;
   stroke-width: 1.6;
 }
 
