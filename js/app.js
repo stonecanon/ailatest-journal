@@ -8591,14 +8591,26 @@
     { id: 'scielo', i18n: 'rail_scielo', zh: '拉美', en: 'LatAm' },
   ];
   const REGION_STATION_IDS = ['dom', 'in', 'my', 'kr', 'pbn', 'isc', 'scielo'];
-  const FREE_BASE_REGION_IDS = ['dom']; // 中国站始终可用
-  const DEFAULT_PINNED_REGION_IDS = ['dom'];
+  const FREE_BASE_REGION_IDS = ['dom']; // 中国站无需订阅即可打开，但不强制显示在侧栏
+  const DEFAULT_PINNED_REGION_IDS = ['dom']; // 中文界面的默认地区站
   const PINNED_REGION_KEY = 'ailatest.pinnedRegionStations';
   const PINNED_REGION_MIGRATION_KEY = `${PINNED_REGION_KEY}.v2`;
   /** 旧版 Max unlockAll 曾把全部地区写进侧栏；一次性收回到默认，之后用户可自行固定 */
   const PINNED_REGION_COLLAPSE_KEY = `${PINNED_REGION_KEY}.v3-collapse-all`;
+  // 新版把“系统默认”与“用户主动固定”分开记录，避免英文界面继承旧版默认中国站。
+  const PINNED_REGION_EXPLICIT_KEY = `${PINNED_REGION_KEY}.explicit-v1`;
   const REGION_VIEW_KEY = 'ailatest.regionViewDaily';
   const FREE_REGION_DAILY_VIEWS = 3;
+
+  function defaultPinnedRegionIds() {
+    return (lang === 'zh-CN' || lang === 'zh-TW')
+      ? DEFAULT_PINNED_REGION_IDS.slice()
+      : [];
+  }
+
+  function hasExplicitPinnedRegionPreference() {
+    try { return localStorage.getItem(PINNED_REGION_EXPLICIT_KEY) === '1'; } catch (_) { return false; }
+  }
 
   /** free | plus(Pro) | pro(Max) — 与 entitlements 对齐；支付未开时默认 free */
   function getRegionPlanTier() {
@@ -8839,21 +8851,31 @@
   function getPinnedRegions() {
     try {
       const raw = localStorage.getItem(PINNED_REGION_KEY);
-      if (!raw) return DEFAULT_PINNED_REGION_IDS.slice();
+      if (!raw) return defaultPinnedRegionIds();
       const saved = JSON.parse(raw);
-      if (!Array.isArray(saved)) return DEFAULT_PINNED_REGION_IDS.slice();
+      if (!Array.isArray(saved)) return defaultPinnedRegionIds();
       let valid = saved.filter(id => REGION_STATION_IDS.includes(id));
-      if (!localStorage.getItem(PINNED_REGION_MIGRATION_KEY) && !valid.includes('dom')) {
+      const explicit = hasExplicitPinnedRegionPreference();
+      // 旧版本把中国站作为所有语言的默认入口。英文界面只显示用户在新版明确固定的中国站，
+      // 历史保存的 dom 一律视为默认值移除；用户仍可在设置中重新固定。
+      if (!explicit && lang !== 'zh-CN' && lang !== 'zh-TW') {
+        valid = valid.filter(id => id !== 'dom');
+      }
+      // 中文界面继续兼容旧偏好：如果旧版本曾保存了自定义地区，补回中国默认入口。
+      if (!localStorage.getItem(PINNED_REGION_MIGRATION_KEY)
+        && !explicit
+        && (lang === 'zh-CN' || lang === 'zh-TW')
+        && !valid.includes('dom')) {
         valid = ['dom', ...valid];
         localStorage.setItem(PINNED_REGION_KEY, JSON.stringify(valid));
         localStorage.setItem(PINNED_REGION_MIGRATION_KEY, '1');
       }
       // 旧 Max「全解锁=全钉侧栏」：侧栏一次挂满全部地区 → 收回默认，仅保留中国
+      if (!explicit && valid.length >= REGION_STATION_IDS.length) {
+        valid = defaultPinnedRegionIds();
+        localStorage.setItem(PINNED_REGION_KEY, JSON.stringify(valid));
+      }
       if (!localStorage.getItem(PINNED_REGION_COLLAPSE_KEY)) {
-        if (valid.length >= REGION_STATION_IDS.length) {
-          valid = DEFAULT_PINNED_REGION_IDS.slice();
-          localStorage.setItem(PINNED_REGION_KEY, JSON.stringify(valid));
-        }
         localStorage.setItem(PINNED_REGION_COLLAPSE_KEY, '1');
       }
       // 权益降级时裁剪多余钉选（Max unlockAll 不裁剪，由用户自由固定/取消）
@@ -8862,20 +8884,18 @@
         const base = FREE_BASE_REGION_IDS.filter(id => valid.includes(id));
         const custom = valid.filter(id => !FREE_BASE_REGION_IDS.includes(id)).slice(0, ent.maxCustomPins);
         valid = [...new Set([...base, ...custom])];
-        if (!valid.includes('dom')) valid = ['dom', ...valid];
       }
       return valid;
     } catch (_) {
-      return DEFAULT_PINNED_REGION_IDS.slice();
+      return defaultPinnedRegionIds();
     }
   }
   function setPinnedRegions(ids) {
     const unique = [...new Set((ids || []).filter(id => REGION_STATION_IDS.includes(id)))];
-    // 至少保留一个地区入口（默认中国）
-    if (!unique.length) unique.push('dom');
     try { localStorage.setItem(PINNED_REGION_KEY, JSON.stringify(unique)); } catch (_) {}
     try { localStorage.setItem(PINNED_REGION_MIGRATION_KEY, '1'); } catch (_) {}
     try { localStorage.setItem(PINNED_REGION_COLLAPSE_KEY, '1'); } catch (_) {}
+    try { localStorage.setItem(PINNED_REGION_EXPLICIT_KEY, '1'); } catch (_) {}
     applyStations();
   }
   function togglePinnedRegion(id) {
@@ -8883,11 +8903,6 @@
     const ent = regionEntitlements();
     const pinned = getPinnedRegions();
     if (pinned.includes(id)) {
-      // 中国站建议保留；允许取消但至少留一个
-      if (id === 'dom' && pinned.length === 1) {
-        showRegionUpgradeToast(T('中国地区站为默认站点，请至少保留一个地区。','China is the default region station. Keep at least one region.'));
-        return false;
-      }
       const next = pinned.filter(x => x !== id);
       setPinnedRegions(next);
       // 取消固定后若仍停在该站，退回全球
@@ -9065,6 +9080,8 @@
       if (typeof window.__syncPricingUi === 'function') window.__syncPricingUi();
       else if (typeof window.__syncEduCheckoutUi === 'function') window.__syncEduCheckoutUi();
     } catch (_) {}
+    // 地区站默认值随界面语言切换：中文默认中国站，英文默认仅全球站；用户主动固定的地区保留。
+    try { applyStations(); } catch (_) {}
     try {
       if (domestic) buildDomIndex(domestic);
     } catch (_) {}
@@ -10031,8 +10048,8 @@
               <p class="settings-hint settings-hint-soft">${(() => {
                 const ent = regionEntitlements();
                 if (ent.unlockAll) return T('当前为 Max：可自由固定 / 取消任意地区。', 'Max plan: pin or unpin any region freely.');
-                if (ent.maxCustomPins > 0) return T(`当前为 Pro：除中国外最多再固定 ${ent.maxCustomPins} 个地区。`, `Pro plan: pin up to ${ent.maxCustomPins} extra regions beyond China.`);
-                return T('当前为 Free：中国站默认保留；其他地区可临时查看，升级后可固定到侧栏。', 'Free plan: China stays on the rail; other regions open temporarily. Upgrade to pin them.');
+                if (ent.maxCustomPins > 0) return T(`当前为 Pro：除中国外最多再固定 ${ent.maxCustomPins} 个地区。`, `Pro plan: pin up to ${ent.maxCustomPins} custom regions.`);
+                return T('当前为 Free：中国站默认保留；其他地区可临时查看，升级后可固定到侧栏。', 'Free plan: Global stays on the rail. China and other regions open temporarily; upgrade to pin them.');
               })()}</p>
               <div class="settings-region-list" data-settings-region-list>
                 ${REGION_STATION_IDS.map((id) => {
