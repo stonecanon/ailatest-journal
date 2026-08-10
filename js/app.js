@@ -7339,7 +7339,6 @@
       ].filter(Boolean);
       const domesticFieldText = [...new Set(domesticFields)].slice(0, 3).join('、');
       const cnName = r.cn_name || ir.cn_name || '';
-      const abbr = r.abbr20 || ir.abbr20 || '';
       const doajWeeks = parseFloat(r.doaj?.review_weeks || ir.doaj?.review_weeks);
       const showFee = canSeePublishFeeInfo();
       const apcValue = showFee
@@ -7386,19 +7385,19 @@
         ? (isDomesticJournal
           ? [
               zhSentence(`${plainName} 是一份中文学术期刊${domesticFieldText ? `，主要关注${domesticFieldText}等方向` : ''}${r.org || r.sponsor ? `，由${r.org || r.sponsor}主办` : r.publisher ? `，出版单位为${r.publisher}` : ''}`),
-              zhSentence(`${r.cn_code ? `国内统一连续出版物号：${r.cn_code}` : ''}${issn ? `${r.cn_code ? '，' : ''}ISSN：${issn}` : ''}${r.frequency ? `${(r.cn_code || issn) ? '，' : ''}出版周期：${r.frequency}` : ''}`),
+              zhSentence(`${r.cn_code ? `国内统一连续出版物号：${r.cn_code}` : ''}${r.frequency ? `${r.cn_code ? '，' : ''}出版周期：${r.frequency}` : ''}`),
               zhSentence(`${crossBadges ? '该刊已收录于本站标注的相关中文核心/评价目录' : ''}${r.tier ? `${crossBadges ? '，' : ''}科协分级：${tn(r.tier, 'tier')}` : ''}`),
               zhSentence(`${oaText}${apcText ? `${oaText ? '，' : ''}${apcText}` : ''}${reviewText ? `${(oaText || apcText) ? '，' : ''}${reviewText}` : ''}`),
             ].filter(Boolean).join(' ')
           : [
               zhSentence(`${plainName} 是一份国际学术期刊${major || plainCats ? `，主要面向${major || plainCats}等研究方向` : ''}，为相关研究成果提供发表平台`),
-              zhSentence(`${cnName ? `该期刊中文名称：${cnName}` : ''}${abbr ? `${cnName ? '，' : ''}国际简称：${abbr}` : ''}${ir.cas_zone ? `${(cnName || abbr) ? '，' : ''}在中科院分区表 2025 年版中大类学科位于 ${ir.cas_zone} 区${ir.cas_top ? '，为 Top 期刊' : ''}` : ''}${ir.if_quartile ? `，JCR 分区为 ${String(ir.if_quartile).toUpperCase()}` : ''}${ir.if_2024 != null ? `，影响因子 IF ${ir.if_2024}` : ''}${ir.if_rank ? `，IF 排名 ${ir.if_rank}` : ''}${tierText}`),
+              zhSentence(`${cnName ? `该期刊中文名称：${cnName}` : ''}${ir.cas_zone ? `${cnName ? '，' : ''}在中科院分区表 2025 年版中大类学科位于 ${ir.cas_zone} 区${ir.cas_top ? '，为 Top 期刊' : ''}` : ''}${ir.if_quartile ? `，JCR 分区为 ${String(ir.if_quartile).toUpperCase()}` : ''}${ir.if_2024 != null ? `，影响因子 IF ${ir.if_2024}` : ''}${ir.if_rank ? `，IF 排名 ${ir.if_rank}` : ''}${tierText}`),
               zhSentence(`${oaText}${apcText ? `${oaText ? '，' : ''}${apcText}` : ''}${reviewText ? `${(oaText || apcText) ? '，' : ''}${reviewText}` : ''}`),
               zhSentence(`${topicList.length ? `期刊聚焦 ${topicList.join('、')} 等方向` : ''}${indexText ? `${topicList.length ? '，' : ''}目前收录于 ${indexText}` : ''}`),
             ].filter(Boolean).join(' '))
         : [
             `${plainName} is an international scholarly journal for researchers in ${major || plainCats || 'related fields'}, providing a venue for new research and academic exchange.`,
-            `${abbr ? `Abbreviation: ${abbr}. ` : ''}${ir.cas_zone ? `CAS 2025 major tier: ${ir.cas_zone}${ir.cas_top ? ' · Top' : ''}. ` : ''}${ir.if_quartile ? `JCR ${String(ir.if_quartile).toUpperCase()}. ` : ''}${ir.if_2024 != null ? `IF ${ir.if_2024}. ` : ''}${ir.if_rank ? `IF rank ${ir.if_rank}.` : ''}`,
+            `${ir.cas_zone ? `CAS 2025 major tier: ${ir.cas_zone}${ir.cas_top ? ' · Top' : ''}. ` : ''}${ir.if_quartile ? `JCR ${String(ir.if_quartile).toUpperCase()}. ` : ''}${ir.if_2024 != null ? `IF ${ir.if_2024}. ` : ''}${ir.if_rank ? `IF rank ${ir.if_rank}.` : ''}`,
             `${oaText}${apcText ? `; ${apcText}` : ''}${reviewText ? `; ${reviewText}` : ''}.`,
             `${topicList.length ? `Focus areas include ${topicList.join(', ')}. ` : ''}${indexText ? `Indexed in ${indexText}.` : ''}`,
           ].filter(Boolean).join(' ');
@@ -7426,7 +7425,7 @@
       const rows = [
         r.sponsor ? [T('主办单位','Sponsor'), r.sponsor] : null,
         r.cn_code ? ['CN', r.cn_code] : null,
-        r.issn ? ['ISSN', r.issn] : null,
+        // ISSN 已在详情页标题副行展示，CNKI 专区不再重复列出。
         r.compound_if ? [T('复合影响因子','Compound IF'), r.compound_if] : null,
         r.comprehensive_if ? [T('综合影响因子','Comprehensive IF'), r.comprehensive_if] : null,
         r.category_code ? [T('CNKI 分类号','CNKI Category Code'), r.category_code] : null,
@@ -7797,7 +7796,7 @@
       <h4>${T('印度 UGC-CARE 收录','India UGC-CARE Listing')}</h4>
       <div class="meta-row"><div class="meta-k">${T('状态','Status')}</div><div class="meta-v"><span class="domsrc-pill ds-india">UGC-CARE listed</span></div></div>
       ${indiaHit.subject ? `<div class="meta-row"><div class="meta-k">${T('学科','Subject')}</div><div class="meta-v">${escape(indiaHit.subject)}</div></div>` : ''}
-      ${indiaHit.publisher ? `<div class="meta-row"><div class="meta-k">${T('出版社','Publisher')}</div><div class="meta-v">${escape(indiaHit.publisher)}</div></div>` : ''}
+      ${indiaHit.publisher && normTitle(indiaHit.publisher) !== normTitle(r.publisher || ir.publisher || '') ? `<div class="meta-row"><div class="meta-k">${T('出版社','Publisher')}</div><div class="meta-v">${escape(indiaHit.publisher)}</div></div>` : ''}
       ${indiaHit.source_url ? `<div class="meta-row"><div class="meta-k">${T('来源','Source')}</div><div class="meta-v"><a href="${escape(indiaHit.source_url)}" target="_blank" rel="noopener nofollow">UGC-CARE PDF source</a></div></div>` : ''}
       <div class="muted-cell" style="margin-top:6px;font-size:12px;line-height:1.6">${t('india_source_note')}</div>
     </div>` : '';
@@ -7805,7 +7804,6 @@
     const malaysiaHTML = src === 'my' ? `<div class="drawer-section malaysia-detail-section">
       <h4>${T('马来西亚 / ERA 来源','Malaysia / ERA Source')}</h4>
       <div class="meta-row"><div class="meta-k">${T('来源','Source')}</div><div class="meta-v"><span class="domsrc-pill ds-malaysia">${escape(r.source || 'MyCite / ERA')}</span></div></div>
-      ${r.publisher ? `<div class="meta-row"><div class="meta-k">${T('出版社','Publisher')}</div><div class="meta-v">${escape(r.publisher)}</div></div>` : ''}
       ${r.indexed_year ? `<div class="meta-row"><div class="meta-k">${T('MyCite 年份','MyCite Year')}</div><div class="meta-v">${escape(r.indexed_year)}</div></div>` : ''}
       ${r.era_year ? `<div class="meta-row"><div class="meta-k">ERA</div><div class="meta-v">${escape(r.era_year)}</div></div>` : ''}
       ${r.for_subjects ? `<div class="meta-row"><div class="meta-k">${T('FoR 学科','FoR Subjects')}</div><div class="meta-v">${escape(r.for_subjects)}</div></div>` : ''}
@@ -7966,6 +7964,18 @@
     const subjectLine = (Array.isArray(ir.wos_categories) && ir.wos_categories[0])
       || ir.jcr_cat || ir.cas_major_cn || ir.esi_category || r.discipline || '';
     const publisherLine = r.publisher || ir.publisher || '';
+    // 缩写与学科、出版商一样属于标题副行的识别信息；只在副行展示一次，
+    // 基本信息区不再重复列出。标题本身就是缩写时不再额外显示。
+    const rawAbbrLine = r.abbr20 || ir.abbr20 || '';
+    const abbrLine = rawAbbrLine && normTitle(rawAbbrLine) !== normTitle(title.replace(/\*$/, ''))
+      ? rawAbbrLine
+      : '';
+    const headerSubjParts = [subjectLine, abbrLine, publisherLine]
+      .filter(Boolean)
+      .filter((value, index, values) => {
+        const key = normTitle(value);
+        return values.findIndex(item => normTitle(item) === key) === index;
+      });
     const siteUrl = r.homepage || ir.homepage || r.url || ir.url || r.website || '';
     const submitUrl = r.submit_url || ir.submit_url || siteUrl || '';
     const heroMetrics = [
@@ -7974,16 +7984,20 @@
       cycleShort ? `<div class="d-m"><div class="n">${escape(cycleShort)}</div><div class="l">${T('审稿','Review')}</div></div>` : '',
       isOaMark ? `<div class="d-m"><div class="n">OA</div><div class="l">${T('开放','Open')}</div></div>` : '',
     ].filter(Boolean).join('');
+    // ISSN/eISSN、学科和出版商已经在标题区展示；基本信息只保留未重复字段。
     const kvExtras = [
-      issn ? [T('ISSN','ISSN'), issn] : null,
-      eissn ? [T('eISSN','eISSN'), eissn] : null,
       siteUrl ? [T('官网','Website'), siteUrl] : null,
-      subjectLine ? [T('学科','Subject'), subjectLine] : null,
     ].filter(Boolean);
-    const seenKeys = new Set(meta.map(([k]) => k));
+    const sameValue = (a, b) => normTitle(a) && normTitle(a) === normTitle(b);
+    const isHeaderDuplicate = ([key, value]) => {
+      if (key === T('期刊缩写','Abbreviation')) return !!abbrLine && sameValue(value, abbrLine);
+      if (key === T('出版商','Publisher')) return !!publisherLine && sameValue(value, publisherLine);
+      if (key === T('学科','Discipline')) return !!subjectLine && sameValue(value, subjectLine);
+      return false;
+    };
     const kvAll = [
-      ...kvExtras.filter(([k]) => !seenKeys.has(k)),
-      ...meta,
+      ...kvExtras,
+      ...meta.filter(row => !isHeaderDuplicate(row)),
     ].map(([k, v]) =>
       `<div class="kv-item"><div class="k">${k}</div><div class="v">${
         (k === T('官网','Website') || String(v).startsWith('http'))
@@ -8015,7 +8029,7 @@
               <div class="d-hero-text">
                 <h1 class="drawer-title">${escape(title.replace(/\*$/,''))}</h1>
                 ${sub ? `<div class="d-cn drawer-sub">${escape(sub)}</div>` : ''}
-                ${(subjectLine || publisherLine) ? `<div class="d-subj">${subjectLine ? `<b>${escape(subjectLine)}</b>` : ''}${subjectLine && publisherLine ? ' · ' : ''}${publisherLine ? escape(publisherLine) : ''}</div>` : ''}
+                ${headerSubjParts.length ? `<div class="d-subj">${headerSubjParts.map((value, index) => `${index === 0 && value === subjectLine ? `<b>${escape(value)}</b>` : escape(value)}`).join(' · ')}</div>` : ''}
                 ${titleFeatureBadges ? `<div class="d-hero-free">${titleFeatureBadges}</div>` : ''}
                 <div class="drawer-issn d-issn">
                   ${issn ? 'ISSN ' + escape(issn) : ''}${eissn ? (issn ? ' · ' : '') + 'eISSN ' + escape(eissn) : ''}
