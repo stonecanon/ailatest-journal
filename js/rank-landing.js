@@ -4,17 +4,32 @@
 (() => {
   const KEY = "ailatest.lang";
 
+  function localLanguagePreference() {
+    try {
+      const query = new URLSearchParams(location.search).get('lang');
+      if (query) return /^zh(?:-|$)/i.test(query) ? 'zh-CN' : 'en';
+      const path = (location.pathname || '').replace(/\/+$/, '') || '/';
+      if (path === '/zh' || path.startsWith('/zh/')) return 'zh-CN';
+      if (path === '/en' || path.startsWith('/en/')) return 'en';
+      if (localStorage.getItem('ailatest.lang.userSet') === '1') {
+        const saved = localStorage.getItem(KEY) || '';
+        if (saved) return /^zh/i.test(saved) ? 'zh-CN' : 'en';
+      }
+      const list = Array.isArray(navigator.languages) ? navigator.languages : [navigator.language];
+      const primary = list.find((item) => String(item || '').trim());
+      if (/^zh(?:-|$)/i.test(String(primary || ''))) return 'zh-CN';
+    } catch (_) {}
+    return '';
+  }
+
   function isEn() {
+    const local = localLanguagePreference();
+    if (local) {
+      window.__journalLangLocalPreference = true;
+      return local !== 'zh-CN';
+    }
     const geo = window.__ailatestGeoLangState;
     if (geo?.ready && geo.known) return geo.lang !== 'zh-CN';
-    // Until the IP probe resolves, keep the public default English. This
-    // prevents an old Chinese localStorage value from leaking to global users.
-    if (location.hostname && !/^(localhost|127(?:\.\d{1,3}){3}|::1)$/i.test(location.hostname)) return true;
-    try {
-      const s = localStorage.getItem(KEY) || "";
-      if (/^en/i.test(s)) return true;
-      if (/^zh/i.test(s)) return false;
-    } catch (_) {}
     return (document.documentElement.lang || "").toLowerCase().startsWith("en");
   }
 
@@ -33,7 +48,7 @@
   function boot() {
     apply(isEn());
     window.__ailatestGeoLangState?.promise?.then((state) => {
-      if (!state?.known || window.__journalLangManualSession) return;
+      if (!state?.known || window.__journalLangManualSession || window.__journalLangLocalPreference) return;
       apply(state.lang !== 'zh-CN', false);
     });
     window.addEventListener('ailatest:langchange', (event) => {

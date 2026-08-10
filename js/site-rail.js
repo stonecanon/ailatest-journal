@@ -1,7 +1,44 @@
 (() => {
-  // All static/listing pages share this bootstrap. Only mainland China gets
-  // the Chinese default; every other country defaults to English. Keep the
-  // result in a shared promise so static-i18n/rank pages reuse the same call.
+  // All static/listing pages share this bootstrap. IP is only the fallback:
+  // an explicit URL, a remembered manual choice, or a Chinese browser locale
+  // should keep the local language even when the visitor is abroad.
+  function normalizeLocalLang(code) {
+    const value = String(code || '').trim().toLowerCase().replace(/_/g, '-');
+    if (!value) return '';
+    if (value === 'zh' || value.startsWith('zh-')) return 'zh-CN';
+    return 'en';
+  }
+
+  function detectLocalLanguage() {
+    try {
+      const query = new URLSearchParams(location.search).get('lang');
+      if (query) return { lang: normalizeLocalLang(query), explicit: true };
+      const path = (location.pathname || '').replace(/\/+$/, '') || '/';
+      if (path === '/zh' || path.startsWith('/zh/')) return { lang: 'zh-CN', explicit: true };
+      if (path === '/en' || path.startsWith('/en/')) return { lang: 'en', explicit: true };
+      if (localStorage.getItem('ailatest.lang.userSet') === '1') {
+        const saved = normalizeLocalLang(localStorage.getItem('ailatest.lang'));
+        if (saved) return { lang: saved, explicit: true };
+      }
+    } catch (_) {}
+    try {
+      const languages = Array.isArray(navigator.languages) ? navigator.languages : [navigator.language];
+      const primary = languages.find((item) => String(item || '').trim());
+      if (normalizeLocalLang(primary) === 'zh-CN') {
+        return { lang: 'zh-CN', explicit: true };
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  const localLanguage = detectLocalLanguage();
+  if (localLanguage?.lang) {
+    window.__journalLangLocalPreference = true;
+    document.documentElement.lang = localLanguage.lang;
+    document.documentElement.setAttribute('data-ui-lang', localLanguage.lang);
+    window.__journalUiLang = localLanguage.lang;
+  }
+
   function probeGeoLanguage() {
     const existing = window.__ailatestGeoLangState;
     if (existing?.promise) return existing.promise;
@@ -28,7 +65,7 @@
       });
     window.__ailatestGeoLangState = state;
     state.promise.then((result) => {
-      if (!result?.known || window.__journalLangManualSession) return;
+      if (!result?.known || window.__journalLangManualSession || window.__journalLangLocalPreference) return;
       const lang = result.lang === 'zh-CN' ? 'zh-CN' : 'en';
       document.documentElement.lang = lang;
       document.documentElement.setAttribute('data-ui-lang', lang);
@@ -166,14 +203,15 @@
     });
   }
 
-  // The first paint on production pages must not inherit zh-CN from an old
-  // generated HTML file or localStorage while /geo is still in flight.
+  // The first paint on production pages should use a local language signal
+  // when present; otherwise keep English until /geo resolves.
   if (typeof location !== 'undefined'
     && !/^(localhost|127(?:\.\d{1,3}){3}|::1)$/i.test(location.hostname || '')
     && !window.__ailatestGeoLangState?.ready) {
-    document.documentElement.lang = 'en';
-    document.documentElement.setAttribute('data-ui-lang', 'en');
-    window.__journalUiLang = 'en';
+    const initial = localLanguage?.lang || 'en';
+    document.documentElement.lang = initial;
+    document.documentElement.setAttribute('data-ui-lang', initial);
+    window.__journalUiLang = initial;
   }
 
   const KEY = 'ailatest.pinnedRegionStations';

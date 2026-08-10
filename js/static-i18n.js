@@ -112,8 +112,8 @@
     return 'en';
   }
 
-  // 生产环境的默认语言只由 Cloudflare 国家码决定：CN = 简体中文，
-  // 其余国家/地区 = English。与主站共享探测 promise，避免重复请求。
+  // IP 只负责没有本地语言信号时的默认值：CN = 简体中文，其他国家/地区 = English。
+  // 用户明确选择、URL 语言入口，以及中文浏览器首选语言均优先于 IP。
   function probeGeoLanguage() {
     const existing = window.__ailatestGeoLangState;
     if (existing?.promise) return existing.promise;
@@ -147,22 +147,51 @@
     return state?.ready && state.known ? state.lang : '';
   }
 
-  function initialLang() {
-    const geoLang = synchronousGeoLanguage();
-    if (geoLang) return geoLang;
-    // 非 CN 用户在 IP 探测完成前先显示英文，避免沿用旧的中文状态。
-    if (typeof location !== 'undefined' && !/^(localhost|127(?:\.\d{1,3}){3}|::1)$/i.test(location.hostname || '')) {
-      return 'en';
-    }
-    const params = new URLSearchParams(location.search);
-    const queryLang = params.get('lang');
-    if (queryLang) return normalize(queryLang);
+  function storedManualLanguage() {
     try {
+      if (localStorage.getItem('ailatest.lang.userSet') !== '1') return '';
       const saved = localStorage.getItem('ailatest.lang');
-      if (saved) return normalize(saved);
-    } catch {}
-    // 首次访问：跟浏览器语言；用户在设置里改过会写入 ailatest.lang
-    return detectBrowserLang();
+      return saved ? normalize(saved) : '';
+    } catch (_) {
+      return '';
+    }
+  }
+
+  function initialLang() {
+    let localLang = '';
+    let hasLocalPreference = false;
+    try {
+      const queryLang = new URLSearchParams(location.search).get('lang');
+      if (queryLang) {
+        localLang = normalize(queryLang);
+        hasLocalPreference = true;
+      }
+    } catch (_) {}
+    if (!localLang) {
+      const path = location.pathname.replace(/\/+$/, '') || '/';
+      if (path === '/zh' || path.startsWith('/zh/')) {
+        localLang = 'zh-CN';
+        hasLocalPreference = true;
+      } else if (path === '/en' || path.startsWith('/en/')) {
+        localLang = 'en';
+        hasLocalPreference = true;
+      }
+    }
+    if (!localLang) {
+      localLang = storedManualLanguage();
+      hasLocalPreference = !!localLang;
+    }
+    if (!localLang) {
+      const browserLang = detectBrowserLang();
+      if (browserLang === 'zh-CN') {
+        localLang = browserLang;
+        hasLocalPreference = true;
+      } else {
+        localLang = synchronousGeoLanguage() || browserLang;
+      }
+    }
+    if (hasLocalPreference) window.__journalLangLocalPreference = true;
+    return localLang || 'en';
   }
 
   /** 页脚已下线：移除静态页 footer 节点 */
@@ -283,7 +312,7 @@
     let lang = initialLang();
     applyLang(lang);
     probeGeoLanguage().then((state) => {
-      if (!state?.known || window.__journalLangManualSession) return;
+      if (!state?.known || window.__journalLangManualSession || window.__journalLangLocalPreference) return;
       if (state.lang !== lang) {
         lang = state.lang;
         applyLang(lang);
@@ -292,6 +321,8 @@
     document.querySelector('[data-static-lang-toggle]')?.addEventListener('click', () => {
       lang = lang === 'zh-CN' ? 'en' : 'zh-CN';
       window.__journalLangManualSession = true;
+      window.__journalLangLocalPreference = true;
+      try { localStorage.setItem('ailatest.lang.userSet', '1'); } catch (_) {}
       applyLang(lang);
     });
   }

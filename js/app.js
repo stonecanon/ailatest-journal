@@ -805,7 +805,7 @@
     return 'en';
   };
 
-  /** 浏览器首选语言（仅本地开发且无法读取 IP 时的回退） */
+  /** 浏览器首选语言（仅保留中文 / 英文两种界面） */
   function detectBrowserLang() {
     const list = [];
     try {
@@ -821,8 +821,8 @@
     return 'en';
   }
 
-  // 生产环境的默认语言只由 Cloudflare 国家码决定：CN = 简体中文，
-  // 其他国家/地区 = English。共享 promise 可避免多个外挂脚本重复请求。
+  // IP 只负责没有本地语言信号时的默认值：CN = 简体中文，其他国家/地区 = English。
+  // 用户明确选择、URL 语言入口，以及中文浏览器首选语言均优先于 IP。
   function probeGeoLanguage() {
     const existing = window.__ailatestGeoLangState;
     if (existing?.promise) return existing.promise;
@@ -861,33 +861,60 @@
     return state?.ready && state.known ? state.lang : '';
   }
 
+  function storedManualLanguage() {
+    try {
+      if (localStorage.getItem('ailatest.lang.userSet') !== '1') return '';
+      const saved = localStorage.getItem('ailatest.lang');
+      const normalized = normalizeLang(saved);
+      return saved && I18N[normalized] ? normalized : '';
+    } catch (_) {
+      return '';
+    }
+  }
+
   // ───────── state ─────────
   function initialLangFromPath() {
-    const geoLang = synchronousGeoLanguage();
-    if (geoLang) return geoLang;
-    // 在生产环境等待 IP 探测时先用英文，避免把旧的中文 localStorage
-    // 泄漏给非中国大陆用户。探测完成后会在本页自动切换到 CN 中文。
-    if (typeof location !== 'undefined' && !/^(localhost|127(?:\.\d{1,3}){3}|::1)$/i.test(location.hostname || '')) {
-      return 'en';
-    }
+    let localLang = '';
+    let hasLocalPreference = false;
     try {
       const queryLang = new URLSearchParams(location.search).get('lang');
-      if (queryLang) return normalizeLang(queryLang);
+      if (queryLang) {
+        localLang = normalizeLang(queryLang);
+        hasLocalPreference = true;
+      }
     } catch (_) {}
-    const path = location.pathname.replace(/\/+$/, '') || '/';
-    if (path === '/zh' || path.startsWith('/zh/')) return 'zh-CN';
-    if (path === '/en' || path.startsWith('/en/')) return 'en';
-    // 用户曾手动选过语言 → 永久尊重（setUiLanguage 会写 userSet）
-    try {
-      const saved = localStorage.getItem('ailatest.lang');
-      if (saved && I18N[normalizeLang(saved)]) return normalizeLang(saved);
-    } catch (_) {}
-    return detectBrowserLang();
+    if (!localLang) {
+      const path = location.pathname.replace(/\/+$/, '') || '/';
+      if (path === '/zh' || path.startsWith('/zh/')) {
+        localLang = 'zh-CN';
+        hasLocalPreference = true;
+      } else if (path === '/en' || path.startsWith('/en/')) {
+        localLang = 'en';
+        hasLocalPreference = true;
+      }
+    }
+    if (!localLang) {
+      localLang = storedManualLanguage();
+      hasLocalPreference = !!localLang;
+    }
+    if (!localLang) {
+      const browserLang = detectBrowserLang();
+      // 中文浏览器表示用户的本地语言偏好，即使访问者当前不在中国大陆。
+      if (browserLang === 'zh-CN') {
+        localLang = browserLang;
+        hasLocalPreference = true;
+      } else {
+        const geoLang = synchronousGeoLanguage();
+        localLang = geoLang || browserLang;
+      }
+    }
+    if (hasLocalPreference) window.__journalLangLocalPreference = true;
+    return localLang || 'en';
   }
   let lang = normalizeLang(initialLangFromPath());
   const geoLanguageProbe = probeGeoLanguage();
   geoLanguageProbe.then((state) => {
-    if (!state?.known || window.__journalLangManualSession) return;
+    if (!state?.known || window.__journalLangManualSession || window.__journalLangLocalPreference) return;
     const next = normalizeLang(state.lang);
     if (next && next !== lang) setUiLanguage(next, { fromGeo: true });
   });
