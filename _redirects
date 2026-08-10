@@ -48,9 +48,6 @@
 /my/ /index.html 200
 /account/ /index.html 200
 /me/ /index.html 200
-# 科研档案 / 发表足迹预览：复用主页 app rail 与顶栏，不改动主站 SPA 入口。
-/publication-footprint /publication-footprint/ 301
-/publication-footprint/ /prototypes/publication-footprint 200
 # 榜单入口并入首页 #rankings；二级目录仍为 /indexes /subjects
 /rankings / 302
 /rankings/ / 302
