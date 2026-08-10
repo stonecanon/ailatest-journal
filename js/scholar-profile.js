@@ -70,24 +70,43 @@ export function parseScholarPapers(html) {
 
 export async function fetchScholarProfile(rawUrl, fetchImpl = globalThis.fetch) {
   const parsed = parseScholarProfileUrl(rawUrl);
-  const target = new URL('https://scholar.google.com/citations');
-  target.searchParams.set('view_op', 'list_works');
-  target.searchParams.set('hl', 'en');
-  target.searchParams.set('user', parsed.user);
-  target.searchParams.set('cstart', '0');
-  target.searchParams.set('pagesize', '100');
-
-  const response = await fetchImpl(target.toString(), {
-    headers: {
-      'Accept': 'text/html,application/xhtml+xml',
-      'Accept-Language': 'en-US,en;q=0.9',
-      'User-Agent': 'Mozilla/5.0 (compatible; AILatest-Journal/1.0; +https://journal.ailatest.org)',
-    },
-  });
-  if (!response.ok) throw new Error(`Google Scholar 暂时无法访问（${response.status}）`);
-  const html = await response.text();
-  if (/not a robot|unusual traffic|captcha|robot check/i.test(html) || !/gsc_a_tr/.test(html)) {
-    throw new Error('Google Scholar 暂时拒绝了自动读取，请稍后重试，或改用 ORCID / OpenAlex 作者 ID');
+  const hosts = [
+    'scholar.google.co.uk',
+    'scholar.google.ca',
+    'scholar.google.com.au',
+    'scholar.google.de',
+    'scholar.google.com',
+  ];
+  const requestHeaders = {
+    'Accept': 'text/html,application/xhtml+xml',
+    'Accept-Language': 'en-US,en;q=0.9',
+    'User-Agent': 'Mozilla/5.0 (compatible; AILatest-Journal/1.0; +https://journal.ailatest.org)',
+  };
+  let html = '';
+  let lastStatus = 0;
+  let lastError = null;
+  for (const host of hosts) {
+    const target = new URL('https://' + host + '/citations');
+    target.searchParams.set('view_op', 'list_works');
+    target.searchParams.set('hl', 'en');
+    target.searchParams.set('user', parsed.user);
+    target.searchParams.set('cstart', '0');
+    target.searchParams.set('pagesize', '100');
+    try {
+      const response = await fetchImpl(target.toString(), { headers: requestHeaders });
+      lastStatus = response.status;
+      const candidate = await response.text();
+      if (response.ok && /gsc_a_tr/.test(candidate) && !/not a robot|unusual traffic|captcha|robot check/i.test(candidate)) {
+        html = candidate;
+        break;
+      }
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  if (!html) {
+    if (lastError && !lastStatus) throw new Error('Google Scholar 暂时无法访问，请稍后重试');
+    throw new Error(`Google Scholar 暂时无法读取（${lastStatus || 403}），请稍后重试，或改用 ORCID / OpenAlex 作者 ID`);
   }
 
   const nameMatch = html.match(/<div[^>]+id=["']gsc_prf_in["'][^>]*>([\s\S]*?)<\/div>/i);
