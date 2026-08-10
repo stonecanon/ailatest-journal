@@ -105,12 +105,11 @@
     .footprint-list { display: grid; gap: 16px; padding: 16px; }
     .journal-card { display: grid; grid-template-columns: 72px minmax(0, 1fr) auto; gap: 14px; padding: 13px 16px; border: 1px solid #e9e2d8; border-radius: 16px; background: #fffdf9; transition: transform .15s, border-color .15s, box-shadow .15s; }
     .journal-card:hover { transform: translateY(-1px); border-color: rgba(249,115,22,.38); box-shadow: 0 10px 24px rgba(39,35,31,.06); }
-    .journal-card-cover { display: flex; min-height: 78px; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 8px 5px; border-radius: 11px; color: #fff; background: var(--cover, linear-gradient(155deg,#d58046,#6d3b32)); box-shadow: inset 0 0 0 1px rgba(255,255,255,.32), 0 7px 14px rgba(39,35,31,.12); text-align: center; }
+    .journal-card-cover { display: flex; min-height: 78px; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 8px 5px; border-radius: 11px; color: #fff; background: var(--cover, linear-gradient(155deg, hsl(210 20% 62%), hsl(210 25% 48%))); box-shadow: inset 0 0 0 1px rgba(255,255,255,.28), 0 7px 14px rgba(39,35,31,.09); text-align: center; }
     .journal-card-cover small { font-size: 9px; font-weight: 760; letter-spacing: .04em; opacity: .9; }
     .journal-card-cover strong { font-size: 42px; font-weight: 900; line-height: .92; letter-spacing: -.06em; }
     .journal-card-main { min-width: 0; }
     .journal-card-title { margin: 0; font-size: 17px; font-weight: 820; line-height: 1.25; }
-    .journal-card-title span { display: block; margin-top: 4px; color: var(--ink-faint); font-size: 12px; font-weight: 600; }
     .journal-meta { display: flex; flex-wrap: wrap; gap: 5px 12px; margin-top: 10px; color: var(--ink-faint); font-size: 12px; }
     .journal-meta strong { color: var(--ink-soft); }
     .paper-title-list { margin: 9px 0 0; padding-left: 17px; color: var(--ink-soft); font-size: 12px; line-height: 1.55; }
@@ -126,6 +125,9 @@
     .pub-badge.quartile { color: #923f12; background: #fff0e2; border-color: #f5cda9; }
     .pub-badge.verified { color: var(--footprint-green); background: var(--footprint-green-soft); border-color: #bfdfcc; }
     .journal-card-side { display: flex; min-width: 86px; flex-direction: column; align-items: flex-end; justify-content: center; gap: 9px; }
+    .journal-if-card { min-width: 62px; padding: 7px 10px 6px; border: 1px solid rgba(249,115,22,.24); border-radius: 11px; color: #9a5218; background: linear-gradient(150deg, #fff8ef, #ffead8); box-shadow: 0 5px 14px rgba(182,93,29,.10); text-align: center; }
+    .journal-if-card strong { display: block; font-size: 18px; font-weight: 850; line-height: 1.05; font-variant-numeric: tabular-nums; }
+    .journal-if-card span { display: block; margin-top: 3px; color: #a47852; font-size: 10px; font-weight: 800; letter-spacing: .08em; line-height: 1; }
     .journal-link { color: var(--footprint-blue); font-size: 12px; font-weight: 760; white-space: nowrap; }
     .journal-link:hover { color: var(--footprint-orange); }
     .empty-state { padding: 36px 20px; color: var(--ink-faint); text-align: center; }
@@ -492,6 +494,18 @@
       const value = Number(String(raw ?? '').replace(/[^0-9.\-]/g, ''));
       return Number.isFinite(value) && value > 0 ? value : null;
     }
+    function displayImpactFactor(item) {
+      return journalImpactFactor(item) ?? journalImpactFactor(item?.journalMetadata);
+    }
+    function journalFrequency(item) {
+      const raw = item?.frequency
+        ?? item?.publication_frequency
+        ?? item?.periodicity
+        ?? item?.doaj?.frequency
+        ?? item?.journalMetadata?.frequency;
+      const value = String(raw ?? '').replace(/\s+/g, ' ').trim();
+      return value && !/^(unknown|n\/a|na|—|-|未标注|未知)$/i.test(value) ? value : '';
+    }
     function paperTitles(item) {
       return [...new Set((Array.isArray(item?.titles) ? item.titles : [])
         .map(title => String(title || '').replace(/\s+/g, ' ').trim())
@@ -500,9 +514,20 @@
     function journalMetadataKey(value) {
       return String(value || '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]+/g, '');
     }
+    function orderJournalBadges(badges) {
+      const priority = label => {
+        const text = String(label || '').trim().toUpperCase();
+        if (text === 'SCIE') return 10;
+        if (text === 'EI') return 20;
+        return 100;
+      };
+      return (Array.isArray(badges) ? badges : []).map((badge, index) => ({ badge, index }))
+        .sort((left, right) => priority(left.badge?.[0]) - priority(right.badge?.[0]) || left.index - right.index)
+        .map(item => item.badge);
+    }
     function journalBadges(item) {
       const existing = Array.isArray(item?.badges) ? item.badges.filter(badge => Array.isArray(badge) && badge[0]) : [];
-      if (existing.length) return existing;
+      if (existing.length) return orderJournalBadges(existing);
       const metadata = item?.journalMetadata && typeof item.journalMetadata === 'object' ? item.journalMetadata : item;
       const badges = [];
       const seen = new Set();
@@ -524,7 +549,34 @@
       const emergingZone = metadata?.cas_xr?.zone;
       if (emergingZone && metadata?.cas_xr?.emerging && /^[1-4]$/.test(String(emergingZone))) add(`新锐 ${emergingZone}区`, 'zone');
       if (metadata?.warning || metadata?.on_hold || metadata?.under_review) add('风险提示', 'verified');
-      return badges;
+      return orderJournalBadges(badges);
+    }
+    // Journal cards share one muted blue-gray hue. Depth is data-driven:
+    // better quartiles/CAS tiers/TOP and a higher IF move the same hue darker.
+    function journalTierStrength(item) {
+      const labels = journalBadges(item).map(([label]) => String(label || '').toUpperCase());
+      let strength = 0;
+      labels.forEach(label => {
+        const jcr = label.match(/\bQ([1-4])\b/);
+        if (jcr) strength = Math.max(strength, (5 - Number(jcr[1])) / 4);
+        const cas = label.match(/(?:CAS|中科院)\s*([1-4])/i);
+        if (cas) strength = Math.max(strength, (5 - Number(cas[1])) / 4);
+        if (/\bTOP\b/.test(label)) strength = 1;
+      });
+      return Math.max(0, Math.min(1, strength));
+    }
+    function journalCardCover(item) {
+      const tierStrength = journalTierStrength(item);
+      const impactFactor = displayImpactFactor(item);
+      const ifStrength = impactFactor == null
+        ? 0
+        : Math.min(1, Math.log1p(impactFactor) / Math.log1p(100));
+      const depth = Math.max(0, Math.min(1, tierStrength * .72 + ifStrength * .28));
+      const startLightness = Math.round(62 - depth * 12);
+      const endLightness = Math.round(50 - depth * 13);
+      const startSaturation = Math.round(20 + depth * 5);
+      const endSaturation = Math.round(25 + depth * 6);
+      return `linear-gradient(155deg, hsl(210 ${startSaturation}% ${startLightness}%), hsl(210 ${endSaturation}% ${endLightness}%))`;
     }
     function metadataTextValues(values) {
       const raw = (Array.isArray(values) ? values : [values]).flat(Infinity);
@@ -673,14 +725,14 @@
       renderAchievementStats();
       list.innerHTML = rows.length ? rows.map(item => `
         <article class="journal-card">
-          <div class="journal-card-cover" style="--cover:${item.cover}" aria-label="${escapeHtml(item.name)}：${Number(item.papers || 0)} 篇论文"><strong>${Number(item.papers || 0)}</strong><small>篇论文</small></div>
+          <div class="journal-card-cover" style="--cover:${journalCardCover(item)}" aria-label="${escapeHtml(item.name)}：${Number(item.papers || 0)} 篇论文"><strong>${Number(item.papers || 0)}</strong><small>篇论文</small></div>
           <div class="journal-card-main">
-            <h3 class="journal-card-title">${escapeHtml(item.name)}<span>${escapeHtml(item.abbr)}</span></h3>
-            <div class="journal-meta">${journalYears(item).length ? `<span>发表年份：<strong>${journalYears(item).join('、')}</strong></span>` : ''}${journalImpactFactor(item) != null ? `<span>IF：<strong>${journalImpactFactor(item)}</strong></span>` : ''}</div>
+            <h3 class="journal-card-title">${escapeHtml(item.name)}</h3>
+            <div class="journal-meta">${journalYears(item).length ? `<span>发表年份：<strong>${journalYears(item).join('、')}</strong></span>` : ''}${journalFrequency(item) ? `<span>刊期：<strong>${escapeHtml(journalFrequency(item))}</strong></span>` : ''}</div>
             ${renderPaperTitles(item)}
           <div class="badge-row">${journalBadges(item).map(([label, cls]) => `<span class="pub-badge ${cls}">${escapeHtml(label)}</span>`).join('')}</div>
           </div>
-          <div class="journal-card-side"><a class="journal-link" href="../#j/${encodeURIComponent(item.name)}">查看期刊 →</a></div>
+          <div class="journal-card-side">${displayImpactFactor(item) != null ? `<div class="journal-if-card" aria-label="影响因子 ${escapeHtml(displayImpactFactor(item))}"><strong>${escapeHtml(displayImpactFactor(item))}</strong><span>IF</span></div>` : ''}<a class="journal-link" href="../#j/${encodeURIComponent(item.name)}">查看期刊 →</a></div>
         </article>`).join('') : '<div class="empty-state"><strong>暂无已确认的发表记录</strong><span>完成作者身份核对后，已确认的期刊会显示在这里。</span></div>';
     }
     let journalMetadataRefresh = null;
@@ -711,6 +763,12 @@
             const next = { ...item, journalMetadata: metadata };
             if (!journalImpactFactor(next) && journalImpactFactor(metadata)) {
               next.impactFactor = journalImpactFactor(metadata);
+              changed = true;
+            }
+            const itemFrequency = journalFrequency(item);
+            const metadataFrequency = journalFrequency(metadata);
+            if (!itemFrequency && metadataFrequency) {
+              next.frequency = metadataFrequency;
               changed = true;
             }
             const metadataBadges = journalBadges({ ...next, badges: [] });

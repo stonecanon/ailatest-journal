@@ -18,6 +18,7 @@ Usage:
 """
 
 import json, time, os, sys
+from http.client import IncompleteRead
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.request import urlopen, Request
@@ -47,13 +48,29 @@ def efetch_nlm_details(ids):
     """Fetch NLM Catalog records for given NlmIds and extract ISSNs."""
     if not ids:
         return []
-    batch_size = 200  # NCBI max batch
+    # Keep batches below the NCBI maximum. Smaller responses are more reliable
+    # through the public gateway, which occasionally closes large chunked XML
+    # responses before the full body arrives.
+    batch_size = 100
     all_issns = []
     for i in range(0, len(ids), batch_size):
         batch = ids[i:i+batch_size]
         url = f'{BASE}/efetch.fcgi?db=nlmcatalog&id={",".join(batch)}&retmode=xml&email={EMAIL}&tool={TOOL}'
-        with urlopen(url, timeout=120) as r:
-            xml = r.read().decode('utf-8')
+        xml = None
+        last_error = None
+        for attempt in range(1, 4):
+            try:
+                with urlopen(url, timeout=120) as r:
+                    xml = r.read().decode('utf-8')
+                break
+            except (IncompleteRead, TimeoutError, OSError) as exc:
+                last_error = exc
+                if attempt == 3:
+                    raise
+                print(f'  retry batch {i//batch_size + 1}: {type(exc).__name__}', flush=True)
+                time.sleep(attempt * 1.5)
+        if xml is None:
+            raise RuntimeError(f'No XML returned for batch {i//batch_size + 1}') from last_error
         # Parse ISSNs from XML
         issns = parse_issns_from_nlm_xml(xml)
         all_issns.extend(issns)

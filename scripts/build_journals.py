@@ -1503,6 +1503,11 @@ def parse_doaj(path, by_title, by_issn, store=None):
                 'fee': (row.get('APC amount') or '').strip(),
                 'review': (row.get('Review process') or '').strip(),
                 'review_weeks': (row.get('Average number of weeks between article submission and publication') or '').strip(),
+                # DOAJ's current public CSV has no cadence column, but retain
+                # it when a future export or another compatible CSV supplies one.
+                'frequency': next((str(row.get(key) or '').strip() for key in (
+                    'Journal publication frequency', 'Publication frequency', 'Frequency'
+                ) if str(row.get(key) or '').strip()), ''),
             }
             rec = (issn and by_issn.get(issn)) or (eissn and by_issn.get(eissn)) or by_title.get(nt)
             if rec is not None:

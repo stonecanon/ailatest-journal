@@ -193,6 +193,9 @@ def sync_doaj(records: list[dict], used: set[str]):
                 "fee": str(row.get("APC amount") or "").strip(),
                 "review": str(row.get("Review process") or "").strip(),
                 "review_weeks": str(row.get("Average number of weeks between article submission and publication") or "").strip(),
+                "frequency": next((str(row.get(key) or "").strip() for key in (
+                    "Journal publication frequency", "Publication frequency", "Frequency"
+                ) if str(row.get(key) or "").strip()), ""),
             }
             if not rec.get("publisher") and item.get("publisher"):
                 rec["publisher"] = str(item["publisher"]).strip()
@@ -207,12 +210,16 @@ def load_issn_set(path: Path) -> set[str]:
 
 def sync_medline(records: list[dict]):
     medline = load_issn_set(LIST / "pubmed_issns.json")
-    pubmed_only = load_issn_set(LIST / "pubmed_only_issns.json")
+    pubmed_only_path = LIST / "pubmed_only_issns.json"
+    # This legacy source is intentionally ignored by git in some checkouts.
+    # If it is unavailable, preserve the existing PubMed flags instead of
+    # accidentally deleting all PubMed-only memberships.
+    pubmed_only = load_issn_set(pubmed_only_path) if pubmed_only_path.exists() else None
     medline_count = pubmed_count = 0
     for rec in records:
         keys = {clean_issn(rec.get("issn")), clean_issn(rec.get("eissn"))} - {""}
         is_medline = bool(keys & medline)
-        is_pubmed = is_medline or bool(keys & pubmed_only)
+        is_pubmed = is_medline or (bool(keys & pubmed_only) if pubmed_only is not None else bool(rec.get("pubmed")))
         if is_medline:
             rec["medline"] = True
             medline_count += 1
@@ -259,7 +266,7 @@ def compact_new_record(rec: dict) -> dict:
     )
     out = {key: rec[key] for key in keys if rec.get(key) not in (None, "", [], {})}
     if rec.get("doaj"):
-        out["doaj"] = compact_dict(rec["doaj"], ("lic", "review_weeks")) or True
+        out["doaj"] = compact_dict(rec["doaj"], ("lic", "review_weeks", "frequency")) or True
     if rec.get("oaj"):
         out["oaj"] = compact_dict(rec["oaj"], ("partition", "position")) or True
     return out
@@ -278,7 +285,7 @@ def sync_light(records: list[dict]) -> int:
             else:
                 row.pop(key, None)
         if rec.get("doaj"):
-            row["doaj"] = compact_dict(rec["doaj"], ("lic", "review_weeks")) or True
+            row["doaj"] = compact_dict(rec["doaj"], ("lic", "review_weeks", "frequency")) or True
         else:
             row.pop("doaj", None)
         if rec.get("oaj"):
@@ -319,8 +326,9 @@ def main() -> int:
     meta = read_json(meta_path)
     doaj_meta = read_json(LIST / "doaj_meta.json") if (LIST / "doaj_meta.json").exists() else {}
     medline_meta = read_json(LIST / "medline_meta.json") if (LIST / "medline_meta.json").exists() else {}
+    doaj_source_date = doaj_meta.get("source_updated") or "current"
     meta.update({
-        "source": "WoS Core 2026-06-15 + JCR 2025 + ESI + 中科院 2025 + Scopus 2026-05 + EI Compendex 2026-07-09 + DOAJ 2026-07-06 + OAJ current + NCBI MEDLINE current + regional and specialty indexes",
+        "source": f"WoS Core 2026-06-15 + JCR 2025 + ESI + 中科院 2025 + Scopus 2026-05 + EI Compendex 2026-07-09 + DOAJ {doaj_source_date} + OAJ current + NCBI MEDLINE current + regional and specialty indexes",
         "total": len(records),
         "with_oaj": sum(bool(rec.get("oaj")) for rec in records),
         "with_doaj": sum(bool(rec.get("doaj")) for rec in records),

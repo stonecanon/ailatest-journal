@@ -2970,6 +2970,12 @@ function publicPublicationJournalMetadata(journal) {
     cn_name: cleanText(journal?.cn_name || '', 240),
     issn: cleanText(journal?.issn || '', 24).toUpperCase(),
     eissn: cleanText(journal?.eissn || '', 24).toUpperCase(),
+    // Only expose an explicitly sourced publication frequency. Do not infer
+    // monthly/quarterly cadence from annual article counts.
+    frequency: cleanText(
+      journal?.frequency || journal?.publication_frequency || journal?.periodicity || journal?.doaj?.frequency || '',
+      80,
+    ) || null,
     if_latest: journal?.if_latest ?? journal?.if_2025 ?? journal?.if_2024 ?? null,
     impactFactor: journal?.if_latest ?? journal?.if_2025 ?? journal?.if_2024 ?? null,
     if_latest_year: journal?.if_latest_year || journal?.jcr_year || null,

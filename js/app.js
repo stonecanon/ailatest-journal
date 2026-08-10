@@ -7537,7 +7537,8 @@
     if (r.address) meta.push([T('出版地址','Address'), r.address]);
     if (r.country) meta.push([T('国家/地区','Country/Region'), r.country]);
     if (r.languages || r.language_cn || r.language) meta.push([T('语种','Language'), r.languages || r.language_cn || r.language]);
-    if (r.frequency) meta.push([T('出版周期','Frequency'), r.frequency]);
+    const publicationFrequency = r.frequency || r.publication_frequency || r.periodicity || r.doaj?.frequency;
+    if (publicationFrequency) meta.push([T('出版周期','Frequency'), publicationFrequency]);
     if (r.discipline) meta.push([T('学科','Discipline'), tn(r.discipline, 'cssci')]);
     if (r.category) meta.push([T('分类','Category'), tn(r.category, 'pku')]);
     if (Array.isArray(r.categories) && r.categories.length) meta.push([T('CNKI 分类','CNKI Categories'), r.categories.join(' · ')]);
@@ -8226,8 +8227,16 @@
     let cycleShort = '';
     {
       const weeks = parseFloat(r.doaj?.review_weeks || ir.doaj?.review_weeks);
-      if (weeks > 0) cycleShort = `~${Math.round(weeks * 7)}d`;
-      else if (r.crossref?.median_days) cycleShort = `~${Math.round(+r.crossref.median_days)}d`;
+      const medianDays = Number(r.crossref?.median_days || 0);
+      if (weeks > 0) {
+        const days = Math.round(weeks * 7);
+        const months = (weeks / 4.33).toFixed(1);
+        cycleShort = `~${days}d${T(`（约 ${months} 个月）`, ` (${months} months)`)}`;
+      } else if (medianDays > 0) {
+        const days = Math.round(medianDays);
+        const months = (medianDays / 30.4).toFixed(1);
+        cycleShort = `~${days}d${T(`（约 ${months} 个月）`, ` (${months} months)`)}`;
+      }
     }
     const isOaMark = !!(ir.cas_oa || r.cas_oa || r.doaj || ir.doaj || r.oaj || ir.oaj || (ir.oa && ir.oa.l));
     const heroIfValue = ir.if_2025 ?? (Number(ir.if_latest_year) === 2025 ? ir.if_latest : null);
@@ -11330,7 +11339,8 @@
     if (ir.utd24) meta.push(['UTD24', ir.utd24.order ? `#${ir.utd24.order}` : 'Listed']);
     if (r.publisher) meta.push([T('出版商','Publisher'), r.publisher]);
     if (r.country) meta.push([T('国家/地区','Country'), r.country]);
-    if (r.frequency) meta.push([T('刊期','Frequency'), r.frequency]);
+    const shareFrequency = r.frequency || r.publication_frequency || r.periodicity || r.doaj?.frequency;
+    if (shareFrequency) meta.push([T('刊期','Frequency'), shareFrequency]);
     if (ir.cas_xr && ir.cas_xr.major_cn) meta.push([T('新锐版大类','Emerging Major'), ir.cas_xr.major_cn]);
 
     // 审稿周期 — 从嵌入的 DOAJ review_weeks 读取
