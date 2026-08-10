@@ -1,4 +1,181 @@
 (() => {
+  // All static/listing pages share this bootstrap. Only mainland China gets
+  // the Chinese default; every other country defaults to English. Keep the
+  // result in a shared promise so static-i18n/rank pages reuse the same call.
+  function probeGeoLanguage() {
+    const existing = window.__ailatestGeoLangState;
+    if (existing?.promise) return existing.promise;
+    const state = { ready: false, known: false, country: '', lang: '' };
+    state.promise = fetch('/geo', {
+      credentials: 'same-origin',
+      cache: 'no-store',
+      headers: { Accept: 'application/json' },
+    })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((payload) => {
+        const country = String(payload?.country || '').trim().toUpperCase();
+        state.country = /^[A-Z]{2}$/.test(country) ? country : '';
+        state.known = !!state.country;
+        state.lang = state.country === 'CN' ? 'zh-CN' : 'en';
+        state.ready = true;
+        return state;
+      })
+      .catch(() => {
+        state.ready = true;
+        state.known = false;
+        state.lang = '';
+        return state;
+      });
+    window.__ailatestGeoLangState = state;
+    state.promise.then((result) => {
+      if (!result?.known || window.__journalLangManualSession) return;
+      const lang = result.lang === 'zh-CN' ? 'zh-CN' : 'en';
+      document.documentElement.lang = lang;
+      document.documentElement.setAttribute('data-ui-lang', lang);
+      window.__journalUiLang = lang;
+      applyListingLanguage(lang);
+      document.querySelectorAll('[data-zh][data-en]').forEach((el) => {
+        const text = el.getAttribute(lang === 'en' ? 'data-en' : 'data-zh');
+        if (text != null && text !== '') el.textContent = text;
+      });
+      window.dispatchEvent(new CustomEvent('ailatest:langchange', { detail: { lang } }));
+    });
+    return state.promise;
+  }
+
+  probeGeoLanguage();
+
+  // Generated subject/index landing pages predate static-i18n and contain a
+  // small amount of Chinese template copy. Keep their visible shell aligned
+  // with the IP-selected language without touching journal names or data.
+  function applyListingLanguage(lang) {
+    const isEnglish = lang === 'en';
+    const listing = document.querySelector('.listing-topbar, body.rank-landing');
+    if (!listing) return;
+    const remember = (el) => {
+      if (!el || el.dataset.geoZhText != null) return el?.dataset.geoZhText || '';
+      el.dataset.geoZhText = el.textContent || '';
+      return el.dataset.geoZhText;
+    };
+    const set = (el, enText) => {
+      if (!el) return;
+      const zhText = remember(el);
+      el.textContent = isEnglish ? enText : zhText;
+    };
+
+    const stationNames = {
+      dom: 'China',
+      in: 'India',
+      my: 'Malaysia',
+      kr: 'Korea',
+      pbn: 'Poland',
+      isc: 'Iran',
+      scielo: 'Latin America',
+    };
+    document.querySelectorAll('.app-rail [data-region-station]').forEach((link) => {
+      const label = link.querySelector('span:not(.rail-flag)');
+      const id = link.getAttribute('data-region-station');
+      if (label && stationNames[id]) set(label, stationNames[id]);
+    });
+    document.querySelectorAll('.app-rail [data-region-pin]').forEach((link) => {
+      const label = link.querySelector('span:not(.rail-flag)');
+      const id = link.getAttribute('data-region-pin');
+      if (label && stationNames[id]) set(label, stationNames[id]);
+    });
+    set(document.querySelector('.app-rail .rail-top > a[href="/global"] span:not(.rail-flag)'), 'Global');
+    set(document.querySelector('.app-rail .rail-region-toggle span > span'), 'Regions');
+
+    if (document.body?.classList.contains('rank-landing')) return;
+    set(document.querySelector('.listing-section-title'), 'Journal rankings');
+    const h1 = document.querySelector('.wrap h1, .listing-main h1, main h1');
+    if (h1) {
+      const zhText = remember(h1);
+      const enText = zhText
+        .replace(/\s*期刊\s*$/, ' Journals')
+        .replace(/中科院预警/g, 'CAS warning')
+        .replace(/中信所预警/g, 'CITIC warning')
+        .replace(/预警名单/g, 'Warning list');
+      set(h1, enText);
+    }
+
+    const breadcrumb = document.querySelector('.breadcrumb');
+    breadcrumb?.querySelectorAll('a').forEach((link) => {
+      const href = link.getAttribute('href') || '';
+      const text = href === '/' ? 'Home'
+        : href.includes('/subjects/') ? 'Subject rankings'
+          : href.includes('/indexes/') ? (href.includes('warning') ? 'Warning list' : 'Index rankings')
+            : 'Rankings';
+      set(link, text);
+    });
+
+    document.querySelectorAll('th').forEach((th) => {
+      const map = {
+        '期刊': 'Journal',
+        '影响因子': 'Impact factor',
+        'JCR 分区': 'JCR quartile',
+        '中科院': 'CAS',
+        '索引': 'Indexing',
+        '出版商': 'Publisher',
+        '状态': 'Status',
+      };
+      const raw = remember(th);
+      if (isEnglish && map[raw]) th.textContent = map[raw];
+      else if (!isEnglish) th.textContent = raw;
+    });
+
+    const sub = document.querySelector('.sub');
+    if (sub) {
+      const zhText = remember(sub);
+      let enText = zhText
+        .replace(/\s*共\s*\d+\s*种期刊，按影响因子排序。?\s*$/, ' Sorted by impact factor.')
+        .replace(/\s*按影响因子排序。?\s*$/, ' Sorted by impact factor.')
+        .replace(/中科院文献情报中心国际期刊预警名单/g, 'CAS international journal warning list')
+        .replace(/中信所\(中国科学技术信息研究所\)国际期刊预警名单\(2025\)/g, 'CITIC (China Institute of Scientific and Technical Information) international journal warning list (2025)')
+        .replace(/含影响因子、分区、CAS 等级和索引信息/g, 'with impact factor, quartiles, CAS tiers and indexing information')
+        .replace(/中信所国际期刊预警名单/g, 'CITIC international journal warning list')
+        .replace(/Web of Science On Hold 期刊/g, 'Web of Science On Hold journals')
+        .replace(/因质量问题被 Clarivate 暂停收录评估的期刊/g, 'journals whose indexing review was paused by Clarivate for quality concerns')
+        .replace(/新锐版\(Under Review\)期刊/g, 'Emerging (Under Review) journals')
+        .replace(/正在被 Web of Science 评审的期刊/g, 'journals currently under Web of Science review');
+      set(sub, enText);
+    }
+    const count = document.querySelector('.count');
+    if (count) {
+      const zhText = remember(count);
+      let enText = zhText
+        .replace(/按影响因子降序展示前\s*(\d+)\s*\/\s*共\s*(\d+)\s*种期刊（字段与主站一致：IF · JCR · 中科院 · 索引 · 出版商）。?/, 'Top $1 of $2 journals by impact factor (same fields as the main site: IF · JCR · CAS · Indexing · Publisher).')
+        .replace(/按影响因子降序展示\s*(\d+)\s*种\s*([^\s（]+)\s*收录期刊（字段与主站一致：IF · JCR · 中科院 · ISSN · 出版商）。?/, '$1 $2-indexed journals sorted by impact factor (same fields as the main site: IF · JCR · CAS · ISSN · Publisher).')
+        .replace(/共\s*(\d+)\s*本中科院预警期刊（按原列表排序；字段：影响因子 · JCR · 中科院 · 状态 · 出版商）/, '$1 CAS warning journals (original list order; fields: impact factor · JCR · CAS · status · publisher)')
+        .replace(/共\s*(\d+)\s*本中信所预警期刊（按原列表排序；字段：影响因子 · JCR · 中科院 · 状态 · 出版商）/, '$1 CITIC warning journals (original list order; fields: impact factor · JCR · CAS · status · publisher)')
+        .replace(/共\s*(\d+)\s*本 WoS On Hold 期刊（按原列表排序；字段：影响因子 · JCR · 中科院 · 状态 · 出版商）/, '$1 WoS On Hold journals (original list order; fields: impact factor · JCR · CAS · status · publisher)')
+        .replace(/共\s*(\d+)\s*本WoS On Hold期刊（按原列表排序；字段：影响因子 · JCR · 中科院 · 状态 · 出版商）/, '$1 WoS On Hold journals (original list order; fields: impact factor · JCR · CAS · status · publisher)')
+        .replace(/共\s*(\d+)\s*本新锐 Under Review期刊（按原列表排序；字段：影响因子 · JCR · 中科院 · 状态 · 出版商）/, '$1 Emerging Under Review journals (original list order; fields: impact factor · JCR · CAS · status · publisher)')
+        .replace(/中科院预警/g, 'CAS warning')
+        .replace(/中信所预警/g, 'CITIC warning')
+        .replace(/新锐 Under Review/g, 'Emerging Under Review');
+      set(count, enText);
+    }
+    const back = document.querySelector('.back-wrap .back, .back-wrap a, .rl-back a');
+    if (back) set(back, '← Back');
+
+    document.querySelectorAll('.footer a, .rl-foot a').forEach((link) => {
+      const href = link.getAttribute('href') || '';
+      if (href === '/about') set(link, 'About');
+      else if (href === '/contact') set(link, 'Contact');
+      else if (href === '/') set(link, 'AILatest Journal');
+    });
+  }
+
+  // The first paint on production pages must not inherit zh-CN from an old
+  // generated HTML file or localStorage while /geo is still in flight.
+  if (typeof location !== 'undefined'
+    && !/^(localhost|127(?:\.\d{1,3}){3}|::1)$/i.test(location.hostname || '')
+    && !window.__ailatestGeoLangState?.ready) {
+    document.documentElement.lang = 'en';
+    document.documentElement.setAttribute('data-ui-lang', 'en');
+    window.__journalUiLang = 'en';
+  }
+
   const KEY = 'ailatest.pinnedRegionStations';
   const MIGRATION_KEY = `${KEY}.v2`;
   let memoryPinned = [];
@@ -133,6 +310,9 @@
 
   function railLanguage() {
     try {
+      const current = String(window.__journalUiLang || document.documentElement.getAttribute('data-ui-lang') || '').toLowerCase();
+      if (current === 'en' || current.startsWith('en-')) return 'en';
+      if (current === 'zh' || current.startsWith('zh-')) return 'zh';
       const saved = String(localStorage.getItem('ailatest.lang') || '').toLowerCase();
       if (saved === 'en' || saved === 'en-us') return 'en';
       if (document.documentElement.lang.toLowerCase() === 'en') return 'en';
@@ -504,6 +684,7 @@
     ensureRailStateMarkup(rail);
     updateRailState(rail);
     ensureHomeShellNav();
+    applyListingLanguage(railLanguage() === 'en' ? 'en' : 'zh-CN');
     const refreshRailState = () => {
       ensureRailStateMarkup(rail);
       updateRailState(rail);

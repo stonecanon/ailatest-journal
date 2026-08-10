@@ -805,7 +805,7 @@
     return 'en';
   };
 
-  /** 浏览器首选语言（仅首次 / 未手动设置时用） */
+  /** 浏览器首选语言（仅本地开发且无法读取 IP 时的回退） */
   function detectBrowserLang() {
     const list = [];
     try {
@@ -821,8 +821,55 @@
     return 'en';
   }
 
+  // 生产环境的默认语言只由 Cloudflare 国家码决定：CN = 简体中文，
+  // 其他国家/地区 = English。共享 promise 可避免多个外挂脚本重复请求。
+  function probeGeoLanguage() {
+    const existing = window.__ailatestGeoLangState;
+    if (existing?.promise) return existing.promise;
+    const state = {
+      ready: false,
+      known: false,
+      country: '',
+      lang: '',
+    };
+    state.promise = fetch('/geo', {
+      credentials: 'same-origin',
+      cache: 'no-store',
+      headers: { Accept: 'application/json' },
+    })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((payload) => {
+        const country = String(payload?.country || '').trim().toUpperCase();
+        state.country = /^[A-Z]{2}$/.test(country) ? country : '';
+        state.known = !!state.country;
+        state.lang = state.country === 'CN' ? 'zh-CN' : 'en';
+        state.ready = true;
+        return state;
+      })
+      .catch(() => {
+        state.ready = true;
+        state.known = false;
+        state.lang = '';
+        return state;
+      });
+    window.__ailatestGeoLangState = state;
+    return state.promise;
+  }
+
+  function synchronousGeoLanguage() {
+    const state = window.__ailatestGeoLangState;
+    return state?.ready && state.known ? state.lang : '';
+  }
+
   // ───────── state ─────────
   function initialLangFromPath() {
+    const geoLang = synchronousGeoLanguage();
+    if (geoLang) return geoLang;
+    // 在生产环境等待 IP 探测时先用英文，避免把旧的中文 localStorage
+    // 泄漏给非中国大陆用户。探测完成后会在本页自动切换到 CN 中文。
+    if (typeof location !== 'undefined' && !/^(localhost|127(?:\.\d{1,3}){3}|::1)$/i.test(location.hostname || '')) {
+      return 'en';
+    }
     try {
       const queryLang = new URLSearchParams(location.search).get('lang');
       if (queryLang) return normalizeLang(queryLang);
@@ -838,6 +885,12 @@
     return detectBrowserLang();
   }
   let lang = normalizeLang(initialLangFromPath());
+  const geoLanguageProbe = probeGeoLanguage();
+  geoLanguageProbe.then((state) => {
+    if (!state?.known || window.__journalLangManualSession) return;
+    const next = normalizeLang(state.lang);
+    if (next && next !== lang) setUiLanguage(next, { fromGeo: true });
+  });
   // 供 pricing-checkout 等外挂脚本读「真实 UI 语言」，避免与 html lang / 旧缓存不一致
   window.__journalUiLang = lang;
   window.__getJournalUiLang = () => lang;
@@ -8901,17 +8954,21 @@
     }
   }
 
-  function setUiLanguage(code) {
+  function setUiLanguage(code, options = {}) {
     const next = normalizeLang(code);
     if (!LANG_META[next]) return;
+    const fromGeo = options?.fromGeo === true;
     // 即使点同一语言，也允许强制刷新（修复「点了没变」的卡死态）
     const changed = next !== lang;
     lang = next;
     hydrateLangPack(lang);
     try {
-      localStorage.setItem('ailatest.lang', lang);
-      // 标记为用户主动选择，后续不再被浏览器语言覆盖
-      localStorage.setItem('ailatest.lang.userSet', '1');
+      if (!fromGeo) {
+        localStorage.setItem('ailatest.lang', lang);
+        // 标记为用户主动选择；IP 默认语言不会写入该标记。
+        localStorage.setItem('ailatest.lang.userSet', '1');
+        window.__journalLangManualSession = true;
+      }
     } catch (_) {}
     window.__journalUiLang = lang;
     try {

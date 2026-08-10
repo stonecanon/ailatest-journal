@@ -112,7 +112,48 @@
     return 'en';
   }
 
+  // 生产环境的默认语言只由 Cloudflare 国家码决定：CN = 简体中文，
+  // 其余国家/地区 = English。与主站共享探测 promise，避免重复请求。
+  function probeGeoLanguage() {
+    const existing = window.__ailatestGeoLangState;
+    if (existing?.promise) return existing.promise;
+    const state = { ready: false, known: false, country: '', lang: '' };
+    state.promise = fetch('/geo', {
+      credentials: 'same-origin',
+      cache: 'no-store',
+      headers: { Accept: 'application/json' },
+    })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((payload) => {
+        const country = String(payload?.country || '').trim().toUpperCase();
+        state.country = /^[A-Z]{2}$/.test(country) ? country : '';
+        state.known = !!state.country;
+        state.lang = state.country === 'CN' ? 'zh-CN' : 'en';
+        state.ready = true;
+        return state;
+      })
+      .catch(() => {
+        state.ready = true;
+        state.known = false;
+        state.lang = '';
+        return state;
+      });
+    window.__ailatestGeoLangState = state;
+    return state.promise;
+  }
+
+  function synchronousGeoLanguage() {
+    const state = window.__ailatestGeoLangState;
+    return state?.ready && state.known ? state.lang : '';
+  }
+
   function initialLang() {
+    const geoLang = synchronousGeoLanguage();
+    if (geoLang) return geoLang;
+    // 非 CN 用户在 IP 探测完成前先显示英文，避免沿用旧的中文状态。
+    if (typeof location !== 'undefined' && !/^(localhost|127(?:\.\d{1,3}){3}|::1)$/i.test(location.hostname || '')) {
+      return 'en';
+    }
     const params = new URLSearchParams(location.search);
     const queryLang = params.get('lang');
     if (queryLang) return normalize(queryLang);
@@ -241,8 +282,16 @@
   function bind() {
     let lang = initialLang();
     applyLang(lang);
+    probeGeoLanguage().then((state) => {
+      if (!state?.known || window.__journalLangManualSession) return;
+      if (state.lang !== lang) {
+        lang = state.lang;
+        applyLang(lang);
+      }
+    });
     document.querySelector('[data-static-lang-toggle]')?.addEventListener('click', () => {
       lang = lang === 'zh-CN' ? 'en' : 'zh-CN';
+      window.__journalLangManualSession = true;
       applyLang(lang);
     });
   }
