@@ -121,7 +121,7 @@
 每个期刊的详情页包含：
 - **索引标识**: SCIE / SSCI / AHCI / ESCI / EI / Scopus / MEDLINE / DOAJ
 - **分区信息**: 中科院 2025 大类分区 + TOP 标志、JCR Quartile
-- **指标**: JCR 2025 影响因子 (IF)、Eigenfactor、排名百分位
+- **指标**: JCR 2025 最新影响因子 (IF)；去自引 JIF 与自引贡献率直接列出
 - **学科分类**: ESI 22 大类、WoS 细分学科
 - **核心信息**: ISSN、EISSN、出版商、语种、出版周期
 - **OA 信息**: 开放获取状态、APC 费用、DOAJ 认证
@@ -129,6 +129,7 @@
 - **学术评价**: CCF、ABDC、ABS 分级
 - **审稿周期**: CrossRef 数据推导的平均审稿周期
 - **出版与地区信息**: 出版商、出版国家/地区、作者机构国家/地区趋势（有数据时展示）
+- **自引趋势**: JCR 口径的年度自引贡献率（有数据时展示）
 - **OpenAlex Topics**: 主要研究领域标签与相关论文信号
 
 ---
@@ -139,6 +140,7 @@
 |------|-------------|------|
 | WoS 核心索引 | Clarivate 公开列表 | SCIE/SSCI/AHCI/ESCI，更新至 2026-06-15 |
 | JCR 指标 | [ShowJCR](https://github.com/hitfyd/ShowJCR) (GPL-3.0) | IF 2025、JCR Quartile、Eigenfactor |
+| JCR 自引口径 | Clarivate JCR 2025 工作表 | 2025 去自引 JIF与自引贡献率，仅展示最新年度 |
 | 中科院分区 | ShowJCR | 2025 大类分区 (1-4 区, TOP 标志) |
 | EI Compendex | Elsevier 公开列表 | 更新至 2026-07-09 |
 | Scopus | Elsevier 公开列表 | 2026-05 来源快照 |

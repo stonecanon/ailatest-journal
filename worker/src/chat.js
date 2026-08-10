@@ -16,7 +16,11 @@ let journalTextIndex = null; // one-line summaries for full-text search
 
 const FIELD_DESCRIPTIONS = {
   name:             '期刊名称',
-  if_2024:          '2024年影响因子',
+  if_2024:          '旧兼容字段（列表历史兼容）',
+  if_2025:          'JCR 2025 年影响因子',
+  if_latest:       '最新 JCR 影响因子',
+  jif_without_self_cites_2025: 'JCR 2025 去自引 JIF',
+  self_citation_rate_2025: 'JCR 2025 自引贡献占比',
   if_quartile:      'JCR分区(Q1/Q2/Q3/Q4)',
   publisher:        '出版商',
   country:          '国家',
@@ -61,7 +65,11 @@ function buildJournalText(j) {
   if (j.eissn) parts.push(`EISSN: ${j.eissn}`);
   if (j.publisher) parts.push(`出版商: ${j.publisher}`);
   if (j.country) parts.push(`国家: ${j.country}`);
-  if (j.if_2024 != null) parts.push(`IF: ${j.if_2024}`);
+  const latestIf = j.if_2025 ?? j.if_latest ?? j.if_2024;
+  const latestIfYear = j.if_latest_year || (j.if_2025 != null ? 2025 : 2024);
+  if (latestIf != null) parts.push(`JCR IF (${latestIfYear}): ${latestIf}`);
+  if (j.jif_without_self_cites_2025 != null) parts.push(`JCR 2025 去自引 JIF: ${j.jif_without_self_cites_2025}`);
+  if (j.self_citation_rate_2025 != null) parts.push(`JCR 2025 自引贡献: ${j.self_citation_rate_2025}%`);
   if (j.if_quartile) parts.push(`JCR分区: ${j.if_quartile}`);
   if (j.cas_zone) parts.push(`中科院: ${j.cas_zone}`);
   if (j.indices && j.indices.length) parts.push(`索引: ${j.indices.join(', ')}`);

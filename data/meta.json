@@ -57,6 +57,8 @@
   "jcr_latest_metric_year": 2025,
   "jcr_latest_release_year": 2026,
   "with_if_2025": 21975,
+  "with_jif_without_self_cites_2025": 21780,
+  "with_jcr_self_citation_rate_2025": 21780,
   "with_publication_history": 29886,
   "with_free_to_publish": 33256,
   "with_if_history_by_year": {

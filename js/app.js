@@ -7423,6 +7423,20 @@
     if (ir.abdc && ir.abdc.rating) meta.push([T('ABDC 等级','ABDC Rating'), ir.abdc.rating + (ir.abdc.field ? ' · ' + ir.abdc.field : '')]);
     if (ir.ft50) meta.push(['FT50', (ir.ft50.order ? `#${ir.ft50.order}` : '') + (ir.ft50.source ? ` · ${ir.ft50.source}` : '')]);
     if (ir.utd24) meta.push(['UTD24', (ir.utd24.order ? `#${ir.utd24.order}` : '') + (ir.utd24.subject ? ` · ${ir.utd24.subject}` : '')]);
+    // JCR 2025 去自引 JIF / 自引贡献率单独展示；趋势图继续使用已有的年度自引率历史数据。
+    // 这些字段由 JCR 2025 工作表写入；旧的 if_2024 仅作为兼容字段保留。
+    const jcrMetricYear = Number(ir.if_latest_year || ir.jcr_year || (ir.if_2025 != null ? 2025 : 0));
+    const jcrIf2025 = Number(ir.if_2025 ?? (jcrMetricYear === 2025 ? ir.if_latest : NaN));
+    const jcrNoSelfIf2025 = Number(ir.jif_without_self_cites_2025);
+    const jcrSelfShare2025 = Number(ir.self_citation_rate_2025);
+    const jcrIntroIf = Number.isFinite(jcrIf2025) ? jcrIf2025 : null;
+    const jcrIntroYear = jcrMetricYear || Number(ir.if_latest_year || ir.jcr_year || 2024);
+    if (Number.isFinite(jcrNoSelfIf2025)) {
+      meta.push([T('JCR 2025 去自引 JIF','JCR 2025 JIF without self-cites'), jcrNoSelfIf2025]);
+    }
+    if (Number.isFinite(jcrSelfShare2025)) {
+      meta.push([T('JCR 2025 自引贡献率','JCR 2025 self-citation contribution rate'), `${jcrSelfShare2025}%`]);
+    }
     if (src === 'nsfc_mgmt' || r.source === 'NSFC Management Science Department Journal List') meta.push([T('来源','Source'), T('国家自然科学基金委管理科学部期刊目录','NSFC Management Science Journal List')]);
     if (src === 'kr') {
       if (r.status) meta.push([T('KCI 等级','KCI Status'), koreaStatusLabel(r.status)]);
@@ -7512,13 +7526,13 @@
             ].filter(Boolean).join(' ')
           : [
               zhSentence(`${plainName} 是一份国际学术期刊${major || plainCats ? `，主要面向${major || plainCats}等研究方向` : ''}，为相关研究成果提供发表平台`),
-              zhSentence(`${cnName ? `该期刊中文名称：${cnName}` : ''}${ir.cas_zone ? `${cnName ? '，' : ''}在中科院分区表 2025 年版中大类学科位于 ${ir.cas_zone} 区${ir.cas_top ? '，为 Top 期刊' : ''}` : ''}${ir.if_quartile ? `，JCR 分区为 ${String(ir.if_quartile).toUpperCase()}` : ''}${ir.if_2024 != null ? `，影响因子 IF ${ir.if_2024}` : ''}${ir.if_rank ? `，IF 排名 ${ir.if_rank}` : ''}${tierText}`),
+              zhSentence(`${cnName ? `该期刊中文名称：${cnName}` : ''}${ir.cas_zone ? `${cnName ? '，' : ''}在中科院分区表 2025 年版中大类学科位于 ${ir.cas_zone} 区${ir.cas_top ? '，为 Top 期刊' : ''}` : ''}${ir.if_quartile ? `，JCR 分区为 ${String(ir.if_quartile).toUpperCase()}` : ''}${jcrIntroIf != null ? `，JCR ${jcrIntroYear} 影响因子 IF ${jcrIntroIf}` : ''}${ir.if_rank ? `，IF 排名 ${ir.if_rank}` : ''}${tierText}`),
               zhSentence(`${oaText}${apcText ? `${oaText ? '，' : ''}${apcText}` : ''}${reviewText ? `${(oaText || apcText) ? '，' : ''}${reviewText}` : ''}`),
               zhSentence(`${topicList.length ? `期刊聚焦 ${topicList.join('、')} 等方向` : ''}${indexText ? `${topicList.length ? '，' : ''}目前收录于 ${indexText}` : ''}`),
             ].filter(Boolean).join(' '))
         : [
             `${plainName} is an international scholarly journal for researchers in ${major || plainCats || 'related fields'}, providing a venue for new research and academic exchange.`,
-            `${ir.cas_zone ? `CAS 2025 major tier: ${ir.cas_zone}${ir.cas_top ? ' · Top' : ''}. ` : ''}${ir.if_quartile ? `JCR ${String(ir.if_quartile).toUpperCase()}. ` : ''}${ir.if_2024 != null ? `IF ${ir.if_2024}. ` : ''}${ir.if_rank ? `IF rank ${ir.if_rank}.` : ''}`,
+            `${ir.cas_zone ? `CAS 2025 major tier: ${ir.cas_zone}${ir.cas_top ? ' · Top' : ''}. ` : ''}${ir.if_quartile ? `JCR ${String(ir.if_quartile).toUpperCase()}. ` : ''}${jcrIntroIf != null ? `JCR ${jcrIntroYear} IF ${jcrIntroIf}. ` : ''}${ir.if_rank ? `IF rank ${ir.if_rank}.` : ''}`,
             `${oaText}${apcText ? `; ${apcText}` : ''}${reviewText ? `; ${reviewText}` : ''}.`,
             `${topicList.length ? `Focus areas include ${topicList.join(', ')}. ` : ''}${indexText ? `Indexed in ${indexText}.` : ''}`,
           ].filter(Boolean).join(' ');
@@ -7597,7 +7611,9 @@
     // 核心指标数值 — 只放真正的"数值"，分区/Q 用徽章呈现，避免重复
     // 重复信息已删：JCR Q（→ badges）、CAS 大类区（→ casHTML）、Emerging 2026 区（→ xrHTML）
     const stats = [];
-    if (ir.if_2024 != null) stats.push([T('影响因子 / IF','Impact Factor'), ir.if_2024]);
+    const latestIfValue = ir.if_2025 ?? (Number(ir.if_latest_year) === 2025 ? ir.if_latest : null);
+    const latestIfMetricYear = Number(ir.if_latest_year || ir.jcr_year || (ir.if_2025 != null ? 2025 : 2024));
+    if (latestIfValue != null) stats.push([T('影响因子 / IF','Impact Factor'), latestIfValue]);
     if (ir.if_rank) stats.push([T('IF 排名','IF Rank'), ir.if_rank]);
     // 审稿周期 — 从嵌入的 DOAJ review_weeks 读取
     {
@@ -7614,9 +7630,9 @@
         stats.push([T('已发表论文','Published Works'), oaWorks.toLocaleString()]);
       }
     }
-    const latestIfYear = Number(ir.if_latest_year || ir.jcr_year || 2025);
+    const latestIfYear = latestIfMetricYear;
     const latestReleaseYear = Number(ir.jcr_release_year || (latestIfYear + 1));
-    const ifNote = ir.if_2024 != null
+    const ifNote = latestIfValue != null
       ? T(`JCR ${latestReleaseYear}发布 · ${latestIfYear}指标`, `JCR ${latestReleaseYear} rel. · ${latestIfYear} metric`)
       : '';
     const statsHTML = stats.length ? `<div class="stats-grid stats-count-${Math.min(stats.length, 4)}">${stats.map(([k,v,sub]) =>
@@ -7629,13 +7645,15 @@
         if (Array.isArray(input)) {
           return input.map(x => ({
             year: Number(x.year),
-            value: Number(x[valueKey] ?? x.value ?? x.count),
+            value: Number(x[valueKey] ?? x.value ?? x.rate ?? x.share ?? x.count),
           })).filter(x => Number.isFinite(x.year) && Number.isFinite(x.value));
         }
         if (typeof input === 'object') {
           return Object.entries(input).map(([year, value]) => ({
             year: Number(year),
-            value: Number(value),
+            value: Number(typeof value === 'object' && value !== null
+              ? (value[valueKey] ?? value.value ?? value.rate ?? value.share ?? value.count)
+              : value),
           })).filter(x => Number.isFinite(x.year) && Number.isFinite(x.value));
         }
         return [];
@@ -7729,6 +7747,7 @@
       };
       const ifPoints = toPointList(ir.if_history, 'value');
       const pubPoints = toPointList(r.publication_history || ir.publication_history, 'count');
+      // 恢复原有 JCR 口径的年度自引率趋势；JCR 2025 最新值仍在上方单独展示。
       const selfCitationPoints = toPointList(ir.self_citation_rate_history, 'value')
         .map(p => ({ ...p, value: Math.round(p.value * 10) / 10 }));
       const selfCitationCard = (() => {
@@ -7780,7 +7799,7 @@
       </div>`;
       const items = cats.map(c => `<li>${escape(c)}${q ? ` · <b>${q}</b>` : ''}</li>`).join('');
       return `<div class="drawer-section jcr-section">
-        <h4>${T(`JCR ${latestReleaseYear} 学科分区`, `JCR ${latestReleaseYear} Subject Categories`)}</h4>
+        <h4>${T(`JCR ${jcrMetricYear || 2025} 学科分区`, `JCR ${jcrMetricYear || 2025} Subject Categories`)}</h4>
         ${majorLine}
         ${items ? `<div class="cat-sub-label">${T('小类 / 学科分类','Subject Categories')}</div><ul class="cas-sub-list">${items}</ul>` : ''}
       </div>`;
@@ -8078,9 +8097,11 @@
       else if (r.crossref?.median_days) cycleShort = `~${Math.round(+r.crossref.median_days)}d`;
     }
     const isOaMark = !!(ir.cas_oa || r.cas_oa || r.doaj || ir.doaj || r.oaj || ir.oaj || (ir.oa && ir.oa.l));
-    const ifNum = ir.if_2024 != null ? (+ir.if_2024).toFixed(1) : '';
-    const ifYearLabel = ir.if_2024 != null
-      ? `IF ${Number(ir.if_latest_year || ir.jcr_year || 2025)}`
+    const heroIfValue = ir.if_2025 ?? (Number(ir.if_latest_year) === 2025 ? ir.if_latest : null);
+    const heroIfYear = Number(ir.if_latest_year || ir.jcr_year || (ir.if_2025 != null ? 2025 : 2024));
+    const ifNum = heroIfValue != null ? (+heroIfValue).toFixed(1) : '';
+    const ifYearLabel = heroIfValue != null
+      ? `IF ${heroIfYear}`
       : 'IF';
     const subjectLine = (Array.isArray(ir.wos_categories) && ir.wos_categories[0])
       || ir.jcr_cat || ir.cas_major_cn || ir.esi_category || r.discipline || '';
@@ -8131,7 +8152,8 @@
       if (!related.length) return '';
       return related.map(j => {
         const name = titleCase(j.name || j.cn_name || '');
-        const ifv = j.if_2024 != null ? (+j.if_2024).toFixed(1) : '—';
+        const relatedIf = j.if_2025 ?? (Number(j.if_latest_year) === 2025 ? j.if_latest : null);
+        const ifv = relatedIf != null ? (+relatedIf).toFixed(1) : '—';
         return `<div class="side-link related-card" data-fid="${escape(favId(j))}" role="button" tabindex="0"><span class="side-link-name">${escape(name)}</span><span class="side-link-if">${escape(ifv)}</span></div>`;
       }).join('');
     })();
@@ -8470,7 +8492,8 @@
   function updateJournalSeo(r) {
     const name = titleCase((r.name || r.cn_name || 'Journal').replace(/\*$/, ''));
     const bits = [name];
-    if (r.if_2024 != null) bits.push(`IF ${r.if_2024}`);
+    const seoIf = r.if_2025 ?? (Number(r.if_latest_year) === 2025 ? r.if_latest : null);
+    if (seoIf != null) bits.push(`IF ${r.if_latest_year || 2025} ${seoIf}`);
     if (r.cas_zone) bits.push(`CAS ${r.cas_zone}${T('区','')}`);
     if (r.if_quartile) bits.push(`JCR ${String(r.if_quartile).toUpperCase()}`);
     bits.push('AILatest Journal');
@@ -11127,11 +11150,12 @@
 
     // 关键指标 + 元信息
     const stats = [];
-    if (ir.if_2024 != null) stats.push([T('影响因子','Impact Factor'), ir.if_2024]);
+    const shareIfValue = ir.if_2025 ?? (Number(ir.if_latest_year) === 2025 ? ir.if_latest : null);
+    if (shareIfValue != null) stats.push([T('影响因子','Impact Factor'), shareIfValue]);
     if (ir.if_rank) stats.push([T('IF 排名','IF Rank'), ir.if_rank]);
     const shareIfYear = Number(ir.if_latest_year || ir.jcr_year || 2025);
     const shareReleaseYear = Number(ir.jcr_release_year || (shareIfYear + 1));
-    const ifNote = ir.if_2024 != null
+    const ifNote = shareIfValue != null
       ? T(`JCR ${shareReleaseYear}发布 · ${shareIfYear}指标`, `JCR ${shareReleaseYear} · ${shareIfYear} IF`)
       : '';
     const statsHtml = stats.length ? `<div class="jcard-stats">${stats.map(([k,v,sub]) => `<div class="jcard-stat"><div class="jcard-stat-v">${v}</div><div class="jcard-stat-k">${k}</div>${sub?`<div class="jcard-stat-sub">${sub}</div>`:''}</div>`).join('')}</div>${ifNote ? `<div class="jcard-stats-sub">${ifNote}</div>` : ''}` : '';

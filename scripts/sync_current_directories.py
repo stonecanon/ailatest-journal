@@ -252,7 +252,8 @@ def compact_new_record(rec: dict) -> dict:
     keys = (
         "name", "cn_name", "en_name", "abbr20", "slug", "issn", "eissn", "publisher", "country",
         "indices", "wos_categories", "esi_category", "if_2024", "if_2025", "if_latest", "if_latest_year",
-        "if_quartile", "jcr_year", "jcr_release_year", "cas_zone", "cas_top", "cas_major_cn", "flagship",
+        "if_quartile", "jif_without_self_cites_2025", "self_citation_rate_2025",
+        "jcr_year", "jcr_release_year", "cas_zone", "cas_top", "cas_major_cn", "flagship",
         "nature_index", "free", "pubmed", "pmc", "medline", "under_review", "on_hold", "citic_warning",
         "ccf", "ft50", "utd24", "routeAliases",
     )

@@ -31,6 +31,7 @@ DEFAULT_WORKBOOKS = [
 JOURNALS_GZ = DATA_DIR / "journals.json.gz"
 JOURNALS_JSON = DATA_DIR / "journals.json"
 LIGHT_GZ = DATA_DIR / "journals_light.json.gz"
+LIGHT_V2_GZ = DATA_DIR / "journals_light_v2.json.gz"
 ANNUAL_OUTPUT_CANDIDATES = [
     DATA_DIR / "annual_outputs.json.gz",
     DATA_DIR / "annual_outputs (1).json.gz",
@@ -127,6 +128,22 @@ def read_latest_jcr(path: Path) -> list[dict]:
         if not title:
             continue
         jif = number_or_none(col(row, "2025 JIF"))
+        # Some JCR workbooks expose the latest JIF without self-cites as a
+        # separate column.  Keep the parser tolerant because Clarivate has
+        # changed the header spelling between exports.
+        jif_without_self = number_or_none(
+            next((col(row, name) for name in (
+                "2025 JIF without self-cites",
+                "2025 JIF Without Self-Cites",
+                "2025 JIF without self-citations",
+                "2025 JIF Without Self-Citations",
+                "2025 JIF without self citations",
+                "JIF without self-cites",
+                "JIF Without Self-Cites",
+                "JIF without self-citations",
+                "JIF Without Self-Citations",
+            ) if col(row, name) not in (None, "")), None)
+        )
         q = str(col(row, "JIF quartile") or "").strip().upper()
         rank = str(col(row, "JIF rank") or "").strip()
         cats = str(col(row, "Categories") or "").strip()
@@ -136,6 +153,7 @@ def read_latest_jcr(path: Path) -> list[dict]:
             "issn": clean_issn(col(row, "ISSN")),
             "eissn": clean_issn(col(row, "eISSN")),
             "jif": jif,
+            "jif_without_self": jif_without_self,
             "quartile": q if q in {"Q1", "Q2", "Q3", "Q4"} else "",
             "rank": rank,
             "categories": cat_list,
@@ -209,6 +227,13 @@ def apply_updates(journals: list[dict], latest_rows: list[dict], annual_outputs:
             rec["if_2025"] = row["jif"]
             rec["if_latest"] = row["jif"]
             rec["if_latest_year"] = 2025
+        if row.get("jif_without_self") is not None:
+            rec["jif_without_self_cites_2025"] = row["jif_without_self"]
+            if row.get("jif") not in (None, 0):
+                rec["self_citation_rate_2025"] = round(
+                    min(100.0, max(0.0, (row["jif"] - row["jif_without_self"]) / row["jif"] * 100)),
+                    2,
+                )
 
         if history:
             rec["if_history"] = dict(sorted(history.items(), key=lambda item: int(item[0])))
@@ -259,6 +284,7 @@ def compact_journal_for_light(rec: dict) -> dict:
         "name", "cn_name", "en_name", "abbr20", "slug", "issn", "eissn",
         "publisher", "country", "indices", "wos_categories", "esi_category",
         "if_2024", "if_2025", "if_latest", "if_latest_year", "if_quartile",
+        "jif_without_self_cites_2025", "self_citation_rate_2025",
         "jcr_year", "jcr_release_year", "cas_zone", "cas_top", "cas_major_cn",
         "flagship", "nature_index", "free", "pubmed", "pmc", "medline",
         "under_review", "on_hold", "citic_warning", "ccf", "ft50", "utd24",
@@ -296,6 +322,9 @@ def compact_journal_for_light(rec: dict) -> dict:
 def write_light_index(journals: list[dict]) -> int:
     light = [compact_journal_for_light(rec) for rec in journals]
     write_json_gz(LIGHT_GZ, light)
+    # The homepage/detail bootstrap consumes v2; keep it in sync so the
+    # latest JCR fields are available before the full bundle upgrade.
+    write_json_gz(LIGHT_V2_GZ, light)
     return len(light)
 
 

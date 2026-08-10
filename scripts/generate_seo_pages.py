@@ -111,6 +111,12 @@ def entry_for(r: dict, oa_rec: dict, annual_rec: dict) -> dict:
     ret = r.get("retraction") or {}
     ann = compact_annual(annual_rec)
     oa_label = oa_rec.get("l") or ""
+    latest_jcr_year = r.get("if_latest_year")
+    latest_jcr_if = (
+        r.get("if_2025")
+        if r.get("if_2025") is not None
+        else (r.get("if_latest") if str(latest_jcr_year) == "2025" else None)
+    )
     entry = {
         "n": r.get("name") or r.get("cn_name") or r.get("en_name") or "",
         "c": r.get("cn_name") or "",
@@ -120,7 +126,10 @@ def entry_for(r: dict, oa_rec: dict, annual_rec: dict) -> dict:
         "country": r.get("country") or "",
         # Use the latest JCR value available in the bundle.  Keep the legacy
         # compact key names because the Pages Function consumes this shape.
-        "f": r.get("if_latest", r.get("if_2025", r.get("if_2024"))),
+        "f": latest_jcr_if,
+        "fy": 2025 if latest_jcr_if is not None else None,
+        "j0": r.get("jif_without_self_cites_2025"),
+        "js": r.get("self_citation_rate_2025"),
         "q": r.get("if_quartile") or "",
         "z": r.get("cas_zone"),
         "zt": bool(r.get("cas_top")),

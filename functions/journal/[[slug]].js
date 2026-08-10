@@ -101,12 +101,13 @@ function valueOrDash(value) {
 function journalSeo(journal, slug, origin) {
   const name = journal.n || 'Journal';
   const bits = [name];
-  if (journal.f != null) bits.push(`IF ${journal.f}`);
+  if (journal.f != null) bits.push(`IF ${journal.fy || 'latest'} ${journal.f}`);
   if (journal.q) bits.push(String(journal.q).toUpperCase());
   if (journal.z != null) bits.push(`CAS ${journal.z}`);
   bits.push('AILatest Journal');
   const descriptionParts = [`${name} journal profile`];
-  if (journal.f != null) descriptionParts.push(`Impact Factor ${journal.f}`);
+  if (journal.f != null) descriptionParts.push(`Impact Factor ${journal.fy || 'latest'} ${journal.f}`);
+  if (journal.j0 != null) descriptionParts.push(`JCR 2025 JIF without self-cites ${journal.j0}`);
   if (journal.q) descriptionParts.push(`JCR ${String(journal.q).toUpperCase()}`);
   if (journal.z != null) descriptionParts.push(`CAS Zone ${journal.z}`);
   if (journal.ix && journal.ix.length) descriptionParts.push(`indexed in ${journal.ix.slice(0, 5).join(', ')}`);
@@ -146,7 +147,9 @@ function serverDetailBody(journal, slug, origin) {
     : '';
   const appLink = `${origin}/#j/${encodeURIComponent(journal.i || journal.is || slug)}`;
   const facts = [
-    ['Impact Factor', valueOrDash(journal.f)],
+    [`Impact Factor${journal.fy ? ` (${journal.fy})` : ''}`, valueOrDash(journal.f)],
+    ...(journal.j0 != null ? [['JCR 2025 JIF without self-cites', journal.j0]] : []),
+    ...(journal.js != null ? [['JCR 2025 self-citation contribution rate', `${journal.js}%`]] : []),
     ['JCR quartile', journal.q ? String(journal.q).toUpperCase() : '—'],
     ['CAS zone', journal.z == null ? '—' : `${journal.z}${journal.zt ? ' · Top' : ''}`],
     ['Publisher', journal.p || '—'],
@@ -201,6 +204,11 @@ function journalRouteSeed(journal, slug) {
     oa: journal.oa || '',
     homepage: journal.hp || '',
     apc: journal.apc == null ? null : journal.apc,
+    if_2025: journal.fy === 2025 ? journal.f : null,
+    if_latest: journal.f,
+    if_latest_year: journal.fy || null,
+    jif_without_self_cites_2025: journal.j0 == null ? null : journal.j0,
+    self_citation_rate_2025: journal.js == null ? null : journal.js,
     tier: journal.tier || '',
     publication_history: Array.isArray(journal.ann)
       ? journal.ann
