@@ -1,11 +1,5 @@
-@view-transition {
-  navigation: auto;
-}
-
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation-duration: .12s;
-}
+/* Listing pages are part of the same shell; avoid a document cross-fade when
+   navigating from the persistent rail. */
 
 :root {
   --paper: #fffdf9;
@@ -1028,6 +1022,52 @@ body {
 .rail-tier-chip.tier-trial { background: linear-gradient(180deg, #e0f2fe 0%, #bae6fd 100%); color: #0369a1; border-color: #7dd3fc; }
 .rail-tier-chip.tier-pro { background: linear-gradient(180deg, #ff9a3c 0%, #f97316 100%); color: #fff; border-color: #e85d04; }
 .rail-tier-chip.tier-max { background: linear-gradient(135deg, #1f2c4c 0%, #0f172a 100%); color: #f6e7b2; border-color: #c9a227; }
+
+/* Same rail geometry/state as the homepage and app pages. */
+.app-rail .rail-nav-btn,
+.app-rail .account-credit-badge {
+  transform: none;
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+.app-rail .rail-nav-btn:hover,
+.app-rail .rail-nav-btn.active,
+.app-rail .rail-nav-btn[aria-current="page"],
+.app-rail .account-credit-badge:hover,
+.app-rail .account-credit-badge.active,
+.app-rail .account-credit-badge[aria-current="page"] {
+  transform: none;
+  color: var(--accent);
+  background: rgba(249, 115, 22, .065) !important;
+  border-color: rgba(249, 115, 22, .20) !important;
+  box-shadow: none !important;
+}
+@media (max-width: 900px) {
+  .app-rail .rail-nav-btn,
+  .app-rail .account-credit-badge {
+    transform: none !important;
+    border-radius: 12px !important;
+  }
+  .app-rail .rail-nav-btn:hover,
+  .app-rail .rail-nav-btn.active,
+  .app-rail .rail-nav-btn[aria-current="page"],
+  .app-rail .account-credit-badge:hover,
+  .app-rail .account-credit-badge.active,
+  .app-rail .account-credit-badge[aria-current="page"] {
+    background: rgba(249, 115, 22, .065) !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+  }
+
+  /* Match the homepage rail width on every listing/ranking route. */
+  .app-rail .rail-nav-btn,
+  .app-rail .account-credit-badge,
+  .app-rail .rail-region-picker {
+    flex: 0 0 58px !important;
+    width: 58px !important;
+    min-width: 58px !important;
+    max-width: 58px !important;
+  }
+}
 
 @media (max-width: 900px) {
   body {

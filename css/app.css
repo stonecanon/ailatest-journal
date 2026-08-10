@@ -1,12 +1,7 @@
 /* AILatest Journal · clean academic search surface */
-@view-transition {
-  navigation: auto;
-}
-
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation-duration: .12s;
-}
+/* Sidebar links are a persistent app shell.  Do not cross-fade the whole
+   document when a rail link opens another shell page: the transition makes
+   the rail appear to resize/rebuild before the destination is ready. */
 
 :root {
   --paper:          #fffdf9;
@@ -13942,4 +13937,63 @@ html[lang] body :is(.citic-warning-pill)[class] {
   background: #f1efeb !important;
   color: #6e665d !important;
   border-color: #ded8cf !important;
+}
+
+/* ─────────── Persistent rail states ───────────
+   All four bottom entries use the same geometry and state treatment.  Older
+   page-specific rules gave 收藏, 足迹 and 设置 different filled cards and
+   shadows, which made a click look like a new sidebar/page shell. */
+.app-rail .rail-nav-btn,
+.app-rail .account-credit-badge {
+  transform: none;
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+.app-rail .rail-nav-btn:hover,
+.app-rail .rail-nav-btn.active,
+.app-rail .rail-nav-btn[aria-current="page"],
+.app-rail .account-credit-badge:hover,
+.app-rail .account-credit-badge.active,
+.app-rail .account-credit-badge[aria-current="page"] {
+  transform: none;
+  color: var(--accent);
+  background: rgba(249, 115, 22, .065) !important;
+  border-color: rgba(249, 115, 22, .20) !important;
+  box-shadow: none !important;
+}
+.app-rail .rail-nav-btn:focus-visible,
+.app-rail .account-credit-badge:focus-visible {
+  transform: none;
+  box-shadow: 0 0 0 2px rgba(249, 115, 22, .28) !important;
+}
+
+@media (max-width: 900px) {
+  /* The bottom rail stays a flat, fixed bar; active state must not become a
+     floating card or change the height of the navigation row. */
+  .app-rail .rail-nav-btn,
+  .app-rail .account-credit-badge {
+    transform: none !important;
+    border-radius: 12px !important;
+  }
+  .app-rail .rail-nav-btn:hover,
+  .app-rail .rail-nav-btn.active,
+  .app-rail .rail-nav-btn[aria-current="page"],
+  .app-rail .account-credit-badge:hover,
+  .app-rail .account-credit-badge.active,
+  .app-rail .account-credit-badge[aria-current="page"] {
+    background: rgba(249, 115, 22, .065) !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+  }
+
+  /* Keep the mobile rail geometry independent of how many station/region
+     entries a route exposes.  The previous flex:1 rule stretched each
+     button differently on home, favorites and footprint pages. */
+  .app-rail .rail-nav-btn,
+  .app-rail .account-credit-badge,
+  .app-rail .rail-region-picker {
+    flex: 0 0 58px !important;
+    width: 58px !important;
+    min-width: 58px !important;
+    max-width: 58px !important;
+  }
 }

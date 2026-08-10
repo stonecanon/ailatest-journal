@@ -1,13 +1,7 @@
 /* 静态信息页共享样式（about/contact/terms/privacy/refund/pricing/signup）
    设计令牌与主站一致：纸色背景 + 深墨文字 */
-@view-transition {
-  navigation: auto;
-}
-
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation-duration: .12s;
-}
+/* Static/listing shell links keep the same rail without a document
+   cross-fade.  A view transition made the sidebar visibly jump on click. */
 
 :root {
   --bg: #faf7f2;
@@ -1299,6 +1293,52 @@ body[data-static-page] .rail-tier-chip.tier-free { background: #ebe6dc; color: #
 body[data-static-page] .rail-tier-chip.tier-trial { background: linear-gradient(180deg, #e0f2fe 0%, #bae6fd 100%); color: #0369a1; border-color: #7dd3fc; }
 body[data-static-page] .rail-tier-chip.tier-pro { background: linear-gradient(180deg, #ff9a3c 0%, #f97316 100%); color: #fff; border-color: #e85d04; }
 body[data-static-page] .rail-tier-chip.tier-max { background: linear-gradient(135deg, #1f2c4c 0%, #0f172a 100%); color: #f6e7b2; border-color: #c9a227; }
+
+/* Keep the rail state identical to the main journal shell. */
+body[data-static-page] .app-rail .rail-nav-btn,
+body[data-static-page] .app-rail .account-credit-badge {
+  transform: none;
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+body[data-static-page] .app-rail .rail-nav-btn:hover,
+body[data-static-page] .app-rail .rail-nav-btn.active,
+body[data-static-page] .app-rail .rail-nav-btn[aria-current="page"],
+body[data-static-page] .app-rail .account-credit-badge:hover,
+body[data-static-page] .app-rail .account-credit-badge.active,
+body[data-static-page] .app-rail .account-credit-badge[aria-current="page"] {
+  transform: none;
+  color: var(--accent);
+  background: rgba(249, 115, 22, .065) !important;
+  border-color: rgba(249, 115, 22, .20) !important;
+  box-shadow: none !important;
+}
+@media (max-width: 900px) {
+  body[data-static-page] .app-rail .rail-nav-btn,
+  body[data-static-page] .app-rail .account-credit-badge {
+    transform: none !important;
+    border-radius: 12px !important;
+  }
+  body[data-static-page] .app-rail .rail-nav-btn:hover,
+  body[data-static-page] .app-rail .rail-nav-btn.active,
+  body[data-static-page] .app-rail .rail-nav-btn[aria-current="page"],
+  body[data-static-page] .app-rail .account-credit-badge:hover,
+  body[data-static-page] .app-rail .account-credit-badge.active,
+  body[data-static-page] .app-rail .account-credit-badge[aria-current="page"] {
+    background: rgba(249, 115, 22, .065) !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+  }
+
+  /* Match the homepage rail width on every static/info route. */
+  body[data-static-page] .app-rail .rail-nav-btn,
+  body[data-static-page] .app-rail .account-credit-badge,
+  body[data-static-page] .app-rail .rail-region-picker {
+    flex: 0 0 58px !important;
+    width: 58px !important;
+    min-width: 58px !important;
+    max-width: 58px !important;
+  }
+}
 
 @media (max-width: 900px) {
   body[data-static-page] {

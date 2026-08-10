@@ -594,14 +594,18 @@
   }
 
   function readPinned() {
+    // Match the SPA rail: Chinese UI keeps the China station as the legacy
+    // default, while English UI starts with only Global.  A stored list is
+    // always treated as the user's explicit choice on either shell.
+    const defaults = railLanguage() === 'en' ? [] : DEFAULT_PINNED;
     try {
       const raw = localStorage.getItem(KEY);
       if (!raw) {
-        memoryPinned = DEFAULT_PINNED.slice();
+        memoryPinned = defaults.slice();
         return memoryPinned;
       }
       const saved = JSON.parse(raw);
-      memoryPinned = Array.isArray(saved) ? saved.filter((id) => REGIONS.some((r) => r.id === id)) : DEFAULT_PINNED.slice();
+      memoryPinned = Array.isArray(saved) ? saved.filter((id) => REGIONS.some((r) => r.id === id)) : defaults.slice();
       if (!localStorage.getItem(MIGRATION_KEY) && !memoryPinned.includes('dom')) {
         memoryPinned = ['dom', ...memoryPinned];
         localStorage.setItem(KEY, JSON.stringify(memoryPinned));
@@ -610,14 +614,14 @@
       const collapseKey = `${KEY}.v3-collapse-all`;
       if (!localStorage.getItem(collapseKey)) {
         if (memoryPinned.length >= REGIONS.length) {
-          memoryPinned = DEFAULT_PINNED.slice();
+          memoryPinned = defaults.slice();
           localStorage.setItem(KEY, JSON.stringify(memoryPinned));
         }
         localStorage.setItem(collapseKey, '1');
       }
       return memoryPinned;
     } catch (_) {
-      return memoryPinned.length ? memoryPinned : DEFAULT_PINNED.slice();
+      return memoryPinned.length ? memoryPinned : defaults.slice();
     }
   }
 
@@ -758,6 +762,10 @@
       ensureRailStateMarkup(rail);
       updateRailState(rail);
       ensureHomeShellNav();
+      // Geo/local language can resolve after the first paint. Re-apply the
+      // station visibility as well, otherwise a static shell keeps the
+      // Chinese default station after switching to the English shell.
+      apply();
     };
     window.addEventListener('storage', refreshRailState);
     window.addEventListener('ailatest:langchange', refreshRailState);
