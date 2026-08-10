@@ -3138,6 +3138,10 @@ async function ensurePublicationSubmissionTables(env) {
       source_url TEXT NOT NULL DEFAULT '',
       evidence_text TEXT NOT NULL DEFAULT '',
       metadata_json TEXT NOT NULL DEFAULT '{}',
+      watch_enabled INTEGER NOT NULL DEFAULT 0,
+      notify_enabled INTEGER NOT NULL DEFAULT 1,
+      last_checked_at INTEGER,
+      last_error TEXT NOT NULL DEFAULT '',
       created_at INTEGER NOT NULL,
       updated_at INTEGER NOT NULL,
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
@@ -3208,6 +3212,10 @@ function submissionRow(row) {
     source_url: row.source_url || '',
     evidence_text: row.evidence_text || '',
     metadata,
+    watch_enabled: Number(row.watch_enabled || 0) === 1,
+    notify_enabled: Number(row.notify_enabled == null ? 1 : row.notify_enabled) === 1,
+    last_checked_at: row.last_checked_at || null,
+    last_error: row.last_error || '',
     created_at: row.created_at || null,
     updated_at: row.updated_at || null,
   };
@@ -3217,6 +3225,37 @@ function submissionFingerprint(record) {
   return [record.system, record.manuscript_id, record.journal, record.title]
     .map((value) => foldPublicationText(value).replace(/\s+/g, ' '))
     .join('|');
+}
+
+function submissionStatusLabel(value) {
+  return ({
+    draft: '准备投稿', submitted: '已提交', editorial_check: '编辑初审',
+    under_review: '外审中', revision: '返修', accepted: '已接收',
+    rejected: '已拒稿', withdrawn: '撤稿/终止',
+  })[String(value || '')] || '状态未识别';
+}
+
+function emailSafeText(value, max = 240) {
+  return String(value || '').replace(/[<>]/g, '').replace(/\s+/g, ' ').trim().slice(0, max);
+}
+
+async function sendSubmissionChangeEmail(env, user, record, previous) {
+  const email = cleanText(user?.email || '', 240).toLowerCase();
+  if (!email || !isEmail(email) || !env.RESEND_API_KEY) return;
+  const journal = emailSafeText(record.journal || record.title || '投稿记录', 180);
+  const before = emailSafeText(submissionStatusLabel(previous?.status_normalized), 40);
+  const after = emailSafeText(submissionStatusLabel(record.status_normalized), 40);
+  const manuscript = emailSafeText(record.manuscript_id || '', 120);
+  const source = emailSafeText({ elsevier: 'Elsevier / Author Hub', editorial_manager: 'Editorial Manager', scholarone: 'ScholarOne' }[record.system] || record.system, 80);
+  const subject = `AILatest 投稿状态更新：${journal} · ${after}`;
+  const html = `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:560px;margin:24px auto;padding:24px;color:#3a3028;background:#fffdf9;border:1px solid #eadfd2;border-radius:14px"><h2 style="margin:0 0 14px;font-size:19px">投稿状态发生变化</h2><p style="line-height:1.7;margin:0 0 14px">${emailSafeText(journal, 180)} 的投稿状态已更新。</p><div style="padding:12px 14px;background:#fff7e9;border-radius:10px;line-height:1.8"><b>${emailSafeText(before, 40)}</b> → <b>${emailSafeText(after, 40)}</b><br>${manuscript ? `稿件编号：${manuscript}<br>` : ''}来源：${source}</div><p style="margin:16px 0 0;color:#776b60;font-size:12px">登录 AILatest Journal 的发表足迹页面查看详情。</p></div>`;
+  try {
+    await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ from: env.MAIL_FROM || 'noreply@ailatest.org', to: [email], subject, html }),
+    });
+  } catch (_) { /* notification failure must not block the status archive */ }
 }
 
 async function routeSubmissionList(req, env) {
@@ -3229,7 +3268,7 @@ async function routeSubmissionList(req, env) {
   return json({ ok: true, records: (rows.results || []).map(submissionRow).filter(Boolean) }, 200, { 'Cache-Control': 'no-store' });
 }
 
-async function routeSubmissionImport(req, env) {
+async function routeSubmissionImport(req, env, ctx) {
   const user = await getUser(req, env);
   if (!user) return err('请先登录后同步投稿档案', 401);
   const body = await req.json().catch(() => null);
@@ -3260,18 +3299,37 @@ async function routeSubmissionImport(req, env) {
       : await env.DB.prepare(
         `SELECT * FROM publication_submissions WHERE user_id = ? AND system = ? AND manuscript_id = ? AND journal = ? AND title = ? LIMIT 1`
       ).bind(user.id, system, manuscriptId, journal, title).first();
+    const watchValue = item.watch_enabled != null ? item.watch_enabled : item.watch;
+    const watchEnabled = watchValue == null
+      ? Boolean(existing?.watch_enabled)
+      : (watchValue === true || watchValue === 1 || watchValue === '1' || watchValue === 'true');
+    const notifyValue = item.notify_enabled;
+    const notifyEnabled = notifyValue == null
+      ? (existing ? Number(existing.notify_enabled == null ? 1 : existing.notify_enabled) === 1 : true)
+      : (notifyValue !== false && notifyValue !== 0 && notifyValue !== '0');
     const id = existing?.id || suppliedId || `sub_${(await sha256Hex(`${user.id}|${fingerprint}`)).slice(0, 32)}`;
     const submittedAt = submissionTimestamp(item.submitted_at || item.submittedAt);
     const statusAt = submissionTimestamp(item.status_at || item.statusAt) || now;
-    const row = [id, user.id, source, system, journal, title, manuscriptId, statusRaw, status, submittedAt, statusAt, sourceUrl, evidence, metadataJson(metadata), Number(existing?.created_at || now), now];
+    const lastCheckedAt = submissionTimestamp(item.last_checked_at || item.lastCheckedAt) || (source === 'extension_watch' ? now : (existing?.last_checked_at || null));
+    const lastError = cleanText(item.last_error || item.lastError || '', 400);
+    const row = [id, user.id, source, system, journal, title, manuscriptId, statusRaw, status, submittedAt, statusAt, sourceUrl, evidence, metadataJson(metadata), watchEnabled ? 1 : 0, notifyEnabled ? 1 : 0, lastCheckedAt, lastError, Number(existing?.created_at || now), now];
+    const statusChanged = !!existing && String(existing.status_normalized || 'unknown') !== String(status || 'unknown');
     if (existing) {
-      await env.DB.prepare(`UPDATE publication_submissions SET source=?, system=?, journal=?, title=?, manuscript_id=?, status_raw=?, status_normalized=?, submitted_at=?, status_at=?, source_url=?, evidence_text=?, metadata_json=?, updated_at=? WHERE user_id=? AND id=?`)
-        .bind(source, system, journal, title, manuscriptId, statusRaw, status, submittedAt, statusAt, sourceUrl, evidence, metadataJson(metadata), now, user.id, id).run();
+      await env.DB.prepare(`UPDATE publication_submissions SET source=?, system=?, journal=?, title=?, manuscript_id=?, status_raw=?, status_normalized=?, submitted_at=?, status_at=?, source_url=?, evidence_text=?, metadata_json=?, watch_enabled=?, notify_enabled=?, last_checked_at=?, last_error=?, updated_at=? WHERE user_id=? AND id=?`)
+        .bind(source, system, journal, title, manuscriptId, statusRaw, status, submittedAt, statusAt, sourceUrl, evidence, metadataJson(metadata), watchEnabled ? 1 : 0, notifyEnabled ? 1 : 0, lastCheckedAt, lastError, now, user.id, id).run();
     } else {
-      await env.DB.prepare(`INSERT INTO publication_submissions (id,user_id,source,system,journal,title,manuscript_id,status_raw,status_normalized,submitted_at,status_at,source_url,evidence_text,metadata_json,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`).bind(...row).run();
+      await env.DB.prepare(`INSERT INTO publication_submissions (id,user_id,source,system,journal,title,manuscript_id,status_raw,status_normalized,submitted_at,status_at,source_url,evidence_text,metadata_json,watch_enabled,notify_enabled,last_checked_at,last_error,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`).bind(...row).run();
     }
     const current = await env.DB.prepare('SELECT * FROM publication_submissions WHERE user_id = ? AND id = ?').bind(user.id, id).first();
-    if (current) saved.push(submissionRow(current));
+    if (current) {
+      const normalized = submissionRow(current);
+      saved.push(normalized);
+      if (statusChanged && normalized.notify_enabled) {
+        const notification = sendSubmissionChangeEmail(env, user, normalized, existing);
+        if (ctx?.waitUntil) ctx.waitUntil(notification);
+        else await notification;
+      }
+    }
   }
   return json({ ok: true, count: saved.length, records: saved, skipped }, 200, { 'Cache-Control': 'no-store' });
 }
@@ -4432,7 +4490,7 @@ export default {
       if (p === '/search' && (req.method === 'GET' || req.method === 'POST')) return json(await buildPublicSearchResponse(req, env));
       if (p === '/submissions/connectors' && req.method === 'GET') return routeSubmissionConnectors(req, env);
       if (p === '/submissions' && req.method === 'GET') return routeSubmissionList(req, env);
-      if (p === '/submissions/import' && req.method === 'POST') return routeSubmissionImport(req, env);
+      if (p === '/submissions/import' && req.method === 'POST') return routeSubmissionImport(req, env, ctx);
       const mSubmission = p.match(/^\/submissions\/([^/]+)$/);
       if (mSubmission && req.method === 'DELETE') return routeSubmissionDelete(req, env, decodeURIComponent(mSubmission[1]));
       if (p === '/publication/authors' && req.method === 'GET') return routePublicationAuthorSearch(req, env);

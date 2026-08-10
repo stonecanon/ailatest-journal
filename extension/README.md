@@ -1,4 +1,4 @@
-# AILatest Journal Badges Extension (v0.2.19)
+# AILatest Journal Badges Extension (v0.2.20)
 
 MV3 browser extension for showing AILatest journal badges on academic pages.
 
@@ -35,6 +35,14 @@ extension adds **读取投稿状态**. It extracts only the visible manuscript t
 journal, manuscript number and status. Review the candidates and click
 **同步选中记录** to save them to the signed-in account's `/submissions/import`
 archive, which is also shown on the AILatest Journal publication-footprint page.
+
+After the first confirmation, selected records enter an automatic watch list.
+While the browser is running, the extension service worker checks saved status
+pages about every 15 minutes and sends a browser notification and account email
+when the normalized status changes. If a publisher requires client-side
+rendering or blocks background reads, opening the same signed-in page lets the
+content script refresh the visible status; the confirmation-email import remains
+the fallback.
 
 The extension never reads or uploads publisher passwords, cookies or session
 tokens. If a publisher page is not supported or an account cannot be read,

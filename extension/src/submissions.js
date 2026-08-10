@@ -183,11 +183,20 @@
     if (!token) { setMessage('请先在 AILatest Journal 登录，再同步到科研档案。', true); window.open('https://journal.ailatest.org/signup?redirect=%2Fpublication-footprint%2F', '_blank', 'noopener'); return; }
     syncButton.disabled = true; syncButton.textContent = '同步中…';
     try {
-      const response = await fetch(API, { method: 'POST', headers: { Accept: 'application/json', 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, ...(state.ajInstallId ? { 'X-AJ-Install': state.ajInstallId } : {}) }, body: JSON.stringify({ source: 'extension', system: systemName(), source_url: location.href, records: chosen }) });
+      const watchRecords = chosen.map((record) => ({ ...record, source: 'extension', watch_enabled: true, notify_enabled: true }));
+      const response = await fetch(API, { method: 'POST', headers: { Accept: 'application/json', 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, ...(state.ajInstallId ? { 'X-AJ-Install': state.ajInstallId } : {}) }, body: JSON.stringify({ source: 'extension', system: systemName(), source_url: location.href, records: watchRecords }) });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.error || `同步失败（${response.status}）`);
-      await storageSet({ ajSubmissionSync: { records: data.records || chosen, syncedAt: Date.now() }, ajSubmissionSyncAt: Date.now() });
-      setMessage(`已同步 ${Number(data.count || chosen.length)} 条投稿记录。打开“发表足迹”即可查看。`, false);
+      const previous = await storageGet(['ajSubmissionWatches']);
+      const oldWatches = Array.isArray(previous.ajSubmissionWatches) ? previous.ajSubmissionWatches : [];
+      const mergedWatches = [...oldWatches];
+      watchRecords.forEach((record) => {
+        const index = mergedWatches.findIndex((item) => item.source_url === record.source_url && (item.manuscript_id || item.title) === (record.manuscript_id || record.title));
+        if (index >= 0) mergedWatches[index] = { ...mergedWatches[index], ...record, watch_enabled: true, last_status_normalized: record.status_normalized || '' };
+        else mergedWatches.unshift({ ...record, last_status_normalized: record.status_normalized || '' });
+      });
+      await storageSet({ ajSubmissionWatches: mergedWatches.slice(0, 30), ajSubmissionSync: { records: data.records || watchRecords, syncedAt: Date.now() }, ajSubmissionSyncAt: Date.now() });
+      setMessage(`已同步 ${Number(data.count || chosen.length)} 条，并开启自动跟踪。状态变化会通过浏览器通知和账号邮箱推送。`, false);
     } catch (error) { setMessage(error && error.message ? error.message : '同步失败，请稍后重试。', true); }
     syncButton.disabled = false; syncButton.textContent = '同步选中记录';
   }

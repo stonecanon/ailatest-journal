@@ -316,12 +316,12 @@
         <div class="publication-left-column">
           <section class="panel submission-panel archive-status-panel" aria-labelledby="submission-title">
             <div class="panel-head">
-              <div><h2 id="submission-title">投稿状态</h2><p>与发表足迹统一保存在同一份科研档案中</p></div>
-              <div class="submission-import-tools"><button class="pending-item button" type="button" data-import="email" style="border:0;border-radius:8px;padding:5px 8px;color:var(--footprint-blue);background:var(--footprint-blue-soft);font:inherit;font-size:11px;font-weight:760;cursor:pointer">导入邮件</button><button class="pending-item button" type="button" data-import="status" style="border:0;border-radius:8px;padding:5px 8px;color:var(--footprint-orange);background:var(--footprint-orange-soft);font:inherit;font-size:11px;font-weight:760;cursor:pointer">添加投稿</button></div>
+              <div><h2 id="submission-title">投稿状态</h2><p>首次确认后自动跟踪；状态变化会推送通知</p></div>
+              <div class="submission-import-tools"><button class="pending-item button" type="button" data-import="email" style="border:0;border-radius:8px;padding:5px 8px;color:var(--footprint-blue);background:var(--footprint-blue-soft);font:inherit;font-size:11px;font-weight:760;cursor:pointer">导入邮件</button><button class="pending-item button" type="button" data-import="status" style="border:0;border-radius:8px;padding:5px 8px;color:var(--footprint-orange);background:var(--footprint-orange-soft);font:inherit;font-size:11px;font-weight:760;cursor:pointer">备用记录</button></div>
             </div>
             <div class="submission-list" id="submission-list"></div>
             <div class="submission-empty" id="submission-empty"><strong>暂无投稿状态</strong><p>添加投稿记录后，状态会显示在这里。</p></div>
-            <div class="submission-note"><strong>隐私原则：</strong>生产版只保存稿件编号、状态和投稿链接；不保存出版社密码。能自动读取时通过授权会话，否则支持手动粘贴确认邮件或状态页。</div>
+            <div class="submission-note"><strong>自动跟踪：</strong>在 Elsevier、Editorial Manager 或 ScholarOne 页面首次勾选并同步后，插件会在浏览器后台定期检查；状态变化通过浏览器通知和账号邮箱推送。出版社页面阻止后台读取时，打开已登录页面即可刷新。手动记录和确认邮件仅作备用。</div>
           </section>
 
           <section class="panel">
@@ -786,7 +786,8 @@
         const system = submissionSystemLabels[item.system] || submissionSystem(link);
         const manuscript = String(item.manuscript || '').trim();
         const title = String(item.title || '').trim();
-        const meta = [title ? `题目：${title}` : '', manuscript ? `稿件编号：${manuscript}` : '', system, formatSubmissionDate(item.updatedAt)].filter(Boolean).join(' · ');
+        const tracking = item.watch_enabled ? '自动跟踪中' : '备用记录';
+        const meta = [title ? `题目：${title}` : '', manuscript ? `稿件编号：${manuscript}` : '', system, tracking, formatSubmissionDate(item.updatedAt)].filter(Boolean).join(' · ');
         const linkLabel = link ? `<a class="submission-action" href="${escapeHtml(link)}" target="_blank" rel="noreferrer">打开链接</a>` : '';
         return `<article class="submission-row"><div class="submission-main"><strong>${escapeHtml(item.journal || '未填写期刊')}</strong><small>${escapeHtml(meta)}</small></div><div class="submission-side"><span class="submission-status ${submissionStatusClass(status)}">${escapeHtml(status)}</span><div class="submission-actions"><button class="submission-action" type="button" data-edit-submission="${escapeHtml(item.id)}">编辑</button>${linkLabel}<button class="submission-action danger" type="button" data-remove-submission="${escapeHtml(item.id)}">删除</button></div></div></article>`;
       }).join('');
@@ -1296,7 +1297,7 @@
       importKind = kind;
       if (kind !== 'status') editingSubmissionId = null;
       if (kind === 'status' && !editingSubmissionId) resetSubmissionForm();
-      modalTitle.textContent = kind === 'name' ? '搜索我的作者身份' : kind === 'email' ? '导入投稿确认邮件' : '导入我的论文';
+      modalTitle.textContent = kind === 'name' ? '搜索我的作者身份' : kind === 'email' ? '导入投稿确认邮件' : kind === 'status' ? '备用投稿记录' : '导入我的论文';
       authorForm.hidden = kind !== 'name';
       document.getElementById('author-search-hint').hidden = kind !== 'name';
       legacyImport.hidden = kind === 'name';
@@ -1317,7 +1318,7 @@
           orcid: '输入 ORCID 或 OpenAlex 作者 ID；系统会读取公开论文并直接加入足迹。',
           doi: '粘贴 DOI、BibTeX 或 CSV 内容；系统会解析公开元数据并直接加入足迹。',
           scholar: '粘贴 Google Scholar 个人主页链接；若服务器被 Google 拦截，请在 Scholar 主页使用插件导入。',
-          status: '填写期刊和当前投稿状态；登录后会同步到账号科研档案，不会读取出版社账号密码。',
+          status: '此处仅用于没有投稿系统访问权限时的备用记录；自动跟踪请在投稿系统页面使用插件首次确认。',
           email: '粘贴投稿确认邮件或上传 .eml；系统只提取可核对的期刊、题目、稿件编号和状态。',
         };
         desc.textContent = copy[kind] || copy.doi;

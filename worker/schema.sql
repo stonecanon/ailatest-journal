@@ -37,6 +37,10 @@ CREATE TABLE IF NOT EXISTS publication_submissions (
   source_url TEXT NOT NULL DEFAULT '',
   evidence_text TEXT NOT NULL DEFAULT '',
   metadata_json TEXT NOT NULL DEFAULT '{}',
+  watch_enabled INTEGER NOT NULL DEFAULT 0,
+  notify_enabled INTEGER NOT NULL DEFAULT 1,
+  last_checked_at INTEGER,
+  last_error TEXT NOT NULL DEFAULT '',
   created_at INTEGER NOT NULL,
   updated_at INTEGER NOT NULL,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
