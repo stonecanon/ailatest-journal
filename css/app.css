@@ -62,6 +62,103 @@
   --badge-border: 1px solid rgba(28, 25, 23, 0.07);
 }
 
+/* JCAR public academic-integrity signal — kept in the same quiet detail-card
+   language as the rest of the journal page.  This is a lead/review signal,
+   not a misconduct verdict. */
+.jcar-section {
+  border-color: rgba(190, 147, 89, .26) !important;
+  background: linear-gradient(180deg, rgba(255, 251, 244, .92), rgba(255, 255, 255, .96)) !important;
+}
+.jcar-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.jcar-head h4 { margin-bottom: 3px !important; }
+.jcar-subtitle {
+  color: #91663a;
+  font-size: 13px;
+  line-height: 1.45;
+}
+.jcar-risk-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 3px 11px;
+  border: 1px solid rgba(190, 147, 89, .34);
+  border-radius: 999px;
+  color: #91663a;
+  background: rgba(246, 228, 200, .58);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.jcar-risk-高,
+.jcar-risk-high { color: #9b3d28; border-color: rgba(180, 75, 50, .28); background: rgba(255, 232, 224, .68); }
+.jcar-risk-中,
+.jcar-risk-medium { color: #8a5a1e; border-color: rgba(184, 130, 42, .28); background: rgba(255, 239, 206, .72); }
+.jcar-risk-低,
+.jcar-risk-low { color: #397052; border-color: rgba(67, 145, 103, .25); background: rgba(226, 245, 234, .72); }
+.jcar-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+.jcar-metric {
+  min-width: 0;
+  padding: 12px 13px 10px;
+  border: 1px solid rgba(215, 194, 164, .45);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .75);
+}
+.jcar-metric-value {
+  color: #a55c1f;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -.01em;
+}
+.jcar-metric-label {
+  margin-top: 4px;
+  color: #5f5144;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+.jcar-metric-sub {
+  margin-top: 3px;
+  color: #8c7e70;
+  font-size: 11px;
+  line-height: 1.35;
+}
+.jcar-foot {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 12px;
+  color: #8c7e70;
+  font-size: 11px;
+  line-height: 1.55;
+}
+.jcar-foot a {
+  flex: 0 0 auto;
+  color: #a55c1f;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.jcar-foot a:hover { text-decoration: underline; }
+.jcar-loading { min-height: 86px; }
+
+@media (max-width: 700px) {
+  .jcar-metrics { grid-template-columns: 1fr; }
+  .jcar-foot { flex-direction: column; gap: 6px; }
+}
+
 /* ───────────────── Reset & Base ───────────────── */
 * { box-sizing: border-box; }
 html, body {

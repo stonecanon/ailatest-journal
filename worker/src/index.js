@@ -38,6 +38,7 @@ import { aggregateRecentStats, recalibrateYesterday } from './analytics-rollups.
 import { handleChat } from './chat.js';
 import { handlePick } from './pick.js';
 import { handleExtLookup } from './ext-lookup.js';
+import { routeJcar } from './jcar.js';
 import { fetchScholarProfile } from '../../js/scholar-profile.js';
 import { renderSitesDashboard } from './sites-dashboard.js';
 import { renderAdmin, routeAdminApi } from './admin.js';
@@ -4520,6 +4521,7 @@ export default {
         return routeHotJournals(req, env);
       }
       if (p === '/openalex/country-output' && req.method === 'GET') return routeOpenAlexCountryOutput(req, env, ctx);
+      if (p === '/jcar' && req.method === 'GET') return routeJcar(req, env, ctx);
       if (p === '/extension/download-stats' && req.method === 'GET') return routeExtensionDownloadStats(req, env);
       if (p === '/extension/download'       && req.method === 'GET') return routeExtensionDownload(req, env);
       if (p === '/me'                  && req.method === 'GET')  return routeMe(req, env);

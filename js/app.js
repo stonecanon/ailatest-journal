@@ -1981,6 +1981,106 @@
     return promise;
   }
 
+  // JCAR 期刊级学术诚信风险：详情接口需登录，本站通过 Worker 读取其
+  // 公开榜单并按 ISSN 缓存。仅展示公开线索，不把风险等级解释成学术不端结论。
+  const jcarCache = new Map();
+  function jcarLookupKey(r) {
+    const issn = String(r?.issn || '').trim().toUpperCase();
+    const eissn = String(r?.eissn || '').trim().toUpperCase();
+    const name = String(r?.name || r?.fullName || r?.cn_name || '').trim().toUpperCase();
+    return `${issn}|${eissn}|${name}`;
+  }
+  async function fetchJcarData(r) {
+    const key = jcarLookupKey(r);
+    if (!key || jcarCache.has(key)) return jcarCache.get(key) || null;
+    const params = new URLSearchParams();
+    if (r?.issn) params.set('issn', String(r.issn));
+    if (r?.eissn) params.set('eissn', String(r.eissn));
+    if (r?.name || r?.fullName) params.set('name', String(r.name || r.fullName));
+    const promise = (async () => {
+      try {
+        const resp = await fetch(`${API_BASE}/jcar?${params.toString()}`, { cache: 'default' });
+        if (!resp.ok) return null;
+        const data = await resp.json().catch(() => null);
+        return data?.ok && data.record ? data.record : null;
+      } catch (_) {
+        return null;
+      }
+    })();
+    jcarCache.set(key, promise);
+    const result = await promise;
+    jcarCache.set(key, result);
+    return result;
+  }
+  function renderJcarSection(jcar) {
+    if (!jcar || typeof jcar !== 'object') return '';
+    const num = (value) => Number.isFinite(Number(value)) ? Number(value) : null;
+    const car = num(jcar.car_index);
+    const growth = num(jcar.car_growth_rate);
+    const problems = num(jcar.problem_articles);
+    const articles = num(jcar.article_count);
+    const previousCar = num(jcar.car_index_last_year);
+    const risk = String(jcar.risk_level || '').trim();
+    const riskMap = {
+      '低': T('低等级 / 复核线索', 'Low / review leads'),
+      '中': T('中等级 / 复核线索', 'Medium / review leads'),
+      '高': T('高等级 / 重点复核', 'High / priority review'),
+      'Low': T('低等级 / 复核线索', 'Low / review leads'),
+      'Medium': T('中等级 / 复核线索', 'Medium / review leads'),
+      'High': T('高等级 / 重点复核', 'High / priority review'),
+    };
+    const riskText = riskMap[risk] || risk || T('暂无等级', 'No level');
+    const fetchedDay = String(jcar.fetched_at || '').slice(0, 10);
+    const metric = (value, label, sub = '') => value == null ? '' : `<div class="jcar-metric">
+      <div class="jcar-metric-value">${escape(String(value))}</div>
+      <div class="jcar-metric-label">${escape(label)}</div>
+      ${sub ? `<div class="jcar-metric-sub">${escape(sub)}</div>` : ''}
+    </div>`;
+    const issueSub = articles != null
+      ? `${T('当年发文', 'Current-year articles')} ${articles.toLocaleString()}`
+      : '';
+    const source = jcar.source_url || 'https://www.jcarindex.com/';
+    const hasValue = car != null || growth != null || problems != null || articles != null || risk;
+    if (!hasValue) return '';
+    return `<section class="drawer-section jcar-section" data-jcar-section>
+      <div class="jcar-head">
+        <div>
+          <h4>${T('JCAR 学术诚信风险', 'JCAR Academic Integrity Risk')}</h4>
+          <div class="jcar-subtitle">${riskText}</div>
+        </div>
+        ${risk ? `<span class="jcar-risk-pill jcar-risk-${escape(risk.toLowerCase())}">${escape(risk)}</span>` : ''}
+      </div>
+      <div class="jcar-metrics">
+        ${metric(car != null ? `${car}%` : null, T('CAR 指数', 'CAR Index'), previousCar != null ? `${T('上年', 'Previous year')} ${previousCar}%` : '')}
+        ${metric(problems != null ? problems.toLocaleString() : null, T('问题论文线索', 'Flagged-paper leads'), issueSub)}
+        ${metric(growth != null ? growth : null, T('JCAR 增长率', 'JCAR growth rate'))}
+      </div>
+      <div class="jcar-foot">
+        <span>${T('JCAR 公开榜单数据；线索需人工复核，不等同于学术不端结论。', 'JCAR public-list data; leads require human review and are not findings of misconduct.')}${fetchedDay ? ` · ${T('读取于', 'Read')} ${escape(fetchedDay)}` : ''}</span>
+        <a href="${escape(source)}" target="_blank" rel="noopener nofollow">${T('查看 JCAR 来源', 'View JCAR source')} ↗</a>
+      </div>
+    </section>`;
+  }
+  function jcarSlotHTML(r) {
+    if (!r || (!r.issn && !r.eissn && !r.name)) return '';
+    return `<section class="drawer-section jcar-section jcar-loading" data-jcar-slot>
+      <h4>${T('JCAR 学术诚信风险', 'JCAR Academic Integrity Risk')}</h4>
+      <div class="muted-cell">${T('正在读取公开风险指标…', 'Loading public risk indicators…')}</div>
+    </section>`;
+  }
+  async function hydrateJcarSection(body, r) {
+    const slot = body?.querySelector?.('[data-jcar-slot]');
+    if (!slot || !r || r.__jcarLoading) return;
+    r.__jcarLoading = true;
+    const data = await fetchJcarData(r);
+    if (_currentDrawerRec !== r && favId(_currentDrawerRec) !== favId(r)) return;
+    r.__jcar = data;
+    r.__jcarLoaded = true;
+    r.__jcarLoading = false;
+    const html = renderJcarSection(data);
+    if (slot.isConnected) slot.outerHTML = html || '';
+  }
+
   function renderCountryOutputChartData(payload, selectedCountry = 'China') {
     if (!payload || !payload.years?.length || !payload.top?.length) return '';
     const rankedTop = rankCountryOutputTop(payload.years, payload.top);
@@ -8196,6 +8296,9 @@
     const accessEmpty = !drawerAccessBadges
       ? `<div class="d-none">—</div>`
       : `<div class="pills badges">${drawerAccessBadges}</div>`;
+    const jcarHTML = r.__jcar
+      ? renderJcarSection(r.__jcar)
+      : (r.__jcarLoaded ? '' : jcarSlotHTML(r));
 
     body.innerHTML = `
       <div class="detail-layout${pageMode ? ' is-page' : ' is-drawer'}">
@@ -8260,6 +8363,7 @@
             ${indiaHTML}
             ${malaysiaHTML}
             ${lockedSrcHTML}
+            ${jcarHTML}
             ${!pageMode ? renderRelatedHTML(r) : ''}
           </div>
         </div>
@@ -8293,6 +8397,8 @@
     body.querySelector('#side-share-proxy')?.addEventListener('click', () => $('#drawer-share')?.click());
     // init rating widget
     setTimeout(() => initRatingWidget(favId(r)), 0);
+    // JCAR 公开风险指标按 ISSN 懒加载；没有匹配记录时移除占位块。
+    hydrateJcarSection(body, r).catch(() => {});
     hydrateCountryOutputChart(body, ir);
     // light 库无 if_history / publication_history / 自引史 → 趋势图空白。
     // 打开详情后立刻补 full，再 soft 重绘四张图（full_upgrade 不计次）。
