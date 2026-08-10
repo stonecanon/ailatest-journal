@@ -3000,6 +3000,26 @@ function crossrefPaper(message, fallback = {}) {
   };
 }
 
+function publicationTitleSimilarity(left, right) {
+  const a = [...new Set(foldPublicationText(left).split(' ').filter(Boolean))];
+  const b = new Set(foldPublicationText(right).split(' ').filter(Boolean));
+  if (!a.length || !b.size) return 0;
+  const intersection = a.filter((word) => b.has(word)).length;
+  const union = new Set([...a, ...b]).size;
+  return Math.min(intersection / a.length, intersection / b.size) * 0.4 + (union ? intersection / union : 0) * 0.6;
+}
+
+function publicationVenueMatches(left, right) {
+  const a = foldPublicationText(left);
+  const b = foldPublicationText(right);
+  if (!a || !b) return true;
+  if (a === b || a.includes(b) || b.includes(a)) return true;
+  const leftWords = new Set(a.split(' ').filter(Boolean));
+  const rightWords = new Set(b.split(' ').filter(Boolean));
+  const overlap = [...leftWords].filter((word) => rightWords.has(word)).length;
+  return overlap >= 1 && overlap / Math.max(1, Math.min(leftWords.size, rightWords.size)) >= 0.5;
+}
+
 async function fetchCrossrefDoi(doi) {
   const response = await fetch(`https://api.crossref.org/works/${encodeURIComponent(doi)}?mailto=${encodeURIComponent(PUBLIC_METADATA_MAILTO)}`, { headers: { Accept: 'application/json', 'User-Agent': `AILatest Journal publication import (mailto:${PUBLIC_METADATA_MAILTO})` } });
   if (!response.ok) throw new Error(`Crossref ${response.status}`);
@@ -3014,7 +3034,15 @@ async function fetchCrossrefBibliographic(item) {
   if (!response.ok) return { ...item };
   const data = await response.json();
   const message = data?.message?.items?.[0];
-  return message ? crossrefPaper(message, item) : { ...item };
+  if (!message) return { ...item };
+  const candidate = crossrefPaper(message, item);
+  const titleScore = publicationTitleSimilarity(item?.title || '', candidate.title || '');
+  const venueMatches = publicationVenueMatches(item?.venue || item?.journal || '', candidate.venue || '');
+  // Crossref's bibliographic endpoint is fuzzy. Only accept a candidate when
+  // the title is clearly the same and an explicitly supplied venue agrees;
+  // otherwise keep the user's input instead of inventing metadata.
+  if (titleScore < 0.62 || (!venueMatches && titleScore < 0.9)) return { ...item };
+  return candidate;
 }
 
 async function routePublicationResolve(req, env) {
