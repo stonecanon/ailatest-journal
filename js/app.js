@@ -2941,15 +2941,16 @@
     }
     updateSearchSubmitLabel();
     const langToggle = $('#lang-toggle');
-    const nextLangLabel = lang === 'zh-CN' ? 'English' : '中文';
+    // 语言入口显示当前界面的中性标签，不再显示“目标语言”（英文界面不再出现“中文”按钮）。
+    const nextLangLabel = lang === 'zh-CN' ? '语言' : 'Language';
     if (langToggle) {
       langToggle.textContent = nextLangLabel;
-      langToggle.setAttribute('aria-label', lang === 'zh-CN' ? 'Switch to English' : '切换到中文');
+      langToggle.setAttribute('aria-label', lang === 'zh-CN' ? '切换语言' : 'Change language');
     }
     const topbarLang = $('#topbar-lang-proxy');
     if (topbarLang) {
       topbarLang.textContent = nextLangLabel;
-      topbarLang.setAttribute('aria-label', lang === 'zh-CN' ? 'Switch to English' : '切换到中文');
+      topbarLang.setAttribute('aria-label', lang === 'zh-CN' ? '切换语言' : 'Change language');
     }
     $$('[data-lang-choice]').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.langChoice === lang);
