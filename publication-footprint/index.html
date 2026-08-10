@@ -486,17 +486,25 @@
         .map(title => String(title || '').replace(/\s+/g, ' ').trim())
         .filter(Boolean))];
     }
+    function metadataTextValues(values) {
+      const raw = (Array.isArray(values) ? values : [values]).flat(Infinity);
+      return raw.flatMap(value => {
+        if (!value || typeof value !== 'object') return [value];
+        return [value.display_name, value.name, value.label, value.code, value.country_code].filter(Boolean);
+      });
+    }
     function uniqueTextValues(values) {
-      return [...new Set((Array.isArray(values) ? values : [values])
+      return [...new Set(metadataTextValues(values)
         .flatMap(value => String(value || '').split(/\s*[·;,/]\s*/))
         .map(value => value.trim())
         .filter(value => value && !/^(未知|未标注|unknown|n\/a|na)$/i.test(value)))];
     }
     function journalCountries(item) {
       return uniqueTextValues([
-        ...(Array.isArray(item?.countries) ? item.countries : []),
+        ...(Array.isArray(item?.countries) ? item.countries : metadataTextValues(item?.countries)),
         item?.country,
-        ...(Array.isArray(item?.authorCountries) ? item.authorCountries : []),
+        ...(Array.isArray(item?.authorCountries) ? item.authorCountries : metadataTextValues(item?.authorCountries)),
+        item?.authorCountry,
       ]);
     }
     function journalOrganizations(item) {
@@ -508,13 +516,29 @@
     }
     function journalFields(item) {
       return uniqueTextValues([
-        ...(Array.isArray(item?.fields) ? item.fields : []),
-        ...(Array.isArray(item?.researchFields) ? item.researchFields : []),
-        ...(Array.isArray(item?.categories) ? item.categories : []),
-        ...(Array.isArray(item?.topics) ? item.topics : []),
+        ...(Array.isArray(item?.fields) ? item.fields : metadataTextValues(item?.fields)),
+        ...(Array.isArray(item?.researchFields) ? item.researchFields : metadataTextValues(item?.researchFields)),
+        ...(Array.isArray(item?.categories) ? item.categories : metadataTextValues(item?.categories)),
+        ...(Array.isArray(item?.topics) ? item.topics : metadataTextValues(item?.topics)),
         item?.field,
         item?.research_field,
+        item?.subject,
+        item?.topic,
       ]);
+    }
+    function normalizeStoredJournal(item) {
+      if (!item || typeof item !== 'object') return null;
+      const normalized = { ...item };
+      const countries = journalCountries(item);
+      const fields = journalFields(item);
+      if (countries.length) normalized.countries = countries;
+      if (fields.length) normalized.fields = fields;
+      if (Array.isArray(item.sourceProfiles)) normalized.sourceProfiles = [...new Set(item.sourceProfiles.map(value => String(value || '').trim()).filter(Boolean))];
+      return normalized;
+    }
+    if (!isDemoMode && publicationJournals.length) {
+      publicationJournals = publicationJournals.map(normalizeStoredJournal).filter(Boolean);
+      try { localStorage.setItem(confirmedStorageKey, JSON.stringify(publicationJournals)); } catch (_) {}
     }
     function renderPaperTitles(item) {
       const titles = paperTitles(item);
@@ -907,7 +931,9 @@
       if (!ids.length) return null;
       setImportLoading('正在从 OpenAlex 读取作者公开论文…');
       try {
-        const data = await publicationApi(`/api/publication/author-works?ids=${encodeURIComponent(ids.join(','))}`);
+        // Bump the metadata version when the Worker schema changes so an old
+        // edge-cached author response cannot keep the country/field cards at 0.
+        const data = await publicationApi(`/api/publication/author-works?ids=${encodeURIComponent(ids.join(','))}&v=20260810-metadata`);
         scholarPayload = data;
         renderScholarResult(data);
         if (autoCommit) {
@@ -986,26 +1012,39 @@
     function scholarPayloadToJournals(payload) {
       const groups = new Map();
       const sourceLabel = payload?.source_label || (payload?.source === 'openalex-author' ? 'OpenAlex 作者' : payload?.source === 'crossref/openalex' ? '公开元数据' : 'Google Scholar');
-      const organizations = [...new Set([
-        ...(Array.isArray(payload?.authors) ? payload.authors.flatMap(author => Array.isArray(author?.organizations) ? author.organizations : []) : []),
+      const authors = Array.isArray(payload?.authors) ? payload.authors : [];
+      const organizations = uniqueTextValues([
+        ...authors.flatMap(author => [author?.organizations, author?.organization]),
         ...String(payload?.affiliation || '').split(/\s*[·;,/]\s*/).filter(Boolean),
-      ])];
-      const countries = [...new Set(Array.isArray(payload?.authors) ? payload.authors.flatMap(author => [
-        ...(Array.isArray(author?.countries) ? author.countries : []),
-        ...(author?.country ? String(author.country).split(/\s*[·;,/]\s*/) : []),
-      ]) : [])];
+      ]);
+      const countries = uniqueTextValues([
+        ...authors.flatMap(author => [author?.countries, author?.country]),
+        payload?.countries,
+        payload?.country,
+      ]);
+      const profileFields = uniqueTextValues([
+        ...authors.flatMap(author => [author?.fields, author?.researchFields, author?.categories, author?.topics]),
+        payload?.fields,
+        payload?.researchFields,
+        payload?.categories,
+        payload?.topics,
+      ]);
+      const sourceProfiles = [payload?.profile_id || payload?.profileId]
+        .map(value => String(value || '').trim())
+        .filter(Boolean);
       (Array.isArray(payload?.papers) ? payload.papers : []).forEach(paper => {
         const name = scholarVenue(paper?.venue || paper?.journal || paper?.container) || '未识别期刊';
         const key = name.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]+/g, '');
         if (!key || key === '未识别期刊') return;
-        const item = groups.get(key) || { name, short: journalShort(name), abbr: journalShort(name), cover: journalCover(name), papers: 0, citations: 0, years: [], titles: [], badges: [], organizations: organizations.slice(), countries: countries.slice(), fields: [], source: sourceLabel };
+        const item = groups.get(key) || { name, short: journalShort(name), abbr: journalShort(name), cover: journalCover(name), papers: 0, citations: 0, years: [], titles: [], badges: [], organizations: organizations.slice(), countries: countries.slice(), fields: profileFields.slice(), sourceProfiles: sourceProfiles.slice(), source: sourceLabel };
         item.papers += 1;
         item.citations += Number(paper?.citations || 0) || 0;
         if (Number(paper?.year) && !item.years.includes(Number(paper.year))) item.years.push(Number(paper.year));
         if (paper?.title && !item.titles.includes(paper.title)) item.titles.push(paper.title);
-        item.organizations = [...new Set([...item.organizations, ...(Array.isArray(paper?.organizations) ? paper.organizations : [])])];
-        item.countries = [...new Set([...item.countries, ...(Array.isArray(paper?.countries) ? paper.countries : [])])];
-        item.fields = [...new Set([...item.fields, ...(Array.isArray(paper?.fields) ? paper.fields : []), ...(Array.isArray(paper?.topics) ? paper.topics : [])])];
+        item.organizations = uniqueTextValues([item.organizations, paper?.organizations, paper?.authorOrganizations, paper?.organization]);
+        item.countries = uniqueTextValues([item.countries, paper?.countries, paper?.authorCountries, paper?.country]);
+        item.fields = uniqueTextValues([item.fields, paper?.fields, paper?.researchFields, paper?.categories, paper?.topics, paper?.subject, paper?.topic]);
+        item.sourceProfiles = [...new Set([...(item.sourceProfiles || []), ...sourceProfiles])];
         const impactFactor = journalImpactFactor(paper);
         if (impactFactor != null && (item.impactFactor == null || impactFactor > item.impactFactor)) item.impactFactor = impactFactor;
         groups.set(key, item);
@@ -1033,6 +1072,7 @@
           existing.organizations = [...new Set([...journalOrganizations(existing), ...journalOrganizations(item)])];
           existing.countries = [...new Set([...journalCountries(existing), ...journalCountries(item)])];
           existing.fields = [...new Set([...journalFields(existing), ...journalFields(item)])];
+          existing.sourceProfiles = [...new Set([...(existing.sourceProfiles || []), ...(item.sourceProfiles || [])])];
           if (item.impactFactor != null && (existing.impactFactor == null || Number(item.impactFactor) > Number(existing.impactFactor))) existing.impactFactor = item.impactFactor;
           if (!existing.source && item.source) existing.source = item.source;
         }
