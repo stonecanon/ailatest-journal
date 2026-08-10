@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>我的发表足迹 · AILatest Journal</title>
   <meta name="robots" content="noindex, nofollow" />
-  <link rel="stylesheet" href="../css/app.css?v=20260810-badge-flat-v1" />
+  <link rel="stylesheet" href="../css/app.css?v=20260810-badge-flat-v2" />
   <link rel="stylesheet" href="../css/pricing-page.css?v=20260810-home-shell-v1" />
   <style>
     :root {
@@ -265,6 +265,7 @@
     <div class="rail-bottom" aria-label="账户">
       <a class="rail-nav-btn" id="rankings-btn" href="/#rankings" aria-label="榜单" title="索引排行榜与预警名单"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 21V11"/><path d="M12 21V7"/><path d="M16 21V3"/><path d="M4 21h16"/></svg><span data-static-i18n="rail_rankings">榜单</span></a>
       <a class="rail-nav-btn" href="/favorites" aria-label="我的收藏" title="我的收藏"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.7l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3.7z"/></svg><span data-static-i18n="rail_saved">收藏</span><span id="fav-count-badge" class="fav-count-badge" hidden>0</span></a>
+      <a class="rail-nav-btn rail-footprint-link" id="publication-footprint-rail-link" href="/publication-footprint/" aria-label="发表足迹" title="发表足迹"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M8.7 11.1 7 20l5-2.8 5 2.8-1.7-8.9"/></svg><span data-static-i18n="rail_footprint">足迹</span></a>
       <a class="rail-nav-btn account-credit-badge" id="account-credit-badge" href="/account" aria-label="设置" title="设置"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="9" r="3.5"/><path d="M5 19c1.5-3 4-4.5 7-4.5S17.5 16 19 19"/></svg><span class="rail-me-label" data-static-i18n="rail_account" data-rail-label="settings">设置</span><span class="rail-tier-chip tier-free" aria-hidden="true">FREE</span></a>
     </div>
   </aside>
@@ -941,7 +942,7 @@
     });
     modal.addEventListener('click', e => { if (e.target === modal) closeImport(); });
   </script>
-  <script src="../js/site-rail.js?v=20260810-language-label-v1" defer></script>
+  <script src="../js/site-rail.js?v=20260810-footprint-persistent-v1" defer></script>
   <script src="../js/static-i18n.js?v=20260810-language-label-v1" defer></script>
 </body>
 </html>

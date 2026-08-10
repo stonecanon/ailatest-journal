@@ -1021,7 +1021,8 @@ td.c, th.c { text-align: center; }
   .app-rail #rankings-btn { order: 7; }
   .app-rail #download-center-rail-link { order: 8; }
   .app-rail #fav-header-btn { order: 9; }
-  .app-rail #account-credit-badge { order: 10; }
+  .app-rail #publication-footprint-rail-link { order: 10; }
+  .app-rail #account-credit-badge { order: 11; }
   .page-head { min-height: 54px; padding: 8px 12px; }
   .page-head nav { justify-content: flex-end; gap: 8px; }
   .brand { font-size: 16px; }
@@ -1236,7 +1237,8 @@ body[data-static-page] main > [data-lang-panel] {
 }
 body[data-static-page] .app-rail #rankings-btn { order: 7; }
 body[data-static-page] .app-rail #fav-header-btn { order: 8; }
-body[data-static-page] .app-rail #account-credit-badge { order: 9; }
+body[data-static-page] .app-rail #publication-footprint-rail-link { order: 9; }
+body[data-static-page] .app-rail #account-credit-badge { order: 10; }
 body[data-static-page] .fav-count-badge {
   display: inline-flex;
   align-items: center;

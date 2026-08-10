@@ -9063,8 +9063,31 @@
     }
     const favBtn = document.querySelector('.rail-nav-btn[data-tab="fav"]');
     if (favBtn) favBtn.style.order = '8';
+    let footprintLink = document.querySelector('#publication-footprint-rail-link, .rail-footprint-link[href="/publication-footprint/"], .rail-footprint-link[href="/publication-footprint"]');
+    if (!footprintLink) {
+      const railBottom = document.querySelector('.app-rail .rail-bottom');
+      if (railBottom) {
+        footprintLink = document.createElement('a');
+        footprintLink.className = 'rail-nav-btn rail-footprint-link';
+        footprintLink.id = 'publication-footprint-rail-link';
+        footprintLink.href = '/publication-footprint/';
+        footprintLink.setAttribute('aria-label', T('发表足迹', 'Publication footprint'));
+        footprintLink.setAttribute('title', T('发表足迹', 'Publication footprint'));
+        footprintLink.setAttribute('data-i18n-aria', 'rail_footprint');
+        footprintLink.setAttribute('data-i18n-title', 'rail_footprint');
+        footprintLink.innerHTML = `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M8.7 11.1 7 20l5-2.8 5 2.8-1.7-8.9"/></svg><span data-i18n="rail_footprint">${T('足迹', 'Footprint')}</span>`;
+        const accountBeforeFootprint = railBottom.querySelector('#account-credit-badge, [data-tab="me"]');
+        if (accountBeforeFootprint) railBottom.insertBefore(footprintLink, accountBeforeFootprint);
+        else railBottom.appendChild(footprintLink);
+      }
+    }
+    if (footprintLink) {
+      footprintLink.style.order = '9';
+      footprintLink.setAttribute('aria-label', T('发表足迹', 'Publication footprint'));
+      footprintLink.setAttribute('title', T('发表足迹', 'Publication footprint'));
+    }
     const creditBadge = document.querySelector('#account-credit-badge');
-    if (creditBadge) creditBadge.style.order = '9';
+    if (creditBadge) creditBadge.style.order = '10';
     applyRegionPinState();
   }
   /** 非中文语言包：用英文补齐缺失 key（ja/ko 等是 en 的薄覆盖，创建后 en 新增的 key 不会自动带上） */

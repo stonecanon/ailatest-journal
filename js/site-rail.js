@@ -282,6 +282,10 @@
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.7l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3.7z"/></svg>
           <span data-static-i18n="rail_saved">收藏</span>
         </a>
+        <a class="rail-nav-btn rail-footprint-link${current('/publication-footprint')}" id="publication-footprint-rail-link" href="/publication-footprint/"${ariaCurrent('/publication-footprint')} aria-label="发表足迹" title="发表足迹">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M8.7 11.1 7 20l5-2.8 5 2.8-1.7-8.9"/></svg>
+          <span data-static-i18n="rail_footprint">足迹</span>
+        </a>
         <a class="rail-nav-btn${current('/account')}" id="account-credit-badge" data-tab="me" href="/account"${ariaCurrent('/account')} aria-label="设置" title="设置">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="9" r="3.5"/><path d="M5 19c1.5-3 4-4.5 7-4.5S17.5 16 19 19"/></svg>
           <span data-static-i18n="rail_account">设置</span>
@@ -429,6 +433,31 @@
       }
       fav.setAttribute('aria-label', railLabel('我的收藏', 'Saved journals'));
       fav.title = railLabel('我的收藏', 'Saved journals');
+    }
+
+    let footprint = bottom.querySelector('#publication-footprint-rail-link, a[href="/publication-footprint/"], a[href="/publication-footprint"]');
+    if (!footprint) {
+      footprint = document.createElement('a');
+      footprint.className = 'rail-nav-btn rail-footprint-link';
+      footprint.href = '/publication-footprint/';
+      footprint.innerHTML = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M8.7 11.1 7 20l5-2.8 5 2.8-1.7-8.9"/></svg><span data-static-i18n="rail_footprint">足迹</span>';
+      const accountBeforeFootprint = bottom.querySelector('#account-credit-badge, a[href="/account"], [data-tab="me"]');
+      if (accountBeforeFootprint) bottom.insertBefore(footprint, accountBeforeFootprint);
+      else bottom.appendChild(footprint);
+    }
+    if (footprint) {
+      footprint.id = 'publication-footprint-rail-link';
+      const label = footprint.querySelector('[data-rail-label]') || footprint.querySelector('span:not(.rail-flag):not(.fav-count-badge)');
+      if (label) {
+        label.dataset.railLabel = 'footprint';
+        label.textContent = railLabel('足迹', 'Footprint');
+      }
+      const active = /^\/publication-footprint(?:\/|$)/i.test(location.pathname || '');
+      footprint.classList.toggle('active', active);
+      if (active) footprint.setAttribute('aria-current', 'page');
+      else footprint.removeAttribute('aria-current');
+      footprint.setAttribute('aria-label', railLabel('发表足迹', 'Publication footprint'));
+      footprint.title = railLabel('发表足迹', 'Publication footprint');
     }
 
     const account = bottom.querySelector('#account-credit-badge, a[href="/account"], [data-tab="me"]');

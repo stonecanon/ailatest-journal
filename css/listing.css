@@ -966,7 +966,8 @@ body {
 .app-rail .rail-region-picker { display: none !important; }
 .app-rail #rankings-btn { order: 7; }
 .app-rail #fav-header-btn { order: 8; }
-.app-rail #account-credit-badge { order: 9; }
+.app-rail #publication-footprint-rail-link { order: 9; }
+.app-rail #account-credit-badge { order: 10; }
 .fav-count-badge {
   display: inline-flex;
   align-items: center;
