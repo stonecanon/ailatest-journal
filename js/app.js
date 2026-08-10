@@ -1162,6 +1162,7 @@
         "物理与天体物理":"Physics & Astrophysics",
         "环境科学与生态学":"Environmental Science & Ecology",
         "农林科学":"Agriculture & Forestry",
+        "老年医学":"Geriatric Medicine",
         "经济学":"Economics",
         "心理学":"Psychology",
         "法学":"Law",
@@ -1500,6 +1501,26 @@
     if (lang !== 'en' || !val) return val;
     const m = DOM_I18N[type];
     return (m && m[val]) || val;
+  };
+  // Translate structured subject/category values in the English UI without
+  // allowing a Chinese source fragment to leak into an English sentence.
+  const translateEnglishField = (value, type = 'domain') => {
+    const raw = String(value || '').replace(/\s+/g, ' ').trim();
+    if (!raw || lang !== 'en') return raw;
+    const direct = tn(raw, type);
+    if (direct !== raw) return direct;
+    if (!/[\u3400-\u9fff\uf900-\ufaff]/.test(raw)) return raw;
+    return raw.match(/[\u3400-\u9fff\uf900-\ufaff]+|[^\u3400-\u9fff\uf900-\ufaff]+/g)
+      .map((part) => {
+        if (!/[\u3400-\u9fff\uf900-\ufaff]/.test(part)) return part;
+        const piece = part.trim();
+        const translated = tn(piece, type);
+        return translated !== piece && !/[\u3400-\u9fff\uf900-\ufaff]/.test(translated) ? translated : '';
+      })
+      .join('')
+      .replace(/\s*[,;、，；/]\s*(?=[,;、，；/]|$)/g, '')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
   };
 
   let journals = [];
@@ -4295,8 +4316,8 @@
   }
   function badgeZone(z, top) {
     if (!z) return '';
-    if (top) return `<span class="zone ztop">TOP·${z}${T('区','')}</span>`;
-    return `<span class="zone z${z}">${z}${T('区','')}</span>`;
+    if (top) return `<span class="zone ztop">TOP·${z}${T('区',' tier')}</span>`;
+    return `<span class="zone z${z}">${z}${T('区',' tier')}</span>`;
   }
   function badgeIF(v) {
     if (v === undefined || v === null) return '';
@@ -4310,8 +4331,8 @@
   }
   function badgeCAS(z, top) {
     if (!z) return '';
-    if (top) return `<span class="zone ztop" title="${T('中科院大类分区 Top','CAS Major Tier · Top')}">${T('中科院','CAS')} ${z}${T('区','')}·TOP</span>`;
-    return `<span class="zone z${z}" title="${T('中科院大类分区','CAS Major Tier')}">${T('中科院','CAS')} ${z}${T('区','')}</span>`;
+    if (top) return `<span class="zone ztop" title="${T('中科院大类分区 Top','CAS Major Tier · Top')}">${T('中科院','CAS')} ${z}${T('区',' tier')}·TOP</span>`;
+    return `<span class="zone z${z}" title="${T('中科院大类分区','CAS Major Tier')}">${T('中科院','CAS')} ${z}${T('区',' tier')}</span>`;
   }
   // 国内来源交叉徽章
   function badgeDomSrc(tag) {
@@ -4390,7 +4411,7 @@
         const top = typeof xr === 'object' && xr.top;
         if (!z) return '';
         const cls = top ? 'xr-top' : `xr-${z}`;
-        const label = `${T('新锐','Emerging')} ${z}${T('区','')}${top ? '·TOP' : ''}`;
+        const label = `${T('新锐','Emerging')} ${z}${T('区',' tier')}${top ? '·TOP' : ''}`;
         return `<span class="xr-pill ${cls}" title="${T('中科院 2026 新锐版分区','CAS Emerging Edition 2026')}">${label}</span>`;
       }
       function badgeWarn(w, isCard) {
@@ -7191,7 +7212,7 @@
     const cards = related.map(j => {
       const name = titleCase(j.name || j.cn_name || '');
       const ifVal = j.if_2024 != null ? `IF ${j.if_2024}` : '';
-      const cas = j.cas_zone ? `${T('中科院','CAS')} ${j.cas_zone}${T('区','')}` : '';
+      const cas = j.cas_zone ? `${T('中科院','CAS')} ${j.cas_zone}${T('区',' tier')}` : '';
       const badges = [ifVal, cas].filter(Boolean).join(' · ');
       return `<div class="related-card" data-fid="${escape(favId(j))}" style="cursor:pointer">
         <div class="related-name">${escape(name)}</div>
@@ -7455,12 +7476,21 @@
     const oa = ir.oa || lookupOA(ir.issn || ir.eissn ? ir : r);
 
     const journalIntroHTML = (() => {
-      const officialText = r.official_desc || ir.official_desc || r.description || ir.description || '';
+      const officialTextRaw = r.official_desc || ir.official_desc || r.description || ir.description || '';
+      // 英文界面不直接展示混入中文字段的官方简介；改用下方已清洗的英文摘要，
+      // 避免出现「... in 医学」这类中英文拼接。
+      const officialText = lang.startsWith('zh') || !/[\u3400-\u9fff\uf900-\ufaff]/.test(String(officialTextRaw))
+        ? officialTextRaw
+        : '';
       const cats = Array.isArray(ir.wos_categories) ? ir.wos_categories.slice(0, 3) : [];
-      const indexText = Array.isArray(ir.indices) && ir.indices.length ? ir.indices.join('/') : '';
+      const translatedCats = cats.map((value) => translateEnglishField(value, 'domain')).filter(Boolean);
+      const indexText = Array.isArray(ir.indices) && ir.indices.length
+        ? ir.indices.map((value) => translateEnglishField(value, 'domain')).filter(Boolean).join('/')
+        : '';
       const plainName = title;
-      const plainCats = cats.join(lang.startsWith('zh') ? '、' : ', ');
-      const major = ir.cas_major_cn || ir.jcr_cat || cats[0] || ir.esi_category || '';
+      const plainCats = translatedCats.join(lang.startsWith('zh') ? '、' : ', ');
+      const majorRaw = ir.cas_major_cn || ir.jcr_cat || cats[0] || ir.esi_category || '';
+      const major = translateEnglishField(majorRaw, 'domain') || translatedCats[0] || '';
       // 判断是否为真正的中文学术期刊：必须有 CN 号或中文刊名（不止一个短横），且来自国内源
       const hasCnCode = !!r.cn_code;
       const hasRealCnName = !!r.cn_name && r.cn_name !== '-' && r.cn_name !== title;
@@ -7509,9 +7539,10 @@
         ? (ir.cnkx || r.cnkx).map(x => x.tier).filter(Boolean)
         : [];
       const tierText = cnkxTiers.length ? `，并入选中国科协高质量科技期刊分级目录（${[...new Set(cnkxTiers)].join(' / ')}）` : '';
-      const topicList = (oa && Array.isArray(oa.tp) && oa.tp.length)
+      const topicListRaw = (oa && Array.isArray(oa.tp) && oa.tp.length)
         ? oa.tp.slice(0, 4)
         : cats;
+      const topicList = topicListRaw.map((value) => translateEnglishField(value, 'domain')).filter(Boolean);
       const zhSentence = (s) => {
         const text = String(s || '').replace(/\s+/g, ' ').replace(/[，、；：:,.。\s]+$/, '');
         return text ? `${text}。` : '';
@@ -7882,13 +7913,13 @@
       const hasSub = Array.isArray(ir.cas_sub_cats) && ir.cas_sub_cats.length;
       if (!hasMajor && !hasSub) return '';
       const majorLine = hasMajor ? `<div class="cat-major-line">
-        ${ir.cas_major_cn ? `<span class="cat-major-name">${escape(ir.cas_major_cn)}</span>` : ''}
-        ${ir.cas_zone ? `<span class="cat-major-zone">${ir.cas_zone}${T('区','')}${ir.cas_top ? ' · Top' : ''}</span>` : ''}
+        ${ir.cas_major_cn ? `<span class="cat-major-name">${escape(translateEnglishField(ir.cas_major_cn, 'domain'))}</span>` : ''}
+        ${ir.cas_zone ? `<span class="cat-major-zone">${ir.cas_zone}${T('区',' tier')}${ir.cas_top ? ' · Top' : ''}</span>` : ''}
       </div>` : '';
       const items = hasSub ? ir.cas_sub_cats.map(s => {
         const nm = typeof s === 'string' ? s : (s.name || '');
         const zn = typeof s === 'object' ? s.zone : null;
-        return `<li>${escape(nm)}${zn ? ` · <b>${zn}${T('区','')}</b>` : ''}</li>`;
+        return `<li>${escape(translateEnglishField(nm, 'domain'))}${zn ? ` · <b>${zn}${T('区',' tier')}</b>` : ''}</li>`;
       }).join('') : '';
       return `<div class="drawer-section">
         <h4>${T('中科院 2025 大类分区','CAS 2025 · Major Tier')}</h4>
@@ -7905,13 +7936,13 @@
       const hasSub = Array.isArray(xr.sub) && xr.sub.length;
       if (!hasMajor && !hasSub) return '';
       const majorLine = hasMajor ? `<div class="cat-major-line">
-        ${xr.major_cn ? `<span class="cat-major-name">${escape(xr.major_cn)}</span>` : ''}
-        ${xr.zone ? `<span class="cat-major-zone">${xr.zone}${T('区','')}</span>` : ''}
+        ${xr.major_cn ? `<span class="cat-major-name">${escape(translateEnglishField(xr.major_cn, 'domain'))}</span>` : ''}
+        ${xr.zone ? `<span class="cat-major-zone">${xr.zone}${T('区',' tier')}</span>` : ''}
       </div>` : '';
       const items = hasSub ? xr.sub.map(s => {
         const nm = s.cat || s.name || '';
         const zn = s.zone;
-        return `<li>${escape(nm)}${zn ? ` · <b>${zn}${T('区','')}</b>` : ''}</li>`;
+        return `<li>${escape(translateEnglishField(nm, 'domain'))}${zn ? ` · <b>${zn}${T('区',' tier')}</b>` : ''}</li>`;
       }).join('') : '';
       return `<div class="drawer-section">
         <h4>${T('新锐版 2026','Emerging 2026')}</h4>
@@ -7925,7 +7956,7 @@
       ? `<div class="drawer-section">
            <h4>${T('中国科协高质量科技期刊分级目录 · 2025-12 版','CAST High-Quality Sci-Tech Journal Tiered Directory · Dec 2025')}</h4>
            <ul class="cas-sub-list">${r.cnkx.map(c =>
-             `<li><b>${escape(c.tier||'')}</b>${c.domain ? ' · ' + escape(c.domain) : ''}${c.subdomain ? ' <span class="muted-cell">· '+escape(c.subdomain)+'</span>' : ''}</li>`
+             `<li><b>${escape(c.tier||'')}</b>${c.domain ? ' · ' + escape(translateEnglishField(c.domain, 'domain')) : ''}${c.subdomain ? ' <span class="muted-cell">· '+escape(translateEnglishField(c.subdomain, 'domain'))+'</span>' : ''}</li>`
            ).join('')}</ul>
            <div class="muted-cell" style="margin-top:6px;font-size:12px;line-height:1.6">${T('同一刊在多个学科领域分别评定 T1 / T2 / T3，互不冲突。','A journal can be tiered T1/T2/T3 separately in multiple disciplines without conflict.')}</div>
          </div>`
@@ -8088,7 +8119,7 @@
     // ── V9 详情：主列（头+双栏信息+图表）| 右侧快捷栏 ──
     const jcrQ = ir.if_quartile ? String(ir.if_quartile).toUpperCase() : '';
     const casZoneLabel = ir.cas_zone != null && ir.cas_zone !== ''
-      ? `${ir.cas_zone}${T('区','')}${ir.cas_top ? ' TOP' : ''}`
+      ? `${ir.cas_zone}${T('区',' tier')}${ir.cas_top ? ' TOP' : ''}`
       : '';
     let cycleShort = '';
     {
@@ -8494,7 +8525,7 @@
     const bits = [name];
     const seoIf = r.if_2025 ?? (Number(r.if_latest_year) === 2025 ? r.if_latest : null);
     if (seoIf != null) bits.push(`IF ${r.if_latest_year || 2025} ${seoIf}`);
-    if (r.cas_zone) bits.push(`CAS ${r.cas_zone}${T('区','')}`);
+    if (r.cas_zone) bits.push(`CAS ${r.cas_zone}${T('区',' tier')}`);
     if (r.if_quartile) bits.push(`JCR ${String(r.if_quartile).toUpperCase()}`);
     bits.push('AILatest Journal');
     const title = bits.join(' | ');
@@ -13879,7 +13910,7 @@
 
     function pickMetricCas(r) {
       if (!r || !r.cas_zone) return '';
-      return `${r.cas_zone}${T('区','')}${r.cas_top ? ' TOP' : ''}`;
+      return `${r.cas_zone}${T('区',' tier')}${r.cas_top ? ' TOP' : ''}`;
     }
 
     function pickDoajApcText(r) {
@@ -14481,13 +14512,13 @@
             const jcrQ = String(e.jcr_q || '').toUpperCase();
             const xrZone = r.cas_xr && r.cas_xr.zone ? String(r.cas_xr.zone) : '';
             const zTag = e.zone
-              ? `<span class="zone z${e.zone}" title="${T('中科院 2025 大类分区','CAS 2025 major category tier')}">${T('中科院2025','CAS 2025')} ${e.zone}${T('区','')}${e.top ? ' TOP' : ''}</span>`
+              ? `<span class="zone z${e.zone}" title="${T('中科院 2025 大类分区','CAS 2025 major category tier')}">${T('中科院2025','CAS 2025')} ${e.zone}${T('区',' tier')}${e.top ? ' TOP' : ''}</span>`
               : '';
             const jcrTag = /^Q[1-4]$/.test(jcrQ)
               ? `<span class="zone jcr-${jcrQ.toLowerCase()}" title="JCR ${ifMetricYear} ${T('分区','quartile')}">JCR ${ifMetricYear} ${jcrQ}</span>`
               : '';
             const xrTag = /^[1-4]$/.test(xrZone)
-              ? `<span class="zone z${xrZone}" title="${T('中科院新锐 2026 分区','CAS Emerging 2026 tier')}">${T('新锐2026','Emerging 2026')} ${xrZone}${T('区','')}${r.cas_xr.top ? ' TOP' : ''}</span>`
+              ? `<span class="zone z${xrZone}" title="${T('中科院新锐 2026 分区','CAS Emerging 2026 tier')}">${T('新锐2026','Emerging 2026')} ${xrZone}${T('区',' tier')}${r.cas_xr.top ? ' TOP' : ''}</span>`
               : '';
             const ccfTxt = r.ccf ? `<span class="badge b-ccf" title="${T('中国计算机学会推荐等级','CCF recommended ranking')}">CCF ${escape(r.ccf)}</span>` : '';
             // 卡片只保留最核心的三档（IF / JCR / 中科院），新锐·CCF 收进详情页，减少徽章堆叠
