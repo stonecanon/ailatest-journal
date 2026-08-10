@@ -38,6 +38,7 @@ import { aggregateRecentStats, recalibrateYesterday } from './analytics-rollups.
 import { handleChat } from './chat.js';
 import { handlePick } from './pick.js';
 import { handleExtLookup } from './ext-lookup.js';
+import { fetchScholarProfile } from '../../js/scholar-profile.js';
 import { renderSitesDashboard } from './sites-dashboard.js';
 import { renderAdmin, routeAdminApi } from './admin.js';
 import { classifyRequestTraffic } from './traffic-classifier.js';
@@ -3869,6 +3870,14 @@ export default {
       const mApiKey = p.match(/^\/api-keys\/([0-9a-f-]+)$/i);
       if (mApiKey && req.method === 'DELETE') return routeRevokeApiKey(req, env, mApiKey[1]);
       if (p === '/search' && (req.method === 'GET' || req.method === 'POST')) return json(await buildPublicSearchResponse(req, env));
+      if (p === '/scholar/profile' && req.method === 'GET') {
+        try {
+          const result = await fetchScholarProfile(u.searchParams.get('url') || '', fetch);
+          return json(result, 200, { 'Cache-Control': 'private, max-age=300' });
+        } catch (e) {
+          return err(e?.message || 'Google Scholar 读取失败', 502, { 'Cache-Control': 'no-store' });
+        }
+      }
       if (p === '/skill/search' && (req.method === 'GET' || req.method === 'POST')) {
         const principal = await resolveRequestPrincipal(req, env);
         if (principal.error) return principal.error;
