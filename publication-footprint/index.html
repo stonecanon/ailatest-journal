@@ -114,6 +114,10 @@
     .journal-meta strong { color: var(--ink-soft); }
     .paper-title-list { margin: 9px 0 0; padding-left: 17px; color: var(--ink-soft); font-size: 12px; line-height: 1.55; }
     .paper-title-list li { overflow-wrap: anywhere; }
+    .paper-title-entry { display: flex; align-items: flex-start; gap: 7px; }
+    .paper-title-entry > span { min-width: 0; flex: 1; }
+    .paper-title-remove { flex: 0 0 auto; margin: 1px 0 0; padding: 0 3px; border: 0; color: var(--ink-faint); background: transparent; font: inherit; font-size: 12px; line-height: 1.2; cursor: pointer; }
+    .paper-title-remove:hover, .paper-title-remove:focus-visible { color: var(--footprint-orange); }
     .paper-title-list li + li { margin-top: 3px; }
     .paper-title-details { margin-top: 7px; color: var(--footprint-blue); font-size: 11px; }
     .paper-title-details summary { cursor: pointer; }
@@ -130,6 +134,8 @@
     .journal-if-card span { display: block; margin-top: 3px; color: #a47852; font-size: 10px; font-weight: 800; letter-spacing: .08em; line-height: 1; }
     .journal-link { color: var(--footprint-blue); font-size: 12px; font-weight: 760; white-space: nowrap; }
     .journal-link:hover { color: var(--footprint-orange); }
+    .footprint-action { cursor: pointer; }
+    .footprint-action:hover, .footprint-action:focus-visible { border-color: rgba(249,115,22,.45); color: var(--footprint-orange); background: #fff8f1; }
     .empty-state { padding: 36px 20px; color: var(--ink-faint); text-align: center; }
     .empty-state strong, .empty-state span { display: block; }
     .empty-state strong { color: var(--ink-soft); font-size: 13px; }
@@ -433,6 +439,7 @@
               <input class="mini-filter" id="journal-search" type="search" placeholder="搜索期刊" aria-label="搜索期刊" />
               <select class="mini-filter" id="year-filter" aria-label="按年份筛选"><option value="all">全部年份</option></select>
               <select class="mini-filter" id="sort-filter" aria-label="排序方式"><option value="year">按发表时间（新到旧）</option><option value="if">按 IF（高到低）</option></select>
+              <button class="mini-filter footprint-action" id="dedupe-footprints" type="button" title="合并重复期刊并删除重复论文">一键去重</button>
             </div>
           </div>
           <div class="footprint-list" id="footprint-list"></div>
@@ -568,6 +575,7 @@
     const search = document.getElementById('journal-search');
     const year = document.getElementById('year-filter');
     const sortFilter = document.getElementById('sort-filter');
+    const dedupeButton = document.getElementById('dedupe-footprints');
     const researcherLevels = [
       { min: 0, label: '新晋研究者', next: 20 },
       { min: 20, label: '初级研究者', next: 60 },
@@ -601,10 +609,19 @@
       const value = String(raw ?? '').replace(/\s+/g, ' ').trim();
       return value && !/^(unknown|n\/a|na|—|-|未标注|未知)$/i.test(value) ? value : '';
     }
+    function paperTitleKey(value) {
+      return journalMetadataKey(String(value || '').replace(/\s+/g, ' ').trim());
+    }
     function paperTitles(item) {
-      return [...new Set((Array.isArray(item?.titles) ? item.titles : [])
+      const seen = new Set();
+      return (Array.isArray(item?.titles) ? item.titles : [])
         .map(title => String(title || '').replace(/\s+/g, ' ').trim())
-        .filter(Boolean))];
+        .filter(title => {
+          const key = paperTitleKey(title);
+          if (!key || seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        });
     }
     function journalMetadataKey(value) {
       return String(value || '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]+/g, '');
@@ -726,6 +743,18 @@
       if (Array.isArray(item.sourceProfiles)) normalized.sourceProfiles = [...new Set(item.sourceProfiles.map(value => String(value || '').trim()).filter(Boolean))];
       return normalized;
     }
+    function dedupeFootprintItem(item) {
+      const normalized = normalizeStoredJournal(item) || { ...(item || {}) };
+      const titles = paperTitles(normalized);
+      const papers = Number(normalized.papers || 0);
+      normalized.titles = titles;
+      normalized.papers = titles.length ? titles.length : Math.max(0, Number.isFinite(papers) ? Math.round(papers) : 0);
+      return normalized;
+    }
+    function footprintJournalGroupKey(item) {
+      const issn = Array.isArray(item?.issns) ? item.issns.map(value => String(value || '').replace(/[^0-9X]/gi, '').toUpperCase()).find(Boolean) : '';
+      return issn ? `issn:${issn}` : `name:${journalMetadataKey(item?.name || item?.journal_key || '')}`;
+    }
     function footprintItemKey(item) {
       const issn = Array.isArray(item?.issns) ? item.issns.find(Boolean) : '';
       return String(item?.journal_key || item?.key || item?.name || issn || '')
@@ -748,7 +777,7 @@
       if (a.impactFactor != null && (b.impactFactor == null || Number(a.impactFactor) > Number(b.impactFactor))) merged.impactFactor = a.impactFactor;
       if (a.frequency && !b.frequency) merged.frequency = a.frequency;
       if (!a.source && b.source) merged.source = b.source;
-      return merged;
+      return dedupeFootprintItem(merged);
     }
     function mergePublicationJournals(incoming) {
       const byKey = new Map(publicationJournals.map(item => [footprintItemKey(item), item]).filter(([key]) => key));
@@ -763,6 +792,51 @@
       publicationJournals = [...byKey.values()];
       return added;
     }
+    async function dedupePublicationJournals() {
+      const before = publicationJournals.slice();
+      const beforePaperCount = before.reduce((sum, item) => sum + Math.max(0, Math.round(Number(item?.papers || 0))), 0);
+      const oldKeys = new Set(before.map(footprintItemKey).filter(Boolean));
+      const groups = new Map();
+      before.forEach(raw => {
+        const item = dedupeFootprintItem(raw);
+        if (!item || !footprintJournalGroupKey(item)) return;
+        const groupKey = footprintJournalGroupKey(item);
+        groups.set(groupKey, groups.has(groupKey) ? mergeFootprintItem(groups.get(groupKey), item) : item);
+      });
+      publicationJournals = [...groups.values()].map(dedupeFootprintItem);
+      const newKeys = new Set(publicationJournals.map(footprintItemKey).filter(Boolean));
+      const deleteKeys = [...oldKeys].filter(key => !newKeys.has(key));
+      const replaceKeys = [...newKeys];
+      const afterPaperCount = publicationJournals.reduce((sum, item) => sum + Math.max(0, Math.round(Number(item?.papers || 0))), 0);
+      const removedJournals = Math.max(0, before.length - publicationJournals.length);
+      const removedPapers = Math.max(0, beforePaperCount - afterPaperCount);
+      persistPublicationJournals(false);
+      renderFootprints();
+      refreshJournalMetadata();
+      await syncPublicationFootprints({ replaceKeys, deleteKeys });
+      setFootprintSyncNote(`已去重：移除 ${removedPapers} 篇重复论文，合并 ${removedJournals} 条重复期刊记录。`, '足迹管理');
+      return { removedJournals, removedPapers };
+    }
+    async function removePaperFromFootprint(journalKey, titleKey) {
+      const index = publicationJournals.findIndex(item => footprintItemKey(item) === journalKey);
+      if (index < 0) return;
+      const item = dedupeFootprintItem(publicationJournals[index]);
+      publicationJournals[index] = item;
+      const titles = paperTitles(item);
+      const nextTitles = titles.filter(title => paperTitleKey(title) !== titleKey);
+      if (nextTitles.length === titles.length) return;
+      item.titles = nextTitles;
+      item.papers = Math.max(0, Math.round(Number(item.papers || 0)) - 1);
+      const removedJournal = item.papers === 0 && !nextTitles.length;
+      if (removedJournal) publicationJournals.splice(index, 1);
+      persistPublicationJournals(false);
+      renderFootprints();
+      refreshJournalMetadata();
+      await syncPublicationFootprints(removedJournal
+        ? { deleteKeys: [journalKey] }
+        : { replaceKeys: [footprintItemKey(item)] });
+      setFootprintSyncNote(removedJournal ? '已删除最后一篇论文，期刊记录也已移除。' : '已删除这篇论文，足迹统计已更新。', '足迹管理');
+    }
     function setFootprintSyncNote(message, strong = '账号同步') {
       const node = document.getElementById('footprint-sync-note');
       if (node) node.innerHTML = `<strong>${escapeHtml(strong)}：</strong>${escapeHtml(message)}`;
@@ -772,24 +846,29 @@
       if (sync) syncPublicationFootprints();
     }
     let footprintSyncPromise = null;
-    async function syncPublicationFootprints() {
+    async function syncPublicationFootprints(options = {}) {
       let account = null;
       try { account = JSON.parse(localStorage.getItem('ailatest.user') || 'null'); } catch (_) {}
       if (!account?.token) {
         setFootprintSyncNote('未登录，当前足迹只保存在此浏览器；登录后会自动上传到账号。');
         return null;
       }
-      if (!publicationJournals.length) {
+      if (!publicationJournals.length && !(Array.isArray(options.deleteKeys) && options.deleteKeys.length)) {
         setFootprintSyncNote('账号已连接；加入论文后会自动同步。');
         return null;
       }
-      if (footprintSyncPromise) return footprintSyncPromise;
+      if (footprintSyncPromise) {
+        await footprintSyncPromise;
+        return syncPublicationFootprints(options);
+      }
       footprintSyncPromise = (async () => {
         try {
+          const replaceKeys = [...new Set((Array.isArray(options.replaceKeys) ? options.replaceKeys : []).map(key => String(key || '').trim()).filter(Boolean))];
+          const deleteKeys = [...new Set((Array.isArray(options.deleteKeys) ? options.deleteKeys : []).map(key => String(key || '').trim()).filter(Boolean))];
           const data = await publicationApi('/api/publication/footprint/import', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ source: 'publication-footprint', records: publicationJournals.slice(0, 200) }),
+            body: JSON.stringify({ source: 'publication-footprint', records: publicationJournals.slice(0, 200), replace_keys: replaceKeys, delete_keys: deleteKeys }),
           });
           if (Array.isArray(data.records) && data.records.length) {
             mergePublicationJournals(data.records);
@@ -837,7 +916,8 @@
       if (!titles.length) return '';
       const visible = titles.length > 3 ? titles.slice(0, 3) : titles;
       const rest = titles.slice(3);
-      const list = values => `<ul class="paper-title-list">${values.map(title => `<li>${escapeHtml(title)}</li>`).join('')}</ul>`;
+      const journalKey = footprintItemKey(item);
+      const list = values => `<ul class="paper-title-list">${values.map(title => `<li><div class="paper-title-entry"><span>${escapeHtml(title)}</span><button class="paper-title-remove" type="button" data-remove-paper-title="${escapeHtml(paperTitleKey(title))}" data-journal-key="${escapeHtml(journalKey)}" aria-label="删除论文：${escapeHtml(title)}" title="删除这篇论文">×</button></div></li>`).join('')}</ul>`;
       return `${list(visible)}${rest.length ? `<details class="paper-title-details"><summary>查看其余 ${rest.length} 个论文题目</summary>${list(rest)}</details>` : ''}`;
     }
     function syncYearFilter() {
@@ -1529,20 +1609,7 @@
         const key = item.name.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]+/g, '');
         const existing = byKey.get(key);
         if (!existing) byKey.set(key, item);
-        else {
-          existing.papers = Math.max(Number(existing.papers || 0), Number(item.papers || 0));
-          existing.citations = Math.max(Number(existing.citations || 0), Number(item.citations || 0));
-          existing.years = [...new Set([...(existing.years || []), ...(item.years || [])])].sort((a, b) => b - a);
-          existing.titles = [...new Set([...(existing.titles || []), ...(item.titles || [])])];
-          existing.papers = Math.max(Number(existing.papers || 0), Number(item.papers || 0), existing.titles.length);
-          existing.issns = [...new Set([...(existing.issns || []), ...(item.issns || [])])];
-          existing.organizations = [...new Set([...journalOrganizations(existing), ...journalOrganizations(item)])];
-          existing.countries = [...new Set([...journalCountries(existing), ...journalCountries(item)])];
-          existing.fields = [...new Set([...journalFields(existing), ...journalFields(item)])];
-          existing.sourceProfiles = [...new Set([...(existing.sourceProfiles || []), ...(item.sourceProfiles || [])])];
-          if (item.impactFactor != null && (existing.impactFactor == null || Number(item.impactFactor) > Number(existing.impactFactor))) existing.impactFactor = item.impactFactor;
-          if (!existing.source && item.source) existing.source = item.source;
-        }
+        else byKey.set(key, mergeFootprintItem(existing, item));
       });
       publicationJournals = [...byKey.values()];
       pendingScholarImports = pendingScholarImports.filter(item => item.profile_id !== profileId);
@@ -1583,6 +1650,15 @@
       renderPendingScholarImports();
     }
     migratePendingScholarImports();
+    dedupeButton.addEventListener('click', () => {
+      dedupeButton.disabled = true;
+      dedupePublicationJournals().finally(() => { dedupeButton.disabled = false; });
+    });
+    list.addEventListener('click', event => {
+      const button = event.target.closest('[data-remove-paper-title]');
+      if (!button) return;
+      removePaperFromFootprint(button.dataset.journalKey || '', button.dataset.removePaperTitle || '');
+    });
     pendingResults.addEventListener('click', event => {
       const button = event.target.closest('[data-accept-profile]');
       if (!button) return;

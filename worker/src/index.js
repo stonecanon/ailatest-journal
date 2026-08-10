@@ -3197,6 +3197,28 @@ function footprintYears(value) {
   return [...new Set(value.map(publicationYear).filter(Boolean))].sort((a, b) => b - a).slice(0, 100);
 }
 
+function footprintTitleKey(value) {
+  return String(value || '')
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9\u4e00-\u9fff]+/g, '');
+}
+
+function footprintTitles(value) {
+  if (!Array.isArray(value)) return [];
+  const seen = new Set();
+  return value
+    .map((title) => cleanText(String(title || '').replace(/\s+/g, ' '), 800))
+    .filter((title) => {
+      const key = footprintTitleKey(title);
+      if (!key || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .slice(0, 500);
+}
+
 function footprintBadges(value) {
   if (!Array.isArray(value)) return [];
   return value
@@ -3251,7 +3273,10 @@ function normalizePublicationFootprintRecord(item) {
   const key = cleanText(value.journal_key || value.key || issns[0] || publicationJournalKey(name), 240);
   if (!name || !key) return null;
   const years = footprintYears(value.years);
-  const titles = footprintArray(value.titles || value.paperTitles || [], 500, 800);
+  const rawTitles = Array.isArray(value.titles || value.paperTitles) ? (value.titles || value.paperTitles) : [];
+  const titles = footprintTitles(rawTitles);
+  const declaredPapers = footprintNumber(value.papers, rawTitles.length, 100000);
+  const duplicateTitles = Math.max(0, rawTitles.length - titles.length);
   const badges = footprintBadges(value.badges);
   const organizations = footprintArray(value.organizations || value.authorOrganizations || [], 120, 180);
   const countries = footprintArray(value.countries || value.authorCountries || [], 80, 80);
@@ -3260,7 +3285,7 @@ function normalizePublicationFootprintRecord(item) {
   return {
     key,
     name,
-    papers: Math.max(0, Math.round(footprintNumber(value.papers, titles.length, 100000))),
+    papers: Math.max(titles.length, Math.round(Math.max(0, declaredPapers - duplicateTitles))),
     citations: Math.max(0, Math.round(footprintNumber(value.citations, 0, 100000000))),
     years,
     titles,
@@ -3321,13 +3346,15 @@ function mergePublicationFootprintRecords(left, right) {
   if (a.metadata?.journalMetadata || b.metadata?.journalMetadata) {
     metadata.journalMetadata = { ...(a.metadata?.journalMetadata || {}), ...(b.metadata?.journalMetadata || {}) };
   }
+  const titles = footprintTitles([...a.titles, ...b.titles]);
+  const duplicateTitles = Math.max(0, a.titles.length + b.titles.length - titles.length);
   return {
     key: a.key || b.key,
     name: b.name || a.name,
-    papers: Math.max(a.papers, b.papers),
+    papers: Math.max(titles.length, Math.round(Math.max(0, Math.max(a.papers, b.papers) - duplicateTitles))),
     citations: Math.max(a.citations, b.citations),
     years: unique([...a.years, ...b.years], 100).sort((x, y) => y - x),
-    titles: unique([...a.titles, ...b.titles], 500),
+    titles,
     issns: unique([...a.issns, ...b.issns], 8),
     badges: [...a.badges, ...b.badges].filter((badge, index, list) => list.findIndex((item) => String(item[0]).toLowerCase() === String(badge[0]).toLowerCase()) === index).slice(0, 40),
     organizations: unique([...a.organizations, ...b.organizations], 120),
@@ -3383,17 +3410,25 @@ async function routePublicationFootprintImport(req, env) {
   if (!user) return err('请先登录后同步发表足迹', 401);
   const body = await req.json().catch(() => null);
   const input = Array.isArray(body?.records) ? body.records : (body?.record ? [body.record] : []);
-  if (!input.length) return err('请提供至少一条发表足迹记录', 400);
+  const replaceKeys = new Set((Array.isArray(body?.replace_keys) ? body.replace_keys : [])
+    .map((key) => cleanText(key || '', 240)).filter(Boolean));
+  const deleteKeys = new Set((Array.isArray(body?.delete_keys) ? body.delete_keys : [])
+    .map((key) => cleanText(key || '', 240)).filter(Boolean));
+  if (!input.length && !deleteKeys.size) return err('请提供至少一条发表足迹记录或删除目标', 400);
   if (input.length > 200) return err('单次最多同步 200 条发表足迹记录', 400);
+  if (replaceKeys.size > 200 || deleteKeys.size > 200) return err('单次最多处理 200 条发表足迹记录', 400);
   await ensurePublicationFootprintTables(env);
   const currentRows = await env.DB.prepare('SELECT * FROM publication_footprints WHERE user_id = ?').bind(user.id).all();
   const current = new Map((currentRows.results || []).map((row) => [String(row.journal_key || ''), publicationFootprintRow(row)]));
   const merged = new Map(current);
+  for (const key of deleteKeys) merged.delete(key);
   for (const raw of input) {
     const normalized = normalizePublicationFootprintRecord(raw);
     if (!normalized) continue;
     const previous = merged.get(normalized.key);
-    merged.set(normalized.key, previous ? mergePublicationFootprintRecords(previous, normalized) : normalized);
+    merged.set(normalized.key, replaceKeys.has(normalized.key)
+      ? normalized
+      : previous ? mergePublicationFootprintRecords(previous, normalized) : normalized);
   }
   const now = nowSec();
   const statements = [];
