@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>我的发表足迹 · AILatest Journal</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="stylesheet" href="../css/app.css?v=20260810-badge-flat-v1" />
+  <link rel="stylesheet" href="../css/pricing-page.css?v=20260810-home-shell-v1" />
+  <style>
+    :root {
+      --footprint-orange: #f97316;
+      --footprint-orange-soft: #fff0e4;
+      --footprint-blue: #29466f;
+      --footprint-blue-soft: #eaf0fa;
+      --footprint-green: #2f7c58;
+      --footprint-green-soft: #e8f4ed;
+    }
+    body.publication-prototype {
+      min-height: 100vh;
+      padding-left: 72px;
+      background-color: #fffdf9;
+      background-image:
+        radial-gradient(ellipse 680px 440px at 52% 16%, rgba(249,115,22,.12), transparent 72%),
+        linear-gradient(rgba(39,35,31,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(39,35,31,.035) 1px, transparent 1px),
+        linear-gradient(180deg, #fffefa 0%, #fffaf2 42%, #fffdf9 100%);
+      background-attachment: fixed;
+      background-size: cover, 60px 60px, 60px 60px, cover;
+    }
+    .publication-prototype .publication-page { max-width: 1320px; margin: 0 auto; }
+    .publication-hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.5fr) minmax(280px, .8fr);
+      gap: 20px;
+      padding: 28px 30px;
+      border: 1px solid rgba(39,35,31,.08);
+      border-radius: 24px;
+      background: linear-gradient(112deg, rgba(255,243,230,.94), rgba(255,253,249,.94) 64%);
+      box-shadow: 0 16px 44px rgba(48,36,20,.08);
+    }
+    .kicker { margin: 0 0 7px; color: var(--footprint-orange); font-size: 11px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; }
+    .publication-hero h1 { margin: 0; font-size: clamp(28px, 4vw, 46px); letter-spacing: -.035em; line-height: 1.12; }
+    .publication-hero .lead { max-width: 680px; margin: 14px 0 0; color: var(--ink-soft); font-size: 16px; line-height: 1.75; }
+    .hero-note { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px; }
+    .source-pill, .status-pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px; font-size: 12px; font-weight: 720; }
+    .source-pill { color: var(--footprint-blue); background: var(--footprint-blue-soft); }
+    .status-pill { color: var(--footprint-green); background: var(--footprint-green-soft); }
+    .hero-preview { display: flex; align-items: center; justify-content: center; min-height: 164px; border-left: 1px solid rgba(39,35,31,.1); padding-left: 24px; }
+    .hero-medal { width: 142px; height: 142px; display: grid; place-items: center; border-radius: 50%; color: #9a5218; background: radial-gradient(circle at 34% 27%, #fffdf9 0 22%, #ffe2c6 23% 60%, #ffc891 61% 100%); border: 7px solid #fff7ee; outline: 1px solid #f4b77d; box-shadow: 0 12px 28px rgba(182,93,29,.18); appearance: none; cursor: pointer; transition: transform .16s, box-shadow .16s; }
+    .hero-medal:hover { transform: translateY(-2px); box-shadow: 0 16px 32px rgba(182,93,29,.24); }
+    .hero-medal:focus-visible { outline: 3px solid rgba(41,70,111,.35); outline-offset: 4px; }
+    .hero-medal svg { width: 62px; height: 62px; fill: none; stroke: currentColor; stroke-width: 1.7; }
+    .hero-preview p { max-width: 160px; margin: 0 0 0 14px; color: var(--ink-faint); font-size: 13px; line-height: 1.55; }
+    .metric-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 18px 0; }
+    .metric-card { padding: 17px 18px; border: 1px solid var(--rule-soft); border-radius: 18px; background: rgba(255,255,255,.86); }
+    .metric-value { font-size: 26px; font-weight: 820; letter-spacing: -.04em; }
+    .metric-label { margin-top: 3px; color: var(--ink-faint); font-size: 12px; }
+    .publication-hero > .metric-grid { grid-column: 1 / -1; margin: 2px 0 0; }
+    .publication-hero > .metric-grid .metric-card { border-color: rgba(39,35,31,.09); background: rgba(255,255,255,.56); }
+    .archive-status-panel { margin: 18px 0; }
+    .publication-left-column { min-width: 0; display: grid; gap: 18px; }
+    .publication-left-column .archive-status-panel { margin: 0; }
+    .achievements-panel { margin: 18px 0; }
+    .achievements-panel .panel-head { align-items: center; }
+    .achievement-head-right { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 7px; }
+    .achievement-stat { display: inline-flex; align-items: baseline; gap: 4px; padding: 5px 8px; border: 1px solid #eee5da; border-radius: 999px; color: var(--ink-faint); background: #fffdf9; font-size: 10px; white-space: nowrap; }
+    .achievement-stat b { color: var(--ink); font-size: 13px; }
+    .achievement-progress { color: var(--footprint-orange); font-size: 12px; font-weight: 800; white-space: nowrap; }
+    .researcher-level { display: inline-flex; align-items: center; min-height: 27px; padding: 0 10px; border-radius: 999px; color: #9b5419; background: #ffead2; font-size: 11px; font-weight: 820; white-space: nowrap; }
+    .achievement-method { margin-top: 3px !important; }
+    .achievement-tracks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; padding: 14px 16px 0; }
+    .achievement-track { min-width: 0; padding: 13px 13px 12px; border: 1px solid #eee5da; border-radius: 15px; background: #fffdf9; }
+    .achievement-track-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+    .achievement-track-head h3 { margin: 0; color: var(--ink); font-size: 13px; }
+    .achievement-track-head span { color: var(--ink-faint); font-size: 11px; white-space: nowrap; }
+    .milestone-row { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; margin-top: 11px; }
+    .milestone { min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 3px; color: var(--ink-faint); text-align: center; }
+    .milestone b { width: 30px; height: 30px; display: grid; place-items: center; border: 1px solid #e3ddd4; border-radius: 50%; color: var(--ink-faint); background: #f5f2ed; font-size: 11px; }
+    .milestone small { font-size: 9px; line-height: 1.2; white-space: nowrap; }
+    .milestone.is-earned b { border-color: #f3bd8d; color: #9b5419; background: #ffead2; }
+    .milestone.is-earned small { color: var(--footprint-green); font-weight: 780; }
+    .milestone.is-locked { opacity: .62; }
+    .achievement-disclaimer { margin: 11px 16px 0; color: var(--ink-faint); font-size: 10px; line-height: 1.5; }
+    .achievement-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; padding: 15px 16px 17px; }
+    .achievement-card { min-width: 0; padding: 13px 12px; border: 1px solid #eee5da; border-radius: 15px; background: #fffdf9; }
+    .achievement-card.is-locked { opacity: .58; filter: saturate(.55); background: #faf8f4; }
+    .achievement-icon { width: 36px; height: 36px; display: grid; place-items: center; margin-bottom: 9px; border-radius: 12px; color: #9b5419; background: #ffead2; font-size: 19px; }
+    .achievement-card.is-locked .achievement-icon { color: var(--ink-faint); background: #efede8; }
+    .achievement-card h3 { margin: 0; color: var(--ink); font-size: 13px; line-height: 1.3; }
+    .achievement-card p { min-height: 31px; margin: 5px 0 0; color: var(--ink-faint); font-size: 11px; line-height: 1.45; }
+    .achievement-state { display: inline-flex; margin-top: 9px; padding: 3px 7px; border-radius: 999px; color: var(--footprint-green); background: var(--footprint-green-soft); font-size: 10px; font-weight: 800; }
+    .achievement-card.is-locked .achievement-state { color: var(--ink-faint); background: #efede8; }
+    .achievements-modal .achievements-dialog { width: min(980px, 100%); max-height: calc(100vh - 40px); margin: 0; overflow: auto; }
+    .achievement-modal-close { position: absolute; top: 8px; right: 12px; z-index: 2; }
+    .achievements-dialog { position: relative; }
+    .workspace-grid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(300px, .72fr); gap: 18px; align-items: start; }
+    .panel { border: 1px solid var(--rule-soft); border-radius: 20px; background: rgba(255,255,255,.9); box-shadow: 0 10px 34px rgba(39,35,31,.05); overflow: hidden; }
+    .panel-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 15px; padding: 20px 22px 15px; border-bottom: 1px solid var(--rule-soft); }
+    .panel-head h2 { margin: 0; font-size: 21px; letter-spacing: -.02em; }
+    .panel-head p { margin: 4px 0 0; color: var(--ink-faint); font-size: 12px; }
+    .panel-tools { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 7px; }
+    .mini-filter { min-height: 34px; border: 1px solid var(--rule); border-radius: 10px; padding: 0 10px; color: var(--ink-soft); background: #fffdf9; font: inherit; font-size: 12px; }
+    .footprint-list { display: grid; gap: 11px; padding: 16px; }
+    .journal-card { display: grid; grid-template-columns: 78px minmax(0, 1fr) auto; gap: 15px; padding: 17px 18px; border: 1px solid #e9e2d8; border-radius: 16px; background: #fffdf9; transition: transform .15s, border-color .15s, box-shadow .15s; }
+    .journal-card:hover { transform: translateY(-1px); border-color: rgba(249,115,22,.38); box-shadow: 0 10px 24px rgba(39,35,31,.06); }
+    .journal-card-cover { display: flex; min-height: 104px; flex-direction: column; justify-content: space-between; padding: 10px 8px; border-radius: 11px; color: rgba(255,255,255,.94); background: var(--cover, linear-gradient(155deg,#d58046,#6d3b32)); box-shadow: inset 0 0 0 1px rgba(255,255,255,.32), 0 7px 14px rgba(39,35,31,.12); }
+    .journal-card-cover small { font-size: 9px; font-weight: 760; letter-spacing: .08em; text-transform: uppercase; opacity: .82; }
+    .journal-card-cover strong { font-size: 13px; line-height: 1.1; }
+    .journal-card-cover em { align-self: flex-start; padding: 2px 4px; border: 1px solid rgba(255,255,255,.42); border-radius: 4px; font-size: 8px; font-style: normal; font-weight: 800; letter-spacing: .08em; }
+    .journal-card-main { min-width: 0; }
+    .journal-card-title { margin: 0; font-size: 17px; font-weight: 820; line-height: 1.25; }
+    .journal-card-title span { display: block; margin-top: 4px; color: var(--ink-faint); font-size: 12px; font-weight: 600; }
+    .journal-meta { display: flex; flex-wrap: wrap; gap: 5px 12px; margin-top: 10px; color: var(--ink-faint); font-size: 12px; }
+    .journal-meta strong { color: var(--ink-soft); }
+    .paper-title-preview { margin-top: 9px; overflow: visible; color: var(--ink-soft); font-size: 12px; line-height: 1.55; text-overflow: clip; white-space: normal; overflow-wrap: anywhere; }
+    .paper-title-preview::before { content: '论文题目：'; color: var(--ink-faint); }
+    .paper-title-details { margin-top: 5px; color: var(--footprint-blue); font-size: 11px; }
+    .paper-title-details summary { cursor: pointer; }
+    .paper-title-details ul { margin: 6px 0 0; padding-left: 16px; color: var(--ink-soft); line-height: 1.55; }
+    .badge-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+    .pub-badge { display: inline-flex; align-items: center; min-height: 24px; padding: 3px 9px; border: 1px solid rgba(39,35,31,.1); border-radius: 999px; color: var(--ink-soft); background: #f7f3ec; font-size: 11px; font-weight: 780; letter-spacing: .02em; }
+    .pub-badge.index { color: #24486f; background: #eaf1fb; border-color: #cddbeb; }
+    .pub-badge.zone { color: #704f2b; background: #f5eadb; border-color: #ead6bb; }
+    .pub-badge.quartile { color: #923f12; background: #fff0e2; border-color: #f5cda9; }
+    .pub-badge.verified { color: var(--footprint-green); background: var(--footprint-green-soft); border-color: #bfdfcc; }
+    .journal-card-side { display: flex; min-width: 86px; flex-direction: column; align-items: flex-end; justify-content: space-between; gap: 9px; }
+    .paper-count { color: var(--footprint-orange); font-size: 13px; font-weight: 820; white-space: nowrap; }
+    .journal-link { color: var(--footprint-blue); font-size: 12px; font-weight: 760; white-space: nowrap; }
+    .journal-link:hover { color: var(--footprint-orange); }
+    .empty-state { padding: 36px 20px; color: var(--ink-faint); text-align: center; }
+    .side-stack { display: grid; gap: 18px; }
+    .import-panel { padding: 20px; }
+    .import-panel h2 { margin: 0; font-size: 19px; }
+    .import-panel > p { margin: 7px 0 15px; color: var(--ink-faint); font-size: 12px; line-height: 1.65; }
+    .import-option { display: grid; grid-template-columns: 34px minmax(0,1fr) auto; gap: 10px; align-items: center; width: 100%; margin-top: 9px; padding: 12px; border: 1px solid var(--rule-soft); border-radius: 14px; background: #fffdf9; text-align: left; cursor: pointer; }
+    .import-option:hover { border-color: rgba(249,115,22,.4); background: #fff8f1; }
+    .import-icon { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 10px; color: var(--footprint-blue); background: var(--footprint-blue-soft); font-size: 14px; font-weight: 850; }
+    .import-option b { display: block; color: var(--ink); font-size: 13px; }
+    .import-option small { display: block; margin-top: 2px; color: var(--ink-faint); font-size: 11px; line-height: 1.35; }
+    .import-option em { padding: 3px 6px; border-radius: 999px; color: #9b4714; background: #fff0e4; font-size: 10px; font-style: normal; font-weight: 800; white-space: nowrap; }
+    .review-note { margin-top: 14px; padding: 12px; border-radius: 13px; color: #66503a; background: #fff7e9; font-size: 11px; line-height: 1.6; }
+    .review-note strong { color: #8b4f14; }
+    .pending-panel { padding: 18px 20px; }
+    .pending-panel h3 { margin: 0; font-size: 15px; }
+    .pending-item { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 11px 0; border-bottom: 1px solid var(--rule-soft); font-size: 12px; }
+    .pending-item:last-child { border-bottom: 0; padding-bottom: 0; }
+    .pending-item span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .pending-item button { border: 0; border-radius: 8px; padding: 5px 8px; color: var(--footprint-green); background: var(--footprint-green-soft); font: inherit; font-size: 11px; font-weight: 760; cursor: pointer; }
+    .submission-panel { padding: 18px 20px; }
+    .submission-panel .panel-head { margin: -18px -20px 8px; padding: 16px 20px 12px; }
+    .submission-panel .panel-head h3 { margin: 0; font-size: 15px; }
+    .submission-panel .panel-head p { margin: 4px 0 0; color: var(--ink-faint); font-size: 11px; line-height: 1.45; }
+    .submission-row { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 8px; padding: 11px 0; border-bottom: 1px solid var(--rule-soft); }
+    .submission-row:last-of-type { border-bottom: 0; }
+    .submission-main strong { display: block; color: var(--ink); font-size: 12px; }
+    .submission-main small { display: block; margin-top: 3px; color: var(--ink-faint); font-size: 10px; line-height: 1.45; }
+    .submission-side { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
+    .submission-status { display: inline-flex; align-items: center; gap: 5px; padding: 4px 7px; border-radius: 999px; color: #24486f; background: var(--footprint-blue-soft); font-size: 10px; font-weight: 800; white-space: nowrap; }
+    .submission-status::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+    .submission-status.review { color: #8b5b20; background: #fff1dc; }
+    .submission-status.revision { color: #8c4930; background: #fbe9e2; }
+    .submission-status.accepted { color: var(--footprint-green); background: var(--footprint-green-soft); }
+    .submission-system { color: var(--ink-faint); font-size: 10px; white-space: nowrap; }
+    .submission-note { margin-top: 10px; padding: 9px 10px; border-radius: 10px; color: #66503a; background: #fff7e9; font-size: 10px; line-height: 1.55; }
+    .submission-note strong { color: #8b4f14; }
+    .modal-backdrop { position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; padding: 20px; background: rgba(39,35,31,.32); backdrop-filter: blur(4px); }
+    .modal-backdrop[hidden] { display: none; }
+    .modal-card { width: min(620px, 100%); padding: 22px; border: 1px solid var(--rule); border-radius: 20px; background: #fffdf9; box-shadow: 0 24px 80px rgba(39,35,31,.2); }
+    .modal-head { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+    .modal-head h2 { margin: 0; font-size: 21px; }
+    .modal-close { border: 0; background: transparent; color: var(--ink-faint); font-size: 25px; cursor: pointer; }
+    .modal-card > p { margin: 7px 0 14px; color: var(--ink-faint); font-size: 12px; line-height: 1.6; }
+    .author-search-form { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; gap: 8px; align-items: end; }
+    .author-search-form[hidden], .author-search-hint[hidden] { display: none; }
+    .author-search-form label { display: grid; gap: 5px; color: var(--ink-faint); font-size: 11px; font-weight: 700; }
+    .author-search-form .modal-input { margin-top: 0; }
+    .author-search-submit { min-height: 42px; border: 1px solid var(--footprint-orange); border-radius: 11px; padding: 0 13px; color: #fff; background: var(--footprint-orange); font: inherit; font-size: 12px; font-weight: 800; cursor: pointer; }
+    .author-search-hint { margin-top: 10px; padding: 9px 11px; border-radius: 11px; color: #66503a; background: #fff7e9; font-size: 11px; line-height: 1.55; }
+    .author-results { margin-top: 17px; }
+    .author-results[hidden], .legacy-import[hidden] { display: none; }
+    .author-results-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+    .author-results-head h3 { margin: 0; font-size: 14px; }
+    .selected-author-count { color: var(--footprint-orange); font-size: 11px; font-weight: 800; }
+    .author-candidate-list { display: grid; gap: 8px; max-height: 270px; overflow: auto; padding-right: 3px; }
+    .author-candidate { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 10px; align-items: start; padding: 11px 12px; border: 1px solid var(--rule-soft); border-radius: 13px; background: #fff; cursor: pointer; }
+    .author-candidate:has(input:checked) { border-color: rgba(249,115,22,.48); background: #fff8f1; box-shadow: inset 0 0 0 1px rgba(249,115,22,.12); }
+    .author-candidate input { width: 16px; height: 16px; margin: 3px 0 0; accent-color: var(--footprint-orange); }
+    .author-candidate-main strong { display: block; color: var(--ink); font-size: 13px; }
+    .author-candidate-main small { display: block; margin-top: 3px; color: var(--ink-faint); font-size: 11px; line-height: 1.45; }
+    .author-candidate-meta { text-align: right; color: var(--ink-faint); font-size: 10px; line-height: 1.55; white-space: nowrap; }
+    .author-candidate-meta b { display: block; color: var(--footprint-blue); font-size: 11px; }
+    .author-multi-note { margin: 9px 0 0; color: var(--ink-faint); font-size: 11px; line-height: 1.55; }
+    .modal-import[disabled] { opacity: .45; cursor: not-allowed; }
+    .modal-input { width: 100%; min-height: 42px; margin-top: 8px; border: 1px solid var(--rule); border-radius: 11px; padding: 0 12px; color: var(--ink); background: #fff; font: inherit; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+    .modal-actions button { min-height: 37px; border-radius: 10px; padding: 0 13px; font: inherit; font-size: 12px; font-weight: 780; cursor: pointer; }
+    .modal-cancel { border: 1px solid var(--rule); color: var(--ink-soft); background: transparent; }
+    .modal-import { border: 1px solid var(--footprint-orange); color: #fff; background: var(--footprint-orange); }
+    @media (max-width: 900px) {
+      .publication-hero { grid-template-columns: 1fr; padding: 22px 18px; border-radius: 18px; }
+      .hero-preview { justify-content: flex-start; min-height: 0; border-top: 1px solid rgba(39,35,31,.1); border-left: 0; padding: 16px 0 0; }
+      .hero-medal { width: 92px; height: 92px; border-width: 5px; }
+      .hero-medal svg { width: 42px; height: 42px; }
+      .metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 12px 0; }
+      .metric-card { padding: 13px; }
+      .achievements-panel { margin: 12px 0; }
+      .achievements-panel .panel-head { display: block; }
+      .achievement-head-right { justify-content: flex-start; margin-top: 10px; }
+      .achievement-tracks { grid-template-columns: 1fr; padding: 10px 10px 0; }
+      .achievement-track { padding: 12px 10px; }
+      .achievement-disclaimer { margin: 10px 10px 0; }
+      .achievement-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 10px; gap: 8px; }
+      .achievement-card { padding: 11px; }
+      .workspace-grid { grid-template-columns: 1fr; }
+      .panel-head { display: block; padding: 17px 15px 13px; }
+      .panel-tools { justify-content: flex-start; margin-top: 11px; }
+      .footprint-list { padding: 10px; }
+      .journal-card { grid-template-columns: 70px minmax(0, 1fr); gap: 10px; padding: 14px; }
+      .journal-card-cover { min-height: 94px; }
+      .journal-card-main { grid-column: 2; }
+      .paper-title-preview { white-space: normal; }
+      .journal-card-side { flex-direction: row; align-items: center; }
+      .journal-card-side { grid-column: 2; }
+      .submission-row { grid-template-columns: minmax(0,1fr); }
+      .submission-side { align-items: flex-start; flex-direction: row; }
+      .author-search-form { grid-template-columns: 1fr; }
+      .author-search-submit { width: 100%; }
+      .author-candidate { grid-template-columns: 21px minmax(0, 1fr); }
+      .author-candidate-meta { grid-column: 2; text-align: left; white-space: normal; }
+    }
+  </style>
+</head>
+<body class="home-route publication-prototype" data-static-page="publication">
+  <aside class="app-rail" aria-label="Primary navigation">
+    <nav class="rail-top" aria-label="站点">
+      <a class="rail-nav-btn" href="/global" aria-label="全球期刊" title="全球期刊"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 3.4 9A14 14 0 0 1 12 21a14 14 0 0 1-3.4-9A14 14 0 0 1 12 3Z"/></svg><span data-static-i18n="rail_global">全球</span></a>
+      <a class="rail-nav-btn rail-region-station" data-region-station="dom" href="/cn" aria-label="中国期刊" title="中国期刊"><span class="rail-flag" aria-hidden="true">CN</span><span data-static-i18n="rail_china">中国</span></a>
+      <a class="rail-nav-btn rail-region-station" data-region-station="in" href="/in" hidden><span class="rail-flag">IN</span><span data-static-i18n="rail_india">印度</span></a>
+      <a class="rail-nav-btn rail-region-station" data-region-station="my" href="/my" hidden><span class="rail-flag">MY</span><span data-static-i18n="rail_malaysia">马来西亚</span></a>
+      <a class="rail-nav-btn rail-region-station" data-region-station="kr" href="/kr" hidden><span class="rail-flag">KR</span><span data-static-i18n="rail_korea">韩国</span></a>
+      <a class="rail-nav-btn rail-region-station" data-region-station="pbn" href="/pbn" hidden><span class="rail-flag">PL</span><span>波兰</span></a>
+      <a class="rail-nav-btn rail-region-station" data-region-station="isc" href="/isc" hidden><span class="rail-flag">IR</span><span>伊朗</span></a>
+      <a class="rail-nav-btn rail-region-station" data-region-station="scielo" href="/scielo" hidden><span class="rail-flag">LA</span><span>拉美</span></a>
+      <div class="rail-region-picker"><button class="rail-nav-btn rail-region-toggle" type="button" aria-label="地区站点" title="地区站点" aria-expanded="false"><span class="rail-flag rail-region-symbol" aria-hidden="true">···</span><span><span data-static-i18n="rail_regions">地区</span><b class="rail-caret" aria-hidden="true">▾</b></span></button><div class="rail-region-menu" aria-label="地区站点"></div></div>
+    </nav>
+    <div class="rail-bottom" aria-label="账户">
+      <a class="rail-nav-btn" id="rankings-btn" href="/#rankings" aria-label="榜单" title="索引排行榜与预警名单"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 21V11"/><path d="M12 21V7"/><path d="M16 21V3"/><path d="M4 21h16"/></svg><span data-static-i18n="rail_rankings">榜单</span></a>
+      <a class="rail-nav-btn" href="/favorites" aria-label="我的收藏" title="我的收藏"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.7l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3.7z"/></svg><span data-static-i18n="rail_saved">收藏</span><span id="fav-count-badge" class="fav-count-badge" hidden>0</span></a>
+      <a class="rail-nav-btn account-credit-badge" id="account-credit-badge" href="/account" aria-label="设置" title="设置"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="9" r="3.5"/><path d="M5 19c1.5-3 4-4.5 7-4.5S17.5 16 19 19"/></svg><span class="rail-me-label" data-static-i18n="rail_account" data-rail-label="settings">设置</span><span class="rail-tier-chip tier-free" aria-hidden="true">FREE</span></a>
+    </div>
+  </aside>
+
+  <nav class="home-top-nav pricing-home-nav" aria-label="首页导航">
+    <a href="/#feat" data-static-i18n="nav_features" data-nav="features">功能</a><a href="/#how" data-static-i18n="nav_how" data-nav="how">怎么用</a><a href="/#rankings" data-static-i18n="nav_rank" data-nav="rank">榜单</a><a href="/pricing" data-static-i18n="nav_pricing" data-nav="pricing">订阅</a><a href="/#download" data-static-i18n="download_center" data-nav="download">下载</a><a href="/#contact" data-static-i18n="nav_contact" data-nav="contact">联系</a><div class="lang-toggle-wrap"><button class="lang-toggle" type="button" data-static-lang-toggle>Language</button></div>
+  </nav>
+
+  <main class="main pricing-main publication-main">
+    <header class="topbar pricing-topbar" aria-label="AILatest Journal"><a class="topbar-brand" href="/" data-topbar-home aria-label="AILatest Journal">AILatest <em>Journal</em></a></header>
+
+    <div class="publication-page">
+      <section class="publication-hero">
+        <div>
+          <p class="kicker">My publication footprint</p>
+          <h1>我的发表足迹</h1>
+          <p class="lead">把你发表过论文的期刊，收集成一面可核验的徽章墙。它和“收藏”分开：收藏是准备投稿，发表足迹是已经走过的投稿记录。</p>
+          <div class="hero-note">
+            <span class="source-pill">示例数据 · 待确认</span>
+            <span class="status-pill">先核对，再加入足迹</span>
+            <span class="source-pill">登录后同步到我的账号</span>
+          </div>
+        </div>
+        <div class="hero-preview">
+          <button class="hero-medal" id="open-achievements" type="button" aria-haspopup="dialog" aria-controls="achievements-modal" aria-label="查看发表成就">
+            <svg viewBox="0 0 24 24"><path d="M7 3h10v5a5 5 0 0 1-10 0V3Z"/><path d="M9 13.2V17h6v-3.8"/><path d="M6 18h12v3H6z"/><path d="M7 5H4v2a3 3 0 0 0 3 3M17 5h3v2a3 3 0 0 1-3 3"/></svg>
+          </button>
+          <p>点击奖杯查看发表成就；期刊卡片保留 JCR / 中科院 / 收录徽章和论文年份。</p>
+        </div>
+        <section class="metric-grid" aria-label="科研档案统计">
+          <div class="metric-card"><div class="metric-value" id="metric-papers">12</div><div class="metric-label">已识别论文</div></div>
+          <div class="metric-card"><div class="metric-value" id="metric-journals">8</div><div class="metric-label">发表期刊</div></div>
+          <div class="metric-card"><div class="metric-value">5</div><div class="metric-label">覆盖国家 / 地区</div></div>
+          <div class="metric-card"><div class="metric-value">3</div><div class="metric-label">主要研究方向</div></div>
+        </section>
+      </section>
+
+      <div class="workspace-grid">
+        <div class="publication-left-column">
+          <section class="panel submission-panel archive-status-panel" aria-labelledby="submission-title">
+            <div class="panel-head">
+              <div><h2 id="submission-title">投稿状态</h2><p>与发表足迹统一保存在同一份科研档案中</p></div>
+              <button class="pending-item button" type="button" data-import="status" style="border:0;border-radius:8px;padding:5px 8px;color:var(--footprint-orange);background:var(--footprint-orange-soft);font:inherit;font-size:11px;font-weight:760;cursor:pointer">添加投稿</button>
+            </div>
+            <div class="submission-row"><div class="submission-main"><strong>Nature Communications</strong><small>Indoor air quality and health · 最近同步：今天</small></div><div class="submission-side"><span class="submission-status">With Editor</span><span class="submission-system">Nature Portfolio</span></div></div>
+            <div class="submission-row"><div class="submission-main"><strong>Applied Energy</strong><small>Urban energy planning · 最近同步：昨天</small></div><div class="submission-side"><span class="submission-status review">Under Review</span><span class="submission-system">Elsevier · Editorial Manager</span></div></div>
+            <div class="submission-row"><div class="submission-main"><strong>Buildings</strong><small>Thermal comfort study · 最近同步：3 天前</small></div><div class="submission-side"><span class="submission-status revision">Revision Required</span><span class="submission-system">MDPI · SuSy</span></div></div>
+            <div class="submission-row"><div class="submission-main"><strong>Energy and Buildings</strong><small>Housing energy retrofit · 最近同步：5 天前</small></div><div class="submission-side"><span class="submission-status accepted">Accepted</span><span class="submission-system">Springer Nature</span></div></div>
+            <div class="submission-note"><strong>隐私原则：</strong>生产版只保存稿件编号、状态和投稿链接；不保存出版社密码。能自动读取时通过授权会话，否则支持手动粘贴确认邮件或状态页。</div>
+          </section>
+
+          <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>期刊徽章墙</h2>
+              <p>按期刊归并你的论文，避免同一本期刊重复占位。</p>
+            </div>
+            <div class="panel-tools">
+              <input class="mini-filter" id="journal-search" type="search" placeholder="搜索期刊" aria-label="搜索期刊" />
+              <select class="mini-filter" id="year-filter" aria-label="按年份筛选"><option value="all">全部年份</option><option value="2025">2025</option><option value="2024">2024</option><option value="2023">2023</option></select>
+            </div>
+          </div>
+            <div class="footprint-list" id="footprint-list"></div>
+          </section>
+        </div>
+
+        <aside class="side-stack">
+          <section class="panel import-panel">
+            <h2>怎么导入？</h2>
+            <p>先搜索姓名，再选择属于你的作者身份。单位变化时可以多选，系统会合并候选论文后让你确认。</p>
+            <button class="import-option" type="button" data-import="name"><span class="import-icon">名</span><span><b>搜索作者姓名</b><small>可多选不同单位的作者身份</small></span><em>推荐</em></button>
+            <button class="import-option" type="button" data-import="orcid"><span class="import-icon">iD</span><span><b>ORCID / OpenAlex 作者 ID</b><small>已有唯一作者标识时直接识别</small></span><span>→</span></button>
+            <button class="import-option" type="button" data-import="doi"><span class="import-icon">DOI</span><span><b>DOI / BibTeX / CSV</b><small>适合一次导入已发表论文清单</small></span><span>→</span></button>
+            <button class="import-option" type="button" data-import="scholar"><span class="import-icon">GS</span><span><b>Google Scholar</b><small>建议粘贴个人主页链接后再核对</small></span><span>→</span></button>
+            <div class="review-note"><strong>核对原则：</strong>姓名只是第一步；机构、年份、合作者和 DOI 至少匹配两项，确认后才生成期刊徽章。</div>
+          </section>
+          <section class="panel pending-panel">
+            <h3>待确认的识别结果 · 3</h3>
+            <div class="pending-item"><span>Indoor Air · 2024 · DOI 已匹配</span><button type="button">确认</button></div>
+            <div class="pending-item"><span>Resources Policy · 2023 · 同名待核对</span><button type="button">查看</button></div>
+            <div class="pending-item"><span>Applied Energy · 2022 · DOI 已匹配</span><button type="button">确认</button></div>
+          </section>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <div class="modal-backdrop achievements-modal" id="achievements-modal" hidden>
+    <section class="panel achievements-panel achievements-dialog" role="dialog" aria-modal="true" aria-labelledby="achievement-title">
+      <button class="modal-close achievement-modal-close" id="close-achievements" type="button" aria-label="关闭发表成就">×</button>
+      <div class="panel-head">
+        <div>
+          <h2 id="achievement-title">发表成就</h2>
+          <p class="achievement-method">根据已确认的论文和期刊自动解锁；积分只用于站内成就展示。</p>
+        </div>
+        <div class="achievement-head-right">
+          <span class="achievement-stat"><b id="achievement-citations">126</b> 被引</span>
+          <span class="achievement-stat"><b id="achievement-points">210</b> 积分</span>
+          <span class="researcher-level" id="researcher-level">高级研究者</span>
+          <span class="achievement-progress">已解锁 4 / 6</span>
+        </div>
+      </div>
+      <div class="achievement-tracks" aria-label="发表与被引里程碑">
+        <section class="achievement-track" aria-labelledby="publication-milestones-title">
+          <div class="achievement-track-head"><h3 id="publication-milestones-title">发表数量</h3><span><b id="publication-count">12</b> 篇已确认</span></div>
+          <div class="milestone-row">
+            <span class="milestone" data-milestone="papers" data-threshold="1"><b>1</b><small>首篇</small></span>
+            <span class="milestone" data-milestone="papers" data-threshold="10"><b>10</b><small>起步</small></span>
+            <span class="milestone is-locked" data-milestone="papers" data-threshold="20"><b>20</b><small>进阶</small></span>
+            <span class="milestone is-locked" data-milestone="papers" data-threshold="30"><b>30</b><small>持续</small></span>
+            <span class="milestone is-locked" data-milestone="papers" data-threshold="50"><b>50</b><small>高产</small></span>
+            <span class="milestone is-locked" data-milestone="papers" data-threshold="100"><b>100</b><small>百篇</small></span>
+          </div>
+        </section>
+        <section class="achievement-track" aria-labelledby="citation-milestones-title">
+          <div class="achievement-track-head"><h3 id="citation-milestones-title">论文被引量</h3><span><b id="citation-count">126</b> 次可核验</span></div>
+          <div class="milestone-row">
+            <span class="milestone" data-milestone="citations" data-threshold="10"><b>10</b><small>初见影响</small></span>
+            <span class="milestone" data-milestone="citations" data-threshold="50"><b>50</b><small>被引起步</small></span>
+            <span class="milestone" data-milestone="citations" data-threshold="100"><b>100</b><small>百次被引</small></span>
+            <span class="milestone is-locked" data-milestone="citations" data-threshold="200"><b>200</b><small>持续影响</small></span>
+            <span class="milestone is-locked" data-milestone="citations" data-threshold="500"><b>500</b><small>高影响</small></span>
+            <span class="milestone is-locked" data-milestone="citations" data-threshold="1000"><b>1000</b><small>广泛传播</small></span>
+          </div>
+        </section>
+      </div>
+      <p class="achievement-disclaimer">积分示例：每篇已确认论文 5 分 + 每次被引 1 分 + 每篇 Q1 论文 3 分。等级是网站内的成就称号，不等同于职称、职务或官方学术荣誉。</p>
+      <div class="achievement-grid">
+        <article class="achievement-card"><div class="achievement-icon" aria-hidden="true">✦</div><h3>初次发表</h3><p>完成第一篇期刊论文</p><span class="achievement-state">已解锁</span></article>
+        <article class="achievement-card"><div class="achievement-icon" aria-hidden="true">◈</div><h3>期刊探索者</h3><p>在 5 本不同期刊发表</p><span class="achievement-state">已解锁</span></article>
+        <article class="achievement-card"><div class="achievement-icon" aria-hidden="true">★</div><h3>Q1 贡献者</h3><p>在 3 本 Q1 期刊发表</p><span class="achievement-state">已解锁</span></article>
+        <article class="achievement-card"><div class="achievement-icon" aria-hidden="true">↗</div><h3>跨单位经历</h3><p>论文覆盖 2 个机构阶段</p><span class="achievement-state">已解锁</span></article>
+        <article class="achievement-card is-locked"><div class="achievement-icon" aria-hidden="true">∞</div><h3>持续发表</h3><p>连续 3 个自然年有论文</p><span class="achievement-state">还差 1 年</span></article>
+        <article class="achievement-card is-locked"><div class="achievement-icon" aria-hidden="true">◎</div><h3>国际足迹</h3><p>覆盖 5 个国家 / 地区</p><span class="achievement-state">还差 2 个</span></article>
+      </div>
+    </section>
+  </div>
+
+  <div class="modal-backdrop" id="import-modal" hidden>
+    <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal-head"><h2 id="modal-title">搜索我的作者身份</h2><button class="modal-close" id="close-import" type="button" aria-label="关闭">×</button></div>
+      <p id="modal-desc">输入姓名和可选单位，先查看候选作者；单位变化时可以多选。</p>
+      <form class="author-search-form" id="author-search-form">
+        <label>作者姓名<input class="modal-input" id="author-name" type="text" placeholder="例如：张三 / San Zhang" autocomplete="name" /></label>
+        <label>曾用单位（可选）<input class="modal-input" id="author-affiliation" type="text" placeholder="例如：同济大学" /></label>
+        <button class="author-search-submit" type="submit">搜索候选</button>
+      </form>
+      <div class="author-search-hint" id="author-search-hint">建议填写你发表时用过的英文名或任一单位；系统会按姓名、单位、年份和论文量排序。</div>
+      <div class="author-results" id="author-results" hidden>
+        <div class="author-results-head"><h3>可能是你的作者身份</h3><span class="selected-author-count" id="selected-author-count">已选 0 个</span></div>
+        <div class="author-candidate-list" id="author-candidate-list"></div>
+        <p class="author-multi-note">可以同时勾选多个身份，例如更换单位前后的两个身份。合并后仍会先进入待确认列表。</p>
+      </div>
+      <div class="legacy-import" id="legacy-import" hidden>
+        <input class="modal-input" id="import-value" type="text" placeholder="例如：10.1016/j.enpol.2024.113456" />
+      </div>
+      <div class="modal-actions"><button class="modal-cancel" id="cancel-import" type="button">取消</button><button class="modal-import" id="confirm-import" type="button" disabled>合并已选身份</button></div>
+    </section>
+  </div>
+
+  <script>
+    const publicationJournals = [
+      { name: 'Indoor Air', short: 'IA', abbr: 'INDOOR AIR', cover: 'linear-gradient(155deg,#598ca1,#123d57)', papers: 3, citations: 38, years: [2025, 2024], titles: ['Indoor environmental quality and occupant health in mixed-mode buildings', 'Ventilation behaviour and indoor air quality during extreme heat', 'Low-cost sensing for classroom exposure assessment'], badges: [['SCIE', 'index'], ['Scopus', 'index'], ['PubMed', 'index'], ['JCR Q1', 'quartile'], ['中科院 1区', 'zone'], ['TOP', 'zone'], ['已核验', 'verified']] },
+      { name: 'Resources Policy', short: 'RP', abbr: 'RESOUR POLICY', cover: 'linear-gradient(155deg,#b68a58,#553a2c)', papers: 2, citations: 31, years: [2024, 2023], titles: ['Circular economy transitions and the geography of critical minerals', 'Policy pathways for resilient urban resource systems'], badges: [['SSCI', 'index'], ['SCIE', 'index'], ['Scopus', 'index'], ['JCR Q1', 'quartile'], ['中科院 2区', 'zone'], ['TOP', 'zone'], ['已核验', 'verified']] },
+      { name: 'Building and Environment', short: 'B&E', abbr: 'BUILD ENVIRON', cover: 'linear-gradient(155deg,#8c9f82,#354a3b)', papers: 2, citations: 24, years: [2025, 2023], titles: ['Thermal comfort and energy demand in adaptive residential buildings', 'A multi-city study of indoor environmental inequalities'], badges: [['SCIE', 'index'], ['Scopus', 'index'], ['EI', 'index'], ['JCR Q1', 'quartile'], ['中科院 1区', 'zone'], ['TOP', 'zone'], ['已核验', 'verified']] },
+      { name: 'Applied Energy', short: 'AE', abbr: 'APPL ENERG', cover: 'linear-gradient(155deg,#e29a47,#8b3f1f)', papers: 1, citations: 18, years: [2022], titles: ['Integrated energy planning for low-carbon urban districts'], badges: [['SCIE', 'index'], ['Scopus', 'index'], ['EI', 'index'], ['JCR Q1', 'quartile'], ['中科院 1区', 'zone'], ['TOP', 'zone']] },
+      { name: 'Energy Policy', short: 'EP', abbr: 'ENERG POLICY', cover: 'linear-gradient(155deg,#8470a2,#30224d)', papers: 1, citations: 9, years: [2022], titles: ['Policy design for equitable building energy retrofits'], badges: [['SSCI', 'index'], ['SCIE', 'index'], ['Scopus', 'index'], ['JCR Q1', 'quartile'], ['中科院 2区', 'zone']] },
+      { name: 'Journal of Cleaner Production', short: 'JCP', abbr: 'J CLEAN PROD', cover: 'linear-gradient(155deg,#5eaa82,#145442)', papers: 1, citations: 4, years: [2021], titles: ['Cleaner production strategies for urban construction materials'], badges: [['SCIE', 'index'], ['Scopus', 'index'], ['EI', 'index'], ['JCR Q1', 'quartile'], ['中科院 1区', 'zone'], ['TOP', 'zone']] },
+      { name: 'Sustainable Cities and Society', short: 'SCS', abbr: 'SUST CITIES SOC', cover: 'linear-gradient(155deg,#7e9aaf,#243a59)', papers: 1, citations: 2, years: [2021], titles: ['Measuring neighbourhood resilience through indoor environmental quality'], badges: [['SCIE', 'index'], ['Scopus', 'index'], ['JCR Q1', 'quartile'], ['中科院 1区', 'zone'], ['TOP', 'zone']] },
+      { name: 'Environmental Research Letters', short: 'ERL', abbr: 'ENVIRON RES LETT', cover: 'linear-gradient(155deg,#6ca68b,#1f4e49)', papers: 1, citations: 0, years: [2020], titles: ['Environmental exposure, housing quality and public health outcomes'], badges: [['SCIE', 'index'], ['Scopus', 'index'], ['DOAJ', 'index'], ['JCR Q2', 'quartile'], ['中科院 2区', 'zone'], ['新锐 2区', 'zone']] },
+    ];
+    const list = document.getElementById('footprint-list');
+    const search = document.getElementById('journal-search');
+    const year = document.getElementById('year-filter');
+    const researcherLevels = [
+      { min: 0, label: '新晋研究者', next: 20 },
+      { min: 20, label: '初级研究者', next: 60 },
+      { min: 60, label: '进阶研究者', next: 120 },
+      { min: 120, label: '高级研究者', next: 250 },
+      { min: 250, label: '资深研究者', next: 500 },
+      { min: 500, label: '学术领航者', next: null },
+    ];
+    function renderAchievementStats() {
+      const paperCount = publicationJournals.reduce((sum, item) => sum + item.papers, 0);
+      const citationCount = publicationJournals.reduce((sum, item) => sum + (item.citations || 0), 0);
+      const q1PaperCount = publicationJournals
+        .filter(item => item.badges.some(([label]) => /Q1/.test(label)))
+        .reduce((sum, item) => sum + item.papers, 0);
+      const points = paperCount * 5 + citationCount + q1PaperCount * 3;
+      const level = [...researcherLevels].reverse().find(item => points >= item.min) || researcherLevels[0];
+      document.getElementById('achievement-citations').textContent = citationCount;
+      document.getElementById('achievement-points').textContent = points;
+      document.getElementById('publication-count').textContent = paperCount;
+      document.getElementById('citation-count').textContent = citationCount;
+      document.getElementById('researcher-level').textContent = level.label;
+      document.getElementById('researcher-level').title = level.next ? `距离${researcherLevels.find(item => item.min === level.next)?.label || '下一等级'}还差 ${level.next - points} 分` : '已达到当前等级体系最高级';
+      document.querySelectorAll('[data-milestone][data-threshold]').forEach(node => {
+        const current = node.dataset.milestone === 'citations' ? citationCount : paperCount;
+        const earned = current >= Number(node.dataset.threshold);
+        node.classList.toggle('is-earned', earned);
+        node.classList.toggle('is-locked', !earned);
+      });
+    }
+    function renderFootprints() {
+      const q = String(search.value || '').trim().toLowerCase();
+      const y = year.value;
+      const rows = publicationJournals.filter(item => {
+        const text = `${item.name} ${item.abbr}`.toLowerCase();
+        return (!q || text.includes(q)) && (y === 'all' || item.years.includes(Number(y)));
+      });
+      document.getElementById('metric-journals').textContent = publicationJournals.length;
+      document.getElementById('metric-papers').textContent = publicationJournals.reduce((sum, item) => sum + item.papers, 0);
+      renderAchievementStats();
+      list.innerHTML = rows.length ? rows.map(item => `
+        <article class="journal-card">
+          <div class="journal-card-cover" style="--cover:${item.cover}" aria-label="${item.name} (${item.short})"><em>JOURNAL</em><strong>${item.short}</strong><small>${item.years[0]} · Journal</small></div>
+          <div class="journal-card-main">
+            <h3 class="journal-card-title">${item.name}<span>${item.abbr}</span></h3>
+            <div class="journal-meta"><span><strong>${item.papers}</strong> 篇论文</span><span>发表年份：<strong>${item.years.join('、')}</strong></span><span>最后确认：2026-08</span></div>
+            <div class="paper-title-preview" title="${item.titles[0]}">${item.titles[0]}</div>
+            ${item.titles.length > 1 ? `<details class="paper-title-details"><summary>查看全部 ${item.titles.length} 个论文题目</summary><ul>${item.titles.map(title => `<li>${title}</li>`).join('')}</ul></details>` : ''}
+            <div class="badge-row">${item.badges.map(([label, cls]) => `<span class="pub-badge ${cls}">${label}</span>`).join('')}</div>
+          </div>
+          <div class="journal-card-side"><span class="paper-count">已发表</span><a class="journal-link" href="../#j/${encodeURIComponent(item.name)}">查看期刊 →</a></div>
+        </article>`).join('') : '<div class="empty-state">没有匹配的发表期刊。</div>';
+    }
+    search.addEventListener('input', renderFootprints);
+    year.addEventListener('change', renderFootprints);
+    renderFootprints();
+
+    const achievementsModal = document.getElementById('achievements-modal');
+    const openAchievements = document.getElementById('open-achievements');
+    function closeAchievements() {
+      achievementsModal.hidden = true;
+    }
+    openAchievements.addEventListener('click', () => {
+      achievementsModal.hidden = false;
+      document.getElementById('close-achievements').focus();
+    });
+    document.getElementById('close-achievements').addEventListener('click', closeAchievements);
+    achievementsModal.addEventListener('click', event => {
+      if (event.target === achievementsModal) closeAchievements();
+    });
+
+    const modal = document.getElementById('import-modal');
+    const desc = document.getElementById('modal-desc');
+    const authorForm = document.getElementById('author-search-form');
+    const authorName = document.getElementById('author-name');
+    const authorAffiliation = document.getElementById('author-affiliation');
+    const authorResults = document.getElementById('author-results');
+    const authorList = document.getElementById('author-candidate-list');
+    const selectedAuthorCount = document.getElementById('selected-author-count');
+    const legacyImport = document.getElementById('legacy-import');
+    const value = document.getElementById('import-value');
+    const confirmImport = document.getElementById('confirm-import');
+    const modalTitle = document.getElementById('modal-title');
+    let importKind = 'name';
+    const authorCandidates = [
+      { name: 'Zhang, San', org: 'Tongji University · 2016–2020', country: 'China', works: 18, id: 'A5012345601', match: '单位与年份高度匹配' },
+      { name: 'San Zhang', org: 'University of Leeds · 2021–2025', country: 'United Kingdom', works: 11, id: 'A5012345602', match: '英文名与研究方向匹配' },
+      { name: 'Zhang, S.', org: '同名候选 · 无明确机构', country: '多地区', works: 7, id: 'A5012345603', match: '需要更多信息' },
+    ];
+    function selectedCandidates() {
+      return [...authorList.querySelectorAll('input[name="author-candidate"]:checked')];
+    }
+    function updateSelectedAuthors() {
+      const count = selectedCandidates().length;
+      selectedAuthorCount.textContent = `已选 ${count} 个`;
+      confirmImport.disabled = importKind === 'name' ? count === 0 : !String(value.value || '').trim();
+    }
+    function renderAuthorCandidates(query = '') {
+      const displayQuery = query || '你的姓名';
+      authorList.innerHTML = authorCandidates.map((item, index) => `
+        <label class="author-candidate">
+          <input type="checkbox" name="author-candidate" value="${item.id}" data-author-index="${index}" />
+          <span class="author-candidate-main"><strong>${displayQuery} <span style="color:var(--ink-faint);font-weight:600">· ${item.name}</span></strong><small>${item.org}<br />${item.match}</small></span>
+          <span class="author-candidate-meta"><b>${item.works} 篇论文</b>${item.country}<br />${item.id}</span>
+        </label>`).join('');
+      authorList.querySelectorAll('input').forEach(input => input.addEventListener('change', updateSelectedAuthors));
+      authorResults.hidden = false;
+      updateSelectedAuthors();
+    }
+    function resetAuthorSearch() {
+      authorResults.hidden = true;
+      authorList.innerHTML = '';
+      authorName.value = '';
+      authorAffiliation.value = '';
+      selectedAuthorCount.textContent = '已选 0 个';
+      confirmImport.disabled = true;
+    }
+    function openImport(kind = 'name') {
+      importKind = kind;
+      modalTitle.textContent = kind === 'name' ? '搜索我的作者身份' : '导入我的论文';
+      authorForm.hidden = kind !== 'name';
+      document.getElementById('author-search-hint').hidden = kind !== 'name';
+      legacyImport.hidden = kind === 'name';
+      authorResults.hidden = true;
+      if (kind === 'name') {
+        desc.textContent = '输入姓名和可选单位，先查看候选作者；单位变化时可以多选。';
+        confirmImport.textContent = '合并已选身份';
+        resetAuthorSearch();
+        setTimeout(() => authorName.focus(), 0);
+      } else {
+        const copy = {
+          orcid: '输入 ORCID 或 OpenAlex 作者 ID。原型会先生成待确认结果。',
+          doi: '粘贴 DOI、BibTeX 或 CSV 内容。生产版会解析论文并匹配期刊 ISSN。',
+          scholar: '粘贴 Google Scholar 个人主页链接。生产版建议只把它作为候选来源，仍需人工核对。',
+          status: '粘贴投稿系统链接、稿件编号或确认邮件中的状态信息。原型会先生成一条待同步记录。',
+        };
+        desc.textContent = copy[kind] || copy.doi;
+        value.placeholder = kind === 'scholar' ? '例如：https://scholar.google.com/citations?user=...' : kind === 'orcid' ? '例如：0000-0002-1825-0097 / A5012345678' : kind === 'status' ? '例如：Editorial Manager 链接 / Manuscript No.' : '例如：10.1016/j.enpol.2024.113456';
+        confirmImport.textContent = '创建识别任务';
+        value.value = '';
+        setTimeout(() => value.focus(), 0);
+        updateSelectedAuthors();
+      }
+      modal.hidden = false;
+    }
+    function closeImport() { modal.hidden = true; }
+    authorForm.addEventListener('submit', event => {
+      event.preventDefault();
+      const query = String(authorName.value || '').trim();
+      if (!query) { authorName.focus(); return; }
+      renderAuthorCandidates(query);
+    });
+    value.addEventListener('input', updateSelectedAuthors);
+    document.querySelectorAll('[data-import]').forEach(btn => btn.addEventListener('click', () => openImport(btn.dataset.import)));
+    document.getElementById('close-import').addEventListener('click', closeImport);
+    document.getElementById('cancel-import').addEventListener('click', closeImport);
+    document.addEventListener('keydown', event => {
+      if (event.key !== 'Escape') return;
+      if (!achievementsModal.hidden) closeAchievements();
+      if (!modal.hidden) closeImport();
+    });
+    confirmImport.addEventListener('click', () => {
+      if (importKind === 'name') {
+        const count = selectedCandidates().length;
+        if (!count) return;
+        closeImport();
+        const note = document.querySelector('.review-note');
+        note.innerHTML = `<strong>已选择 ${count} 个作者身份：</strong>原型不会联网，生产版会合并这些身份的论文，先放入“待确认”，核对 DOI 后再加入徽章墙。`;
+        return;
+      }
+      const entered = String(value.value || '').trim();
+      if (!entered) { value.focus(); return; }
+      closeImport();
+      const note = document.querySelector('.review-note');
+      note.innerHTML = '<strong>已创建识别任务：</strong>原型不会联网，生产版会将候选论文放入“待确认”，核对作者与 DOI 后再加入徽章墙。';
+    });
+    modal.addEventListener('click', e => { if (e.target === modal) closeImport(); });
+  </script>
+  <script src="../js/site-rail.js?v=20260810-language-label-v1" defer></script>
+  <script src="../js/static-i18n.js?v=20260810-language-label-v1" defer></script>
+</body>
+</html>
