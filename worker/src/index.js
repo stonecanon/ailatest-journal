@@ -535,7 +535,7 @@ async function routeExtensionDownload(req, env) {
   // The ZIP path is intentionally immutable at the edge. Bump this query
   // when the packaged extension changes so the redirect cannot serve an old
   // cached archive after a Pages deployment.
-  target.searchParams.set('v', '20260806-ext-v2');
+  target.searchParams.set('v', '20260810-ext-v3-publication-import');
   return new Response(null, {
     status: 302,
     headers: {
@@ -3872,8 +3872,8 @@ export default {
       if (p === '/search' && (req.method === 'GET' || req.method === 'POST')) return json(await buildPublicSearchResponse(req, env));
       if (p === '/scholar/profile' && req.method === 'GET') {
         try {
-          const result = await fetchScholarProfile(u.searchParams.get('url') || '', fetch);
-          return json(result, 200, { 'Cache-Control': 'private, max-age=300' });
+          const result = await fetchScholarProfile(u.searchParams.get('url') || '', fetch, { browser: env.BROWSER });
+          return json(result, 200, { 'Cache-Control': 'public, max-age=300, s-maxage=1800' });
         } catch (e) {
           return err(e?.message || 'Google Scholar 读取失败', 502, { 'Cache-Control': 'no-store' });
         }

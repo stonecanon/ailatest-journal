@@ -68,7 +68,26 @@ export function parseScholarPapers(html) {
   }).filter(Boolean).slice(0, 100);
 }
 
-export async function fetchScholarProfile(rawUrl, fetchImpl = globalThis.fetch) {
+function isScholarHtml(html) {
+  return /gsc_a_tr/.test(String(html || ''))
+    && !/not a robot|unusual traffic|captcha|robot check|sorry\.google/i.test(String(html || ''));
+}
+
+async function fetchScholarHtmlWithBrowser(target, browser) {
+  if (!browser || typeof browser.quickAction !== 'function') return '';
+  const response = await browser.quickAction('content', {
+    url: target.toString(),
+    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/126 Safari/537.36',
+    gotoOptions: { waitUntil: 'domcontentloaded' },
+    waitForSelector: 'tr.gsc_a_tr',
+    rejectResourceTypes: ['image', 'stylesheet', 'font', 'media'],
+  });
+  if (!response || !response.ok) return '';
+  const html = await response.text();
+  return isScholarHtml(html) ? html : '';
+}
+
+export async function fetchScholarProfile(rawUrl, fetchImpl = globalThis.fetch, options = {}) {
   const parsed = parseScholarProfileUrl(rawUrl);
   const hosts = [
     'scholar.google.co.uk',
@@ -85,7 +104,23 @@ export async function fetchScholarProfile(rawUrl, fetchImpl = globalThis.fetch) 
   let html = '';
   let lastStatus = 0;
   let lastError = null;
+  // Cloudflare Browser Run is the only server-side path that can execute a
+  // real browser. It is optional so Pages/local callers continue to work.
+  if (options?.browser) {
+    const target = new URL('https://scholar.google.com/citations');
+    target.searchParams.set('view_op', 'list_works');
+    target.searchParams.set('hl', 'en');
+    target.searchParams.set('user', parsed.user);
+    target.searchParams.set('cstart', '0');
+    target.searchParams.set('pagesize', '100');
+    try {
+      html = await fetchScholarHtmlWithBrowser(target, options.browser);
+    } catch (error) {
+      lastError = error;
+    }
+  }
   for (const host of hosts) {
+    if (html) break;
     const target = new URL('https://' + host + '/citations');
     target.searchParams.set('view_op', 'list_works');
     target.searchParams.set('hl', 'en');
@@ -96,7 +131,7 @@ export async function fetchScholarProfile(rawUrl, fetchImpl = globalThis.fetch) 
       const response = await fetchImpl(target.toString(), { headers: requestHeaders });
       lastStatus = response.status;
       const candidate = await response.text();
-      if (response.ok && /gsc_a_tr/.test(candidate) && !/not a robot|unusual traffic|captcha|robot check/i.test(candidate)) {
+      if (response.ok && isScholarHtml(candidate)) {
         html = candidate;
         break;
       }
