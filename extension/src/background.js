@@ -102,6 +102,11 @@
   }
   if (chrome.runtime && chrome.runtime.onInstalled) chrome.runtime.onInstalled.addListener(ensureAlarm);
   if (chrome.runtime && chrome.runtime.onStartup) chrome.runtime.onStartup.addListener(ensureAlarm);
+  if (chrome.notifications && chrome.notifications.onClicked) {
+    chrome.notifications.onClicked.addListener(() => {
+      chrome.tabs.create({ url: 'https://journal.ailatest.org/publication-footprint/' });
+    });
+  }
   if (chrome.alarms && chrome.alarms.onAlarm) chrome.alarms.onAlarm.addListener((alarm) => { if (alarm.name === ALARM) poll(); });
   ensureAlarm();
   poll();
