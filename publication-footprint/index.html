@@ -130,6 +130,9 @@
     .journal-link { color: var(--footprint-blue); font-size: 12px; font-weight: 760; white-space: nowrap; }
     .journal-link:hover { color: var(--footprint-orange); }
     .empty-state { padding: 36px 20px; color: var(--ink-faint); text-align: center; }
+    .empty-state strong, .empty-state span { display: block; }
+    .empty-state strong { color: var(--ink-soft); font-size: 13px; }
+    .empty-state span { margin-top: 5px; font-size: 12px; line-height: 1.6; }
     .side-stack { display: grid; gap: 18px; }
     .import-panel { padding: 20px; }
     .import-panel h2 { margin: 0; font-size: 19px; }
@@ -278,10 +281,10 @@
           <p>点击奖杯查看发表成就；期刊卡片保留 JCR / 中科院 / 收录徽章和论文年份。</p>
         </div>
         <section class="metric-grid" aria-label="科研档案统计">
-          <div class="metric-card"><div class="metric-value" id="metric-papers">12</div><div class="metric-label">已识别论文</div></div>
-          <div class="metric-card"><div class="metric-value" id="metric-journals">8</div><div class="metric-label">发表期刊</div></div>
-          <div class="metric-card"><div class="metric-value">5</div><div class="metric-label">覆盖国家 / 地区</div></div>
-          <div class="metric-card"><div class="metric-value">3</div><div class="metric-label">主要研究方向</div></div>
+          <div class="metric-card"><div class="metric-value" id="metric-papers">0</div><div class="metric-label">已识别论文</div></div>
+          <div class="metric-card"><div class="metric-value" id="metric-journals">0</div><div class="metric-label">发表期刊</div></div>
+          <div class="metric-card"><div class="metric-value">0</div><div class="metric-label">覆盖国家 / 地区</div></div>
+          <div class="metric-card"><div class="metric-value">0</div><div class="metric-label">主要研究方向</div></div>
         </section>
       </section>
 
@@ -339,15 +342,15 @@
           <p class="achievement-method">根据已确认的论文和期刊自动解锁；积分只用于站内成就展示。</p>
         </div>
         <div class="achievement-head-right">
-          <span class="achievement-stat"><b id="achievement-citations">126</b> 被引</span>
-          <span class="achievement-stat"><b id="achievement-points">210</b> 积分</span>
-          <span class="researcher-level" id="researcher-level">高级研究者</span>
-          <span class="achievement-progress">已解锁 4 / 6</span>
+          <span class="achievement-stat"><b id="achievement-citations">0</b> 被引</span>
+          <span class="achievement-stat"><b id="achievement-points">0</b> 积分</span>
+          <span class="researcher-level" id="researcher-level">新晋研究者</span>
+          <span class="achievement-progress" id="achievement-progress">已解锁 0 / 6</span>
         </div>
       </div>
       <div class="achievement-tracks" aria-label="发表与被引里程碑">
         <section class="achievement-track" aria-labelledby="publication-milestones-title">
-          <div class="achievement-track-head"><h3 id="publication-milestones-title">发表数量</h3><span><b id="publication-count">12</b> 篇已确认</span></div>
+          <div class="achievement-track-head"><h3 id="publication-milestones-title">发表数量</h3><span><b id="publication-count">0</b> 篇已确认</span></div>
           <div class="milestone-row">
             <span class="milestone" data-milestone="papers" data-threshold="1"><b>1</b><small>首篇</small></span>
             <span class="milestone" data-milestone="papers" data-threshold="10"><b>10</b><small>起步</small></span>
@@ -358,7 +361,7 @@
           </div>
         </section>
         <section class="achievement-track" aria-labelledby="citation-milestones-title">
-          <div class="achievement-track-head"><h3 id="citation-milestones-title">论文被引量</h3><span><b id="citation-count">126</b> 次可核验</span></div>
+          <div class="achievement-track-head"><h3 id="citation-milestones-title">论文被引量</h3><span><b id="citation-count">0</b> 次可核验</span></div>
           <div class="milestone-row">
             <span class="milestone" data-milestone="citations" data-threshold="10"><b>10</b><small>初见影响</small></span>
             <span class="milestone" data-milestone="citations" data-threshold="50"><b>50</b><small>被引起步</small></span>
@@ -371,10 +374,10 @@
       </div>
       <p class="achievement-disclaimer">积分示例：每篇已确认论文 5 分 + 每次被引 1 分 + 每篇 Q1 论文 3 分。等级是网站内的成就称号，不等同于职称、职务或官方学术荣誉。</p>
       <div class="achievement-grid">
-        <article class="achievement-card"><div class="achievement-icon" aria-hidden="true">✦</div><h3>初次发表</h3><p>完成第一篇期刊论文</p><span class="achievement-state">已解锁</span></article>
-        <article class="achievement-card"><div class="achievement-icon" aria-hidden="true">◈</div><h3>期刊探索者</h3><p>在 5 本不同期刊发表</p><span class="achievement-state">已解锁</span></article>
-        <article class="achievement-card"><div class="achievement-icon" aria-hidden="true">★</div><h3>Q1 贡献者</h3><p>在 3 本 Q1 期刊发表</p><span class="achievement-state">已解锁</span></article>
-        <article class="achievement-card"><div class="achievement-icon" aria-hidden="true">↗</div><h3>跨单位经历</h3><p>论文覆盖 2 个机构阶段</p><span class="achievement-state">已解锁</span></article>
+        <article class="achievement-card is-locked"><div class="achievement-icon" aria-hidden="true">✦</div><h3>初次发表</h3><p>完成第一篇期刊论文</p><span class="achievement-state">未解锁</span></article>
+        <article class="achievement-card is-locked"><div class="achievement-icon" aria-hidden="true">◈</div><h3>期刊探索者</h3><p>在 5 本不同期刊发表</p><span class="achievement-state">未解锁</span></article>
+        <article class="achievement-card is-locked"><div class="achievement-icon" aria-hidden="true">★</div><h3>Q1 贡献者</h3><p>在 3 本 Q1 期刊发表</p><span class="achievement-state">未解锁</span></article>
+        <article class="achievement-card is-locked"><div class="achievement-icon" aria-hidden="true">↗</div><h3>跨单位经历</h3><p>论文覆盖 2 个机构阶段</p><span class="achievement-state">未解锁</span></article>
         <article class="achievement-card is-locked"><div class="achievement-icon" aria-hidden="true">∞</div><h3>持续发表</h3><p>连续 3 个自然年有论文</p><span class="achievement-state">还差 1 年</span></article>
         <article class="achievement-card is-locked"><div class="achievement-icon" aria-hidden="true">◎</div><h3>国际足迹</h3><p>覆盖 5 个国家 / 地区</p><span class="achievement-state">还差 2 个</span></article>
       </div>
@@ -404,7 +407,7 @@
   </div>
 
   <script>
-    const publicationJournals = [
+    const demoPublicationJournals = [
       { name: 'Indoor Air', short: 'IA', abbr: 'INDOOR AIR', cover: 'linear-gradient(155deg,#598ca1,#123d57)', papers: 3, citations: 38, years: [2025, 2024], titles: ['Indoor environmental quality and occupant health in mixed-mode buildings', 'Ventilation behaviour and indoor air quality during extreme heat', 'Low-cost sensing for classroom exposure assessment'], badges: [['SCIE', 'index'], ['Scopus', 'index'], ['PubMed', 'index'], ['JCR Q1', 'quartile'], ['中科院 1区', 'zone'], ['TOP', 'zone'], ['已核验', 'verified']] },
       { name: 'Resources Policy', short: 'RP', abbr: 'RESOUR POLICY', cover: 'linear-gradient(155deg,#b68a58,#553a2c)', papers: 2, citations: 31, years: [2024, 2023], titles: ['Circular economy transitions and the geography of critical minerals', 'Policy pathways for resilient urban resource systems'], badges: [['SSCI', 'index'], ['SCIE', 'index'], ['Scopus', 'index'], ['JCR Q1', 'quartile'], ['中科院 2区', 'zone'], ['TOP', 'zone'], ['已核验', 'verified']] },
       { name: 'Building and Environment', short: 'B&E', abbr: 'BUILD ENVIRON', cover: 'linear-gradient(155deg,#8c9f82,#354a3b)', papers: 2, citations: 24, years: [2025, 2023], titles: ['Thermal comfort and energy demand in adaptive residential buildings', 'A multi-city study of indoor environmental inequalities'], badges: [['SCIE', 'index'], ['Scopus', 'index'], ['EI', 'index'], ['JCR Q1', 'quartile'], ['中科院 1区', 'zone'], ['TOP', 'zone'], ['已核验', 'verified']] },
@@ -414,6 +417,8 @@
       { name: 'Sustainable Cities and Society', short: 'SCS', abbr: 'SUST CITIES SOC', cover: 'linear-gradient(155deg,#7e9aaf,#243a59)', papers: 1, citations: 2, years: [2021], titles: ['Measuring neighbourhood resilience through indoor environmental quality'], badges: [['SCIE', 'index'], ['Scopus', 'index'], ['JCR Q1', 'quartile'], ['中科院 1区', 'zone'], ['TOP', 'zone']] },
       { name: 'Environmental Research Letters', short: 'ERL', abbr: 'ENVIRON RES LETT', cover: 'linear-gradient(155deg,#6ca68b,#1f4e49)', papers: 1, citations: 0, years: [2020], titles: ['Environmental exposure, housing quality and public health outcomes'], badges: [['SCIE', 'index'], ['Scopus', 'index'], ['DOAJ', 'index'], ['JCR Q2', 'quartile'], ['中科院 2区', 'zone'], ['新锐 2区', 'zone']] },
     ];
+    const isDemoMode = new URLSearchParams(location.search).get('demo') === '1';
+    const publicationJournals = isDemoMode ? demoPublicationJournals : [];
     const list = document.getElementById('footprint-list');
     const search = document.getElementById('journal-search');
     const year = document.getElementById('year-filter');
@@ -433,11 +438,13 @@
         .reduce((sum, item) => sum + item.papers, 0);
       const points = paperCount * 5 + citationCount + q1PaperCount * 3;
       const level = [...researcherLevels].reverse().find(item => points >= item.min) || researcherLevels[0];
+      const unlockedAchievements = [paperCount >= 1, publicationJournals.length >= 5, q1PaperCount >= 3].filter(Boolean).length;
       document.getElementById('achievement-citations').textContent = citationCount;
       document.getElementById('achievement-points').textContent = points;
       document.getElementById('publication-count').textContent = paperCount;
       document.getElementById('citation-count').textContent = citationCount;
       document.getElementById('researcher-level').textContent = level.label;
+      document.getElementById('achievement-progress').textContent = `已解锁 ${unlockedAchievements} / 6`;
       document.getElementById('researcher-level').title = level.next ? `距离${researcherLevels.find(item => item.min === level.next)?.label || '下一等级'}还差 ${level.next - points} 分` : '已达到当前等级体系最高级';
       document.querySelectorAll('[data-milestone][data-threshold]').forEach(node => {
         const current = node.dataset.milestone === 'citations' ? citationCount : paperCount;
@@ -467,7 +474,7 @@
             <div class="badge-row">${item.badges.map(([label, cls]) => `<span class="pub-badge ${cls}">${label}</span>`).join('')}</div>
           </div>
           <div class="journal-card-side"><span class="paper-count">已发表</span><a class="journal-link" href="../#j/${encodeURIComponent(item.name)}">查看期刊 →</a></div>
-        </article>`).join('') : '<div class="empty-state">没有匹配的发表期刊。</div>';
+        </article>`).join('') : '<div class="empty-state"><strong>暂无已确认的发表记录</strong><span>完成作者身份核对后，已确认的期刊会显示在这里。</span></div>';
     }
     search.addEventListener('input', renderFootprints);
     year.addEventListener('change', renderFootprints);
@@ -500,11 +507,12 @@
     const confirmImport = document.getElementById('confirm-import');
     const modalTitle = document.getElementById('modal-title');
     let importKind = 'name';
-    const authorCandidates = [
+    const demoAuthorCandidates = [
       { name: 'Zhang, San', org: 'Tongji University · 2016–2020', country: 'China', works: 18, id: 'A5012345601', match: '单位与年份高度匹配' },
       { name: 'San Zhang', org: 'University of Leeds · 2021–2025', country: 'United Kingdom', works: 11, id: 'A5012345602', match: '英文名与研究方向匹配' },
       { name: 'Zhang, S.', org: '同名候选 · 无明确机构', country: '多地区', works: 7, id: 'A5012345603', match: '需要更多信息' },
     ];
+    const authorCandidates = isDemoMode ? demoAuthorCandidates : [];
     function selectedCandidates() {
       return [...authorList.querySelectorAll('input[name="author-candidate"]:checked')];
     }
@@ -514,6 +522,12 @@
       confirmImport.disabled = importKind === 'name' ? count === 0 : !String(value.value || '').trim();
     }
     function renderAuthorCandidates(query = '') {
+      if (!authorCandidates.length) {
+        authorList.innerHTML = '<div class="empty-state"><strong>暂无可核验的作者候选</strong><span>作者数据源接入后，搜索结果会显示在这里。</span></div>';
+        authorResults.hidden = false;
+        updateSelectedAuthors();
+        return;
+      }
       const displayQuery = query || '你的姓名';
       authorList.innerHTML = authorCandidates.map((item, index) => `
         <label class="author-candidate">
