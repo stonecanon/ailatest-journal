@@ -105,7 +105,7 @@
     .footprint-list { display: grid; gap: 16px; padding: 16px; }
     .journal-card { display: grid; grid-template-columns: 72px minmax(0, 1fr) auto; gap: 14px; padding: 13px 16px; border: 1px solid #e9e2d8; border-radius: 16px; background: #fffdf9; transition: transform .15s, border-color .15s, box-shadow .15s; }
     .journal-card:hover { transform: translateY(-1px); border-color: rgba(249,115,22,.38); box-shadow: 0 10px 24px rgba(39,35,31,.06); }
-    .journal-card-cover { display: flex; min-height: 78px; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 8px 5px; border-radius: 11px; color: #fff; background: var(--cover, linear-gradient(155deg, hsl(210 20% 62%), hsl(210 25% 48%))); box-shadow: inset 0 0 0 1px rgba(255,255,255,.28), 0 7px 14px rgba(39,35,31,.09); text-align: center; }
+    .journal-card-cover { display: flex; min-height: 78px; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 8px 5px; border-radius: 11px; color: #fff; background: var(--cover, linear-gradient(155deg, hsl(210 18% 66%), hsl(210 22% 54%))); box-shadow: 0 7px 14px rgba(61,84,102,.08); text-align: center; }
     .journal-card-cover small { font-size: 9px; font-weight: 760; letter-spacing: .04em; opacity: .9; }
     .journal-card-cover strong { font-size: 42px; font-weight: 900; line-height: .92; letter-spacing: -.06em; }
     .journal-card-main { min-width: 0; }
@@ -265,6 +265,100 @@
       .author-search-submit { width: 100%; }
       .author-candidate { grid-template-columns: 21px minmax(0, 1fr); }
       .author-candidate-meta { grid-column: 2; text-align: left; white-space: normal; }
+    }
+    /* 手机外部端：沿用主页底栏，但把足迹内容恢复为真正的单列流式布局。
+       左侧数字色块保留论文数量和白字语义，颜色由统一的蓝灰色算法控制。 */
+    @media (max-width: 720px) {
+      body.publication-prototype {
+        width: 100%;
+        padding-left: 0;
+        padding-bottom: calc(76px + env(safe-area-inset-bottom));
+        overflow-x: hidden;
+      }
+      .publication-prototype main.main.publication-main {
+        width: 100%;
+        max-width: none;
+        min-width: 0;
+        box-sizing: border-box;
+        padding: 78px 10px calc(88px + env(safe-area-inset-bottom));
+      }
+      .publication-prototype .publication-page {
+        width: 100%;
+        max-width: none;
+        min-width: 0;
+        margin: 0;
+      }
+      .publication-prototype .topbar {
+        width: 100%;
+        min-width: 0;
+        margin: 0;
+        padding: 0;
+      }
+      .publication-prototype .topbar-brand {
+        left: 52px !important;
+        top: 14px !important;
+        max-width: calc(100vw - 148px) !important;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .publication-hero {
+        min-width: 0;
+        padding: 20px 14px;
+        border-radius: 16px;
+      }
+      .publication-hero h1 { font-size: clamp(30px, 10vw, 42px); line-height: 1.1; }
+      .publication-hero .lead { font-size: 14px; line-height: 1.65; }
+      .hero-preview { min-width: 0; }
+      .metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .workspace-grid { min-width: 0; gap: 14px; }
+      .publication-left-column,
+      .side-stack,
+      .panel { min-width: 0; width: 100%; }
+      .panel { border-radius: 16px; }
+      .panel-head { padding: 15px 13px 12px; }
+      .panel-head h2 { font-size: 19px; }
+      .panel-tools {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        width: 100%;
+        min-width: 0;
+        margin-top: 10px;
+      }
+      .mini-filter { width: 100%; min-width: 0; box-sizing: border-box; }
+      .footprint-list { padding: 9px; gap: 10px; }
+      .journal-card {
+        grid-template-columns: 58px minmax(0, 1fr);
+        gap: 9px;
+        min-width: 0;
+        padding: 11px;
+      }
+      .journal-card-main,
+      .journal-card-side { min-width: 0; }
+      .journal-card-cover { min-height: 64px; }
+      .journal-card-cover strong { font-size: 34px; }
+      .journal-card-title { font-size: 16px; overflow-wrap: anywhere; }
+      .journal-meta { gap: 4px 8px; margin-top: 7px; font-size: 11px; }
+      .paper-title-list { margin-top: 7px; padding-left: 15px; font-size: 11px; }
+      .badge-row { gap: 5px; margin-top: 9px; }
+      .pub-badge { min-height: 22px; padding: 2px 7px; font-size: 10px; }
+      .journal-card-side {
+        grid-column: 2;
+        width: 100%;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-end;
+      }
+      .journal-link { margin-left: auto; }
+      .submission-panel { padding: 13px; }
+      .submission-panel .panel-head { margin: -13px -13px 7px; padding: 13px; }
+      .submission-import-tools { width: 100%; }
+      .submission-import-tools button { width: 100%; }
+      .import-panel { padding: 14px; }
+      .pending-panel { padding: 14px; }
+      .submission-row { min-width: 0; }
+      .submission-main { min-width: 0; }
+      .modal-backdrop { padding: 10px; }
+      .modal-card { max-height: calc(100dvh - 20px); overflow: auto; padding: 16px; border-radius: 16px; }
     }
   </style>
 </head>
@@ -573,10 +667,13 @@
         ? 0
         : Math.min(1, Math.log1p(impactFactor) / Math.log1p(100));
       const depth = Math.max(0, Math.min(1, tierStrength * .72 + ifStrength * .28));
-      const startLightness = Math.round(62 - depth * 12);
-      const endLightness = Math.round(50 - depth * 13);
-      const startSaturation = Math.round(20 + depth * 5);
-      const endSaturation = Math.round(25 + depth * 6);
+      // Keep the paper-count tile in the same restrained blue-gray family as
+      // the site's badges. Better quartiles/IF still deepen the shade, but
+      // the overall card stays light enough for the white count to read cleanly.
+      const startLightness = Math.round(66 - depth * 10);
+      const endLightness = Math.round(54 - depth * 10);
+      const startSaturation = Math.round(18 + depth * 4);
+      const endSaturation = Math.round(22 + depth * 5);
       return `linear-gradient(155deg, hsl(210 ${startSaturation}% ${startLightness}%), hsl(210 ${endSaturation}% ${endLightness}%))`;
     }
     function metadataTextValues(values) {
