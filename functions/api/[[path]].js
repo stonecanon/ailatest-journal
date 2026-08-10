@@ -9,6 +9,7 @@
  *   GET /api/journal/:issn
  *   GET /api/journals/batch?ids=issn1,issn2
  *   GET /api/filters
+ *   GET /api/scholar/profile?url=https://scholar.google.com/citations?user=...
  */
 
 // ───────── helpers ─────────
@@ -248,6 +249,114 @@ async function handleStats() {
   };
 }
 
+// ───────── Google Scholar profile import ─────────
+// Scholar has no supported public JSON API for profile publication lists. This
+// endpoint only reads a user-supplied public profile URL, returns candidates,
+// and never treats them as confirmed publications.
+function decodeHtml(value) {
+  return String(value || '')
+    .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Number(n)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCodePoint(parseInt(n, 16)))
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;|&apos;/gi, "'")
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>');
+}
+
+function htmlText(fragment) {
+  return decodeHtml(String(fragment || '')
+    .replace(/<br\s*\/?>/gi, ' ')
+    .replace(/<[^>]+>/g, ' '))
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function parseScholarProfileUrl(raw) {
+  let value = String(raw || '').trim();
+  // Chat apps commonly leave a Chinese/ASCII comma after the pasted URL.
+  value = value.replace(/[，。；;,\.]+$/u, '');
+  if (!value) throw new Error('请粘贴 Google Scholar 个人主页链接');
+  if (!/^https?:\/\//i.test(value)) value = `https://${value}`;
+  let parsed;
+  try {
+    parsed = new URL(value);
+  } catch (_) {
+    throw new Error('Google Scholar 链接格式不正确');
+  }
+  const host = parsed.hostname.toLowerCase();
+  if (host !== 'scholar.google.com' && !host.endsWith('.scholar.google.com')) {
+    throw new Error('只支持 scholar.google.com 的个人主页链接');
+  }
+  if (!/^\/citations\/?$/i.test(parsed.pathname)) {
+    throw new Error('请粘贴 Google Scholar 个人主页，而不是普通检索链接');
+  }
+  const user = parsed.searchParams.get('user') || '';
+  if (!/^[A-Za-z0-9_-]{6,80}$/.test(user)) {
+    throw new Error('链接中没有有效的 Scholar user ID');
+  }
+  return { user, url: parsed };
+}
+
+function parseScholarPapers(html) {
+  const rows = [...String(html || '').matchAll(/<tr[^>]+class=["']gsc_a_tr["'][^>]*>([\s\S]*?)<\/tr>/gi)];
+  return rows.map((match) => {
+    const row = match[1] || '';
+    const titleMatch = row.match(/<a[^>]+class=["']gsc_a_at["'][^>]*>([\s\S]*?)<\/a>/i);
+    const gray = [...row.matchAll(/<div[^>]+class=["']gs_gray["'][^>]*>([\s\S]*?)<\/div>/gi)]
+      .map((m) => htmlText(m[1]));
+    const citationMatch = row.match(/class=["']gsc_a_c["'][\s\S]*?<a[^>]*>([\s\S]*?)<\/a>/i);
+    const yearMatch = row.match(/class=["']gsc_a_y["'][\s\S]*?>(\d{4})<\//i);
+    const title = htmlText(titleMatch?.[1]);
+    if (!title) return null;
+    return {
+      title,
+      authors: gray[0] || '',
+      venue: gray[1] || '',
+      year: yearMatch ? Number(yearMatch[1]) : null,
+      citations: Number.parseInt(htmlText(citationMatch?.[1]) || '0', 10) || 0,
+    };
+  }).filter(Boolean).slice(0, 100);
+}
+
+async function handleScholarProfile(url) {
+  const parsed = parseScholarProfileUrl(url.searchParams.get('url') || '');
+  const target = new URL('https://scholar.google.com/citations');
+  target.searchParams.set('view_op', 'list_works');
+  target.searchParams.set('hl', 'en');
+  target.searchParams.set('user', parsed.user);
+  target.searchParams.set('cstart', '0');
+  target.searchParams.set('pagesize', '100');
+
+  const response = await fetch(target.toString(), {
+    headers: {
+      'Accept': 'text/html,application/xhtml+xml',
+      'Accept-Language': 'en-US,en;q=0.9',
+      'User-Agent': 'Mozilla/5.0 (compatible; AILatest-Journal/1.0; +https://journal.ailatest.org)',
+    },
+  });
+  if (!response.ok) throw new Error(`Google Scholar 暂时无法访问（${response.status}）`);
+  const html = await response.text();
+  if (/not a robot|unusual traffic|captcha|robot check/i.test(html) || !/gsc_a_tr/.test(html)) {
+    throw new Error('Google Scholar 暂时拒绝了自动读取，请稍后重试，或改用 ORCID / OpenAlex 作者 ID');
+  }
+
+  const nameMatch = html.match(/<div[^>]+id=["']gsc_prf_in["'][^>]*>([\s\S]*?)<\/div>/i);
+  const affiliationMatch = html.match(/<div[^>]+class=["']gsc_prf_il["'][^>]*>([\s\S]*?)<\/div>/i);
+  const papers = parseScholarPapers(html);
+  return {
+    source: 'google-scholar',
+    profile_id: parsed.user,
+    profile_url: `https://scholar.google.com/citations?user=${encodeURIComponent(parsed.user)}`,
+    name: htmlText(nameMatch?.[1]),
+    affiliation: htmlText(affiliationMatch?.[1]),
+    papers,
+    paper_count: papers.length,
+    note: 'Scholar 结果仅作为候选；确认作者、论文题目和期刊后，才可加入发表足迹。',
+  };
+}
+
 // ───────── main entry ─────────
 export async function onRequest(context) {
   const { request } = context;
@@ -268,6 +377,8 @@ export async function onRequest(context) {
       result = await handleStats();
     } else if (path === '/api/filters') {
       result = await handleFilters();
+    } else if (path === '/api/scholar/profile') {
+      result = await handleScholarProfile(url);
     } else if (path === '/api/journals/batch') {
       result = await handleBatch(url);
     } else if (path.startsWith('/api/journal/')) {

@@ -199,6 +199,15 @@
     .author-candidate-meta { text-align: right; color: var(--ink-faint); font-size: 10px; line-height: 1.55; white-space: nowrap; }
     .author-candidate-meta b { display: block; color: var(--footprint-blue); font-size: 11px; }
     .author-multi-note { margin: 9px 0 0; color: var(--ink-faint); font-size: 11px; line-height: 1.55; }
+    .scholar-result { margin-top: 12px; padding: 11px 12px; border: 1px solid var(--rule-soft); border-radius: 13px; background: #fffdf9; }
+    .scholar-result[hidden] { display: none; }
+    .scholar-result.is-error { color: #8c4930; background: #fff3ed; }
+    .scholar-profile-summary { display: grid; gap: 3px; color: var(--ink-faint); font-size: 11px; line-height: 1.45; }
+    .scholar-profile-summary strong { color: var(--ink); font-size: 13px; }
+    .scholar-paper-list { display: grid; gap: 6px; max-height: 190px; margin: 10px 0 0; padding: 0 2px 0 16px; overflow: auto; }
+    .scholar-paper-list li { padding-left: 2px; color: var(--ink-soft); font-size: 11px; line-height: 1.45; }
+    .scholar-paper-list small { display: block; margin-top: 2px; color: var(--ink-faint); font-size: 10px; }
+    .scholar-result-note { margin: 9px 0 0; color: var(--ink-faint); font-size: 10px; line-height: 1.5; }
     .modal-import[disabled] { opacity: .45; cursor: not-allowed; }
     .modal-input { width: 100%; min-height: 42px; margin-top: 8px; border: 1px solid var(--rule); border-radius: 11px; padding: 0 12px; color: var(--ink); background: #fff; font: inherit; }
     .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
@@ -326,7 +335,7 @@
           </section>
           <section class="panel pending-panel">
             <h3>待确认的识别结果</h3>
-            <div class="pending-empty">暂无待确认结果</div>
+            <div id="pending-results"><div class="pending-empty" id="pending-empty">暂无待确认结果</div></div>
           </section>
         </aside>
       </div>
@@ -401,6 +410,7 @@
       </div>
       <div class="legacy-import" id="legacy-import" hidden>
         <input class="modal-input" id="import-value" type="text" placeholder="例如：10.1016/j.enpol.2024.113456" />
+        <div class="scholar-result" id="scholar-result" hidden></div>
       </div>
       <div class="modal-actions"><button class="modal-cancel" id="cancel-import" type="button">取消</button><button class="modal-import" id="confirm-import" type="button" disabled>合并已选身份</button></div>
     </section>
@@ -506,13 +516,82 @@
     const value = document.getElementById('import-value');
     const confirmImport = document.getElementById('confirm-import');
     const modalTitle = document.getElementById('modal-title');
+    const scholarResult = document.getElementById('scholar-result');
+    const pendingResults = document.getElementById('pending-results');
+    const pendingStorageKey = 'ailatest-publication-pending-scholar-v1';
     let importKind = 'name';
+    let scholarPayload = null;
+    let pendingScholarImports = [];
+    try {
+      const saved = JSON.parse(localStorage.getItem(pendingStorageKey) || '[]');
+      if (Array.isArray(saved)) pendingScholarImports = saved.slice(0, 10);
+    } catch (_) {}
     const demoAuthorCandidates = [
       { name: 'Zhang, San', org: 'Tongji University · 2016–2020', country: 'China', works: 18, id: 'A5012345601', match: '单位与年份高度匹配' },
       { name: 'San Zhang', org: 'University of Leeds · 2021–2025', country: 'United Kingdom', works: 11, id: 'A5012345602', match: '英文名与研究方向匹配' },
       { name: 'Zhang, S.', org: '同名候选 · 无明确机构', country: '多地区', works: 7, id: 'A5012345603', match: '需要更多信息' },
     ];
     const authorCandidates = isDemoMode ? demoAuthorCandidates : [];
+    function escapeHtml(value) {
+      return String(value || '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
+    }
+    function renderPendingScholarImports() {
+      if (!pendingScholarImports.length) {
+        pendingResults.innerHTML = '<div class="pending-empty">暂无待确认结果</div>';
+        return;
+      }
+      pendingResults.innerHTML = pendingScholarImports.map(item => `
+        <div class="pending-item">
+          <span><strong>${escapeHtml(item.name || 'Google Scholar 作者')}</strong> · ${Number(item.paper_count || 0)} 篇候选论文</span>
+          <small class="submission-system">待核对</small>
+        </div>`).join('');
+    }
+    function renderScholarResult(data) {
+      const papers = Array.isArray(data?.papers) ? data.papers : [];
+      const profile = `<div class="scholar-profile-summary"><strong>${escapeHtml(data?.name || '未读取到作者姓名')}</strong><span>${escapeHtml(data?.affiliation || '未读取到机构')}</span><span>已读取 ${papers.length} 篇公开论文 · Scholar ID ${escapeHtml(data?.profile_id || '')}</span></div>`;
+      const list = papers.slice(0, 8).map(item => `<li><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.venue || '期刊信息未识别')} · ${item.year || '年份未知'} · 被引 ${Number(item.citations || 0)}</small></li>`).join('');
+      scholarResult.classList.remove('is-error');
+      scholarResult.innerHTML = `${profile}${list ? `<ol class="scholar-paper-list">${list}</ol>` : ''}<p class="scholar-result-note">结果只进入待确认，不会直接生成发表徽章；需要逐条核对作者、题目和期刊。</p>`;
+      scholarResult.hidden = false;
+    }
+    function showScholarError(message) {
+      scholarResult.classList.add('is-error');
+      scholarResult.textContent = message;
+      scholarResult.hidden = false;
+    }
+    async function lookupScholarProfile() {
+      const entered = String(value.value || '').trim();
+      if (!entered) { value.focus(); return; }
+      confirmImport.disabled = true;
+      confirmImport.textContent = '读取中…';
+      scholarResult.classList.remove('is-error');
+      scholarResult.textContent = '正在读取公开 Scholar 主页…';
+      scholarResult.hidden = false;
+      try {
+        const response = await fetch(`/api/scholar/profile?url=${encodeURIComponent(entered)}`, { headers: { Accept: 'application/json' } });
+        let data = null;
+        try { data = await response.json(); } catch (_) {}
+        if (!response.ok) throw new Error(data?.error || `读取失败（${response.status}）`);
+        scholarPayload = data;
+        renderScholarResult(data);
+        confirmImport.disabled = false;
+        confirmImport.textContent = '加入待确认';
+      } catch (error) {
+        scholarPayload = null;
+        showScholarError(error?.message || '暂时无法读取 Google Scholar 主页');
+        confirmImport.disabled = false;
+        confirmImport.textContent = '重新读取';
+      }
+    }
+    function queueScholarImport() {
+      if (!scholarPayload) return;
+      pendingScholarImports = [scholarPayload, ...pendingScholarImports.filter(item => item.profile_id !== scholarPayload.profile_id)].slice(0, 10);
+      try { localStorage.setItem(pendingStorageKey, JSON.stringify(pendingScholarImports)); } catch (_) {}
+      renderPendingScholarImports();
+      document.querySelector('.review-note').innerHTML = `<strong>已读取 ${Number(scholarPayload.paper_count || 0)} 篇 Scholar 候选论文：</strong>已放入待确认区，核对后再加入徽章墙。`;
+      closeImport();
+    }
+    renderPendingScholarImports();
     function selectedCandidates() {
       return [...authorList.querySelectorAll('input[name="author-candidate"]:checked')];
     }
@@ -554,6 +633,9 @@
       document.getElementById('author-search-hint').hidden = kind !== 'name';
       legacyImport.hidden = kind === 'name';
       authorResults.hidden = true;
+      scholarPayload = null;
+      scholarResult.hidden = true;
+      scholarResult.classList.remove('is-error');
       if (kind === 'name') {
         desc.textContent = '输入姓名和可选单位，先查看候选作者；单位变化时可以多选。';
         confirmImport.textContent = '合并已选身份';
@@ -563,12 +645,12 @@
         const copy = {
           orcid: '输入 ORCID 或 OpenAlex 作者 ID。原型会先生成待确认结果。',
           doi: '粘贴 DOI、BibTeX 或 CSV 内容。生产版会解析论文并匹配期刊 ISSN。',
-          scholar: '粘贴 Google Scholar 个人主页链接。生产版建议只把它作为候选来源，仍需人工核对。',
+          scholar: '粘贴 Google Scholar 个人主页链接，读取公开论文列表后进入待确认。',
           status: '粘贴投稿系统链接、稿件编号或确认邮件中的状态信息。原型会先生成一条待同步记录。',
         };
         desc.textContent = copy[kind] || copy.doi;
         value.placeholder = kind === 'scholar' ? '例如：https://scholar.google.com/citations?user=...' : kind === 'orcid' ? '例如：0000-0002-1825-0097 / A5012345678' : kind === 'status' ? '例如：Editorial Manager 链接 / Manuscript No.' : '例如：10.1016/j.enpol.2024.113456';
-        confirmImport.textContent = '创建识别任务';
+        confirmImport.textContent = kind === 'scholar' ? '读取个人主页' : '创建识别任务';
         value.value = '';
         setTimeout(() => value.focus(), 0);
         updateSelectedAuthors();
@@ -582,7 +664,15 @@
       if (!query) { authorName.focus(); return; }
       renderAuthorCandidates(query);
     });
-    value.addEventListener('input', updateSelectedAuthors);
+    value.addEventListener('input', () => {
+      if (importKind === 'scholar') {
+        scholarPayload = null;
+        scholarResult.hidden = true;
+        scholarResult.classList.remove('is-error');
+        confirmImport.textContent = '读取个人主页';
+      }
+      updateSelectedAuthors();
+    });
     document.querySelectorAll('[data-import]').forEach(btn => btn.addEventListener('click', () => openImport(btn.dataset.import)));
     document.getElementById('close-import').addEventListener('click', closeImport);
     document.getElementById('cancel-import').addEventListener('click', closeImport);
@@ -591,7 +681,7 @@
       if (!achievementsModal.hidden) closeAchievements();
       if (!modal.hidden) closeImport();
     });
-    confirmImport.addEventListener('click', () => {
+    confirmImport.addEventListener('click', async () => {
       if (importKind === 'name') {
         const count = selectedCandidates().length;
         if (!count) return;
@@ -602,6 +692,11 @@
       }
       const entered = String(value.value || '').trim();
       if (!entered) { value.focus(); return; }
+      if (importKind === 'scholar') {
+        if (scholarPayload) queueScholarImport();
+        else await lookupScholarProfile();
+        return;
+      }
       closeImport();
       const note = document.querySelector('.review-note');
       note.innerHTML = '<strong>已创建识别任务：</strong>原型不会联网，生产版会将候选论文放入“待确认”，核对作者与 DOI 后再加入徽章墙。';
