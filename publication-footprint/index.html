@@ -539,9 +539,26 @@
       { name: 'San Zhang', org: 'University of Leeds · 2021–2025', country: 'United Kingdom', works: 11, id: 'A5012345602', match: '英文名与研究方向匹配' },
       { name: 'Zhang, S.', org: '同名候选 · 无明确机构', country: '多地区', works: 7, id: 'A5012345603', match: '需要更多信息' },
     ];
-    const authorCandidates = isDemoMode ? demoAuthorCandidates : [];
+    let authorCandidates = isDemoMode ? demoAuthorCandidates.slice() : [];
     function escapeHtml(value) {
       return String(value || '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
+    }
+    async function publicationApi(path, init = {}) {
+      const response = await fetch(path, {
+        ...init,
+        headers: { Accept: 'application/json', ...(init.headers || {}) },
+      });
+      let data = null;
+      try { data = await response.json(); } catch (_) {}
+      if (!response.ok) throw new Error(data?.error || `请求失败（${response.status}）`);
+      return data || {};
+    }
+    function setImportLoading(message, buttonText = '读取中…') {
+      scholarResult.classList.remove('is-error');
+      scholarResult.textContent = message;
+      scholarResult.hidden = false;
+      confirmImport.disabled = true;
+      confirmImport.textContent = buttonText;
     }
     function renderPendingScholarImports() {
       if (!pendingScholarImports.length) {
@@ -550,22 +567,124 @@
       }
       pendingResults.innerHTML = pendingScholarImports.map(item => `
         <div class="pending-item">
-          <span><strong>${escapeHtml(item.name || 'Google Scholar 作者')}</strong> · ${Number(item.paper_count || 0)} 篇候选论文</span>
+          <span><strong>${escapeHtml(item.name || item.source_label || '待确认导入')}</strong> · ${Number(item.paper_count || item.papers?.length || 0)} 篇候选论文</span>
           <button type="button" data-accept-profile="${escapeHtml(item.profile_id || '')}">核对后加入</button>
         </div>`).join('');
     }
     function renderScholarResult(data) {
       const papers = Array.isArray(data?.papers) ? data.papers : [];
-      const profile = `<div class="scholar-profile-summary"><strong>${escapeHtml(data?.name || '未读取到作者姓名')}</strong><span>${escapeHtml(data?.affiliation || '未读取到机构')}</span><span>已读取 ${papers.length} 篇公开论文 · Scholar ID ${escapeHtml(data?.profile_id || '')}</span></div>`;
+      const sourceLabel = data?.source_label || (data?.source === 'openalex-author' ? 'OpenAlex 作者' : data?.source === 'crossref/openalex' ? '公开元数据' : 'Google Scholar');
+      const profile = `<div class="scholar-profile-summary"><strong>${escapeHtml(data?.name || sourceLabel)}</strong><span>${escapeHtml(data?.affiliation || '未读取到机构')}</span><span>已读取 ${papers.length} 篇公开论文 · 来源：${escapeHtml(sourceLabel)}${data?.profile_id ? ` · ${escapeHtml(data.profile_id)}` : ''}</span></div>`;
       const list = papers.slice(0, 8).map(item => `<li><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.venue || '期刊信息未识别')} · ${item.year || '年份未知'} · 被引 ${Number(item.citations || 0)}</small></li>`).join('');
       scholarResult.classList.remove('is-error');
-      scholarResult.innerHTML = `${profile}${list ? `<ol class="scholar-paper-list">${list}</ol>` : ''}<p class="scholar-result-note">结果只进入待确认，不会直接生成发表徽章；需要逐条核对作者、题目和期刊。</p>`;
+      const warning = Array.isArray(data?.errors) && data.errors.length ? `<p class="scholar-result-note">有 ${data.errors.length} 条记录未完整匹配，已保留你输入的题目/期刊信息。</p>` : '';
+      scholarResult.innerHTML = `${profile}${list ? `<ol class="scholar-paper-list">${list}</ol>` : ''}${warning}<p class="scholar-result-note">结果只进入待确认，不会直接生成发表徽章；请逐条核对作者、题目和期刊。</p>`;
       scholarResult.hidden = false;
     }
     function showScholarError(message) {
       scholarResult.classList.add('is-error');
       scholarResult.textContent = message;
       scholarResult.hidden = false;
+    }
+    function cleanDoi(value) {
+      return String(value || '').trim()
+        .replace(/^doi:\s*/i, '')
+        .replace(/^https?:\/\/(?:dx\.)?doi\.org\//i, '')
+        .replace(/[\s<>"'`]+$/g, '')
+        .replace(/[),.;:]+$/g, '');
+    }
+    function parseCsvLine(line) {
+      const cells = [];
+      let cell = '';
+      let quoted = false;
+      for (let i = 0; i < line.length; i += 1) {
+        const char = line[i];
+        if (char === '"') {
+          if (quoted && line[i + 1] === '"') { cell += '"'; i += 1; }
+          else quoted = !quoted;
+        } else if ((char === ',' || char === '\t') && !quoted) {
+          cells.push(cell.trim());
+          cell = '';
+        } else cell += char;
+      }
+      cells.push(cell.trim());
+      return cells;
+    }
+    function parsePublicationInput(raw) {
+      const text = String(raw || '').trim();
+      if (!text) return [];
+      const items = [];
+      const doiMatches = text.match(/10\.\d{4,9}\/[-._;()/:A-Z0-9]+/ig) || [];
+      doiMatches.forEach(doi => items.push({ doi: cleanDoi(doi) }));
+      const bibEntries = text.split(/(?=@[A-Za-z]+\s*\{)/g).filter(entry => /^\s*@[A-Za-z]+\s*\{/i.test(entry));
+      bibEntries.forEach(entry => {
+        const item = {};
+        const fieldPattern = /\b(doi|title|journal|year|author)\s*=\s*(?:\{([\s\S]*?)\}|"([\s\S]*?)")\s*,?/gi;
+        let match;
+        while ((match = fieldPattern.exec(entry))) item[match[1].toLowerCase()] = String(match[2] || match[3] || '').replace(/[{}]/g, '').replace(/\s+/g, ' ').trim();
+        if (Object.keys(item).length) items.push({ doi: cleanDoi(item.doi), title: item.title || '', venue: item.journal || '', year: item.year || '', authors: item.author ? [item.author] : [] });
+      });
+      const lines = text.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+      if (lines.length >= 2 && (lines[0].includes(',') || lines[0].includes('\t'))) {
+        const headers = parseCsvLine(lines[0]).map(header => header.toLowerCase().replace(/[^a-z0-9]+/g, ''));
+        lines.slice(1).forEach(line => {
+          const cells = parseCsvLine(line);
+          const row = {};
+          headers.forEach((header, index) => { row[header] = cells[index] || ''; });
+          const item = {
+            doi: cleanDoi(row.doi || row.digitalobjectidentifier || ''),
+            title: row.title || row.articletitle || row.name || '',
+            venue: row.journal || row.venue || row.journalname || row.container || '',
+            year: row.year || row.publicationyear || '',
+            authors: row.author || row.authors ? [row.author || row.authors] : [],
+          };
+          if (item.doi || item.title || item.venue) items.push(item);
+        });
+      }
+      if (!items.length) {
+        const title = text.replace(/\s+/g, ' ').trim();
+        if (title.length >= 3) items.push({ title });
+      }
+      const unique = new Map();
+      items.forEach(item => {
+        const key = cleanDoi(item.doi).toLowerCase() || `${String(item.title || '').toLowerCase()}|${String(item.venue || '').toLowerCase()}`.trim();
+        if (key && !unique.has(key)) unique.set(key, { ...item, doi: cleanDoi(item.doi) });
+      });
+      return [...unique.values()].slice(0, 50);
+    }
+    async function resolvePublicationInput() {
+      const items = parsePublicationInput(value.value);
+      if (!items.length) { showScholarError('没有识别到 DOI、BibTeX、CSV 或论文题目。'); return; }
+      setImportLoading(`正在解析 ${items.length} 条论文，并读取公开元数据…`);
+      try {
+        const data = await publicationApi('/api/publication/resolve', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ items }) });
+        scholarPayload = data;
+        renderScholarResult(data);
+        confirmImport.disabled = false;
+        confirmImport.textContent = '加入待确认';
+      } catch (error) {
+        scholarPayload = null;
+        showScholarError(error?.message || '论文元数据暂时不可用，请稍后重试。');
+        confirmImport.disabled = false;
+        confirmImport.textContent = '重新解析';
+      }
+    }
+    async function lookupAuthorWorks(identifiers) {
+      const ids = Array.isArray(identifiers) ? identifiers : [identifiers];
+      if (!ids.length) return;
+      setImportLoading('正在从 OpenAlex 读取作者公开论文…');
+      try {
+        const data = await publicationApi(`/api/publication/author-works?ids=${encodeURIComponent(ids.join(','))}`);
+        scholarPayload = data;
+        renderScholarResult(data);
+        confirmImport.disabled = false;
+        confirmImport.textContent = '加入待确认';
+      } catch (error) {
+        scholarPayload = null;
+        showScholarError(error?.message || '作者论文暂时不可用，请稍后重试。');
+        confirmImport.disabled = false;
+        confirmImport.textContent = '重新读取';
+      }
     }
     async function lookupScholarProfile() {
       const entered = String(value.value || '').trim();
@@ -671,7 +790,8 @@
       pendingScholarImports = [payload, ...pendingScholarImports.filter(item => item.profile_id !== payload.profile_id)].slice(0, 10);
       try { localStorage.setItem(pendingStorageKey, JSON.stringify(pendingScholarImports)); } catch (_) {}
       renderPendingScholarImports();
-      document.querySelector('.review-note').innerHTML = `<strong>已读取 ${Number(payload.paper_count || 0)} 篇 Scholar 候选论文：</strong>已放入待确认区，核对后再加入徽章墙。`;
+      const sourceLabel = payload.source_label || (payload.source === 'openalex-author' ? 'OpenAlex' : payload.source === 'crossref/openalex' ? '公开元数据' : 'Google Scholar');
+      document.querySelector('.review-note').innerHTML = `<strong>已读取 ${Number(payload.paper_count || payload.papers?.length || 0)} 篇 ${escapeHtml(sourceLabel)} 候选论文：</strong>已放入待确认区，核对后再加入徽章墙。`;
     }
     renderPendingScholarImports();
     pendingResults.addEventListener('click', event => {
@@ -692,9 +812,9 @@
       selectedAuthorCount.textContent = `已选 ${count} 个`;
       confirmImport.disabled = importKind === 'name' ? count === 0 : !String(value.value || '').trim();
     }
-    function renderAuthorCandidates(query = '') {
+    function renderAuthorCandidates(query = '', note = '') {
       if (!authorCandidates.length) {
-        authorList.innerHTML = '<div class="empty-state"><strong>暂无可核验的作者候选</strong><span>作者数据源接入后，搜索结果会显示在这里。</span></div>';
+        authorList.innerHTML = '<div class="empty-state"><strong>暂无可核验的作者候选</strong><span>OpenAlex 没有返回匹配结果；试试英文名、曾用单位，或改用 ORCID / OpenAlex 作者 ID。</span></div>';
         authorResults.hidden = false;
         updateSelectedAuthors();
         return;
@@ -702,10 +822,14 @@
       const displayQuery = query || '你的姓名';
       authorList.innerHTML = authorCandidates.map((item, index) => `
         <label class="author-candidate">
-          <input type="checkbox" name="author-candidate" value="${item.id}" data-author-index="${index}" />
-          <span class="author-candidate-main"><strong>${displayQuery} <span style="color:var(--ink-faint);font-weight:600">· ${item.name}</span></strong><small>${item.org}<br />${item.match}</small></span>
-          <span class="author-candidate-meta"><b>${item.works} 篇论文</b>${item.country}<br />${item.id}</span>
+          <input type="checkbox" name="author-candidate" value="${escapeHtml(item.id)}" data-author-index="${index}" />
+          <span class="author-candidate-main"><strong>${escapeHtml(item.name || displayQuery)}</strong><small>${escapeHtml(item.org || '机构未标注')}<br />${escapeHtml(item.match || 'OpenAlex 候选 · 仍需人工确认')}${item.orcid ? `<br />ORCID ${escapeHtml(item.orcid.replace(/^https?:\/\/orcid\.org\//i, ''))}` : ''}</small></span>
+          <span class="author-candidate-meta"><b>${Number(item.works_count || item.works || 0)} 篇论文</b>${escapeHtml(item.country || '地区未标注')}<br />被引 ${Number(item.cited_by_count || item.citations || 0)}<br />${escapeHtml(item.id || '')}</span>
         </label>`).join('');
+      if (note) {
+        const hint = document.getElementById('author-search-hint');
+        hint.textContent = note;
+      }
       authorList.querySelectorAll('input').forEach(input => input.addEventListener('change', updateSelectedAuthors));
       authorResults.hidden = false;
       updateSelectedAuthors();
@@ -735,14 +859,14 @@
         setTimeout(() => authorName.focus(), 0);
       } else {
         const copy = {
-          orcid: '输入 ORCID 或 OpenAlex 作者 ID。原型会先生成待确认结果。',
-          doi: '粘贴 DOI、BibTeX 或 CSV 内容。生产版会解析论文并匹配期刊 ISSN。',
+          orcid: '输入 ORCID 或 OpenAlex 作者 ID；系统会从 OpenAlex 读取公开论文，先放入待确认。',
+          doi: '粘贴 DOI、BibTeX 或 CSV 内容；系统会解析公开元数据，先放入待确认。',
           scholar: '粘贴 Google Scholar 个人主页链接；若服务器被 Google 拦截，请在 Scholar 主页使用插件导入。',
-          status: '粘贴投稿系统链接、稿件编号或确认邮件中的状态信息。原型会先生成一条待同步记录。',
+          status: '粘贴投稿系统链接、稿件编号或确认邮件中的状态信息；当前保存为手动待同步记录。',
         };
         desc.textContent = copy[kind] || copy.doi;
         value.placeholder = kind === 'scholar' ? '例如：https://scholar.google.com/citations?user=...' : kind === 'orcid' ? '例如：0000-0002-1825-0097 / A5012345678' : kind === 'status' ? '例如：Editorial Manager 链接 / Manuscript No.' : '例如：10.1016/j.enpol.2024.113456';
-        confirmImport.textContent = kind === 'scholar' ? '读取个人主页' : '创建识别任务';
+        confirmImport.textContent = kind === 'scholar' ? '读取个人主页' : kind === 'orcid' ? '读取论文' : kind === 'doi' ? '解析并加入待确认' : '添加记录';
         value.value = '';
         setTimeout(() => value.focus(), 0);
         updateSelectedAuthors();
@@ -750,11 +874,24 @@
       modal.hidden = false;
     }
     function closeImport() { modal.hidden = true; }
-    authorForm.addEventListener('submit', event => {
+    authorForm.addEventListener('submit', async event => {
       event.preventDefault();
       const query = String(authorName.value || '').trim();
       if (!query) { authorName.focus(); return; }
-      renderAuthorCandidates(query);
+      authorCandidates = [];
+      authorResults.hidden = false;
+      authorList.innerHTML = '<div class="empty-state"><strong>正在搜索 OpenAlex 作者…</strong><span>会按姓名、单位和论文量整理候选。</span></div>';
+      confirmImport.disabled = true;
+      try {
+        const data = await publicationApi(`/api/publication/authors?name=${encodeURIComponent(query)}&affiliation=${encodeURIComponent(String(authorAffiliation.value || '').trim())}`);
+        authorCandidates = Array.isArray(data.results) ? data.results : [];
+        renderAuthorCandidates(query, data.note || '候选来自 OpenAlex；仍需人工确认。');
+      } catch (error) {
+        authorCandidates = [];
+        authorList.innerHTML = `<div class="empty-state"><strong>作者搜索暂时失败</strong><span>${escapeHtml(error?.message || '请稍后重试，或改用 ORCID / OpenAlex 作者 ID。')}</span></div>`;
+        authorResults.hidden = false;
+        updateSelectedAuthors();
+      }
     });
     value.addEventListener('input', () => {
       if (importKind === 'scholar') {
@@ -777,9 +914,8 @@
       if (importKind === 'name') {
         const count = selectedCandidates().length;
         if (!count) return;
-        closeImport();
-        const note = document.querySelector('.review-note');
-        note.innerHTML = `<strong>已选择 ${count} 个作者身份：</strong>原型不会联网，生产版会合并这些身份的论文，先放入“待确认”，核对 DOI 后再加入徽章墙。`;
+        const ids = selectedCandidates().map(input => input.value).filter(Boolean);
+        await lookupAuthorWorks(ids);
         return;
       }
       const entered = String(value.value || '').trim();
@@ -789,9 +925,19 @@
         else await lookupScholarProfile();
         return;
       }
+      if (importKind === 'orcid') {
+        if (scholarPayload) queueScholarImport();
+        else await lookupAuthorWorks(entered);
+        return;
+      }
+      if (importKind === 'doi') {
+        if (scholarPayload) queueScholarImport();
+        else await resolvePublicationInput();
+        return;
+      }
       closeImport();
       const note = document.querySelector('.review-note');
-      note.innerHTML = '<strong>已创建识别任务：</strong>原型不会联网，生产版会将候选论文放入“待确认”，核对作者与 DOI 后再加入徽章墙。';
+      note.innerHTML = '<strong>已添加投稿记录：</strong>当前仅保存你粘贴的投稿状态信息，不会读取出版社账号密码。';
     });
     modal.addEventListener('click', e => { if (e.target === modal) closeImport(); });
   </script>

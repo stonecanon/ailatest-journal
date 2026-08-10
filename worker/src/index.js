@@ -2725,6 +2725,335 @@ function getOpenAlexApiKeys(env) {
   ].filter(Boolean))];
 }
 
+// ───────── publication-footprint public import helpers ─────────
+// These routes deliberately keep provider keys on the Worker.  The browser
+// only receives normalized author/paper metadata and never sees OPENALEX keys.
+const PUBLIC_METADATA_MAILTO = 'ailatest@ailatest.org';
+
+function foldPublicationText(value) {
+  return String(value || '')
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9\u4e00-\u9fff]+/g, ' ')
+    .trim();
+}
+
+function shortOpenAlexId(value) {
+  const match = String(value || '').match(/(?:openalex\.org\/)?(A\d+)$/i);
+  return match ? match[1].toUpperCase() : '';
+}
+
+function normalizeOrcid(value) {
+  const raw = String(value || '').trim().replace(/^https?:\/\/orcid\.org\//i, '');
+  return /^\d{4}-\d{4}-\d{4}-[\dX]{4}$/i.test(raw) ? raw.toUpperCase() : '';
+}
+
+function normalizePublicationDoi(value) {
+  let doi = String(value || '').trim();
+  doi = doi.replace(/^doi:\s*/i, '').replace(/^https?:\/\/(?:dx\.)?doi\.org\//i, '');
+  doi = doi.replace(/[\s<>"'`]+$/g, '').replace(/[),.;:]+$/g, '');
+  return /^10\.\d{4,9}\/\S+$/i.test(doi) ? doi : '';
+}
+
+function publicationYear(value) {
+  const year = Number(Array.isArray(value) ? value[0] : value);
+  return Number.isInteger(year) && year >= 1800 && year <= 2200 ? year : null;
+}
+
+function crossrefYear(message) {
+  for (const key of ['published-print', 'published-online', 'issued', 'created']) {
+    const year = publicationYear(message?.[key]?.['date-parts']?.[0]);
+    if (year) return year;
+  }
+  return null;
+}
+
+function normalizeOpenAlexSource(work) {
+  const source = work?.primary_location?.source || work?.host_venue || {};
+  const issns = Array.isArray(source?.issn) ? source.issn : [];
+  return {
+    name: cleanText(source?.display_name || source?.name || '', 240),
+    issn: cleanText(source?.issn_l || issns[0] || '', 24).toUpperCase(),
+  };
+}
+
+function normalizeOpenAlexWork(work) {
+  const source = normalizeOpenAlexSource(work);
+  const doi = normalizePublicationDoi(work?.doi || work?.ids?.doi || '');
+  return {
+    title: cleanText(work?.title || work?.display_name || '', 500),
+    venue: source.name,
+    year: publicationYear(work?.publication_year),
+    citations: Math.max(0, Number(work?.cited_by_count || 0) || 0),
+    doi,
+    issn: source.issn,
+    url: cleanText(work?.doi || work?.id || '', 500),
+    authors: Array.isArray(work?.authorships)
+      ? work.authorships.slice(0, 40).map((authorship) => cleanText(authorship?.author?.display_name || '', 160)).filter(Boolean)
+      : [],
+  };
+}
+
+function normalizeOpenAlexAuthor(author) {
+  const institutions = [];
+  const addInstitution = (institution) => {
+    const name = cleanText(institution?.display_name || institution?.name || institution || '', 180);
+    if (name && !institutions.includes(name)) institutions.push(name);
+  };
+  (Array.isArray(author?.last_known_institutions) ? author.last_known_institutions : []).forEach(addInstitution);
+  (Array.isArray(author?.affiliations) ? author.affiliations : []).forEach((entry) => addInstitution(entry?.institution || entry));
+  const countries = [];
+  const addCountry = (value) => {
+    const country = cleanText(value || '', 80);
+    if (country && !countries.includes(country)) countries.push(country);
+  };
+  (Array.isArray(author?.last_known_institutions) ? author.last_known_institutions : []).forEach((institution) => addCountry(institution?.country_code));
+  const years = [];
+  (Array.isArray(author?.affiliations) ? author.affiliations : []).forEach((entry) => {
+    (Array.isArray(entry?.years) ? entry.years : []).forEach((year) => {
+      const parsed = publicationYear(year);
+      if (parsed && !years.includes(parsed)) years.push(parsed);
+    });
+  });
+  years.sort((a, b) => a - b);
+  const id = shortOpenAlexId(author?.id || author?.ids?.openalex);
+  return {
+    id,
+    openalex_id: id ? `https://openalex.org/${id}` : '',
+    name: cleanText(author?.display_name || '', 180),
+    orcid: cleanText(author?.orcid || author?.ids?.orcid || '', 120),
+    org: institutions.join(' · ') || '机构未标注',
+    organizations: institutions,
+    country: countries.join(' / ') || '地区未标注',
+    countries,
+    years,
+    works: Math.max(0, Number(author?.works_count || 0) || 0),
+    works_count: Math.max(0, Number(author?.works_count || 0) || 0),
+    citations: Math.max(0, Number(author?.cited_by_count || 0) || 0),
+    cited_by_count: Math.max(0, Number(author?.cited_by_count || 0) || 0),
+    match: 'OpenAlex 候选 · 仍需人工确认',
+  };
+}
+
+function publicationAuthorIdentifier(value) {
+  const text = cleanText(value || '', 240);
+  const id = shortOpenAlexId(text);
+  if (id) return { kind: 'openalex', id, path: id };
+  const orcid = normalizeOrcid(text);
+  if (orcid) return { kind: 'orcid', id: orcid, path: `https://orcid.org/${orcid}` };
+  return null;
+}
+
+async function fetchOpenAlexPublicJson(env, path, options = {}) {
+  const keys = getOpenAlexApiKeys(env);
+  const attempts = keys.length ? keys : [''];
+  let lastStatus = 502;
+  for (const key of attempts) {
+    const params = new URLSearchParams(options.params || {});
+    params.set('mailto', PUBLIC_METADATA_MAILTO);
+    if (key) params.set('api_key', key);
+    const url = `https://api.openalex.org${path}${params.toString() ? `?${params.toString()}` : ''}`;
+    const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    const timer = controller ? setTimeout(() => controller.abort(), Math.min(15000, Number(options.timeoutMs || 12000))) : null;
+    let response;
+    try {
+      response = await fetch(url, {
+        headers: { Accept: 'application/json', 'User-Agent': `AILatest Journal publication import (mailto:${PUBLIC_METADATA_MAILTO})` },
+        ...(controller ? { signal: controller.signal } : {}),
+      });
+    } catch (_) {
+      lastStatus = 502;
+      continue;
+    } finally {
+      if (timer) clearTimeout(timer);
+    }
+    lastStatus = response.status;
+    if (response.ok) return { data: await response.json().catch(() => ({})), status: response.status };
+    // A key can be exhausted while another configured key is healthy. Try the
+    // next one for quota/auth failures; other errors should not fan out.
+    if (![401, 403, 408, 425, 429].includes(response.status)) break;
+  }
+  const error = new Error(`OpenAlex 请求失败（${lastStatus}）`);
+  error.status = lastStatus;
+  throw error;
+}
+
+async function routePublicationAuthorSearch(req, env) {
+  const url = new URL(req.url);
+  const name = cleanText(url.searchParams.get('name') || '', 160);
+  const affiliation = cleanText(url.searchParams.get('affiliation') || '', 160);
+  if (name.length < 2) return err('请输入至少 2 个字符的姓名', 400);
+  const cacheKey = new Request(`https://cache.internal/publication-author-search/v1?name=${encodeURIComponent(name.toLowerCase())}&affiliation=${encodeURIComponent(affiliation.toLowerCase())}`);
+  const cacheHit = await caches.default.match(cacheKey);
+  if (cacheHit) return new Response(cacheHit.body, { status: 200, headers: { 'Content-Type': 'application/json', ...CORS, 'Cache-Control': 'public, max-age=600' } });
+  try {
+    const result = await fetchOpenAlexPublicJson(env, '/authors', { params: { search: name, 'per-page': '20' } });
+    const query = foldPublicationText(name);
+    const institutionQuery = foldPublicationText(affiliation);
+    const results = (Array.isArray(result?.data?.results) ? result.data.results : [])
+      .map((author) => {
+        const normalized = normalizeOpenAlexAuthor(author);
+        const authorText = foldPublicationText(normalized.name);
+        const orgText = foldPublicationText(normalized.organizations.join(' '));
+        let score = Number(author?.relevance_score || 0) || 0;
+        if (query && authorText === query) score += 10;
+        else if (query && authorText.includes(query)) score += 4;
+        if (institutionQuery && orgText.includes(institutionQuery)) score += 12;
+        score += Math.min(3, Math.log10(Math.max(1, normalized.works_count)));
+        return { ...normalized, _score: score };
+      })
+      .filter((item) => item.id && item.name)
+      .sort((a, b) => b._score - a._score)
+      .slice(0, 12)
+      .map(({ _score, ...item }) => item);
+    const body = JSON.stringify({ ok: true, source: 'openalex', query: name, affiliation, results, count: results.length, note: '候选来自 OpenAlex；请选择属于你的作者身份后再读取论文。' });
+    const response = new Response(body, { status: 200, headers: { 'Content-Type': 'application/json', ...CORS, 'Cache-Control': 'public, max-age=600' } });
+    await caches.default.put(cacheKey, response.clone());
+    return response;
+  } catch (error) {
+    const status = [401, 403, 408, 425, 429].includes(Number(error?.status)) ? 503 : 502;
+    return err(error?.message || '作者数据暂时不可用', status, { 'Cache-Control': 'no-store' });
+  }
+}
+
+async function fetchOpenAlexAuthor(env, identifier) {
+  const normalized = publicationAuthorIdentifier(identifier);
+  if (!normalized) throw new Error('请输入有效的 ORCID 或 OpenAlex 作者 ID');
+  const path = `/authors/${normalized.path}`;
+  const result = await fetchOpenAlexPublicJson(env, path);
+  const author = normalizeOpenAlexAuthor(result.data || {});
+  if (!author.id) throw new Error('OpenAlex 未找到该作者');
+  return author;
+}
+
+async function fetchOpenAlexAuthorWorks(env, author) {
+  const result = await fetchOpenAlexPublicJson(env, '/works', {
+    params: { filter: `author.id:${author.id}`, 'per-page': '200', sort: 'cited_by_count:desc' },
+  });
+  return (Array.isArray(result?.data?.results) ? result.data.results : [])
+    .map(normalizeOpenAlexWork)
+    .filter((paper) => paper.title || paper.venue);
+}
+
+async function routePublicationAuthorWorks(req, env) {
+  const url = new URL(req.url);
+  const rawIds = cleanText(url.searchParams.get('ids') || url.searchParams.get('id') || '', 900);
+  const ids = [...new Set(rawIds.split(/[\s,;|]+/).map((item) => item.trim()).filter(Boolean))].slice(0, 5);
+  if (!ids.length) return err('missing author id', 400);
+  try {
+    const authors = [];
+    const failures = [];
+    for (const identifier of ids) {
+      try { authors.push(await fetchOpenAlexAuthor(env, identifier)); }
+      catch (error) { failures.push(error?.message || '作者读取失败'); }
+    }
+    if (!authors.length) return err(failures[0] || 'OpenAlex 未找到作者', 404);
+    const papersByKey = new Map();
+    for (const author of authors) {
+      const papers = await fetchOpenAlexAuthorWorks(env, author);
+      for (const paper of papers) {
+        const key = paper.doi.toLowerCase() || foldPublicationText(`${paper.title} ${paper.venue}`);
+        if (!key) continue;
+        const previous = papersByKey.get(key);
+        if (!previous || Number(paper.citations || 0) > Number(previous.citations || 0)) papersByKey.set(key, paper);
+      }
+    }
+    const papers = [...papersByKey.values()].sort((a, b) => (Number(b.citations || 0) - Number(a.citations || 0)) || (Number(b.year || 0) - Number(a.year || 0))).slice(0, 500);
+    const profileId = `openalex:${authors.map((author) => author.id).join(',')}`;
+    return json({
+      ok: true,
+      source: 'openalex-author',
+      source_label: 'OpenAlex 作者',
+      profile_id: profileId,
+      name: authors.map((author) => author.name).filter(Boolean).join(' / '),
+      affiliation: [...new Set(authors.flatMap((author) => author.organizations))].join(' · ') || '机构未标注',
+      paper_count: papers.length,
+      profile_citations: authors.reduce((sum, author) => sum + Number(author.cited_by_count || 0), 0),
+      authors,
+      papers,
+      ...(failures.length ? { warnings: failures } : {}),
+    }, 200, { 'Cache-Control': 'public, max-age=1800' });
+  } catch (error) {
+    const status = Number(error?.status) === 429 ? 503 : 502;
+    return err(error?.message || '作者论文暂时不可用', status, { 'Cache-Control': 'no-store' });
+  }
+}
+
+function crossrefPaper(message, fallback = {}) {
+  const title = cleanText(Array.isArray(message?.title) ? message.title[0] : message?.title || fallback.title || '', 500);
+  const venue = cleanText(Array.isArray(message?.['container-title']) ? message['container-title'][0] : message?.['container-title'] || fallback.venue || fallback.journal || '', 240);
+  const doi = normalizePublicationDoi(message?.DOI || fallback.doi || '');
+  const issn = cleanText((Array.isArray(message?.ISSN) ? message.ISSN[0] : message?.ISSN) || fallback.issn || '', 24).toUpperCase();
+  const authors = Array.isArray(message?.author)
+    ? message.author.slice(0, 40).map((author) => cleanText([author?.given, author?.family].filter(Boolean).join(' ') || author?.name || '', 160)).filter(Boolean)
+    : (Array.isArray(fallback.authors) ? fallback.authors : []);
+  return {
+    title,
+    venue,
+    year: crossrefYear(message) || publicationYear(fallback.year),
+    citations: Math.max(0, Number(message?.['is-referenced-by-count'] || fallback.citations || 0) || 0),
+    doi,
+    issn,
+    url: cleanText(message?.URL || (doi ? `https://doi.org/${doi}` : fallback.url || ''), 500),
+    authors,
+  };
+}
+
+async function fetchCrossrefDoi(doi) {
+  const response = await fetch(`https://api.crossref.org/works/${encodeURIComponent(doi)}?mailto=${encodeURIComponent(PUBLIC_METADATA_MAILTO)}`, { headers: { Accept: 'application/json', 'User-Agent': `AILatest Journal publication import (mailto:${PUBLIC_METADATA_MAILTO})` } });
+  if (!response.ok) throw new Error(`Crossref ${response.status}`);
+  const data = await response.json();
+  return crossrefPaper(data?.message || {}, { doi });
+}
+
+async function fetchCrossrefBibliographic(item) {
+  const query = cleanText([item?.title, item?.venue || item?.journal, item?.year].filter(Boolean).join(' '), 500);
+  if (!query) return { ...item };
+  const response = await fetch(`https://api.crossref.org/works?query.bibliographic=${encodeURIComponent(query)}&rows=1&mailto=${encodeURIComponent(PUBLIC_METADATA_MAILTO)}`, { headers: { Accept: 'application/json', 'User-Agent': `AILatest Journal publication import (mailto:${PUBLIC_METADATA_MAILTO})` } });
+  if (!response.ok) return { ...item };
+  const data = await response.json();
+  const message = data?.message?.items?.[0];
+  return message ? crossrefPaper(message, item) : { ...item };
+}
+
+async function routePublicationResolve(req, env) {
+  const body = await req.json().catch(() => null);
+  const input = Array.isArray(body?.items) ? body.items : [];
+  if (!input.length) return err('请提供 DOI、BibTeX 或 CSV 解析后的论文条目', 400);
+  if (input.length > 50) return err('单次最多解析 50 条论文', 400);
+  const papers = [];
+  const errors = [];
+  for (const raw of input) {
+    const item = raw && typeof raw === 'object' ? raw : { title: String(raw || '') };
+    const doi = normalizePublicationDoi(item.doi || '');
+    try {
+      let paper;
+      if (doi) {
+        try { paper = await fetchCrossrefDoi(doi); }
+        catch (_) {
+          const result = await fetchOpenAlexPublicJson(env, `/works/https://doi.org/${encodeURIComponent(doi)}`);
+          paper = normalizeOpenAlexWork(result.data || {});
+        }
+      } else {
+        paper = await fetchCrossrefBibliographic(item);
+      }
+      if (!paper.title && !paper.venue) throw new Error('未识别到题目或期刊');
+      papers.push(paper);
+    } catch (error) {
+      errors.push({ input: cleanText(item.doi || item.title || item.venue || '', 180), error: error?.message || '解析失败' });
+      const fallback = { ...item, doi, title: cleanText(item.title || '', 500), venue: cleanText(item.venue || item.journal || '', 240), year: publicationYear(item.year), citations: Number(item.citations || 0) || 0 };
+      if (fallback.title || fallback.venue) papers.push(fallback);
+    }
+  }
+  const unique = new Map();
+  papers.forEach((paper) => {
+    const key = normalizePublicationDoi(paper.doi).toLowerCase() || foldPublicationText(`${paper.title} ${paper.venue}`);
+    if (key && !unique.has(key)) unique.set(key, paper);
+  });
+  return json({ ok: true, source: 'crossref/openalex', source_label: 'DOI / BibTeX / CSV', profile_id: `import:${Date.now()}`, name: 'DOI / BibTeX / CSV 导入', affiliation: '公开元数据', paper_count: unique.size, papers: [...unique.values()], ...(errors.length ? { errors } : {}) }, 200, { 'Cache-Control': 'no-store' });
+}
+
 async function loadCountryPreloadManifest(env) {
   const base = (cleanText(env?.SITE_URL || 'https://journal.ailatest.org', 200) || 'https://journal.ailatest.org').replace(/\/+$/, '');
   const resp = await fetch(`${base}${COUNTRY_PRELOAD_MANIFEST_PATH}?v=${COUNTRY_PRELOAD_MANIFEST_COUNT}`, {
@@ -3870,6 +4199,9 @@ export default {
       const mApiKey = p.match(/^\/api-keys\/([0-9a-f-]+)$/i);
       if (mApiKey && req.method === 'DELETE') return routeRevokeApiKey(req, env, mApiKey[1]);
       if (p === '/search' && (req.method === 'GET' || req.method === 'POST')) return json(await buildPublicSearchResponse(req, env));
+      if (p === '/publication/authors' && req.method === 'GET') return routePublicationAuthorSearch(req, env);
+      if (p === '/publication/author-works' && req.method === 'GET') return routePublicationAuthorWorks(req, env);
+      if (p === '/publication/resolve' && req.method === 'POST') return routePublicationResolve(req, env);
       if (p === '/scholar/profile' && req.method === 'GET') {
         try {
           const result = await fetchScholarProfile(u.searchParams.get('url') || '', fetch, { browser: env.BROWSER });
