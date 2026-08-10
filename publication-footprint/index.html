@@ -28,6 +28,7 @@
       background-attachment: fixed;
       background-size: cover, 60px 60px, 60px 60px, cover;
     }
+    .publication-prototype main.main.publication-main { padding-top: 92px; }
     .publication-prototype .publication-page { max-width: 1320px; margin: 0 auto; }
     .publication-hero {
       display: grid;
@@ -147,6 +148,7 @@
     .pending-item:last-child { border-bottom: 0; padding-bottom: 0; }
     .pending-item span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .pending-item button { border: 0; border-radius: 8px; padding: 5px 8px; color: var(--footprint-green); background: var(--footprint-green-soft); font: inherit; font-size: 11px; font-weight: 760; cursor: pointer; }
+    .pending-empty { padding: 14px 0 2px; color: var(--ink-faint); font-size: 12px; line-height: 1.6; }
     .submission-panel { padding: 18px 20px; }
     .submission-panel .panel-head { margin: -18px -20px 8px; padding: 16px 20px 12px; }
     .submission-panel .panel-head h3 { margin: 0; font-size: 15px; }
@@ -164,6 +166,9 @@
     .submission-system { color: var(--ink-faint); font-size: 10px; white-space: nowrap; }
     .submission-note { margin-top: 10px; padding: 9px 10px; border-radius: 10px; color: #66503a; background: #fff7e9; font-size: 10px; line-height: 1.55; }
     .submission-note strong { color: #8b4f14; }
+    .submission-empty { padding: 24px 0 14px; color: var(--ink-faint); font-size: 12px; line-height: 1.6; }
+    .submission-empty strong { display: block; color: var(--ink-soft); font-size: 13px; }
+    .submission-empty p { margin: 4px 0 0; }
     .modal-backdrop { position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; padding: 20px; background: rgba(39,35,31,.32); backdrop-filter: blur(4px); }
     .modal-backdrop[hidden] { display: none; }
     .modal-card { width: min(620px, 100%); padding: 22px; border: 1px solid var(--rule); border-radius: 20px; background: #fffdf9; box-shadow: 0 24px 80px rgba(39,35,31,.2); }
@@ -199,6 +204,7 @@
     .modal-import { border: 1px solid var(--footprint-orange); color: #fff; background: var(--footprint-orange); }
     @media (max-width: 900px) {
       .publication-hero { grid-template-columns: 1fr; padding: 22px 18px; border-radius: 18px; }
+      .publication-prototype main.main.publication-main { padding-top: 72px; }
       .hero-preview { justify-content: flex-start; min-height: 0; border-top: 1px solid rgba(39,35,31,.1); border-left: 0; padding: 16px 0 0; }
       .hero-medal { width: 92px; height: 92px; border-width: 5px; }
       .hero-medal svg { width: 42px; height: 42px; }
@@ -264,11 +270,6 @@
           <p class="kicker">My publication footprint</p>
           <h1>我的发表足迹</h1>
           <p class="lead">把你发表过论文的期刊，收集成一面可核验的徽章墙。它和“收藏”分开：收藏是准备投稿，发表足迹是已经走过的投稿记录。</p>
-          <div class="hero-note">
-            <span class="source-pill">示例数据 · 待确认</span>
-            <span class="status-pill">先核对，再加入足迹</span>
-            <span class="source-pill">登录后同步到我的账号</span>
-          </div>
         </div>
         <div class="hero-preview">
           <button class="hero-medal" id="open-achievements" type="button" aria-haspopup="dialog" aria-controls="achievements-modal" aria-label="查看发表成就">
@@ -291,10 +292,7 @@
               <div><h2 id="submission-title">投稿状态</h2><p>与发表足迹统一保存在同一份科研档案中</p></div>
               <button class="pending-item button" type="button" data-import="status" style="border:0;border-radius:8px;padding:5px 8px;color:var(--footprint-orange);background:var(--footprint-orange-soft);font:inherit;font-size:11px;font-weight:760;cursor:pointer">添加投稿</button>
             </div>
-            <div class="submission-row"><div class="submission-main"><strong>Nature Communications</strong><small>Indoor air quality and health · 最近同步：今天</small></div><div class="submission-side"><span class="submission-status">With Editor</span><span class="submission-system">Nature Portfolio</span></div></div>
-            <div class="submission-row"><div class="submission-main"><strong>Applied Energy</strong><small>Urban energy planning · 最近同步：昨天</small></div><div class="submission-side"><span class="submission-status review">Under Review</span><span class="submission-system">Elsevier · Editorial Manager</span></div></div>
-            <div class="submission-row"><div class="submission-main"><strong>Buildings</strong><small>Thermal comfort study · 最近同步：3 天前</small></div><div class="submission-side"><span class="submission-status revision">Revision Required</span><span class="submission-system">MDPI · SuSy</span></div></div>
-            <div class="submission-row"><div class="submission-main"><strong>Energy and Buildings</strong><small>Housing energy retrofit · 最近同步：5 天前</small></div><div class="submission-side"><span class="submission-status accepted">Accepted</span><span class="submission-system">Springer Nature</span></div></div>
+            <div class="submission-empty"><strong>暂无投稿状态</strong><p>添加投稿记录后，状态会显示在这里。</p></div>
             <div class="submission-note"><strong>隐私原则：</strong>生产版只保存稿件编号、状态和投稿链接；不保存出版社密码。能自动读取时通过授权会话，否则支持手动粘贴确认邮件或状态页。</div>
           </section>
 
@@ -324,10 +322,8 @@
             <div class="review-note"><strong>核对原则：</strong>姓名只是第一步；机构、年份、合作者和 DOI 至少匹配两项，确认后才生成期刊徽章。</div>
           </section>
           <section class="panel pending-panel">
-            <h3>待确认的识别结果 · 3</h3>
-            <div class="pending-item"><span>Indoor Air · 2024 · DOI 已匹配</span><button type="button">确认</button></div>
-            <div class="pending-item"><span>Resources Policy · 2023 · 同名待核对</span><button type="button">查看</button></div>
-            <div class="pending-item"><span>Applied Energy · 2022 · DOI 已匹配</span><button type="button">确认</button></div>
+            <h3>待确认的识别结果</h3>
+            <div class="pending-empty">暂无待确认结果</div>
           </section>
         </aside>
       </div>
