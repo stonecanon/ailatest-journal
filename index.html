@@ -9,6 +9,11 @@
   try {
     if (/^\/journal\/[^/]+/i.test(location.pathname || '')) {
       document.documentElement.classList.add('journal-route-pending');
+      // If a stale cached script or a blocked data request prevents hydration,
+      // reveal the crawlable fallback instead of leaving a blank page.
+      window.setTimeout(function () {
+        document.documentElement.classList.remove('journal-route-pending');
+      }, 10000);
     }
   } catch (_) {}
 })();
@@ -43,7 +48,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- End Google Tag Manager -->
 <link rel="preload" href="/data/journal_aliases.json" as="fetch" crossorigin="anonymous" />
 <link rel="stylesheet" href="/css/app.css?v=20260810-mobile-fix-v2" />
-<link rel="stylesheet" href="/css/journal-detail-wide.css?v=20260716-detail-force2" />
+<link rel="stylesheet" href="/css/journal-detail-wide.css?v=20260810-journal-route-v1" />
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json" />
@@ -1026,7 +1031,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <script>
 // Build version for cache busting data files
-window.__BUILD_VER = 'v20260810-mobile-filter-detail-v1';
+window.__BUILD_VER = 'v20260810-journal-route-v1';
 // Service Worker 清理 — 必须在 app.js 加载前运行
 (function() {
   if ('serviceWorker' in navigator) {
@@ -1049,7 +1054,7 @@ window.__BUILD_VER = 'v20260810-mobile-filter-detail-v1';
 <script src="/js/pick-match.js?v=20260716-v10" defer></script>
 <script src="/js/pricing-checkout.js?v=20260809-no-pricing-flash-v1" defer></script>
 <script src="/js/extension-downloads.js?v=20260716-home-dl" defer></script>
-<script src="/js/app.js?v=20260810-mobile-fix-v2" defer></script>
+<script src="/js/app.js?v=20260810-journal-route-v1" defer></script>
 
 </body>
 </html>

@@ -181,6 +181,37 @@ function serverDetailBody(journal, slug, origin) {
 </div>`;
 }
 
+// The browser hydrates this compact record into the same detail component used
+// by the homepage. Keep the payload small; the full journal bundle is loaded
+// in the background after the first paint.
+function journalRouteSeed(journal, slug) {
+  return {
+    slug,
+    name: journal.n || '',
+    issn: journal.i || '',
+    eissn: journal.is || '',
+    country: journal.country || '',
+    publisher: journal.p || '',
+    indices: Array.isArray(journal.ix) ? journal.ix : [],
+    scopus: journal.sc ? { active: true } : null,
+    medline: !!journal.med,
+    pubmed: !!journal.pm,
+    pmc: !!journal.pmc,
+    doaj: !!journal.doaj,
+    oa: journal.oa || '',
+    homepage: journal.hp || '',
+    apc: journal.apc == null ? null : journal.apc,
+    tier: journal.tier || '',
+    publication_history: Array.isArray(journal.ann)
+      ? journal.ann
+        .map((item) => ({ year: Number(item.y), count: Number(item.c) }))
+        .filter((item) => Number.isFinite(item.year) && Number.isFinite(item.count))
+      : [],
+    __src: 'int',
+    __routeSeed: true,
+  };
+}
+
 function notFound(origin) {
   const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Journal not found | AILatest Journal</title><meta name="robots" content="noindex,follow"><link rel="canonical" href="${origin}/"></head><body><h1>Journal not found</h1><p><a href="${origin}/">Back to AILatest Journal</a></p></body></html>`;
   return new Response(html, {
@@ -212,8 +243,11 @@ async function render(ctx, journal, slug) {
     { '@context': 'https://schema.org', '@type': 'Periodical', name: journal.n, url: seo.url, issn: journal.i || undefined, publisher: journal.p ? { '@type': 'Organization', name: journal.p } : undefined },
     { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'AILatest Journal', item: `${origin}/` }, { '@type': 'ListItem', position: 2, name: journal.n, item: seo.url }] },
   ].map((item) => `<script type="application/ld+json">${jsonLd(item)}</script>`).join('\n');
-  html = html.replace('</head>', `<meta name="robots" content="index,follow" />\n${schema}\n</head>`);
-  html = html.replace(/<body([^>]*)>/i, '<body$1 class="journal-route">');
+  html = html.replace('</head>', `<meta name="robots" content="index,follow" />\n${schema}\n<script id="journal-route-seed" type="application/json">${jsonLd(journalRouteSeed(journal, slug))}</script>\n</head>`);
+  html = html.replace(/<body([^>]*)>/i, (match, attrs) => {
+    const cleaned = String(attrs || '').replace(/\sclass="[^"]*"/i, '');
+    return `<body${cleaned} class="journal-route">`;
+  });
   html = html.replace(/<aside id="j-drawer" class="j-drawer" aria-hidden="true">/i, '<aside id="j-drawer" class="j-drawer open journal-page" aria-hidden="false">');
   html = html.replace('<div id="drawer-body" class="drawer-body"></div>', `<div id="drawer-body" class="drawer-body">${serverDetailBody(journal, slug, origin)}</div>`);
   return new Response(html, {

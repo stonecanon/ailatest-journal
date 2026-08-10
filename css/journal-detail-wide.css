@@ -31,6 +31,14 @@ body.journal-route .lang-toggle-wrap {
   display: none !important;
 }
 
+/* The Pages Function supplies a crawlable fallback body. Keep that fallback
+   out of the browser's first paint; app.js replaces it synchronously with the
+   same detail renderer used by the homepage, while no-JS crawlers still see
+   the server-rendered content. */
+html.journal-route-pending #j-drawer #drawer-body {
+  display: none !important;
+}
+
 /* 壳：铺满 rail 右侧全部宽度 */
 body.journal-route #j-drawer.j-drawer,
 body.journal-route #j-drawer.j-drawer.open,

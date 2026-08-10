@@ -7171,6 +7171,31 @@
   let _currentDrawerRec = null;
   let _drawerStack = []; // for back-navigation through related journals
   let _drawerSourceTab = 'int'; // tab active when drawer opened in pageMode
+
+  // A journal detail URL is server-rendered for crawlers. Reuse its compact
+  // record immediately in the normal drawer renderer instead of showing a
+  // second, hand-written page while the large catalogue bundle downloads.
+  function journalRouteSeedRecord() {
+    const node = document.getElementById('journal-route-seed');
+    if (!node) return null;
+    if (node.__record) return node.__record;
+    try {
+      const raw = JSON.parse(node.textContent || '{}');
+      if (!raw || !raw.slug || !raw.name) return null;
+      const record = {
+        ...raw,
+        name: raw.name || '',
+        issn: raw.issn || '',
+        eissn: raw.eissn || '',
+        __src: raw.__src || 'int',
+      };
+      node.__record = record;
+      return record;
+    } catch (_) {
+      return null;
+    }
+  }
+
   // 跨源按 favId 检索任意期刊记录（用于 #j/<id> 深链）
   function findRecByFid(id) {
     if (!id) return null;
@@ -7224,6 +7249,11 @@
     if (india && Array.isArray(india.records)) {
       const rr = findIn(india.records.map(r => ({ ...r, name: r.journal_title })), 'in');
       if (rr) return rr;
+    }
+    const seed = journalRouteSeedRecord();
+    if (seed) {
+      const seedKeys = recordRouteKeys(seed);
+      if (wantedList.some((key) => seedKeys.has(key))) return Object.assign({}, seed);
     }
     return null;
   }
@@ -8173,7 +8203,7 @@
     hydrateCountryOutputChart(body, ir);
     // light 库无 if_history / publication_history / 自引史 → 趋势图空白。
     // 打开详情后立刻补 full，再 soft 重绘四张图（full_upgrade 不计次）。
-    if (!softRefresh && (src === 'int' || intRec)) {
+    if (!softRefresh && (src === 'int' || intRec) && !r.__routeSeed) {
       const needFullCharts = !Array.isArray(ir.if_history) || !ir.if_history.length
         || !Array.isArray(ir.publication_history || r.publication_history)
         || !(ir.publication_history || r.publication_history || []).length;
@@ -8458,6 +8488,7 @@
     }
     const rec = findRecByFid(slug);
     if (!rec) {
+      document.documentElement.classList.remove('journal-route-pending');
       if (body) {
         body.innerHTML = `<div class="journal-not-found">
           <div class="drawer-kicker">${T('期刊详情','Journal Details')}</div>
@@ -14865,6 +14896,9 @@
       const initialTab = pendingInitialTab || tabFromPath();
       const initialPath = location.pathname.replace(/\/+$/, '') || '/';
       const isJournalPath = !!journalPathSlug();
+      // Render the server-provided seed immediately with the homepage detail
+      // component. The light/full catalogue loads afterward and upgrades it.
+      if (isJournalPath && journalRouteSeedRecord()) renderJournalRoutePage();
       // int/fav/pick/import 最终需要 full；首页与详情深链先用 light 首屏（~3MB vs ~9MB）
       const needsFullForTab = initialPath === '/import'
         || ['int', 'fav', 'pick'].includes(initialTab);
