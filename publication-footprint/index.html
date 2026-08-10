@@ -167,6 +167,11 @@
     .submission-status.revision { color: #8c4930; background: #fbe9e2; }
     .submission-status.accepted { color: var(--footprint-green); background: var(--footprint-green-soft); }
     .submission-system { color: var(--ink-faint); font-size: 10px; white-space: nowrap; }
+    .submission-actions { display: flex; align-items: center; gap: 6px; }
+    .submission-action { border: 0; padding: 2px 0; color: var(--footprint-blue); background: transparent; font: inherit; font-size: 10px; cursor: pointer; }
+    .submission-action:hover { color: var(--footprint-orange); text-decoration: underline; }
+    .submission-action.danger { color: var(--ink-faint); }
+    .submission-action.danger:hover { color: #8c4930; }
     .submission-note { margin-top: 10px; padding: 9px 10px; border-radius: 10px; color: #66503a; background: #fff7e9; font-size: 10px; line-height: 1.55; }
     .submission-note strong { color: #8b4f14; }
     .submission-empty { padding: 24px 0 14px; color: var(--ink-faint); font-size: 12px; line-height: 1.6; }
@@ -179,6 +184,12 @@
     .modal-head h2 { margin: 0; font-size: 21px; }
     .modal-close { border: 0; background: transparent; color: var(--ink-faint); font-size: 25px; cursor: pointer; }
     .modal-card > p { margin: 7px 0 14px; color: var(--ink-faint); font-size: 12px; line-height: 1.6; }
+    .status-fields { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
+    .status-fields[hidden] { display: none; }
+    .status-fields label { display: grid; gap: 5px; color: var(--ink-faint); font-size: 11px; font-weight: 700; }
+    .status-fields label.full { grid-column: 1 / -1; }
+    .status-fields .modal-input { margin-top: 0; }
+    .status-fields select.modal-input { appearance: auto; }
     .author-search-form { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; gap: 8px; align-items: end; }
     .author-search-form[hidden], .author-search-hint[hidden] { display: none; }
     .author-search-form label { display: grid; gap: 5px; color: var(--ink-faint); font-size: 11px; font-weight: 700; }
@@ -305,7 +316,8 @@
               <div><h2 id="submission-title">投稿状态</h2><p>与发表足迹统一保存在同一份科研档案中</p></div>
               <button class="pending-item button" type="button" data-import="status" style="border:0;border-radius:8px;padding:5px 8px;color:var(--footprint-orange);background:var(--footprint-orange-soft);font:inherit;font-size:11px;font-weight:760;cursor:pointer">添加投稿</button>
             </div>
-            <div class="submission-empty"><strong>暂无投稿状态</strong><p>添加投稿记录后，状态会显示在这里。</p></div>
+            <div class="submission-list" id="submission-list"></div>
+            <div class="submission-empty" id="submission-empty"><strong>暂无投稿状态</strong><p>添加投稿记录后，状态会显示在这里。</p></div>
             <div class="submission-note"><strong>隐私原则：</strong>生产版只保存稿件编号、状态和投稿链接；不保存出版社密码。能自动读取时通过授权会话，否则支持手动粘贴确认邮件或状态页。</div>
           </section>
 
@@ -411,6 +423,12 @@
         <p class="author-multi-note">可以同时勾选多个身份，例如更换单位前后的两个身份。读取完成后会直接合并到下方徽章墙。</p>
       </div>
       <div class="legacy-import" id="legacy-import" hidden>
+        <div class="status-fields" id="status-fields" hidden>
+          <label>期刊名称<input class="modal-input" id="submission-journal" type="text" placeholder="例如：Nature Communications" autocomplete="off" /></label>
+          <label>投稿状态<select class="modal-input" id="submission-status"><option value="准备投稿">准备投稿</option><option value="已提交">已提交</option><option value="编辑初审">编辑初审</option><option value="外审中">外审中</option><option value="返修">返修</option><option value="已接收">已接收</option><option value="已拒稿">已拒稿</option><option value="撤稿/终止">撤稿/终止</option></select></label>
+          <label>稿件编号（可选）<input class="modal-input" id="submission-manuscript" type="text" placeholder="例如：NCOMMS-12345" autocomplete="off" /></label>
+          <label>投稿系统或状态链接（可选）<input class="modal-input" id="submission-link" type="url" placeholder="https://..." autocomplete="url" /></label>
+        </div>
         <input class="modal-input" id="import-value" type="text" placeholder="例如：10.1016/j.enpol.2024.113456" />
         <div class="scholar-result" id="scholar-result" hidden></div>
       </div>
@@ -628,14 +646,28 @@
     const selectedAuthorCount = document.getElementById('selected-author-count');
     const legacyImport = document.getElementById('legacy-import');
     const value = document.getElementById('import-value');
+    const statusFields = document.getElementById('status-fields');
+    const submissionJournal = document.getElementById('submission-journal');
+    const submissionStatus = document.getElementById('submission-status');
+    const submissionManuscript = document.getElementById('submission-manuscript');
+    const submissionLink = document.getElementById('submission-link');
+    const submissionList = document.getElementById('submission-list');
+    const submissionEmpty = document.getElementById('submission-empty');
     const confirmImport = document.getElementById('confirm-import');
     const modalTitle = document.getElementById('modal-title');
     const scholarResult = document.getElementById('scholar-result');
     const pendingResults = document.getElementById('pending-results');
     const pendingStorageKey = 'ailatest-publication-pending-scholar-v1';
+    const submissionStorageKey = 'ailatest-publication-submissions-v1';
     let importKind = 'name';
+    let editingSubmissionId = null;
     let scholarPayload = null;
     let pendingScholarImports = [];
+    let submissionRecords = [];
+    try {
+      const saved = JSON.parse(localStorage.getItem(submissionStorageKey) || '[]');
+      if (Array.isArray(saved)) submissionRecords = saved.slice(0, 100);
+    } catch (_) {}
     try {
       const saved = JSON.parse(localStorage.getItem(pendingStorageKey) || '[]');
       if (Array.isArray(saved)) pendingScholarImports = saved.slice(0, 10);
@@ -649,6 +681,87 @@
     function escapeHtml(value) {
       return String(value || '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
     }
+    function submissionStatusClass(status) {
+      const text = String(status || '');
+      if (/接收/.test(text)) return 'accepted';
+      if (/返修|拒稿|撤稿|终止/.test(text)) return 'revision';
+      if (/提交|初审|外审|审稿/.test(text)) return 'review';
+      return '';
+    }
+    function submissionSystem(link) {
+      try {
+        const host = new URL(String(link || '')).hostname.replace(/^www\./i, '');
+        return host || '手动记录';
+      } catch (_) {
+        return '手动记录';
+      }
+    }
+    function formatSubmissionDate(value) {
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return '刚刚更新';
+      return `最后更新：${date.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' })}`;
+    }
+    function persistSubmissionRecords() {
+      try { localStorage.setItem(submissionStorageKey, JSON.stringify(submissionRecords)); } catch (_) {}
+    }
+    function renderSubmissions() {
+      if (!submissionRecords.length) {
+        submissionList.innerHTML = '';
+        submissionEmpty.hidden = false;
+        return;
+      }
+      submissionEmpty.hidden = true;
+      submissionList.innerHTML = submissionRecords.map(item => {
+        const status = String(item.status || '未填写');
+        const link = String(item.link || '').trim();
+        const system = submissionSystem(link);
+        const manuscript = String(item.manuscript || '').trim();
+        const meta = [manuscript ? `稿件编号：${manuscript}` : '', system, formatSubmissionDate(item.updatedAt)].filter(Boolean).join(' · ');
+        const linkLabel = link ? `<a class="submission-action" href="${escapeHtml(link)}" target="_blank" rel="noreferrer">打开链接</a>` : '';
+        return `<article class="submission-row"><div class="submission-main"><strong>${escapeHtml(item.journal || '未填写期刊')}</strong><small>${escapeHtml(meta)}</small></div><div class="submission-side"><span class="submission-status ${submissionStatusClass(status)}">${escapeHtml(status)}</span><div class="submission-actions"><button class="submission-action" type="button" data-edit-submission="${escapeHtml(item.id)}">编辑</button>${linkLabel}<button class="submission-action danger" type="button" data-remove-submission="${escapeHtml(item.id)}">删除</button></div></div></article>`;
+      }).join('');
+    }
+    function resetSubmissionForm() {
+      editingSubmissionId = null;
+      submissionJournal.value = '';
+      submissionStatus.value = '准备投稿';
+      submissionManuscript.value = '';
+      submissionLink.value = '';
+      confirmImport.textContent = '保存投稿状态';
+    }
+    function loadSubmissionForm(id) {
+      const record = submissionRecords.find(item => item.id === id);
+      if (!record) return;
+      editingSubmissionId = id;
+      submissionJournal.value = record.journal || '';
+      submissionStatus.value = record.status || '准备投稿';
+      submissionManuscript.value = record.manuscript || '';
+      submissionLink.value = record.link || '';
+      openImport('status');
+      submissionJournal.focus();
+    }
+    function saveSubmissionRecord() {
+      const journal = String(submissionJournal.value || '').trim();
+      if (!journal) { submissionJournal.focus(); return false; }
+      const now = new Date().toISOString();
+      const rawLink = String(submissionLink.value || '').trim();
+      const record = {
+        id: editingSubmissionId || `submission:${Date.now()}`,
+        journal,
+        status: String(submissionStatus.value || '准备投稿'),
+        manuscript: String(submissionManuscript.value || '').trim(),
+        link: /^https?:\/\//i.test(rawLink) ? rawLink : '',
+        updatedAt: now,
+      };
+      const index = submissionRecords.findIndex(item => item.id === record.id);
+      if (index >= 0) submissionRecords[index] = record;
+      else submissionRecords.unshift(record);
+      submissionRecords = submissionRecords.slice(0, 100);
+      persistSubmissionRecords();
+      renderSubmissions();
+      return true;
+    }
+    renderSubmissions();
     async function publicationApi(path, init = {}) {
       const response = await fetch(path, {
         ...init,
@@ -969,6 +1082,19 @@
       if (!button) return;
       confirmScholarProfile(button.dataset.acceptProfile || '');
     });
+    submissionList.addEventListener('click', event => {
+      const editButton = event.target.closest('[data-edit-submission]');
+      if (editButton) {
+        loadSubmissionForm(editButton.dataset.editSubmission || '');
+        return;
+      }
+      const removeButton = event.target.closest('[data-remove-submission]');
+      if (!removeButton) return;
+      const id = removeButton.dataset.removeSubmission || '';
+      submissionRecords = submissionRecords.filter(item => item.id !== id);
+      persistSubmissionRecords();
+      renderSubmissions();
+    });
     window.addEventListener('message', event => {
       const data = event && event.data;
       if (!data || data.source !== 'ailatest-extension' || data.type !== 'publication-scholar-import') return;
@@ -980,7 +1106,11 @@
     function updateSelectedAuthors() {
       const count = selectedCandidates().length;
       selectedAuthorCount.textContent = `已选 ${count} 个`;
-      confirmImport.disabled = importKind === 'name' ? count === 0 : !String(value.value || '').trim();
+      confirmImport.disabled = importKind === 'name'
+        ? count === 0
+        : importKind === 'status'
+          ? !String(submissionJournal.value || '').trim()
+          : !String(value.value || '').trim();
     }
     function renderAuthorCandidates(query = '', note = '') {
       if (!authorCandidates.length) {
@@ -1014,10 +1144,14 @@
     }
     function openImport(kind = 'name') {
       importKind = kind;
+      if (kind !== 'status') editingSubmissionId = null;
+      if (kind === 'status' && !editingSubmissionId) resetSubmissionForm();
       modalTitle.textContent = kind === 'name' ? '搜索我的作者身份' : '导入我的论文';
       authorForm.hidden = kind !== 'name';
       document.getElementById('author-search-hint').hidden = kind !== 'name';
       legacyImport.hidden = kind === 'name';
+      statusFields.hidden = kind !== 'status';
+      value.hidden = kind === 'status';
       authorResults.hidden = true;
       scholarPayload = null;
       scholarResult.hidden = true;
@@ -1032,18 +1166,18 @@
           orcid: '输入 ORCID 或 OpenAlex 作者 ID；系统会读取公开论文并直接加入足迹。',
           doi: '粘贴 DOI、BibTeX 或 CSV 内容；系统会解析公开元数据并直接加入足迹。',
           scholar: '粘贴 Google Scholar 个人主页链接；若服务器被 Google 拦截，请在 Scholar 主页使用插件导入。',
-          status: '粘贴投稿系统链接、稿件编号或确认邮件中的状态信息；当前保存为手动待同步记录。',
+          status: '填写期刊和当前投稿状态；记录只保存在本浏览器的科研档案中，不会读取出版社账号密码。',
         };
         desc.textContent = copy[kind] || copy.doi;
         value.placeholder = kind === 'scholar' ? '例如：https://scholar.google.com/citations?user=...' : kind === 'orcid' ? '例如：0000-0002-1825-0097 / A5012345678' : kind === 'status' ? '例如：Editorial Manager 链接 / Manuscript No.' : '例如：10.1016/j.enpol.2024.113456';
-        confirmImport.textContent = kind === 'scholar' ? '读取并加入足迹' : kind === 'orcid' ? '读取并加入足迹' : kind === 'doi' ? '解析并加入足迹' : '添加记录';
-        value.value = '';
-        setTimeout(() => value.focus(), 0);
+        confirmImport.textContent = kind === 'scholar' ? '读取并加入足迹' : kind === 'orcid' ? '读取并加入足迹' : kind === 'doi' ? '解析并加入足迹' : (editingSubmissionId ? '更新投稿状态' : '保存投稿状态');
+        if (kind !== 'status') value.value = '';
+        setTimeout(() => (kind === 'status' ? submissionJournal : value).focus(), 0);
         updateSelectedAuthors();
       }
       modal.hidden = false;
     }
-    function closeImport() { modal.hidden = true; }
+    function closeImport() { modal.hidden = true; editingSubmissionId = null; }
     authorForm.addEventListener('submit', async event => {
       event.preventDefault();
       const query = String(authorName.value || '').trim();
@@ -1072,6 +1206,7 @@
       }
       updateSelectedAuthors();
     });
+    submissionJournal.addEventListener('input', updateSelectedAuthors);
     document.querySelectorAll('[data-import]').forEach(btn => btn.addEventListener('click', () => openImport(btn.dataset.import)));
     document.getElementById('close-import').addEventListener('click', closeImport);
     document.getElementById('cancel-import').addEventListener('click', closeImport);
@@ -1088,6 +1223,13 @@
         // The checked candidate(s) are the manual identity confirmation.
         // Read their works and commit the merged journals in this same flow.
         await lookupAuthorWorks(ids, true);
+        return;
+      }
+      if (importKind === 'status') {
+        if (!saveSubmissionRecord()) return;
+        closeImport();
+        const note = document.querySelector('.review-note');
+        note.innerHTML = '<strong>投稿状态已保存：</strong>记录已写入当前科研档案；如需自动读取出版社状态，还需要单独接入并授权对应投稿系统。';
         return;
       }
       const entered = String(value.value || '').trim();
@@ -1107,9 +1249,6 @@
         else await resolvePublicationInput();
         return;
       }
-      closeImport();
-      const note = document.querySelector('.review-note');
-      note.innerHTML = '<strong>已添加投稿记录：</strong>当前仅保存你粘贴的投稿状态信息，不会读取出版社账号密码。';
     });
     modal.addEventListener('click', e => { if (e.target === modal) closeImport(); });
   </script>
