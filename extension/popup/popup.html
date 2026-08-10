@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AILatest Journal</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <main class="panel">
+    <header>
+      <img src="../assets/icon-48.png" alt="" width="32" height="32">
+      <div>
+        <h1>AILatest Journal</h1>
+        <p>期刊评级徽章</p>
+      </div>
+    </header>
+
+    <!-- 账号 -->
+    <section class="account" aria-label="账号">
+      <div id="logged-in" hidden>
+        <div class="user-box">✅ 已登录：<b id="user-label"></b>
+          <button class="link-btn" id="logout-btn" type="button">退出</button>
+        </div>
+      </div>
+      <div id="logged-out" hidden>
+        <p class="hint" id="trial-banner">未登录也可用：每日 40 次查询；登录后同步账号权益</p>
+        <form id="login-form">
+          <input type="email" id="email" placeholder="邮箱（新邮箱即注册）" autocomplete="email" required>
+          <input type="text" id="code" placeholder="6 位验证码" inputmode="numeric" maxlength="6" hidden>
+          <button class="btn" type="submit" id="submit-btn" data-step="request">注册 / 登录</button>
+          <p class="msg" id="login-msg"></p>
+        </form>
+        <button class="btn ghost" id="oauth-btn" type="button">用 GitHub / Google 登录</button>
+      </div>
+    </section>
+
+    <!-- 配额提示 -->
+    <p class="quota-hint" id="quota-hint" hidden></p>
+
+    <!-- 徽章设置 -->
+    <section class="settings" aria-label="徽章设置">
+      <div class="set-title">显示主题</div>
+      <label class="select-row">语言
+        <select id="lang-select">
+          <option value="auto">Auto（跟随浏览器）</option>
+          <option value="zh-CN">中文</option>
+          <option value="en">English</option>
+        </select>
+      </label>
+      <div class="theme-row" id="theme-row">
+        <label><input type="radio" name="theme" value="site" checked> 网站默认</label>
+        <label><input type="radio" name="theme" value="light"> 淡雅</label>
+        <label><input type="radio" name="theme" value="dark"> 深色</label>
+      </div>
+
+      <div class="set-title">显示哪些徽章</div>
+      <div class="toggles" id="toggles">
+        <div class="cat-label">收录</div>
+        <label><input type="checkbox" data-setting="showIndex"> 国际索引（SCIE / SSCI / EI / Scopus…）</label>
+        <label><input type="checkbox" data-setting="showCnIndex"> 国内目录（北大核心 / CSSCI / CSCD）</label>
+
+        <div class="cat-label">分级</div>
+        <label><input type="checkbox" data-setting="showCas"> 中科院分区 / 新锐</label>
+        <label><input type="checkbox" data-setting="showJcr"> JCR 分区</label>
+        <label><input type="checkbox" data-setting="showIf"> 影响因子 IF</label>
+        <label><input type="checkbox" data-setting="showCcf"> CCF 推荐</label>
+        <label><input type="checkbox" data-setting="showBusiness"> 商科分级（ABDC / ABS / FMS / VHB / CNRS）</label>
+        <label><input type="checkbox" data-setting="showCnTier"> 国内分级（科协 / CCF-T / SCD / AMI / 浙大 / NSFC）</label>
+
+        <div class="cat-label">免费开放</div>
+        <label><input type="checkbox" data-setting="showFree"> 免费发表 / DOAJ 免 APC</label>
+
+        <div class="cat-label">预警</div>
+        <label><input type="checkbox" data-setting="showWarnings"> 预警 / 撤稿 / 停收</label>
+      </div>
+
+      <div class="set-title">自定义颜色 <span class="muted">（留默认则跟随主题）</span></div>
+      <div class="colors" id="colors">
+        <label>分区 <input type="color" data-color="cas"></label>
+        <label>JCR <input type="color" data-color="jcr"></label>
+        <label>IF <input type="color" data-color="if"></label>
+        <label>索引 <input type="color" data-color="idx"></label>
+      </div>
+
+      <button class="link-btn" id="reset-settings" type="button">恢复默认（主题 + 颜色）</button>
+    </section>
+
+    <footer>
+      <a href="https://journal.ailatest.org/" target="_blank" rel="noopener noreferrer">打开 AILatest Journal</a>
+    </footer>
+  </main>
+  <script src="../src/norm.js"></script>
+  <script src="../src/lookup.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

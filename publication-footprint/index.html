@@ -156,6 +156,7 @@
     .submission-panel .panel-head { margin: -18px -20px 8px; padding: 16px 20px 12px; }
     .submission-panel .panel-head h3 { margin: 0; font-size: 15px; }
     .submission-panel .panel-head p { margin: 4px 0 0; color: var(--ink-faint); font-size: 11px; line-height: 1.45; }
+    .submission-import-tools { display: flex; align-items: center; gap: 6px; }
     .submission-row { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 8px; padding: 11px 0; border-bottom: 1px solid var(--rule-soft); }
     .submission-row:last-of-type { border-bottom: 0; }
     .submission-main strong { display: block; color: var(--ink); font-size: 12px; }
@@ -177,6 +178,8 @@
     .submission-empty { padding: 24px 0 14px; color: var(--ink-faint); font-size: 12px; line-height: 1.6; }
     .submission-empty strong { display: block; color: var(--ink-soft); font-size: 13px; }
     .submission-empty p { margin: 4px 0 0; }
+    .modal-help { margin: 5px 0 0; color: var(--ink-faint); font-size: 11px; line-height: 1.45; }
+    .email-fields textarea { min-height: 130px; resize: vertical; }
     .modal-backdrop { position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; padding: 20px; background: rgba(39,35,31,.32); backdrop-filter: blur(4px); }
     .modal-backdrop[hidden] { display: none; }
     .modal-card { width: min(620px, 100%); padding: 22px; border: 1px solid var(--rule); border-radius: 20px; background: #fffdf9; box-shadow: 0 24px 80px rgba(39,35,31,.2); }
@@ -314,7 +317,7 @@
           <section class="panel submission-panel archive-status-panel" aria-labelledby="submission-title">
             <div class="panel-head">
               <div><h2 id="submission-title">投稿状态</h2><p>与发表足迹统一保存在同一份科研档案中</p></div>
-              <button class="pending-item button" type="button" data-import="status" style="border:0;border-radius:8px;padding:5px 8px;color:var(--footprint-orange);background:var(--footprint-orange-soft);font:inherit;font-size:11px;font-weight:760;cursor:pointer">添加投稿</button>
+              <div class="submission-import-tools"><button class="pending-item button" type="button" data-import="email" style="border:0;border-radius:8px;padding:5px 8px;color:var(--footprint-blue);background:var(--footprint-blue-soft);font:inherit;font-size:11px;font-weight:760;cursor:pointer">导入邮件</button><button class="pending-item button" type="button" data-import="status" style="border:0;border-radius:8px;padding:5px 8px;color:var(--footprint-orange);background:var(--footprint-orange-soft);font:inherit;font-size:11px;font-weight:760;cursor:pointer">添加投稿</button></div>
             </div>
             <div class="submission-list" id="submission-list"></div>
             <div class="submission-empty" id="submission-empty"><strong>暂无投稿状态</strong><p>添加投稿记录后，状态会显示在这里。</p></div>
@@ -428,6 +431,11 @@
           <label>投稿状态<select class="modal-input" id="submission-status"><option value="准备投稿">准备投稿</option><option value="已提交">已提交</option><option value="编辑初审">编辑初审</option><option value="外审中">外审中</option><option value="返修">返修</option><option value="已接收">已接收</option><option value="已拒稿">已拒稿</option><option value="撤稿/终止">撤稿/终止</option></select></label>
           <label>稿件编号（可选）<input class="modal-input" id="submission-manuscript" type="text" placeholder="例如：NCOMMS-12345" autocomplete="off" /></label>
           <label>投稿系统或状态链接（可选）<input class="modal-input" id="submission-link" type="url" placeholder="https://..." autocomplete="url" /></label>
+        </div>
+        <div class="email-fields" id="email-fields" hidden>
+          <label>粘贴投稿确认邮件正文<textarea class="modal-input" id="submission-email-text" rows="7" placeholder="可粘贴主题、发件人和正文；系统只提取期刊、稿件编号、题目和状态。"></textarea></label>
+          <label>或上传 .eml<input class="modal-input" id="submission-eml-file" type="file" accept=".eml,message/rfc822,text/plain" /></label>
+          <p class="modal-help">无法读取出版社页面时使用；不会上传邮件附件，也不会保存邮箱密码。</p>
         </div>
         <input class="modal-input" id="import-value" type="text" placeholder="例如：10.1016/j.enpol.2024.113456" />
         <div class="scholar-result" id="scholar-result" hidden></div>
@@ -671,6 +679,9 @@
     const legacyImport = document.getElementById('legacy-import');
     const value = document.getElementById('import-value');
     const statusFields = document.getElementById('status-fields');
+    const emailFields = document.getElementById('email-fields');
+    const submissionEmailText = document.getElementById('submission-email-text');
+    const submissionEmlFile = document.getElementById('submission-eml-file');
     const submissionJournal = document.getElementById('submission-journal');
     const submissionStatus = document.getElementById('submission-status');
     const submissionManuscript = document.getElementById('submission-manuscript');
@@ -707,11 +718,13 @@
     }
     function submissionStatusClass(status) {
       const text = String(status || '');
-      if (/接收/.test(text)) return 'accepted';
-      if (/返修|拒稿|撤稿|终止/.test(text)) return 'revision';
-      if (/提交|初审|外审|审稿/.test(text)) return 'review';
+      if (/accepted|已接收|接收/.test(text)) return 'accepted';
+      if (/revision|返修|拒稿|rejected|撤稿|终止|withdrawn/.test(text)) return 'revision';
+      if (/submitted|editorial_check|under_review|提交|初审|外审|审稿/.test(text)) return 'review';
       return '';
     }
+    const submissionSystemLabels = { elsevier: 'Elsevier / Author Hub', editorial_manager: 'Editorial Manager', scholarone: 'ScholarOne', email: '确认邮件', manual: '手动记录', nature: 'Nature', springer_nature: 'Springer Nature', mdpi: 'MDPI' };
+    const submissionStatusLabels = { draft: '准备投稿', submitted: '已提交', editorial_check: '编辑初审', under_review: '外审中', revision: '返修', accepted: '已接收', rejected: '已拒稿', withdrawn: '撤稿/终止', unknown: '状态未识别' };
     function submissionSystem(link) {
       try {
         const host = new URL(String(link || '')).hostname.replace(/^www\./i, '');
@@ -721,9 +734,41 @@
       }
     }
     function formatSubmissionDate(value) {
-      const date = new Date(value);
+      const raw = Number(value || 0);
+      const date = raw > 1000000000 && raw < 100000000000 ? new Date(raw * 1000) : new Date(value);
       if (Number.isNaN(date.getTime())) return '刚刚更新';
       return `最后更新：${date.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' })}`;
+    }
+    function normalizeSubmissionRecord(item) {
+      const row = item && typeof item === 'object' ? item : {};
+      const status = submissionStatusLabels[row.status_normalized] || String(row.status || row.status_raw || row.status_normalized || '未填写');
+      return {
+        ...row,
+        id: String(row.id || `submission:${Date.now()}:${Math.random().toString(16).slice(2)}`),
+        journal: String(row.journal || row.venue || '').trim(),
+        title: String(row.title || row.manuscript_title || '').trim(),
+        status,
+        status_raw: String(row.status_raw || status),
+        status_normalized: String(row.status_normalized || ''),
+        manuscript: String(row.manuscript || row.manuscript_id || '').trim(),
+        link: String(row.link || row.source_url || '').trim(),
+        system: String(row.system || '').trim(),
+        source: String(row.source || 'manual'),
+        updatedAt: row.updatedAt || row.updated_at || row.status_at || new Date().toISOString(),
+      };
+    }
+    function mergeSubmissionRecords(incoming) {
+      const merged = [...submissionRecords];
+      (Array.isArray(incoming) ? incoming : []).map(normalizeSubmissionRecord).forEach((record) => {
+        const index = merged.findIndex((item) => item.id === record.id || (
+          item.system === record.system && item.journal === record.journal && item.manuscript === record.manuscript && item.title === record.title
+        ));
+        if (index >= 0) merged[index] = { ...merged[index], ...record };
+        else merged.unshift(record);
+      });
+      submissionRecords = merged.slice(0, 100);
+      persistSubmissionRecords();
+      renderSubmissions();
     }
     function persistSubmissionRecords() {
       try { localStorage.setItem(submissionStorageKey, JSON.stringify(submissionRecords)); } catch (_) {}
@@ -736,11 +781,12 @@
       }
       submissionEmpty.hidden = true;
       submissionList.innerHTML = submissionRecords.map(item => {
-        const status = String(item.status || '未填写');
+        const status = submissionStatusLabels[item.status_normalized] || String(item.status || item.status_raw || '未填写');
         const link = String(item.link || '').trim();
-        const system = submissionSystem(link);
+        const system = submissionSystemLabels[item.system] || submissionSystem(link);
         const manuscript = String(item.manuscript || '').trim();
-        const meta = [manuscript ? `稿件编号：${manuscript}` : '', system, formatSubmissionDate(item.updatedAt)].filter(Boolean).join(' · ');
+        const title = String(item.title || '').trim();
+        const meta = [title ? `题目：${title}` : '', manuscript ? `稿件编号：${manuscript}` : '', system, formatSubmissionDate(item.updatedAt)].filter(Boolean).join(' · ');
         const linkLabel = link ? `<a class="submission-action" href="${escapeHtml(link)}" target="_blank" rel="noreferrer">打开链接</a>` : '';
         return `<article class="submission-row"><div class="submission-main"><strong>${escapeHtml(item.journal || '未填写期刊')}</strong><small>${escapeHtml(meta)}</small></div><div class="submission-side"><span class="submission-status ${submissionStatusClass(status)}">${escapeHtml(status)}</span><div class="submission-actions"><button class="submission-action" type="button" data-edit-submission="${escapeHtml(item.id)}">编辑</button>${linkLabel}<button class="submission-action danger" type="button" data-remove-submission="${escapeHtml(item.id)}">删除</button></div></div></article>`;
       }).join('');
@@ -751,6 +797,8 @@
       submissionStatus.value = '准备投稿';
       submissionManuscript.value = '';
       submissionLink.value = '';
+      submissionEmailText.value = '';
+      submissionEmlFile.value = '';
       confirmImport.textContent = '保存投稿状态';
     }
     function loadSubmissionForm(id) {
@@ -764,7 +812,7 @@
       openImport('status');
       submissionJournal.focus();
     }
-    function saveSubmissionRecord() {
+    async function saveSubmissionRecord() {
       const journal = String(submissionJournal.value || '').trim();
       if (!journal) { submissionJournal.focus(); return false; }
       const now = new Date().toISOString();
@@ -776,6 +824,8 @@
         manuscript: String(submissionManuscript.value || '').trim(),
         link: /^https?:\/\//i.test(rawLink) ? rawLink : '',
         updatedAt: now,
+        source: 'manual',
+        system: submissionSystem(rawLink),
       };
       const index = submissionRecords.findIndex(item => item.id === record.id);
       if (index >= 0) submissionRecords[index] = record;
@@ -783,13 +833,69 @@
       submissionRecords = submissionRecords.slice(0, 100);
       persistSubmissionRecords();
       renderSubmissions();
+      try { await publicationApi('/api/submissions/import', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ source: 'manual', records: [record] }) }); } catch (_) { /* 未登录时保留本地科研档案 */ }
       return true;
     }
+    function emailTextLines(text) {
+      return String(text || '').replace(/\r/g, '').replace(/<[^>]+>/g, ' ').split(/\n+/).map(line => String(line || '').replace(/\s+/g, ' ').trim()).filter(Boolean);
+    }
+    function emailField(text, labels) {
+      const pattern = new RegExp(`^(?:${labels.join('|')})\\s*[:：-]\\s*(.+)$`, 'i');
+      const line = emailTextLines(text).find(item => pattern.test(item));
+      return line ? cleanSubmissionText(line.replace(pattern, '$1'), 500) : '';
+    }
+    function cleanSubmissionText(value, max = 500) { return String(value || '').replace(/\s+/g, ' ').trim().slice(0, max); }
+    function parseSubmissionEmail(text) {
+      const raw = String(text || '').trim();
+      if (!raw) return null;
+      const lower = raw.toLowerCase();
+      const sourceUrl = (raw.match(/https?:\/\/[^\s<>"']+/i) || [])[0] || '';
+      const system = /authorhub|elsevier/i.test(lower) ? 'elsevier' : /editorialmanager/i.test(lower) ? 'editorial_manager' : /manuscriptcentral|scholarone/i.test(lower) ? 'scholarone' : /nature\.com/i.test(lower) ? 'nature' : /springer/i.test(lower) ? 'springer_nature' : 'email';
+      const journal = emailField(raw, ['journal(?: name)?', 'publication', '期刊', 'submitted to', '投稿期刊']) || cleanSubmissionText(((raw.match(/(?:submitted to|投稿至|投稿期刊)\s*[:：-]?\s*([^\n,;]+)/i) || [])[1] || ''), 240);
+      const title = emailField(raw, ['manuscript title', 'paper title', 'article title', 'title', '稿件题目']);
+      const manuscript = cleanSubmissionText(((raw.match(/(?:manuscript(?:\s*(?:no|id|number))?|submission(?:\s*(?:no|id|number))?|稿件(?:编号|号))\s*[:：#-]?\s*([A-Z0-9][A-Z0-9._/-]{3,80})/i) || [])[1] || ''), 120);
+      const statusRules = [[/withdraw|撤稿|终止|cancel/i, '撤稿/终止', 'withdrawn'], [/reject|declin|拒稿|拒绝/i, '已拒稿', 'rejected'], [/accept|接收|accepted|in production/i, '已接收', 'accepted'], [/revision|revise|返修|修改/i, '返修', 'revision'], [/under review|peer review|审稿|外审/i, '外审中', 'under_review'], [/with editor|editorial check|初审|编辑/i, '编辑初审', 'editorial_check'], [/submitted|已提交|complete submission/i, '已提交', 'submitted']];
+      const statusMatch = statusRules.find(([rule]) => rule.test(raw));
+      const status = statusMatch ? statusMatch[1] : '状态未识别';
+      const statusNormalized = statusMatch ? statusMatch[2] : 'unknown';
+      if (!journal && !title && !manuscript) return null;
+      return { source: 'email', system, journal, title, manuscript, status, status_raw: status, status_normalized: statusNormalized, link: sourceUrl, source_url: sourceUrl, evidence_text: cleanSubmissionText(raw, 2000), updatedAt: new Date().toISOString() };
+    }
+    async function importSubmissionEmail() {
+      let text = String(submissionEmailText.value || '').trim();
+      const file = submissionEmlFile.files && submissionEmlFile.files[0];
+      if (!text && file) text = await file.text();
+      const record = parseSubmissionEmail(text);
+      if (!record) {
+        scholarResult.classList.add('is-error');
+        scholarResult.textContent = '没有识别到可核对的期刊、题目或稿件编号；请粘贴包含这些字段的确认邮件正文。';
+        scholarResult.hidden = false;
+        return;
+      }
+      mergeSubmissionRecords([record]);
+      try {
+        const data = await publicationApi('/api/submissions/import', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ source: 'email', records: [record] }) });
+        mergeSubmissionRecords(data.records || []);
+        document.querySelector('.review-note').innerHTML = '<strong>确认邮件已同步：</strong>记录已加入账号科研档案；未登录时会先保存在本地。';
+      } catch (_) {
+        document.querySelector('.review-note').innerHTML = '<strong>确认邮件已加入：</strong>当前设备已保存；登录后可再次同步到账号科研档案。';
+      }
+      closeImport();
+    }
     renderSubmissions();
+    loadServerSubmissions();
+    async function loadServerSubmissions() {
+      try {
+        const data = await publicationApi('/api/submissions');
+        mergeSubmissionRecords(data.records || []);
+      } catch (_) { /* public page remains usable without account login */ }
+    }
     async function publicationApi(path, init = {}) {
+      let account = null;
+      try { account = JSON.parse(localStorage.getItem('ailatest.user') || 'null'); } catch (_) {}
       const response = await fetch(path, {
         ...init,
-        headers: { Accept: 'application/json', ...(init.headers || {}) },
+        headers: { Accept: 'application/json', ...(account?.token ? { Authorization: `Bearer ${account.token}` } : {}), ...(init.headers || {}) },
       });
       let data = null;
       try { data = await response.json(); } catch (_) {}
@@ -1134,11 +1240,13 @@
       submissionRecords = submissionRecords.filter(item => item.id !== id);
       persistSubmissionRecords();
       renderSubmissions();
+      if (/^sub_[a-f0-9]{16,64}$/i.test(id)) publicationApi(`/api/submissions/${encodeURIComponent(id)}`, { method: 'DELETE' }).catch(() => {});
     });
     window.addEventListener('message', event => {
       const data = event && event.data;
-      if (!data || data.source !== 'ailatest-extension' || data.type !== 'publication-scholar-import') return;
-      queueScholarPayload(data.payload);
+      if (!data || data.source !== 'ailatest-extension') return;
+      if (data.type === 'publication-scholar-import') queueScholarPayload(data.payload);
+      if (data.type === 'publication-submissions-sync') mergeSubmissionRecords(data.payload && data.payload.records);
     });
     function selectedCandidates() {
       return [...authorList.querySelectorAll('input[name="author-candidate"]:checked')];
@@ -1150,6 +1258,8 @@
         ? count === 0
         : importKind === 'status'
           ? !String(submissionJournal.value || '').trim()
+          : importKind === 'email'
+            ? !String(submissionEmailText.value || '').trim() && !(submissionEmlFile.files && submissionEmlFile.files[0])
           : !String(value.value || '').trim();
     }
     function renderAuthorCandidates(query = '', note = '') {
@@ -1186,12 +1296,13 @@
       importKind = kind;
       if (kind !== 'status') editingSubmissionId = null;
       if (kind === 'status' && !editingSubmissionId) resetSubmissionForm();
-      modalTitle.textContent = kind === 'name' ? '搜索我的作者身份' : '导入我的论文';
+      modalTitle.textContent = kind === 'name' ? '搜索我的作者身份' : kind === 'email' ? '导入投稿确认邮件' : '导入我的论文';
       authorForm.hidden = kind !== 'name';
       document.getElementById('author-search-hint').hidden = kind !== 'name';
       legacyImport.hidden = kind === 'name';
       statusFields.hidden = kind !== 'status';
-      value.hidden = kind === 'status';
+      emailFields.hidden = kind !== 'email';
+      value.hidden = kind === 'status' || kind === 'email';
       authorResults.hidden = true;
       scholarPayload = null;
       scholarResult.hidden = true;
@@ -1206,13 +1317,15 @@
           orcid: '输入 ORCID 或 OpenAlex 作者 ID；系统会读取公开论文并直接加入足迹。',
           doi: '粘贴 DOI、BibTeX 或 CSV 内容；系统会解析公开元数据并直接加入足迹。',
           scholar: '粘贴 Google Scholar 个人主页链接；若服务器被 Google 拦截，请在 Scholar 主页使用插件导入。',
-          status: '填写期刊和当前投稿状态；记录只保存在本浏览器的科研档案中，不会读取出版社账号密码。',
+          status: '填写期刊和当前投稿状态；登录后会同步到账号科研档案，不会读取出版社账号密码。',
+          email: '粘贴投稿确认邮件或上传 .eml；系统只提取可核对的期刊、题目、稿件编号和状态。',
         };
         desc.textContent = copy[kind] || copy.doi;
         value.placeholder = kind === 'scholar' ? '例如：https://scholar.google.com/citations?user=...' : kind === 'orcid' ? '例如：0000-0002-1825-0097 / A5012345678' : kind === 'status' ? '例如：Editorial Manager 链接 / Manuscript No.' : '例如：10.1016/j.enpol.2024.113456';
-        confirmImport.textContent = kind === 'scholar' ? '读取并加入足迹' : kind === 'orcid' ? '读取并加入足迹' : kind === 'doi' ? '解析并加入足迹' : (editingSubmissionId ? '更新投稿状态' : '保存投稿状态');
-        if (kind !== 'status') value.value = '';
-        setTimeout(() => (kind === 'status' ? submissionJournal : value).focus(), 0);
+        confirmImport.textContent = kind === 'scholar' ? '读取并加入足迹' : kind === 'orcid' ? '读取并加入足迹' : kind === 'doi' ? '解析并加入足迹' : kind === 'email' ? '解析并加入档案' : (editingSubmissionId ? '更新投稿状态' : '保存投稿状态');
+        if (kind !== 'status' && kind !== 'email') value.value = '';
+        if (kind === 'email') { submissionEmailText.value = ''; submissionEmlFile.value = ''; }
+        setTimeout(() => (kind === 'status' ? submissionJournal : kind === 'email' ? submissionEmailText : value).focus(), 0);
         updateSelectedAuthors();
       }
       modal.hidden = false;
@@ -1266,12 +1379,13 @@
         return;
       }
       if (importKind === 'status') {
-        if (!saveSubmissionRecord()) return;
+        if (!(await saveSubmissionRecord())) return;
         closeImport();
         const note = document.querySelector('.review-note');
-        note.innerHTML = '<strong>投稿状态已保存：</strong>记录已写入当前科研档案；如需自动读取出版社状态，还需要单独接入并授权对应投稿系统。';
+        note.innerHTML = '<strong>投稿状态已保存：</strong>记录已写入当前科研档案；插件可在 Elsevier、Editorial Manager、ScholarOne 页面读取可见状态，确认后同步。';
         return;
       }
+      if (importKind === 'email') { await importSubmissionEmail(); return; }
       const entered = String(value.value || '').trim();
       if (!entered) { value.focus(); return; }
       if (importKind === 'scholar') {
@@ -1290,6 +1404,8 @@
         return;
       }
     });
+    submissionEmailText.addEventListener('input', updateSelectedAuthors);
+    submissionEmlFile.addEventListener('change', updateSelectedAuthors);
     modal.addEventListener('click', e => { if (e.target === modal) closeImport(); });
   </script>
   <script src="../js/site-rail.js?v=20260810-footprint-persistent-v1" defer></script>

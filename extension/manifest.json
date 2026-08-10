@@ -1,0 +1,128 @@
+﻿{
+  "manifest_version": 3,
+  "name": "AILatest Journal — 期刊分区影响因子助手",
+  "version": "0.2.19",
+  "description": "在 Google Scholar、PubMed、知网页面自动显示期刊影响因子、中科院分区、JCR 分区、收录与国内目录等评级徽章；可复制纯文字参考文献。数据来自 journal.ailatest.org。",
+  "icons": {
+    "16": "assets/icon-16.png",
+    "48": "assets/icon-48.png",
+    "128": "assets/icon-128.png"
+  },
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://journal.ailatest.org/*",
+    "https://api.ailatest.org/*",
+    "https://api.openalex.org/*",
+    "https://api.semanticscholar.org/*",
+    "https://api.crossref.org/*",
+    "https://track.authorhub.elsevier.com/*",
+    "https://*.elsevier.com/*",
+    "https://*.editorialmanager.com/*",
+    "https://*.manuscriptcentral.com/*",
+    "https://*.scholarone.com/*",
+    "http://127.0.0.1:23119/*",
+    "http://localhost:23119/*"
+  ],
+  "action": {
+    "default_title": "AILatest Journal",
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "assets/icon-16.png",
+      "48": "assets/icon-48.png",
+      "128": "assets/icon-128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.cnki.net/*",
+        "http://*.cnki.net/*",
+        "https://scholar.google.com/*",
+        "https://xs2.dailyheadlines.cc/*",
+        "https://scholar.lanfanshu.cn/*",
+        "https://scholar.google.com.hk/*",
+        "https://scholar.google.com.tw/*",
+        "https://scholar.google.co.jp/*",
+        "https://scholar.google.co.uk/*",
+        "https://scholar.google.de/*",
+        "https://scholar.google.fr/*",
+        "https://scholar.google.ca/*",
+        "https://scholar.google.com.au/*",
+        "https://scholar.google.co.in/*",
+        "https://scholar.google.com.sg/*",
+        "https://scholar.google.es/*",
+        "https://scholar.google.it/*",
+        "https://scholar.google.nl/*",
+        "https://scholar.google.se/*",
+        "https://scholar.google.ch/*",
+        "https://pubmed.ncbi.nlm.nih.gov/*",
+        "https://www.tandfonline.com/*",
+        "https://*.tandfonline.com/*",
+        "https://link.springer.com/*",
+        "https://ieeexplore.ieee.org/*",
+        "https://dblp.uni-trier.de/*",
+        "http://apps.webofknowledge.com/*",
+        "https://*.webofknowledge.com/*",
+        "https://*.webofscience.com/*",
+        "https://xueshu.baidu.com/*",
+        "https://www.aminer.cn/*",
+        "https://readpaper.com/*",
+        "https://www.sciencedirect.com/*",
+        "https://www.tsgyun.com/*",
+        "https://*.embase.com/*",
+        "https://*.scopus.com/*",
+        "https://*.airitilibrary.com/*",
+        "https://www.x-mol.com/*",
+        "https://www.mdpi.com/*",
+        "https://*.wiley.com/*",
+        "https://onlinelibrary.wiley.com/*",
+        "https://*.mitpressjournals.org/*",
+        "https://www.scilit.com/*",
+        "https://europepmc.org/*",
+        "https://www.semanticscholar.org/*",
+    "https://arxiv.org/*"
+      ],
+      "js": [
+        "src/norm.js",
+        "src/i18n.js",
+        "src/lookup.js",
+        "src/badges.js",
+        "src/citations.js",
+        "src/adapters/index.js",
+        "src/adapters/googleScholar.js",
+        "src/adapters/pubmed.js",
+        "src/adapters/cnki.js",
+        "src/adapters/tandfonline.js",
+        "src/adapters/genericArticle.js",
+        "src/content.js"
+      ],
+      "all_frames": true,
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://track.authorhub.elsevier.com/*",
+        "https://*.elsevier.com/*",
+        "https://*.editorialmanager.com/*",
+        "https://*.manuscriptcentral.com/*",
+        "https://*.scholarone.com/*"
+      ],
+      "js": [
+        "src/submissions.js"
+      ],
+      "all_frames": false,
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://journal.ailatest.org/*"
+      ],
+      "js": [
+        "src/bridge.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}

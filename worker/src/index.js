@@ -3103,6 +3103,188 @@ async function routePublicationResolve(req, env) {
   return json({ ok: true, source: 'crossref/openalex', source_label: 'DOI / BibTeX / CSV', profile_id: `import:${Date.now()}`, name: 'DOI / BibTeX / CSV 导入', affiliation: '公开元数据', paper_count: unique.size, papers: [...unique.values()], ...(errors.length ? { errors } : {}) }, 200, { 'Cache-Control': 'no-store' });
 }
 
+// ───────── publication submission archive ─────────
+// Browser adapters submit only visible, user-confirmed metadata.  This archive
+// is deliberately separate from publisher credentials: passwords, cookies and
+// access tokens are never accepted or persisted here.
+let publicationSubmissionTablesReady = false;
+const SUBMISSION_CONNECTORS = [
+  { id: 'elsevier', label: 'Elsevier / Author Hub', mode: 'browser_confirmed', status: 'available', note: '浏览器读取可见状态，用户确认后同步。官方接口需另行授权。' },
+  { id: 'editorial_manager', label: 'Editorial Manager', mode: 'browser_confirmed', status: 'available', note: '浏览器读取可见状态，用户确认后同步。不同期刊站点仍需逐站适配。' },
+  { id: 'scholarone', label: 'ScholarOne', mode: 'browser_confirmed', status: 'available', note: '浏览器读取可见状态，用户确认后同步；官方 Web Services 需出版社授权。' },
+  { id: 'email', label: '投稿确认邮件 / .eml', mode: 'evidence_import', status: 'available', note: '无页面权限时的备用导入方式。' },
+  { id: 'scholarone_api', label: 'ScholarOne Web Services', mode: 'official_api', status: 'authorization_required', note: '仅在获得出版社或期刊的 API 授权后启用，不在无授权时模拟调用。' },
+];
+
+function routeSubmissionConnectors(req, env) {
+  return json({ ok: true, connectors: SUBMISSION_CONNECTORS, official_api: { enabled: false, reason: '尚未配置出版社授权凭据' } }, 200, { 'Cache-Control': 'no-store' });
+}
+
+async function ensurePublicationSubmissionTables(env) {
+  if (publicationSubmissionTablesReady) return;
+  await env.DB.batch([
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS publication_submissions (
+      id TEXT PRIMARY KEY,
+      user_id INTEGER NOT NULL,
+      source TEXT NOT NULL DEFAULT 'manual',
+      system TEXT NOT NULL DEFAULT 'unknown',
+      journal TEXT NOT NULL DEFAULT '',
+      title TEXT NOT NULL DEFAULT '',
+      manuscript_id TEXT NOT NULL DEFAULT '',
+      status_raw TEXT NOT NULL DEFAULT '',
+      status_normalized TEXT NOT NULL DEFAULT 'unknown',
+      submitted_at INTEGER,
+      status_at INTEGER,
+      source_url TEXT NOT NULL DEFAULT '',
+      evidence_text TEXT NOT NULL DEFAULT '',
+      metadata_json TEXT NOT NULL DEFAULT '{}',
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    )`),
+    env.DB.prepare(`CREATE INDEX IF NOT EXISTS idx_publication_submissions_user_updated
+      ON publication_submissions(user_id, updated_at DESC)`),
+    env.DB.prepare(`CREATE INDEX IF NOT EXISTS idx_publication_submissions_user_key
+      ON publication_submissions(user_id, system, manuscript_id)`),
+  ]);
+  publicationSubmissionTablesReady = true;
+}
+
+function normalizeSubmissionSystem(value, sourceUrl = '') {
+  const raw = cleanText(value || '', 80).toLowerCase();
+  let host = '';
+  try { host = new URL(sourceUrl).hostname.toLowerCase(); } catch (_) {}
+  if (/elsevier|authorhub|track\.authorhub/.test(raw) || /elsevier|authorhub/.test(host)) return 'elsevier';
+  if (/editorial.?manager|em\b/.test(raw) || /editorialmanager/.test(host)) return 'editorial_manager';
+  if (/scholar.?one|manuscriptcentral/.test(raw) || /manuscriptcentral|scholarone/.test(host)) return 'scholarone';
+  if (/nature/.test(raw) || /nature\.com/.test(host)) return 'nature';
+  if (/springer/.test(raw) || /springernature/.test(host)) return 'springer_nature';
+  if (/mdpi/.test(raw) || /mdpi\.com/.test(host)) return 'mdpi';
+  if (/email|eml/.test(raw)) return 'email';
+  if (/manual/.test(raw)) return 'manual';
+  return raw.replace(/[^a-z0-9_:-]+/g, '_').slice(0, 50) || 'unknown';
+}
+
+function normalizeSubmissionStatus(value) {
+  const raw = cleanText(value || '', 120).toLowerCase();
+  if (!raw) return 'unknown';
+  if (/withdraw|撤稿|终止|withdrawn|cancel/.test(raw)) return 'withdrawn';
+  if (/reject|declin|拒稿|拒绝|not suitable/.test(raw)) return 'rejected';
+  if (/accept|accepted|已接收|接收|待出版|in production/.test(raw)) return 'accepted';
+  if (/revision|revise|返修|修改|minor|major/.test(raw)) return 'revision';
+  if (/review|审稿|外审|under consideration|with reviewer|in peer review/.test(raw)) return 'under_review';
+  if (/editor|初审|with editor|technical check|editorial check/.test(raw)) return 'editorial_check';
+  if (/submit|submitted|已提交|complete|完成提交/.test(raw)) return 'submitted';
+  if (/draft|incomplete|准备投稿|未提交/.test(raw)) return 'draft';
+  return 'unknown';
+}
+
+function submissionTimestamp(value) {
+  if (value == null || value === '') return null;
+  const number = Number(value);
+  if (Number.isFinite(number) && number > 0) {
+    const seconds = number > 10_000_000_000 ? Math.floor(number / 1000) : Math.floor(number);
+    return seconds > 0 && seconds < nowSec() + 86400 ? seconds : null;
+  }
+  const parsed = Date.parse(String(value));
+  return Number.isFinite(parsed) ? Math.floor(parsed / 1000) : null;
+}
+
+function submissionRow(row) {
+  if (!row) return null;
+  let metadata = {};
+  try { metadata = JSON.parse(row.metadata_json || '{}'); } catch (_) {}
+  return {
+    id: row.id,
+    source: row.source || 'manual',
+    system: row.system || 'unknown',
+    journal: row.journal || '',
+    title: row.title || '',
+    manuscript_id: row.manuscript_id || '',
+    status_raw: row.status_raw || '',
+    status_normalized: row.status_normalized || 'unknown',
+    submitted_at: row.submitted_at || null,
+    status_at: row.status_at || null,
+    source_url: row.source_url || '',
+    evidence_text: row.evidence_text || '',
+    metadata,
+    created_at: row.created_at || null,
+    updated_at: row.updated_at || null,
+  };
+}
+
+function submissionFingerprint(record) {
+  return [record.system, record.manuscript_id, record.journal, record.title]
+    .map((value) => foldPublicationText(value).replace(/\s+/g, ' '))
+    .join('|');
+}
+
+async function routeSubmissionList(req, env) {
+  const user = await getUser(req, env);
+  if (!user) return err('请先登录后同步投稿档案', 401);
+  await ensurePublicationSubmissionTables(env);
+  const rows = await env.DB.prepare(
+    `SELECT * FROM publication_submissions WHERE user_id = ? ORDER BY COALESCE(status_at, updated_at) DESC, updated_at DESC LIMIT 200`
+  ).bind(user.id).all();
+  return json({ ok: true, records: (rows.results || []).map(submissionRow).filter(Boolean) }, 200, { 'Cache-Control': 'no-store' });
+}
+
+async function routeSubmissionImport(req, env) {
+  const user = await getUser(req, env);
+  if (!user) return err('请先登录后同步投稿档案', 401);
+  const body = await req.json().catch(() => null);
+  const input = Array.isArray(body?.records) ? body.records : (body?.record ? [body.record] : []);
+  if (!input.length) return err('请提供至少一条投稿记录', 400);
+  if (input.length > 50) return err('单次最多同步 50 条投稿记录', 400);
+  await ensurePublicationSubmissionTables(env);
+  const now = nowSec();
+  const saved = [];
+  const skipped = [];
+  for (const raw of input) {
+    const item = raw && typeof raw === 'object' ? raw : {};
+    const sourceUrl = cleanText(item.source_url || item.link || item.url || '', 500);
+    const system = normalizeSubmissionSystem(item.system || item.publisher || item.source_system || body?.system, sourceUrl);
+    const journal = cleanText(item.journal || item.venue || item.journal_name || '', 240);
+    const title = cleanText(item.title || item.manuscript_title || '', 500);
+    const manuscriptId = cleanText(item.manuscript_id || item.manuscript || item.reference || '', 120);
+    const statusRaw = cleanText(item.status_raw || item.status || item.state || '', 120);
+    if (!journal && !title && !manuscriptId) { skipped.push({ reason: '缺少期刊、题目或稿件编号' }); continue; }
+    const status = normalizeSubmissionStatus(item.status_normalized || statusRaw);
+    const source = cleanText(item.source || body?.source || 'manual', 40).replace(/[^a-z0-9_:-]+/gi, '_').slice(0, 40) || 'manual';
+    const evidence = cleanText(item.evidence_text || item.evidence || '', 2000);
+    const metadata = item.metadata && typeof item.metadata === 'object' ? item.metadata : {};
+    const fingerprint = submissionFingerprint({ system, manuscript_id: manuscriptId, journal, title });
+    const suppliedId = /^sub_[a-f0-9]{16,64}$/i.test(String(item.id || '')) ? String(item.id) : '';
+    const existing = suppliedId
+      ? await env.DB.prepare('SELECT * FROM publication_submissions WHERE user_id = ? AND id = ?').bind(user.id, suppliedId).first()
+      : await env.DB.prepare(
+        `SELECT * FROM publication_submissions WHERE user_id = ? AND system = ? AND manuscript_id = ? AND journal = ? AND title = ? LIMIT 1`
+      ).bind(user.id, system, manuscriptId, journal, title).first();
+    const id = existing?.id || suppliedId || `sub_${(await sha256Hex(`${user.id}|${fingerprint}`)).slice(0, 32)}`;
+    const submittedAt = submissionTimestamp(item.submitted_at || item.submittedAt);
+    const statusAt = submissionTimestamp(item.status_at || item.statusAt) || now;
+    const row = [id, user.id, source, system, journal, title, manuscriptId, statusRaw, status, submittedAt, statusAt, sourceUrl, evidence, metadataJson(metadata), Number(existing?.created_at || now), now];
+    if (existing) {
+      await env.DB.prepare(`UPDATE publication_submissions SET source=?, system=?, journal=?, title=?, manuscript_id=?, status_raw=?, status_normalized=?, submitted_at=?, status_at=?, source_url=?, evidence_text=?, metadata_json=?, updated_at=? WHERE user_id=? AND id=?`)
+        .bind(source, system, journal, title, manuscriptId, statusRaw, status, submittedAt, statusAt, sourceUrl, evidence, metadataJson(metadata), now, user.id, id).run();
+    } else {
+      await env.DB.prepare(`INSERT INTO publication_submissions (id,user_id,source,system,journal,title,manuscript_id,status_raw,status_normalized,submitted_at,status_at,source_url,evidence_text,metadata_json,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`).bind(...row).run();
+    }
+    const current = await env.DB.prepare('SELECT * FROM publication_submissions WHERE user_id = ? AND id = ?').bind(user.id, id).first();
+    if (current) saved.push(submissionRow(current));
+  }
+  return json({ ok: true, count: saved.length, records: saved, skipped }, 200, { 'Cache-Control': 'no-store' });
+}
+
+async function routeSubmissionDelete(req, env, id) {
+  const user = await getUser(req, env);
+  if (!user) return err('请先登录后管理投稿档案', 401);
+  if (!/^sub_[a-f0-9]{16,64}$/i.test(String(id || ''))) return err('无效的投稿记录', 400);
+  await ensurePublicationSubmissionTables(env);
+  const result = await env.DB.prepare('DELETE FROM publication_submissions WHERE user_id = ? AND id = ?').bind(user.id, id).run();
+  return json({ ok: true, deleted: Number(result?.meta?.changes || 0) > 0 }, 200, { 'Cache-Control': 'no-store' });
+}
+
 async function loadCountryPreloadManifest(env) {
   const base = (cleanText(env?.SITE_URL || 'https://journal.ailatest.org', 200) || 'https://journal.ailatest.org').replace(/\/+$/, '');
   const resp = await fetch(`${base}${COUNTRY_PRELOAD_MANIFEST_PATH}?v=${COUNTRY_PRELOAD_MANIFEST_COUNT}`, {
@@ -4248,6 +4430,11 @@ export default {
       const mApiKey = p.match(/^\/api-keys\/([0-9a-f-]+)$/i);
       if (mApiKey && req.method === 'DELETE') return routeRevokeApiKey(req, env, mApiKey[1]);
       if (p === '/search' && (req.method === 'GET' || req.method === 'POST')) return json(await buildPublicSearchResponse(req, env));
+      if (p === '/submissions/connectors' && req.method === 'GET') return routeSubmissionConnectors(req, env);
+      if (p === '/submissions' && req.method === 'GET') return routeSubmissionList(req, env);
+      if (p === '/submissions/import' && req.method === 'POST') return routeSubmissionImport(req, env);
+      const mSubmission = p.match(/^\/submissions\/([^/]+)$/);
+      if (mSubmission && req.method === 'DELETE') return routeSubmissionDelete(req, env, decodeURIComponent(mSubmission[1]));
       if (p === '/publication/authors' && req.method === 'GET') return routePublicationAuthorSearch(req, env);
       if (p === '/publication/author-works' && req.method === 'GET') return routePublicationAuthorWorks(req, env);
       if (p === '/publication/resolve' && req.method === 'POST') return routePublicationResolve(req, env);
