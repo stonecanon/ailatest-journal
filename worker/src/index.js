@@ -3173,6 +3173,255 @@ async function routePublicationResolve(req, env) {
   return json({ ok: true, source: 'crossref/openalex', source_label: 'DOI / BibTeX / CSV', profile_id: `import:${Date.now()}`, name: 'DOI / BibTeX / CSV 导入', affiliation: '公开元数据', paper_count: unique.size, papers: [...unique.values()], ...(errors.length ? { errors } : {}) }, 200, { 'Cache-Control': 'no-store' });
 }
 
+// ───────── publication-footprint account archive ─────────
+// The browser keeps a local copy so the page remains usable offline, while
+// confirmed records are also stored per account when the user is signed in.
+// This table intentionally stores only publication metadata; no publisher
+// credentials, cookies, or access tokens are accepted here.
+let publicationFootprintTablesReady = false;
+
+function footprintArray(value, maxItems = 500, maxLength = 500) {
+  if (!Array.isArray(value)) return [];
+  return [...new Set(value
+    .map((item) => cleanText(item || '', maxLength))
+    .filter(Boolean))].slice(0, maxItems);
+}
+
+function footprintNumber(value, fallback = 0, max = 10000000) {
+  const number = Number(value);
+  return Number.isFinite(number) ? Math.max(0, Math.min(max, number)) : fallback;
+}
+
+function footprintYears(value) {
+  if (!Array.isArray(value)) return [];
+  return [...new Set(value.map(publicationYear).filter(Boolean))].sort((a, b) => b - a).slice(0, 100);
+}
+
+function footprintBadges(value) {
+  if (!Array.isArray(value)) return [];
+  return value
+    .filter((badge) => Array.isArray(badge) && badge.length >= 1)
+    .map((badge) => [cleanText(badge[0] || '', 120), cleanText(badge[1] || '', 40)])
+    .filter(([label]) => label)
+    .slice(0, 40);
+}
+
+function footprintMetadata(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
+  const metadata = {};
+  const impactFactor = Number(value.impactFactor ?? value.impact_factor ?? value.if ?? value.if_latest);
+  if (Number.isFinite(impactFactor) && impactFactor >= 0) metadata.impactFactor = Math.min(100000, impactFactor);
+  const frequency = cleanText(value.frequency || value.publication_frequency || value.periodicity || '', 80);
+  if (frequency) metadata.frequency = frequency;
+  const source = cleanText(value.source || '', 80);
+  if (source) metadata.source = source;
+  if (value.journalMetadata && typeof value.journalMetadata === 'object' && !Array.isArray(value.journalMetadata)) {
+    const journal = value.journalMetadata;
+    metadata.journalMetadata = {
+      name: cleanText(journal.name || '', 240),
+      cn_name: cleanText(journal.cn_name || '', 240),
+      issn: cleanText(journal.issn || '', 24).toUpperCase(),
+      eissn: cleanText(journal.eissn || '', 24).toUpperCase(),
+      frequency: cleanText(journal.frequency || '', 80),
+      if_latest: journal.if_latest ?? null,
+      impactFactor: journal.impactFactor ?? null,
+      if_latest_year: journal.if_latest_year || null,
+      if_quartile: cleanText(journal.if_quartile || '', 32),
+      indices: footprintArray(journal.indices, 8, 80),
+      scopus: !!journal.scopus,
+      pubmed: !!journal.pubmed,
+      doaj: !!journal.doaj,
+      cas_zone: journal.cas_zone ?? null,
+      cas_top: !!journal.cas_top,
+      cas_xr: journal.cas_xr && typeof journal.cas_xr === 'object'
+        ? { zone: cleanText(journal.cas_xr.zone || '', 12), top: !!journal.cas_xr.top, emerging: !!journal.cas_xr.emerging }
+        : null,
+      warning: !!journal.warning,
+      on_hold: !!journal.on_hold,
+      under_review: !!journal.under_review,
+    };
+  }
+  return metadata;
+}
+
+function normalizePublicationFootprintRecord(item) {
+  const value = item && typeof item === 'object' ? item : {};
+  const name = cleanText(value.name || value.journal || value.venue || '', 240);
+  const issns = footprintArray(value.issns || value.ISSNs || [], 8, 24).map((issn) => issn.toUpperCase());
+  const key = cleanText(value.journal_key || value.key || issns[0] || publicationJournalKey(name), 240);
+  if (!name || !key) return null;
+  const years = footprintYears(value.years);
+  const titles = footprintArray(value.titles || value.paperTitles || [], 500, 800);
+  const badges = footprintBadges(value.badges);
+  const organizations = footprintArray(value.organizations || value.authorOrganizations || [], 120, 180);
+  const countries = footprintArray(value.countries || value.authorCountries || [], 80, 80);
+  const fields = footprintArray(value.fields || value.researchFields || [], 120, 180);
+  const sourceProfiles = footprintArray(value.sourceProfiles || [], 20, 240);
+  return {
+    key,
+    name,
+    papers: Math.max(0, Math.round(footprintNumber(value.papers, titles.length, 100000))),
+    citations: Math.max(0, Math.round(footprintNumber(value.citations, 0, 100000000))),
+    years,
+    titles,
+    issns,
+    badges,
+    organizations,
+    countries,
+    fields,
+    sourceProfiles,
+    metadata: footprintMetadata(value),
+  };
+}
+
+function parseFootprintJson(value, fallback = []) {
+  try {
+    const parsed = JSON.parse(value || '[]');
+    return Array.isArray(parsed) ? parsed : fallback;
+  } catch (_) {
+    return fallback;
+  }
+}
+
+function publicationFootprintRow(row) {
+  if (!row) return null;
+  const metadata = (() => {
+    try { return JSON.parse(row.metadata_json || '{}') || {}; } catch (_) { return {}; }
+  })();
+  const output = {
+    id: row.id,
+    journal_key: row.journal_key,
+    name: row.name,
+    papers: Number(row.papers || 0),
+    citations: Number(row.citations || 0),
+    years: parseFootprintJson(row.years_json),
+    titles: parseFootprintJson(row.titles_json),
+    issns: parseFootprintJson(row.issns_json),
+    badges: parseFootprintJson(row.badges_json),
+    organizations: parseFootprintJson(row.organizations_json),
+    countries: parseFootprintJson(row.countries_json),
+    fields: parseFootprintJson(row.fields_json),
+    sourceProfiles: parseFootprintJson(row.source_profiles_json),
+    createdAt: row.created_at || null,
+    updatedAt: row.updated_at || null,
+  };
+  if (metadata.source) output.source = metadata.source;
+  if (metadata.frequency) output.frequency = metadata.frequency;
+  if (metadata.impactFactor != null) output.impactFactor = metadata.impactFactor;
+  if (metadata.journalMetadata) output.journalMetadata = metadata.journalMetadata;
+  return output;
+}
+
+function mergePublicationFootprintRecords(left, right) {
+  const a = normalizePublicationFootprintRecord(left) || normalizePublicationFootprintRecord(right);
+  const b = normalizePublicationFootprintRecord(right) || normalizePublicationFootprintRecord(left);
+  if (!a || !b) return a || b || null;
+  const unique = (values, maxItems = 500) => [...new Set(values.filter(Boolean))].slice(0, maxItems);
+  const metadata = { ...(a.metadata || {}), ...(b.metadata || {}) };
+  if (a.metadata?.journalMetadata || b.metadata?.journalMetadata) {
+    metadata.journalMetadata = { ...(a.metadata?.journalMetadata || {}), ...(b.metadata?.journalMetadata || {}) };
+  }
+  return {
+    key: a.key || b.key,
+    name: b.name || a.name,
+    papers: Math.max(a.papers, b.papers),
+    citations: Math.max(a.citations, b.citations),
+    years: unique([...a.years, ...b.years], 100).sort((x, y) => y - x),
+    titles: unique([...a.titles, ...b.titles], 500),
+    issns: unique([...a.issns, ...b.issns], 8),
+    badges: [...a.badges, ...b.badges].filter((badge, index, list) => list.findIndex((item) => String(item[0]).toLowerCase() === String(badge[0]).toLowerCase()) === index).slice(0, 40),
+    organizations: unique([...a.organizations, ...b.organizations], 120),
+    countries: unique([...a.countries, ...b.countries], 80),
+    fields: unique([...a.fields, ...b.fields], 120),
+    sourceProfiles: unique([...a.sourceProfiles, ...b.sourceProfiles], 20),
+    metadata,
+  };
+}
+
+async function ensurePublicationFootprintTables(env) {
+  if (publicationFootprintTablesReady) return;
+  await env.DB.batch([
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS publication_footprints (
+      id TEXT PRIMARY KEY,
+      user_id INTEGER NOT NULL,
+      journal_key TEXT NOT NULL,
+      name TEXT NOT NULL,
+      papers INTEGER NOT NULL DEFAULT 0,
+      citations INTEGER NOT NULL DEFAULT 0,
+      years_json TEXT NOT NULL DEFAULT '[]',
+      titles_json TEXT NOT NULL DEFAULT '[]',
+      issns_json TEXT NOT NULL DEFAULT '[]',
+      badges_json TEXT NOT NULL DEFAULT '[]',
+      organizations_json TEXT NOT NULL DEFAULT '[]',
+      countries_json TEXT NOT NULL DEFAULT '[]',
+      fields_json TEXT NOT NULL DEFAULT '[]',
+      source_profiles_json TEXT NOT NULL DEFAULT '[]',
+      metadata_json TEXT NOT NULL DEFAULT '{}',
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL,
+      UNIQUE(user_id, journal_key),
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    )`),
+    env.DB.prepare(`CREATE INDEX IF NOT EXISTS idx_publication_footprints_user_updated
+      ON publication_footprints(user_id, updated_at DESC)`),
+  ]);
+  publicationFootprintTablesReady = true;
+}
+
+async function routePublicationFootprintList(req, env) {
+  const user = await getUser(req, env);
+  if (!user) return err('请先登录后同步发表足迹', 401);
+  await ensurePublicationFootprintTables(env);
+  const rows = await env.DB.prepare(
+    'SELECT * FROM publication_footprints WHERE user_id = ? ORDER BY updated_at DESC LIMIT 200'
+  ).bind(user.id).all();
+  return json({ ok: true, records: (rows.results || []).map(publicationFootprintRow).filter(Boolean) }, 200, { 'Cache-Control': 'no-store' });
+}
+
+async function routePublicationFootprintImport(req, env) {
+  const user = await getUser(req, env);
+  if (!user) return err('请先登录后同步发表足迹', 401);
+  const body = await req.json().catch(() => null);
+  const input = Array.isArray(body?.records) ? body.records : (body?.record ? [body.record] : []);
+  if (!input.length) return err('请提供至少一条发表足迹记录', 400);
+  if (input.length > 200) return err('单次最多同步 200 条发表足迹记录', 400);
+  await ensurePublicationFootprintTables(env);
+  const currentRows = await env.DB.prepare('SELECT * FROM publication_footprints WHERE user_id = ?').bind(user.id).all();
+  const current = new Map((currentRows.results || []).map((row) => [String(row.journal_key || ''), publicationFootprintRow(row)]));
+  const merged = new Map(current);
+  for (const raw of input) {
+    const normalized = normalizePublicationFootprintRecord(raw);
+    if (!normalized) continue;
+    const previous = merged.get(normalized.key);
+    merged.set(normalized.key, previous ? mergePublicationFootprintRecords(previous, normalized) : normalized);
+  }
+  const now = nowSec();
+  const statements = [];
+  for (const [key, item] of merged) {
+    const id = current.get(key)?.id || `fp_${(await sha256Hex(`${user.id}|${key}`)).slice(0, 32)}`;
+    const metadataJson = JSON.stringify(item.metadata || {});
+    const values = [
+      id, user.id, key, item.name, item.papers, item.citations,
+      JSON.stringify(item.years), JSON.stringify(item.titles), JSON.stringify(item.issns), JSON.stringify(item.badges),
+      JSON.stringify(item.organizations), JSON.stringify(item.countries), JSON.stringify(item.fields), JSON.stringify(item.sourceProfiles),
+      metadataJson, Number(current.get(key)?.createdAt || now), now,
+    ];
+    if (current.has(key)) {
+      statements.push(env.DB.prepare(`UPDATE publication_footprints SET id=?, name=?, papers=?, citations=?, years_json=?, titles_json=?, issns_json=?, badges_json=?, organizations_json=?, countries_json=?, fields_json=?, source_profiles_json=?, metadata_json=?, updated_at=? WHERE user_id=? AND journal_key=?`).bind(
+        id, item.name, item.papers, item.citations, JSON.stringify(item.years), JSON.stringify(item.titles), JSON.stringify(item.issns), JSON.stringify(item.badges), JSON.stringify(item.organizations), JSON.stringify(item.countries), JSON.stringify(item.fields), JSON.stringify(item.sourceProfiles), metadataJson, now, user.id, key,
+      ));
+    } else {
+      statements.push(env.DB.prepare(`INSERT INTO publication_footprints (id,user_id,journal_key,name,papers,citations,years_json,titles_json,issns_json,badges_json,organizations_json,countries_json,fields_json,source_profiles_json,metadata_json,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`).bind(...values));
+    }
+  }
+  for (let index = 0; index < statements.length; index += 100) await env.DB.batch(statements.slice(index, index + 100));
+  return json({ ok: true, count: merged.size, records: [...merged.values()].map((item) => ({
+    ...item,
+    journal_key: item.key,
+    ...(item.metadata || {}),
+  })) }, 200, { 'Cache-Control': 'no-store' });
+}
+
 // ───────── publication submission archive ─────────
 // Browser adapters submit only visible, user-confirmed metadata.  This archive
 // is deliberately separate from publisher credentials: passwords, cookies and
@@ -4568,6 +4817,8 @@ export default {
       if (p === '/publication/author-works' && req.method === 'GET') return routePublicationAuthorWorks(req, env);
       if (p === '/publication/journal-metadata' && req.method === 'GET') return routePublicationJournalMetadata(req, env);
       if (p === '/publication/resolve' && req.method === 'POST') return routePublicationResolve(req, env);
+      if (p === '/publication/footprint' && req.method === 'GET') return routePublicationFootprintList(req, env);
+      if (p === '/publication/footprint/import' && req.method === 'POST') return routePublicationFootprintImport(req, env);
       if (p === '/scholar/profile' && req.method === 'GET') {
         try {
           const result = await fetchScholarProfile(u.searchParams.get('url') || '', fetch, { browser: env.BROWSER });

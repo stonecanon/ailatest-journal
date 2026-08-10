@@ -341,7 +341,8 @@
               <select class="mini-filter" id="sort-filter" aria-label="排序方式"><option value="year">按发表时间（新到旧）</option><option value="if">按 IF（高到低）</option></select>
             </div>
           </div>
-            <div class="footprint-list" id="footprint-list"></div>
+          <div class="footprint-list" id="footprint-list"></div>
+            <div class="review-note" id="footprint-sync-note"><strong>账号同步：</strong>未登录时足迹只保存在当前浏览器；登录后会自动同步到你的账号。</div>
           </section>
         </div>
 
@@ -628,9 +629,111 @@
       if (Array.isArray(item.sourceProfiles)) normalized.sourceProfiles = [...new Set(item.sourceProfiles.map(value => String(value || '').trim()).filter(Boolean))];
       return normalized;
     }
+    function footprintItemKey(item) {
+      const issn = Array.isArray(item?.issns) ? item.issns.find(Boolean) : '';
+      return String(item?.journal_key || item?.key || item?.name || issn || '')
+        .toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]+/g, '');
+    }
+    function mergeFootprintItem(left, right) {
+      const a = left && typeof left === 'object' ? left : {};
+      const b = right && typeof right === 'object' ? right : {};
+      const unique = (values, max = 500) => [...new Set(values.filter(Boolean))].slice(0, max);
+      const merged = { ...a, ...b };
+      merged.papers = Math.max(Number(a.papers || 0), Number(b.papers || 0));
+      merged.citations = Math.max(Number(a.citations || 0), Number(b.citations || 0));
+      ['years', 'titles', 'issns', 'organizations', 'countries', 'fields', 'sourceProfiles'].forEach(key => {
+        merged[key] = unique([...(Array.isArray(a[key]) ? a[key] : []), ...(Array.isArray(b[key]) ? b[key] : [])]);
+      });
+      merged.years = merged.years.map(Number).filter(Number.isInteger).sort((x, y) => y - x);
+      merged.badges = [...(Array.isArray(a.badges) ? a.badges : []), ...(Array.isArray(b.badges) ? b.badges : [])]
+        .filter((badge, index, list) => Array.isArray(badge) && badge[0] && list.findIndex(item => String(item[0]).toLowerCase() === String(badge[0]).toLowerCase()) === index);
+      if (a.journalMetadata || b.journalMetadata) merged.journalMetadata = { ...(a.journalMetadata || {}), ...(b.journalMetadata || {}) };
+      if (a.impactFactor != null && (b.impactFactor == null || Number(a.impactFactor) > Number(b.impactFactor))) merged.impactFactor = a.impactFactor;
+      if (a.frequency && !b.frequency) merged.frequency = a.frequency;
+      if (!a.source && b.source) merged.source = b.source;
+      return merged;
+    }
+    function mergePublicationJournals(incoming) {
+      const byKey = new Map(publicationJournals.map(item => [footprintItemKey(item), item]).filter(([key]) => key));
+      let added = 0;
+      (Array.isArray(incoming) ? incoming : []).forEach(item => {
+        const normalized = normalizeStoredJournal(item);
+        const key = footprintItemKey(normalized);
+        if (!normalized || !key) return;
+        if (byKey.has(key)) byKey.set(key, mergeFootprintItem(byKey.get(key), normalized));
+        else { byKey.set(key, normalized); added += 1; }
+      });
+      publicationJournals = [...byKey.values()];
+      return added;
+    }
+    function setFootprintSyncNote(message, strong = '账号同步') {
+      const node = document.getElementById('footprint-sync-note');
+      if (node) node.innerHTML = `<strong>${escapeHtml(strong)}：</strong>${escapeHtml(message)}`;
+    }
+    function persistPublicationJournals(sync = false) {
+      try { localStorage.setItem(confirmedStorageKey, JSON.stringify(publicationJournals.slice(0, 200))); } catch (_) {}
+      if (sync) syncPublicationFootprints();
+    }
+    let footprintSyncPromise = null;
+    async function syncPublicationFootprints() {
+      let account = null;
+      try { account = JSON.parse(localStorage.getItem('ailatest.user') || 'null'); } catch (_) {}
+      if (!account?.token) {
+        setFootprintSyncNote('未登录，当前足迹只保存在此浏览器；登录后会自动上传到账号。');
+        return null;
+      }
+      if (!publicationJournals.length) {
+        setFootprintSyncNote('账号已连接；加入论文后会自动同步。');
+        return null;
+      }
+      if (footprintSyncPromise) return footprintSyncPromise;
+      footprintSyncPromise = (async () => {
+        try {
+          const data = await publicationApi('/api/publication/footprint/import', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ source: 'publication-footprint', records: publicationJournals.slice(0, 200) }),
+          });
+          if (Array.isArray(data.records) && data.records.length) {
+            mergePublicationJournals(data.records);
+            persistPublicationJournals(false);
+            renderFootprints();
+          }
+          setFootprintSyncNote('已同步到账号；这份足迹可在其他设备继续使用。');
+          return data;
+        } catch (error) {
+          setFootprintSyncNote(error?.message || '账号同步暂时失败，数据仍保留在当前浏览器。');
+          return null;
+        } finally {
+          footprintSyncPromise = null;
+        }
+      })();
+      return footprintSyncPromise;
+    }
+    async function loadServerFootprints() {
+      let account = null;
+      try { account = JSON.parse(localStorage.getItem('ailatest.user') || 'null'); } catch (_) {}
+      if (!account?.token) {
+        setFootprintSyncNote('未登录，当前足迹只保存在此浏览器；登录后会自动上传到账号。');
+        return;
+      }
+      try {
+        const data = await publicationApi('/api/publication/footprint');
+        if (Array.isArray(data.records) && data.records.length) {
+          mergePublicationJournals(data.records);
+          persistPublicationJournals(false);
+          renderFootprints();
+          refreshJournalMetadata();
+        }
+        await syncPublicationFootprints();
+        if (!data.records?.length && !publicationJournals.length) setFootprintSyncNote('账号已连接；加入论文后会自动同步。');
+      } catch (error) {
+        setFootprintSyncNote(error?.message || '账号足迹暂时无法读取，数据仍保留在当前浏览器。');
+      }
+    }
     if (!isDemoMode && publicationJournals.length) {
       publicationJournals = publicationJournals.map(normalizeStoredJournal).filter(Boolean);
-      try { localStorage.setItem(confirmedStorageKey, JSON.stringify(publicationJournals)); } catch (_) {}
+      persistPublicationJournals(false);
     }
     function renderPaperTitles(item) {
       const titles = paperTitles(item);
@@ -784,7 +887,7 @@
             return next;
           });
           if (changed) {
-            try { localStorage.setItem(confirmedStorageKey, JSON.stringify(publicationJournals)); } catch (_) {}
+            persistPublicationJournals(true);
             renderFootprints();
           }
         } catch (_) {
@@ -1038,6 +1141,7 @@
     }
     renderSubmissions();
     loadServerSubmissions();
+    loadServerFootprints();
     async function loadServerSubmissions() {
       try {
         const data = await publicationApi('/api/submissions');
@@ -1056,6 +1160,9 @@
       if (!response.ok) throw new Error(data?.error || `请求失败（${response.status}）`);
       return data || {};
     }
+    window.addEventListener('storage', event => {
+      if (event.key === 'ailatest.user') loadServerFootprints();
+    });
     function setImportLoading(message, buttonText = '读取中…') {
       scholarResult.classList.remove('is-error');
       scholarResult.textContent = message;
@@ -1342,10 +1449,8 @@
       });
       publicationJournals = [...byKey.values()];
       pendingScholarImports = pendingScholarImports.filter(item => item.profile_id !== profileId);
-      try {
-        localStorage.setItem(confirmedStorageKey, JSON.stringify(publicationJournals));
-        localStorage.setItem(pendingStorageKey, JSON.stringify(pendingScholarImports));
-      } catch (_) {}
+      persistPublicationJournals(true);
+      try { localStorage.setItem(pendingStorageKey, JSON.stringify(pendingScholarImports)); } catch (_) {}
       renderPendingScholarImports();
       renderFootprints();
       refreshJournalMetadata();
