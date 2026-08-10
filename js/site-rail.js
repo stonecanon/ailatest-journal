@@ -538,7 +538,8 @@
         else link.removeAttribute('aria-current');
       });
       if (staticShell && langButton) {
-        langButton.textContent = railLanguage() === 'en' ? '中文' : 'English';
+        langButton.textContent = railLanguage() === 'en' ? 'Language' : '语言';
+        langButton.setAttribute('aria-label', railLanguage() === 'en' ? 'Change language' : '切换语言');
       }
       return;
     }
@@ -557,7 +558,8 @@
       toggle.className = 'static-lang-toggle';
       toggle.type = 'button';
       toggle.dataset.staticLangToggle = '';
-      toggle.textContent = railLanguage() === 'en' ? '中文' : 'English';
+      toggle.textContent = railLanguage() === 'en' ? 'Language' : '语言';
+      toggle.setAttribute('aria-label', railLanguage() === 'en' ? 'Change language' : '切换语言');
       nav.appendChild(toggle);
     }
   }

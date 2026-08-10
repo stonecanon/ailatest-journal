@@ -28,7 +28,7 @@
       footer_refund: '退款',
       footer_download: '下载',
       footer_llms: 'llms.txt',
-      lang_toggle: 'English',
+      lang_toggle: '语言',
       pricing_title: '订阅与定价 | AILatest Journal',
       pricing_desc: 'AILatest Journal 订阅：Free / Pro / Max。网站查刊永久开放；Pro 提升插件能力与额度；Max 含高额度 AI 荐刊与完整文献工作流。',
       extension_title: '下载 | AILatest Journal',
@@ -70,7 +70,7 @@
       footer_refund: 'Refund',
       footer_download: 'Download',
       footer_llms: 'llms.txt',
-      lang_toggle: '中文',
+      lang_toggle: 'Language',
       pricing_title: 'Plans & Pricing | AILatest Journal',
       pricing_desc: 'AILatest Journal plans: Free / Pro / Max. Full website search forever free; Pro upgrades extension power and quotas; Max adds high-quota AI picks and full research workflow.',
       extension_title: 'Downloads | AILatest Journal',
@@ -267,7 +267,7 @@
     const toggle = document.querySelector('[data-static-lang-toggle]');
     if (toggle) {
       toggle.textContent = dict.lang_toggle;
-      toggle.setAttribute('aria-label', lang === 'zh-CN' ? 'Switch to English' : '切换到中文');
+      toggle.setAttribute('aria-label', lang === 'zh-CN' ? '切换语言' : 'Change language');
     }
     syncStaticAuth(lang);
     markActiveNav();
