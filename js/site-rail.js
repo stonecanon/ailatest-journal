@@ -517,14 +517,22 @@
   }
 
   function ensureHomeShellNav() {
-    const nav = document.querySelector('.page-head-nav') || document.querySelector('.listing-topbar nav');
+    const nav = document.querySelector('.page-head-nav')
+      || document.querySelector('.listing-topbar nav')
+      || document.querySelector('.home-top-nav');
     if (!nav) return;
-    const staticShell = !!nav.closest('.page-head');
-    const langButton = staticShell ? nav.querySelector('[data-static-lang-toggle]') : null;
+    const staticShell = !!nav.closest('.page-head')
+      || nav.classList.contains('home-top-nav')
+      || !!document.body?.dataset?.staticPage;
+    const langWrap = staticShell ? nav.querySelector('.lang-toggle-wrap') : null;
+    const langButton = staticShell
+      ? nav.querySelector('[data-static-lang-toggle]')
+      : null;
     const items = [
       ['/#feat', 'nav_features', 'features', '功能', 'Features'],
       ['/#how', 'nav_how', 'how', '怎么用', 'How it works'],
       ['/#rankings', 'nav_rank', 'rankings', '榜单', 'Rankings'],
+      ['/publication-footprint/', 'nav_footprint', 'footprint', '发表足迹', 'Publication footprint'],
       ['/pricing', 'nav_pricing', 'pricing', '订阅', 'Pricing'],
       ['/#download', 'download_center', 'download', '下载', 'Download'],
       ['/#contact', 'nav_contact', 'contact', '联系', 'Contact'],
@@ -539,19 +547,61 @@
           && link.dataset.nav === dataNav
           && (!staticShell || link.dataset.staticI18n === key);
       })
-      && (!staticShell || (langButton && nav.lastElementChild === langButton));
+      && (!staticShell || (langButton && nav.lastElementChild === (langWrap || langButton)));
 
     const currentNav = (() => {
       const page = String(document.body?.dataset?.staticPage || '').toLowerCase();
       if (page === 'terms' || page === 'privacy' || page === 'refund') return 'about';
+      if (page === 'publication') return 'footprint';
       if (page === 'about' || page === 'contact' || page === 'pricing') return page;
       const path = (location.pathname || '').toLowerCase();
+      if (path.includes('/publication-footprint')) return 'footprint';
       if (path.includes('/pricing')) return 'pricing';
       if (path.includes('/about') || path.includes('/terms') || path.includes('/privacy') || path.includes('/refund')) return 'about';
       if (path.includes('/contact')) return 'contact';
       if (path.includes('/indexes') || path.includes('/subjects')) return 'rankings';
       return '';
     })();
+
+    // Older shells already have the same six links, just without the
+    // footprint entry. Add the missing item in place so the shared header
+    // keeps its geometry and never flashes by clearing/recreating children.
+    const withoutFootprint = items.filter((_, index) => index !== 3);
+    const missingFootprint = !links.some((link) => link.dataset.nav === 'footprint'
+      || /\/publication-footprint\/?$/i.test(link.getAttribute('href') || ''));
+    const legacyShell = missingFootprint
+      && links.length === withoutFootprint.length
+      && withoutFootprint.every(([href, key, dataNav], index) => {
+        const link = links[index];
+        return link
+          && link.getAttribute('href') === href
+          && (link.dataset.nav === dataNav || (dataNav === 'rankings' && link.dataset.nav === 'rank'))
+          && (!staticShell || link.dataset.staticI18n === key);
+      });
+    if (legacyShell) {
+      links.forEach((link, index) => {
+        const [, key, dataNav, zh, en] = withoutFootprint[index];
+        link.dataset.nav = dataNav;
+        if (staticShell) link.dataset.staticI18n = key;
+        link.textContent = railLanguage() === 'en' ? en : zh;
+        const active = dataNav === currentNav;
+        link.classList.toggle('active', active);
+        if (active) link.setAttribute('aria-current', 'page');
+        else link.removeAttribute('aria-current');
+      });
+      const [href, key, dataNav, zh, en] = items[3];
+      const link = document.createElement('a');
+      link.href = href;
+      link.dataset.nav = dataNav;
+      if (staticShell) link.dataset.staticI18n = key;
+      link.textContent = railLanguage() === 'en' ? en : zh;
+      if (dataNav === currentNav) {
+        link.classList.add('active');
+        link.setAttribute('aria-current', 'page');
+      }
+      nav.insertBefore(link, links[3] || null);
+      return;
+    }
 
     // Do not clear and recreate a shell that is already canonical. Clearing
     // nav children after first paint is the source of the click-to-page flash
@@ -580,6 +630,9 @@
       link.dataset.nav = dataNav;
       if (staticShell) link.dataset.staticI18n = key;
       link.textContent = railLanguage() === 'en' ? en : zh;
+      const active = dataNav === currentNav;
+      link.classList.toggle('active', active);
+      if (active) link.setAttribute('aria-current', 'page');
       nav.appendChild(link);
     });
     if (staticShell) {
@@ -589,7 +642,12 @@
       toggle.dataset.staticLangToggle = '';
       toggle.textContent = railLanguage() === 'en' ? 'Language' : '语言';
       toggle.setAttribute('aria-label', railLanguage() === 'en' ? 'Change language' : '切换语言');
-      nav.appendChild(toggle);
+      if (langWrap) {
+        langWrap.replaceChildren(toggle);
+        nav.appendChild(langWrap);
+      } else {
+        nav.appendChild(toggle);
+      }
     }
   }
 

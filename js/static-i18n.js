@@ -6,6 +6,7 @@
       nav_features: '功能',
       nav_how: '怎么用',
       nav_rank: '榜单',
+      nav_footprint: '发表足迹',
       download_center: '下载',
       rail_global: '全球',
       rail_china: '中国',
@@ -48,6 +49,7 @@
       nav_features: 'Features',
       nav_how: 'How it works',
       nav_rank: 'Rankings',
+      nav_footprint: 'Publication footprint',
       download_center: 'Download',
       rail_global: 'Global',
       rail_china: 'China',
@@ -209,6 +211,7 @@
     if (!key) {
       if (path.endsWith('/about') || path.endsWith('/about.html')) key = 'about';
       else if (path.endsWith('/contact') || path.endsWith('/contact.html')) key = 'contact';
+      else if (path.includes('publication-footprint')) key = 'footprint';
       else if (path.includes('pricing')) key = 'pricing';
       else if (path.includes('extension')) key = 'download';
       else if (path.includes('signup') || path.includes('login')) key = 'signup';
@@ -222,12 +225,14 @@
       about: 'about',
       contact: 'contact',
       pricing: 'pricing',
+      publication: 'footprint',
+      footprint: 'footprint',
       download: 'download',
       extension: 'download',
       signup: 'home',
     };
     const active = map[navKey] || navKey;
-    document.querySelectorAll('.page-head [data-nav], .pricing-head [data-nav], .pricing-route .home-top-nav [data-nav]').forEach((a) => {
+    document.querySelectorAll('.page-head [data-nav], .pricing-head [data-nav], .home-top-nav [data-nav]').forEach((a) => {
       const on = a.getAttribute('data-nav') === active;
       a.classList.toggle('active', on);
       if (on) a.setAttribute('aria-current', 'page');
