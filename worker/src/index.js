@@ -2781,6 +2781,24 @@ function normalizeOpenAlexSource(work) {
 function normalizeOpenAlexWork(work) {
   const source = normalizeOpenAlexSource(work);
   const doi = normalizePublicationDoi(work?.doi || work?.ids?.doi || '');
+  const organizations = [];
+  const countries = [];
+  const fields = [];
+  const add = (list, value, max = 180) => {
+    const text = cleanText(value || '', max);
+    if (text && !list.includes(text)) list.push(text);
+  };
+  const authorships = Array.isArray(work?.authorships) ? work.authorships : [];
+  authorships.forEach((authorship) => {
+    (Array.isArray(authorship?.institutions) ? authorship.institutions : []).forEach((institution) => {
+      add(organizations, institution?.display_name || institution?.name || institution);
+      add(countries, institution?.country_code, 80);
+    });
+  });
+  const topics = Array.isArray(work?.topics) ? work.topics : [];
+  topics.forEach((topic) => add(fields, topic?.subfield?.display_name || topic?.field?.display_name || topic?.display_name));
+  if (work?.primary_topic) add(fields, work.primary_topic?.subfield?.display_name || work.primary_topic?.field?.display_name || work.primary_topic?.display_name);
+  if (!fields.length && Array.isArray(work?.concepts)) work.concepts.slice(0, 5).forEach((concept) => add(fields, concept?.display_name));
   return {
     title: cleanText(work?.title || work?.display_name || '', 500),
     venue: source.name,
@@ -2789,6 +2807,9 @@ function normalizeOpenAlexWork(work) {
     doi,
     issn: source.issn,
     url: cleanText(work?.doi || work?.id || '', 500),
+    organizations,
+    countries,
+    fields,
     authors: Array.isArray(work?.authorships)
       ? work.authorships.slice(0, 40).map((authorship) => cleanText(authorship?.author?.display_name || '', 160)).filter(Boolean)
       : [],

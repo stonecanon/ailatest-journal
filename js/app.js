@@ -9062,7 +9062,7 @@
       regionPicker.style.display = 'none';
     }
     const favBtn = document.querySelector('.rail-nav-btn[data-tab="fav"]');
-    if (favBtn) favBtn.style.order = '8';
+    if (favBtn) favBtn.style.order = '9';
     let footprintLink = document.querySelector('#publication-footprint-rail-link, .rail-footprint-link[href="/publication-footprint/"], .rail-footprint-link[href="/publication-footprint"]');
     if (!footprintLink) {
       const railBottom = document.querySelector('.app-rail .rail-bottom');
@@ -9082,7 +9082,7 @@
       }
     }
     if (footprintLink) {
-      footprintLink.style.order = '9';
+      footprintLink.style.order = '8';
       footprintLink.setAttribute('aria-label', T('发表足迹', 'Publication footprint'));
       footprintLink.setAttribute('title', T('发表足迹', 'Publication footprint'));
     }

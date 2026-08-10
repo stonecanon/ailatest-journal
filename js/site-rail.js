@@ -278,13 +278,13 @@
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 21V11"/><path d="M12 21V7"/><path d="M16 21V3"/><path d="M4 21h16"/></svg>
           <span data-static-i18n="rail_rankings">榜单</span>
         </a>
-        <a class="rail-nav-btn${current('/favorites')}" id="fav-header-btn" href="/favorites"${ariaCurrent('/favorites')} aria-label="我的收藏" title="我的收藏">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.7l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3.7z"/></svg>
-          <span data-static-i18n="rail_saved">收藏</span>
-        </a>
         <a class="rail-nav-btn rail-footprint-link${current('/publication-footprint')}" id="publication-footprint-rail-link" href="/publication-footprint/"${ariaCurrent('/publication-footprint')} aria-label="发表足迹" title="发表足迹">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M8.7 11.1 7 20l5-2.8 5 2.8-1.7-8.9"/></svg>
           <span data-static-i18n="rail_footprint">足迹</span>
+        </a>
+        <a class="rail-nav-btn${current('/favorites')}" id="fav-header-btn" href="/favorites"${ariaCurrent('/favorites')} aria-label="我的收藏" title="我的收藏">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.7l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3.7z"/></svg>
+          <span data-static-i18n="rail_saved">收藏</span>
         </a>
         <a class="rail-nav-btn${current('/account')}" id="account-credit-badge" data-tab="me" href="/account"${ariaCurrent('/account')} aria-label="设置" title="设置">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="9" r="3.5"/><path d="M5 19c1.5-3 4-4.5 7-4.5S17.5 16 19 19"/></svg>
@@ -458,6 +458,12 @@
       else footprint.removeAttribute('aria-current');
       footprint.setAttribute('aria-label', railLabel('发表足迹', 'Publication footprint'));
       footprint.title = railLabel('发表足迹', 'Publication footprint');
+      const favBeforeFootprint = bottom.querySelector('#fav-header-btn, a[href="/favorites"], [data-tab="fav"]');
+      footprint.style.order = '8';
+      if (favBeforeFootprint && footprint !== favBeforeFootprint) {
+        favBeforeFootprint.style.order = '9';
+        bottom.insertBefore(footprint, favBeforeFootprint);
+      }
     }
 
     const account = bottom.querySelector('#account-credit-badge, a[href="/account"], [data-tab="me"]');

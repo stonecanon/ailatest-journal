@@ -293,8 +293,8 @@
         <section class="metric-grid" aria-label="科研档案统计">
           <div class="metric-card"><div class="metric-value" id="metric-papers">0</div><div class="metric-label">已识别论文</div></div>
           <div class="metric-card"><div class="metric-value" id="metric-journals">0</div><div class="metric-label">发表期刊</div></div>
-          <div class="metric-card"><div class="metric-value">0</div><div class="metric-label">覆盖国家 / 地区</div></div>
-          <div class="metric-card"><div class="metric-value">0</div><div class="metric-label">主要研究方向</div></div>
+          <div class="metric-card"><div class="metric-value" id="metric-countries">0</div><div class="metric-label">覆盖国家 / 地区</div></div>
+          <div class="metric-card"><div class="metric-value" id="metric-fields">0</div><div class="metric-label">主要研究方向</div></div>
         </section>
       </section>
 
@@ -317,7 +317,8 @@
             </div>
             <div class="panel-tools">
               <input class="mini-filter" id="journal-search" type="search" placeholder="搜索期刊" aria-label="搜索期刊" />
-              <select class="mini-filter" id="year-filter" aria-label="按年份筛选"><option value="all">全部年份</option><option value="2025">2025</option><option value="2024">2024</option><option value="2023">2023</option></select>
+              <select class="mini-filter" id="year-filter" aria-label="按年份筛选"><option value="all">全部年份</option></select>
+              <select class="mini-filter" id="sort-filter" aria-label="排序方式"><option value="year">按发表时间（新到旧）</option><option value="if">按 IF（高到低）</option></select>
             </div>
           </div>
             <div class="footprint-list" id="footprint-list"></div>
@@ -327,16 +328,16 @@
         <aside class="side-stack">
           <section class="panel import-panel">
             <h2>怎么导入？</h2>
-            <p>先搜索姓名，再选择属于你的作者身份。单位变化时可以多选，系统会合并候选论文后让你确认。</p>
+            <p>先搜索姓名，再选择属于你的作者身份。单位变化时可以多选，系统会合并论文并直接加入足迹。</p>
             <button class="import-option" type="button" data-import="name"><span class="import-icon">名</span><span><b>搜索作者姓名</b><small>可多选不同单位的作者身份</small></span><em>推荐</em></button>
             <button class="import-option" type="button" data-import="orcid"><span class="import-icon">iD</span><span><b>ORCID / OpenAlex 作者 ID</b><small>已有唯一作者标识时直接识别</small></span><span>→</span></button>
             <button class="import-option" type="button" data-import="doi"><span class="import-icon">DOI</span><span><b>DOI / BibTeX / CSV</b><small>适合一次导入已发表论文清单</small></span><span>→</span></button>
             <button class="import-option" type="button" data-import="scholar"><span class="import-icon">GS</span><span><b>Google Scholar</b><small>可粘贴主页；也可在 Scholar 页面用插件导入</small></span><span>→</span></button>
-            <div class="review-note"><strong>核对原则：</strong>姓名只是第一步；机构、年份、合作者和 DOI 至少匹配两项，确认后才生成期刊徽章。</div>
+            <div class="review-note"><strong>核对原则：</strong>选择作者身份后会直接加入徽章墙；期刊分区、IF 等指标只显示本站已有的核验数据，不会凭空补写。</div>
           </section>
           <section class="panel pending-panel">
-            <h3>待确认的识别结果</h3>
-            <div id="pending-results"><div class="pending-empty" id="pending-empty">暂无待确认结果</div></div>
+            <h3>识别结果</h3>
+            <div id="pending-results"><div class="pending-empty" id="pending-empty">导入后会直接显示在下方徽章墙；无法匹配期刊的记录才会留在这里。</div></div>
           </section>
         </aside>
       </div>
@@ -384,12 +385,12 @@
       </div>
       <p class="achievement-disclaimer">积分示例：每篇已确认论文 5 分 + 每次被引 1 分 + 每篇 Q1 论文 3 分。等级是网站内的成就称号，不等同于职称、职务或官方学术荣誉。</p>
       <div class="achievement-grid">
-        <article class="achievement-card is-locked"><div class="achievement-icon" aria-hidden="true">✦</div><h3>初次发表</h3><p>完成第一篇期刊论文</p><span class="achievement-state">未解锁</span></article>
-        <article class="achievement-card is-locked"><div class="achievement-icon" aria-hidden="true">◈</div><h3>期刊探索者</h3><p>在 5 本不同期刊发表</p><span class="achievement-state">未解锁</span></article>
-        <article class="achievement-card is-locked"><div class="achievement-icon" aria-hidden="true">★</div><h3>Q1 贡献者</h3><p>在 3 本 Q1 期刊发表</p><span class="achievement-state">未解锁</span></article>
-        <article class="achievement-card is-locked"><div class="achievement-icon" aria-hidden="true">↗</div><h3>跨单位经历</h3><p>论文覆盖 2 个机构阶段</p><span class="achievement-state">未解锁</span></article>
-        <article class="achievement-card is-locked"><div class="achievement-icon" aria-hidden="true">∞</div><h3>持续发表</h3><p>连续 3 个自然年有论文</p><span class="achievement-state">还差 1 年</span></article>
-        <article class="achievement-card is-locked"><div class="achievement-icon" aria-hidden="true">◎</div><h3>国际足迹</h3><p>覆盖 5 个国家 / 地区</p><span class="achievement-state">还差 2 个</span></article>
+        <article class="achievement-card is-locked" data-achievement="first-publication"><div class="achievement-icon" aria-hidden="true">✦</div><h3>初次发表</h3><p>完成第一篇期刊论文</p><span class="achievement-state">未解锁</span></article>
+        <article class="achievement-card is-locked" data-achievement="journal-explorer"><div class="achievement-icon" aria-hidden="true">◈</div><h3>期刊探索者</h3><p>在 5 本不同期刊发表</p><span class="achievement-state">未解锁</span></article>
+        <article class="achievement-card is-locked" data-achievement="q1-contributor"><div class="achievement-icon" aria-hidden="true">★</div><h3>Q1 贡献者</h3><p>在 3 本 Q1 期刊发表</p><span class="achievement-state">未解锁</span></article>
+        <article class="achievement-card is-locked" data-achievement="cross-institution"><div class="achievement-icon" aria-hidden="true">↗</div><h3>跨单位经历</h3><p>论文覆盖 2 个机构阶段</p><span class="achievement-state">未解锁</span></article>
+        <article class="achievement-card is-locked" data-achievement="sustained-publication"><div class="achievement-icon" aria-hidden="true">∞</div><h3>持续发表</h3><p>连续 3 个自然年有论文</p><span class="achievement-state">还差 1 年</span></article>
+        <article class="achievement-card is-locked" data-achievement="international-footprint"><div class="achievement-icon" aria-hidden="true">◎</div><h3>国际足迹</h3><p>覆盖 5 个国家 / 地区</p><span class="achievement-state">还差 2 个</span></article>
       </div>
     </section>
   </div>
@@ -407,13 +408,13 @@
       <div class="author-results" id="author-results" hidden>
         <div class="author-results-head"><h3>可能是你的作者身份</h3><span class="selected-author-count" id="selected-author-count">已选 0 个</span></div>
         <div class="author-candidate-list" id="author-candidate-list"></div>
-        <p class="author-multi-note">可以同时勾选多个身份，例如更换单位前后的两个身份。合并后仍会先进入待确认列表。</p>
+        <p class="author-multi-note">可以同时勾选多个身份，例如更换单位前后的两个身份。读取完成后会直接合并到下方徽章墙。</p>
       </div>
       <div class="legacy-import" id="legacy-import" hidden>
         <input class="modal-input" id="import-value" type="text" placeholder="例如：10.1016/j.enpol.2024.113456" />
         <div class="scholar-result" id="scholar-result" hidden></div>
       </div>
-      <div class="modal-actions"><button class="modal-cancel" id="cancel-import" type="button">取消</button><button class="modal-import" id="confirm-import" type="button" disabled>加入待确认</button></div>
+      <div class="modal-actions"><button class="modal-cancel" id="cancel-import" type="button">取消</button><button class="modal-import" id="confirm-import" type="button" disabled>加入足迹</button></div>
     </section>
   </div>
 
@@ -440,6 +441,7 @@
     const list = document.getElementById('footprint-list');
     const search = document.getElementById('journal-search');
     const year = document.getElementById('year-filter');
+    const sortFilter = document.getElementById('sort-filter');
     const researcherLevels = [
       { min: 0, label: '新晋研究者', next: 20 },
       { min: 20, label: '初级研究者', next: 60 },
@@ -448,15 +450,95 @@
       { min: 250, label: '资深研究者', next: 500 },
       { min: 500, label: '学术领航者', next: null },
     ];
+    function journalYears(item) {
+      return [...new Set((Array.isArray(item?.years) ? item.years : [])
+        .map(value => Number(value))
+        .filter(value => Number.isInteger(value) && value >= 1800 && value <= 2200))];
+    }
+    function latestJournalYear(item) {
+      return Math.max(0, ...journalYears(item));
+    }
+    function journalImpactFactor(item) {
+      const raw = item?.impactFactor ?? item?.impact_factor ?? item?.if ?? item?.IF;
+      const value = Number(String(raw ?? '').replace(/[^0-9.\-]/g, ''));
+      return Number.isFinite(value) ? value : null;
+    }
+    function paperTitles(item) {
+      return [...new Set((Array.isArray(item?.titles) ? item.titles : [])
+        .map(title => String(title || '').replace(/\s+/g, ' ').trim())
+        .filter(Boolean))];
+    }
+    function uniqueTextValues(values) {
+      return [...new Set((Array.isArray(values) ? values : [values])
+        .flatMap(value => String(value || '').split(/\s*[·;,/]\s*/))
+        .map(value => value.trim())
+        .filter(value => value && !/^(未知|未标注|unknown|n\/a|na)$/i.test(value)))];
+    }
+    function journalCountries(item) {
+      return uniqueTextValues([
+        ...(Array.isArray(item?.countries) ? item.countries : []),
+        item?.country,
+        ...(Array.isArray(item?.authorCountries) ? item.authorCountries : []),
+      ]);
+    }
+    function journalOrganizations(item) {
+      return uniqueTextValues([
+        ...(Array.isArray(item?.organizations) ? item.organizations : []),
+        item?.organization,
+        ...(Array.isArray(item?.authorOrganizations) ? item.authorOrganizations : []),
+      ]);
+    }
+    function journalFields(item) {
+      return uniqueTextValues([
+        ...(Array.isArray(item?.fields) ? item.fields : []),
+        ...(Array.isArray(item?.researchFields) ? item.researchFields : []),
+        ...(Array.isArray(item?.categories) ? item.categories : []),
+        ...(Array.isArray(item?.topics) ? item.topics : []),
+        item?.field,
+        item?.research_field,
+      ]);
+    }
+    function renderPaperTitles(item) {
+      const titles = paperTitles(item);
+      if (!titles.length) return '';
+      const rest = titles.slice(1);
+      return `<div class="paper-title-preview" title="${escapeHtml(titles[0])}">${escapeHtml(titles[0])}</div>${rest.length ? `<details class="paper-title-details"><summary>查看其余 ${rest.length} 个论文题目</summary><ul>${rest.map(title => `<li>${escapeHtml(title)}</li>`).join('')}</ul></details>` : ''}`;
+    }
+    function syncYearFilter() {
+      const selected = year.value || 'all';
+      const years = [...new Set(publicationJournals.flatMap(journalYears))].sort((a, b) => b - a);
+      const options = ['all', ...years.map(String)];
+      const currentOptions = [...year.options].map(option => option.value);
+      if (currentOptions.join('|') !== options.join('|')) {
+        year.replaceChildren(...options.map(value => {
+          const option = document.createElement('option');
+          option.value = value;
+          option.textContent = value === 'all' ? '全部年份' : value;
+          return option;
+        }));
+      }
+      year.value = options.includes(selected) ? selected : 'all';
+    }
     function renderAchievementStats() {
-      const paperCount = publicationJournals.reduce((sum, item) => sum + item.papers, 0);
+      const paperCount = publicationJournals.reduce((sum, item) => sum + Number(item.papers || 0), 0);
       const citationCount = publicationJournals.reduce((sum, item) => sum + (item.citations || 0), 0);
-      const q1PaperCount = publicationJournals
-        .filter(item => (Array.isArray(item.badges) ? item.badges : []).some(([label]) => /Q1/.test(label)))
-        .reduce((sum, item) => sum + item.papers, 0);
+      const q1Journals = publicationJournals.filter(item => (Array.isArray(item.badges) ? item.badges : []).some(([label]) => /Q1/.test(label)));
+      const q1PaperCount = q1Journals.reduce((sum, item) => sum + Number(item.papers || 0), 0);
       const points = paperCount * 5 + citationCount + q1PaperCount * 3;
       const level = [...researcherLevels].reverse().find(item => points >= item.min) || researcherLevels[0];
-      const unlockedAchievements = [paperCount >= 1, publicationJournals.length >= 5, q1PaperCount >= 3].filter(Boolean).length;
+      const years = new Set(publicationJournals.flatMap(journalYears));
+      const organizations = new Set(publicationJournals.flatMap(journalOrganizations));
+      const countries = new Set(publicationJournals.flatMap(journalCountries));
+      const hasThreeConsecutiveYears = [...years].some(value => years.has(value - 1) && years.has(value - 2));
+      const achievementRules = {
+        'first-publication': { earned: paperCount >= 1, locked: '未解锁' },
+        'journal-explorer': { earned: publicationJournals.length >= 5, locked: `还差 ${Math.max(0, 5 - publicationJournals.length)} 本` },
+        'q1-contributor': { earned: q1Journals.length >= 3, locked: `还差 ${Math.max(0, 3 - q1Journals.length)} 本 Q1` },
+        'cross-institution': { earned: organizations.size >= 2, locked: `还差 ${Math.max(0, 2 - organizations.size)} 个机构阶段` },
+        'sustained-publication': { earned: hasThreeConsecutiveYears, locked: `还差 ${Math.max(0, 3 - years.size)} 年` },
+        'international-footprint': { earned: countries.size >= 5, locked: `还差 ${Math.max(0, 5 - countries.size)} 个地区` },
+      };
+      const unlockedAchievements = Object.values(achievementRules).filter(item => item.earned).length;
       document.getElementById('achievement-citations').textContent = citationCount;
       document.getElementById('achievement-points').textContent = points;
       document.getElementById('publication-count').textContent = paperCount;
@@ -464,6 +546,14 @@
       document.getElementById('researcher-level').textContent = level.label;
       document.getElementById('achievement-progress').textContent = `已解锁 ${unlockedAchievements} / 6`;
       document.getElementById('researcher-level').title = level.next ? `距离${researcherLevels.find(item => item.min === level.next)?.label || '下一等级'}还差 ${level.next - points} 分` : '已达到当前等级体系最高级';
+      document.querySelectorAll('[data-achievement]').forEach(card => {
+        const rule = achievementRules[card.dataset.achievement];
+        if (!rule) return;
+        card.classList.toggle('is-locked', !rule.earned);
+        card.classList.toggle('is-earned', rule.earned);
+        const state = card.querySelector('.achievement-state');
+        if (state) state.textContent = rule.earned ? '已解锁' : rule.locked;
+      });
       document.querySelectorAll('[data-milestone][data-threshold]').forEach(node => {
         const current = node.dataset.milestone === 'citations' ? citationCount : paperCount;
         const earned = current >= Number(node.dataset.threshold);
@@ -472,24 +562,38 @@
       });
     }
     function renderFootprints() {
+      syncYearFilter();
       const q = String(search.value || '').trim().toLowerCase();
       const y = year.value;
       const rows = publicationJournals.filter(item => {
         const text = `${item.name} ${item.abbr}`.toLowerCase();
-        const years = Array.isArray(item.years) ? item.years : [];
+        const years = journalYears(item);
         return (!q || text.includes(q)) && (y === 'all' || years.includes(Number(y)));
       });
+      rows.sort((left, right) => {
+        if (sortFilter.value === 'if') {
+          const leftIf = journalImpactFactor(left);
+          const rightIf = journalImpactFactor(right);
+          if (leftIf == null && rightIf != null) return 1;
+          if (leftIf != null && rightIf == null) return -1;
+          if (leftIf != null && rightIf != null && rightIf !== leftIf) return rightIf - leftIf;
+        }
+        return (latestJournalYear(right) - latestJournalYear(left))
+          || (Number(right.citations || 0) - Number(left.citations || 0))
+          || String(left.name || '').localeCompare(String(right.name || ''));
+      });
       document.getElementById('metric-journals').textContent = publicationJournals.length;
-      document.getElementById('metric-papers').textContent = publicationJournals.reduce((sum, item) => sum + item.papers, 0);
+      document.getElementById('metric-papers').textContent = publicationJournals.reduce((sum, item) => sum + Number(item.papers || 0), 0);
+      document.getElementById('metric-countries').textContent = new Set(publicationJournals.flatMap(journalCountries)).size;
+      document.getElementById('metric-fields').textContent = new Set(publicationJournals.flatMap(journalFields)).size;
       renderAchievementStats();
       list.innerHTML = rows.length ? rows.map(item => `
         <article class="journal-card">
           <div class="journal-card-cover" style="--cover:${item.cover}" aria-label="${escapeHtml(item.name)} (${escapeHtml(item.short)})"><em>JOURNAL</em><strong>${escapeHtml(item.short)}</strong>${item.years?.length ? `<small>${item.years[0]} · Journal</small>` : ''}</div>
           <div class="journal-card-main">
             <h3 class="journal-card-title">${escapeHtml(item.name)}<span>${escapeHtml(item.abbr)}</span></h3>
-            <div class="journal-meta"><span><strong>${Number(item.papers || 0)}</strong> 篇论文</span>${item.years?.length ? `<span>发表年份：<strong>${item.years.join('、')}</strong></span>` : ''}${item.lastConfirmed ? `<span>最后确认：${escapeHtml(item.lastConfirmed)}</span>` : (item.source ? `<span>来源：${escapeHtml(item.source)}</span>` : '')}</div>
-            ${item.titles?.length ? `<div class="paper-title-preview" title="${escapeHtml(item.titles[0])}">${escapeHtml(item.titles[0])}</div>` : ''}
-            ${item.titles?.length > 1 ? `<details class="paper-title-details"><summary>查看全部 ${item.titles.length} 个论文题目</summary><ul>${item.titles.map(title => `<li>${escapeHtml(title)}</li>`).join('')}</ul></details>` : ''}
+            <div class="journal-meta"><span><strong>${Number(item.papers || 0)}</strong> 篇论文</span>${journalYears(item).length ? `<span>发表年份：<strong>${journalYears(item).join('、')}</strong></span>` : ''}${journalImpactFactor(item) != null ? `<span>IF：<strong>${journalImpactFactor(item)}</strong></span>` : ''}${item.lastConfirmed ? `<span>最后确认：${escapeHtml(item.lastConfirmed)}</span>` : (item.source ? `<span>来源：${escapeHtml(item.source)}</span>` : '')}</div>
+            ${renderPaperTitles(item)}
           <div class="badge-row">${(Array.isArray(item.badges) ? item.badges : []).map(([label, cls]) => `<span class="pub-badge ${cls}">${escapeHtml(label)}</span>`).join('')}</div>
           </div>
           <div class="journal-card-side"><span class="paper-count">已发表</span><a class="journal-link" href="../#j/${encodeURIComponent(item.name)}">查看期刊 →</a></div>
@@ -497,6 +601,7 @@
     }
     search.addEventListener('input', renderFootprints);
     year.addEventListener('change', renderFootprints);
+    sortFilter.addEventListener('change', renderFootprints);
     renderFootprints();
 
     const achievementsModal = document.getElementById('achievements-modal');
@@ -568,13 +673,13 @@
     }
     function renderPendingScholarImports() {
       if (!pendingScholarImports.length) {
-        pendingResults.innerHTML = '<div class="pending-empty">暂无待确认结果</div>';
+        pendingResults.innerHTML = '<div class="pending-empty">导入后会直接显示在下方徽章墙；无法匹配期刊的记录才会留在这里。</div>';
         return;
       }
       pendingResults.innerHTML = pendingScholarImports.map(item => `
         <div class="pending-item">
           <span><strong>${escapeHtml(item.name || item.source_label || '待确认导入')}</strong> · ${Number(item.paper_count || item.papers?.length || 0)} 篇候选论文</span>
-          <button type="button" data-accept-profile="${escapeHtml(item.profile_id || '')}">核对后加入</button>
+          <button type="button" data-accept-profile="${escapeHtml(item.profile_id || '')}">加入足迹</button>
         </div>`).join('');
     }
     function renderScholarResult(data) {
@@ -584,7 +689,7 @@
       const list = papers.slice(0, 8).map(item => `<li><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.venue || '期刊信息未识别')} · ${item.year || '年份未知'} · 被引 ${Number(item.citations || 0)}</small></li>`).join('');
       scholarResult.classList.remove('is-error');
       const warning = Array.isArray(data?.errors) && data.errors.length ? `<p class="scholar-result-note">有 ${data.errors.length} 条记录未完整匹配，已保留你输入的题目/期刊信息。</p>` : '';
-      scholarResult.innerHTML = `${profile}${list ? `<ol class="scholar-paper-list">${list}</ol>` : ''}${warning}<p class="scholar-result-note">结果只进入待确认，不会直接生成发表徽章；请逐条核对作者、题目和期刊。</p>`;
+      scholarResult.innerHTML = `${profile}${list ? `<ol class="scholar-paper-list">${list}</ol>` : ''}${warning}<p class="scholar-result-note">读取完成后会直接加入下方徽章墙；未识别到期刊的记录才会留在识别结果区。</p>`;
       scholarResult.hidden = false;
     }
     function showScholarError(message) {
@@ -671,8 +776,12 @@
         const data = await publicationApi('/api/publication/resolve', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ items }) });
         scholarPayload = data;
         renderScholarResult(data);
-        confirmImport.disabled = false;
-        confirmImport.textContent = '加入待确认';
+        const added = queueScholarPayload(data);
+        if (added) closeImport();
+        else {
+          confirmImport.disabled = false;
+          confirmImport.textContent = '加入足迹';
+        }
       } catch (error) {
         scholarPayload = null;
         showScholarError(error?.message || '论文元数据暂时不可用，请稍后重试。');
@@ -680,7 +789,7 @@
         confirmImport.textContent = '重新解析';
       }
     }
-    async function lookupAuthorWorks(identifiers) {
+    async function lookupAuthorWorks(identifiers, autoCommit = false) {
       const ids = Array.isArray(identifiers) ? identifiers : [identifiers];
       if (!ids.length) return null;
       setImportLoading('正在从 OpenAlex 读取作者公开论文…');
@@ -688,14 +797,23 @@
         const data = await publicationApi(`/api/publication/author-works?ids=${encodeURIComponent(ids.join(','))}`);
         scholarPayload = data;
         renderScholarResult(data);
-        confirmImport.disabled = false;
-        confirmImport.textContent = '加入待确认';
+        if (autoCommit) {
+          const added = queueScholarPayload(data);
+          if (added) closeImport();
+          else {
+            confirmImport.disabled = false;
+            confirmImport.textContent = '加入足迹';
+          }
+        } else {
+          confirmImport.disabled = false;
+          confirmImport.textContent = '加入足迹';
+        }
         return data;
       } catch (error) {
         scholarPayload = null;
         showScholarError(error?.message || '作者论文暂时不可用，请稍后重试。');
         confirmImport.disabled = false;
-        confirmImport.textContent = importKind === 'name' ? '重试并加入待确认' : '重新读取';
+        confirmImport.textContent = importKind === 'name' ? '重试并加入足迹' : '重新读取';
         return null;
       }
     }
@@ -714,12 +832,16 @@
         if (!response.ok) throw new Error(data?.error || `读取失败（${response.status}）`);
         scholarPayload = data;
         renderScholarResult(data);
-        confirmImport.disabled = false;
-        confirmImport.textContent = '加入待确认';
+        const added = queueScholarPayload(data);
+        if (added) closeImport();
+        else {
+          confirmImport.disabled = false;
+          confirmImport.textContent = '加入足迹';
+        }
       } catch (error) {
         scholarPayload = null;
         const message = error?.message || '暂时无法读取 Google Scholar 主页';
-        showScholarError(/403|无法读取|拦截/.test(message) ? `${message}。Google 会拦截服务器直连；请在 Scholar 个人主页点击插件的“导入 AILatest 发表足迹”，结果会自动送到本页面待确认。` : message);
+        showScholarError(/403|无法读取|拦截/.test(message) ? `${message}。Google 会拦截服务器直连；请在 Scholar 个人主页点击插件的“导入 AILatest 发表足迹”，结果会自动送到本页面识别。` : message);
         confirmImport.disabled = false;
         confirmImport.textContent = '重新读取';
       }
@@ -750,26 +872,40 @@
     }
     function scholarPayloadToJournals(payload) {
       const groups = new Map();
+      const sourceLabel = payload?.source_label || (payload?.source === 'openalex-author' ? 'OpenAlex 作者' : payload?.source === 'crossref/openalex' ? '公开元数据' : 'Google Scholar');
+      const organizations = [...new Set([
+        ...(Array.isArray(payload?.authors) ? payload.authors.flatMap(author => Array.isArray(author?.organizations) ? author.organizations : []) : []),
+        ...String(payload?.affiliation || '').split(/\s*[·;,/]\s*/).filter(Boolean),
+      ])];
+      const countries = [...new Set(Array.isArray(payload?.authors) ? payload.authors.flatMap(author => [
+        ...(Array.isArray(author?.countries) ? author.countries : []),
+        ...(author?.country ? String(author.country).split(/\s*[·;,/]\s*/) : []),
+      ]) : [])];
       (Array.isArray(payload?.papers) ? payload.papers : []).forEach(paper => {
-        const name = scholarVenue(paper?.venue) || '未识别期刊';
+        const name = scholarVenue(paper?.venue || paper?.journal || paper?.container) || '未识别期刊';
         const key = name.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]+/g, '');
         if (!key || key === '未识别期刊') return;
-        const item = groups.get(key) || { name, short: journalShort(name), abbr: journalShort(name), cover: journalCover(name), papers: 0, citations: 0, years: [], titles: [], badges: [], source: 'Google Scholar' };
+        const item = groups.get(key) || { name, short: journalShort(name), abbr: journalShort(name), cover: journalCover(name), papers: 0, citations: 0, years: [], titles: [], badges: [], organizations: organizations.slice(), countries: countries.slice(), fields: [], source: sourceLabel };
         item.papers += 1;
         item.citations += Number(paper?.citations || 0) || 0;
         if (Number(paper?.year) && !item.years.includes(Number(paper.year))) item.years.push(Number(paper.year));
         if (paper?.title && !item.titles.includes(paper.title)) item.titles.push(paper.title);
+        item.organizations = [...new Set([...item.organizations, ...(Array.isArray(paper?.organizations) ? paper.organizations : [])])];
+        item.countries = [...new Set([...item.countries, ...(Array.isArray(paper?.countries) ? paper.countries : [])])];
+        item.fields = [...new Set([...item.fields, ...(Array.isArray(paper?.fields) ? paper.fields : []), ...(Array.isArray(paper?.topics) ? paper.topics : [])])];
+        const impactFactor = journalImpactFactor(paper);
+        if (impactFactor != null && (item.impactFactor == null || impactFactor > item.impactFactor)) item.impactFactor = impactFactor;
         groups.set(key, item);
       });
       return [...groups.values()].map(item => ({ ...item, years: item.years.sort((a, b) => b - a) }));
     }
     function confirmScholarProfile(profileId) {
       const payload = pendingScholarImports.find(item => item.profile_id === profileId);
-      if (!payload) return;
+      if (!payload) return 0;
       const incoming = scholarPayloadToJournals(payload);
       if (!incoming.length) {
-        document.querySelector('.review-note').innerHTML = '<strong>暂未识别到期刊：</strong>Scholar 结果里没有可确认的期刊来源，候选仍保留在待确认区，不会生成空白徽章。';
-        return;
+        document.querySelector('.review-note').innerHTML = '<strong>暂未识别到期刊：</strong>这批记录没有可匹配的期刊名称，已保留在识别结果区，未生成空白徽章。';
+        return 0;
       }
       const byKey = new Map(publicationJournals.map(item => [String(item.name || '').toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]+/g, ''), item]));
       incoming.forEach(item => {
@@ -781,6 +917,11 @@
           existing.citations = Math.max(Number(existing.citations || 0), Number(item.citations || 0));
           existing.years = [...new Set([...(existing.years || []), ...(item.years || [])])].sort((a, b) => b - a);
           existing.titles = [...new Set([...(existing.titles || []), ...(item.titles || [])])];
+          existing.organizations = [...new Set([...journalOrganizations(existing), ...journalOrganizations(item)])];
+          existing.countries = [...new Set([...journalCountries(existing), ...journalCountries(item)])];
+          existing.fields = [...new Set([...journalFields(existing), ...journalFields(item)])];
+          if (item.impactFactor != null && (existing.impactFactor == null || Number(item.impactFactor) > Number(existing.impactFactor))) existing.impactFactor = item.impactFactor;
+          if (!existing.source && item.source) existing.source = item.source;
         }
       });
       publicationJournals = [...byKey.values()];
@@ -791,7 +932,8 @@
       } catch (_) {}
       renderPendingScholarImports();
       renderFootprints();
-      document.querySelector('.review-note').innerHTML = `<strong>已加入 ${incoming.length} 本期刊：</strong>徽章墙只显示 Scholar 读取到的期刊与论文；JCR / 中科院等未核验数据不会自行补写。`;
+      document.querySelector('.review-note').innerHTML = `<strong>已加入 ${incoming.length} 本期刊：</strong>论文年份和题目已合并；JCR / 中科院等未核验数据不会自行补写。`;
+      return incoming.length;
     }
     function queueScholarImport() {
       if (!scholarPayload) return;
@@ -799,14 +941,29 @@
       closeImport();
     }
     function queueScholarPayload(payload) {
-      if (!payload) return;
-      pendingScholarImports = [payload, ...pendingScholarImports.filter(item => item.profile_id !== payload.profile_id)].slice(0, 10);
+      if (!payload) return 0;
+      const profileId = String(payload.profile_id || `import:${Date.now()}`);
+      const queued = { ...payload, profile_id: profileId };
+      pendingScholarImports = [queued, ...pendingScholarImports.filter(item => item.profile_id !== profileId)].slice(0, 10);
+      const added = confirmScholarProfile(profileId);
+      if (!added) {
+        try { localStorage.setItem(pendingStorageKey, JSON.stringify(pendingScholarImports)); } catch (_) {}
+        renderPendingScholarImports();
+      }
+      return added;
+    }
+    function migratePendingScholarImports() {
+      const legacy = pendingScholarImports.slice();
+      pendingScholarImports = [];
+      legacy.forEach(payload => {
+        const profileId = String(payload?.profile_id || `import:${Date.now()}`);
+        pendingScholarImports.push({ ...payload, profile_id: profileId });
+        confirmScholarProfile(profileId);
+      });
       try { localStorage.setItem(pendingStorageKey, JSON.stringify(pendingScholarImports)); } catch (_) {}
       renderPendingScholarImports();
-      const sourceLabel = payload.source_label || (payload.source === 'openalex-author' ? 'OpenAlex' : payload.source === 'crossref/openalex' ? '公开元数据' : 'Google Scholar');
-      document.querySelector('.review-note').innerHTML = `<strong>已读取 ${Number(payload.paper_count || payload.papers?.length || 0)} 篇 ${escapeHtml(sourceLabel)} 候选论文：</strong>已放入待确认区，核对后再加入徽章墙。`;
     }
-    renderPendingScholarImports();
+    migratePendingScholarImports();
     pendingResults.addEventListener('click', event => {
       const button = event.target.closest('[data-accept-profile]');
       if (!button) return;
@@ -867,19 +1024,19 @@
       scholarResult.classList.remove('is-error');
       if (kind === 'name') {
         desc.textContent = '输入姓名和可选单位，先查看候选作者；单位变化时可以多选。';
-        confirmImport.textContent = '加入待确认';
+        confirmImport.textContent = '加入足迹';
         resetAuthorSearch();
         setTimeout(() => authorName.focus(), 0);
       } else {
         const copy = {
-          orcid: '输入 ORCID 或 OpenAlex 作者 ID；系统会从 OpenAlex 读取公开论文，先放入待确认。',
-          doi: '粘贴 DOI、BibTeX 或 CSV 内容；系统会解析公开元数据，先放入待确认。',
+          orcid: '输入 ORCID 或 OpenAlex 作者 ID；系统会读取公开论文并直接加入足迹。',
+          doi: '粘贴 DOI、BibTeX 或 CSV 内容；系统会解析公开元数据并直接加入足迹。',
           scholar: '粘贴 Google Scholar 个人主页链接；若服务器被 Google 拦截，请在 Scholar 主页使用插件导入。',
           status: '粘贴投稿系统链接、稿件编号或确认邮件中的状态信息；当前保存为手动待同步记录。',
         };
         desc.textContent = copy[kind] || copy.doi;
         value.placeholder = kind === 'scholar' ? '例如：https://scholar.google.com/citations?user=...' : kind === 'orcid' ? '例如：0000-0002-1825-0097 / A5012345678' : kind === 'status' ? '例如：Editorial Manager 链接 / Manuscript No.' : '例如：10.1016/j.enpol.2024.113456';
-        confirmImport.textContent = kind === 'scholar' ? '读取个人主页' : kind === 'orcid' ? '读取论文' : kind === 'doi' ? '解析并加入待确认' : '添加记录';
+        confirmImport.textContent = kind === 'scholar' ? '读取并加入足迹' : kind === 'orcid' ? '读取并加入足迹' : kind === 'doi' ? '解析并加入足迹' : '添加记录';
         value.value = '';
         setTimeout(() => value.focus(), 0);
         updateSelectedAuthors();
@@ -911,7 +1068,7 @@
         scholarPayload = null;
         scholarResult.hidden = true;
         scholarResult.classList.remove('is-error');
-        confirmImport.textContent = '读取个人主页';
+        confirmImport.textContent = '读取并加入足迹';
       }
       updateSelectedAuthors();
     });
@@ -928,16 +1085,9 @@
         const count = selectedCandidates().length;
         if (!count) return;
         const ids = selectedCandidates().map(input => input.value).filter(Boolean);
-        // A name search has already been manually disambiguated by the
-        // checked candidate(s). One click should now read their works and
-        // place the merged result in the review queue; the old flow fetched
-        // successfully but kept the result in a hidden panel, then fetched
-        // again on every subsequent click.
-        const data = await lookupAuthorWorks(ids);
-        if (data) {
-          queueScholarPayload(data);
-          closeImport();
-        }
+        // The checked candidate(s) are the manual identity confirmation.
+        // Read their works and commit the merged journals in this same flow.
+        await lookupAuthorWorks(ids, true);
         return;
       }
       const entered = String(value.value || '').trim();
@@ -949,7 +1099,7 @@
       }
       if (importKind === 'orcid') {
         if (scholarPayload) queueScholarImport();
-        else await lookupAuthorWorks(entered);
+        else await lookupAuthorWorks(entered, true);
         return;
       }
       if (importKind === 'doi') {

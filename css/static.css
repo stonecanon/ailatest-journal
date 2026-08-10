@@ -300,6 +300,9 @@ a:hover { text-decoration: underline; }
   align-items: center;
   gap: 12px;
 }
+.app-rail .rail-bottom .rail-footprint-link { order: 8; }
+.app-rail .rail-bottom #fav-header-btn { order: 9; }
+.app-rail .rail-bottom #account-credit-badge { order: 10; }
 .app-rail .rail-nav-btn {
   position: relative;
   width: 52px;
@@ -1015,7 +1018,7 @@ td.c, th.c { text-align: center; }
   .app-rail #rankings-btn { order: 7; }
   .app-rail #download-center-rail-link { order: 8; }
   .app-rail #fav-header-btn { order: 9; }
-  .app-rail #publication-footprint-rail-link { order: 10; }
+  .app-rail #publication-footprint-rail-link { order: 8; }
   .app-rail #account-credit-badge { order: 11; }
   .page-head { min-height: 54px; padding: 8px 12px; }
   .page-head nav { justify-content: flex-end; gap: 8px; }
@@ -1230,8 +1233,8 @@ body[data-static-page] main > [data-lang-panel] {
   box-shadow: 0 10px 28px rgba(40,28,16,.05);
 }
 body[data-static-page] .app-rail #rankings-btn { order: 7; }
-body[data-static-page] .app-rail #fav-header-btn { order: 8; }
-body[data-static-page] .app-rail #publication-footprint-rail-link { order: 9; }
+body[data-static-page] .app-rail #fav-header-btn { order: 9; }
+body[data-static-page] .app-rail #publication-footprint-rail-link { order: 8; }
 body[data-static-page] .app-rail #account-credit-badge { order: 10; }
 body[data-static-page] .fav-count-badge {
   display: inline-flex;

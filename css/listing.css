@@ -134,6 +134,9 @@ a.cat-link.index-card .index-card-hint {
   align-items: center;
   gap: 12px;
 }
+.rail-bottom .rail-footprint-link { order: 8; }
+.rail-bottom #fav-header-btn { order: 9; }
+.rail-bottom #account-credit-badge { order: 10; }
 .rail-nav-btn,
 .app-rail .account-credit-badge {
   position: relative;
@@ -959,8 +962,8 @@ body {
 .footer { display: none !important; }
 .app-rail .rail-region-picker { display: none !important; }
 .app-rail #rankings-btn { order: 7; }
-.app-rail #fav-header-btn { order: 8; }
-.app-rail #publication-footprint-rail-link { order: 9; }
+.app-rail #fav-header-btn { order: 9; }
+.app-rail #publication-footprint-rail-link { order: 8; }
 .app-rail #account-credit-badge { order: 10; }
 .fav-count-badge {
   display: inline-flex;

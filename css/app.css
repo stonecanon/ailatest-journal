@@ -127,6 +127,9 @@ body.share-mode .app-rail { display: none !important; }
   align-items: center;
   gap: 12px;
 }
+.rail-bottom .rail-footprint-link { order: 8; }
+.rail-bottom #fav-header-btn { order: 9; }
+.rail-bottom #account-credit-badge { order: 10; }
 /* ─── Page-level brand (desktop top-left) ─── */
 .page-brand {
   display: none;
@@ -11661,7 +11664,7 @@ body.journal-route .lang-toggle-wrap { display: none; }
   }
   #fav-header-btn { order: 9; }
   #download-center-rail-link { order: 8; }
-  #publication-footprint-rail-link { order: 10; }
+  #publication-footprint-rail-link { order: 8; }
   #account-credit-badge { order: 11; }
   #rankings-btn { order: 7; }
   .rail-nav-btn svg { width: 23px; height: 23px; }
