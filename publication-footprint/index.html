@@ -626,6 +626,25 @@
     function journalMetadataKey(value) {
       return String(value || '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]+/g, '');
     }
+    function journalDetailHref(item) {
+      const metadata = item?.journalMetadata && typeof item.journalMetadata === 'object' ? item.journalMetadata : {};
+      const slug = String(item?.slug || metadata.slug || '').trim();
+      if (slug) return `/journal/${encodeURIComponent(slug)}/`;
+      const issn = [
+        ...(Array.isArray(item?.issns) ? item.issns : []),
+        item?.issn,
+        item?.eissn,
+        metadata.issn,
+        metadata.eissn,
+      ].map(value => String(value || '').replace(/[^0-9X]/gi, '').toUpperCase())
+        .find(value => value.length === 8);
+      if (issn) return `/journal/${encodeURIComponent(issn)}/`;
+      const name = String(item?.name || '').trim();
+      const nameSlug = name.toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9\u4e00-\u9fff-]+/g, '-')
+        .replace(/-+/g, '-').replace(/^-|-$/g, '').slice(0, 60).replace(/-+$/g, '');
+      return nameSlug ? `/journal/${encodeURIComponent(nameSlug)}/` : `/#j/${encodeURIComponent(name)}`;
+    }
     function orderJournalBadges(badges) {
       const priority = label => {
         const text = String(label || '').trim().toUpperCase();
@@ -1012,7 +1031,7 @@
             ${renderPaperTitles(item)}
           <div class="badge-row">${journalBadges(item).map(([label, cls]) => `<span class="pub-badge ${cls}">${escapeHtml(label)}</span>`).join('')}</div>
           </div>
-          <div class="journal-card-side">${displayImpactFactor(item) != null ? `<div class="journal-if-card" aria-label="影响因子 ${escapeHtml(displayImpactFactor(item))}"><strong>${escapeHtml(displayImpactFactor(item))}</strong><span>IF</span></div>` : ''}<a class="journal-link" href="../#j/${encodeURIComponent(item.name)}">查看期刊 →</a></div>
+          <div class="journal-card-side">${displayImpactFactor(item) != null ? `<div class="journal-if-card" aria-label="影响因子 ${escapeHtml(displayImpactFactor(item))}"><strong>${escapeHtml(displayImpactFactor(item))}</strong><span>IF</span></div>` : ''}<a class="journal-link" href="${escapeHtml(journalDetailHref(item))}">查看期刊 →</a></div>
         </article>`).join('') : '<div class="empty-state"><strong>暂无已确认的发表记录</strong><span>完成作者身份核对后，已确认的期刊会显示在这里。</span></div>';
     }
     let journalMetadataRefresh = null;
@@ -1041,6 +1060,7 @@
             const metadata = metadataByKey.get(journalMetadataKey(item.name)) || (Array.isArray(item.issns) ? item.issns.map(value => metadataByKey.get(journalMetadataKey(value))).find(Boolean) : null);
             if (!metadata) return item;
             const next = { ...item, journalMetadata: metadata };
+            if (metadata.slug && !next.slug) next.slug = metadata.slug;
             if (!journalImpactFactor(next) && journalImpactFactor(metadata)) {
               next.impactFactor = journalImpactFactor(metadata);
               changed = true;

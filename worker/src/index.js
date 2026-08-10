@@ -2968,6 +2968,7 @@ function publicPublicationJournalMetadata(journal) {
   return {
     name: cleanText(journal?.name || '', 240),
     cn_name: cleanText(journal?.cn_name || '', 240),
+    slug: cleanText(journal?.slug || '', 120),
     issn: cleanText(journal?.issn || '', 24).toUpperCase(),
     eissn: cleanText(journal?.eissn || '', 24).toUpperCase(),
     // Only expose an explicitly sourced publication frequency. Do not infer
@@ -3242,6 +3243,7 @@ function footprintMetadata(value) {
     metadata.journalMetadata = {
       name: cleanText(journal.name || '', 240),
       cn_name: cleanText(journal.cn_name || '', 240),
+      slug: cleanText(journal.slug || '', 120),
       issn: cleanText(journal.issn || '', 24).toUpperCase(),
       eissn: cleanText(journal.eissn || '', 24).toUpperCase(),
       frequency: cleanText(journal.frequency || '', 80),
