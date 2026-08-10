@@ -60,7 +60,7 @@
     .publication-hero > .metric-grid { grid-column: 1 / -1; margin: 2px 0 0; }
     .publication-hero > .metric-grid .metric-card { border-color: rgba(39,35,31,.09); background: rgba(255,255,255,.56); }
     .archive-status-panel { margin: 18px 0; }
-    .publication-left-column { min-width: 0; display: grid; gap: 18px; }
+    .publication-left-column { min-width: 0; display: grid; gap: 24px; }
     .publication-left-column .archive-status-panel { margin: 0; }
     .achievements-panel { margin: 18px 0; }
     .achievements-panel .panel-head { align-items: center; }
@@ -95,38 +95,37 @@
     .achievements-modal .achievements-dialog { width: min(980px, 100%); max-height: calc(100vh - 40px); margin: 0; overflow: auto; }
     .achievement-modal-close { position: absolute; top: 8px; right: 12px; z-index: 2; }
     .achievements-dialog { position: relative; }
-    .workspace-grid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(300px, .72fr); gap: 18px; align-items: start; }
+    .workspace-grid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(300px, .72fr); gap: 24px; align-items: start; }
     .panel { border: 1px solid var(--rule-soft); border-radius: 20px; background: rgba(255,255,255,.9); box-shadow: 0 10px 34px rgba(39,35,31,.05); overflow: hidden; }
     .panel-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 15px; padding: 20px 22px 15px; border-bottom: 1px solid var(--rule-soft); }
     .panel-head h2 { margin: 0; font-size: 21px; letter-spacing: -.02em; }
     .panel-head p { margin: 4px 0 0; color: var(--ink-faint); font-size: 12px; }
     .panel-tools { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 7px; }
     .mini-filter { min-height: 34px; border: 1px solid var(--rule); border-radius: 10px; padding: 0 10px; color: var(--ink-soft); background: #fffdf9; font: inherit; font-size: 12px; }
-    .footprint-list { display: grid; gap: 11px; padding: 16px; }
-    .journal-card { display: grid; grid-template-columns: 78px minmax(0, 1fr) auto; gap: 15px; padding: 17px 18px; border: 1px solid #e9e2d8; border-radius: 16px; background: #fffdf9; transition: transform .15s, border-color .15s, box-shadow .15s; }
+    .footprint-list { display: grid; gap: 16px; padding: 16px; }
+    .journal-card { display: grid; grid-template-columns: 72px minmax(0, 1fr) auto; gap: 14px; padding: 13px 16px; border: 1px solid #e9e2d8; border-radius: 16px; background: #fffdf9; transition: transform .15s, border-color .15s, box-shadow .15s; }
     .journal-card:hover { transform: translateY(-1px); border-color: rgba(249,115,22,.38); box-shadow: 0 10px 24px rgba(39,35,31,.06); }
-    .journal-card-cover { display: flex; min-height: 104px; flex-direction: column; justify-content: space-between; padding: 10px 8px; border-radius: 11px; color: rgba(255,255,255,.94); background: var(--cover, linear-gradient(155deg,#d58046,#6d3b32)); box-shadow: inset 0 0 0 1px rgba(255,255,255,.32), 0 7px 14px rgba(39,35,31,.12); }
-    .journal-card-cover small { font-size: 9px; font-weight: 760; letter-spacing: .08em; text-transform: uppercase; opacity: .82; }
-    .journal-card-cover strong { font-size: 13px; line-height: 1.1; }
-    .journal-card-cover em { align-self: flex-start; padding: 2px 4px; border: 1px solid rgba(255,255,255,.42); border-radius: 4px; font-size: 8px; font-style: normal; font-weight: 800; letter-spacing: .08em; }
+    .journal-card-cover { display: flex; min-height: 78px; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 8px 5px; border-radius: 11px; color: #fff; background: var(--cover, linear-gradient(155deg,#d58046,#6d3b32)); box-shadow: inset 0 0 0 1px rgba(255,255,255,.32), 0 7px 14px rgba(39,35,31,.12); text-align: center; }
+    .journal-card-cover small { font-size: 9px; font-weight: 760; letter-spacing: .04em; opacity: .9; }
+    .journal-card-cover strong { font-size: 42px; font-weight: 900; line-height: .92; letter-spacing: -.06em; }
     .journal-card-main { min-width: 0; }
     .journal-card-title { margin: 0; font-size: 17px; font-weight: 820; line-height: 1.25; }
     .journal-card-title span { display: block; margin-top: 4px; color: var(--ink-faint); font-size: 12px; font-weight: 600; }
     .journal-meta { display: flex; flex-wrap: wrap; gap: 5px 12px; margin-top: 10px; color: var(--ink-faint); font-size: 12px; }
     .journal-meta strong { color: var(--ink-soft); }
-    .paper-title-preview { margin-top: 9px; overflow: visible; color: var(--ink-soft); font-size: 12px; line-height: 1.55; text-overflow: clip; white-space: normal; overflow-wrap: anywhere; }
-    .paper-title-preview::before { content: '论文题目：'; color: var(--ink-faint); }
-    .paper-title-details { margin-top: 5px; color: var(--footprint-blue); font-size: 11px; }
+    .paper-title-list { margin: 9px 0 0; padding-left: 17px; color: var(--ink-soft); font-size: 12px; line-height: 1.55; }
+    .paper-title-list li { overflow-wrap: anywhere; }
+    .paper-title-list li + li { margin-top: 3px; }
+    .paper-title-details { margin-top: 7px; color: var(--footprint-blue); font-size: 11px; }
     .paper-title-details summary { cursor: pointer; }
-    .paper-title-details ul { margin: 6px 0 0; padding-left: 16px; color: var(--ink-soft); line-height: 1.55; }
+    .paper-title-details .paper-title-list { margin-top: 6px; }
     .badge-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
     .pub-badge { display: inline-flex; align-items: center; min-height: 24px; padding: 3px 9px; border: 1px solid rgba(39,35,31,.1); border-radius: 999px; color: var(--ink-soft); background: #f7f3ec; font-size: 11px; font-weight: 780; letter-spacing: .02em; }
     .pub-badge.index { color: #24486f; background: #eaf1fb; border-color: #cddbeb; }
     .pub-badge.zone { color: #704f2b; background: #f5eadb; border-color: #ead6bb; }
     .pub-badge.quartile { color: #923f12; background: #fff0e2; border-color: #f5cda9; }
     .pub-badge.verified { color: var(--footprint-green); background: var(--footprint-green-soft); border-color: #bfdfcc; }
-    .journal-card-side { display: flex; min-width: 86px; flex-direction: column; align-items: flex-end; justify-content: space-between; gap: 9px; }
-    .paper-count { color: var(--footprint-orange); font-size: 13px; font-weight: 820; white-space: nowrap; }
+    .journal-card-side { display: flex; min-width: 86px; flex-direction: column; align-items: flex-end; justify-content: center; gap: 9px; }
     .journal-link { color: var(--footprint-blue); font-size: 12px; font-weight: 760; white-space: nowrap; }
     .journal-link:hover { color: var(--footprint-orange); }
     .empty-state { padding: 36px 20px; color: var(--ink-faint); text-align: center; }
@@ -137,9 +136,8 @@
     .import-panel { padding: 20px; }
     .import-panel h2 { margin: 0; font-size: 19px; }
     .import-panel > p { margin: 7px 0 15px; color: var(--ink-faint); font-size: 12px; line-height: 1.65; }
-    .import-option { display: grid; grid-template-columns: 34px minmax(0,1fr) auto; gap: 10px; align-items: center; width: 100%; margin-top: 9px; padding: 12px; border: 1px solid var(--rule-soft); border-radius: 14px; background: #fffdf9; text-align: left; cursor: pointer; }
+    .import-option { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 10px; align-items: center; width: 100%; margin-top: 9px; padding: 12px 14px; border: 1px solid var(--rule-soft); border-radius: 14px; background: #fffdf9; text-align: left; cursor: pointer; }
     .import-option:hover { border-color: rgba(249,115,22,.4); background: #fff8f1; }
-    .import-icon { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 10px; color: var(--footprint-blue); background: var(--footprint-blue-soft); font-size: 14px; font-weight: 850; }
     .import-option b { display: block; color: var(--ink); font-size: 13px; }
     .import-option small { display: block; margin-top: 2px; color: var(--ink-faint); font-size: 11px; line-height: 1.35; }
     .import-option em { padding: 3px 6px; border-radius: 999px; color: #9b4714; background: #fff0e4; font-size: 10px; font-style: normal; font-weight: 800; white-space: nowrap; }
@@ -180,6 +178,12 @@
     .submission-empty p { margin: 4px 0 0; }
     .modal-help { margin: 5px 0 0; color: var(--ink-faint); font-size: 11px; line-height: 1.45; }
     .email-fields textarea { min-height: 130px; resize: vertical; }
+    .file-upload { display: grid; gap: 6px; color: var(--ink-soft); font-size: 13px; }
+    .file-upload-control { position: relative; display: flex; align-items: center; gap: 10px; min-height: 42px; padding: 5px 10px; border: 1px solid var(--rule); border-radius: 12px; background: #fffdf9; }
+    .file-upload-control:focus-within { border-color: var(--footprint-orange); box-shadow: 0 0 0 3px rgba(249,115,22,.14); }
+    .file-upload-input { position: absolute; width: 1px; height: 1px; overflow: hidden; opacity: 0; clip: rect(0 0 0 0); }
+    .file-upload-button { display: inline-flex; align-items: center; min-height: 30px; padding: 0 11px; border-radius: 8px; color: var(--footprint-blue); background: var(--footprint-blue-soft); font-size: 12px; font-weight: 780; white-space: nowrap; }
+    .file-upload-name { min-width: 0; overflow: hidden; color: var(--ink-faint); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
     .modal-backdrop { position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; padding: 20px; background: rgba(39,35,31,.32); backdrop-filter: blur(4px); }
     .modal-backdrop[hidden] { display: none; }
     .modal-card { width: min(620px, 100%); padding: 22px; border: 1px solid var(--rule); border-radius: 20px; background: #fffdf9; box-shadow: 0 24px 80px rgba(39,35,31,.2); }
@@ -249,9 +253,8 @@
       .panel-tools { justify-content: flex-start; margin-top: 11px; }
       .footprint-list { padding: 10px; }
       .journal-card { grid-template-columns: 70px minmax(0, 1fr); gap: 10px; padding: 14px; }
-      .journal-card-cover { min-height: 94px; }
+      .journal-card-cover { min-height: 72px; }
       .journal-card-main { grid-column: 2; }
-      .paper-title-preview { white-space: normal; }
       .journal-card-side { flex-direction: row; align-items: center; }
       .journal-card-side { grid-column: 2; }
       .submission-row { grid-template-columns: minmax(0,1fr); }
@@ -344,10 +347,10 @@
           <section class="panel import-panel">
             <h2>怎么导入？</h2>
             <p>先搜索姓名，再选择属于你的作者身份。单位变化时可以多选，系统会合并论文并直接加入足迹。</p>
-            <button class="import-option" type="button" data-import="name"><span class="import-icon">名</span><span><b>搜索作者姓名</b><small>可多选不同单位的作者身份</small></span><em>推荐</em></button>
-            <button class="import-option" type="button" data-import="orcid"><span class="import-icon">iD</span><span><b>ORCID / OpenAlex 作者 ID</b><small>已有唯一作者标识时直接识别</small></span><span>→</span></button>
-            <button class="import-option" type="button" data-import="doi"><span class="import-icon">DOI</span><span><b>DOI / BibTeX / CSV</b><small>适合一次导入已发表论文清单</small></span><span>→</span></button>
-            <button class="import-option" type="button" data-import="scholar"><span class="import-icon">GS</span><span><b>Google Scholar</b><small>可粘贴主页；也可在 Scholar 页面用插件导入</small></span><span>→</span></button>
+            <button class="import-option" type="button" data-import="name"><span><b>搜索作者姓名</b><small>可多选不同单位的作者身份</small></span><em>推荐</em></button>
+            <button class="import-option" type="button" data-import="orcid"><span><b>ORCID / OpenAlex 作者 ID</b><small>已有唯一作者标识时直接识别</small></span><span>→</span></button>
+            <button class="import-option" type="button" data-import="doi"><span><b>DOI / BibTeX / CSV</b><small>适合一次导入已发表论文清单</small></span><span>→</span></button>
+            <button class="import-option" type="button" data-import="scholar"><span><b>Google Scholar</b><small>可粘贴主页；也可在 Scholar 页面用插件导入</small></span><span>→</span></button>
             <div class="review-note"><strong>核对原则：</strong>选择作者身份后会直接加入徽章墙；期刊分区、IF 等指标只显示本站已有的核验数据，不会凭空补写。</div>
           </section>
           <section class="panel pending-panel">
@@ -434,7 +437,7 @@
         </div>
         <div class="email-fields" id="email-fields" hidden>
           <label>粘贴投稿确认邮件正文<textarea class="modal-input" id="submission-email-text" rows="7" placeholder="可粘贴主题、发件人和正文；系统只提取期刊、稿件编号、题目和状态。"></textarea></label>
-          <label>或上传 .eml<input class="modal-input" id="submission-eml-file" type="file" accept=".eml,message/rfc822,text/plain" /></label>
+          <label class="file-upload">或上传 .eml<span class="file-upload-control"><input class="file-upload-input" id="submission-eml-file" type="file" accept=".eml,message/rfc822,text/plain" /><span class="file-upload-button">选择 .eml 文件</span><span class="file-upload-name" id="submission-eml-name">未选择文件</span></span></label>
           <p class="modal-help">无法读取出版社页面时使用；不会上传邮件附件，也不会保存邮箱密码。</p>
         </div>
         <input class="modal-input" id="import-value" type="text" placeholder="例如：10.1016/j.enpol.2024.113456" />
@@ -485,14 +488,43 @@
       return Math.max(0, ...journalYears(item));
     }
     function journalImpactFactor(item) {
-      const raw = item?.impactFactor ?? item?.impact_factor ?? item?.if ?? item?.IF;
+      const raw = item?.impactFactor ?? item?.impact_factor ?? item?.if ?? item?.IF ?? item?.if_latest;
       const value = Number(String(raw ?? '').replace(/[^0-9.\-]/g, ''));
-      return Number.isFinite(value) ? value : null;
+      return Number.isFinite(value) && value > 0 ? value : null;
     }
     function paperTitles(item) {
       return [...new Set((Array.isArray(item?.titles) ? item.titles : [])
         .map(title => String(title || '').replace(/\s+/g, ' ').trim())
         .filter(Boolean))];
+    }
+    function journalMetadataKey(value) {
+      return String(value || '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]+/g, '');
+    }
+    function journalBadges(item) {
+      const existing = Array.isArray(item?.badges) ? item.badges.filter(badge => Array.isArray(badge) && badge[0]) : [];
+      if (existing.length) return existing;
+      const metadata = item?.journalMetadata && typeof item.journalMetadata === 'object' ? item.journalMetadata : item;
+      const badges = [];
+      const seen = new Set();
+      const add = (label, cls) => {
+        const text = String(label || '').trim();
+        if (!text || seen.has(text.toLowerCase())) return;
+        seen.add(text.toLowerCase());
+        badges.push([text, cls]);
+      };
+      (Array.isArray(metadata?.indices) ? metadata.indices : []).slice(0, 6).forEach(index => add(index, 'index'));
+      if (metadata?.scopus && !seen.has('scopus')) add('Scopus', 'index');
+      if (metadata?.pubmed) add('PubMed', 'index');
+      if (metadata?.doaj) add('DOAJ', 'index');
+      const quartile = String(metadata?.if_quartile || '').toUpperCase();
+      if (/^Q[1-4]$/.test(quartile)) add(`JCR ${quartile}`, 'quartile');
+      const casZone = metadata?.cas_zone || metadata?.cas_xr?.zone;
+      if (casZone && /^[1-4]$/.test(String(casZone))) add(`中科院 ${casZone}区`, 'zone');
+      if (metadata?.cas_top || metadata?.cas_xr?.top) add('TOP', 'zone');
+      const emergingZone = metadata?.cas_xr?.zone;
+      if (emergingZone && metadata?.cas_xr?.emerging && /^[1-4]$/.test(String(emergingZone))) add(`新锐 ${emergingZone}区`, 'zone');
+      if (metadata?.warning || metadata?.on_hold || metadata?.under_review) add('风险提示', 'verified');
+      return badges;
     }
     function metadataTextValues(values) {
       const raw = (Array.isArray(values) ? values : [values]).flat(Infinity);
@@ -551,8 +583,10 @@
     function renderPaperTitles(item) {
       const titles = paperTitles(item);
       if (!titles.length) return '';
-      const rest = titles.slice(1);
-      return `<div class="paper-title-preview" title="${escapeHtml(titles[0])}">${escapeHtml(titles[0])}</div>${rest.length ? `<details class="paper-title-details"><summary>查看其余 ${rest.length} 个论文题目</summary><ul>${rest.map(title => `<li>${escapeHtml(title)}</li>`).join('')}</ul></details>` : ''}`;
+      const visible = titles.length > 3 ? titles.slice(0, 3) : titles;
+      const rest = titles.slice(3);
+      const list = values => `<ul class="paper-title-list">${values.map(title => `<li>${escapeHtml(title)}</li>`).join('')}</ul>`;
+      return `${list(visible)}${rest.length ? `<details class="paper-title-details"><summary>查看其余 ${rest.length} 个论文题目</summary>${list(rest)}</details>` : ''}`;
     }
     function syncYearFilter() {
       const selected = year.value || 'all';
@@ -572,7 +606,7 @@
     function renderAchievementStats() {
       const paperCount = publicationJournals.reduce((sum, item) => sum + Number(item.papers || 0), 0);
       const citationCount = publicationJournals.reduce((sum, item) => sum + (item.citations || 0), 0);
-      const q1Journals = publicationJournals.filter(item => (Array.isArray(item.badges) ? item.badges : []).some(([label]) => /Q1/.test(label)));
+      const q1Journals = publicationJournals.filter(item => journalBadges(item).some(([label]) => /Q1/.test(label)));
       const q1PaperCount = q1Journals.reduce((sum, item) => sum + Number(item.papers || 0), 0);
       const points = paperCount * 5 + citationCount + q1PaperCount * 3;
       const level = [...researcherLevels].reverse().find(item => points >= item.min) || researcherLevels[0];
@@ -639,20 +673,79 @@
       renderAchievementStats();
       list.innerHTML = rows.length ? rows.map(item => `
         <article class="journal-card">
-          <div class="journal-card-cover" style="--cover:${item.cover}" aria-label="${escapeHtml(item.name)} (${escapeHtml(item.short)})"><em>JOURNAL</em><strong>${escapeHtml(item.short)}</strong>${item.years?.length ? `<small>${item.years[0]} · Journal</small>` : ''}</div>
+          <div class="journal-card-cover" style="--cover:${item.cover}" aria-label="${escapeHtml(item.name)}：${Number(item.papers || 0)} 篇论文"><strong>${Number(item.papers || 0)}</strong><small>篇论文</small></div>
           <div class="journal-card-main">
             <h3 class="journal-card-title">${escapeHtml(item.name)}<span>${escapeHtml(item.abbr)}</span></h3>
-            <div class="journal-meta"><span><strong>${Number(item.papers || 0)}</strong> 篇论文</span>${journalYears(item).length ? `<span>发表年份：<strong>${journalYears(item).join('、')}</strong></span>` : ''}${journalImpactFactor(item) != null ? `<span>IF：<strong>${journalImpactFactor(item)}</strong></span>` : ''}${item.lastConfirmed ? `<span>最后确认：${escapeHtml(item.lastConfirmed)}</span>` : (item.source ? `<span>来源：${escapeHtml(item.source)}</span>` : '')}</div>
+            <div class="journal-meta">${journalYears(item).length ? `<span>发表年份：<strong>${journalYears(item).join('、')}</strong></span>` : ''}${journalImpactFactor(item) != null ? `<span>IF：<strong>${journalImpactFactor(item)}</strong></span>` : ''}</div>
             ${renderPaperTitles(item)}
-          <div class="badge-row">${(Array.isArray(item.badges) ? item.badges : []).map(([label, cls]) => `<span class="pub-badge ${cls}">${escapeHtml(label)}</span>`).join('')}</div>
+          <div class="badge-row">${journalBadges(item).map(([label, cls]) => `<span class="pub-badge ${cls}">${escapeHtml(label)}</span>`).join('')}</div>
           </div>
-          <div class="journal-card-side"><span class="paper-count">已发表</span><a class="journal-link" href="../#j/${encodeURIComponent(item.name)}">查看期刊 →</a></div>
+          <div class="journal-card-side"><a class="journal-link" href="../#j/${encodeURIComponent(item.name)}">查看期刊 →</a></div>
         </article>`).join('') : '<div class="empty-state"><strong>暂无已确认的发表记录</strong><span>完成作者身份核对后，已确认的期刊会显示在这里。</span></div>';
+    }
+    let journalMetadataRefresh = null;
+    let journalMetadataRefreshQueued = false;
+    async function refreshJournalMetadata() {
+      if (!publicationJournals.length) return null;
+      if (journalMetadataRefresh) {
+        journalMetadataRefreshQueued = true;
+        return journalMetadataRefresh;
+      }
+      const names = [...new Set(publicationJournals.map(item => String(item?.name || '').trim()).filter(Boolean))].slice(0, 120);
+      const issns = [...new Set(publicationJournals.flatMap(item => Array.isArray(item?.issns) ? item.issns : []).map(value => String(value || '').trim().toUpperCase()).filter(Boolean))].slice(0, 120);
+      if (!names.length && !issns.length) return null;
+      journalMetadataRefresh = (async () => {
+        try {
+          const params = new URLSearchParams();
+          names.forEach(name => params.append('name', name));
+          issns.forEach(issn => params.append('issn', issn));
+          const data = await publicationApi(`/api/publication/journal-metadata?${params.toString()}`);
+          const metadataByKey = new Map();
+          (Array.isArray(data.items) ? data.items : []).filter(item => item && item.name && item.found !== false).forEach(item => {
+            [item.query, item.name, item.issn, item.eissn].filter(Boolean).forEach(key => metadataByKey.set(journalMetadataKey(key), item));
+          });
+          let changed = false;
+          publicationJournals = publicationJournals.map(item => {
+            const metadata = metadataByKey.get(journalMetadataKey(item.name)) || (Array.isArray(item.issns) ? item.issns.map(value => metadataByKey.get(journalMetadataKey(value))).find(Boolean) : null);
+            if (!metadata) return item;
+            const next = { ...item, journalMetadata: metadata };
+            if (!journalImpactFactor(next) && journalImpactFactor(metadata)) {
+              next.impactFactor = journalImpactFactor(metadata);
+              changed = true;
+            }
+            const metadataBadges = journalBadges({ ...next, badges: [] });
+            const mergedBadges = [...(Array.isArray(item.badges) ? item.badges : []), ...metadataBadges]
+              .filter(badge => Array.isArray(badge) && badge[0])
+              .filter((badge, index, list) => list.findIndex(other => String(other[0]).toLowerCase() === String(badge[0]).toLowerCase()) === index);
+            const oldBadges = JSON.stringify(Array.isArray(item.badges) ? item.badges : []);
+            if (mergedBadges.length && JSON.stringify(mergedBadges) !== oldBadges) {
+              next.badges = mergedBadges;
+              changed = true;
+            }
+            if (JSON.stringify(item.journalMetadata || {}) !== JSON.stringify(metadata)) changed = true;
+            return next;
+          });
+          if (changed) {
+            try { localStorage.setItem(confirmedStorageKey, JSON.stringify(publicationJournals)); } catch (_) {}
+            renderFootprints();
+          }
+        } catch (_) {
+          // The journal card remains useful with the author metadata if the badge lookup is unavailable.
+        } finally {
+          journalMetadataRefresh = null;
+          if (journalMetadataRefreshQueued) {
+            journalMetadataRefreshQueued = false;
+            setTimeout(() => refreshJournalMetadata(), 0);
+          }
+        }
+      })();
+      return journalMetadataRefresh;
     }
     search.addEventListener('input', renderFootprints);
     year.addEventListener('change', renderFootprints);
     sortFilter.addEventListener('change', renderFootprints);
     renderFootprints();
+    refreshJournalMetadata();
 
     const achievementsModal = document.getElementById('achievements-modal');
     const openAchievements = document.getElementById('open-achievements');
@@ -682,6 +775,7 @@
     const emailFields = document.getElementById('email-fields');
     const submissionEmailText = document.getElementById('submission-email-text');
     const submissionEmlFile = document.getElementById('submission-eml-file');
+    const submissionEmlName = document.getElementById('submission-eml-name');
     const submissionJournal = document.getElementById('submission-journal');
     const submissionStatus = document.getElementById('submission-status');
     const submissionManuscript = document.getElementById('submission-manuscript');
@@ -800,6 +894,7 @@
       submissionLink.value = '';
       submissionEmailText.value = '';
       submissionEmlFile.value = '';
+      if (submissionEmlName) submissionEmlName.textContent = '未选择文件';
       confirmImport.textContent = '保存投稿状态';
     }
     function loadSubmissionForm(id) {
@@ -1143,11 +1238,12 @@
         const name = scholarVenue(paper?.venue || paper?.journal || paper?.container) || '未识别期刊';
         const key = name.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]+/g, '');
         if (!key || key === '未识别期刊') return;
-        const item = groups.get(key) || { name, short: journalShort(name), abbr: journalShort(name), cover: journalCover(name), papers: 0, citations: 0, years: [], titles: [], badges: [], organizations: organizations.slice(), countries: countries.slice(), fields: profileFields.slice(), sourceProfiles: sourceProfiles.slice(), source: sourceLabel };
+        const item = groups.get(key) || { name, short: journalShort(name), abbr: journalShort(name), cover: journalCover(name), papers: 0, citations: 0, years: [], titles: [], issns: [], badges: [], organizations: organizations.slice(), countries: countries.slice(), fields: profileFields.slice(), sourceProfiles: sourceProfiles.slice(), source: sourceLabel };
         item.papers += 1;
         item.citations += Number(paper?.citations || 0) || 0;
         if (Number(paper?.year) && !item.years.includes(Number(paper.year))) item.years.push(Number(paper.year));
         if (paper?.title && !item.titles.includes(paper.title)) item.titles.push(paper.title);
+        if (paper?.issn && !item.issns.includes(String(paper.issn).toUpperCase())) item.issns.push(String(paper.issn).toUpperCase());
         item.organizations = uniqueTextValues([item.organizations, paper?.organizations, paper?.authorOrganizations, paper?.organization]);
         item.countries = uniqueTextValues([item.countries, paper?.countries, paper?.authorCountries, paper?.country]);
         item.fields = uniqueTextValues([item.fields, paper?.fields, paper?.researchFields, paper?.categories, paper?.topics, paper?.subject, paper?.topic]);
@@ -1176,6 +1272,8 @@
           existing.citations = Math.max(Number(existing.citations || 0), Number(item.citations || 0));
           existing.years = [...new Set([...(existing.years || []), ...(item.years || [])])].sort((a, b) => b - a);
           existing.titles = [...new Set([...(existing.titles || []), ...(item.titles || [])])];
+          existing.papers = Math.max(Number(existing.papers || 0), Number(item.papers || 0), existing.titles.length);
+          existing.issns = [...new Set([...(existing.issns || []), ...(item.issns || [])])];
           existing.organizations = [...new Set([...journalOrganizations(existing), ...journalOrganizations(item)])];
           existing.countries = [...new Set([...journalCountries(existing), ...journalCountries(item)])];
           existing.fields = [...new Set([...journalFields(existing), ...journalFields(item)])];
@@ -1192,6 +1290,7 @@
       } catch (_) {}
       renderPendingScholarImports();
       renderFootprints();
+      refreshJournalMetadata();
       document.querySelector('.review-note').innerHTML = `<strong>已加入 ${incoming.length} 本期刊：</strong>论文年份和题目已合并；JCR / 中科院等未核验数据不会自行补写。`;
       return incoming.length;
     }
@@ -1325,7 +1424,7 @@
         value.placeholder = kind === 'scholar' ? '例如：https://scholar.google.com/citations?user=...' : kind === 'orcid' ? '例如：0000-0002-1825-0097 / A5012345678' : kind === 'status' ? '例如：Editorial Manager 链接 / Manuscript No.' : '例如：10.1016/j.enpol.2024.113456';
         confirmImport.textContent = kind === 'scholar' ? '读取并加入足迹' : kind === 'orcid' ? '读取并加入足迹' : kind === 'doi' ? '解析并加入足迹' : kind === 'email' ? '解析并加入档案' : (editingSubmissionId ? '更新投稿状态' : '保存投稿状态');
         if (kind !== 'status' && kind !== 'email') value.value = '';
-        if (kind === 'email') { submissionEmailText.value = ''; submissionEmlFile.value = ''; }
+        if (kind === 'email') { submissionEmailText.value = ''; submissionEmlFile.value = ''; if (submissionEmlName) submissionEmlName.textContent = '未选择文件'; }
         setTimeout(() => (kind === 'status' ? submissionJournal : kind === 'email' ? submissionEmailText : value).focus(), 0);
         updateSelectedAuthors();
       }
@@ -1406,7 +1505,10 @@
       }
     });
     submissionEmailText.addEventListener('input', updateSelectedAuthors);
-    submissionEmlFile.addEventListener('change', updateSelectedAuthors);
+    submissionEmlFile.addEventListener('change', () => {
+      if (submissionEmlName) submissionEmlName.textContent = submissionEmlFile.files?.[0]?.name || '未选择文件';
+      updateSelectedAuthors();
+    });
     modal.addEventListener('click', e => { if (e.target === modal) closeImport(); });
   </script>
   <script src="../js/site-rail.js?v=20260810-footprint-persistent-v1" defer></script>

@@ -48,6 +48,7 @@ import {
   buildSkillRecommendResponse,
   buildSkillQuotaResponse,
 } from './journal-search.js';
+import { loadJournals } from './deepseek-common.js';
 import {
   getEntitlements,
   activateTrialForNewUser,
@@ -2957,6 +2958,68 @@ async function fetchOpenAlexAuthorWorks(env, author) {
     .filter((paper) => paper.title || paper.venue);
 }
 
+function publicationJournalKey(value) {
+  return foldPublicationText(value).replace(/\s+/g, '');
+}
+
+function publicPublicationJournalMetadata(journal) {
+  const casXr = journal?.cas_xr && typeof journal.cas_xr === 'object' ? journal.cas_xr : null;
+  return {
+    name: cleanText(journal?.name || '', 240),
+    cn_name: cleanText(journal?.cn_name || '', 240),
+    issn: cleanText(journal?.issn || '', 24).toUpperCase(),
+    eissn: cleanText(journal?.eissn || '', 24).toUpperCase(),
+    if_latest: journal?.if_latest ?? journal?.if_2025 ?? journal?.if_2024 ?? null,
+    impactFactor: journal?.if_latest ?? journal?.if_2025 ?? journal?.if_2024 ?? null,
+    if_latest_year: journal?.if_latest_year || journal?.jcr_year || null,
+    if_quartile: cleanText(journal?.if_quartile || '', 32),
+    indices: Array.isArray(journal?.indices) ? journal.indices.slice(0, 8) : [],
+    scopus: !!journal?.scopus,
+    pubmed: !!journal?.pubmed,
+    doaj: !!journal?.doaj,
+    cas_zone: journal?.cas_zone ?? null,
+    cas_top: !!journal?.cas_top,
+    cas_xr: casXr ? { zone: casXr.zone || '', top: !!casXr.top, emerging: !!casXr.emerging } : null,
+    warning: !!journal?.warning,
+    on_hold: !!journal?.on_hold,
+    under_review: !!journal?.under_review,
+  };
+}
+
+async function routePublicationJournalMetadata(req, env) {
+  const url = new URL(req.url);
+  const names = url.searchParams.getAll('name').concat(url.searchParams.getAll('names'))
+    .flatMap((value) => String(value || '').split(/[|,;\n]+/))
+    .map((value) => cleanText(value, 240))
+    .filter(Boolean);
+  const issns = url.searchParams.getAll('issn').concat(url.searchParams.getAll('issns'))
+    .flatMap((value) => String(value || '').split(/[|,;\n]+/))
+    .map((value) => cleanText(value, 24).toUpperCase())
+    .filter(Boolean);
+  const queries = [...new Set([...names, ...issns])].slice(0, 120);
+  if (!queries.length) return err('请提供期刊名称或 ISSN', 400);
+  try {
+    const journals = await loadJournals(env);
+    const byName = new Map();
+    const byIssn = new Map();
+    journals.forEach((journal) => {
+      const metadata = publicPublicationJournalMetadata(journal);
+      const nameKey = publicationJournalKey(metadata.name);
+      if (nameKey && !byName.has(nameKey)) byName.set(nameKey, metadata);
+      [metadata.issn, metadata.eissn].filter(Boolean).forEach((issn) => {
+        if (!byIssn.has(issn)) byIssn.set(issn, metadata);
+      });
+    });
+    const items = queries.map((query) => {
+      const metadata = byIssn.get(query.toUpperCase()) || byName.get(publicationJournalKey(query));
+      return metadata ? { query, ...metadata } : { query, found: false };
+    });
+    return json({ ok: true, items }, 200, { 'Cache-Control': 'no-store' });
+  } catch (error) {
+    return err(error?.message || '期刊指标暂时不可用', 502, { 'Cache-Control': 'no-store' });
+  }
+}
+
 async function routePublicationAuthorWorks(req, env) {
   const url = new URL(req.url);
   const rawIds = cleanText(url.searchParams.get('ids') || url.searchParams.get('id') || '', 900);
@@ -4495,6 +4558,7 @@ export default {
       if (mSubmission && req.method === 'DELETE') return routeSubmissionDelete(req, env, decodeURIComponent(mSubmission[1]));
       if (p === '/publication/authors' && req.method === 'GET') return routePublicationAuthorSearch(req, env);
       if (p === '/publication/author-works' && req.method === 'GET') return routePublicationAuthorWorks(req, env);
+      if (p === '/publication/journal-metadata' && req.method === 'GET') return routePublicationJournalMetadata(req, env);
       if (p === '/publication/resolve' && req.method === 'POST') return routePublicationResolve(req, env);
       if (p === '/scholar/profile' && req.method === 'GET') {
         try {
