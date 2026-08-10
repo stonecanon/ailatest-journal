@@ -413,7 +413,7 @@
         <input class="modal-input" id="import-value" type="text" placeholder="例如：10.1016/j.enpol.2024.113456" />
         <div class="scholar-result" id="scholar-result" hidden></div>
       </div>
-      <div class="modal-actions"><button class="modal-cancel" id="cancel-import" type="button">取消</button><button class="modal-import" id="confirm-import" type="button" disabled>合并已选身份</button></div>
+      <div class="modal-actions"><button class="modal-cancel" id="cancel-import" type="button">取消</button><button class="modal-import" id="confirm-import" type="button" disabled>加入待确认</button></div>
     </section>
   </div>
 
@@ -558,6 +558,11 @@
       scholarResult.classList.remove('is-error');
       scholarResult.textContent = message;
       scholarResult.hidden = false;
+      if (importKind === 'name') {
+        const hint = document.getElementById('author-search-hint');
+        hint.hidden = false;
+        hint.textContent = message;
+      }
       confirmImport.disabled = true;
       confirmImport.textContent = buttonText;
     }
@@ -586,6 +591,11 @@
       scholarResult.classList.add('is-error');
       scholarResult.textContent = message;
       scholarResult.hidden = false;
+      if (importKind === 'name') {
+        const hint = document.getElementById('author-search-hint');
+        hint.hidden = false;
+        hint.textContent = message;
+      }
     }
     function cleanDoi(value) {
       return String(value || '').trim()
@@ -672,7 +682,7 @@
     }
     async function lookupAuthorWorks(identifiers) {
       const ids = Array.isArray(identifiers) ? identifiers : [identifiers];
-      if (!ids.length) return;
+      if (!ids.length) return null;
       setImportLoading('正在从 OpenAlex 读取作者公开论文…');
       try {
         const data = await publicationApi(`/api/publication/author-works?ids=${encodeURIComponent(ids.join(','))}`);
@@ -680,11 +690,13 @@
         renderScholarResult(data);
         confirmImport.disabled = false;
         confirmImport.textContent = '加入待确认';
+        return data;
       } catch (error) {
         scholarPayload = null;
         showScholarError(error?.message || '作者论文暂时不可用，请稍后重试。');
         confirmImport.disabled = false;
-        confirmImport.textContent = '重新读取';
+        confirmImport.textContent = importKind === 'name' ? '重试并加入待确认' : '重新读取';
+        return null;
       }
     }
     async function lookupScholarProfile() {
@@ -855,7 +867,7 @@
       scholarResult.classList.remove('is-error');
       if (kind === 'name') {
         desc.textContent = '输入姓名和可选单位，先查看候选作者；单位变化时可以多选。';
-        confirmImport.textContent = '合并已选身份';
+        confirmImport.textContent = '加入待确认';
         resetAuthorSearch();
         setTimeout(() => authorName.focus(), 0);
       } else {
@@ -916,7 +928,16 @@
         const count = selectedCandidates().length;
         if (!count) return;
         const ids = selectedCandidates().map(input => input.value).filter(Boolean);
-        await lookupAuthorWorks(ids);
+        // A name search has already been manually disambiguated by the
+        // checked candidate(s). One click should now read their works and
+        // place the merged result in the review queue; the old flow fetched
+        // successfully but kept the result in a hidden panel, then fetched
+        // again on every subsequent click.
+        const data = await lookupAuthorWorks(ids);
+        if (data) {
+          queueScholarPayload(data);
+          closeImport();
+        }
         return;
       }
       const entered = String(value.value || '').trim();
