@@ -153,6 +153,9 @@
     .paper-export-list-manager .mini-filter { min-height: 30px; font-size: 11px; }
     .paper-export-corresponding-toggle { display: inline-flex; align-items: center; gap: 5px; min-height: 30px; padding: 0 8px; border: 1px solid var(--rule); border-radius: 8px; color: var(--ink-soft); background: #fffdf9; font-size: 11px; white-space: nowrap; }
     .paper-export-corresponding-toggle input { accent-color: var(--footprint-orange); }
+    .paper-export-index-filters { display: inline-flex; flex-wrap: wrap; gap: 5px; align-items: center; margin-top: 8px; }
+    .paper-export-index-filter { display: inline-flex; align-items: center; gap: 4px; min-height: 27px; padding: 0 7px; border: 1px solid var(--rule); border-radius: 7px; color: var(--ink-soft); background: #fffdf9; font-size: 11px; }
+    .paper-export-index-filter input { accent-color: var(--footprint-blue); }
     .paper-export-note { margin: -7px 16px 16px; color: var(--ink-faint); font-size: 11px; }
     .badge-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
     .pub-badge { display: inline-flex; align-items: center; min-height: 24px; padding: 3px 9px; border: 1px solid rgba(39,35,31,.1); border-radius: 999px; color: var(--ink-soft); background: #f7f3ec; font-size: 11px; font-weight: 780; letter-spacing: .02em; }
@@ -625,7 +628,7 @@
   <div class="modal-backdrop" id="paper-export-modal" hidden>
     <section class="panel paper-export-dialog" role="dialog" aria-modal="true" aria-labelledby="paper-export-modal-title">
       <button class="modal-close" id="close-paper-export" type="button" aria-label="关闭论文清单预览">×</button>
-      <div class="panel-head"><div><h2 id="paper-export-modal-title">论文清单</h2><p>可删除或调整顺序；新加入的论文会自动追加到清单末尾。</p><div class="paper-export-list-manager"><select class="mini-filter" id="paper-export-list-select" aria-label="选择论文清单"></select><button class="mini-filter footprint-action" id="new-paper-export" type="button">新建</button><button class="mini-filter footprint-action" id="duplicate-paper-export" type="button">复制清单</button><button class="mini-filter footprint-action" id="rename-paper-export" type="button">重命名</button><button class="mini-filter footprint-action" id="recent-five-paper-export" type="button">仅近 5 年</button><label class="paper-export-corresponding-toggle"><input id="mark-corresponding-author" type="checkbox" checked />标注通讯作者</label></div></div><div class="paper-export-modal-tools"><button class="mini-filter footprint-action" id="copy-paper-export" type="button">复制全部</button><button class="mini-filter footprint-action" id="download-paper-export" type="button">导出纯文本</button></div></div>
+      <div class="panel-head"><div><h2 id="paper-export-modal-title">论文清单</h2><p>可删除或调整顺序；新加入的论文会自动追加到清单末尾。</p><div class="paper-export-list-manager"><select class="mini-filter" id="paper-export-list-select" aria-label="选择论文清单"></select><button class="mini-filter footprint-action" id="new-paper-export" type="button">新建</button><button class="mini-filter footprint-action" id="duplicate-paper-export" type="button">复制清单</button><button class="mini-filter footprint-action" id="rename-paper-export" type="button">重命名</button><button class="mini-filter footprint-action" id="recent-five-paper-export" type="button">仅近 5 年</button><label class="paper-export-corresponding-toggle"><input id="mark-corresponding-author" type="checkbox" checked />标注通讯作者</label></div><div class="paper-export-index-filters" aria-label="按收录索引筛选"><label class="paper-export-index-filter"><input type="checkbox" data-paper-export-index="SCIE" />SCI</label><label class="paper-export-index-filter"><input type="checkbox" data-paper-export-index="SSCI" />SSCI</label><label class="paper-export-index-filter"><input type="checkbox" data-paper-export-index="AHCI" />AHCI</label><label class="paper-export-index-filter"><input type="checkbox" data-paper-export-index="EI" />EI</label></div></div><div class="paper-export-modal-tools"><button class="mini-filter footprint-action" id="copy-paper-export" type="button">复制全部</button><button class="mini-filter footprint-action" id="download-paper-export" type="button">导出纯文本</button></div></div>
       <div class="paper-export-list" id="paper-export-list"></div>
       <div class="paper-export-dialog-actions"><button class="mini-filter footprint-action" id="save-paper-export" type="button">保存论文清单</button><button class="mini-filter footprint-action" id="restore-paper-export" type="button">恢复全部论文</button></div>
     </section>
@@ -672,6 +675,7 @@
     const duplicatePaperExportButton = document.getElementById('duplicate-paper-export');
     const renamePaperExportButton = document.getElementById('rename-paper-export');
     const recentFivePaperExportButton = document.getElementById('recent-five-paper-export');
+    const paperExportIndexFilters = [...document.querySelectorAll('[data-paper-export-index]')];
     const markCorrespondingAuthorCheckbox = document.getElementById('mark-corresponding-author');
     try { markCorrespondingAuthorCheckbox.checked = localStorage.getItem('ailatest-paper-export-mark-corresponding') !== '0'; } catch (_) {}
     const paperExportStorageKey = 'ailatest-paper-export-list-v1';
@@ -1278,6 +1282,13 @@
         .sort((left, right) => (Number(right.year || 0) - Number(left.year || 0)) || left.title.localeCompare(right.title));
     }
     function paperExportRecordKey(record) { return paperTitleKey(record?.title || ''); }
+    function paperExportIndexMatches(record) {
+      const selected = paperExportIndexFilters.filter(input => input.checked).map(input => input.dataset.paperExportIndex);
+      if (!selected.length) return true;
+      const journal = publicationJournals.find(item => footprintItemKey(item) === record.journalKey);
+      const indexes = new Set((journal ? exportIndexLabels(journal) : []).map(label => label === 'SCIE' ? 'SCIE' : label === 'A&HCI' ? 'AHCI' : label));
+      return selected.some(index => indexes.has(index));
+    }
     function paperExportRecords() {
       const all = allPaperRecords();
       const byKey = new Map(all.map(record => [paperExportRecordKey(record), record]));
@@ -1288,7 +1299,7 @@
         const key = paperExportRecordKey(record);
         return key && !excluded.has(key) && !orderedSet.has(key);
       });
-      return [...orderedKeys.map(key => byKey.get(key)), ...appended];
+      return [...orderedKeys.map(key => byKey.get(key)), ...appended].filter(paperExportIndexMatches);
     }
     function persistPaperExportState() {
       try { localStorage.setItem(paperExportStorageKey, JSON.stringify({ activeId: activePaperExportListId, lists: paperExportLists })); } catch (_) {}
@@ -1373,8 +1384,9 @@
         : '<div class="paper-export-list-empty">暂无可导出的论文。</div>';
       enrichPaperAuthorsButton.disabled = !missingAuthors.length;
       const markedCorresponding = records.filter(record => Array.isArray(record.authors) && record.authors.some(author => String(author).includes('*'))).length;
+      const activeIndexes = paperExportIndexFilters.filter(input => input.checked).map(input => input.parentElement.textContent.trim()).join('、');
       paperExportNote.textContent = records.length
-        ? `共 ${publicationJournals.length} 本期刊、${records.length} 篇论文。${missingAuthors.length ? `其中 ${missingAuthors.length} 篇缺少作者，可点击“补全作者”。` : '作者信息以公开元数据为准。'}${markCorrespondingAuthorCheckbox.checked && !markedCorresponding ? '当前数据未提供通讯作者标记。' : ''}`
+        ? `共 ${publicationJournals.length} 本期刊、${records.length} 篇论文。${activeIndexes ? `当前索引筛选：${activeIndexes}。` : ''}${missingAuthors.length ? `其中 ${missingAuthors.length} 篇缺少作者，可点击“补全作者”。` : '作者信息以公开元数据为准。'}${markCorrespondingAuthorCheckbox.checked && !markedCorresponding ? '当前数据未提供通讯作者标记。' : ''}`
         : '导入并确认论文后，这里会生成可编辑的论文清单。';
     }
     function openPaperExportPreview() {
@@ -1744,6 +1756,7 @@
     duplicatePaperExportButton.addEventListener('click', () => createPaperExportList(true));
     renamePaperExportButton.addEventListener('click', renamePaperExportList);
     recentFivePaperExportButton.addEventListener('click', selectRecentFivePaperExport);
+    paperExportIndexFilters.forEach(input => input.addEventListener('change', renderPaperExport));
     paperExportModal.addEventListener('click', event => {
       if (event.target === paperExportModal) closePaperExportPreview();
     });
