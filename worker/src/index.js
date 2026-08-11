@@ -591,7 +591,7 @@ async function routeExtensionDownload(req, env) {
   // The ZIP path is intentionally immutable at the edge. Bump this query
   // when the packaged extension changes so the redirect cannot serve an old
   // cached archive after a Pages deployment.
-  target.searchParams.set('v', '20260811-ext-v8-badge-order');
+  target.searchParams.set('v', '20260811-ext-v9-performance');
   return new Response(null, {
     status: 302,
     headers: {

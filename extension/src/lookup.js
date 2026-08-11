@@ -5,7 +5,7 @@
   const API_URL = 'https://api.ailatest.org/ext/lookup';
   const HEARTBEAT_URL = 'https://api.ailatest.org/ext/heartbeat';
   const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
-  const CACHE_PREFIX = 'lookup:v4:';
+  const CACHE_PREFIX = 'lookup:v5:';
   const HEARTBEAT_DAY_KEY = 'ajUsageHeartbeatDay';
 
   function storageArea(areaName) {
@@ -250,5 +250,7 @@
     consumeFulltextQuota,
     FREE_FULLTEXT_LIMIT,
   };
-  void maybeHeartbeat();
+  // Telemetry is deliberately deferred so it never competes with the first
+  // journal lookup on a newly opened page.
+  setTimeout(() => { void maybeHeartbeat(); }, 5000);
 })(globalThis);

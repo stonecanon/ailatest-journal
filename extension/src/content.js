@@ -185,8 +185,11 @@
     scanTimer = setTimeout(scan, delay == null ? 600 : delay);
   }
 
-  scheduleScan(50);
-  [800, 1800, 3500, 7000].forEach((delay) => setTimeout(() => scheduleScan(0), delay));
+  // document_idle already guarantees that the page parser has yielded. Start
+  // immediately, then use only a few targeted retries for SPA/infinite-list
+  // pages instead of rescanning four times during the first seven seconds.
+  scheduleScan(0);
+  [500, 1500, 3200].forEach((delay) => setTimeout(() => scheduleScan(0), delay));
 
   function isOwnNode(node) {
     if (!node || node.nodeType !== 1) return false;

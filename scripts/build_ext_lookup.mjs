@@ -194,20 +194,75 @@ for (const r of (domestic.cnki_major?.records || [])) {
   mergeDomestic(r, patch);
 }
 
+// Keep the extension payload intentionally smaller than the full journal
+// bundle.  The extension only needs lookup keys, the detail slug, and the
+// fields used to render badges; verbose publisher/Scopus/CNKI records make a
+// cold Worker spend tens of megabytes parsing JSON before the first badge can
+// be returned.
+const EXTENSION_FIELDS = new Set([
+  'name', 'cn_name', 'issn', 'eissn', 'slug', 'aliases',
+  'indices', 'cstpcd', 'cscd', 'cssci', 'pku',
+  'if_quartile', 'cas_zone', 'cas_top', 'if_2024', 'if_latest',
+  'ccf', 'free', 'inspec', 'fsta', 'fsta_full_text', 'cabi',
+  'warning', 'citic_warning', 'on_hold', 'under_review',
+  'cnkx', 'scd', 'ami', 'ccft', 'zju', 'nsfc_mgmt',
+]);
+
+function compactExtensionRecord(record) {
+  const clean = {};
+  EXTENSION_FIELDS.forEach((key) => {
+    const value = record[key];
+    if (value === undefined || value === null || value === '') return;
+    if (Array.isArray(value) && !value.length) return;
+    clean[key] = value;
+  });
+
+  // Only truthiness is used for the Scopus badge; the source's large status
+  // object is not needed by the browser extension.
+  if (record.scopus) clean.scopus = true;
+
+  if (record.cas_xr && typeof record.cas_xr === 'object') {
+    const zone = record.cas_xr.zone || '';
+    if (zone) clean.cas_xr = { zone, ...(record.cas_xr.top ? { top: true } : {}) };
+  }
+
+  if (record.doaj && typeof record.doaj === 'object' && record.doaj.apc) {
+    clean.doaj = { apc: record.doaj.apc };
+  }
+
+  if (record.retraction && typeof record.retraction === 'object') {
+    const count = Number(
+      record.retraction.retractions_total
+      ?? record.retraction.total
+      ?? record.retraction.count
+      ?? 0,
+    );
+    if (Number.isFinite(count) && count > 0) clean.retraction = count;
+  } else if (Number(record.retraction) > 0) {
+    clean.retraction = Number(record.retraction);
+  }
+
+  for (const key of ['abdc', 'abs']) {
+    if (!record[key]) continue;
+    if (typeof record[key] === 'string') clean[key] = record[key];
+    else if (record[key].rating || record[key].value) clean[key] = record[key].rating || record[key].value;
+  }
+
+  if (Array.isArray(record.cnkx)) {
+    clean.cnkx = record.cnkx
+      .map((item) => ({ tier: item?.tier || '', domain: item?.domain || '' }))
+      .filter((item) => item.tier || item.domain);
+    if (!clean.cnkx.length) delete clean.cnkx;
+  }
+
+  return clean;
+}
+
 const output = records
   .filter((r) => r && (r.name || r.cn_name) && (
     r.issn || r.eissn || r.cn_code || r.slug || r.indices || r.cnkx || r.cssci || r.pku || r.cscd || r.cstpcd || r.scd || r.ami || r.ccft || r.zju || r.nsfc_mgmt || r.cnki_category
   ))
-  .map((r) => {
-    const clean = {};
-    Object.keys(r).sort().forEach((key) => {
-      const value = r[key];
-      if (value === undefined || value === null || value === '') return;
-      if (Array.isArray(value) && !value.length) return;
-      clean[key] = value;
-    });
-    return clean;
-  });
+  .map(compactExtensionRecord);
 
 const json = JSON.stringify(output);
 fs.writeFileSync(OUT_FILE, zlib.gzipSync(json, { level: 9 }));

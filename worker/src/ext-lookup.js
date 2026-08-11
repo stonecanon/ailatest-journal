@@ -8,7 +8,7 @@
 
 import { CORS, json, loadJournals } from './deepseek-common.js';
 
-const DEFAULT_LOOKUP_URL = 'https://journal.ailatest.org/data/ext_lookup.json.gz?v=20260806-ext-v2';
+const DEFAULT_LOOKUP_URL = 'https://journal.ailatest.org/data/ext_lookup.json.gz?v=20260811-ext-v3-compact';
 const ANONYMOUS_EXTENSION_FEATURES = {
   queries_per_day: 40,
   devices: 1,
@@ -110,7 +110,9 @@ function canShow(features, key) {
 }
 
 function retractionCount(value) {
-  const n = Number(value?.retractions_total ?? value?.total ?? value?.count ?? 0);
+  const n = typeof value === 'number'
+    ? value
+    : Number(value?.retractions_total ?? value?.total ?? value?.count ?? 0);
   return Number.isFinite(n) ? Math.max(0, n) : 0;
 }
 
