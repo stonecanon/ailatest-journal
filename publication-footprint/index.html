@@ -142,6 +142,7 @@
     .paper-export-row:last-child { border-bottom: 0; }
     .paper-export-row-number { color: var(--ink-faint); font-size: 11px; font-weight: 800; text-align: center; }
     .paper-export-row-text { min-width: 0; color: var(--ink-soft); font-size: 12px; line-height: 1.55; overflow-wrap: anywhere; }
+    .paper-export-row-text strong { color: var(--ink); font-weight: 850; }
     .paper-export-row-actions { display: flex; gap: 4px; }
     .paper-export-row-actions button { min-width: 28px; min-height: 28px; padding: 0 6px; border: 1px solid var(--rule); border-radius: 7px; color: var(--footprint-blue); background: #fff; font: inherit; font-size: 11px; cursor: pointer; }
     .paper-export-row-actions button:hover, .paper-export-row-actions button:focus-visible { border-color: rgba(249,115,22,.45); color: var(--footprint-orange); }
@@ -1361,6 +1362,26 @@
         : { ...record, authors: (Array.isArray(record.authors) ? record.authors : []).map(author => String(author).replace(/\s*\*+/g, '')) };
       return `${formatPaperCitation(citationRecord, style)}${indexes.length ? ` [${indexes.join(', ')}]` : ''}`;
     }
+    function primaryPaperAuthor() {
+      const counts = new Map();
+      allPaperRecords().forEach(record => (Array.isArray(record.authors) ? record.authors : []).forEach(author => {
+        const name = String(author || '').replace(/\s*\*+/g, '').trim();
+        if (!name) return;
+        const key = name.toLowerCase();
+        const current = counts.get(key) || { name, count: 0, first: counts.size };
+        current.count += 1;
+        counts.set(key, current);
+      }));
+      return [...counts.values()].sort((left, right) => right.count - left.count || left.first - right.first)[0]?.name || '';
+    }
+    function exportPaperLineHtml(record, style) {
+      let html = escapeHtml(exportPaperLine(record, style));
+      const author = primaryPaperAuthor();
+      const venue = String(record?.venue || record?.journalName || '').trim();
+      if (author) html = html.split(escapeHtml(author)).join(`<strong>${escapeHtml(author)}</strong>`);
+      if (venue) html = html.split(escapeHtml(venue)).join(`<strong>${escapeHtml(venue)}</strong>`);
+      return html;
+    }
     function completeExportText(style) {
       const records = paperExportRecords();
       const lines = [
@@ -1380,7 +1401,7 @@
       const style = paperCitationStyle.value || 'apa';
       paperExportText.value = records.length ? completeExportText(style) : '';
       paperExportList.innerHTML = records.length
-        ? records.map((record, index) => `<div class="paper-export-row" data-paper-export-key="${escapeHtml(paperExportRecordKey(record))}"><span class="paper-export-row-number">${index + 1}</span><div class="paper-export-row-text">${escapeHtml(exportPaperLine(record, style))}</div><div class="paper-export-row-actions"><button type="button" data-paper-export-action="up" aria-label="上移">↑</button><button type="button" data-paper-export-action="down" aria-label="下移">↓</button><button type="button" data-paper-export-action="remove" aria-label="删除">×</button></div></div>`).join('')
+        ? records.map((record, index) => `<div class="paper-export-row" data-paper-export-key="${escapeHtml(paperExportRecordKey(record))}"><span class="paper-export-row-number">${index + 1}</span><div class="paper-export-row-text">${exportPaperLineHtml(record, style)}</div><div class="paper-export-row-actions"><button type="button" data-paper-export-action="up" aria-label="上移">↑</button><button type="button" data-paper-export-action="down" aria-label="下移">↓</button><button type="button" data-paper-export-action="remove" aria-label="删除">×</button></div></div>`).join('')
         : '<div class="paper-export-list-empty">暂无可导出的论文。</div>';
       enrichPaperAuthorsButton.disabled = !missingAuthors.length;
       const markedCorresponding = records.filter(record => Array.isArray(record.authors) && record.authors.some(author => String(author).includes('*'))).length;
