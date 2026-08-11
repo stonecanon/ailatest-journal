@@ -133,6 +133,9 @@
     .paper-export-head { align-items: center; }
     .paper-export-tools { display: flex; flex-wrap: nowrap; justify-content: flex-end; gap: 7px; }
     #paper-citation-style { width: 145px; }
+    .paper-export-tools > .mini-filter { white-space: nowrap; }
+    .paper-author-display-toggle { display: inline-flex; align-items: center; gap: 5px; min-height: 34px; padding: 0 9px; border: 1px solid var(--rule); border-radius: 10px; color: var(--ink-soft); background: #fffdf9; font-size: 12px; white-space: nowrap; }
+    .paper-author-display-toggle input { accent-color: var(--footprint-blue); }
     #open-paper-export { color: #fff; border-color: var(--footprint-blue); background: var(--footprint-blue); }
     #open-paper-export:hover, #open-paper-export:focus-visible { color: #fff; border-color: #1e3557; background: #1e3557; }
     .paper-export-view { display: flex; justify-content: center; padding: 16px 16px 4px; }
@@ -495,6 +498,7 @@
                   <option value="chicago">Chicago 17</option>
                   <option value="gbt">GB/T 7714-2025</option>
                 </select>
+                <label class="paper-author-display-toggle"><input id="paper-author-first-three" type="checkbox" />前三位作者</label>
                 <button class="mini-filter footprint-action" id="enrich-paper-authors" type="button">补全作者</button>
                 <button class="mini-filter footprint-action" id="open-paper-export" type="button">打开论文清单</button>
               </div>
@@ -674,6 +678,7 @@
     const sortFilter = document.getElementById('sort-filter');
     const dedupeButton = document.getElementById('dedupe-footprints');
     const paperCitationStyle = document.getElementById('paper-citation-style');
+    const paperAuthorFirstThree = document.getElementById('paper-author-first-three');
     const paperExportText = document.getElementById('paper-export-text');
     const openPaperExportButton = document.getElementById('open-paper-export');
     const paperExportModal = document.getElementById('paper-export-modal');
@@ -1286,12 +1291,14 @@
     function formatCitationAuthors(record, style) {
       const authors = Array.isArray(record?.authors) ? record.authors.filter(Boolean) : [];
       if (!authors.length) return '作者信息待补全';
+      const displayAuthors = paperAuthorFirstThree.checked && authors.length > 3 ? authors.slice(0, 3) : authors;
+      const abbreviated = displayAuthors.length < authors.length;
       if (style === 'apa') {
-        if (authors.length === 1) return authors[0];
-        return `${authors.slice(0, -1).join(', ')}, & ${authors[authors.length - 1]}`;
+        if (displayAuthors.length === 1) return `${displayAuthors[0]}${abbreviated ? ', et al.' : ''}`;
+        return abbreviated ? `${displayAuthors.join(', ')}, et al.` : `${displayAuthors.slice(0, -1).join(', ')}, & ${displayAuthors[displayAuthors.length - 1]}`;
       }
-      if (style === 'mla' && authors.length > 3) return `${authors[0]} et al.`;
-      return authors.join(', ');
+      if (style === 'mla' && abbreviated) return `${displayAuthors[0]} et al.`;
+      return `${displayAuthors.join(', ')}${abbreviated ? ' 等' : ''}`;
     }
     function citationDoi(record) {
       const doi = String(record?.doi || '').trim().replace(/^https?:\/\/doi\.org\//i, '').replace(/^doi:\s*/i, '');
@@ -1816,6 +1823,7 @@
     year.addEventListener('change', renderFootprints);
     sortFilter.addEventListener('change', renderFootprints);
     paperCitationStyle.addEventListener('change', renderPaperExport);
+    paperAuthorFirstThree.addEventListener('change', renderPaperExport);
     openPaperExportButton.addEventListener('click', openPaperExportPreview);
     closePaperExportButton.addEventListener('click', closePaperExportPreview);
     paperExportList.addEventListener('click', handlePaperExportAction);
