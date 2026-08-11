@@ -151,6 +151,8 @@
     .paper-export-modal-tools { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 7px; }
     .paper-export-list-manager { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
     .paper-export-list-manager .mini-filter { min-height: 30px; font-size: 11px; }
+    .paper-export-corresponding-toggle { display: inline-flex; align-items: center; gap: 5px; min-height: 30px; padding: 0 8px; border: 1px solid var(--rule); border-radius: 8px; color: var(--ink-soft); background: #fffdf9; font-size: 11px; white-space: nowrap; }
+    .paper-export-corresponding-toggle input { accent-color: var(--footprint-orange); }
     .paper-export-note { margin: -7px 16px 16px; color: var(--ink-faint); font-size: 11px; }
     .badge-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
     .pub-badge { display: inline-flex; align-items: center; min-height: 24px; padding: 3px 9px; border: 1px solid rgba(39,35,31,.1); border-radius: 999px; color: var(--ink-soft); background: #f7f3ec; font-size: 11px; font-weight: 780; letter-spacing: .02em; }
@@ -623,7 +625,7 @@
   <div class="modal-backdrop" id="paper-export-modal" hidden>
     <section class="panel paper-export-dialog" role="dialog" aria-modal="true" aria-labelledby="paper-export-modal-title">
       <button class="modal-close" id="close-paper-export" type="button" aria-label="关闭论文清单预览">×</button>
-      <div class="panel-head"><div><h2 id="paper-export-modal-title">论文清单</h2><p>可删除或调整顺序；新加入的论文会自动追加到清单末尾。</p><div class="paper-export-list-manager"><select class="mini-filter" id="paper-export-list-select" aria-label="选择论文清单"></select><button class="mini-filter footprint-action" id="new-paper-export" type="button">新建</button><button class="mini-filter footprint-action" id="duplicate-paper-export" type="button">复制清单</button><button class="mini-filter footprint-action" id="rename-paper-export" type="button">重命名</button></div></div><div class="paper-export-modal-tools"><button class="mini-filter footprint-action" id="copy-paper-export" type="button">复制全部</button><button class="mini-filter footprint-action" id="download-paper-export" type="button">导出纯文本</button></div></div>
+      <div class="panel-head"><div><h2 id="paper-export-modal-title">论文清单</h2><p>可删除或调整顺序；新加入的论文会自动追加到清单末尾。</p><div class="paper-export-list-manager"><select class="mini-filter" id="paper-export-list-select" aria-label="选择论文清单"></select><button class="mini-filter footprint-action" id="new-paper-export" type="button">新建</button><button class="mini-filter footprint-action" id="duplicate-paper-export" type="button">复制清单</button><button class="mini-filter footprint-action" id="rename-paper-export" type="button">重命名</button><label class="paper-export-corresponding-toggle"><input id="mark-corresponding-author" type="checkbox" checked />标注通讯作者</label></div></div><div class="paper-export-modal-tools"><button class="mini-filter footprint-action" id="copy-paper-export" type="button">复制全部</button><button class="mini-filter footprint-action" id="download-paper-export" type="button">导出纯文本</button></div></div>
       <div class="paper-export-list" id="paper-export-list"></div>
       <div class="paper-export-dialog-actions"><button class="mini-filter footprint-action" id="save-paper-export" type="button">保存论文清单</button><button class="mini-filter footprint-action" id="restore-paper-export" type="button">恢复全部论文</button></div>
     </section>
@@ -669,6 +671,8 @@
     const newPaperExportButton = document.getElementById('new-paper-export');
     const duplicatePaperExportButton = document.getElementById('duplicate-paper-export');
     const renamePaperExportButton = document.getElementById('rename-paper-export');
+    const markCorrespondingAuthorCheckbox = document.getElementById('mark-corresponding-author');
+    try { markCorrespondingAuthorCheckbox.checked = localStorage.getItem('ailatest-paper-export-mark-corresponding') !== '0'; } catch (_) {}
     const paperExportStorageKey = 'ailatest-paper-export-list-v1';
     let paperExportLists = [];
     let activePaperExportListId = '';
@@ -1340,7 +1344,10 @@
     function exportPaperLine(record, style) {
       const journal = publicationJournals.find(item => footprintItemKey(item) === record.journalKey);
       const indexes = journal ? exportIndexLabels(journal) : [];
-      return `${formatPaperCitation(record, style)}${indexes.length ? ` [${indexes.join(', ')}]` : ''}`;
+      const citationRecord = markCorrespondingAuthorCheckbox.checked
+        ? record
+        : { ...record, authors: (Array.isArray(record.authors) ? record.authors : []).map(author => String(author).replace(/\s*\*+/g, '')) };
+      return `${formatPaperCitation(citationRecord, style)}${indexes.length ? ` [${indexes.join(', ')}]` : ''}`;
     }
     function completeExportText(style) {
       const records = paperExportRecords();
@@ -1351,7 +1358,7 @@
         '',
         ...records.map((record, index) => `${index + 1}. ${exportPaperLine(record, style)}`),
       ];
-      if (records.some(record => Array.isArray(record.authors) && record.authors.some(author => String(author).includes('*')))) lines.push('', '* 通讯作者');
+      if (markCorrespondingAuthorCheckbox.checked && records.some(record => Array.isArray(record.authors) && record.authors.some(author => String(author).includes('*')))) lines.push('', '* 通讯作者');
       return lines.join('\n');
     }
     function renderPaperExport() {
@@ -1364,8 +1371,9 @@
         ? records.map((record, index) => `<div class="paper-export-row" data-paper-export-key="${escapeHtml(paperExportRecordKey(record))}"><span class="paper-export-row-number">${index + 1}</span><div class="paper-export-row-text">${escapeHtml(exportPaperLine(record, style))}</div><div class="paper-export-row-actions"><button type="button" data-paper-export-action="up" aria-label="上移">↑</button><button type="button" data-paper-export-action="down" aria-label="下移">↓</button><button type="button" data-paper-export-action="remove" aria-label="删除">×</button></div></div>`).join('')
         : '<div class="paper-export-list-empty">暂无可导出的论文。</div>';
       enrichPaperAuthorsButton.disabled = !missingAuthors.length;
+      const markedCorresponding = records.filter(record => Array.isArray(record.authors) && record.authors.some(author => String(author).includes('*'))).length;
       paperExportNote.textContent = records.length
-        ? `共 ${publicationJournals.length} 本期刊、${records.length} 篇论文。${missingAuthors.length ? `其中 ${missingAuthors.length} 篇缺少作者，可点击“补全作者”。` : '作者信息以公开元数据为准。'}`
+        ? `共 ${publicationJournals.length} 本期刊、${records.length} 篇论文。${missingAuthors.length ? `其中 ${missingAuthors.length} 篇缺少作者，可点击“补全作者”。` : '作者信息以公开元数据为准。'}${markCorrespondingAuthorCheckbox.checked && !markedCorresponding ? '当前数据未提供通讯作者标记。' : ''}`
         : '导入并确认论文后，这里会生成可编辑的论文清单。';
     }
     function openPaperExportPreview() {
@@ -1709,6 +1717,10 @@
     year.addEventListener('change', renderFootprints);
     sortFilter.addEventListener('change', renderFootprints);
     paperCitationStyle.addEventListener('change', renderPaperExport);
+    markCorrespondingAuthorCheckbox.addEventListener('change', () => {
+      try { localStorage.setItem('ailatest-paper-export-mark-corresponding', markCorrespondingAuthorCheckbox.checked ? '1' : '0'); } catch (_) {}
+      renderPaperExport();
+    });
     openPaperExportButton.addEventListener('click', openPaperExportPreview);
     closePaperExportButton.addEventListener('click', closePaperExportPreview);
     paperExportList.addEventListener('click', handlePaperExportAction);
