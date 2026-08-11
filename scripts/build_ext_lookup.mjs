@@ -3,6 +3,9 @@ import zlib from 'zlib';
 
 const DATA_DIR = new URL('../data/', import.meta.url);
 const OUT_FILE = new URL('../data/ext_lookup.json.gz', import.meta.url);
+// Use a versioned URL for Worker fetches so the immutable Pages cache cannot
+// return the previous 4 MB payload after a data refresh.
+const VERSIONED_OUT_FILE = new URL('../data/ext_lookup_v3.json.gz', import.meta.url);
 
 function readJson(name, gz = false) {
   const file = new URL(name, DATA_DIR);
@@ -265,5 +268,7 @@ const output = records
   .map(compactExtensionRecord);
 
 const json = JSON.stringify(output);
-fs.writeFileSync(OUT_FILE, zlib.gzipSync(json, { level: 9 }));
-console.log(`wrote ${OUT_FILE.pathname} (${output.length.toLocaleString()} records, ${Buffer.byteLength(json).toLocaleString()} bytes raw)`);
+const compressed = zlib.gzipSync(json, { level: 9 });
+fs.writeFileSync(OUT_FILE, compressed);
+fs.writeFileSync(VERSIONED_OUT_FILE, compressed);
+console.log(`wrote ${OUT_FILE.pathname} and ${VERSIONED_OUT_FILE.pathname} (${output.length.toLocaleString()} records, ${Buffer.byteLength(json).toLocaleString()} bytes raw)`);

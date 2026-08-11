@@ -8,7 +8,7 @@
 
 import { CORS, json, loadJournals } from './deepseek-common.js';
 
-const DEFAULT_LOOKUP_URL = 'https://journal.ailatest.org/data/ext_lookup.json.gz?v=20260811-ext-v3-compact';
+const DEFAULT_LOOKUP_URL = 'https://journal.ailatest.org/data/ext_lookup_v3.json.gz';
 const ANONYMOUS_EXTENSION_FEATURES = {
   queries_per_day: 40,
   devices: 1,
