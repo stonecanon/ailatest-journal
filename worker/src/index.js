@@ -37,7 +37,7 @@ import { buildDashboardPayload } from './dashboard.js';
 import { aggregateRecentStats, recalibrateYesterday } from './analytics-rollups.js';
 import { handleChat } from './chat.js';
 import { handlePick } from './pick.js';
-import { handleExtLookup } from './ext-lookup.js';
+import { handleExtLookup, recordExtensionHeartbeat } from './ext-lookup.js';
 import { routeJcar } from './jcar.js';
 import { fetchScholarProfile } from '../../js/scholar-profile.js';
 import { renderSitesDashboard } from './sites-dashboard.js';
@@ -422,6 +422,60 @@ async function routePageview(req, env) {
 
 
 let extensionDownloadsReady = false;
+
+let apiRequestMetricsReady = false;
+async function ensureApiRequestMetricsTables(env) {
+  if (apiRequestMetricsReady || !env?.DB) return;
+  await env.DB.batch([
+    env.DB.prepare(
+      `CREATE TABLE IF NOT EXISTS api_request_metrics (
+        day         TEXT NOT NULL,
+        path        TEXT NOT NULL,
+        method      TEXT NOT NULL,
+        requests    INTEGER NOT NULL DEFAULT 0,
+        last_seen_at INTEGER NOT NULL,
+        PRIMARY KEY (day, path, method)
+      )`
+    ),
+    env.DB.prepare('CREATE INDEX IF NOT EXISTS idx_api_request_metrics_day ON api_request_metrics(day)'),
+  ]);
+  apiRequestMetricsReady = true;
+}
+
+function normalizeApiMetricPath(path) {
+  const raw = String(path || '/').replace(/^\/+/, '').split('/').filter(Boolean);
+  const parts = raw.map((part) => {
+    if (/^\d+$/.test(part) || /^[0-9a-f]{8,}$/i.test(part) || /^[0-9a-f-]{16,}$/i.test(part)) return ':id';
+    if (part.length > 80) return ':value';
+    return part.toLowerCase();
+  });
+  return `/${parts.join('/')}`.slice(0, 180) || '/';
+}
+
+function shouldRecordApiMetric(path) {
+  const p = String(path || '/');
+  // These are static/HTML entry points rather than API calls.  JSON routes,
+  // the extension download redirect, and authenticated admin API calls remain
+  // visible in the usage view.
+  return p !== '/' && p !== '' && p !== '/admin' && p !== '/admin/'
+    && !p.startsWith('/analytics/sites')
+    && p !== '/llms.txt' && p !== '/robots.txt';
+}
+
+async function recordApiRequestMetric(env, path, method) {
+  if (!env?.DB || !shouldRecordApiMetric(path)) return;
+  await ensureApiRequestMetricsTables(env);
+  const now = nowSec();
+  const day = dayFromSec(now);
+  await env.DB.prepare(
+    `INSERT INTO api_request_metrics (day, path, method, requests, last_seen_at)
+     VALUES (?, ?, ?, 1, ?)
+     ON CONFLICT(day, path, method) DO UPDATE SET
+       requests = api_request_metrics.requests + 1,
+       last_seen_at = ?`
+  ).bind(day, normalizeApiMetricPath(path), String(method || 'GET').toUpperCase(), now, now).run();
+}
+
 async function ensureExtensionDownloadsTables(env) {
   if (extensionDownloadsReady || !env?.DB) return;
   await env.DB.batch([
@@ -537,7 +591,7 @@ async function routeExtensionDownload(req, env) {
   // The ZIP path is intentionally immutable at the edge. Bump this query
   // when the packaged extension changes so the redirect cannot serve an old
   // cached archive after a Pages deployment.
-  target.searchParams.set('v', '20260810-ext-v6-auto-watch');
+  target.searchParams.set('v', '20260811-ext-v7-usage-heartbeat');
   return new Response(null, {
     status: 302,
     headers: {
@@ -4751,6 +4805,11 @@ export default {
     // Same-origin entry: journal.ailatest.org/api/* routes here too — strip the prefix.
     if (p === '/api' || p === '/api/') p = '/';
     else if (p.startsWith('/api/')) p = p.slice(4);
+    if (ctx?.waitUntil) {
+      ctx.waitUntil(recordApiRequestMetric(env, p, req.method).catch((e) => {
+        console.warn('[usage] api request metric failed:', e?.message || e);
+      }));
+    }
     try {
       if (p === '/llms.txt' && req.method === 'GET') return routeApiLlmsTxt();
       if (p === '/robots.txt' && req.method === 'GET') return routeApiRobotsTxt();
@@ -4887,6 +4946,14 @@ export default {
         const installId = cleanText(req.headers.get('X-AJ-Install') || '', 160);
         const ipHash = await requestIpHash(req, env);
         return handleExtLookup(req, env, { ...principal, installId, ipHash });
+      }
+      if (p === '/ext/heartbeat' && (req.method === 'POST' || req.method === 'GET')) {
+        const principal = await resolveRequestPrincipal(req, env);
+        if (principal.error) return principal.error;
+        const installId = cleanText(req.headers.get('X-AJ-Install') || '', 160);
+        const ipHash = await requestIpHash(req, env);
+        const result = await recordExtensionHeartbeat(env, { ...principal, installId, ipHash });
+        return json(result, 200, { 'Cache-Control': 'no-store' });
       }
       if (p === '/favorites'           && req.method === 'GET')  return routeGetFavs(req, env);
       if (p === '/favorites'           && req.method === 'PUT')  return routePutFavs(req, env);

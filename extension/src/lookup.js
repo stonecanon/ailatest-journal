@@ -3,8 +3,10 @@
 
   const ns = root.AILatestExt = root.AILatestExt || {};
   const API_URL = 'https://api.ailatest.org/ext/lookup';
+  const HEARTBEAT_URL = 'https://api.ailatest.org/ext/heartbeat';
   const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
   const CACHE_PREFIX = 'lookup:v4:';
+  const HEARTBEAT_DAY_KEY = 'ajUsageHeartbeatDay';
 
   function storageArea(areaName) {
     return typeof chrome !== 'undefined' && chrome.storage && chrome.storage[areaName] ? chrome.storage[areaName] : null;
@@ -163,6 +165,30 @@
     return headers;
   }
 
+  // Once per UTC day, record that this installed extension was opened.  The
+  // server stores only an anonymised scope and aggregate counters; no page
+  // contents, email, or raw IP is sent by this heartbeat.
+  async function maybeHeartbeat() {
+    const local = storageArea('local');
+    if (!local) return;
+    const day = new Date().toISOString().slice(0, 10);
+    const state = await storageGet(local, [HEARTBEAT_DAY_KEY]);
+    if (state[HEARTBEAT_DAY_KEY] === day) return;
+    // Mark before the network request so multiple content-script frames do
+    // not produce duplicate daily heartbeats for the same installation.
+    await storageSet(local, { [HEARTBEAT_DAY_KEY]: day });
+    try {
+      await fetch(HEARTBEAT_URL, {
+        method: 'POST',
+        headers: await authHeaders(),
+        body: '{}',
+        cache: 'no-store',
+      });
+    } catch (_) {
+      // Usage telemetry must never interrupt journal badge rendering.
+    }
+  }
+
   async function batchLookup(items) {
     const cleanItems = (items || []).filter((it) => it && (it.issn || it.name)).slice(0, 100);
     if (!cleanItems.length) return [];
@@ -213,6 +239,7 @@
 
   ns.lookup = {
     batchLookup,
+    heartbeat: maybeHeartbeat,
     getSettings,
     setSettings,
     queryKey,
@@ -223,4 +250,5 @@
     consumeFulltextQuota,
     FREE_FULLTEXT_LIMIT,
   };
+  void maybeHeartbeat();
 })(globalThis);

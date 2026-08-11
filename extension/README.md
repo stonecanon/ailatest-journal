@@ -1,4 +1,4 @@
-# AILatest Journal Badges Extension (v0.2.20)
+# AILatest Journal Badges Extension (v0.2.21)
 
 MV3 browser extension for showing AILatest journal badges on academic pages.
 
