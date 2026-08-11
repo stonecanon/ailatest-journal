@@ -433,12 +433,12 @@
         <div class="publication-left-column">
           <section class="panel submission-panel archive-status-panel" aria-labelledby="submission-title">
             <div class="panel-head">
-              <div><h2 id="submission-title">投稿状态</h2><p>首次确认后自动跟踪；状态变化会推送通知</p></div>
-              <div class="submission-import-tools"><button class="pending-item button" type="button" data-import="email" style="border:0;border-radius:8px;padding:5px 8px;color:var(--footprint-blue);background:var(--footprint-blue-soft);font:inherit;font-size:11px;font-weight:760;cursor:pointer">导入确认邮件（备用）</button></div>
+              <div><h2 id="submission-title">投稿状态</h2><p>插件确认后自动跟踪；这里显示已同步结果</p></div>
+              <div class="submission-import-tools"><button class="pending-item button" type="button" data-import="email" style="border:0;border-radius:8px;padding:5px 8px;color:var(--footprint-blue);background:var(--footprint-blue-soft);font:inherit;font-size:11px;font-weight:760;cursor:pointer">导入确认邮件（无插件时）</button></div>
             </div>
             <div class="submission-list" id="submission-list"></div>
             <div class="submission-empty" id="submission-empty"><strong>暂无投稿状态</strong><p>添加投稿记录后，状态会显示在这里。</p></div>
-            <div class="submission-note"><strong>自动跟踪：</strong>在 Elsevier、Editorial Manager 或 ScholarOne 页面首次勾选并同步后，插件会在浏览器后台定期检查；状态变化通过浏览器通知和账号邮箱推送。出版社页面阻止后台读取时，打开已登录页面即可刷新。确认邮件仅作无权限时的备用导入方式。</div>
+            <div class="submission-note"><strong>自动跟踪：</strong>安装最新版插件，在 Elsevier、Editorial Manager 或 ScholarOne 的已登录页面点击“读取投稿状态”，核对并同步后，插件会在浏览器运行期间约每 15 分钟检查已同步链接；状态变化会尝试发送浏览器通知和账号邮箱通知。页面需要前端渲染、登录过期或被拦截时，打开该页面重新读取。确认邮件导入只保存邮件中的可核对状态，不会开启自动跟踪。</div>
           </section>
 
           <section class="panel">
@@ -1298,7 +1298,7 @@
         const system = submissionSystemLabels[item.system] || submissionSystem(link);
         const manuscript = String(item.manuscript || '').trim();
         const title = String(item.title || '').trim();
-        const tracking = item.watch_enabled ? '自动跟踪中' : '备用记录';
+        const tracking = item.watch_enabled ? '插件自动跟踪中' : item.source === 'email' ? '确认邮件记录' : '手动记录';
         const meta = [title ? `题目：${title}` : '', manuscript ? `稿件编号：${manuscript}` : '', system, tracking, formatSubmissionDate(item.updatedAt)].filter(Boolean).join(' · ');
         const linkLabel = link ? `<a class="submission-action" href="${escapeHtml(link)}" target="_blank" rel="noreferrer">打开链接</a>` : '';
         return `<article class="submission-row"><div class="submission-main"><strong>${escapeHtml(item.journal || '未填写期刊')}</strong><small>${escapeHtml(meta)}</small></div><div class="submission-side"><span class="submission-status ${submissionStatusClass(status)}">${escapeHtml(status)}</span><div class="submission-actions"><button class="submission-action" type="button" data-edit-submission="${escapeHtml(item.id)}">编辑</button>${linkLabel}<button class="submission-action danger" type="button" data-remove-submission="${escapeHtml(item.id)}">删除</button></div></div></article>`;
