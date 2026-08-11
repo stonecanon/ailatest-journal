@@ -424,7 +424,7 @@
         <section class="metric-grid" aria-label="科研档案统计">
           <div class="metric-card"><div class="metric-value" id="metric-papers">0</div><div class="metric-label">已识别论文</div></div>
           <div class="metric-card"><div class="metric-value" id="metric-journals">0</div><div class="metric-label">发表期刊</div></div>
-          <button class="metric-card metric-card-action" id="metric-countries-card" type="button" data-metric-detail="countries" aria-haspopup="dialog" aria-controls="metric-detail-modal" aria-label="查看覆盖国家和地区明细"><div class="metric-value" id="metric-countries">0</div><div class="metric-label">覆盖国家 / 地区<span class="metric-card-hint">查看明细 →</span></div></button>
+          <button class="metric-card metric-card-action" id="metric-countries-card" type="button" data-metric-detail="countries" aria-haspopup="dialog" aria-controls="metric-detail-modal" aria-label="查看覆盖国家/地区明细"><div class="metric-value" id="metric-countries">0</div><div class="metric-label">覆盖国家/地区<span class="metric-card-hint">查看明细 →</span></div></button>
           <button class="metric-card metric-card-action" id="metric-fields-card" type="button" data-metric-detail="fields" aria-haspopup="dialog" aria-controls="metric-detail-modal" aria-label="查看主要研究方向明细"><div class="metric-value" id="metric-fields">0</div><div class="metric-label">主要研究方向<span class="metric-card-hint">查看明细 →</span></div></button>
         </section>
       </section>
@@ -524,7 +524,7 @@
         <article class="achievement-card is-locked" data-achievement="q1-contributor"><div class="achievement-icon" aria-hidden="true">★</div><h3>Q1 贡献者</h3><p>在 3 本 Q1 期刊发表</p><span class="achievement-state">未解锁</span></article>
         <article class="achievement-card is-locked" data-achievement="cross-institution"><div class="achievement-icon" aria-hidden="true">↗</div><h3>跨单位经历</h3><p>论文覆盖 2 个机构阶段</p><span class="achievement-state">未解锁</span></article>
         <article class="achievement-card is-locked" data-achievement="sustained-publication"><div class="achievement-icon" aria-hidden="true">∞</div><h3>持续发表</h3><p>连续 3 个自然年有论文</p><span class="achievement-state">还差 1 年</span></article>
-        <article class="achievement-card is-locked" data-achievement="international-footprint"><div class="achievement-icon" aria-hidden="true">◎</div><h3>国际足迹</h3><p>覆盖 5 个国家 / 地区</p><span class="achievement-state">还差 2 个</span></article>
+        <article class="achievement-card is-locked" data-achievement="international-footprint"><div class="achievement-icon" aria-hidden="true">◎</div><h3>国际足迹</h3><p>覆盖 5 个国家/地区</p><span class="achievement-state">还差 2 个</span></article>
       </div>
     </section>
   </div>
@@ -532,7 +532,7 @@
   <div class="modal-backdrop" id="metric-detail-modal" hidden>
     <section class="modal-card metric-detail-dialog" role="dialog" aria-modal="true" aria-labelledby="metric-detail-title">
       <div class="modal-head">
-        <div><p class="metric-detail-kicker">科研档案明细</p><h2 id="metric-detail-title">覆盖国家 / 地区</h2></div>
+        <div><p class="metric-detail-kicker">科研档案明细</p><h2 id="metric-detail-title">覆盖国家/地区</h2></div>
         <button class="modal-close" id="close-metric-detail" type="button" aria-label="关闭明细">×</button>
       </div>
       <p class="metric-detail-summary" id="metric-detail-summary"></p>
@@ -748,13 +748,60 @@
         .map(value => value.trim())
         .filter(value => value && !/^(未知|未标注|unknown|n\/a|na)$/i.test(value)))];
     }
+    // OpenAlex/author imports may provide ISO-2/ISO-3 codes, while manual
+    // imports often provide a full country name. Keep the metric readable in
+    // the Chinese UI and collapse code + name pairs into one country/region.
+    const COUNTRY_DISPLAY_NAMES = Object.freeze({
+      AF: '阿富汗', AL: '阿尔巴尼亚', DZ: '阿尔及利亚', AR: '阿根廷', AM: '亚美尼亚',
+      AU: '澳大利亚', AT: '奥地利', AZ: '阿塞拜疆', BD: '孟加拉国', BY: '白俄罗斯',
+      BE: '比利时', BO: '玻利维亚', BA: '波斯尼亚和黑塞哥维那', BW: '博茨瓦纳', BR: '巴西',
+      BG: '保加利亚', KH: '柬埔寨', CM: '喀麦隆', CA: '加拿大', CL: '智利', CO: '哥伦比亚',
+      CR: '哥斯达黎加', HR: '克罗地亚', CY: '塞浦路斯', CZ: '捷克', DK: '丹麦', DO: '多米尼加',
+      EC: '厄瓜多尔', EG: '埃及', EE: '爱沙尼亚', ET: '埃塞俄比亚', FI: '芬兰', FR: '法国',
+      GE: '格鲁吉亚', DE: '德国', GH: '加纳', GR: '希腊', GT: '危地马拉', HN: '洪都拉斯',
+      HU: '匈牙利', IS: '冰岛', IN: '印度', ID: '印度尼西亚', IR: '伊朗', IQ: '伊拉克',
+      IE: '爱尔兰', IL: '以色列', IT: '意大利', JM: '牙买加', JP: '日本', JO: '约旦',
+      KZ: '哈萨克斯坦', KE: '肯尼亚', KP: '朝鲜', KR: '韩国', KW: '科威特', KG: '吉尔吉斯斯坦',
+      LA: '老挝', LV: '拉脱维亚', LB: '黎巴嫩', LY: '利比亚', LT: '立陶宛', LU: '卢森堡',
+      MG: '马达加斯加', MY: '马来西亚', MT: '马耳他', MX: '墨西哥', MD: '摩尔多瓦', MN: '蒙古',
+      ME: '黑山', MA: '摩洛哥', MZ: '莫桑比克', MM: '缅甸', NP: '尼泊尔', NL: '荷兰',
+      NZ: '新西兰', NI: '尼加拉瓜', NG: '尼日利亚', MK: '北马其顿', NO: '挪威', OM: '阿曼',
+      PK: '巴基斯坦', PA: '巴拿马', PY: '巴拉圭', PE: '秘鲁', PH: '菲律宾', PL: '波兰',
+      PT: '葡萄牙', PR: '波多黎各', QA: '卡塔尔', RO: '罗马尼亚', RU: '俄罗斯', SA: '沙特阿拉伯',
+      RS: '塞尔维亚', SG: '新加坡', SK: '斯洛伐克', SI: '斯洛文尼亚', ZA: '南非', ES: '西班牙',
+      LK: '斯里兰卡', SD: '苏丹', SE: '瑞典', CH: '瑞士', SY: '叙利亚', TJ: '塔吉克斯坦',
+      TZ: '坦桑尼亚', TH: '泰国', TN: '突尼斯', TR: '土耳其', TM: '土库曼斯坦', UG: '乌干达',
+      UA: '乌克兰', AE: '阿拉伯联合酋长国', GB: '英国', US: '美国', UY: '乌拉圭',
+      UZ: '乌兹别克斯坦', VE: '委内瑞拉', VN: '越南', YE: '也门', ZM: '赞比亚', ZW: '津巴布韦',
+      CN: '中国', HK: '中国香港', MO: '中国澳门', TW: '中国台湾',
+      CHN: '中国', HKG: '中国香港', MAC: '中国澳门', TWN: '中国台湾',
+      USA: '美国', GBR: '英国', DEU: '德国', FRA: '法国', JPN: '日本', IND: '印度',
+      ITA: '意大利', ESP: '西班牙', AUS: '澳大利亚', CAN: '加拿大', NLD: '荷兰', BRA: '巴西',
+      RUS: '俄罗斯', IRN: '伊朗', KOR: '韩国', MYS: '马来西亚', SGP: '新加坡',
+      'CHINA': '中国', 'TAIWAN': '中国台湾', 'HONG KONG': '中国香港', 'MACAO': '中国澳门',
+      'MACAU': '中国澳门', 'UNITED STATES': '美国', 'UNITED STATES OF AMERICA': '美国',
+      'UNITED KINGDOM': '英国', 'UNITED KINGDOM OF GREAT BRITAIN AND NORTHERN IRELAND': '英国', 'UK': '英国',
+      'SOUTH KOREA': '韩国', 'KOREA, REPUBLIC OF': '韩国', 'VIET NAM': '越南',
+      'RUSSIAN FEDERATION': '俄罗斯', 'IRAN (ISLAMIC REPUBLIC OF)': '伊朗',
+    });
+    const COUNTRY_REGION_NAMES = (() => {
+      try { return new Intl.DisplayNames(['zh-CN'], { type: 'region' }); } catch (_) { return null; }
+    })();
+    function countryDisplayName(value) {
+      const text = String(value || '').replace(/\s+/g, ' ').trim();
+      if (!text) return '';
+      const normalized = text.toUpperCase().replace(/[._-]+/g, ' ').replace(/\s+/g, ' ').trim();
+      const code = normalized.replace(/[^A-Z]/g, '');
+      const intlName = code.length === 2 ? COUNTRY_REGION_NAMES?.of(code) || '' : '';
+      return COUNTRY_DISPLAY_NAMES[normalized] || COUNTRY_DISPLAY_NAMES[code] || intlName || text;
+    }
     function journalCountries(item) {
-      return uniqueTextValues([
+      return [...new Set(uniqueTextValues([
         ...(Array.isArray(item?.countries) ? item.countries : metadataTextValues(item?.countries)),
         item?.country,
         ...(Array.isArray(item?.authorCountries) ? item.authorCountries : metadataTextValues(item?.authorCountries)),
         item?.authorCountry,
-      ]);
+      ]).map(countryDisplayName).filter(Boolean))];
     }
     function journalOrganizations(item) {
       return uniqueTextValues([
@@ -793,9 +840,28 @@
       normalized.papers = titles.length ? titles.length : Math.max(0, Number.isFinite(papers) ? Math.round(papers) : 0);
       return normalized;
     }
+    function footprintJournalIdentityKeys(item) {
+      const metadata = item?.journalMetadata && typeof item.journalMetadata === 'object' ? item.journalMetadata : {};
+      const issnValues = [
+        ...(Array.isArray(item?.issns) ? item.issns : []), item?.issn, item?.eissn,
+        ...(Array.isArray(metadata?.issns) ? metadata.issns : []), metadata?.issn, metadata?.eissn,
+      ];
+      const issnKeys = issnValues
+        .map(value => String(value || '').replace(/[^0-9X]/gi, '').toUpperCase())
+        .filter(value => value.length === 8)
+        .map(value => `issn:${value}`);
+      const nameValues = [
+        item?.name, item?.journal, item?.venue, item?.journal_key,
+        metadata?.name, metadata?.title, metadata?.journal,
+      ];
+      const nameKeys = nameValues
+        .map(value => journalMetadataKey(value))
+        .filter(Boolean)
+        .map(value => `name:${value}`);
+      return [...new Set([...nameKeys, ...issnKeys])];
+    }
     function footprintJournalGroupKey(item) {
-      const issn = Array.isArray(item?.issns) ? item.issns.map(value => String(value || '').replace(/[^0-9X]/gi, '').toUpperCase()).find(Boolean) : '';
-      return issn ? `issn:${issn}` : `name:${journalMetadataKey(item?.name || item?.journal_key || '')}`;
+      return footprintJournalIdentityKeys(item)[0] || '';
     }
     function footprintItemKey(item) {
       const issn = Array.isArray(item?.issns) ? item.issns.find(Boolean) : '';
@@ -821,31 +887,43 @@
       if (!a.source && b.source) merged.source = b.source;
       return dedupeFootprintItem(merged);
     }
-    function mergePublicationJournals(incoming) {
-      const byKey = new Map(publicationJournals.map(item => [footprintItemKey(item), item]).filter(([key]) => key));
-      let added = 0;
-      (Array.isArray(incoming) ? incoming : []).forEach(item => {
-        const normalized = normalizeStoredJournal(item);
-        const key = footprintItemKey(normalized);
-        if (!normalized || !key) return;
-        if (byKey.has(key)) byKey.set(key, mergeFootprintItem(byKey.get(key), normalized));
-        else { byKey.set(key, normalized); added += 1; }
+    function groupPublicationJournals(records) {
+      const groups = [];
+      const owners = new Map();
+      (Array.isArray(records) ? records : []).forEach(raw => {
+        const item = dedupeFootprintItem(raw);
+        const keys = footprintJournalIdentityKeys(item);
+        if (!item || !keys.length) return;
+        const matches = [...new Set(keys.map(key => owners.get(key)).filter(index => Number.isInteger(index) && groups[index]))];
+        let target = matches.shift();
+        if (!Number.isInteger(target)) {
+          target = groups.length;
+          groups.push(item);
+        } else {
+          groups[target] = mergeFootprintItem(groups[target], item);
+        }
+        matches.forEach(source => {
+          if (source === target || !groups[source]) return;
+          groups[target] = mergeFootprintItem(groups[target], groups[source]);
+          groups[source] = null;
+          owners.forEach((owner, key) => {
+            if (owner === source) owners.set(key, target);
+          });
+        });
+        keys.forEach(key => owners.set(key, target));
       });
-      publicationJournals = [...byKey.values()];
-      return added;
+      return groups.filter(Boolean).map(dedupeFootprintItem);
+    }
+    function mergePublicationJournals(incoming) {
+      const previousCount = publicationJournals.length;
+      publicationJournals = groupPublicationJournals([...publicationJournals, ...(Array.isArray(incoming) ? incoming : [])]);
+      return Math.max(0, publicationJournals.length - previousCount);
     }
     async function dedupePublicationJournals() {
       const before = publicationJournals.slice();
       const beforePaperCount = before.reduce((sum, item) => sum + Math.max(0, Math.round(Number(item?.papers || 0))), 0);
       const oldKeys = new Set(before.map(footprintItemKey).filter(Boolean));
-      const groups = new Map();
-      before.forEach(raw => {
-        const item = dedupeFootprintItem(raw);
-        if (!item || !footprintJournalGroupKey(item)) return;
-        const groupKey = footprintJournalGroupKey(item);
-        groups.set(groupKey, groups.has(groupKey) ? mergeFootprintItem(groups.get(groupKey), item) : item);
-      });
-      publicationJournals = [...groups.values()].map(dedupeFootprintItem);
+      publicationJournals = groupPublicationJournals(before);
       const newKeys = new Set(publicationJournals.map(footprintItemKey).filter(Boolean));
       const deleteKeys = [...oldKeys].filter(key => !newKeys.has(key));
       const replaceKeys = [...newKeys];
@@ -856,7 +934,12 @@
       renderFootprints();
       refreshJournalMetadata();
       await syncPublicationFootprints({ replaceKeys, deleteKeys });
-      setFootprintSyncNote(`已去重：移除 ${removedPapers} 篇重复论文，合并 ${removedJournals} 条重复期刊记录。`, '足迹管理');
+      setFootprintSyncNote(
+        removedJournals || removedPapers
+          ? `已去重：移除 ${removedPapers} 篇重复论文，合并 ${removedJournals} 条重复期刊记录。`
+          : '未发现重复期刊或论文。',
+        '足迹管理',
+      );
       return { removedJournals, removedPapers };
     }
     async function removePaperFromFootprint(journalKey, titleKey) {
@@ -950,7 +1033,9 @@
       }
     }
     if (!isDemoMode && publicationJournals.length) {
-      publicationJournals = publicationJournals.map(normalizeStoredJournal).filter(Boolean);
+      // Normalize and merge legacy local records before the first render, so
+      // duplicate cards do not remain visible while waiting for the button.
+      publicationJournals = groupPublicationJournals(publicationJournals);
       persistPublicationJournals(false);
     }
     function renderPaperTitles(item) {
@@ -1036,7 +1121,7 @@
     function openMetricDetail(kind) {
       const isCountries = kind === 'countries';
       const rows = metricDetailRows(kind);
-      metricDetailTitle.textContent = isCountries ? '覆盖国家 / 地区' : '主要研究方向';
+      metricDetailTitle.textContent = isCountries ? '覆盖国家/地区' : '主要研究方向';
       metricDetailSummary.textContent = rows.length
         ? `共 ${rows.length} 项；数量表示当前已确认足迹中涉及的期刊数。`
         : '当前足迹还没有可核验的明细数据。完成作者身份核对后，这里会自动更新。';
@@ -1730,9 +1815,19 @@
       renderPendingScholarImports();
     }
     migratePendingScholarImports();
-    dedupeButton.addEventListener('click', () => {
+    dedupeButton.addEventListener('click', async () => {
+      if (dedupeButton.disabled) return;
       dedupeButton.disabled = true;
-      dedupePublicationJournals().finally(() => { dedupeButton.disabled = false; });
+      const originalLabel = dedupeButton.textContent;
+      dedupeButton.textContent = '去重中…';
+      try {
+        await dedupePublicationJournals();
+      } catch (error) {
+        setFootprintSyncNote(error?.message || '去重失败，请刷新页面后重试。', '足迹管理');
+      } finally {
+        dedupeButton.disabled = false;
+        dedupeButton.textContent = originalLabel || '一键去重';
+      }
     });
     list.addEventListener('click', event => {
       const button = event.target.closest('[data-remove-paper-title]');
