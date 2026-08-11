@@ -483,7 +483,6 @@
               <p>按期刊归并你的论文，避免同一本期刊重复占位。</p>
             </div>
             <div class="panel-tools">
-              <input class="mini-filter" id="journal-search" type="search" placeholder="搜索期刊" aria-label="搜索期刊" />
               <select class="mini-filter" id="year-filter" aria-label="按年份筛选"><option value="all">全部年份</option></select>
               <select class="mini-filter" id="sort-filter" aria-label="排序方式"><option value="year">按发表时间（新到旧）</option><option value="if">按 IF（高到低）</option></select>
               <button class="mini-filter footprint-action" id="dedupe-footprints" type="button" title="合并重复期刊并删除重复论文">一键去重</button>
@@ -638,7 +637,6 @@
       } catch (_) {}
     }
     const list = document.getElementById('footprint-list');
-    const search = document.getElementById('journal-search');
     const year = document.getElementById('year-filter');
     const sortFilter = document.getElementById('sort-filter');
     const dedupeButton = document.getElementById('dedupe-footprints');
@@ -1434,12 +1432,10 @@
     });
     function renderFootprints() {
       syncYearFilter();
-      const q = String(search.value || '').trim().toLowerCase();
       const y = year.value;
       const rows = publicationJournals.filter(item => {
-        const text = `${item.name} ${item.abbr}`.toLowerCase();
         const years = journalYears(item);
-        return (!q || text.includes(q)) && (y === 'all' || years.includes(Number(y)));
+        return y === 'all' || years.includes(Number(y));
       });
       rows.sort((left, right) => {
         if (sortFilter.value === 'if') {
@@ -1572,7 +1568,6 @@
       })();
       return journalMetadataRefresh;
     }
-    search.addEventListener('input', renderFootprints);
     year.addEventListener('change', renderFootprints);
     sortFilter.addEventListener('change', renderFootprints);
     paperCitationStyle.addEventListener('change', renderPaperExport);
