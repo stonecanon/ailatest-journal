@@ -825,11 +825,24 @@
     function normalizeStoredJournal(item) {
       if (!item || typeof item !== 'object') return null;
       const normalized = { ...item };
-      const countries = journalCountries(item);
+      const sourceProfiles = Array.isArray(item.sourceProfiles)
+        ? [...new Set(item.sourceProfiles.map(value => String(value || '').trim()).filter(Boolean))]
+        : [];
+      const isOpenAlexAuthor = /^openalex\s*作者$/i.test(String(item.source || '').trim())
+        || sourceProfiles.some(value => /^openalex:/i.test(value));
+      const hasScopedCountryData = String(item.countrySource || '').trim() === 'author-affiliation-v2';
+      // Records created before the author-affiliation fix inherited the
+      // profile/co-author countries. Drop that stale field once; new imports
+      // carry an explicit source marker and are retained.
+      const countries = isOpenAlexAuthor && !hasScopedCountryData ? [] : journalCountries(item);
       const fields = journalFields(item);
       if (countries.length) normalized.countries = countries;
+      if (isOpenAlexAuthor && !hasScopedCountryData) {
+        normalized.countries = [];
+        normalized.countrySource = 'author-affiliation-v2';
+      }
       if (fields.length) normalized.fields = fields;
-      if (Array.isArray(item.sourceProfiles)) normalized.sourceProfiles = [...new Set(item.sourceProfiles.map(value => String(value || '').trim()).filter(Boolean))];
+      if (sourceProfiles.length) normalized.sourceProfiles = sourceProfiles;
       return normalized;
     }
     function dedupeFootprintItem(item) {
@@ -1722,15 +1735,6 @@
       const groups = new Map();
       const sourceLabel = payload?.source_label || (payload?.source === 'openalex-author' ? 'OpenAlex 作者' : payload?.source === 'crossref/openalex' ? '公开元数据' : 'Google Scholar');
       const authors = Array.isArray(payload?.authors) ? payload.authors : [];
-      const organizations = uniqueTextValues([
-        ...authors.flatMap(author => [author?.organizations, author?.organization]),
-        ...String(payload?.affiliation || '').split(/\s*[·;,/]\s*/).filter(Boolean),
-      ]);
-      const countries = uniqueTextValues([
-        ...authors.flatMap(author => [author?.countries, author?.country]),
-        payload?.countries,
-        payload?.country,
-      ]);
       const profileFields = uniqueTextValues([
         ...authors.flatMap(author => [author?.fields, author?.researchFields, author?.categories, author?.topics]),
         payload?.fields,
@@ -1745,7 +1749,7 @@
         const name = scholarVenue(paper?.venue || paper?.journal || paper?.container) || '未识别期刊';
         const key = name.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]+/g, '');
         if (!key || key === '未识别期刊') return;
-        const item = groups.get(key) || { name, short: journalShort(name), abbr: journalShort(name), cover: journalCover(name), papers: 0, citations: 0, years: [], titles: [], issns: [], badges: [], organizations: organizations.slice(), countries: countries.slice(), fields: profileFields.slice(), sourceProfiles: sourceProfiles.slice(), source: sourceLabel };
+        const item = groups.get(key) || { name, short: journalShort(name), abbr: journalShort(name), cover: journalCover(name), papers: 0, citations: 0, years: [], titles: [], issns: [], badges: [], organizations: [], countries: [], fields: profileFields.slice(), sourceProfiles: sourceProfiles.slice(), source: sourceLabel, ...(sourceLabel === 'OpenAlex 作者' ? { countrySource: 'author-affiliation-v2' } : {}) };
         item.papers += 1;
         item.citations += Number(paper?.citations || 0) || 0;
         if (Number(paper?.year) && !item.years.includes(Number(paper.year))) item.years.push(Number(paper.year));

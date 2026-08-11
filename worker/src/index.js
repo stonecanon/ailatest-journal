@@ -2834,7 +2834,7 @@ function normalizeOpenAlexSource(work) {
   };
 }
 
-function normalizeOpenAlexWork(work) {
+function normalizeOpenAlexWork(work, focusAuthorId = '') {
   const source = normalizeOpenAlexSource(work);
   const doi = normalizePublicationDoi(work?.doi || work?.ids?.doi || '');
   const organizations = [];
@@ -2845,7 +2845,15 @@ function normalizeOpenAlexWork(work) {
     if (text && !list.includes(text)) list.push(text);
   };
   const authorships = Array.isArray(work?.authorships) ? work.authorships : [];
-  authorships.forEach((authorship) => {
+  const focusId = shortOpenAlexId(focusAuthorId);
+  // For an author profile, only use institutions attached to the selected
+  // author's authorship. The previous implementation collected every
+  // co-author institution, which made one country appear on many unrelated
+  // journals in the user's own footprint.
+  const relevantAuthorships = focusId
+    ? authorships.filter((authorship) => shortOpenAlexId(authorship?.author?.id || authorship?.author?.ids?.openalex) === focusId)
+    : authorships;
+  relevantAuthorships.forEach((authorship) => {
     (Array.isArray(authorship?.institutions) ? authorship.institutions : []).forEach((institution) => {
       add(organizations, institution?.display_name || institution?.name || institution);
       add(countries, institution?.country_code, 80);
@@ -3009,7 +3017,7 @@ async function fetchOpenAlexAuthorWorks(env, author) {
     params: { filter: `author.id:${author.id}`, 'per-page': '200', sort: 'cited_by_count:desc' },
   });
   return (Array.isArray(result?.data?.results) ? result.data.results : [])
-    .map(normalizeOpenAlexWork)
+    .map((work) => normalizeOpenAlexWork(work, author?.id))
     .filter((paper) => paper.title || paper.venue);
 }
 
@@ -3292,6 +3300,8 @@ function footprintMetadata(value) {
   if (frequency) metadata.frequency = frequency;
   const source = cleanText(value.source || '', 80);
   if (source) metadata.source = source;
+  const countrySource = cleanText(value.countrySource || value.country_source || '', 80);
+  if (countrySource) metadata.countrySource = countrySource;
   if (value.journalMetadata && typeof value.journalMetadata === 'object' && !Array.isArray(value.journalMetadata)) {
     const journal = value.journalMetadata;
     metadata.journalMetadata = {
@@ -3338,6 +3348,7 @@ function normalizePublicationFootprintRecord(item) {
   const countries = footprintArray(value.countries || value.authorCountries || [], 80, 80);
   const fields = footprintArray(value.fields || value.researchFields || [], 120, 180);
   const sourceProfiles = footprintArray(value.sourceProfiles || [], 20, 240);
+  const metadata = footprintMetadata(value);
   return {
     key,
     name,
@@ -3351,7 +3362,8 @@ function normalizePublicationFootprintRecord(item) {
     countries,
     fields,
     sourceProfiles,
-    metadata: footprintMetadata(value),
+    countrySource: cleanText(value.countrySource || value.country_source || metadata.countrySource || '', 80),
+    metadata,
   };
 }
 
@@ -3387,6 +3399,7 @@ function publicationFootprintRow(row) {
     updatedAt: row.updated_at || null,
   };
   if (metadata.source) output.source = metadata.source;
+  if (metadata.countrySource) output.countrySource = metadata.countrySource;
   if (metadata.frequency) output.frequency = metadata.frequency;
   if (metadata.impactFactor != null) output.impactFactor = metadata.impactFactor;
   if (metadata.journalMetadata) output.journalMetadata = metadata.journalMetadata;
@@ -3417,6 +3430,7 @@ function mergePublicationFootprintRecords(left, right) {
     countries: unique([...a.countries, ...b.countries], 80),
     fields: unique([...a.fields, ...b.fields], 120),
     sourceProfiles: unique([...a.sourceProfiles, ...b.sourceProfiles], 20),
+    countrySource: b.countrySource || a.countrySource || '',
     metadata,
   };
 }
