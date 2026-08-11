@@ -627,7 +627,7 @@
   <div class="modal-backdrop" id="paper-export-modal" hidden>
     <section class="panel paper-export-dialog" role="dialog" aria-modal="true" aria-labelledby="paper-export-modal-title">
       <button class="modal-close" id="close-paper-export" type="button" aria-label="关闭论文清单预览">×</button>
-      <div class="panel-head"><div><h2 id="paper-export-modal-title">论文清单</h2><p>可删除或调整顺序；新加入的论文会自动追加到清单末尾。</p><div class="paper-export-list-manager"><select class="mini-filter" id="paper-export-list-select" aria-label="选择论文清单"></select><button class="mini-filter footprint-action" id="new-paper-export" type="button">新建</button><button class="mini-filter footprint-action" id="duplicate-paper-export" type="button">复制清单</button><button class="mini-filter footprint-action" id="rename-paper-export" type="button">重命名</button><label class="paper-export-index-filter"><input id="recent-five-paper-export" type="checkbox" />仅近 5 年</label></div><div class="paper-export-index-filters" aria-label="按收录索引筛选"><label class="paper-export-index-filter"><input type="checkbox" data-paper-export-index="SCIE" />SCI</label><label class="paper-export-index-filter"><input type="checkbox" data-paper-export-index="SSCI" />SSCI</label><label class="paper-export-index-filter"><input type="checkbox" data-paper-export-index="AHCI" />AHCI</label><label class="paper-export-index-filter"><input type="checkbox" data-paper-export-index="EI" />EI</label></div></div><div class="paper-export-modal-tools"><button class="mini-filter footprint-action" id="copy-paper-export" type="button">复制全部</button><button class="mini-filter footprint-action" id="download-paper-export" type="button">导出纯文本</button></div></div>
+      <div class="panel-head"><div><h2 id="paper-export-modal-title">论文清单</h2><p>可删除或调整顺序；新加入的论文会自动追加到清单末尾。</p><div class="paper-export-list-manager"><select class="mini-filter" id="paper-export-list-select" aria-label="选择论文清单"></select><button class="mini-filter footprint-action" id="new-paper-export" type="button">新建</button><button class="mini-filter footprint-action" id="duplicate-paper-export" type="button">复制清单</button><button class="mini-filter footprint-action" id="rename-paper-export" type="button">重命名</button><label class="paper-export-index-filter"><input id="recent-five-paper-export" type="checkbox" />仅近 5 年</label></div><div class="paper-export-index-filters" aria-label="按收录索引筛选"><label class="paper-export-index-filter"><input type="checkbox" data-paper-export-index="SCIE" />SCI</label><label class="paper-export-index-filter"><input type="checkbox" data-paper-export-index="SSCI" />SSCI</label><label class="paper-export-index-filter"><input type="checkbox" data-paper-export-index="AHCI" />AHCI</label><label class="paper-export-index-filter"><input type="checkbox" data-paper-export-index="EI" />EI</label><label class="paper-export-index-filter"><input id="show-paper-export-if" type="checkbox" />显示 IF</label></div></div><div class="paper-export-modal-tools"><button class="mini-filter footprint-action" id="copy-paper-export" type="button">复制全部</button><button class="mini-filter footprint-action" id="download-paper-export" type="button">导出纯文本</button></div></div>
       <div class="paper-export-list" id="paper-export-list"></div>
       <div class="paper-export-dialog-actions"><button class="mini-filter footprint-action" id="save-paper-export" type="button">保存论文清单</button><button class="mini-filter footprint-action" id="restore-paper-export" type="button">恢复全部论文</button></div>
     </section>
@@ -675,6 +675,7 @@
     const renamePaperExportButton = document.getElementById('rename-paper-export');
     const recentFivePaperExportButton = document.getElementById('recent-five-paper-export');
     const paperExportIndexFilters = [...document.querySelectorAll('[data-paper-export-index]')];
+    const showPaperExportIfCheckbox = document.getElementById('show-paper-export-if');
     const paperExportStorageKey = 'ailatest-paper-export-list-v1';
     const paperExportStorageSchema = 2;
     let paperExportLists = [];
@@ -1358,7 +1359,10 @@
     function exportPaperLine(record, style) {
       const journal = publicationJournals.find(item => footprintItemKey(item) === record.journalKey);
       const indexes = journal ? exportIndexLabels(journal) : [];
-      return `${formatPaperCitation(record, style)}${indexes.length ? ` [${indexes.join(', ')}]` : ''}`;
+      const indexText = indexes.length ? ` [${indexes.join(', ')}]` : '';
+      const latestIf = journal ? displayImpactFactor(journal) : null;
+      const ifText = showPaperExportIfCheckbox.checked && latestIf != null ? ` IF ${latestIf}` : '';
+      return `${formatPaperCitation(record, style)}${indexText}${ifText}`;
     }
     function primaryPaperAuthor() {
       const counts = new Map();
@@ -1379,6 +1383,7 @@
       if (author) html = html.split(escapeHtml(author)).join(`<strong>${escapeHtml(author)}</strong>`);
       if (venue) html = html.split(escapeHtml(venue)).join(`<strong>${escapeHtml(venue)}</strong>`);
       html = html.replace(/\[(?:SCIE|SSCI|A&amp;HCI|EI)(?:, (?:SCIE|SSCI|A&amp;HCI|EI))*\]/g, value => `<strong>${value}</strong>`);
+      html = html.replace(/ IF \d+(?:\.\d+)?(?=\s*$)/g, value => `<strong>${value}</strong>`);
       return html;
     }
     function completeExportText(style) {
@@ -1768,6 +1773,7 @@
     renamePaperExportButton.addEventListener('click', renamePaperExportList);
     recentFivePaperExportButton.addEventListener('change', toggleRecentFivePaperExport);
     paperExportIndexFilters.forEach(input => input.addEventListener('change', renderPaperExport));
+    showPaperExportIfCheckbox.addEventListener('change', renderPaperExport);
     paperExportModal.addEventListener('click', event => {
       if (event.target === paperExportModal) closePaperExportPreview();
     });
