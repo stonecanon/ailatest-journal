@@ -43,7 +43,7 @@
     .ccf { background: #72728d; }
     .biz { background: #724a58; }
     .tier { background: #72849b; }
-    .index, .idx { background: #526b86; }
+    .index, .idx, .inspec, .fsta, .cabi { background: #526b86; }
     .free { background: #1d6f42; }
     .warning { background: #b23a3a; }
     .onhold { background: #d94a1e; }
@@ -57,6 +57,7 @@
     .scd, .ami { background: #5a6b3a; }
     .ccft { background: #7a2030; }
     .nsfc { background: #0f766e; }
+    .retraction { background: #a33a2a; }
     a.pill { color: #fff; text-decoration: none; cursor: pointer; }
     a.pill:hover { filter: brightness(1.08); }
     .detail-link {
@@ -89,6 +90,36 @@
     return visible;
   }
 
+  function orderedIndices(values) {
+    const source = [];
+    const seen = new Set();
+    (Array.isArray(values) ? values : []).forEach((value) => {
+      const text = String(value || '').trim();
+      const key = text.toUpperCase();
+      if (!text || seen.has(key)) return;
+      seen.add(key);
+      source.push({ text, key });
+    });
+    const preferred = ['SCIE', 'SSCI', 'AHCI'];
+    const ordered = [];
+    preferred.forEach((key) => {
+      const hit = source.find((item) => item.key === key);
+      if (hit) ordered.push(hit.text);
+    });
+    source.forEach((item) => {
+      if (!preferred.includes(item.key)) ordered.push(item.text);
+    });
+    return ordered;
+  }
+
+  function displayBadgePriority(badge) {
+    const text = String(badge?.text || '').trim().toUpperCase();
+    if (text === 'SCIE') return 0;
+    if (text === 'SSCI') return 1;
+    if (text === 'AHCI') return 2;
+    return 10;
+  }
+
   /** Free 不展示是否付费发表 / APC；Pro(plus)/Max(pro) 可见 */
   function canShowPublishFee(settings) {
     if (settings && settings.allowPublishFee === true) return true;
@@ -110,14 +141,25 @@
       };
       return j.display_badges
         .filter(enabled)
-        .map((badge) => ({
+        .map((badge, index) => ({
           text: badge.text,
           className: `pill ${badge.className || badge.group || 'index'}`,
           title: badge.title || '',
-        }));
+          originalIndex: index,
+        }))
+        .sort((a, b) => displayBadgePriority(a) - displayBadgePriority(b) || a.originalIndex - b.originalIndex)
+        .map(({ originalIndex, ...badge }) => badge);
     }
 
     const out = [];
+
+    // Keep the three Web of Science Core Collection labels prominent, then
+    // show the remaining international indexes and ratings.
+    const indices = orderedIndices(j.indices);
+    indices.forEach((idx) => add(out, s.showIndex, idx, 'pill index'));
+    if (j.scopus && !indices.some((idx) => String(idx).toUpperCase() === 'SCOPUS')) {
+      add(out, s.showIndex, 'Scopus', 'pill index');
+    }
 
     add(out, s.showCas, j.cas_zone ? `中科院 ${j.cas_zone}区${j.cas_top ? ' TOP' : ''}` : '', 'pill zone');
     if (j.cas_xr && j.cas_xr.zone) {
@@ -128,10 +170,6 @@
     add(out, s.showCcf, j.ccf ? `CCF ${j.ccf}` : '', 'pill ccf');
     add(out, s.showBusiness, j.abdc ? `ABDC ${j.abdc}` : '', 'pill biz');
     add(out, s.showBusiness, j.abs ? `ABS ${j.abs}` : '', 'pill biz');
-
-    const indices = Array.isArray(j.indices) ? j.indices.slice(0, 3) : [];
-    indices.forEach((idx) => add(out, s.showIndex, idx, 'pill index'));
-    add(out, s.showIndex, j.scopus ? 'Scopus' : '', 'pill index');
 
     add(out, s.showDomestic, j.cssci === 'core' ? 'CSSCI' : '', 'pill cssci');
     add(out, s.showDomestic, j.cssci === 'ext' ? 'CSSCI 扩展' : '', 'pill cssci-ext');
