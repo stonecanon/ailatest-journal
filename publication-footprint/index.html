@@ -625,7 +625,7 @@
   <div class="modal-backdrop" id="paper-export-modal" hidden>
     <section class="panel paper-export-dialog" role="dialog" aria-modal="true" aria-labelledby="paper-export-modal-title">
       <button class="modal-close" id="close-paper-export" type="button" aria-label="关闭论文清单预览">×</button>
-      <div class="panel-head"><div><h2 id="paper-export-modal-title">论文清单</h2><p>可删除或调整顺序；新加入的论文会自动追加到清单末尾。</p><div class="paper-export-list-manager"><select class="mini-filter" id="paper-export-list-select" aria-label="选择论文清单"></select><button class="mini-filter footprint-action" id="new-paper-export" type="button">新建</button><button class="mini-filter footprint-action" id="duplicate-paper-export" type="button">复制清单</button><button class="mini-filter footprint-action" id="rename-paper-export" type="button">重命名</button><label class="paper-export-corresponding-toggle"><input id="mark-corresponding-author" type="checkbox" checked />标注通讯作者</label></div></div><div class="paper-export-modal-tools"><button class="mini-filter footprint-action" id="copy-paper-export" type="button">复制全部</button><button class="mini-filter footprint-action" id="download-paper-export" type="button">导出纯文本</button></div></div>
+      <div class="panel-head"><div><h2 id="paper-export-modal-title">论文清单</h2><p>可删除或调整顺序；新加入的论文会自动追加到清单末尾。</p><div class="paper-export-list-manager"><select class="mini-filter" id="paper-export-list-select" aria-label="选择论文清单"></select><button class="mini-filter footprint-action" id="new-paper-export" type="button">新建</button><button class="mini-filter footprint-action" id="duplicate-paper-export" type="button">复制清单</button><button class="mini-filter footprint-action" id="rename-paper-export" type="button">重命名</button><button class="mini-filter footprint-action" id="recent-five-paper-export" type="button">仅近 5 年</button><label class="paper-export-corresponding-toggle"><input id="mark-corresponding-author" type="checkbox" checked />标注通讯作者</label></div></div><div class="paper-export-modal-tools"><button class="mini-filter footprint-action" id="copy-paper-export" type="button">复制全部</button><button class="mini-filter footprint-action" id="download-paper-export" type="button">导出纯文本</button></div></div>
       <div class="paper-export-list" id="paper-export-list"></div>
       <div class="paper-export-dialog-actions"><button class="mini-filter footprint-action" id="save-paper-export" type="button">保存论文清单</button><button class="mini-filter footprint-action" id="restore-paper-export" type="button">恢复全部论文</button></div>
     </section>
@@ -671,6 +671,7 @@
     const newPaperExportButton = document.getElementById('new-paper-export');
     const duplicatePaperExportButton = document.getElementById('duplicate-paper-export');
     const renamePaperExportButton = document.getElementById('rename-paper-export');
+    const recentFivePaperExportButton = document.getElementById('recent-five-paper-export');
     const markCorrespondingAuthorCheckbox = document.getElementById('mark-corresponding-author');
     try { markCorrespondingAuthorCheckbox.checked = localStorage.getItem('ailatest-paper-export-mark-corresponding') !== '0'; } catch (_) {}
     const paperExportStorageKey = 'ailatest-paper-export-list-v1';
@@ -1418,6 +1419,18 @@
       renderPaperExport();
       paperExportNote.textContent = '已恢复全部论文；后续新论文会自动加入清单。';
     }
+    function selectRecentFivePaperExport() {
+      const cutoff = new Date().getFullYear() - 4;
+      const all = allPaperRecords();
+      const selected = paperExportRecords().filter(record => Number(record.year || 0) >= cutoff);
+      const selectedKeys = selected.map(paperExportRecordKey).filter(Boolean);
+      const allKeys = all.map(paperExportRecordKey).filter(Boolean);
+      paperExportState.order = selectedKeys;
+      paperExportState.excluded = allKeys.filter(key => !selectedKeys.includes(key));
+      persistPaperExportState();
+      renderPaperExport();
+      paperExportNote.textContent = `已筛选近 5 年论文（${cutoff}–${new Date().getFullYear()}），共 ${selected.length} 篇。`;
+    }
     function paperAuthorMatchKey(record) {
       return paperRecordKey(record) || paperTitleKey(record?.title || '');
     }
@@ -1730,6 +1743,7 @@
     newPaperExportButton.addEventListener('click', () => createPaperExportList(false));
     duplicatePaperExportButton.addEventListener('click', () => createPaperExportList(true));
     renamePaperExportButton.addEventListener('click', renamePaperExportList);
+    recentFivePaperExportButton.addEventListener('click', selectRecentFivePaperExport);
     paperExportModal.addEventListener('click', event => {
       if (event.target === paperExportModal) closePaperExportPreview();
     });
