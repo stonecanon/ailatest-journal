@@ -3282,6 +3282,63 @@ function footprintTitles(value) {
     .slice(0, 500);
 }
 
+function normalizeFootprintPaperRecord(value) {
+  const item = value && typeof value === 'object' ? value : {};
+  const title = cleanText(item.title || item.name || '', 800);
+  if (!title) return null;
+  const doi = normalizePublicationDoi(item.doi || '');
+  const year = publicationYear(item.year);
+  const venue = cleanText(item.venue || item.journal || item.container || '', 240);
+  const url = cleanText(item.url || (doi ? `https://doi.org/${doi}` : ''), 500);
+  const authors = footprintArray(item.authors || item.author || [], 40, 180);
+  const issn = cleanText(item.issn || '', 24).toUpperCase();
+  return {
+    title,
+    authors,
+    year,
+    venue,
+    doi,
+    url,
+    issn,
+    citations: Math.max(0, Number(item.citations || 0) || 0),
+  };
+}
+
+function footprintPaperRecordKey(item) {
+  const record = normalizeFootprintPaperRecord(item);
+  if (!record) return '';
+  return record.doi.toLowerCase() || `${footprintTitleKey(record.title)}|${record.year || ''}`;
+}
+
+function footprintPaperRecords(value) {
+  return mergeFootprintPaperRecords(value);
+}
+
+function mergeFootprintPaperRecords(value) {
+  const byKey = new Map();
+  (Array.isArray(value) ? value : []).map(normalizeFootprintPaperRecord).filter(Boolean).forEach((record) => {
+    const key = footprintPaperRecordKey(record);
+    const previous = byKey.get(key);
+    if (!previous) {
+      byKey.set(key, record);
+      return;
+    }
+    byKey.set(key, {
+      ...previous,
+      ...record,
+      authors: [...new Set([...(previous.authors || []), ...(record.authors || [])])].slice(0, 40),
+      venue: record.venue || previous.venue,
+      doi: record.doi || previous.doi,
+      url: record.url || previous.url,
+      issn: record.issn || previous.issn,
+      citations: Math.max(previous.citations || 0, record.citations || 0),
+    });
+  });
+  return [...byKey.values()]
+    .sort((a, b) => (Number(b.year || 0) - Number(a.year || 0)) || a.title.localeCompare(b.title))
+    .slice(0, 500);
+}
+
 function footprintBadges(value) {
   if (!Array.isArray(value)) return [];
   return value
@@ -3302,6 +3359,8 @@ function footprintMetadata(value) {
   if (source) metadata.source = source;
   const countrySource = cleanText(value.countrySource || value.country_source || '', 80);
   if (countrySource) metadata.countrySource = countrySource;
+  const paperRecords = footprintPaperRecords(value.paperRecords || value.paper_records || []);
+  if (paperRecords.length) metadata.paperRecords = paperRecords;
   if (value.journalMetadata && typeof value.journalMetadata === 'object' && !Array.isArray(value.journalMetadata)) {
     const journal = value.journalMetadata;
     metadata.journalMetadata = {
@@ -3349,6 +3408,8 @@ function normalizePublicationFootprintRecord(item) {
   const fields = footprintArray(value.fields || value.researchFields || [], 120, 180);
   const sourceProfiles = footprintArray(value.sourceProfiles || [], 20, 240);
   const metadata = footprintMetadata(value);
+  const paperRecords = footprintPaperRecords(value.paperRecords || metadata.paperRecords || []);
+  if (paperRecords.length) metadata.paperRecords = paperRecords;
   return {
     key,
     name,
@@ -3362,6 +3423,7 @@ function normalizePublicationFootprintRecord(item) {
     countries,
     fields,
     sourceProfiles,
+    paperRecords,
     countrySource: cleanText(value.countrySource || value.country_source || metadata.countrySource || '', 80),
     metadata,
   };
@@ -3395,6 +3457,7 @@ function publicationFootprintRow(row) {
     countries: parseFootprintJson(row.countries_json),
     fields: parseFootprintJson(row.fields_json),
     sourceProfiles: parseFootprintJson(row.source_profiles_json),
+    paperRecords: Array.isArray(metadata.paperRecords) ? metadata.paperRecords : [],
     createdAt: row.created_at || null,
     updatedAt: row.updated_at || null,
   };
@@ -3415,6 +3478,8 @@ function mergePublicationFootprintRecords(left, right) {
   if (a.metadata?.journalMetadata || b.metadata?.journalMetadata) {
     metadata.journalMetadata = { ...(a.metadata?.journalMetadata || {}), ...(b.metadata?.journalMetadata || {}) };
   }
+  const paperRecords = mergeFootprintPaperRecords([...(a.paperRecords || []), ...(b.paperRecords || [])]);
+  if (paperRecords.length) metadata.paperRecords = paperRecords;
   const titles = footprintTitles([...a.titles, ...b.titles]);
   const duplicateTitles = Math.max(0, a.titles.length + b.titles.length - titles.length);
   return {
@@ -3430,6 +3495,7 @@ function mergePublicationFootprintRecords(left, right) {
     countries: unique([...a.countries, ...b.countries], 80),
     fields: unique([...a.fields, ...b.fields], 120),
     sourceProfiles: unique([...a.sourceProfiles, ...b.sourceProfiles], 20),
+    paperRecords,
     countrySource: b.countrySource || a.countrySource || '',
     metadata,
   };

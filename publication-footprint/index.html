@@ -119,13 +119,20 @@
     .paper-title-list { margin: 9px 0 0; padding-left: 17px; color: var(--ink-soft); font-size: 12px; line-height: 1.55; }
     .paper-title-list li { overflow-wrap: anywhere; }
     .paper-title-entry { display: flex; align-items: flex-start; gap: 7px; }
-    .paper-title-entry > span { min-width: 0; flex: 1; }
+    .paper-title-content { min-width: 0; flex: 1; }
+    .paper-title-content > span { display: block; }
+    .paper-title-authors { display: block; margin-top: 2px; color: var(--ink-faint); font-size: 10px; line-height: 1.45; }
     .paper-title-remove { flex: 0 0 auto; margin: 1px 0 0; padding: 0 3px; border: 0; color: var(--ink-faint); background: transparent; font: inherit; font-size: 12px; line-height: 1.2; cursor: pointer; }
     .paper-title-remove:hover, .paper-title-remove:focus-visible { color: var(--footprint-orange); }
     .paper-title-list li + li { margin-top: 3px; }
     .paper-title-details { margin-top: 7px; color: var(--footprint-blue); font-size: 11px; }
     .paper-title-details summary { cursor: pointer; }
     .paper-title-details .paper-title-list { margin-top: 6px; }
+    .paper-export-panel { margin-top: 16px; }
+    .paper-export-head { align-items: center; }
+    .paper-export-tools { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 7px; }
+    .paper-export-text { display: block; width: calc(100% - 32px); min-height: 220px; margin: 16px; padding: 14px; border: 1px solid var(--rule-soft); border-radius: 12px; color: var(--ink-soft); background: #fffdf9; font: 12px/1.7 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; resize: vertical; }
+    .paper-export-note { margin: -7px 16px 16px; color: var(--ink-faint); font-size: 11px; }
     .badge-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
     .pub-badge { display: inline-flex; align-items: center; min-height: 24px; padding: 3px 9px; border: 1px solid rgba(39,35,31,.1); border-radius: 999px; color: var(--ink-soft); background: #f7f3ec; font-size: 11px; font-weight: 780; letter-spacing: .02em; }
     .pub-badge.index { color: #24486f; background: #eaf1fb; border-color: #cddbeb; }
@@ -271,6 +278,7 @@
       .workspace-grid { grid-template-columns: 1fr; }
       .panel-head { display: block; padding: 17px 15px 13px; }
       .panel-tools { justify-content: flex-start; margin-top: 11px; }
+      .paper-export-tools { justify-content: flex-start; margin-top: 11px; }
       .footprint-list { padding: 10px; }
       .journal-card { grid-template-columns: 70px minmax(0, 1fr); gap: 10px; padding: 14px; }
       .journal-card-cover { min-height: 72px; }
@@ -335,6 +343,8 @@
       .panel { border-radius: 16px; }
       .panel-head { padding: 15px 13px 12px; }
       .panel-head h2 { font-size: 19px; }
+      .paper-export-tools { display: grid; grid-template-columns: minmax(0, 1fr); width: 100%; margin-top: 10px; }
+      .paper-export-tools .mini-filter { width: 100%; min-width: 0; box-sizing: border-box; }
       .panel-tools {
         display: grid;
         grid-template-columns: minmax(0, 1fr);
@@ -456,6 +466,23 @@
           </div>
           <div class="footprint-list" id="footprint-list"></div>
             <div class="review-note" id="footprint-sync-note"><strong>账号同步：</strong>未登录时足迹只保存在当前浏览器；登录后会自动同步到你的账号。</div>
+          </section>
+          <section class="panel paper-export-panel" aria-labelledby="paper-export-title">
+            <div class="panel-head paper-export-head">
+              <div><h2 id="paper-export-title">论文列表</h2><p>按发表年份从新到旧排列，可生成常用参考文献格式。</p></div>
+              <div class="paper-export-tools">
+                <select class="mini-filter" id="paper-citation-style" aria-label="论文格式">
+                  <option value="apa">APA 7</option>
+                  <option value="mla">MLA 9</option>
+                  <option value="chicago">Chicago 17</option>
+                  <option value="gbt">GB/T 7714-2015</option>
+                </select>
+                <button class="mini-filter footprint-action" id="copy-paper-export" type="button">复制纯文字</button>
+                <button class="mini-filter footprint-action" id="download-paper-export" type="button">导出 .txt</button>
+              </div>
+            </div>
+            <textarea class="paper-export-text" id="paper-export-text" readonly aria-label="论文列表纯文字预览" placeholder="导入并确认论文后，这里会显示论文列表。"></textarea>
+            <div class="paper-export-note" id="paper-export-note">导入并确认论文后，这里会生成可复制的纯文字论文列表。</div>
           </section>
         </div>
 
@@ -599,6 +626,11 @@
     const year = document.getElementById('year-filter');
     const sortFilter = document.getElementById('sort-filter');
     const dedupeButton = document.getElementById('dedupe-footprints');
+    const paperCitationStyle = document.getElementById('paper-citation-style');
+    const paperExportText = document.getElementById('paper-export-text');
+    const paperExportNote = document.getElementById('paper-export-note');
+    const copyPaperExportButton = document.getElementById('copy-paper-export');
+    const downloadPaperExportButton = document.getElementById('download-paper-export');
     const researcherLevels = [
       { min: 0, label: '新晋研究者', next: 20 },
       { min: 20, label: '初级研究者', next: 60 },
@@ -645,6 +677,73 @@
           seen.add(key);
           return true;
         });
+    }
+    function normalizePaperRecord(value, fallbackTitle = '', fallbackYear = null) {
+      const item = value && typeof value === 'object' ? value : {};
+      const title = String(item.title || item.name || fallbackTitle || '').replace(/\s+/g, ' ').trim();
+      if (!title) return null;
+      const authors = (Array.isArray(item.authors) ? item.authors : [item.authors || item.author])
+        .flat(Infinity)
+        .map(author => String(author || '').replace(/\s+/g, ' ').trim())
+        .filter(Boolean)
+        .filter((author, index, list) => list.findIndex(other => other.toLowerCase() === author.toLowerCase()) === index)
+        .slice(0, 40);
+      const doi = String(item.doi || '').trim().replace(/^https?:\/\/doi\.org\//i, '').replace(/^doi:\s*/i, '');
+      const year = Number(item.year || fallbackYear || 0);
+      return {
+        title,
+        authors,
+        year: Number.isInteger(year) && year >= 1800 && year <= 2200 ? year : null,
+        venue: String(item.venue || item.journal || item.container || '').replace(/\s+/g, ' ').trim(),
+        doi,
+        url: String(item.url || '').trim(),
+        issn: String(item.issn || '').trim().toUpperCase(),
+        citations: Math.max(0, Number(item.citations || 0) || 0),
+      };
+    }
+    function paperRecordKey(record) {
+      const doi = String(record?.doi || '').trim().toLowerCase();
+      return doi || `${paperTitleKey(record?.title || '')}|${record?.year || ''}`;
+    }
+    function paperRecords(item) {
+      const raw = Array.isArray(item?.paperRecords) ? item.paperRecords : [];
+      const fallbackYears = journalYears(item);
+      const input = raw.length
+        ? raw
+        : paperTitles(item).map((title, index) => ({ title, year: fallbackYears[index] || null }));
+      const seen = new Set();
+      return input
+        .map((record, index) => normalizePaperRecord(record, typeof record === 'string' ? record : '', fallbackYears[index] || null))
+        .filter(record => {
+          const key = paperRecordKey(record);
+          if (!key || seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        })
+        .sort((left, right) => (Number(right.year || 0) - Number(left.year || 0)) || left.title.localeCompare(right.title));
+    }
+    function mergePaperRecords(left, right) {
+      const merged = [...paperRecords({ paperRecords: left }), ...paperRecords({ paperRecords: right })];
+      const byKey = new Map();
+      merged.forEach(record => {
+        const key = paperRecordKey(record);
+        const previous = byKey.get(key);
+        if (!previous) byKey.set(key, record);
+        else byKey.set(key, {
+          ...previous,
+          ...record,
+          authors: [...new Set([...(previous.authors || []), ...(record.authors || [])])].slice(0, 40),
+          venue: record.venue || previous.venue,
+          doi: record.doi || previous.doi,
+          url: record.url || previous.url,
+          issn: record.issn || previous.issn,
+          citations: Math.max(previous.citations || 0, record.citations || 0),
+        });
+      });
+      return [...byKey.values()].sort((left, right) => (Number(right.year || 0) - Number(left.year || 0)) || left.title.localeCompare(right.title));
+    }
+    function paperAuthorsText(record) {
+      return Array.isArray(record?.authors) && record.authors.length ? record.authors.join('；') : '作者未标注';
     }
     function journalMetadataKey(value) {
       return String(value || '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]+/g, '');
@@ -705,8 +804,8 @@
       if (metadata?.warning || metadata?.on_hold || metadata?.under_review) add('风险提示', 'verified');
       return orderJournalBadges(badges);
     }
-    // Journal cards share one muted blue-gray hue. Depth is data-driven:
-    // better quartiles/CAS tiers/TOP and a higher IF move the same hue darker.
+    // Card covers use a stable palette per journal, with a wider light/dark
+    // range so adjacent cards are easy to distinguish at a glance.
     function journalTierStrength(item) {
       const labels = journalBadges(item).map(([label]) => String(label || '').toUpperCase());
       let strength = 0;
@@ -726,14 +825,17 @@
         ? 0
         : Math.min(1, Math.log1p(impactFactor) / Math.log1p(100));
       const depth = Math.max(0, Math.min(1, tierStrength * .72 + ifStrength * .28));
-      // Keep the paper-count tile in the same restrained blue-gray family as
-      // the site's badges. Better quartiles/IF still deepen the shade, but
-      // the overall card stays light enough for the white count to read cleanly.
-      const startLightness = Math.round(66 - depth * 10);
-      const endLightness = Math.round(54 - depth * 10);
-      const startSaturation = Math.round(18 + depth * 4);
-      const endSaturation = Math.round(22 + depth * 5);
-      return `linear-gradient(155deg, hsl(210 ${startSaturation}% ${startLightness}%), hsl(210 ${endSaturation}% ${endLightness}%))`;
+      const palettes = [
+        [207, 34], [188, 40], [157, 38], [132, 34],
+        [38, 58], [18, 62], [276, 32], [224, 38],
+      ];
+      const hash = [...String(item?.name || '')].reduce((sum, char) => (sum * 31 + char.charCodeAt(0)) >>> 0, 11);
+      const [hue, saturation] = palettes[hash % palettes.length];
+      const startLightness = Math.round(76 - depth * 20);
+      const endLightness = Math.round(48 - depth * 19);
+      const startSaturation = Math.round(saturation + depth * 16);
+      const endSaturation = Math.round(saturation + 10 + depth * 22);
+      return `linear-gradient(155deg, hsl(${hue} ${startSaturation}% ${startLightness}%), hsl(${hue} ${endSaturation}% ${endLightness}%))`;
     }
     function metadataTextValues(values) {
       const raw = (Array.isArray(values) ? values : [values]).flat(Infinity);
@@ -835,6 +937,7 @@
       // profile/co-author countries. Drop that stale field once; new imports
       // carry an explicit source marker and are retained.
       const countries = isOpenAlexAuthor && !hasScopedCountryData ? [] : journalCountries(item);
+      const records = paperRecords(item);
       const fields = journalFields(item);
       if (countries.length) normalized.countries = countries;
       if (isOpenAlexAuthor && !hasScopedCountryData) {
@@ -842,12 +945,18 @@
         normalized.countrySource = 'author-affiliation-v2';
       }
       if (fields.length) normalized.fields = fields;
+      if (records.length) {
+        normalized.paperRecords = records;
+        normalized.titles = records.map(record => record.title);
+      }
       if (sourceProfiles.length) normalized.sourceProfiles = sourceProfiles;
       return normalized;
     }
     function dedupeFootprintItem(item) {
       const normalized = normalizeStoredJournal(item) || { ...(item || {}) };
-      const titles = paperTitles(normalized);
+      const records = paperRecords(normalized);
+      const titles = records.map(record => record.title);
+      if (records.length) normalized.paperRecords = records;
       const papers = Number(normalized.papers || 0);
       normalized.titles = titles;
       normalized.papers = titles.length ? titles.length : Math.max(0, Number.isFinite(papers) ? Math.round(papers) : 0);
@@ -888,6 +997,8 @@
       const merged = { ...a, ...b };
       merged.papers = Math.max(Number(a.papers || 0), Number(b.papers || 0));
       merged.citations = Math.max(Number(a.citations || 0), Number(b.citations || 0));
+      merged.paperRecords = mergePaperRecords(paperRecords(a), paperRecords(b));
+      if (merged.paperRecords.length) merged.titles = merged.paperRecords.map(record => record.title);
       ['years', 'titles', 'issns', 'organizations', 'countries', 'fields', 'sourceProfiles'].forEach(key => {
         merged[key] = unique([...(Array.isArray(a[key]) ? a[key] : []), ...(Array.isArray(b[key]) ? b[key] : [])]);
       });
@@ -960,11 +1071,13 @@
       if (index < 0) return;
       const item = dedupeFootprintItem(publicationJournals[index]);
       publicationJournals[index] = item;
-      const titles = paperTitles(item);
-      const nextTitles = titles.filter(title => paperTitleKey(title) !== titleKey);
-      if (nextTitles.length === titles.length) return;
+      const records = paperRecords(item);
+      const nextRecords = records.filter(record => paperTitleKey(record.title) !== titleKey);
+      if (nextRecords.length === records.length) return;
+      const nextTitles = nextRecords.map(record => record.title);
+      item.paperRecords = nextRecords;
       item.titles = nextTitles;
-      item.papers = Math.max(0, Math.round(Number(item.papers || 0)) - 1);
+      item.papers = nextRecords.length;
       const removedJournal = item.papers === 0 && !nextTitles.length;
       if (removedJournal) publicationJournals.splice(index, 1);
       persistPublicationJournals(false);
@@ -1052,13 +1165,52 @@
       persistPublicationJournals(false);
     }
     function renderPaperTitles(item) {
-      const titles = paperTitles(item);
-      if (!titles.length) return '';
-      const visible = titles.length > 3 ? titles.slice(0, 3) : titles;
-      const rest = titles.slice(3);
+      const records = paperRecords(item);
+      if (!records.length) return '';
+      const visible = records.length > 3 ? records.slice(0, 3) : records;
+      const rest = records.slice(3);
       const journalKey = footprintItemKey(item);
-      const list = values => `<ul class="paper-title-list">${values.map(title => `<li><div class="paper-title-entry"><span>${escapeHtml(title)}</span><button class="paper-title-remove" type="button" data-remove-paper-title="${escapeHtml(paperTitleKey(title))}" data-journal-key="${escapeHtml(journalKey)}" aria-label="删除论文：${escapeHtml(title)}" title="删除这篇论文">×</button></div></li>`).join('')}</ul>`;
+      const list = values => `<ul class="paper-title-list">${values.map(record => `<li><div class="paper-title-entry"><div class="paper-title-content"><span>${escapeHtml(record.title)}</span><small class="paper-title-authors">${escapeHtml(paperAuthorsText(record))}</small></div><button class="paper-title-remove" type="button" data-remove-paper-title="${escapeHtml(paperTitleKey(record.title))}" data-journal-key="${escapeHtml(journalKey)}" aria-label="删除论文：${escapeHtml(record.title)}" title="删除这篇论文">×</button></div></li>`).join('')}</ul>`;
       return `${list(visible)}${rest.length ? `<details class="paper-title-details"><summary>查看其余 ${rest.length} 个论文题目</summary>${list(rest)}</details>` : ''}`;
+    }
+    function formatCitationAuthors(record, style) {
+      const authors = Array.isArray(record?.authors) ? record.authors.filter(Boolean) : [];
+      if (!authors.length) return '作者未标注';
+      if (style === 'apa') {
+        if (authors.length === 1) return authors[0];
+        return `${authors.slice(0, -1).join(', ')}, & ${authors[authors.length - 1]}`;
+      }
+      if (style === 'mla' && authors.length > 3) return `${authors[0]} et al.`;
+      return authors.join(', ');
+    }
+    function citationDoi(record) {
+      const doi = String(record?.doi || '').trim().replace(/^https?:\/\/doi\.org\//i, '').replace(/^doi:\s*/i, '');
+      return doi ? `https://doi.org/${doi}` : '';
+    }
+    function formatPaperCitation(record, style) {
+      const authors = formatCitationAuthors(record, style);
+      const title = String(record?.title || '').trim();
+      const venue = String(record?.venue || record?.journalName || '期刊信息未识别').trim();
+      const year = record?.year || 'n.d.';
+      const doi = citationDoi(record);
+      if (style === 'mla') return `${authors}. “${title}.” ${venue}${record?.year ? `, ${year}` : ''}.${doi ? ` ${doi}` : ''}`;
+      if (style === 'chicago') return `${authors}. “${title}.” ${venue}${record?.year ? ` (${year})` : ''}.${doi ? ` ${doi}` : ''}`;
+      if (style === 'gbt') return `${authors}. ${title}[J]. ${venue}${record?.year ? `, ${year}` : ''}.${doi ? ` DOI:${String(record.doi).trim()}` : ''}`;
+      return `${authors} (${year}). ${title}. ${venue}.${doi ? ` ${doi}` : ''}`;
+    }
+    function allPaperRecords() {
+      return publicationJournals.flatMap(item => paperRecords(item).map(record => ({ ...record, venue: record.venue || item.name, journalName: item.name })))
+        .sort((left, right) => (Number(right.year || 0) - Number(left.year || 0)) || left.title.localeCompare(right.title));
+    }
+    function renderPaperExport() {
+      const records = allPaperRecords();
+      const style = paperCitationStyle.value || 'apa';
+      paperExportText.value = records.length
+        ? records.map((record, index) => `${index + 1}. ${formatPaperCitation(record, style)}`).join('\n')
+        : '';
+      paperExportNote.textContent = records.length
+        ? `共 ${records.length} 篇论文，已按发表年份从新到旧排列。作者信息以公开元数据为准。`
+        : '导入并确认论文后，这里会生成可复制的纯文字论文列表。';
     }
     function syncYearFilter() {
       const selected = year.value || 'all';
@@ -1191,6 +1343,37 @@
           </div>
           <div class="journal-card-side">${displayImpactFactor(item) != null ? `<div class="journal-if-card" aria-label="影响因子 ${escapeHtml(displayImpactFactor(item))}"><strong>${escapeHtml(displayImpactFactor(item))}</strong><span>IF</span></div>` : ''}<a class="journal-link" href="${escapeHtml(journalDetailHref(item))}">查看期刊 →</a></div>
         </article>`).join('') : '<div class="empty-state"><strong>暂无已确认的发表记录</strong><span>完成作者身份核对后，已确认的期刊会显示在这里。</span></div>';
+      renderPaperExport();
+    }
+    async function copyPaperExport() {
+      const text = paperExportText.value.trim();
+      if (!text) {
+        paperExportNote.textContent = '当前还没有可复制的论文记录。';
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (_) {
+        paperExportText.focus();
+        paperExportText.select();
+        document.execCommand('copy');
+      }
+      paperExportNote.textContent = '已复制纯文字论文列表。';
+    }
+    function downloadPaperExport() {
+      const text = paperExportText.value.trim();
+      if (!text) {
+        paperExportNote.textContent = '当前还没有可导出的论文记录。';
+        return;
+      }
+      const blob = new Blob([`${text}\n`], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `ailatest-publications-${new Date().toISOString().slice(0, 10)}.txt`;
+      link.click();
+      URL.revokeObjectURL(url);
+      paperExportNote.textContent = '已导出纯文字论文列表。';
     }
     let journalMetadataRefresh = null;
     let journalMetadataRefreshQueued = false;
@@ -1260,6 +1443,9 @@
     search.addEventListener('input', renderFootprints);
     year.addEventListener('change', renderFootprints);
     sortFilter.addEventListener('change', renderFootprints);
+    paperCitationStyle.addEventListener('change', renderPaperExport);
+    copyPaperExportButton.addEventListener('click', copyPaperExport);
+    downloadPaperExportButton.addEventListener('click', downloadPaperExport);
     renderFootprints();
     refreshJournalMetadata();
 
@@ -1749,11 +1935,30 @@
         const name = scholarVenue(paper?.venue || paper?.journal || paper?.container) || '未识别期刊';
         const key = name.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]+/g, '');
         if (!key || key === '未识别期刊') return;
-        const item = groups.get(key) || { name, short: journalShort(name), abbr: journalShort(name), cover: journalCover(name), papers: 0, citations: 0, years: [], titles: [], issns: [], badges: [], organizations: [], countries: [], fields: profileFields.slice(), sourceProfiles: sourceProfiles.slice(), source: sourceLabel, ...(sourceLabel === 'OpenAlex 作者' ? { countrySource: 'author-affiliation-v2' } : {}) };
-        item.papers += 1;
-        item.citations += Number(paper?.citations || 0) || 0;
-        if (Number(paper?.year) && !item.years.includes(Number(paper.year))) item.years.push(Number(paper.year));
-        if (paper?.title && !item.titles.includes(paper.title)) item.titles.push(paper.title);
+        const item = groups.get(key) || { name, short: journalShort(name), abbr: journalShort(name), cover: journalCover(name), papers: 0, citations: 0, years: [], titles: [], paperRecords: [], issns: [], badges: [], organizations: [], countries: [], fields: profileFields.slice(), sourceProfiles: sourceProfiles.slice(), source: sourceLabel, ...(sourceLabel === 'OpenAlex 作者' ? { countrySource: 'author-affiliation-v2' } : {}) };
+        const paperRecord = normalizePaperRecord({
+          title: paper?.title,
+          authors: paper?.authors || paper?.author,
+          year: paper?.year,
+          venue: name,
+          doi: paper?.doi,
+          url: paper?.url,
+          issn: paper?.issn,
+          citations: paper?.citations,
+        });
+        const recordKey = paperRecord ? paperRecordKey(paperRecord) : '';
+        const existingRecord = recordKey ? item.paperRecords.find(record => paperRecordKey(record) === recordKey) : null;
+        if (!existingRecord && paperRecord) {
+          item.paperRecords.push(paperRecord);
+          item.citations += Number(paper?.citations || 0) || 0;
+        } else if (!paperRecord) {
+          item.papers += 1;
+          item.citations += Number(paper?.citations || 0) || 0;
+        }
+        item.paperRecords = mergePaperRecords(item.paperRecords, []);
+        item.papers = item.paperRecords.length || item.papers;
+        item.titles = item.paperRecords.map(record => record.title);
+        item.years = [...new Set(item.paperRecords.map(record => record.year).filter(Boolean))].sort((a, b) => b - a);
         if (paper?.issn && !item.issns.includes(String(paper.issn).toUpperCase())) item.issns.push(String(paper.issn).toUpperCase());
         item.organizations = uniqueTextValues([item.organizations, paper?.organizations, paper?.authorOrganizations, paper?.organization]);
         item.countries = uniqueTextValues([item.countries, paper?.countries, paper?.authorCountries, paper?.country]);
