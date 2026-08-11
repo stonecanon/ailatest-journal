@@ -1373,6 +1373,7 @@
       const venue = String(record?.venue || record?.journalName || '').trim();
       if (author) html = html.split(escapeHtml(author)).join(`<strong>${escapeHtml(author)}</strong>`);
       if (venue) html = html.split(escapeHtml(venue)).join(`<strong>${escapeHtml(venue)}</strong>`);
+      html = html.replace(/\[(?:SCIE|SSCI|A&amp;HCI|EI)(?:, (?:SCIE|SSCI|A&amp;HCI|EI))*\]/g, value => `<strong>${value}</strong>`);
       return html;
     }
     function completeExportText(style) {
