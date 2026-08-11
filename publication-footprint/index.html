@@ -728,31 +728,20 @@
       // the same paper to survive twice when only one copy had a year.
       return doi || paperTitleKey(record?.title || '');
     }
-    function paperRecords(item) {
-      const raw = Array.isArray(item?.paperRecords) ? item.paperRecords : [];
-      const fallbackYears = journalYears(item);
-      const input = raw.length
-        ? raw
-        : paperTitles(item).map((title, index) => ({ title, year: fallbackYears[index] || null }));
-      const seen = new Set();
-      return input
-        .map((record, index) => normalizePaperRecord(record, typeof record === 'string' ? record : '', fallbackYears[index] || null))
-        .filter(record => {
-          const key = paperRecordKey(record);
-          if (!key || seen.has(key)) return false;
-          seen.add(key);
-          return true;
-        })
-        .sort((left, right) => (Number(right.year || 0) - Number(left.year || 0)) || left.title.localeCompare(right.title));
-    }
-    function mergePaperRecords(left, right) {
-      const merged = [...paperRecords({ paperRecords: left }), ...paperRecords({ paperRecords: right })];
-      const byKey = new Map();
-      merged.forEach(record => {
-        const key = paperRecordKey(record);
-        const previous = byKey.get(key);
-        if (!previous) byKey.set(key, record);
-        else byKey.set(key, {
+    function mergeNormalizedPaperRecords(records) {
+      const groups = [];
+      (Array.isArray(records) ? records : []).forEach(record => {
+        if (!record?.title) return;
+        const titleKey = paperTitleKey(record.title);
+        const doiKey = String(record.doi || '').trim().toLowerCase();
+        let group = groups.find(entry => (titleKey && entry.titles.has(titleKey)) || (doiKey && entry.dois.has(doiKey)));
+        if (!group) {
+          group = { record, titles: new Set(titleKey ? [titleKey] : []), dois: new Set(doiKey ? [doiKey] : []) };
+          groups.push(group);
+          return;
+        }
+        const previous = group.record;
+        group.record = {
           ...previous,
           ...record,
           title: previous.title || record.title,
@@ -763,9 +752,26 @@
           url: previous.url || record.url,
           issn: previous.issn || record.issn,
           citations: Math.max(previous.citations || 0, record.citations || 0),
-        });
+        };
+        if (titleKey) group.titles.add(titleKey);
+        if (doiKey) group.dois.add(doiKey);
       });
-      return [...byKey.values()].sort((left, right) => (Number(right.year || 0) - Number(left.year || 0)) || left.title.localeCompare(right.title));
+      return groups.map(group => group.record)
+        .sort((left, right) => (Number(right.year || 0) - Number(left.year || 0)) || left.title.localeCompare(right.title));
+    }
+    function paperRecords(item) {
+      const raw = Array.isArray(item?.paperRecords) ? item.paperRecords : [];
+      const fallbackYears = journalYears(item);
+      const input = raw.length
+        ? raw
+        : paperTitles(item).map((title, index) => ({ title, year: fallbackYears[index] || null }));
+      const normalized = input
+        .map((record, index) => normalizePaperRecord(record, typeof record === 'string' ? record : '', fallbackYears[index] || null))
+        .filter(Boolean);
+      return mergeNormalizedPaperRecords(normalized);
+    }
+    function mergePaperRecords(left, right) {
+      return mergeNormalizedPaperRecords([...paperRecords({ paperRecords: left }), ...paperRecords({ paperRecords: right })]);
     }
     function paperAuthorsText(record) {
       return Array.isArray(record?.authors) && record.authors.length ? record.authors.join('；') : '作者信息待补全';
