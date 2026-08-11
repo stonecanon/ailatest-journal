@@ -6,6 +6,8 @@ const OUT_FILE = new URL('../data/ext_lookup.json.gz', import.meta.url);
 // Use a versioned URL for Worker fetches so the immutable Pages cache cannot
 // return the previous 4 MB payload after a data refresh.
 const VERSIONED_OUT_FILE = new URL('../data/ext_lookup_v3.json.gz', import.meta.url);
+const SHARD_DIR = new URL('../data/ext_lookup_v3_shards/', import.meta.url);
+const SHARD_COUNT = 64;
 
 function readJson(name, gz = false) {
   const file = new URL(name, DATA_DIR);
@@ -24,6 +26,20 @@ function norm(value) {
     .replace(/\s+/g, ' ')
     .trim()
     .replace(/^(the|a|an) /, '');
+}
+
+function issnKey(value) {
+  return String(value || '').replace(/[^0-9Xx]/g, '').toUpperCase();
+}
+
+function shardId(value) {
+  let hash = 2166136261;
+  const text = String(value || '');
+  for (let i = 0; i < text.length; i += 1) {
+    hash ^= text.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return String((hash >>> 0) % SHARD_COUNT).padStart(2, '0');
 }
 
 function cleanCnCode(value) {
@@ -271,4 +287,32 @@ const json = JSON.stringify(output);
 const compressed = zlib.gzipSync(json, { level: 9 });
 fs.writeFileSync(OUT_FILE, compressed);
 fs.writeFileSync(VERSIONED_OUT_FILE, compressed);
-console.log(`wrote ${OUT_FILE.pathname} and ${VERSIONED_OUT_FILE.pathname} (${output.length.toLocaleString()} records, ${Buffer.byteLength(json).toLocaleString()} bytes raw)`);
+
+// A cold Worker should not parse the entire 11 MB JSON payload for a page
+// containing only a handful of journals.  Store direct ISSN/name keys in 64
+// immutable shards; a normal batch touches only a few shards in parallel.
+const shards = Array.from({ length: SHARD_COUNT }, () => ({}));
+output.forEach((record) => {
+  const keys = new Set();
+  [record.issn, record.eissn].forEach((value) => {
+    const key = issnKey(value);
+    if (key) keys.add(`i:${key}`);
+  });
+  [record.name, record.cn_name, ...(record.aliases || [])].forEach((value) => {
+    const key = norm(value);
+    if (key) keys.add(`n:${key}`);
+  });
+  keys.forEach((key) => {
+    shards[Number(shardId(key))][key] = record;
+  });
+});
+fs.mkdirSync(SHARD_DIR, { recursive: true });
+const shardSizes = [];
+shards.forEach((shard, index) => {
+  const shardJson = JSON.stringify(shard);
+  const shardCompressed = zlib.gzipSync(shardJson, { level: 9 });
+  const file = new URL(`${String(index).padStart(2, '0')}.json.gz`, SHARD_DIR);
+  fs.writeFileSync(file, shardCompressed);
+  shardSizes.push(shardCompressed.length);
+});
+console.log(`wrote ${OUT_FILE.pathname}, ${VERSIONED_OUT_FILE.pathname}, and ${SHARD_COUNT} shards (${output.length.toLocaleString()} records, ${Buffer.byteLength(json).toLocaleString()} bytes raw, ${shardSizes.reduce((a, b) => a + b, 0).toLocaleString()} shard bytes)`);

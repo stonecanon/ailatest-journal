@@ -9,6 +9,8 @@
 import { CORS, json, loadJournals } from './deepseek-common.js';
 
 const DEFAULT_LOOKUP_URL = 'https://journal.ailatest.org/data/ext_lookup_v3.json.gz';
+const DEFAULT_LOOKUP_SHARD_BASE = 'https://journal.ailatest.org/data/ext_lookup_v3_shards/';
+const LOOKUP_SHARD_COUNT = 64;
 const ANONYMOUS_EXTENSION_FEATURES = {
   queries_per_day: 40,
   devices: 1,
@@ -17,6 +19,7 @@ const ANONYMOUS_EXTENSION_FEATURES = {
 
 let lookupCache = null;
 let lookupPromise = null;
+const lookupShardCache = new Map();
 
 function issnKey(value) {
   return String(value || '').replace(/[^0-9Xx]/g, '').toUpperCase();
@@ -32,6 +35,16 @@ function norm(value) {
     .replace(/\s+/g, ' ')
     .trim()
     .replace(/^(the|a|an) /, '');
+}
+
+function shardId(value) {
+  let hash = 2166136261;
+  const text = String(value || '');
+  for (let i = 0; i < text.length; i += 1) {
+    hash ^= text.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return String((hash >>> 0) % LOOKUP_SHARD_COUNT).padStart(2, '0');
 }
 
 async function fetchJsonMaybeGzip(url) {
@@ -81,6 +94,50 @@ async function loadLookupIndex(env) {
     });
   }
   return lookupPromise;
+}
+
+function lookupKeys(item) {
+  const keys = [];
+  const issn = issnKey(item?.issn);
+  if (issn) keys.push(`i:${issn}`);
+  const name = norm(item?.name);
+  if (name) keys.push(`n:${name}`);
+  return keys;
+}
+
+async function loadLookupShard(env, id) {
+  const base = env.EXT_LOOKUP_SHARD_BASE || DEFAULT_LOOKUP_SHARD_BASE;
+  const url = `${base.replace(/\/$/, '')}/${id}.json.gz`;
+  if (lookupShardCache.has(url)) return lookupShardCache.get(url);
+  const promise = fetchJsonMaybeGzip(url).catch((error) => {
+    lookupShardCache.delete(url);
+    throw error;
+  });
+  lookupShardCache.set(url, promise);
+  return promise;
+}
+
+async function loadShardedLookupIndex(env, items) {
+  const shardIds = new Set();
+  (items || []).forEach((item) => lookupKeys(item).forEach((key) => shardIds.add(shardId(key))));
+  const maps = await Promise.all(Array.from(shardIds).map((id) => loadLookupShard(env, id)));
+  const index = { byIssn: new Map(), byName: new Map() };
+  maps.forEach((shard) => {
+    Object.entries(shard || {}).forEach(([key, record]) => {
+      if (key.startsWith('i:')) index.byIssn.set(key.slice(2), record);
+      else if (key.startsWith('n:')) index.byName.set(key.slice(2), record);
+    });
+  });
+  return index;
+}
+
+async function loadLookupIndexForItems(env, items) {
+  try {
+    if (Array.isArray(items) && items.length) return await loadShardedLookupIndex(env, items);
+  } catch (error) {
+    console.warn('[ext-lookup] sharded lookup failed; using compact fallback:', error?.message || error);
+  }
+  return loadLookupIndex(env);
 }
 
 function lookupOne(index, query) {
@@ -341,13 +398,6 @@ export async function handleExtLookup(req, env, context = {}) {
     }, 403);
   }
 
-  let index;
-  try {
-    index = await loadLookupIndex(env);
-  } catch (e) {
-    return json({ ok: false, error: `lookup data failed: ${e.message}` }, 500);
-  }
-
   const cacheHeaders = { 'Cache-Control': 'no-store' };
   if (req.method === 'GET') {
     const url = new URL(req.url);
@@ -357,6 +407,12 @@ export async function handleExtLookup(req, env, context = {}) {
     };
     const quota = await consumeExtensionQuota(env, context, features, query.issn || query.name ? 1 : 0);
     if (!quota.ok) return json({ ok: false, error: 'extension lookup quota exceeded', code: quota.code, quota }, 429);
+    let index;
+    try {
+      index = await loadLookupIndexForItems(env, [query]);
+    } catch (e) {
+      return json({ ok: false, error: `lookup data failed: ${e.message}` }, 500);
+    }
     const hit = lookupOne(index, query);
     return new Response(JSON.stringify(hit
       ? { ok: true, found: true, journal: redactJournal(hit, features), quota }
@@ -373,6 +429,12 @@ export async function handleExtLookup(req, env, context = {}) {
     const validItems = items.filter((item) => item && (item.issn || item.name));
     const quota = await consumeExtensionQuota(env, context, features, validItems.length);
     if (!quota.ok) return json({ ok: false, error: 'extension lookup quota exceeded', code: quota.code, quota }, 429);
+    let index;
+    try {
+      index = await loadLookupIndexForItems(env, validItems);
+    } catch (e) {
+      return json({ ok: false, error: `lookup data failed: ${e.message}` }, 500);
+    }
     const results = items.map((item) => redactJournal(lookupOne(index, item), features));
     return new Response(JSON.stringify({ ok: true, results, quota }), {
       status: 200,
