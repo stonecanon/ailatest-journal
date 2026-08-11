@@ -451,6 +451,25 @@
             <div class="submission-note"><strong>自动跟踪：</strong>安装最新版插件，在 Elsevier、Editorial Manager 或 ScholarOne 的已登录页面点击“读取投稿状态”，核对并同步后，插件会在浏览器运行期间约每 15 分钟检查已同步链接；状态变化会尝试发送浏览器通知和账号邮箱通知。页面需要前端渲染、登录过期或被拦截时，打开该页面重新读取。确认邮件导入只保存邮件中的可核对状态，不会开启自动跟踪。</div>
           </section>
 
+          <section class="panel paper-export-panel" id="paper-export-panel" aria-labelledby="paper-export-title">
+            <div class="panel-head paper-export-head">
+              <div><h2 id="paper-export-title">论文列表与导出</h2><p>先在这里生成列表；按发表年份从新到旧排列。</p></div>
+              <div class="paper-export-tools">
+                <select class="mini-filter" id="paper-citation-style" aria-label="论文格式">
+                  <option value="apa">APA 7</option>
+                  <option value="mla">MLA 9</option>
+                  <option value="chicago">Chicago 17</option>
+                  <option value="gbt">GB/T 7714-2015</option>
+                </select>
+                <button class="mini-filter footprint-action" id="enrich-paper-authors" type="button">补全作者</button>
+                <button class="mini-filter footprint-action" id="copy-paper-export" type="button">复制纯文字</button>
+                <button class="mini-filter footprint-action" id="download-paper-export" type="button">导出 .txt</button>
+              </div>
+            </div>
+            <textarea class="paper-export-text" id="paper-export-text" readonly aria-label="论文列表纯文字预览" placeholder="导入并确认论文后，这里会显示论文列表。"></textarea>
+            <div class="paper-export-note" id="paper-export-note">导入并确认论文后，这里会生成可复制的纯文字论文列表。</div>
+          </section>
+
           <section class="panel">
           <div class="panel-head">
             <div>
@@ -466,24 +485,6 @@
           </div>
           <div class="footprint-list" id="footprint-list"></div>
             <div class="review-note" id="footprint-sync-note"><strong>账号同步：</strong>未登录时足迹只保存在当前浏览器；登录后会自动同步到你的账号。</div>
-          </section>
-          <section class="panel paper-export-panel" aria-labelledby="paper-export-title">
-            <div class="panel-head paper-export-head">
-              <div><h2 id="paper-export-title">论文列表</h2><p>按发表年份从新到旧排列，可生成常用参考文献格式。</p></div>
-              <div class="paper-export-tools">
-                <select class="mini-filter" id="paper-citation-style" aria-label="论文格式">
-                  <option value="apa">APA 7</option>
-                  <option value="mla">MLA 9</option>
-                  <option value="chicago">Chicago 17</option>
-                  <option value="gbt">GB/T 7714-2015</option>
-                </select>
-                <button class="mini-filter footprint-action" id="enrich-paper-authors" type="button">补全作者</button>
-                <button class="mini-filter footprint-action" id="copy-paper-export" type="button">复制纯文字</button>
-                <button class="mini-filter footprint-action" id="download-paper-export" type="button">导出 .txt</button>
-              </div>
-            </div>
-            <textarea class="paper-export-text" id="paper-export-text" readonly aria-label="论文列表纯文字预览" placeholder="导入并确认论文后，这里会显示论文列表。"></textarea>
-            <div class="paper-export-note" id="paper-export-note">导入并确认论文后，这里会生成可复制的纯文字论文列表。</div>
           </section>
         </div>
 
