@@ -55,8 +55,12 @@
     .hero-preview p { max-width: 160px; margin: 0 0 0 14px; color: var(--ink-faint); font-size: 13px; line-height: 1.55; }
     .metric-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 18px 0; }
     .metric-card { padding: 17px 18px; border: 1px solid var(--rule-soft); border-radius: 18px; background: rgba(255,255,255,.86); }
+    .metric-card-action { width: 100%; appearance: none; color: inherit; font: inherit; text-align: left; cursor: pointer; transition: border-color .15s, box-shadow .15s, transform .15s; }
+    .metric-card-action:hover { border-color: rgba(249,115,22,.42); box-shadow: 0 8px 18px rgba(39,35,31,.06); transform: translateY(-1px); }
+    .metric-card-action:focus-visible { outline: 3px solid rgba(41,70,111,.24); outline-offset: 3px; }
     .metric-value { font-size: 26px; font-weight: 820; letter-spacing: -.04em; }
     .metric-label { margin-top: 3px; color: var(--ink-faint); font-size: 12px; }
+    .metric-card-hint { margin-left: 5px; color: var(--footprint-blue); font-size: 10px; font-weight: 760; white-space: nowrap; }
     .publication-hero > .metric-grid { grid-column: 1 / -1; margin: 2px 0 0; }
     .publication-hero > .metric-grid .metric-card { border-color: rgba(39,35,31,.09); background: rgba(255,255,255,.56); }
     .archive-status-panel { margin: 18px 0; }
@@ -195,6 +199,14 @@
     .modal-backdrop { position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; padding: 20px; background: rgba(39,35,31,.32); backdrop-filter: blur(4px); }
     .modal-backdrop[hidden] { display: none; }
     .modal-card { width: min(620px, 100%); padding: 22px; border: 1px solid var(--rule); border-radius: 20px; background: #fffdf9; box-shadow: 0 24px 80px rgba(39,35,31,.2); }
+    .metric-detail-dialog { width: min(560px, 100%); max-height: min(680px, calc(100vh - 40px)); overflow: auto; }
+    .metric-detail-kicker { margin: 0 0 3px; color: var(--footprint-orange); font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+    .metric-detail-summary { margin: 8px 0 14px; color: var(--ink-faint); font-size: 12px; line-height: 1.6; }
+    .metric-detail-list { display: grid; gap: 7px; max-height: 430px; overflow: auto; padding-right: 3px; }
+    .metric-detail-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 10px 12px; border: 1px solid var(--rule-soft); border-radius: 12px; background: rgba(255,255,255,.82); }
+    .metric-detail-row strong { min-width: 0; overflow-wrap: anywhere; color: var(--ink-soft); font-size: 13px; font-weight: 760; }
+    .metric-detail-row span { flex: 0 0 auto; color: var(--footprint-blue); font-size: 11px; font-weight: 760; white-space: nowrap; }
+    .metric-detail-empty { padding: 20px 8px; color: var(--ink-faint); text-align: center; font-size: 12px; line-height: 1.6; }
     .modal-head { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
     .modal-head h2 { margin: 0; font-size: 21px; }
     .modal-close { border: 0; background: transparent; color: var(--ink-faint); font-size: 25px; cursor: pointer; }
@@ -412,8 +424,8 @@
         <section class="metric-grid" aria-label="科研档案统计">
           <div class="metric-card"><div class="metric-value" id="metric-papers">0</div><div class="metric-label">已识别论文</div></div>
           <div class="metric-card"><div class="metric-value" id="metric-journals">0</div><div class="metric-label">发表期刊</div></div>
-          <div class="metric-card"><div class="metric-value" id="metric-countries">0</div><div class="metric-label">覆盖国家 / 地区</div></div>
-          <div class="metric-card"><div class="metric-value" id="metric-fields">0</div><div class="metric-label">主要研究方向</div></div>
+          <button class="metric-card metric-card-action" id="metric-countries-card" type="button" data-metric-detail="countries" aria-haspopup="dialog" aria-controls="metric-detail-modal" aria-label="查看覆盖国家和地区明细"><div class="metric-value" id="metric-countries">0</div><div class="metric-label">覆盖国家 / 地区<span class="metric-card-hint">查看明细 →</span></div></button>
+          <button class="metric-card metric-card-action" id="metric-fields-card" type="button" data-metric-detail="fields" aria-haspopup="dialog" aria-controls="metric-detail-modal" aria-label="查看主要研究方向明细"><div class="metric-value" id="metric-fields">0</div><div class="metric-label">主要研究方向<span class="metric-card-hint">查看明细 →</span></div></button>
         </section>
       </section>
 
@@ -514,6 +526,17 @@
         <article class="achievement-card is-locked" data-achievement="sustained-publication"><div class="achievement-icon" aria-hidden="true">∞</div><h3>持续发表</h3><p>连续 3 个自然年有论文</p><span class="achievement-state">还差 1 年</span></article>
         <article class="achievement-card is-locked" data-achievement="international-footprint"><div class="achievement-icon" aria-hidden="true">◎</div><h3>国际足迹</h3><p>覆盖 5 个国家 / 地区</p><span class="achievement-state">还差 2 个</span></article>
       </div>
+    </section>
+  </div>
+
+  <div class="modal-backdrop" id="metric-detail-modal" hidden>
+    <section class="modal-card metric-detail-dialog" role="dialog" aria-modal="true" aria-labelledby="metric-detail-title">
+      <div class="modal-head">
+        <div><p class="metric-detail-kicker">科研档案明细</p><h2 id="metric-detail-title">覆盖国家 / 地区</h2></div>
+        <button class="modal-close" id="close-metric-detail" type="button" aria-label="关闭明细">×</button>
+      </div>
+      <p class="metric-detail-summary" id="metric-detail-summary"></p>
+      <div class="metric-detail-list" id="metric-detail-list"></div>
     </section>
   </div>
 
@@ -996,6 +1019,43 @@
         node.classList.toggle('is-locked', !earned);
       });
     }
+    const metricDetailModal = document.getElementById('metric-detail-modal');
+    const metricDetailTitle = document.getElementById('metric-detail-title');
+    const metricDetailSummary = document.getElementById('metric-detail-summary');
+    const metricDetailList = document.getElementById('metric-detail-list');
+    function metricDetailRows(kind) {
+      const counts = new Map();
+      publicationJournals.forEach(item => {
+        const values = kind === 'countries' ? journalCountries(item) : journalFields(item);
+        values.forEach(value => counts.set(value, (counts.get(value) || 0) + 1));
+      });
+      return [...counts.entries()]
+        .map(([label, count]) => ({ label, count }))
+        .sort((left, right) => right.count - left.count || left.label.localeCompare(right.label, 'zh-CN'));
+    }
+    function openMetricDetail(kind) {
+      const isCountries = kind === 'countries';
+      const rows = metricDetailRows(kind);
+      metricDetailTitle.textContent = isCountries ? '覆盖国家 / 地区' : '主要研究方向';
+      metricDetailSummary.textContent = rows.length
+        ? `共 ${rows.length} 项；数量表示当前已确认足迹中涉及的期刊数。`
+        : '当前足迹还没有可核验的明细数据。完成作者身份核对后，这里会自动更新。';
+      metricDetailList.innerHTML = rows.length
+        ? rows.map(row => `<div class="metric-detail-row"><strong>${escapeHtml(row.label)}</strong><span>${row.count} 本期刊</span></div>`).join('')
+        : '<div class="metric-detail-empty">暂无明细</div>';
+      metricDetailModal.hidden = false;
+      document.getElementById('close-metric-detail').focus();
+    }
+    function closeMetricDetail() {
+      metricDetailModal.hidden = true;
+    }
+    document.querySelectorAll('[data-metric-detail]').forEach(button => {
+      button.addEventListener('click', () => openMetricDetail(button.dataset.metricDetail));
+    });
+    document.getElementById('close-metric-detail').addEventListener('click', closeMetricDetail);
+    metricDetailModal.addEventListener('click', event => {
+      if (event.target === metricDetailModal) closeMetricDetail();
+    });
     function renderFootprints() {
       syncYearFilter();
       const q = String(search.value || '').trim().toLowerCase();
@@ -1821,6 +1881,7 @@
     document.getElementById('cancel-import').addEventListener('click', closeImport);
     document.addEventListener('keydown', event => {
       if (event.key !== 'Escape') return;
+      if (!metricDetailModal.hidden) closeMetricDetail();
       if (!achievementsModal.hidden) closeAchievements();
       if (!modal.hidden) closeImport();
     });
