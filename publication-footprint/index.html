@@ -453,7 +453,7 @@
 
           <section class="panel paper-export-panel" id="paper-export-panel" aria-labelledby="paper-export-title">
             <div class="panel-head paper-export-head">
-              <div><h2 id="paper-export-title">论文列表与导出</h2><p>先在这里生成列表；按发表年份从新到旧排列。</p></div>
+              <div><h2 id="paper-export-title">期刊与论文完整导出</h2><p>一键汇总全部期刊信息和论文信息，论文按发表年份从新到旧排列。</p></div>
               <div class="paper-export-tools">
                 <select class="mini-filter" id="paper-citation-style" aria-label="论文格式">
                   <option value="apa">APA 7</option>
@@ -462,12 +462,12 @@
                   <option value="gbt">GB/T 7714-2015</option>
                 </select>
                 <button class="mini-filter footprint-action" id="enrich-paper-authors" type="button">补全作者</button>
-                <button class="mini-filter footprint-action" id="copy-paper-export" type="button">复制纯文字</button>
-                <button class="mini-filter footprint-action" id="download-paper-export" type="button">导出 .txt</button>
+                <button class="mini-filter footprint-action" id="copy-paper-export" type="button">复制全部信息</button>
+                <button class="mini-filter footprint-action" id="download-paper-export" type="button">导出全部信息</button>
               </div>
             </div>
-            <textarea class="paper-export-text" id="paper-export-text" readonly aria-label="论文列表纯文字预览" placeholder="导入并确认论文后，这里会显示论文列表。"></textarea>
-            <div class="paper-export-note" id="paper-export-note">导入并确认论文后，这里会生成可复制的纯文字论文列表。</div>
+            <textarea class="paper-export-text" id="paper-export-text" readonly aria-label="期刊与论文完整清单预览" placeholder="导入并确认论文后，这里会显示完整清单。"></textarea>
+            <div class="paper-export-note" id="paper-export-note">导入并确认论文后，这里会生成包含期刊信息和论文信息的完整清单。</div>
           </section>
 
           <section class="panel">
@@ -1178,7 +1178,7 @@
     }
     function formatCitationAuthors(record, style) {
       const authors = Array.isArray(record?.authors) ? record.authors.filter(Boolean) : [];
-      if (!authors.length) return '作者未标注';
+      if (!authors.length) return '作者信息待补全';
       if (style === 'apa') {
         if (authors.length === 1) return authors[0];
         return `${authors.slice(0, -1).join(', ')}, & ${authors[authors.length - 1]}`;
@@ -1205,16 +1205,54 @@
       return publicationJournals.flatMap(item => paperRecords(item).map(record => ({ ...record, venue: record.venue || item.name, journalName: item.name, journalKey: footprintItemKey(item) })))
         .sort((left, right) => (Number(right.year || 0) - Number(left.year || 0)) || left.title.localeCompare(right.title));
     }
+    function exportJournalRows(item, index, style) {
+      const metadata = item?.journalMetadata && typeof item.journalMetadata === 'object' ? item.journalMetadata : {};
+      const records = paperRecords(item);
+      const badges = journalBadges(item).map(([label]) => label).join(' / ');
+      const issns = [...new Set([...(Array.isArray(item?.issns) ? item.issns : []), metadata.issn, metadata.eissn].map(value => String(value || '').trim()).filter(Boolean))];
+      const fields = journalFields(item).join('、');
+      const countries = journalCountries(item).join('、');
+      const lines = [
+        `${index}. ${item.name}`,
+        `   论文数：${records.length || Number(item.papers || 0)}`,
+        issns.length ? `   ISSN：${issns.join(' / ')}` : '',
+        journalYears(item).length ? `   发表年份：${journalYears(item).join('、')}` : '',
+        displayImpactFactor(item) != null ? `   IF：${displayImpactFactor(item)}` : '',
+        Number(item.citations || 0) ? `   被引次数：${Number(item.citations || 0)}` : '',
+        badges ? `   收录/分区/风险：${badges}` : '',
+        journalFrequency(item) ? `   刊期：${journalFrequency(item)}` : '',
+        fields ? `   研究方向：${fields}` : '',
+        countries ? `   覆盖国家/地区：${countries}` : '',
+        records.length ? '   论文：' : '',
+        ...records.map((record, paperIndex) => `   ${paperIndex + 1}. ${formatPaperCitation({ ...record, journalName: item.name }, style)}`),
+        '',
+      ];
+      return lines.filter(Boolean);
+    }
+    function completeExportText(style) {
+      const journals = publicationJournals.slice().sort((left, right) => (latestJournalYear(right) - latestJournalYear(left)) || String(left.name || '').localeCompare(String(right.name || '')));
+      const records = allPaperRecords();
+      const lines = [
+        'AILatest Journal 期刊与论文完整清单',
+        `导出时间：${new Date().toLocaleString('zh-CN')}`,
+        `期刊数量：${journals.length}；论文数量：${records.length}`,
+        `论文格式：${({ apa: 'APA 7', mla: 'MLA 9', chicago: 'Chicago 17', gbt: 'GB/T 7714-2015' })[style] || 'APA 7'}`,
+        '',
+        '一、期刊信息与论文',
+        ...journals.flatMap((item, index) => exportJournalRows(item, index + 1, style)),
+        '二、全部论文列表（按发表年份从新到旧）',
+        ...records.map((record, index) => `${index + 1}. ${formatPaperCitation(record, style)}`),
+      ];
+      return lines.join('\n');
+    }
     function renderPaperExport() {
       const records = allPaperRecords();
       const missingAuthors = records.filter(record => !Array.isArray(record.authors) || !record.authors.length);
       const style = paperCitationStyle.value || 'apa';
-      paperExportText.value = records.length
-        ? records.map((record, index) => `${index + 1}. ${formatPaperCitation(record, style)}`).join('\n')
-        : '';
+      paperExportText.value = records.length ? completeExportText(style) : '';
       enrichPaperAuthorsButton.disabled = !missingAuthors.length;
       paperExportNote.textContent = records.length
-        ? `共 ${records.length} 篇论文，已按发表年份从新到旧排列。${missingAuthors.length ? `其中 ${missingAuthors.length} 篇缺少作者，可点击“补全作者”。` : '作者信息以公开元数据为准。'}`
+        ? `共 ${publicationJournals.length} 本期刊、${records.length} 篇论文，已合并生成完整清单。${missingAuthors.length ? `其中 ${missingAuthors.length} 篇缺少作者，可点击“补全作者”。` : '作者信息以公开元数据为准。'}`
         : '导入并确认论文后，这里会生成可复制的纯文字论文列表。';
     }
     function paperAuthorMatchKey(record) {
@@ -1427,7 +1465,7 @@
         paperExportText.select();
         document.execCommand('copy');
       }
-      paperExportNote.textContent = '已复制纯文字论文列表。';
+      paperExportNote.textContent = '已复制全部期刊信息和论文信息。';
     }
     function downloadPaperExport() {
       const text = paperExportText.value.trim();
@@ -1439,10 +1477,10 @@
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `ailatest-publications-${new Date().toISOString().slice(0, 10)}.txt`;
+      link.download = `ailatest-journal-publications-${new Date().toISOString().slice(0, 10)}.txt`;
       link.click();
       URL.revokeObjectURL(url);
-      paperExportNote.textContent = '已导出纯文字论文列表。';
+      paperExportNote.textContent = '已导出全部期刊信息和论文信息。';
     }
     let journalMetadataRefresh = null;
     let journalMetadataRefreshQueued = false;
