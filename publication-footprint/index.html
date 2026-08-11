@@ -466,7 +466,7 @@
                   <option value="apa">APA 7</option>
                   <option value="mla">MLA 9</option>
                   <option value="chicago">Chicago 17</option>
-                  <option value="gbt">GB/T 7714-2015</option>
+                  <option value="gbt">GB/T 7714-2025</option>
                 </select>
                 <button class="mini-filter footprint-action" id="enrich-paper-authors" type="button">补全作者</button>
                 <button class="mini-filter footprint-action" id="open-paper-export" type="button">打开论文清单</button>
@@ -1248,7 +1248,7 @@
       const lines = [
         'AILatest Journal 论文清单',
         `论文数量：${records.length}`,
-        `论文格式：${({ apa: 'APA 7', mla: 'MLA 9', chicago: 'Chicago 17', gbt: 'GB/T 7714-2015' })[style] || 'APA 7'}`,
+        `论文格式：${({ apa: 'APA 7', mla: 'MLA 9', chicago: 'Chicago 17', gbt: 'GB/T 7714-2025' })[style] || 'APA 7'}`,
         '',
         ...records.map((record, index) => `${index + 1}. ${exportPaperLine(record, style)}`),
       ];
