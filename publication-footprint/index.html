@@ -226,6 +226,7 @@
     .submission-empty p { margin: 4px 0 0; }
     .modal-help { margin: 5px 0 0; color: var(--ink-faint); font-size: 11px; line-height: 1.45; }
     .email-fields textarea { min-height: 130px; resize: vertical; }
+    .cnki-fields textarea { min-height: 180px; resize: vertical; }
     .file-upload { display: grid; gap: 6px; color: var(--ink-soft); font-size: 13px; }
     .file-upload-control { position: relative; display: flex; align-items: center; gap: 10px; min-height: 42px; padding: 5px 10px; border: 1px solid var(--rule); border-radius: 12px; background: #fffdf9; }
     .file-upload-control:focus-within { border-color: var(--footprint-orange); box-shadow: 0 0 0 3px rgba(249,115,22,.14); }
@@ -520,6 +521,7 @@
             <h2>怎么导入？</h2>
             <p>先搜索姓名，再选择属于你的作者身份。单位变化时可以多选，系统会合并论文并直接加入足迹。</p>
             <button class="import-option" type="button" data-import="name"><span><b>搜索作者姓名</b><small>可多选不同单位的作者身份</small></span><em>推荐</em></button>
+            <button class="import-option" type="button" data-import="cnki"><span><b>导入知网文献</b><small>粘贴 GB/T 7714-2025 中文引用，可一次导入多条</small></span><span>→</span></button>
             <button class="import-option" type="button" data-import="orcid"><span><b>ORCID / OpenAlex 作者 ID</b><small>已有唯一作者标识时直接识别</small></span><span>→</span></button>
             <button class="import-option" type="button" data-import="doi"><span><b>DOI / BibTeX / CSV</b><small>适合一次导入已发表论文清单</small></span><span>→</span></button>
             <button class="import-option" type="button" data-import="scholar"><span><b>Google Scholar</b><small>可粘贴主页；也可在 Scholar 页面用插件导入</small></span><span>→</span></button>
@@ -622,6 +624,10 @@
           <label>粘贴投稿确认邮件正文<textarea class="modal-input" id="submission-email-text" rows="7" placeholder="可粘贴主题、发件人和正文；系统只提取期刊、稿件编号、题目和状态。"></textarea></label>
           <label class="file-upload">或上传 .eml<span class="file-upload-control"><input class="file-upload-input" id="submission-eml-file" type="file" accept=".eml,message/rfc822,text/plain" /><span class="file-upload-button">选择 .eml 文件</span><span class="file-upload-name" id="submission-eml-name">未选择文件</span></span></label>
           <p class="modal-help">无法读取出版社页面时使用；不会上传邮件附件，也不会保存邮箱密码。</p>
+        </div>
+        <div class="cnki-fields" id="cnki-fields" hidden>
+          <label>粘贴知网引用信息<textarea class="modal-input" id="cnki-text" rows="8" placeholder="例如：[1]倪深博,翁建涛,应小宇.高品质绿色健康亚运住区建设实践研究[J].室内设计与装修,2024,(2):128-129。&#10;&#10;支持一条或多条 GB/T 7714-2025 格式；也可在末尾附 DOI 或知网链接。"></textarea></label>
+          <p class="modal-help">系统会识别作者、题目、期刊、年份、卷期页码；无法识别的字段会保留原文，导入后可继续补充。</p>
         </div>
         <input class="modal-input" id="import-value" type="text" placeholder="例如：10.1016/j.enpol.2024.113456" />
         <div class="scholar-result" id="scholar-result" hidden></div>
@@ -1287,16 +1293,20 @@
       const doi = String(record?.doi || '').trim().replace(/^https?:\/\/doi\.org\//i, '').replace(/^doi:\s*/i, '');
       return doi ? `https://doi.org/${doi}` : '';
     }
+    function citationUrl(record) {
+      const url = String(record?.url || '').trim();
+      return /^https?:\/\//i.test(url) ? url : '';
+    }
     function formatPaperCitation(record, style) {
       const authors = formatCitationAuthors(record, style);
       const title = String(record?.title || '').trim();
       const venue = String(record?.venue || record?.journalName || '期刊信息未识别').trim();
       const year = record?.year || 'n.d.';
-      const doi = citationDoi(record);
-      if (style === 'mla') return `${authors}. “${title}.” ${venue}${record?.year ? `, ${year}` : ''}.${doi ? ` ${doi}` : ''}`;
-      if (style === 'chicago') return `${authors}. “${title}.” ${venue}${record?.year ? ` (${year})` : ''}.${doi ? ` ${doi}` : ''}`;
-      if (style === 'gbt') return `${authors}. ${title}[J]. ${venue}${record?.year ? `, ${year}` : ''}.${doi ? ` DOI:${String(record.doi).trim()}` : ''}`;
-      return `${authors} (${year}). ${title}. ${venue}.${doi ? ` ${doi}` : ''}`;
+      const link = citationDoi(record) || citationUrl(record);
+      if (style === 'mla') return `${authors}. “${title}.” ${venue}${record?.year ? `, ${year}` : ''}.${link ? ` ${link}` : ''}`;
+      if (style === 'chicago') return `${authors}. “${title}.” ${venue}${record?.year ? ` (${year})` : ''}.${link ? ` ${link}` : ''}`;
+      if (style === 'gbt') return `${authors}. ${title}[J]. ${venue}${record?.year ? `, ${year}` : ''}.${link ? ` ${citationDoi(record) ? ` DOI:${String(record.doi).trim()}` : ` ${link}`}` : ''}`;
+      return `${authors} (${year}). ${title}. ${venue}.${link ? ` ${link}` : ''}`;
     }
     function allPaperRecords() {
       return publicationJournals.flatMap(item => paperRecords(item).map(record => ({ ...record, venue: record.venue || item.name, journalName: item.name, journalKey: footprintItemKey(item) })))
@@ -1849,6 +1859,8 @@
     const value = document.getElementById('import-value');
     const statusFields = document.getElementById('status-fields');
     const emailFields = document.getElementById('email-fields');
+    const cnkiFields = document.getElementById('cnki-fields');
+    const cnkiText = document.getElementById('cnki-text');
     const submissionEmailText = document.getElementById('submission-email-text');
     const submissionEmlFile = document.getElementById('submission-eml-file');
     const submissionEmlName = document.getElementById('submission-eml-name');
@@ -2344,6 +2356,52 @@
       });
       return [...groups.values()].map(item => ({ ...item, years: item.years.sort((a, b) => b - a) }));
     }
+    function splitCnkiCitationText(text) {
+      return String(text || '').replace(/\r/g, '').split(/\n+|(?=\[\s*\d+\s*\])/).map(line => line.replace(/^[\s\u3000]+|[。；;]+$/g, '').trim()).filter(Boolean);
+    }
+    function parseCnkiCitation(line, index) {
+      const raw = String(line || '').replace(/^\[\s*\d+\s*\]\s*/, '').trim();
+      if (!raw) return null;
+      const url = (raw.match(/https?:\/\/[^\s<>"']+/i) || [])[0] || '';
+      const clean = raw.replace(url, '').replace(/[。；;]+$/g, '').trim();
+      const match = clean.match(/^(.*?)\s*[.．]\s*(.*?)\s*\[([A-Z])\]\s*[.．]\s*(.*)$/i);
+      if (!match) {
+        return { title: clean.slice(0, 500) || `知网文献 ${index + 1}`, authors: [], year: null, venue: '知网导入文献', url };
+      }
+      const authors = match[1].split(/[,，、;；]\s*/).map(value => value.trim()).filter(Boolean);
+      const title = match[2].trim();
+      const tail = match[4].trim();
+      const yearMatch = tail.match(/[,，]\s*((?:19|20)\d{2})\s*(?:[,，]\s*(.*))?$/);
+      const venue = (yearMatch ? tail.slice(0, yearMatch.index) : tail).trim();
+      const year = yearMatch ? Number(yearMatch[1]) : null;
+      const detail = yearMatch?.[2] || '';
+      const bibliographic = detail.match(/^(?:第)?([^:：]+?)(?:期)?[:：](.+)$/);
+      return {
+        title: title || `知网文献 ${index + 1}`,
+        authors,
+        year: Number.isInteger(year) ? year : null,
+        venue: venue || '知网导入文献',
+        volume: bibliographic?.[1]?.replace(/[()（）]/g, '').trim() || '',
+        pages: bibliographic?.[2]?.trim() || '',
+        url,
+      };
+    }
+    function importCnkiCitations() {
+      const papers = splitCnkiCitationText(cnkiText.value).map(parseCnkiCitation).filter(Boolean);
+      if (!papers.length) {
+        scholarResult.classList.add('is-error');
+        scholarResult.textContent = '没有识别到知网文献，请粘贴 GB/T 7714-2025 引用信息。';
+        scholarResult.hidden = false;
+        return;
+      }
+      const incoming = scholarPayloadToJournals({ source_label: '知网手动导入', papers });
+      mergePublicationJournals(incoming);
+      persistPublicationJournals(false);
+      renderFootprints();
+      refreshJournalMetadata();
+      closeImport();
+      document.getElementById('footprint-sync-note').innerHTML = `<strong>知网导入完成：</strong>已识别 ${papers.length} 条中文文献；作者、题目、期刊和年份已加入足迹。`;
+    }
     function confirmScholarProfile(profileId) {
       const payload = pendingScholarImports.find(item => item.profile_id === profileId);
       if (!payload) return 0;
@@ -2454,6 +2512,8 @@
           ? !String(submissionJournal.value || '').trim()
           : importKind === 'email'
             ? !String(submissionEmailText.value || '').trim() && !(submissionEmlFile.files && submissionEmlFile.files[0])
+          : importKind === 'cnki'
+            ? !String(cnkiText.value || '').trim()
           : !String(value.value || '').trim();
     }
     function renderAuthorCandidates(query = '', note = '') {
@@ -2496,7 +2556,8 @@
       legacyImport.hidden = kind === 'name';
       statusFields.hidden = kind !== 'status';
       emailFields.hidden = kind !== 'email';
-      value.hidden = kind === 'status' || kind === 'email';
+      cnkiFields.hidden = kind !== 'cnki';
+      value.hidden = kind === 'status' || kind === 'email' || kind === 'cnki';
       authorResults.hidden = true;
       scholarPayload = null;
       scholarResult.hidden = true;
@@ -2510,16 +2571,18 @@
         const copy = {
           orcid: '输入 ORCID 或 OpenAlex 作者 ID；系统会读取公开论文并直接加入足迹。',
           doi: '粘贴 DOI、BibTeX 或 CSV 内容；系统会解析公开元数据并直接加入足迹。',
+          cnki: '粘贴知网导出的 GB/T 7714-2025 中文引用；系统会识别并加入发表足迹。',
           scholar: '粘贴 Google Scholar 个人主页链接；若服务器被 Google 拦截，请在 Scholar 主页使用插件导入。',
           status: '此处仅用于没有投稿系统访问权限时的备用记录；自动跟踪请在投稿系统页面使用插件首次确认。',
           email: '粘贴投稿确认邮件或上传 .eml；系统只提取可核对的期刊、题目、稿件编号和状态。',
         };
         desc.textContent = copy[kind] || copy.doi;
         value.placeholder = kind === 'scholar' ? '例如：https://scholar.google.com/citations?user=...' : kind === 'orcid' ? '例如：0000-0002-1825-0097 / A5012345678' : kind === 'status' ? '例如：Editorial Manager 链接 / Manuscript No.' : '例如：10.1016/j.enpol.2024.113456';
-        confirmImport.textContent = kind === 'scholar' ? '读取并加入足迹' : kind === 'orcid' ? '读取并加入足迹' : kind === 'doi' ? '解析并加入足迹' : kind === 'email' ? '解析并加入档案' : (editingSubmissionId ? '更新投稿状态' : '保存投稿状态');
+        confirmImport.textContent = kind === 'scholar' ? '读取并加入足迹' : kind === 'orcid' ? '读取并加入足迹' : kind === 'doi' ? '解析并加入足迹' : kind === 'cnki' ? '解析并加入足迹' : kind === 'email' ? '解析并加入档案' : (editingSubmissionId ? '更新投稿状态' : '保存投稿状态');
         if (kind !== 'status' && kind !== 'email') value.value = '';
+        if (kind === 'cnki') cnkiText.value = '';
         if (kind === 'email') { submissionEmailText.value = ''; submissionEmlFile.value = ''; if (submissionEmlName) submissionEmlName.textContent = '未选择文件'; }
-        setTimeout(() => (kind === 'status' ? submissionJournal : kind === 'email' ? submissionEmailText : value).focus(), 0);
+        setTimeout(() => (kind === 'status' ? submissionJournal : kind === 'email' ? submissionEmailText : kind === 'cnki' ? cnkiText : value).focus(), 0);
         updateSelectedAuthors();
       }
       modal.hidden = false;
@@ -2554,6 +2617,7 @@
       updateSelectedAuthors();
     });
     submissionJournal.addEventListener('input', updateSelectedAuthors);
+    cnkiText.addEventListener('input', updateSelectedAuthors);
     document.querySelectorAll('[data-import]').forEach(btn => btn.addEventListener('click', () => openImport(btn.dataset.import)));
     document.getElementById('close-import').addEventListener('click', closeImport);
     document.getElementById('cancel-import').addEventListener('click', closeImport);
@@ -2581,6 +2645,7 @@
         return;
       }
       if (importKind === 'email') { await importSubmissionEmail(); return; }
+      if (importKind === 'cnki') { importCnkiCitations(); return; }
       const entered = String(value.value || '').trim();
       if (!entered) { value.focus(); return; }
       if (importKind === 'scholar') {
