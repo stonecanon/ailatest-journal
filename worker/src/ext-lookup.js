@@ -230,12 +230,9 @@ async function ensureExtensionQuotaTables(env) {
     env.DB.prepare('CREATE INDEX IF NOT EXISTS idx_extension_usage_day ON extension_usage(day, scope_key)'),
     env.DB.prepare('CREATE INDEX IF NOT EXISTS idx_extension_devices_user_seen ON extension_devices(user_id, last_seen_at)'),
   ]);
-  // Production may already have the pre-usage version of extension_usage.
-  // D1 migrations add these columns too, but keeping this guard makes the
-  // endpoint self-healing when an older deployment receives a request first.
-  try { await env.DB.prepare('ALTER TABLE extension_usage ADD COLUMN requests INTEGER NOT NULL DEFAULT 0').run(); } catch (_) {}
-  try { await env.DB.prepare('ALTER TABLE extension_usage ADD COLUMN heartbeats INTEGER NOT NULL DEFAULT 0').run(); } catch (_) {}
-  try { await env.DB.prepare('ALTER TABLE extension_usage ADD COLUMN last_seen_at INTEGER').run(); } catch (_) {}
+  // The production schema is managed by worker/migrations.  Do not issue
+  // three sequential ALTER TABLE probes on every cold isolate; those probes
+  // were the main source of the first-request delay for anonymous users.
   extensionQuotaReady = true;
 }
 
@@ -285,7 +282,7 @@ async function consumeExtensionQuota(env, context, features, amount) {
   if (count > limit) return { ok: false, code: 'extension_quota', used: 0, limit, remaining: 0, day };
   await ensureExtensionQuotaTables(env);
   const scope = quotaScope(context);
-  const result = await env.DB.prepare(
+  const inserted = await env.DB.prepare(
     `INSERT INTO extension_usage (scope_key, day, used, requests, heartbeats, last_seen_at, updated_at)
      VALUES (?, ?, ?, 1, 0, ?, ?)
      ON CONFLICT(scope_key, day) DO UPDATE SET
@@ -293,19 +290,17 @@ async function consumeExtensionQuota(env, context, features, amount) {
        requests = extension_usage.requests + 1,
        last_seen_at = ?,
        updated_at = ?
-     WHERE extension_usage.used + ? <= ?`
-  ).bind(scope, day, count, now, now, count, now, now, count, limit).run();
-  if (!Number(result?.meta?.changes || 0)) {
+     WHERE extension_usage.used + ? <= ?
+     RETURNING used`
+  ).bind(scope, day, count, now, now, count, now, now, count, limit).first();
+  if (!inserted) {
     const row = await env.DB.prepare(
       'SELECT used FROM extension_usage WHERE scope_key = ? AND day = ?'
     ).bind(scope, day).first();
     const used = Number(row?.used || 0);
     return { ok: false, code: 'extension_quota', used, limit, remaining: Math.max(0, limit - used), day };
   }
-  const row = await env.DB.prepare(
-    'SELECT used FROM extension_usage WHERE scope_key = ? AND day = ?'
-  ).bind(scope, day).first();
-  const used = Number(row?.used || count);
+  const used = Number(inserted.used || count);
   return { ok: true, used, limit, remaining: Math.max(0, limit - used), day };
 }
 
