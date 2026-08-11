@@ -723,7 +723,10 @@
     }
     function paperRecordKey(record) {
       const doi = String(record?.doi || '').trim().toLowerCase();
-      return doi || `${paperTitleKey(record?.title || '')}|${record?.year || ''}`;
+      // DOI is definitive. When older imports lack DOI/year metadata, the
+      // normalized title is the stable fallback; including year here allowed
+      // the same paper to survive twice when only one copy had a year.
+      return doi || paperTitleKey(record?.title || '');
     }
     function paperRecords(item) {
       const raw = Array.isArray(item?.paperRecords) ? item.paperRecords : [];
@@ -752,11 +755,13 @@
         else byKey.set(key, {
           ...previous,
           ...record,
+          title: previous.title || record.title,
           authors: [...new Set([...(previous.authors || []), ...(record.authors || [])])].slice(0, 40),
-          venue: record.venue || previous.venue,
-          doi: record.doi || previous.doi,
-          url: record.url || previous.url,
-          issn: record.issn || previous.issn,
+          year: previous.year || record.year || null,
+          venue: previous.venue || record.venue,
+          doi: previous.doi || record.doi,
+          url: previous.url || record.url,
+          issn: previous.issn || record.issn,
           citations: Math.max(previous.citations || 0, record.citations || 0),
         });
       });
