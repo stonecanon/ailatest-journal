@@ -935,6 +935,12 @@
         .map(value => value.trim())
         .filter(value => value && !/^(未知|未标注|unknown|n\/a|na)$/i.test(value)))];
     }
+    function countryTextValues(values) {
+      return (Array.isArray(values) ? values : [values]).flat(Infinity).flatMap(value => {
+        if (!value || typeof value !== 'object') return [value];
+        return [value.country, value.country_name, value.countryName, value.country_code, value.countryCode, value.display_name, value.name].filter(Boolean);
+      });
+    }
     // OpenAlex/author imports may provide ISO-2/ISO-3 codes, while manual
     // imports often provide a full country name. Keep the metric readable in
     // the Chinese UI and collapse code + name pairs into one country/region.
@@ -983,12 +989,21 @@
       return COUNTRY_DISPLAY_NAMES[normalized] || COUNTRY_DISPLAY_NAMES[code] || intlName || text;
     }
     function journalCountries(item) {
-      return [...new Set(uniqueTextValues([
-        ...(Array.isArray(item?.countries) ? item.countries : metadataTextValues(item?.countries)),
-        item?.country,
-        ...(Array.isArray(item?.authorCountries) ? item.authorCountries : metadataTextValues(item?.authorCountries)),
+      // This metric is author-affiliation coverage, not publisher location.
+      // Older OpenAlex imports stored a generic country field; ignore it so a
+      // publisher country or unrelated two-letter code cannot become a false
+      // author country in the profile summary.
+      const isAuthorImport = item?.countrySource === 'author-affiliation-v2' || item?.source === 'OpenAlex 作者';
+      return [...new Set(countryTextValues([
+        item?.authorCountries,
         item?.authorCountry,
-      ]).map(countryDisplayName).filter(Boolean))];
+        ...(isAuthorImport ? [] : [item?.countries]),
+      ])
+        .flatMap(value => String(value || '').split(/\s*[·;,/]\s*/))
+        .map(value => value.trim())
+        .filter(value => value && !/^(未知|未标注|unknown|n\/a|na)$/i.test(value))
+        .map(countryDisplayName)
+        .filter(Boolean))];
     }
     function journalOrganizations(item) {
       return uniqueTextValues([
@@ -1084,7 +1099,7 @@
       merged.citations = Math.max(Number(a.citations || 0), Number(b.citations || 0));
       merged.paperRecords = mergePaperRecords(paperRecords(a), paperRecords(b));
       if (merged.paperRecords.length) merged.titles = merged.paperRecords.map(record => record.title);
-      ['years', 'titles', 'issns', 'organizations', 'countries', 'fields', 'sourceProfiles'].forEach(key => {
+      ['years', 'titles', 'issns', 'organizations', 'countries', 'authorCountries', 'fields', 'sourceProfiles'].forEach(key => {
         merged[key] = unique([...(Array.isArray(a[key]) ? a[key] : []), ...(Array.isArray(b[key]) ? b[key] : [])]);
       });
       merged.years = merged.years.map(Number).filter(Number.isInteger).sort((x, y) => y - x);
@@ -2294,7 +2309,7 @@
         const name = scholarVenue(paper?.venue || paper?.journal || paper?.container) || '未识别期刊';
         const key = name.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]+/g, '');
         if (!key || key === '未识别期刊') return;
-        const item = groups.get(key) || { name, short: journalShort(name), abbr: journalShort(name), cover: journalCover(name), papers: 0, citations: 0, years: [], titles: [], paperRecords: [], issns: [], badges: [], organizations: [], countries: [], fields: profileFields.slice(), sourceProfiles: sourceProfiles.slice(), source: sourceLabel, ...(sourceLabel === 'OpenAlex 作者' ? { countrySource: 'author-affiliation-v2' } : {}) };
+        const item = groups.get(key) || { name, short: journalShort(name), abbr: journalShort(name), cover: journalCover(name), papers: 0, citations: 0, years: [], titles: [], paperRecords: [], issns: [], badges: [], organizations: [], countries: [], authorCountries: [], fields: profileFields.slice(), sourceProfiles: sourceProfiles.slice(), source: sourceLabel, ...(sourceLabel === 'OpenAlex 作者' ? { countrySource: 'author-affiliation-v2' } : {}) };
         const paperRecord = normalizePaperRecord({
           title: paper?.title,
           authors: paper?.authors || paper?.author,
@@ -2320,7 +2335,7 @@
         item.years = [...new Set(item.paperRecords.map(record => record.year).filter(Boolean))].sort((a, b) => b - a);
         if (paper?.issn && !item.issns.includes(String(paper.issn).toUpperCase())) item.issns.push(String(paper.issn).toUpperCase());
         item.organizations = uniqueTextValues([item.organizations, paper?.organizations, paper?.authorOrganizations, paper?.organization]);
-        item.countries = uniqueTextValues([item.countries, paper?.countries, paper?.authorCountries, paper?.country]);
+        item.authorCountries = uniqueTextValues([item.authorCountries, paper?.authorCountries]);
         item.fields = uniqueTextValues([item.fields, paper?.fields, paper?.researchFields, paper?.categories, paper?.topics, paper?.subject, paper?.topic]);
         item.sourceProfiles = [...new Set([...(item.sourceProfiles || []), ...sourceProfiles])];
         const impactFactor = journalImpactFactor(paper);
