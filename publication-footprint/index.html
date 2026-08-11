@@ -137,6 +137,7 @@
     .paper-export-text { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
     .paper-export-preview { max-height: min(68vh, 680px); margin: 14px 0 0; padding: 14px; overflow: auto; border: 1px solid var(--rule-soft); border-radius: 12px; color: var(--ink-soft); background: #fffdf9; white-space: pre-wrap; overflow-wrap: anywhere; font: 12px/1.7 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
     .paper-export-dialog { position: relative; width: min(860px, 100%); max-height: min(86vh, 820px); overflow: auto; }
+    .paper-export-modal-tools { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 7px; }
     .paper-export-note { margin: -7px 16px 16px; color: var(--ink-faint); font-size: 11px; }
     .badge-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
     .pub-badge { display: inline-flex; align-items: center; min-height: 24px; padding: 3px 9px; border: 1px solid rgba(39,35,31,.1); border-radius: 999px; color: var(--ink-soft); background: #f7f3ec; font-size: 11px; font-weight: 780; letter-spacing: .02em; }
@@ -467,13 +468,11 @@
                   <option value="gbt">GB/T 7714-2015</option>
                 </select>
                 <button class="mini-filter footprint-action" id="enrich-paper-authors" type="button">补全作者</button>
-                <button class="mini-filter footprint-action" id="copy-paper-export" type="button">复制全部信息</button>
-                <button class="mini-filter footprint-action" id="download-paper-export" type="button">导出全部信息</button>
+                <button class="mini-filter footprint-action" id="open-paper-export" type="button">打开论文清单</button>
               </div>
             </div>
-            <div class="paper-export-view"><button class="paper-export-view-button" id="open-paper-export" type="button">查看导出内容</button></div>
             <textarea class="paper-export-text" id="paper-export-text" readonly aria-hidden="true" tabindex="-1"></textarea>
-            <div class="paper-export-note" id="paper-export-note">点击“查看导出内容”可预览；复制或导出时会包含全部论文条目。</div>
+            <div class="paper-export-note" id="paper-export-note">打开论文清单后，可在弹窗中复制或导出全部论文条目。</div>
           </section>
 
           <section class="panel">
@@ -612,7 +611,7 @@
   <div class="modal-backdrop" id="paper-export-modal" hidden>
     <section class="panel paper-export-dialog" role="dialog" aria-modal="true" aria-labelledby="paper-export-modal-title">
       <button class="modal-close" id="close-paper-export" type="button" aria-label="关闭论文清单预览">×</button>
-      <div class="panel-head"><div><h2 id="paper-export-modal-title">论文清单预览</h2><p>每篇论文一条；仅显示作者、题目、期刊、DOI 和核心收录信息。</p></div></div>
+      <div class="panel-head"><div><h2 id="paper-export-modal-title">论文清单</h2><p>每篇论文一条；仅显示作者、题目、期刊、DOI 和核心收录信息。</p></div><div class="paper-export-modal-tools"><button class="mini-filter footprint-action" id="copy-paper-export" type="button">复制全部</button><button class="mini-filter footprint-action" id="download-paper-export" type="button">导出纯文本</button></div></div>
       <pre class="paper-export-preview" id="paper-export-preview"></pre>
     </section>
   </div>
