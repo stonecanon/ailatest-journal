@@ -538,7 +538,7 @@
       ['/#feat', 'nav_features', 'features', '功能', 'Features'],
       ['/#how', 'nav_how', 'how', '怎么用', 'How it works'],
       ['/#rankings', 'nav_rank', 'rankings', '榜单', 'Rankings'],
-      ['/publication-footprint/', 'nav_footprint', 'footprint', '发表足迹', 'Publication footprint'],
+      ['/publication-footprint/', 'nav_footprint', 'footprint', '足迹', 'Footprint'],
       ['/pricing', 'nav_pricing', 'pricing', '订阅', 'Pricing'],
       ['/#download', 'download_center', 'download', '下载', 'Download'],
       ['/#contact', 'nav_contact', 'contact', '联系', 'Contact'],
