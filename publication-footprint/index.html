@@ -146,6 +146,12 @@
     .paper-export-row-actions { display: flex; gap: 4px; }
     .paper-export-row-actions button { min-width: 28px; min-height: 28px; padding: 0 6px; border: 1px solid var(--rule); border-radius: 7px; color: var(--footprint-blue); background: #fff; font: inherit; font-size: 11px; cursor: pointer; }
     .paper-export-row-actions button:hover, .paper-export-row-actions button:focus-visible { border-color: rgba(249,115,22,.45); color: var(--footprint-orange); }
+    .paper-export-deleted-section { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--rule); }
+    .paper-export-deleted-title { margin: 0 0 5px; color: var(--ink-faint); font-size: 12px; font-weight: 800; }
+    .paper-export-deleted-row { color: var(--ink-faint); opacity: .72; }
+    .paper-export-deleted-row .paper-export-row-text { color: var(--ink-faint); }
+    .paper-export-deleted-row .paper-export-row-text strong { color: var(--ink-soft); }
+    .paper-export-deleted-row .paper-export-row-actions button { color: var(--ink-soft); }
     .paper-export-list-empty { padding: 24px 8px; color: var(--ink-faint); text-align: center; font-size: 12px; }
     .paper-export-dialog-actions { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 7px; margin-top: 10px; }
     .paper-export-dialog { position: relative; width: min(860px, 100%); max-height: min(86vh, 820px); overflow: auto; }
@@ -1304,6 +1310,16 @@
         .filter(paperExportIndexMatches)
         .filter(record => !recentFivePaperExportButton.checked || Number(record.year || 0) >= recentCutoff);
     }
+    function paperExportDeletedRecords() {
+      const excluded = new Set(paperExportState.excluded);
+      const seen = new Set();
+      return allPaperRecords().filter(record => {
+        const key = paperExportRecordKey(record);
+        if (!key || !excluded.has(key) || seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+    }
     function persistPaperExportState() {
       try { localStorage.setItem(paperExportStorageKey, JSON.stringify({ schemaVersion: paperExportStorageSchema, activeId: activePaperExportListId, lists: paperExportLists })); } catch (_) {}
     }
@@ -1401,12 +1417,13 @@
     function renderPaperExport() {
       renderPaperExportListSelector();
       const records = paperExportRecords();
+      const deletedRecords = paperExportDeletedRecords();
       const missingAuthors = records.filter(record => !Array.isArray(record.authors) || !record.authors.length);
       const style = paperCitationStyle.value || 'apa';
       paperExportText.value = records.length ? completeExportText(style) : '';
-      paperExportList.innerHTML = records.length
-        ? records.map((record, index) => `<div class="paper-export-row" data-paper-export-key="${escapeHtml(paperExportRecordKey(record))}"><span class="paper-export-row-number">${index + 1}</span><div class="paper-export-row-text">${exportPaperLineHtml(record, style)}</div><div class="paper-export-row-actions"><button type="button" data-paper-export-action="up" aria-label="上移">↑</button><button type="button" data-paper-export-action="down" aria-label="下移">↓</button><button type="button" data-paper-export-action="remove" aria-label="删除">×</button></div></div>`).join('')
-        : '<div class="paper-export-list-empty">暂无可导出的论文。</div>';
+      const activeMarkup = records.map((record, index) => `<div class="paper-export-row" data-paper-export-key="${escapeHtml(paperExportRecordKey(record))}"><span class="paper-export-row-number">${index + 1}</span><div class="paper-export-row-text">${exportPaperLineHtml(record, style)}</div><div class="paper-export-row-actions"><button type="button" data-paper-export-action="up" aria-label="上移">↑</button><button type="button" data-paper-export-action="down" aria-label="下移">↓</button><button type="button" data-paper-export-action="remove" aria-label="删除">×</button></div></div>`).join('');
+      const deletedMarkup = deletedRecords.length ? `<div class="paper-export-deleted-section"><p class="paper-export-deleted-title">已删除论文（${deletedRecords.length}）</p>${deletedRecords.map(record => `<div class="paper-export-row paper-export-deleted-row" data-paper-export-key="${escapeHtml(paperExportRecordKey(record))}"><span class="paper-export-row-number">—</span><div class="paper-export-row-text">${exportPaperLineHtml(record, style)}</div><div class="paper-export-row-actions"><button type="button" data-paper-export-action="restore" aria-label="恢复论文">恢复</button></div></div>`).join('')}</div>` : '';
+      paperExportList.innerHTML = activeMarkup || deletedMarkup ? `${activeMarkup || (!deletedMarkup ? '<div class="paper-export-list-empty">暂无可导出的论文。</div>' : '')}${deletedMarkup}` : '<div class="paper-export-list-empty">暂无可导出的论文。</div>';
       enrichPaperAuthorsButton.disabled = !missingAuthors.length;
       const markedCorresponding = records.filter(record => Array.isArray(record.authors) && record.authors.some(author => String(author).includes('*'))).length;
       const activeIndexes = paperExportIndexFilters.filter(input => input.checked).map(input => input.parentElement.textContent.trim()).join('、');
@@ -1427,10 +1444,18 @@
       const row = button.closest('[data-paper-export-key]');
       const key = row?.dataset.paperExportKey;
       if (!key) return;
+      const action = button.dataset.paperExportAction;
+      if (action === 'restore') {
+        paperExportState.excluded = paperExportState.excluded.filter(item => item !== key);
+        paperExportState.order = [...paperExportState.order.filter(item => item !== key), key];
+        persistPaperExportState();
+        renderPaperExport();
+        paperExportNote.textContent = '已恢复 1 篇论文，并追加到清单末尾。';
+        return;
+      }
       const keys = currentPaperExportKeys();
       const index = keys.indexOf(key);
       if (index < 0) return;
-      const action = button.dataset.paperExportAction;
       if (action === 'remove') {
         paperExportState.excluded = [...new Set([...paperExportState.excluded, key])];
         paperExportState.order = keys.filter(item => item !== key);
