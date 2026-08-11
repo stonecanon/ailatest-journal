@@ -131,7 +131,12 @@
     .paper-export-panel { margin-top: 16px; }
     .paper-export-head { align-items: center; }
     .paper-export-tools { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 7px; }
-    .paper-export-text { display: block; width: calc(100% - 32px); min-height: 220px; margin: 16px; padding: 14px; border: 1px solid var(--rule-soft); border-radius: 12px; color: var(--ink-soft); background: #fffdf9; font: 12px/1.7 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; resize: vertical; }
+    .paper-export-view { display: flex; justify-content: center; padding: 16px 16px 4px; }
+    .paper-export-view-button { min-height: 42px; width: min(420px, 100%); border: 1px solid var(--rule); border-radius: 11px; color: var(--footprint-blue); background: var(--footprint-blue-soft); font: inherit; font-size: 12px; font-weight: 800; cursor: pointer; }
+    .paper-export-view-button:hover, .paper-export-view-button:focus-visible { border-color: rgba(249,115,22,.45); color: var(--footprint-orange); background: #fff8f1; }
+    .paper-export-text { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+    .paper-export-preview { max-height: min(68vh, 680px); margin: 14px 0 0; padding: 14px; overflow: auto; border: 1px solid var(--rule-soft); border-radius: 12px; color: var(--ink-soft); background: #fffdf9; white-space: pre-wrap; overflow-wrap: anywhere; font: 12px/1.7 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .paper-export-dialog { position: relative; width: min(860px, 100%); max-height: min(86vh, 820px); overflow: auto; }
     .paper-export-note { margin: -7px 16px 16px; color: var(--ink-faint); font-size: 11px; }
     .badge-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
     .pub-badge { display: inline-flex; align-items: center; min-height: 24px; padding: 3px 9px; border: 1px solid rgba(39,35,31,.1); border-radius: 999px; color: var(--ink-soft); background: #f7f3ec; font-size: 11px; font-weight: 780; letter-spacing: .02em; }
@@ -453,7 +458,7 @@
 
           <section class="panel paper-export-panel" id="paper-export-panel" aria-labelledby="paper-export-title">
             <div class="panel-head paper-export-head">
-              <div><h2 id="paper-export-title">期刊与论文完整导出</h2><p>一键汇总全部期刊信息和论文信息，论文按发表年份从新到旧排列。</p></div>
+              <div><h2 id="paper-export-title">论文清单导出</h2><p>只保留作者、题目、期刊、DOI 和核心收录信息，按发表年份从新到旧排列。</p></div>
               <div class="paper-export-tools">
                 <select class="mini-filter" id="paper-citation-style" aria-label="论文格式">
                   <option value="apa">APA 7</option>
@@ -466,8 +471,9 @@
                 <button class="mini-filter footprint-action" id="download-paper-export" type="button">导出全部信息</button>
               </div>
             </div>
-            <textarea class="paper-export-text" id="paper-export-text" readonly aria-label="期刊与论文完整清单预览" placeholder="导入并确认论文后，这里会显示完整清单。"></textarea>
-            <div class="paper-export-note" id="paper-export-note">导入并确认论文后，这里会生成包含期刊信息和论文信息的完整清单。</div>
+            <div class="paper-export-view"><button class="paper-export-view-button" id="open-paper-export" type="button">查看导出内容</button></div>
+            <textarea class="paper-export-text" id="paper-export-text" readonly aria-hidden="true" tabindex="-1"></textarea>
+            <div class="paper-export-note" id="paper-export-note">点击“查看导出内容”可预览；复制或导出时会包含全部论文条目。</div>
           </section>
 
           <section class="panel">
@@ -603,6 +609,14 @@
     </section>
   </div>
 
+  <div class="modal-backdrop" id="paper-export-modal" hidden>
+    <section class="panel paper-export-dialog" role="dialog" aria-modal="true" aria-labelledby="paper-export-modal-title">
+      <button class="modal-close" id="close-paper-export" type="button" aria-label="关闭论文清单预览">×</button>
+      <div class="panel-head"><div><h2 id="paper-export-modal-title">论文清单预览</h2><p>每篇论文一条；仅显示作者、题目、期刊、DOI 和核心收录信息。</p></div></div>
+      <pre class="paper-export-preview" id="paper-export-preview"></pre>
+    </section>
+  </div>
+
   <script>
     const demoPublicationJournals = [
       { name: 'Indoor Air', short: 'IA', abbr: 'INDOOR AIR', cover: 'linear-gradient(155deg,#598ca1,#123d57)', papers: 3, citations: 38, years: [2025, 2024], titles: ['Indoor environmental quality and occupant health in mixed-mode buildings', 'Ventilation behaviour and indoor air quality during extreme heat', 'Low-cost sensing for classroom exposure assessment'], badges: [['SCIE', 'index'], ['Scopus', 'index'], ['PubMed', 'index'], ['JCR Q1', 'quartile'], ['中科院 1区', 'zone'], ['TOP', 'zone'], ['已核验', 'verified']] },
@@ -630,6 +644,10 @@
     const dedupeButton = document.getElementById('dedupe-footprints');
     const paperCitationStyle = document.getElementById('paper-citation-style');
     const paperExportText = document.getElementById('paper-export-text');
+    const openPaperExportButton = document.getElementById('open-paper-export');
+    const paperExportModal = document.getElementById('paper-export-modal');
+    const closePaperExportButton = document.getElementById('close-paper-export');
+    const paperExportPreview = document.getElementById('paper-export-preview');
     const paperExportNote = document.getElementById('paper-export-note');
     const enrichPaperAuthorsButton = document.getElementById('enrich-paper-authors');
     const copyPaperExportButton = document.getElementById('copy-paper-export');
@@ -1205,44 +1223,27 @@
       return publicationJournals.flatMap(item => paperRecords(item).map(record => ({ ...record, venue: record.venue || item.name, journalName: item.name, journalKey: footprintItemKey(item) })))
         .sort((left, right) => (Number(right.year || 0) - Number(left.year || 0)) || left.title.localeCompare(right.title));
     }
-    function exportJournalRows(item, index, style) {
-      const metadata = item?.journalMetadata && typeof item.journalMetadata === 'object' ? item.journalMetadata : {};
-      const records = paperRecords(item);
-      const badges = journalBadges(item).map(([label]) => label).join(' / ');
-      const issns = [...new Set([...(Array.isArray(item?.issns) ? item.issns : []), metadata.issn, metadata.eissn].map(value => String(value || '').trim()).filter(Boolean))];
-      const fields = journalFields(item).join('、');
-      const countries = journalCountries(item).join('、');
-      const lines = [
-        `${index}. ${item.name}`,
-        `   论文数：${records.length || Number(item.papers || 0)}`,
-        issns.length ? `   ISSN：${issns.join(' / ')}` : '',
-        journalYears(item).length ? `   发表年份：${journalYears(item).join('、')}` : '',
-        displayImpactFactor(item) != null ? `   IF：${displayImpactFactor(item)}` : '',
-        Number(item.citations || 0) ? `   被引次数：${Number(item.citations || 0)}` : '',
-        badges ? `   收录/分区/风险：${badges}` : '',
-        journalFrequency(item) ? `   刊期：${journalFrequency(item)}` : '',
-        fields ? `   研究方向：${fields}` : '',
-        countries ? `   覆盖国家/地区：${countries}` : '',
-        records.length ? '   论文：' : '',
-        ...records.map((record, paperIndex) => `   ${paperIndex + 1}. ${formatPaperCitation({ ...record, journalName: item.name }, style)}`),
-        '',
-      ];
-      return lines.filter(Boolean);
+    function exportIndexLabels(item) {
+      const aliases = { SCI: 'SCIE', SCIE: 'SCIE', SSCI: 'SSCI', AHCI: 'A&HCI', 'A&HCI': 'A&HCI', EI: 'EI' };
+      const seen = new Set();
+      return journalBadges(item).map(([label]) => aliases[String(label || '').replace(/\s+/g, '').toUpperCase()] || '')
+        .filter(label => label && !seen.has(label) && seen.add(label));
+    }
+    function exportPaperLine(record, style) {
+      const journal = publicationJournals.find(item => footprintItemKey(item) === record.journalKey);
+      const indexes = journal ? exportIndexLabels(journal) : [];
+      return `${formatPaperCitation(record, style)}${indexes.length ? ` [${indexes.join(', ')}]` : ''}`;
     }
     function completeExportText(style) {
-      const journals = publicationJournals.slice().sort((left, right) => (latestJournalYear(right) - latestJournalYear(left)) || String(left.name || '').localeCompare(String(right.name || '')));
       const records = allPaperRecords();
       const lines = [
-        'AILatest Journal 期刊与论文完整清单',
-        `导出时间：${new Date().toLocaleString('zh-CN')}`,
-        `期刊数量：${journals.length}；论文数量：${records.length}`,
+        'AILatest Journal 论文清单',
+        `论文数量：${records.length}`,
         `论文格式：${({ apa: 'APA 7', mla: 'MLA 9', chicago: 'Chicago 17', gbt: 'GB/T 7714-2015' })[style] || 'APA 7'}`,
         '',
-        '一、期刊信息与论文',
-        ...journals.flatMap((item, index) => exportJournalRows(item, index + 1, style)),
-        '二、全部论文列表（按发表年份从新到旧）',
-        ...records.map((record, index) => `${index + 1}. ${formatPaperCitation(record, style)}`),
+        ...records.map((record, index) => `${index + 1}. ${exportPaperLine(record, style)}`),
       ];
+      if (records.some(record => Array.isArray(record.authors) && record.authors.some(author => String(author).includes('*')))) lines.push('', '* 通讯作者');
       return lines.join('\n');
     }
     function renderPaperExport() {
@@ -1250,11 +1251,18 @@
       const missingAuthors = records.filter(record => !Array.isArray(record.authors) || !record.authors.length);
       const style = paperCitationStyle.value || 'apa';
       paperExportText.value = records.length ? completeExportText(style) : '';
+      paperExportPreview.textContent = paperExportText.value || '暂无可导出的论文。';
       enrichPaperAuthorsButton.disabled = !missingAuthors.length;
       paperExportNote.textContent = records.length
-        ? `共 ${publicationJournals.length} 本期刊、${records.length} 篇论文，已合并生成完整清单。${missingAuthors.length ? `其中 ${missingAuthors.length} 篇缺少作者，可点击“补全作者”。` : '作者信息以公开元数据为准。'}`
+        ? `共 ${publicationJournals.length} 本期刊、${records.length} 篇论文。${missingAuthors.length ? `其中 ${missingAuthors.length} 篇缺少作者，可点击“补全作者”。` : '作者信息以公开元数据为准。'}`
         : '导入并确认论文后，这里会生成可复制的纯文字论文列表。';
     }
+    function openPaperExportPreview() {
+      renderPaperExport();
+      paperExportModal.hidden = false;
+      closePaperExportButton.focus();
+    }
+    function closePaperExportPreview() { paperExportModal.hidden = true; }
     function paperAuthorMatchKey(record) {
       return paperRecordKey(record) || paperTitleKey(record?.title || '');
     }
@@ -1461,11 +1469,17 @@
       try {
         await navigator.clipboard.writeText(text);
       } catch (_) {
-        paperExportText.focus();
-        paperExportText.select();
+        const fallback = document.createElement('textarea');
+        fallback.value = text;
+        fallback.style.position = 'fixed';
+        fallback.style.opacity = '0';
+        document.body.appendChild(fallback);
+        fallback.focus();
+        fallback.select();
         document.execCommand('copy');
+        fallback.remove();
       }
-      paperExportNote.textContent = '已复制全部期刊信息和论文信息。';
+      paperExportNote.textContent = '已复制全部论文条目。';
     }
     function downloadPaperExport() {
       const text = paperExportText.value.trim();
@@ -1480,7 +1494,7 @@
       link.download = `ailatest-journal-publications-${new Date().toISOString().slice(0, 10)}.txt`;
       link.click();
       URL.revokeObjectURL(url);
-      paperExportNote.textContent = '已导出全部期刊信息和论文信息。';
+      paperExportNote.textContent = '已导出全部论文条目。';
     }
     let journalMetadataRefresh = null;
     let journalMetadataRefreshQueued = false;
@@ -1551,6 +1565,11 @@
     year.addEventListener('change', renderFootprints);
     sortFilter.addEventListener('change', renderFootprints);
     paperCitationStyle.addEventListener('change', renderPaperExport);
+    openPaperExportButton.addEventListener('click', openPaperExportPreview);
+    closePaperExportButton.addEventListener('click', closePaperExportPreview);
+    paperExportModal.addEventListener('click', event => {
+      if (event.target === paperExportModal) closePaperExportPreview();
+    });
     enrichPaperAuthorsButton.addEventListener('click', enrichPaperAuthors);
     copyPaperExportButton.addEventListener('click', copyPaperExport);
     downloadPaperExportButton.addEventListener('click', downloadPaperExport);

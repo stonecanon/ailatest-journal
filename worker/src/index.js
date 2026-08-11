@@ -2875,7 +2875,10 @@ function normalizeOpenAlexWork(work, focusAuthorId = '') {
     countries,
     fields,
     authors: Array.isArray(work?.authorships)
-      ? work.authorships.slice(0, 40).map((authorship) => cleanText(authorship?.author?.display_name || '', 160)).filter(Boolean)
+      ? work.authorships.slice(0, 40).map((authorship) => {
+        const name = cleanText(authorship?.author?.display_name || '', 160);
+        return name ? `${name}${authorship?.is_corresponding ? '*' : ''}` : '';
+      }).filter(Boolean)
       : [],
   };
 }
@@ -3140,7 +3143,10 @@ function crossrefPaper(message, fallback = {}) {
   const doi = normalizePublicationDoi(message?.DOI || fallback.doi || '');
   const issn = cleanText((Array.isArray(message?.ISSN) ? message.ISSN[0] : message?.ISSN) || fallback.issn || '', 24).toUpperCase();
   const authors = Array.isArray(message?.author)
-    ? message.author.slice(0, 40).map((author) => cleanText([author?.given, author?.family].filter(Boolean).join(' ') || author?.name || '', 160)).filter(Boolean)
+    ? message.author.slice(0, 40).map((author) => {
+      const name = cleanText([author?.given, author?.family].filter(Boolean).join(' ') || author?.name || '', 160);
+      return name ? `${name}${author?.is_corresponding || author?.corresponding ? '*' : ''}` : '';
+    }).filter(Boolean)
     : (Array.isArray(fallback.authors) ? fallback.authors : []);
   return {
     title,
