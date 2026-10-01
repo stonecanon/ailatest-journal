@@ -20,6 +20,10 @@
         "type": "folder"
       },
       {
+        "value": "local-data-manifest.json",
+        "type": "file"
+      },
+      {
         "value": "README.md",
         "type": "file"
       }

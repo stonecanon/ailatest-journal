@@ -1,6 +1,8 @@
 App({
   globalData: {
-    localDataReady: true
+    localDataReady: false,
+    // 分包占位页解锁回调：root -> resolve 函数
+    __localDataSubpackageWaiters: {}
   },
 
   onLaunch() {
@@ -25,6 +27,19 @@ App({
           })
         }
       })
+    }
+  },
+
+  /** 注册分包解锁等待（供占位页回调） */
+  registerSubpackageWaiter(root, fn) {
+    if (!root || typeof fn !== 'function') return
+    this.globalData.__localDataSubpackageWaiters[root] = fn
+  },
+
+  /** 清除分包解锁等待 */
+  clearSubpackageWaiter(root) {
+    if (root && this.globalData.__localDataSubpackageWaiters) {
+      delete this.globalData.__localDataSubpackageWaiters[root]
     }
   }
 })

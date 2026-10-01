@@ -35,19 +35,6 @@ Page({
 
   fetchRank(type, slug) {
     this.setData({ loading: true, error: '' })
-    if (app.globalData.cloudReady && wx.cloud) {
-      api.getRanking({ type, slug, limit: 20 }).then((result) => {
-        const items = Array.isArray(result.items) ? result.items : []
-        this.setData({
-          journals: items.slice(0, 20).map(normalizeItem),
-          loading: false,
-          error: ''
-        })
-      }).catch(() => {
-        this.fetchLocalRank(type, slug)
-      })
-      return
-    }
     this.fetchLocalRank(type, slug)
   },
 

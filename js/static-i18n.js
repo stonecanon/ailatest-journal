@@ -41,7 +41,9 @@
       terms_title: '使用条款 | AILatest Journal',
       privacy_title: '隐私政策 | AILatest Journal',
       refund_title: '退款政策 | AILatest Journal',
-      signup_title: '登录 | AILatest Journal'
+      signup_title: '登录 | AILatest Journal',
+      publication_title: '我的发表足迹 | AILatest Journal',
+      publication_desc: '整理已发表论文、核验期刊信息，并把个人发表经历保存为可持续更新的科研档案。'
     },
     en: {
       nav_about: 'About',
@@ -84,7 +86,9 @@
       terms_title: 'Terms | AILatest Journal',
       privacy_title: 'Privacy | AILatest Journal',
       refund_title: 'Refund | AILatest Journal',
-      signup_title: 'Sign in | AILatest Journal'
+      signup_title: 'Sign in | AILatest Journal',
+      publication_title: 'My Publication Footprint | AILatest Journal',
+      publication_desc: 'Collect your published papers, verify journal information, and keep a research record that can grow with you.'
     }
   };
 

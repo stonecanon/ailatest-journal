@@ -10,11 +10,22 @@
     "pages/profile/profile"
   ],
   "subpackages": [
-    {
-      "root": "static-data",
-      "name": "data",
-      "independent": true
-    }
+    { "root": "static-data-0", "name": "data0", "pages": ["pages/data-placeholder/data-placeholder"], "independent": true },
+    { "root": "static-data-1", "name": "data1", "pages": ["pages/data-placeholder/data-placeholder"], "independent": true },
+    { "root": "static-data-2", "name": "data2", "pages": ["pages/data-placeholder/data-placeholder"], "independent": true },
+    { "root": "static-data-3", "name": "data3", "pages": ["pages/data-placeholder/data-placeholder"], "independent": true },
+    { "root": "static-data-4", "name": "data4", "pages": ["pages/data-placeholder/data-placeholder"], "independent": true },
+    { "root": "static-data-5", "name": "data5", "pages": ["pages/data-placeholder/data-placeholder"], "independent": true },
+    { "root": "static-data-6", "name": "data6", "pages": ["pages/data-placeholder/data-placeholder"], "independent": true },
+    { "root": "static-data-7", "name": "data7", "pages": ["pages/data-placeholder/data-placeholder"], "independent": true },
+    { "root": "static-data-8", "name": "data8", "pages": ["pages/data-placeholder/data-placeholder"], "independent": true },
+    { "root": "static-data-9", "name": "data9", "pages": ["pages/data-placeholder/data-placeholder"], "independent": true },
+    { "root": "static-data-10", "name": "data10", "pages": ["pages/data-placeholder/data-placeholder"], "independent": true },
+    { "root": "static-data-11", "name": "data11", "pages": ["pages/data-placeholder/data-placeholder"], "independent": true },
+    { "root": "static-data-12", "name": "data12", "pages": ["pages/data-placeholder/data-placeholder"], "independent": true },
+    { "root": "static-data-13", "name": "data13", "pages": ["pages/data-placeholder/data-placeholder"], "independent": true },
+    { "root": "static-data-14", "name": "data14", "pages": ["pages/data-placeholder/data-placeholder"], "independent": true },
+    { "root": "static-data-15", "name": "data15", "pages": ["pages/data-placeholder/data-placeholder"], "independent": true }
   ],
   "window": {
     "navigationBarTitleText": "Journal",
