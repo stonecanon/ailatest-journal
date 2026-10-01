@@ -4,7 +4,9 @@
  */
 
 const DEEPSEEK_BASE = 'https://api.deepseek.com/v1';
-const DEFAULT_JOURNALS_URL = 'https://journal.ailatest.org/data/journals.json.gz';
+// Bump the asset query whenever the public bundle changes so the API Worker
+// cannot retain a stale Cloudflare-cached gzip after a Pages deployment.
+const DEFAULT_JOURNALS_URL = 'https://journal.ailatest.org/data/journals.json.gz?v=20261001-citic-world-class';
 // The full public data set is intentionally rich for the browser, but it is
 // too expensive for a cold Worker isolate to parse and normalize during an AI
 // recommendation request.  This compact, pre-tokenized asset contains only
