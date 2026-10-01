@@ -26,6 +26,15 @@ RENAMES = {
     "0957-154X": "History of Psychiatry-Madness Science Culture",
     "1971-8993": "Fracture and Structural Integrity",
 }
+RENAME_SOURCES = {
+    "0100-2945": "REVISTA BRASILEIRA DE FRUTICULTURA",
+    "2040-6223": "THERAPEUTIC ADVANCES IN CHRONIC DISEASE",
+    "0253-1933": "REVUE SCIENTIFIQUE ET TECHNIQUE-OFFICE INTERNATIONAL DES EPIZOOTIES",
+    "0886-3520": "JOURNAL OF THE COPYRIGHT SOCIETY OF THE USA",
+    "0104-0146": "INFORMACAO & SOCIEDADE-ESTUDOS",
+    "0957-154X": "HISTORY OF PSYCHIATRY",
+    "1971-8993": "FRATTURA ED INTEGRITA STRUTTURALE-FRACTURE AND STRUCTURAL INTEGRITY",
+}
 
 DELISTED = {
     "1078-3466": "Editorial",
@@ -113,7 +122,7 @@ def apply_records(records):
     for old, new in RENAMES.items():
         r = by_id.get(bare(old))
         if not r: continue
-        old_name = r.get("name") or ""
+        old_name = RENAME_SOURCES.get(old) or r.get("wos_title_change", {}).get("from") or r.get("name") or ""
         if old_name != new:
             r["name"] = new
             r["aliases"] = list(dict.fromkeys([*(r.get("aliases") or []), old_name]))
