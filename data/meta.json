@@ -89,7 +89,7 @@
   "with_cas_major": 22592,
   "with_review_cycle": 26068,
   "with_on_hold": 26,
-  "with_under_review": 44,
+  "with_under_review": 80,
   "with_citic_warning": 39,
   "wos_core_update": {
     "date": "2026-09-21",
@@ -97,5 +97,11 @@
     "renamed": 7,
     "delisted": 12,
     "on_hold_snapshot": 26
+  },
+  "under_review_source_updated": "2026-10-01",
+  "under_review_source": "user-provided workbook: 新锐分区-Under Review-20261001.xlsx",
+  "under_review_update": {
+    "date": "2026-10-01",
+    "count": 80
   }
 }

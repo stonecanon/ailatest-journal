@@ -86,7 +86,7 @@
 | 🟠 中科院预警 | CAS Warning List 2025 | **105** |
 | 🔴 中信所预警 | CITIC Warning List | **39** |
 | 🟡 On Hold (WoS) | WoS On Hold | **26** |
-| ⏸️ Under Review | Under Review (topeditsci) | **44** |
+| ⏸️ Under Review | 新锐分区 Under Review（2026-10-01） | **80** |
 
 ---
 
@@ -154,7 +154,7 @@
 | ABS | Chartered ABS | Academic Journal Guide 2024 |
 | 预警名单 | 中科院文献情报中心 | 2025 版 105 条 |
 | 中信所预警 | 中信所 | 39 条预警期刊 |
-| Under Review | [topeditsci](https://topeditsci.com) | 44 本考察期期刊 |
+| Under Review | 用户提供的《新锐分区-Under Review-20261001.xlsx》 | 80 本考察期期刊（2026-10-01） |
 | On Hold | Clarivate / 自跟踪 | 26 本期刊（2026-09-21 快照） |
 | OpenAlex | OpenAlex API / snapshot | Topics、OA、APC 元数据，以及作者机构国家/地区统计 |
 | CNKI 中文期刊 | 知网 | 6,038 种中文核心期刊 |
