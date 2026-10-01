@@ -56,4 +56,4 @@ manifest.bin        { version, total, searchChunks, detailIndexes, detailBuckets
 - 单个分包 / 主包 ≤ **2 MB**
 - 所有分包合计 ≤ **30 MB**（服务商代开发 ≤ 20 MB）
 
-当前 16 包合计约 **23.5 MB**，单包最大 1.8 MB，均在红线内。
+当前 16 包合计约 **24.7 MB**，单包最大 1.8 MB，均在红线内。
