@@ -1,9 +1,9 @@
 {
-  "source": "WoS Core 2026-06-15 + JCR 2025 + ESI + 中科院 2025 + Scopus 2026-05 + EI Compendex 2026-07-09 + DOAJ 2026-07-10 + OAJ current + NCBI MEDLINE current + regional and specialty indexes",
-  "last_updated_source": "WoS Core 2026-06-15",
-  "total": 50381,
+  "source": "WoS Core 2026-09-21 + JCR 2025 + ESI + 中科院 2025 + Scopus 2026-05 + EI Compendex 2026-07-09 + DOAJ 2026-07-10 + OAJ current + NCBI MEDLINE current + regional and specialty indexes",
+  "last_updated_source": "WoS Core 2026-09-21",
+  "total": 50383,
   "indices": {
-    "ESCI": 9356,
+    "ESCI": 9360,
     "AHCI": 1799,
     "SCIE": 9433,
     "EI": 4887,
@@ -72,7 +72,7 @@
   },
   "ei_source_updated": "2026-07-09",
   "ei_source_url": "https://www.elsevier.com/products/engineering-village/databases/compendex",
-  "wos_source_updated": "2026-06-15",
+  "wos_source_updated": "2026-09-21",
   "wos_source_url": "https://mjl.clarivate.com/collection-list-downloads",
   "wos_historical_records": 277,
   "with_self_citation_2024": 2188,
@@ -88,7 +88,14 @@
   "with_jcr_quartile": 22834,
   "with_cas_major": 22592,
   "with_review_cycle": 26068,
-  "with_on_hold": 19,
+  "with_on_hold": 26,
   "with_under_review": 44,
-  "with_citic_warning": 39
+  "with_citic_warning": 39,
+  "wos_core_update": {
+    "date": "2026-09-21",
+    "added_esci": 16,
+    "renamed": 7,
+    "delisted": 12,
+    "on_hold_snapshot": 26
+  }
 }

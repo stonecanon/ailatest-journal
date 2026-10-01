@@ -47,17 +47,17 @@
 
 ## 📊 数据统计
 
-以下为仓库当前数据包的统计快照，数据包更新时间为 **2026-08-06**；各指标的发布日期和更新周期不同，页面会标注对应来源与年份。
+以下为仓库当前数据包的统计快照，WoS 目录已纳入 **2026-09-21** 变更（新增16、改名7、剔除12）；各指标的发布日期和更新周期不同，页面会标注对应来源与年份。
 
 ### 覆盖范围
 
 | 指标 | Metric | 数量 |
 |------|--------|-----:|
-| **总期刊数** | **Total journals** | **50,350** |
+| **总期刊数** | **Total journals** | **50,383** |
 | 🟢 **SCIE** | Science Citation Index Expanded | **9,433** |
 | 🟡 **SSCI** | Social Sciences Citation Index | **3,538** |
 | 🔵 **AHCI** | Arts & Humanities Citation Index | **1,799** |
-| 🟣 **ESCI** | Emerging Sources Citation Index | **9,356** |
+| 🟣 **ESCI** | Emerging Sources Citation Index | **9,355** |
 | 🟠 **EI** | Engineering Index (Compendex) | **4,887** |
 | 📘 **Scopus** | Scopus | **29,887** |
 | 📗 **DOAJ** | Directory of Open Access Journals | **22,975** |
@@ -85,7 +85,7 @@
 |------|--------|-----:|
 | 🟠 中科院预警 | CAS Warning List 2025 | **105** |
 | 🔴 中信所预警 | CITIC Warning List | **39** |
-| 🟡 On Hold (WoS) | WoS On Hold | **19** |
+| 🟡 On Hold (WoS) | WoS On Hold | **26** |
 | ⏸️ Under Review | Under Review (topeditsci) | **44** |
 
 ---
@@ -138,7 +138,7 @@
 
 | 数据 | Data Source | 说明 |
 |------|-------------|------|
-| WoS 核心索引 | Clarivate 公开列表 | SCIE/SSCI/AHCI/ESCI，更新至 2026-06-15 |
+| WoS 核心索引 | Clarivate 公开列表 | 2026-09-21：新增16、改名7、剔除12 |
 | JCR 指标 | [ShowJCR](https://github.com/hitfyd/ShowJCR) (GPL-3.0) | IF 2025、JCR Quartile、Eigenfactor |
 | JCR 自引口径 | Clarivate JCR 2025 工作表 | 2025 去自引 JIF与自引贡献率，仅展示最新年度 |
 | 中科院分区 | ShowJCR | 2025 大类分区 (1-4 区, TOP 标志) |
@@ -155,7 +155,7 @@
 | 预警名单 | 中科院文献情报中心 | 2025 版 105 条 |
 | 中信所预警 | 中信所 | 39 条预警期刊 |
 | Under Review | [topeditsci](https://topeditsci.com) | 44 本考察期期刊 |
-| On Hold | Clarivate / 自跟踪 | 19 本期刊 |
+| On Hold | Clarivate / 自跟踪 | 26 本期刊（2026-09-21 快照） |
 | OpenAlex | OpenAlex API / snapshot | Topics、OA、APC 元数据，以及作者机构国家/地区统计 |
 | CNKI 中文期刊 | 知网 | 6,038 种中文核心期刊 |
 

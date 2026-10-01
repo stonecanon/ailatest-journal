@@ -24,6 +24,7 @@ __pycache__/
 
 # Generated or local-only data
 data/*.bak
+data/ext_lookup.json.gz
 data/sources/
 data/journals.json
 data/journals_deploy.json

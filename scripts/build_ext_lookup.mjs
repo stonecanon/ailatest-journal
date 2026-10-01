@@ -2,7 +2,6 @@ import fs from 'fs';
 import zlib from 'zlib';
 
 const DATA_DIR = new URL('../data/', import.meta.url);
-const OUT_FILE = new URL('../data/ext_lookup.json.gz', import.meta.url);
 // Use a versioned URL for Worker fetches so the immutable Pages cache cannot
 // return the previous 4 MB payload after a data refresh.
 const VERSIONED_OUT_FILE = new URL('../data/ext_lookup_v3.json.gz', import.meta.url);
@@ -285,7 +284,6 @@ const output = records
 
 const json = JSON.stringify(output);
 const compressed = zlib.gzipSync(json, { level: 9 });
-fs.writeFileSync(OUT_FILE, compressed);
 fs.writeFileSync(VERSIONED_OUT_FILE, compressed);
 
 // A cold Worker should not parse the entire 11 MB JSON payload for a page
@@ -315,4 +313,4 @@ shards.forEach((shard, index) => {
   fs.writeFileSync(file, shardCompressed);
   shardSizes.push(shardCompressed.length);
 });
-console.log(`wrote ${OUT_FILE.pathname}, ${VERSIONED_OUT_FILE.pathname}, and ${SHARD_COUNT} shards (${output.length.toLocaleString()} records, ${Buffer.byteLength(json).toLocaleString()} bytes raw, ${shardSizes.reduce((a, b) => a + b, 0).toLocaleString()} shard bytes)`);
+console.log(`wrote ${VERSIONED_OUT_FILE.pathname} and ${SHARD_COUNT} shards (${output.length.toLocaleString()} records, ${Buffer.byteLength(json).toLocaleString()} bytes raw, ${shardSizes.reduce((a, b) => a + b, 0).toLocaleString()} shard bytes)`);
