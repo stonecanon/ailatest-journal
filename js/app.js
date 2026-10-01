@@ -4561,6 +4561,12 @@
       function badgeCiticWarning() {
         return `<span class="citic-warning-pill">${T('中信所预警','CITIC Warning')}</span>`;
       }
+      function badgeCiticWorldClass(value) {
+        if (!value) return '';
+        const year = value.year || 2025;
+        const partial = value.partial ? T('；当前为部分公开名单样本','; partial public sample') : '';
+        return `<span class="badge b-citic-world" title="${escape(T(`中信所世界一流科技期刊目录 ${year}${partial}`, `CITIC World-Class Journals ${year}${partial}`))}">${T('世界一流','World-Class')}</span>`;
+      }
 
   // 统一标签组合：主页 / 收藏页 / 抽屉 / 分享卡片共用同一批 badge 函数与 CSS 类。
   function renderIndexBadges(r) {
@@ -4569,6 +4575,7 @@
       badgeFlagship(r.flagship),
       r.nature_index ? badgeNatureIndex() : '',
       ...((r.indices) || []).map(badgeIndex),
+      badgeCiticWorldClass(r.citic_world_class),
       badgeScopus(r.scopus),
       badgeInspec(r.inspec),
       badgeFSTAFullText(r.fsta || r.fsta_full_text),
@@ -4578,6 +4585,7 @@
       badgeMEDLINE(r.medline),
       r.cscd ? badgeCSCD(r.cscd) : '',
       r.cstpcd ? badgeCSTPCD(r.cstpcd) : '',
+      badgeCiticWorldClass(r.citic_world_class),
     ].filter(Boolean).join('');
   }
   function renderRankBadges(r) {
@@ -5099,6 +5107,7 @@
             (activeFeats.has('free') && canSeePublishFeeInfo() && isFreeToPublish(r)) ||
             (activeFeats.has('warning') && r.warning) ||
             (activeFeats.has('citic_warning') && r.citic_warning) ||
+            (activeFeats.has('citic_world_class') && r.citic_world_class) ||
             (activeFeats.has('under_review') && r.under_review) ||
             (activeFeats.has('on_hold') && r.on_hold))) return false;
     }
@@ -5145,6 +5154,7 @@
     if (activeFeats.has('free') && (!canSeePublishFeeInfo() || !isFreeToPublish(r))) return false;
     if (activeFeats.has('warning') && !r.warning) return false;
     if (activeFeats.has('citic_warning') && !r.citic_warning) return false;
+    if (activeFeats.has('citic_world_class') && !r.citic_world_class) return false;
     if (activeFeats.has('under_review') && !r.under_review) return false;
     if (activeFeats.has('on_hold') && !r.on_hold) return false;
     if (activeFeats.has('abdc') && !(r.abdc && r.abdc.rating)) return false;
@@ -5329,6 +5339,7 @@
       if (isFreeToPublish(r)) inc('feat', 'free');
       if (r.warning) inc('feat', 'warning');
       if (r.citic_warning) inc('feat', 'citic_warning');
+      if (r.citic_world_class) inc('feat', 'citic_world_class');
       if (r.under_review) inc('feat', 'under_review');
       if (r.on_hold) inc('feat', 'on_hold');
       const jq = String(r.if_quartile || '').toUpperCase();

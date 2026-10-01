@@ -92,6 +92,7 @@ function matchFilters(journal, f) {
   if (f.on_hold === '1' && !journal.on_hold) return false;
   if (f.warning === '1' && !journal.warning) return false;
   if (f.citic_warning === '1' && !journal.citic_warning) return false;
+  if (f.citic_world_class === '1' && !journal.citic_world_class) return false;
   return true;
 }
 
@@ -144,6 +145,7 @@ function publicFields(j) {
     under_review: j.under_review,
     on_hold: j.on_hold,
     citic_warning: j.citic_warning,
+    citic_world_class: j.citic_world_class,
   };
 }
 
@@ -160,6 +162,7 @@ async function handleSearch(url) {
     on_hold: url.searchParams.get('on_hold') || '',
     warning: url.searchParams.get('warning') || '',
     citic_warning: url.searchParams.get('citic_warning') || '',
+    citic_world_class: url.searchParams.get('citic_world_class') || '',
   };
 
   const journals = await loadJournals();
@@ -235,6 +238,7 @@ async function handleFilters() {
       on_hold: journals.filter(j => j.on_hold).length,
       warning: journals.filter(j => j.warning).length,
       citic_warning: journals.filter(j => j.citic_warning).length,
+      citic_world_class: journals.filter(j => j.citic_world_class).length,
     },
   };
 }

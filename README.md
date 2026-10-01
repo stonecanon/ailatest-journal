@@ -25,7 +25,7 @@
 
 ---
 
-**AILatest Journal（知刊）** 是一个面向科研人员的学术期刊检索、投稿选刊与数据分析平台，覆盖 **50,547 本** 国际期刊及 **SCIE / SSCI / AHCI / ESCI / EI / Scopus / DOAJ / MEDLINE** 等主流索引，集中展示影响因子、JCR/中科院分区、审稿周期、开放获取、APC 与预警风险等投稿参考信息。
+**AILatest Journal（知刊）** 是一个面向科研人员的学术期刊检索、投稿选刊与数据分析平台，覆盖 **50,548 本** 国际期刊及 **SCIE / SSCI / AHCI / ESCI / EI / Scopus / DOAJ / MEDLINE** 等主流索引，集中展示影响因子、JCR/中科院分区、审稿周期、开放获取、APC 与预警风险等投稿参考信息。
 
 基础检索在浏览器端完成，配合 Cloudflare Pages、Workers 与 D1 提供搜索 API、账户同步、动态期刊数据和地区统计。项目支持中文与英文界面，并持续更新数据和功能。
 
@@ -146,6 +146,7 @@
 | Scopus | Elsevier 公开列表 | 2026-05 来源快照 |
 | ESI 22 学科 | 高校图书馆公开发布 | 12,272 本期刊匹配 |
 | DOAJ | Directory of Open Access Journals | 2026-08-31 公共 CSV，匹配 23,208 本 |
+| 中信所世界一流科技期刊目录 | 中国科学技术信息研究所（WSCD / 四力评价框架） | 2025 年度（2026-09-12 发布）；已确认 434 种部分样本，官方完整目录 6,132 种 |
 | MEDLINE | NLM Catalog | 2026-08-06 当前收录查询，匹配 5,368 本 |
 | 审稿周期 | CrossRef + 自收集 | 26,070 个期刊实测数据 |
 | 作者机构国家/地区 | [OpenAlex](https://openalex.org/) API + Crossref 兜底 | 按期刊和年份缓存到 Cloudflare D1，逐步补齐 |

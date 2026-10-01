@@ -4871,6 +4871,7 @@ button.linkish:hover { color: #5a4818; }
 .badge.b-fsta { background: #6d6342; }                 /* FSTA Full Text subset */
 .badge.b-oaj { background: #5a7a7a; }                 /* 低饱和青 — 次要收录 */
 .badge.b-doaj { background: #6a8a6a; }                /* 低饱和绿 — 次要收录 */
+.badge.b-citic-world { background: #8b5e3c; }
 .badge.b-nature-index { background: #3f3a2f; }
 .badge.b-cscd { background: #4f6f7c; }
 .badge.b-cstpcd { background: #6b5a3a; }

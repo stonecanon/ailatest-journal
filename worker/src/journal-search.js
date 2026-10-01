@@ -70,6 +70,7 @@ function parseSearchParams(url) {
     limit: read('limit') || read('page_size'),
     warning: read('warning'),
     citic_warning: read('citic_warning'),
+    citic_world_class: read('citic_world_class'),
     on_hold: read('on_hold'),
     under_review: read('under_review'),
   };
@@ -137,6 +138,7 @@ function journalIndexTags(journal) {
   if (journal.abdc) tags.add('ABDC');
   if (journal.abs) tags.add('ABS');
   if (journal.cssci) tags.add('CSSCI');
+  if (journal.citic_world_class) tags.add('CITIC_WORLD_CLASS');
   return tags;
 }
 
@@ -191,6 +193,7 @@ function matchesFilters(journal, filters) {
   if (parseBool(filters.exclude_warning) && hasWarning(journal)) return false;
   if (String(filters.warning || '') === '1' && !journal.warning) return false;
   if (String(filters.citic_warning || '') === '1' && !journal.citic_warning) return false;
+  if (String(filters.citic_world_class || '') === '1' && !journal.citic_world_class) return false;
   if (String(filters.on_hold || '') === '1' && !journal.on_hold) return false;
   if (String(filters.under_review || '') === '1' && !journal.under_review) return false;
   return true;
@@ -278,6 +281,7 @@ function publicFields(journal) {
     under_review: journal.under_review,
     on_hold: journal.on_hold,
     citic_warning: journal.citic_warning,
+    citic_world_class: journal.citic_world_class,
     slug: journal.slug,
   };
 }
@@ -345,6 +349,7 @@ function skillFields(journal, env, match = {}) {
     risk: {
       warning: !!journal.warning,
       citic_warning: !!journal.citic_warning,
+      citic_world_class: !!journal.citic_world_class,
       on_hold: !!journal.on_hold,
       under_review: !!journal.under_review,
     },
