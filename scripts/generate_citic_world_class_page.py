@@ -26,8 +26,8 @@ def main() -> int:
         source_issns = " / ".join(citic.get("source_issns") or [])
         subjects = "；".join(citic.get("subjects") or []) or "—"
         publisher = citic.get("publisher") or "中信所查询样本"
-        evidence = citic.get("evidence") or "中信所公开查询结果"
-        issn_note = source_issns or ("未在截图中提供（按主库刊名匹配）" if citic.get("publisher") == "MDPI" else "—")
+        evidence = citic.get("publisher") or "中信所查询样本"
+        issn_note = source_issns or "—"
         source_rows.append(
             f'<tr><td class="row-num">{len(source_rows) + 1}</td>'
             f'<td><a href="/journal/{esc(j.get("slug"))}/">{esc(j.get("name"))}</a></td>'
@@ -61,7 +61,7 @@ def main() -> int:
   <h1>中信所世界一流科技期刊目录（部分名单）</h1>
   <p class="breadcrumb"><a href="/">首页</a> · <a href="/#rankings">榜单</a> · <a href="/indexes/">索引排行榜</a></p>
   <p class="sub">中国科学技术信息研究所（中信所）2025年度《世界一流科技期刊目录》公开可确认的部分样本。</p>
-  <p class="count">当前整理 <b>{len(rows)}</b> 种；其中含用户提供的 MDPI 截图条目（截图未列 ISSN，按主库刊名匹配）。官方目录共公布 6,132 种，但未提供按学科分类的完整公开名单，本页不代表完整目录。</p>
+  <p class="count">当前整理 <b>{len(rows)}</b> 种。官方目录共公布 6,132 种，但未提供按学科分类的完整公开名单，本页不代表完整目录。</p>
   <div class="card"><div class="table-wrap"><table>
     <thead><tr><th>#</th><th>期刊</th><th>中文名</th><th>主库 ISSN</th><th>目录原始 ISSN</th><th>平台学科标引</th><th>来源出版方</th><th>证据</th></tr></thead>
     <tbody>{''.join(source_rows)}</tbody>
