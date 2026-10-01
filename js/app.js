@@ -199,7 +199,7 @@
       home_price_max_was: '原价 $14.99',
       home_price_forever: '/ 永久', home_price_year: '/ 年', home_price_month: '/ 月', home_price_rec: '推荐',
       home_price_more: '查看完整订阅方案 →',
-      home_footprint_promo: '新功能：搜索并识别你的论文，生成期刊徽章墙 →',
+      home_footprint_promo: 'WCJ China 目录已更新，现收录 {count} 种期刊 →',
       home_price_free_d: '适合日常检索与轻量试用',
       home_price_free_1: '网站完整检索与详情', home_price_free_2: '本站收藏最多 5 本期刊', home_price_free_3: 'AI 荐刊试用次数',
       home_price_free_cta: '继续免费使用',
@@ -414,7 +414,7 @@
       home_price_max_was: 'Was $14.99',
       home_price_forever: '/ forever', home_price_year: '/ year', home_price_month: '/ month', home_price_rec: 'Best',
       home_price_more: 'View full plans →',
-      home_footprint_promo: 'New: search and identify your publications to build your journal footprint →',
+      home_footprint_promo: 'WCJ China directory updated — {count} journals currently listed →',
       home_price_free_d: 'Everyday search & light trials',
       home_price_free_1: 'Full website search & details', home_price_free_2: 'Save up to 5 journals', home_price_free_3: 'Limited AI pick trial',
       home_price_free_cta: 'Stay on Free',
@@ -1695,7 +1695,7 @@
   function loadOaMap() {
     if (oaMap) return Promise.resolve(oaMap);
     if (!oaMapPromise) {
-      oaMapPromise = fetchJSON('data/oa.json.gz')
+      oaMapPromise = fetchJSON('data/oa.json.gz?v=20261001-data-v1')
         .then(data => {
           oaMap = data || {};
           return oaMap;
@@ -1711,7 +1711,7 @@
   function loadCountryOutputMap() {
     if (countryOutputMap) return Promise.resolve(countryOutputMap);
     if (!countryOutputMapPromise) {
-      countryOutputMapPromise = fetchJSON('data/country_output.json.gz')
+      countryOutputMapPromise = fetchJSON('data/country_output.json.gz?v=20261001-data-v1')
         .then(data => {
           countryOutputMap = (data && data.m) || data || {};
           return countryOutputMap;
@@ -3037,10 +3037,18 @@
     return 'search_dom';
   }
 
+  // WCJ China 首页提示使用 meta.json 中的可确认样本数；首屏先用最近一次快照，
+  // 等元数据加载后再校正，避免把“可确认样本”误写成官方完整目录数量。
+  window.__citicWorldClassCount = Number(window.__citicWorldClassCount) || 437;
+  function citicWorldClassCountText() {
+    const n = Number(window.__citicWorldClassCount);
+    return Number.isFinite(n) && n > 0 ? n.toLocaleString() : '437';
+  }
+
   function applyI18n() {
     $$('[data-i18n]').forEach(el => {
       const k = el.dataset.i18n;
-      const v = t(k); if (v) el.innerHTML = v;
+      const v = t(k); if (v) el.innerHTML = v.replace(/\{count\}/g, citicWorldClassCountText());
     });
     $$('[data-i18n-placeholder]').forEach(el => {
       const k = el.dataset.i18nPlaceholder;
@@ -4565,7 +4573,8 @@
         if (!value) return '';
         const year = value.year || 2025;
         const partial = value.partial ? T('；当前为部分公开名单样本','; partial public sample') : '';
-        return `<span class="badge b-citic-world" title="${escape(T(`中信所世界一流科技期刊目录 ${year}${partial}`, `CITIC World-Class Journals ${year}${partial}`))}">${T('世界一流','World-Class')}</span>`;
+        const full = T(`中信所世界一流科技期刊目录 ${year}${partial}`, `CITIC World-Class Journals ${year}${partial}`);
+        return `<button type="button" class="badge b-citic-world" data-citic-badge data-citic-full="${escape(full)}" aria-expanded="false" title="${escape(full)}">WCJ</button>`;
       }
 
   // 统一标签组合：主页 / 收藏页 / 抽屉 / 分享卡片共用同一批 badge 函数与 CSS 类。
@@ -5432,7 +5441,7 @@
   function ensureJournalsLoaded() {
     if (journalsReady && journals.length) return Promise.resolve(journals);
     if (!journalsPromise) {
-      journalsPromise = fetchJSON('data/journals.json.gz')
+      journalsPromise = fetchJSON('data/journals.json.gz?v=20261001-citic-437-v1')
         .then(rows => {
           finalizeJournalDataset(rows, {
             full: true,
@@ -14886,10 +14895,10 @@
   // 首屏 HTML 使用最近一次 public-total 采样，异步请求只负责校正增长中的数字。
   // 这样网络请求尚未完成时也不会先显示已经过期的旧占位值。
   const HOME_STAT_DEFAULTS = Object.freeze({
-    journals: 50350,
-    journal_views: 24067,
-    views: 10330,
-    visitors: 1513,
+    journals: 50548,
+    journal_views: 25436,
+    views: 13192,
+    visitors: 2113,
   });
   const HOME_STAT_FLOOR = { journal_views: HOME_STAT_DEFAULTS.journal_views };
 
@@ -15166,7 +15175,7 @@
       const needsFullForTab = initialPath === '/import'
         || ['int', 'fav', 'pick'].includes(initialTab);
       const [j, m, esi, aliases, underReviewIssns, onHoldIssns] = await Promise.all([
-        fetchJSON('data/journals_light_v2.json.gz'),
+        fetchJSON('data/journals_light_v2.json.gz?v=20261001-citic-437-v1'),
         fetch('/data/meta.json').then(r => r.json()).catch(() => null),
         fetch('/data/esi_categories.json').then(r => r.json()).catch(() => []),
         fetch('/data/journal_aliases.json').then(r => r.json()).catch(() => DEFAULT_JOURNAL_ALIASES),
@@ -15177,6 +15186,8 @@
       window.__underReviewIssns = underReviewIssns || [];
       window.__onHoldIssns = onHoldIssns || [];
       meta = m; esiCats = esi;
+      window.__citicWorldClassCount = Number(meta?.with_citic_world_class ?? meta?.citic_world_class_sample_count ?? 437) || 437;
+      applyI18n();
       homeJournals = Array.isArray(j) ? j : [];
       // finalize 已含 mark / searchMeta / index / filterCounts / topicList（light 路径不标 journalsReady）
       finalizeJournalDataset(j, { full: false, underReviewIssns, onHoldIssns });
@@ -15315,6 +15326,98 @@
     }
   }
 
+  // WCJ 在卡片上保持短标签，点击后展开来源全称；事件委托兼容列表/抽屉/详情页的动态渲染。
+  function initCiticWorldBadgeToggle() {
+    if (document.__citicWorldBadgeToggleBound) return;
+    document.__citicWorldBadgeToggleBound = true;
+    document.addEventListener('click', (event) => {
+      const badge = event.target?.closest?.('[data-citic-badge]');
+      if (!badge) return;
+      event.preventDefault();
+      event.stopPropagation();
+      const expanded = badge.getAttribute('aria-expanded') === 'true';
+      document.querySelectorAll('[data-citic-badge][aria-expanded="true"]').forEach((other) => {
+        if (other === badge) return;
+        other.textContent = 'WCJ';
+        other.setAttribute('aria-expanded', 'false');
+        other.classList.remove('is-expanded');
+      });
+      badge.textContent = expanded ? 'WCJ' : (badge.dataset.citicFull || 'WCJ');
+      badge.setAttribute('aria-expanded', String(!expanded));
+      badge.classList.toggle('is-expanded', !expanded);
+    });
+  }
+
+  // 所有收录/分区/风险/费用徽章统一提供即时悬停说明；title 仍保留作原生和无障碍兜底。
+  function initBadgeHoverTooltip() {
+    if (document.__badgeHoverTooltipBound) return;
+    document.__badgeHoverTooltipBound = true;
+    const selector = '.badge, .zone, .if-pill, .xr-pill, .warn-pill, .under-review-pill, .on-hold-pill, .citic-warning-pill, .flagship-pill, .retraction-pill, .domsrc-pill, .ccf-pill, .abdc-pill, .abs-pill, .tier-pill';
+    let active = null;
+    let tip = null;
+    const infoFor = (el) => {
+      const title = String(el.getAttribute('title') || '').trim();
+      if (title) return title;
+      const text = String(el.textContent || '').trim();
+      if (el.classList.contains('citic-warning-pill')) return T('中信所期刊预警/风险提示', 'CITIC journal warning / risk signal');
+      if (el.classList.contains('under-review-pill') || /Under Review|审查中/.test(text)) return T('新锐期刊 Under Review 名单', 'Emerging journal Under Review list');
+      if (el.classList.contains('on-hold-pill') || /On Hold/.test(text)) return T('Web of Science On Hold 名单', 'Web of Science On Hold list');
+      if (el.classList.contains('domsrc-pill')) return T('国内来源目录或交叉分区标记', 'Domestic source directory or cross-directory tier');
+      if (el.classList.contains('ccf-pill')) return T('中国计算机学会推荐目录分级', 'CCF recommended journal tier');
+      if (el.classList.contains('warn-pill') || /^⚠/.test(text)) return T('期刊风险或预警提示，需结合来源核查', 'Journal risk or warning signal; verify against the source');
+      if (el.classList.contains('if-pill')) return T('最新 JCR 影响因子', 'Latest JCR Impact Factor');
+      return text;
+    };
+    const remove = () => {
+      if (tip) tip.remove();
+      tip = null;
+      active = null;
+    };
+    const show = (el) => {
+      const info = infoFor(el);
+      if (!info) return;
+      remove();
+      active = el;
+      tip = document.createElement('div');
+      tip.className = 'badge-hover-tooltip';
+      tip.setAttribute('role', 'tooltip');
+      tip.textContent = info;
+      document.body.appendChild(tip);
+      const rect = el.getBoundingClientRect();
+      const gap = 8;
+      const margin = 12;
+      const width = tip.offsetWidth;
+      const height = tip.offsetHeight;
+      let left = rect.left + (rect.width - width) / 2;
+      let top = rect.bottom + gap;
+      left = Math.max(margin, Math.min(left, window.innerWidth - width - margin));
+      if (top + height + margin > window.innerHeight) top = Math.max(margin, rect.top - height - gap);
+      tip.style.left = `${Math.round(left)}px`;
+      tip.style.top = `${Math.round(top)}px`;
+      requestAnimationFrame(() => tip?.classList.add('is-visible'));
+    };
+    document.addEventListener('pointerover', (event) => {
+      const el = event.target?.closest?.(selector);
+      if (!el || (event.relatedTarget && el.contains(event.relatedTarget))) return;
+      show(el);
+    });
+    document.addEventListener('pointerout', (event) => {
+      const el = event.target?.closest?.(selector);
+      if (!el || (event.relatedTarget && el.contains(event.relatedTarget))) return;
+      if (el === active) remove();
+    });
+    document.addEventListener('focusin', (event) => {
+      const el = event.target?.closest?.(selector);
+      if (el) show(el);
+    });
+    document.addEventListener('focusout', (event) => {
+      const el = event.target?.closest?.(selector);
+      if (el && !(event.relatedTarget && el.contains(event.relatedTarget))) remove();
+    });
+    window.addEventListener('scroll', remove, { passive: true });
+    window.addEventListener('resize', remove);
+  }
+
   function updateThStickyTop() {
     const topbar = document.querySelector('.topbar');
     if (topbar) {
@@ -15360,5 +15463,7 @@
   }
 
   loadJournalViewTotalFootnote();
+  initCiticWorldBadgeToggle();
+  initBadgeHoverTooltip();
   boot();
 })();

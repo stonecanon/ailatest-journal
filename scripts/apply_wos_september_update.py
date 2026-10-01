@@ -26,15 +26,6 @@ RENAMES = {
     "0957-154X": "History of Psychiatry-Madness Science Culture",
     "1971-8993": "Fracture and Structural Integrity",
 }
-RENAME_SOURCES = {
-    "0100-2945": "REVISTA BRASILEIRA DE FRUTICULTURA",
-    "2040-6223": "THERAPEUTIC ADVANCES IN CHRONIC DISEASE",
-    "0253-1933": "REVUE SCIENTIFIQUE ET TECHNIQUE-OFFICE INTERNATIONAL DES EPIZOOTIES",
-    "0886-3520": "JOURNAL OF THE COPYRIGHT SOCIETY OF THE USA",
-    "0104-0146": "INFORMACAO & SOCIEDADE-ESTUDOS",
-    "0957-154X": "HISTORY OF PSYCHIATRY",
-    "1971-8993": "FRATTURA ED INTEGRITA STRUTTURALE-FRACTURE AND STRUCTURAL INTEGRITY",
-}
 
 DELISTED = {
     "1078-3466": "Editorial",
@@ -122,7 +113,7 @@ def apply_records(records):
     for old, new in RENAMES.items():
         r = by_id.get(bare(old))
         if not r: continue
-        old_name = RENAME_SOURCES.get(old) or r.get("wos_title_change", {}).get("from") or r.get("name") or ""
+        old_name = r.get("name") or ""
         if old_name != new:
             r["name"] = new
             r["aliases"] = list(dict.fromkeys([*(r.get("aliases") or []), old_name]))
@@ -153,7 +144,7 @@ def apply_records(records):
         r["wos_source"] = "WoS Core 2026-09-21 bulletin"
     status_ids = {}
     review_ids = set()
-    for order, (display_name, issn, eissn, _year, _db, _iff, _zone, review) in enumerate(ON_HOLD):
+    for order, (_, issn, eissn, _year, _db, _iff, _zone, review) in enumerate(ON_HOLD):
         for v in (issn, eissn):
             if v:
                 status_ids[bare(v)] = order
@@ -164,10 +155,6 @@ def apply_records(records):
         if oh is not None:
             r["on_hold"] = True
             r["on_hold_order"] = oh
-            display_name = ON_HOLD[oh][0]
-            if r.get("name") and r["name"] != display_name:
-                r["aliases"] = list(dict.fromkeys([*(r.get("aliases") or []), r["name"]]))
-                r["name"] = display_name
         if any(x in review_ids for x in ids):
             r["under_review"] = True
     return changed
@@ -216,9 +203,6 @@ def main():
     meta_path = DATA / "meta.json"
     meta = json.loads(meta_path.read_text())
     meta["total"] = len(records)
-    meta["source"] = str(meta.get("source", "")).replace("WoS Core 2026-06-15", "WoS Core 2026-09-21")
-    meta["last_updated_source"] = "WoS Core 2026-09-21"
-    meta["wos_source_updated"] = "2026-09-21"
     meta.setdefault("indices", {})
     for key in ("ESCI", "SCIE", "SSCI", "AHCI", "EI"):
         meta["indices"][key] = sum(key in (r.get("indices") or []) for r in records)

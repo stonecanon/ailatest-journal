@@ -1285,7 +1285,24 @@ async function buildGoogleAnalytics(env) {
 // ───────── top-level ─────────
 export async function buildDashboardPayload(env, options = {}) {
   const [d1, cloudflare, ga, siteMonitoring, siteBusiness] = await Promise.all([
-    buildD1(env),
+    buildD1(env).catch(e => ({
+      status: 'error',
+      reason: e.message || String(e),
+      tables: [],
+      kpis: {},
+      provider_mix: [],
+      registrations_by_day: [],
+      active_proxy_by_day: [],
+      top_favorites: [],
+      top_rated: [],
+      top_journal_views: [],
+      login_events_by_day: [],
+      login_provider_mix: [],
+      pageviews_by_day: [],
+      top_paths: [],
+      traffic_countries: [],
+      recent_users: [],
+    })),
     buildCloudflare(env).catch(e => ({ source: 'Cloudflare Analytics', status: 'error', reason: e.message })),
     buildGoogleAnalytics(env).catch(e => ({ source: 'Google Analytics 4', status: 'error', reason: e.message })),
     buildSiteMonitoring(env, options).catch(e => ({

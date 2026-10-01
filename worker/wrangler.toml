@@ -1,6 +1,6 @@
 name = "ailatest-journal-api"
 main = "src/index.js"
-compatibility_date = "2026-03-24"
+compatibility_date = "2024-11-01"
 account_id = "e7dbf2ec3ab60aa5557cc2364a7a2f26"
 
 routes = [
@@ -12,23 +12,26 @@ routes = [
 
 [triggers]
 crons = [
-  # Every 5 minutes: preload-only slice; the bounded job lock prevents overlap.
-  "*/5 * * * *",
-  # Every 15 minutes: analytics rollup only.
-  "*/15 * * * *",
-  # 00:12 Asia/Shanghai (16:12 UTC): finalize yesterday after GA/edge data settles.
-  "12 16 * * *"
+  # "*/15 * * * *",  # 2026-08-20 停用：每15分钟跑一次 90 天流量分类，每天产生 ~1400 万行 D1 写入（约 $14/天）
+  # 00:12 Asia/Shanghai: finalize yesterday after GA/edge data has had time to settle.
+  # 日统计重算已停用：免费 D1 采用静态快照，按月人工刷新。
+  "0 * * * *" # 账户级 D1 异常检查与邮件通知
 ]
-
-[browser]
-binding = "BROWSER"
 
 [vars]
 GITHUB_CLIENT_ID = "Ov23liKY2We6M23yTMJV"
 GOOGLE_CLIENT_ID = "393406357932-4sqvlnbm296o5pj68o60i8o8k2ujgfov.apps.googleusercontent.com"
 SITE_URL         = "https://journal.ailatest.org"
 MAIL_FROM        = "noreply@ailatest.org"   # must be a Resend-verified sender
+D1_GUARD_NOTIFY_EMAIL = "wengjt@hzcu.edu.cn"
+ANDROID_PACKAGE_NAME = "org.ailatest.journal"
+# Google Play subscription product IDs. Create these as subscriptions with
+# monthly/yearly base plans in Play Console before enabling production checkout.
+GOOGLE_PLAY_PRO_PRODUCT_ID = "ailatest_pro"
+GOOGLE_PLAY_MAX_PRODUCT_ID = "ailatest_max"
 CF_ZONE_ID       = "435525fb783ba7bf4c686a9734e26124"  # journal.ailatest.org zone (Cloudflare Analytics)
+CF_ACCOUNT_ID    = "e7dbf2ec3ab60aa5557cc2364a7a2f26"
+D1_INCLUDED_MONTHLY_ROWS = "50000000"
 GA4_PROPERTY_ID  = "537014253"                          # Google Analytics 4 property
 # Creem Journal products（与 Todo 分离；可被 secret 外的 vars 覆盖）
 # China one-time 365-day SKUs: fill these only after creating one-time products in Creem.
@@ -52,11 +55,24 @@ CREEM_GRANT_PRO_EDU_YEARLY_PRODUCT_ID  = "prod_5J2FqPO8k4bssN4KKh3Lp6"
 CREEM_GRANT_MAX_EDU_MONTHLY_PRODUCT_ID = "prod_4kuY9jhjzsqdDmFo1IFhJe"
 CREEM_GRANT_MAX_EDU_YEARLY_PRODUCT_ID  = "prod_2DWHbc7FvP3iPM7o8YkljH"
 GRANT_SITE_URL                         = "https://grant.ailatest.org"
+# Creem Grant 国际价 products（国际站约国内 3×；建品后填入 product_id）
+CREEM_GRANT_INTL_PRO_MONTHLY_PRODUCT_ID     = "prod_7XzAmCbU6YXoFtetZndiZc"
+CREEM_GRANT_INTL_PRO_YEARLY_PRODUCT_ID      = "prod_57P3ye6xgvoBulBkz3Al3O"
+CREEM_GRANT_INTL_MAX_MONTHLY_PRODUCT_ID     = "prod_2Pdwlyv3htQLcfuCG6UatJ"
+CREEM_GRANT_INTL_MAX_YEARLY_PRODUCT_ID      = "prod_3QUwqls109msHQhP5KkfAD"
+CREEM_GRANT_INTL_PRO_EDU_MONTHLY_PRODUCT_ID = "prod_WpuTAMaYq1fxeNWkN0KkZ"
+CREEM_GRANT_INTL_PRO_EDU_YEARLY_PRODUCT_ID  = "prod_718Lk3hL4oEddk9tuQMydm"
+CREEM_GRANT_INTL_MAX_EDU_MONTHLY_PRODUCT_ID = "prod_7cdzG1YeQHH3MVv5pxHJ5K"
+CREEM_GRANT_INTL_MAX_EDU_YEARLY_PRODUCT_ID  = "prod_3eaBdivzN1IigS2P2lWN8G"
 
 [[d1_databases]]
 binding = "DB"
 database_name = "ailatest-journal"
 database_id = "861dd053-c23a-4363-b62b-2559c06ec3fd"
+
+[[kv_namespaces]]
+binding = "AILATEST_WRITE_GUARD"
+id = "9ad09b56d0db4672ac82256927eccb53"
 
 # Secrets to configure:
 #   wrangler secret put GITHUB_CLIENT_SECRET
@@ -65,13 +81,15 @@ database_id = "861dd053-c23a-4363-b62b-2559c06ec3fd"
 #   wrangler secret put RESEND_API_KEY
 #   wrangler secret put DEEPSEEK_API_KEY
 #   wrangler secret put OPENALEX_API_KEY
-#   wrangler secret put OPENALEX_API_KEY_2  # optional secondary key for preload rotation
-#   wrangler secret put OPENALEX_API_KEY_3  # optional third key for preload rotation
-#   wrangler secret put OPENALEX_API_KEY_4  # optional fourth key for sequential preload rotation
 #   wrangler secret put CODE_PEPPER
+#   wrangler secret put REVIEWER_EMAIL
+#   wrangler secret put REVIEWER_PASSWORD_HASH   # sha256 of the review password
 #   wrangler secret put CF_ANALYTICS_TOKEN   # Cloudflare API token, Analytics:Read (dashboard)
+#   wrangler secret put CF_BILLING_TOKEN     # Cloudflare API token, account Billing:Read only
 #   wrangler secret put GA4_SA_KEY           # GA4 service-account JSON (dashboard)
 #   wrangler secret put ACCOUNT_SYNC_SECRET  # 与 Todo 相同：跨产品订阅写入 product_memberships
 #   wrangler secret put TODO_INTERNAL_SECRET # 可选，读取 todo.ailatest.org 订阅汇总
 #   wrangler secret put CREEM_API_KEY        # Creem production API key (checkout sessions)
 #   wrangler secret put CREEM_WEBHOOK_SECRET # Creem webhook signing secret
+#   wrangler secret put GOOGLE_PLAY_SERVICE_ACCOUNT_JSON # service account with Play Developer API access
+#   wrangler secret put GOOGLE_PLAY_RTDN_TOKEN            # random Pub/Sub push bearer token

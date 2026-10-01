@@ -804,7 +804,10 @@ button.active,.btn.active{background:var(--accent);border-color:var(--accent);co
     if (!token) return showLogin();
     logout.style.display = 'inline-flex';
     try {
-      var res = await fetch(API + '/analytics/dashboard?days=' + encodeURIComponent(activeDays) + '&nocache=1', { headers: { Authorization: 'Bearer ' + token } });
+      // Reuse the last successful edge snapshot when D1's free daily read
+      // allowance is exhausted. The previous nocache=1 forced a full
+      // multi-table recomputation and made the entire dashboard disappear.
+      var res = await fetch(API + '/analytics/dashboard?days=' + encodeURIComponent(activeDays), { headers: { Authorization: 'Bearer ' + token } });
       if (res.status === 401) { localStorage.removeItem(TOKEN_KEY); return showLogin('登录已失效，请重新登录。'); }
       if (res.status === 403) { localStorage.removeItem(TOKEN_KEY); return showLogin('当前账号无权限。'); }
       if (!res.ok) throw new Error('HTTP ' + res.status);

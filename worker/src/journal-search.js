@@ -257,11 +257,8 @@ function publicFields(journal) {
     eissn: journal.eissn,
     publisher: journal.publisher,
     if_2024: journal.if_2024,
-    if_2025: journal.if_2025,
     if_latest: journal.if_latest,
     if_latest_year: journal.if_latest_year,
-    jif_without_self_cites_2025: journal.jif_without_self_cites_2025,
-    self_citation_rate_2025: journal.self_citation_rate_2025,
     indices: journal.indices,
     esi_category: journal.esi_category,
     cas_zone: journal.cas_zone,
@@ -305,8 +302,6 @@ function skillFields(journal, env, match = {}) {
     metrics: {
       if: ifValue,
       if_year: journal.if_latest_year || journal.jcr_year || (journal.if_2024 != null ? 2024 : null),
-      jif_without_self_cites_2025: journal.jif_without_self_cites_2025 ?? null,
-      self_citation_rate_2025: journal.self_citation_rate_2025 ?? null,
       if_rank: journal.if_rank || null,
       five_year_if: journal.five_year_if || null,
       jci: journal.jci || null,
@@ -316,7 +311,6 @@ function skillFields(journal, env, match = {}) {
       category: (journal.wos_categories || [])[0] || '',
       year: journal.jcr_year || null,
       release_year: journal.jcr_release_year || null,
-      metric_year: journal.if_latest_year || journal.jcr_year || null,
     },
     cas: {
       zone: journal.cas_zone || journal.cas_xr?.zone || null,
@@ -471,6 +465,24 @@ export async function buildPublicSearchResponse(request, env) {
     total_pages: page.total_pages,
     items: page.slice.map(publicFields),
   };
+}
+
+/** Public exact lookup used by mobile clients and lightweight integrations. */
+export async function buildPublicJournalResponse(env, id) {
+  const key = normalize(id);
+  if (!key) return null;
+  const journals = await loadJournals(env);
+  const journal = journals.find((item) =>
+    normalize(item.issn) === key
+      || normalize(item.eissn) === key
+      || normalize(item.id) === key
+  );
+  // The website's journal detail view uses the complete public record (OA,
+  // review, ranking, regional and publisher fields). Keep the exact lookup
+  // rich so native clients can reproduce that detail view without bundling a
+  // second catalogue. The record is already present as a public static asset
+  // on the website; this endpoint only avoids downloading the whole catalogue.
+  return journal ? { ...journal, id: journal.issn || journal.eissn || '' } : null;
 }
 
 export async function buildSkillSearchResponse(request, env, context = {}) {

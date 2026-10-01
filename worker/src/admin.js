@@ -28,7 +28,6 @@ const json = (value, status = 200, extra = {}) => new Response(
 );
 const err = (message, status = 400, extra = {}) => json({ error: message }, status, extra);
 const nowSec = () => Math.floor(Date.now() / 1000);
-const dayFromSec = (sec) => new Date(Number(sec) * 1000).toISOString().slice(0, 10);
 const clean = (value, max = 200) => typeof value === 'string' ? value.trim().slice(0, max) : '';
 
 let schemaReady = false;
@@ -108,49 +107,15 @@ async function ensureApiKeyTables(env) {
     try { await env.DB.prepare('ALTER TABLE api_keys ADD COLUMN call_count INTEGER NOT NULL DEFAULT 0').run(); } catch (_) {}
   }
   await env.DB.prepare('CREATE INDEX IF NOT EXISTS idx_admin_api_keys_user ON api_keys(user_id, created_at DESC)').run().catch(() => {});
-}
-
-async function ensureUsageTables(env) {
-  await env.DB.batch([
-    env.DB.prepare(`CREATE TABLE IF NOT EXISTS extension_usage (
-      scope_key TEXT NOT NULL,
-      day TEXT NOT NULL,
-      used INTEGER NOT NULL DEFAULT 0,
-      requests INTEGER NOT NULL DEFAULT 0,
-      heartbeats INTEGER NOT NULL DEFAULT 0,
-      last_seen_at INTEGER,
-      updated_at INTEGER NOT NULL,
-      PRIMARY KEY (scope_key, day)
-    )`),
-    env.DB.prepare(`CREATE TABLE IF NOT EXISTS api_request_metrics (
-      day TEXT NOT NULL,
-      path TEXT NOT NULL,
-      method TEXT NOT NULL,
-      requests INTEGER NOT NULL DEFAULT 0,
-      last_seen_at INTEGER NOT NULL,
-      PRIMARY KEY (day, path, method)
-    )`),
-    env.DB.prepare(`CREATE TABLE IF NOT EXISTS extension_download_events (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      asset TEXT NOT NULL,
-      event_at INTEGER NOT NULL,
-      day TEXT NOT NULL,
-      visitor_id TEXT DEFAULT '',
-      session_id TEXT DEFAULT '',
-      referrer TEXT DEFAULT '',
-      user_agent TEXT DEFAULT '',
-      ip_hash TEXT DEFAULT '',
-      country TEXT DEFAULT '',
-      client_language TEXT DEFAULT '',
-      source_path TEXT DEFAULT ''
-    )`),
-    env.DB.prepare('CREATE INDEX IF NOT EXISTS idx_usage_extension_day ON extension_usage(day, scope_key)'),
-    env.DB.prepare('CREATE INDEX IF NOT EXISTS idx_usage_api_day ON api_request_metrics(day)'),
-    env.DB.prepare('CREATE INDEX IF NOT EXISTS idx_usage_download_day ON extension_download_events(day)'),
-  ]);
-  try { await env.DB.prepare('ALTER TABLE extension_usage ADD COLUMN requests INTEGER NOT NULL DEFAULT 0').run(); } catch (_) {}
-  try { await env.DB.prepare('ALTER TABLE extension_usage ADD COLUMN heartbeats INTEGER NOT NULL DEFAULT 0').run(); } catch (_) {}
-  try { await env.DB.prepare('ALTER TABLE extension_usage ADD COLUMN last_seen_at INTEGER').run(); } catch (_) {}
+  await env.DB.prepare(`CREATE TABLE IF NOT EXISTS api_usage_daily (
+    api_key_id TEXT NOT NULL,
+    day TEXT NOT NULL,
+    endpoint TEXT NOT NULL DEFAULT '',
+    calls INTEGER NOT NULL DEFAULT 0,
+    last_used_at INTEGER NOT NULL,
+    PRIMARY KEY (api_key_id, day, endpoint)
+  )`).run();
+  await env.DB.prepare('CREATE INDEX IF NOT EXISTS idx_api_usage_daily_day ON api_usage_daily(day, api_key_id)').run().catch(() => {});
 }
 
 async function ensureProductMembershipTables(env) {
@@ -173,7 +138,6 @@ async function ensureAdminSchema(env) {
   await ensureCreemTables(env);
   await ensureGiftTables(env);
   await ensureApiKeyTables(env);
-  await ensureUsageTables(env);
   await ensureProductMembershipTables(env);
   await env.DB.batch([
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS admin_audit_log (
@@ -306,98 +270,6 @@ async function routeSummary(env) {
       memberships: memberships.results || [],
     },
     recent_audit: audits.results || [],
-  });
-}
-
-async function routeUsage(req, env) {
-  const url = new URL(req.url);
-  const requestedDays = Number(url.searchParams.get('days') || 30);
-  const days = [7, 30, 90].includes(requestedDays) ? requestedDays : 30;
-  const now = nowSec();
-  const endDay = dayFromSec(now);
-  const startDay = dayFromSec(now - (days - 1) * 86400);
-
-  const [extension, extensionByDay, downloads, downloadsByDay, downloadsByAsset, api, apiByDay, topRoutes, apiKeys] = await Promise.all([
-    env.DB.prepare(
-      `SELECT COALESCE(SUM(used), 0) AS lookup_items,
-              COALESCE(SUM(requests), 0) AS lookup_requests,
-              COALESCE(SUM(heartbeats), 0) AS heartbeats,
-              COUNT(DISTINCT scope_key) AS active_scopes,
-              COUNT(DISTINCT CASE WHEN scope_key LIKE 'user:%' THEN scope_key END) AS signed_in_scopes,
-              COUNT(DISTINCT CASE WHEN scope_key LIKE 'anon:%' THEN scope_key END) AS anonymous_scopes
-         FROM extension_usage WHERE day >= ? AND day <= ?`
-    ).bind(startDay, endDay).first(),
-    env.DB.prepare(
-      `SELECT day,
-              COALESCE(SUM(used), 0) AS lookup_items,
-              COALESCE(SUM(requests), 0) AS lookup_requests,
-              COALESCE(SUM(heartbeats), 0) AS heartbeats,
-              COUNT(DISTINCT scope_key) AS active_scopes,
-              COUNT(DISTINCT CASE WHEN scope_key LIKE 'user:%' THEN scope_key END) AS signed_in_scopes,
-              COUNT(DISTINCT CASE WHEN scope_key LIKE 'anon:%' THEN scope_key END) AS anonymous_scopes
-         FROM extension_usage WHERE day >= ? AND day <= ?
-        GROUP BY day ORDER BY day`
-    ).bind(startDay, endDay).all(),
-    env.DB.prepare(
-      `SELECT COALESCE(COUNT(*), 0) AS downloads
-         FROM extension_download_events WHERE day >= ? AND day <= ?`
-    ).bind(startDay, endDay).first(),
-    env.DB.prepare(
-      `SELECT day, asset, COUNT(*) AS downloads
-         FROM extension_download_events WHERE day >= ? AND day <= ?
-        GROUP BY day, asset ORDER BY day, asset`
-    ).bind(startDay, endDay).all(),
-    env.DB.prepare(
-      `SELECT asset, COUNT(*) AS downloads
-         FROM extension_download_events WHERE day >= ? AND day <= ?
-        GROUP BY asset ORDER BY downloads DESC`
-    ).bind(startDay, endDay).all(),
-    env.DB.prepare(
-      `SELECT COALESCE(SUM(requests), 0) AS requests,
-              COUNT(DISTINCT path) AS routes,
-              MAX(last_seen_at) AS last_seen_at
-         FROM api_request_metrics WHERE day >= ? AND day <= ?`
-    ).bind(startDay, endDay).first(),
-    env.DB.prepare(
-      `SELECT day, COALESCE(SUM(requests), 0) AS requests,
-              COUNT(DISTINCT path) AS routes
-         FROM api_request_metrics WHERE day >= ? AND day <= ?
-        GROUP BY day ORDER BY day`
-    ).bind(startDay, endDay).all(),
-    env.DB.prepare(
-      `SELECT path, method, COALESCE(SUM(requests), 0) AS requests,
-              MAX(last_seen_at) AS last_seen_at
-         FROM api_request_metrics WHERE day >= ? AND day <= ?
-        GROUP BY path, method ORDER BY requests DESC LIMIT 20`
-    ).bind(startDay, endDay).all(),
-    env.DB.prepare(
-      `SELECT COUNT(*) AS total_keys,
-              COALESCE(SUM(CASE WHEN revoked_at IS NULL THEN 1 ELSE 0 END), 0) AS active_keys,
-              COALESCE(SUM(call_count), 0) AS lifetime_calls,
-              MAX(last_used_at) AS last_used_at
-         FROM api_keys`
-    ).first(),
-  ]);
-
-  return json({
-    ok: true,
-    generated_at: new Date().toISOString(),
-    window: { days, start_day: startDay, end_day: endDay },
-    extension: {
-      totals: extension || {},
-      by_day: extensionByDay.results || [],
-    },
-    downloads: {
-      totals: downloads || {},
-      by_day: downloadsByDay.results || [],
-      by_asset: downloadsByAsset.results || [],
-    },
-    api: {
-      totals: api || {},
-      by_day: apiByDay.results || [],
-      top_routes: topRoutes.results || [],
-    },
-    api_keys: apiKeys || {},
   });
 }
 
@@ -895,6 +767,19 @@ async function routeAudit(req, env) {
   return json({ ok: true, audit: rows.results || [] });
 }
 
+async function routeUsage(req, env) {
+  const url = new URL(req.url);
+  const rawDays = Number(url.searchParams.get('days') || '30');
+  const days = [7, 30, 90].includes(rawDays) ? rawDays : 30;
+  const since = new Date(Date.now() - (days - 1) * 86400 * 1000).toISOString().slice(0, 10);
+  const [api, extension, downloads] = await Promise.all([
+    env.DB.prepare('SELECT day, SUM(calls) AS calls, COUNT(DISTINCT api_key_id) AS active_keys FROM api_usage_daily WHERE day >= ? GROUP BY day ORDER BY day ASC').bind(since).all().catch(() => ({ results: [] })),
+    env.DB.prepare('SELECT day, SUM(used) AS calls, COUNT(DISTINCT scope_key) AS active_scopes FROM extension_usage WHERE day >= ? GROUP BY day ORDER BY day ASC').bind(since).all().catch(() => ({ results: [] })),
+    env.DB.prepare('SELECT day, asset, COUNT(*) AS calls FROM extension_download_events WHERE day >= ? GROUP BY day, asset ORDER BY day ASC, asset ASC').bind(since).all().catch(() => ({ results: [] })),
+  ]);
+  return json({ ok: true, days, since, api: api.results || [], extension: extension.results || [], downloads: downloads.results || [] });
+}
+
 /** Route for /admin/api/*; every method is owner-gated before dispatch. */
 export async function routeAdminApi(req, env, ctx) {
   const auth = await requireOwner(req, env, ctx);
@@ -904,7 +789,6 @@ export async function routeAdminApi(req, env, ctx) {
   const path = new URL(req.url).pathname.replace(/^\/api\//, '/').replace(/^\/admin\/api\/?/, '/');
   try {
     if (path === '/summary' && req.method === 'GET') return await routeSummary(env);
-    if (path === '/usage' && req.method === 'GET') return await routeUsage(req, env);
     if (path === '/projects' || /^\/projects\/[^/]+$/.test(path)) return await routeProjects(req, env, actor, path.match(/^\/projects\/([^/]+)$/));
     if (path === '/users' && req.method === 'POST') return await routeCreateUser(req, env, actor);
     if (path === '/users' || /^\/users\/\d+$/.test(path)) return await routeUsers(req, env, actor, path.match(/^\/users\/(\d+)$/));
@@ -916,6 +800,7 @@ export async function routeAdminApi(req, env, ctx) {
     if (path === '/payments') return await routePayments(req, env);
     if (path === '/overrides' || /^\/overrides\/[^/]+\/[^/]+$/.test(path)) return await routeOverrides(req, env, actor, path.match(/^\/overrides\/([^/]+)\/([^/]+)$/));
     if (path === '/audit') return await routeAudit(req, env);
+    if (path === '/usage' && req.method === 'GET') return await routeUsage(req, env);
     return err('admin endpoint not found', 404);
   } catch (e) {
     console.error('admin api error:', e?.stack || e?.message || e);
@@ -952,15 +837,14 @@ const ADMIN_HTML = String.raw`<!doctype html>
   function loginLink(){return API+'/auth/google?analytics=1&redirect='+encodeURIComponent(location.href.split('?')[0]);}
   document.getElementById('loginLink').href=loginLink();
   async function api(path,opt){opt=opt||{};var h=opt.headers||{};h['Content-Type']='application/json';if(token)h.Authorization='Bearer '+token;var res=await fetch(API+'/admin/api'+path,{...opt,headers:h});var data=await res.json().catch(function(){return{};});if(res.status===401||res.status===403){throw new Error(data.error||'请先用站长账号登录');}if(!res.ok)throw new Error(data.error||('HTTP '+res.status));return data;}
-  function shell(){root.innerHTML='<div class="app"><aside class="side"><div class="brand">AILatest Admin<small>Owner console · all projects</small></div><nav class="nav">'+[['overview','总览'],['usage','使用量'],['projects','项目'],['users','用户'],['entitlements','权益'],['memberships','会员'],['gift-codes','礼品码'],['api-keys','API Keys'],['payments','支付'],['overrides','覆盖配置'],['audit','审计']].map(function(x){return '<button data-view="'+x[0]+'">'+x[1]+'</button>';}).join('')+'</nav><div class="side-foot">所有写操作进入审计日志<br>删除均为停用/归档</div></aside><main class="main"><div class="top"><div><h1 id="title">总览</h1><p id="subtitle">AILatest 统一后台</p></div><div class="top-actions"><button class="ghost small" id="refresh">刷新</button><button class="ghost small" id="logout">退出</button></div></div><section id="overview" class="view"></section><section id="usage" class="view"></section><section id="projects" class="view"></section><section id="users" class="view"></section><section id="entitlements" class="view"></section><section id="memberships" class="view"></section><section id="gift-codes" class="view"></section><section id="api-keys" class="view"></section><section id="payments" class="view"></section><section id="overrides" class="view"></section><section id="audit" class="view"></section></main></div>';
+  function shell(){root.innerHTML='<div class="app"><aside class="side"><div class="brand">AILatest Admin<small>Owner console · all projects</small></div><nav class="nav">'+[['overview','总览'],['projects','项目'],['users','用户'],['entitlements','权益'],['memberships','会员'],['gift-codes','礼品码'],['api-keys','API Keys'],['usage','调用统计'],['payments','支付'],['overrides','覆盖配置'],['audit','审计']].map(function(x){return '<button data-view="'+x[0]+'">'+x[1]+'</button>';}).join('')+'</nav><div class="side-foot">所有写操作进入审计日志<br>删除均为停用/归档</div></aside><main class="main"><div class="top"><div><h1 id="title">总览</h1><p id="subtitle">AILatest 统一后台</p></div><div class="top-actions"><button class="ghost small" id="refresh">刷新</button><button class="ghost small" id="logout">退出</button></div></div><section id="overview" class="view"></section><section id="projects" class="view"></section><section id="users" class="view"></section><section id="entitlements" class="view"></section><section id="memberships" class="view"></section><section id="gift-codes" class="view"></section><section id="api-keys" class="view"></section><section id="usage" class="view"></section><section id="payments" class="view"></section><section id="overrides" class="view"></section><section id="audit" class="view"></section></main></div>';
     document.querySelectorAll('.nav button').forEach(function(b){b.onclick=function(){go(b.dataset.view);};});document.getElementById('refresh').onclick=function(){load(current);};document.getElementById('logout').onclick=function(){localStorage.removeItem(TOKEN_KEY);location.reload();};
   }
-  function go(view){current=view;document.querySelectorAll('.nav button').forEach(function(b){b.classList.toggle('on',b.dataset.view===view);});document.querySelectorAll('.view').forEach(function(v){v.classList.toggle('active',v.id===view);});var names={'overview':'总览','usage':'使用量','projects':'项目','users':'用户','entitlements':'权益','memberships':'会员','gift-codes':'礼品码','api-keys':'API Keys','payments':'支付','overrides':'覆盖配置','audit':'审计'};document.getElementById('title').textContent=names[view]||view;load(view);}
+  function go(view){current=view;document.querySelectorAll('.nav button').forEach(function(b){b.classList.toggle('on',b.dataset.view===view);});document.querySelectorAll('.view').forEach(function(v){v.classList.toggle('active',v.id===view);});var names={'overview':'总览','projects':'项目','users':'用户','entitlements':'权益','memberships':'会员','gift-codes':'礼品码','api-keys':'API Keys','usage':'调用统计','payments':'支付','overrides':'覆盖配置','audit':'审计'};document.getElementById('title').textContent=names[view]||view;load(view);}
   function set(id,html){document.getElementById(id).innerHTML=html;}
   function openUserForm(user){showModal(user?'编辑用户':'新建用户','<form id="userForm" class="form"><label>邮箱<input name="email" type="email" value="'+esc(user&&user.email||'')+'" required></label><label>登录名<input name="login" value="'+esc(user&&user.login||'')+'"></label><label>姓名<input name="name" value="'+esc(user&&user.name||'')+'"></label><label>状态<select name="status"><option value="active" '+((!user||user.status==='active')?'selected':'')+'>active</option><option value="disabled" '+(user&&user.status==='disabled'?'selected':'')+'>disabled</option></select></label><label>后台备注<textarea name="admin_note">'+esc(user&&user.admin_note||'')+'</textarea></label><div class="form-actions"><button type="button" class="ghost" id="cancel">取消</button><button>保存</button></div></form>');document.getElementById('cancel').onclick=closeModal;document.getElementById('userForm').onsubmit=async function(e){e.preventDefault();var o=Object.fromEntries(new FormData(e.target));try{await api(user?'/users/'+user.id:'/users',{method:user?'PATCH':'POST',body:JSON.stringify(o)});closeModal();notify('已保存');load('users');}catch(err){notify(err.message);}};}
-  async function load(view){try{if(view==='overview')return renderOverview(await api('/summary'));if(view==='usage')return renderUsage(await api('/usage?days='+(cache.usageDays||30)));if(view==='projects')return renderProjects(await api('/projects'));if(view==='users')return renderUsers(await api('/users'+(cache.userQ?'?q='+encodeURIComponent(cache.userQ):'')));if(view==='entitlements')return renderEntitlements(await api('/users?limit=100'));if(view==='memberships')return renderMemberships(await api('/memberships'));if(view==='gift-codes')return renderGiftCodes(await api('/gift-codes'));if(view==='api-keys')return renderApiKeys(await api('/api-keys'));if(view==='payments')return renderPayments(await api('/payments'));if(view==='overrides')return renderOverrides(await api('/overrides'));if(view==='audit')return renderAudit(await api('/audit'));}catch(e){if(!token){root.innerHTML='<div class="card login"><h2>需要站长登录</h2><p class="muted">'+esc(e.message)+'</p><a href="'+esc(loginLink())+'"><button>使用 Google 登录</button></a></div>';return;}notify(e.message);}}
+  async function load(view){try{if(view==='overview')return renderOverview(await api('/summary'));if(view==='projects')return renderProjects(await api('/projects'));if(view==='users')return renderUsers(await api('/users'+(cache.userQ?'?q='+encodeURIComponent(cache.userQ):'')));if(view==='entitlements')return renderEntitlements(await api('/users?limit=100'));if(view==='memberships')return renderMemberships(await api('/memberships'));if(view==='gift-codes')return renderGiftCodes(await api('/gift-codes'));if(view==='api-keys')return renderApiKeys(await api('/api-keys'));if(view==='usage'){var usage=await api('/usage');usage.billing=await api('/billing-usage');return renderUsage(usage);}if(view==='payments')return renderPayments(await api('/payments'));if(view==='overrides')return renderOverrides(await api('/overrides'));if(view==='audit')return renderAudit(await api('/audit'));}catch(e){if(!token){root.innerHTML='<div class="card login"><h2>需要站长登录</h2><p class="muted">'+esc(e.message)+'</p><a href="'+esc(loginLink())+'"><button>使用 Google 登录</button></a></div>';return;}notify(e.message);}}
   function renderOverview(d){var c=d.counts||{};set('overview','<div class="cards"><div class="card"><div class="label">用户</div><div class="metric">'+(c.users||0)+'</div><div class="muted">活跃 '+(c.active_users||0)+'</div></div><div class="card"><div class="label">API Keys</div><div class="metric">'+(c.api_keys||0)+'</div><div class="muted">未撤销</div></div><div class="card"><div class="label">项目</div><div class="metric">'+(d.projects||[]).length+'</div><div class="muted">统一注册表</div></div><div class="card"><div class="label">覆盖配置</div><div class="metric">'+(c.overrides||[]).reduce(function(a,x){return a+Number(x.n||0);},0)+'</div><div class="muted">D1 可追踪</div></div></div><div class="card"><h3>项目状态</h3>'+projectTable(d.projects||[])+'</div><div class="card"><h3>最近操作</h3>'+auditTable(d.recent_audit||[])+'</div>');}
-  function renderUsage(d){var ex=d.extension||{},et=ex.totals||{},dl=d.downloads||{},apiu=d.api||{},ak=d.api_keys||{},assetTotals={};(dl.by_day||[]).forEach(function(r){assetTotals[r.asset]=(assetTotals[r.asset]||0)+Number(r.downloads||0);});var assetRows=Object.keys(assetTotals).map(function(k){return '<tr><td>'+esc(k)+'</td><td>'+Number(assetTotals[k]).toLocaleString()+'</td></tr>';}).join('');var extRows=ex.by_day||[],apiRows=apiu.by_day||[],days={};extRows.concat(apiRows).forEach(function(r){days[r.day]=days[r.day]||{};Object.keys(r).forEach(function(k){if(k!=='day')days[r.day][k]=(days[r.day][k]||0)+Number(r[k]||0);});});var daily=Object.keys(days).sort().reverse().map(function(day){var r=days[day]||{};var e=extRows.find(function(x){return x.day===day;})||{},a=apiRows.find(function(x){return x.day===day;})||{};return '<tr><td>'+esc(day)+'</td><td>'+Number(e.lookup_requests||0).toLocaleString()+'</td><td>'+Number(e.lookup_items||0).toLocaleString()+'</td><td>'+Number(e.heartbeats||0).toLocaleString()+'</td><td>'+Number(e.active_scopes||0).toLocaleString()+'</td><td>'+Number(a.requests||0).toLocaleString()+'</td><td>'+Number(a.routes||0).toLocaleString()+'</td></tr>';}).join('');var top=(apiu.top_routes||[]).map(function(r){return '<tr><td>'+esc(r.method)+'</td><td>'+esc(r.path)+'</td><td>'+Number(r.requests||0).toLocaleString()+'</td><td>'+fmtTime(r.last_seen_at)+'</td></tr>';}).join('');set('usage','<div class="toolbar"><label class="muted">统计窗口 <select id="usageDays"><option value="7" '+(d.window&&d.window.days===7?'selected':'')+'>近 7 天</option><option value="30" '+(!d.window||d.window.days===30?'selected':'')+'>近 30 天</option><option value="90" '+(d.window&&d.window.days===90?'selected':'')+'>近 90 天</option></select></label><button class="ghost" id="usageRefresh">刷新</button></div><div class="notice">窗口：'+esc(d.window&&d.window.start_day||'')+' 至 '+esc(d.window&&d.window.end_day||'')+'（UTC）。匿名活跃范围不是用户数；查询条目按期刊条目计，API 请求按 Worker 路由计数，不含静态 CDN 资源。</div><div class="cards"><div class="card"><div class="label">API 请求</div><div class="metric">'+Number(apiu.totals&&apiu.totals.requests||0).toLocaleString()+'</div><div class="muted">覆盖 '+Number(apiu.totals&&apiu.totals.routes||0)+' 个路由</div></div><div class="card"><div class="label">插件查询请求</div><div class="metric">'+Number(et.lookup_requests||0).toLocaleString()+'</div><div class="muted">实际发往 Worker 的查询批次</div></div><div class="card"><div class="label">插件查询条目</div><div class="metric">'+Number(et.lookup_items||0).toLocaleString()+'</div><div class="muted">按配额计量单位</div></div><div class="card"><div class="label">插件活跃范围</div><div class="metric">'+Number(et.active_scopes||0).toLocaleString()+'</div><div class="muted">匿名 '+Number(et.anonymous_scopes||0)+' · 登录 '+Number(et.signed_in_scopes||0)+'</div></div><div class="card"><div class="label">插件心跳</div><div class="metric">'+Number(et.heartbeats||0).toLocaleString()+'</div><div class="muted">每日打开/启动信号</div></div><div class="card"><div class="label">插件下载</div><div class="metric">'+Number(dl.totals&&dl.totals.downloads||0).toLocaleString()+'</div><div class="muted">窗口内所有插件资产</div></div><div class="card"><div class="label">API Key 累计调用</div><div class="metric">'+Number(ak.lifetime_calls||0).toLocaleString()+'</div><div class="muted">当前 '+Number(ak.active_keys||0)+' 个未撤销 Key</div></div></div><div class="card"><h3>每日汇总</h3><div class="table-wrap"><table class="table"><thead><tr><th>日期（UTC）</th><th>插件请求</th><th>查询条目</th><th>心跳</th><th>活跃范围</th><th>API 请求</th><th>路由数</th></tr></thead><tbody>'+(daily||'<tr><td colspan="7" class="muted">暂无数据</td></tr>')+'</tbody></table></div></div><div class="grid2"><div class="card"><h3>插件下载（按资产）</h3><div class="table-wrap"><table class="table"><thead><tr><th>资产</th><th>次数</th></tr></thead><tbody>'+(assetRows||'<tr><td colspan="2" class="muted">暂无数据</td></tr>')+'</tbody></table></div></div><div class="card"><h3>API 热门路由</h3><div class="table-wrap"><table class="table"><thead><tr><th>方法</th><th>路由</th><th>请求</th><th>最近</th></tr></thead><tbody>'+(top||'<tr><td colspan="4" class="muted">暂无数据</td></tr>')+'</tbody></table></div></div></div>');document.getElementById('usageDays').onchange=function(){cache.usageDays=Number(this.value);load('usage');};document.getElementById('usageRefresh').onclick=function(){load('usage');};}
   function projectTable(rows){if(!rows.length)return '<div class="empty">暂无项目</div>';return '<div class="table-wrap"><table class="table"><thead><tr><th>ID</th><th>名称</th><th>域名</th><th>类型</th><th>状态</th><th>更新时间</th></tr></thead><tbody>'+rows.map(function(r){return '<tr><td>'+esc(r.project_id)+'</td><td>'+esc(r.label)+'</td><td>'+esc(r.host)+'</td><td>'+esc(r.kind)+'</td><td>'+badge(r.status)+'</td><td>'+fmtTime(r.updated_at)+'</td></tr>';}).join('')+'</tbody></table></div>';}
   function renderProjects(d){var rows=d.projects||[];set('projects','<div class="toolbar"><button id="newProject">+ 新项目</button><button class="ghost" id="analytics">打开数据看板</button></div><div class="card">'+projectTable(rows).replace(/<tbody>/,'<tbody>')+'</div><div class="card"><div class="notice">项目注册表管理所有 AILatest 站点的标签、域名和启停状态；归档不会删除统计或用户数据。</div><div class="table-wrap"><table class="table"><thead><tr><th>项目</th><th>备注</th><th>操作</th></tr></thead><tbody>'+rows.map(function(r){return '<tr><td>'+esc(r.project_id)+' · '+esc(r.label)+'</td><td>'+esc(r.note||'')+'</td><td><button class="small ghost edit-project" data-id="'+esc(r.project_id)+'">编辑</button> <button class="small danger archive-project" data-id="'+esc(r.project_id)+'">归档</button></td></tr>';}).join('')+'</tbody></table></div></div>');document.getElementById('analytics').onclick=function(){window.open(API+'/analytics/sites','_blank');};document.getElementById('newProject').onclick=function(){projectForm(null);};document.querySelectorAll('.edit-project').forEach(function(b){b.onclick=function(){projectForm(rows.find(function(x){return x.project_id===b.dataset.id;}));};});document.querySelectorAll('.archive-project').forEach(function(b){b.onclick=async function(){if(!confirm('归档该项目？'))return;try{await api('/projects/'+encodeURIComponent(b.dataset.id),{method:'DELETE'});notify('已归档');load('projects');}catch(e){notify(e.message);}};});}
   function projectForm(p){showModal(p?'编辑项目':'新项目','<form id="projectForm" class="form"><label>ID<input name="project_id" value="'+esc(p&&p.project_id||'')+'" '+(p?'readonly':'')+' required></label><label>名称<input name="label" value="'+esc(p&&p.label||'')+'" required></label><label>域名<input name="host" value="'+esc(p&&p.host||'')+'" required></label><label>类型<input name="kind" value="'+esc(p&&p.kind||'product')+'"></label><label>状态<select name="status"><option '+(!p||p.status==='active'?'selected':'')+'>active</option><option '+(p&&p.status==='paused'?'selected':'')+'>paused</option><option '+(p&&p.status==='archived'?'selected':'')+'>archived</option></select></label><label>备注<textarea name="note">'+esc(p&&p.note||'')+'</textarea></label><div class="form-actions"><button type="button" class="ghost" id="cancel">取消</button><button>保存</button></div></form>');document.getElementById('cancel').onclick=closeModal;document.getElementById('projectForm').onsubmit=async function(e){e.preventDefault();var o=Object.fromEntries(new FormData(e.target));try{await api(p?'/projects/'+encodeURIComponent(p.project_id):'/projects',{method:p?'PATCH':'POST',body:JSON.stringify(o)});closeModal();notify('已保存');load('projects');}catch(err){notify(err.message);}};}
@@ -973,6 +857,7 @@ const ADMIN_HTML = String.raw`<!doctype html>
   function renderGiftCodes(d){var rows=d.gift_codes||[];set('gift-codes','<div class="toolbar"><button id="newGift">+ 生成礼品码</button></div><div class="card"><div class="notice">完整码只在生成时显示一次；后台只保留末 4 位提示。已兑换码不可作废。</div><div class="table-wrap"><table class="table"><thead><tr><th>提示</th><th>计划</th><th>时长</th><th>状态</th><th>创建者</th><th>创建时间</th></tr></thead><tbody>'+rows.map(function(r){return '<tr><td>••••'+esc(r.code_hint)+'</td><td>'+esc(r.plan)+'</td><td>'+esc(r.duration_days||'永久')+'</td><td>'+badge(r.status)+'</td><td>'+esc(r.created_by)+'</td><td>'+fmtTime(r.created_at)+'</td></tr>';}).join('')+'</tbody></table></div></div>');document.getElementById('newGift').onclick=function(){giftForm();};}
   function giftForm(){showModal('生成礼品码','<form id="giftForm" class="form"><label>计划<select name="plan"><option value="pro">Pro</option><option value="max">Max</option></select></label><label>时长（天）<input name="duration_days" value="365"></label><label>数量（1-20）<input name="quantity" value="1"></label><div class="form-actions"><button type="button" class="ghost" id="cancel">取消</button><button>生成</button></div></form>');document.getElementById('cancel').onclick=closeModal;document.getElementById('giftForm').onsubmit=async function(e){e.preventDefault();var o=Object.fromEntries(new FormData(e.target));o.duration_days=Number(o.duration_days);o.quantity=Number(o.quantity);try{var d=await api('/gift-codes',{method:'POST',body:JSON.stringify(o)});showModal('请立即保存礼品码','<div class="notice">完整码不会再次显示。</div><div class="json">'+esc((d.codes||[]).join('\n'))+'</div><div class="form-actions"><button id="done">完成</button></div>');document.getElementById('done').onclick=function(){closeModal();load('gift-codes');};}catch(err){notify(err.message);}};}
   function renderApiKeys(d){var rows=d.api_keys||[];set('api-keys','<div class="toolbar"><button id="newKey">+ 创建 API Key</button></div><div class="card"><div class="notice">只显示前缀和末 6 位；创建时返回完整 secret 一次。撤销后不可恢复。</div><div class="table-wrap"><table class="table"><thead><tr><th>用户</th><th>名称</th><th>Key</th><th>调用</th><th>最后使用</th><th>状态</th><th>操作</th></tr></thead><tbody>'+rows.map(function(r){return '<tr><td>#'+r.user_id+'<br><small>'+esc(r.email||r.login||'')+'</small></td><td>'+esc(r.name)+'</td><td>'+esc(r.key_prefix)+'••••'+esc(r.key_tail)+'</td><td>'+Number(r.call_count||0)+'</td><td>'+fmtTime(r.last_used_at)+'</td><td>'+badge(r.revoked_at?'revoked':'active')+'</td><td><button class="small danger key-revoke" data-id="'+esc(r.id)+'">撤销</button></td></tr>';}).join('')+'</tbody></table></div></div>');document.getElementById('newKey').onclick=function(){keyForm();};document.querySelectorAll('.key-revoke').forEach(function(b){b.onclick=async function(){if(!confirm('撤销 API Key？'))return;try{await api('/api-keys/'+encodeURIComponent(b.dataset.id),{method:'DELETE'});notify('已撤销');load('api-keys');}catch(e){notify(e.message);}};});}
+  function renderUsage(d){var api=d.api||[], ext=d.extension||[], dl=d.downloads||[], b=d.billing||{};var rows={};api.forEach(function(r){rows[r.day]=rows[r.day]||{};rows[r.day].api=Number(r.calls||0);rows[r.day].keys=Number(r.active_keys||0);});ext.forEach(function(r){rows[r.day]=rows[r.day]||{};rows[r.day].ext=Number(r.calls||0);rows[r.day].scopes=Number(r.active_scopes||0);});var days=Object.keys(rows).sort().reverse();var billingHtml=b.ok?'<div class="cards"><div class="card"><div class="label">Cloudflare 当前账期成本</div><div class="metric">'+Number(b.totalCost||0).toFixed(2)+' '+esc(b.currency||'USD')+'</div><div class="muted">'+esc(b.from||'')+' 至 '+esc(b.to||'')+'</div></div><div class="card"><div class="label">D1 成本</div><div class="metric">'+Number(b.d1Cost||0).toFixed(2)+' '+esc(b.currency||'USD')+'</div><div class="muted">Cloudflare Billable Usage API</div></div></div><div class="card"><h3>Cloudflare 账单用量</h3><div class="notice">账单接口按天更新，不是实时余额；D1 写入保护仍由运行时配额负责。当前返回 '+(b.rows||[]).length+' 条产品/服务记录。</div><div class="table-wrap"><table class="table"><thead><tr><th>服务</th><th>计量</th><th>计费量</th><th>成本</th></tr></thead><tbody>'+(b.rows||[]).map(function(r){return '<tr><td>'+esc(r.service||r.family||'-')+'</td><td>'+esc(String(r.consumedUnit||r.pricingUnit||''))+'</td><td>'+Number(r.pricingQuantity||r.consumedQuantity||0)+'</td><td>'+Number(r.contractedCost||0).toFixed(4)+' '+esc(r.currency||b.currency||'')+'</td></tr>';}).join('')+'</tbody></table></div></div>':'<div class="card"><div class="notice">Cloudflare 账单用量暂不可读：'+esc(b.error||'尚未配置 CF_BILLING_TOKEN')+'。请配置账户级 Billing Read Token。</div></div>';set('usage','<div class="toolbar"><button class="ghost" id="usageRefresh">刷新</button></div>'+billingHtml+'<div class="card"><div class="notice">API 调用按 API Key 统计；Chrome 插件按 /ext/lookup 的实际查询量统计。active scopes 表示当天活跃用户/安装范围，不等于去重后的真实人数。</div><div class="table-wrap"><table class="table"><thead><tr><th>日期</th><th>API 调用</th><th>活跃 API Key</th><th>插件调用</th><th>活跃插件范围</th><th>插件下载</th></tr></thead><tbody>'+days.map(function(day){var r=rows[day]||{};var downloads=dl.filter(function(x){return x.day===day;}).reduce(function(n,x){return n+Number(x.calls||0);},0);return '<tr><td>'+esc(day)+'</td><td>'+Number(r.api||0)+'</td><td>'+Number(r.keys||0)+'</td><td>'+Number(r.ext||0)+'</td><td>'+Number(r.scopes||0)+'</td><td>'+downloads+'</td></tr>';}).join('')+'</tbody></table></div></div>');document.getElementById('usageRefresh').onclick=function(){load('usage');};}
   function keyForm(){showModal('创建 API Key','<form id="keyForm" class="form"><label>用户 ID<input name="user_id" required></label><label>名称<input name="name" value="Admin API"></label><div class="form-actions"><button type="button" class="ghost" id="cancel">取消</button><button>创建</button></div></form>');document.getElementById('cancel').onclick=closeModal;document.getElementById('keyForm').onsubmit=async function(e){e.preventDefault();var o=Object.fromEntries(new FormData(e.target));try{var d=await api('/api-keys',{method:'POST',body:JSON.stringify(o)});showModal('请立即保存 Secret','<div class="notice">完整 secret 只显示一次：'+esc(d.secret||'')+'</div><div class="form-actions"><button id="done">完成</button></div>');document.getElementById('done').onclick=function(){closeModal();load('api-keys');};}catch(err){notify(err.message);}};}
   function renderPayments(d){set('payments','<div class="notice">支付状态来自 Creem webhook / confirm 记录，此页只读。退款、退款原因和订单级操作请在 Creem 完成。</div><div class="card"><h3>会员与订阅</h3>'+projectTable((d.subscriptions||[]).map(function(r){return {project_id:'#'+r.user_id,label:r.email||r.customer_email||'-',host:r.product_id||'',kind:r.tier,status:r.status,updated_at:r.updated_at};}))+'</div><div class="card"><h3>Webhook 事件</h3>'+auditTable(d.webhook_events||[])+'</div>');}
   function renderOverrides(d){var rows=d.overrides||[];set('overrides','<div class="toolbar"><button id="newOverride">+ 新覆盖配置</button></div><div class="card"><div class="notice">这里保存 D1 覆盖配置，不直接改动 Pages 中的大型静态期刊数据；适合隐藏、标记风险、补充字段。发布到前端的合并逻辑可按项目逐步接入。</div><div class="table-wrap"><table class="table"><thead><tr><th>项目</th><th>记录</th><th>状态</th><th>备注</th><th>更新时间</th><th>操作</th></tr></thead><tbody>'+rows.map(function(r){return '<tr><td>'+esc(r.project_id)+'</td><td>'+esc(r.record_key)+'</td><td>'+badge(r.status)+'</td><td>'+esc(r.note||'')+'</td><td>'+fmtTime(r.updated_at)+'</td><td><button class="small ghost override-edit" data-project="'+esc(r.project_id)+'" data-key="'+esc(r.record_key)+'">编辑</button> <button class="small danger override-del" data-project="'+esc(r.project_id)+'" data-key="'+esc(r.record_key)+'">归档</button></td></tr>';}).join('')+'</tbody></table></div></div>');document.getElementById('newOverride').onclick=function(){overrideForm(null);};document.querySelectorAll('.override-edit').forEach(function(b){b.onclick=function(){overrideForm(rows.find(function(x){return x.project_id===b.dataset.project&&x.record_key===b.dataset.key;}));};});document.querySelectorAll('.override-del').forEach(function(b){b.onclick=async function(){if(!confirm('归档覆盖配置？'))return;try{await api('/overrides/'+encodeURIComponent(b.dataset.project)+'/'+encodeURIComponent(b.dataset.key),{method:'DELETE'});notify('已归档');load('overrides');}catch(e){notify(e.message);}};});}

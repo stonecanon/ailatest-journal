@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cloudflare D1 写入审计报告</title>
+<style>
+  :root { --ink:#1a2233; --muted:#667085; --blue:#2456e6; --line:#e6e9f0; --bg:#f7f9fc; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif; color:var(--ink); background:#fff; }
+  .wrap { max-width: 980px; margin:0 auto; padding: 40px 28px 60px; }
+  h1 { font-size:24px; margin:0 0 6px; }
+  .sub { color:var(--muted); font-size:13px; margin-bottom:24px; }
+  .cards { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:28px; }
+  .card { background:var(--bg); border:1px solid var(--line); border-radius:12px; padding:16px; }
+  .card .k { font-size:12px; color:var(--muted); margin-bottom:6px; }
+  .card .v { font-size:20px; font-weight:700; }
+  .card .v small { font-size:12px; font-weight:500; color:var(--muted); }
+  .chart-box { border:1px solid var(--line); border-radius:12px; padding:20px 16px 8px; margin-bottom:28px; }
+  .chart-title { font-size:14px; font-weight:700; margin-bottom:12px; }
+  canvas { width:100%; height:340px; display:block; }
+  h2 { font-size:16px; margin:28px 0 10px; border-left:3px solid var(--blue); padding-left:10px; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th,td { border:1px solid var(--line); padding:7px 10px; text-align:left; }
+  th { background:var(--bg); font-weight:600; position:sticky; top:0; }
+  td.num, th.num { text-align:right; font-variant-numeric:tabular-nums; }
+  tr:nth-child(even) td { background:#fbfcfe; }
+  .note { color:var(--muted); font-size:12px; margin-top:10px; line-height:1.7; }
+  .root { background:#fff8f6; border:1px solid #ffd9cc; border-radius:12px; padding:16px 18px; margin-top:14px; }
+  .root li { margin:6px 0; font-size:13px; }
+  @media (max-width:700px){ .cards{grid-template-columns:repeat(2,1fr);} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Cloudflare D1 写入审计报告</h1>
+  <div class="sub">数据库 ailatest-journal（uuid 861dd053-c23a-4363-b62b-2559c06ec3fd）· 账户 e7dbf2ec3ab60aa5557cc2364a7a2f26 · 数据来源：Cloudflare GraphQL API（d1AnalyticsAdaptiveGroups）</div>
+
+  <div class="cards">
+    <div class="card"><div class="k">缺陷起始</div><div class="v">2026-06-13</div></div>
+    <div class="card"><div class="k">稳定刷写开始</div><div class="v">2026-06-21</div></div>
+    <div class="card"><div class="k">修复完成</div><div class="v">2026-08-20</div></div>
+    <div class="card"><div class="k">峰值单日写入</div><div class="v">22.6M <small>行 (08-10)</small></div></div>
+  </div>
+
+  <div class="chart-box">
+    <div class="chart-title">每日 D1 行写入量（2026-06-13 → 08-20）</div>
+    <canvas id="chart"></canvas>
+  </div>
+
+  <div class="root">
+    <strong style="font-size:14px">根因（三层叠加的代码缺陷）</strong>
+    <ul>
+      <li>① 定时任务频率过高：cron 配为 <code>*/15 * * * *</code>，每 15 分钟执行一次。</li>
+      <li>② 回扫窗口过大：每次执行扫描<strong>最近 90 天</strong>的全部事件数据做流量分类。</li>
+      <li>③ UPDATE 无去重过滤：分类的 UPDATE 只按时间范围、未按"是否已分类"过滤，已分类的历史行被反复写回；D1 对 UPDATE 按行计费（值不变也计入）。</li>
+    </ul>
+    <strong style="font-size:14px">已部署修复（2026-08-20 当天）</strong>
+    <ul>
+      <li>✓ 停用高频 cron，仅保留每天一次 <code>12 16 * * *</code></li>
+      <li>✓ 回扫窗口 90 天 → 1 天</li>
+      <li>✓ UPDATE 增加 <code>AND (traffic_type='' OR visitor_hash='')</code> 过滤，只处理未分类行</li>
+    </ul>
+  </div>
+
+  <h2>每日写入明细</h2>
+  <table id="tbl"><thead><tr><th>日期</th><th class="num">写入行数</th><th class="num">约合费用($)</th></tr></thead><tbody></tbody></table>
+  <div class="note">注：费用按 D1 计费标准估算（每月前 5000 万行免费，超出部分 $1/百万行）。08-20 为修复当天、数据截至 16:32 UTC，故明显下降。</div>
+</div>
+
+<script>
+const data = [
+['06-13',2454306],['06-14',1566333],['06-15',1668490],['06-16',8430],['06-17',15627],['06-18',13949],['06-19',9322],['06-20',5126],
+['06-21',4858868],['06-22',4957126],['06-23',5741505],['06-24',5154416],['06-25',6064872],['06-26',7548369],['06-27',7960850],['06-28',7313129],['06-29',8048023],['06-30',8706314],
+['07-01',8048299],['07-02',8713388],['07-03',9644849],['07-04',9825224],['07-05',8743312],['07-06',8503203],['07-07',8610987],['07-08',8592763],['07-09',9902167],['07-10',8723698],['07-11',8284306],['07-12',8570165],['07-13',8757149],['07-14',9914936],
+['07-15',10490728],['07-16',10690356],['07-17',10542775],['07-18',9886293],['07-19',12524074],['07-20',11258584],['07-21',11911240],['07-22',11573240],['07-23',11488821],['07-24',11337094],['07-25',10863056],['07-26',11812922],['07-27',10971809],['07-28',11413747],['07-29',10234403],['07-30',12883401],['07-31',12657611],
+['08-01',12911323],['08-02',12520958],['08-03',13132377],['08-04',11318386],['08-05',10389383],['08-06',19924494],['08-07',14688686],['08-08',17730361],['08-09',11797588],['08-10',22574597],['08-11',14520150],['08-12',13613532],['08-13',13667403],['08-14',13710246],['08-15',14241982],['08-16',14084543],['08-17',14103960],['08-18',14125453],['08-19',13953391],['08-20',4745444]
+];
+
+// 表格
+const tbody = document.querySelector('#tbl tbody');
+data.forEach(([d, n]) => {
+  const tr = document.createElement('tr');
+  const cost = (n / 1000000).toFixed(2);
+  tr.innerHTML = `<td>${d}</td><td class="num">${n.toLocaleString('en-US')}</td><td class="num">${cost}</td>`;
+  tbody.appendChild(tr);
+});
+
+// 折线图
+const canvas = document.getElementById('chart');
+const ctx = canvas.getContext('2d');
+const dpr = window.devicePixelRatio || 1;
+const W = canvas.clientWidth, H = canvas.clientHeight;
+canvas.width = W * dpr; canvas.height = H * dpr;
+ctx.scale(dpr, dpr);
+
+const padL = 52, padR = 14, padT = 14, padB = 30;
+const plotW = W - padL - padR, plotH = H - padT - padB;
+const maxV = 24000000;
+const n = data.length;
+const x = i => padL + (i / (n - 1)) * plotW;
+const y = v => padT + plotH - (v / maxV) * plotH;
+
+// 网格 + y 轴刻度
+ctx.strokeStyle = '#eef1f6'; ctx.fillStyle = '#98a2b3'; ctx.font = '11px sans-serif';
+for (let g = 0; g <= 6; g++) {
+  const v = maxV / 6 * g, yy = y(v);
+  ctx.beginPath(); ctx.moveTo(padL, yy); ctx.lineTo(W - padR, yy); ctx.stroke();
+  ctx.textAlign = 'right'; ctx.fillText((v/1000000).toFixed(0) + 'M', padL - 8, yy + 4);
+}
+// x 轴刻度（每月首日 + 修复点）
+ctx.textAlign = 'center';
+data.forEach(([d], i) => {
+  if (d.endsWith('-01') || d === '06-13' || d === '06-21' || d === '08-20') {
+    ctx.fillText(d.slice(3), x(i), H - 10);
+  }
+});
+
+// 折线
+ctx.beginPath();
+data.forEach(([d, v], i) => { i === 0 ? ctx.moveTo(x(i), y(v)) : ctx.lineTo(x(i), y(v)); });
+ctx.strokeStyle = '#2456e6'; ctx.lineWidth = 2; ctx.stroke();
+
+// 面积填充
+ctx.lineTo(x(n-1), padT + plotH); ctx.lineTo(x(0), padT + plotH); ctx.closePath();
+const grad = ctx.createLinearGradient(0, padT, 0, padT + plotH);
+grad.addColorStop(0, 'rgba(36,86,230,0.18)'); grad.addColorStop(1, 'rgba(36,86,230,0)');
+ctx.fillStyle = grad; ctx.fill();
+
+// 关键点标注
+function mark(i, label, color) {
+  const [d, v] = data[i];
+  ctx.beginPath(); ctx.arc(x(i), y(v), 4, 0, Math.PI * 2); ctx.fillStyle = color; ctx.fill();
+  ctx.fillStyle = color; ctx.textAlign = 'center';
+  ctx.fillText(label, x(i), y(v) - 10);
+}
+mark(0, '上线 06-13', '#f79009');
+mark(data.findIndex(d => d[0]==='06-21'), '开始刷写 06-21', '#f79009');
+mark(data.findIndex(d => d[0]==='08-10'), '峰值 22.6M', '#ef4444');
+mark(n-1, '修复 08-20', '#12b76a');
+</script>
+</body>
+</html>

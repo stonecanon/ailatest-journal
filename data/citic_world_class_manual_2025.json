@@ -131,6 +131,9 @@
     {"name": "IEEE TRANSACTIONS ON COGNITIVE AND DEVELOPMENTAL SYSTEMS", "issn": "2379-8920", "publisher": "IEEE", "evidence": "用户补充的 IEEE 入选名单（IEEE TCDS）"},
     {"name": "IEEE TRANSACTIONS ON EMERGING TOPICS IN COMPUTATIONAL INTELLIGENCE", "issn": "2471-285X", "publisher": "IEEE", "evidence": "用户补充的 IEEE 入选名单（IEEE TETCI）"},
     {"name": "IEEE TRANSACTIONS ON SIGNAL AND INFORMATION PROCESSING OVER NETWORKS", "issn": "2373-776X", "publisher": "IEEE", "evidence": "用户补充的 IEEE 入选名单（IEEE TSIPN）"},
-    {"name": "IEEE TRANSACTIONS ON INSTRUMENTATION AND MEASUREMENT", "issn": "0018-9456", "publisher": "IEEE", "evidence": "用户补充的 IEEE 入选名单（IEEE TIM）"}
+    {"name": "IEEE TRANSACTIONS ON INSTRUMENTATION AND MEASUREMENT", "issn": "0018-9456", "publisher": "IEEE", "evidence": "用户补充的 IEEE 入选名单（IEEE TIM）"},
+    {"name": "NATURE", "issn": "0028-0836", "evidence": "用户提供的中信所查询结果截图"},
+    {"name": "ENERGY AND BUILDINGS", "issn": "0378-7788", "evidence": "用户提供的中信所查询结果截图"},
+    {"name": "JOURNAL OF ASIAN ARCHITECTURE AND BUILDING ENGINEERING", "issn": "1346-7581", "evidence": "用户提供的中信所查询结果截图"}
   ]
 }

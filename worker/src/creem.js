@@ -206,6 +206,85 @@ export const GRANT_CREEM_PRODUCTS = {
   },
 };
 
+/**
+ * Grant 国际站产品目录（价格约为国内 3×，Creem 标价 = 划线原价，折扣码落到实付价）。
+ * product_id 在 Creem 后台创建后填入（env CREEM_GRANT_INTL_*_PRODUCT_ID 优先）。
+ */
+export const GRANT_CREEM_PRODUCTS_INTL = {
+  pro_intl_monthly: {
+    product_id: 'prod_7XzAmCbU6YXoFtetZndiZc',
+    discount_code: 'GRIPROM',
+    tier: 'plus',
+    period: 'month',
+    edu: false,
+    market: 'intl',
+    checkout_url: 'https://creem.io/product/prod_7XzAmCbU6YXoFtetZndiZc?discount_code=GRIPROM',
+  },
+  pro_intl_yearly: {
+    product_id: 'prod_57P3ye6xgvoBulBkz3Al3O',
+    discount_code: 'GRIPROY',
+    tier: 'plus',
+    period: 'year',
+    edu: false,
+    market: 'intl',
+    checkout_url: 'https://creem.io/product/prod_57P3ye6xgvoBulBkz3Al3O?discount_code=GRIPROY',
+  },
+  max_intl_monthly: {
+    product_id: 'prod_2Pdwlyv3htQLcfuCG6UatJ',
+    discount_code: 'GRIMAXM',
+    tier: 'pro',
+    period: 'month',
+    edu: false,
+    market: 'intl',
+    checkout_url: 'https://creem.io/product/prod_2Pdwlyv3htQLcfuCG6UatJ?discount_code=GRIMAXM',
+  },
+  max_intl_yearly: {
+    product_id: 'prod_3QUwqls109msHQhP5KkfAD',
+    discount_code: 'GRIMAXY',
+    tier: 'pro',
+    period: 'year',
+    edu: false,
+    market: 'intl',
+    checkout_url: 'https://creem.io/product/prod_3QUwqls109msHQhP5KkfAD?discount_code=GRIMAXY',
+  },
+  pro_intl_edu_monthly: {
+    product_id: 'prod_WpuTAMaYq1fxeNWkN0KkZ',
+    discount_code: 'GRIEPROM',
+    tier: 'plus',
+    period: 'month',
+    edu: true,
+    market: 'intl',
+    checkout_url: 'https://creem.io/product/prod_WpuTAMaYq1fxeNWkN0KkZ?discount_code=GRIEPROM',
+  },
+  pro_intl_edu_yearly: {
+    product_id: 'prod_718Lk3hL4oEddk9tuQMydm',
+    discount_code: 'GRIEPROY',
+    tier: 'plus',
+    period: 'year',
+    edu: true,
+    market: 'intl',
+    checkout_url: 'https://creem.io/product/prod_718Lk3hL4oEddk9tuQMydm?discount_code=GRIEPROY',
+  },
+  max_intl_edu_monthly: {
+    product_id: 'prod_7cdzG1YeQHH3MVv5pxHJ5K',
+    discount_code: 'GRIEMAXM',
+    tier: 'pro',
+    period: 'month',
+    edu: true,
+    market: 'intl',
+    checkout_url: 'https://creem.io/product/prod_7cdzG1YeQHH3MVv5pxHJ5K?discount_code=GRIEMAXM',
+  },
+  max_intl_edu_yearly: {
+    product_id: 'prod_3eaBdivzN1IigS2P2lWN8G',
+    discount_code: 'GRIEMAXY',
+    tier: 'pro',
+    period: 'year',
+    edu: true,
+    market: 'intl',
+    checkout_url: 'https://creem.io/product/prod_3eaBdivzN1IigS2P2lWN8G?discount_code=GRIEMAXY',
+  },
+};
+
 function normalizeApp(app) {
   const a = String(app || 'journal').toLowerCase().trim();
   if (a === 'grant' || a === 'grants' || a === 'ailatest-grant') return 'grant';
@@ -215,6 +294,11 @@ function normalizeApp(app) {
 
 function catalogForApp(app) {
   return normalizeApp(app) === 'grant' ? GRANT_CREEM_PRODUCTS : CREEM_PRODUCTS;
+}
+
+/** grant 国际站目录（market=intl / global） */
+function catalogForAppIntl(app) {
+  return normalizeApp(app) === 'grant' ? GRANT_CREEM_PRODUCTS_INTL : null;
 }
 
 function productIdFromEnv(env, key, app = 'journal') {
@@ -228,10 +312,18 @@ function productIdFromEnv(env, key, app = 'journal') {
       pro_edu_yearly: env.CREEM_GRANT_PRO_EDU_YEARLY_PRODUCT_ID,
       max_edu_monthly: env.CREEM_GRANT_MAX_EDU_MONTHLY_PRODUCT_ID,
       max_edu_yearly: env.CREEM_GRANT_MAX_EDU_YEARLY_PRODUCT_ID,
+      pro_intl_monthly: env.CREEM_GRANT_INTL_PRO_MONTHLY_PRODUCT_ID,
+      pro_intl_yearly: env.CREEM_GRANT_INTL_PRO_YEARLY_PRODUCT_ID,
+      max_intl_monthly: env.CREEM_GRANT_INTL_MAX_MONTHLY_PRODUCT_ID,
+      max_intl_yearly: env.CREEM_GRANT_INTL_MAX_YEARLY_PRODUCT_ID,
+      pro_intl_edu_monthly: env.CREEM_GRANT_INTL_PRO_EDU_MONTHLY_PRODUCT_ID,
+      pro_intl_edu_yearly: env.CREEM_GRANT_INTL_PRO_EDU_YEARLY_PRODUCT_ID,
+      max_intl_edu_monthly: env.CREEM_GRANT_INTL_MAX_EDU_MONTHLY_PRODUCT_ID,
+      max_intl_edu_yearly: env.CREEM_GRANT_INTL_MAX_EDU_YEARLY_PRODUCT_ID,
     };
     const fromEnv = String(map[key] || '').trim();
     if (fromEnv) return fromEnv;
-    return String(GRANT_CREEM_PRODUCTS[key]?.product_id || '').trim();
+    return String((GRANT_CREEM_PRODUCTS[key] || GRANT_CREEM_PRODUCTS_INTL[key])?.product_id || '').trim();
   }
   const map = {
     pro_cn_365: env.CREEM_PRO_CN_365_PRODUCT_ID,
@@ -257,7 +349,11 @@ function checkoutUrlFor(productId, discountCode) {
 export function resolveCreemPlan(env, { plan = 'pro', period = 'year', edu = false, app = 'journal', market = '' } = {}) {
   const appKey = normalizeApp(app);
   if (appKey === 'todo') return null;
-  const catalog = catalogForApp(appKey);
+  // grant 国际站：market=intl / global → 用国际价目录（国内目录的价格仅参考，避免扣错款）
+  const isIntl = appKey === 'grant'
+    && (['intl', 'global', 'international'].includes(String(market || '').toLowerCase()));
+  const catalog = isIntl ? catalogForAppIntl(appKey) : catalogForApp(appKey);
+  if (!catalog) return null;
   const p = plan === 'max' || plan === 'pro_max' ? 'max' : 'pro';
   const isChinaOneTime = appKey === 'journal'
     && (String(market || '').toLowerCase() === 'cn' || ['one_time', '365', '365days', '365_day'].includes(String(period || '').toLowerCase()));
@@ -278,7 +374,9 @@ export function resolveCreemPlan(env, { plan = 'pro', period = 'year', edu = fal
     };
   }
   const y = period === 'month' || period === 'monthly' ? 'monthly' : 'yearly';
-  const key = edu ? `${p}_edu_${y}` : `${p}_${y}`;
+  const key = isIntl
+    ? (edu ? `${p}_intl_edu_${y}` : `${p}_intl_${y}`)
+    : (edu ? `${p}_edu_${y}` : `${p}_${y}`);
   const base = catalog[key];
   if (!base) return null;
   const product_id = productIdFromEnv(env, key, appKey) || base.product_id;
@@ -307,11 +405,13 @@ function defaultPaidUntilSec(env, productId, nowSec) {
   const id = String(productId || '').trim();
   let period = 'year';
   for (const app of ['journal', 'grant']) {
-    const catalog = catalogForApp(app);
-    for (const key of Object.keys(catalog)) {
-      if (productIdFromEnv(env, key, app) === id || catalog[key].product_id === id) {
-        period = catalog[key].period;
-        return nowSec + (period === 'month' ? 31 : period === 'one_time' ? 365 : 366) * 86400;
+    const catalogs = [catalogForApp(app), catalogForAppIntl(app)].filter(Boolean);
+    for (const catalog of catalogs) {
+      for (const key of Object.keys(catalog)) {
+        if (productIdFromEnv(env, key, app) === id || catalog[key].product_id === id) {
+          period = catalog[key].period;
+          return nowSec + (period === 'month' ? 31 : period === 'one_time' ? 365 : 366) * 86400;
+        }
       }
     }
   }
@@ -323,16 +423,18 @@ export function metaForProductId(env, productId) {
   const id = String(productId || '').trim();
   if (!id) return null;
   for (const app of ['journal', 'grant']) {
-    const catalog = catalogForApp(app);
-    for (const key of Object.keys(catalog)) {
-      const pid = productIdFromEnv(env, key, app);
-      if (pid && pid === id) {
-        return { tier: catalog[key].tier, app, edu: !!catalog[key].edu, key, period: catalog[key].period, market: catalog[key].market || (key.endsWith('_cn_365') ? 'cn' : 'intl') };
+    const catalogs = [catalogForApp(app), catalogForAppIntl(app)].filter(Boolean);
+    for (const catalog of catalogs) {
+      for (const key of Object.keys(catalog)) {
+        const pid = productIdFromEnv(env, key, app);
+        if (pid && pid === id) {
+          return { tier: catalog[key].tier, app, edu: !!catalog[key].edu, key, period: catalog[key].period, market: catalog[key].market || (key.endsWith('_cn_365') ? 'cn' : 'intl') };
+        }
       }
-    }
-    for (const [key, meta] of Object.entries(catalog)) {
-      if (meta.product_id && meta.product_id === id) {
-        return { tier: meta.tier, app, edu: !!meta.edu, key, period: meta.period, market: meta.market || (key.endsWith('_cn_365') ? 'cn' : 'intl') };
+      for (const [key, meta] of Object.entries(catalog)) {
+        if (meta.product_id && meta.product_id === id) {
+          return { tier: meta.tier, app, edu: !!meta.edu, key, period: meta.period, market: meta.market || (key.endsWith('_cn_365') ? 'cn' : 'intl') };
+        }
       }
     }
   }
@@ -352,26 +454,28 @@ export function listCreemCatalog(env, appFilter) {
   const out = [];
   for (const app of apps) {
     if (app === 'todo') continue;
-    const catalog = catalogForApp(app);
-    for (const key of Object.keys(catalog)) {
-      const base = catalog[key];
-      if (base.legacy) continue;
-      const product_id = productIdFromEnv(env, key, app) || base.product_id || '';
-      out.push({
-        app,
-        key,
-        product_id,
-        discount_code: base.discount_code,
-        tier: base.tier,
-        product_tier: base.tier === 'pro' ? 'max' : 'pro',
-        period: base.period,
-        market: base.market || (key.endsWith('_cn_365') ? 'cn' : 'intl'),
-        duration_days: base.duration_days || null,
-        one_time: !!base.one_time,
-        edu: base.edu,
-        configured: !!product_id,
-        checkout_url: checkoutUrlFor(product_id, base.discount_code),
-      });
+    const catalogs = [catalogForApp(app), catalogForAppIntl(app)].filter(Boolean);
+    for (const catalog of catalogs) {
+      for (const key of Object.keys(catalog)) {
+        const base = catalog[key];
+        if (base.legacy) continue;
+        const product_id = productIdFromEnv(env, key, app) || base.product_id || '';
+        out.push({
+          app,
+          key,
+          product_id,
+          discount_code: base.discount_code,
+          tier: base.tier,
+          product_tier: base.tier === 'pro' ? 'max' : 'pro',
+          period: base.period,
+          market: base.market || (key.endsWith('_cn_365') ? 'cn' : 'intl'),
+          duration_days: base.duration_days || null,
+          one_time: !!base.one_time,
+          edu: base.edu,
+          configured: !!product_id,
+          checkout_url: checkoutUrlFor(product_id, base.discount_code),
+        });
+      }
     }
   }
   return out;

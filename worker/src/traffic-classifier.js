@@ -165,6 +165,7 @@ export async function applyTrafficClassification(env, {
          SET traffic_type = CASE WHEN COALESCE(traffic_type,'') = '' THEN CASE WHEN is_bot=1 THEN 'scraper' ELSE 'human' END ELSE traffic_type END,
              visitor_hash = CASE WHEN COALESCE(visitor_hash,'') = '' THEN 'vh_' || substr(COALESCE(ip_hash,''),1,18) || '_' || substr(COALESCE(visitor_id,''),1,18) ELSE visitor_hash END
        WHERE ${table === 'journal_view_events' ? 'viewed_at' : 'event_ts'} >= ?
+         AND (COALESCE(traffic_type,'') = '' OR COALESCE(visitor_hash,'') = '')
     `, [start]).catch(() => null);
   }
 

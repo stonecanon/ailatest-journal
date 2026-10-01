@@ -8,9 +8,7 @@
 
 import { CORS, json, loadJournals } from './deepseek-common.js';
 
-const DEFAULT_LOOKUP_URL = 'https://journal.ailatest.org/data/ext_lookup_v3.json.gz';
-const DEFAULT_LOOKUP_SHARD_BASE = 'https://journal.ailatest.org/data/ext_lookup_v3_shards/';
-const LOOKUP_SHARD_COUNT = 64;
+const DEFAULT_LOOKUP_URL = 'https://journal.ailatest.org/data/ext_lookup.json.gz?v=20260806-ext-v2';
 const ANONYMOUS_EXTENSION_FEATURES = {
   queries_per_day: 40,
   devices: 1,
@@ -19,7 +17,6 @@ const ANONYMOUS_EXTENSION_FEATURES = {
 
 let lookupCache = null;
 let lookupPromise = null;
-const lookupShardCache = new Map();
 
 function issnKey(value) {
   return String(value || '').replace(/[^0-9Xx]/g, '').toUpperCase();
@@ -35,16 +32,6 @@ function norm(value) {
     .replace(/\s+/g, ' ')
     .trim()
     .replace(/^(the|a|an) /, '');
-}
-
-function shardId(value) {
-  let hash = 2166136261;
-  const text = String(value || '');
-  for (let i = 0; i < text.length; i += 1) {
-    hash ^= text.charCodeAt(i);
-    hash = Math.imul(hash, 16777619);
-  }
-  return String((hash >>> 0) % LOOKUP_SHARD_COUNT).padStart(2, '0');
 }
 
 async function fetchJsonMaybeGzip(url) {
@@ -96,50 +83,6 @@ async function loadLookupIndex(env) {
   return lookupPromise;
 }
 
-function lookupKeys(item) {
-  const keys = [];
-  const issn = issnKey(item?.issn);
-  if (issn) keys.push(`i:${issn}`);
-  const name = norm(item?.name);
-  if (name) keys.push(`n:${name}`);
-  return keys;
-}
-
-async function loadLookupShard(env, id) {
-  const base = env.EXT_LOOKUP_SHARD_BASE || DEFAULT_LOOKUP_SHARD_BASE;
-  const url = `${base.replace(/\/$/, '')}/${id}.json.gz`;
-  if (lookupShardCache.has(url)) return lookupShardCache.get(url);
-  const promise = fetchJsonMaybeGzip(url).catch((error) => {
-    lookupShardCache.delete(url);
-    throw error;
-  });
-  lookupShardCache.set(url, promise);
-  return promise;
-}
-
-async function loadShardedLookupIndex(env, items) {
-  const shardIds = new Set();
-  (items || []).forEach((item) => lookupKeys(item).forEach((key) => shardIds.add(shardId(key))));
-  const maps = await Promise.all(Array.from(shardIds).map((id) => loadLookupShard(env, id)));
-  const index = { byIssn: new Map(), byName: new Map() };
-  maps.forEach((shard) => {
-    Object.entries(shard || {}).forEach(([key, record]) => {
-      if (key.startsWith('i:')) index.byIssn.set(key.slice(2), record);
-      else if (key.startsWith('n:')) index.byName.set(key.slice(2), record);
-    });
-  });
-  return index;
-}
-
-async function loadLookupIndexForItems(env, items) {
-  try {
-    if (Array.isArray(items) && items.length) return await loadShardedLookupIndex(env, items);
-  } catch (error) {
-    console.warn('[ext-lookup] sharded lookup failed; using compact fallback:', error?.message || error);
-  }
-  return loadLookupIndex(env);
-}
-
 function lookupOne(index, query) {
   const ik = issnKey(query?.issn);
   if (ik && index.byIssn.has(ik)) return index.byIssn.get(ik);
@@ -167,9 +110,7 @@ function canShow(features, key) {
 }
 
 function retractionCount(value) {
-  const n = typeof value === 'number'
-    ? value
-    : Number(value?.retractions_total ?? value?.total ?? value?.count ?? 0);
+  const n = Number(value?.retractions_total ?? value?.total ?? value?.count ?? 0);
   return Number.isFinite(n) ? Math.max(0, n) : 0;
 }
 
@@ -268,9 +209,6 @@ async function ensureExtensionQuotaTables(env) {
         scope_key   TEXT NOT NULL,
         day         TEXT NOT NULL,
         used        INTEGER NOT NULL DEFAULT 0,
-        requests    INTEGER NOT NULL DEFAULT 0,
-        heartbeats  INTEGER NOT NULL DEFAULT 0,
-        last_seen_at INTEGER,
         updated_at  INTEGER NOT NULL,
         PRIMARY KEY (scope_key, day)
       )`
@@ -287,9 +225,6 @@ async function ensureExtensionQuotaTables(env) {
     env.DB.prepare('CREATE INDEX IF NOT EXISTS idx_extension_usage_day ON extension_usage(day, scope_key)'),
     env.DB.prepare('CREATE INDEX IF NOT EXISTS idx_extension_devices_user_seen ON extension_devices(user_id, last_seen_at)'),
   ]);
-  // The production schema is managed by worker/migrations.  Do not issue
-  // three sequential ALTER TABLE probes on every cold isolate; those probes
-  // were the main source of the first-request delay for anonymous users.
   extensionQuotaReady = true;
 }
 
@@ -339,48 +274,26 @@ async function consumeExtensionQuota(env, context, features, amount) {
   if (count > limit) return { ok: false, code: 'extension_quota', used: 0, limit, remaining: 0, day };
   await ensureExtensionQuotaTables(env);
   const scope = quotaScope(context);
-  const inserted = await env.DB.prepare(
-    `INSERT INTO extension_usage (scope_key, day, used, requests, heartbeats, last_seen_at, updated_at)
-     VALUES (?, ?, ?, 1, 0, ?, ?)
+  const result = await env.DB.prepare(
+    `INSERT INTO extension_usage (scope_key, day, used, updated_at)
+     VALUES (?, ?, ?, ?)
      ON CONFLICT(scope_key, day) DO UPDATE SET
        used = extension_usage.used + ?,
-       requests = extension_usage.requests + 1,
-       last_seen_at = ?,
        updated_at = ?
-     WHERE extension_usage.used + ? <= ?
-     RETURNING used`
-  ).bind(scope, day, count, now, now, count, now, now, count, limit).first();
-  if (!inserted) {
+     WHERE extension_usage.used + ? <= ?`
+  ).bind(scope, day, count, now, count, now, count, limit).run();
+  if (!Number(result?.meta?.changes || 0)) {
     const row = await env.DB.prepare(
       'SELECT used FROM extension_usage WHERE scope_key = ? AND day = ?'
     ).bind(scope, day).first();
     const used = Number(row?.used || 0);
     return { ok: false, code: 'extension_quota', used, limit, remaining: Math.max(0, limit - used), day };
   }
-  const used = Number(inserted.used || count);
+  const row = await env.DB.prepare(
+    'SELECT used FROM extension_usage WHERE scope_key = ? AND day = ?'
+  ).bind(scope, day).first();
+  const used = Number(row?.used || count);
   return { ok: true, used, limit, remaining: Math.max(0, limit - used), day };
-}
-
-/**
- * Record a lightweight daily activity heartbeat from the extension.  This is
- * deliberately separate from quota consumption so a cached lookup can still
- * count as an active installation without spending a lookup unit.
- */
-export async function recordExtensionHeartbeat(env, context = {}) {
-  if (!env?.DB) return { ok: true };
-  const now = Math.floor(Date.now() / 1000);
-  const day = new Date(now * 1000).toISOString().slice(0, 10);
-  await ensureExtensionQuotaTables(env);
-  const scope = quotaScope(context);
-  await env.DB.prepare(
-    `INSERT INTO extension_usage (scope_key, day, used, requests, heartbeats, last_seen_at, updated_at)
-     VALUES (?, ?, 0, 0, 1, ?, ?)
-     ON CONFLICT(scope_key, day) DO UPDATE SET
-       heartbeats = extension_usage.heartbeats + 1,
-       last_seen_at = ?,
-       updated_at = ?`
-  ).bind(scope, day, now, now, now, now).run();
-  return { ok: true, day };
 }
 
 export async function handleExtLookup(req, env, context = {}) {
@@ -398,6 +311,13 @@ export async function handleExtLookup(req, env, context = {}) {
     }, 403);
   }
 
+  let index;
+  try {
+    index = await loadLookupIndex(env);
+  } catch (e) {
+    return json({ ok: false, error: `lookup data failed: ${e.message}` }, 500);
+  }
+
   const cacheHeaders = { 'Cache-Control': 'no-store' };
   if (req.method === 'GET') {
     const url = new URL(req.url);
@@ -407,12 +327,6 @@ export async function handleExtLookup(req, env, context = {}) {
     };
     const quota = await consumeExtensionQuota(env, context, features, query.issn || query.name ? 1 : 0);
     if (!quota.ok) return json({ ok: false, error: 'extension lookup quota exceeded', code: quota.code, quota }, 429);
-    let index;
-    try {
-      index = await loadLookupIndexForItems(env, [query]);
-    } catch (e) {
-      return json({ ok: false, error: `lookup data failed: ${e.message}` }, 500);
-    }
     const hit = lookupOne(index, query);
     return new Response(JSON.stringify(hit
       ? { ok: true, found: true, journal: redactJournal(hit, features), quota }
@@ -429,12 +343,6 @@ export async function handleExtLookup(req, env, context = {}) {
     const validItems = items.filter((item) => item && (item.issn || item.name));
     const quota = await consumeExtensionQuota(env, context, features, validItems.length);
     if (!quota.ok) return json({ ok: false, error: 'extension lookup quota exceeded', code: quota.code, quota }, 429);
-    let index;
-    try {
-      index = await loadLookupIndexForItems(env, validItems);
-    } catch (e) {
-      return json({ ok: false, error: `lookup data failed: ${e.message}` }, 500);
-    }
     const results = items.map((item) => redactJournal(lookupOne(index, item), features));
     return new Response(JSON.stringify({ ok: true, results, quota }), {
       status: 200,

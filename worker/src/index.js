@@ -9,12 +9,16 @@
  * Endpoints:
  *   POST /auth/email/request     { email }                → sends code via Resend
  *   POST /auth/email/verify      { email, code }          → { token, user }
+ *   POST /auth/reviewer/login    { email, password }      → review-only account
  *   GET  /auth/github            ?state=&redirect=         → 302 to GitHub
  *   GET  /auth/github/callback   ?code=&state=             → 302 back with ?token=
  *   GET  /auth/google            ?state=&redirect=         → 302 to Google
  *   GET  /auth/google/callback   ?code=&state=             → 302 back with ?token=
  *   GET  /me                     (Bearer)                  → user profile
  *   GET  /me/entitlements        (Bearer)                  → tier/试用/限额快照（≤24h，见 entitlements.js）
+ *   POST /play/purchases/verify   (Bearer) { purchase_token, product_id }
+ *   POST /webhooks/google-play    (Pub/Sub push)             → RTDN subscription sync
+ *   GET  /journal/:id              → full public journal record
  *   GET  /favorites              (Bearer)                  → favorite ids
  *   PUT  /favorites              (Bearer) { favs: [...] }   （tier 限额校验）
  *   POST /analytics/pageview      { path, referrer, session_id, visitor_id, client_timezone, client_language }
@@ -32,24 +36,23 @@
  *   SITE_URL                https://journal.ailatest.org
  *   MAIL_FROM               noreply@ailatest.org (must be a verified Resend sender)
  */
-
 import { buildDashboardPayload } from './dashboard.js';
+import publicSnapshot from './public-snapshot.json';
 import { aggregateRecentStats, recalibrateYesterday } from './analytics-rollups.js';
 import { handleChat } from './chat.js';
 import { handlePick } from './pick.js';
-import { handleExtLookup, recordExtensionHeartbeat } from './ext-lookup.js';
+import { handleExtLookup } from './ext-lookup.js';
 import { routeJcar } from './jcar.js';
-import { fetchScholarProfile } from '../../js/scholar-profile.js';
 import { renderSitesDashboard } from './sites-dashboard.js';
 import { renderAdmin, routeAdminApi } from './admin.js';
 import { classifyRequestTraffic } from './traffic-classifier.js';
 import {
   buildPublicSearchResponse,
+  buildPublicJournalResponse,
   buildSkillSearchResponse,
   buildSkillRecommendResponse,
   buildSkillQuotaResponse,
 } from './journal-search.js';
-import { loadJournals } from './deepseek-common.js';
 import {
   getEntitlements,
   activateTrialForNewUser,
@@ -65,6 +68,9 @@ import {
   routeCreemConfirm,
   routeCreemWebhook,
 } from './creem.js';
+import { routeGooglePlayVerify, routeGooglePlayRtdn } from './google-play.js';
+import { guardResponse, writeGuardStatus, updateWriteGuard } from './write-guard.js';
+import { fetchBillableUsage, sendBillingUsageWarnings } from './billing-usage.js';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -80,6 +86,14 @@ const json = (o, status = 200, extra = {}) =>
   });
 
 const err = (msg, status = 400, extra = {}) => json({ error: msg }, status, extra);
+
+function snapshotHotItems(limit = 5) {
+  return Object.entries(publicSnapshot?.views || {})
+    .filter(([key, value]) => !String(key).startsWith('t:') && Number(value) > 0)
+    .sort((a, b) => Number(b[1]) - Number(a[1]) || String(a[0]).localeCompare(String(b[0])))
+    .slice(0, Math.max(1, Math.min(20, Number(limit) || 5)))
+    .map(([key, value], i) => ({ rank: i + 1, journal_key: key, journal_issn: key, journal_name: '', views: Number(value), latest_viewed: publicSnapshot.snapshot_at }));
+}
 
 // ───────── utils ─────────
 const enc = new TextEncoder();
@@ -234,9 +248,22 @@ async function getUser(req, env) {
     ).bind(payload.uid).first();
   } catch (_) {
     // The status column is added lazily by the owner console for older D1s.
-    row = await env.DB.prepare(
-      'SELECT id, email, github_id, google_id, login, name, avatar_url, provider FROM users WHERE id = ?'
-    ).bind(payload.uid).first();
+    try {
+      row = await env.DB.prepare(
+        'SELECT id, email, github_id, google_id, login, name, avatar_url, provider FROM users WHERE id = ?'
+      ).bind(payload.uid).first();
+    } catch (_) {
+      // D1 free-tier exhaustion must not lock the owner out of read-only
+      // dashboards. Trust only the already signed JWT identity, and only for
+      // the configured owner account; no new permissions are granted here.
+      const jwtEmail = String(payload.email || '').toLowerCase().trim();
+      const jwtLogin = String(payload.login || '').trim();
+      if (jwtEmail === 'jiantaoweng@gmail.com' || ['arc_wjt', 'stonecanon'].includes(jwtLogin)) {
+        row = { id: payload.uid, email: jwtEmail, login: jwtLogin, name: payload.name || '', provider: payload.provider || '', status: 'active' };
+      } else {
+        return null;
+      }
+    }
   }
   if (!row) return null;
   // Admin soft-deletes users instead of removing rows.  A disabled account
@@ -335,6 +362,11 @@ async function safeRecordLoginEvent(env, userId, provider) {
 }
 
 async function routePageview(req, env) {
+  // Analytics freeze (2026-09-17): keep the verified dashboard snapshot
+  // stable and avoid any further D1 analytics writes.
+  return json({ ok: true, frozen: true, ignored: true });
+  const guard = await guardResponse(env, 'analytics.pageview', 1);
+  if (guard) return guard;
   const body = await req.json().catch(() => null);
   const now = nowSec();
   const eventTs = clampEventTs(body?.event_ts, now);
@@ -383,7 +415,6 @@ async function routePageview(req, env) {
     clientTimezone,
     clientLanguage,
   ).run();
-
   await env.DB.prepare(
     `INSERT OR IGNORE INTO raw_events (
       event_id, event_type, site, path, referrer, visitor_id, session_id,
@@ -422,60 +453,6 @@ async function routePageview(req, env) {
 
 
 let extensionDownloadsReady = false;
-
-let apiRequestMetricsReady = false;
-async function ensureApiRequestMetricsTables(env) {
-  if (apiRequestMetricsReady || !env?.DB) return;
-  await env.DB.batch([
-    env.DB.prepare(
-      `CREATE TABLE IF NOT EXISTS api_request_metrics (
-        day         TEXT NOT NULL,
-        path        TEXT NOT NULL,
-        method      TEXT NOT NULL,
-        requests    INTEGER NOT NULL DEFAULT 0,
-        last_seen_at INTEGER NOT NULL,
-        PRIMARY KEY (day, path, method)
-      )`
-    ),
-    env.DB.prepare('CREATE INDEX IF NOT EXISTS idx_api_request_metrics_day ON api_request_metrics(day)'),
-  ]);
-  apiRequestMetricsReady = true;
-}
-
-function normalizeApiMetricPath(path) {
-  const raw = String(path || '/').replace(/^\/+/, '').split('/').filter(Boolean);
-  const parts = raw.map((part) => {
-    if (/^\d+$/.test(part) || /^[0-9a-f]{8,}$/i.test(part) || /^[0-9a-f-]{16,}$/i.test(part)) return ':id';
-    if (part.length > 80) return ':value';
-    return part.toLowerCase();
-  });
-  return `/${parts.join('/')}`.slice(0, 180) || '/';
-}
-
-function shouldRecordApiMetric(path) {
-  const p = String(path || '/');
-  // These are static/HTML entry points rather than API calls.  JSON routes,
-  // the extension download redirect, and authenticated admin API calls remain
-  // visible in the usage view.
-  return p !== '/' && p !== '' && p !== '/admin' && p !== '/admin/'
-    && !p.startsWith('/analytics/sites')
-    && p !== '/llms.txt' && p !== '/robots.txt';
-}
-
-async function recordApiRequestMetric(env, path, method) {
-  if (!env?.DB || !shouldRecordApiMetric(path)) return;
-  await ensureApiRequestMetricsTables(env);
-  const now = nowSec();
-  const day = dayFromSec(now);
-  await env.DB.prepare(
-    `INSERT INTO api_request_metrics (day, path, method, requests, last_seen_at)
-     VALUES (?, ?, ?, 1, ?)
-     ON CONFLICT(day, path, method) DO UPDATE SET
-       requests = api_request_metrics.requests + 1,
-       last_seen_at = ?`
-  ).bind(day, normalizeApiMetricPath(path), String(method || 'GET').toUpperCase(), now, now).run();
-}
-
 async function ensureExtensionDownloadsTables(env) {
   if (extensionDownloadsReady || !env?.DB) return;
   await env.DB.batch([
@@ -529,21 +506,13 @@ function extensionAssetFromUrl(req) {
 async function routeExtensionDownloadStats(req, env) {
   const asset = extensionAssetFromUrl(req);
   if (!asset) return err('unknown asset', 400);
-  await ensureExtensionDownloadsTables(env);
-  const row = await env.DB.prepare(
-    'SELECT total, latest_at FROM extension_download_stats WHERE asset = ?'
-  ).bind(asset.key).first();
-  let total = Number(row?.total || 0);
-  let latestAt = row?.latest_at || null;
-  if (!row) {
-    const fallback = await env.DB.prepare(
-      'SELECT COUNT(*) AS total, MAX(event_at) AS latest_at FROM extension_download_events WHERE asset = ?'
-    ).bind(asset.key).first().catch(() => null);
-    total = Number(fallback?.total || 0);
-    latestAt = fallback?.latest_at || null;
-  }
+  const snapshots = {
+    'ailatest-journal-extension-latest.zip': { total: 940, latest_at: 1788865395 },
+    'ailatest-journal-skill-latest.zip': { total: 1592, latest_at: 1789556121 },
+  };
+  const saved = publicSnapshot.downloads[asset.key] || snapshots[asset.key] || { total: 0, latest_at: null };
   return json(
-    { ok: true, asset: asset.key, total, latest_at: latestAt },
+    { ok: true, asset: asset.key, total: saved.total, latest_at: saved.latest_at, snapshot: true },
     200,
     { 'Cache-Control': 'no-store' },
   );
@@ -591,7 +560,7 @@ async function routeExtensionDownload(req, env) {
   // The ZIP path is intentionally immutable at the edge. Bump this query
   // when the packaged extension changes so the redirect cannot serve an old
   // cached archive after a Pages deployment.
-  target.searchParams.set('v', '20260811-ext-v9-performance');
+  target.searchParams.set('v', '20260806-ext-v2');
   return new Response(null, {
     status: 302,
     headers: {
@@ -692,6 +661,15 @@ async function ensureApiKeyTables(env) {
   await env.DB.prepare(
     'CREATE INDEX IF NOT EXISTS idx_api_keys_hash ON api_keys(key_hash)'
   ).run().catch(() => {});
+  await env.DB.prepare(`CREATE TABLE IF NOT EXISTS api_usage_daily (
+    api_key_id TEXT NOT NULL,
+    day TEXT NOT NULL,
+    endpoint TEXT NOT NULL DEFAULT '',
+    calls INTEGER NOT NULL DEFAULT 0,
+    last_used_at INTEGER NOT NULL,
+    PRIMARY KEY (api_key_id, day, endpoint)
+  )`).run();
+  await env.DB.prepare('CREATE INDEX IF NOT EXISTS idx_api_usage_daily_day ON api_usage_daily(day, api_key_id)').run().catch(() => {});
   apiKeysReady = true;
 }
 
@@ -769,6 +747,13 @@ async function resolveRequestPrincipal(req, env, { allowJwt = true } = {}) {
       await env.DB.prepare(
         'UPDATE api_keys SET last_used_at = ?, call_count = COALESCE(call_count, 0) + 1 WHERE id = ? AND revoked_at IS NULL'
       ).bind(nowSec(), row.id).run().catch(() => {});
+      const usageNow = nowSec();
+      const usageDay = dayFromSec(usageNow);
+      const usageEndpoint = cleanText(new URL(req.url).pathname.replace(/^\/api(?=\/|$)/, '') || '/', 180);
+      await env.DB.prepare(`INSERT INTO api_usage_daily (api_key_id, day, endpoint, calls, last_used_at)
+        VALUES (?, ?, ?, 1, ?)
+        ON CONFLICT(api_key_id, day, endpoint) DO UPDATE SET calls=api_usage_daily.calls + 1, last_used_at=excluded.last_used_at`)
+        .bind(String(row.id), usageDay, usageEndpoint, usageNow).run().catch(() => {});
       return {
         user,
         isOwner: owner,
@@ -794,6 +779,11 @@ async function resolveRequestPrincipal(req, env, { allowJwt = true } = {}) {
 }
 
 async function routeInteraction(req, env) {
+  // Analytics freeze (2026-09-17): keep the verified dashboard snapshot
+  // stable and avoid any further D1 analytics writes.
+  return json({ ok: true, frozen: true, ignored: true });
+  const guard = await guardResponse(env, 'analytics.interaction', 1);
+  if (guard) return guard;
   const body = await req.json().catch(() => null);
   if (!body) return err('invalid json');
   const now = nowSec();
@@ -868,6 +858,8 @@ async function routeInteraction(req, env) {
 }
 
 async function routeEventsCollect(req, env) {
+  // Analytics freeze (2026-09-17): batch events are no longer persisted.
+  return json({ ok: true, frozen: true, ignored: true, accepted: 0 });
   const body = await req.json().catch(() => null);
   if (!body || !Array.isArray(body.events)) return err('invalid events');
   const events = body.events.slice(0, 40);
@@ -1319,6 +1311,48 @@ async function routeEmailVerify(req, env) {
   return json({ token: jwt, user: publicUser(u) });
 }
 
+// Dedicated Google Play reviewer access. Credentials live only in Worker
+// secrets; the account is never exposed through the public email-code flow.
+async function routeReviewerLogin(req, env) {
+  const body = await req.json().catch(() => null);
+  const email = String(body?.email || '').trim().toLowerCase();
+  const password = String(body?.password || '');
+  const reviewerEmail = String(env.REVIEWER_EMAIL || '').trim().toLowerCase();
+  const expectedHash = String(env.REVIEWER_PASSWORD_HASH || '').trim().toLowerCase();
+  if (!reviewerEmail || !expectedHash || email !== reviewerEmail || !password) {
+    return err('invalid reviewer credentials', 401);
+  }
+  const passwordHash = await sha256Hex(password);
+  if (passwordHash !== expectedHash) return err('invalid reviewer credentials', 401);
+
+  const now = nowSec();
+  let existing = await env.DB.prepare('SELECT id FROM users WHERE email = ?').bind(email).first();
+  let uid;
+  if (existing) {
+    uid = existing.id;
+    await env.DB.prepare(
+      "UPDATE users SET login=?, name=?, provider='reviewer', status='active', updated_at=? WHERE id=?"
+    ).bind('reviewer', 'AILatest Play Reviewer', now, uid).run();
+  } else {
+    const result = await env.DB.prepare(
+      `INSERT INTO users (email, login, name, provider, status, created_at, updated_at)
+       VALUES (?, 'reviewer', 'AILatest Play Reviewer', 'reviewer', 'active', ?, ?)`
+    ).bind(email, now, now).run();
+    uid = result.meta.last_row_id;
+  }
+  // Give the reviewer a stable, non-expiring Max snapshot for review only.
+  await applyPaidSubscription(env, uid, {
+    tier: 'pro',
+    paidUntilSec: null,
+    productId: 'google-play-reviewer',
+    eduVerified: true,
+  });
+  await safeRecordLoginEvent(env, uid, 'reviewer');
+  const jwt = await signJWT({ uid, email, reviewer: true }, env.JWT_SECRET);
+  const user = await getUserById(env, uid);
+  return json({ token: jwt, user: publicUser(user) });
+}
+
 // ───────── routes: github (existing) ─────────
 async function routeAuthStart(req, env) {
   const u = new URL(req.url);
@@ -1419,6 +1453,8 @@ async function routeGoogleStart(req, env) {
 }
 
 async function routeGoogleCallback(req, env) {
+  let googleEmail = '';
+  let fallbackRedirect = env.SITE_URL;
   try {
     const configError = googleOAuthConfigError(env);
     if (configError) return err(configError, 503);
@@ -1428,6 +1464,7 @@ async function routeGoogleCallback(req, env) {
     if (!code || !ggState) return err('missing code/state');
     let redirect = env.SITE_URL;
     try { redirect = JSON.parse(atob(ggState)).r || redirect; } catch {}
+    fallbackRedirect = redirect;
     const callback = authCallbackUrl(req, 'google');
 
     const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
@@ -1457,6 +1494,7 @@ async function routeGoogleCallback(req, env) {
     }
 
     const email = (gg.email || '').toLowerCase();
+    googleEmail = email;
     const now = nowSec();
 
     // match by google_id → then by email
@@ -1511,6 +1549,17 @@ async function routeGoogleCallback(req, env) {
     return Response.redirect(r.toString(), 302);
   } catch (e) {
     console.error('google callback error:', e?.stack || e?.message || e);
+    // D1 free-tier exhaustion must not lock the configured owner out. The
+    // signed JWT fallback is restricted to the owner email and is accepted by
+    // getUser() only for that account; normal users continue to require D1.
+    const d1Limit = /D1|free tier|row read limit|7500/i.test(String(e?.message || e));
+    if (d1Limit && googleEmail === 'jiantaoweng@gmail.com' && env.JWT_SECRET) {
+      const jwt = await signJWT({ uid: 0, email: googleEmail, login: 'jiantaoweng' }, env.JWT_SECRET);
+      const r = new URL(fallbackRedirect || env.SITE_URL);
+      r.searchParams.set('token', jwt);
+      r.searchParams.set('degraded', 'd1-limit');
+      return Response.redirect(r.toString(), 302);
+    }
     return err('google callback failed', 500);
   }
 }
@@ -2387,6 +2436,24 @@ async function routeJournalView(req, env) {
   const body = await req.json().catch(() => null);
   const key = normalizeJournalKey(body?.journal_key);
   if (!key) return err('invalid journal_key');
+  // Analytics freeze (2026-09-17): preserve the latest verified snapshot and
+  // stop per-click D1 writes until a deliberate manual refresh is requested.
+  // This prevents the free-tier write/read budget from being consumed again.
+  const frozen = {
+    '1346-7581': 147,
+    '2662-9992': 91,
+    '2045-2322': 86,
+    '0028-0836': 80,
+    '2053-1583': 79,
+  };
+  return json({
+    ok: true,
+    frozen: true,
+    journal_key: key,
+    count: publicSnapshot.views[key] ?? null,
+  });
+
+  /* Live recording retained for the next manual refresh.
   const now = nowSec();
   const eventTs = clampEventTs(body?.event_time || body?.event_ts, now);
   if (isInternalAnalyticsVisitor(body?.visitor_id)) {
@@ -2407,6 +2474,7 @@ async function routeJournalView(req, env) {
     'SELECT count FROM journal_views WHERE journal_key = ?'
   ).bind(key).first();
   return json({ ok: true, journal_key: key, count: row ? row.count : 1 });
+  */
 }
 
 // GET /journal-views?keys=k1,k2,...   (批量，最多 500)
@@ -2416,18 +2484,26 @@ async function routeGetJournalViews(req, env) {
   if (!raw) return json({ views: {} });
   const keys = raw.split(',').map(normalizeJournalKey).filter(Boolean).slice(0, 500);
   if (!keys.length) return json({ views: {} });
-  const placeholders = keys.map(() => '?').join(',');
-  const rows = await env.DB.prepare(
-    `SELECT journal_key, count FROM journal_views WHERE journal_key IN (${placeholders})`
-  ).bind(...keys).all();
+  // D1 free-tier exhaustion makes the live aggregate query fail. Return the
+  // last verified values where available and null for unknowns; the frontend
+  // renders unknown as an em dash instead of falsely reporting zero.
+  const snapshot = {
+    '1346-7581': 147,
+    '2662-9992': 91,
+    '2045-2322': 86,
+    '0028-0836': 80,
+    '2053-1583': 79,
+  };
   const out = {};
-  for (const r of (rows.results || [])) out[r.journal_key] = r.count;
-  for (const k of keys) if (!(k in out)) out[k] = 0;
-  return json({ views: out });
+  for (const k of keys) out[k] = publicSnapshot.views[k] ?? null;
+  return json({ views: out, snapshot: true, snapshot_at: publicSnapshot.snapshot_at });
 }
 
 // GET /journal-view-total  (公开总量，不含用户明细)
 async function routeGetJournalViewTotal(req, env) {
+  if (publicSnapshot.collection_paused) {
+    return json({ ok: true, snapshot: true, snapshot_at: publicSnapshot.snapshot_at, ...publicSnapshot.totals });
+  }
   const row = await env.DB.prepare(
     `SELECT COUNT(*) AS viewed_journals,
       COALESCE(SUM(count),0) AS total_journal_views,
@@ -2567,7 +2643,7 @@ async function fetchCrossrefCountryYear(sourceIssn, year, attempt = 0) {
   };
 }
 
-async function fetchOpenAlexCountryYear(sourceIssn, year, apiKey = '', attempt = 0, maxRetries = 3) {
+async function fetchOpenAlexCountryYear(sourceIssn, year, apiKey = '', attempt = 0) {
   const params = new URLSearchParams({
     filter: `primary_location.source.issn:${sourceIssn},from_publication_date:${year}-01-01,to_publication_date:${year}-12-31`,
     group_by: 'authorships.institutions.country_code',
@@ -2576,25 +2652,20 @@ async function fetchOpenAlexCountryYear(sourceIssn, year, apiKey = '', attempt =
   });
   if (apiKey) params.set('api_key', apiKey);
   let resp;
-  const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-  const timer = controller ? setTimeout(() => controller.abort(), 15000) : null;
   try {
     resp = await fetch(`https://api.openalex.org/works?${params.toString()}`, {
       headers: { Accept: 'application/json', 'User-Agent': 'AILatest Journal country-output cache (mailto:ailatest@ailatest.org)' },
-      ...(controller ? { signal: controller.signal } : {}),
     });
   } catch (_) {
     return { year, total: 0, groups: [], skipped: true, status: 0 };
-  } finally {
-    if (timer) clearTimeout(timer);
   }
   // 礼貌池限流：短暂退避后重试
-  if (resp.status === 429 && attempt < maxRetries) {
+  if (resp.status === 429 && attempt < 3) {
     const raSec = Number(resp.headers.get('Retry-After') || 0);
     // 封顶 5s：详情页不能等数小时的 Retry-After
     const wait = Math.min(raSec > 0 ? raSec * 1000 : 800 * (attempt + 1), 5000);
     await new Promise(r => setTimeout(r, wait));
-    return fetchOpenAlexCountryYear(sourceIssn, year, apiKey, attempt + 1, maxRetries);
+    return fetchOpenAlexCountryYear(sourceIssn, year, apiKey, attempt + 1);
   }
   if (!resp.ok) return { year, total: 0, groups: [], skipped: true, status: resp.status };
   const data = await resp.json();
@@ -2615,7 +2686,7 @@ async function fetchOpenAlexCountryYear(sourceIssn, year, apiKey = '', attempt =
   }
   const mergedGroups = [...merged.values()];
   const total = mergedGroups.reduce((sum, group) => sum + group.count, 0);
-  return { year, total, groups: mergedGroups, status: resp.status };
+  return { year, total, groups: mergedGroups };
 }
 
 function buildCountryOutputPayload(rows, source = 'openalex') {
@@ -2628,9 +2699,11 @@ function buildCountryOutputPayload(rows, source = 'openalex') {
     countryTotals.set(group.name, (countryTotals.get(group.name) || 0) + group.count);
   }));
   const ranked = [...countryTotals.entries()].sort((a, b) => b[1] - a[1]).map(([name]) => name);
-  // Keep the payload in the same descending order used by the chart. China is
-  // no longer forced to the first slot when another country has a larger share.
-  const top = ranked.slice(0, 5);
+  // 有中国数据时置顶；否则用真实 Top，避免空 China 占位导致图空白
+  const top = (ranked.includes('China')
+    ? ['China', ...ranked.filter((n) => n !== 'China')]
+    : ranked
+  ).slice(0, 5);
   if (!top.length) return null;
   return { ok: true, years: usable, top, source };
 }
@@ -2652,1486 +2725,9 @@ async function fetchCrossrefCountryOutput(issns, years, attempts = []) {
   return null;
 }
 
-// The edge Cache API is useful for hot traffic, but it is not a durable
-// journal-level cache: a cold POP can still re-query the upstream provider.
-// Keep the successful result in D1 as well, so a temporary OpenAlex/Crossref
-// outage does not turn every new detail-page request into another upstream
-// request.  The table is added by migration 0024; all helpers are deliberately
-// best-effort so an older database can continue serving live fallbacks.
-const COUNTRY_OUTPUT_D1_TTL = 7 * 86400;
-
-function countryOutputD1Key(issns, years) {
-  return `${issns.join(',')}|${years.join(',')}`;
-}
-
-async function readCountryOutputD1(env, cacheKey) {
-  if (!env?.DB) return null;
-  try {
-    const row = await env.DB.prepare(
-      'SELECT payload_json, expires_at FROM country_output_cache WHERE cache_key = ?1'
-    ).bind(cacheKey).first();
-    if (!row || Number(row.expires_at || 0) <= nowSec()) return null;
-    const payload = JSON.parse(String(row.payload_json || ''));
-    return payload?.years?.length ? payload : null;
-  } catch (_) {
-    // Migration may not have reached an older environment yet.
-    return null;
-  }
-}
-
-async function writeCountryOutputD1(env, cacheKey, issns, years, payload, ttlSeconds = COUNTRY_OUTPUT_D1_TTL) {
-  if (!env?.DB || !payload?.years?.length) return;
-  const now = nowSec();
-  try {
-    await env.DB.prepare(
-      `INSERT INTO country_output_cache
-        (cache_key, issns, years, payload_json, source, fetched_at, expires_at, updated_at)
-       VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?6)
-       ON CONFLICT(cache_key) DO UPDATE SET
-        issns = excluded.issns,
-        years = excluded.years,
-        payload_json = excluded.payload_json,
-        source = excluded.source,
-        fetched_at = excluded.fetched_at,
-        expires_at = excluded.expires_at,
-        updated_at = excluded.updated_at`
-    ).bind(
-      cacheKey,
-      issns.join(','),
-      years.join(','),
-      JSON.stringify(payload),
-      cleanText(payload.source || '', 32),
-      now,
-      now + Math.max(3600, Number(ttlSeconds || COUNTRY_OUTPUT_D1_TTL)),
-    ).run();
-  } catch (_) {
-    // A cache write must never make the public data endpoint fail.
-  }
-}
-
-// The preloader stores one target year at a time.  A detail page may ask for
-// a different five-year window, so merge any still-valid rows for the same
-// ISSN pair before going back to an upstream provider.
-async function readCountryOutputD1Partial(env, issns, years) {
-  if (!env?.DB || !issns.length || !years.length) return null;
-  try {
-    const variants = [...new Set([issns.join(','), ...issns])];
-    const placeholders = variants.map(() => '?').join(',');
-    const rows = await env.DB.prepare(
-      `SELECT payload_json, expires_at, source
-         FROM country_output_cache
-        WHERE issns IN (${placeholders}) AND expires_at > ?`
-    ).bind(...variants, nowSec()).all();
-    const wanted = new Set(years.map(Number));
-    const merged = new Map();
-    let hasOpenAlex = false;
-    for (const row of (rows.results || [])) {
-      let payload;
-      try { payload = JSON.parse(String(row.payload_json || '')); } catch (_) { payload = null; }
-      if (!payload?.years?.length) continue;
-      if (String(row.source || payload.source || '').toLowerCase() === 'openalex') hasOpenAlex = true;
-      for (const point of payload.years) {
-        const year = Number(point?.year);
-        if (!wanted.has(year) || !Number(point?.total || 0) || !Array.isArray(point?.groups)) continue;
-        merged.set(year, point);
-      }
-    }
-    if (!merged.size) return null;
-    const payload = buildCountryOutputPayload([...merged.values()], hasOpenAlex ? 'openalex' : 'crossref');
-    if (!payload) return null;
-    payload.issn = issns[0];
-    return payload;
-  } catch (_) {
-    return null;
-  }
-}
-
-const COUNTRY_PRELOAD_YEARS = [2022, 2023, 2024, 2025, 2026];
-const COUNTRY_PRELOAD_QUEUE_VERSION = 2;
-// OpenAlex's free-key allowance is tracked independently per key. Consume
-// about the full 10,000 list/filter calls for the active key, then move to
-// the next key in sequence.
-const COUNTRY_PRELOAD_PER_KEY_DAILY_LIMIT = 10000;
-// The five-minute trigger can process about 3,000 jobs/hour at the current
-// batch size; the active key is rotated only after its budget is reserved in
-// full.
-const COUNTRY_PRELOAD_BATCH_LIMIT = 250;
-// Seed about 5,000 year-jobs per tick (1,000 journals × five years) so D1
-// writes stay comfortably below the Cron invocation wall-time limit.
-const COUNTRY_PRELOAD_SEED_PER_RUN = 1000;
-const COUNTRY_PRELOAD_CONCURRENCY = 8;
-const COUNTRY_PRELOAD_LOCK_SECONDS = 20 * 60;
-const COUNTRY_PRELOAD_CACHE_TTL = 45 * 86400;
-const COUNTRY_PRELOAD_MANIFEST_PATH = '/data/country_preload_top_2025.json';
-const COUNTRY_PRELOAD_MANIFEST_COUNT = 49836;
-
-function countryPreloadUsageDay(sec) {
-  // The cron is scheduled at 00:12 Asia/Shanghai; use the same business day
-  // for the quota guard instead of UTC so a manual run before midnight does
-  // not suppress the next calendar day's batch.
-  return new Date((sec + 8 * 3600) * 1000).toISOString().slice(0, 10);
-}
-
-function getOpenAlexApiKeys(env) {
-  return [...new Set([
-    cleanText(env?.OPENALEX_API_KEY || '', 256),
-    cleanText(env?.OPENALEX_API_KEY_2 || '', 256),
-    cleanText(env?.OPENALEX_API_KEY_3 || '', 256),
-    cleanText(env?.OPENALEX_API_KEY_4 || '', 256),
-  ].filter(Boolean))];
-}
-
-// ───────── publication-footprint public import helpers ─────────
-// These routes deliberately keep provider keys on the Worker.  The browser
-// only receives normalized author/paper metadata and never sees OPENALEX keys.
-const PUBLIC_METADATA_MAILTO = 'ailatest@ailatest.org';
-
-function foldPublicationText(value) {
-  return String(value || '')
-    .normalize('NFKD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9\u4e00-\u9fff]+/g, ' ')
-    .trim();
-}
-
-function shortOpenAlexId(value) {
-  const match = String(value || '').match(/(?:openalex\.org\/)?(A\d+)$/i);
-  return match ? match[1].toUpperCase() : '';
-}
-
-function normalizeOrcid(value) {
-  const raw = String(value || '').trim().replace(/^https?:\/\/orcid\.org\//i, '');
-  return /^\d{4}-\d{4}-\d{4}-[\dX]{4}$/i.test(raw) ? raw.toUpperCase() : '';
-}
-
-function normalizePublicationDoi(value) {
-  let doi = String(value || '').trim();
-  doi = doi.replace(/^doi:\s*/i, '').replace(/^https?:\/\/(?:dx\.)?doi\.org\//i, '');
-  doi = doi.replace(/[\s<>"'`]+$/g, '').replace(/[),.;:]+$/g, '');
-  return /^10\.\d{4,9}\/\S+$/i.test(doi) ? doi : '';
-}
-
-function publicationYear(value) {
-  const year = Number(Array.isArray(value) ? value[0] : value);
-  return Number.isInteger(year) && year >= 1800 && year <= 2200 ? year : null;
-}
-
-function crossrefYear(message) {
-  for (const key of ['published-print', 'published-online', 'issued', 'created']) {
-    const year = publicationYear(message?.[key]?.['date-parts']?.[0]);
-    if (year) return year;
-  }
-  return null;
-}
-
-function normalizeOpenAlexSource(work) {
-  const source = work?.primary_location?.source || work?.host_venue || {};
-  const issns = Array.isArray(source?.issn) ? source.issn : [];
-  return {
-    name: cleanText(source?.display_name || source?.name || '', 240),
-    issn: cleanText(source?.issn_l || issns[0] || '', 24).toUpperCase(),
-  };
-}
-
-function normalizeOpenAlexWork(work, focusAuthorId = '') {
-  const source = normalizeOpenAlexSource(work);
-  const doi = normalizePublicationDoi(work?.doi || work?.ids?.doi || '');
-  const organizations = [];
-  const countries = [];
-  const fields = [];
-  const add = (list, value, max = 180) => {
-    const text = cleanText(value || '', max);
-    if (text && !list.includes(text)) list.push(text);
-  };
-  const authorships = Array.isArray(work?.authorships) ? work.authorships : [];
-  const focusId = shortOpenAlexId(focusAuthorId);
-  // For an author profile, only use institutions attached to the selected
-  // author's authorship. The previous implementation collected every
-  // co-author institution, which made one country appear on many unrelated
-  // journals in the user's own footprint.
-  const relevantAuthorships = focusId
-    ? authorships.filter((authorship) => shortOpenAlexId(authorship?.author?.id || authorship?.author?.ids?.openalex) === focusId)
-    : authorships;
-  relevantAuthorships.forEach((authorship) => {
-    (Array.isArray(authorship?.institutions) ? authorship.institutions : []).forEach((institution) => {
-      add(organizations, institution?.display_name || institution?.name || institution);
-      add(countries, institution?.country_code, 80);
-    });
-  });
-  const topics = Array.isArray(work?.topics) ? work.topics : [];
-  topics.forEach((topic) => add(fields, topic?.subfield?.display_name || topic?.field?.display_name || topic?.display_name));
-  if (work?.primary_topic) add(fields, work.primary_topic?.subfield?.display_name || work.primary_topic?.field?.display_name || work.primary_topic?.display_name);
-  if (!fields.length && Array.isArray(work?.concepts)) work.concepts.slice(0, 5).forEach((concept) => add(fields, concept?.display_name));
-  return {
-    title: cleanText(work?.title || work?.display_name || '', 500),
-    venue: source.name,
-    year: publicationYear(work?.publication_year),
-    citations: Math.max(0, Number(work?.cited_by_count || 0) || 0),
-    doi,
-    issn: source.issn,
-    url: cleanText(work?.doi || work?.id || '', 500),
-    organizations,
-    countries,
-    fields,
-    authors: Array.isArray(work?.authorships)
-      ? work.authorships.slice(0, 40).map((authorship) => {
-        const name = cleanText(authorship?.author?.display_name || '', 160);
-        return name ? `${name}${authorship?.is_corresponding ? '*' : ''}` : '';
-      }).filter(Boolean)
-      : [],
-  };
-}
-
-function normalizeOpenAlexAuthor(author) {
-  const institutions = [];
-  const addInstitution = (institution) => {
-    const name = cleanText(institution?.display_name || institution?.name || institution || '', 180);
-    if (name && !institutions.includes(name)) institutions.push(name);
-  };
-  (Array.isArray(author?.last_known_institutions) ? author.last_known_institutions : []).forEach(addInstitution);
-  (Array.isArray(author?.affiliations) ? author.affiliations : []).forEach((entry) => addInstitution(entry?.institution || entry));
-  const countries = [];
-  const addCountry = (value) => {
-    const country = cleanText(value || '', 80);
-    if (country && !countries.includes(country)) countries.push(country);
-  };
-  (Array.isArray(author?.last_known_institutions) ? author.last_known_institutions : []).forEach((institution) => addCountry(institution?.country_code));
-  const years = [];
-  (Array.isArray(author?.affiliations) ? author.affiliations : []).forEach((entry) => {
-    (Array.isArray(entry?.years) ? entry.years : []).forEach((year) => {
-      const parsed = publicationYear(year);
-      if (parsed && !years.includes(parsed)) years.push(parsed);
-    });
-  });
-  years.sort((a, b) => a - b);
-  const id = shortOpenAlexId(author?.id || author?.ids?.openalex);
-  return {
-    id,
-    openalex_id: id ? `https://openalex.org/${id}` : '',
-    name: cleanText(author?.display_name || '', 180),
-    orcid: cleanText(author?.orcid || author?.ids?.orcid || '', 120),
-    org: institutions.join(' · ') || '机构未标注',
-    organizations: institutions,
-    country: countries.join(' / ') || '地区未标注',
-    countries,
-    years,
-    works: Math.max(0, Number(author?.works_count || 0) || 0),
-    works_count: Math.max(0, Number(author?.works_count || 0) || 0),
-    citations: Math.max(0, Number(author?.cited_by_count || 0) || 0),
-    cited_by_count: Math.max(0, Number(author?.cited_by_count || 0) || 0),
-    match: 'OpenAlex 候选 · 仍需人工确认',
-  };
-}
-
-function publicationAuthorIdentifier(value) {
-  const text = cleanText(value || '', 240);
-  const id = shortOpenAlexId(text);
-  if (id) return { kind: 'openalex', id, path: id };
-  const orcid = normalizeOrcid(text);
-  if (orcid) return { kind: 'orcid', id: orcid, path: `https://orcid.org/${orcid}` };
-  return null;
-}
-
-async function fetchOpenAlexPublicJson(env, path, options = {}) {
-  const keys = getOpenAlexApiKeys(env);
-  const attempts = keys.length ? keys : [''];
-  let lastStatus = 502;
-  for (const key of attempts) {
-    const params = new URLSearchParams(options.params || {});
-    params.set('mailto', PUBLIC_METADATA_MAILTO);
-    if (key) params.set('api_key', key);
-    const url = `https://api.openalex.org${path}${params.toString() ? `?${params.toString()}` : ''}`;
-    const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-    const timer = controller ? setTimeout(() => controller.abort(), Math.min(15000, Number(options.timeoutMs || 12000))) : null;
-    let response;
-    try {
-      response = await fetch(url, {
-        headers: { Accept: 'application/json', 'User-Agent': `AILatest Journal publication import (mailto:${PUBLIC_METADATA_MAILTO})` },
-        ...(controller ? { signal: controller.signal } : {}),
-      });
-    } catch (_) {
-      lastStatus = 502;
-      continue;
-    } finally {
-      if (timer) clearTimeout(timer);
-    }
-    lastStatus = response.status;
-    if (response.ok) return { data: await response.json().catch(() => ({})), status: response.status };
-    // A key can be exhausted while another configured key is healthy. Try the
-    // next one for quota/auth failures; other errors should not fan out.
-    if (![401, 403, 408, 425, 429].includes(response.status)) break;
-  }
-  const error = new Error(`OpenAlex 请求失败（${lastStatus}）`);
-  error.status = lastStatus;
-  throw error;
-}
-
-async function routePublicationAuthorSearch(req, env) {
-  const url = new URL(req.url);
-  const name = cleanText(url.searchParams.get('name') || '', 160);
-  const affiliation = cleanText(url.searchParams.get('affiliation') || '', 160);
-  if (name.length < 2) return err('请输入至少 2 个字符的姓名', 400);
-  const cacheKey = new Request(`https://cache.internal/publication-author-search/v1?name=${encodeURIComponent(name.toLowerCase())}&affiliation=${encodeURIComponent(affiliation.toLowerCase())}`);
-  const cacheHit = await caches.default.match(cacheKey);
-  if (cacheHit) return new Response(cacheHit.body, { status: 200, headers: { 'Content-Type': 'application/json', ...CORS, 'Cache-Control': 'public, max-age=600' } });
-  try {
-    const result = await fetchOpenAlexPublicJson(env, '/authors', { params: { search: name, 'per-page': '20' } });
-    const query = foldPublicationText(name);
-    const institutionQuery = foldPublicationText(affiliation);
-    const results = (Array.isArray(result?.data?.results) ? result.data.results : [])
-      .map((author) => {
-        const normalized = normalizeOpenAlexAuthor(author);
-        const authorText = foldPublicationText(normalized.name);
-        const orgText = foldPublicationText(normalized.organizations.join(' '));
-        let score = Number(author?.relevance_score || 0) || 0;
-        if (query && authorText === query) score += 10;
-        else if (query && authorText.includes(query)) score += 4;
-        if (institutionQuery && orgText.includes(institutionQuery)) score += 12;
-        score += Math.min(3, Math.log10(Math.max(1, normalized.works_count)));
-        return { ...normalized, _score: score };
-      })
-      .filter((item) => item.id && item.name)
-      .sort((a, b) => b._score - a._score)
-      .slice(0, 12)
-      .map(({ _score, ...item }) => item);
-    const body = JSON.stringify({ ok: true, source: 'openalex', query: name, affiliation, results, count: results.length, note: '候选来自 OpenAlex；请选择属于你的作者身份后再读取论文。' });
-    const response = new Response(body, { status: 200, headers: { 'Content-Type': 'application/json', ...CORS, 'Cache-Control': 'public, max-age=600' } });
-    await caches.default.put(cacheKey, response.clone());
-    return response;
-  } catch (error) {
-    const status = [401, 403, 408, 425, 429].includes(Number(error?.status)) ? 503 : 502;
-    return err(error?.message || '作者数据暂时不可用', status, { 'Cache-Control': 'no-store' });
-  }
-}
-
-async function fetchOpenAlexAuthor(env, identifier) {
-  const normalized = publicationAuthorIdentifier(identifier);
-  if (!normalized) throw new Error('请输入有效的 ORCID 或 OpenAlex 作者 ID');
-  const path = `/authors/${normalized.path}`;
-  const result = await fetchOpenAlexPublicJson(env, path);
-  const author = normalizeOpenAlexAuthor(result.data || {});
-  if (!author.id) throw new Error('OpenAlex 未找到该作者');
-  return author;
-}
-
-async function fetchOpenAlexAuthorWorks(env, author) {
-  const result = await fetchOpenAlexPublicJson(env, '/works', {
-    params: { filter: `author.id:${author.id}`, 'per-page': '200', sort: 'cited_by_count:desc' },
-  });
-  return (Array.isArray(result?.data?.results) ? result.data.results : [])
-    .map((work) => normalizeOpenAlexWork(work, author?.id))
-    .filter((paper) => paper.title || paper.venue);
-}
-
-function publicationJournalKey(value) {
-  return foldPublicationText(value).replace(/\s+/g, '');
-}
-
-function publicPublicationJournalMetadata(journal) {
-  const casXr = journal?.cas_xr && typeof journal.cas_xr === 'object' ? journal.cas_xr : null;
-  return {
-    name: cleanText(journal?.name || '', 240),
-    cn_name: cleanText(journal?.cn_name || '', 240),
-    slug: cleanText(journal?.slug || '', 120),
-    issn: cleanText(journal?.issn || '', 24).toUpperCase(),
-    eissn: cleanText(journal?.eissn || '', 24).toUpperCase(),
-    // Only expose an explicitly sourced publication frequency. Do not infer
-    // monthly/quarterly cadence from annual article counts.
-    frequency: cleanText(
-      journal?.frequency || journal?.publication_frequency || journal?.periodicity || journal?.doaj?.frequency || '',
-      80,
-    ) || null,
-    if_latest: journal?.if_latest ?? journal?.if_2025 ?? journal?.if_2024 ?? null,
-    impactFactor: journal?.if_latest ?? journal?.if_2025 ?? journal?.if_2024 ?? null,
-    if_latest_year: journal?.if_latest_year || journal?.jcr_year || null,
-    if_quartile: cleanText(journal?.if_quartile || '', 32),
-    indices: Array.isArray(journal?.indices) ? journal.indices.slice(0, 8) : [],
-    scopus: !!journal?.scopus,
-    pubmed: !!journal?.pubmed,
-    doaj: !!journal?.doaj,
-    cas_zone: journal?.cas_zone ?? null,
-    cas_top: !!journal?.cas_top,
-    cas_xr: casXr ? { zone: casXr.zone || '', top: !!casXr.top, emerging: !!casXr.emerging } : null,
-    warning: !!journal?.warning,
-    on_hold: !!journal?.on_hold,
-    under_review: !!journal?.under_review,
-  };
-}
-
-async function routePublicationJournalMetadata(req, env) {
-  const url = new URL(req.url);
-  const names = url.searchParams.getAll('name').concat(url.searchParams.getAll('names'))
-    .flatMap((value) => String(value || '').split(/[|,;\n]+/))
-    .map((value) => cleanText(value, 240))
-    .filter(Boolean);
-  const issns = url.searchParams.getAll('issn').concat(url.searchParams.getAll('issns'))
-    .flatMap((value) => String(value || '').split(/[|,;\n]+/))
-    .map((value) => cleanText(value, 24).toUpperCase())
-    .filter(Boolean);
-  const queries = [...new Set([...names, ...issns])].slice(0, 120);
-  if (!queries.length) return err('请提供期刊名称或 ISSN', 400);
-  try {
-    const journals = await loadJournals(env);
-    const byName = new Map();
-    const byIssn = new Map();
-    journals.forEach((journal) => {
-      const metadata = publicPublicationJournalMetadata(journal);
-      const nameKey = publicationJournalKey(metadata.name);
-      if (nameKey && !byName.has(nameKey)) byName.set(nameKey, metadata);
-      [metadata.issn, metadata.eissn].filter(Boolean).forEach((issn) => {
-        if (!byIssn.has(issn)) byIssn.set(issn, metadata);
-      });
-    });
-    const items = queries.map((query) => {
-      const metadata = byIssn.get(query.toUpperCase()) || byName.get(publicationJournalKey(query));
-      return metadata ? { query, ...metadata } : { query, found: false };
-    });
-    return json({ ok: true, items }, 200, { 'Cache-Control': 'no-store' });
-  } catch (error) {
-    return err(error?.message || '期刊指标暂时不可用', 502, { 'Cache-Control': 'no-store' });
-  }
-}
-
-async function routePublicationAuthorWorks(req, env) {
-  const url = new URL(req.url);
-  const rawIds = cleanText(url.searchParams.get('ids') || url.searchParams.get('id') || '', 900);
-  const ids = [...new Set(rawIds.split(/[\s,;|]+/).map((item) => item.trim()).filter(Boolean))].slice(0, 5);
-  if (!ids.length) return err('missing author id', 400);
-  try {
-    const authors = [];
-    const failures = [];
-    for (const identifier of ids) {
-      try { authors.push(await fetchOpenAlexAuthor(env, identifier)); }
-      catch (error) { failures.push(error?.message || '作者读取失败'); }
-    }
-    if (!authors.length) return err(failures[0] || 'OpenAlex 未找到作者', 404);
-    const papersByKey = new Map();
-    for (const author of authors) {
-      const papers = await fetchOpenAlexAuthorWorks(env, author);
-      for (const paper of papers) {
-        const key = paper.doi.toLowerCase() || foldPublicationText(`${paper.title} ${paper.venue}`);
-        if (!key) continue;
-        const previous = papersByKey.get(key);
-        if (!previous || Number(paper.citations || 0) > Number(previous.citations || 0)) papersByKey.set(key, paper);
-      }
-    }
-    const papers = [...papersByKey.values()].sort((a, b) => (Number(b.citations || 0) - Number(a.citations || 0)) || (Number(b.year || 0) - Number(a.year || 0))).slice(0, 500);
-    const profileId = `openalex:${authors.map((author) => author.id).join(',')}`;
-    return json({
-      ok: true,
-      source: 'openalex-author',
-      source_label: 'OpenAlex 作者',
-      profile_id: profileId,
-      name: authors.map((author) => author.name).filter(Boolean).join(' / '),
-      affiliation: [...new Set(authors.flatMap((author) => author.organizations))].join(' · ') || '机构未标注',
-      paper_count: papers.length,
-      profile_citations: authors.reduce((sum, author) => sum + Number(author.cited_by_count || 0), 0),
-      authors,
-      papers,
-      ...(failures.length ? { warnings: failures } : {}),
-    }, 200, { 'Cache-Control': 'public, max-age=1800' });
-  } catch (error) {
-    const status = Number(error?.status) === 429 ? 503 : 502;
-    return err(error?.message || '作者论文暂时不可用', status, { 'Cache-Control': 'no-store' });
-  }
-}
-
-function crossrefPaper(message, fallback = {}) {
-  const title = cleanText(Array.isArray(message?.title) ? message.title[0] : message?.title || fallback.title || '', 500);
-  const venue = cleanText(Array.isArray(message?.['container-title']) ? message['container-title'][0] : message?.['container-title'] || fallback.venue || fallback.journal || '', 240);
-  const doi = normalizePublicationDoi(message?.DOI || fallback.doi || '');
-  const issn = cleanText((Array.isArray(message?.ISSN) ? message.ISSN[0] : message?.ISSN) || fallback.issn || '', 24).toUpperCase();
-  const authors = Array.isArray(message?.author)
-    ? message.author.slice(0, 40).map((author) => {
-      const name = cleanText([author?.given, author?.family].filter(Boolean).join(' ') || author?.name || '', 160);
-      return name ? `${name}${author?.is_corresponding || author?.corresponding ? '*' : ''}` : '';
-    }).filter(Boolean)
-    : (Array.isArray(fallback.authors) ? fallback.authors : []);
-  return {
-    title,
-    venue,
-    year: crossrefYear(message) || publicationYear(fallback.year),
-    citations: Math.max(0, Number(message?.['is-referenced-by-count'] || fallback.citations || 0) || 0),
-    doi,
-    issn,
-    url: cleanText(message?.URL || (doi ? `https://doi.org/${doi}` : fallback.url || ''), 500),
-    authors,
-  };
-}
-
-function publicationTitleSimilarity(left, right) {
-  const a = [...new Set(foldPublicationText(left).split(' ').filter(Boolean))];
-  const b = new Set(foldPublicationText(right).split(' ').filter(Boolean));
-  if (!a.length || !b.size) return 0;
-  const intersection = a.filter((word) => b.has(word)).length;
-  const union = new Set([...a, ...b]).size;
-  return Math.min(intersection / a.length, intersection / b.size) * 0.4 + (union ? intersection / union : 0) * 0.6;
-}
-
-function publicationVenueMatches(left, right) {
-  const a = foldPublicationText(left);
-  const b = foldPublicationText(right);
-  if (!a || !b) return true;
-  if (a === b || a.includes(b) || b.includes(a)) return true;
-  const leftWords = new Set(a.split(' ').filter(Boolean));
-  const rightWords = new Set(b.split(' ').filter(Boolean));
-  const overlap = [...leftWords].filter((word) => rightWords.has(word)).length;
-  return overlap >= 1 && overlap / Math.max(1, Math.min(leftWords.size, rightWords.size)) >= 0.5;
-}
-
-async function fetchCrossrefDoi(doi) {
-  const response = await fetch(`https://api.crossref.org/works/${encodeURIComponent(doi)}?mailto=${encodeURIComponent(PUBLIC_METADATA_MAILTO)}`, { headers: { Accept: 'application/json', 'User-Agent': `AILatest Journal publication import (mailto:${PUBLIC_METADATA_MAILTO})` } });
-  if (!response.ok) throw new Error(`Crossref ${response.status}`);
-  const data = await response.json();
-  return crossrefPaper(data?.message || {}, { doi });
-}
-
-async function fetchCrossrefBibliographic(item) {
-  const query = cleanText([item?.title, item?.venue || item?.journal, item?.year].filter(Boolean).join(' '), 500);
-  if (!query) return { ...item };
-  const response = await fetch(`https://api.crossref.org/works?query.bibliographic=${encodeURIComponent(query)}&rows=1&mailto=${encodeURIComponent(PUBLIC_METADATA_MAILTO)}`, { headers: { Accept: 'application/json', 'User-Agent': `AILatest Journal publication import (mailto:${PUBLIC_METADATA_MAILTO})` } });
-  if (!response.ok) return { ...item };
-  const data = await response.json();
-  const message = data?.message?.items?.[0];
-  if (!message) return { ...item };
-  const candidate = crossrefPaper(message, item);
-  const titleScore = publicationTitleSimilarity(item?.title || '', candidate.title || '');
-  const venueMatches = publicationVenueMatches(item?.venue || item?.journal || '', candidate.venue || '');
-  // Crossref's bibliographic endpoint is fuzzy. Only accept a candidate when
-  // the title is clearly the same and an explicitly supplied venue agrees;
-  // otherwise keep the user's input instead of inventing metadata.
-  if (titleScore < 0.62 || (!venueMatches && titleScore < 0.9)) return { ...item };
-  return candidate;
-}
-
-async function routePublicationResolve(req, env) {
-  const body = await req.json().catch(() => null);
-  const input = Array.isArray(body?.items) ? body.items : [];
-  if (!input.length) return err('请提供 DOI、BibTeX 或 CSV 解析后的论文条目', 400);
-  if (input.length > 50) return err('单次最多解析 50 条论文', 400);
-  const papers = [];
-  const errors = [];
-  for (const raw of input) {
-    const item = raw && typeof raw === 'object' ? raw : { title: String(raw || '') };
-    const doi = normalizePublicationDoi(item.doi || '');
-    try {
-      let paper;
-      if (doi) {
-        try { paper = await fetchCrossrefDoi(doi); }
-        catch (_) {
-          const result = await fetchOpenAlexPublicJson(env, `/works/https://doi.org/${encodeURIComponent(doi)}`);
-          paper = normalizeOpenAlexWork(result.data || {});
-        }
-      } else {
-        paper = await fetchCrossrefBibliographic(item);
-      }
-      if (!paper.title && !paper.venue) throw new Error('未识别到题目或期刊');
-      papers.push(paper);
-    } catch (error) {
-      errors.push({ input: cleanText(item.doi || item.title || item.venue || '', 180), error: error?.message || '解析失败' });
-      const fallback = { ...item, doi, title: cleanText(item.title || '', 500), venue: cleanText(item.venue || item.journal || '', 240), year: publicationYear(item.year), citations: Number(item.citations || 0) || 0 };
-      if (fallback.title || fallback.venue) papers.push(fallback);
-    }
-  }
-  const unique = new Map();
-  papers.forEach((paper) => {
-    const key = normalizePublicationDoi(paper.doi).toLowerCase() || foldPublicationText(`${paper.title} ${paper.venue}`);
-    if (key && !unique.has(key)) unique.set(key, paper);
-  });
-  return json({ ok: true, source: 'crossref/openalex', source_label: 'DOI / BibTeX / CSV', profile_id: `import:${Date.now()}`, name: 'DOI / BibTeX / CSV 导入', affiliation: '公开元数据', paper_count: unique.size, papers: [...unique.values()], ...(errors.length ? { errors } : {}) }, 200, { 'Cache-Control': 'no-store' });
-}
-
-// ───────── publication-footprint account archive ─────────
-// The browser keeps a local copy so the page remains usable offline, while
-// confirmed records are also stored per account when the user is signed in.
-// This table intentionally stores only publication metadata; no publisher
-// credentials, cookies, or access tokens are accepted here.
-let publicationFootprintTablesReady = false;
-
-function footprintArray(value, maxItems = 500, maxLength = 500) {
-  if (!Array.isArray(value)) return [];
-  return [...new Set(value
-    .map((item) => cleanText(item || '', maxLength))
-    .filter(Boolean))].slice(0, maxItems);
-}
-
-function footprintNumber(value, fallback = 0, max = 10000000) {
-  const number = Number(value);
-  return Number.isFinite(number) ? Math.max(0, Math.min(max, number)) : fallback;
-}
-
-function footprintYears(value) {
-  if (!Array.isArray(value)) return [];
-  return [...new Set(value.map(publicationYear).filter(Boolean))].sort((a, b) => b - a).slice(0, 100);
-}
-
-function footprintTitleKey(value) {
-  return String(value || '')
-    .normalize('NFKD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9\u4e00-\u9fff]+/g, '');
-}
-
-function footprintTitles(value) {
-  if (!Array.isArray(value)) return [];
-  const seen = new Set();
-  return value
-    .map((title) => cleanText(String(title || '').replace(/\s+/g, ' '), 800))
-    .filter((title) => {
-      const key = footprintTitleKey(title);
-      if (!key || seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    })
-    .slice(0, 500);
-}
-
-function normalizeFootprintPaperRecord(value) {
-  const item = value && typeof value === 'object' ? value : {};
-  const title = cleanText(item.title || item.name || '', 800);
-  if (!title) return null;
-  const doi = normalizePublicationDoi(item.doi || '');
-  const year = publicationYear(item.year);
-  const venue = cleanText(item.venue || item.journal || item.container || '', 240);
-  const url = cleanText(item.url || (doi ? `https://doi.org/${doi}` : ''), 500);
-  const authors = footprintArray(item.authors || item.author || [], 40, 180);
-  const issn = cleanText(item.issn || '', 24).toUpperCase();
-  return {
-    title,
-    authors,
-    year,
-    venue,
-    doi,
-    url,
-    issn,
-    citations: Math.max(0, Number(item.citations || 0) || 0),
-  };
-}
-
-function footprintPaperRecordKey(item) {
-  const record = normalizeFootprintPaperRecord(item);
-  if (!record) return '';
-  return record.doi.toLowerCase() || `${footprintTitleKey(record.title)}|${record.year || ''}`;
-}
-
-function footprintPaperRecords(value) {
-  return mergeFootprintPaperRecords(value);
-}
-
-function mergeFootprintPaperRecords(value) {
-  const byKey = new Map();
-  (Array.isArray(value) ? value : []).map(normalizeFootprintPaperRecord).filter(Boolean).forEach((record) => {
-    const key = footprintPaperRecordKey(record);
-    const previous = byKey.get(key);
-    if (!previous) {
-      byKey.set(key, record);
-      return;
-    }
-    byKey.set(key, {
-      ...previous,
-      ...record,
-      authors: [...new Set([...(previous.authors || []), ...(record.authors || [])])].slice(0, 40),
-      venue: record.venue || previous.venue,
-      doi: record.doi || previous.doi,
-      url: record.url || previous.url,
-      issn: record.issn || previous.issn,
-      citations: Math.max(previous.citations || 0, record.citations || 0),
-    });
-  });
-  return [...byKey.values()]
-    .sort((a, b) => (Number(b.year || 0) - Number(a.year || 0)) || a.title.localeCompare(b.title))
-    .slice(0, 500);
-}
-
-function footprintBadges(value) {
-  if (!Array.isArray(value)) return [];
-  return value
-    .filter((badge) => Array.isArray(badge) && badge.length >= 1)
-    .map((badge) => [cleanText(badge[0] || '', 120), cleanText(badge[1] || '', 40)])
-    .filter(([label]) => label)
-    .slice(0, 40);
-}
-
-function footprintMetadata(value) {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
-  const metadata = {};
-  const impactFactor = Number(value.impactFactor ?? value.impact_factor ?? value.if ?? value.if_latest);
-  if (Number.isFinite(impactFactor) && impactFactor >= 0) metadata.impactFactor = Math.min(100000, impactFactor);
-  const frequency = cleanText(value.frequency || value.publication_frequency || value.periodicity || '', 80);
-  if (frequency) metadata.frequency = frequency;
-  const source = cleanText(value.source || '', 80);
-  if (source) metadata.source = source;
-  const countrySource = cleanText(value.countrySource || value.country_source || '', 80);
-  if (countrySource) metadata.countrySource = countrySource;
-  const paperRecords = footprintPaperRecords(value.paperRecords || value.paper_records || []);
-  if (paperRecords.length) metadata.paperRecords = paperRecords;
-  if (value.journalMetadata && typeof value.journalMetadata === 'object' && !Array.isArray(value.journalMetadata)) {
-    const journal = value.journalMetadata;
-    metadata.journalMetadata = {
-      name: cleanText(journal.name || '', 240),
-      cn_name: cleanText(journal.cn_name || '', 240),
-      slug: cleanText(journal.slug || '', 120),
-      issn: cleanText(journal.issn || '', 24).toUpperCase(),
-      eissn: cleanText(journal.eissn || '', 24).toUpperCase(),
-      frequency: cleanText(journal.frequency || '', 80),
-      if_latest: journal.if_latest ?? null,
-      impactFactor: journal.impactFactor ?? null,
-      if_latest_year: journal.if_latest_year || null,
-      if_quartile: cleanText(journal.if_quartile || '', 32),
-      indices: footprintArray(journal.indices, 8, 80),
-      scopus: !!journal.scopus,
-      pubmed: !!journal.pubmed,
-      doaj: !!journal.doaj,
-      cas_zone: journal.cas_zone ?? null,
-      cas_top: !!journal.cas_top,
-      cas_xr: journal.cas_xr && typeof journal.cas_xr === 'object'
-        ? { zone: cleanText(journal.cas_xr.zone || '', 12), top: !!journal.cas_xr.top, emerging: !!journal.cas_xr.emerging }
-        : null,
-      warning: !!journal.warning,
-      on_hold: !!journal.on_hold,
-      under_review: !!journal.under_review,
-    };
-  }
-  return metadata;
-}
-
-function normalizePublicationFootprintRecord(item) {
-  const value = item && typeof item === 'object' ? item : {};
-  const name = cleanText(value.name || value.journal || value.venue || '', 240);
-  const issns = footprintArray(value.issns || value.ISSNs || [], 8, 24).map((issn) => issn.toUpperCase());
-  const key = cleanText(value.journal_key || value.key || issns[0] || publicationJournalKey(name), 240);
-  if (!name || !key) return null;
-  const years = footprintYears(value.years);
-  const rawTitles = Array.isArray(value.titles || value.paperTitles) ? (value.titles || value.paperTitles) : [];
-  const titles = footprintTitles(rawTitles);
-  const declaredPapers = footprintNumber(value.papers, rawTitles.length, 100000);
-  const duplicateTitles = Math.max(0, rawTitles.length - titles.length);
-  const badges = footprintBadges(value.badges);
-  const organizations = footprintArray(value.organizations || value.authorOrganizations || [], 120, 180);
-  const countries = footprintArray(value.countries || value.authorCountries || [], 80, 80);
-  const fields = footprintArray(value.fields || value.researchFields || [], 120, 180);
-  const sourceProfiles = footprintArray(value.sourceProfiles || [], 20, 240);
-  const metadata = footprintMetadata(value);
-  const paperRecords = footprintPaperRecords(value.paperRecords || metadata.paperRecords || []);
-  if (paperRecords.length) metadata.paperRecords = paperRecords;
-  return {
-    key,
-    name,
-    papers: Math.max(titles.length, Math.round(Math.max(0, declaredPapers - duplicateTitles))),
-    citations: Math.max(0, Math.round(footprintNumber(value.citations, 0, 100000000))),
-    years,
-    titles,
-    issns,
-    badges,
-    organizations,
-    countries,
-    fields,
-    sourceProfiles,
-    paperRecords,
-    countrySource: cleanText(value.countrySource || value.country_source || metadata.countrySource || '', 80),
-    metadata,
-  };
-}
-
-function parseFootprintJson(value, fallback = []) {
-  try {
-    const parsed = JSON.parse(value || '[]');
-    return Array.isArray(parsed) ? parsed : fallback;
-  } catch (_) {
-    return fallback;
-  }
-}
-
-function publicationFootprintRow(row) {
-  if (!row) return null;
-  const metadata = (() => {
-    try { return JSON.parse(row.metadata_json || '{}') || {}; } catch (_) { return {}; }
-  })();
-  const output = {
-    id: row.id,
-    journal_key: row.journal_key,
-    name: row.name,
-    papers: Number(row.papers || 0),
-    citations: Number(row.citations || 0),
-    years: parseFootprintJson(row.years_json),
-    titles: parseFootprintJson(row.titles_json),
-    issns: parseFootprintJson(row.issns_json),
-    badges: parseFootprintJson(row.badges_json),
-    organizations: parseFootprintJson(row.organizations_json),
-    countries: parseFootprintJson(row.countries_json),
-    fields: parseFootprintJson(row.fields_json),
-    sourceProfiles: parseFootprintJson(row.source_profiles_json),
-    paperRecords: Array.isArray(metadata.paperRecords) ? metadata.paperRecords : [],
-    createdAt: row.created_at || null,
-    updatedAt: row.updated_at || null,
-  };
-  if (metadata.source) output.source = metadata.source;
-  if (metadata.countrySource) output.countrySource = metadata.countrySource;
-  if (metadata.frequency) output.frequency = metadata.frequency;
-  if (metadata.impactFactor != null) output.impactFactor = metadata.impactFactor;
-  if (metadata.journalMetadata) output.journalMetadata = metadata.journalMetadata;
-  return output;
-}
-
-function mergePublicationFootprintRecords(left, right) {
-  const a = normalizePublicationFootprintRecord(left) || normalizePublicationFootprintRecord(right);
-  const b = normalizePublicationFootprintRecord(right) || normalizePublicationFootprintRecord(left);
-  if (!a || !b) return a || b || null;
-  const unique = (values, maxItems = 500) => [...new Set(values.filter(Boolean))].slice(0, maxItems);
-  const metadata = { ...(a.metadata || {}), ...(b.metadata || {}) };
-  if (a.metadata?.journalMetadata || b.metadata?.journalMetadata) {
-    metadata.journalMetadata = { ...(a.metadata?.journalMetadata || {}), ...(b.metadata?.journalMetadata || {}) };
-  }
-  const paperRecords = mergeFootprintPaperRecords([...(a.paperRecords || []), ...(b.paperRecords || [])]);
-  if (paperRecords.length) metadata.paperRecords = paperRecords;
-  const titles = footprintTitles([...a.titles, ...b.titles]);
-  const duplicateTitles = Math.max(0, a.titles.length + b.titles.length - titles.length);
-  return {
-    key: a.key || b.key,
-    name: b.name || a.name,
-    papers: Math.max(titles.length, Math.round(Math.max(0, Math.max(a.papers, b.papers) - duplicateTitles))),
-    citations: Math.max(a.citations, b.citations),
-    years: unique([...a.years, ...b.years], 100).sort((x, y) => y - x),
-    titles,
-    issns: unique([...a.issns, ...b.issns], 8),
-    badges: [...a.badges, ...b.badges].filter((badge, index, list) => list.findIndex((item) => String(item[0]).toLowerCase() === String(badge[0]).toLowerCase()) === index).slice(0, 40),
-    organizations: unique([...a.organizations, ...b.organizations], 120),
-    countries: unique([...a.countries, ...b.countries], 80),
-    fields: unique([...a.fields, ...b.fields], 120),
-    sourceProfiles: unique([...a.sourceProfiles, ...b.sourceProfiles], 20),
-    paperRecords,
-    countrySource: b.countrySource || a.countrySource || '',
-    metadata,
-  };
-}
-
-async function ensurePublicationFootprintTables(env) {
-  if (publicationFootprintTablesReady) return;
-  await env.DB.batch([
-    env.DB.prepare(`CREATE TABLE IF NOT EXISTS publication_footprints (
-      id TEXT PRIMARY KEY,
-      user_id INTEGER NOT NULL,
-      journal_key TEXT NOT NULL,
-      name TEXT NOT NULL,
-      papers INTEGER NOT NULL DEFAULT 0,
-      citations INTEGER NOT NULL DEFAULT 0,
-      years_json TEXT NOT NULL DEFAULT '[]',
-      titles_json TEXT NOT NULL DEFAULT '[]',
-      issns_json TEXT NOT NULL DEFAULT '[]',
-      badges_json TEXT NOT NULL DEFAULT '[]',
-      organizations_json TEXT NOT NULL DEFAULT '[]',
-      countries_json TEXT NOT NULL DEFAULT '[]',
-      fields_json TEXT NOT NULL DEFAULT '[]',
-      source_profiles_json TEXT NOT NULL DEFAULT '[]',
-      metadata_json TEXT NOT NULL DEFAULT '{}',
-      created_at INTEGER NOT NULL,
-      updated_at INTEGER NOT NULL,
-      UNIQUE(user_id, journal_key),
-      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-    )`),
-    env.DB.prepare(`CREATE INDEX IF NOT EXISTS idx_publication_footprints_user_updated
-      ON publication_footprints(user_id, updated_at DESC)`),
-  ]);
-  publicationFootprintTablesReady = true;
-}
-
-async function routePublicationFootprintList(req, env) {
-  const user = await getUser(req, env);
-  if (!user) return err('请先登录后同步发表足迹', 401);
-  await ensurePublicationFootprintTables(env);
-  const rows = await env.DB.prepare(
-    'SELECT * FROM publication_footprints WHERE user_id = ? ORDER BY updated_at DESC LIMIT 200'
-  ).bind(user.id).all();
-  return json({ ok: true, records: (rows.results || []).map(publicationFootprintRow).filter(Boolean) }, 200, { 'Cache-Control': 'no-store' });
-}
-
-async function routePublicationFootprintImport(req, env) {
-  const user = await getUser(req, env);
-  if (!user) return err('请先登录后同步发表足迹', 401);
-  const body = await req.json().catch(() => null);
-  const input = Array.isArray(body?.records) ? body.records : (body?.record ? [body.record] : []);
-  const replaceKeys = new Set((Array.isArray(body?.replace_keys) ? body.replace_keys : [])
-    .map((key) => cleanText(key || '', 240)).filter(Boolean));
-  const deleteKeys = new Set((Array.isArray(body?.delete_keys) ? body.delete_keys : [])
-    .map((key) => cleanText(key || '', 240)).filter(Boolean));
-  if (!input.length && !deleteKeys.size) return err('请提供至少一条发表足迹记录或删除目标', 400);
-  if (input.length > 200) return err('单次最多同步 200 条发表足迹记录', 400);
-  if (replaceKeys.size > 200 || deleteKeys.size > 200) return err('单次最多处理 200 条发表足迹记录', 400);
-  await ensurePublicationFootprintTables(env);
-  const currentRows = await env.DB.prepare('SELECT * FROM publication_footprints WHERE user_id = ?').bind(user.id).all();
-  const current = new Map((currentRows.results || []).map((row) => [String(row.journal_key || ''), publicationFootprintRow(row)]));
-  const merged = new Map(current);
-  for (const key of deleteKeys) merged.delete(key);
-  for (const raw of input) {
-    const normalized = normalizePublicationFootprintRecord(raw);
-    if (!normalized) continue;
-    const previous = merged.get(normalized.key);
-    merged.set(normalized.key, replaceKeys.has(normalized.key)
-      ? normalized
-      : previous ? mergePublicationFootprintRecords(previous, normalized) : normalized);
-  }
-  const now = nowSec();
-  const statements = [];
-  for (const [key, item] of merged) {
-    const id = current.get(key)?.id || `fp_${(await sha256Hex(`${user.id}|${key}`)).slice(0, 32)}`;
-    const metadataJson = JSON.stringify(item.metadata || {});
-    const values = [
-      id, user.id, key, item.name, item.papers, item.citations,
-      JSON.stringify(item.years), JSON.stringify(item.titles), JSON.stringify(item.issns), JSON.stringify(item.badges),
-      JSON.stringify(item.organizations), JSON.stringify(item.countries), JSON.stringify(item.fields), JSON.stringify(item.sourceProfiles),
-      metadataJson, Number(current.get(key)?.createdAt || now), now,
-    ];
-    if (current.has(key)) {
-      statements.push(env.DB.prepare(`UPDATE publication_footprints SET id=?, name=?, papers=?, citations=?, years_json=?, titles_json=?, issns_json=?, badges_json=?, organizations_json=?, countries_json=?, fields_json=?, source_profiles_json=?, metadata_json=?, updated_at=? WHERE user_id=? AND journal_key=?`).bind(
-        id, item.name, item.papers, item.citations, JSON.stringify(item.years), JSON.stringify(item.titles), JSON.stringify(item.issns), JSON.stringify(item.badges), JSON.stringify(item.organizations), JSON.stringify(item.countries), JSON.stringify(item.fields), JSON.stringify(item.sourceProfiles), metadataJson, now, user.id, key,
-      ));
-    } else {
-      statements.push(env.DB.prepare(`INSERT INTO publication_footprints (id,user_id,journal_key,name,papers,citations,years_json,titles_json,issns_json,badges_json,organizations_json,countries_json,fields_json,source_profiles_json,metadata_json,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`).bind(...values));
-    }
-  }
-  for (let index = 0; index < statements.length; index += 100) await env.DB.batch(statements.slice(index, index + 100));
-  return json({ ok: true, count: merged.size, records: [...merged.values()].map((item) => ({
-    ...item,
-    journal_key: item.key,
-    ...(item.metadata || {}),
-  })) }, 200, { 'Cache-Control': 'no-store' });
-}
-
-// ───────── publication submission archive ─────────
-// Browser adapters submit only visible, user-confirmed metadata.  This archive
-// is deliberately separate from publisher credentials: passwords, cookies and
-// access tokens are never accepted or persisted here.
-let publicationSubmissionTablesReady = false;
-const SUBMISSION_CONNECTORS = [
-  { id: 'elsevier', label: 'Elsevier / Author Hub', mode: 'browser_confirmed', status: 'available', note: '浏览器读取可见状态，用户确认后同步。官方接口需另行授权。' },
-  { id: 'editorial_manager', label: 'Editorial Manager', mode: 'browser_confirmed', status: 'available', note: '浏览器读取可见状态，用户确认后同步。不同期刊站点仍需逐站适配。' },
-  { id: 'scholarone', label: 'ScholarOne', mode: 'browser_confirmed', status: 'available', note: '浏览器读取可见状态，用户确认后同步；官方 Web Services 需出版社授权。' },
-  { id: 'email', label: '投稿确认邮件 / .eml', mode: 'evidence_import', status: 'available', note: '无页面权限时的备用导入方式。' },
-  { id: 'scholarone_api', label: 'ScholarOne Web Services', mode: 'official_api', status: 'authorization_required', note: '仅在获得出版社或期刊的 API 授权后启用，不在无授权时模拟调用。' },
-];
-
-function routeSubmissionConnectors(req, env) {
-  return json({ ok: true, connectors: SUBMISSION_CONNECTORS, official_api: { enabled: false, reason: '尚未配置出版社授权凭据' } }, 200, { 'Cache-Control': 'no-store' });
-}
-
-async function ensurePublicationSubmissionTables(env) {
-  if (publicationSubmissionTablesReady) return;
-  await env.DB.batch([
-    env.DB.prepare(`CREATE TABLE IF NOT EXISTS publication_submissions (
-      id TEXT PRIMARY KEY,
-      user_id INTEGER NOT NULL,
-      source TEXT NOT NULL DEFAULT 'manual',
-      system TEXT NOT NULL DEFAULT 'unknown',
-      journal TEXT NOT NULL DEFAULT '',
-      title TEXT NOT NULL DEFAULT '',
-      manuscript_id TEXT NOT NULL DEFAULT '',
-      status_raw TEXT NOT NULL DEFAULT '',
-      status_normalized TEXT NOT NULL DEFAULT 'unknown',
-      submitted_at INTEGER,
-      status_at INTEGER,
-      source_url TEXT NOT NULL DEFAULT '',
-      evidence_text TEXT NOT NULL DEFAULT '',
-      metadata_json TEXT NOT NULL DEFAULT '{}',
-      watch_enabled INTEGER NOT NULL DEFAULT 0,
-      notify_enabled INTEGER NOT NULL DEFAULT 1,
-      last_checked_at INTEGER,
-      last_error TEXT NOT NULL DEFAULT '',
-      created_at INTEGER NOT NULL,
-      updated_at INTEGER NOT NULL,
-      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-    )`),
-    env.DB.prepare(`CREATE INDEX IF NOT EXISTS idx_publication_submissions_user_updated
-      ON publication_submissions(user_id, updated_at DESC)`),
-    env.DB.prepare(`CREATE INDEX IF NOT EXISTS idx_publication_submissions_user_key
-      ON publication_submissions(user_id, system, manuscript_id)`),
-  ]);
-  publicationSubmissionTablesReady = true;
-}
-
-function normalizeSubmissionSystem(value, sourceUrl = '') {
-  const raw = cleanText(value || '', 80).toLowerCase();
-  let host = '';
-  try { host = new URL(sourceUrl).hostname.toLowerCase(); } catch (_) {}
-  if (/elsevier|authorhub|track\.authorhub/.test(raw) || /elsevier|authorhub/.test(host)) return 'elsevier';
-  if (/editorial.?manager|em\b/.test(raw) || /editorialmanager/.test(host)) return 'editorial_manager';
-  if (/scholar.?one|manuscriptcentral/.test(raw) || /manuscriptcentral|scholarone/.test(host)) return 'scholarone';
-  if (/nature/.test(raw) || /nature\.com/.test(host)) return 'nature';
-  if (/springer/.test(raw) || /springernature/.test(host)) return 'springer_nature';
-  if (/mdpi/.test(raw) || /mdpi\.com/.test(host)) return 'mdpi';
-  if (/email|eml/.test(raw)) return 'email';
-  if (/manual/.test(raw)) return 'manual';
-  return raw.replace(/[^a-z0-9_:-]+/g, '_').slice(0, 50) || 'unknown';
-}
-
-function normalizeSubmissionStatus(value) {
-  const raw = cleanText(value || '', 120).toLowerCase();
-  if (!raw) return 'unknown';
-  if (/withdraw|撤稿|终止|withdrawn|cancel/.test(raw)) return 'withdrawn';
-  if (/reject|declin|拒稿|拒绝|not suitable/.test(raw)) return 'rejected';
-  if (/accept|accepted|已接收|接收|待出版|in production/.test(raw)) return 'accepted';
-  if (/revision|revise|返修|修改|minor|major/.test(raw)) return 'revision';
-  if (/review|审稿|外审|under consideration|with reviewer|in peer review/.test(raw)) return 'under_review';
-  if (/editor|初审|with editor|technical check|editorial check/.test(raw)) return 'editorial_check';
-  if (/submit|submitted|已提交|complete|完成提交/.test(raw)) return 'submitted';
-  if (/draft|incomplete|准备投稿|未提交/.test(raw)) return 'draft';
-  return 'unknown';
-}
-
-function submissionTimestamp(value) {
-  if (value == null || value === '') return null;
-  const number = Number(value);
-  if (Number.isFinite(number) && number > 0) {
-    const seconds = number > 10_000_000_000 ? Math.floor(number / 1000) : Math.floor(number);
-    return seconds > 0 && seconds < nowSec() + 86400 ? seconds : null;
-  }
-  const parsed = Date.parse(String(value));
-  return Number.isFinite(parsed) ? Math.floor(parsed / 1000) : null;
-}
-
-function submissionRow(row) {
-  if (!row) return null;
-  let metadata = {};
-  try { metadata = JSON.parse(row.metadata_json || '{}'); } catch (_) {}
-  return {
-    id: row.id,
-    source: row.source || 'manual',
-    system: row.system || 'unknown',
-    journal: row.journal || '',
-    title: row.title || '',
-    manuscript_id: row.manuscript_id || '',
-    status_raw: row.status_raw || '',
-    status_normalized: row.status_normalized || 'unknown',
-    submitted_at: row.submitted_at || null,
-    status_at: row.status_at || null,
-    source_url: row.source_url || '',
-    evidence_text: row.evidence_text || '',
-    metadata,
-    watch_enabled: Number(row.watch_enabled || 0) === 1,
-    notify_enabled: Number(row.notify_enabled == null ? 1 : row.notify_enabled) === 1,
-    last_checked_at: row.last_checked_at || null,
-    last_error: row.last_error || '',
-    created_at: row.created_at || null,
-    updated_at: row.updated_at || null,
-  };
-}
-
-function submissionFingerprint(record) {
-  return [record.system, record.manuscript_id, record.journal, record.title]
-    .map((value) => foldPublicationText(value).replace(/\s+/g, ' '))
-    .join('|');
-}
-
-function submissionStatusLabel(value) {
-  return ({
-    draft: '准备投稿', submitted: '已提交', editorial_check: '编辑初审',
-    under_review: '外审中', revision: '返修', accepted: '已接收',
-    rejected: '已拒稿', withdrawn: '撤稿/终止',
-  })[String(value || '')] || '状态未识别';
-}
-
-function emailSafeText(value, max = 240) {
-  return String(value || '').replace(/[<>]/g, '').replace(/\s+/g, ' ').trim().slice(0, max);
-}
-
-async function sendSubmissionChangeEmail(env, user, record, previous) {
-  const email = cleanText(user?.email || '', 240).toLowerCase();
-  if (!email || !isEmail(email) || !env.RESEND_API_KEY) return;
-  const journal = emailSafeText(record.journal || record.title || '投稿记录', 180);
-  const before = emailSafeText(submissionStatusLabel(previous?.status_normalized), 40);
-  const after = emailSafeText(submissionStatusLabel(record.status_normalized), 40);
-  const manuscript = emailSafeText(record.manuscript_id || '', 120);
-  const source = emailSafeText({ elsevier: 'Elsevier / Author Hub', editorial_manager: 'Editorial Manager', scholarone: 'ScholarOne' }[record.system] || record.system, 80);
-  const subject = `AILatest 投稿状态更新：${journal} · ${after}`;
-  const html = `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:560px;margin:24px auto;padding:24px;color:#3a3028;background:#fffdf9;border:1px solid #eadfd2;border-radius:14px"><h2 style="margin:0 0 14px;font-size:19px">投稿状态发生变化</h2><p style="line-height:1.7;margin:0 0 14px">${emailSafeText(journal, 180)} 的投稿状态已更新。</p><div style="padding:12px 14px;background:#fff7e9;border-radius:10px;line-height:1.8"><b>${emailSafeText(before, 40)}</b> → <b>${emailSafeText(after, 40)}</b><br>${manuscript ? `稿件编号：${manuscript}<br>` : ''}来源：${source}</div><p style="margin:16px 0 0;color:#776b60;font-size:12px">登录 AILatest Journal 的发表足迹页面查看详情。</p></div>`;
-  try {
-    await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ from: env.MAIL_FROM || 'noreply@ailatest.org', to: [email], subject, html }),
-    });
-  } catch (_) { /* notification failure must not block the status archive */ }
-}
-
-async function routeSubmissionList(req, env) {
-  const user = await getUser(req, env);
-  if (!user) return err('请先登录后同步投稿档案', 401);
-  await ensurePublicationSubmissionTables(env);
-  const rows = await env.DB.prepare(
-    `SELECT * FROM publication_submissions WHERE user_id = ? ORDER BY COALESCE(status_at, updated_at) DESC, updated_at DESC LIMIT 200`
-  ).bind(user.id).all();
-  return json({ ok: true, records: (rows.results || []).map(submissionRow).filter(Boolean) }, 200, { 'Cache-Control': 'no-store' });
-}
-
-async function routeSubmissionImport(req, env, ctx) {
-  const user = await getUser(req, env);
-  if (!user) return err('请先登录后同步投稿档案', 401);
-  const body = await req.json().catch(() => null);
-  const input = Array.isArray(body?.records) ? body.records : (body?.record ? [body.record] : []);
-  if (!input.length) return err('请提供至少一条投稿记录', 400);
-  if (input.length > 50) return err('单次最多同步 50 条投稿记录', 400);
-  await ensurePublicationSubmissionTables(env);
-  const now = nowSec();
-  const saved = [];
-  const skipped = [];
-  for (const raw of input) {
-    const item = raw && typeof raw === 'object' ? raw : {};
-    const sourceUrl = cleanText(item.source_url || item.link || item.url || '', 500);
-    const system = normalizeSubmissionSystem(item.system || item.publisher || item.source_system || body?.system, sourceUrl);
-    const journal = cleanText(item.journal || item.venue || item.journal_name || '', 240);
-    const title = cleanText(item.title || item.manuscript_title || '', 500);
-    const manuscriptId = cleanText(item.manuscript_id || item.manuscript || item.reference || '', 120);
-    const statusRaw = cleanText(item.status_raw || item.status || item.state || '', 120);
-    if (!journal && !title && !manuscriptId) { skipped.push({ reason: '缺少期刊、题目或稿件编号' }); continue; }
-    const status = normalizeSubmissionStatus(item.status_normalized || statusRaw);
-    const source = cleanText(item.source || body?.source || 'manual', 40).replace(/[^a-z0-9_:-]+/gi, '_').slice(0, 40) || 'manual';
-    const evidence = cleanText(item.evidence_text || item.evidence || '', 2000);
-    const metadata = item.metadata && typeof item.metadata === 'object' ? item.metadata : {};
-    const fingerprint = submissionFingerprint({ system, manuscript_id: manuscriptId, journal, title });
-    const suppliedId = /^sub_[a-f0-9]{16,64}$/i.test(String(item.id || '')) ? String(item.id) : '';
-    const existing = suppliedId
-      ? await env.DB.prepare('SELECT * FROM publication_submissions WHERE user_id = ? AND id = ?').bind(user.id, suppliedId).first()
-      : await env.DB.prepare(
-        `SELECT * FROM publication_submissions WHERE user_id = ? AND system = ? AND manuscript_id = ? AND journal = ? AND title = ? LIMIT 1`
-      ).bind(user.id, system, manuscriptId, journal, title).first();
-    const watchValue = item.watch_enabled != null ? item.watch_enabled : item.watch;
-    const watchEnabled = watchValue == null
-      ? Boolean(existing?.watch_enabled)
-      : (watchValue === true || watchValue === 1 || watchValue === '1' || watchValue === 'true');
-    const notifyValue = item.notify_enabled;
-    const notifyEnabled = notifyValue == null
-      ? (existing ? Number(existing.notify_enabled == null ? 1 : existing.notify_enabled) === 1 : true)
-      : (notifyValue !== false && notifyValue !== 0 && notifyValue !== '0');
-    const id = existing?.id || suppliedId || `sub_${(await sha256Hex(`${user.id}|${fingerprint}`)).slice(0, 32)}`;
-    const submittedAt = submissionTimestamp(item.submitted_at || item.submittedAt);
-    const statusAt = submissionTimestamp(item.status_at || item.statusAt) || now;
-    const lastCheckedAt = submissionTimestamp(item.last_checked_at || item.lastCheckedAt) || (source === 'extension_watch' ? now : (existing?.last_checked_at || null));
-    const lastError = cleanText(item.last_error || item.lastError || '', 400);
-    const row = [id, user.id, source, system, journal, title, manuscriptId, statusRaw, status, submittedAt, statusAt, sourceUrl, evidence, metadataJson(metadata), watchEnabled ? 1 : 0, notifyEnabled ? 1 : 0, lastCheckedAt, lastError, Number(existing?.created_at || now), now];
-    const statusChanged = !!existing && String(existing.status_normalized || 'unknown') !== String(status || 'unknown');
-    if (existing) {
-      await env.DB.prepare(`UPDATE publication_submissions SET source=?, system=?, journal=?, title=?, manuscript_id=?, status_raw=?, status_normalized=?, submitted_at=?, status_at=?, source_url=?, evidence_text=?, metadata_json=?, watch_enabled=?, notify_enabled=?, last_checked_at=?, last_error=?, updated_at=? WHERE user_id=? AND id=?`)
-        .bind(source, system, journal, title, manuscriptId, statusRaw, status, submittedAt, statusAt, sourceUrl, evidence, metadataJson(metadata), watchEnabled ? 1 : 0, notifyEnabled ? 1 : 0, lastCheckedAt, lastError, now, user.id, id).run();
-    } else {
-      await env.DB.prepare(`INSERT INTO publication_submissions (id,user_id,source,system,journal,title,manuscript_id,status_raw,status_normalized,submitted_at,status_at,source_url,evidence_text,metadata_json,watch_enabled,notify_enabled,last_checked_at,last_error,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`).bind(...row).run();
-    }
-    const current = await env.DB.prepare('SELECT * FROM publication_submissions WHERE user_id = ? AND id = ?').bind(user.id, id).first();
-    if (current) {
-      const normalized = submissionRow(current);
-      saved.push(normalized);
-      if (statusChanged && normalized.notify_enabled) {
-        const notification = sendSubmissionChangeEmail(env, user, normalized, existing);
-        if (ctx?.waitUntil) ctx.waitUntil(notification);
-        else await notification;
-      }
-    }
-  }
-  return json({ ok: true, count: saved.length, records: saved, skipped }, 200, { 'Cache-Control': 'no-store' });
-}
-
-async function routeSubmissionDelete(req, env, id) {
-  const user = await getUser(req, env);
-  if (!user) return err('请先登录后管理投稿档案', 401);
-  if (!/^sub_[a-f0-9]{16,64}$/i.test(String(id || ''))) return err('无效的投稿记录', 400);
-  await ensurePublicationSubmissionTables(env);
-  const result = await env.DB.prepare('DELETE FROM publication_submissions WHERE user_id = ? AND id = ?').bind(user.id, id).run();
-  return json({ ok: true, deleted: Number(result?.meta?.changes || 0) > 0 }, 200, { 'Cache-Control': 'no-store' });
-}
-
-async function loadCountryPreloadManifest(env) {
-  const base = (cleanText(env?.SITE_URL || 'https://journal.ailatest.org', 200) || 'https://journal.ailatest.org').replace(/\/+$/, '');
-  const resp = await fetch(`${base}${COUNTRY_PRELOAD_MANIFEST_PATH}?v=${COUNTRY_PRELOAD_MANIFEST_COUNT}`, {
-    headers: { Accept: 'application/json' },
-    cf: { cacheTtl: 300, cacheEverything: true },
-  });
-  if (!resp.ok) throw new Error(`country preload manifest ${resp.status}`);
-  const data = await resp.json();
-  return Array.isArray(data) ? data : [];
-}
-
-function preloadJobKey(item, year) {
-  const issn = normalizeOpenAlexIssn(item?.issn) || normalizeOpenAlexIssn(item?.eissn);
-  const eissn = normalizeOpenAlexIssn(item?.eissn);
-  const targetYear = Number(year);
-  return issn && COUNTRY_PRELOAD_YEARS.includes(targetYear)
-    ? `${targetYear}:${issn}|${eissn && eissn !== issn ? eissn : ''}`
-    : '';
-}
-
-async function seedCountryPreloadJobs(env, manifest, state, now) {
-  const cursor = Math.max(0, Number(state?.seed_cursor || 0));
-  if (cursor >= manifest.length) return { seeded: 0, cursor };
-  const slice = manifest.slice(cursor, cursor + COUNTRY_PRELOAD_SEED_PER_RUN);
-  const statements = [];
-  for (const [itemOffset, item] of slice.entries()) {
-    const issn = normalizeOpenAlexIssn(item?.issn) || normalizeOpenAlexIssn(item?.eissn);
-    const eissn = normalizeOpenAlexIssn(item?.eissn);
-    const manifestRank = Number(item?.rank || cursor + itemOffset + 1);
-    if (!issn) continue;
-    for (const [yearOffset, year] of COUNTRY_PRELOAD_YEARS.entries()) {
-      const jobKey = preloadJobKey(item, year);
-      if (!jobKey) continue;
-      const rank = (manifestRank - 1) * COUNTRY_PRELOAD_YEARS.length + yearOffset + 1;
-      statements.push(env.DB.prepare(
-        `INSERT INTO country_output_preload_jobs
-          (job_key, issn, eissn, year, rank, journal_name, status, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, 'pending', ?)
-         ON CONFLICT(job_key) DO UPDATE SET
-           issn = excluded.issn,
-           eissn = excluded.eissn,
-           year = excluded.year,
-           rank = excluded.rank,
-           journal_name = excluded.journal_name,
-           updated_at = excluded.updated_at`
-      ).bind(
-        jobKey,
-        issn,
-        eissn && eissn !== issn ? eissn : '',
-        year,
-        rank,
-        cleanText(item?.name || '', 240),
-        now,
-      ));
-    }
-  }
-  for (let i = 0; i < statements.length; i += 100) {
-    await env.DB.batch(statements.slice(i, i + 100));
-  }
-  const nextCursor = cursor + slice.length;
-  await env.DB.prepare(
-    'UPDATE country_output_preload_state SET seed_cursor = ?1, updated_at = ?2 WHERE state_key = ?3'
-  ).bind(nextCursor, now, 'global').run();
-  return { seeded: statements.length, cursor: nextCursor };
-}
-
-function preloadTransientStatus(status) {
-  const code = Number(status || 0);
-  return code === 0 || code === 408 || code === 425 || code === 429 || code >= 500;
-}
-
-async function reserveCountryPreloadJobs(env, now, keyCount) {
-  const usageDay = countryPreloadUsageDay(now);
-  await env.DB.prepare(
-    `INSERT OR IGNORE INTO country_output_preload_usage (usage_day, reserved_jobs, updated_at)
-     VALUES (?1, 0, ?2)`
-  ).bind(usageDay, now).run();
-  const keyRows = await env.DB.prepare(
-    `SELECT key_index, reserved_jobs
-       FROM country_output_preload_key_usage
-      WHERE usage_day = ?1
-      ORDER BY key_index`
-  ).bind(usageDay).all();
-  const byKey = new Map((keyRows.results || []).map(row => [Number(row.key_index), Number(row.reserved_jobs || 0)]));
-  let keyIndex = -1;
-  let keyReserved = 0;
-  for (let i = 0; i < Math.max(0, Number(keyCount || 0)); i += 1) {
-    const reserved = byKey.get(i) || 0;
-    if (reserved < COUNTRY_PRELOAD_PER_KEY_DAILY_LIMIT) {
-      keyIndex = i;
-      keyReserved = reserved;
-      break;
-    }
-  }
-  if (keyIndex < 0) return { jobs: [], keyIndex: null };
-  await env.DB.prepare(
-    `INSERT OR IGNORE INTO country_output_preload_key_usage
-      (usage_day, key_index, reserved_jobs, updated_at)
-     VALUES (?1, ?2, 0, ?3)`
-  ).bind(usageDay, keyIndex, now).run();
-  const remaining = Math.min(
-    COUNTRY_PRELOAD_BATCH_LIMIT,
-    Math.max(0, COUNTRY_PRELOAD_PER_KEY_DAILY_LIMIT - keyReserved),
-  );
-  if (!remaining) return { jobs: [], keyIndex: null };
-  const yearPlaceholders = COUNTRY_PRELOAD_YEARS.map(() => '?').join(',');
-  const candidates = await env.DB.prepare(
-    `SELECT job_key, issn, eissn, year, rank, journal_name, attempts
-       FROM country_output_preload_jobs
-      WHERE year IN (${yearPlaceholders}) AND status = ? AND next_attempt_at <= ?
-      ORDER BY rank ASC
-      LIMIT ?`
-  ).bind(...COUNTRY_PRELOAD_YEARS, 'pending', now, remaining).all();
-  const jobs = candidates.results || [];
-  if (!jobs.length) return { jobs: [], keyIndex: null };
-  const count = jobs.length;
-  const reserve = await env.DB.prepare(
-    `UPDATE country_output_preload_key_usage
-        SET reserved_jobs = reserved_jobs + ?1, updated_at = ?2
-      WHERE usage_day = ?3 AND key_index = ?4
-        AND reserved_jobs + ?1 <= ?5`
-  ).bind(count, now, usageDay, keyIndex, COUNTRY_PRELOAD_PER_KEY_DAILY_LIMIT).run();
-  if (!Number(reserve?.meta?.changes || 0)) return { jobs: [], keyIndex: null };
-  await env.DB.prepare(
-    `UPDATE country_output_preload_usage
-        SET reserved_jobs = reserved_jobs + ?1, updated_at = ?2
-      WHERE usage_day = ?3`
-  ).bind(count, now, usageDay).run();
-  const claims = jobs.map((job) => env.DB.prepare(
-    `UPDATE country_output_preload_jobs
-        SET status = 'running', attempts = attempts + 1, claimed_at = ?1, updated_at = ?1
-      WHERE job_key = ?2 AND status = 'pending'`
-  ).bind(now, job.job_key));
-  await env.DB.batch(claims);
-  return { jobs, keyIndex };
-}
-
-async function updateCountryPreloadJob(env, job, result, now) {
-  const status = result.status || 'pending';
-  const retry = status === 'pending';
-  const nextAttempt = retry ? now + Math.min(6 * 3600, 300 * Math.max(1, Number(job.attempts || 1))) : 0;
-  await env.DB.prepare(
-    `UPDATE country_output_preload_jobs
-        SET status = ?1,
-            last_status = ?2,
-            last_error = ?3,
-            next_attempt_at = ?4,
-            completed_at = ?5,
-            source = ?6,
-            updated_at = ?7
-      WHERE job_key = ?8`
-  ).bind(
-    status,
-    Number(result.httpStatus || 0) || null,
-    cleanText(result.error || '', 240),
-    nextAttempt,
-    status === 'completed' || status === 'no_data' ? now : null,
-    cleanText(result.source || '', 32),
-    now,
-    job.job_key,
-  ).run();
-}
-
-async function processCountryPreloadJob(env, job, apiKeys, keyIndex, now) {
-  // One reserved job equals one OpenAlex request.  This keeps the daily
-  // budget predictable; the public detail endpoint can still try eISSN as a
-  // live fallback when a preload has no result.
-  const sourceIssns = [normalizeOpenAlexIssn(job.issn)].filter(Boolean);
-  const year = Number(job.year || 0);
-  const cached = await readCountryOutputD1(env, countryOutputD1Key(sourceIssns, [year]))
-    || await readCountryOutputD1Partial(env, sourceIssns, [year]);
-  if (cached?.years?.length) {
-    return { status: 'completed', httpStatus: 200, source: cached.source || 'openalex' };
-  }
-  let transient = false;
-  let lastStatus = 0;
-  const keys = Array.isArray(apiKeys) ? apiKeys.filter(Boolean) : [cleanText(apiKeys || '', 256)].filter(Boolean);
-  const apiKey = keys.length ? keys[Math.max(0, Number(keyIndex || 0)) % keys.length] : '';
-  for (const sourceIssn of sourceIssns) {
-    const row = await fetchOpenAlexCountryYear(sourceIssn, year, apiKey, 0, 0);
-    lastStatus = Number(row.status || 200);
-    if (!row.skipped && row.total > 0 && row.groups?.length) {
-      const payload = buildCountryOutputPayload([row], 'openalex');
-      if (payload) {
-        payload.issn = sourceIssn;
-        const cacheIssns = sourceIssns;
-        const cacheKey = countryOutputD1Key(cacheIssns, [year]);
-        await writeCountryOutputD1(env, cacheKey, cacheIssns, [year], payload, COUNTRY_PRELOAD_CACHE_TTL);
-        return { status: 'completed', httpStatus: lastStatus, source: 'openalex' };
-      }
-    }
-    if (preloadTransientStatus(row.status)) transient = true;
-  }
-  if (transient && Number(job.attempts || 0) < 3) {
-    return { status: 'pending', httpStatus: lastStatus, error: `openalex_retry_${lastStatus}` };
-  }
-  return { status: 'no_data', httpStatus: lastStatus, error: 'openalex_no_affiliation_data', source: 'openalex' };
-}
-
-async function runCountryOutputPreload(env, now) {
-  const apiKeys = getOpenAlexApiKeys(env);
-  if (!apiKeys.length || !env?.DB) return { skipped: true, reason: apiKeys.length ? 'no_db' : 'missing_openalex_key' };
-  let locked = false;
-  try {
-    await env.DB.prepare(
-      `INSERT OR IGNORE INTO country_output_preload_state
-        (state_key, seed_cursor, lock_until, last_run_at, updated_at)
-       VALUES ('global', 0, 0, 0, ?1)`
-    ).bind(now).run();
-    const lock = await env.DB.prepare(
-      `UPDATE country_output_preload_state
-          SET lock_until = ?1, updated_at = ?2
-        WHERE state_key = 'global' AND lock_until <= ?2`
-    ).bind(now + COUNTRY_PRELOAD_LOCK_SECONDS, now).run();
-    if (!Number(lock?.meta?.changes || 0)) return { skipped: true, reason: 'locked' };
-    locked = true;
-
-    let state = await env.DB.prepare(
-      'SELECT seed_cursor, seed_version, lock_until, last_run_at FROM country_output_preload_state WHERE state_key = \'global\''
-    ).first();
-    if (Number(state?.seed_version || 1) !== COUNTRY_PRELOAD_QUEUE_VERSION) {
-      await env.DB.prepare(
-        `UPDATE country_output_preload_state
-            SET seed_cursor = 0, seed_version = ?1, updated_at = ?2
-          WHERE state_key = 'global'`
-      ).bind(COUNTRY_PRELOAD_QUEUE_VERSION, now).run();
-      state = { ...state, seed_cursor: 0, seed_version: COUNTRY_PRELOAD_QUEUE_VERSION };
-    }
-    const needsSeed = Number(state?.seed_cursor || 0) < COUNTRY_PRELOAD_MANIFEST_COUNT;
-    const manifest = needsSeed ? await loadCountryPreloadManifest(env) : [];
-    const seed = needsSeed
-      ? await seedCountryPreloadJobs(env, manifest, state, now)
-      : { seeded: 0, cursor: Number(state?.seed_cursor || 0) };
-    await env.DB.prepare(
-      `UPDATE country_output_preload_jobs
-          SET status = 'pending', claimed_at = 0, next_attempt_at = ?1, updated_at = ?1
-        WHERE status = 'running' AND claimed_at < ?2`
-    ).bind(now, now - COUNTRY_PRELOAD_LOCK_SECONDS).run();
-    const reservation = await reserveCountryPreloadJobs(env, now, apiKeys.length);
-    const jobs = reservation.jobs;
-    const keyIndex = reservation.keyIndex;
-    let completed = 0;
-    let noData = 0;
-    let retried = 0;
-    for (let i = 0; i < jobs.length; i += COUNTRY_PRELOAD_CONCURRENCY) {
-      const group = jobs.slice(i, i + COUNTRY_PRELOAD_CONCURRENCY);
-      const results = await Promise.all(group.map(async (job) => {
-        try {
-          return await processCountryPreloadJob(env, job, apiKeys, keyIndex, now);
-        } catch (error) {
-          return { status: Number(job.attempts || 0) < 3 ? 'pending' : 'no_data', error: cleanText(error?.message || 'preload_error', 240) };
-        }
-      }));
-      await Promise.all(group.map((job, index) => updateCountryPreloadJob(env, job, results[index], now)));
-      for (const result of results) {
-        if (result.status === 'completed') completed += 1;
-        else if (result.status === 'pending') retried += 1;
-        else noData += 1;
-      }
-    }
-    await env.DB.prepare(
-      `UPDATE country_output_preload_state SET last_run_at = ?1, updated_at = ?1 WHERE state_key = 'global'`
-    ).bind(now).run();
-    return {
-      years: COUNTRY_PRELOAD_YEARS,
-      per_key_daily_job_limit: COUNTRY_PRELOAD_PER_KEY_DAILY_LIMIT,
-      daily_job_limit: COUNTRY_PRELOAD_PER_KEY_DAILY_LIMIT * apiKeys.length,
-      key_index: keyIndex,
-      seeded: seed.seeded,
-      seed_cursor: seed.cursor,
-      reserved: jobs.length,
-      completed,
-      no_data: noData,
-      retried,
-      manifest: needsSeed ? manifest.length : COUNTRY_PRELOAD_MANIFEST_COUNT,
-    };
-  } catch (error) {
-    console.error('country output preload failed:', error?.stack || error?.message || error);
-    return { skipped: true, reason: 'preload_error' };
-  } finally {
-    if (locked) {
-      try {
-        await env.DB.prepare(
-          `UPDATE country_output_preload_state SET lock_until = 0, updated_at = ?1 WHERE state_key = 'global'`
-        ).bind(now).run();
-      } catch (_) { /* best effort */ }
-    }
-  }
-}
-
 // GET /openalex/country-output?issn=1474-760X[,1474-760X]&years=2022,2023,2024,2025,2026
-// OpenAlex is an optional enrichment source; Crossref is the no-key fallback.
-async function routeOpenAlexCountryOutput(req, env, ctx) {
+// OpenAlex is preferred when configured; Crossref is the no-key fallback.
+async function routeOpenAlexCountryOutput(req, env) {
   const url = new URL(req.url);
   const debug = url.searchParams.get('debug') === '1';
   const issns = cleanText(url.searchParams.get('issn') || '', 120)
@@ -4146,63 +2742,27 @@ async function routeOpenAlexCountryOutput(req, env, ctx) {
     .slice(-8);
   if (!issns.length || !years.length) return err('missing issn or years', 400);
 
-  // api_key 可选：没有 key 时不再反复撞 OpenAlex 公共池，优先使用
-  // Crossref + D1 缓存；如需调试公共池，可显式加 public_openalex=1。
-  const apiKeys = getOpenAlexApiKeys(env);
-  const apiKey = apiKeys[0] || '';
+  // api_key 可选：无 key 时走 OpenAlex 礼貌池（mailto），不再返回空壳阻断前端
+  const apiKey = cleanText(env.OPENALEX_API_KEY || '', 256);
 
-  // With a key we can request the exact client window.  Without one, keep the
-  // live fallback bounded to five years; the preloaded D1 rows still cover the
-  // same window without spending an upstream request.
-  const requestedYears = apiKey ? years : years.slice(-5);
   const cache = caches.default;
-  const cacheKey = new Request(`https://cache.internal/openalex-country-output/v4?issn=${encodeURIComponent(issns.join(','))}&years=${encodeURIComponent(requestedYears.join(','))}&k=${apiKey ? '1' : '0'}`);
+  const cacheKey = new Request(`https://cache.internal/openalex-country-output/v4?issn=${encodeURIComponent(issns.join(','))}&years=${encodeURIComponent(years.join(','))}&k=${apiKey ? '1' : '0'}`);
   const hit = debug ? null : await cache.match(cacheKey);
   if (hit) return new Response(hit.body, { status: 200, headers: { 'Content-Type': 'application/json', ...CORS, 'Cache-Control': 'public, max-age=86400' } });
 
-  const durableKey = countryOutputD1Key(issns, requestedYears);
-  const bypassDurableCache = debug || url.searchParams.get('fresh') === '1';
-  const durableHit = bypassDurableCache ? null : await readCountryOutputD1(env, durableKey);
-  const durableComplete = durableHit?.years?.length
-    && requestedYears.every((year) => durableHit.years.some((point) => Number(point?.year) === Number(year)));
-  if (durableHit && durableComplete) {
-    const bodyText = JSON.stringify({ ...durableHit, cache: 'd1' });
-    return new Response(bodyText, {
-      status: 200,
-      headers: { 'Content-Type': 'application/json', ...CORS, 'Cache-Control': 'public, max-age=86400' },
-    });
-  }
-  const partialDurableHit = bypassDurableCache ? null : await readCountryOutputD1Partial(env, issns, requestedYears);
-  const cachedYears = new Set((partialDurableHit?.years || []).map((point) => Number(point?.year)));
-  const missingYears = requestedYears.filter((year) => !cachedYears.has(Number(year)));
-  if (partialDurableHit && !missingYears.length) {
-    const bodyText = JSON.stringify({ ...partialDurableHit, cache: 'd1-partial' });
-    return new Response(bodyText, {
-      status: 200,
-      headers: { 'Content-Type': 'application/json', ...CORS, 'Cache-Control': 'public, max-age=86400' },
-    });
-  }
-
-  // Fetch only the years absent from the durable cache, then merge them back
-  // with the already-preloaded rows before responding.  This prevents a single
-  // cached year (for example 2025) from masking the other four years.
-  const queryYears = missingYears.length ? missingYears : requestedYears;
-
+  // 无 API key 时少查几年；有 key 时并行拉年，显著缩短详情页等待
+  const queryYears = apiKey ? years : years.slice(-3);
   let payload = null;
   const attempts = [];
   // OpenAlex now requires a funded API budget for many requests. Crossref
   // deposits carry author affiliations for a large share of journals and are a
   // useful server-side fallback when OPENALEX_API_KEY is absent or exhausted.
   if (!apiKey) payload = await fetchCrossrefCountryOutput(issns, queryYears, attempts);
-  const allowPublicOpenAlex = url.searchParams.get('public_openalex') === '1';
   for (const sourceIssn of issns) {
     if (payload) break;
-    if (!apiKey && !allowPublicOpenAlex) break;
     let rows;
     if (apiKey) {
-      rows = await Promise.all(queryYears.map((year, index) => (
-        fetchOpenAlexCountryYear(sourceIssn, year, apiKeys[index % apiKeys.length])
-      )));
+      rows = await Promise.all(queryYears.map((year) => fetchOpenAlexCountryYear(sourceIssn, year, apiKey)));
     } else {
       rows = [];
       for (const year of queryYears) {
@@ -4230,44 +2790,21 @@ async function routeOpenAlexCountryOutput(req, env, ctx) {
     }
   }
   if (!payload && apiKey) payload = await fetchCrossrefCountryOutput(issns, queryYears, attempts);
-  if (!payload && partialDurableHit) payload = partialDurableHit;
   if (!payload) {
     payload = {
       ok: true,
       years: [],
       top: [],
       source: 'openalex',
-      reason: apiKey ? 'no_data' : 'sources_exhausted',
+      reason: apiKey ? 'no_data' : 'public_pool_empty',
     };
-  }
-  if (partialDurableHit && payload?.years?.length) {
-    const byYear = new Map();
-    for (const point of partialDurableHit.years) byYear.set(Number(point?.year), point);
-    for (const point of payload.years) byYear.set(Number(point?.year), point);
-    const source = [partialDurableHit.source, payload.source].some((value) => String(value || '').toLowerCase() === 'openalex')
-      ? 'openalex'
-      : (payload.source || partialDurableHit.source || 'crossref');
-    const merged = buildCountryOutputPayload([...byYear.values()], source);
-    if (merged) {
-      merged.issn = payload.issn || partialDurableHit.issn || issns[0];
-      payload = merged;
-    }
   }
   if (debug) payload.attempts = attempts;
 
-  if (payload.years.length) {
-    const persistYears = [...new Set(payload.years.map((point) => Number(point?.year)).filter(Number.isFinite))].sort((a, b) => a - b);
-    const persistKey = countryOutputD1Key(issns, persistYears);
-    const persist = writeCountryOutputD1(env, persistKey, issns, persistYears, payload);
-    if (ctx?.waitUntil) ctx.waitUntil(persist);
-    else await persist;
-  }
-
   const bodyText = JSON.stringify(payload);
-  const complete = requestedYears.every((year) => payload.years.some((point) => Number(point?.year) === Number(year)));
-  const ttl = complete ? 86400 : (payload.years.length ? 300 : 60);
+  const ttl = payload.years.length ? 86400 : 60;
   const headers = { 'Content-Type': 'application/json', ...CORS, 'Cache-Control': `public, max-age=${ttl}` };
-  if (complete && payload.years.length && !debug) await cache.put(cacheKey, new Response(bodyText, { status: 200, headers }));
+  if (payload.years.length && !debug) await cache.put(cacheKey, new Response(bodyText, { status: 200, headers }));
   return new Response(bodyText, { status: 200, headers });
 }
 
@@ -4279,6 +2816,25 @@ async function routeHotJournals(req, env) {
   const days = Number.isFinite(daysRaw) ? Math.min(90, Math.max(1, Math.floor(daysRaw))) : 30;
   const limitRaw = Number(url.searchParams.get('limit') || 5);
   const limit = Number.isFinite(limitRaw) ? Math.min(20, Math.max(1, Math.floor(limitRaw))) : 5;
+  const snapshot = [
+    { journal_key: '1346-7581', journal_issn: '1346-7581', views: 147, latest_viewed: 1788007518 },
+    { journal_key: '2662-9992', journal_issn: '2662-9992', views: 91, latest_viewed: 1789014678 },
+    { journal_key: '2045-2322', journal_issn: '2045-2322', views: 86, latest_viewed: 1788965753 },
+    { journal_key: '0028-0836', journal_issn: '0028-0836', views: 80, latest_viewed: 1788227646 },
+    { journal_key: '2053-1583', journal_issn: '2053-1583', views: 79, latest_viewed: 1786340609 },
+  ];
+  return json({
+    ok: true,
+    days,
+    limit,
+    snapshot: true,
+    snapshot_kind: 'rolling_30_days',
+    collection_paused: publicSnapshot.collection_paused,
+    period_days: publicSnapshot.hot_days,
+    snapshot_at: publicSnapshot.snapshot_at,
+    items: snapshotHotItems(limit),
+  }, 200, { 'Cache-Control': 'public, max-age=3600' });
+
   const startSec = Math.floor(Date.now() / 1000) - days * 86400;
   const humanTrafficSql = "COALESCE(traffic_type, CASE WHEN is_bot=1 THEN 'scraper' ELSE 'human' END) = 'human'";
 
@@ -4328,6 +2884,23 @@ async function routeHotJournals(req, env) {
 
 // GET /analytics/public-total  (public aggregate, no user-level detail)
 async function routePublicTrafficTotal(req, env) {
+  return json({
+    ok: true,
+    snapshot: true,
+    snapshot_at: publicSnapshot.snapshot_at,
+    total_pageviews: 13192,
+    total_visitors: 2113,
+    total_sessions: 0,
+    first_pageview_at: null,
+    latest_pageview_at: 1789517297,
+    viewed_journals: 15358,
+    total_journal_views: 25437,
+    latest_journal_view_at: 1789584948,
+    raw_pageviews: null,
+    raw_bot_pageviews: null,
+    ...publicSnapshot.totals,
+  }, 200, { 'Cache-Control': 'public, max-age=3600' });
+
   const url = new URL(req.url);
   const requestedSite = url.searchParams.has('site')
     ? canonicalAnalyticsSite(url.searchParams.get('site') || 'journal.ailatest.org')
@@ -4410,6 +2983,9 @@ async function routeJournalViewTrend(req, env) {
   const u = await getUser(req, env);
   if (!u) return err('login required', 401);
   if (!isOwnerUser(u)) return err('forbidden', 403);
+  if (publicSnapshot.collection_paused) {
+    return json({ ok: true, snapshot: true, snapshot_at: publicSnapshot.snapshot_at, days: 30, kpis: { total_journal_views: Number(publicSnapshot.totals?.total_journal_views || 0), viewed_journals: Number(publicSnapshot.totals?.viewed_journals || 0), latest_journal_view_at: publicSnapshot.totals?.latest_journal_view_at || null, cumulative_journal_views: Number(publicSnapshot.totals?.total_journal_views || 0) }, series: [] });
+  }
 
   const url = new URL(req.url);
   const rawDays = Number(url.searchParams.get('days') || '7');
@@ -4485,6 +3061,10 @@ async function routeSiteTrafficTrend(req, env) {
   const siteId = url.searchParams.get('site') || 'journal';
   const site = sites[siteId];
   if (!site) return err('unknown site', 400);
+  if (publicSnapshot.collection_paused) {
+    const pageviews = siteId === 'journal' ? Number(publicSnapshot.totals?.total_pageviews || 0) : 0;
+    return json({ ok: true, snapshot: true, snapshot_at: publicSnapshot.snapshot_at, site: siteId, first_party: { ...site, status: 'snapshot', kpis: { pageviews, visitors: siteId === 'journal' ? Number(publicSnapshot.totals?.total_visitors || 0) : 0, sessions: siteId === 'journal' ? Number(publicSnapshot.totals?.total_sessions || 0) : 0 }, series: [], hourly: [], topPaths: [], topCountries: [], traffic_mix: { human: pageviews, all: pageviews } } });
+  }
   const rawDays = Number(url.searchParams.get('days') || '7');
   const days = [1, 7, 30].includes(rawDays) ? rawDays : 7;
 
@@ -4563,6 +3143,27 @@ async function routeSiteTrafficTrend(req, env) {
 
 // ───────── dispatcher ─────────
 // GET /analytics/dashboard  (owner only) → full dashboard payload, edge-cached ~5min
+function buildStaticDashboardPayload(days = 30) {
+  const totals = publicSnapshot.totals || {};
+  const sites = [
+    { id: 'journal', label: 'Journal', host: 'journal.ailatest.org', kind: 'product' },
+    { id: 'grant', label: 'Grant', host: 'grant.ailatest.org', kind: 'product' },
+    { id: 'path', label: 'Path', host: 'path.ailatest.org', kind: 'product' },
+    { id: 'major', label: 'Major', host: 'major.ailatest.org', kind: 'product' },
+    { id: 'todo', label: 'Todo', host: 'todo.ailatest.org', kind: 'product' },
+    { id: 'ailatest', label: 'Studio', host: 'ailatest.org', kind: 'hub' },
+  ];
+  const firstParty = Object.fromEntries(sites.map(site => {
+    const isJournal = site.id === 'journal';
+    const pageviews = isJournal ? Number(totals.total_pageviews || 0) : 0;
+    return [site.id, { ...site, status: 'snapshot', totals: { pageviews, visitors: isJournal ? Number(totals.total_visitors || 0) : 0, sessions: isJournal ? Number(totals.total_sessions || 0) : 0 }, series: [], hourly: [], traffic_mix: { human: pageviews, all: pageviews }, topPaths: [], topCountries: [] }];
+  }));
+  const comparison = Object.fromEntries(sites.map(site => [site.id, { first_party: firstParty[site.id].totals, cloudflare: { status: 'paused' }, google_analytics: { status: 'paused' } }]));
+  const hot = snapshotHotItems(20);
+  const journalBusiness = { status: 'ok', kpis: { total_users: Number(totals.registered_users || 0), total_login_events: 0, total_journal_views: Number(totals.total_journal_views || 0), viewed_journals: Number(totals.viewed_journals || 0), latest_journal_view_at: totals.latest_journal_view_at || null, search_events: 0, pick_events: 0, pick_consumed: 0, ai_requests: 0, ai_users: 0, ai_total_tokens: 0, ai_prompt_tokens: 0, ai_completion_tokens: 0, ai_total_cny: 0, ai_failed_requests: 0, ai_avg_latency_ms: 0, favorite_rows: 0, lists: 0, rating_rows: 0 }, tables: { recentUsers: [], topFavorites: [], topRated: [], topJournalViews: hot, periodTopJournalViews: hot, recentJournalViews: [], jvSourceSummary: [], jvHourlySeries: [], interactionSummary: [], interactionByTab: [], recentInteractions: [], recentFavorites: [], recentRatings: [], topLists: [], pickUsageByDay: [], aiUsageByDay: [], aiUsageByFeature: [], aiUsageByModel: [], recentAiUsage: [], loginProviders: [] } };
+  return { generated_at: publicSnapshot.snapshot_at, source: 'verified static snapshot', snapshot: true, notes: ['D1 免费额度保护快照：统计采集与全表重算已暂停，需人工刷新。'], site_monitoring: { days, sites, first_party: firstParty, cloudflare: { status: 'paused', sites: {} }, google_analytics: { status: 'paused', sites: {} }, source_comparison: comparison }, site_business: { journal: journalBusiness, grant: { status: 'empty', reason: 'static snapshot mode' }, path: { status: 'empty', reason: 'static snapshot mode' }, major: { status: 'empty', reason: 'static snapshot mode' }, todo: { status: 'empty', reason: 'static snapshot mode' }, ailatest: { status: 'empty', reason: 'static snapshot mode' } } };
+}
+
 async function routeDashboard(req, env) {
   const u = await getUser(req, env);
   if (!u) return err('login required', 401);
@@ -4579,7 +3180,12 @@ async function routeDashboard(req, env) {
     if (hit) return new Response(hit.body, { status: 200, headers: { 'Content-Type': 'application/json', ...CORS } });
   }
 
-  const payload = await buildDashboardPayload(env, { days });
+  let payload;
+  try {
+    payload = publicSnapshot.collection_paused ? buildStaticDashboardPayload(days) : await buildDashboardPayload(env, { days });
+  } catch (e) {
+    payload = { ...buildStaticDashboardPayload(days), fallback_reason: e?.message || String(e) };
+  }
   const bodyText = JSON.stringify(payload);
   // Store under a stable, auth-free key so the cache is reusable; never served without auth
   // because this is the only place that writes it and the route itself is owner-gated.
@@ -4743,6 +3349,26 @@ function routeApiPortal() {
   });
 }
 
+async function routeApiUsage(req, env) {
+  const u = await getUser(req, env);
+  if (!u) return err('login required', 401);
+  if (!isOwnerUser(u, env)) return err('forbidden', 403);
+  await ensureApiKeyTables(env);
+  const url = new URL(req.url);
+  const rawDays = Number(url.searchParams.get('days') || '30');
+  const days = [7, 30, 90].includes(rawDays) ? rawDays : 30;
+  const since = dayFromSec(nowSec() - (days - 1) * 86400);
+  const [api, extension, downloads] = await Promise.all([
+    env.DB.prepare(`SELECT day, SUM(calls) AS calls, COUNT(DISTINCT api_key_id) AS active_keys
+      FROM api_usage_daily WHERE day >= ? GROUP BY day ORDER BY day ASC`).bind(since).all(),
+    env.DB.prepare(`SELECT day, SUM(used) AS calls, COUNT(DISTINCT scope_key) AS active_scopes
+      FROM extension_usage WHERE day >= ? GROUP BY day ORDER BY day ASC`).bind(since).all().catch(() => ({ results: [] })),
+    env.DB.prepare(`SELECT day, asset, COUNT(*) AS calls
+      FROM extension_download_events WHERE day >= ? GROUP BY day, asset ORDER BY day ASC, asset ASC`).bind(since).all().catch(() => ({ results: [] })),
+  ]);
+  return json({ ok: true, days, since, api: api.results || [], extension: extension.results || [], downloads: downloads.results || [] }, 200, { 'Cache-Control': 'no-store' });
+}
+
 function mcpResponse(id, result) {
   return { jsonrpc: '2.0', id: id ?? null, result };
 }
@@ -4891,15 +3517,16 @@ export default {
     // Same-origin entry: journal.ailatest.org/api/* routes here too — strip the prefix.
     if (p === '/api' || p === '/api/') p = '/';
     else if (p.startsWith('/api/')) p = p.slice(4);
-    if (ctx?.waitUntil) {
-      ctx.waitUntil(recordApiRequestMetric(env, p, req.method).catch((e) => {
-        console.warn('[usage] api request metric failed:', e?.message || e);
-      }));
-    }
     try {
       if (p === '/llms.txt' && req.method === 'GET') return routeApiLlmsTxt();
       if (p === '/robots.txt' && req.method === 'GET') return routeApiRobotsTxt();
       if (p === '/mcp') return routeMcp(req, env);
+      // Account-level emergency switch: every non-GET request is guarded when
+      // the shared KV config is set to mode=all or paused=true.
+      if (req.method !== 'GET' && req.method !== 'OPTIONS' && p !== '/admin/api/write-guard') {
+        const guard = await guardResponse(env, 'core.request', 1, { core: true });
+        if (guard) return guard;
+      }
       if (p === '/stats' && req.method === 'GET') {
         const siteUrl = String(env.SITE_URL || 'https://journal.ailatest.org').replace(/\/$/, '');
         const metaResponse = await fetch(`${siteUrl}/data/meta.json`);
@@ -4934,6 +3561,7 @@ export default {
       }
       if (p === '/auth/email/request'  && req.method === 'POST') return routeEmailRequest(req, env);
       if (p === '/auth/email/verify'   && req.method === 'POST') return routeEmailVerify(req, env);
+      if (p === '/auth/reviewer/login' && req.method === 'POST') return routeReviewerLogin(req, env);
       if (p === '/auth/github'         && req.method === 'GET')  return routeAuthStart(req, env);
       if (p === '/auth/github/callback'&& req.method === 'GET')  return routeAuthCallback(req, env);
       if (p === '/auth/google'         && req.method === 'GET')  return routeGoogleStart(req, env);
@@ -4950,14 +3578,36 @@ export default {
       // Unified owner console.  The HTML shell is intentionally lightweight;
       // every data read/write below is gated again by routeAdminApi.
       if ((p === '/admin' || p === '/admin/') && req.method === 'GET') return renderAdmin();
+      if (p === '/admin/api/write-guard' && (req.method === 'GET' || req.method === 'PUT')) {
+        const owner = await getUser(req, env);
+        if (!owner || !isOwnerUser(owner, env)) return err('forbidden', 403);
+        if (req.method === 'GET') return json(await writeGuardStatus(env));
+        const patch = await req.json().catch(() => ({}));
+        return json(await updateWriteGuard(env, patch));
+      }
+      if (p === '/admin/api/billing-usage' && req.method === 'GET') {
+        const owner = await getUser(req, env);
+        if (!owner || !isOwnerUser(owner, env)) return err('forbidden', 403);
+        const url = new URL(req.url);
+        return json(await fetchBillableUsage(env, {
+          from: url.searchParams.get('from') || undefined,
+          to: url.searchParams.get('to') || undefined,
+        }));
+      }
       if (p.startsWith('/admin/api/')) return routeAdminApi(req, env, { getUser, isOwnerUser });
       if (p === '/analytics/journal-view-trend' && req.method === 'GET') return routeJournalViewTrend(req, env);
       if (p === '/analytics/site-traffic-trend' && req.method === 'GET') return routeSiteTrafficTrend(req, env);
+      if (p === '/analytics/api-usage' && req.method === 'GET') return routeApiUsage(req, env);
       if (p === '/analytics/public-total' && req.method === 'GET') return routePublicTrafficTotal(req, env);
       if ((p === '/analytics/hot-journals' || p === '/analytics/hot-journals/') && req.method === 'GET') {
         return routeHotJournals(req, env);
       }
-      if (p === '/openalex/country-output' && req.method === 'GET') return routeOpenAlexCountryOutput(req, env, ctx);
+      if (p === '/publication/authors' && req.method === 'GET') return routePublicationAuthorSearch(req, env);
+      if (p === '/publication/author-works' && req.method === 'GET') return routePublicationAuthorWorks(req, env);
+      if (p === '/publication/footprint' && req.method === 'GET') return routePublicationFootprintList(req, env);
+      if (p === '/publication/footprint/import' && req.method === 'POST') return routePublicationFootprintImport(req, env);
+      if (p === '/publication/resolve' && req.method === 'POST') return routePublicationResolve(req, env);
+      if (p === '/openalex/country-output' && req.method === 'GET') return routeOpenAlexCountryOutput(req, env);
       if (p === '/jcar' && req.method === 'GET') return routeJcar(req, env, ctx);
       if (p === '/extension/download-stats' && req.method === 'GET') return routeExtensionDownloadStats(req, env);
       if (p === '/extension/download'       && req.method === 'GET') return routeExtensionDownload(req, env);
@@ -4981,6 +3631,12 @@ export default {
         const out = await routeCreemCatalog(req, env);
         return json(out.body, out.status);
       }
+      if (p === '/play/purchases/verify' && req.method === 'POST') {
+        return routeGooglePlayVerify(req, env, getUser);
+      }
+      if ((p === '/webhooks/google-play' || p === '/webhooks/google-play/') && req.method === 'POST') {
+        return routeGooglePlayRtdn(req, env);
+      }
       if ((p === '/webhooks/creem' || p === '/webhooks/creem/') && req.method === 'POST') {
         const out = await routeCreemWebhook(req, env);
         return json(out.body, out.status);
@@ -4990,24 +3646,10 @@ export default {
       const mApiKey = p.match(/^\/api-keys\/([0-9a-f-]+)$/i);
       if (mApiKey && req.method === 'DELETE') return routeRevokeApiKey(req, env, mApiKey[1]);
       if (p === '/search' && (req.method === 'GET' || req.method === 'POST')) return json(await buildPublicSearchResponse(req, env));
-      if (p === '/submissions/connectors' && req.method === 'GET') return routeSubmissionConnectors(req, env);
-      if (p === '/submissions' && req.method === 'GET') return routeSubmissionList(req, env);
-      if (p === '/submissions/import' && req.method === 'POST') return routeSubmissionImport(req, env, ctx);
-      const mSubmission = p.match(/^\/submissions\/([^/]+)$/);
-      if (mSubmission && req.method === 'DELETE') return routeSubmissionDelete(req, env, decodeURIComponent(mSubmission[1]));
-      if (p === '/publication/authors' && req.method === 'GET') return routePublicationAuthorSearch(req, env);
-      if (p === '/publication/author-works' && req.method === 'GET') return routePublicationAuthorWorks(req, env);
-      if (p === '/publication/journal-metadata' && req.method === 'GET') return routePublicationJournalMetadata(req, env);
-      if (p === '/publication/resolve' && req.method === 'POST') return routePublicationResolve(req, env);
-      if (p === '/publication/footprint' && req.method === 'GET') return routePublicationFootprintList(req, env);
-      if (p === '/publication/footprint/import' && req.method === 'POST') return routePublicationFootprintImport(req, env);
-      if (p === '/scholar/profile' && req.method === 'GET') {
-        try {
-          const result = await fetchScholarProfile(u.searchParams.get('url') || '', fetch, { browser: env.BROWSER });
-          return json(result, 200, { 'Cache-Control': 'public, max-age=300, s-maxage=1800' });
-        } catch (e) {
-          return err(e?.message || 'Google Scholar 读取失败', 502, { 'Cache-Control': 'no-store' });
-        }
+      const mJournal = p.match(/^\/journal\/([^/]+)$/i);
+      if (mJournal && req.method === 'GET') {
+        const journal = await buildPublicJournalResponse(env, decodeURIComponent(mJournal[1]));
+        return journal ? json(journal) : err('journal not found', 404);
       }
       if (p === '/skill/search' && (req.method === 'GET' || req.method === 'POST')) {
         const principal = await resolveRequestPrincipal(req, env);
@@ -5032,14 +3674,6 @@ export default {
         const installId = cleanText(req.headers.get('X-AJ-Install') || '', 160);
         const ipHash = await requestIpHash(req, env);
         return handleExtLookup(req, env, { ...principal, installId, ipHash });
-      }
-      if (p === '/ext/heartbeat' && (req.method === 'POST' || req.method === 'GET')) {
-        const principal = await resolveRequestPrincipal(req, env);
-        if (principal.error) return principal.error;
-        const installId = cleanText(req.headers.get('X-AJ-Install') || '', 160);
-        const ipHash = await requestIpHash(req, env);
-        const result = await recordExtensionHeartbeat(env, { ...principal, installId, ipHash });
-        return json(result, 200, { 'Cache-Control': 'no-store' });
       }
       if (p === '/favorites'           && req.method === 'GET')  return routeGetFavs(req, env);
       if (p === '/favorites'           && req.method === 'PUT')  return routePutFavs(req, env);
@@ -5072,26 +3706,470 @@ export default {
   },
   async scheduled(event, env, ctx) {
     const run = async () => {
+      const kv = env.WRITE_GUARD_KV || env.AILATEST_WRITE_GUARD;
+      const lockKey = `lock:scheduled:${event.cron}:${new Date().toISOString().slice(0, 13)}`;
+      if (kv && await kv.get(lockKey).catch(() => null)) return { skipped: true, reason: 'already_running' };
+      if (kv) await kv.put(lockKey, String(Date.now()), { expirationTtl: 3300 }).catch(() => {});
+      const guard = await guardResponse(env, 'analytics.rollup', 1);
+      if (guard) return;
+      // Cloudflare's billable-usage endpoint is updated daily. The hourly
+      // trigger only checks the latest available snapshot and deduplicates
+      // warning emails by threshold; it never emails on every run.
+      if (event.cron === '0 * * * *') {
+        await sendBillingUsageWarnings(env);
+        return { billingChecked: true };
+      }
+      // Free-tier safety: the old daily rollup re-scanned 24 hourly windows
+      // plus 30 daily windows (five full-table aggregates per window), which
+      // can exceed D1's 5M rows-read/day allowance even when run only once.
+      // Keep analytics snapshots static and refresh them manually instead.
+      if (event.cron === '12 16 * * *') {
+        return { skipped: true, reason: 'free_tier_static_snapshot' };
+      }
       const now = nowSec();
-      const preloadOnlyTick = event.cron === '*/5 * * * *';
-      const rollupTick = event.cron === '*/15 * * * *' || event.cron === '12 16 * * *';
-      const shouldPreloadCountry = preloadOnlyTick || event.cron === '12 16 * * *';
-      const countryPreload = shouldPreloadCountry ? await runCountryOutputPreload(env, now) : null;
-      // The preload-only trigger keeps the OpenAlex work independent from the
-      // heavier historical analytics rollup.
-      const result = rollupTick
-        ? await aggregateRecentStats(env, now)
-        : { ok: true, mode: 'preload-only' };
+      const result = await aggregateRecentStats(env, now);
       if (event.cron === '12 16 * * *') {
         const finalized = await recalibrateYesterday(env, now);
-        return { ...result, finalized, countryPreload };
+        return { ...result, finalized };
       }
-      return { ...result, countryPreload };
+      return result;
     };
-    const task = run().catch(e => console.error('analytics rollup failed:', e?.stack || e?.message || e));
-    // Keep the promise in waitUntil for production and also await it so local
-    // cron tests cannot exit before the preload batch has committed to D1.
-    ctx.waitUntil(task);
-    await task;
+    ctx.waitUntil(run().catch(e => console.error('analytics rollup failed:', e?.stack || e?.message || e)));
   },
 };
+function getOpenAlexApiKeys(env) {
+  return [...new Set([
+    cleanText(env?.OPENALEX_API_KEY || '', 256),
+    cleanText(env?.OPENALEX_API_KEY_2 || '', 256),
+    cleanText(env?.OPENALEX_API_KEY_3 || '', 256),
+    cleanText(env?.OPENALEX_API_KEY_4 || '', 256),
+  ].filter(Boolean))];
+}
+
+// ───────── publication-footprint public import helpers ─────────
+// These routes deliberately keep provider keys on the Worker.  The browser
+// only receives normalized author/paper metadata and never sees OPENALEX keys.
+const PUBLIC_METADATA_MAILTO = 'ailatest@ailatest.org';
+
+function foldPublicationText(value) {
+  return String(value || '')
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9\u4e00-\u9fff]+/g, ' ')
+    .trim();
+}
+
+function shortOpenAlexId(value) {
+  const match = String(value || '').match(/(?:openalex\.org\/)?(A\d+)$/i);
+  return match ? match[1].toUpperCase() : '';
+}
+
+function normalizeOrcid(value) {
+  const raw = String(value || '').trim().replace(/^https?:\/\/orcid\.org\//i, '');
+  return /^\d{4}-\d{4}-\d{4}-[\dX]{4}$/i.test(raw) ? raw.toUpperCase() : '';
+}
+
+function normalizePublicationDoi(value) {
+  let doi = String(value || '').trim();
+  doi = doi.replace(/^doi:\s*/i, '').replace(/^https?:\/\/(?:dx\.)?doi\.org\//i, '');
+  doi = doi.replace(/[\s<>"'`]+$/g, '').replace(/[),.;:]+$/g, '');
+  return /^10\.\d{4,9}\/\S+$/i.test(doi) ? doi : '';
+}
+
+function publicationYear(value) {
+  const year = Number(Array.isArray(value) ? value[0] : value);
+  return Number.isInteger(year) && year >= 1800 && year <= 2200 ? year : null;
+}
+
+function crossrefYear(message) {
+  for (const key of ['published-print', 'published-online', 'issued', 'created']) {
+    const year = publicationYear(message?.[key]?.['date-parts']?.[0]);
+    if (year) return year;
+  }
+  return null;
+}
+
+function normalizeOpenAlexSource(work) {
+  const source = work?.primary_location?.source || work?.host_venue || {};
+  const issns = Array.isArray(source?.issn) ? source.issn : [];
+  return {
+    name: cleanText(source?.display_name || source?.name || '', 240),
+    issn: cleanText(source?.issn_l || issns[0] || '', 24).toUpperCase(),
+  };
+}
+
+function normalizeOpenAlexWork(work) {
+  const source = normalizeOpenAlexSource(work);
+  const doi = normalizePublicationDoi(work?.doi || work?.ids?.doi || '');
+  return {
+    title: cleanText(work?.title || work?.display_name || '', 500),
+    venue: source.name,
+    year: publicationYear(work?.publication_year),
+    citations: Math.max(0, Number(work?.cited_by_count || 0) || 0),
+    doi,
+    issn: source.issn,
+    url: cleanText(work?.doi || work?.id || '', 500),
+    authors: Array.isArray(work?.authorships)
+      ? work.authorships.slice(0, 40).map((authorship) => cleanText(authorship?.author?.display_name || '', 160)).filter(Boolean)
+      : [],
+  };
+}
+
+function normalizeOpenAlexAuthor(author) {
+  const institutions = [];
+  const addInstitution = (institution) => {
+    const name = cleanText(institution?.display_name || institution?.name || institution || '', 180);
+    if (name && !institutions.includes(name)) institutions.push(name);
+  };
+  (Array.isArray(author?.last_known_institutions) ? author.last_known_institutions : []).forEach(addInstitution);
+  (Array.isArray(author?.affiliations) ? author.affiliations : []).forEach((entry) => addInstitution(entry?.institution || entry));
+  const countries = [];
+  const addCountry = (value) => {
+    const country = cleanText(value || '', 80);
+    if (country && !countries.includes(country)) countries.push(country);
+  };
+  (Array.isArray(author?.last_known_institutions) ? author.last_known_institutions : []).forEach((institution) => addCountry(institution?.country_code));
+  const years = [];
+  (Array.isArray(author?.affiliations) ? author.affiliations : []).forEach((entry) => {
+    (Array.isArray(entry?.years) ? entry.years : []).forEach((year) => {
+      const parsed = publicationYear(year);
+      if (parsed && !years.includes(parsed)) years.push(parsed);
+    });
+  });
+  years.sort((a, b) => a - b);
+  const id = shortOpenAlexId(author?.id || author?.ids?.openalex);
+  return {
+    id,
+    openalex_id: id ? `https://openalex.org/${id}` : '',
+    name: cleanText(author?.display_name || '', 180),
+    orcid: cleanText(author?.orcid || author?.ids?.orcid || '', 120),
+    org: institutions.join(' · ') || '机构未标注',
+    organizations: institutions,
+    country: countries.join(' / ') || '地区未标注',
+    countries,
+    years,
+    works: Math.max(0, Number(author?.works_count || 0) || 0),
+    works_count: Math.max(0, Number(author?.works_count || 0) || 0),
+    citations: Math.max(0, Number(author?.cited_by_count || 0) || 0),
+    cited_by_count: Math.max(0, Number(author?.cited_by_count || 0) || 0),
+    match: 'OpenAlex 候选 · 仍需人工确认',
+  };
+}
+
+function publicationAuthorIdentifier(value) {
+  const text = cleanText(value || '', 240);
+  const id = shortOpenAlexId(text);
+  if (id) return { kind: 'openalex', id, path: id };
+  const orcid = normalizeOrcid(text);
+  if (orcid) return { kind: 'orcid', id: orcid, path: `https://orcid.org/${orcid}` };
+  return null;
+}
+
+async function fetchOpenAlexPublicJson(env, path, options = {}) {
+  const keys = [...new Set([
+    cleanText(env?.OPENALEX_API_KEY || '', 256),
+    cleanText(env?.OPENALEX_API_KEY_2 || '', 256),
+    cleanText(env?.OPENALEX_API_KEY_3 || '', 256),
+    cleanText(env?.OPENALEX_API_KEY_4 || '', 256),
+  ].filter(Boolean))];
+  const attempts = keys.length ? keys : [''];
+  let lastStatus = 502;
+  for (const key of attempts) {
+    const params = new URLSearchParams(options.params || {});
+    params.set('mailto', PUBLIC_METADATA_MAILTO);
+    if (key) params.set('api_key', key);
+    const url = `https://api.openalex.org${path}${params.toString() ? `?${params.toString()}` : ''}`;
+    const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    const timer = controller ? setTimeout(() => controller.abort(), Math.min(15000, Number(options.timeoutMs || 12000))) : null;
+    let response;
+    try {
+      response = await fetch(url, {
+        headers: { Accept: 'application/json', 'User-Agent': `AILatest Journal publication import (mailto:${PUBLIC_METADATA_MAILTO})` },
+        ...(controller ? { signal: controller.signal } : {}),
+      });
+    } catch (_) {
+      lastStatus = 502;
+      continue;
+    } finally {
+      if (timer) clearTimeout(timer);
+    }
+    lastStatus = response.status;
+    if (response.ok) return { data: await response.json().catch(() => ({})), status: response.status };
+    // A key can be exhausted while another configured key is healthy. Try the
+    // next one for quota/auth failures; other errors should not fan out.
+    if (![401, 403, 408, 425, 429].includes(response.status)) break;
+  }
+  const error = new Error(`OpenAlex 请求失败（${lastStatus}）`);
+  error.status = lastStatus;
+  throw error;
+}
+
+async function routePublicationAuthorSearch(req, env) {
+  const url = new URL(req.url);
+  const name = cleanText(url.searchParams.get('name') || '', 160);
+  const affiliation = cleanText(url.searchParams.get('affiliation') || '', 160);
+  if (name.length < 2) return err('请输入至少 2 个字符的姓名', 400);
+  const cacheKey = new Request(`https://cache.internal/publication-author-search/v1?name=${encodeURIComponent(name.toLowerCase())}&affiliation=${encodeURIComponent(affiliation.toLowerCase())}`);
+  const cacheHit = await caches.default.match(cacheKey);
+  if (cacheHit) return new Response(cacheHit.body, { status: 200, headers: { 'Content-Type': 'application/json', ...CORS, 'Cache-Control': 'public, max-age=600' } });
+  try {
+    const result = await fetchOpenAlexPublicJson(env, '/authors', { params: { search: name, 'per-page': '20' } });
+    const query = foldPublicationText(name);
+    const institutionQuery = foldPublicationText(affiliation);
+    const results = (Array.isArray(result?.data?.results) ? result.data.results : [])
+      .map((author) => {
+        const normalized = normalizeOpenAlexAuthor(author);
+        const authorText = foldPublicationText(normalized.name);
+        const orgText = foldPublicationText(normalized.organizations.join(' '));
+        let score = Number(author?.relevance_score || 0) || 0;
+        if (query && authorText === query) score += 10;
+        else if (query && authorText.includes(query)) score += 4;
+        if (institutionQuery && orgText.includes(institutionQuery)) score += 12;
+        score += Math.min(3, Math.log10(Math.max(1, normalized.works_count)));
+        return { ...normalized, _score: score };
+      })
+      .filter((item) => item.id && item.name)
+      .sort((a, b) => b._score - a._score)
+      .slice(0, 12)
+      .map(({ _score, ...item }) => item);
+    const body = JSON.stringify({ ok: true, source: 'openalex', query: name, affiliation, results, count: results.length, note: '候选来自 OpenAlex；请选择属于你的作者身份后再读取论文。' });
+    const response = new Response(body, { status: 200, headers: { 'Content-Type': 'application/json', ...CORS, 'Cache-Control': 'public, max-age=600' } });
+    await caches.default.put(cacheKey, response.clone());
+    return response;
+  } catch (error) {
+    const status = [401, 403, 408, 425, 429].includes(Number(error?.status)) ? 503 : 502;
+    return err(error?.message || '作者数据暂时不可用', status, { 'Cache-Control': 'no-store' });
+  }
+}
+
+async function fetchOpenAlexAuthor(env, identifier) {
+  const normalized = publicationAuthorIdentifier(identifier);
+  if (!normalized) throw new Error('请输入有效的 ORCID 或 OpenAlex 作者 ID');
+  const path = `/authors/${normalized.path}`;
+  const result = await fetchOpenAlexPublicJson(env, path);
+  const author = normalizeOpenAlexAuthor(result.data || {});
+  if (!author.id) throw new Error('OpenAlex 未找到该作者');
+  return author;
+}
+
+async function fetchOpenAlexAuthorWorks(env, author) {
+  const result = await fetchOpenAlexPublicJson(env, '/works', {
+    params: { filter: `author.id:${author.id}`, 'per-page': '200', sort: 'cited_by_count:desc' },
+  });
+  return (Array.isArray(result?.data?.results) ? result.data.results : [])
+    .map(normalizeOpenAlexWork)
+    .filter((paper) => paper.title || paper.venue);
+}
+
+async function routePublicationAuthorWorks(req, env) {
+  const url = new URL(req.url);
+  const rawIds = cleanText(url.searchParams.get('ids') || url.searchParams.get('id') || '', 900);
+  const ids = [...new Set(rawIds.split(/[\s,;|]+/).map((item) => item.trim()).filter(Boolean))].slice(0, 5);
+  if (!ids.length) return err('missing author id', 400);
+  try {
+    const authors = [];
+    const failures = [];
+    for (const identifier of ids) {
+      try { authors.push(await fetchOpenAlexAuthor(env, identifier)); }
+      catch (error) { failures.push(error?.message || '作者读取失败'); }
+    }
+    if (!authors.length) return err(failures[0] || 'OpenAlex 未找到作者', 404);
+    const papersByKey = new Map();
+    for (const author of authors) {
+      const papers = await fetchOpenAlexAuthorWorks(env, author);
+      for (const paper of papers) {
+        const key = paper.doi.toLowerCase() || foldPublicationText(`${paper.title} ${paper.venue}`);
+        if (!key) continue;
+        const previous = papersByKey.get(key);
+        if (!previous || Number(paper.citations || 0) > Number(previous.citations || 0)) papersByKey.set(key, paper);
+      }
+    }
+    const papers = [...papersByKey.values()].sort((a, b) => (Number(b.citations || 0) - Number(a.citations || 0)) || (Number(b.year || 0) - Number(a.year || 0))).slice(0, 500);
+    const profileId = `openalex:${authors.map((author) => author.id).join(',')}`;
+    return json({
+      ok: true,
+      source: 'openalex-author',
+      source_label: 'OpenAlex 作者',
+      profile_id: profileId,
+      name: authors.map((author) => author.name).filter(Boolean).join(' / '),
+      affiliation: [...new Set(authors.flatMap((author) => author.organizations))].join(' · ') || '机构未标注',
+      paper_count: papers.length,
+      profile_citations: authors.reduce((sum, author) => sum + Number(author.cited_by_count || 0), 0),
+      authors,
+      papers,
+      ...(failures.length ? { warnings: failures } : {}),
+    }, 200, { 'Cache-Control': 'public, max-age=1800' });
+  } catch (error) {
+    const status = Number(error?.status) === 429 ? 503 : 502;
+    return err(error?.message || '作者论文暂时不可用', status, { 'Cache-Control': 'no-store' });
+  }
+}
+
+function crossrefPaper(message, fallback = {}) {
+  const title = cleanText(Array.isArray(message?.title) ? message.title[0] : message?.title || fallback.title || '', 500);
+  const venue = cleanText(Array.isArray(message?.['container-title']) ? message['container-title'][0] : message?.['container-title'] || fallback.venue || fallback.journal || '', 240);
+  const doi = normalizePublicationDoi(message?.DOI || fallback.doi || '');
+  const issn = cleanText((Array.isArray(message?.ISSN) ? message.ISSN[0] : message?.ISSN) || fallback.issn || '', 24).toUpperCase();
+  const authors = Array.isArray(message?.author)
+    ? message.author.slice(0, 40).map((author) => cleanText([author?.given, author?.family].filter(Boolean).join(' ') || author?.name || '', 160)).filter(Boolean)
+    : (Array.isArray(fallback.authors) ? fallback.authors : []);
+  return {
+    title,
+    venue,
+    year: crossrefYear(message) || publicationYear(fallback.year),
+    citations: Math.max(0, Number(message?.['is-referenced-by-count'] || fallback.citations || 0) || 0),
+    doi,
+    issn,
+    url: cleanText(message?.URL || (doi ? `https://doi.org/${doi}` : fallback.url || ''), 500),
+    authors,
+  };
+}
+
+async function fetchCrossrefDoi(doi) {
+  const response = await fetch(`https://api.crossref.org/works/${encodeURIComponent(doi)}?mailto=${encodeURIComponent(PUBLIC_METADATA_MAILTO)}`, { headers: { Accept: 'application/json', 'User-Agent': `AILatest Journal publication import (mailto:${PUBLIC_METADATA_MAILTO})` } });
+  if (!response.ok) throw new Error(`Crossref ${response.status}`);
+  const data = await response.json();
+  return crossrefPaper(data?.message || {}, { doi });
+}
+
+async function fetchCrossrefBibliographic(item) {
+  const query = cleanText([item?.title, item?.venue || item?.journal, item?.year].filter(Boolean).join(' '), 500);
+  if (!query) return { ...item };
+  const response = await fetch(`https://api.crossref.org/works?query.bibliographic=${encodeURIComponent(query)}&rows=1&mailto=${encodeURIComponent(PUBLIC_METADATA_MAILTO)}`, { headers: { Accept: 'application/json', 'User-Agent': `AILatest Journal publication import (mailto:${PUBLIC_METADATA_MAILTO})` } });
+  if (!response.ok) return { ...item };
+  const data = await response.json();
+  const message = data?.message?.items?.[0];
+  return message ? crossrefPaper(message, item) : { ...item };
+}
+
+const PUBLICATION_FOOTPRINT_FREE_LIMIT = 20;
+const PUBLICATION_FOOTPRINT_PRO_LIMIT = 500;
+let publicationFootprintTableReady = false;
+
+async function ensurePublicationFootprintTable(env) {
+  if (publicationFootprintTableReady) return;
+  await env.DB.batch([
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS publication_footprints (
+      user_id INTEGER NOT NULL,
+      footprint_key TEXT NOT NULL,
+      record_json TEXT NOT NULL DEFAULT '{}',
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL,
+      PRIMARY KEY (user_id, footprint_key),
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    )`),
+    env.DB.prepare('CREATE INDEX IF NOT EXISTS idx_publication_footprints_user_updated ON publication_footprints(user_id, updated_at DESC)'),
+  ]);
+  publicationFootprintTableReady = true;
+}
+
+function publicationFootprintKey(record) {
+  const issn = Array.isArray(record?.issns) ? record.issns.find(Boolean) : '';
+  return String(record?.journal_key || record?.key || record?.name || issn || '')
+    .toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]+/g, '').slice(0, 180);
+}
+
+function publicationFootprintEntitlement(entitlements, owner = false) {
+  const tier = owner ? 'pro' : String(entitlements?.tier || 'free').toLowerCase();
+  const full = owner || tier === 'trial' || tier === 'plus' || tier === 'pro';
+  return {
+    tier,
+    limit: tier === 'free' ? PUBLICATION_FOOTPRINT_FREE_LIMIT : (tier === 'plus' || tier === 'trial' ? PUBLICATION_FOOTPRINT_PRO_LIMIT : null),
+    bulkAllowed: full,
+  };
+}
+
+function parsePublicationFootprintRows(rows) {
+  return (rows || []).map(row => {
+    try { return JSON.parse(row.record_json || '{}'); } catch (_) { return {}; }
+  }).filter(record => record && typeof record === 'object');
+}
+
+async function routePublicationFootprintList(req, env) {
+  const user = await getUser(req, env);
+  if (!user) return err('请先登录后同步发表足迹', 401);
+  await ensurePublicationFootprintTable(env);
+  const owner = isOwnerUser(user, env);
+  const access = publicationFootprintEntitlement(await getEntitlements(env, user, owner), owner);
+  const result = await env.DB.prepare('SELECT record_json FROM publication_footprints WHERE user_id = ? ORDER BY updated_at DESC').bind(user.id).all();
+  const records = parsePublicationFootprintRows(result.results || []);
+  return json({ ok: true, records, count: records.length, ...access, read_only: access.limit != null && records.length >= access.limit });
+}
+
+async function routePublicationFootprintImport(req, env) {
+  const user = await getUser(req, env);
+  if (!user) return err('请先登录后同步发表足迹', 401);
+  const body = await req.json().catch(() => null);
+  const deleteKeys = [...new Set((Array.isArray(body?.delete_keys) ? body.delete_keys : []).map(key => String(key || '').trim()).filter(Boolean).slice(0, 500))];
+  await ensurePublicationFootprintTable(env);
+  const owner = isOwnerUser(user, env);
+  const access = publicationFootprintEntitlement(await getEntitlements(env, user, owner), owner);
+  const rawRecords = Array.isArray(body?.records) ? body.records.slice(0, access.limit == null ? 2000 : Math.max(access.limit, PUBLICATION_FOOTPRINT_PRO_LIMIT)) : [];
+  const currentResult = await env.DB.prepare('SELECT footprint_key, record_json FROM publication_footprints WHERE user_id = ?').bind(user.id).all();
+  const current = new Map((currentResult.results || []).map(row => [String(row.footprint_key), row]));
+  for (const key of deleteKeys) current.delete(key);
+  const incoming = new Map();
+  for (const record of rawRecords) {
+    if (!record || typeof record !== 'object') continue;
+    const key = publicationFootprintKey(record);
+    if (key) incoming.set(key, record);
+  }
+  const newKeys = [...incoming.keys()].filter(key => !current.has(key));
+  if (!access.bulkAllowed && body?.bulk === true && newKeys.length) {
+    return json({ error: '普通用户需升级 PRO 才能批量导入发表足迹。', code: 'publication_footprint_bulk_locked', tier: access.tier, limit: access.limit, count: current.size, read_only: true }, 403);
+  }
+  if (access.limit != null && current.size + newKeys.length > access.limit) {
+    return json({ error: `普通用户最多保存 ${access.limit} 条发表足迹；已有数据不会删除。升级 PRO 后可继续添加或批量导入。`, code: 'publication_footprint_limit', tier: access.tier, limit: access.limit, count: current.size, read_only: true, upgrade: 'https://journal.ailatest.org/#pricing' }, 403);
+  }
+  const now = nowSec();
+  const statements = [];
+  for (const key of deleteKeys) statements.push(env.DB.prepare('DELETE FROM publication_footprints WHERE user_id = ? AND footprint_key = ?').bind(user.id, key));
+  for (const [key, record] of incoming) {
+    statements.push(env.DB.prepare(`INSERT INTO publication_footprints (user_id, footprint_key, record_json, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?)
+      ON CONFLICT(user_id, footprint_key) DO UPDATE SET record_json=excluded.record_json, updated_at=excluded.updated_at`)
+      .bind(user.id, key, JSON.stringify(record).slice(0, 200000), now, now));
+  }
+  if (statements.length) await env.DB.batch(statements);
+  const result = await env.DB.prepare('SELECT record_json FROM publication_footprints WHERE user_id = ? ORDER BY updated_at DESC').bind(user.id).all();
+  const records = parsePublicationFootprintRows(result.results || []);
+  return json({ ok: true, records, count: records.length, ...access, read_only: access.limit != null && records.length >= access.limit });
+}
+
+async function routePublicationResolve(req, env) {
+  const body = await req.json().catch(() => null);
+  const input = Array.isArray(body?.items) ? body.items : [];
+  if (!input.length) return err('请提供 DOI、BibTeX 或 CSV 解析后的论文条目', 400);
+  if (input.length > 50) return err('单次最多解析 50 条论文', 400);
+  const papers = [];
+  const errors = [];
+  for (const raw of input) {
+    const item = raw && typeof raw === 'object' ? raw : { title: String(raw || '') };
+    const doi = normalizePublicationDoi(item.doi || '');
+    try {
+      let paper;
+      if (doi) {
+        try { paper = await fetchCrossrefDoi(doi); }
+        catch (_) {
+          const result = await fetchOpenAlexPublicJson(env, `/works/https://doi.org/${encodeURIComponent(doi)}`);
+          paper = normalizeOpenAlexWork(result.data || {});
+        }
+      } else {
+        paper = await fetchCrossrefBibliographic(item);
+      }
+      if (!paper.title && !paper.venue) throw new Error('未识别到题目或期刊');
+      papers.push(paper);
+    } catch (error) {
+      errors.push({ input: cleanText(item.doi || item.title || item.venue || '', 180), error: error?.message || '解析失败' });
+      const fallback = { ...item, doi, title: cleanText(item.title || '', 500), venue: cleanText(item.venue || item.journal || '', 240), year: publicationYear(item.year), citations: Number(item.citations || 0) || 0 };
+      if (fallback.title || fallback.venue) papers.push(fallback);
+    }
+  }
+  const unique = new Map();
+  papers.forEach((paper) => {
+    const key = normalizePublicationDoi(paper.doi).toLowerCase() || foldPublicationText(`${paper.title} ${paper.venue}`);
+    if (key && !unique.has(key)) unique.set(key, paper);
+  });
+  return json({ ok: true, source: 'crossref/openalex', source_label: 'DOI / BibTeX / CSV', profile_id: `import:${Date.now()}`, name: 'DOI / BibTeX / CSV 导入', affiliation: '公开元数据', paper_count: unique.size, papers: [...unique.values()], ...(errors.length ? { errors } : {}) }, 200, { 'Cache-Control': 'no-store' });
+}

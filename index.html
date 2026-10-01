@@ -313,7 +313,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <button type="button" id="topbar-lang-proxy">Language</button>
     </nav>
   </header>
-  <p class="footprint-search-promo"><a href="/publication-footprint/" data-i18n="home_footprint_promo">新功能：搜索并识别你的论文，生成期刊徽章墙 →</a></p>
+  <p class="footprint-search-promo"><a href="/publication-footprint/" data-i18n="home_footprint_promo" data-citic-promo>WCJ China 目录已更新，现收录 437 种期刊 →</a></p>
   <!-- 搜索记录：紧贴搜索框下方 -->
   <div id="home-search-chips" class="home-search-chips" hidden></div>
 
@@ -322,9 +322,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="home-v4">
       <div class="home-stats" id="home-stats" aria-label="Platform metrics">
         <div class="home-stat"><div class="home-stat-num" data-stat="journals">50,000+</div><div class="home-stat-label" data-i18n="home_stat_journals">收录期刊</div></div>
-        <div class="home-stat"><div class="home-stat-num" data-stat="journal_views">24,000+</div><div class="home-stat-label" data-i18n="home_stat_jviews">期刊详情</div></div>
-        <div class="home-stat"><div class="home-stat-num" data-stat="views">10,000+</div><div class="home-stat-label" data-i18n="home_stat_views">累计浏览</div></div>
-        <div class="home-stat"><div class="home-stat-num" data-stat="visitors">1,500+</div><div class="home-stat-label" data-i18n="home_stat_visitors">服务用户</div></div>
+        <div class="home-stat"><div class="home-stat-num" data-stat="journal_views">25,000+</div><div class="home-stat-label" data-i18n="home_stat_jviews">期刊详情</div></div>
+        <div class="home-stat"><div class="home-stat-num" data-stat="views">13,000+</div><div class="home-stat-label" data-i18n="home_stat_views">累计浏览</div></div>
+        <div class="home-stat"><div class="home-stat-num" data-stat="visitors">2,100+</div><div class="home-stat-label" data-i18n="home_stat_visitors">服务用户</div></div>
       </div>
       <div class="home-hot" id="home-hot">
         <div class="home-hot-head">
@@ -429,6 +429,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <a class="rank-row" href="/indexes/scopus/"><span class="rank-n">5</span><strong>Scopus</strong><span class="rank-pill" data-i18n="home_rank_pill_board">Board</span></a>
                 <a class="rank-row" href="/indexes/medline/"><span class="rank-n">6</span><strong>MEDLINE</strong><span class="rank-pill" data-i18n="home_rank_pill_board">Board</span></a>
                 <a class="rank-row" href="/indexes/ahci/"><span class="rank-n">7</span><strong>AHCI by IF</strong><span class="rank-pill" data-i18n="home_rank_pill_board">Board</span></a>
+                <a class="rank-row" href="/indexes/world-class/"><span class="rank-n">8</span><strong data-zh="中信所世界一流（部分名单）" data-en="CITIC World-Class (partial)">中信所世界一流（部分名单）</strong><span class="rank-pill">2025</span></a>
               </section>
               <section class="rank-board rank-board-risk">
                 <header class="rank-board-head">
@@ -573,7 +574,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               </div>
               <div class="dl-strip-name" data-i18n="home_dl_plat_browser">Browser</div>
               <a class="dl-strip-btn" href="/api/extension/download?asset=latest&amp;source=home" data-extension-download-link download="ailatest-journal-extension-latest.zip" data-i18n="home_dl_plat_browser_cta">添加插件</a>
-              <p class="dl-strip-meta"><span data-extension-download-count="latest">—</span> <span data-i18n="home_dl_ext_stat_post">次</span></p>
+              <p class="dl-strip-meta"><span data-extension-download-count="latest">943</span> <span data-i18n="home_dl_ext_stat_post">次</span></p>
             </div>
             <div class="dl-strip-item" role="listitem">
               <div class="dl-strip-icon" aria-hidden="true">
@@ -581,7 +582,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               </div>
               <div class="dl-strip-name">Skill</div>
               <a class="dl-strip-btn" href="/api/extension/download?asset=skill&amp;source=home" data-extension-download-link download="ailatest-journal-skill-latest.zip" data-i18n="home_dl_plat_skill_cta">下载</a>
-              <p class="dl-strip-meta"><span data-extension-download-count="skill">—</span> <span data-i18n="home_dl_ext_stat_post">次</span></p>
+              <p class="dl-strip-meta"><span data-extension-download-count="skill">1,725</span> <span data-i18n="home_dl_ext_stat_post">次</span></p>
             </div>
             <div class="dl-strip-item" role="listitem">
               <div class="dl-strip-icon" aria-hidden="true">
@@ -1038,7 +1039,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <script>
 // Build version for cache busting data files
-window.__BUILD_VER = 'v20260810-overview-en-v1';
+window.__BUILD_VER = 'v20261001-footprint-citic-v1';
 // Service Worker 清理 — 必须在 app.js 加载前运行
 (function() {
   if ('serviceWorker' in navigator) {
@@ -1060,8 +1061,8 @@ window.__BUILD_VER = 'v20260810-overview-en-v1';
 </script>
 <script src="/js/pick-match.js?v=20260716-v10" defer></script>
 <script src="/js/pricing-checkout.js?v=20260809-no-pricing-flash-v1" defer></script>
-<script src="/js/extension-downloads.js?v=20260716-home-dl" defer></script>
-<script src="/js/app.js?v=20260810-jcar-v1" defer></script>
+<script src="/js/extension-downloads.js?v=20261001-stats-snapshot-v1" defer></script>
+<script src="/js/app.js?v=20261001-footprint-citic-v1" defer></script>
 
 </body>
 </html>

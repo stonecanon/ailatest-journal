@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="paper" x1="18" y1="10" x2="108" y2="120" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fffaf0"/>
+      <stop offset="1" stop-color="#ead9b1"/>
+    </linearGradient>
+    <linearGradient id="ink" x1="39" y1="30" x2="91" y2="100" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#24211d"/>
+      <stop offset="1" stop-color="#4a3f2d"/>
+    </linearGradient>
+  </defs>
+
+  <!-- High-contrast, edge-to-edge tile for browser extension stores. -->
+  <rect x="3" y="3" width="122" height="122" rx="27" fill="#2b2824"/>
+  <rect x="6" y="6" width="116" height="116" rx="23" fill="url(#paper)"/>
+
+  <!-- The established AILatest Journal “A”, enlarged for 16–128 px legibility. -->
+  <path fill="url(#ink)" d="M64 26 32 101h16l6.6-17h29L91 101h16L74 26H64Zm-4 43 9-23 9 23H60Z"/>
+
+  <!-- Editorial rule: a small journal-page cue, kept clear of the letterform. -->
+  <rect x="29" y="108" width="70" height="3" rx="1.5" fill="#9a7134"/>
+  <rect x="43" y="114" width="42" height="2" rx="1" fill="#9a7134" opacity=".58"/>
+</svg>

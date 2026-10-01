@@ -1,5 +1,5 @@
 {
-  "source": "WoS Core 2026-09-21 + JCR 2025 + ESI + 中科院 2025 + Scopus 2026-05 + EI Compendex 2026-07-09 + DOAJ 2026-08-31 + OAJ current + NCBI MEDLINE current + regional and specialty indexes + CITIC World-Class 2025 (partial sample 434)",
+  "source": "WoS Core 2026-09-21 + JCR 2025 + ESI + 中科院 2025 + Scopus 2026-05 + EI Compendex 2026-07-09 + DOAJ 2026-08-31 + OAJ current + NCBI MEDLINE current + regional and specialty indexes + CITIC World-Class 2025 (partial sample 437)",
   "last_updated_source": "WoS Core 2026-09-21",
   "total": 50548,
   "indices": {
@@ -104,10 +104,10 @@
     "date": "2026-10-01",
     "count": 80
   },
-  "with_citic_world_class": 434,
+  "with_citic_world_class": 437,
   "citic_world_class_source_updated": "2026-09-12",
   "citic_world_class_source_url": "https://wcj.istic.ac.cn/qikan/search",
   "citic_world_class_partial": true,
-  "citic_world_class_sample_count": 434,
+  "citic_world_class_sample_count": 437,
   "citic_world_class_official_total": 6132
 }

@@ -205,7 +205,7 @@ async function aggregateWindow(env, { startSec, endSec, bucket, key, calibrated 
 }
 
 export async function aggregateRecentStats(env, nowSec = Math.floor(Date.now() / 1000)) {
-  const classification = await applyTrafficClassification(env, { days: 90, nowSec }).catch(e => ({ ok: false, error: e.message || String(e) }));
+  const classification = await applyTrafficClassification(env, { days: 1, nowSec }).catch(e => ({ ok: false, error: e.message || String(e) }));
   const currentHourStart = Math.floor(nowSec / 3600) * 3600;
   const results = [];
   for (let i = 0; i < 24; i += 1) {
@@ -231,7 +231,7 @@ export async function aggregateRecentStats(env, nowSec = Math.floor(Date.now() /
 }
 
 export async function recalibrateYesterday(env, nowSec = Math.floor(Date.now() / 1000)) {
-  const classification = await applyTrafficClassification(env, { days: 90, nowSec }).catch(e => ({ ok: false, error: e.message || String(e) }));
+  const classification = await applyTrafficClassification(env, { days: 1, nowSec }).catch(e => ({ ok: false, error: e.message || String(e) }));
   const todayStart = secFromDay(ymdFromSec(nowSec));
   const yesterdayStart = todayStart - 86400;
   const result = await aggregateWindow(env, {

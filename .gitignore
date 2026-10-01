@@ -40,6 +40,8 @@ data/stripped.json.gz
 
 # Sync/editor clutter
 _archive/
+.audit/
+publication-footprint/demo-*.html
 .DS_Store
 Thumbs.db
 * (1).*
@@ -49,3 +51,11 @@ Thumbs.db
 *.log
 *.err.log
 *.plist
+
+# Android local build output and signing material
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/*.jks
+android/*.pem

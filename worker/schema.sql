@@ -22,60 +22,6 @@ CREATE TABLE IF NOT EXISTS favorites (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS publication_submissions (
-  id TEXT PRIMARY KEY,
-  user_id INTEGER NOT NULL,
-  source TEXT NOT NULL DEFAULT 'manual',
-  system TEXT NOT NULL DEFAULT 'unknown',
-  journal TEXT NOT NULL DEFAULT '',
-  title TEXT NOT NULL DEFAULT '',
-  manuscript_id TEXT NOT NULL DEFAULT '',
-  status_raw TEXT NOT NULL DEFAULT '',
-  status_normalized TEXT NOT NULL DEFAULT 'unknown',
-  submitted_at INTEGER,
-  status_at INTEGER,
-  source_url TEXT NOT NULL DEFAULT '',
-  evidence_text TEXT NOT NULL DEFAULT '',
-  metadata_json TEXT NOT NULL DEFAULT '{}',
-  watch_enabled INTEGER NOT NULL DEFAULT 0,
-  notify_enabled INTEGER NOT NULL DEFAULT 1,
-  last_checked_at INTEGER,
-  last_error TEXT NOT NULL DEFAULT '',
-  created_at INTEGER NOT NULL,
-  updated_at INTEGER NOT NULL,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
-CREATE INDEX IF NOT EXISTS idx_publication_submissions_user_updated
-  ON publication_submissions(user_id, updated_at DESC);
-CREATE INDEX IF NOT EXISTS idx_publication_submissions_user_key
-  ON publication_submissions(user_id, system, manuscript_id);
-
--- Confirmed publication footprint records, shared by the website and account.
--- The browser keeps a local copy for offline use; this table is the account copy.
-CREATE TABLE IF NOT EXISTS publication_footprints (
-  id                 TEXT PRIMARY KEY,
-  user_id            INTEGER NOT NULL,
-  journal_key        TEXT NOT NULL,
-  name               TEXT NOT NULL,
-  papers             INTEGER NOT NULL DEFAULT 0,
-  citations          INTEGER NOT NULL DEFAULT 0,
-  years_json         TEXT NOT NULL DEFAULT '[]',
-  titles_json        TEXT NOT NULL DEFAULT '[]',
-  issns_json         TEXT NOT NULL DEFAULT '[]',
-  badges_json        TEXT NOT NULL DEFAULT '[]',
-  organizations_json TEXT NOT NULL DEFAULT '[]',
-  countries_json     TEXT NOT NULL DEFAULT '[]',
-  fields_json        TEXT NOT NULL DEFAULT '[]',
-  source_profiles_json TEXT NOT NULL DEFAULT '[]',
-  metadata_json      TEXT NOT NULL DEFAULT '{}',
-  created_at         INTEGER NOT NULL,
-  updated_at         INTEGER NOT NULL,
-  UNIQUE(user_id, journal_key),
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
-CREATE INDEX IF NOT EXISTS idx_publication_footprints_user_updated
-  ON publication_footprints(user_id, updated_at DESC);
-
 -- 邮箱一次性验证码
 CREATE TABLE IF NOT EXISTS email_codes (
   email       TEXT NOT NULL,
@@ -203,3 +149,24 @@ CREATE INDEX IF NOT EXISTS idx_page_events_day ON page_events(day);
 CREATE INDEX IF NOT EXISTS idx_page_events_session_day ON page_events(session_id, day);
 CREATE INDEX IF NOT EXISTS idx_page_events_visitor_day ON page_events(visitor_id, day);
 CREATE INDEX IF NOT EXISTS idx_pick_usage_user_period ON pick_usage(user_id, period, period_key);
+
+CREATE TABLE IF NOT EXISTS publication_footprints (
+  user_id INTEGER NOT NULL,
+  footprint_key TEXT NOT NULL,
+  record_json TEXT NOT NULL DEFAULT '{}',
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL,
+  PRIMARY KEY (user_id, footprint_key),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_publication_footprints_user_updated ON publication_footprints(user_id, updated_at DESC);
+
+CREATE TABLE IF NOT EXISTS api_usage_daily (
+  api_key_id TEXT NOT NULL,
+  day TEXT NOT NULL,
+  endpoint TEXT NOT NULL DEFAULT '',
+  calls INTEGER NOT NULL DEFAULT 0,
+  last_used_at INTEGER NOT NULL,
+  PRIMARY KEY (api_key_id, day, endpoint)
+);
+CREATE INDEX IF NOT EXISTS idx_api_usage_daily_day ON api_usage_daily(day, api_key_id);
