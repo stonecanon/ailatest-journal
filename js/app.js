@@ -4619,6 +4619,7 @@
       badgeFlagship(r.flagship),
       r.nature_index ? badgeNatureIndex() : '',
       ...((r.indices) || []).map(badgeIndex),
+      badgeCiticWorldClass(r.citic_world_class),
       badgeScopus(r.scopus),
       badgeInspec(r.inspec),
       badgeFSTAFullText(r.fsta || r.fsta_full_text),
